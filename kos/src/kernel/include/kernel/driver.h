@@ -511,9 +511,9 @@ driver_insmod(USER CHECKED byte_t *base, size_t num_bytes,
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) char const *
 NOTHROW(KCALL driver_getname)(struct driver *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define driver_getname(self) ((self)->d_name)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Return the INode/filename of a given driver (which is
  * lazily loaded for drivers loaded via the kernel commandline) */

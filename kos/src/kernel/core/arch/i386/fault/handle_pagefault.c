@@ -331,7 +331,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	pageid_t pageid;
 	void *pageaddr;
 	struct vm *effective_vm;
-	uintptr_half_t prot;
 	bool has_changed;
 	/* Check for memcpy_nopf() */
 	pc = state->ics_irregs.ir_pip;
@@ -358,6 +357,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			/* This is a hinted node (perform assertions on all
 			 * of the requirements documented for such a node) */
 			pageptr_t ppage;
+			uintptr_half_t pagedir_prot;
 			assert(hinted_node->vn_flags & VM_NODE_FLAG_HINTED);
 			assert(hinted_node->vn_prot & VM_PROT_SHARED);
 			assert(hinted_node->vn_flags & VM_NODE_FLAG_PREPARED);
@@ -381,14 +381,14 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			                             (size_t)(pageid - vm_node_getminpageid(hinted_node)),
 			                             &has_changed);
 			/* Map the affected page, overriding the mapping hint that originally got us here. */
-			prot = hinted_node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			pagedir_prot = hinted_node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 			/* Unset so we're able to track changes.
 			 * NOTE: The actual tracking of changes isn't something that can be done atomically,
 			 *       however atomic kernel pages do not impose any restrictions on use of change
 			 *       tracking. */
 			if ((hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
-				prot &= ~PAGEDIR_MAP_FWRITE;
-			pagedir_mapone(pageaddr, page2addr(ppage), prot);
+				pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
+			pagedir_mapone(pageaddr, page2addr(ppage), pagedir_prot);
 			goto done;
 		}
 	}
@@ -654,6 +654,7 @@ do_handle_iob_node_access:
 			/* Acquire a lock to the affected data part. */
 			TRY {
 				pageptr_t ppage;
+				uintptr_half_t pagedir_prot;
 				/* Need at least a read-lock for part initialization */
 #ifdef LIBVIO_CONFIG_ENABLED
 				if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
@@ -927,15 +928,15 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 				}
 
 				/* Map the affected page, overriding the mapping hint that originally got us here. */
-				prot = node_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+				pagedir_prot = node_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
 				/* Unset so we're able to track changes.
 				 * NOTE: The actual tracking of changes isn't something that can be done atomically,
 				 *       however atomic kernel pages do not impose any restrictions on use of change
 				 *       tracking. */
 				if (node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG && !has_changed)
-					prot &= ~PAGEDIR_MAP_FWRITE;
-				else if ((prot & PAGEDIR_MAP_FWRITE) && !(ecode & X86_PAGEFAULT_ECODE_WRITING)) {
+					pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
+				else if ((pagedir_prot & PAGEDIR_MAP_FWRITE) && !(ecode & X86_PAGEFAULT_ECODE_WRITING)) {
 					/* When `X86_PAGEFAULT_ECODE_WRITING' wasn't set, we didn't actually unshare the part, so if
 					 * we're mapping it with write permissions, we must delete those in case of a PRIVATE
 					 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
@@ -944,10 +945,10 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					    (ATOMIC_READ(part->dp_block->db_parts) != VM_DATABLOCK_ANONPARTS ||
 					     part->dp_srefs != NULL || part->dp_crefs != node ||
 					     node->vn_link.ln_next != NULL))
-						prot &= ~PAGEDIR_MAP_FWRITE;
+						pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
 				}
 				if (effective_vm != &vm_kernel)
-					prot |= PAGEDIR_MAP_FUSER;
+					pagedir_prot |= PAGEDIR_MAP_FUSER;
 				/* If the node isn't prepared, make sure that we can map memory. */
 				if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
 					if unlikely(!pagedir_prepare_mapone(pageaddr)) {
@@ -957,14 +958,14 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					}
 				}
 				/* Actually map the accessed page! */
-				pagedir_mapone(pageaddr, page2addr(ppage), prot);
+				pagedir_mapone(pageaddr, page2addr(ppage), pagedir_prot);
 
 				/* Make sure that the performed access can now succeed */
 				assertf(ecode & X86_PAGEFAULT_ECODE_WRITING
-				        ? (ecode & X86_PAGEFAULT_ECODE_USERSPACE
+				        ? (pagedir_prot & PAGEDIR_MAP_FUSER
 				           ? pagedir_isuserwritable(addr)
 				           : pagedir_iswritable(addr))
-				        : (ecode & X86_PAGEFAULT_ECODE_USERSPACE
+				        : (pagedir_prot & PAGEDIR_MAP_FUSER
 				           ? pagedir_isuseraccessible(addr)
 				           : pagedir_ismapped(addr)),
 				        "ecode         = %p\n"
@@ -975,7 +976,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 				        "effective_vm  = %p\n"
 				        "has_changed   = %u\n",
 				        (uintptr_t)ecode,
-				        (uintptr_t)prot,
+				        (uintptr_t)pagedir_prot,
 				        (uintptr_t)node->vn_prot,
 				        (uintptr_t)addr,
 				        (uintptr_t)pageaddr,

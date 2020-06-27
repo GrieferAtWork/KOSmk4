@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74f1b011 */
+/* HASH CRC-32:0xd4fa1ce8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -796,10 +796,10 @@ __TSYSCALL1_UNUSED(0xffffffc9, 0x11a, 0x11a)
 __TSYSCALL1(ioctlf, 0x11b, 0x11b)
 __TSYSCALL1_UNUSED(0xffffffcb, 0x11c, 0x11c)
 __TSYSCALL1_UNUSED(0xffffffcc, 0x11d, 0x11d)
-__TSYSCALL1_UNUSED(0xffffffcd, 0x11e, 0x11e)
-__TSYSCALL1_UNUSED(0xffffffce, 0x11f, 0x11f)
-__TSYSCALL1_UNUSED(0xffffffcf, 0x120, 0x120)
-__TSYSCALL1_UNUSED(0xffffffd0, 0x121, 0x121)
+__TSYSCALL1(rtm_test, 0x11e, 0x11e)
+__TSYSCALL1(rtm_abort, 0x11f, 0x11f)
+__TSYSCALL1(rtm_end, 0x120, 0x120)
+__TSYSCALL1(rtm_begin, 0x121, 0x121)
 __TSYSCALL1_UNUSED(0xffffffd1, 0x122, 0x122)
 __TSYSCALL1_UNUSED(0xffffffd2, 0x123, 0x123)
 __TSYSCALL1_UNUSED(0xffffffd3, 0x124, 0x124)

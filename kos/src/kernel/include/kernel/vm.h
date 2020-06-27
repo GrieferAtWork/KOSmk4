@@ -219,8 +219,8 @@ struct vm_datapart {
 		}                              dp_tree_ptr;
 		ATREE_NODE(struct vm_datapart, datapage_t)
 		                               dp_tree;   /* [lock(READ(dp_block || dp_lock))]
-		                                           * [lock(WRITE(a_vmin,a_vmax:dp_block && dp_lock))]
-		                                           * [lock(WRITE(a_min,a_max:dp_block))]
+		                                           * [lock(WRITE(a_vmin, a_vmax:dp_block && dp_lock))]
+		                                           * [lock(WRITE(a_min, a_max:dp_block))]
 		                                           * Part tree. */
 	};
 	LLIST(struct vm_node)    dp_crefs;   /* [0..1][lock(dp_lock)] Chain of vm_node mappings this part in copy-on-write mode (VM_MAP_FPRIVATE). */
@@ -2226,7 +2226,9 @@ FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
 /* Flags for `vm_forcefault()' */
 #define VM_FORCEFAULT_FLAG_READ  0x0000 /* Prefault for the purpose of a future read operation. */
 #define VM_FORCEFAULT_FLAG_WRITE 0x0001 /* Prefault for the purpose of a future write operation. */
+#ifdef LIBVIO_CONFIG_ENABLED
 #define VM_FORCEFAULT_FLAG_NOVIO 0x0002 /* Throw an `E_SEGFAULT' exception when a VIO mapping is encountered. */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 /* Force all bytes within the given address range to be faulted for either reading
  * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
@@ -2235,41 +2237,22 @@ FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
  * for any mapping that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
  * towards the returned value), unless `VM_FORCEFAULT_FLAG_NOVIO' is set
- * @return: * : The total number of bytes that become faulted as the result of this
- *              function being called. Note that even if you may be expecting that some
- *              specified address within the range wasn't faulted before, you must still
- *              allow for this function to return `0', since there always exists a
- *              possibility of some other thread changing the backing mappings, or
- *              faulting the mappings themself.
- *              As such, the return value should only be used for probability optimizations,
- *              as well as profiling, but not for the purpose of actual logic decisions.
+ * @return: * : The total number of bytes that had their mappings updated.
  * NOTE: This function will also update the page directory mappings for any dataparts
  *       that get faulted during its invocation, meaning that use of `memcpy_nopf()'
  *       within the indicated address range (whilst still checking it for errors for
  *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
- *       possible immediately, without having to force any soft of additional memory
+ *       possible immediately, without having to force any sort of additional memory
  *       access (note though that this only applies to the page directory of `self',
- *       though also note that if some datapart within the range was already faulted, its
- *       page directory mapping in `self' will still be updated). */
+ *       though also note that if some datapart within the range was already faulted,
+ *       its page directory mapping in `self' will still be updated, as it may have
+ *       been faulted as a lazy memory mapping). */
 FUNDEF size_t FCALL
-vm_paged_forcefault(struct vm *__restrict self,
-                    pageid_t minpageid,
-                    pageid_t maxpageid,
-                    unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-LOCAL size_t FCALL
 vm_forcefault(struct vm *__restrict self,
               PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
               PAGEDIR_PAGEALIGNED size_t num_bytes,
               unsigned int flags)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	return vm_paged_forcefault(self,
-	                           PAGEID_ENCODE((byte_t *)addr),
-	                           PAGEID_ENCODE((byte_t *)addr + num_bytes - 1),
-	                           flags);
-}
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 
 /* Lock and (possibly) unshare some given datapart for the purpose of performing

@@ -21,10 +21,17 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_VM_FUTEX_H 1
 
 #include <kernel/compiler.h>
+
+#include <kernel/arch/vm-rtm.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <hybrid/sequence/atree.h>
 #include <misc/atomic-ref.h>
+
+#include <hybrid/sequence/atree.h>
+
+#ifdef ARCH_VM_HAVE_RTM
+#include <hybrid/sync/atomic-rwlock.h>
+#endif /* ARCH_VM_HAVE_RTM */
 
 DECL_BEGIN
 
@@ -61,15 +68,24 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vm_futex, f_refcnt, vm_futex_destroy)
 
 
 struct vm_futex_controller {
-	ATREE_HEAD(WEAK struct vm_futex) fc_tree;   /* [lock(:dp_lock)] Futex tree.
-	                                             * HINT: Dead futex objects are automatically removed
-	                                             *       from the tree whenever `dp_lock' is acquired,
-	                                             *       though more futex objects can die even while
-	                                             *       a lock to `dp_lock' is being held. */
-	uintptr_t                        fc_semi0;  /* [lock(:dp_lock)] Futex tree SEMI0 value. */
-	unsigned int                     fc_leve0;  /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
-	WEAK struct vm_futex            *fc_dead;   /* [0..1][LINK(->f_ndead)] Chain of dead futex objects.
-	                                             * This chain is serviced at the same time as `dp_stale' */
+	ATREE_HEAD(WEAK struct vm_futex) fc_tree;  /* [lock(:dp_lock)] Futex tree.
+	                                            * HINT: Dead futex objects are automatically removed
+	                                            *       from the tree whenever `dp_lock' is acquired,
+	                                            *       though more futex objects can die even while
+	                                            *       a lock to `dp_lock' is being held. */
+	uintptr_t                        fc_semi0; /* [lock(:dp_lock)] Futex tree SEMI0 value. */
+	unsigned int                     fc_leve0; /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
+	WEAK struct vm_futex            *fc_dead;  /* [0..1][LINK(->f_ndead)] Chain of dead futex objects.
+	                                            * This chain is serviced at the same time as `dp_stale' */
+#ifdef ARCH_VM_HAVE_RTM
+	/* We keep the RTM version and lock fields in the futex controller, such that
+	 * they don't take up space in the base vm_datapart structure, but only exist
+	 * conditionally, and upon first access. */
+	struct atomic_rwlock             fc_rtm_lock; /* RTM memory update lock. */
+	uintptr_t                        fc_rtm_vers; /* [lock(READ(ATOMIC), WRITE(fc_rtm_lock))]
+	                                               * RTM version (incremented for every RTM-driven
+	                                               * modifications made to memory). */
+#endif /* ARCH_VM_HAVE_RTM */
 };
 
 #define vm_futex_controller_alloc()              ((struct vm_futex_controller *)kmalloc(sizeof(struct vm_futex_controller), GFP_CALLOC))

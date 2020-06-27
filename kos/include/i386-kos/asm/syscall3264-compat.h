@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaae52988 */
+/* HASH CRC-32:0xb9b749d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,6 +209,10 @@
 #define __NR3264COMPAT_rt_sigpending          1(rt_sigpending)
 #define __NR3264COMPAT_rt_sigprocmask         1(rt_sigprocmask)
 #define __NR3264COMPAT_rt_sigsuspend          1(rt_sigsuspend)
+#define __NR3264COMPAT_rtm_abort              1(rtm_abort)
+#define __NR3264COMPAT_rtm_begin              1(rtm_begin)
+#define __NR3264COMPAT_rtm_end                1(rtm_end)
+#define __NR3264COMPAT_rtm_test               1(rtm_test)
 #define __NR3264COMPAT_sched_get_priority_max 1(sched_get_priority_max)
 #define __NR3264COMPAT_sched_get_priority_min 1(sched_get_priority_min)
 #define __NR3264COMPAT_sched_getattr          1(sched_getattr)

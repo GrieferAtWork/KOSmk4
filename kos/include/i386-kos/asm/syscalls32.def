@@ -621,6 +621,10 @@ rt_sigreturn = sigreturn;
 -0x0000001b:userviofd
 -0x0000001e:utime64
 -0x00000023:ftime64
+-0x00000030:rtm_begin
+-0x00000031:rtm_end
+-0x00000032:rtm_abort
+-0x00000033:rtm_test
 -0x00000036:ioctlf
 -0x0000003c:fsmode
 -0x0000004d:getrusage64

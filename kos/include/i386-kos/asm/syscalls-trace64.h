@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f09e693 */
+/* HASH CRC-32:0xa971a6e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -819,6 +819,7 @@
 #define __NRAN1_kreaddir               buf
 #define __NRAN2_kreaddir               bufsize
 #define __NRAN3_kreaddir               mode
+#define __NRAN0_rtm_abort              code
 #define __NRAN0_userviofd              initial_size
 #define __NRAN1_userviofd              flags
 #define __NRAN0_process_spawnveat      dirfd
@@ -2162,6 +2163,11 @@
 #define __NRATR2_kreaddir               SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NRATR3_kreaddir               SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NRRTR_kreaddir                SC_REPR_SSIZE_T                                                      /* return */
+#define __NRRTR_rtm_test                SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_rtm_abort              SC_REPR_SYSCALL_ULONG_T                                              /* code */ 
+#define __NRRTR_rtm_abort               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_rtm_end                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_rtm_begin               SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_userviofd              SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NRATR1_userviofd              SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NRRTR_userviofd               SC_REPR_FD_T                                                         /* return */

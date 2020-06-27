@@ -731,22 +731,53 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				 * Since we always choose the fallback-branch, this instruction should never
 				 * be encountered during normal execution, and as such is considered to be
 				 * unsupported (during said normal execution) */
+#if !defined(EMU86_EMULATE_XTEST_IS_ONE) && !defined(EMU86_EMULATE_XTEST_IS_ZERO)
+				if (EMU86_EMULATE_XTEST())
+#endif /* !EMU86_EMULATE_XTEST_IS_ONE && !EMU86_EMULATE_XTEST_IS_ZERO */
+				{
+#ifndef EMU86_EMULATE_XTEST_IS_ZERO
 #ifdef EMU86_EMULATE_RETURN_AFTER_XEND
-				EMU86_EMULATE_RETURN_AFTER_XEND();
+					EMU86_EMULATE_RETURN_AFTER_XEND();
 #else /* EMU86_EMULATE_RETURN_AFTER_XEND */
-				goto return_unsupported_instruction_rmreg;
+					goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_RETURN_AFTER_XEND */
+#endif /* !EMU86_EMULATE_XTEST_IS_ZERO */
+				}
+#if !defined(EMU86_EMULATE_XTEST_IS_ONE) && !defined(EMU86_EMULATE_XTEST_IS_ZERO)
+				else
+#endif /* !EMU86_EMULATE_XTEST_IS_ONE && !EMU86_EMULATE_XTEST_IS_ZERO */
+				{
+#ifndef EMU86_EMULATE_XTEST_IS_ONE
+#ifdef EMU86_EMULATE_RETURN_AFTER_INT
+					EMU86_EMULATE_RETURN_AFTER_INT(0x0d); /* #GP */
+#else /* EMU86_EMULATE_RETURN_AFTER_INT */
+					goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_RETURN_AFTER_INT */
+#endif /* !EMU86_EMULATE_XTEST_IS_ONE */
+				}
+				__builtin_unreachable();
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_XEND */
 
 
 #if EMU86_EMULATE_CONFIG_WANT_XTEST
 			case 6: /* 0F 01 D6     XTEST      Test if executing in a transactional region */
-				/* XTEST clears EFLAGS.ZF if inside of a transaction, and sets it if outside.
-				 * Since we're always outside of a transaction, simply always set the flag. */
+				/* XTEST clears EFLAGS.ZF if inside of a transaction, and sets it if outside. */
 				{
 					u32 eflags;
 					eflags = EMU86_GETFLAGS();
+#ifdef EMU86_EMULATE_XTEST_IS_ZERO
+					/* xtest() should always indicate outside-of-rtm */
 					eflags |= EFLAGS_ZF;
+#elif defined(EMU86_EMULATE_XTEST_IS_ONE)
+					/* xtest() should always indicate inside-of-rtm */
+					eflags &= ~EFLAGS_ZF;
+#else /* ... */
+					eflags &= ~EFLAGS_ZF;
+					if (EMU86_EMULATE_XTEST())
+						eflags |= EFLAGS_ZF;
+#endif /* !... */
 					/* Intel documents that these flags are always cleared... */
 					eflags &= ~(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF | EFLAGS_PF | EFLAGS_AF);
 					EMU86_SETFLAGS(eflags);

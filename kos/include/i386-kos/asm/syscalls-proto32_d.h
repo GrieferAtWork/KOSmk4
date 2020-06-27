@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31e78206 */
+/* HASH CRC-32:0x5e337d9c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,6 +461,10 @@
 #define __NR32AC_getrusage64             2
 #define __NR32AC_fsmode                  1
 #define __NR32AC_ioctlf                  4
+#define __NR32AC_rtm_test                0
+#define __NR32AC_rtm_abort               1
+#define __NR32AC_rtm_end                 0
+#define __NR32AC_rtm_begin               0
 #define __NR32AC_ftime64                 1
 #define __NR32AC_utime64                 2
 #define __NR32AC_userviofd               2
@@ -922,6 +926,10 @@
 #define __NR32RT_getrusage64             (errno_t, __errno_t)
 #define __NR32RT_fsmode                  (uint64_t, __uint64_t)
 #define __NR32RT_ioctlf                  (syscall_slong_t, __syscall_slong_t)
+#define __NR32RT_rtm_test                (syscall_slong_t, __syscall_slong_t)
+#define __NR32RT_rtm_abort               (errno_t, __errno_t)
+#define __NR32RT_rtm_end                 (errno_t, __errno_t)
+#define __NR32RT_rtm_begin               (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_ftime64                 (errno_t, __errno_t)
 #define __NR32RT_utime64                 (errno_t, __errno_t)
 #define __NR32RT_userviofd               (fd_t, __fd_t)
@@ -1963,6 +1971,7 @@
 #define __NR32AT1_ioctlf                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_ioctlf                  (iomode_t, __iomode_t)
 #define __NR32AT3_ioctlf                  (void *, void *)
+#define __NR32AT0_rtm_abort               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_ftime64                 (struct timebx32_64 *, struct __timebx32_64 *)
 #define __NR32AT0_utime64                 (char const *, char const *)
 #define __NR32AT1_utime64                 (struct utimbufx32_64 const *, struct __utimbufx32_64 const *)
@@ -2486,6 +2495,10 @@
 #define __NR32AM_getrusage64(a, b, c, d, e, f)             (__syscall_slong_t)a, (struct __rusagex32_64 *)b
 #define __NR32AM_fsmode(a, b, c, d, e, f)                  (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
 #define __NR32AM_ioctlf(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NR32AM_rtm_test(a, b, c, d, e, f)                /* nothing */
+#define __NR32AM_rtm_abort(a, b, c, d, e, f)               (__syscall_ulong_t)a
+#define __NR32AM_rtm_end(a, b, c, d, e, f)                 /* nothing */
+#define __NR32AM_rtm_begin(a, b, c, d, e, f)               /* nothing */
 #define __NR32AM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
 #define __NR32AM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NR32AM_userviofd(a, b, c, d, e, f)               (__size_t)a, (__syscall_ulong_t)b
@@ -2947,6 +2960,10 @@
 #define __NR32AP_getrusage64(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_fsmode(a)                                 (__syscall_ulong_t)a, (__syscall_ulong_t)((__uint64_t)a >> 32)
 #define __NR32AP_ioctlf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_rtm_test()                                /* nothing */
+#define __NR32AP_rtm_abort(a)                              (__syscall_ulong_t)a
+#define __NR32AP_rtm_end()                                 /* nothing */
+#define __NR32AP_rtm_begin()                               /* nothing */
 #define __NR32AP_ftime64(a)                                (__syscall_ulong_t)a
 #define __NR32AP_utime64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_userviofd(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b

@@ -52,7 +52,7 @@ __DECL_BEGIN
 #pragma GCC target("rtm")
 #endif /* ... */
 
-/* Start a transaction
+/* Start a transaction (s.a. `sys_rtm_begin()')
  * @return: _XBEGIN_STARTED: Transaction started.
  * @return: _XABORT_* :      Transaction failed. */
 __FORCELOCAL __UINT32_TYPE__(__xbegin)(void)
@@ -72,7 +72,7 @@ __FORCELOCAL __UINT32_TYPE__(__xbegin)(void)
 #endif /* !__has_builtin(__builtin_ia32_xbegin) */
 
 
-/* End a transaction
+/* End a transaction (s.a. `sys_rtm_end()')
  * If the transaction was successful, return normally.
  * If the transaction failed, `__xbegin()' returns `_XABORT_*'
  * If no transaction was in progress, trigger #GP(0) that is propagated to user-space as
@@ -91,7 +91,7 @@ __FORCELOCAL void(__xend)(void)
 
 /* Abort the current transaction by having `__xbegin()'
  * return with `_XABORT_EXPLICIT | ((code & 0xff) << _XABORT_CODE_S)'
- * If no transaction was in progress, behave as a no-op */
+ * If no transaction was in progress, behave as a no-op (s.a. `sys_rtm_abort()') */
 #if __has_builtin(__builtin_ia32_xabort)
 #define __xabort(code) __builtin_ia32_xabort(code)
 #elif !defined(__NO_XBLOCK)
@@ -101,7 +101,7 @@ __FORCELOCAL void(__xend)(void)
 #endif /* !... */
 
 
-/* Check if a transaction is currently in progress */
+/* Check if a transaction is currently in progress (s.a. `sys_rtm_test()') */
 #ifdef __KOS__ /* Always available under KOS */
 __FORCELOCAL __BOOL __NOTHROW(__xtest)(void)
 #else /* __KOS__ */

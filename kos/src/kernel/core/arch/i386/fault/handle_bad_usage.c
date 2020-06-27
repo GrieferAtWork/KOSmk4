@@ -69,11 +69,13 @@ opt.append("-Os");
 #include <kernel/compiler.h>
 
 #include <kernel/debugtrap.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/restart-interrupt.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <kernel/vm/rtm.h>
 #include <kernel/x86/cpuid.h>
 #include <kernel/x86/emulock.h>
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
@@ -1671,6 +1673,54 @@ done:
 #define EMU86_EMULATE_PATCH_WRFSBASE(pc) PATCH_FSGSBASE(pc)
 #define EMU86_EMULATE_PATCH_WRGSBASE(pc) PATCH_FSGSBASE(pc)
 #endif /* __x86_64__ */
+
+
+PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
+x86_emulate_xbegin(struct icpustate *__restrict state,
+                   uintptr_t fallback_ip) {
+	REF struct vm_rtm_driver_hooks *hooks;
+	/* Lookup RTM hooks. */
+	hooks = vm_rtm_hooks.get();
+	if unlikely(!hooks) {
+		REF struct driver *rtm_driver;
+		/* Lazily load the RTM driver. */
+		TRY {
+			rtm_driver = driver_insmod(ARCH_VM_RTM_DRIVER_NAME);
+		} EXCEPT {
+			goto throw_illegal_op;
+		}
+		/* Check if hooks have become available now. */
+		{
+			FINALLY_DECREF_UNLIKELY(rtm_driver);
+			hooks = vm_rtm_hooks.get();
+		}
+		if unlikely(!hooks)
+			goto throw_illegal_op;
+	}
+	{
+		FINALLY_DECREF_UNLIKELY(hooks);
+		/* Emulate the RTM operation. */
+		state = (hooks->rdh_hooks.rh_xbegin)(state, fallback_ip);
+		return state;
+	}
+throw_illegal_op:
+	THROW(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE,
+	      E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f01, 2));
+}
+
+/* RTM instruction emulation.
+ * `xbegin' calls into the `rtm' driver, while all of the other
+ * instruction must be implemented to behave as though execution
+ * was outside of an RTM context (which it is) */
+#define EMU86_EMULATE_RETURN_AFTER_XBEGIN(fallback_ip) \
+	return x86_emulate_xbegin(_state, fallback_ip)
+#undef EMU86_EMULATE_RETURN_AFTER_XABORT
+#undef EMU86_EMULATE_RETURN_AFTER_XEND
+#define EMU86_EMULATE_XTEST() 0
+#undef EMU86_EMULATE_XTEST_IS_ONE
+#define EMU86_EMULATE_XTEST_IS_ZERO 1
+
+
 
 
 DECL_END

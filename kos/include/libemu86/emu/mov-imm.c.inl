@@ -54,11 +54,32 @@ case EMU86_OPCODE_ENCODE(0xc6):
 		if (modrm.mi_rm != 0)
 			goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
+
+		/* Check if we're inside of an RTM region */
+#undef EMU86_EMULATE_XTEST_NO_FALLBACK_BRANCH
+#ifndef EMU86_EMULATE_XTEST_IS_ZERO
+#ifdef EMU86_EMULATE_RETURN_AFTER_XABORT
+#ifdef EMU86_EMULATE_XTEST_IS_ONE
+#define EMU86_EMULATE_XTEST_NO_FALLBACK_BRANCH
+#else /* EMU86_EMULATE_XTEST_IS_ONE */
+		if (EMU86_EMULATE_XTEST())
+#endif /* !EMU86_EMULATE_XTEST_IS_ONE */
+		{
+			u8 code = *(u8 *)pc;
+			EMU86_EMULATE_RETURN_AFTER_XABORT(code);
+			__builtin_unreachable();
+		}
+#endif /* EMU86_EMULATE_RETURN_AFTER_XABORT */
+#endif /* !EMU86_EMULATE_XTEST_IS_ZERO */
+#ifndef EMU86_EMULATE_XTEST_NO_FALLBACK_BRANCH
 		pc += 1; /* imm8 */
 		/* Since we emulate transactions by always choosing the fallback-branch,
 		 * we must emulate this instruction as a no-op, since that's what it's
 		 * supposed to behave as whenever not inside of a transaction. */
 		goto done;
+#else /* !EMU86_EMULATE_XTEST_HAVE_FALLBACK_BRANCH */
+#undef EMU86_EMULATE_XTEST_NO_FALLBACK_BRANCH
+#endif /* EMU86_EMULATE_XTEST_HAVE_FALLBACK_BRANCH */
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 	case 7:
@@ -155,6 +176,12 @@ case EMU86_OPCODE_ENCODE(0xc7):
 			offset = (s32)UNALIGNED_GETLE32((u32 *)pc);
 			pc += 4;
 		}
+#ifdef EMU86_EMULATE_RETURN_AFTER_XBEGIN
+		/* Set the instruction to the start of RTM execution. */
+		EMU86_SETPCPTR(REAL_IP());
+		EMU86_EMULATE_RETURN_AFTER_XBEGIN(REAL_IP() + offset);
+		__builtin_unreachable();
+#else /* EMU86_EMULATE_RETURN_AFTER_XBEGIN */
 		/* We don't actually implement proper transaction support.
 		 * Instead, what we do is behave like an implementation that
 		 * doesn't have support for any kind of transactional instruction,
@@ -164,6 +191,7 @@ case EMU86_OPCODE_ENCODE(0xc7):
 		EMU86_SETEAX(_XABORT_FAILED);
 		goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
+#endif /* !EMU86_EMULATE_RETURN_AFTER_XBEGIN */
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 	case 7:

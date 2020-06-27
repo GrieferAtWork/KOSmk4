@@ -130,6 +130,10 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 
+		if (TARGET_ARCH in ["i386", "x86_64"]) {
+			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
+		}
+
 		DEFINE_SIMPLE_DRIVER("procfs",
 			SOURCE({
 				"modprocfs/files/*.c",

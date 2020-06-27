@@ -217,8 +217,8 @@ again_reset:
 		assert(!lockcnt || lockvec != NULL);
 #endif /* !DMA_ENUM */
 		minmax.mm_min = minmax.mm_max = NULL;
-		minpage                       = PAGEID_ENCODE((byte_t *)vaddr);
-		maxpage                       = PAGEID_ENCODE((byte_t *)vaddr + num_bytes - 1);
+		minpage = PAGEID_ENCODE((byte_t *)vaddr);
+		maxpage = PAGEID_ENCODE((byte_t *)vaddr + num_bytes - 1);
 		vm_nodetree_minmaxlocate(effective_vm->v_tree, minpage, maxpage, &minmax);
 		assert((minmax.mm_min != NULL) == (minmax.mm_max != NULL));
 		if unlikely(!minmax.mm_min)

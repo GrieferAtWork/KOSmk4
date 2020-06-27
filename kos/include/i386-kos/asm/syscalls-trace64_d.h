@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9321c4b5 */
+/* HASH CRC-32:0x36b058a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -819,6 +819,7 @@
 #define __NR64AN1_kreaddir               buf
 #define __NR64AN2_kreaddir               bufsize
 #define __NR64AN3_kreaddir               mode
+#define __NR64AN0_rtm_abort              code
 #define __NR64AN0_userviofd              initial_size
 #define __NR64AN1_userviofd              flags
 #define __NR64AN0_process_spawnveat      dirfd
@@ -2162,6 +2163,11 @@
 #define __NR64ATR2_kreaddir               SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR64ATR3_kreaddir               SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NR64RTR_kreaddir                SC_REPR_SSIZE_T                                                      /* return */
+#define __NR64RTR_rtm_test                SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR64ATR0_rtm_abort              SC_REPR_SYSCALL_ULONG_T                                              /* code */ 
+#define __NR64RTR_rtm_abort               SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64RTR_rtm_end                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64RTR_rtm_begin               SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR64ATR0_userviofd              SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NR64ATR1_userviofd              SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NR64RTR_userviofd               SC_REPR_FD_T                                                         /* return */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84982411 */
+/* HASH CRC-32:0x62cb5ea3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -612,6 +612,37 @@
 #define SYS_getrusage64             __NR_getrusage64             /* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 #define SYS_fsmode                  __NR_fsmode                  /* uint64_t fsmode(uint64_t mode) */
 #define SYS_ioctlf                  __NR_ioctlf                  /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* Check if a transaction is currently in progress
+ * @return: 0 : No RTM operation in progress
+ * @return: 1 : An RTM operation is currently in progress */
+#define SYS_rtm_test                __NR_rtm_test                /* syscall_slong_t rtm_test(void) */
+/* Abort the current transaction by having `sys_rtm_begin()'
+ * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK' */
+#define SYS_rtm_abort               __NR_rtm_abort               /* errno_t rtm_abort(syscall_ulong_t code) */
+/* End a transaction (s.a. `sys_rtm_end()')
+ * If the transaction was successful, return normally (by returning `-EOK').
+ * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
+ * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
+#define SYS_rtm_end                 __NR_rtm_end                 /* errno_t rtm_end(void) */
+/* Begin an RTM operation. Note that if the arch-specific RTM driver
+ * wasn't already loaded into the kernel, it will be loaded automatically,
+ * though any error that may happen during this will be converted into
+ * an `E_ILLEGAL_OPERATION' exception.
+ * Note that while an RTM operation is in progress, only a very small hand
+ * full of system calls are allowed to be used. Attempting to use arbitrary
+ * system calls, or attempting to access too much system memory in general
+ * will result in this function returning with `RTM_ABORT_CAPACITY', rather
+ * than succeeding. The following is a list of system calls which are
+ * whitelisted for use during a transaction:
+ *   - sys_rtm_begin:  Nested RTM operation
+ *   - sys_rtm_end:    End an RTM operation
+ *   - sys_rtm_abort:  Abort an RTM operation
+ *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
+ * @return: RTM_STARTED : RTM operation was started.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
+#define SYS_rtm_begin               __NR_rtm_begin               /* syscall_slong_t rtm_begin(void) */
 #define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct timebx32_64 *tp) */
 #define SYS_utime64                 __NR_utime64                 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 /* Construct a user-fault-fd object supporting mmap(2), with actual

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26a4a21a */
+/* HASH CRC-32:0xfe0caa2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,6 +461,10 @@
 #define __NRAC_getrusage64             2
 #define __NRAC_fsmode                  1
 #define __NRAC_ioctlf                  4
+#define __NRAC_rtm_test                0
+#define __NRAC_rtm_abort               1
+#define __NRAC_rtm_end                 0
+#define __NRAC_rtm_begin               0
 #define __NRAC_ftime64                 1
 #define __NRAC_utime64                 2
 #define __NRAC_userviofd               2
@@ -922,6 +926,10 @@
 #define __NRRT_getrusage64             (errno_t, __errno_t)
 #define __NRRT_fsmode                  (uint64_t, __uint64_t)
 #define __NRRT_ioctlf                  (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rtm_test                (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rtm_abort               (errno_t, __errno_t)
+#define __NRRT_rtm_end                 (errno_t, __errno_t)
+#define __NRRT_rtm_begin               (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_ftime64                 (errno_t, __errno_t)
 #define __NRRT_utime64                 (errno_t, __errno_t)
 #define __NRRT_userviofd               (fd_t, __fd_t)
@@ -1963,6 +1971,7 @@
 #define __NRAT1_ioctlf                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_ioctlf                  (iomode_t, __iomode_t)
 #define __NRAT3_ioctlf                  (void *, void *)
+#define __NRAT0_rtm_abort               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_ftime64                 (struct timebx32_64 *, struct __timebx32_64 *)
 #define __NRAT0_utime64                 (char const *, char const *)
 #define __NRAT1_utime64                 (struct utimbufx32_64 const *, struct __utimbufx32_64 const *)
@@ -2486,6 +2495,10 @@
 #define __NRAM_getrusage64(a, b, c, d, e, f)             (__syscall_slong_t)a, (struct __rusagex32_64 *)b
 #define __NRAM_fsmode(a, b, c, d, e, f)                  (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
 #define __NRAM_ioctlf(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NRAM_rtm_test(a, b, c, d, e, f)                /* nothing */
+#define __NRAM_rtm_abort(a, b, c, d, e, f)               (__syscall_ulong_t)a
+#define __NRAM_rtm_end(a, b, c, d, e, f)                 /* nothing */
+#define __NRAM_rtm_begin(a, b, c, d, e, f)               /* nothing */
 #define __NRAM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
 #define __NRAM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NRAM_userviofd(a, b, c, d, e, f)               (__size_t)a, (__syscall_ulong_t)b
@@ -2947,6 +2960,10 @@
 #define __NRAP_getrusage64(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_fsmode(a)                                 (__syscall_ulong_t)a, (__syscall_ulong_t)((__uint64_t)a >> 32)
 #define __NRAP_ioctlf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_rtm_test()                                /* nothing */
+#define __NRAP_rtm_abort(a)                              (__syscall_ulong_t)a
+#define __NRAP_rtm_end()                                 /* nothing */
+#define __NRAP_rtm_begin()                               /* nothing */
 #define __NRAP_ftime64(a)                                (__syscall_ulong_t)a
 #define __NRAP_utime64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_userviofd(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b

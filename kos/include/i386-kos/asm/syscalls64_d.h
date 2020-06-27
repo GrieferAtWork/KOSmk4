@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee38bc95 */
+/* HASH CRC-32:0xb8b2a295 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -505,6 +505,37 @@
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR64_kreaddir               __UINT64_C(0xffffffffffffffb2) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* Check if a transaction is currently in progress
+ * @return: 0 : No RTM operation in progress
+ * @return: 1 : An RTM operation is currently in progress */
+#define __NR64_rtm_test               __UINT64_C(0xffffffffffffffdd) /* syscall_slong_t rtm_test(void) */
+/* Abort the current transaction by having `sys_rtm_begin()'
+ * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK' */
+#define __NR64_rtm_abort              __UINT64_C(0xffffffffffffffde) /* errno_t rtm_abort(syscall_ulong_t code) */
+/* End a transaction (s.a. `sys_rtm_end()')
+ * If the transaction was successful, return normally (by returning `-EOK').
+ * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
+ * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
+#define __NR64_rtm_end                __UINT64_C(0xffffffffffffffdf) /* errno_t rtm_end(void) */
+/* Begin an RTM operation. Note that if the arch-specific RTM driver
+ * wasn't already loaded into the kernel, it will be loaded automatically,
+ * though any error that may happen during this will be converted into
+ * an `E_ILLEGAL_OPERATION' exception.
+ * Note that while an RTM operation is in progress, only a very small hand
+ * full of system calls are allowed to be used. Attempting to use arbitrary
+ * system calls, or attempting to access too much system memory in general
+ * will result in this function returning with `RTM_ABORT_CAPACITY', rather
+ * than succeeding. The following is a list of system calls which are
+ * whitelisted for use during a transaction:
+ *   - sys_rtm_begin:  Nested RTM operation
+ *   - sys_rtm_end:    End an RTM operation
+ *   - sys_rtm_abort:  Abort an RTM operation
+ *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
+ * @return: RTM_STARTED : RTM operation was started.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
+#define __NR64_rtm_begin              __UINT64_C(0xffffffffffffffe0) /* syscall_slong_t rtm_begin(void) */
 /* Construct a user-fault-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
@@ -1198,6 +1229,10 @@
 #define __NR64RM_fchdirat               0
 #define __NR64RM_kreaddirf              0
 #define __NR64RM_kreaddir               0
+#define __NR64RM_rtm_test               0
+#define __NR64RM_rtm_abort              0
+#define __NR64RM_rtm_end                0
+#define __NR64RM_rtm_begin              0
 #define __NR64RM_userviofd              0
 #define __NR64RM_process_spawnveat      0
 #define __NR64RM_coredump               2
@@ -1734,6 +1769,10 @@
 #define __NR64RC_fchdirat               3
 #define __NR64RC_kreaddirf              5
 #define __NR64RC_kreaddir               4
+#define __NR64RC_rtm_test               0
+#define __NR64RC_rtm_abort              1
+#define __NR64RC_rtm_end                0
+#define __NR64RC_rtm_begin              0
 #define __NR64RC_userviofd              2
 #define __NR64RC_process_spawnveat      6
 #define __NR64RC_coredump               6

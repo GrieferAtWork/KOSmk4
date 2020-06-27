@@ -3505,6 +3505,10 @@
 #define __CRT_HAVE_sys_Xrt_sigsuspend 1
 #define __CRT_HAVE_sys_Xrt_sigtimedwait 1
 #define __CRT_HAVE_sys_Xrt_tgsigqueueinfo 1
+#define __CRT_HAVE_sys_Xrtm_abort 1
+#define __CRT_HAVE_sys_Xrtm_begin 1
+#define __CRT_HAVE_sys_Xrtm_end 1
+#define __CRT_HAVE_sys_Xrtm_test 1
 #define __CRT_HAVE_sys_Xsched_get_priority_max 1
 #define __CRT_HAVE_sys_Xsched_get_priority_min 1
 #define __CRT_HAVE_sys_Xsched_getaffinity 1
@@ -3878,6 +3882,10 @@
 #define __CRT_HAVE_sys_rt_sigsuspend 1
 #define __CRT_HAVE_sys_rt_sigtimedwait 1
 #define __CRT_HAVE_sys_rt_tgsigqueueinfo 1
+#define __CRT_HAVE_sys_rtm_abort 1
+#define __CRT_HAVE_sys_rtm_begin 1
+#define __CRT_HAVE_sys_rtm_end 1
+#define __CRT_HAVE_sys_rtm_test 1
 #define __CRT_HAVE_sys_sched_get_priority_max 1
 #define __CRT_HAVE_sys_sched_get_priority_min 1
 #define __CRT_HAVE_sys_sched_getaffinity 1

@@ -35,6 +35,8 @@
 
 #include <assert.h>
 
+#include "vm-nodeapi.h"
+
 DECL_BEGIN
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -139,7 +141,7 @@ do_unshare_cow:
 			size_t missing_part_num_vpages;
 
 			/* We have to split the part such that we can
-			 * manipulate the accessed page individually. */
+			 * manipulate the accessed page(s) individually. */
 			if (node_vpage_offset != 0) {
 				sync_endread(part);
 				xdecref(vm_datapart_split(part, node_vpage_offset));
@@ -156,27 +158,41 @@ do_unshare_cow:
 			/*assert(vm_node_getstartpageid(node) == PAGEID_ENCODE(addr));*/
 			/*assert(vm_node_getpagecount(node) >= 1 && vm_node_getpagecount(node) <= node_vpage_count);*/
 
-			/* Make sure that PAGE#0 of `part' has been initialized!
-			 * If it wasn't, we need to initialize it now, since
+			/* Make sure that the first couple of pages of `part' has been initialized!
+			 * If they weren't, we need to initialize it now, since
 			 * otherwise we'd be copying uninitialized data below!
-			 * Also: If this page isn't marked as initialized, the
-			 *       duplicated part won't be set as such, either! */
+			 * Also: If these pages aren't marked as initialized, the
+			 *       duplicated part couldn't be set as such, either! */
 			{
-				unsigned int i, count, state;
-				count = VM_DATABLOCK_PAGEALIGN(part->dp_block);
+				size_t i, count;
+				count = VM_DATABLOCK_PAGEALIGN(part->dp_block) * part_num_vpages;
 				for (i = 0; i < count; ++i) {
+					unsigned int state;
 					state = vm_datapart_getstate(part, i);
 					if (VM_DATAPART_PPP_ISINITIALIZED(state))
 						continue;
-					/* Must initialize the part's first page! */
+					/* Must initialize the part's page */
 					TRY {
 						bool has_changed = false;
-						vm_datapart_loadpage(part, 0, &has_changed);
+						vm_datapart_loadpage(part,
+						                     i >> VM_DATABLOCK_PAGESHIFT(part->dp_block),
+						                     &has_changed);
+						/* Also check the remaining pages. */
+						for (++i; i < count; ++i) {
+							state = vm_datapart_getstate(part, i);
+							if (VM_DATAPART_PPP_ISINITIALIZED(state))
+								continue;
+							has_changed = false;
+							vm_datapart_loadpage(part,
+							                     i >> VM_DATABLOCK_PAGESHIFT(part->dp_block),
+							                     &has_changed);
+						}
 					} EXCEPT {
 						sync_endread(part);
 						RETHROW();
 					}
 					sync_endread(part);
+					/* Try again, how that the affected parts have been loaded. */
 					return 0;
 				}
 			}
@@ -218,7 +234,7 @@ upgrade_and_recheck_vm_for_node:
 			}
 
 			/* Initialize the new part. */
-			new_part->dp_refcnt = 2; /* +1 (CREF: `node'), +1 (part; assignment below) */
+			new_part->dp_refcnt = 2; /* +1 (CREF: `node'), +1 (*ppart; assignment below) */
 			shared_rwlock_init_read(&new_part->dp_lock);
 			new_part->dp_tree.a_vmin = part->dp_tree.a_vmin;
 			new_part->dp_tree.a_vmax = part->dp_tree.a_vmax;
@@ -301,8 +317,8 @@ upgrade_and_recheck_vm_for_node:
 			if (!sync_trywrite(self)) {
 				sync_endwrite(part);
 				free_partilly_initialized_datapart(new_part);
-				sync_write(self);
-				sync_endwrite(self);
+				while (!sync_canwrite(self))
+					task_yield();
 				return 0;
 			}
 			if unlikely(vm_getnodeofpageid(self, addr_pageid) != node ||
@@ -331,7 +347,7 @@ upgrade_and_recheck_vm_for_node:
 			 * from the appropriate anonymous-zero set of datablocks. */
 			new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 
-			/* Copy the contents of the page being unshared. */
+			/* Copy the contents of the page(s) being unshared. */
 			assert(vm_datapart_numvpages(new_part) == part_num_vpages);
 			vm_datapart_do_copyram(new_part, part);
 
@@ -358,7 +374,7 @@ upgrade_and_recheck_vm_for_node:
 			}
 #endif /* !CONFIG_NO_SMP */
 
-			/* Actually map the accessed page! */
+			/* Actually map the accessed page(s)! */
 			if (self == THIS_VM || self == &vm_kernel) {
 				vm_datapart_map_ram(new_part, pageaddr, pagedir_prot);
 			} else {
@@ -398,8 +414,7 @@ upgrade_and_recheck_vm_for_node:
 			goto done;
 		}
 	}
-
-	/* Check if the part still includes the accessed page.
+	/* Check if the part still includes the accessed page(s).
 	 * This is required to ensure that `vm_datapart_loadpage()'
 	 * can be called safely (the part may have been split between
 	 * the time of us acquiring a read-lock to it, and the point
@@ -410,7 +425,6 @@ upgrade_and_recheck_vm_for_node:
 		sync_endread(part);
 		return 0;
 	}
-	/* Load the affected page into the core. */
 	assert(part->dp_state != VM_DATAPART_STATE_ABSENT);
 	assert(node_vpage_offset < part_num_vpages);
 	assert(sync_reading(part));
@@ -547,38 +561,244 @@ vm_prefault(USER CHECKED void const *addr,
  * for any mapping that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
  * towards the returned value), unless `VM_FORCEFAULT_FLAG_NOVIO' is set
- * @return: * : The total number of bytes that become faulted as the result of this
- *              function being called. Note that even if you may be expecting that some
- *              specified address within the range wasn't faulted before, you must still
- *              allow for this function to return `0', since there always exists a
- *              possibility of some other thread changing the backing mappings, or
- *              faulting the mappings themself.
- *              As such, the return value should only be used for probability optimizations,
- *              as well as profiling, but not for the purpose of actual logic decisions.
+ * @return: * : The total number of bytes that had their mappings updated.
  * NOTE: This function will also update the page directory mappings for any dataparts
  *       that get faulted during its invocation, meaning that use of `memcpy_nopf()'
  *       within the indicated address range (whilst still checking it for errors for
  *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
- *       possible immediately, without having to force any soft of additional memory
+ *       possible immediately, without having to force any sort of additional memory
  *       access (note though that this only applies to the page directory of `self',
- *       though also note that if some datapart within the range was already faulted, its
- *       page directory mapping in `self' will still be updated). */
+ *       though also note that if some datapart within the range was already faulted,
+ *       its page directory mapping in `self' will still be updated, as it may have
+ *       been faulted as a lazy memory mapping). */
 FUNDEF size_t FCALL
-vm_paged_forcefault(struct vm *__restrict self,
-                    pageid_t minpageid,
-                    pageid_t maxpageid,
-                    unsigned int flags)
+vm_forcefault(struct vm *__restrict self,
+              PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+              PAGEDIR_PAGEALIGNED size_t num_bytes,
+              unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	assert(minpageid <= maxpageid);
-	(void)self;
-	(void)minpageid;
-	(void)maxpageid;
-	(void)flags;
+	size_t result;
+	struct vm_node *node;
+	struct vm_datapart *part;
+	size_t node_prefault_vpage_offset;
+	size_t node_prefault_vpage_count;
+	pageid_t node_prefault_maxpageid;
+	uintptr_half_t node_prot;
+	pageid_t minpageid, maxpageid;
+	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	minpageid = PAGEID_ENCODE((byte_t *)addr);
+	maxpageid = PAGEID_ENCODE((byte_t *)addr + num_bytes - 1);
+	result = 0;
+again_acquire_treelock:
+	if (minpageid > maxpageid) {
+done:
+		return result;
+	}
+again_acquire_treelock_no_done_check:
+	sync_read(self);
+	node = vm_nodetree_locate(self->v_tree, minpageid);
+again_with_node:
+	if unlikely(!node) {
+unlock_treelock_and_throw_segfault:
+		sync_endread(self);
+		/* At least some part of memory isn't mapped near the start or end of the
+		 * given address range. Since we have to ensure that the address range is
+		 * mapped in its entirety, we must throw an exception in this case. */
+		THROW(E_SEGFAULT_UNMAPPED, addr,
+		      E_SEGFAULT_CONTEXT_FAULT |
+		      ((flags & VM_FORCEFAULT_FLAG_WRITE) ? E_SEGFAULT_CONTEXT_WRITING : 0));
+	}
+	/* Check if the node must be faulted, or if we can
+	 * update its page directory mapping directly. */
+	part = node->vn_part;
+#ifdef LIBVIO_CONFIG_ENABLED
+	if unlikely(part->dp_state == VM_DATAPART_STATE_VIOPRT) {
+		/* Deal with VIO node. */
+		if (flags & VM_FORCEFAULT_FLAG_NOVIO)
+			goto unlock_treelock_and_throw_segfault;
+		minpageid = vm_node_getmaxpageid(node) + 1;
+		if (minpageid > maxpageid)
+			goto done; /* This was the last mapping! */
+		node      = node->vn_byaddr.ln_next;
+		goto again_with_node;
+	}
+#endif /* LIBVIO_CONFIG_ENABLED */
+	incref(part);
+	node_prot = node->vn_prot;
+	/* Figure out the address range that should get faulted, in related to `node' itself. */
+	assert(minpageid == vm_node_getminpageid(node));
+	node_prefault_maxpageid = vm_node_getmaxpageid(node);
+	if (node_prefault_maxpageid > maxpageid)
+		node_prefault_maxpageid = maxpageid;
+	node_prefault_vpage_offset = minpageid - vm_node_getminpageid(node);
+	node_prefault_vpage_count  = (node_prefault_maxpageid - minpageid) + 1;
+	sync_endread(self);
+	assert(node_prefault_vpage_count != 0);
+	assert(addr == PAGEID_DECODE(minpageid));
+	TRY {
+		size_t fault_index, fault_count;
+		/* Check if, and what needs to be faulted */
+again_acquire_part_lock:
+		if (flags & VM_FORCEFAULT_FLAG_WRITE) {
+			bool did_unshare;
+			if unlikely(!(node_prot & VM_PROT_WRITE)) {
+				/* Read-only memory */
+				THROW(E_SEGFAULT_READONLY, addr,
+				      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
+			}
+			fault_count = vm_lock_and_unshare_datapart_for_writing(self,
+			                                                       &part,
+			                                                       addr,
+			                                                       node,
+			                                                       node_prot,
+			                                                       node_prefault_vpage_offset,
+			                                                       node_prefault_vpage_count,
+			                                                       &did_unshare);
+			if (!fault_count) {
+				/* Race condition... (try again) */
+				decref_unlikely(part);
+				goto again_acquire_treelock_no_done_check;
+			}
+			/* In case an unshare did actually happen, `vm_lock_and_unshare_datapart_for_writing()'
+			 * will have already performed the necessary page directory re-mapping, so we're already
+			 * done. */
+			if (did_unshare) {
+				sync_endread(part);
+				vm_datapart_decref_and_merge(part);
+				result += fault_count * PAGESIZE;
+				minpageid += fault_count;
+				addr = (byte_t *)addr + fault_count * PAGESIZE;
+				goto again_acquire_treelock;
+			}
+		} else {
+			if unlikely(!(node_prot & VM_PROT_READ)) {
+				/* Write-only memory */
+				THROW(E_SEGFAULT_NOTREADABLE, addr,
+				      E_SEGFAULT_CONTEXT_FAULT);
+			}
+			vm_datapart_lockread_setcore(part);
+			/* Check if the part still includes the accessed page.
+			 * This is required to ensure that `vm_datapart_loadpage()'
+			 * can be called safely (the part may have been split between
+			 * the time of us acquiring a read-lock to it, and the point
+			 * when we released our write-lock to the effected VM) */
+			fault_count = vm_datapart_numvpages(part);
+			if unlikely(node_prefault_vpage_offset >= fault_count) {
+				sync_endread(part);
+				decref_unlikely(part);
+				goto again_acquire_treelock;
+			}
+			fault_count -= node_prefault_vpage_offset;
+		}
+		if (fault_count > node_prefault_vpage_count)
+			fault_count = node_prefault_vpage_count;
+		assert(fault_count != 0);
+		assert(sync_reading(part));
+		assert(part->dp_state != VM_DATAPART_STATE_ABSENT);
+		assert(node_prefault_vpage_offset + fault_count <= vm_datapart_numvpages(part));
+		COMPILER_BARRIER();
+		/* At this point, we update the page directory mappings for all of the pages
+		 * within the range specified by `node_prefault_vpage_offset ... += fault_count' */
+		for (fault_index = 0; fault_index < fault_count; ++fault_index) {
+			pageptr_t ppage;
+			uintptr_half_t pagedir_prot;
+			bool has_changed;
+			has_changed = (flags & VM_FORCEFAULT_FLAG_WRITE) != 0;
+			ppage = vm_datapart_loadpage(part,
+			                             node_prefault_vpage_offset + fault_index,
+			                             &has_changed);
+			if unlikely(!sync_trywrite(self)) {
+				sync_endread(part);
+				while (!sync_canwrite(self))
+					task_yield();
+				decref_unlikely(part);
+				goto again_acquire_part_lock;
+			}
+			/* Verify that the node hasn't changed in the mean time. */
+			if unlikely(vm_nodetree_locate(self->v_tree, minpageid) != node ||
+			            node->vn_part != part || node->vn_prot != node_prot) {
+				sync_endread(part);
+				sync_endwrite(self);
+				decref_unlikely(part);
+				printk(KERN_DEBUG "Race condition: Mapping target at %p has changed\n", addr);
+				goto again_acquire_treelock;
+			}
+			assertf(vm_node_getmaxpageid(node) >=
+			        minpageid + node_prefault_vpage_offset + fault_count - 1,
+			        "This should have been ensured by us holding a lock to the part "
+			        "that is being mapped by this node, meaning that the node's size "
+			        "shouldn't have been able to change");
 
-	COMPILER_IMPURE();
-	kernel_panic("TODO");
+			/* Now to map `ppage' into the page at `addr + fault_index * PAGESIZE' */
+			pagedir_prot = node_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
-	return 0;
+			/* Unset so we're able to track changes.
+			 * NOTE: The actual tracking of changes isn't something that can be done atomically,
+			 *       however atomic kernel pages do not impose any restrictions on use of change
+			 *       tracking. */
+			if (node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG && !has_changed)
+				pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
+			else if ((pagedir_prot & PAGEDIR_MAP_FWRITE) && !(flags & VM_FORCEFAULT_FLAG_WRITE)) {
+				/* When `VM_FORCEFAULT_FLAG_WRITE' wasn't set, we didn't actually unshare the part, so if
+				 * we're mapping it with write permissions, we must delete those in case of a PRIVATE
+				 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
+				 * mappings. */
+				if (!(node_prot & VM_PROT_SHARED) &&
+				    (ATOMIC_READ(part->dp_block->db_parts) != VM_DATABLOCK_ANONPARTS ||
+				     part->dp_srefs != NULL || part->dp_crefs != node ||
+				     node->vn_link.ln_next != NULL))
+					pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
+			}
+			if (self != &vm_kernel)
+				pagedir_prot |= PAGEDIR_MAP_FUSER;
+			/* If the node isn't prepared, make sure that we can map memory. */
+			if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
+				if unlikely(!pagedir_prepare_mapone(addr)) {
+					sync_endwrite(self);
+					sync_endread(part);
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
+				}
+			}
+			/* Actually map the accessed page! */
+			pagedir_mapone(addr, page2addr(ppage), pagedir_prot);
+
+			/* Make sure that the performed access can now succeed */
+			assertf(flags & VM_FORCEFAULT_FLAG_WRITE
+			        ? (pagedir_prot & PAGEDIR_MAP_FUSER
+			           ? pagedir_isuserwritable(addr)
+			           : pagedir_iswritable(addr))
+			        : (pagedir_prot & PAGEDIR_MAP_FUSER
+			           ? pagedir_isuseraccessible(addr)
+			           : pagedir_ismapped(addr)),
+			        "flags         = %#x\n"
+			        "prot          = %p\n"
+			        "node->vn_prot = %p\n"
+			        "addr          = %p\n"
+			        "phys          = " FORMAT_VM_PHYS_T " (page " FORMAT_PAGEPTR_T ")\n"
+			        "self          = %p\n"
+			        "has_changed   = %u\n",
+			        (uintptr_t)flags,
+			        (uintptr_t)pagedir_prot,
+			        (uintptr_t)node->vn_prot,
+			        (uintptr_t)addr,
+			        (vm_phys_t)page2addr(ppage),
+			        (pageptr_t)ppage,
+			        (uintptr_t)self,
+			        (unsigned int)has_changed);
+			sync_endwrite(self);
+		}
+		sync_endread(part);
+		/* Account for pages that were actually faulted. */
+		result += fault_count * PAGESIZE;
+		minpageid += fault_count;
+		addr = (byte_t *)addr + fault_count * PAGESIZE;
+	} EXCEPT {
+		decref_unlikely(part);
+		RETHROW();
+	}
+	decref_unlikely(part);
+	goto again_acquire_treelock;
 }
 
 

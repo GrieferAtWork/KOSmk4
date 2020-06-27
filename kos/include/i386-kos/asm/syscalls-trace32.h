@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0972033 */
+/* HASH CRC-32:0x46b79caf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1029,6 +1029,7 @@
 #define __NRAN1_ioctlf                  command
 #define __NRAN2_ioctlf                  mode
 #define __NRAN3_ioctlf                  arg
+#define __NRAN0_rtm_abort               code
 #define __NRAN0_ftime64                 tp
 #define __NRAN0_utime64                 filename
 #define __NRAN1_utime64                 times
@@ -2668,6 +2669,11 @@
 #define __NRATR3_ioctlf                  SC_REPR_IOCTL_ARG                                                    /* arg */ 
 #define __NRATL3_ioctlf                  1                                                                    /* arg -> command */ 
 #define __NRRTR_ioctlf                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRRTR_rtm_test                 SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_rtm_abort               SC_REPR_SYSCALL_ULONG_T                                              /* code */ 
+#define __NRRTR_rtm_abort                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_rtm_end                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_rtm_begin                SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_ftime64                 SC_REPR_POINTER                                                      /* tp */ 
 #define __NRRTR_ftime64                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_utime64                 SC_REPR_FILENAME                                                     /* filename */ 

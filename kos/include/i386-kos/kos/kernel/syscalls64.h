@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc39d00a */
+/* HASH CRC-32:0xc9981707 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -281,6 +281,10 @@
 #define __ARCH_WANT_SYSCALL_RT_SIGSUSPEND                  1
 #define __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT                1
 #define __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO              1
+#define __ARCH_WANT_SYSCALL_RTM_ABORT                      1
+#define __ARCH_WANT_SYSCALL_RTM_BEGIN                      1
+#define __ARCH_WANT_SYSCALL_RTM_END                        1
+#define __ARCH_WANT_SYSCALL_RTM_TEST                       1
 #define __ARCH_WANT_SYSCALL_SCHED_GET_PRIORITY_MAX         1
 #define __ARCH_WANT_SYSCALL_SCHED_GET_PRIORITY_MIN         1
 #define __ARCH_WANT_SYSCALL_SCHED_GETAFFINITY              1

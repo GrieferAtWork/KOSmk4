@@ -31,6 +31,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
+#include <kos/asm/rtm.h>
 #include <kos/debugtrap.h>
 #include <kos/except.h>
 #include <kos/fcntl.h>
@@ -646,6 +647,34 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_rtm(int argc, char *argv[], char *envp[]) {
+	static volatile int a, b, c;
+	syscall_slong_t error;
+	(void)argc, (void)argv, (void)envp;
+	a = 10;
+	b = 20;
+	c = 30;
+	error = sys_rtm_begin();
+	if (error == (syscall_slong_t)RTM_STARTED) {
+		if (a < b)
+			c = b;
+		b = a * c;
+		a = b - c;
+		sys_rtm_end();
+		printf("RTM success\n");
+		printf("\ta = %d\n", a); /* 180 */
+		printf("\tb = %d\n", b); /* 200 */
+		printf("\tc = %d\n", c); /* 20  */
+	} else {
+		printf("RTM error: %#Ix\n", error);
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -673,6 +702,7 @@ PRIVATE DEF defs[] = {
 #endif /* HAVE_MAIN_SGBASE */
 	{ "yield", &main_yield },
 	{ "vio", &main_vio },
+	{ "rtm", &main_rtm },
 	{ NULL, NULL }
 };
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe664931c */
+/* HASH CRC-32:0x3080036 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8599,6 +8599,156 @@ INTERN_FUNCTION(libc_sys_Xkreaddir)
 	.cfi_endproc
 END(libc_sys_Xkreaddir)
 DEFINE_PUBLIC_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
+
+/* Check if a transaction is currently in progress
+ * @return: 0 : No RTM operation in progress
+ * @return: 1 : An RTM operation is currently in progress */
+/* syscall_slong_t rtm_test(void) */
+.section .text.crt.syscall.rtm_test
+INTERN_FUNCTION(libc_sys_rtm_test)
+	.cfi_startproc
+	movq   $(0xffffffffffffffdd), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rtm_test)
+DEFINE_PUBLIC_ALIAS(sys_rtm_test, libc_sys_rtm_test)
+
+/* Check if a transaction is currently in progress
+ * @return: 0 : No RTM operation in progress
+ * @return: 1 : An RTM operation is currently in progress */
+/* syscall_slong_t rtm_test(void) */
+.section .text.crt.syscall.Xrtm_test
+INTERN_FUNCTION(libc_sys_Xrtm_test)
+	.cfi_startproc
+	movq   $(0xffffffffffffffdd), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrtm_test)
+DEFINE_PUBLIC_ALIAS(sys_Xrtm_test, libc_sys_Xrtm_test)
+
+/* Abort the current transaction by having `sys_rtm_begin()'
+ * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK' */
+/* errno_t rtm_abort(syscall_ulong_t code) */
+.section .text.crt.syscall.rtm_abort
+INTERN_FUNCTION(libc_sys_rtm_abort)
+	.cfi_startproc
+	movq   $(0xffffffffffffffde), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rtm_abort)
+DEFINE_PUBLIC_ALIAS(sys_rtm_abort, libc_sys_rtm_abort)
+
+/* Abort the current transaction by having `sys_rtm_begin()'
+ * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK' */
+/* errno_t rtm_abort(syscall_ulong_t code) */
+.section .text.crt.syscall.Xrtm_abort
+INTERN_FUNCTION(libc_sys_Xrtm_abort)
+	.cfi_startproc
+	movq   $(0xffffffffffffffde), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrtm_abort)
+DEFINE_PUBLIC_ALIAS(sys_Xrtm_abort, libc_sys_Xrtm_abort)
+
+/* End a transaction (s.a. `sys_rtm_end()')
+ * If the transaction was successful, return normally (by returning `-EOK').
+ * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
+ * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
+/* errno_t rtm_end(void) */
+.section .text.crt.syscall.rtm_end
+INTERN_FUNCTION(libc_sys_rtm_end)
+	.cfi_startproc
+	movq   $(0xffffffffffffffdf), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rtm_end)
+DEFINE_PUBLIC_ALIAS(sys_rtm_end, libc_sys_rtm_end)
+
+/* End a transaction (s.a. `sys_rtm_end()')
+ * If the transaction was successful, return normally (by returning `-EOK').
+ * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
+ * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
+/* errno_t rtm_end(void) */
+.section .text.crt.syscall.Xrtm_end
+INTERN_FUNCTION(libc_sys_Xrtm_end)
+	.cfi_startproc
+	movq   $(0xffffffffffffffdf), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrtm_end)
+DEFINE_PUBLIC_ALIAS(sys_Xrtm_end, libc_sys_Xrtm_end)
+
+/* Begin an RTM operation. Note that if the arch-specific RTM driver
+ * wasn't already loaded into the kernel, it will be loaded automatically,
+ * though any error that may happen during this will be converted into
+ * an `E_ILLEGAL_OPERATION' exception.
+ * Note that while an RTM operation is in progress, only a very small hand
+ * full of system calls are allowed to be used. Attempting to use arbitrary
+ * system calls, or attempting to access too much system memory in general
+ * will result in this function returning with `RTM_ABORT_CAPACITY', rather
+ * than succeeding. The following is a list of system calls which are
+ * whitelisted for use during a transaction:
+ *   - sys_rtm_begin:  Nested RTM operation
+ *   - sys_rtm_end:    End an RTM operation
+ *   - sys_rtm_abort:  Abort an RTM operation
+ *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
+ * @return: RTM_STARTED : RTM operation was started.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
+/* syscall_slong_t rtm_begin(void) */
+.section .text.crt.syscall.rtm_begin
+INTERN_FUNCTION(libc_sys_rtm_begin)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe0), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rtm_begin)
+DEFINE_PUBLIC_ALIAS(sys_rtm_begin, libc_sys_rtm_begin)
+
+/* Begin an RTM operation. Note that if the arch-specific RTM driver
+ * wasn't already loaded into the kernel, it will be loaded automatically,
+ * though any error that may happen during this will be converted into
+ * an `E_ILLEGAL_OPERATION' exception.
+ * Note that while an RTM operation is in progress, only a very small hand
+ * full of system calls are allowed to be used. Attempting to use arbitrary
+ * system calls, or attempting to access too much system memory in general
+ * will result in this function returning with `RTM_ABORT_CAPACITY', rather
+ * than succeeding. The following is a list of system calls which are
+ * whitelisted for use during a transaction:
+ *   - sys_rtm_begin:  Nested RTM operation
+ *   - sys_rtm_end:    End an RTM operation
+ *   - sys_rtm_abort:  Abort an RTM operation
+ *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
+ * @return: RTM_STARTED : RTM operation was started.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
+/* syscall_slong_t rtm_begin(void) */
+.section .text.crt.syscall.Xrtm_begin
+INTERN_FUNCTION(libc_sys_Xrtm_begin)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe0), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrtm_begin)
+DEFINE_PUBLIC_ALIAS(sys_Xrtm_begin, libc_sys_Xrtm_begin)
 
 /* Construct a user-fault-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests

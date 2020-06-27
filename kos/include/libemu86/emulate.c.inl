@@ -965,10 +965,6 @@ __DECL_BEGIN
 #define EMU86_EMULATE_RETURN_AFTER_INTO() \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x04) /* #OF */
 #endif /* !EMU86_EMULATE_RETURN_AFTER_INTO */
-#ifndef EMU86_EMULATE_RETURN_AFTER_XEND
-#define EMU86_EMULATE_RETURN_AFTER_XEND() \
-	EMU86_EMULATE_RETURN_AFTER_INT(0x0d) /* #GP */
-#endif /* !EMU86_EMULATE_RETURN_AFTER_XEND */
 #ifndef EMU86_EMULATE_THROW_BOUNDERR
 #define EMU86_EMULATE_THROW_BOUNDERR(bound_idx, bound_min, bound_max) \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x05) /* #BR */
@@ -1149,6 +1145,29 @@ __DECL_BEGIN
  * instruction had actually been supported. */
 /* #define EMU86_EMULATE_RETURN_AFTER_SYSCALL() ... */
 /* #define EMU86_EMULATE_RETURN_AFTER_SYSENTER() ... */
+
+
+
+/* Define to implement custom handling of RTM instructions. */
+/* #define EMU86_EMULATE_RETURN_AFTER_XBEGIN(fallback_ip) ... */
+/* #define EMU86_EMULATE_RETURN_AFTER_XABORT(code)        ... // Only called when `EMU86_EMULATE_XTEST() != 0' */
+/* #define EMU86_EMULATE_RETURN_AFTER_XEND()              ... // Only called when `EMU86_EMULATE_XTEST() != 0' */
+/* #define EMU86_EMULATE_XTEST()                          0/1 */
+/* #define EMU86_EMULATE_XTEST_IS_ONE                     1 // EMU86_EMULATE_XTEST() is always 1 */
+/* #define EMU86_EMULATE_XTEST_IS_ZERO                    1 // EMU86_EMULATE_XTEST() is always 0 (default) */
+
+/* Default-configure `EMU86_EMULATE_XTEST()' */
+#ifdef EMU86_EMULATE_XTEST_IS_ONE
+#undef EMU86_EMULATE_XTEST
+#define EMU86_EMULATE_XTEST() 1
+#elif defined(EMU86_EMULATE_XTEST_IS_ZERO)
+#undef EMU86_EMULATE_XTEST
+#define EMU86_EMULATE_XTEST() 0
+#elif !defined(EMU86_EMULATE_XTEST)
+#define EMU86_EMULATE_XTEST() 0
+#define EMU86_EMULATE_XTEST_IS_ZERO 1
+#endif /* ... */
+
 
 
 /* Do what should be done in order to handle
