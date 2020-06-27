@@ -58,67 +58,67 @@ set_cf_from_nonzero:
 
 
 #if EMU86_EMULATE_CONFIG_WANT_BITTEST
-#define DEFINE_BIT_TEST_AND_op(pred_oldval_mask)                                       \
-	IF_64BIT(if (IS_64BIT()) {                                                         \
-		u64 oldval, mask;                                                              \
-		mask = (u64)1 << (bitno % 64);                                                 \
-		NIF_ONLY_MEMORY(                                                               \
-		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			oldval = MODRM_GETRMREGQ();                                                \
-			MODRM_SETRMREGQ(pred_oldval_mask(oldval, mask));                           \
-		} else) {                                                                      \
-			byte_t *addr = MODRM_MEMADDR();                                            \
-			EMU86_WRITE_USER_MEMORY(addr, 8);                                          \
-			for (;;) {                                                                 \
-				oldval = EMU86_MEMREADL(addr);                                         \
-				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval,                    \
-				                                      pred_oldval_mask(oldval, mask),  \
-				                                      (op_flags & EMU86_F_LOCK) != 0)) \
-					break;                                                             \
-				EMU86_EMULATE_LOOPHINT();                                              \
-			}                                                                          \
-		}                                                                              \
-		nonzero = (oldval & mask) != 0;                                                \
-	} else) if (!IS_16BIT()) {                                                         \
-		u32 oldval, mask;                                                              \
-		mask = (u32)1 << (bitno % 32);                                                 \
-		NIF_ONLY_MEMORY(                                                               \
-		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			oldval = MODRM_GETRMREGL();                                                \
-			MODRM_SETRMREGL(pred_oldval_mask(oldval, mask));                           \
-		} else) {                                                                      \
-			byte_t *addr = MODRM_MEMADDR();                                            \
-			EMU86_WRITE_USER_MEMORY(addr, 4);                                          \
-			for (;;) {                                                                 \
-				oldval = EMU86_MEMREADL(addr);                                         \
-				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval,                    \
-				                                      pred_oldval_mask(oldval, mask),  \
-				                                      (op_flags & EMU86_F_LOCK) != 0)) \
-					break;                                                             \
-				EMU86_EMULATE_LOOPHINT();                                              \
-			}                                                                          \
-		}                                                                              \
-		nonzero = (oldval & mask) != 0;                                                \
-	} else {                                                                           \
-		u16 oldval, mask;                                                              \
-		mask = (u16)1 << (bitno % 16);                                                 \
-		NIF_ONLY_MEMORY(                                                               \
-		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                        \
-			oldval = MODRM_GETRMREGW();                                                \
-			MODRM_SETRMREGW(pred_oldval_mask(oldval, mask));                           \
-		} else) {                                                                      \
-			byte_t *addr = MODRM_MEMADDR();                                            \
-			EMU86_WRITE_USER_MEMORY(addr, 2);                                          \
-			for (;;) {                                                                 \
-				oldval = EMU86_MEMREADW(addr);                                         \
-				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval,                    \
-				                                      pred_oldval_mask(oldval, mask),  \
-				                                      (op_flags & EMU86_F_LOCK) != 0)) \
-					break;                                                             \
-				EMU86_EMULATE_LOOPHINT();                                              \
-			}                                                                          \
-		}                                                                              \
-		nonzero = (oldval & mask) != 0;                                                \
+#define DEFINE_BIT_TEST_AND_op(pred_oldval_mask)                                      \
+	IF_64BIT(if (IS_64BIT()) {                                                        \
+		u64 oldval, mask;                                                             \
+		mask = (u64)1 << (bitno % 64);                                                \
+		NIF_ONLY_MEMORY(                                                              \
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
+			oldval = MODRM_GETRMREGQ();                                               \
+			MODRM_SETRMREGQ(pred_oldval_mask(oldval, mask));                          \
+		} else) {                                                                     \
+			byte_t *addr = MODRM_MEMADDR();                                           \
+			EMU86_WRITE_USER_MEMORY(addr, 8);                                         \
+			for (;;) {                                                                \
+				oldval = EMU86_MEMREADL(addr);                                        \
+				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEQ(addr, oldval,                   \
+				                                      pred_oldval_mask(oldval, mask), \
+				                                      EMU86_HASLOCK()))               \
+					break;                                                            \
+				EMU86_EMULATE_LOOPHINT();                                             \
+			}                                                                         \
+		}                                                                             \
+		nonzero = (oldval & mask) != 0;                                               \
+	} else) if (!IS_16BIT()) {                                                        \
+		u32 oldval, mask;                                                             \
+		mask = (u32)1 << (bitno % 32);                                                \
+		NIF_ONLY_MEMORY(                                                              \
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
+			oldval = MODRM_GETRMREGL();                                               \
+			MODRM_SETRMREGL(pred_oldval_mask(oldval, mask));                          \
+		} else) {                                                                     \
+			byte_t *addr = MODRM_MEMADDR();                                           \
+			EMU86_WRITE_USER_MEMORY(addr, 4);                                         \
+			for (;;) {                                                                \
+				oldval = EMU86_MEMREADL(addr);                                        \
+				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEL(addr, oldval,                   \
+				                                      pred_oldval_mask(oldval, mask), \
+				                                      EMU86_HASLOCK()))               \
+					break;                                                            \
+				EMU86_EMULATE_LOOPHINT();                                             \
+			}                                                                         \
+		}                                                                             \
+		nonzero = (oldval & mask) != 0;                                               \
+	} else {                                                                          \
+		u16 oldval, mask;                                                             \
+		mask = (u16)1 << (bitno % 16);                                                \
+		NIF_ONLY_MEMORY(                                                              \
+		if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
+			oldval = MODRM_GETRMREGW();                                               \
+			MODRM_SETRMREGW(pred_oldval_mask(oldval, mask));                          \
+		} else) {                                                                     \
+			byte_t *addr = MODRM_MEMADDR();                                           \
+			EMU86_WRITE_USER_MEMORY(addr, 2);                                         \
+			for (;;) {                                                                \
+				oldval = EMU86_MEMREADW(addr);                                        \
+				if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, oldval,                   \
+				                                      pred_oldval_mask(oldval, mask), \
+				                                      EMU86_HASLOCK()))               \
+					break;                                                            \
+				EMU86_EMULATE_LOOPHINT();                                             \
+			}                                                                         \
+		}                                                                             \
+		nonzero = (oldval & mask) != 0;                                               \
 	}
 #endif /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
 

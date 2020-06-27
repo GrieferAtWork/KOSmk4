@@ -33,14 +33,14 @@ case EMU86_OPCODE_ENCODE(0x9c): {
 	 * 9C     PUSHFQ     Push RFLAGS. */
 	u32 value;
 	value = EMU86_GETFLAGS() & ~(EFLAGS_VM | EFLAGS_RF);
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_VM86
 	if (EMU86_ISVM86()) {
 		value |= EFLAGS_IOPL(3); /* (visible) IOPL is always 3 in vm86 mode. */
 		value &= EFLAGS_IF;
 		if (EMU86_EMULATE_VM86_GETIF())
 			value |= EFLAGS_IF;
 	}
-#endif /* EMU86_EMULATE_VM86 */
+#endif /* EMU86_EMULATE_CONFIG_VM86 */
 	EMU86_PUSH163264((u16)value,
 	                 (u32)value,
 	                 (u64)value);
@@ -76,12 +76,12 @@ case EMU86_OPCODE_ENCODE(0x9d): {
 	                     new_eflags  = ~(EFLAGS_RF) & (u32) /*value;*/);
 #undef EFLAGS_MASK_COMMON
 	EMU86_SETSTACKPTR(sp);
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_VM86
 	if (EMU86_ISVM86()) {
 		EMU86_EMULATE_VM86_SETIF((new_eflags & EFLAGS_IF) != 0);
 		eflags_mask &= ~(EFLAGS_IOPLMASK | EFLAGS_IF);
 	} else
-#endif /* EMU86_EMULATE_VM86 */
+#endif /* EMU86_EMULATE_CONFIG_VM86 */
 	{
 		/* Allow modifications to #IOPL and #IF when IOPL=3 in user-space.
 		 * This matches the official documentation of `popf' which can modify

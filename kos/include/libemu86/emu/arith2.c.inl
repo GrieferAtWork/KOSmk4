@@ -26,49 +26,48 @@ EMU86_INTELLISENSE_BEGIN(arith2) {
 #if EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_ARITH2
 
 #if EMU86_EMULATE_CONFIG_WANT_ARITH2
-#define DEFINE_NOT_MODRM_rm(BWLQ, Nbits, Nbytes, mask)                   \
-	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {              \
-		u##Nbits reg;                                                    \
-		reg = MODRM_GETRMREG##BWLQ();                                    \
-		MODRM_SETRMREG##BWLQ(~reg);                                      \
-	} else) {                                                            \
-		byte_t *addr;                                                    \
-		/* Use XOR to implement NOT */                                   \
-		addr = MODRM_MEMADDR();                                          \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                           \
-		EMU86_MEM_ATOMIC_FETCHXOR##BWLQ(addr, mask,                      \
-		                                (op_flags & EMU86_F_LOCK) != 0); \
+#define DEFINE_NOT_MODRM_rm(BWLQ, Nbits, Nbytes, mask)                \
+	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {           \
+		u##Nbits reg;                                                 \
+		reg = MODRM_GETRMREG##BWLQ();                                 \
+		MODRM_SETRMREG##BWLQ(~reg);                                   \
+	} else) {                                                         \
+		byte_t *addr;                                                 \
+		/* Use XOR to implement NOT */                                \
+		addr = MODRM_MEMADDR();                                       \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                        \
+		EMU86_MEM_ATOMIC_FETCHXOR##BWLQ(addr, mask, EMU86_HASLOCK()); \
 	}
 
-#define DEFINE_NEG_MODRM_rm(bwlq, BWLQ, Nbits, Nbytes, maxbit_set)             \
-	u32 eflags_addend = 0;                                                     \
-	u##Nbits oldval, newval;                                                   \
-	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {                    \
-		oldval = MODRM_GETRMREG##BWLQ();                                       \
-		newval = (u##Nbits)0 - oldval;                                         \
-		MODRM_SETRMREG##BWLQ(newval);                                          \
-	} else) {                                                                  \
-		byte_t *addr;                                                          \
-		/* Use XOR to implement NEG */                                         \
-		addr = MODRM_MEMADDR();                                                \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                 \
-		for (;;) {                                                             \
-			oldval = EMU86_MEMREAD##BWLQ(addr);                                \
-			newval = (u##Nbits)0 - oldval;                                     \
-			if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,            \
-			                                  (op_flags & EMU86_F_LOCK) != 0)) \
-				break;                                                         \
-			EMU86_EMULATE_LOOPHINT();                                          \
-		}                                                                      \
-	}                                                                          \
-	if (oldval != 0)                                                           \
-		eflags_addend |= EFLAGS_CF;                                            \
-	if (oldval == maxbit_set) /* 0x80, 0x8000, etc... */                       \
-		eflags_addend |= EFLAGS_OF;                                            \
-	if (emu86_getflags_AF_sub(0, oldval))                                      \
-		eflags_addend |= EFLAGS_AF;                                            \
-	EMU86_MSKFLAGS(~(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF |                       \
-	                 EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF),                       \
+#define DEFINE_NEG_MODRM_rm(bwlq, BWLQ, Nbits, Nbytes, maxbit_set)  \
+	u32 eflags_addend = 0;                                          \
+	u##Nbits oldval, newval;                                        \
+	NIF_ONLY_MEMORY(if (EMU86_MODRM_ISREG(modrm.mi_type)) {         \
+		oldval = MODRM_GETRMREG##BWLQ();                            \
+		newval = (u##Nbits)0 - oldval;                              \
+		MODRM_SETRMREG##BWLQ(newval);                               \
+	} else) {                                                       \
+		byte_t *addr;                                               \
+		/* Use XOR to implement NEG */                              \
+		addr = MODRM_MEMADDR();                                     \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                      \
+		for (;;) {                                                  \
+			oldval = EMU86_MEMREAD##BWLQ(addr);                     \
+			newval = (u##Nbits)0 - oldval;                          \
+			if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval, \
+			                                  EMU86_HASLOCK()))     \
+				break;                                              \
+			EMU86_EMULATE_LOOPHINT();                               \
+		}                                                           \
+	}                                                               \
+	if (oldval != 0)                                                \
+		eflags_addend |= EFLAGS_CF;                                 \
+	if (oldval == maxbit_set) /* 0x80, 0x8000, etc... */            \
+		eflags_addend |= EFLAGS_OF;                                 \
+	if (emu86_getflags_AF_sub(0, oldval))                           \
+		eflags_addend |= EFLAGS_AF;                                 \
+	EMU86_MSKFLAGS(~(EFLAGS_CF | EFLAGS_OF | EFLAGS_SF |            \
+	                 EFLAGS_ZF | EFLAGS_AF | EFLAGS_PF),            \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
 #endif /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 

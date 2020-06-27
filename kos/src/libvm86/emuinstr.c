@@ -137,7 +137,7 @@ DECL_END
 #define REG32(id) self->vr_regs.vr_regdatal[id]
 #undef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP
 #define EMU86_EMULATE_TRANSLATEADDR(addr) libvm86_translate(self, addr)
-#define EMU86_EMULATE_VM86 0 /* We're emulating realmode, not vm86 */
+#define EMU86_EMULATE_CONFIG_VM86 0 /* We're emulating realmode, not vm86 */
 #define EMU86_ISUSER() 0
 #define EMU86_ISUSER_NOVM86() 0
 #define EMU86_ISVM86() 0

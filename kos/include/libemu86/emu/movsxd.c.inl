@@ -91,7 +91,7 @@ case EMU86_OPCODE_ENCODE(0x63): {
 					newval = (dst & ~3) | (src & 3);
 #if EMU86_EMULATE_CONFIG_LOCK_ARPL
 					if (EMU86_MEM_ATOMIC_CMPXCH_OR_WRITEW(addr, dst, newval,
-					                                      (op_flags & EMU86_F_LOCK) != 0)) {
+					                                      EMU86_HASLOCK())) {
 						eflags_addend = EFLAGS_ZF;
 						break;
 					}

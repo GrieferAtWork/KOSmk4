@@ -144,9 +144,21 @@ __DECL_BEGIN
  * Enabling this option matches hardware behavior, but adds a small amount of overhead to every
  * instruction that gets emulated. Disabling this option causes a lock prefix to be ignored by
  * instructions that don't actually support it */
-#ifndef EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK
-#define EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK 1
-#endif /* !EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK */
+#ifndef EMU86_EMULATE_CONFIG_CHECKLOCK
+#define EMU86_EMULATE_CONFIG_CHECKLOCK 1
+#endif /* !EMU86_EMULATE_CONFIG_CHECKLOCK */
+
+
+/* Ignore the `lock' prefix in individual instructions, which will instead always operate
+ * identical to how they would when no `lock'-prefix would have been given. Note however that
+ * this option does not affect `EMU86_EMULATE_CONFIG_CHECKLOCK', meaning that when that
+ * option is enabled, the emulator will still ensure that only certain instruction are
+ * allowed to make use of `lock' prefixes.
+ * Note however that this does _NOT_ affect instructions that use the `lock' prefix to
+ * alter their actual behavior in some way other than becoming atomic. */
+#ifndef EMU86_EMULATE_CONFIG_IGNORE_LOCK
+#define EMU86_EMULATE_CONFIG_IGNORE_LOCK 0
+#endif /* !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
 
 
 /* Accept the `lock' prefix for various instructions where hardware doesn't
@@ -895,7 +907,7 @@ __DECL_BEGIN
 
 /* A list of arguments taken by `emu86_emulate()' */
 #ifndef EMU86_EMULATE_ARGS
-#define EMU86_EMULATE_ARGS          struct icpustate *__restrict _state
+#define EMU86_EMULATE_ARGS struct icpustate *__restrict _state
 #endif /* !EMU86_EMULATE_ARGS */
 
 /* Hint at a spin-loop that may not necessarily break on its own.
@@ -919,8 +931,8 @@ __DECL_BEGIN
 /* Arguments taken by helper functions */
 #ifndef EMU86_EMULATE_HELPER_ARGS
 #define EMU86_EMULATE_HELPER_ATTR   __ATTR_NONNULL((1))
-#define EMU86_EMULATE_HELPER_ARGS   struct icpustate *__restrict _state   /* Arguments for helper functions */
-#define EMU86_EMULATE_HELPER_PARAM  _state /* Parameters passed to helper functions */
+#define EMU86_EMULATE_HELPER_ARGS   struct icpustate *__restrict _state /* Arguments for helper functions */
+#define EMU86_EMULATE_HELPER_PARAM  _state                              /* Parameters passed to helper functions */
 #endif /* !EMU86_EMULATE_HELPER_ARGS */
 #ifndef EMU86_EMULATE_HELPER_ARGS_
 #define EMU86_EMULATE_HELPER_ARGS_  EMU86_EMULATE_HELPER_ARGS,
@@ -953,6 +965,7 @@ __DECL_BEGIN
 
 /* Return handlers for specific instructions */
 #ifdef EMU86_EMULATE_RETURN_AFTER_INT
+#ifndef EMU86_EMULATE_NO_IMPLICIT_RETURN_AFTER_INT
 #ifndef EMU86_EMULATE_RETURN_AFTER_INT1
 #define EMU86_EMULATE_RETURN_AFTER_INT1() \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x01) /* #DB */
@@ -980,10 +993,13 @@ __DECL_BEGIN
 	                               ? 0x06 /* #UD */                                           \
 	                               : 0x0d /* #GP */)
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#ifndef EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER
+#endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 #ifndef EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED
 #define EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED(addr, context, req_alignment) \
 	EMU86_EMULATE_RETURN_AFTER_INT(0x0d) /* #GP */
 #endif /* !EMU86_EMULATE_THROW_SEGFAULT_UNALIGNED */
+#endif /* !EMU86_EMULATE_NO_IMPLICIT_RETURN_AFTER_INT */
 #endif /* EMU86_EMULATE_RETURN_AFTER_INT */
 
 
@@ -1276,19 +1292,19 @@ __DECL_BEGIN
 
 
 /* Enable emulation of VM86 helpers */
-#ifndef EMU86_EMULATE_VM86
-#define EMU86_EMULATE_VM86 (!CONFIG_LIBEMU86_WANT_64BIT && CONFIG_LIBEMU86_WANT_16BIT)
-#endif /* !EMU86_EMULATE_VM86 */
+#ifndef EMU86_EMULATE_CONFIG_VM86
+#define EMU86_EMULATE_CONFIG_VM86 (!CONFIG_LIBEMU86_WANT_64BIT && CONFIG_LIBEMU86_WANT_16BIT)
+#endif /* !EMU86_EMULATE_CONFIG_VM86 */
 
-#if EMU86_EMULATE_VM86 && CONFIG_LIBEMU86_WANT_64BIT
+#if EMU86_EMULATE_CONFIG_VM86 && CONFIG_LIBEMU86_WANT_64BIT
 #error "Cannot emulate vm86 together with 64-bit support!"
-#endif /* EMU86_EMULATE_VM86 && CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* EMU86_EMULATE_CONFIG_VM86 && CONFIG_LIBEMU86_WANT_64BIT */
 
 /* These functions are used only when emulating an instruction for vm86
  * They are _not_ used by libvm86 (which is a full realmode emulator that
  * doesn't actually make use of vm86, so-as to also work on x86_64!)
  * These functions are used by  */
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_VM86
 #ifndef EMU86_EMULATE_VM86_GETIF
 #define EMU86_EMULATE_VM86_GETIF() 0
 #endif /* !EMU86_EMULATE_VM86_GETIF */
@@ -1298,7 +1314,7 @@ __DECL_BEGIN
 #ifndef EMU86_EMULATE_RETURN_AFTER_HLT_VM86
 #define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() goto done
 #endif /* !EMU86_EMULATE_RETURN_AFTER_HLT_VM86 */
-#endif /* EMU86_EMULATE_VM86 */
+#endif /* EMU86_EMULATE_CONFIG_VM86 */
 
 
 
@@ -1870,18 +1886,18 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 #define EMU86_ISUSER() icpustate_isuser(_state)
 #endif /* !EMU86_ISUSER */
 #ifndef EMU86_ISUSER_NOVM86
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_VM86
 #define EMU86_ISUSER_NOVM86() icpustate_isuser_novm86(_state)
-#else /* EMU86_EMULATE_VM86 */
+#else /* EMU86_EMULATE_CONFIG_VM86 */
 #define EMU86_ISUSER_NOVM86() EMU86_ISUSER()
-#endif /* !EMU86_EMULATE_VM86 */
+#endif /* !EMU86_EMULATE_CONFIG_VM86 */
 #endif /* !EMU86_ISUSER_NOVM86 */
 #ifndef EMU86_ISVM86
-#ifdef EMU86_EMULATE_VM86
+#ifdef EMU86_EMULATE_CONFIG_VM86
 #define EMU86_ISVM86() (EMU86_GETFLAGS() & EFLAGS_VM)
-#else /* EMU86_EMULATE_VM86 */
+#else /* EMU86_EMULATE_CONFIG_VM86 */
 #define EMU86_ISVM86() 0
-#endif /* !EMU86_EMULATE_VM86 */
+#endif /* !EMU86_EMULATE_CONFIG_VM86 */
 #endif /* !EMU86_ISVM86 */
 
 /* Validate that `addr ... += num_bytes' is a user-space address range. */
@@ -3570,7 +3586,16 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 #error "Invalid configuration"
 #endif
 
-#if EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK
+/* Check if a lock-prefix has been given. */
+#ifndef EMU86_HASLOCK
+#if EMU86_EMULATE_CONFIG_IGNORE_LOCK
+#define EMU86_HASLOCK() 0
+#else /* EMU86_EMULATE_CONFIG_IGNORE_LOCK */
+#define EMU86_HASLOCK() ((op_flags & EMU86_F_LOCK) != 0)
+#endif /* !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
+#endif /* !EMU86_HASLOCK */
+
+#if EMU86_EMULATE_CONFIG_CHECKLOCK
 			if unlikely(op_flags & EMU86_F_LOCK) {
 				switch (tiny_opcode) {
 #define HAVEOP(config) config || EMU86_EMULATE_CONFIG_CHECKERROR
@@ -3876,7 +3901,7 @@ checklock_modrm_memory_parsed:
 #define NEED_return_unexpected_lock
 				}
 			}
-#endif /* EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK */
+#endif /* EMU86_EMULATE_CONFIG_CHECKLOCK */
 			switch (tiny_opcode) {
 
 				/* Pull in emulated instructions. */
@@ -3915,6 +3940,7 @@ checklock_modrm_memory_parsed:
 #include "emu/flush.c.inl"
 #include "emu/hlt.c.inl"
 #include "emu/incdec.c.inl"
+#include "emu/int.c.inl"
 #include "emu/io.c.inl"
 #include "emu/iret.c.inl"
 #include "emu/jcc.c.inl"

@@ -51,8 +51,10 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			newval.qwords[1]      = EMU86_GETRCX();
 			addr                  = MODRM_MEMADDR();
 			EMU86_READWRITE_USER_MEMORY(addr, 16);
-			real_oldval.word128 = EMU86_MEM_ATOMIC_CMPXCHX(addr, want_oldval.word128, newval.word128,
-			                                               (op_flags & EMU86_F_LOCK) != 0);
+			real_oldval.word128 = EMU86_MEM_ATOMIC_CMPXCHX(addr,
+			                                               want_oldval.word128,
+			                                               newval.word128,
+			                                               EMU86_HASLOCK());
 			if (real_oldval.qwords[0] == want_oldval.qwords[0] &&
 			    real_oldval.qwords[1] == want_oldval.qwords[1]) {
 				EMU86_MSKFLAGS(~EFLAGS_ZF, EFLAGS_ZF);
@@ -64,7 +66,10 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B && EMU86_MEM_ATOMIC_CMPXCHX */
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B
-			if (!(op_flags & EMU86_F_LOCK)) {
+#if !EMU86_EMULATE_CONFIG_IGNORE_LOCK
+			if (!EMU86_HASLOCK())
+#endif /* !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
+			{
 				/* We can easily emulate the non-atomic variant! */
 				union {
 					u64 qwords[2];
@@ -95,9 +100,11 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				goto done;
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B */
+#if !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_EMULATE_CONFIG_IGNORE_LOCK
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 16, true, true);
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_MEM_ATOMIC_CMPXCHX */
 		} else
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
@@ -115,7 +122,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			addr                  = MODRM_MEMADDR();
 			EMU86_READWRITE_USER_MEMORY(addr, 8);
 			real_oldval.qword = EMU86_MEM_ATOMIC_CMPXCHQ(addr, want_oldval.qword, newval.qword,
-			                                             (op_flags & EMU86_F_LOCK) != 0);
+			                                             EMU86_HASLOCK());
 #if __SIZEOF_POINTER__ >= 8
 			if (real_oldval.qword == want_oldval.qword)
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -132,7 +139,10 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B && EMU86_MEM_ATOMIC_CMPXCHQ */
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B
-			if (!(op_flags & EMU86_F_LOCK)) {
+#if !EMU86_EMULATE_CONFIG_IGNORE_LOCK
+			if (!EMU86_HASLOCK())
+#endif /* !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
+			{
 				/* We can easily emulate the non-atomic variant! */
 				union {
 					u64 qword;
@@ -173,9 +183,11 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				goto done;
 			}
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B */
+#if !EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || !EMU86_EMULATE_CONFIG_IGNORE_LOCK
 			EMU86_UNSUPPORTED_MEMACCESS(MODRM_MEMADDR(), 8, true, true);
 			goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
+#endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B || !EMU86_MEM_ATOMIC_CMPXCHQ */
 		}
 		break;

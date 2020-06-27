@@ -1117,9 +1117,9 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 	}
 #define EMU86_EMULATE_GETOPFLAGS() _CS(emu86_opflagsof)(self->vea_args.va_state)
 #ifdef __x86_64__
-#define EMU86_EMULATE_VM86 0
+#define EMU86_EMULATE_CONFIG_VM86 0
 #else /* __x86_64__ */
-#define EMU86_EMULATE_VM86 1
+#define EMU86_EMULATE_CONFIG_VM86 1
 #define EMU86_EMULATE_VM86_GETIF()  0       /* TODO: Get vm86 #IF bit */
 #define EMU86_EMULATE_VM86_SETIF(v) (void)0 /* TODO: Set vm86 #IF bit */
 /* TODO: vm86 I/O functions (used by ins and outs) */
@@ -1127,13 +1127,13 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 #ifdef __KERNEL__
 #define EMU86_EMULATE_CONFIG_CHECKUSER 1
 #define EMU86_ISUSER()        icpustate_isuser(self->vea_args.va_state)
-#if EMU86_EMULATE_VM86
+#if EMU86_EMULATE_CONFIG_VM86
 #define EMU86_ISUSER_NOVM86() icpustate_isuser_novm86(self->vea_args.va_state)
 #define EMU86_ISVM86()        icpustate_isvm86(self->vea_args.va_state)
-#else /* EMU86_EMULATE_VM86 */
+#else /* EMU86_EMULATE_CONFIG_VM86 */
 #define EMU86_ISUSER_NOVM86() icpustate_isuser(self->vea_args.va_state)
 #define EMU86_ISVM86()        0
-#endif /* !EMU86_EMULATE_VM86 */
+#endif /* !EMU86_EMULATE_CONFIG_VM86 */
 #else /* __KERNEL__ */
 #define EMU86_EMULATE_CONFIG_CHECKUSER 0
 #define EMU86_ISUSER() 0
@@ -1834,7 +1834,7 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_EMULATE_CONFIG_ONLY_MEMORY     1 /* _ONLY_ emulate memory-based instructions! */
 #define EMU86_EMULATE_CONFIG_CHECKERROR      0 /* Don't emulate error checks for instructions that are disabled */
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 0 /* Enable instruction emulator by default (though only for memory-based instruction) */
-#define EMU86_EMULATE_CONFIG_ONLY_CHECKLOCK  1 /* Make sure of that lock prefixes are used properly */
+#define EMU86_EMULATE_CONFIG_CHECKLOCK       1 /* Make sure of that lock prefixes are used properly */
 
 /* Configure ISA extensions */
 #define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       1 /* [enabled] Allow use of (rd|wr)(fs|gs)base from 32-bit */

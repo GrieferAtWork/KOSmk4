@@ -24,29 +24,29 @@
 EMU86_INTELLISENSE_BEGIN(xadd) {
 
 #if EMU86_EMULATE_CONFIG_WANT_XADD
-#define DEFINE_XADD_MODRM_reg_rm(bwlq, BWLQ, Nbits, Nbytes)                       \
-	u##Nbits rhs, oldval, newval;                                                 \
-	u32 eflags_addend = 0;                                                        \
-	rhs = MODRM_GETREG##BWLQ();                                                   \
-	NIF_ONLY_MEMORY(                                                              \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                       \
-		oldval = MODRM_GETRMREG##BWLQ();                                          \
-		MODRM_SETRMREG##BWLQ(oldval + rhs);                                       \
-	} else) {                                                                     \
-		byte_t *addr;                                                             \
-		addr = MODRM_MEMADDR();                                                   \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                    \
-		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, rhs,                       \
-		                                         (op_flags & EMU86_F_LOCK) != 0); \
-	}                                                                             \
-	if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval))      \
-		eflags_addend |= EFLAGS_OF;                                               \
-	if (OVERFLOW_UADD(oldval, rhs, &newval))                                      \
-		eflags_addend |= EFLAGS_CF;                                               \
-	if (emu86_getflags_AF_add(oldval, rhs))                                       \
-		eflags_addend |= EFLAGS_AF;                                               \
-	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                          \
-	                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                          \
+#define DEFINE_XADD_MODRM_reg_rm(bwlq, BWLQ, Nbits, Nbytes)                  \
+	u##Nbits rhs, oldval, newval;                                            \
+	u32 eflags_addend = 0;                                                   \
+	rhs = MODRM_GETREG##BWLQ();                                              \
+	NIF_ONLY_MEMORY(                                                         \
+	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                  \
+		oldval = MODRM_GETRMREG##BWLQ();                                     \
+		MODRM_SETRMREG##BWLQ(oldval + rhs);                                  \
+	} else) {                                                                \
+		byte_t *addr;                                                        \
+		addr = MODRM_MEMADDR();                                              \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                               \
+		oldval = EMU86_MEM_ATOMIC_FETCHADD##BWLQ(addr, rhs,                  \
+		                                         EMU86_HASLOCK());           \
+	}                                                                        \
+	if (OVERFLOW_SADD((s##Nbits)oldval, (s##Nbits)rhs, (s##Nbits *)&newval)) \
+		eflags_addend |= EFLAGS_OF;                                          \
+	if (OVERFLOW_UADD(oldval, rhs, &newval))                                 \
+		eflags_addend |= EFLAGS_CF;                                          \
+	if (emu86_getflags_AF_add(oldval, rhs))                                  \
+		eflags_addend |= EFLAGS_AF;                                          \
+	EMU86_MSKFLAGS(~(EFLAGS_OF | EFLAGS_CF | EFLAGS_SF |                     \
+	                 EFLAGS_ZF | EFLAGS_PF | EFLAGS_AF),                     \
 	               eflags_addend | emu86_geteflags_test##bwlq(newval));
 
 

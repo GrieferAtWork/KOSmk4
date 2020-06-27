@@ -24,11 +24,13 @@
 EMU86_INTELLISENSE_BEGIN(xchg) {
 
 #if EMU86_EMULATE_CONFIG_WANT_XCHG_RM
-#if EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK
-#define XCHG_IS_ATOMIC() ((op_flags & EMU86_F_LOCK) != 0)
-#else /* EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK */
-#define XCHG_IS_ATOMIC() true
-#endif /* !EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK */
+#if EMU86_EMULATE_CONFIG_IGNORE_LOCK
+#define XCHG_IS_ATOMIC() 0
+#elif EMU86_EMULATE_CONFIG_ATOMIC_XCHG_REQUIRES_LOCK
+#define XCHG_IS_ATOMIC() EMU86_HASLOCK()
+#else /* ... */
+#define XCHG_IS_ATOMIC() 1
+#endif /* !... */
 
 #define DEFINE_XCHG_modrm(BWLQ, Nbits, Nbytes)                 \
 	u##Nbits reg_operand, oldval;                              \

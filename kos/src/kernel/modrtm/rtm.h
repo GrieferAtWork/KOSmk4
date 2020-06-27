@@ -51,12 +51,12 @@ DECL_BEGIN
  * >>         bool baz_should_set = false;
  * >>         tx_oldver = tx_version_for_baz;
  * >>         COMPILER_BARRIER();
+ * >>         // NOTE: Anything done in here that would be ~too~ complex, such as (trying
+ * >>         //       to) do a system call would instead trigger `goto tx_failed'
  * >>         if (bar == 7) {
  * >>             baz_should_set = true;
  * >>             baz_newval = 3;
  * >>         }
- * >>         // NOTE: Anything done in here that would be ~too~ complex, such as (trying
- * >>         //       to) do a system call would instead trigger `goto tx_failed'
  * >>         COMPILER_BARRIER();
  * >>         if (!baz_should_set) {
  * >>             // Nothing modified. -> No need to change the version of do any write-back
@@ -94,8 +94,8 @@ DECL_BEGIN
 /*
  * How the kernel applies RTM memory modifications:
  *
- * >> local accessedDataParts: {vm_datapart: int}; // part -> versionOnFirstAccess
- * >> local modifiedMemory: {(int, Bytes, {vm_datapart...})...};
+ * >> @@Tuples of (addr, data, changed, version, part)
+ * >> local accessedParts: {(int, Bytes, bool, int, vm_datapart)...};
  * >>
  * >> RETRY:
  * >>
@@ -104,50 +104,41 @@ DECL_BEGIN
  * >>
  * >> ...
  * >>
- * >> // Prefault all modified memory locations
  * >>RETRY_FORCEFAULT:
- * >> for (local start, data, none: modifiedMemory) {
- * >>     vm_forcefault(THIS_VM, start, #data,
- * >>                   VM_FORCEFAULT_FLAG_WRITE |
- * >>                   VM_FORCEFAULT_FLAG_NOVIO);
- * >> }
- * >>
- * >> // Acquire tx-locks to all of the modified data parts
- * >> for (local none, none, parts: modifiedMemory) {
- * >>     for (local part: parts)
- * >>         sync_write(&part.tx_lock);
- * >> }
- * >> #define UNLOCK()                                    \
- * >>     for (local none, none, parts: modifiedMemory) { \
- * >>         for (local part: parts)                     \
- * >>             sync_endwrite(&part.tx_lock);           \
+ * >> // Prefault all modified memory locations
+ * >> for (local start, data, changed, none, none: accessedParts) {
+ * >>     if (changed) {
+ * >>         vm_forcefault(THIS_VM, start, #data,
+ * >>                       VM_FORCEFAULT_FLAG_WRITE |
+ * >>                       VM_FORCEFAULT_FLAG_NOVIO);
  * >>     }
+ * >> }
  * >>
- * >> // Verify that none of the accessed parts have been changed
- * >> for (local dataPart, datapartVersionOnFirstAccess: accessedDataParts) {
- * >>     if (dataPart.tx_version != datapartVersionOnFirstAccess) {
- * >>         UNLOCK();
+ * >> // Acquire tx-locks to all of the modified data parts, and
+ * >> // verify that accessed data parts are still up-to-date
+ * >> for (local addr, data, changed, version, part: accessedParts) {
+ * >>     if (VM_NODE_AT(min: addr, max: addr + #data - 1)->vn_part != part)
  * >>         goto RETRY;
- * >>     }
+ * >>     if (part->dp_futex->fc_rtm_vers != version)
+ * >>         goto RETRY;
+ * >>     if (changed)
+ * >>         sync_write(part);
  * >> }
  * >>
  * >> // Apply modifications
- * >> for (local addr, data, none: modifiedMemory) {
- * >>     if (memcpy_nopf(addr, data.bytes(), #data) != 0) {
- * >>         UNLOCK();
- * >>         goto RETRY_FORCEFAULT;
+ * >> for (local addr, data, changed, none, none: modifiedMemory) {
+ * >>     if (changed) {
+ * >>         if (memcpy_nopf(addr, data.bytes(), #data) != 0)
+ * >>             goto RETRY_FORCEFAULT;
+ * >>         ++part->dp_futex->fc_rtm_vers;
+ * >>         sync_endwrite(part);
  * >>     }
  * >> }
- * >> 
- * >> for (local none, none, parts: modifiedMemory) {
- * >>     for (local part: parts) {
- * >>         ATOMIC_FETCHINC(part.tx_version);
- * >>         sync_endwrite(&part.tx_lock);
- * >>     }
- * >> }
+ * >>
+ *
  */
 
-DATDEF struct vm_rtm_driver_hooks rtm_hooks;
+INTDEF struct vm_rtm_driver_hooks rtm_hooks;
 
 DECL_END
 

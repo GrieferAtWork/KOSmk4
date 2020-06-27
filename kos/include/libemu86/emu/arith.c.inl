@@ -36,15 +36,14 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
 	/* NOTE: Always support register-based MODR/M to support reverse encoded operands */
-#define DO_ARITHn(NAME, operator, BWLQ, Nbytes, oldval, rhs)                         \
-	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {                                          \
-		byte_t *_addr = MODRM_MEMADDR();                                             \
-		EMU86_WRITE_USER_MEMORY(_addr, Nbytes);                                      \
-		oldval = EMU86_MEM_ATOMIC_FETCH##NAME##BWLQ(_addr, rhs,                      \
-		                                            (op_flags & EMU86_F_LOCK) != 0); \
-	} else {                                                                         \
-		oldval = MODRM_GETRMREG##BWLQ();                                             \
-		MODRM_SETRMREG##BWLQ(oldval operator rhs);                                   \
+#define DO_ARITHn(NAME, operator, BWLQ, Nbytes, oldval, rhs)                      \
+	if (EMU86_MODRM_ISMEM(modrm.mi_type)) {                                       \
+		byte_t *_addr = MODRM_MEMADDR();                                          \
+		EMU86_WRITE_USER_MEMORY(_addr, Nbytes);                                   \
+		oldval = EMU86_MEM_ATOMIC_FETCH##NAME##BWLQ(_addr, rhs, EMU86_HASLOCK()); \
+	} else {                                                                      \
+		oldval = MODRM_GETRMREG##BWLQ();                                          \
+		MODRM_SETRMREG##BWLQ(oldval operator rhs);                                \
 	}
 #endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 
@@ -117,7 +116,7 @@ do_adc##Nbits:                                                                  
 				if (OVERFLOW_UADD(newval, 1, &newval))                               \
 					eflags_addend |= EFLAGS_CF;                                      \
 				if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,              \
-				                                  (op_flags & EMU86_F_LOCK) != 0))   \
+				                                  EMU86_HASLOCK()))                  \
 					break;                                                           \
 				EMU86_EMULATE_LOOPHINT();                                            \
 			}                                                                        \
@@ -158,7 +157,7 @@ do_sbb##Nbits:                                                                  
 				if (OVERFLOW_USUB(newval, 1, &newval))                               \
 					eflags_addend |= EFLAGS_CF;                                      \
 				if (EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, oldval, newval,              \
-				                                  (op_flags & EMU86_F_LOCK) != 0))   \
+				                                  EMU86_HASLOCK()))                  \
 					break;                                                           \
 				EMU86_EMULATE_LOOPHINT();                                            \
 			}                                                                        \

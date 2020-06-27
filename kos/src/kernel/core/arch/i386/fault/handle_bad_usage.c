@@ -129,7 +129,7 @@ DECL_BEGIN
 #define BAD_USAGE_ECODE(usage)  (((usage) & UINT32_C(0x00ffff)))
 typedef u32 bad_usage_reason_t;
 
-
+/* Prototype for the main instruction emulator */
 PRIVATE ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usage);
 
@@ -139,8 +139,9 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_ONLY_MEMORY              0 /* Emulate all instructions (as opposed to only those that access memory) */
 #define EMU86_EMULATE_CONFIG_CHECKUSER                1 /* Restrict system instructions in user-space */
 #define EMU86_EMULATE_CONFIG_CHECKERROR               1 /* Disabled instructions (`EMU86_EMULATE_CONFIG_WANT_* == 0') are still checked for usage errors */
-#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR          1 /* Default: Any instruction not explicitly configured defaults to `#define EMU86_EMULATE_CONFIG_WANT_... 0' */
-#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 1 /* Don't include code-paths for basic instructions that are assumed to always be available */
+#define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR          0 /* Do more that just error checking */
+#define EMU86_EMULATE_CONFIG_CHECKLOCK                1 /* Make sure of that lock prefixes are used properly */
+#define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC     1 /* Allow user-space to make use of stac/clac */
 
 /* Configure ISA extensions */
 #ifdef CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS
@@ -917,10 +918,10 @@ setgsbase(uintptr_t value) {
 #define EMU86_ISUSER() icpustate_isuser(_state)
 
 #ifdef __x86_64__
-#define EMU86_EMULATE_VM86    0
+#define EMU86_EMULATE_CONFIG_VM86    0
 #define EMU86_ISUSER_NOVM86() EMU86_ISUSER()
 #else /* __x86_64__ */
-#define EMU86_EMULATE_VM86 1
+#define EMU86_EMULATE_CONFIG_VM86 1
 #define EMU86_EMULATE_VM86_GETIF()            0 /* TODO */
 #define EMU86_EMULATE_VM86_SETIF(v)           (void)0
 #define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() /* TODO */
@@ -1143,18 +1144,18 @@ assert_canonical_address(struct icpustate *__restrict state,
 #define EMU86_GETFLAGS()            icpustate_getpflags(_state)
 #define EMU86_SETFLAGS(v)           icpustate_setpflags(_state, v)
 #define EMU86_MSKFLAGS(mask, value) icpustate_mskpflags(_state, mask, value)
-#define EMU86_GETPCPTR()            (byte_t *)icpustate_getpc(_state)
-#define EMU86_SETPCPTR(v)           icpustate_setpc(_state, (__uintptr_t)(v))
-#define EMU86_GETIPREG()            (uintptr_t)EMU86_GETPCPTR()
-#define EMU86_SETIPREG(v)           EMU86_SETPCPTR(v)
-#define EMU86_GETSTACKPTR()         (byte_t *)icpustate_getsp(_state)
-#ifdef __x86_64__
-#define EMU86_SETSTACKPTR(v)        icpustate64_setrsp(_state, (__uintptr_t)(v))
-#else /* __x86_64__ */
-#define EMU86_SETSTACKPTR(v)        (_state = icpustate_setsp_p(_state, (__uintptr_t)(v)))
-#endif /* !__x86_64__ */
+#define EMU86_GETIPREG()            (uintptr_t)icpustate_getpc(_state)
+#define EMU86_SETIPREG(v)           icpustate_setpc(_state, (__uintptr_t)(v))
 #define EMU86_GETSPREG()            (uintptr_t)icpustate_getsp(_state)
-#define EMU86_SETSPREG(v)           EMU86_SETSTACKPTR(v)
+#ifdef __x86_64__
+#define EMU86_SETSPREG(v)           icpustate64_setrsp(_state, (__uintptr_t)(v))
+#else /* __x86_64__ */
+#define EMU86_SETSPREG(v)           (void)(_state = icpustate_setsp_p(_state, (__uintptr_t)(v)))
+#endif /* !__x86_64__ */
+#define EMU86_GETPCPTR()            (byte_t *)EMU86_GETIPREG()
+#define EMU86_SETPCPTR(v)           EMU86_SETIPREG(v)
+#define EMU86_GETSTACKPTR()         (byte_t *)EMU86_GETSPREG()
+#define EMU86_SETSTACKPTR(v)        EMU86_SETSPREG(v)
 
 
 #ifdef __x86_64__

@@ -81,8 +81,7 @@ struct vm_futex_controller {
 	/* We keep the RTM version and lock fields in the futex controller, such that
 	 * they don't take up space in the base vm_datapart structure, but only exist
 	 * conditionally, and upon first access. */
-	struct atomic_rwlock             fc_rtm_lock; /* RTM memory update lock. */
-	uintptr_t                        fc_rtm_vers; /* [lock(READ(ATOMIC), WRITE(fc_rtm_lock))]
+	uintptr_t                        fc_rtm_vers; /* [lock(:dp_lock)]
 	                                               * RTM version (incremented for every RTM-driven
 	                                               * modifications made to memory). */
 #endif /* ARCH_VM_HAVE_RTM */
