@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38daee85 */
+/* HASH CRC-32:0x466d8c31 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,8 +182,10 @@ DEFINE_PUBLIC_ALIAS(DOS$envz_strip, libd_envz_strip);
 
 /* err */
 DEFINE_PUBLIC_ALIAS(DOS$vwarn, libd_vwarn);
+DEFINE_PUBLIC_ALIAS(DOS$vwarnc, libd_vwarnc);
 DEFINE_PUBLIC_ALIAS(DOS$vwarnx, libd_vwarnx);
 DEFINE_PUBLIC_ALIAS(DOS$verr, libd_verr);
+DEFINE_PUBLIC_ALIAS(DOS$verrc, libd_verrc);
 DEFINE_PUBLIC_ALIAS(DOS$verrx, libd_verrx);
 
 /* execinfo */

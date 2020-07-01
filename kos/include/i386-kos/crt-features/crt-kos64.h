@@ -1480,6 +1480,7 @@
 #define __CRT_HAVE_erff 1
 #define __CRT_HAVE_erfl 1
 #define __CRT_HAVE_err 1
+#define __CRT_HAVE_errc 1
 #define __CRT_HAVE_errno_cyg2dos 1
 #define __CRT_HAVE_errno_cyg2kos 1
 #define __CRT_HAVE_errno_cyg2nt 1
@@ -4153,6 +4154,7 @@
 #define __CRT_HAVE_vasprintf 1
 #define __CRT_HAVE_vdprintf 1
 #define __CRT_HAVE_verr 1
+#define __CRT_HAVE_verrc 1
 #define __CRT_HAVE_verrx 1
 #define __CRT_HAVE_versionsort 1
 #define __CRT_HAVE_versionsort64 1
@@ -4180,6 +4182,7 @@
 #define __CRT_HAVE_vswscanf 1
 #define __CRT_HAVE_vsyslog 1
 #define __CRT_HAVE_vwarn 1
+#define __CRT_HAVE_vwarnc 1
 #define __CRT_HAVE_vwarnx 1
 #define __CRT_HAVE_vwprintf 1
 #define __CRT_HAVE_vwprintf_unlocked 1
@@ -4194,6 +4197,7 @@
 #define __CRT_HAVE_waitid 1
 #define __CRT_HAVE_waitpid 1
 #define __CRT_HAVE_warn 1
+#define __CRT_HAVE_warnc 1
 #define __CRT_HAVE_warnx 1
 #define __CRT_HAVE_wchdir 1
 #define __CRT_HAVE_wchown 1
@@ -5735,6 +5739,7 @@
 #define __CRT_HAVE_KOS$erff 1
 #define __CRT_HAVE_KOS$erfl 1
 #define __CRT_HAVE_KOS$err 1
+#define __CRT_HAVE_KOS$errc 1
 #define __CRT_HAVE_KOS$error 1
 #define __CRT_HAVE_KOS$error_at_line 1
 #define __CRT_HAVE_KOS$errx 1
@@ -7513,6 +7518,7 @@
 #define __CRT_HAVE_KOS$vasprintf 1
 #define __CRT_HAVE_KOS$vdprintf 1
 #define __CRT_HAVE_KOS$verr 1
+#define __CRT_HAVE_KOS$verrc 1
 #define __CRT_HAVE_KOS$verrx 1
 #define __CRT_HAVE_KOS$versionsort 1
 #define __CRT_HAVE_KOS$versionsort64 1
@@ -7539,6 +7545,7 @@
 #define __CRT_HAVE_KOS$vswscanf 1
 #define __CRT_HAVE_KOS$vsyslog 1
 #define __CRT_HAVE_KOS$vwarn 1
+#define __CRT_HAVE_KOS$vwarnc 1
 #define __CRT_HAVE_KOS$vwarnx 1
 #define __CRT_HAVE_KOS$vwprintf 1
 #define __CRT_HAVE_KOS$vwprintf_unlocked 1
@@ -7553,6 +7560,7 @@
 #define __CRT_HAVE_KOS$waitid 1
 #define __CRT_HAVE_KOS$waitpid 1
 #define __CRT_HAVE_KOS$warn 1
+#define __CRT_HAVE_KOS$warnc 1
 #define __CRT_HAVE_KOS$warnx 1
 #define __CRT_HAVE_KOS$wchdir 1
 #define __CRT_HAVE_KOS$wchown 1
@@ -9095,6 +9103,7 @@
 #define __CRT_HAVE_DOS$erff 1
 #define __CRT_HAVE_DOS$erfl 1
 #define __CRT_HAVE_DOS$err 1
+#define __CRT_HAVE_DOS$errc 1
 #define __CRT_HAVE_DOS$error 1
 #define __CRT_HAVE_DOS$error_at_line 1
 #define __CRT_HAVE_DOS$errx 1
@@ -10873,6 +10882,7 @@
 #define __CRT_HAVE_DOS$vasprintf 1
 #define __CRT_HAVE_DOS$vdprintf 1
 #define __CRT_HAVE_DOS$verr 1
+#define __CRT_HAVE_DOS$verrc 1
 #define __CRT_HAVE_DOS$verrx 1
 #define __CRT_HAVE_DOS$versionsort 1
 #define __CRT_HAVE_DOS$versionsort64 1
@@ -10899,6 +10909,7 @@
 #define __CRT_HAVE_DOS$vswscanf 1
 #define __CRT_HAVE_DOS$vsyslog 1
 #define __CRT_HAVE_DOS$vwarn 1
+#define __CRT_HAVE_DOS$vwarnc 1
 #define __CRT_HAVE_DOS$vwarnx 1
 #define __CRT_HAVE_DOS$vwprintf 1
 #define __CRT_HAVE_DOS$vwprintf_unlocked 1
@@ -10913,6 +10924,7 @@
 #define __CRT_HAVE_DOS$waitid 1
 #define __CRT_HAVE_DOS$waitpid 1
 #define __CRT_HAVE_DOS$warn 1
+#define __CRT_HAVE_DOS$warnc 1
 #define __CRT_HAVE_DOS$warnx 1
 #define __CRT_HAVE_DOS$wchdir 1
 #define __CRT_HAVE_DOS$wchown 1

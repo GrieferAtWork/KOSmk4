@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f5d4da7 */
+/* HASH CRC-32:0x1442c2a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,8 +185,10 @@ DFUN(".text.crt.dos.string.envz", libd_envz_strip, libc_envz_strip, TV, 2, TP, T
 
 /* err */
 DFUN(".text.crt.dos.error", libd_vwarn, libc_vwarn, TV, 2, TP, TP)
+DFUN(".text.crt.dos.error", libd_vwarnc, libc_vwarnc, TV, 3, TIn(__SIZEOF_ERRNO_T__), TP, TP)
 DFUN(".text.crt.dos.error", libd_vwarnx, libc_vwarnx, TV, 2, TP, TP)
 DFUN(".text.crt.dos.error", libd_verr, libc_verr, TV, 3, TD, TP, TP)
+DFUN(".text.crt.dos.error", libd_verrc, libc_verrc, TV, 4, TD, TIn(__SIZEOF_ERRNO_T__), TP, TP)
 DFUN(".text.crt.dos.error", libd_verrx, libc_verrx, TV, 3, TD, TP, TP)
 
 /* execinfo */

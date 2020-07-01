@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca657caf */
+/* HASH CRC-32:0x928c90bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -788,6 +788,7 @@
 #define __CRT_HAVE_DOS$erff 1
 #define __CRT_HAVE_DOS$erfl 1
 #define __CRT_HAVE_DOS$err 1
+#define __CRT_HAVE_DOS$errc 1
 #define __CRT_HAVE_DOS$error 1
 #define __CRT_HAVE_DOS$error_at_line 1
 #define __CRT_HAVE_DOS$errx 1
@@ -2625,6 +2626,7 @@
 #define __CRT_HAVE_DOS$vasprintf 1
 #define __CRT_HAVE_DOS$vdprintf 1
 #define __CRT_HAVE_DOS$verr 1
+#define __CRT_HAVE_DOS$verrc 1
 #define __CRT_HAVE_DOS$verrx 1
 #define __CRT_HAVE_DOS$versionsort 1
 #define __CRT_HAVE_DOS$versionsort64 1
@@ -2658,6 +2660,7 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$vsyslog 1
 #define __CRT_HAVE_DOS$vwarn 1
+#define __CRT_HAVE_DOS$vwarnc 1
 #define __CRT_HAVE_DOS$vwarnx 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2676,6 +2679,7 @@
 #define __CRT_HAVE_DOS$waitid 1
 #define __CRT_HAVE_DOS$waitpid 1
 #define __CRT_HAVE_DOS$warn 1
+#define __CRT_HAVE_DOS$warnc 1
 #define __CRT_HAVE_DOS$warnx 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3716,6 +3720,7 @@
 #define __CRT_HAVE_erff 1
 #define __CRT_HAVE_erfl 1
 #define __CRT_HAVE_err 1
+#define __CRT_HAVE_errc 1
 #define __CRT_HAVE_error 1
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_error_active 1
@@ -5646,6 +5651,7 @@
 #define __CRT_HAVE_vasprintf 1
 #define __CRT_HAVE_vdprintf 1
 #define __CRT_HAVE_verr 1
+#define __CRT_HAVE_verrc 1
 #define __CRT_HAVE_verrx 1
 #define __CRT_HAVE_versionsort 1
 #define __CRT_HAVE_versionsort64 1
@@ -5677,6 +5683,7 @@
 #define __CRT_HAVE_vswscanf 1
 #define __CRT_HAVE_vsyslog 1
 #define __CRT_HAVE_vwarn 1
+#define __CRT_HAVE_vwarnc 1
 #define __CRT_HAVE_vwarnx 1
 #define __CRT_HAVE_vwprintf 1
 #define __CRT_HAVE_vwprintf_unlocked 1
@@ -5691,6 +5698,7 @@
 #define __CRT_HAVE_waitid 1
 #define __CRT_HAVE_waitpid 1
 #define __CRT_HAVE_warn 1
+#define __CRT_HAVE_warnc 1
 #define __CRT_HAVE_warnx 1
 #define __CRT_HAVE_wchdir 1
 #define __CRT_HAVE_wchown 1
