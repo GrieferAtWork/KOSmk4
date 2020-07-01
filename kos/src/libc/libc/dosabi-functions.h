@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeacfdec7 */
+/* HASH CRC-32:0x1f5d4da7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1470,7 +1470,7 @@ DFUN(".text.crt.dos.random", libd_initstate_r, libc_initstate_r, TD, 4, TD, TP, 
 DFUN(".text.crt.dos.random", libd_setstate_r, libc_setstate_r, TD, 2, TP, TP)
 DFUN(".text.crt.dos.sched.process", libd_on_exit, libc_on_exit, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemps, libc_mkstemps, TD, 2, TP, TD)
-DFUN(".text.crt.dos.fs.utility", libd_rpmatch, libc_rpmatch, TD, 1, TP)
+DFUN(".text.crt.dos.utility.locale", libd_rpmatch, libc_rpmatch, TD, 1, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemps64, libc_mkstemps64, TD, 2, TP, TD)
 DFUN(".text.crt.dos.random", libd_rand_r, libc_rand_r, TD, 1, TP)
 DFUN(".text.crt.dos.system.utility", libd_getloadavg, libc_getloadavg, TD, 2, TP, TD)

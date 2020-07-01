@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb80411d */
+/* HASH CRC-32:0x75565383 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -809,6 +809,15 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
 	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return NULL;
 	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+}
+INTERN ATTR_SECTION(".text.crt.utility.locale") WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
+	char c = response[0];
+	if (c == 'n' || c == 'N')
+		return 0;
+	if (c == 'y' || c == 'Y')
+		return 1;
+	return -1;
 }
 #ifndef __CRT_QCVT_BUFFER_DEFINED
 #define __CRT_QCVT_BUFFER_DEFINED 1
@@ -3080,6 +3089,7 @@ DEFINE_PUBLIC_ALIAS(_ecvt, libc_qecvt);
 DEFINE_PUBLIC_ALIAS(qecvt, libc_qecvt);
 DEFINE_PUBLIC_ALIAS(_fcvt, libc_qfcvt);
 DEFINE_PUBLIC_ALIAS(qfcvt, libc_qfcvt);
+DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
 DEFINE_PUBLIC_ALIAS(_ecvt, libc_ecvt);
 DEFINE_PUBLIC_ALIAS(ecvt, libc_ecvt);
 DEFINE_PUBLIC_ALIAS(_ecvt, libc_fcvt);

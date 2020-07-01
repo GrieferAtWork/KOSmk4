@@ -1084,17 +1084,6 @@ NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
 }
 /*[[[end:libc_mkstemps]]]*/
 
-/*[[[head:libc_rpmatch,hash:CRC-32=0x30b72b07]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response)
-/*[[[body:libc_rpmatch]]]*/
-/*AUTO*/{
-	(void)response;
-	CRT_UNIMPLEMENTED("rpmatch"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_rpmatch]]]*/
 
 /*[[[head:libc_mkstemps64,hash:CRC-32=0xdfb71f3]]]*/
 #if !defined(__O_LARGEFILE) || !__O_LARGEFILE
@@ -2335,7 +2324,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xad665e64]]]*/
+/*[[[start:exports,hash:CRC-32=0xfbac2fbf]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2362,7 +2351,6 @@ DEFINE_PUBLIC_ALIAS(setstate_r, libc_setstate_r);
 DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
 DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
-DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
 DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps64);
 DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
 DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);

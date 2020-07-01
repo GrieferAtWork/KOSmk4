@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2412dfb0 */
+/* HASH CRC-32:0xf935e33c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1518,7 +1518,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char 
 #elif defined(__CRT_HAVE_mkstemps)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char *__template_, int __suffixlen),(__template_,__suffixlen))
 #endif /* ... */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpmatch,(char const *__response),(__response))
+#ifdef __CRT_HAVE_rpmatch
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpmatch,(char const *__response),(__response))
+#else /* __CRT_HAVE_rpmatch */
+#include <local/stdlib/rpmatch.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(rpmatch, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rpmatch)(char const *__response) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rpmatch))(__response); })
+#endif /* !__CRT_HAVE_rpmatch */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_mkstemps64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps64,(char *__template_, int __suffixlen),(__template_,__suffixlen))
