@@ -196,7 +196,7 @@ INTERN_FUNCTION(libc___afailf)
 	movq   %rsp, %rdi     /* libc_assertion_failure_core:args */
 #ifndef __NO_FPU
 	/* Check if FPU registers need saving */
-	testq  %rax, %rax
+	testb  %al, %al
 	jz     1f
 	.cfi_remember_state
 	subq_imm_cfi (1 * 8 + X86_64_VA_LIST_XMM_COUNT * 16), %rsp
@@ -370,7 +370,7 @@ INTERN_FUNCTION(libc___acheckf)
 	movq   %rsp, %rdi     /* libc_assertion_failure_core:args */
 #ifndef __NO_FPU
 	/* Check if FPU registers need saving */
-	testq  %rax, %rax
+	testb  %al, %al
 	jz     1f
 	.cfi_remember_state
 	subq_imm_cfi (1 * 8 + X86_64_VA_LIST_XMM_COUNT * 16), %rsp

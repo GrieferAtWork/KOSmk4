@@ -81,6 +81,9 @@ END(libc_pthread_clone)
  *                                   int exitcode); */
 .section .text.crt.sched.pthread.pthread_unmap_stack_and_exit
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
+	/* NOTE: We must use `int 80h' for syscalls here, since the (more efficient)
+	 *       method of using `__i386_syscall()' would require use of stack memory
+	 *       _after_ we've already unmapped the stack. */
 	movl   4(%esp), %esp       /* int exitcode */
 	movl   %ecx,          %ebx /* munmap:addr = void *stackaddr */
 	movl   %edx,          %ecx /* munmap:len  = size_t stacksize */
@@ -92,6 +95,7 @@ INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	movl   $(SYS_exit), %eax
 	int    $(0x80)
 	/* -unreachable- */
+	hlt
 END(libc_pthread_unmap_stack_and_exit)
 
 #endif /* !GUARD_LIBC_LIBC_ARCH_I386_PTHREAD32_S */

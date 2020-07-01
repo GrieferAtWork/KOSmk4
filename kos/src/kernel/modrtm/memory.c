@@ -104,8 +104,8 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
 #define VM_FORCEFAULT_FLAG_NOVIO_OPT 0
 #endif /* !VM_FORCEFAULT_FLAG_NOVIO */
 
-PRIVATE void KCALL
-prefault_memory_for_writing(void *addr, size_t num_bytes) {
+PRIVATE void FCALL
+prefault_memory_for_writing(USER void *addr, size_t num_bytes) {
 	vm_forcefault(ADDR_ISKERN(addr) ? &vm_kernel
 	                                : THIS_VM,
 	              addr, num_bytes,
@@ -281,18 +281,20 @@ again_allocate_ftx_controller_for_part:
 					RETHROW();
 				}
 				if likely(!part->dp_futex) {
+					/* Install the new controller. */
 					part->dp_futex = ftx;
 					sync_endwrite(part);
 				} else {
+					/* Race condition: Someone else already installed a controller. */
 					sync_endwrite(part);
 					vm_futex_controller_free(ftx);
 				}
 #ifndef __OPTIMIZE_SIZE__
 				/* While we're at it, also try to look head if there are
 				 * more modified regions with parts that are lacking their
-				 * futex controllers. Because if there are more, then we can
-				 * just fill in their controllers all at once, without having
-				 * to fill them in one-at-a-time. */
+				 * futex controllers. Because if there are more, then we
+				 * can just fill in their controllers all at once, without
+				 * having to fill them in one-at-a-time. */
 				for (++i; i < self->rm_regionc; ++i) {
 					region = self->rm_regionv[i];
 					if (!rtm_memory_region_waschanged(region))
@@ -392,8 +394,8 @@ again_acquire_region_locks_for_vm_lock:
 			        "But we're asserted that all of this should be writable...\n"
 			        "region->mr_addr = %p\n"
 			        "region->mr_data = %p\n"
-			        "region->mr_size = %#Iu\n"
-			        "error           = %#Iu\n",
+			        "region->mr_size = %Iu\n"
+			        "error           = %Iu\n",
 			        region->mr_addr,
 			        region->mr_data,
 			        region->mr_size,
@@ -404,7 +406,7 @@ again_acquire_region_locks_for_vm_lock:
 		assert(part->dp_futex);
 		++part->dp_futex->fc_rtm_vers;
 		COMPILER_BARRIER();
-		/* Release our lock from this part. */
+		/* Release our lock to this part. */
 		sync_endwrite(part);
 	}
 	if (has_modified_kern)

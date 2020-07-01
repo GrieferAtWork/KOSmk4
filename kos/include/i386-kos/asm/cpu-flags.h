@@ -31,7 +31,7 @@
 #define EFLAGS_IF          __UINT32_C(0x00000200) /* [bit(9)] Interrupt Enable Flag (System). */
 #define EFLAGS_DF          __UINT32_C(0x00000400) /* [bit(10)] Direction Flag (Control). */
 #define EFLAGS_OF          __UINT32_C(0x00000800) /* [bit(11)] Overflow Flag Status. (unsigned arithmetic) */
-#define EFLAGS_IOPL(n) (((n)&3) << 12)/* [bit(12,13)] I/O Privilege Level (System). */
+#define EFLAGS_IOPL(n)     (((n) & 3) << 12)      /* [bit(12,13)] I/O Privilege Level (System). */
 #define EFLAGS_IOPLMASK    __UINT32_C(0x00003000) /* [bit(12,13)] I/O Privilege Level (System). */
 #define EFLAGS_NT          __UINT32_C(0x00004000) /* [bit(14)] Nested Task Flag (System). */
 #define EFLAGS_RF          __UINT32_C(0x00010000) /* [bit(16)] Resume Flag (System). */

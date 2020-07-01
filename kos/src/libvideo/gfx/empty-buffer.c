@@ -191,10 +191,10 @@ video_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
 PRIVATE NONNULL((1, 2)) void CC
 video_buffer_empty_unlock(struct video_buffer *__restrict UNUSED(self),
                           struct video_lock const *__restrict lock) {
-	(void)lock;
 	assert(lock->vl_data == (byte_t *)video_buffer_empty_data);
 	assert(lock->vl_size == 0);
 	assert(lock->vl_stride == 0);
+	(void)lock;
 }
 
 PRIVATE NONNULL((1, 2)) void CC

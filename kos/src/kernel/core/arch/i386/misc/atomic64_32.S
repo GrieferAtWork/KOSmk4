@@ -54,7 +54,7 @@ ST(atomic64_read)
 	xorl   OVAL_HI, OVAL_HI
 	xorl   NVAL_LO, NVAL_LO
 	xorl   NVAL_HI, NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
@@ -74,7 +74,7 @@ ST(atomic64_cmpxch_val)
 	movl   16(%esp), OVAL_HI
 	movl   20(%esp), NVAL_LO
 	movl   24(%esp), NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret    $(16)
@@ -94,7 +94,7 @@ ST(atomic64_cmpxch)
 	movl   16(%esp), OVAL_HI
 	movl   20(%esp), NVAL_LO
 	movl   24(%esp), NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	sete   %al
@@ -114,7 +114,7 @@ ST(atomic64_xch)
 	movl   %ecx, %esi
 	movl   12(%esp), NVAL_LO
 	movl   16(%esp), NVAL_HI
-1:	lock;  cmpxchg8b 0(%esi)
+1:	lock   cmpxchg8b 0(%esi)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -133,7 +133,7 @@ ST(atomic64_write)
 	movl   %ecx, %esi
 	movl   12(%esp), NVAL_LO
 	movl   16(%esp), NVAL_HI
-1:	lock;  cmpxchg8b 0(%esi)
+1:	lock   cmpxchg8b 0(%esi)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -154,7 +154,7 @@ ST(atomic64_fetchadd)
 	movl   OVAL_HI, NVAL_HI
 	addl   12(%esp), NVAL_LO
 	adcl   16(%esp), NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -175,7 +175,7 @@ ST(atomic64_fetchand)
 	movl   OVAL_HI, NVAL_HI
 	andl   12(%esp), NVAL_LO
 	andl   16(%esp), NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -196,7 +196,7 @@ ST(atomic64_fetchor)
 	movl   OVAL_HI, NVAL_HI
 	orl    12(%esp), NVAL_LO
 	orl    16(%esp), NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -217,7 +217,7 @@ ST(atomic64_fetchxor)
 	movl   OVAL_HI, NVAL_HI
 	xorl   12(%esp), NVAL_LO
 	xorl   16(%esp), NVAL_HI
-	lock;  cmpxchg8b 0(%esi)
+	lock   cmpxchg8b 0(%esi)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx

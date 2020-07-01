@@ -1128,7 +1128,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 	struct rtm_machstate mach;
 	x86_rtm_status_t status;
 	mach.r_icstate = state;
-	rtm_memory_init(&mach.r_mem);
+	rtm_memory_init(&mach.r_mem, icpustate_isuser(state));
 	mach.r_pax = gpregs_getpax(&state->ics_gpregs);
 	mach.r_pcx = gpregs_getpcx(&state->ics_gpregs);
 	mach.r_pdx = gpregs_getpdx(&state->ics_gpregs);

@@ -74,7 +74,7 @@ PUBLIC_FUNCTION(__predict_update_eax)
 1:	movl   $(0), %eax
 	sete   %al
 	/* Increment the miss/hit counter */
-	lock;  incl 4(%ecx,%eax,4)
+	lock   incl 4(%ecx,%eax,4)
 	popl_cfi_r %eax
 	popfl_cfi_r
 	ret

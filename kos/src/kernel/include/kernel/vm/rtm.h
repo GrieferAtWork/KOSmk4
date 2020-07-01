@@ -62,7 +62,7 @@ struct vm_rtm_driver_hooks {
 #define vm_rtm_driver_hooks_destroy(self) driver_destroy((self)->rdh_driver)
 DEFINE_REFCOUNT_FUNCTIONS(struct vm_rtm_driver_hooks, rdh_driver->d_refcnt, vm_rtm_driver_hooks_destroy)
 
-/* The currently installed RTM driver hooks. */
+/* [0..1] The currently installed RTM driver hooks. */
 DATDEF XATOMIC_WEAKLYREF(struct vm_rtm_driver_hooks) vm_rtm_hooks;
 
 #endif /* __CC__ */

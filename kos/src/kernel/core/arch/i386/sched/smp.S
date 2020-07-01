@@ -557,7 +557,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* Check if CPUID is supported.
 	 * NOTE: For this, we need 8 bytes of stack memory... */
 	movb   $(1), %al
-	lock;  xchgb %al, SYM(x86_smp_entry32_ministack_lock)
+	lock   xchgb %al, SYM(x86_smp_entry32_ministack_lock)
 	testb  %al, %al
 	jnz    x86_smp_entry32_spin
 
@@ -788,7 +788,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	EXTERN(thiscpu_state)
 	movP   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
 	EXTERN(cpu_online_count)
-	lock;  incP cpu_online_count
+	lock   incP cpu_online_count
 
 	/* Found our CPU (now stored in R_CPU) */
 	EXTERN(thiscpu_current)
@@ -995,7 +995,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	/* Check for, and load all threads that are pending execution by our CPU. */
 	movP   $(CPU_PENDING_ENDOFCHAIN), %Pdx
 	EXTERN(thiscpu_pending)
-	lock;  xchgP %Pdx, thiscpu_pending(R_CPU)
+	lock   xchgP %Pdx, thiscpu_pending(R_CPU)
 	cmpP   $(CPU_PENDING_ENDOFCHAIN), %Pdx
 	jz     1f
 	movP   R_CPU, %Pcx
@@ -1200,7 +1200,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 
 	/* Decrement the cpu-online counter. */
 	EXTERN(cpu_online_count)
-	lock;  decP cpu_online_count
+	lock   decP cpu_online_count
 
 	EXTERN(thiscpu_idle_sched_state)
 	movP   %Psp, thiscpu_idle_sched_state(%R_fcall0P)

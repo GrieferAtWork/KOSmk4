@@ -105,7 +105,7 @@ PUBLIC_FUNCTION(__predict_update_rax)
 1:	movq   $(0), %rax
 	sete   %al
 	/* Increment the miss/hit counter */
-	lock;  incl  4(%rdi,%rax,4)
+	lock   incl 4(%rdi,%rax,4)
 	popq_cfi_r %rax
 	popfq_cfi_r
 	ret

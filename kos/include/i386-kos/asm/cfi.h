@@ -48,28 +48,20 @@ __ASM_BEGIN
 #ifdef __x86_64__
 __ASM_L(.macro subq_imm_cfi offset:req, reg:req)
 __ASM_L(	subq $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
-__ASM_L(.ifc __ASM_ARG(\reg),%rsp)
 __ASM_L(	.cfi_adjust_cfa_offset __ASM_ARG(\offset))
-__ASM_L(.endif)
 __ASM_L(.endm)
 __ASM_L(.macro addq_imm_cfi offset:req, reg:req)
 __ASM_L(	addq $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
-__ASM_L(.ifc __ASM_ARG(\reg),%rsp)
 __ASM_L(	.cfi_adjust_cfa_offset -__ASM_ARG(\offset))
-__ASM_L(.endif)
 __ASM_L(.endm)
 #else /* __x86_64__ */
 __ASM_L(.macro subl_imm_cfi offset:req, reg:req)
 __ASM_L(	subl $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
-__ASM_L(.ifc __ASM_ARG(\reg),%esp)
 __ASM_L(	.cfi_adjust_cfa_offset __ASM_ARG(\offset))
-__ASM_L(.endif)
 __ASM_L(.endm)
 __ASM_L(.macro addl_imm_cfi offset:req, reg:req)
 __ASM_L(	addl $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
-__ASM_L(.ifc __ASM_ARG(\reg),%esp)
 __ASM_L(	.cfi_adjust_cfa_offset -__ASM_ARG(\offset))
-__ASM_L(.endif)
 __ASM_L(.endm)
 #endif /* !__x86_64__ */
 

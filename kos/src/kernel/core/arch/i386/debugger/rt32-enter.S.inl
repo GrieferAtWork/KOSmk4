@@ -174,7 +174,7 @@ L(.Lacquire_lapicid_lock):
 	leal   1(%eax), %ecx
 	xorl   %eax, %eax
 	EXTERN(x86_dbg_owner_lapicid)
-	lock;  cmpxchgw %cx, %ss:x86_dbg_owner_lapicid
+	lock   cmpxchgw %cx, %ss:x86_dbg_owner_lapicid
 	jz     L(.Lfirst_lapicid_lock) /* First time the debugger is entered. */
 	cmpw   %ax, %cx /* PREVIOUS_LAPIC_ID == MY_LAPIC_ID */
 	je     L(.Lfirst_lapicid_lock) /* Recursive debugger entry (handled later) */

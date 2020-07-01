@@ -49,7 +49,12 @@ struct rtm_memory {
 	                                         * value would grow larger than `rtm_memory_limit', the
 	                                         * current RTM operation must fail with `RTM_ABORT_CAPACITY' */
 	size_t                     rm_regionc;  /* # of elements from `rm_regionv' that are currently in use. */
-	struct rtm_memory_region **rm_regionv;  /* [1..1][owned][0..rm_regionc][owned] Vector of in-use memory regions. */
+	struct rtm_memory_region **rm_regionv;  /* [1..1][owned][0..rm_regionc][owned] Vector of in-use memory regions.
+	                                         * Sorted ascendingly by `mr_addr', meaning that an bsearch with a worst
+	                                         * case lookup time of O(log2(n)) can be used for locating specific memory
+	                                         * regions. (though in practice, most programs will only ever use 2 regions:
+	                                         * one for the calling program's stack, and the other for the parts of memory
+	                                         * that the program is actually intending to modify) */
 	bool                       rm_chkuser;  /* [const] When true, verify that `addr' doesn't point into kernel-space
 	                                         * as part of the execution of `rtm_memory_read()' and `rtm_memory_write()'
 	                                         * before constructing a new, or extending an existing RTM memory region. */
@@ -61,15 +66,17 @@ INTDEF size_t rtm_memory_limit;
 
 
 /* Initialize a given `struct rtm_memory' */
-#define RTM_MEMORY_INIT { 0, 0, __NULLPTR }
-#define rtm_memory_init(self) \
-	((self)->rm_mem_used = 0, \
-	 (self)->rm_regionc  = 0, \
-	 (self)->rm_regionv  = __NULLPTR)
-#define rtm_memory_cinit(self)                  \
-	(__hybrid_assert((self)->rm_mem_used == 0), \
-	 __hybrid_assert((self)->rm_regionc == 0),  \
-	 __hybrid_assert((self)->rm_regionv == __NULLPTR))
+#define RTM_MEMORY_INIT(chkuser) { 0, 0, __NULLPTR, chkuser }
+#define rtm_memory_init(self, chkuser) \
+	((self)->rm_mem_used = 0,          \
+	 (self)->rm_regionc  = 0,          \
+	 (self)->rm_regionv  = __NULLPTR,  \
+	 (self)->rm_chkuser  = (chkuser))
+#define rtm_memory_cinit(self, chkuser)                \
+	(__hybrid_assert((self)->rm_mem_used == 0),        \
+	 __hybrid_assert((self)->rm_regionc == 0),         \
+	 __hybrid_assert((self)->rm_regionv == __NULLPTR), \
+	 (self)->rm_chkuser = (chkuser))
 
 /* Finalize a given `struct rtm_memory' */
 INTDEF NOBLOCK NONNULL((1)) void

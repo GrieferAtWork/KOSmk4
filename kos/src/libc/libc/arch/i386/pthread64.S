@@ -55,10 +55,10 @@ INTERN_FUNCTION(libc_pthread_clone)
 	movq   %rdx, %r10                           /* pid_t *ctid */
 	movq   OFFSET_PTHREAD_STACKADDR(%rdi), %rsi
 	addq   OFFSET_PTHREAD_STACKSIZE(%rdi), %rsi /* void *child_stack */
-	movq       $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
-	             CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
-	             CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID |      \
-	             CLONE_IO | CLONE_PARENT_SETTID), %rdi /* int flags */
+	movq   $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
+	         CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
+	         CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID |      \
+	         CLONE_IO | CLONE_PARENT_SETTID), %rdi /* int flags */
 	/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
 	movq   $(SYS_clone), %rax
 	syscall
@@ -94,6 +94,7 @@ INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	movq   $(SYS_exit), %rax
 	syscall
 	/* -unreachable- */
+	hlt
 END(libc_pthread_unmap_stack_and_exit)
 
 #endif /* !GUARD_LIBC_LIBC_ARCH_I386_PTHREAD64_S */

@@ -38,8 +38,9 @@
 
 DECL_BEGIN
 
-/* The currently installed RTM driver hooks. */
-PUBLIC XATOMIC_WEAKLYREF(struct vm_rtm_driver_hooks) vm_rtm_hooks = XATOMIC_WEAKLYREF_INIT(NULL);
+/* [0..1] The currently installed RTM driver hooks. */
+PUBLIC XATOMIC_WEAKLYREF(struct vm_rtm_driver_hooks)
+vm_rtm_hooks = XATOMIC_WEAKLYREF_INIT(NULL);
 
 #ifdef __ARCH_WANT_SYSCALL_RTM_BEGIN
 PRIVATE struct icpustate *FCALL
