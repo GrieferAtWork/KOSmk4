@@ -76,9 +76,9 @@
 #else
 #   define __CRT_DOS 2
 #endif
-#else
+#else /* ... */
 #   define __CRT_GENERIC 1
-#endif
+#endif /* !... */
 #endif /* !__CRT_... */
 
 
@@ -112,7 +112,7 @@
 #include <crt-features/generic.h>
 #elif defined(__CRT_FREESTANDING)
 #define __NO_STDSTREAMS 1
-#endif
+#endif /* ... */
 
 
 #define __ATTR_LIBC_PRINTF(a, b)    /* nothing */
@@ -147,8 +147,8 @@
 #endif /* !__ATTR_MALL_PAGEALIGNED */
 
 #undef __LIBC_BIND_OPTIMIZATIONS
-#if !defined(__INTELLISENSE__) && \
-    (defined(__OPTIMIZE__) || defined(__KERNEL__))
+#if (!defined(__INTELLISENSE__) && \
+     (defined(__OPTIMIZE__) || defined(__KERNEL__)))
 #define __LIBC_BIND_OPTIMIZATIONS 1
 #endif /* ... */
 
@@ -157,53 +157,52 @@
 #if (__LIBC_BIND_CRTBUILTINS + 0) == 0
 #undef __LIBC_BIND_CRTBUILTINS
 #endif /* !__LIBC_BIND_CRTBUILTINS */
-#elif !defined(__INTELLISENSE__) && \
-      !defined(__NO_has_builtin) && \
-      /* Don't bind CRT-builtin functions (such as `__builtin_malloc()') when building \
-       * libc itself, so-as to prevent GCC from generating relocations against the \
-       * real symbols (which would end up as relocations in the final binary), when we \
-       * actually want everything to be linked against symbols from the `libc_' namespace. */ \
-      !defined(__BUILDING_LIBC) && \
-      /* Don't bind CRT-builtin functions when linking against the i386 kernel's builtin CRT. \
-       * Because GCC assumes the default calling convention for builtin functions, we'd end up \
-       * with stack corruptions since the kernel uses STDCALL, but gcc invokes as CDECL. */ \
-      !(defined(__CRT_KOS_KERNEL) && (defined(__i386__) && !defined(__x86_64__)))
+#elif (!defined(__INTELLISENSE__) && !defined(__NO_has_builtin) &&                              \
+       /* Don't bind CRT-builtin functions (such as `__builtin_malloc()') when building         \
+        * libc itself, so-as to prevent GCC from generating relocations against the             \
+        * real symbols (which would end up as relocations in the final binary), when we         \
+        * actually want everything to be linked against symbols from the `libc_' namespace. */  \
+       !defined(__BUILDING_LIBC) &&                                                             \
+       /* Don't bind CRT-builtin functions when linking against the i386 kernel's builtin CRT.  \
+        * Because GCC assumes the default calling convention for builtin functions, we'd end up \
+        * with stack corruptions since the kernel uses STDCALL, but gcc invokes as CDECL. */    \
+       !(defined(__CRT_KOS_KERNEL) && (defined(__i386__) && !defined(__x86_64__))))
 #define __LIBC_BIND_CRTBUILTINS 1
 #endif
 
 
 /* Automatic namespacing for fast (platform/arch-specific) optimized implementations of functions. */
 #ifdef __cplusplus
-#define __NAMESPACE_FAST_BEGIN              namespace __optimized_imp {
-#define __NAMESPACE_FAST_END                }
-#define __NAMESPACE_FAST_SYM                ::__optimized_imp::
-#define __NAMESPACE_FAST_USING(x)           using ::__optimized_imp::x;
-#define __NAMESPACE_FAST_USING_OR_IMPL(x,i) using ::__optimized_imp::x;
-#define __LIBC_FAST_NAME(x)                 x
+#define __NAMESPACE_FAST_BEGIN               namespace __optimized_imp {
+#define __NAMESPACE_FAST_END                 }
+#define __NAMESPACE_FAST_SYM                 ::__optimized_imp::
+#define __NAMESPACE_FAST_USING(x)            using ::__optimized_imp::x;
+#define __NAMESPACE_FAST_USING_OR_IMPL(x, i) using ::__optimized_imp::x;
+#define __LIBC_FAST_NAME(x)                  x
 #else /* __cplusplus */
-#define __NAMESPACE_FAST_BEGIN              /* nothing */
-#define __NAMESPACE_FAST_END                /* nothing */
-#define __NAMESPACE_FAST_SYM                /* nothing */
-#define __NAMESPACE_FAST_USING(x)           /* nothing */
-#define __NAMESPACE_FAST_USING_OR_IMPL(x,i) i
-#define __LIBC_FAST_NAME(x)                 __optimized_##x
+#define __NAMESPACE_FAST_BEGIN               /* nothing */
+#define __NAMESPACE_FAST_END                 /* nothing */
+#define __NAMESPACE_FAST_SYM                 /* nothing */
+#define __NAMESPACE_FAST_USING(x)            /* nothing */
+#define __NAMESPACE_FAST_USING_OR_IMPL(x, i) i
+#define __LIBC_FAST_NAME(x)                  __optimized_##x
 #endif /* !__cplusplus */
 
 /* Automatic namespacing for header-local implementations of functions. */
 #ifdef __cplusplus
-#define __NAMESPACE_LOCAL_BEGIN              namespace __local_imp {
-#define __NAMESPACE_LOCAL_END                }
-#define __NAMESPACE_LOCAL_SYM                ::__local_imp::
-#define __NAMESPACE_LOCAL_USING(x)           using ::__local_imp::x;
-#define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) using ::__local_imp::x;
-#define __LIBC_LOCAL_NAME(x)                 x
+#define __NAMESPACE_LOCAL_BEGIN               namespace __local_imp {
+#define __NAMESPACE_LOCAL_END                 }
+#define __NAMESPACE_LOCAL_SYM                 ::__local_imp::
+#define __NAMESPACE_LOCAL_USING(x)            using ::__local_imp::x;
+#define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) using ::__local_imp::x;
+#define __LIBC_LOCAL_NAME(x)                  x
 #else /* __cplusplus */
-#define __NAMESPACE_LOCAL_BEGIN              /* nothing */
-#define __NAMESPACE_LOCAL_END                /* nothing */
-#define __NAMESPACE_LOCAL_SYM                /* nothing */
-#define __NAMESPACE_LOCAL_USING(x)           /* nothing */
-#define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) i
-#define __LIBC_LOCAL_NAME(x)                 __local_##x
+#define __NAMESPACE_LOCAL_BEGIN               /* nothing */
+#define __NAMESPACE_LOCAL_END                 /* nothing */
+#define __NAMESPACE_LOCAL_SYM                 /* nothing */
+#define __NAMESPACE_LOCAL_USING(x)            /* nothing */
+#define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) i
+#define __LIBC_LOCAL_NAME(x)                  __local_##x
 #endif /* !__cplusplus */
 
 #ifndef __FCALL
@@ -211,9 +210,9 @@
 #define __FCALL __ATTR_SYSVABI
 #elif defined(__i386__)
 #define __FCALL __ATTR_FASTCALL
-#else
+#else /* ... */
 #define __FCALL /* nothing */
-#endif
+#endif /* !... */
 #endif /* !__FCALL */
 
 #ifndef __KCALL
@@ -221,9 +220,9 @@
 #define __KCALL __ATTR_SYSVABI
 #elif defined(__i386__)
 #define __KCALL __ATTR_STDCALL
-#else
+#else /* ... */
 #define __KCALL /* nothing */
-#endif
+#endif /* !... */
 #endif /* !__KCALL */
 
 /*
@@ -354,9 +353,9 @@
 #define __LOCAL_LIBC(name) __INTERN __ATTR_SELECTANY __ATTR_UNUSED
 #elif !defined(__NO_ATTR_WEAK)
 #define __LOCAL_LIBC(name) __INTERN __ATTR_WEAK __ATTR_UNUSED
-#else
+#else /* ... */
 #define __LOCAL_LIBC(name) __PRIVATE __ATTR_UNUSED
-#endif
+#endif /* !... */
 #endif /* !__LOCAL_LIBC */
 
 #ifndef __NO_ATTR_SECTION
@@ -372,9 +371,9 @@
 #define __LOCAL_LIBC_DATA(name) __INTERN __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #elif !defined(__NO_ATTR_WEAK) && 1
 #define __LOCAL_LIBC_DATA(name) __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
-#else
+#else /* ... */
 #define __LOCAL_LIBC_DATA(name) __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
-#endif
+#endif /* !... */
 #endif /* !__LOCAL_LIBC_DATA */
 
 #ifndef __LOCAL_LIBC_CONST_DATA
@@ -383,9 +382,9 @@
 #define __LOCAL_LIBC_CONST_DATA(name) extern __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
 #elif !defined(__NO_ATTR_WEAK) && 1
 #define __LOCAL_LIBC_CONST_DATA(name) extern __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
-#else
+#else /* ... */
 #define __LOCAL_LIBC_CONST_DATA(name) __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
-#endif
+#endif /* !... */
 #else /* __cplusplus */
 #define __LOCAL_LIBC_CONST_DATA       __LOCAL_LIBC_DATA
 #endif /* !__cplusplus */
@@ -654,7 +653,7 @@ typedef void *__locale_t;
 #define __CRT_AT_FDCWD   (-100)
 #elif defined(__CRT_CYG)
 #define __CRT_AT_FDCWD   (-2)
-#endif
+#endif /* ... */
 #endif /* !__CRT_AT_FDCWD */
 
 
