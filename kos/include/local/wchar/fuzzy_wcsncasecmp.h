@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe47699c */
+/* HASH CRC-32:0xbbbf9c1f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fuzzy_wcsncasecmp_defined
 #define __local_fuzzy_wcsncasecmp_defined 1
 #include <__crt.h>
+#include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fuzzy_wmemcasecmp from wchar */
@@ -28,19 +29,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_fuzzy_wmemcasecmp_defined 1
 #ifdef __CRT_HAVE_fuzzy_wmemcasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_wmemcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
-#else /* __CRT_HAVE_fuzzy_wmemcasecmp */
-__NAMESPACE_LOCAL_END
-#include <parts/malloca.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __NO_MALLOCA
+#elif !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_END
 #include <local/wchar/fuzzy_wmemcasecmp.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fuzzy_wmemcasecmp __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp)
-#else /* !__NO_MALLOCA */
+#else /* ... */
 #undef __local___localdep_fuzzy_wmemcasecmp_defined
-#endif /* __NO_MALLOCA */
-#endif /* !__CRT_HAVE_fuzzy_wmemcasecmp */
+#endif /* !... */
 #endif /* !__local___localdep_fuzzy_wmemcasecmp_defined */
 /* Dependency: wcsnlen from wchar */
 #ifndef __local___localdep_wcsnlen_defined

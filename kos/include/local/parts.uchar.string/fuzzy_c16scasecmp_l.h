@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96a3f3c1 */
+/* HASH CRC-32:0x37283f5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fuzzy_c16scasecmp_l_defined
 #define __local_fuzzy_c16scasecmp_l_defined 1
 #include <__crt.h>
+#include <parts/malloca.h>
 #if (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16slen from parts.uchar.string */
@@ -53,28 +54,18 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_c16memcasecmp_l,(__CHAR16_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
 #elif defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_c16memcasecmp_l,(__CHAR16_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <parts/malloca.h>
-__NAMESPACE_LOCAL_BEGIN
-#if !defined(__NO_MALLOCA) && __SIZEOF_WCHAR_T__ == 2
+#elif !defined(__NO_MALLOCA) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/wchar/fuzzy_wmemcasecmp_l.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fuzzy_c16memcasecmp_l (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *, __SIZE_TYPE__, __CHAR16_TYPE__ const *, __SIZE_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))
-#else /* !__NO_MALLOCA && __SIZEOF_WCHAR_T__ == 2 */
-__NAMESPACE_LOCAL_END
-#include <parts/malloca.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __NO_MALLOCA
+#elif !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/fuzzy_c16memcasecmp_l.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fuzzy_c16memcasecmp_l __LIBC_LOCAL_NAME(fuzzy_c16memcasecmp_l)
-#else /* !__NO_MALLOCA */
+#else /* ... */
 #undef __local___localdep_fuzzy_c16memcasecmp_l_defined
-#endif /* __NO_MALLOCA */
-#endif /* __NO_MALLOCA || __SIZEOF_WCHAR_T__ != 2 */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_c16memcasecmp_l_defined */
 __LOCAL_LIBC(fuzzy_c16scasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__

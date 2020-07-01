@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cc92d68 */
+/* HASH CRC-32:0x6cc3bc67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__strerror_defined
 #define __local__strerror_defined 1
 #include <__crt.h>
+#include <parts/errno.h>
 #if defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _strerror_s from string */
@@ -31,19 +32,14 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,__localdep__strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),_strerror_s,(__buf,__buflen,__message))
-#else /* __CRT_HAVE__strerror_s */
-__NAMESPACE_LOCAL_END
-#include <parts/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __libc_geterrno
+#elif defined(__libc_geterrno)
 __NAMESPACE_LOCAL_END
 #include <local/string/_strerror_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__strerror_s __LIBC_LOCAL_NAME(_strerror_s)
-#else /* __libc_geterrno */
+#else /* ... */
 #undef __local___localdep__strerror_s_defined
-#endif /* !__libc_geterrno */
-#endif /* !__CRT_HAVE__strerror_s */
+#endif /* !... */
 #endif /* !__local___localdep__strerror_s_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __local_strerror_buf_defined

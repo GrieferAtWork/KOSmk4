@@ -82,6 +82,24 @@ function isLibcLinkage(
 	return false;
 }
 
+function CWriter_ppIfEscaped(
+		fp: CWriter, ppCond: string | UserString, escapeMode: int) {
+	local extendedPrefixes = [];
+	local usedCond = escapeText(
+		ppCond, escapeMode, extendedPrefixes: extendedPrefixes);
+again:
+	local newExtendedPrefixes = [];
+	for (local x: extendedPrefixes) {
+		escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
+			extendedPrefixes: newExtendedPrefixes);
+	}
+	if (newExtendedPrefixes) {
+		extendedPrefixes = newExtendedPrefixes;
+		goto again;
+	}
+	fp.ppIf(usedCond);
+}
+
 class CType {
 	this = default;
 
@@ -1457,7 +1475,7 @@ class LocalFunction {
 			/* Include the preprocessor-condition prefix texts. */
 			for (local x: ppCondPrefix)
 				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
-			fp.ppIf(escapeText(ppCond, escapeMode));
+			CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 			/* Print out the declaration prefix. */
 			for (local x: usedPrototype.declPrefix)
 				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
@@ -1984,15 +2002,15 @@ class FunctionBinding {
 	}
 
 	@@Print requires-conditions for this function (has used by @"$has_function(...)")
-	public function cprintRequires(fp: CWriter | File) {
+	public function cprintRequires(
+			fp: CWriter | File,
+			extendedPrefixes: List | none) {
 		if (ppCond == "0") {
 			fp << "0";
 			return;
 		}
-		if (functionBinding is NamespaceBinding) {
-			fp << ppCond;
-			return;
-		}
+		if (functionBinding is NamespaceBinding)
+			goto do_universal_binding;
 		local usedProtos = functionPrototypes;
 		if (!usedProtos) {
 			fp << "0";
@@ -2006,14 +2024,21 @@ class FunctionBinding {
 			}
 		}
 		if (hasUniversalPrototype) {
+do_universal_binding:
+			if (extendedPrefixes !is none)
+				extendedPrefixes.extend(ppCondPrefix);
 			fp << "(";
-			escapeTextIntoFile(fp, ppCond, ESCAPE_MODE_FULL);
+			escapeTextIntoFile(fp, ppCond, ESCAPE_MODE_FULL,
+				extendedPrefixes: extendedPrefixes);
 			fp << ")";
 			return;
 		}
 		if (ppCond != "1") {
+			if (extendedPrefixes !is none)
+				extendedPrefixes.extend(ppCondPrefix);
 			fp << "((";
-			escapeTextIntoFile(fp, ppCond, ESCAPE_MODE_FULL);
+			escapeTextIntoFile(fp, ppCond, ESCAPE_MODE_FULL,
+				extendedPrefixes: extendedPrefixes);
 			fp << ")&&";
 		}
 		local hasMultiplePrototypes = 0;
@@ -2030,7 +2055,8 @@ class FunctionBinding {
 			if (!isFirst)
 				fp << "||";
 			fp << "(";
-			escapeTextIntoFile(fp, protoCond, ESCAPE_MODE_FULL);
+			escapeTextIntoFile(fp, protoCond, ESCAPE_MODE_FULL,
+				extendedPrefixes: extendedPrefixes);
 			fp << ")";
 			isFirst = false;
 		}
@@ -2337,7 +2363,9 @@ class Function {
 	}
 
 	@@Print requires-conditions for this function (has used by @"$has_function(...)")
-	public function cprintRequires(fp: CWriter | File) {
+	public function cprintRequires(
+			fp: CWriter | File,
+			extendedPrefixes: List | none) {
 		local usedBindings = functionBindings;
 		if (!usedBindings) {
 no_usable_bindings:
@@ -2369,7 +2397,7 @@ no_usable_bindings:
 				if (bind.getRequiresConstant() is none)
 					break;
 			}
-			bind.cprintRequires(fp);
+			bind.cprintRequires(fp, extendedPrefixes);
 		} else {
 			fp << "(";
 			local isFirst = true;
@@ -2382,7 +2410,7 @@ no_usable_bindings:
 				}
 				if (!isFirst)
 					fp << "||";
-				bind.cprintRequires(fp);
+				bind.cprintRequires(fp, extendedPrefixes);
 				isFirst = false;
 			}
 			fp << ")";
@@ -2451,9 +2479,22 @@ no_usable_bindings:
 					     bindBinding.namespace === fp.namespace ||
 					     bindBinding.importName != exposedName))
 						return;
+					local extendedPrefixes = [];
 					for (local x: bind.ppCondPrefix) {
-						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
+						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode,
+								extendedPrefixes: extendedPrefixes)))
 							goto normal_guardName_binding;
+					}
+again_check_extendedPrefixes:
+					local newExtendedPrefixes = [];
+					for (local x: extendedPrefixes) {
+						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode,
+								extendedPrefixes: newExtendedPrefixes)))
+							goto normal_guardName_binding;
+					}
+					if (newExtendedPrefixes) {
+						extendedPrefixes = newExtendedPrefixes;
+						goto again_check_extendedPrefixes;
 					}
 					fp.ppIf("!defined({}) && ({})".format({
 						guardName,
@@ -2516,12 +2557,19 @@ normal_guardName_binding:
 					if (bindBinding.importName != exposedName)
 						continue;
 				}
-				local usedPpCond = escapeText(bind.ppCond, escapeMode);
+				local extendedPrefixes = [];
+				local newExtendedPrefixes = [];
+				local usedPpCond = escapeText(
+					bind.ppCond, escapeMode, extendedPrefixes: newExtendedPrefixes);
 				local oldNs: Namespace | none = none;
 				local oldExternLinkage;
-				for (local x: bind.ppCondPrefix) {
-					local newText = escapeText(x, escapeMode);
-					if (fp.wasPrefixPrinted(newText))
+				local extendedPrefixes = bind.ppCondPrefix;
+handle_extendedPrefixes:
+				for (local text: extendedPrefixes) {
+					text = escapeText(text, escapeMode,
+						extendedPrefixes: newExtendedPrefixes)
+						.rstrip().lstrip("\n");
+					if (fp._wasPrefixPrinted(text))
 						continue;
 					if (oldNs is none) {
 						if (!isFirst) {
@@ -2535,7 +2583,13 @@ normal_guardName_binding:
 						oldNs = fp.namespace;
 						fp.namespace = GLOBAL_NAMESPACE;
 					}
-					fp.forceStartOfLine() << newText;
+					fp.forceStartOfLine() << text << "\n";
+					fp._rememberPrefixAlreadyPrinted(text);
+				}
+				if (newExtendedPrefixes) {
+					extendedPrefixes = newExtendedPrefixes;
+					newExtendedPrefixes = [];
+					goto handle_extendedPrefixes;
 				}
 				if (oldNs !is none) {
 					fp.namespace = oldNs;
@@ -3023,6 +3077,10 @@ class SystemHeader {
 				part(fp, escapeMode);
 			} else {
 				fp << part;
+				/* Clear known, globally printed prefixes, since `part'
+				 * may contain explicit preprocessor block directives
+				 * that could encapsulate known, printed prefixes. */
+				fp.clearGlobalPrintedPrefixes();
 			}
 		}
 	}

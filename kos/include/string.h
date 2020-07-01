@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33825b38 */
+/* HASH CRC-32:0x19f4898f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5005,28 +5005,40 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wildstrcasecmp, __FORCELOCAL __ATTR_PURE __ATTR_
 #endif /* !__CRT_HAVE_wildstrcasecmp */
 #ifdef __CRT_HAVE_fuzzy_strcmp
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_strcmp,(char const *__s1, char const *__s2),(__s1,__s2))
-#elif defined(__CRT_HAVE_fuzzy_memcmp) || !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_strcmp */
+#include <parts/malloca.h>
+#if defined(__CRT_HAVE_fuzzy_memcmp) || !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_strcmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_strcmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL fuzzy_strcmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_strcmp))(__s1, __s2); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fuzzy_memcmp || !__NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_strcmp */
 #ifdef __CRT_HAVE_fuzzy_strncmp
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_strncmp,(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen),(__s1,__s1_maxlen,__s2,__s2_maxlen))
-#elif defined(__CRT_HAVE_fuzzy_memcmp) || !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_strncmp */
+#include <parts/malloca.h>
+#if defined(__CRT_HAVE_fuzzy_memcmp) || !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_strncmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_strncmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL fuzzy_strncmp)(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_strncmp))(__s1, __s1_maxlen, __s2, __s2_maxlen); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fuzzy_memcmp || !__NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_strncmp */
 #ifdef __CRT_HAVE_fuzzy_strcasecmp
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_strcasecmp,(char const *__s1, char const *__s2),(__s1,__s2))
-#elif defined(__CRT_HAVE_fuzzy_memcasecmp) || !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_strcasecmp */
+#include <parts/malloca.h>
+#if defined(__CRT_HAVE_fuzzy_memcasecmp) || !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_strcasecmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_strcasecmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL fuzzy_strcasecmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_strcasecmp))(__s1, __s2); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fuzzy_memcasecmp || !__NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_strcasecmp */
 #ifdef __CRT_HAVE_fuzzy_strncasecmp
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_strncasecmp,(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen),(__s1,__s1_maxlen,__s2,__s2_maxlen))
-#elif defined(__CRT_HAVE_fuzzy_memcasecmp) || !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_strncasecmp */
+#include <parts/malloca.h>
+#if defined(__CRT_HAVE_fuzzy_memcasecmp) || !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_strncasecmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_strncasecmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL fuzzy_strncasecmp)(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_strncasecmp))(__s1, __s1_maxlen, __s2, __s2_maxlen); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fuzzy_memcasecmp || !__NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_strncasecmp */
 #ifdef __CRT_HAVE_fuzzy_memcmp
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),(__s1,__s1_bytes,__s2,__s2_bytes))
 #else /* __CRT_HAVE_fuzzy_memcmp */
@@ -5048,16 +5060,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_memcasecmp, __FORCELOCAL __ATTR_PURE __ATT
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_fuzzy_strcasecmp_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_fuzzy_memcasecmp_l) || !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_strcasecmp_l */
+#include <parts/malloca.h>
+#if defined(__CRT_HAVE_fuzzy_memcasecmp_l) || !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_strcasecmp_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_strcasecmp_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL fuzzy_strcasecmp_l)(char const *__s1, char const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_strcasecmp_l))(__s1, __s2, __locale); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fuzzy_memcasecmp_l || !__NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_strcasecmp_l */
 #ifdef __CRT_HAVE_fuzzy_strncasecmp_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_strncasecmp_l,(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
-#elif defined(__CRT_HAVE_fuzzy_memcasecmp_l) || !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_strncasecmp_l */
+#include <parts/malloca.h>
+#if defined(__CRT_HAVE_fuzzy_memcasecmp_l) || !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_strncasecmp_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_strncasecmp_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL fuzzy_strncasecmp_l)(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_strncasecmp_l))(__s1, __s1_maxlen, __s2, __s2_maxlen, __locale); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fuzzy_memcasecmp_l || !__NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_strncasecmp_l */
 #ifdef __CRT_HAVE_wildstrcasecmp_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wildstrcasecmp_l,(char const *__pattern, char const *__string, __locale_t __locale),(__pattern,__string,__locale))
 #else /* __CRT_HAVE_wildstrcasecmp_l */
@@ -5568,10 +5586,13 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 #endif /* !... */
 #ifdef __CRT_HAVE__strerror
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,_strerror,(char const *__message),(__message))
-#elif defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
+#else /* __CRT_HAVE__strerror */
+#include <parts/errno.h>
+#if defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
 #include <local/string/_strerror.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_strerror, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL _strerror)(char const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strerror))(__message); })
-#endif /* ... */
+#endif /* __CRT_HAVE__strerror_s || __libc_geterrno */
+#endif /* !__CRT_HAVE__strerror */
 #ifdef __CRT_HAVE__strerror_s
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,_strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),(__buf,__buflen,__message))
 #else /* __CRT_HAVE__strerror_s */

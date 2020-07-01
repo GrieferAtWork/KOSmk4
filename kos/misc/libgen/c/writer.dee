@@ -741,6 +741,10 @@ done:
 	@@Set of prefix strings printed at the global scope
 	private member m_GlobalPrintedPrefixes: {string...} = HashSet();
 
+	public function clearGlobalPrintedPrefixes() {
+		m_GlobalPrintedPrefixes.clear();
+	}
+
 	@@Check if a given @prefix was already printed
 	public function wasPrefixPrinted(prefix: string): bool {
 		if (m_IfdefDead)
@@ -755,7 +759,7 @@ done:
 		return prefix in m_GlobalPrintedPrefixes;
 	}
 
-	private function _wasPrefixPrinted(prefix: string): bool {
+	public function _wasPrefixPrinted(prefix: string): bool {
 		if (m_IfdefDead)
 			goto done;
 		for (local ste: m_IfdefStack) {
@@ -785,7 +789,7 @@ done:
 			goto done;
 		prefix = prefix.rstrip().lstrip("\n");
 		if (!_wasPrefixPrinted(prefix)) {
-			rememberPrefixAlreadyPrinted(prefix);
+			_rememberPrefixAlreadyPrinted(prefix);
 			generator.addForceNl();
 			generator.addPrinter << prefix << "\n";
 		}
@@ -798,7 +802,7 @@ done:
 	}
 
 	@@Remember the inclusion of a given @header
-	private function rememberPrefixAlreadyPrinted(prefix: string) {
+	public function _rememberPrefixAlreadyPrinted(prefix: string) {
 		(m_IfdefStack
 			? m_IfdefStack.last.printedPrefixes
 			: m_GlobalPrintedPrefixes)
