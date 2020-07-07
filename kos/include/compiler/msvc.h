@@ -291,8 +291,8 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __ATTR_FORCEINLINE       __forceinline
 #define __LOCAL                  static __inline
 #define __FORCELOCAL             static __forceinline
-#define __NO_EXTERNINLINE        1
-#define __EXTERNINLINE           static __inline
+#define __NO_EXTERN_INLINE       1
+#define __EXTERN_INLINE          static __inline
 #define __LONGLONG               long long
 #define __ULONGLONG              unsigned long long
 #define __NO_builtin_constant_p  1

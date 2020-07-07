@@ -1597,7 +1597,7 @@ class InlineFunction {
 	@@Inline mode. One of:
 	@@  - @"LOCAL"
 	@@  - @"FORCELOCAL"
-	@@  - @"__EXTERNINLINE"
+	@@  - @"__EXTERN_INLINE"
 	public member mode: string = "LOCAL";
 
 	@@The different, possible methods by which this function can be implemented.
@@ -1606,7 +1606,7 @@ class InlineFunction {
 	public member impl: FunctionImplementation | Callable = ();
 
 	@@Name of the assembly symbol against which
-	@@to link in case @(mode == "__EXTERNINLINE")
+	@@to link in case @(mode == "__EXTERN_INLINE")
 	public member externInlineAsmname: string | UserString;
 
 	@@Returns @impl, but will unwind @Callable wrappers
@@ -1708,7 +1708,7 @@ class InlineFunction {
 		for (local prototype: prototypes) {
 			if (doc)
 				fp.printComment(doc);
-			if (mode == "__EXTERNINLINE") {
+			if (mode == "__EXTERN_INLINE") {
 				prototype.cprintExternInlineBindingStart(
 					fp, escapeMode, decl, exposedName,
 					str externInlineAsmname);
@@ -1917,7 +1917,7 @@ class FunctionBinding {
 	@@  - @LocalFunction:    Provide a local function implementation, via inclusion of
 	@@                       <local/@(binding.originalSystemHeaderName)/@(binding.name).h>
 	@@  - @InlineFunction:   Provide an in-line function implementation, possibly alongside
-	@@                       support for @"__EXTERNINLINE"
+	@@                       support for @"__EXTERN_INLINE"
 	@@  - @string:           External assembly symbol (bind the function against
 	@@                       an assembly symbol by the name of @binding)
 	@@  - @UserString:       Same as @string

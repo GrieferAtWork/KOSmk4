@@ -4005,7 +4005,7 @@ got_chk_checkexpr:
 				local builtin_name = name ? name : "__builtin_" + funname;
 				local cond = "__has_builtin({})".format({ builtin_name });
 				if (fun.args_is_varargs)
-					cond = cond + " && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERNINLINE)";
+					cond = cond + " && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERN_INLINE)";
 				if (needcrt) {
 					cond = cond + " && defined(__LIBC_BIND_CRTBUILTINS) && " + key_crt_have(funname);
 #ifdef WARN_KNOWN_BUILTINS

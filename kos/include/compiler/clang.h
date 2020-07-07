@@ -646,10 +646,10 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __FORCELOCAL   static __ATTR_FORCEINLINE
 
 #if __has_attribute(__gnu_inline__)
-#define __EXTERNINLINE extern __ATTR_INLINE __attribute__((__gnu_inline__))
+#define __EXTERN_INLINE extern __ATTR_INLINE __attribute__((__gnu_inline__))
 #else /* __gnu_inline__ */
-#define __NO_EXTERNINLINE 1
-#define __EXTERNINLINE __LOCAL
+#define __NO_EXTERN_INLINE 1
+#define __EXTERN_INLINE __LOCAL
 #endif /* !__gnu_inline__ */
 
 #define __LONGLONG   signed long long

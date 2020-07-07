@@ -256,6 +256,8 @@
 #define __PRIVATE
 #define FORCELOCAL
 #define __FORCELOCAL
+#define EXTERN_INLINE
+#define __EXTERN_INLINE
 #define LOCAL
 #define __LOCAL
 #define DFL(x) = x

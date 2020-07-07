@@ -2721,7 +2721,7 @@ again_parse_annotations:
 									body: body,
 									name: current.name));
 							if (tok.endswith("extern_inline")) {
-								ifun.mode                = "__EXTERNINLINE";
+								ifun.mode                = "__EXTERN_INLINE";
 								ifun.externInlineAsmname = externSymbolName;
 							} else if ("force" in tok) {
 								ifun.mode = "FORCELOCAL";
@@ -2835,7 +2835,7 @@ again_parse_annotations:
 							ppCond:     bindingCond,
 							prototypes: usedCurrentPrototypes,
 							binding:    InlineFunction(
-								mode: "__EXTERNINLINE",
+								mode: "__EXTERN_INLINE",
 								impl: FunctionImplementation(
 									body: bodyFp.string,
 									name: current.name),
@@ -4077,7 +4077,7 @@ wc_bind_continue_scan_bindings:
 											ppCondPrefix:   (existingBinding.ppCondPrefix as Sequence) + xcImpl.ppCondPrefix,
 											prototypes:     existingBinding.prototypes,
 											binding:        InlineFunction(
-												mode:                "__EXTERNINLINE",
+												mode:                "__EXTERN_INLINE",
 												impl:                xcImpl.impl,
 												externInlineAsmname: existingBinding.binding));
 										if (xcImpl.ppCond == "1") {
@@ -4216,7 +4216,7 @@ with_primaryImplementation:
 							if (!feat_noInlineTruncate)
 								inlImpl = inlImpl.truncateBodyForInline();
 							if (!feat_noExternInline) {
-								/* Create secondary inline-bindings for all __EXTERNINLINE */
+								/* Create secondary inline-bindings for all __EXTERN_INLINE */
 								for (local existingBinding /*: FunctionBinding*/: usedExistingBindings) {
 									if (existingBinding is Callable)
 										existingBinding = existingBinding();
@@ -4232,7 +4232,7 @@ with_primaryImplementation:
 										ppCondPrefix: (existingBinding.ppCondPrefix as Sequence) + implBinding.ppCondPrefix,
 										prototypes:   existingBinding.prototypes,
 										binding:      InlineFunction(
-											mode:                "__EXTERNINLINE",
+											mode:                "__EXTERN_INLINE",
 											impl:                inlImpl,
 											externInlineAsmname: existingBinding.binding));
 								}
@@ -4262,7 +4262,7 @@ with_primaryImplementation:
 						if (!currentFeatures.noInlineTruncate)
 							inlImpl = funImpl.truncateBodyForInline();
 						if (!currentFeatures.noExternInline) {
-							/* Create secondary inline-bindings for all __EXTERNINLINE */
+							/* Create secondary inline-bindings for all __EXTERN_INLINE */
 							local n = #existingBindings;
 							for (local i = 0; i < n;) {
 								local existingBinding: FunctionBinding = existingBindings[i];
@@ -4275,7 +4275,7 @@ with_primaryImplementation:
 									ppCondPrefix: (existingBinding.ppCondPrefix as Sequence) + implBinding.ppCondPrefix,
 									prototypes:   existingBinding.prototypes,
 									binding:      InlineFunction(
-										mode:                "__EXTERNINLINE",
+										mode:                "__EXTERN_INLINE",
 										impl:                inlImpl,
 										externInlineAsmname: existingBinding.binding));
 								if (implBinding.ppCond == "1") {
