@@ -371,7 +371,7 @@ found_index:
  * with multiple configurations), and have the purpose to allow drivers to be provided
  * for combinations of certain devices.
  * NOTE: After registering a new interface probe function, any USB interface that had
- *       not been recognized at that point will immediatly be probed using the given
+ *       not been recognized at that point will immediately be probed using the given
  *       `func' before returning. */
 PUBLIC bool KCALL
 usb_register_device_probe(PUSB_DEVICE_PROBE func)

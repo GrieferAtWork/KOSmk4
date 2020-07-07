@@ -291,7 +291,7 @@ again:
 		PREEMPTION_DISABLE();
 		workers = awork.get_nopr();
 		PREEMPTION_ENABLE();
-		/* First pass: test() for work and service immediatly if present. */
+		/* First pass: test() for work and service immediately if present. */
 		for (i = 0; i < workers->av_testc; ++i) {
 			struct aworker *w;
 			REF void *obj;

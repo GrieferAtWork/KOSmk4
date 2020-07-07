@@ -20,6 +20,7 @@
 #ifndef _I386_KOS_LIBRPC_BITS_RPC64_H
 #define _I386_KOS_LIBRPC_BITS_RPC64_H 1
 
+#ifndef __DEEMON__
 #include <__stdinc.h>
 #include <features.h>
 #include <hybrid/host.h>
@@ -37,6 +38,7 @@
 #ifdef __KERNEL__
 #include <kernel/x86/gdt.h> /* x86_(get|set)_user_(fs|gs)base() */
 #endif /* __KERNEL__ */
+#endif /* !__DEEMON__ */
 
 
 #ifdef __x86_64__
@@ -57,8 +59,6 @@
 #endif /* __CC__ */
 #endif /* __x86_64__ */
 
-
-__DECL_BEGIN
 
 /* [P]: Preserve  /  [C]: Clobber */
 #define RPC_X86_64_REGISTER_RAX     0x00 /* [C] Accumulator. */
@@ -96,6 +96,7 @@ __DECL_BEGIN
 
 
 #ifdef __CC__
+__DECL_BEGIN
 struct rpc_register_state64 {
 	__uint64_t rs_valid;                           /* Set of valid registers. */
 	__uint64_t rs_regs[RPC_X86_64_REGISTER_COUNT]; /* Register value overrides. */
@@ -273,9 +274,8 @@ rpc_register_state64_getreg_icpustate(struct icpustate *__restrict state,
 
 #endif /* __USE_KOS_KERNEL */
 
+__DECL_END
 #endif /* __CC__ */
 
-
-__DECL_END
 
 #endif /* !_I386_KOS_LIBRPC_BITS_RPC64_H */

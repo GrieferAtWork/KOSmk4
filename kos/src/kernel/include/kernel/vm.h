@@ -2795,7 +2795,7 @@ struct vm_mapinfo {
  * @param: arg:   The argument (cookie) originally passed to `vm_enum()'
  * @param: info:  Information about the mapping range being enumerated.
  * @return: >= 0: Continue enumeration and add the result to the sum eventually returned by `vm_enum()'
- * @return: < 0:  Halt enumeration immediatly by having `vm_enum()' re-return this same value. */
+ * @return: < 0:  Halt enumeration immediately by having `vm_enum()' re-return this same value. */
 typedef ssize_t (FCALL *vm_enum_callback_t)(void *arg, struct vm_mapinfo *__restrict info);
 
 /* Enumerate all mappings contained within the given `enum_minaddr...enum_maxaddr'

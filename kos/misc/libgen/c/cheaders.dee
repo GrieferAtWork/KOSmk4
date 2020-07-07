@@ -333,7 +333,7 @@ again_compare_typenames:
 
 	@@Output @this @CType to a @CWriter
 	@@Returns @true if the type string must be followed by whitespace if
-	@@immediatly succeeded by a keyword. Returns @false otherwise.
+	@@immediately succeeded by a keyword. Returns @false otherwise.
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprint(fp: CWriter, escapeMode: int, name: string | UserString = ""): bool {
 		local beforeNameStr = str beforeName;

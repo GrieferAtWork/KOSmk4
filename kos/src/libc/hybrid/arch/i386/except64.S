@@ -539,7 +539,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 #if 0 /* Not required, since icpustate64 (excluding the iret tail portion) doesn't
        * contain any registers that can't also be found in kcpustate64 */
 	/* Another special case: If the interrupt state was re-directed, then we must
-	 *                       load it immediatly (and have `x86_rpc_user_redirection'
+	 *                       load it immediately (and have `x86_rpc_user_redirection'
 	 *                       take care of propagating the exception), since it still
 	 *                       actually points into user-space.
 	 * This is necessrary because otherwise we'd not be restoring the original user-space

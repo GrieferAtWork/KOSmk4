@@ -180,7 +180,7 @@ struct socket_ops {
 	 *       the send could be done without blocking, then the AIO handle
 	 *       will indicate success, rather than cancel.
 	 * NOTE: Non-blocking recv() can be done by first polling for `POLLIN',
-	 *       then performing the recv() and once again immediatly canceling
+	 *       then performing the recv() and once again immediately canceling
 	 *       the AIO operation. (if the AIO stopped with cancel, handle this
 	 *       the same as so_poll() indicate that no data can be received) */
 

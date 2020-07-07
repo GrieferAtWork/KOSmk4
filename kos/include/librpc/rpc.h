@@ -195,8 +195,8 @@ __SYSDECL_BEGIN
 
 /* RPC reason codes (used to describe the state of a target at the time of an interrupt) */
 #define RPC_REASON_ASYNC       0x0000 /* Arbitrary user-space code was interrupted. */
-#define RPC_REASON_SYSCALL     0x0001 /* A system call was interrupted, and should be restarted once the RPC callback returns/completes. */
-#define RPC_REASON_CONTEXTMASK 0x00ff /* Mask for RPC reason context codes (unmasked bits are used/reserved for flags) */
+#define RPC_REASON_SYSCALL     0x0001 /* FLAG: A system call was interrupted, and should be restarted once the RPC callback returns/completes. */
+#define RPC_REASON_CONTEXTMASK 0x00ff /* Mask for RPC reason context codes (unmasked bits are unused/reserved for flags) */
 
 
 /* RPC scheduling flags:

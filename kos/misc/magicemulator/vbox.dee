@@ -389,7 +389,7 @@ function start(
 	fs.environ["VBOX_RELEASE_LOG"] = "-dev_vmm_backdoor.restrict";
 
 	/* Directly invoke VirtualBox so that we have terminate() powers over it,
-	 * and can immediatly shut down emulation when the user presses CTRL+C
+	 * and can immediately shut down emulation when the user presses CTRL+C
 	 * from within our console. */
 //	runVBoxManageCommand({ "startvm", vmName });
 	local proc = ipc.Process(EXE_VIRTUALBOXVM, {

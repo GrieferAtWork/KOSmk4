@@ -1594,7 +1594,7 @@ again_add_finalizer_read_list:
 			while (!atomic_rwlock_trywrite(&flz->df_lock)) {
 				if (atomic_rwlock_reading(&flz->df_lock)) {
 					/* Callbacks have already been serviced!
-					 * -> Invoke the one given immediatly. */
+					 * -> Invoke the one given immediately. */
 					(*func)(arg);
 					goto done_add_finalizer;
 				}

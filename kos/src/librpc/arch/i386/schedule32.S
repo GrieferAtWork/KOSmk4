@@ -89,7 +89,7 @@ PRIVATE_FUNCTION(librpc_schedule_rpc_entry)
 	/* Invoke the user-level RPC callback */
 	call  *%eax
 	/* Check if we should restart an interrupted system call. */
-	testl  $RPC_REASON_SYSCALL, %ebx
+	testl  $(RPC_REASON_SYSCALL), %ebx
 	jnz    .Lrestart_system_call
 	/* Restore the interrupted register state. */
 	movl   %ebp, %esp

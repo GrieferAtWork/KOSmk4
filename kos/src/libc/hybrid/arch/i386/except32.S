@@ -505,7 +505,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	testl  $(EFLAGS_VM), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	/* Another special case: If the interrupt state was re-directed, then we must
-	 *                       load it immediatly (and have `x86_rpc_user_redirection'
+	 *                       load it immediately (and have `x86_rpc_user_redirection'
 	 *                       take care of propagating the exception), since it still
 	 *                       actually points into user-space.
 	 * This is necessrary because otherwise we'd not be restoring the original user-space

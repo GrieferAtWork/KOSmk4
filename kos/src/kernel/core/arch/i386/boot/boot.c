@@ -411,6 +411,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: renameat2() is missing from <stdio.h> */
 
+	/* TODO: Have libc export symbols `alloca()' and `_alloca()' that do exactly as
+	 *       they're supposed to do. - Other c libraries also export these by-name! */
+
 	return state;
 }
 
