@@ -98,10 +98,13 @@ print("\t", " \\\n\t".join(fp.string.strip().splitlines(false)));
 
 
 #undef TEST_DX_MASK
+#undef TEST_SI_MASK
 #if 1
 #define TEST_DX_MASK(mask) testb $(mask), %dl
+#define TEST_SI_MASK(mask) testb $(mask), %sil
 #else
 #define TEST_DX_MASK(mask) testq $(mask), %rdx
+#define TEST_SI_MASK(mask) testq $(mask), %rsi
 #endif
 
 #if RETURN_PCPY
@@ -291,6 +294,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmovedown),
 
 PRIVATE_LABEL(IFELSE_PCPY(F(libc_x86_mempmovedown_start),
                           F(libc_x86_memmovedown_start))):
+	BEGIN_CLD
 	NIF_PCPY(movq %rdi, %rax)
 	rep    I(movs)   /* Actually copy memory */
 	IF_PCPY(movq %rdi, %rax)
@@ -490,6 +494,54 @@ DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempset),
 
 
 #if !RETURN_PCPY
+/******************************************************************************************/
+/* void SYSVABI bzero(void *restrict dst, size_t num_words);                              */
+/******************************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(F(libc_bzero))
+	.cfi_startproc
+	BEGIN_CLD
+	movq   %rsi, %rcx /* num_words */
+	xorq   %rax, %rax /* Filler word */
+#if N == 1
+	shrq   $(3), %rcx
+	rep    stosq
+	jnc    1f /* if (!(n_bytes & 4)) goto 1f; */
+	stosl
+1:	TEST_SI_MASK(2)
+	jz     1f /* if (!(n_bytes & 2)) goto 1f; */
+	stosw
+1:	TEST_SI_MASK(1)
+	jz     1f /* if (!(n_bytes & 1)) goto 1f; */
+	stosb
+1:
+#elif N == 2
+	shrq   $(2), %rcx
+	rep    stosq
+	jnc    1f /* if (!(n_words & 2)) goto 1f; */
+	stosl
+1:	TEST_SI_MASK(1)
+	jz     1f /* if (!(n_words & 1)) goto 1f; */
+	stosw
+1:
+#elif N == 4
+	shrq   $(1), %rcx
+	rep    stosq
+	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
+	stosl
+1:
+#else /* N... */
+	rep    stosq
+#endif /* !N... */
+	END_CLD
+	ret
+	.cfi_endproc
+END(F(libc_bzero))
+DEFINE_PUBLIC_ALIAS(F(bzero), F(libc_bzero))
+
+
+
+
 
 /********************************************************************************/
 /* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
@@ -573,7 +625,7 @@ INTERN_FUNCTION(F_STRING(end))
 #endif /* N == 2 */
 	movq   $-1, %rcx
 	xorl   %eax, %eax
-	repne; I(scas)
+	repne  I(scas)
 	leaq   -N(%rdi), %rax
 #if N == 2
 	popq_cfi_r %rdi
@@ -595,7 +647,7 @@ INTERN_FUNCTION(F_STRING(len))
 #endif /* N == 2 */
 	movq   $-1, %rcx
 	xorl   %eax, %eax
-	repne; I(scas)
+	repne  I(scas)
 	subq   %rcx, %rax /* result = 0 - RCX; */
 	subq   $(2), %rax   /* result = (0 - RCX) - 2; */
 #if N == 2
@@ -620,7 +672,7 @@ INTERN_FUNCTION(F_STRING(nlen))
 	testq  %rdx, %rdx
 	jz     2f
 	movq   %rdx, %rcx
-	repne; I(scas)
+	repne  I(scas)
 	jne    1f
 	incq   %rcx
 1:	subq   %rcx, %rdx
@@ -630,7 +682,7 @@ INTERN_FUNCTION(F_STRING(nlen))
 	testq  %rsi, %rsi
 	jz     2f
 	movq   %rsi, %rcx
-	repne; I(scas)
+	repne  I(scas)
 	jne    1f
 	incq   %rcx
 1:	subq   %rcx, %rsi
@@ -655,7 +707,7 @@ INTERN_FUNCTION(F_STRING(nend))
 	movq   %rcx, %rdi
 	jz     1f
 	movq   %rdx, %rcx
-	repne; I(scas)
+	repne  I(scas)
 	jne    1f
 	subq   $(2), %rdi
 1:	movq   %rdi, %rax
@@ -667,7 +719,7 @@ INTERN_FUNCTION(F_STRING(nend))
 	testq  %rsi, %rsi
 	jz     1f
 	movq   %rsi, %rcx
-	repne; I(scas)
+	repne  I(scas)
 	jne    1f
 #if N == 1
 	decq   %rdi

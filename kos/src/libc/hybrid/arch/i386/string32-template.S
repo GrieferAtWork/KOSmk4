@@ -144,9 +144,9 @@ print("\t", " \\\n\t".join(fp.string.strip().splitlines(false)));
 INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempcpy),
                             F(libc_memcpy)))
 	.cfi_startproc
-	BEGIN_CLD
 	pushl_cfi_r %edi
 	pushl_cfi_r %esi
+	BEGIN_CLD
 	movl   12(%esp), %edi /* dst */
 	movl   16(%esp), %esi /* src */
 	movl   20(%esp), %ecx /* n_bytes */
@@ -171,9 +171,9 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempcpy),
 	rep    movsl
 #endif /* N != ... */
 	IF_PCPY(movl %edi, %eax)
-	popl_cfi_r  %esi
-	popl_cfi_r  %edi
 	END_CLD
+	popl_cfi_r %esi
+	popl_cfi_r %edi
 	RET(12)
 	.cfi_endproc
 END(IFELSE_PCPY(F(libc_mempcpy),
@@ -207,8 +207,8 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmove),
 	jb     USED_LIBC_MEMMOVEDOWN_START /* if (dst < src) memmovedown() */
 	ja     USED_LIBC_MEMMOVEUP_START   /* if (dst > src) memmoveup() */
 	/* dst == src */
-	popl_cfi_r  %esi
-	popl_cfi_r  %edi
+	popl_cfi_r %esi
+	popl_cfi_r %edi
 	RET(12)
 #endif /* !__OPTIMIZE_SIZE__ */
 	.cfi_endproc
@@ -260,9 +260,9 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmovedown),
                             F(libc_memmovedown)))
 	.cfi_startproc
 	/* assert(dst <= src || !n_bytes); */
-	BEGIN_CLD
 	pushl_cfi_r %edi
 	pushl_cfi_r %esi
+	BEGIN_CLD
 	movl   12(%esp), %edi /* dst */
 	movl   16(%esp), %esi /* src */
 	movl   20(%esp), %ecx /* n_bytes */
@@ -312,12 +312,13 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmovedown),
 
 PRIVATE_LABEL(IFELSE_PCPY(F(libc_x86_mempmovedown_start),
                           F(libc_x86_memmovedown_start))):
+	BEGIN_CLD
 	NIF_PCPY(movl %edi, %eax)
 	rep    I(movs)   /* Actually copy memory */
 	IF_PCPY(movl %edi, %eax)
-	popl_cfi_r  %esi
-	popl_cfi_r  %edi
 	END_CLD
+	popl_cfi_r %esi
+	popl_cfi_r %edi
 	RET(12)
 	.cfi_endproc
 END(IFELSE_PCPY(F(libc_mempmovedown),
@@ -428,8 +429,8 @@ PRIVATE_LABEL(IFELSE_PCPY(F(libc_x86_mempmoveup_start),
 	IF_PCPY(leal N(%edi), %eax)
 	rep    I(movs) /* Actually perform the memory copy */
 	END_STD        /* Restore the direction flag */
-	popl_cfi_r  %esi
-	popl_cfi_r  %edi
+	popl_cfi_r %esi
+	popl_cfi_r %edi
 	RET(12)
 	.cfi_endproc
 END(IFELSE_PCPY(F(libc_mempmoveup),
@@ -453,17 +454,16 @@ DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempmoveup),
 INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempset),
                             F(libc_memset)))
 	.cfi_startproc
-	BEGIN_CLD
 	pushl_cfi_r %edi
-	pushl_cfi_r %esi
-	movl   12(%esp), %edi /* dst */
+	BEGIN_CLD
+	movl   8(%esp), %edi /* dst */
 #if N == 1
-	movzbl 16(%esp), %eax /* byte */
+	movzbl 12(%esp), %eax /* byte */
 	movb   %al, %ah
 	movw   %ax, %cx
 	shll   $(16), %eax
 	movw   %cx, %ax
-	movl   20(%esp), %ecx /* n_bytes */
+	movl   16(%esp), %ecx /* n_bytes */
 	NIF_PCPY(pushl_cfi %edi)
 	movl   %ecx, %edx
 	shrl   $(2), %ecx
@@ -476,11 +476,11 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempset),
 1:	NIF_PCPY(popl_cfi %eax)
 	IF_PCPY(movl %edi, %eax)
 #elif N == 2
-	movzwl 16(%esp), %eax /* word */
+	movzwl 12(%esp), %eax /* word */
 	movw   %ax, %cx
 	shll   $(16), %eax
 	movw   %cx, %ax
-	movl   20(%esp), %ecx /* n_words */
+	movl   16(%esp), %ecx /* n_words */
 	NIF_PCPY(movl %edi, %edx)
 	shrl   $(1), %ecx
 	rep    stosl
@@ -488,15 +488,14 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempset),
 	stosw
 1:	movl   IFELSE_PCPY(%edi, %edx), %eax
 #else /* N == 4 */
-	movl   16(%esp), %eax /* dword */
-	movl   20(%esp), %ecx /* n_dwords */
+	movl   12(%esp), %eax /* dword */
+	movl   16(%esp), %ecx /* n_dwords */
 	NIF_PCPY(movl   %edi, %edx)
 	rep    stosl
 	movl   IFELSE_PCPY(%edi, %edx), %eax
 #endif /* N == ... */
-	popl_cfi_r  %esi
-	popl_cfi_r  %edi
 	END_CLD
+	popl_cfi_r %edi
 	RET(12)
 	.cfi_endproc
 END(IFELSE_PCPY(F(libc_mempset),
@@ -511,15 +510,55 @@ DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempset),
 
 #if !RETURN_PCPY
 
+/**************************************************************************/
+/* void LIBCCALL bzero(void *restrict dst, size_t num_Tword);             */
+/**************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(F(libc_bzero))
+	.cfi_startproc
+	pushl_cfi_r %edi
+	movl   8(%esp),  %edi /* dst */
+	movl   12(%esp), %ecx /* n_bytes */
+	xorl   %eax, %eax     /* Filler word */
+	BEGIN_CLD
+#if N == 1
+	movl   %ecx, %edx
+	shrl   $(2), %ecx
+	rep    stosl
+	jnc    1f /* if (!(n_bytes & 2)) goto 1f; */
+	stosw
+1:	TEST_DX_MASK(1)
+	jz     1f /* if (!(n_bytes & 1)) goto 1f; */
+	stosb
+1:
+#elif N == 2
+	shrl   $(1), %ecx
+	rep    stosl
+	jnc    1f /* if (!(n_words & 1)) goto 1f; */
+	stosw
+1:
+#else /* N == ... */
+	rep    stosl
+#endif /* N != ... */
+	END_CLD
+	popl_cfi_r %edi
+	RET(8)
+	.cfi_endproc
+END(F(libc_bzero))
+DEFINE_PUBLIC_ALIAS(F(bzero), F(libc_bzero))
+
+
+
+
 /********************************************************************************/
 /* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
 /********************************************************************************/
 .section .text.crt.string.memory
 INTERN_FUNCTION(F(libc_memcmp))
 	.cfi_startproc
-	BEGIN_CLD
 	pushl_cfi_r %edi
 	pushl_cfi_r %esi
+	BEGIN_CLD
 	/* Compare DS:ESI (lhs) with ES:EDI (rhs) */
 	movl   12(%esp), %esi /* lhs */
 	movl   16(%esp), %edi /* rhs */
@@ -533,9 +572,9 @@ INTERN_FUNCTION(F(libc_memcmp))
 	seta   %al            /* result = (result & 0xffffff00) | ((lhs > rhs) ? 1 : 0); */
 	movl   $(-1), %ecx
 	cmovb  %ecx, %eax     /* if (lhs < rhs) result = -1; */
-	popl_cfi_r  %esi
-	popl_cfi_r  %edi
 	END_CLD
+	popl_cfi_r %esi
+	popl_cfi_r %edi
 	RET(12)
 	.cfi_endproc
 END(F(libc_memcmp))
@@ -589,15 +628,15 @@ DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(end))
 	.cfi_startproc
-	BEGIN_CLD
 	pushl_cfi_r %edi
+	BEGIN_CLD
 	movl   8(%esp), %edi
 	movl   $-1, %ecx
 	xorl   %eax, %eax
-	repne; I(scas)
+	repne  I(scas)
 	leal   -N(%edi), %eax
-	popl_cfi_r %edi
 	END_CLD
+	popl_cfi_r %edi
 	RET(4)
 	.cfi_endproc
 END(F_STRING(end))
@@ -609,16 +648,16 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(end), F_STRING(end))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(len))
 	.cfi_startproc
-	BEGIN_CLD
 	pushl_cfi_r %edi
+	BEGIN_CLD
 	movl   8(%esp), %edi
 	movl   $-1, %ecx
 	xorl   %eax, %eax
-	repne; I(scas)
+	repne  I(scas)
 	subl   %ecx, %eax /* result = 0 - ECX; */
 	subl   $(2), %eax   /* result = (0 - ECX) - 2; */
-	popl_cfi_r %edi
 	END_CLD
+	popl_cfi_r %edi
 	RET(4)
 	.cfi_endproc
 END(F_STRING(len))
@@ -630,22 +669,22 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(len), F_STRING(len))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_startproc
-	BEGIN_CLD
 	xorl   %eax, %eax
 	movl   8(%esp), %edx
 	testl  %edx, %edx
 	jz     2f
 	pushl_cfi_r %edi
+	BEGIN_CLD
 	movl   8(%esp), %edi
 	movl   %edx, %ecx
-	repne; I(scas)
+	repne  I(scas)
 	jne    1f
 	incl   %ecx
 1:	subl   %ecx, %edx
 	movl   %edx, %eax /* result = max_chars - ECX; */
+	END_CLD
 	popl_cfi_r %edi
-2:	END_CLD
-	RET(8)
+2:	RET(8)
 	.cfi_endproc
 END(F_STRING(nlen))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen), F_STRING(nlen))
@@ -656,14 +695,14 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen), F_STRING(nlen))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nend))
 	.cfi_startproc
-	BEGIN_CLD
 	pushl_cfi_r %edi
+	BEGIN_CLD
 	xorl   %eax, %eax
 	movl   8(%esp), %edi
 	movl   12(%esp), %ecx
 	testl  %ecx, %ecx
 	jz     1f
-	repne; I(scas)
+	repne  I(scas)
 	jne    1f
 #if N == 1
 	decl   %edi
@@ -671,8 +710,8 @@ INTERN_FUNCTION(F_STRING(nend))
 	subl   $(N), %edi
 #endif /* N != 1 */
 1:	movl   %edi, %eax
-	popl_cfi_r %edi
 	END_CLD
+	popl_cfi_r %edi
 	RET(8)
 	.cfi_endproc
 END(F_STRING(nend))

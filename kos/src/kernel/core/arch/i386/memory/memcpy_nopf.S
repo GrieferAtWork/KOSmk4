@@ -90,57 +90,57 @@ PUBLIC_LABEL(x86_nopf_end_clc):
 
 PUBLIC_FUNCTION(x86_nopf_rep_insb)
 	cld
-	rep;   insb
+	rep    insb
 	ret
 END(x86_nopf_rep_insb)
 
 PUBLIC_FUNCTION(x86_nopf_rep_insw)
 	cld
-	rep;   insw
+	rep    insw
 	ret
 END(x86_nopf_rep_insw)
 
 PUBLIC_FUNCTION(x86_nopf_rep_insl)
 	cld
-	rep;   insl
+	rep    insl
 	ret
 END(x86_nopf_rep_insl)
 
 PUBLIC_FUNCTION(x86_nopf_rep_outsb)
 	cld
-	rep;   outsb
+	rep    outsb
 	ret
 END(x86_nopf_rep_outsb)
 
 PUBLIC_FUNCTION(x86_nopf_rep_outsw)
 	cld
-	rep;   outsw
+	rep    outsw
 	ret
 END(x86_nopf_rep_outsw)
 
 PUBLIC_FUNCTION(x86_nopf_rep_outsl)
 	cld
-	rep;   outsl
+	rep    outsl
 	ret
 END(x86_nopf_rep_outsl)
 
 
 PUBLIC_FUNCTION(x86_nopf_repe_cmpsb)
 	cld
-	repe;  cmpsb
+	repe   cmpsb
 	ret
 END(x86_nopf_repe_cmpsb)
 
 PUBLIC_FUNCTION(x86_nopf_rep_stosb)
 	cld
-	rep;   stosb
+	rep    stosb
 	ret
 END(x86_nopf_rep_stosb)
 
 /* Assembly function:
  * >> PUBLIC_FUNCTION(x86_nopf_rep_movsb)
  * >>     cld
- * >>     rep;   movsb
+ * >>     rep    movsb
  * >>     ret
  * >> END(x86_nopf_rep_movsb)
  * Yes. - That's literally the implementation,
@@ -167,7 +167,7 @@ END(x86_nopf_rep_stosb)
  */
 PUBLIC_FUNCTION(x86_nopf_rep_movsb)
 	cld
-	rep;   movsb
+	rep    movsb
 PUBLIC_LABEL(x86_nopf_end):
 PUBLIC_FUNCTION(x86_nopf_ret)
 	ret
