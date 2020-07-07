@@ -127,7 +127,7 @@ NOTHROW(KCALL x86_interrupt_disable)(void) {
 typedef uintptr_t pflag_t;
 
 #ifdef __x86_64__
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
 	__asm__ __volatile__("pushfq\n\t"
@@ -138,7 +138,7 @@ NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_push)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -151,7 +151,7 @@ NOTHROW(KCALL x86_interrupt_push)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -165,7 +165,7 @@ NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -179,7 +179,7 @@ NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushq %0\n\t"
@@ -192,7 +192,7 @@ NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 
 #else /* __x86_64__ */
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
 	__asm__ __volatile__("pushfl\n\t"
@@ -203,7 +203,7 @@ NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_push)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -216,7 +216,7 @@ NOTHROW(KCALL x86_interrupt_push)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -230,7 +230,7 @@ NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK pflag_t
 NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -244,7 +244,7 @@ NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushl %0\n\t"
@@ -265,7 +265,7 @@ NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 #define PREEMPTION_PUSH()                x86_interrupt_push()
 #define PREEMPTION_PUSHON()              x86_interrupt_pushon()
 #define PREEMPTION_PUSHOFF()             x86_interrupt_pushoff()
-#define PREEMPTION_WASENABLED(flag)    ((flag) & 0x00000200 /* EFLAGS_IF */)
+#define PREEMPTION_WASENABLED(flag)      ((flag) & 0x00000200 /* EFLAGS_IF */)
 #define PREEMPTION_WAIT()                x86_interrupt_wait()
 #define PREEMPTION_HALT()                x86_interrupt_halt()
 #define PREEMPTION_POP(flag)             x86_interrupt_pop(flag)
@@ -320,165 +320,6 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 #define x86_get_irregs(thread) \
 	((struct irregs *)FORTASK(thread, *(uintptr_t *)&this_x86_kernel_psp0) - 1)
 
-/* Safely modify the values of saved registers that may be modified by RPC redirection. */
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
-NOTHROW(FCALL irregs_rdip)(struct irregs const *__restrict self) {
-	uintptr_t result = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-	if (result == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rip);
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED u16
-NOTHROW(FCALL irregs_rdcs)(struct irregs const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	u16 result = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	if (SEGMENT_IS_VALID_KERNCODE(result)) {
-		uintptr_t rip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-		if (rip == (uintptr_t)&x86_rpc_user_redirection)
-			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
-	}
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
-NOTHROW(FCALL irregs_rdflags)(struct irregs const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	uintptr_t result = __hybrid_atomic_load(self->ir_rflags, __ATOMIC_ACQUIRE);
-	uintptr_t rip    = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-	if (rip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rflags);
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED __BOOL
-NOTHROW(FCALL irregs_isuser)(struct irregs const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	u16 cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	if (cs & 3)
-		return 1;
-	if (SEGMENT_IS_VALID_KERNCODE(cs)) {
-		uintptr_t rip;
-		rip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-		if (rip == (uintptr_t)&x86_rpc_user_redirection)
-			return 1;
-	}
-	return 0;
-}
-
-FORCELOCAL NOBLOCK WUNUSED __BOOL
-NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
-	u16 cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	if (cs == SEGMENT_USER_CODE32_RPL)
-		return 1;
-	if (SEGMENT_IS_VALID_KERNCODE(cs)) {
-		uintptr_t rip;
-		rip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-		if (rip == (uintptr_t)&x86_rpc_user_redirection) {
-			cs = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
-			if (cs == SEGMENT_USER_CODE32_RPL)
-				return 1;
-		}
-	}
-	return 0;
-}
-
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
-NOTHROW(FCALL irregs_rdsp)(struct irregs const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	uintptr_t result = __hybrid_atomic_load(self->ir_rsp, __ATOMIC_ACQUIRE);
-	if (ADDR_ISKERN(result)) {
-		uintptr_t rip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-		if (rip == (uintptr_t)&x86_rpc_user_redirection)
-			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rsp);
-	}
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED u16
-NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	u16 result = __hybrid_atomic_load(self->ir_ss16, __ATOMIC_ACQUIRE);
-	if (SEGMENT_IS_VALID_KERNDATA(result)) {
-		uintptr_t rip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-		if (rip == (uintptr_t)&x86_rpc_user_redirection)
-			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_ss16);
-	}
-	return result;
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrip)(struct irregs *__restrict self, uintptr_t value) {
-	uintptr_t oldval;
-	do {
-		oldval = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
-		if (oldval == (uintptr_t)&x86_rpc_user_redirection) {
-			PERTASK_SET(this_x86_rpc_redirection_iret.ir_rip, value);
-			break;
-		}
-	} while (!__hybrid_atomic_cmpxch_weak(self->ir_rip, oldval, value,
-	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-}
-
-/* Sadly, these last 2 can only be implemented by disabling preemption... */
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrcs)(struct irregs *__restrict self, u16 value) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
-	} else {
-		self->ir_cs = (uintptr_t)value;
-	}
-	PREEMPTION_POP(was);
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrflags)(struct irregs *__restrict self, uintptr_t value) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_rflags, value);
-	} else {
-		self->ir_rflags = value;
-	}
-	PREEMPTION_POP(was);
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_mskflags)(struct irregs *__restrict self, uintptr_t mask, uintptr_t flags) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		uintptr_t newval;
-		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rflags);
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_rflags, (newval & mask) | flags);
-	} else {
-		self->ir_rflags &= mask;
-		self->ir_rflags |= flags;
-	}
-	PREEMPTION_POP(was);
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_rsp, value);
-	} else {
-		self->ir_rsp = value;
-	}
-	PREEMPTION_POP(was);
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_ss, (uintptr_t)value);
-	} else {
-		self->ir_ss = (uintptr_t)value;
-	}
-	PREEMPTION_POP(was);
-}
-
 #else /* __x86_64__ */
 
 DATDEF ATTR_PERTASK struct irregs_kernel this_x86_rpc_redirection_iret;
@@ -491,147 +332,75 @@ struct irregs_user;
  *       and that `thread' is hosted by the calling CPU. */
 FUNDEF ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
-
-/* Safely modify the values of saved registers that may be modified by RPC redirection. */
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
-NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
-	uintptr_t result = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (result == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eip);
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED u16
-NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	u16 result    = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	uintptr_t eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
-NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	uintptr_t result = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
-	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
-	return result;
-}
-
-FORCELOCAL NOBLOCK WUNUSED __BOOL
-NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	u16 cs;
-	uintptr_t eflags, eip;
-	cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	if (cs & 3)
-		return 1;
-	eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
-	if (eflags & 0x20000)
-		return 1;
-	eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		return 1;
-	return 0;
-}
-
-/* Not guarantied to return `1' for vm86 interrupt registers. */
-FORCELOCAL NOBLOCK WUNUSED __BOOL
-NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	u16 cs;
-	uintptr_t eip;
-	cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	if (cs & 3)
-		return 1;
-	eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		return 1;
-	return 0;
-}
-
-FORCELOCAL NOBLOCK WUNUSED __BOOL
-NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	uintptr_t eip, eflags;
-	eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
-	if (eflags & 0x20000)
-		return 1;
-	eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection) {
-		eflags = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
-		if (eflags & 0x20000)
-			return 1;
-	}
-	return 0;
-}
-
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
-NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
-	/* NOTE: The read-order here is very important! */
-	uintptr_t result = (uintptr_t)(self + 1);
-	u16 cs           = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	uintptr_t eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
-	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection || (cs & 3) || (eflags & 0x20000))
-		result = *(u32 *)(self + 1);
-	return result;
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value) {
-	uintptr_t oldval;
-	do {
-		oldval = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-		if (oldval == (uintptr_t)&x86_rpc_user_redirection) {
-			PERTASK_SET(this_x86_rpc_redirection_iret.ir_eip, value);
-			break;
-		}
-	} while (!__hybrid_atomic_cmpxch_weak(self->ir_eip, oldval, value, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-}
-
-/* Sadly, these last 2 can only be implemented by disabling preemption... */
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
-	} else {
-		self->ir_cs = (uintptr_t)value;
-	}
-	PREEMPTION_POP(was);
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_eflags, value);
-	} else {
-		self->ir_eflags = value;
-	}
-	PREEMPTION_POP(was);
-}
-
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self, uintptr_t mask, uintptr_t flags) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
-		uintptr_t newval;
-		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
-		PERTASK_SET(this_x86_rpc_redirection_iret.ir_eflags, (newval & mask) | flags);
-	} else {
-		self->ir_eflags &= mask;
-		self->ir_eflags |= flags;
-	}
-	PREEMPTION_POP(was);
-}
-
 #endif /* !__x86_64__ */
 
+
+/* Safely get/set the values of saved registers that may be modified by RPC redirection. */
+
+/* Check if `self' returns to user-space. */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
+NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self);
+
+/* get:`self->ir_pip' */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self);
+
+/* get:`self->ir_cs16' */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) u16
+NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self);
+
+/* get:`self->ir_pflags' */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self);
+
+/* set:`self->ir_pip' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t value);
+
+/* set:`self->ir_cs' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value);
+
+/* set:`self->ir_pflags' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value);
+
+/* set:`self->ir_pflags = (self->ir_pflags & mask) | flags' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
+                               uintptr_t mask, uintptr_t flags);
+
+/* get:`self->ir_psp' (with accounting for kernel-space return-sp on i386) */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self);
+
+
+#ifdef __x86_64__
+/* Check if `self' returns to compatibility-mode. */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
+NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self);
+
+/* get:`self->ir_ss16' */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) u16
+NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self);
+
+/* set:`self->ir_rsp' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value);
+
+/* set:`self->ir_ss' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value);
+#else /* __x86_64__ */
+
+/* Check if `self' returns to user-space (but returns `false' if it returns to vm86). */
+FUNDEF NOBLOCK WUNUSED __BOOL
+NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self);
+
+/* Check if `self' returns to vm86. */
+FUNDEF NOBLOCK WUNUSED __BOOL
+NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self);
+#endif /* !__x86_64__ */
 
 #endif /* __CC__ */
 

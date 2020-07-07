@@ -317,6 +317,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	thread_iret->ir_rflags = 0;
 	COMPILER_WRITE_BARRIER();
 	thread_iret->ir_ss  = SEGMENT_KERNEL_DATA0;
+	COMPILER_WRITE_BARRIER();
 	thread_iret->ir_rsp = (u64)(thread_iret + 1);
 	COMPILER_WRITE_BARRIER();
 	return true;
