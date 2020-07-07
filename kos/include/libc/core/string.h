@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69c593d1 */
+/* HASH CRC-32:0x6f1552b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,9 +176,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 #define __libc_core_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
 #endif /* !... */
-#if __has_builtin(__builtin_bzero) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bzero)
-__CEIREDIRECT(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,__libc_core_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,{ return __builtin_bzero(__dst, __num_bytes); })
-#elif defined(__CRT_HAVE_bzero)
+#ifdef __CRT_HAVE_bzero
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))

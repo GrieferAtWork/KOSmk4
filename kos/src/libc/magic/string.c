@@ -1036,7 +1036,18 @@ void bcopy([[nonnull]] void const *src,
 
 %#ifndef __bzero_defined
 %#define __bzero_defined 1
-[[fast, libc, kernel, crtbuiltin, alias("__bzero", "explicit_bzero")]]
+/* Disable [[crtbuiltin]] because gcc translates `__builtin_bzero()' into a call to `memset()'
+ * s.a.: https://gcc.gnu.org/legacy-ml/gcc-bugs/2002-01/msg00511.html
+ * While I do understand what is causing GCC to do this, I still cannot let it do this under
+ * KOS due to the fact that we're using __CRT_HAVE_* feature test macros that rely on the
+ * compiler not randomly deciding to emit calls to libc function that havn't been white-listed.
+ * And while this could be fixed by only calling `__builtin_bzero()' when `__CRT_HAVE_memset'
+ * is defined, doing this would still produce sub-optimal code because `memset()' takes 3
+ * arguments, while bzero() only takes 2 (and also doesn't have to fill the return register
+ * with any meaningful value)
+ * So rather than dealing with that headache, just don't link bzero() against its builtin
+ * counterpart! */
+[[fast, libc, kernel, /*crtbuiltin,*/ alias("__bzero", "explicit_bzero")]]
 [[if(!defined(__KERNEL__)), export_as("__bzero", "explicit_bzero")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZERO))]]
 void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
