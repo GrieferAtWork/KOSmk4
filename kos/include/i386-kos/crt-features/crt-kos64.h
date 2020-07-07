@@ -786,6 +786,7 @@
 #define __CRT_HAVE__aligned_realloc_dbg 1
 #define __CRT_HAVE__aligned_recalloc 1
 #define __CRT_HAVE__aligned_recalloc_dbg 1
+#define __CRT_HAVE__alloca 1
 #define __CRT_HAVE__assert 1
 #define __CRT_HAVE__atodbl 1
 #define __CRT_HAVE__atodbl_l 1
@@ -1289,6 +1290,7 @@
 #define __CRT_HAVE_adjtimex64 1
 #define __CRT_HAVE_alarm 1
 #define __CRT_HAVE_aligned_alloc 1
+#define __CRT_HAVE_alloca 1
 #define __CRT_HAVE_alphasort 1
 #define __CRT_HAVE_alphasort64 1
 #define __CRT_HAVE_argz_add 1
@@ -5028,6 +5030,7 @@
 #define __CRT_HAVE_KOS$_aligned_offset_recalloc 1
 #define __CRT_HAVE_KOS$_aligned_realloc 1
 #define __CRT_HAVE_KOS$_aligned_recalloc 1
+#define __CRT_HAVE_KOS$_alloca 1
 #define __CRT_HAVE_KOS$_atodbl 1
 #define __CRT_HAVE_KOS$_atodbl_l 1
 #define __CRT_HAVE_KOS$_atof_l 1
@@ -5571,6 +5574,7 @@
 #define __CRT_HAVE_KOS$adjtimex64 1
 #define __CRT_HAVE_KOS$alarm 1
 #define __CRT_HAVE_KOS$aligned_alloc 1
+#define __CRT_HAVE_KOS$alloca 1
 #define __CRT_HAVE_KOS$alphasort 1
 #define __CRT_HAVE_KOS$alphasort64 1
 #define __CRT_HAVE_KOS$argz_add 1
@@ -8392,6 +8396,7 @@
 #define __CRT_HAVE_DOS$_aligned_offset_recalloc 1
 #define __CRT_HAVE_DOS$_aligned_realloc 1
 #define __CRT_HAVE_DOS$_aligned_recalloc 1
+#define __CRT_HAVE_DOS$_alloca 1
 #define __CRT_HAVE_DOS$_atodbl 1
 #define __CRT_HAVE_DOS$_atodbl_l 1
 #define __CRT_HAVE_DOS$_atof_l 1
@@ -8935,6 +8940,7 @@
 #define __CRT_HAVE_DOS$adjtimex64 1
 #define __CRT_HAVE_DOS$alarm 1
 #define __CRT_HAVE_DOS$aligned_alloc 1
+#define __CRT_HAVE_DOS$alloca 1
 #define __CRT_HAVE_DOS$alphasort 1
 #define __CRT_HAVE_DOS$alphasort64 1
 #define __CRT_HAVE_DOS$argz_add 1

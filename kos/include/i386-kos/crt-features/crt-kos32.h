@@ -789,6 +789,7 @@
 #define __CRT_HAVE__aligned_realloc_dbg 1
 #define __CRT_HAVE__aligned_recalloc 1
 #define __CRT_HAVE__aligned_recalloc_dbg 1
+#define __CRT_HAVE__alloca 1
 #define __CRT_HAVE__assert 1
 #define __CRT_HAVE__atodbl 1
 #define __CRT_HAVE__atodbl_l 1
@@ -1292,6 +1293,7 @@
 #define __CRT_HAVE_adjtimex64 1
 #define __CRT_HAVE_alarm 1
 #define __CRT_HAVE_aligned_alloc 1
+#define __CRT_HAVE_alloca 1
 #define __CRT_HAVE_alphasort 1
 #define __CRT_HAVE_alphasort64 1
 #define __CRT_HAVE_argz_add 1
