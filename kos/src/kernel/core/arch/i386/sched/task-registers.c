@@ -114,7 +114,8 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 	if (ATOMIC_READ(self->ir_eflags) & EFLAGS_VM)
 		goto is_user_iret;
 	if (cs == SEGMENT_KERNEL_CODE) {
-		u32 eip = ATOMIC_READ(self->ir_eip);
+		u32 eip;
+		eip = ATOMIC_READ(self->ir_eip);
 		if unlikely(eip == (u32)&x86_rpc_user_redirection) {
 is_user_iret:
 			result = *(u32 *)result;
@@ -174,7 +175,7 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if unlikely(self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
+	if unlikely(self->ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
 		uintptr_t newval;
 		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_pflags);
 		PERTASK_SET(this_x86_rpc_redirection_iret.ir_pflags, (newval & mask) | flags);
