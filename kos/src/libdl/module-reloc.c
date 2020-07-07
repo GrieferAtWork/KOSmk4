@@ -40,29 +40,29 @@ DECL_BEGIN
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t CC
 builtin_symbol_size(char const *__restrict name) {
-	if (!strcmp(name, "program_invocation_name"))
+	if (strcmp(name, "program_invocation_name") == 0)
 		return sizeof(void *);
-	if (!strcmp(name, "program_invocation_short_name"))
+	if (strcmp(name, "program_invocation_short_name") == 0)
 		return sizeof(void *);
 	if (*name == '_') {
 		++name;
-		if (!strcmp(name, "pgmptr"))
+		if (strcmp(name, "pgmptr") == 0)
 			return sizeof(void *);
 		if (*name == '_') {
 			++name;
-			if (!strcmp(name, "peb"))
+			if (strcmp(name, "peb") == 0)
 				return sizeof(struct process_peb);
-			if (!strcmp(name, "argc"))
+			if (strcmp(name, "argc") == 0)
 				return sizeof(size_t);
-			if (!strcmp(name, "argv"))
+			if (strcmp(name, "argv") == 0)
 				return sizeof(void *);
-			if (!strcmp(name, "progname"))
+			if (strcmp(name, "progname") == 0)
 				return sizeof(void *);
-			if (!strcmp(name, "progname_full"))
+			if (strcmp(name, "progname_full") == 0)
 				return sizeof(void *);
 		}
 	}
-	if (!strcmp(name, "environ"))
+	if (strcmp(name, "environ") == 0)
 		return sizeof(void *);
 	return 0;
 }

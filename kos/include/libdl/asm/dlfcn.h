@@ -27,7 +27,8 @@
 
 __DECL_BEGIN
 
-#if defined(__CRT_KOS) || defined(__CRT_GLC)
+#if (defined(__CRT_KOS) || defined(__CRT_GLC) || \
+     (defined(__KOS__) && defined(__BUILDING_LIBDL)))
 #define __RTLD_NEXT    (__CCAST(void *)-1)
 #define __RTLD_LAZY         0x00001 /* Lazy function call binding. */
 #define __RTLD_NOW          0x00002 /* Immediate function call binding. */
@@ -42,7 +43,8 @@ __DECL_BEGIN
 
 
 /* KOS Extensions for <dlfcn.h> */
-#if defined(__KOS__) || defined(__CRT_KOS)
+#if (defined(__KOS__) || defined(__CRT_KOS) || \
+     (defined(__KOS__) && defined(__BUILDING_LIBDL)))
 #define __DLCACHES_SECTION_NAME ".dl_caches"
 #if __KOS_VERSION__ >= 400
 #define __RTLD_NOINIT 0x80000000 /* KOS Extension: Don't run module initializers, and consequently
@@ -75,7 +77,7 @@ __DECL_BEGIN
 #else /* __KOS_VERSION__ >= 400 */
 #define __CRT_HAVE_fdlopen 1 /* WARNING: In KOS v300, `fdlopen()' didn't inherit the given `FD' on success! */
 #endif /* __KOS_VERSION__ < 400 */
-#endif /* __KOS__ || __CRT_KOS */
+#endif /* __KOS__ || __CRT_KOS || (__KOS__ && __BUILDING_LIBDL) */
 
 /* Stuff from GLibc that also exist under KOS */
 #define __CRT_HAVE_dladdr 1

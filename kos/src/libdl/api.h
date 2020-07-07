@@ -33,7 +33,7 @@
  *   - Substitute the rest using implementations from <local/xxx/yyy.h> */
 #define __CRT_FREESTANDING 1
 #ifndef __LIBC
-#define __LIBC    __INTDEF
+#define __LIBC __INTDEF
 #endif /* !__LIBC */
 
 /* Disable some format_printf() features that we're not using. */
@@ -62,6 +62,33 @@
 
 /* Define CRT features which may be exposed in
  * headers, that we are explicitly implementing. */
+
+/* Functions defined by libdl itself */
+#define __CRT_HAVE_dlfopen 1
+#define __CRT_HAVE_dlexceptaware 1
+#define __CRT_HAVE_dlgethandle 1
+#define __CRT_HAVE_dlgetmodule 1
+#define __CRT_HAVE_dlmodulefd 1
+#define __CRT_HAVE_dlmodulename 1
+#define __CRT_HAVE_dlmodulebase 1
+#define __CRT_HAVE_dllocksection 1
+#define __CRT_HAVE_dlunlocksection 1
+#define __CRT_HAVE_dlsectionname 1
+#define __CRT_HAVE_dlsectionindex 1
+#define __CRT_HAVE_dlsectionmodule 1
+#define __CRT_HAVE_dlclearcaches 1
+#define __CRT_HAVE_dltlsallocseg 1
+#define __CRT_HAVE_dltlsfreeseg 1
+#define __CRT_HAVE_dltlsalloc 1
+#define __CRT_HAVE_dltlsfree 1
+#define __CRT_HAVE_dltlsaddr 1
+#define __CRT_HAVE_dlauxctrl 1
+#define __CRT_HAVE_dladdr 1
+#define __CRT_HAVE_dl_iterate_phdr 1
+#define __CRT_HAVE_dlopen 1
+#define __CRT_HAVE_dlclose 1
+#define __CRT_HAVE_dlsym 1
+#define __CRT_HAVE_dlerror 1
 
 /* Functions defined through dlmalloc */
 #define __CRT_HAVE_malloc 1
