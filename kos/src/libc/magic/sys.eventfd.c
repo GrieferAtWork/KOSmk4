@@ -25,8 +25,8 @@
 %{
 #include <features.h>
 
+#include <asm/eventfd.h> /* __EFD_* */
 #include <bits/types.h>
-#include <bits/eventfd.h>
 
 #ifdef __USE_GLIBC
 #include <stdint.h>
@@ -51,6 +51,49 @@
    <http://www.gnu.org/licenses/>.  */
 
 __SYSDECL_BEGIN
+
+/* Flags for `eventfd()'. */
+#if (defined(__EFD_SEMAPHORE) || defined(__EFD_NONBLOCK) || \
+     defined(__EFD_CLOEXEC))
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+#ifdef __EFD_SEMAPHORE
+	EFD_SEMAPHORE = __EFD_SEMAPHORE, /* Create a semaphore */
+#endif /* __EFD_SEMAPHORE */
+#ifdef __EFD_NONBLOCK
+	EFD_NONBLOCK  = __EFD_NONBLOCK,  /* Set the IO_NONBLOCK flag */
+#endif /* __EFD_NONBLOCK */
+#ifdef __EFD_CLOEXEC
+	EFD_CLOEXEC   = __EFD_CLOEXEC,   /* Set the IO_CLOEXEC flag */
+#endif /* __EFD_CLOEXEC */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __EFD_SEMAPHORE
+#define EFD_SEMAPHORE EFD_SEMAPHORE /* Create a semaphore */
+#endif /* __EFD_SEMAPHORE */
+#ifdef __EFD_NONBLOCK
+#define EFD_NONBLOCK  EFD_NONBLOCK  /* Set the IO_NONBLOCK flag */
+#endif /* __EFD_NONBLOCK */
+#ifdef __EFD_CLOEXEC
+#define EFD_CLOEXEC   EFD_CLOEXEC   /* Set the IO_CLOEXEC flag */
+#endif /* __EFD_CLOEXEC */
+#else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __EFD_SEMAPHORE
+#define EFD_SEMAPHORE __EFD_SEMAPHORE /* Create a semaphore */
+#endif /* __EFD_SEMAPHORE */
+#ifdef __EFD_NONBLOCK
+#define EFD_NONBLOCK  __EFD_NONBLOCK  /* Set the IO_NONBLOCK flag */
+#endif /* __EFD_NONBLOCK */
+#ifdef __EFD_CLOEXEC
+#define EFD_CLOEXEC   __EFD_CLOEXEC   /* Set the IO_CLOEXEC flag */
+#endif /* __EFD_CLOEXEC */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
+#endif /* __EFD_SEMAPHORE || __EFD_NONBLOCK || __EFD_CLOEXEC */
+
 
 #ifdef __CC__
 

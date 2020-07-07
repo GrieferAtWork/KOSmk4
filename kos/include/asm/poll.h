@@ -46,9 +46,9 @@
 /* Event types that can be polled for. These bits may be set in `events'
  * to indicate the interesting event types; they will appear in `revents'
  * to indicate the status of the file descriptor. */
-#define __POLLIN  0x001 /* There is data to read. */
+#define __POLLIN  0x001 /* There is data to read. (`read' & friends won't block when invoked) */
 #define __POLLPRI 0x002 /* There is urgent data to read. */
-#define __POLLOUT 0x004 /* Writing now will not block. */
+#define __POLLOUT 0x004 /* Writing now will not block. (`write' & friends won't block when invoked) */
 
 /* These values are defined in XPG4.2. */
 #define __POLLRDNORM 0x040 /* 100% identical to `POLLIN' (Normal data may be read). */
@@ -69,9 +69,9 @@
 #define __POLLNVAL 0x020 /* Invalid polling request. */
 
 /* Poll events are mapped by select(2) using these macros. */
-#define __POLLSELECT_READFDS   (__POLLRDNORM | __POLLRDBAND | __POLLIN | __POLLHUP | __POLLERR) /* readfds */
-#define __POLLSELECT_WRITEFDS  (__POLLWRBAND | __POLLWRNORM | __POLLOUT | __POLLERR) /* writefds */
-#define __POLLSELECT_EXCEPTFDS (__POLLPRI) /* exceptfds */
+#define __POLLSELECT_READFDS   (__POLLRDNORM | __POLLRDBAND | __POLLIN | __POLLHUP | __POLLERR) /* select(2).readfds */
+#define __POLLSELECT_WRITEFDS  (__POLLWRBAND | __POLLWRNORM | __POLLOUT | __POLLERR)            /* select(2).writefds */
+#define __POLLSELECT_EXCEPTFDS (__POLLPRI)                                                      /* select(2).exceptfds */
 
 #endif /* ... */
 

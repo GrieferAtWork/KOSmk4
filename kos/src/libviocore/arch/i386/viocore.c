@@ -1631,7 +1631,7 @@ NOTHROW(CC CS_setregb)(vio_cpustate_t *__restrict state,
 
 #ifdef __KERNEL__
 #define EMU86_GETREGW(regno) CS_getregw(self->vea_args.va_state, regno)
-PRIVATE WUNUSED NONNULL((1)) u16
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(CC CS_getregw)(vio_cpustate_t *__restrict state, u8 regno) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_SP) {
@@ -1641,7 +1641,7 @@ NOTHROW(CC CS_getregw)(vio_cpustate_t *__restrict state, u8 regno) {
 	}
 }
 #define EMU86_GETREGL(regno) CS_getregl(self->vea_args.va_state, regno)
-PRIVATE WUNUSED NONNULL((1)) u32
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u32
 NOTHROW(CC CS_getregl)(vio_cpustate_t *__restrict state, u8 regno) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_ESP) {
@@ -1652,7 +1652,7 @@ NOTHROW(CC CS_getregl)(vio_cpustate_t *__restrict state, u8 regno) {
 }
 #ifdef __x86_64__
 #define EMU86_GETREGQ(regno)        CS_getregq(self->vea_args.va_state, regno)
-PRIVATE WUNUSED NONNULL((1)) u64
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u64
 NOTHROW(CC CS_getregq)(vio_cpustate_t *__restrict state, u8 regno) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_RSP) {
@@ -1662,7 +1662,7 @@ NOTHROW(CC CS_getregq)(vio_cpustate_t *__restrict state, u8 regno) {
 	}
 }
 #define EMU86_SETREGW(regno, value) CS_setregw(self->vea_args.va_state, regno, value)
-PRIVATE WUNUSED NONNULL((1)) void
+PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregw)(vio_cpustate_t *__restrict state, u8 regno, u16 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_SP) {
@@ -1672,7 +1672,7 @@ NOTHROW(CC CS_setregw)(vio_cpustate_t *__restrict state, u8 regno, u16 value) {
 	}
 }
 #define EMU86_SETREGL(regno, value) CS_setregl(self->vea_args.va_state, regno, value)
-PRIVATE WUNUSED NONNULL((1)) void
+PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregl)(vio_cpustate_t *__restrict state, u8 regno, u32 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_ESP) {
@@ -1682,7 +1682,7 @@ NOTHROW(CC CS_setregl)(vio_cpustate_t *__restrict state, u8 regno, u32 value) {
 	}
 }
 #define EMU86_SETREGQ(regno, value) CS_setregq(self->vea_args.va_state, regno, value)
-PRIVATE WUNUSED NONNULL((1)) void
+PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregq)(vio_cpustate_t *__restrict state, u8 regno, u64 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_RSP) {
@@ -1693,7 +1693,7 @@ NOTHROW(CC CS_setregq)(vio_cpustate_t *__restrict state, u8 regno, u64 value) {
 }
 #else /* __x86_64__ */
 #define EMU86_SETREGW(regno, value) CS_setregw(self, regno, value)
-PRIVATE WUNUSED NONNULL((1)) void
+PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregw)(struct vio_emulate_args *__restrict self, u8 regno, u16 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_SP) {
@@ -1703,7 +1703,7 @@ NOTHROW(CC CS_setregw)(struct vio_emulate_args *__restrict self, u8 regno, u16 v
 	}
 }
 #define EMU86_SETREGL(regno, value) CS_setregl(self, regno, value)
-PRIVATE WUNUSED NONNULL((1)) void
+PRIVATE ATTR_LEAF WUNUSED NONNULL((1)) void
 NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 value) {
 	regno &= (X86_GPREGCOUNT - 1);
 	if (regno == EMU86_R_ESP) {
@@ -1714,22 +1714,22 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 }
 #endif /* __x86_64__ */
 #else /* __KERNEL__ */
-#define EMU86_GETREGW(regno) _EMU86_GETREGW(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
-#define EMU86_GETREGL(regno) _EMU86_GETREGL(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
+#define EMU86_GETREGW(regno)        _EMU86_GETREGW(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
+#define EMU86_GETREGL(regno)        _EMU86_GETREGL(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
 #define EMU86_SETREGW(regno, value) _EMU86_SETREGW(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1), value)
 #define EMU86_SETREGL(regno, value) _EMU86_SETREGL(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1), value)
 #ifdef __x86_64__
-#define EMU86_GETREGQ(regno) _EMU86_GETREGQ(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
+#define EMU86_GETREGQ(regno)        _EMU86_GETREGQ(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1))
 #define EMU86_SETREGQ(regno, value) _EMU86_SETREGQ(self->vea_args.va_state, (regno) & (X86_GPREGCOUNT - 1), value)
 #endif /* __x86_64__ */
 #endif /* !__KERNEL__ */
 
 #ifdef __x86_64__
-#define _EMU86_REGP_MASK(op_flags) (EMU86_F_IS64(op_flags) ? (u64)UINT64_MAX : (u64)UINT32_MAX)
+#define _EMU86_REGP_MASK(op_flags)            (EMU86_F_IS64(op_flags) ? (u64)UINT64_MAX : (u64)UINT32_MAX)
 #define EMU86_GETREGP(regno, op_flags)        (EMU86_GETREGQ(regno) & _EMU86_REGP_MASK(op_flags))
 #define EMU86_SETREGP(regno, value, op_flags) (EMU86_SETREGQ(regno, (value) & _EMU86_REGP_MASK(op_flags)))
 #else /* __x86_64__ */
-#define _EMU86_REGP_MASK(op_flags) (EMU86_F_IS32(op_flags) ? (u32)UINT32_MAX : (u32)UINT16_MAX)
+#define _EMU86_REGP_MASK(op_flags)            (EMU86_F_IS32(op_flags) ? (u32)UINT32_MAX : (u32)UINT16_MAX)
 #define EMU86_GETREGP(regno, op_flags)        (EMU86_GETREGL(regno) & _EMU86_REGP_MASK(op_flags))
 #define EMU86_SETREGP(regno, value, op_flags) (EMU86_SETREGL(regno, (value) & _EMU86_REGP_MASK(op_flags)))
 #endif /* !__x86_64__ */
@@ -1740,46 +1740,46 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define _CPUSTATE_GPREGS self->vea_args.va_state->ucs_gpregs
 #endif /* !__KERNEL__ */
 
-#define EMU86_GETAL() ((u8)_CPUSTATE_GPREGS.gp_pax)
-#define EMU86_GETCL() ((u8)_CPUSTATE_GPREGS.gp_pcx)
-#define EMU86_GETDL() ((u8)_CPUSTATE_GPREGS.gp_pdx)
-#define EMU86_GETBL() ((u8)_CPUSTATE_GPREGS.gp_pbx)
-#define EMU86_GETAH() ((u8)(_CPUSTATE_GPREGS.gp_pax >> 8))
-#define EMU86_GETCH() ((u8)(_CPUSTATE_GPREGS.gp_pcx >> 8))
-#define EMU86_GETDH() ((u8)(_CPUSTATE_GPREGS.gp_pdx >> 8))
-#define EMU86_GETBH() ((u8)(_CPUSTATE_GPREGS.gp_pbx >> 8))
-#define EMU86_SETAL(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pax)[0] = (u8)(value))
-#define EMU86_SETCL(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pcx)[0] = (u8)(value))
-#define EMU86_SETDL(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pdx)[0] = (u8)(value))
-#define EMU86_SETBL(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pbx)[0] = (u8)(value))
-#define EMU86_SETAH(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pax)[1] = (u8)(value))
-#define EMU86_SETCH(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pcx)[1] = (u8)(value))
-#define EMU86_SETDH(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pdx)[1] = (u8)(value))
-#define EMU86_SETBH(value) (((u8 *)&_CPUSTATE_GPREGS.gp_pbx)[1] = (u8)(value))
-#define EMU86_GETAX() ((u16)_CPUSTATE_GPREGS.gp_pax)
-#define EMU86_GETCX() ((u16)_CPUSTATE_GPREGS.gp_pcx)
-#define EMU86_GETDX() ((u16)_CPUSTATE_GPREGS.gp_pdx)
-#define EMU86_GETBX() ((u16)_CPUSTATE_GPREGS.gp_pbx)
-#define EMU86_GETSP() ((u16)EMU86_GETSPREG())
-#define EMU86_GETBP() ((u16)_CPUSTATE_GPREGS.gp_pbp)
-#define EMU86_GETSI() ((u16)_CPUSTATE_GPREGS.gp_psi)
-#define EMU86_GETDI() ((u16)_CPUSTATE_GPREGS.gp_pdi)
-#define EMU86_SETAX(value) (_CPUSTATE_GPREGS.gp_pax = (uintptr_t)(u16)(value))
-#define EMU86_SETCX(value) (_CPUSTATE_GPREGS.gp_pcx = (uintptr_t)(u16)(value))
-#define EMU86_SETDX(value) (_CPUSTATE_GPREGS.gp_pdx = (uintptr_t)(u16)(value))
-#define EMU86_SETBX(value) (_CPUSTATE_GPREGS.gp_pbx = (uintptr_t)(u16)(value))
-#define EMU86_SETSP(value) EMU86_SETSPREG((uintptr_t)(u16)(value))
-#define EMU86_SETBP(value) (_CPUSTATE_GPREGS.gp_pbp = (uintptr_t)(u16)(value))
-#define EMU86_SETSI(value) (_CPUSTATE_GPREGS.gp_psi = (uintptr_t)(u16)(value))
-#define EMU86_SETDI(value) (_CPUSTATE_GPREGS.gp_pdi = (uintptr_t)(u16)(value))
-#define EMU86_GETEAX() ((u32)_CPUSTATE_GPREGS.gp_pax)
-#define EMU86_GETECX() ((u32)_CPUSTATE_GPREGS.gp_pcx)
-#define EMU86_GETEDX() ((u32)_CPUSTATE_GPREGS.gp_pdx)
-#define EMU86_GETEBX() ((u32)_CPUSTATE_GPREGS.gp_pbx)
-#define EMU86_GETESP() ((u32)EMU86_GETSPREG())
-#define EMU86_GETEBP() ((u32)_CPUSTATE_GPREGS.gp_pbp)
-#define EMU86_GETESI() ((u32)_CPUSTATE_GPREGS.gp_psi)
-#define EMU86_GETEDI() ((u32)_CPUSTATE_GPREGS.gp_pdi)
+#define EMU86_GETAL()       ((u8)_CPUSTATE_GPREGS.gp_pax)
+#define EMU86_GETCL()       ((u8)_CPUSTATE_GPREGS.gp_pcx)
+#define EMU86_GETDL()       ((u8)_CPUSTATE_GPREGS.gp_pdx)
+#define EMU86_GETBL()       ((u8)_CPUSTATE_GPREGS.gp_pbx)
+#define EMU86_GETAH()       ((u8)(_CPUSTATE_GPREGS.gp_pax >> 8))
+#define EMU86_GETCH()       ((u8)(_CPUSTATE_GPREGS.gp_pcx >> 8))
+#define EMU86_GETDH()       ((u8)(_CPUSTATE_GPREGS.gp_pdx >> 8))
+#define EMU86_GETBH()       ((u8)(_CPUSTATE_GPREGS.gp_pbx >> 8))
+#define EMU86_SETAL(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pax)[0] = (u8)(value))
+#define EMU86_SETCL(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pcx)[0] = (u8)(value))
+#define EMU86_SETDL(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pdx)[0] = (u8)(value))
+#define EMU86_SETBL(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pbx)[0] = (u8)(value))
+#define EMU86_SETAH(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pax)[1] = (u8)(value))
+#define EMU86_SETCH(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pcx)[1] = (u8)(value))
+#define EMU86_SETDH(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pdx)[1] = (u8)(value))
+#define EMU86_SETBH(value)  (((u8 *)&_CPUSTATE_GPREGS.gp_pbx)[1] = (u8)(value))
+#define EMU86_GETAX()       ((u16)_CPUSTATE_GPREGS.gp_pax)
+#define EMU86_GETCX()       ((u16)_CPUSTATE_GPREGS.gp_pcx)
+#define EMU86_GETDX()       ((u16)_CPUSTATE_GPREGS.gp_pdx)
+#define EMU86_GETBX()       ((u16)_CPUSTATE_GPREGS.gp_pbx)
+#define EMU86_GETSP()       ((u16)EMU86_GETSPREG())
+#define EMU86_GETBP()       ((u16)_CPUSTATE_GPREGS.gp_pbp)
+#define EMU86_GETSI()       ((u16)_CPUSTATE_GPREGS.gp_psi)
+#define EMU86_GETDI()       ((u16)_CPUSTATE_GPREGS.gp_pdi)
+#define EMU86_SETAX(value)  (_CPUSTATE_GPREGS.gp_pax = (uintptr_t)(u16)(value))
+#define EMU86_SETCX(value)  (_CPUSTATE_GPREGS.gp_pcx = (uintptr_t)(u16)(value))
+#define EMU86_SETDX(value)  (_CPUSTATE_GPREGS.gp_pdx = (uintptr_t)(u16)(value))
+#define EMU86_SETBX(value)  (_CPUSTATE_GPREGS.gp_pbx = (uintptr_t)(u16)(value))
+#define EMU86_SETSP(value)  EMU86_SETSPREG((uintptr_t)(u16)(value))
+#define EMU86_SETBP(value)  (_CPUSTATE_GPREGS.gp_pbp = (uintptr_t)(u16)(value))
+#define EMU86_SETSI(value)  (_CPUSTATE_GPREGS.gp_psi = (uintptr_t)(u16)(value))
+#define EMU86_SETDI(value)  (_CPUSTATE_GPREGS.gp_pdi = (uintptr_t)(u16)(value))
+#define EMU86_GETEAX()      ((u32)_CPUSTATE_GPREGS.gp_pax)
+#define EMU86_GETECX()      ((u32)_CPUSTATE_GPREGS.gp_pcx)
+#define EMU86_GETEDX()      ((u32)_CPUSTATE_GPREGS.gp_pdx)
+#define EMU86_GETEBX()      ((u32)_CPUSTATE_GPREGS.gp_pbx)
+#define EMU86_GETESP()      ((u32)EMU86_GETSPREG())
+#define EMU86_GETEBP()      ((u32)_CPUSTATE_GPREGS.gp_pbp)
+#define EMU86_GETESI()      ((u32)_CPUSTATE_GPREGS.gp_psi)
+#define EMU86_GETEDI()      ((u32)_CPUSTATE_GPREGS.gp_pdi)
 #define EMU86_SETEAX(value) (_CPUSTATE_GPREGS.gp_pax = (uintptr_t)(u32)(value))
 #define EMU86_SETECX(value) (_CPUSTATE_GPREGS.gp_pcx = (uintptr_t)(u32)(value))
 #define EMU86_SETEDX(value) (_CPUSTATE_GPREGS.gp_pdx = (uintptr_t)(u32)(value))
@@ -1789,22 +1789,22 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_SETESI(value) (_CPUSTATE_GPREGS.gp_psi = (uintptr_t)(u32)(value))
 #define EMU86_SETEDI(value) (_CPUSTATE_GPREGS.gp_pdi = (uintptr_t)(u32)(value))
 #ifdef __x86_64__
-#define EMU86_GETSPL() ((u8)EMU86_GETSPREG())
-#define EMU86_GETBPL() ((u8)_CPUSTATE_GPREGS.gp_rbp)
-#define EMU86_GETSIL() ((u8)_CPUSTATE_GPREGS.gp_rsi)
-#define EMU86_GETDIL() ((u8)_CPUSTATE_GPREGS.gp_rdi)
+#define EMU86_GETSPL()      ((u8)EMU86_GETSPREG())
+#define EMU86_GETBPL()      ((u8)_CPUSTATE_GPREGS.gp_rbp)
+#define EMU86_GETSIL()      ((u8)_CPUSTATE_GPREGS.gp_rsi)
+#define EMU86_GETDIL()      ((u8)_CPUSTATE_GPREGS.gp_rdi)
 #define EMU86_SETSPL(value) EMU86_SETSPREG((EMU86_GETSPREG() & ~0xff) | (u8)(value))
 #define EMU86_SETBPL(value) (_CPUSTATE_GPREGS.gp_rbp = (_CPUSTATE_GPREGS.gp_rbp & ~0xff) | (u8)(value))
 #define EMU86_SETSIL(value) (_CPUSTATE_GPREGS.gp_rsi = (_CPUSTATE_GPREGS.gp_rsi & ~0xff) | (u8)(value))
 #define EMU86_SETDIL(value) (_CPUSTATE_GPREGS.gp_rdi = (_CPUSTATE_GPREGS.gp_rdi & ~0xff) | (u8)(value))
-#define EMU86_GETRAX() ((u64)_CPUSTATE_GPREGS.gp_rax)
-#define EMU86_GETRCX() ((u64)_CPUSTATE_GPREGS.gp_rcx)
-#define EMU86_GETRDX() ((u64)_CPUSTATE_GPREGS.gp_rdx)
-#define EMU86_GETRBX() ((u64)_CPUSTATE_GPREGS.gp_rbx)
-#define EMU86_GETRSP() ((u64)EMU86_GETSPREG())
-#define EMU86_GETRBP() ((u64)_CPUSTATE_GPREGS.gp_rbp)
-#define EMU86_GETRSI() ((u64)_CPUSTATE_GPREGS.gp_rsi)
-#define EMU86_GETRDI() ((u64)_CPUSTATE_GPREGS.gp_rdi)
+#define EMU86_GETRAX()      ((u64)_CPUSTATE_GPREGS.gp_rax)
+#define EMU86_GETRCX()      ((u64)_CPUSTATE_GPREGS.gp_rcx)
+#define EMU86_GETRDX()      ((u64)_CPUSTATE_GPREGS.gp_rdx)
+#define EMU86_GETRBX()      ((u64)_CPUSTATE_GPREGS.gp_rbx)
+#define EMU86_GETRSP()      ((u64)EMU86_GETSPREG())
+#define EMU86_GETRBP()      ((u64)_CPUSTATE_GPREGS.gp_rbp)
+#define EMU86_GETRSI()      ((u64)_CPUSTATE_GPREGS.gp_rsi)
+#define EMU86_GETRDI()      ((u64)_CPUSTATE_GPREGS.gp_rdi)
 #define EMU86_SETRAX(value) (_CPUSTATE_GPREGS.gp_rax = (u64)(value))
 #define EMU86_SETRCX(value) (_CPUSTATE_GPREGS.gp_rcx = (u64)(value))
 #define EMU86_SETRDX(value) (_CPUSTATE_GPREGS.gp_rdx = (u64)(value))

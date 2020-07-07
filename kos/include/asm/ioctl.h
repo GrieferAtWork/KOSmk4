@@ -61,13 +61,12 @@
 #define _IOC_READ  2 /* Read from property; write to arg */
 
 #define _IOC(dir, type, nr, size) \
-	(((dir) << _IOC_DIRSHIFT) |   \
+	(((dir) << _IOC_DIRSHIFT) |     \
+	 ((size) << _IOC_SIZESHIFT) |   \
 	 ((type) << _IOC_TYPESHIFT) | \
-	 ((nr) << _IOC_NRSHIFT) |     \
-	 ((size) << _IOC_SIZESHIFT))
-
+	 ((nr) << _IOC_NRSHIFT))
 #define _IOC_KOS(dir, type, nr, size) \
-	(_IOC(dir, type, nr, size) | (1 << _IOC_KOSSHIFT))
+	((1 << _IOC_KOSSHIFT) | _IOC(dir, type, nr, size))
 
 #define _IOC_TYPECHECK(t) sizeof(t)
 

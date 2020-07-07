@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe03d6cde */
+/* HASH CRC-32:0x8751b514 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_OpenAt64_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/fcntl.h>
+#include <asm/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 (__VLIBCCALL __LIBC_LOCAL_NAME(Open64))(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) {

@@ -81,7 +81,7 @@
 #define __O_NOATIME    0x0040000 /* Don't update last-accessed time stamps. */
 #define __O_CLOEXEC    0x0080000 /* Close the file during exec() */
 #define __O_PATH       0x0200000 /* Open a path for *at system calls. */
-#define __O_TMPFILE   (0x0400000 | __O_DIRECTORY)
+#define __O_TMPFILE   (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
 #endif /* ... */
 
 #if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)

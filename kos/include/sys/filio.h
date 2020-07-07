@@ -21,8 +21,9 @@
 #define _SYS_FILIO_H 1
 
 #include <__stdinc.h>
-#include <asm/sockios.h>
+
 #include <asm/ioctls.h>
+#include <asm/sockios.h>
 
 /* This file only needs to define the following macros:
  * >> #define FIOCLEX   ...

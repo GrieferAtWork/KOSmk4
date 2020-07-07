@@ -17,14 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_ENDIAN_H
-#define _BITS_ENDIAN_H 1
+#ifndef _ASM_EVENTFD_H
+#define _ASM_EVENTFD_H 1
 
-#include <__stdinc.h>
-#include <hybrid/__byteorder.h>
+#include <__crt.h>
 
-#ifndef __BYTE_ORDER
-#define __BYTE_ORDER __BYTE_ORDER__
-#endif /* !__BYTE_ORDER */
+#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
 
-#endif /* !_BITS_ENDIAN_H */
+/* Flags for `eventfd()'. */
+#define __EFD_SEMAPHORE 0x00001 /* Create a semaphore */
+#define __EFD_NONBLOCK  0x00800 /* Set the IO_NONBLOCK flag */
+#define __EFD_CLOEXEC   0x80000 /* Set the IO_CLOEXEC flag */
+
+#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+
+#endif /* !_ASM_EVENTFD_H */

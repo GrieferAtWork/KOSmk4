@@ -21,33 +21,10 @@
 #define _BITS_EPOLL_H 1
 
 #include <__stdinc.h>
-#include <asm/epoll.h>
+
 #include <bits/types.h>
 
 __DECL_BEGIN
-
-/* Flags to be passed to epoll_create1. */
-#undef EPOLL_CLOEXEC
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-#ifdef __EPOLL_CLOEXEC
-	EPOLL_CLOEXEC = __EPOLL_CLOEXEC
-#endif /* __EPOLL_CLOEXEC */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __EPOLL_CLOEXEC
-#define EPOLL_CLOEXEC EPOLL_CLOEXEC
-#endif /* __EPOLL_CLOEXEC */
-#else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __EPOLL_CLOEXEC
-#define EPOLL_CLOEXEC __EPOLL_CLOEXEC
-#endif /* __EPOLL_CLOEXEC */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-
 
 #ifdef __CC__
 #ifndef __EPOLL_PACKED

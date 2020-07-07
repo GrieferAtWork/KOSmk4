@@ -24,17 +24,23 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/elfclass.h> /* Defines __ELF_NATIVE_CLASS.  */
 #include <bits/types.h>
 #include <kos/exec/elf.h> /* ElfW() */
 #include <sys/types.h>
+/* #include <bits/link.h> */
 
 #include <dlfcn.h>
 #include <elf.h>
 
 #include <libdl/asm/dlfcn.h> /* __CRT_HAVE_dl_iterate_phdr */
 
-/* #include <bits/link.h> */
+
+#undef __ELF_NATIVE_CLASS
+#if ELF_ARCH_CLASS == ELFCLASS32
+#define __ELF_NATIVE_CLASS 32
+#elif ELF_ARCH_CLASS == ELFCLASS64
+#define __ELF_NATIVE_CLASS 64
+#endif /* ELF_ARCH_CLASS == ... */
 
 __SYSDECL_BEGIN
 

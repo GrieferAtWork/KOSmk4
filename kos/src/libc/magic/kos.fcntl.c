@@ -71,7 +71,7 @@ $fd_t Creat([[nonnull]] char const *filename, $mode_t mode) {
 %
 %#ifdef __USE_LARGEFILE64
 [[cp, throws, vartypes($mode_t), decl_include("<bits/types.h>")]]
-[[wunused, largefile64_variant_of(Open), impl_include("<bits/fcntl.h>")]]
+[[wunused, largefile64_variant_of(Open), impl_include("<asm/fcntl.h>")]]
 [[userimpl, requires((defined(__CRT_AT_FDCWD) && $has_function(OpenAt64)) || $has_function(Open32))]]
 $fd_t Open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
@@ -108,7 +108,6 @@ $fd_t OpenAt32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Openat64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt")]]
 [[userimpl, requires($has_function(OpenAt32) || $has_function(OpenAt64))]]
-[[impl_include("<bits/fcntl.h>")]]
 $fd_t OpenAt($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;

@@ -27,13 +27,26 @@
 
 __SYSDECL_BEGIN
 
+
+#undef  _DIRENT_HAVE_D_RECLEN
+#define _DIRENT_HAVE_D_NAMLEN
+#define _DIRENT_HAVE_D_TYPE      1
+#define _DIRENT_HAVE_D_FILENO    1 /* Backwards compatibility. */
+#define _DIRENT_MATCHES_DIRENT64 1
+
 #ifdef __CC__
+#ifdef _DIRENT_HAVE_D_FILENO
+#undef d_fileno
+#endif /* _DIRENT_HAVE_D_FILENO */
 struct dirent {
 #ifdef __USE_KOS
 #undef d_ino
 #undef d_ino32
 #undef d_ino64
 	union {
+#ifdef _DIRENT_HAVE_D_FILENO
+		__FS_TYPE(ino)     d_fileno;
+#endif /* _DIRENT_HAVE_D_FILENO */
 		__FS_TYPE(ino)     d_ino;
 		__ino32_t          d_ino32;
 		__ino64_t          d_ino64;
@@ -42,16 +55,35 @@ struct dirent {
 	;
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	__u_d_ino;
+#ifdef _DIRENT_HAVE_D_FILENO
+#define d_fileno     __u_d_ino.d_fileno
+#endif /* _DIRENT_HAVE_D_FILENO */
 #define d_ino        __u_d_ino.d_ino
 #define d_ino32      __u_d_ino.d_ino32
 #define d_ino64      __u_d_ino.d_ino64
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #else /* __USE_KOS */
-#ifdef __USE_FILE_OFFSET64
-	__ino64_t          d_ino;
-#else /* __USE_FILE_OFFSET64 */
-	__ino32_t          d_ino;
-	__ino32_t        __padding0;
+#ifdef _DIRENT_HAVE_D_FILENO
+	union {
+		__FS_TYPE(ino) d_ino;
+		__FS_TYPE(ino) d_fileno;
+	}
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	;
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	__u_d_ino;
+#ifdef _DIRENT_HAVE_D_FILENO
+#define d_fileno     __u_d_ino.d_fileno
+#endif /* _DIRENT_HAVE_D_FILENO */
+#define d_ino        __u_d_ino.d_ino
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#else /* _DIRENT_HAVE_D_FILENO */
+	__FS_TYPE(ino)     d_ino;
+#endif /* !_DIRENT_HAVE_D_FILENO */
+#ifndef __USE_FILE_OFFSET64
+#if __SIZEOF_INO32_T__ < __SIZEOF_INO64_T__
+	__byte_t         __padding0[__SIZEOF_INO64_T__ - __SIZEOF_INO32_T__];
+#endif /* __SIZEOF_INO32_T__ < __SIZEOF_INO64_T__ */
 #endif /* !__USE_FILE_OFFSET64 */
 #endif /* !__USE_KOS */
 	__UINT8_TYPE__     d_type;
@@ -61,21 +93,27 @@ struct dirent {
 	char               d_name[__DIRENT_TEXTSIZE];
 #elif defined(__USE_KOS_KERNEL)
 	__COMPILER_FLEXIBLE_ARRAY(char, d_name); /* Allocated as required. */
-#else
+#else /* ... */
 	char               d_name[256];
-#endif
+#endif /* !... */
 };
 
 #ifdef __USE_LARGEFILE64
 #ifdef __USE_STRUCT64_MACRO
 #define dirent64 dirent
 #else /* __USE_STRUCT64_MACRO */
+#ifndef _DIRENT_HAVE_D_FILENO
+#undef d_fileno
+#endif /* !_DIRENT_HAVE_D_FILENO */
 struct dirent64 {
 #ifdef __USE_KOS
 #undef d_ino
 #undef d_ino32
 #undef d_ino64
 	union {
+#ifndef _DIRENT_HAVE_D_FILENO
+		__ino64_t          d_fileno;
+#endif /* !_DIRENT_HAVE_D_FILENO */
 		__ino64_t          d_ino;
 		__ino32_t          d_ino32;
 		__ino64_t          d_ino64;
@@ -84,12 +122,31 @@ struct dirent64 {
 	;
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	__u_d_ino;
+#ifndef _DIRENT_HAVE_D_FILENO
+#define d_fileno   __u_d_ino.d_fileno
+#endif /* !_DIRENT_HAVE_D_FILENO */
 #define d_ino      __u_d_ino.d_ino
 #define d_ino32    __u_d_ino.d_ino32
 #define d_ino64    __u_d_ino.d_ino64
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #else /* __USE_KOS */
+#ifdef _DIRENT_HAVE_D_FILENO
+	union {
+		__ino64_t      d_ino;
+		__ino64_t      d_fileno;
+	}
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	;
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	__u_d_ino;
+#ifdef _DIRENT_HAVE_D_FILENO
+#define d_fileno     __u_d_ino.d_fileno
+#endif /* _DIRENT_HAVE_D_FILENO */
+#define d_ino        __u_d_ino.d_ino
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#else /* _DIRENT_HAVE_D_FILENO */
 	__ino64_t          d_ino;
+#endif /* !_DIRENT_HAVE_D_FILENO */
 #endif /* !__USE_KOS */
 	__UINT8_TYPE__     d_type;
 	__UINT8_TYPE__   __d_pad;
@@ -98,23 +155,20 @@ struct dirent64 {
 	char               d_name[__DIRENT_TEXTSIZE];
 #elif defined(__USE_KOS_KERNEL)
 	__COMPILER_FLEXIBLE_ARRAY(char, d_name); /* Allocated as required. */
-#else
+#else /* ... */
 	char               d_name[256];
-#endif
+#endif /* !... */
 };
 #endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_LARGEFILE64 */
 
-#undef d_fileno
-#define d_fileno d_ino /* Backwards compatibility. */
+#ifdef _DIRENT_HAVE_D_FILENO
+#ifndef d_fileno
+#define d_fileno d_fileno
+#endif /* !d_fileno */
+#endif /* _DIRENT_HAVE_D_FILENO */
 
 #endif /* __CC__ */
-
-
-#undef  _DIRENT_HAVE_D_RECLEN
-#define _DIRENT_HAVE_D_NAMLEN
-#define _DIRENT_HAVE_D_TYPE 1
-#define _DIRENT_MATCHES_DIRENT64 1
 
 __SYSDECL_END
 

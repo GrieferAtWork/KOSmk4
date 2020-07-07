@@ -53,8 +53,8 @@
 
 #define TIOCGSOFTCAR        _IO('T', 0x19) /* [int *arg] Get the state of `termios::c_cflag::CLOCAL'. */
 #define TIOCSSOFTCAR        _IO('T', 0x1a) /* [int const *arg] Set the state of `termios::c_cflag::CLOCAL'. */
-#define FIONREAD            _IO('T', 0x1b) /* [int *count] Save the number of pending input bytes */
-#define TIOCINQ            FIONREAD        /* [int *count] Save the number of pending input bytes */
+#define TIOCINQ             _IO('T', 0x1b) /* [int *count] Save the number of pending input bytes */
+#define FIONREAD            TIOCINQ        /* [int *count] Save the number of pending input bytes */
 #define TIOCLINUX           _IO('T', 0x1c)
 #define TIOCCONS            _IO('T', 0x1d)
 #define TIOCGSERIAL         _IO('T', 0x1e)

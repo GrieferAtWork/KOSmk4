@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/endian.h>
+#include <hybrid/byteorder.h>
 
 #ifndef __ORDER_LITTLE_ENDIAN__
 #define __ORDER_LITTLE_ENDIAN__ 1234
@@ -41,26 +41,30 @@
 #define __PDP_ENDIAN    __ORDER_PDP_ENDIAN__
 #endif /* !__LITTLE_ENDIAN */
 
+#ifndef __BYTE_ORDER
+#define __BYTE_ORDER __BYTE_ORDER__
+#endif /* !__BYTE_ORDER */
+
 #ifndef __FLOAT_WORD_ORDER
 #ifdef __FLOAT_WORD_ORDER__
 #define __FLOAT_WORD_ORDER __FLOAT_WORD_ORDER__
 #else /* __FLOAT_WORD_ORDER__ */
-#define __FLOAT_WORD_ORDER __BYTE_ORDER
+#define __FLOAT_WORD_ORDER __BYTE_ORDER__
 #endif /* !__FLOAT_WORD_ORDER__ */
 #endif /* !__FLOAT_WORD_ORDER */
 
 #ifdef __USE_MISC
-#define LITTLE_ENDIAN __LITTLE_ENDIAN
-#define BIG_ENDIAN    __BIG_ENDIAN
-#define PDP_ENDIAN    __PDP_ENDIAN
+#define LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+#define BIG_ENDIAN    __ORDER_BIG_ENDIAN__
+#define PDP_ENDIAN    __ORDER_PDP_ENDIAN__
 #ifndef BYTE_ORDER
-#define BYTE_ORDER    __BYTE_ORDER
+#define BYTE_ORDER    __BYTE_ORDER__
 #endif /* !BYTE_ORDER */
 #endif /* !__USE_MISC */
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __LONG_LONG_PAIR(hi,lo) lo,hi
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __LONG_LONG_PAIR(hi,lo) hi,lo
 #endif
 

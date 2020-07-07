@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 #include <_ansi.h>
-#include <bits/endian.h>
+#include <hybrid/__byteorder.h> /* __BYTE_ORDER__, __ORDER_..._ENDIAN__ */
 
 #ifdef _SYS_ISA_DEFS_H
 #warning "\
@@ -34,9 +34,12 @@ meanings (and values). - Please change your code to only include one of either"
 #undef _LITTLE_ENDIAN
 #undef _BIG_ENDIAN
 #undef _PDB_ENDIAN
-#define _LITTLE_ENDIAN __LITTLE_ENDIAN__
+#define _LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
 #define _BIG_ENDIAN    __ORDER_BIG_ENDIAN__
 #define _PDP_ENDIAN    __ORDER_PDP_ENDIAN__
 #define _BYTE_ORDER    __BYTE_ORDER__
+#ifndef __BYTE_ORDER
+#define __BYTE_ORDER __BYTE_ORDER__
+#endif /* !__BYTE_ORDER */
 
 #endif /* !_MACHINE__ENDIAN_H */

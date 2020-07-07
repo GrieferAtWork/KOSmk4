@@ -17,34 +17,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_EVENTFD_H
-#define _BITS_EVENTFD_H 1
+#ifndef _BITS_F_OWNER_EX_STRUCT_H
+#define _BITS_F_OWNER_EX_STRUCT_H 1
 
-#include <__stdinc.h>
+#include <__crt.h>
 
+#include <bits/types.h>
+
+#ifdef __CC__
 __DECL_BEGIN
 
-/* Flags for eventfd. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	EFD_SEMAPHORE = 0x00001,
-	EFD_NONBLOCK  = 0x00800,
-	EFD_CLOEXEC   = 0x80000
+#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("type")
+#pragma push_macro("pid")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef type
+#undef pid
+struct f_owner_ex {
+	int     type; /* Owner type of ID. (One of `F_OWNER_(TID|PID|PGRP|GID)') */
+	__pid_t pid;  /* ID of owner. */
 };
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define EFD_SEMAPHORE EFD_SEMAPHORE
-#define EFD_NONBLOCK  EFD_NONBLOCK
-#define EFD_CLOEXEC   EFD_CLOEXEC
-#else /* __COMPILER_PREFERR_ENUMS */
-#define EFD_SEMAPHORE 0x00001
-#define EFD_NONBLOCK  0x00800
-#define EFD_CLOEXEC   0x80000
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("pid")
+#pragma pop_macro("type")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+#endif /* ... */
 
 __DECL_END
+#endif /* __CC__ */
 
-#endif /* !_BITS_EVENTFD_H */
+
+#endif /* !_BITS_F_OWNER_EX_STRUCT_H */

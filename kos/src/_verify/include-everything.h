@@ -191,6 +191,7 @@ incdir("", "../../include");
 #include <asm/crt/ttyent.h>
 #include <asm/dirent.h>
 #include <asm/epoll.h>
+#include <asm/eventfd.h>
 #include <asm/fcntl.h>
 #include <asm/fp_type.h>
 #include <asm/int-l64.h>
@@ -264,11 +265,9 @@ incdir("", "../../include");
 #include <bits/crt/threads.h>
 #include <bits/dirent.h>
 #include <bits/elf-types.h>
-#include <bits/elfclass.h>
-#include <bits/endian.h>
 #include <bits/epoll.h>
-#include <bits/eventfd.h>
-#include <bits/fcntl.h>
+#include <bits/f_owner_ex-struct.h>
+#include <bits/file_handle-struct.h>
 #include <bits/flock-struct.h>
 #include <bits/format-printer.h>
 #include <bits/huge_val.h>
@@ -574,6 +573,7 @@ incdir("", "../../include");
 #include <iso646.h>
 #include <kos/anno.h>
 #include <kos/asm/except.h>
+#include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
 #include <kos/asm/uaio.h>
 #include <kos/bits/debugtrap.h>
@@ -635,6 +635,7 @@ incdir("", "../../include");
 #include <kos/ioctl/clock.h>
 #include <kos/ioctl/keyboard.h>
 #include <kos/ioctl/mouse.h>
+#include <kos/ioctl/tty.h>
 #include <kos/ioctl/video.h>
 #include <kos/jiffies.h>
 #include <kos/kernel/handle.h>

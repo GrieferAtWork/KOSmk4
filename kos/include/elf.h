@@ -1289,55 +1289,53 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 } Elf64_auxv_t;
 #endif /* __CC__ */
 
-#ifndef AT_NULL
 /* Legal values for a_type (entry type). */
-#define AT_NULL         0               /* End of vector */
-#define AT_IGNORE       1               /* Entry should be ignored */
-#define AT_EXECFD       2               /* File descriptor of program */
-#define AT_PHDR         3               /* Program headers for program */
-#define AT_PHENT        4               /* Size of program header entry */
-#define AT_PHNUM        5               /* Number of program headers */
-#define AT_PAGESZ       6               /* System page size */
-#define AT_BASE         7               /* Base address of interpreter */
-#define AT_FLAGS        8               /* Flags */
-#define AT_ENTRY        9               /* Entry point of program */
-#define AT_NOTELF       10              /* Program is not ELF */
-#define AT_UID          11              /* Real uid */
-#define AT_EUID         12              /* Effective uid */
-#define AT_GID          13              /* Real gid */
-#define AT_EGID         14              /* Effective gid */
-#define AT_CLKTCK       17              /* Frequency of times() */
+#define AT_NULL           0             /* End of vector */
+#define AT_IGNORE         1             /* Entry should be ignored */
+#define AT_EXECFD         2             /* File descriptor of program */
+#define AT_PHDR           3             /* Program headers for program */
+#define AT_PHENT          4             /* Size of program header entry */
+#define AT_PHNUM          5             /* Number of program headers */
+#define AT_PAGESZ         6             /* System page size */
+#define AT_BASE           7             /* Base address of interpreter */
+#define AT_FLAGS          8             /* Flags */
+#define AT_ENTRY          9             /* Entry point of program */
+#define AT_NOTELF         10            /* Program is not ELF */
+#define AT_UID            11            /* Real uid */
+#define AT_EUID           12            /* Effective uid */
+#define AT_GID            13            /* Real gid */
+#define AT_EGID           14            /* Effective gid */
+#define AT_CLKTCK         17            /* Frequency of times() */
 
 /* Some more special a_type values describing the hardware. */
-#define AT_PLATFORM     15              /* String identifying platform. */
-#define AT_HWCAP        16              /* Machine dependent hints about processor capabilities. */
+#define AT_PLATFORM       15            /* String identifying platform. */
+#define AT_HWCAP          16            /* Machine dependent hints about processor capabilities. */
 
 /* This entry gives some information about the
  * FPU initialization performed by the kernel. */
-#define AT_FPUCW        18              /* Used FPU control word. */
+#define AT_FPUCW          18            /* Used FPU control word. */
 
 /* Cache block sizes. */
-#define AT_DCACHEBSIZE  19              /* Data cache block size. */
-#define AT_ICACHEBSIZE  20              /* Instruction cache block size. */
-#define AT_UCACHEBSIZE  21              /* Unified cache block size. */
+#define AT_DCACHEBSIZE    19            /* Data cache block size. */
+#define AT_ICACHEBSIZE    20            /* Instruction cache block size. */
+#define AT_UCACHEBSIZE    21            /* Unified cache block size. */
 
 /* A special ignored value for PPC, used by the kernel to
  * control the interpretation of the AUXV. Must be > 16. */
-#define AT_IGNOREPPC    22              /* Entry should be ignored. */
-#define AT_SECURE       23              /* Boolean, was exec setuid-like?  */
-#define AT_BASE_PLATFORM 24             /* String identifying real platforms.*/
+#define AT_IGNOREPPC      22            /* Entry should be ignored. */
+#define AT_SECURE         23            /* Boolean, was exec setuid-like?  */
+#define AT_BASE_PLATFORM  24            /* String identifying real platforms.*/
 
 /* Pointer to the global system page used for system calls and other nice things. */
-#define AT_SYSINFO      32
-#define AT_SYSINFO_EHDR 33
+#define AT_SYSINFO        32
+#define AT_SYSINFO_EHDR   33
 
 /* Shapes of the caches. Bits 0-3 contains associativity; bits 4-7
  * contains log2 of line size; mask those to get cache size. */
-#define AT_L1I_CACHESHAPE       34
-#define AT_L1D_CACHESHAPE       35
-#define AT_L2_CACHESHAPE        36
-#define AT_L3_CACHESHAPE        37
-#endif /* !AT_NULL */
+#define AT_L1I_CACHESHAPE 34
+#define AT_L1D_CACHESHAPE 35
+#define AT_L2_CACHESHAPE  36
+#define AT_L3_CACHESHAPE  37
 
 /* Note section contents. Each entry in the note
  * section begins with a header of a fixed form. */
@@ -1488,9 +1486,9 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 /************************************************************************/
 
 /* Legal values for note segment descriptor types for core files. */
-#define NT_386_TLS           0x200      /* x86 TLS information; note name must be "LINUX". */
-#define NT_386_IOPERM        0x201      /* x86 io permissions; note name must be "LINUX". */
-#define NT_X86_XSTATE        0x202      /* x86 XSAVE extended state; note name must be "LINUX". */
+#define NT_386_TLS           0x200 /* x86 TLS information; note name must be "LINUX". */
+#define NT_386_IOPERM        0x201 /* x86 io permissions; note name must be "LINUX". */
+#define NT_X86_XSTATE        0x202 /* x86 XSAVE extended state; note name must be "LINUX". */
 
 /* i386 relocs.
  * NOTE: Only relocations marked as [RTLD] must be handled by the RunTimeLinkDriver.
@@ -1508,7 +1506,7 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 #define R_386_GOTOFF        9  /* 32 bit offset to GOT */
 #define R_386_GOTPC         10 /* 32 bit PC relative offset to GOT */
 #define R_386_32PLT         11
-#define R_386_TLS_TPOFF     14 /* [RTLD] Offset in static TLS block (which evaluates to a nagative value) */
+#define R_386_TLS_TPOFF     14 /* [RTLD] Offset in static TLS block (which evaluates to a negative value) */
 #define R_386_TLS_IE        15 /* Address of GOT entry for static TLS block offset */
 #define R_386_TLS_GOTIE     16 /* GOT entry for static TLS block offset */
 #define R_386_TLS_LE        17 /* Offset relative to static TLS block */

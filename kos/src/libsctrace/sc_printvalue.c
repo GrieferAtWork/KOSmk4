@@ -58,6 +58,7 @@ if (gcc_opt.remove("-O3"))
 #include <linux/futex.h>
 #include <linux/hdreg.h>
 #include <linux/kd.h>
+#include <sys/filio.h>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <sys/poll.h>
@@ -535,7 +536,6 @@ print_iomode_t_impl(pformatprinter printer, void *arg,
 		case IO_RDONLY:   accname = "RDONLY"; break;
 		case IO_WRONLY:   accname = "WRONLY"; break;
 		case IO_RDWR:     accname = "RDWR"; break;
-		case IO_RDWR_ALT: accname = "RDWR_ALT"; break;
 		default: accname = NULL; break;
 		}
 		if likely(accname) {

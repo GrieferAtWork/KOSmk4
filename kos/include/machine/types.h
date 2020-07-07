@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <bits/fcntl.h> /* For `struct flock' */
+#include <bits/flock-struct.h>
 #include <bits/timespec.h>
 #include <bits/types.h>
 #include <sys/sysmacros.h>

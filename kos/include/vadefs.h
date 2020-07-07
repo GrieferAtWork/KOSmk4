@@ -25,8 +25,8 @@
 #ifdef __USE_DOS
 #ifndef _INC_CRTDEFS
 #include <crtdefs.h>
-#endif
-#endif
+#endif /* !_INC_CRTDEFS */
+#endif /* __USE_DOS */
 
 __DECL_BEGIN
 
@@ -38,17 +38,17 @@ typedef __builtin_va_list va_list;
 #ifdef __USE_DOS
 #ifndef _ADDRESSOF
 #ifdef __cplusplus
-#   define _ADDRESSOF(v) (&reinterpret_cast<char const &>(v))
-#else
-#   define _ADDRESSOF(v) (&(v))
-#endif
-#endif
+#define _ADDRESSOF(v) (&reinterpret_cast<char const &>(v))
+#else /* __cplusplus */
+#define _ADDRESSOF(v) (&(v))
+#endif /* !__cplusplus */
+#endif /* !_ADDRESSOF */
 #endif /* __USE_DOS */
 
-#define _crt_va_start(ap,start)     __builtin_va_start(ap,start)
-#define _crt_va_arg(ap,T)           __builtin_va_arg(ap,T)
-#define _crt_va_end(ap)             __builtin_va_end(ap)
-#define _crt_va_copy(dst_ap,src_ap) __builtin_va_copy(dst_ap,src_ap)
+#define _crt_va_start(ap, start)     __builtin_va_start(ap, start)
+#define _crt_va_arg(ap, T)           __builtin_va_arg(ap, T)
+#define _crt_va_end(ap)              __builtin_va_end(ap)
+#define _crt_va_copy(dst_ap, src_ap) __builtin_va_copy(dst_ap, src_ap)
 
 __DECL_END
 

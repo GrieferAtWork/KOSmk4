@@ -24,9 +24,10 @@
 #include <features.h>
 
 #include <asm/dirent.h>
+#include <asm/oflags.h>
+#include <asm/poll.h>
 #include <asm/stat.h>
 #include <bits/types.h>
-#include <bits/fcntl.h> /* Open flags (`oflag_t') */
 
 #ifndef __KOS__
 #error "KOS-only system header"
@@ -57,64 +58,248 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* __CC__ */
 
 
-/* Poll flags (`poll_mode_t' / `struct pollfd') */
-#ifndef POLLIN
-#define POLLIN   0x001 /* There is data to read. (`read' & friends won't block when invoked) */
-#define POLLPRI  0x002 /* There is urgent data to read. */
-#define POLLOUT  0x004 /* Writing now will not block. (`write' & friends won't block when invoked) */
-#endif /* !POLLOUT */
+/* Poll flags (`poll_mode_t' / `struct pollfd')
+ *     Event types that can be polled for. These bits may be set in `events'
+ *     to indicate the interesting event types; they will appear in `revents'
+ *     to indicate the status of the file descriptor. */
+#if !defined(POLLIN) && defined(__POLLIN)
+#define POLLIN               __POLLIN               /* There is data to read. (`read' & friends won't block when invoked) */
+#endif /* !POLLIN && __POLLIN */
+#if !defined(POLLPRI) && defined(__POLLPRI)
+#define POLLPRI              __POLLPRI              /* There is urgent data to read. */
+#endif /* !POLLPRI && __POLLPRI */
+#if !defined(POLLOUT) && defined(__POLLOUT)
+#define POLLOUT              __POLLOUT              /* Writing now will not block. (`write' & friends won't block when invoked) */
+#endif /* !POLLOUT && __POLLOUT */
+#if !defined(POLLRDNORM) && defined(__POLLRDNORM)
+#define POLLRDNORM           __POLLRDNORM           /* 100% identical to `POLLIN' (Normal data may be read). */
+#endif /* !POLLRDNORM && __POLLRDNORM */
+#if !defined(POLLRDBAND) && defined(__POLLRDBAND)
+#define POLLRDBAND           __POLLRDBAND           /* Priority data may be read. */
+#endif /* !POLLRDBAND && __POLLRDBAND */
+#if !defined(POLLWRNORM) && defined(__POLLWRNORM)
+#define POLLWRNORM           __POLLWRNORM           /* 100% identical to `POLLOUT' (Writing now will not block). */
+#endif /* !POLLWRNORM && __POLLWRNORM */
+#if !defined(POLLWRBAND) && defined(__POLLWRBAND)
+#define POLLWRBAND           __POLLWRBAND           /* Priority data may be written. */
+#endif /* !POLLWRBAND && __POLLWRBAND */
+#if !defined(POLLRDHUP) && defined(__POLLRDHUP)
+#define POLLRDHUP            __POLLRDHUP            /* Socket peer closed connection, or shut down writing half of its connection */
+#endif /* !POLLRDHUP && __POLLRDHUP */
+#if !defined(POLLSELECT_READFDS) && defined(__POLLSELECT_READFDS)
+#define POLLSELECT_READFDS   __POLLSELECT_READFDS   /* select(2).readfds */
+#endif /* !POLLSELECT_READFDS && __POLLSELECT_READFDS */
+#if !defined(POLLSELECT_WRITEFDS) && defined(__POLLSELECT_WRITEFDS)
+#define POLLSELECT_WRITEFDS  __POLLSELECT_WRITEFDS  /* select(2).writefds */
+#endif /* !POLLSELECT_WRITEFDS && __POLLSELECT_WRITEFDS */
+#if !defined(POLLSELECT_EXCEPTFDS) && defined(__POLLSELECT_EXCEPTFDS)
+#define POLLSELECT_EXCEPTFDS __POLLSELECT_EXCEPTFDS /* select(2).exceptfds */
+#endif /* !POLLSELECT_EXCEPTFDS && __POLLSELECT_EXCEPTFDS */
+
 
 
 
 /* File status flags (`struct stat::st_mode') */
-#ifndef S_IFMT
+#if !defined(S_IFMT) && defined(__S_IFMT)
 #define S_IFMT   __S_IFMT   /* These bits determine file type. */
+#endif /* !S_IFMT && __S_IFMT */
+#if !defined(S_IFDIR) && defined(__S_IFDIR)
 #define S_IFDIR  __S_IFDIR  /* Directory. */
+#endif /* !S_IFDIR && __S_IFDIR */
+#if !defined(S_IFCHR) && defined(__S_IFCHR)
 #define S_IFCHR  __S_IFCHR  /* Character device. */
+#endif /* !S_IFCHR && __S_IFCHR */
+#if !defined(S_IFBLK) && defined(__S_IFBLK)
 #define S_IFBLK  __S_IFBLK  /* Block device. */
+#endif /* !S_IFBLK && __S_IFBLK */
+#if !defined(S_IFREG) && defined(__S_IFREG)
 #define S_IFREG  __S_IFREG  /* Regular file. */
+#endif /* !S_IFREG && __S_IFREG */
+#if !defined(S_IFIFO) && defined(__S_IFIFO)
 #define S_IFIFO  __S_IFIFO  /* FIFO. */
+#endif /* !S_IFIFO && __S_IFIFO */
+#if !defined(S_IFLNK) && defined(__S_IFLNK)
 #define S_IFLNK  __S_IFLNK  /* Symbolic link. */
+#endif /* !S_IFLNK && __S_IFLNK */
+#if !defined(S_IFSOCK) && defined(__S_IFSOCK)
 #define S_IFSOCK __S_IFSOCK /* Socket. */
+#endif /* !S_IFSOCK && __S_IFSOCK */
+#if !defined(S_ISUID) && defined(__S_ISUID)
 #define S_ISUID  __S_ISUID  /* Set user ID on execution. */
+#endif /* !S_ISUID && __S_ISUID */
+#if !defined(S_ISGID) && defined(__S_ISGID)
 #define S_ISGID  __S_ISGID  /* Set group ID on execution. */
+#endif /* !S_ISGID && __S_ISGID */
+#if !defined(S_ISVTX) && defined(__S_ISVTX)
 #define S_ISVTX  __S_ISVTX  /* Save swapped text after use (sticky). */
+#endif /* !S_ISVTX && __S_ISVTX */
+#if !defined(S_IREAD) && defined(__S_IREAD)
 #define S_IREAD  __S_IREAD  /* Read by owner. */
+#endif /* !S_IREAD && __S_IREAD */
+#if !defined(S_IWRITE) && defined(__S_IWRITE)
 #define S_IWRITE __S_IWRITE /* Write by owner. */
+#endif /* !S_IWRITE && __S_IWRITE */
+#if !defined(S_IEXEC) && defined(__S_IEXEC)
 #define S_IEXEC  __S_IEXEC  /* Execute by owner. */
-#endif /* !S_IFMT */
+#endif /* !S_IEXEC && __S_IEXEC */
 
-#ifndef S_ISDIR
+/* File mode test macros. */
+#if !defined(S_ISDIR) && defined(__S_ISDIR)
 #define S_ISDIR(x)  __S_ISDIR(x)
+#endif /* !S_ISDIR && __S_ISDIR */
+#if !defined(S_ISCHR) && defined(__S_ISCHR)
 #define S_ISCHR(x)  __S_ISCHR(x)
+#endif /* !S_ISCHR && __S_ISCHR */
+#if !defined(S_ISBLK) && defined(__S_ISBLK)
 #define S_ISBLK(x)  __S_ISBLK(x)
+#endif /* !S_ISBLK && __S_ISBLK */
+#if !defined(S_ISREG) && defined(__S_ISREG)
 #define S_ISREG(x)  __S_ISREG(x)
+#endif /* !S_ISREG && __S_ISREG */
+#if !defined(S_ISFIFO) && defined(__S_ISFIFO)
 #define S_ISFIFO(x) __S_ISFIFO(x)
+#endif /* !S_ISFIFO && __S_ISFIFO */
+#if !defined(S_ISLNK) && defined(__S_ISLNK)
 #define S_ISLNK(x)  __S_ISLNK(x)
-#endif /* !S_ISDIR */
-#ifndef S_ISDEV
+#endif /* !S_ISLNK && __S_ISLNK */
+#if !defined(S_ISDEV) && defined(__S_ISDEV)
 #define S_ISDEV(x)  __S_ISDEV(x)
-#endif /* !S_ISDEV */
+#endif /* !S_ISDEV && __S_ISDEV */
 
 
 /* Directory entry types (`struct dirent::d_type'). */
-#ifndef DT_UNKNOWN
-#define DT_UNKNOWN __DT_UNKNOWN
-#define DT_FIFO    __DT_FIFO
-#define DT_CHR     __DT_CHR
-#define DT_DIR     __DT_DIR
-#define DT_BLK     __DT_BLK
-#define DT_REG     __DT_REG
-#define DT_LNK     __DT_LNK
-#define DT_SOCK    __DT_SOCK
-#define DT_WHT     __DT_WHT
-#endif /* DT_UNKNOWN */
+#if !defined(DT_UNKNOWN) && defined(__DT_UNKNOWN)
+#define DT_UNKNOWN __DT_UNKNOWN /* Unknown file type */
+#endif /* !DT_UNKNOWN && __DT_UNKNOWN */
+#if !defined(DT_FIFO) && defined(__DT_FIFO)
+#define DT_FIFO    __DT_FIFO    /* FistInFirstOut (pipe) file (s.a. `S_ISFIFO()', `S_IFMT & S_IFIFO') */
+#endif /* !DT_FIFO && __DT_FIFO */
+#if !defined(DT_CHR) && defined(__DT_CHR)
+#define DT_CHR     __DT_CHR     /* Character device file      (s.a. `S_ISCHR()', `S_IFMT & S_IFCHR') */
+#endif /* !DT_CHR && __DT_CHR */
+#if !defined(DT_DIR) && defined(__DT_DIR)
+#define DT_DIR     __DT_DIR     /* Directory                  (s.a. `S_ISDIR()', `S_IFMT & S_IFDIR') */
+#endif /* !DT_DIR && __DT_DIR */
+#if !defined(DT_BLK) && defined(__DT_BLK)
+#define DT_BLK     __DT_BLK     /* Block device file          (s.a. `S_ISBLK()', `S_IFMT & S_IFBLK') */
+#endif /* !DT_BLK && __DT_BLK */
+#if !defined(DT_REG) && defined(__DT_REG)
+#define DT_REG     __DT_REG     /* Regular text file          (s.a. `S_ISREG()', `S_IFMT & S_IFREG') */
+#endif /* !DT_REG && __DT_REG */
+#if !defined(DT_LNK) && defined(__DT_LNK)
+#define DT_LNK     __DT_LNK     /* Symbolic link              (s.a. `S_ISLNK()', `S_IFMT & S_IFLNK') */
+#endif /* !DT_LNK && __DT_LNK */
+#if !defined(DT_SOCK) && defined(__DT_SOCK)
+#define DT_SOCK    __DT_SOCK    /* Socket file                (s.a. `S_ISSOCK()', `S_IFMT & S_IFSOCK') */
+#endif /* !DT_SOCK && __DT_SOCK */
+#if !defined(DT_WHT) && defined(__DT_WHT)
+#define DT_WHT     __DT_WHT     /* Mounting point? */
+#endif /* !DT_WHT && __DT_WHT */
+
 
 /* Convert between stat structure types and directory types. */
-#ifndef IFTODT
-#define IFTODT(mode)    __IFTODT(mode)
+#if !defined(IFTODT) && defined(__IFTODT)
+#define IFTODT(mode) __IFTODT(mode)
+#endif /* !IFTODT && __IFTODT */
+#if !defined(DTTOIF) && defined(__DTTOIF)
 #define DTTOIF(dirtype) __DTTOIF(dirtype)
-#endif /* !IFTODT */
+#endif /* !DTTOIF && __DTTOIF */
+
+
+
+/* Open flags (s.a. `open(2)', `oflag_t') */
+#if !defined(O_ACCMODE) && defined(__O_ACCMODE)
+#define O_ACCMODE   __O_ACCMODE   /* Mask for `O_RDONLY | O_WRONLY | O_RDWR' */
+#endif /* !O_ACCMODE && __O_ACCMODE */
+#if !defined(O_RDONLY) && defined(__O_RDONLY)
+#define O_RDONLY    __O_RDONLY    /* Access mode: read-only */
+#endif /* !O_RDONLY && __O_RDONLY */
+#if !defined(O_WRONLY) && defined(__O_WRONLY)
+#define O_WRONLY    __O_WRONLY    /* Access mode: write-only */
+#endif /* !O_WRONLY && __O_WRONLY */
+#if !defined(O_RDWR) && defined(__O_RDWR)
+#define O_RDWR      __O_RDWR      /* Access mode: read/write */
+#endif /* !O_RDWR && __O_RDWR */
+#if !defined(O_TRUNC) && defined(__O_TRUNC)
+#define O_TRUNC     __O_TRUNC     /* Truncate the file's size to 0 */
+#endif /* !O_TRUNC && __O_TRUNC */
+#if !defined(O_CREAT) && defined(__O_CREAT)
+#define O_CREAT     __O_CREAT     /* If missing, create a new file */
+#endif /* !O_CREAT && __O_CREAT */
+#if !defined(O_EXCL) && defined(__O_EXCL)
+#define O_EXCL      __O_EXCL      /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS' (-EEXISTS)
+                                   * exception if the file already exists. */
+#endif /* !O_EXCL && __O_EXCL */
+#if !defined(O_NOCTTY) && defined(__O_NOCTTY)
+#define O_NOCTTY    __O_NOCTTY    /* If the calling process does not have a controlling terminal assigned,
+                                   * do not attempt to assign the newly opened file as terminal, even when
+                                   * `isatty(open(...))' would be true. */
+#endif /* !O_NOCTTY && __O_NOCTTY */
+#if !defined(O_APPEND) && defined(__O_APPEND)
+#define O_APPEND    __O_APPEND    /* Always append data to the end of the file */
+#endif /* !O_APPEND && __O_APPEND */
+#if !defined(O_NONBLOCK) && defined(__O_NONBLOCK)
+#define O_NONBLOCK  __O_NONBLOCK  /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !O_NONBLOCK && __O_NONBLOCK */
+#if !defined(O_SYNC) && defined(__O_SYNC)
+#define O_SYNC      __O_SYNC      /* ??? */
+#endif /* !O_SYNC && __O_SYNC */
+#if !defined(O_ASYNC) && defined(__O_ASYNC)
+#define O_ASYNC     __O_ASYNC     /* ??? */
+#endif /* !O_ASYNC && __O_ASYNC */
+#if !defined(O_ANYTHING) && defined(__O_ANYTHING)
+#define O_ANYTHING  __O_ANYTHING  /* Open anything directly (as best as possible). (file, directory or symlink)
+                                   * KOS: Open a file, directory or symlink directly.
+                                   * DOS: Open a file or directory directly.
+                                   * GLC: Open a file or directory directly. */
+#endif /* !O_ANYTHING && __O_ANYTHING */
+#if !defined(O_LARGEFILE) && defined(__O_LARGEFILE)
+#define O_LARGEFILE __O_LARGEFILE /* Ignored... */
+#endif /* !O_LARGEFILE && __O_LARGEFILE */
+#if !defined(O_DIRECTORY) && defined(__O_DIRECTORY)
+#define O_DIRECTORY __O_DIRECTORY /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' (-ENOTDIR) exception when the
+                                   * final path component of an open() system call turns out to be something other than a directory. */
+#endif /* !O_DIRECTORY && __O_DIRECTORY */
+#if !defined(O_NOFOLLOW) && defined(__O_NOFOLLOW)
+#define O_NOFOLLOW  __O_NOFOLLOW  /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' (-ELOOP) exception when
+                                   * the final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
+                                   * is given, in which case the link itself is opened. */
+#endif /* !O_NOFOLLOW && __O_NOFOLLOW */
+#if !defined(O_CLOEXEC) && defined(__O_CLOEXEC)
+#define O_CLOEXEC   __O_CLOEXEC   /* Close the file during exec() */
+#endif /* !O_CLOEXEC && __O_CLOEXEC */
+#if !defined(O_CLOFORK) && defined(__O_CLOFORK)
+#define O_CLOFORK   __O_CLOFORK   /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#endif /* !O_CLOFORK && __O_CLOFORK */
+#if !defined(O_DOSPATH) && defined(__O_DOSPATH)
+#define O_DOSPATH   __O_DOSPATH   /* Interpret '\\' as '/', and ignore casing during path resolution.
+                                   * Additionally, recognize DOS mounting points, and interpret leading
+                                   * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
+#endif /* !O_DOSPATH && __O_DOSPATH */
+#if !defined(O_SYMLINK) && defined(__O_SYMLINK)
+#define O_SYMLINK   __O_SYMLINK   /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
+                                   * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
+                                   *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
+#endif /* !O_SYMLINK && __O_SYMLINK */
+#if !defined(O_DIRECT) && defined(__O_DIRECT)
+#define O_DIRECT    __O_DIRECT    /* ??? */
+#endif /* !O_DIRECT && __O_DIRECT */
+#if !defined(O_NOATIME) && defined(__O_NOATIME)
+#define O_NOATIME   __O_NOATIME   /* Don't update last-accessed time stamps. */
+#endif /* !O_NOATIME && __O_NOATIME */
+#if !defined(O_PATH) && defined(__O_PATH)
+#define O_PATH      __O_PATH      /* Open a path for *at system calls. */
+#endif /* !O_PATH && __O_PATH */
+#if !defined(O_TMPFILE) && defined(__O_TMPFILE)
+#define O_TMPFILE   __O_TMPFILE   /* Open a temporary file */
+#endif /* !O_TMPFILE && __O_TMPFILE */
+#if !defined(O_DSYNC) && defined(__O_DSYNC)
+#define O_DSYNC     __O_DSYNC     /* ??? */
+#endif /* !O_DSYNC && __O_DSYNC */
+#if !defined(O_RSYNC) && defined(__O_SYNC)
+#define O_RSYNC     __O_SYNC      /* ??? */
+#endif /* !O_RSYNC && __O_SYNC */
+
 
 
 /* File system mode (`atflag_t') */
@@ -196,12 +381,13 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  * >> }
  * >>done:
  */
-#define READDIR_MULTIPLE_GETNEXT(p) \
-	((struct dirent *)(((uintptr_t)((p)->d_name+((p)->d_namlen+1))+ \
-	                    (sizeof(__ino64_t)-1)) & ~(sizeof(__ino64_t)-1)))
-#define READDIR_MULTIPLE_ISVALID(p,buf,bufsize) \
-	(((__BYTE_TYPE__ *)((p)->d_name)) < ((__BYTE_TYPE__ *)(buf)+(bufsize)) && \
-	 ((__BYTE_TYPE__ *)((p)->d_name+(p)->d_namlen)) < ((__BYTE_TYPE__ *)(buf)+(bufsize)))
+#define READDIR_MULTIPLE_GETNEXT(p)                                      \
+	((struct dirent *)(((uintptr_t)((p)->d_name + ((p)->d_namlen + 1)) + \
+	                    (sizeof(__ino64_t) - 1)) &                       \
+	                   ~(sizeof(__ino64_t) - 1)))
+#define READDIR_MULTIPLE_ISVALID(p, buf, bufsize)                               \
+	(((__BYTE_TYPE__ *)((p)->d_name)) < ((__BYTE_TYPE__ *)(buf) + (bufsize)) && \
+	 ((__BYTE_TYPE__ *)((p)->d_name + (p)->d_namlen)) < ((__BYTE_TYPE__ *)(buf) + (bufsize)))
 #define READDIR_MULTIPLE_ISEOF(p) ((p)->d_namlen == 0)
 #ifdef __USE_LARGEFILE64
 #define READDIR_MULTIPLE_GETNEXT64(p) ((struct dirent64 *)READDIR_MULTIPLE_GETNEXT(p))
@@ -215,22 +401,22 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* Universal I/O mode & handle access flags. */
 #ifndef IO_GENERIC
-#define IO_GENERIC     0x0000 /* Generic I/O access. */
-#define IO_ACCMODE     0x0003 /* Access mode mask */
-#define IO_RDONLY      0x0000 /* Read-only access */
-#define IO_WRONLY      0x0001 /* Write-only access */
-#define IO_RDWR        0x0002 /* Read/write access */
-#define IO_RDWR_ALT    0x0003 /* Read/write access */
-#define IO_CLOEXEC     0x0004 /* Close during exec() */
-#define IO_CLOFORK     0x0008 /* Close during fork() */
-#define IO_APPEND      0x0400 /* Append newly written data at the end */
-#define IO_NONBLOCK    0x0800 /* Don't block in I/O */
-#define IO_SYNC        0x1000 /* Ensure that all modified caches are flushed during write() */
-#define IO_ASYNC       0x2000 /* Use asynchronous I/O and generate SIGIO upon completion. */
-#define IO_DIRECT      0x4000 /* Bypass input/output buffers if possible. - Try to read/write data directly to/from provided buffers. */
-#define IO_NODATAZERO  0x8000 /* For use with `IO_NONBLOCK': Allow 0 to be returned (which normally indicates EOF)
-                               * when no data is available at the moment (which normally would cause `E_WOULDBLOCK'
-                               * to be thrown). NOTE: This flag is merely a hint. - Functions are allowed to ignore it! */
+#define IO_GENERIC    0x0000 /* Generic I/O access. */
+#define IO_ACCMODE    0x0003 /* Access mode mask */
+#define IO_RDONLY     0x0000 /* Read-only access */
+#define IO_WRONLY     0x0001 /* Write-only access */
+#define IO_RDWR       0x0002 /* Read/write access */
+#define IO_RDWR_ALT   0x0003 /* Read/write access */
+#define IO_CLOEXEC    0x0004 /* Close during exec() */
+#define IO_CLOFORK    0x0008 /* Close during fork() */
+#define IO_APPEND     0x0400 /* Append newly written data at the end */
+#define IO_NONBLOCK   0x0800 /* Don't block in I/O */
+#define IO_SYNC       0x1000 /* Ensure that all modified caches are flushed during write() */
+#define IO_ASYNC      0x2000 /* Use asynchronous I/O and generate SIGIO upon completion. */
+#define IO_DIRECT     0x4000 /* Bypass input/output buffers if possible. - Try to read/write data directly to/from provided buffers. */
+#define IO_NODATAZERO 0x8000 /* For use with `IO_NONBLOCK': Allow 0 to be returned (which normally indicates EOF)
+                              * when no data is available at the moment (which normally would cause `E_WOULDBLOCK'
+                              * to be thrown). NOTE: This flag is merely a hint. - Functions are allowed to ignore it! */
 
 /* Check if reading/writing is possible with a given I/O mode. */
 #define IO_CANREAD(mode)      (((mode) & IO_ACCMODE) != IO_WRONLY)

@@ -671,12 +671,10 @@ install_libstdcxx_symlinks() {
 	fi
 }
 
-
 install_libstdcxx "${KOS_ROOT}/bin/${NAME}-common/$BINLIBDIRNAME"
 for BUILD_CONFIG in $(echo $KOS_VALID_BUILD_CONFIGS); do
 	install_libstdcxx_symlinks "${KOS_ROOT}/bin/${NAME}-${BUILD_CONFIG}/$BINLIBDIRNAME"
 done
-
 
 # Installing libstdc++ leaves behind a bunch of unwanted overrides for system headers which
 # we're already providing ourself. - Just remove those headers
@@ -685,6 +683,9 @@ for HEADER_NAME in $(echo $CXX_COMPAT_HEADER_NAMES); do
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME.h"
 done
 
+# KOS overrides the <bits/os_defines.h> header from libstdc++, so to prevent confusion,
+# simply delete that header from the installed libstdc++ headers.
+delete_header_file "$PREFIX/$TARGET/include/c++/${GCC_VERSION_NUMBER}/${TARGET}/bits/os_defines.h"
 
 # $1: .patch file
 # $2: Header file path where patch should be applied

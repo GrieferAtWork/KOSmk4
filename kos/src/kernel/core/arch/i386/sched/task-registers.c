@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 

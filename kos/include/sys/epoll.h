@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5a0396d */
+/* HASH CRC-32:0xaa5766e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,23 @@
    <http://www.gnu.org/licenses/>.  */
 
 __SYSDECL_BEGIN
+
+/* Flags to be passed to `epoll_create1()'. */
+#ifdef __EPOLL_CLOEXEC
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	EPOLL_CLOEXEC = __EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define EPOLL_CLOEXEC EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define EPOLL_CLOEXEC __EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
+#endif /* __EPOLL_CLOEXEC */
 
 #if (defined(__EPOLLIN) || defined(__EPOLLPRI) ||        \
      defined(__EPOLLOUT) || defined(__EPOLLERR) ||       \
@@ -208,7 +225,7 @@ enum EPOLL_EVENTS {
 
 #if (defined(__EPOLL_CTL_ADD) || defined(__EPOLL_CTL_DEL) || \
      defined(__EPOLL_CTL_MOD))
-/* Valid opcodes ( "op" parameter ) to issue to epoll_ctl().  */
+/* Valid opcodes ("op" parameter) to issue to `epoll_ctl()'. */
 /*[[[enum]]]*/
 #ifdef __CC__
 typedef enum __epoll_ctl {

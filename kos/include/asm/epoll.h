@@ -20,7 +20,7 @@
 #ifndef _ASM_EPOLL_H
 #define _ASM_EPOLL_H 1
 
-#include <__stdinc.h>
+#include <__crt.h>
 
 #if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
 
@@ -40,13 +40,13 @@
 #define __EPOLLONESHOT  0x40000000 /* ... */
 #define __EPOLLET       0x80000000 /* ... */
 
-/* Valid opcodes ( "op" parameter ) to issue to epoll_ctl().  */
-#define __EPOLL_CTL_ADD 1 /* Add a file descriptor to the interface.  */
-#define __EPOLL_CTL_DEL 2 /* Remove a file descriptor from the interface.  */
-#define __EPOLL_CTL_MOD 3 /* Change file descriptor epoll_event structure.  */
+/* Valid opcodes ("op" parameter) to issue to `epoll_ctl()'. */
+#define __EPOLL_CTL_ADD 1 /* Add a file descriptor to the interface. */
+#define __EPOLL_CTL_DEL 2 /* Remove a file descriptor from the interface. */
+#define __EPOLL_CTL_MOD 3 /* Change file descriptor epoll_event structure. */
 
-/* Flags to be passed to epoll_create1. */
-#define __EPOLL_CLOEXEC 0x80000
+/* Flags to be passed to `epoll_create1()'. */
+#define __EPOLL_CLOEXEC 0x80000 /* Set the IO_CLOEXEC flag */
 
 #endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
 

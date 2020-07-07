@@ -35,7 +35,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <bits/fcntl.h>
+#include <kos/io.h>
 #include <sys/stat.h>
 
 #include <assert.h>

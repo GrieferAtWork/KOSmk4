@@ -17,13 +17,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_ELFCLASS_H
-#define _BITS_ELFCLASS_H 1
+#ifndef _BITS_FILE_HANDLE_STRUCT_H
+#define _BITS_FILE_HANDLE_STRUCT_H 1
 
-#include <__stdinc.h>
+#include <__crt.h>
 
-#include <bits/wordsize.h>
+#include <bits/types.h>
 
-#define __ELF_NATIVE_CLASS __WORDSIZE
+#ifdef __CC__
+__DECL_BEGIN
 
-#endif /* _BITS_ELFCLASS_H */
+#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("handle_bytes")
+#pragma push_macro("handle_type")
+#pragma push_macro("f_handle")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef handle_bytes
+#undef handle_type
+#undef f_handle
+struct file_handle {
+	unsigned int                             handle_bytes; /* Handle bytes ??? */
+	int                                      handle_type;  /* Handle type ??? */
+	__COMPILER_FLEXIBLE_ARRAY(unsigned char, f_handle);    /* File identifier (max is `MAX_HANDLE_SZ'). */
+};
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("f_handle")
+#pragma pop_macro("handle_type")
+#pragma pop_macro("handle_bytes")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+#endif /* ... */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_FILE_HANDLE_STRUCT_H */
