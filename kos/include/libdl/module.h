@@ -121,7 +121,7 @@ typedef struct elfW(hashtable) {
 	ElfW(Word) ht_nbuckts;      /* # of buckets. */
 	ElfW(Word) ht_nchains;      /* # of symbols. */
 	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
-/*	ElfW(Word) ht_chains[1024]; /* [ht_nchains] Hash chains. */
+/*	ElfW(Word) ht_chains[1024];  * [ht_nchains] Hash chains. */
 } ElfW(HashTable);
 
 typedef struct elfW(gnu_hashtable) {
@@ -130,8 +130,8 @@ typedef struct elfW(gnu_hashtable) {
 	ElfW(Word) gh_bloom_size;    /* # of elements in the bloom table. */
 	ElfW(Word) gh_bloom_shift;   /* Shift for bloom masks */
 	ElfW(Addr) gh_bloom[1024];   /* [gh_bloom_size] Bloom filter */
-/*	ElfW(Word) gh_buckets[1024]; /* [gh_nbuckets] Hash buckest. */
-/*	ElfW(Word) gh_chains[];      /* Hash chains */
+/*	ElfW(Word) gh_buckets[1024];  * [gh_nbuckets] Hash buckest. */
+/*	ElfW(Word) gh_chains[];       * Hash chains */
 } ElfW(GnuHashTable);
 
 struct dlmodule_elf {
@@ -215,7 +215,7 @@ struct dlmodule {
 	void                    (*dm_tls_fini)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
 	void                     *dm_tls_arg;    /* [?..?][const] Argument passed to `dm_tls_init' / `dm_tls_fini' */
 
-	/* All of the above was just so that `libdl_dltlsalloc()' doesn't
+	/* All of the above was just so that `dltlsalloc()' doesn't
 	 * have to allocate the full DlModule structure. The rest following
 	 * below is what should be considered the actual module structure. */
 	WEAK refcnt_t             dm_refcnt;     /* Reference counter. */

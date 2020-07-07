@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eb6005a */
+/* HASH CRC-32:0xefedf52d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(rindex) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rindex))(char const *__restrict __haystack, int __needle) {
 	char const *__result = __NULLPTR;
-	for (; *__haystack; ++__haystack) {
-		if (*__haystack == __needle)
+	for (;; ++__haystack) {
+		char __ch = *__haystack;
+		if (__ch == __needle)
 			__result = __haystack;
+		if (!__ch)
+			break;
 	}
-	if (!__needle)
-		return (char *)__haystack;
 	return (char *)__result;
 }
 __NAMESPACE_LOCAL_END

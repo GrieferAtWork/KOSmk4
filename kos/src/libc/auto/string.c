@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x818070e0 */
+/* HASH CRC-32:0x55d880e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -816,6 +816,105 @@ NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp,
 		*iter++ = '\0';
 	*stringp = iter;
 	return result;
+}
+INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
+                                 void *dst,
+                                 size_t num_bytes) {
+	libc_memmove(dst, src, num_bytes);
+}
+#endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_BZERO
+INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
+                                 size_t num_bytes) {
+	libc_memset(dst, 0, num_bytes);
+}
+#endif /* !LIBC_ARCH_HAVE_BZERO */
+#ifndef LIBC_ARCH_HAVE_BZEROW
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_bzerow)(void *__restrict dst,
+                                  size_t num_words) {
+	libc_memsetw(dst, 0, num_words);
+}
+#endif /* !LIBC_ARCH_HAVE_BZEROW */
+#ifndef LIBC_ARCH_HAVE_BZEROL
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_bzerol)(void *__restrict dst,
+                                  size_t num_dwords) {
+	libc_memsetl(dst, 0, num_dwords);
+}
+#endif /* !LIBC_ARCH_HAVE_BZEROL */
+#ifndef LIBC_ARCH_HAVE_BZEROQ
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__restrict dst,
+                                  size_t num_qwords) {
+#ifdef __UINT64_TYPE__
+	libc_memsetq(dst, 0, num_qwords);
+#else /* __UINT64_TYPE__ */
+	libc_bzerol(dst, num_qwords * 2);
+#endif /* !__UINT64_TYPE__ */
+}
+#endif /* !LIBC_ARCH_HAVE_BZEROQ */
+#include <hybrid/host.h>
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst,
+                                  size_t elem_count,
+                                  size_t elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		libc_bzero(dst, elem_count);
+		break;
+
+	case 2:
+		libc_bzerow(dst, elem_count);
+		break;
+
+	case 4:
+		libc_bzerol(dst, elem_count);
+		break;
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		libc_bzeroq(dst, elem_count);
+		break;
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		libc_bzero(dst, elem_count * elem_size);
+		break;
+	}
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	libc_bzero(dst, elem_count * elem_size);
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+}
+#ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
+                                 int needle) {
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if (ch == needle)
+			return (char *)haystack;
+		if (!ch)
+			break;
+	}
+	return NULL;
+}
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
+                                  int needle) {
+	char const *result = NULL;
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if (ch == needle)
+			result = haystack;
+		if (!ch)
+			break;
+	}
+	return (char *)result;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
@@ -2232,7 +2331,6 @@ NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWN */
 #ifndef __KERNEL__
-#include <hybrid/host.h>
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -2263,7 +2361,6 @@ NOTHROW_NCX(LIBCCALL libc_memcpyc)(void *__restrict dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memcpy(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempcpyc)(void *__restrict dst,
@@ -2293,7 +2390,6 @@ NOTHROW_NCX(LIBCCALL libc_mempcpyc)(void *__restrict dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_mempcpy(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -2324,7 +2420,6 @@ NOTHROW_NCX(LIBCCALL libc_memmovec)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmove(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmovec)(void *dst,
@@ -2354,7 +2449,6 @@ NOTHROW_NCX(LIBCCALL libc_mempmovec)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_mempmove(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -2385,7 +2479,6 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmoveup(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst,
@@ -2415,7 +2508,6 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_mempmoveup(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -2446,7 +2538,6 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmovedown(dst, src, elem_count * elem_size);
 }
-#include <hybrid/host.h>
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmovedownc)(void *dst,
@@ -4301,6 +4392,28 @@ DEFINE_PUBLIC_ALIAS(__strerror_r, libc_strerror_r);
 DEFINE_PUBLIC_ALIAS(strerror_r, libc_strerror_r);
 DEFINE_PUBLIC_ALIAS(__xpg_strerror_r, libc___xpg_strerror_r);
 DEFINE_PUBLIC_ALIAS(strsep, libc_strsep);
+DEFINE_PUBLIC_ALIAS(bcopy, libc_bcopy);
+#endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_BZERO
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__bzero, libc_bzero);
+DEFINE_PUBLIC_ALIAS(explicit_bzero, libc_bzero);
+#endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(bzero, libc_bzero);
+#endif /* !LIBC_ARCH_HAVE_BZERO */
+#ifndef LIBC_ARCH_HAVE_BZEROW
+DEFINE_PUBLIC_ALIAS(bzerow, libc_bzerow);
+#endif /* !LIBC_ARCH_HAVE_BZEROW */
+#ifndef LIBC_ARCH_HAVE_BZEROL
+DEFINE_PUBLIC_ALIAS(bzerol, libc_bzerol);
+#endif /* !LIBC_ARCH_HAVE_BZEROL */
+#ifndef LIBC_ARCH_HAVE_BZEROQ
+DEFINE_PUBLIC_ALIAS(bzeroq, libc_bzeroq);
+#endif /* !LIBC_ARCH_HAVE_BZEROQ */
+DEFINE_PUBLIC_ALIAS(bzeroc, libc_bzeroc);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(index, libc_index);
+DEFINE_PUBLIC_ALIAS(rindex, libc_rindex);
 DEFINE_PUBLIC_ALIAS(_stricmp, libc_strcasecmp);
 DEFINE_PUBLIC_ALIAS(_strcmpi, libc_strcasecmp);
 DEFINE_PUBLIC_ALIAS(stricmp, libc_strcasecmp);

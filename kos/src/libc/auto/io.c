@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b16f0d0 */
+/* HASH CRC-32:0xcf9b1d52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,12 +72,14 @@ NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") int
 NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") void
 NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670d8e66 */
+/* HASH CRC-32:0x691dd3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1064,6 +1064,7 @@ NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
                                      size_t buflen,
                                      char16_t const *__restrict format,
                                      va_list args) {
+	COMPILER_IMPURE();
 	if (buflen)
 		*buf = 0;
 	/* TODO: format_wprintf() */
@@ -1076,6 +1077,7 @@ NOTHROW_NCX(LIBKCALL libc_vswprintf)(char32_t *__restrict buf,
                                      size_t buflen,
                                      char32_t const *__restrict format,
                                      va_list args) {
+	COMPILER_IMPURE();
 	if (buflen)
 		*buf = 0;
 	/* TODO: format_wprintf() */

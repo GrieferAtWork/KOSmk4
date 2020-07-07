@@ -688,7 +688,7 @@ void rewind([[nonnull]] FILE *__restrict stream) {
 @@Clear the error state of `STREAM', returning the stream to normal operations mode
 [[std, export_alias("clearerr_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("clearerr_unlocked")]]
-void clearerr([[nonnull]] FILE *__restrict stream);
+void clearerr([[nonnull]] $FILE *__restrict stream);
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
@@ -697,7 +697,7 @@ void clearerr([[nonnull]] FILE *__restrict stream);
 [[decl_include("<features.h>")]]
 [[std, wunused, ATTR_PURE, export_alias("_IO_feof", "feof_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("feof_unlocked")]]
-int feof([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream);
+int feof([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 
 %[default:section(".text.crt{|.dos}.FILE.locked.utility")]
 
@@ -705,7 +705,7 @@ int feof([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream);
 [[decl_include("<features.h>")]]
 [[std, wunused, ATTR_PURE, export_alias("_IO_ferror", "ferror_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ferror_unlocked")]]
-int ferror([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream);
+int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 
 %[default:section(".text.crt{|.dos}.errno.utility")]
 

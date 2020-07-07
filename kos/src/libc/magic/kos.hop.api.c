@@ -20,8 +20,11 @@
 %[default:section(".text.crt{|.dos}.syscall.hop")]
 
 %{
-#include <bits/types.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/types.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 

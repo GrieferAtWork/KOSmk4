@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf0452e */
+/* HASH CRC-32:0x3da72352 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -917,39 +917,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rewind, __FORCELOCAL __ATTR_NONNULL((1)) void (_
 #endif /* ... */
 #if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Clear the error state of `STREAM', returning the stream to normal operations mode */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(FILE *__restrict __stream),clearerr_unlocked,(__stream))
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #elif defined(__CRT_HAVE_clearerr)
 /* Clear the error state of `STREAM', returning the stream to normal operations mode */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(FILE *__restrict __stream),(__stream))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_clearerr_unlocked)
 /* Clear the error state of `STREAM', returning the stream to normal operations mode */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(FILE *__restrict __stream),clearerr_unlocked,(__stream))
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_feof_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Check if end-of-file has been reached in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
 #elif defined(__CRT_HAVE_feof)
 /* Check if end-of-file has been reached in `STREAM' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_feof)
 /* Check if end-of-file has been reached in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
 #elif defined(__CRT_HAVE_feof_unlocked)
 /* Check if end-of-file has been reached in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #endif /* ... */
 #ifndef __std_perror_defined
 #define __std_perror_defined 1
@@ -1835,39 +1835,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fwrite_unlocked, __FORCELOCAL __ATTR_WUNUSED __A
 #endif /* ... */
 #if defined(__CRT_HAVE_feof_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Same as `feof()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_feof)
 /* Same as `feof()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),feof,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof,(__stream))
 #elif defined(__CRT_HAVE__IO_feof)
 /* Same as `feof()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
 #elif defined(__CRT_HAVE_feof_unlocked)
 /* Same as `feof()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Same as `clearerr()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(FILE *__restrict __stream),(__stream))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_clearerr)
 /* Same as `clearerr()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(FILE *__restrict __stream),clearerr,(__stream))
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(__FILE *__restrict __stream),clearerr,(__stream))
 #elif defined(__CRT_HAVE_clearerr_unlocked)
 /* Same as `clearerr()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(FILE *__restrict __stream),(__stream))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(__FILE *__restrict __stream),(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Same as `fileno()', but performs I/O without acquiring a lock to `STREAM' */

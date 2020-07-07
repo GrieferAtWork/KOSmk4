@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75565383 */
+/* HASH CRC-32:0xf3e160ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -810,7 +810,7 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
 		return NULL;
 	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
 }
-INTERN ATTR_SECTION(".text.crt.utility.locale") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.utility.locale") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 	char c = response[0];
 	if (c == 'n' || c == 'N')

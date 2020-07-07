@@ -76,12 +76,12 @@ libdl_dltlsaddr(DlModule *self)
 		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
 			__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
 				dl_seterrorf("Failed to read %Iu bytes of TLS template data from %I64u",
-				                self->dm_tlsfsize,
-				                (uint64_t)self->dm_tlsoff);
+				             self->dm_tlsfsize,
+				             (uint64_t)self->dm_tlsoff);
 			} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
 				dl_seterrorf("Failed to read %Iu bytes of TLS template data from %I32u",
-				                self->dm_tlsfsize,
-				                (uint32_t)self->dm_tlsoff);
+				             self->dm_tlsfsize,
+				             (uint32_t)self->dm_tlsoff);
 			}
 			goto err;
 		}

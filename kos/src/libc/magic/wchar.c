@@ -796,6 +796,7 @@ __STDC_INT_AS_SIZE_T swscanf([[nonnull]] wchar_t const *__restrict src, [[nonnul
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
                                [[nonnull]] wchar_t const *__restrict format, $va_list args) {
+	COMPILER_IMPURE();
 	if (buflen)
 		*buf = 0;
 	/* TODO: format_wprintf() */

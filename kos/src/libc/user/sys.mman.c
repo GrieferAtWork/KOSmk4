@@ -268,6 +268,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
 /*[[[body:libc_posix_madvise]]]*/
 /*AUTO*/{
 	/* Implement as a no-op, since this function is merely meant as a hint */
+	COMPILER_IMPURE();
 	(void)addr;
 	(void)len;
 	(void)advice;

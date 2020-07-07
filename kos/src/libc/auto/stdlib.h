@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd88e2dc7 */
+/* HASH CRC-32:0xe65ddc84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,10 +290,10 @@ INTDEF NONNULL((2, 4)) int NOTHROW_NCX(LIBDCALL libd_initstate_r)(unsigned int s
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setstate_r)(char *__restrict statebuf, struct random_data *__restrict buf);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(__on_exit_func_t func, void *arg);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *template_, int suffixlen);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rpmatch)(char const *response);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rpmatch)(char const *response);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemps64)(char *template_, int suffixlen);

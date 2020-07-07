@@ -38,48 +38,29 @@ typedef __SIZE_TYPE__ size_t;
 }
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 
-[[guard, crtbuiltin]]
-void bcopy([[nonnull]] void const *src,
-           [[nonnull]] void *dst, $size_t num_bytes) {
-	memmove(dst, src, num_bytes);
-}
-
-[[guard, crtbuiltin, export_alias("__bzero", "explicit_bzero")]]
-void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
-	memset(dst, 0, num_bytes);
-}
-
+%[insert:extern(bcopy)]
 %[insert:guarded_function(bcmp = memcmp)]
+%[insert:extern(index)]
+%[insert:extern(rindex)]
 
-[[guard, wunused, crtbuiltin, ATTR_PURE]]
-char *index([[nonnull]] char const *__restrict haystack, int needle)
-	[([[nonnull]] char *__restrict haystack, int needle): char *]
-	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
-{
-	for (; *haystack; ++haystack) {
-		if (*haystack == needle)
-			return (char *)haystack;
-	}
-	if (!needle)
-		return (char *)haystack;
-	return NULL;
-}
-
-[[guard, wunused, crtbuiltin, ATTR_PURE]]
-char *rindex([[nonnull]] char const *__restrict haystack, int needle)
-	[([[nonnull]] char *__restrict haystack, int needle): char *]
-	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
-{
-	char const *result = NULL;
-	for (; *haystack; ++haystack) {
-		if (*haystack == needle)
-			result = haystack;
-	}
-	if (!needle)
-		return (char *)haystack;
-	return (char *)result;
-}
-
+%
+%#ifndef __bzero_defined
+%#define __bzero_defined 1
+%[insert:function(bzero)]
+%#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%[insert:function(bzero = bzeroc, externLinkageOverride: "C++")]
+%#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+%#endif /* !__bzero_defined */
+%
+%#ifdef __USE_STRING_BWLQ
+%[insert:extern(bzerow)]
+%[insert:extern(bzerol)]
+%[insert:extern(bzeroq)]
+%#endif /* __USE_STRING_BWLQ */
+%
+%#ifdef __USE_KOS
+%[insert:extern(bzeroc)]
+%#endif /* __USE_KOS */
 %#endif /* __USE_MISC || !__USE_XOPEN2K8 */
 %
 %[insert:extern(strcasecmp)]
@@ -91,20 +72,42 @@ char *rindex([[nonnull]] char const *__restrict haystack, int needle)
 %#endif /* __USE_XOPEN2K8 */
 %
 
+
 %
 %#if defined(__USE_KOS) || defined(__USE_GNU) || defined(__USE_BSD)
-@@Same as `bzero(buf, len)', however compilers will not optimize away
-@@uses of this function when they (think) that clearing the memory
+@@Same as `bzero(buf, num_bytes)', however compilers will not optimize
+@@away uses of this function when they (think) that clearing the memory
 @@wouldn't have any visible side-effects (though those side-effects
 @@may be a security-concious application trying to wipe sensitive data)
 [[nocrt, no_crt_self_import]]
 [[alias("bzero", "explicit_bzero", "__bzero")]]
-void explicit_bzero(void *buf, size_t len) {
+void explicit_bzero(void *buf, size_t num_bytes) {
 	void *volatile vbuf = buf;
-	bzero(buf, len);
+	bzero(vbuf, num_bytes);
 }
 %#endif /* __USE_KOS || __USE_GNU || __USE_BSD */
 
+
+%{
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+/* In C, we can use argument-count overload macros to implement these overloads! */
+#ifdef __USE_MISC
+#undef __PRIVATE_bzero_3
+#undef __PRIVATE_bzero_4
+#ifdef __USE_KOS
+#define __PRIVATE_bzero_4   bzeroc
+#else /* __USE_KOS */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#define __PRIVATE_bzero_4   __libc_bzeroc
+#endif /* !__USE_KOS */
+#define __PRIVATE_bzero_3   (bzero)
+#undef bzero
+#define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_MISC */
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+}
 
 %{
 #endif /* __CC__ */

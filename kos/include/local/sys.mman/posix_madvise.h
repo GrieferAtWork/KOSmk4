@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3e6afde */
+/* HASH CRC-32:0x191c362f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(posix_madvise) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_madvise))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
+	__COMPILER_IMPURE();
 	(void)__addr;
 	(void)__len;
 	(void)__advice;

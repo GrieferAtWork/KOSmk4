@@ -683,11 +683,10 @@ char *strtok_r([[nullable]] char *string,
 	*save_ptr = end + 1;
 	return string;
 }
-%{
-#endif /* __USE_POSIX */
 
-#ifdef __USE_GNU
-}
+%#endif /* __USE_POSIX */
+%
+%#ifdef __USE_GNU
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
 [[libc, kernel, wunused, ATTR_PURE]]
@@ -1010,6 +1009,7 @@ $errno_t __xpg_strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen) {
 }
 %#endif /* !__USE_GNU */
 %#endif /* __USE_XOPEN2K */
+
 %
 %#ifdef __USE_MISC
 
@@ -1027,11 +1027,123 @@ char *strsep([[nonnull]] char **__restrict stringp,
 	return result;
 }
 
-%[insert:extern(bcopy)]
-%[insert:extern(bzero)]
+[[guard, crtbuiltin]]
+void bcopy([[nonnull]] void const *src,
+           [[nonnull]] void *dst, $size_t num_bytes) {
+	memmove(dst, src, num_bytes);
+}
+
+
+%#ifndef __bzero_defined
+%#define __bzero_defined 1
+[[fast, libc, kernel, crtbuiltin, alias("__bzero", "explicit_bzero")]]
+[[if(!defined(__KERNEL__)), export_as("__bzero", "explicit_bzero")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZERO))]]
+void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
+	memset(dst, 0, num_bytes);
+}
+%#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%[insert:function(bzero = bzeroc, externLinkageOverride: "C++")]
+%#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+%#endif /* !__bzero_defined */
+
+
+%
+%#ifdef __USE_STRING_BWLQ
+[[guard, fast, libc, kernel, ATTR_LEAF]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROW))]]
+void bzerow([[nonnull]] void *__restrict dst, $size_t num_words) {
+	memsetw(dst, 0, num_words);
+}
+
+[[guard, fast, libc, kernel, ATTR_LEAF]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROL))]]
+void bzerol([[nonnull]] void *__restrict dst, $size_t num_dwords) {
+	memsetl(dst, 0, num_dwords);
+}
+
+[[guard, fast, libc, kernel, ATTR_LEAF]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROQ))]]
+void bzeroq([[nonnull]] void *__restrict dst, $size_t num_qwords) {
+#ifdef __UINT64_TYPE__
+	memsetq(dst, 0, num_qwords);
+#else /* __UINT64_TYPE__ */
+	bzerol(dst, num_qwords * 2);
+#endif /* !__UINT64_TYPE__ */
+}
+
+%#endif /* __USE_STRING_BWLQ */
+
+%
+%#ifdef __USE_KOS
+[[guard, fast, kernel, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+void bzeroc([[nonnull]] void *__restrict dst,
+            $size_t elem_count, $size_t elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		bzero(dst, elem_count);
+		break;
+
+	case 2:
+		bzerow(dst, elem_count);
+		break;
+
+	case 4:
+		bzerol(dst, elem_count);
+		break;
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		bzeroq(dst, elem_count);
+		break;
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		bzero(dst, elem_count * elem_size);
+		break;
+	}
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	bzero(dst, elem_count * elem_size);
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+}
+
+%#endif /* __USE_KOS */
+
+
 %[insert:guarded_function(bcmp = memcmp)]
-%[insert:extern(index)]
-%[insert:extern(rindex)]
+
+[[guard, wunused, crtbuiltin, ATTR_PURE]]
+char *index([[nonnull]] char const *__restrict haystack, int needle)
+	[([[nonnull]] char *__restrict haystack, int needle): char *]
+	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
+{
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if (ch == needle)
+			return (char *)haystack;
+		if (!ch)
+			break;
+	}
+	return NULL;
+}
+
+[[guard, wunused, crtbuiltin, ATTR_PURE]]
+char *rindex([[nonnull]] char const *__restrict haystack, int needle)
+	[([[nonnull]] char *__restrict haystack, int needle): char *]
+	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
+{
+	char const *result = NULL;
+	for (;; ++haystack) {
+		char ch = *haystack;
+		if (ch == needle)
+			result = haystack;
+		if (!ch)
+			break;
+	}
+	return (char *)result;
+}
 
 [[guard, export_alias("_stricmp", "_strcmpi", "stricmp", "strcmpi", "__strcasecmp")]]
 [[wunused, ATTR_PURE, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
@@ -1123,11 +1235,9 @@ $size_t strlcpy([[nonnull]] char *__restrict dst,
 	return result;
 }
 
-%{
-#endif /* __USE_MISC */
-
-#if defined(__USE_MISC) || defined(__USE_XOPEN)
-}
+%#endif /* __USE_MISC */
+%
+%#if defined(__USE_MISC) || defined(__USE_XOPEN)
 
 [[ATTR_LEAF, export_alias("_memccpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCCPY))]]
@@ -5961,6 +6071,21 @@ __NOTHROW_NCX(__LIBCCALL __strndupa_init)(void *__restrict __buf, char const *__
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 /* In C, we can use argument-count overload macros to implement these overloads! */
+#ifdef __USE_MISC
+#undef __PRIVATE_bzero_3
+#undef __PRIVATE_bzero_4
+#ifdef __USE_KOS
+#define __PRIVATE_bzero_4   bzeroc
+#else /* __USE_KOS */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#define __PRIVATE_bzero_4   __libc_bzeroc
+#endif /* !__USE_KOS */
+#define __PRIVATE_bzero_3   (bzero)
+#undef bzero
+#define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_MISC */
 #ifdef __USE_KOS
 #define __PRIVATE_memcpy_4  memcpyc
 #define __PRIVATE_memmove_4 memmovec

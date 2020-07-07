@@ -633,6 +633,7 @@ void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 int posix_madvise([[nonnull]] void *addr, size_t len,
                   __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
+	COMPILER_IMPURE();
 	(void)addr;
 	(void)len;
 	(void)advice;

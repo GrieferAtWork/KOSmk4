@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd9f21eb */
+/* HASH CRC-32:0xc34bfde6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,6 +106,31 @@
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 #define __libc_mempcpy __libc_core_mempcpy
 #endif /* !__fast_mempcpy_defined */
+#ifdef __fast_bzero_defined
+#define __libc_bzero (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))
+#else /* __fast_bzero_defined */
+#define __libc_bzero __libc_core_bzero
+#endif /* !__fast_bzero_defined */
+#ifdef __fast_bzerow_defined
+#define __libc_bzerow (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerow))
+#else /* __fast_bzerow_defined */
+#define __libc_bzerow __libc_core_bzerow
+#endif /* !__fast_bzerow_defined */
+#ifdef __fast_bzerol_defined
+#define __libc_bzerol (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerol))
+#else /* __fast_bzerol_defined */
+#define __libc_bzerol __libc_core_bzerol
+#endif /* !__fast_bzerol_defined */
+#ifdef __fast_bzeroq_defined
+#define __libc_bzeroq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))
+#else /* __fast_bzeroq_defined */
+#define __libc_bzeroq __libc_core_bzeroq
+#endif /* !__fast_bzeroq_defined */
+#ifdef __fast_bzeroc_defined
+#define __libc_bzeroc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))
+#else /* __fast_bzeroc_defined */
+#define __libc_bzeroc __libc_core_bzeroc
+#endif /* !__fast_bzeroc_defined */
 #ifdef __fast_memcpyw_defined
 /* Copy memory between non-overlapping memory blocks. */
 #define __libc_memcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw))

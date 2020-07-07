@@ -152,14 +152,14 @@ DlModule_InitStaticTLSBindings(void) {
 			if (preadall(fd, dst, iter->dm_tlsfsize, iter->dm_tlsoff) <= 0) {
 				__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
 					dl_seterrorf("%q: Failed to read %Iu bytes of TLS template data from %I64u",
-					                iter->dm_filename,
-					                iter->dm_tlsfsize,
-					                (uint64_t)iter->dm_tlsoff);
+					             iter->dm_filename,
+					             iter->dm_tlsfsize,
+					             (uint64_t)iter->dm_tlsoff);
 				} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
 					dl_seterrorf("%q: Failed to read %Iu bytes of TLS template data from %I32u",
-					                iter->dm_filename,
-					                iter->dm_tlsfsize,
-					                (uint32_t)iter->dm_tlsoff);
+					             iter->dm_filename,
+					             iter->dm_tlsfsize,
+					             (uint32_t)iter->dm_tlsoff);
 				}
 				goto err;
 			}
@@ -435,19 +435,19 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {
 		dl_seterrorf("TLS template size (%Iu) is greater than TLS memory size (%Iu)",
-		                template_size, num_bytes);
+		             template_size, num_bytes);
 		goto err;
 	}
 	if unlikely(min_alignment & (min_alignment - 1)) {
 		dl_seterrorf("TLS alignment %Iu isn't a power-of-2",
-		                min_alignment);
+		             min_alignment);
 		goto err;
 	}
 	result = (DlModule *)malloc(SIZEOF_DL_MODULE_FOR_TLS);
 	if unlikely(!result)
 		goto err_nomem;
 #ifndef NDEBUG
-	/* Invalid all of the `struct link_map' emulation garbage. */
+	/* Invalidate all of the `struct link_map' emulation garbage. */
 	memset(result, 0xcc, OFFSETOF_DL_MODULE_FOR_TLS);
 #endif /* !NDEBUG */
 	result->dm_tlsoff   = 0;

@@ -1347,6 +1347,10 @@
 #define __CRT_HAVE_btowc 1
 #define __CRT_HAVE_bulk_free 1
 #define __CRT_HAVE_bzero 1
+#define __CRT_HAVE_bzeroc 1
+#define __CRT_HAVE_bzerol 1
+#define __CRT_HAVE_bzeroq 1
+#define __CRT_HAVE_bzerow 1
 #define __CRT_HAVE_c16rtomb 1
 #define __CRT_HAVE_c32rtomb 1
 #define __CRT_HAVE_call_once 1
@@ -5629,6 +5633,10 @@
 #define __CRT_HAVE_KOS$bsearch_s 1
 #define __CRT_HAVE_KOS$btowc 1
 #define __CRT_HAVE_KOS$bzero 1
+#define __CRT_HAVE_KOS$bzeroc 1
+#define __CRT_HAVE_KOS$bzerol 1
+#define __CRT_HAVE_KOS$bzeroq 1
+#define __CRT_HAVE_KOS$bzerow 1
 #define __CRT_HAVE_KOS$c16rtomb 1
 #define __CRT_HAVE_KOS$call_once 1
 #define __CRT_HAVE_KOS$calloc 1
@@ -8995,6 +9003,10 @@
 #define __CRT_HAVE_DOS$bsearch_s 1
 #define __CRT_HAVE_DOS$btowc 1
 #define __CRT_HAVE_DOS$bzero 1
+#define __CRT_HAVE_DOS$bzeroc 1
+#define __CRT_HAVE_DOS$bzerol 1
+#define __CRT_HAVE_DOS$bzeroq 1
+#define __CRT_HAVE_DOS$bzerow 1
 #define __CRT_HAVE_DOS$c16rtomb 1
 #define __CRT_HAVE_DOS$call_once 1
 #define __CRT_HAVE_DOS$calloc 1

@@ -102,6 +102,7 @@ DEFINE_SYSCALL0(errno_t, rtm_end) {
 #ifdef __ARCH_WANT_SYSCALL_RTM_ABORT
 DEFINE_SYSCALL1(errno_t, rtm_abort, syscall_ulong_t, code) {
 	/* This system call is a no-op outside of RTM mode. */
+	COMPILER_IMPURE();
 	(void)code;
 	return -EOK;
 }
@@ -110,6 +111,7 @@ DEFINE_SYSCALL1(errno_t, rtm_abort, syscall_ulong_t, code) {
 #ifdef __ARCH_WANT_SYSCALL_RTM_TEST
 DEFINE_SYSCALL0(syscall_slong_t, rtm_test) {
 	/* No RTM operation in progress */
+	COMPILER_IMPURE();
 	return 0;
 }
 #endif /* __ARCH_WANT_SYSCALL_RTM_TEST */

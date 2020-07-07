@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1442c2a5 */
+/* HASH CRC-32:0xaff35add */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1640,6 +1640,14 @@ DFUN(".text.crt.dos.unicode.locale.memory", libd_strcasecmp_l, libc_strcasecmp_l
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strncasecmp_l, libc_strncasecmp_l, TD, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.errno", libd___xpg_strerror_r, libc___xpg_strerror_r, TIn(__SIZEOF_ERRNO_T__), 3, TD, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strsep, libc_strsep, TP, 2, TP, TP)
+DFUN(".text.crt.dos.string.memory", libd_bcopy, libc_bcopy, TV, 3, TP, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_bzero, libc_bzero, TV, 2, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_bzerow, libc_bzerow, TV, 2, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_bzerol, libc_bzerol, TV, 2, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_bzeroq, libc_bzeroq, TV, 2, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_bzeroc, libc_bzeroc, TV, 3, TP, TI, TI)
+DFUN(".text.crt.dos.string.memory", libd_index, libc_index, TP, 2, TP, TD)
+DFUN(".text.crt.dos.string.memory", libd_rindex, libc_rindex, TP, 2, TP, TD)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strcasecmp, libc_strcasecmp, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strncasecmp, libc_strncasecmp, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_ffs, libc_ffs, TD, 1, TD)
@@ -1851,12 +1859,6 @@ DFUN(".text.crt.dos.bsd.strstat", libd_strmode, libc_strmode, TV, 2, TIn(__SIZEO
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_add, libc_sl_add, TD, 2, TP, TP)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_free, libc_sl_free, TV, 2, TP, TD)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_find, libc_sl_find, TP, 2, TP, TP)
-
-/* strings */
-DFUN(".text.crt.dos.unsorted", libd_bcopy, libc_bcopy, TV, 3, TP, TP, TI)
-DFUN(".text.crt.dos.unsorted", libd_bzero, libc_bzero, TV, 2, TP, TI)
-DFUN(".text.crt.dos.unsorted", libd_index, libc_index, TP, 2, TP, TD)
-DFUN(".text.crt.dos.unsorted", libd_rindex, libc_rindex, TP, 2, TP, TD)
 
 /* stropts */
 DFUN(".text.crt.dos.io.stropts", libd_isastream, libc_isastream, TD, 1, TIn(__SIZEOF_FD_T__))

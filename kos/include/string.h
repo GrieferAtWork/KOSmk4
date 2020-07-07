@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19f4898f */
+/* HASH CRC-32:0xafb6af61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1168,13 +1168,15 @@ __CEIDECLARE(__ATTR_NONNULL((1, 2)),void,__NOTHROW_NCX,bcopy,(void const *__src,
 #elif defined(__CRT_HAVE_bcopy)
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),(__src,__dst,__num_bytes))
 #else /* ... */
-#include <local/strings/bcopy.h>
+#include <local/string/bcopy.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(bcopy, __FORCELOCAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL bcopy)(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bcopy))(__src, __dst, __num_bytes); })
 #endif /* !... */
 #endif /* !__bcopy_defined */
 #ifndef __bzero_defined
 #define __bzero_defined 1
-#if __has_builtin(__builtin_bzero) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bzero)
+#ifdef __fast_bzero_defined
+__NAMESPACE_FAST_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif __has_builtin(__builtin_bzero) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bzero)
 __CEIDECLARE(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),{ return __builtin_bzero(__dst, __num_bytes); })
 #elif defined(__CRT_HAVE_bzero)
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),(__dst,__num_bytes))
@@ -1183,10 +1185,72 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst
 #elif defined(__CRT_HAVE_explicit_bzero)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
 #else /* ... */
-#include <local/strings/bzero.h>
+#include <local/string/bzero.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); })
 #endif /* !... */
+#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+extern "C++" {
+#ifdef __CRT_HAVE_bzeroc
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
+#else /* __CRT_HAVE_bzeroc */
+} /* extern "C++" */
+#include <local/string/bzeroc.h>
+extern "C++" {
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc))(__dst, __elem_count, __elem_size); }
+#endif /* !__CRT_HAVE_bzeroc */
+} /* extern "C++" */
+#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 #endif /* !__bzero_defined */
+
+#ifdef __USE_STRING_BWLQ
+#ifndef __bzerow_defined
+#define __bzerow_defined 1
+#ifdef __fast_bzerow_defined
+__NAMESPACE_FAST_USING_OR_IMPL(bzerow, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerow)(void *__restrict __dst, __SIZE_TYPE__ __num_words) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerow))(__dst, __num_words); })
+#elif defined(__CRT_HAVE_bzerow)
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerow,(void *__restrict __dst, __SIZE_TYPE__ __num_words),(__dst,__num_words))
+#else /* ... */
+#include <local/string/bzerow.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(bzerow, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerow)(void *__restrict __dst, __SIZE_TYPE__ __num_words) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerow))(__dst, __num_words); })
+#endif /* !... */
+#endif /* !__bzerow_defined */
+#ifndef __bzerol_defined
+#define __bzerol_defined 1
+#ifdef __fast_bzerol_defined
+__NAMESPACE_FAST_USING_OR_IMPL(bzerol, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerol)(void *__restrict __dst, __SIZE_TYPE__ __num_dwords) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerol))(__dst, __num_dwords); })
+#elif defined(__CRT_HAVE_bzerol)
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),(__dst,__num_dwords))
+#else /* ... */
+#include <local/string/bzerol.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(bzerol, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerol)(void *__restrict __dst, __SIZE_TYPE__ __num_dwords) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerol))(__dst, __num_dwords); })
+#endif /* !... */
+#endif /* !__bzerol_defined */
+#ifndef __bzeroq_defined
+#define __bzeroq_defined 1
+#ifdef __fast_bzeroq_defined
+__NAMESPACE_FAST_USING_OR_IMPL(bzeroq, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroq)(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))(__dst, __num_qwords); })
+#elif defined(__CRT_HAVE_bzeroq)
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzeroq,(void *__restrict __dst, __SIZE_TYPE__ __num_qwords),(__dst,__num_qwords))
+#else /* ... */
+#include <local/string/bzeroq.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(bzeroq, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroq)(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroq))(__dst, __num_qwords); })
+#endif /* !... */
+#endif /* !__bzeroq_defined */
+#endif /* __USE_STRING_BWLQ */
+
+#ifdef __USE_KOS
+#ifndef __bzeroc_defined
+#define __bzeroc_defined 1
+#ifdef __fast_bzeroc_defined
+__NAMESPACE_FAST_USING_OR_IMPL(bzeroc, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroc)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))(__dst, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_bzeroc)
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__dst,__elem_count,__elem_size))
+#else /* ... */
+#include <local/string/bzeroc.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(bzeroc, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroc)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc))(__dst, __elem_count, __elem_size); })
+#endif /* !... */
+#endif /* !__bzeroc_defined */
+#endif /* __USE_KOS */
 #ifndef __bcmp_defined
 #define __bcmp_defined 1
 #ifdef __CRT_HAVE_memcmp
@@ -1213,65 +1277,65 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 #ifndef __index_defined
 #define __index_defined 1
 #if __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,index,(char *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 } /* extern "C++" */
-#else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),{ return __builtin_index(__haystack, __needle); })
-#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #elif defined(__CRT_HAVE_index)
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,index,(char *__restrict __haystack, int __needle),index,(__haystack,__needle))
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),index,(__haystack,__needle))
 } /* extern "C++" */
-#else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
-#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* ... */
-#include <local/strings/index.h>
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
+#include <local/string/index.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL index)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); }
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); }
 } /* extern "C++" */
-#else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 __NAMESPACE_LOCAL_USING_OR_IMPL(index, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); })
-#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !... */
 #endif /* !__index_defined */
 #ifndef __rindex_defined
 #define __rindex_defined 1
 #if __has_builtin(__builtin_rindex) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rindex)
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,rindex,(char *__restrict __haystack, int __needle),rindex,{ return __builtin_rindex(__haystack, __needle); })
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),rindex,{ return __builtin_rindex(__haystack, __needle); })
 } /* extern "C++" */
-#else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),{ return __builtin_rindex(__haystack, __needle); })
-#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #elif defined(__CRT_HAVE_rindex)
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,rindex,(char *__restrict __haystack, int __needle),rindex,(__haystack,__needle))
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),rindex,(__haystack,__needle))
 } /* extern "C++" */
-#else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
-#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* ... */
-#include <local/strings/rindex.h>
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
+#include <local/string/rindex.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL rindex)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); }
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); }
 } /* extern "C++" */
-#else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rindex, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); })
-#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !... */
 #endif /* !__rindex_defined */
 #ifndef __strcasecmp_defined
@@ -1387,7 +1451,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __ds
 #elif defined(__CRT_HAVE_explicit_bzero)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
 #else /* ... */
-#include <local/strings/bzero.h>
+#include <local/string/bzero.h>
 __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtok_r
@@ -6718,6 +6782,21 @@ __NOTHROW_NCX(__LIBCCALL __strndupa_init)(void *__restrict __buf, char const *__
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 /* In C, we can use argument-count overload macros to implement these overloads! */
+#ifdef __USE_MISC
+#undef __PRIVATE_bzero_3
+#undef __PRIVATE_bzero_4
+#ifdef __USE_KOS
+#define __PRIVATE_bzero_4   bzeroc
+#else /* __USE_KOS */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#define __PRIVATE_bzero_4   __libc_bzeroc
+#endif /* !__USE_KOS */
+#define __PRIVATE_bzero_3   (bzero)
+#undef bzero
+#define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_MISC */
 #ifdef __USE_KOS
 #define __PRIVATE_memcpy_4  memcpyc
 #define __PRIVATE_memmove_4 memmovec

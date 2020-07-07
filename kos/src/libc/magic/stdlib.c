@@ -1327,7 +1327,7 @@ int clearenv();
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
 [[wunused]] int mkstemps([[nonnull]] char *template_, int suffixlen);
 
-[[section(".text.crt{|.dos}.utility.locale")]]
+[[ATTR_PURE, section(".text.crt{|.dos}.utility.locale")]]
 [[wunused]] int rpmatch([[nonnull]] char const *response) {
 	char c = response[0];
 	if (c == 'n' || c == 'N')

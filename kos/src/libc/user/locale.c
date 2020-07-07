@@ -45,6 +45,7 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
                                      char const *locale)
 /*[[[body:libc_setlocale]]]*/
 {
+	COMPILER_IMPURE();
 	(void)category;
 	(void)locale;
 	return current_locale;

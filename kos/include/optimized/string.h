@@ -1324,12 +1324,567 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restr
 #endif /* !__fast_mempcpy_defined */
 
 
-#ifdef __CRT_HAVE_bzero
-#ifndef ____localdep_bzero_defined
-#define ____localdep_bzero_defined 1
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst, __num_bytes))
-#endif /* !____localdep_bzero_defined */
-#endif /* __CRT_HAVE_bzero */
+#if (!defined(__fast_bzero_defined) ||  \
+     !defined(__fast_bzerow_defined) || \
+     !defined(__fast_bzerol_defined) || \
+     (!defined(__fast_bzeroq_defined) && defined(__UINT64_TYPE__)))
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define __private_bzero_constant(dst, n_bytes, alignment) \
+	(__private_bzero_constant)(dst, n_bytes)
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+__FORCELOCAL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __private_bzero_constant)(void *__restrict __dst,
+                                                   __SIZE_TYPE__ __n_bytes
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#define __private_bzero_constant_ifaligned(n, tt)      if (__alignment >= n) tt
+                                                   ,
+                                                   __SIZE_TYPE__ __alignment
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#define __private_bzero_constant_ifaligned(n, tt)      tt
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+                                                   ) {
+	switch (__n_bytes) {
+
+	case 0:
+		return;
+
+	case 1:
+		((__UINT8_TYPE__ *)__dst)[0] = 0;
+		return;
+
+	case 2:
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		((__UINT8_TYPE__ *)__dst)[0] =
+		((__UINT8_TYPE__ *)__dst)[1] = 0;
+		return;
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 3:
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] = 0;
+			((__UINT8_TYPE__ *)__dst)[2]  = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		((__UINT8_TYPE__ *)__dst)[0] =
+		((__UINT8_TYPE__ *)__dst)[1] =
+		((__UINT8_TYPE__ *)__dst)[2] = 0;
+		return;
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 4:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] =
+			((__UINT16_TYPE__ *)__dst)[1] = 0;
+			return;
+		})
+#ifndef __OPTIMIZE_SIZE__
+		((__UINT8_TYPE__ *)__dst)[0] =
+		((__UINT8_TYPE__ *)__dst)[1] =
+		((__UINT8_TYPE__ *)__dst)[2] =
+		((__UINT8_TYPE__ *)__dst)[3] = 0;
+		return;
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 5:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] = 0;
+			((__UINT8_TYPE__ *)__dst)[4]  = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] =
+			((__UINT16_TYPE__ *)__dst)[1] = 0;
+			((__UINT8_TYPE__ *)__dst)[4]  = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 6:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] = 0;
+			((__UINT16_TYPE__ *)__dst)[2] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] =
+			((__UINT16_TYPE__ *)__dst)[1] =
+			((__UINT16_TYPE__ *)__dst)[2] = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+#ifndef __OPTIMIZE_SIZE__
+	case 7:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] = 0;
+			((__UINT16_TYPE__ *)__dst)[2] = 0;
+			((__UINT8_TYPE__ *)__dst)[6]  = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] =
+			((__UINT16_TYPE__ *)__dst)[1] =
+			((__UINT16_TYPE__ *)__dst)[2] = 0;
+			((__UINT8_TYPE__ *)__dst)[6]  = 0;
+			return;
+		})
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+#endif /* !__OPTIMIZE_SIZE__ */
+
+	case 8:
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			return;
+		})
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#if !defined(__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS) || __SIZEOF_BUSINT__ < 8 || !defined(__UINT64_TYPE__)
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			return;
+		})
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS || __SIZEOF_BUSINT__ | 8 || !__UINT64_TYPE__ */
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(2, {
+			((__UINT16_TYPE__ *)__dst)[0] =
+			((__UINT16_TYPE__ *)__dst)[1] =
+			((__UINT16_TYPE__ *)__dst)[2] =
+			((__UINT16_TYPE__ *)__dst)[3] = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+	case 9:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT8_TYPE__ *)__dst)[8]  = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			((__UINT8_TYPE__ *)__dst)[8]  = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 10:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT16_TYPE__ *)__dst)[4] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			((__UINT16_TYPE__ *)__dst)[4] = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 12:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 16:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifndef __OPTIMIZE_SIZE__
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] =
+			((__UINT32_TYPE__ *)__dst)[3] = 0;
+			return;
+		})
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+#ifndef __OPTIMIZE_SIZE__
+	case 11:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT16_TYPE__ *)__dst)[4] = 0;
+			((__UINT8_TYPE__ *)__dst)[10] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			((__UINT16_TYPE__ *)__dst)[4] = 0;
+			((__UINT8_TYPE__ *)__dst)[10] = 0;
+			return;
+		})
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 13:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT8_TYPE__ *)__dst)[12] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT8_TYPE__ *)__dst)[12] = 0;
+			return;
+		})
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 14:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT16_TYPE__ *)__dst)[6] = 0;
+			return;
+		})
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT16_TYPE__ *)__dst)[6] = 0;
+			return;
+		})
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		break;
+
+	case 15:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] = 0;
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT16_TYPE__ *)__dst)[6] = 0;
+			((__UINT8_TYPE__ *)__dst)[14] = 0;
+			return;
+		})
+		break;
+
+	case 17:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] = 0;
+			((__UINT8_TYPE__ *)__dst)[16] = 0;
+			return;
+		})
+		break;
+
+	case 18:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] = 0;
+			((__UINT16_TYPE__ *)__dst)[8] = 0;
+			return;
+		})
+		break;
+
+	case 19:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] = 0;
+			((__UINT16_TYPE__ *)__dst)[8] = 0;
+			((__UINT8_TYPE__ *)__dst)[18] = 0;
+			return;
+		})
+		break;
+
+	case 20:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] = 0;
+			((__UINT32_TYPE__ *)__dst)[4] = 0;
+			return;
+		})
+		break;
+
+	case 21:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] = 0;
+			((__UINT32_TYPE__ *)__dst)[4] = 0;
+			((__UINT8_TYPE__ *)__dst)[20] = 0;
+			return;
+		})
+		break;
+
+	case 22:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0]  =
+			((__UINT64_TYPE__ *)__dst)[1]  = 0;
+			((__UINT32_TYPE__ *)__dst)[4]  = 0;
+			((__UINT16_TYPE__ *)__dst)[10] = 0;
+			return;
+		})
+		break;
+
+	case 24:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] =
+			((__UINT64_TYPE__ *)__dst)[2] = 0;
+			return;
+		})
+		break;
+
+	case 25:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] =
+			((__UINT64_TYPE__ *)__dst)[2] = 0;
+			((__UINT8_TYPE__ *)__dst)[24] = 0;
+			return;
+		})
+		break;
+
+	case 26:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0]  =
+			((__UINT64_TYPE__ *)__dst)[1]  =
+			((__UINT64_TYPE__ *)__dst)[2]  = 0;
+			((__UINT16_TYPE__ *)__dst)[12] = 0;
+			return;
+		})
+		break;
+
+	case 28:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] =
+			((__UINT64_TYPE__ *)__dst)[2] = 0;
+			((__UINT32_TYPE__ *)__dst)[6] = 0;
+			return;
+		})
+		break;
+
+	case 32:
+		__private_bzero_constant_ifaligned(8, {
+			((__UINT64_TYPE__ *)__dst)[0] =
+			((__UINT64_TYPE__ *)__dst)[1] =
+			((__UINT64_TYPE__ *)__dst)[2] =
+			((__UINT64_TYPE__ *)__dst)[3] = 0;
+			return;
+		})
+		break;
+#endif /* !__OPTIMIZE_SIZE__ */
+
+#else /* __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__) */
+#ifndef __OPTIMIZE_SIZE__
+	case 9:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			((__UINT8_TYPE__ *)__dst)[8]  = 0;
+			return;
+		})
+		break;
+
+	case 10:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			((__UINT16_TYPE__ *)__dst)[4] = 0;
+			return;
+		})
+		break;
+
+	case 11:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] = 0;
+			((__UINT16_TYPE__ *)__dst)[4] = 0;
+			((__UINT8_TYPE__ *)__dst)[10] = 0;
+			return;
+		})
+		break;
+
+	case 12:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			return;
+		})
+		break;
+
+	case 13:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT8_TYPE__ *)__dst)[12] = 0;
+			return;
+		})
+		break;
+
+	case 14:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] = 0;
+			((__UINT16_TYPE__ *)__dst)[6] = 0;
+			return;
+		})
+		break;
+
+	case 16:
+		__private_bzero_constant_ifaligned(4, {
+			((__UINT32_TYPE__ *)__dst)[0] =
+			((__UINT32_TYPE__ *)__dst)[1] =
+			((__UINT32_TYPE__ *)__dst)[2] =
+			((__UINT32_TYPE__ *)__dst)[3] = 0;
+			return;
+		})
+		break;
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	if (!(__n_bytes & 7))
+		__libc_core_bzeroq(__dst, __n_bytes >> 3);
+	else if (!(__n_bytes & 3))
+		__libc_core_bzerol(__dst, __n_bytes >> 2);
+	else if (!(__n_bytes & 1))
+		__libc_core_bzerow(__dst, __n_bytes >> 1);
+	else {
+		__libc_core_bzero(__dst, __n_bytes);
+	}
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	if (!(__n_bytes & 7) && __alignment >= 8)
+		__libc_core_bzeroq(__dst, __n_bytes >> 3);
+	else if (!(__n_bytes & 3) && __alignment >= 4)
+		__libc_core_bzerol(__dst, __n_bytes >> 2);
+	else if (!(__n_bytes & 1) && __alignment >= 2)
+		__libc_core_bzerow(__dst, __n_bytes >> 1);
+	else {
+		__libc_core_bzero(__dst, __n_bytes);
+	}
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#undef __private_bzero_constant_ifaligned
+}
+#endif /* !__fast_bzero_defined */
+
+
+#ifdef __UINT64_TYPE__
+#ifndef __fast_bzeroq_defined
+#define __fast_bzeroq_defined 1
+__FORCELOCAL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(bzeroq))(/*aligned(8)*/ void *__restrict __dst,
+                                                   __SIZE_TYPE__ __n_qwords) {
+	if __untraced(__builtin_constant_p(__n_qwords)) {
+		__private_bzero_constant(__dst, __n_qwords << 3, 8);
+	} else {
+		__libc_core_bzeroq(__dst, __n_qwords);
+	}
+}
+#endif /* !__fast_bzeroq_defined */
+#endif /* __UINT64_TYPE__ */
+
+
+#ifndef __fast_bzerol_defined
+#define __fast_bzerol_defined 1
+__FORCELOCAL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(bzerol))(/*aligned(4)*/ void *__restrict __dst,
+                                                   __SIZE_TYPE__ __n_dwords) {
+	if __untraced(__builtin_constant_p(__n_dwords)) {
+		__private_bzero_constant(__dst, __n_dwords << 2, 4);
+	} else {
+		__libc_core_bzerol(__dst, __n_dwords);
+	}
+}
+#endif /* !__fast_bzerol_defined */
+
+
+#ifndef __fast_bzerow_defined
+#define __fast_bzerow_defined 1
+__FORCELOCAL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(bzerow))(/*aligned(2)*/ void *__restrict __dst,
+                                                   __SIZE_TYPE__ __n_words) {
+	if __untraced(__builtin_constant_p(__n_words)) {
+		__private_bzero_constant(__dst, __n_words << 1, 2);
+	} else {
+		__libc_core_bzerow(__dst, __n_words);
+	}
+}
+#endif /* !__fast_bzerow_defined */
+
+#ifndef __fast_bzero_defined
+#define __fast_bzero_defined 1
+__FORCELOCAL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(bzero))(/*aligned(1)*/ void *__restrict __dst,
+                                                  __SIZE_TYPE__ __n_bytes) {
+	if __untraced(__builtin_constant_p(__n_bytes)) {
+		__private_bzero_constant(__dst, __n_bytes, 1);
+	} else {
+		__libc_core_bzero(__dst, __n_bytes);
+	}
+}
+#endif /* !__fast_bzero_defined */
 
 
 #ifdef __UINT64_TYPE__
@@ -1340,6 +1895,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restr
                                                     __UINT64_TYPE__ __qword,
                                                     __SIZE_TYPE__ __n_qwords) {
 	if __untraced(__builtin_constant_p(__qword)) {
+		if __untraced(__qword == 0) {
+			__LIBC_FAST_NAME(bzeroq)(__dst, __n_qwords);
+			return (__UINT64_TYPE__ *)__dst;
+		}
 		if __untraced(__builtin_constant_p(__n_qwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_qwords) {
@@ -1412,12 +1971,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restr
 	   (__qword & __UINT32_C(0xffffffff)) == ((__qword >> 32) & __UINT32_C(0xffffffff)))
 		return (__UINT64_TYPE__ *)__libc_core_memsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
 #endif /* !__CRT_HAVE_memsetq && ... */
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__qword) && __qword == 0) {
-		__localdep_bzero(__dst, __n_qwords * 8);
-		return (__UINT64_TYPE__ *)__dst;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_memsetq(__dst, __qword, __n_qwords);
 }
 #endif /* !__fast_memsetq_defined */
@@ -1431,6 +1984,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restr
                                                     __UINT32_TYPE__ __dword,
                                                     __SIZE_TYPE__ __n_dwords) {
 	if __untraced(__builtin_constant_p(__dword)) {
+		if __untraced(__dword == 0) {
+			__LIBC_FAST_NAME(bzerol)(__dst, __n_dwords);
+			return (__UINT32_TYPE__ *)__dst;
+		}
 		if __untraced(__builtin_constant_p(__n_dwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_dwords) {
@@ -1549,12 +2106,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restr
 #endif /* __CRT_HAVE_memset */
 	}
 #endif /* !__CRT_HAVE_memsetl && (__CRT_HAVE_memsetw || __CRT_HAVE_memset) */
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__dword) && __dword == 0) {
-		__localdep_bzero(__dst, __n_dwords * 4);
-		return (__UINT32_TYPE__ *)__dst;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_memsetl(__dst, __dword, __n_dwords);
 }
 #endif /* !__fast_memsetl_defined */
@@ -1567,6 +2118,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
                                                     __UINT16_TYPE__ __word,
                                                     __SIZE_TYPE__ __n_words) {
 	if __untraced(__builtin_constant_p(__word)) {
+		if __untraced(__word == 0) {
+			__LIBC_FAST_NAME(bzerow)(__dst, __n_words);
+			return (__UINT16_TYPE__ *)__dst;
+		}
 		if __untraced(__builtin_constant_p(__n_words)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_words) {
@@ -1577,19 +2132,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
 				return (__UINT16_TYPE__ *)__dst;
 #ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 			case 2:
-				((__UINT16_TYPE__ *)__dst)[0] = __word;
+				((__UINT16_TYPE__ *)__dst)[0] =
 				((__UINT16_TYPE__ *)__dst)[1] = __word;
 				return (__UINT16_TYPE__ *)__dst;
 #ifndef __OPTIMIZE_SIZE__
 			case 3:
-				((__UINT16_TYPE__ *)__dst)[0] = __word;
-				((__UINT16_TYPE__ *)__dst)[1] = __word;
+				((__UINT16_TYPE__ *)__dst)[0] =
+				((__UINT16_TYPE__ *)__dst)[1] =
 				((__UINT16_TYPE__ *)__dst)[2] = __word;
 				return (__UINT16_TYPE__ *)__dst;
 			case 4:
-				((__UINT16_TYPE__ *)__dst)[0] = __word;
-				((__UINT16_TYPE__ *)__dst)[1] = __word;
-				((__UINT16_TYPE__ *)__dst)[2] = __word;
+				((__UINT16_TYPE__ *)__dst)[0] =
+				((__UINT16_TYPE__ *)__dst)[1] =
+				((__UINT16_TYPE__ *)__dst)[2] =
 				((__UINT16_TYPE__ *)__dst)[3] = __word;
 				return (__UINT16_TYPE__ *)__dst;
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1739,12 +2294,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
 			return (__UINT16_TYPE__ *)__libc_core_memset(__dst, __word & __UINT8_C(0xff), __n_words * 2);
 	}
 #endif /* !__CRT_HAVE_memsetw && __CRT_HAVE_memset */
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__word) && __word == 0) {
-		__localdep_bzero(__dst, __n_words * 2);
-		return (__UINT16_TYPE__ *)__dst;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_memsetw(__dst, __word, __n_words);
 }
 #endif /* !__fast_memsetw_defined */
@@ -1757,6 +2306,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restri
                                                    int __byte,
                                                    __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__byte)) {
+		if __untraced(__byte == 0) {
+			__LIBC_FAST_NAME(bzero)(__dst, __n_bytes);
+			return __dst;
+		}
 		if __untraced(__builtin_constant_p(__n_bytes)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_bytes) {
@@ -2032,12 +2585,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restri
 #endif /* !__OPTIMIZE_SIZE__ */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__byte) && __byte == 0) {
-		__localdep_bzero(__dst, __n_bytes);
-		return __dst;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_memset(__dst, __byte, __n_bytes);
 }
 #endif /* !__fast_memset_defined */
@@ -2051,6 +2598,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__rest
                                                      __UINT64_TYPE__ __qword,
                                                      __SIZE_TYPE__ __n_qwords) {
 	if __untraced(__builtin_constant_p(__qword)) {
+		if __untraced(__qword == 0) {
+			__LIBC_FAST_NAME(bzeroq)(__dst, __n_qwords);
+			return (__UINT64_TYPE__ *)__dst + __n_qwords;
+		}
 		if __untraced(__builtin_constant_p(__n_qwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_qwords) {
@@ -2125,12 +2676,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__rest
 	   (__qword & __UINT32_C(0xffffffff)) == ((__qword >> 32) & __UINT32_C(0xffffffff)))
 		return (__UINT64_TYPE__ *)__libc_core_mempsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
 #endif /* !__CRT_HAVE_memsetq && ... */
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__qword) && __qword == 0) {
-		__localdep_bzero(__dst, __n_qwords * 8);
-		return (__UINT64_TYPE__ *)__dst + __n_qwords;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_mempsetq(__dst, __qword, __n_qwords);
 }
 #endif /* !__fast_mempsetq_defined */
@@ -2144,6 +2689,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__rest
                                                      __UINT32_TYPE__ __dword,
                                                      __SIZE_TYPE__ __n_dwords) {
 	if __untraced(__builtin_constant_p(__dword)) {
+		if __untraced(__dword == 0) {
+			__LIBC_FAST_NAME(bzerol)(__dst, __n_dwords);
+			return (__UINT32_TYPE__ *)__dst + __n_dwords;
+		}
 		if __untraced(__builtin_constant_p(__n_dwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_dwords) {
@@ -2270,12 +2819,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__rest
 #endif /* __CRT_HAVE_memset || __CRT_HAVE_mempset */
 	}
 #endif /* !__CRT_HAVE_memsetl && ... */
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__dword) && __dword == 0) {
-		__localdep_bzero(__dst, __n_dwords * 4);
-		return (__UINT32_TYPE__ *)__dst + __n_dwords;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_mempsetl(__dst, __dword, __n_dwords);
 }
 #endif /* !__fast_mempsetl_defined */
@@ -2288,6 +2831,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__rest
                                                      __UINT16_TYPE__ __word,
                                                      __SIZE_TYPE__ __n_words) {
 	if __untraced(__builtin_constant_p(__word)) {
+		if __untraced(__word == 0) {
+			__LIBC_FAST_NAME(bzerow)(__dst, __n_words);
+			return (__UINT16_TYPE__ *)__dst + __n_words;
+		}
 		if __untraced(__builtin_constant_p(__n_words)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_words) {
@@ -2467,12 +3014,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__rest
 			return (__UINT16_TYPE__ *)__libc_core_mempset(__dst, __word & __UINT8_C(0xff), __n_words * 2);
 	}
 #endif /* !__CRT_HAVE_memsetw && ... */
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__word) && __word == 0) {
-		__localdep_bzero(__dst, __n_words * 2);
-		return (__UINT16_TYPE__ *)__dst + __n_words;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_mempsetw(__dst, __word, __n_words);
 }
 #endif /* !__fast_mempsetw_defined */
@@ -2485,6 +3026,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restr
                                                     int __byte,
                                                     __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__byte)) {
+		if __untraced(__byte == 0) {
+			__LIBC_FAST_NAME(bzero)(__dst, __n_bytes);
+			return (__UINT8_TYPE__ *)__dst + __n_bytes;
+		}
 		if __untraced(__builtin_constant_p(__n_bytes)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 			switch (__n_bytes) {
@@ -2758,12 +3303,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restr
 #endif /* !__OPTIMIZE_SIZE__ */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-#ifdef __CRT_HAVE_bzero
-	if __untraced(__builtin_constant_p(__byte) && __byte == 0) {
-		__localdep_bzero(__dst, __n_bytes);
-		return (__UINT8_TYPE__ *)__dst + __n_bytes;
-	}
-#endif /* __CRT_HAVE_bzero */
 	return __libc_core_mempset(__dst, __byte, __n_bytes);
 }
 #endif /* !__fast_mempset_defined */

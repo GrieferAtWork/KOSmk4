@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x302ef5f5 */
+/* HASH CRC-32:0x1adaadc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,29 +27,29 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_explicit_bzero_defined
 #define __local___localdep_explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
-/* Same as `bzero(buf, len)', however compilers will not optimize away
- * uses of this function when they (think) that clearing the memory
+/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+ * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __len),bzero,(__buf,__len))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __num_bytes),bzero,(__buf,__num_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
-/* Same as `bzero(buf, len)', however compilers will not optimize away
- * uses of this function when they (think) that clearing the memory
+/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+ * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __len),explicit_bzero,(__buf,__len))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__buf,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
-/* Same as `bzero(buf, len)', however compilers will not optimize away
- * uses of this function when they (think) that clearing the memory
+/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+ * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __len),__bzero,(__buf,__len))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __num_bytes),__bzero,(__buf,__num_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/strings/explicit_bzero.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `bzero(buf, len)', however compilers will not optimize away
- * uses of this function when they (think) that clearing the memory
+/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+ * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 #define __localdep_explicit_bzero __LIBC_LOCAL_NAME(explicit_bzero)

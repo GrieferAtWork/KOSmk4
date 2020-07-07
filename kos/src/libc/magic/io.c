@@ -263,6 +263,7 @@ errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 
 [[cp, decl_include("<bits/types.h>")]]
 int __lock_fhandle($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
 	return 0;
@@ -270,6 +271,7 @@ int __lock_fhandle($fd_t fd) {
 
 [[decl_include("<bits/types.h>")]]
 void _unlock_fhandle($fd_t fd) {
+	COMPILER_IMPURE();
 	(void)fd;
 	/* No-op */
 }

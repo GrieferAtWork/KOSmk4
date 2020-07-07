@@ -1350,6 +1350,10 @@
 #define __CRT_HAVE_btowc 1
 #define __CRT_HAVE_bulk_free 1
 #define __CRT_HAVE_bzero 1
+#define __CRT_HAVE_bzeroc 1
+#define __CRT_HAVE_bzerol 1
+#define __CRT_HAVE_bzeroq 1
+#define __CRT_HAVE_bzerow 1
 #define __CRT_HAVE_c16rtomb 1
 #define __CRT_HAVE_c32rtomb 1
 #define __CRT_HAVE_call_once 1

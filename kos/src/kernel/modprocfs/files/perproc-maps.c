@@ -160,7 +160,7 @@ ProcFS_PerProc_Maps_Printer(struct regular_node *__restrict self,
                             pformatprinter printer, void *arg) {
 	REF struct task *thread;
 	REF struct vm *threadvm;
-	ssize_t result;
+	ssize_t result = 0;
 	upid_t pid;
 	/* Lookup the associated thread. */
 	pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);

@@ -621,3 +621,5 @@
 
 #define ANSITTY_INTERNAL(x) x
 
+#define DEFINE_TEST(name) void test_##name(void)
+

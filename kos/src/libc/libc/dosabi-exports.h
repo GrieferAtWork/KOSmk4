@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x466d8c31 */
+/* HASH CRC-32:0x612b96be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2072,6 +2072,16 @@ DEFINE_PUBLIC_ALIAS(DOS$__strncasecmp_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$strncasecmp_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_strerror_r, libd___xpg_strerror_r);
 DEFINE_PUBLIC_ALIAS(DOS$strsep, libd_strsep);
+DEFINE_PUBLIC_ALIAS(DOS$bcopy, libd_bcopy);
+DEFINE_PUBLIC_ALIAS(DOS$__bzero, libd_bzero);
+DEFINE_PUBLIC_ALIAS(DOS$explicit_bzero, libd_bzero);
+DEFINE_PUBLIC_ALIAS(DOS$bzero, libd_bzero);
+DEFINE_PUBLIC_ALIAS(DOS$bzerow, libd_bzerow);
+DEFINE_PUBLIC_ALIAS(DOS$bzerol, libd_bzerol);
+DEFINE_PUBLIC_ALIAS(DOS$bzeroq, libd_bzeroq);
+DEFINE_PUBLIC_ALIAS(DOS$bzeroc, libd_bzeroc);
+DEFINE_PUBLIC_ALIAS(DOS$index, libd_index);
+DEFINE_PUBLIC_ALIAS(DOS$rindex, libd_rindex);
 DEFINE_PUBLIC_ALIAS(DOS$_stricmp, libd_strcasecmp);
 DEFINE_PUBLIC_ALIAS(DOS$_strcmpi, libd_strcasecmp);
 DEFINE_PUBLIC_ALIAS(DOS$stricmp, libd_strcasecmp);
@@ -2320,14 +2330,6 @@ DEFINE_PUBLIC_ALIAS(DOS$strmode, libd_strmode);
 DEFINE_PUBLIC_ALIAS(DOS$sl_add, libd_sl_add);
 DEFINE_PUBLIC_ALIAS(DOS$sl_free, libd_sl_free);
 DEFINE_PUBLIC_ALIAS(DOS$sl_find, libd_sl_find);
-
-/* strings */
-DEFINE_PUBLIC_ALIAS(DOS$bcopy, libd_bcopy);
-DEFINE_PUBLIC_ALIAS(DOS$__bzero, libd_bzero);
-DEFINE_PUBLIC_ALIAS(DOS$explicit_bzero, libd_bzero);
-DEFINE_PUBLIC_ALIAS(DOS$bzero, libd_bzero);
-DEFINE_PUBLIC_ALIAS(DOS$index, libd_index);
-DEFINE_PUBLIC_ALIAS(DOS$rindex, libd_rindex);
 
 /* stropts */
 DEFINE_PUBLIC_ALIAS(DOS$isastream, libd_isastream);

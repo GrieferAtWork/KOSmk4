@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1455cf96 */
+/* HASH CRC-32:0x4d195bf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_unlock_fhandle) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_unlock_fhandle))(__fd_t __fd) {
+	__COMPILER_IMPURE();
 	(void)__fd;
 	/* No-op */
 }
