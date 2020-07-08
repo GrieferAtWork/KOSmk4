@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ATTR_XATTR_H
-#define _ATTR_XATTR_H 1
-#include <sys/xattr.h>
-#endif /* !_ATTR_XATTR_H */
+#ifndef _BSD_SYS_BITSTRING_H
+#define _BSD_SYS_BITSTRING_H 1
+#include <sys/bitstring.h>
+#endif /* !_BSD_SYS_BITSTRING_H */
