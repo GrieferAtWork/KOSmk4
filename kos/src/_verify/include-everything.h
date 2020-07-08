@@ -231,6 +231,7 @@ incdir("", "../../include");
 #include <asm/types.h>
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
+#include <asm/util.h>
 #include <asm/utsname.h>
 #include <asm/xattr.h>
 #include <assert.h>
@@ -393,6 +394,14 @@ incdir("", "../../include");
 #include <bits/wordsize.h>
 #include <bits/xopen_lim.h>
 #include <bits/xtitypes.h>
+#include <bitstring.h>
+#include <bsd/bitstring.h>
+#include <bsd/err.h>
+#include <bsd/libutil.h>
+#include <bsd/stringlist.h>
+#include <bsd/sys/bitstring.h>
+#include <bsd/sys/param.h>
+#include <bsd/sys/poll.h>
 #include <byteswap.h>
 #include <compat/bits/cmsghdr-struct.h>
 #include <compat/bits/flock-struct.h>
@@ -801,6 +810,7 @@ incdir("", "../../include");
 #include <libunwind/eh_frame.h>
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
+#include <libutil.h>
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
@@ -1058,14 +1068,17 @@ incdir("", "../../include");
 #include <stringlist.h>
 #include <strings.h>
 #include <stropts.h>
+#include <struct.h>
 #include <sys/_types.h>
 #include <sys/acct.h>
 #include <sys/auxv.h>
+#include <sys/bitstring.h>
 #include <sys/bitypes.h>
 #include <sys/cdefs.h>
 #include <sys/config.h>
 #include <sys/dir.h>
 #include <sys/elf.h>
+#include <sys/endian.h>
 #include <sys/epoll.h>
 #include <sys/errno.h>
 #include <sys/eventfd.h>
@@ -1162,6 +1175,7 @@ incdir("", "../../include");
 #include <unistd.h>
 #include <unwind.h>
 #include <ustat.h>
+#include <util.h>
 #include <utime.h>
 #include <utmp.h>
 #include <utmpx.h>

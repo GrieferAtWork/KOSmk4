@@ -29,7 +29,10 @@
 #if !defined(__INTELLISENSE__) && \
     (defined(__TPP_VERSION__) || defined(__GNUC__))
 #define __PREPROCESSOR_HAVE_INCLUDE_NEXT 1 /* #include_next */
-#define __PREPROCESSOR_HAVE_WARNING 1 /* #warning */
+#define __PREPROCESSOR_HAVE_WARNING      1 /* #warning "foo" */
+#endif
+#if defined(_MSC_VER) || defined(__TPP_VERSION__)
+#define __PREPROCESSOR_HAVE_PRAGMA_WARNING 1 /* #pragma warning("foo") */
 #endif
 
 

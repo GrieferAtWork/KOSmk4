@@ -32,14 +32,26 @@
  * I would copy the documentation, but I don't think
  * the source's copyright allows that... */
 
-#ifdef _MACHINE__ENDIAN_H
+#if defined(_MACHINE__ENDIAN_H) || defined(_SYS_ENDIAN_H)
 #ifndef __NO_WARNINGS
+#ifdef __PREPROCESSOR_HAVE_WARNING
 #warning "\
-Both <machine/endian.h> (<machine/_endian.h>) and <sys/isa_defs.h> define the \
-macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely different \
+Both [<machine/endian.h>, <machine/_endian.h>, <sys/endian.h>] and [<sys/isa_defs.h>] \
+define the macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely different \
 meanings (and values). - Please change your code to only include one of either"
+#elif defined(__PREPROCESSOR_HAVE_PRAGMA_WARNING)
+#pragma warning("\
+Both [<machine/endian.h>, <machine/_endian.h>, <sys/endian.h>] and [<sys/isa_defs.h>] \
+define the macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely different \
+meanings (and values). - Please change your code to only include one of either")
+#else /* ... */
+#error "\
+Both [<machine/endian.h>, <machine/_endian.h>, <sys/endian.h>] and [<sys/isa_defs.h>] \
+define the macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely different \
+meanings (and values). - Please change your code to only include one of either"
+#endif /* !... */
 #endif /* !__NO_WARNINGS */
-#endif /* _MACHINE__ENDIAN_H */
+#endif /* _MACHINE__ENDIAN_H || _SYS_ENDIAN_H */
 
 #undef _LITTLE_ENDIAN
 #undef _BIG_ENDIAN
