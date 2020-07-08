@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7308113a */
+/* HASH CRC-32:0x83697349 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -611,7 +611,7 @@ __CDECLARE(,int,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread, __thread_return, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread, __thread_return, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_timedjoin64_np
@@ -620,7 +620,7 @@ __CDECLARE(,int,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void 
 __CREDIRECT(,int,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <local/pthread/pthread_timedjoin64_np.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread, __thread_return, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread, __thread_return, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
@@ -943,7 +943,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_cleanup_routine,(str
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__pthread_cleanup_routine, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_routine)(struct __pthread_cleanup_frame *__frame) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__pthread_cleanup_routine))(__frame); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__pthread_cleanup_routine, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __pthread_cleanup_routine)(struct __pthread_cleanup_frame *__frame) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__pthread_cleanup_routine))(__frame); })
 #endif /* !__CRT_HAVE___pthread_cleanup_routine */
 /* Install a cleanup handler: ROUTINE will be called with arguments ARG
  * when the thread is canceled or calls pthread_exit. ROUTINE will also
@@ -1095,7 +1095,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock,(pth
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <local/pthread/pthread_mutex_timedlock.h>
 /* Wait until lock becomes available, or specified time passes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__mutex, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_mutex_timedlock64
@@ -1107,7 +1107,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock64,(
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <local/pthread/pthread_mutex_timedlock64.h>
 /* Wait until lock becomes available, or specified time passes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__mutex, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
@@ -1205,7 +1205,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <local/pthread/pthread_rwlock_timedrdlock.h>
 /* Try to acquire read lock for RWLOCK or return after specfied time */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock64
@@ -1217,7 +1217,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock6
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <local/pthread/pthread_rwlock_timedrdlock64.h>
 /* Try to acquire read lock for RWLOCK or return after specfied time */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
@@ -1238,7 +1238,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <local/pthread/pthread_rwlock_timedwrlock.h>
 /* Try to acquire write lock for RWLOCK or return after specfied time */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__rwlock, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock64
@@ -1250,7 +1250,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock6
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <local/pthread/pthread_rwlock_timedwrlock64.h>
 /* Try to acquire write lock for RWLOCK or return after specfied time */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__rwlock, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
@@ -1321,7 +1321,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait,(p
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__cond, __mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__cond, __mutex, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_cond_timedwait64
@@ -1342,7 +1342,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait64
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__cond, __mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__cond, __mutex, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 
@@ -1378,7 +1378,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_init,(pthread_spin
 #include <local/pthread/pthread_spin_init.h>
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
 #endif /* !__CRT_HAVE_pthread_spin_init */
 
 #ifdef __CRT_HAVE_pthread_spin_destroy
@@ -1387,7 +1387,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_destroy,(pthread_s
 #else /* __CRT_HAVE_pthread_spin_destroy */
 #include <local/pthread/pthread_spin_destroy.h>
 /* Destroy the spinlock LOCK */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_destroy */
 
 #ifdef __CRT_HAVE_pthread_spin_lock
@@ -1396,7 +1396,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_lock,(pthread_spin
 #else /* __CRT_HAVE_pthread_spin_lock */
 #include <local/pthread/pthread_spin_lock.h>
 /* Wait until spinlock LOCK is retrieved */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_lock */
 
 #ifdef __CRT_HAVE_pthread_spin_trylock
@@ -1405,7 +1405,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_trylock,(pthread_s
 #else /* __CRT_HAVE_pthread_spin_trylock */
 #include <local/pthread/pthread_spin_trylock.h>
 /* Try to lock spinlock LOCK */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_trylock */
 
 #ifdef __CRT_HAVE_pthread_spin_unlock
@@ -1414,7 +1414,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_unlock,(pthread_sp
 #else /* __CRT_HAVE_pthread_spin_unlock */
 #include <local/pthread/pthread_spin_unlock.h>
 /* Release spinlock LOCK */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_unlock */
 
 /* Functions to handle barriers. */
@@ -1510,13 +1510,13 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare,
 __CDECLARE(,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,pthread_num_processors_np,(void),())
 #elif defined(__CRT_HAVE_sched_getaffinity)
 #include <local/pthread/pthread_num_processors_np.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_set_num_processors_np
 __CDECLARE(,int,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n))
 #elif defined(__CRT_HAVE_sched_setaffinity)
 #include <local/pthread/pthread_set_num_processors_np.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
 #endif /* ... */
 #endif /* __CC__ */
 

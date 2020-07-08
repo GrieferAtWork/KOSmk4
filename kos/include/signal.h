@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x776badde */
+/* HASH CRC-32:0x9b23acff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -247,13 +247,13 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,kill,(__pid_t __pid, __signo_t __signo),(__pid
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigemptyset,(sigset_t *__set),(__set))
 #else /* __CRT_HAVE_sigemptyset */
 #include <local/signal/sigemptyset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigemptyset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigemptyset)(sigset_t *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigemptyset))(__set); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigemptyset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigemptyset)(sigset_t *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigemptyset))(__set); })
 #endif /* !__CRT_HAVE_sigemptyset */
 #ifdef __CRT_HAVE_sigfillset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigfillset,(sigset_t *__set),(__set))
 #else /* __CRT_HAVE_sigfillset */
 #include <local/signal/sigfillset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigfillset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigfillset)(sigset_t *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset))(__set); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigfillset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigfillset)(sigset_t *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset))(__set); })
 #endif /* !__CRT_HAVE_sigfillset */
 #ifdef __CRT_HAVE_sigaddset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, __signo_t __signo),(__set,__signo))
@@ -261,7 +261,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, __s
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, __signo_t __signo),__sigaddset,(__set,__signo))
 #else /* ... */
 #include <local/signal/sigaddset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigaddset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(sigset_t *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigaddset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(sigset_t *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdelset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, __signo_t __signo),(__set,__signo))
@@ -269,7 +269,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, __s
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, __signo_t __signo),__sigdelset,(__set,__signo))
 #else /* ... */
 #include <local/signal/sigdelset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(sigset_t *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(sigset_t *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigismember
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, __signo_t __signo),(__set,__signo))
@@ -277,7 +277,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigi
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, __signo_t __signo),__sigismember,(__set,__signo))
 #else /* ... */
 #include <local/signal/sigismember.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
 #endif /* !... */
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
@@ -298,19 +298,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const 
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__restrict __set),(__set))
 #else /* __CRT_HAVE_sigisemptyset */
 #include <local/signal/sigisemptyset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(sigset_t const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(sigset_t const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
 #endif /* !__CRT_HAVE_sigisemptyset */
 #ifdef __CRT_HAVE_sigandset
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,sigandset,(sigset_t *__set, sigset_t const *__left, sigset_t const *__right),(__set,__left,__right))
 #else /* __CRT_HAVE_sigandset */
 #include <local/signal/sigandset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigandset, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL sigandset)(sigset_t *__set, sigset_t const *__left, sigset_t const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigandset))(__set, __left, __right); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigandset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL sigandset)(sigset_t *__set, sigset_t const *__left, sigset_t const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigandset))(__set, __left, __right); })
 #endif /* !__CRT_HAVE_sigandset */
 #ifdef __CRT_HAVE_sigorset
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,sigorset,(sigset_t *__set, sigset_t const *__left, sigset_t const *__right),(__set,__left,__right))
 #else /* __CRT_HAVE_sigorset */
 #include <local/signal/sigorset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigorset, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL sigorset)(sigset_t *__set, sigset_t const *__left, sigset_t const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigorset))(__set, __left, __right); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigorset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL sigorset)(sigset_t *__set, sigset_t const *__left, sigset_t const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigorset))(__set, __left, __right); })
 #endif /* !__CRT_HAVE_sigorset */
 #endif /* __USE_GNU */
 #ifdef __USE_POSIX199309
@@ -321,7 +321,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout),(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait)
 #include <local/signal/sigtimedwait.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait)(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait))(__set, __info, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait)(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait))(__set, __info, __timeout); })
 #endif /* ... */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigqueue,(__pid_t __pid, __signo_t __signo, union sigval const __val),(__pid,__signo,__val))
 #ifdef __USE_TIME64
@@ -331,7 +331,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait64,(sigset_t const 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait64,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait,(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait)
 #include <local/signal/sigtimedwait64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait64)(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait64))(__set, __info, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait64)(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait64))(__set, __info, __timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_POSIX199309 */
@@ -370,7 +370,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_si
 #include <bits/signum-values.h>
 #ifdef __SIGRTMIN
 #include <local/signal/__libc_current_sigrtmin.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
 #endif /* __SIGRTMIN */
 #endif /* !__CRT_HAVE___libc_current_sigrtmin */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
@@ -379,7 +379,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_si
 #include <bits/signum-values.h>
 #ifdef __SIGRTMAX
 #include <local/signal/__libc_current_sigrtmax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
 #endif /* __SIGRTMAX */
 #endif /* !__CRT_HAVE___libc_current_sigrtmax */
 

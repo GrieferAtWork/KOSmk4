@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a70e0ef */
+/* HASH CRC-32:0x2816aa8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,7 +97,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void
  * Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
 #else /* __GRND_RANDOM && __CRT_HAVE_getrandom */
 #undef __getentropy_defined
 #endif /* !__GRND_RANDOM || !__CRT_HAVE_getrandom */

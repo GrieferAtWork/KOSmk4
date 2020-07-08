@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x665c1025 */
+/* HASH CRC-32:0x391a81b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ether_ntoa
 #else /* __CRT_HAVE_ether_ntoa */
 #include <local/netinet.ether/ether_ntoa.h>
 /* Convert 48 bit Ethernet ADDRess to ASCII */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ether_ntoa, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL ether_ntoa)(struct ether_addr const *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa))(__addr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ether_ntoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL ether_ntoa)(struct ether_addr const *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa))(__addr); })
 #endif /* !__CRT_HAVE_ether_ntoa */
 #ifdef __CRT_HAVE_ether_ntoa_r
 /* Convert 48 bit Ethernet ADDRess to ASCII */
@@ -68,7 +68,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,ether_n
 #else /* __CRT_HAVE_ether_ntoa_r */
 #include <local/netinet.ether/ether_ntoa_r.h>
 /* Convert 48 bit Ethernet ADDRess to ASCII */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ether_ntoa_r, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL ether_ntoa_r)(struct ether_addr const *__restrict __addr, char *__restrict __buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa_r))(__addr, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ether_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL ether_ntoa_r)(struct ether_addr const *__restrict __addr, char *__restrict __buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa_r))(__addr, __buf); })
 #endif /* !__CRT_HAVE_ether_ntoa_r */
 #ifdef __CRT_HAVE_ether_aton
 /* Convert ASCII string S to 48 bit Ethernet address */
@@ -76,7 +76,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct ether_addr *,__NOTHROW_N
 #else /* __CRT_HAVE_ether_aton */
 #include <local/netinet.ether/ether_aton.h>
 /* Convert ASCII string S to 48 bit Ethernet address */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ether_aton, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct ether_addr *__NOTHROW_NCX(__LIBCCALL ether_aton)(char const *__restrict __asc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_aton))(__asc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ether_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct ether_addr *__NOTHROW_NCX(__LIBCCALL ether_aton)(char const *__restrict __asc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_aton))(__asc); })
 #endif /* !__CRT_HAVE_ether_aton */
 #ifdef __CRT_HAVE_ether_aton_r
 /* Convert ASCII string S to 48 bit Ethernet address */
@@ -84,7 +84,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_N
 #else /* __CRT_HAVE_ether_aton_r */
 #include <local/netinet.ether/ether_aton_r.h>
 /* Convert ASCII string S to 48 bit Ethernet address */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ether_aton_r, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *__NOTHROW_NCX(__LIBCCALL ether_aton_r)(char const *__restrict __asc, struct ether_addr *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_aton_r))(__asc, __addr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ether_aton_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *__NOTHROW_NCX(__LIBCCALL ether_aton_r)(char const *__restrict __asc, struct ether_addr *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_aton_r))(__asc, __addr); })
 #endif /* !__CRT_HAVE_ether_aton_r */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_ether_paton_r
@@ -93,7 +93,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_N
 #else /* __CRT_HAVE_ether_paton_r */
 #include <local/netinet.ether/ether_paton_r.h>
 /* Convert ASCII string S to 48 bit Ethernet address */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ether_paton_r, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *__NOTHROW_NCX(__LIBCCALL ether_paton_r)(char const **__restrict __pasc, struct ether_addr *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_paton_r))(__pasc, __addr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ether_paton_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *__NOTHROW_NCX(__LIBCCALL ether_paton_r)(char const **__restrict __pasc, struct ether_addr *__restrict __addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_paton_r))(__pasc, __addr); })
 #endif /* !__CRT_HAVE_ether_paton_r */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_ether_line
@@ -102,7 +102,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,ether_line,(char const *_
 #else /* __CRT_HAVE_ether_line */
 #include <local/netinet.ether/ether_line.h>
 /* Scan LINE and set ADDR and HOSTNAME */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ether_line, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL ether_line)(char const *__line, struct ether_addr *__addr, char *__hostname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_line))(__line, __addr, __hostname); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ether_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL ether_line)(char const *__line, struct ether_addr *__addr, char *__hostname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_line))(__line, __addr, __hostname); })
 #endif /* !__CRT_HAVE_ether_line */
 /* Map 48 bit Ethernet number ADDR to HOSTNAME */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,ether_ntohost,(char *__hostname, struct ether_addr const *__addr),(__hostname,__addr))

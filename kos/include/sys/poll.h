@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2992a033 */
+/* HASH CRC-32:0xfb415549 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll,(struct pollfd *__fds, nf
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll,(struct pollfd *__fds, nfds_t __nfds, struct timespec const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll64) || defined(__CRT_HAVE_ppoll)
 #include <local/sys.poll/ppoll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ppoll, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL ppoll)(struct pollfd *__fds, nfds_t __nfds, struct timespec const *__timeout, struct __sigset_struct const *__ss) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ppoll))(__fds, __nfds, __timeout, __ss); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ppoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL ppoll)(struct pollfd *__fds, nfds_t __nfds, struct timespec const *__timeout, struct __sigset_struct const *__ss) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ppoll))(__fds, __nfds, __timeout, __ss); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -165,7 +165,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll64,(struct pollfd *__fds, 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll64,(struct pollfd *__fds, nfds_t __nfds, struct timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll)
 #include <local/sys.poll/ppoll64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ppoll64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL ppoll64)(struct pollfd *__fds, nfds_t __nfds, struct timespec64 const *__timeout, struct __sigset_struct const *__ss) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ppoll64))(__fds, __nfds, __timeout, __ss); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ppoll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL ppoll64)(struct pollfd *__fds, nfds_t __nfds, struct timespec64 const *__timeout, struct __sigset_struct const *__ss) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ppoll64))(__fds, __nfds, __timeout, __ss); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */

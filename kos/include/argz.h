@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57e38563 */
+/* HASH CRC-32:0x49c10c68 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_create,(char *c
 /* Make a '\0' separated arg vector from a unix argv vector, returning it in
  * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
  * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_create, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_create)(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create))(___argv, __pargz, __pargz_len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_create, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_create)(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create))(___argv, __pargz, __pargz_len); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_create
 /* Make a '\0' separated arg vector from a unix argv vector, returning it in
@@ -109,7 +109,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_create,(char *
 /* Make a '\0' separated arg vector from a unix argv vector, returning it in
  * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
  * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
-__FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_create)(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create))(___argv, __pargz, __pargz_len); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_create)(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create))(___argv, __pargz, __pargz_len); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_create_sep
 /* Make a '\0' separated arg vector from a `SEP' separated list in
@@ -129,7 +129,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(cha
  * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
  * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
  * The result can be destroyed using `free()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_create_sep, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_create_sep)(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create_sep))(__string, __sep, __pargz, __pargz_len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_create_sep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_create_sep)(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create_sep))(__string, __sep, __pargz, __pargz_len); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_create_sep
 /* Make a '\0' separated arg vector from a `SEP' separated list in
@@ -149,7 +149,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(ch
  * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
  * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
  * The result can be destroyed using `free()' */
-__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_create_sep)(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create_sep))(__string, __sep, __pargz, __pargz_len); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_create_sep)(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create_sep))(__string, __sep, __pargz, __pargz_len); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_count
 /* Returns the number of strings in `ARGZ'
@@ -163,7 +163,7 @@ __CREDIRECT(__ATTR_PURE,size_t,__NOTHROW_NCX,argz_count,(char const *__argz, siz
 #include <local/argz/argz_count.h>
 /* Returns the number of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_count, __FORCELOCAL __ATTR_PURE size_t __NOTHROW_NCX(__LIBCCALL argz_count)(char const *__argz, size_t __argz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_count))(__argz, __argz_len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_count, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE size_t __NOTHROW_NCX(__LIBCCALL argz_count)(char const *__argz, size_t __argz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_count))(__argz, __argz_len); })
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_count
 /* Returns the number of strings in `ARGZ'
@@ -177,7 +177,7 @@ __CDECLARE(__ATTR_PURE,size_t,__NOTHROW_NCX,__argz_count,(char const *__argz, si
 #include <local/argz/argz_count.h>
 /* Returns the number of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
-__FORCELOCAL __ATTR_PURE size_t __NOTHROW_NCX(__LIBCCALL __argz_count)(char const *__argz, size_t __argz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_count))(__argz, __argz_len); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE size_t __NOTHROW_NCX(__LIBCCALL __argz_count)(char const *__argz, size_t __argz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_count))(__argz, __argz_len); }
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_extract
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
@@ -215,15 +215,15 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char const *
 extern "C++" {
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
-__FORCELOCAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
-__FORCELOCAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_extract, __FORCELOCAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_extract, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_extract
@@ -262,15 +262,15 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char const 
 extern "C++" {
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
-__FORCELOCAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
-__FORCELOCAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
-__FORCELOCAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_stringify
@@ -285,7 +285,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,argz_stringify,(char *__argz, size_t __len, int 
 #include <local/argz/argz_stringify.h>
 /* Make '\0' separated arg vector `ARGZ' printable by converting
  * all the '\0's except the last into the character `SEP' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_stringify, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL argz_stringify)(char *__argz, size_t __len, int __sep) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_stringify))(__argz, __len, __sep); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_stringify, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL argz_stringify)(char *__argz, size_t __len, int __sep) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_stringify))(__argz, __len, __sep); })
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_stringify
 /* Make '\0' separated arg vector `ARGZ' printable by converting
@@ -299,7 +299,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,__argz_stringify,(char *__argz, size_t __len, int
 #include <local/argz/argz_stringify.h>
 /* Make '\0' separated arg vector `ARGZ' printable by converting
  * all the '\0's except the last into the character `SEP' */
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL __argz_stringify)(char *__argz, size_t __len, int __sep) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_stringify))(__argz, __len, __sep); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL __argz_stringify)(char *__argz, size_t __len, int __sep) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_stringify))(__argz, __len, __sep); }
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_append
 /* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -310,7 +310,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,argz_append,(char **__r
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_append.h>
 /* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_append, __FORCELOCAL __ATTR_NONNULL((1, 2)) error_t __NOTHROW_NCX(__LIBCCALL argz_append)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_append))(__pargz, __pargz_len, __buf, __buf_len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_append, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) error_t __NOTHROW_NCX(__LIBCCALL argz_append)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_append))(__pargz, __pargz_len, __buf, __buf_len); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_append
 /* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -321,7 +321,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,__argz_append,(char **_
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_append.h>
 /* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) error_t __NOTHROW_NCX(__LIBCCALL __argz_append)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_append))(__pargz, __pargz_len, __buf, __buf_len); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) error_t __NOTHROW_NCX(__LIBCCALL __argz_append)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_append))(__pargz, __pargz_len, __buf, __buf_len); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -332,7 +332,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add,(char **__r
 #elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add.h>
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_add, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_add)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add))(__pargz, __pargz_len, __str); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_add)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add))(__pargz, __pargz_len, __str); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -343,7 +343,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add,(char **__
 #elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add.h>
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
-__FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_add)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add))(__pargz, __pargz_len, __str); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_add)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add))(__pargz, __pargz_len, __str); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add_sep
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -354,7 +354,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char *
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add_sep.h>
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_add_sep, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_add_sep)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add_sep))(__pargz, __pargz_len, __string, __sep); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_add_sep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_add_sep)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add_sep))(__pargz, __pargz_len, __string, __sep); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add_sep
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -365,7 +365,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char 
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add_sep.h>
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
-__FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_add_sep)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add_sep))(__pargz, __pargz_len, __string, __sep); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_add_sep)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add_sep))(__pargz, __pargz_len, __string, __sep); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_delete
 /* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
@@ -385,7 +385,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,argz_delete,(char **__rest
  * Note that `ENTRY' must be the actual pointer to one of the elements
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_delete, __FORCELOCAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL argz_delete)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_delete))(__pargz, __pargz_len, __entry); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL argz_delete)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_delete))(__pargz, __pargz_len, __entry); })
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_delete
 /* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
@@ -405,7 +405,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__argz_delete,(char **__re
  * Note that `ENTRY' must be the actual pointer to one of the elements
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL __argz_delete)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_delete))(__pargz, __pargz_len, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL __argz_delete)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_delete))(__pargz, __pargz_len, __entry); }
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_insert
 /* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
@@ -431,7 +431,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_insert,(char **
  * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
  * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
  * On success, `0' is returned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_insert, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_insert)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_insert))(__pargz, __pargz_len, __before, __entry); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_insert, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_insert)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_insert))(__pargz, __pargz_len, __before, __entry); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_insert
 /* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
@@ -457,7 +457,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_insert,(char *
  * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
  * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
  * On success, `0' is returned */
-__FORCELOCAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_insert)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_insert))(__pargz, __pargz_len, __before, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_insert)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_insert))(__pargz, __pargz_len, __before, __entry); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_replace
 /* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
@@ -474,7 +474,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_replace,(char *
 /* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
  * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
  * incremented by number of replacements performed */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_replace, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_replace, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_replace
 /* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
@@ -491,7 +491,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_replace,(char 
 /* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
  * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
  * incremented by number of replacements performed */
-__FORCELOCAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_next
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
@@ -585,7 +585,7 @@ extern "C++" {
  * >> char *entry;
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
  * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
@@ -596,7 +596,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next
  * >> char *entry;
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
@@ -609,7 +609,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL arg
  * >> char *entry;
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_next, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_next, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_next
@@ -704,7 +704,7 @@ extern "C++" {
  * >> char *entry;
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
  * are no more. If entry is NULL, then the first entry is returned. This
  * behavior allows two convenient iteration styles:
@@ -715,7 +715,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_ne
  * >> char *entry;
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
@@ -728,7 +728,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL __a
  * >> char *entry;
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fee24d7 */
+/* HASH CRC-32:0x2c671641 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,7 +301,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg))
 #else /* __CRT_HAVE_qsort_r */
 #include <local/stdlib/qsort_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __cmp, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __cmp, __arg); })
 #endif /* !__CRT_HAVE_qsort_r */
 #endif /* __USE_GNU */
 
@@ -323,11 +323,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_r,
 #include <local/stdlib/bsearch_r.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_r, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 #endif /* !__CRT_HAVE_bsearch_r */
 #endif /* __USE_KOS */
@@ -339,7 +339,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort,(void *__pbase, size_t _
 __NAMESPACE_STD_END
 #include <local/stdlib/qsort.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort))(__pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort))(__pbase, __item_count, __item_size, __cmp); })
 #endif /* !__CRT_HAVE_qsort */
 #ifdef __CRT_HAVE_bsearch
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
@@ -356,11 +356,11 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 #endif /* !__CRT_HAVE_bsearch */
 #if __has_builtin(__builtin_labs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_labs)
@@ -379,7 +379,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),_abs64,(_
 __NAMESPACE_STD_END
 #include <local/stdlib/labs.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(labs, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL labs)(long __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(labs))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(labs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL labs)(long __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(labs))(__x); })
 #endif /* !... */
 #ifdef __USE_ISOC99
 #if __has_builtin(__builtin_llabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llabs)
@@ -398,7 +398,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llabs,(__LONGLONG _
 __NAMESPACE_STD_END
 #include <local/stdlib/llabs.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(llabs, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llabs)(__LONGLONG __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(llabs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llabs)(__LONGLONG __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))(__x); })
 #endif /* !... */
 #endif /* __USE_ISOC99 */
 #ifdef __CRT_HAVE_ldiv
@@ -413,7 +413,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,ldiv,
 __NAMESPACE_STD_END
 #include <local/stdlib/ldiv.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(ldiv, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL ldiv)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL ldiv)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); })
 #endif /* !... */
 #ifdef __USE_ISOC99
 #ifdef __CRT_HAVE_lldiv
@@ -428,7 +428,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,lldi
 __NAMESPACE_STD_END
 #include <local/stdlib/lldiv.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(lldiv, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL lldiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lldiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL lldiv)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); })
 #endif /* !... */
 #endif /* __USE_ISOC99 */
 #if __has_builtin(__builtin_abs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abs)
@@ -447,7 +447,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),_abs64,(__x)
 __NAMESPACE_STD_END
 #include <local/stdlib/abs.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(abs, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL abs)(int __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abs))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(abs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL abs)(int __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abs))(__x); })
 #endif /* !... */
 #ifdef __CRT_HAVE_div
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),(__numer,__denom))
@@ -461,7 +461,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(i
 __NAMESPACE_STD_END
 #include <local/stdlib/div.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(div, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __div_struct __NOTHROW_NCX(__LIBCCALL div)(int __numer, int __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(div))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(div, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __div_struct __NOTHROW_NCX(__LIBCCALL div)(int __numer, int __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(div))(__numer, __denom); })
 #endif /* !... */
 #ifdef __cplusplus
 #ifdef __CORRECT_ISO_CPP_STDLIB_H_PROTO
@@ -484,7 +484,7 @@ __NAMESPACE_STD_END
 #include <local/stdlib/labs.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL abs)(long __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(labs))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL abs)(long __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(labs))(__x); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ldiv
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
@@ -500,7 +500,7 @@ __NAMESPACE_STD_END
 #include <local/stdlib/ldiv.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL div)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL div)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); }
 #endif /* !... */
 } /* extern "C++" */
 #if defined(__USE_ISOC99) && defined(__COMPILER_HAVE_LONGLONG)
@@ -523,7 +523,7 @@ __NAMESPACE_STD_END
 #include <local/stdlib/llabs.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL abs)(__LONGLONG __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL abs)(__LONGLONG __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))(__x); }
 #endif /* !... */
 #ifdef __CRT_HAVE_lldiv
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
@@ -539,7 +539,7 @@ __NAMESPACE_STD_END
 #include <local/stdlib/lldiv.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __USE_ISOC99 && __COMPILER_HAVE_LONGLONG */
@@ -562,7 +562,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Absolute value of X */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL abs)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL abs)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
@@ -580,7 +580,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Absolute value of X */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL abs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL abs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); }
 #endif /* !... */
 } /* extern "C++" */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -601,7 +601,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Absolute value of X */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL abs)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL abs)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -614,7 +614,7 @@ __CDECLARE(,int,__NOTHROW_NCX,mblen,(char const *__str, size_t __maxlen),(__str,
 __NAMESPACE_STD_END
 #include <local/stdlib/mblen.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(mblen, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL mblen)(char const *__str, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mblen))(__str, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mblen, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL mblen)(char const *__str, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mblen))(__str, __maxlen); })
 #endif /* !__CRT_HAVE_mblen */
 #ifdef __CRT_HAVE_mbtowc
 __CDECLARE(,int,__NOTHROW_NCX,mbtowc,(wchar_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),(__pwc,__str,__maxlen))
@@ -622,7 +622,7 @@ __CDECLARE(,int,__NOTHROW_NCX,mbtowc,(wchar_t *__restrict __pwc, char const *__r
 __NAMESPACE_STD_END
 #include <local/stdlib/mbtowc.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(mbtowc, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL mbtowc)(wchar_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbtowc))(__pwc, __str, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mbtowc, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL mbtowc)(wchar_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbtowc))(__pwc, __str, __maxlen); })
 #endif /* !__CRT_HAVE_mbtowc */
 #ifdef __CRT_HAVE_wctomb
 __CDECLARE(,int,__NOTHROW_NCX,wctomb,(char *__str, wchar_t __wc),(__str,__wc))
@@ -630,7 +630,7 @@ __CDECLARE(,int,__NOTHROW_NCX,wctomb,(char *__str, wchar_t __wc),(__str,__wc))
 __NAMESPACE_STD_END
 #include <local/stdlib/wctomb.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(wctomb, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL wctomb)(char *__str, wchar_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb))(__str, __wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wctomb, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL wctomb)(char *__str, wchar_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb))(__str, __wc); })
 #endif /* !__CRT_HAVE_wctomb */
 #ifdef __CRT_HAVE_mbstowcs
 __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstowcs,(wchar_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),(__dst,__src,__dstlen))
@@ -638,7 +638,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstowcs,(wchar_t *__rest
 __NAMESPACE_STD_END
 #include <local/stdlib/mbstowcs.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(mbstowcs, __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL mbstowcs)(wchar_t *__restrict __dst, char const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs))(__dst, __src, __dstlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mbstowcs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL mbstowcs)(wchar_t *__restrict __dst, char const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs))(__dst, __src, __dstlen); })
 #endif /* !__CRT_HAVE_mbstowcs */
 #ifdef __CRT_HAVE_wcstombs
 __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,wcstombs,(char *__restrict __dst, wchar_t const *__restrict __src, size_t __dstlen),(__dst,__src,__dstlen))
@@ -646,7 +646,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,wcstombs,(char *__restric
 __NAMESPACE_STD_END
 #include <local/stdlib/wcstombs.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL wcstombs)(char *__restrict __dst, wchar_t const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs))(__dst, __src, __dstlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL wcstombs)(char *__restrict __dst, wchar_t const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs))(__dst, __src, __dstlen); })
 #endif /* !__CRT_HAVE_wcstombs */
 #ifndef __std_system_defined
 #define __std_system_defined 1
@@ -674,7 +674,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 __NAMESPACE_STD_END
 #include <local/stdlib/abort.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
 #else /* ... */
 #undef __std_abort_defined
 #endif /* !... */
@@ -745,7 +745,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC
 __NAMESPACE_STD_END
 #include <local/stdlib/malloc.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(malloc, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL malloc)(size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))(__num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL malloc)(size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))(__num_bytes); })
 #else /* ... */
 #undef __std_malloc_defined
 #endif /* !... */
@@ -762,7 +762,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC
 __NAMESPACE_STD_END
 #include <local/stdlib/calloc.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __count, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(calloc))(__count, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __count, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(calloc))(__count, __num_bytes); })
 #else /* ... */
 #undef __std_calloc_defined
 #endif /* !... */
@@ -801,7 +801,7 @@ __CREDIRECT_VOID(,__NOTHROW,srand,(long __seed),srandom,(__seed))
 __NAMESPACE_STD_END
 #include <local/stdlib/srand.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(srand, __FORCELOCAL void __NOTHROW(__LIBCCALL srand)(long __seed) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(srand))(__seed); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(srand, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL srand)(long __seed) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(srand))(__seed); })
 #endif /* !... */
 #ifdef __CRT_HAVE_rand
 __CDECLARE(,int,__NOTHROW,rand,(void),())
@@ -811,7 +811,7 @@ __CREDIRECT(,int,__NOTHROW,rand,(void),random,())
 __NAMESPACE_STD_END
 #include <local/stdlib/rand.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(rand, __FORCELOCAL int __NOTHROW(__LIBCCALL rand)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rand, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW(__LIBCCALL rand)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand))(); })
 #endif /* !... */
 #ifdef __CRT_HAVE_atoi
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,atoi,(char const *__restrict __nptr),(__nptr))
@@ -823,7 +823,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ato
 __NAMESPACE_STD_END
 #include <local/stdlib/atoi.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(atoi, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL atoi)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atoi))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL atoi)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atoi))(__nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE_atol
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,atol,(char const *__restrict __nptr),(__nptr))
@@ -835,7 +835,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,at
 __NAMESPACE_STD_END
 #include <local/stdlib/atol.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(atol, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL atol)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atol))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL atol)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atol))(__nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE_atoll
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,atoll,(char const *__restrict __nptr),(__nptr))
@@ -847,7 +847,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_
 __NAMESPACE_STD_END
 #include <local/stdlib/atoll.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(atoll, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL atoll)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atoll))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL atoll)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atoll))(__nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoul
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
@@ -867,7 +867,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul,
 __NAMESPACE_STD_END
 #include <local/stdlib/strtoul.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoul, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtol
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
@@ -887,17 +887,17 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol,(char cons
 __NAMESPACE_STD_END
 #include <local/stdlib/strto32.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
 #elif __SIZEOF_LONG__ == 8
 __NAMESPACE_STD_END
 #include <local/stdlib/strto64.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <local/stdlib/strtol.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtol, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __ULONGLONG
 #ifdef __USE_ISOC99
@@ -923,17 +923,17 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull,(
 __NAMESPACE_STD_END
 #include <local/stdlib/strtou64.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
 #elif __SIZEOF_LONG__ == 4
 __NAMESPACE_STD_END
 #include <local/stdlib/strtou32.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <local/stdlib/strtoull.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoull, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__std_strtoull_defined */
 #ifndef __std_strtoll_defined
@@ -958,17 +958,17 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll,(ch
 __NAMESPACE_STD_END
 #include <local/stdlib/strto64.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
 #elif __SIZEOF_LONG__ == 4
 __NAMESPACE_STD_END
 #include <local/stdlib/strto32.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <local/stdlib/strtoll.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoll, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__std_strtoll_defined */
 #endif /* __USE_ISOC99 */
@@ -980,7 +980,7 @@ __CDECLARE(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,a
 __NAMESPACE_STD_END
 #include <local/stdlib/atof.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(atof, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL atof)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atof))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL atof)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atof))(__nptr); })
 #endif /* !__CRT_HAVE_atof */
 #ifdef __CRT_HAVE_strtod
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
@@ -990,7 +990,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod,(char co
 __NAMESPACE_STD_END
 #include <local/stdlib/strtod.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtod, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL strtod)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod))(__nptr, __endptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL strtod)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod))(__nptr, __endptr); })
 #endif /* !... */
 #ifdef __USE_ISOC99
 #ifndef __std_strtof_defined
@@ -1003,7 +1003,7 @@ __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof,(char cons
 __NAMESPACE_STD_END
 #include <local/stdlib/strtof.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof))(__nptr, __endptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__std_strtof_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -1019,7 +1019,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,strtold,(
 __NAMESPACE_STD_END
 #include <local/stdlib/strtold.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold))(__nptr, __endptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold)(char const *__restrict __nptr, char **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__std_strtold_defined */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1040,7 +1040,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE(
 __NAMESPACE_STD_END
 #include <local/malloc/memalign.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(size_t __alignment, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __n_bytes); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(size_t __alignment, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __n_bytes); }
 #else /* ... */
 #undef __std_aligned_alloc_defined
 #endif /* !... */
@@ -1182,13 +1182,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(cha
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #elif __SIZEOF_LONG__ == 8
 #include <local/stdlib/strto64.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
 #elif __SIZEOF_LONG__ == 4
 #include <local/stdlib/strto32.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); }
 #else /* ... */
 #include <local/stdlib/strtoll.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoull
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoull,(__nptr,__endptr,__base))
@@ -1206,13 +1206,13 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(c
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #elif __SIZEOF_LONG__ == 8
 #include <local/stdlib/strtou64.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
 #elif __SIZEOF_LONG__ == 4
 #include <local/stdlib/strtou32.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); }
 #else /* ... */
 #include <local/stdlib/strtoull.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* __ULONGLONG */
 #endif /* __USE_MISC */
@@ -1229,7 +1229,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/stdlib/strtou32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtou32, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou32)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtou32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou32)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto32
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
@@ -1243,7 +1243,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/stdlib/strto32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strto32, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strto32)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strto32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strto32)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __UINT64_TYPE__
 #ifdef __CRT_HAVE_strtou64
@@ -1260,7 +1260,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/stdlib/strtou64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtou64, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtou64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
@@ -1276,7 +1276,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/stdlib/strto64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strto64, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strto64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strto64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strto64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
 
@@ -1303,7 +1303,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,strtou32_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/stdlib/strtou32_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtou32_l, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou32_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtou32_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou32_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto32_l
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
@@ -1327,7 +1327,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,strto32_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/stdlib/strto32_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strto32_l, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strto32_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strto32_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL strto32_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #ifdef __UINT64_TYPE__
 #ifdef __CRT_HAVE_strtou64_l
@@ -1354,7 +1354,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,strtou64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/stdlib/strtou64_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtou64_l, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtou64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64_l
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
@@ -1380,7 +1380,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,strto64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/stdlib/strto64_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strto64_l, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strto64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strto64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL strto64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
 #endif /* __USE_XOPEN2K8 */
@@ -1396,7 +1396,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,gcvt,(double 
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,gcvt,(double __val, int __ndigit, char *__buf),_gcvt,(__val,__ndigit,__buf))
 #else /* ... */
 #include <local/stdlib/gcvt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gcvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL gcvt)(double __val, int __ndigit, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gcvt))(__val, __ndigit, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL gcvt)(double __val, int __ndigit, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gcvt))(__val, __ndigit, __buf); })
 #endif /* !... */
 #endif /* !__NO_FPU */
 #endif /* ... */
@@ -1407,13 +1407,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gcvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL
 __CDECLARE(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* __CRT_HAVE_ecvt_r */
 #include <local/stdlib/ecvt_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ecvt_r, __FORCELOCAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL ecvt_r)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ecvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL ecvt_r)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
 #endif /* !__CRT_HAVE_ecvt_r */
 #ifdef __CRT_HAVE_fcvt_r
 __CDECLARE(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,fcvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* __CRT_HAVE_fcvt_r */
 #include <local/stdlib/fcvt_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fcvt_r, __FORCELOCAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL fcvt_r)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fcvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL fcvt_r)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
 #endif /* !__CRT_HAVE_fcvt_r */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_qgcvt
@@ -1422,19 +1422,19 @@ __CDECLARE(__ATTR_NONNULL((3)),char *,__NOTHROW_NCX,qgcvt,(__LONGDOUBLE __val, i
 __CREDIRECT(__ATTR_NONNULL((3)),char *,__NOTHROW_NCX,qgcvt,(__LONGDOUBLE __val, int __ndigit, char *__buf),_gcvt,(__val,__ndigit,__buf))
 #else /* ... */
 #include <local/stdlib/qgcvt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qgcvt, __FORCELOCAL __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL qgcvt)(__LONGDOUBLE __val, int __ndigit, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qgcvt))(__val, __ndigit, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qgcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL qgcvt)(__LONGDOUBLE __val, int __ndigit, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qgcvt))(__val, __ndigit, __buf); })
 #endif /* !... */
 #ifdef __CRT_HAVE_qecvt_r
 __CDECLARE(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,qecvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* __CRT_HAVE_qecvt_r */
 #include <local/stdlib/qecvt_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qecvt_r, __FORCELOCAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL qecvt_r)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qecvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qecvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL qecvt_r)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qecvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
 #endif /* !__CRT_HAVE_qecvt_r */
 #ifdef __CRT_HAVE_qfcvt_r
 __CDECLARE(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,qfcvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* __CRT_HAVE_qfcvt_r */
 #include <local/stdlib/qfcvt_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qfcvt_r, __FORCELOCAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL qfcvt_r)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qfcvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qfcvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4, 5)) int __NOTHROW_NCX(__LIBCCALL qfcvt_r)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qfcvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
 #endif /* !__CRT_HAVE_qfcvt_r */
 #ifdef __CRT_HAVE_qecvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,qecvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
@@ -1442,7 +1442,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,qecvt,(__L
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,qecvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <local/stdlib/qecvt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qecvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL qecvt)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qecvt))(__val, __ndigit, __decptr, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qecvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL qecvt)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qecvt))(__val, __ndigit, __decptr, __sign); })
 #endif /* !... */
 #ifdef __CRT_HAVE_qfcvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,qfcvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
@@ -1450,7 +1450,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,qfcvt,(__L
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,qfcvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_fcvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <local/stdlib/qfcvt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qfcvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL qfcvt)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qfcvt))(__val, __ndigit, __decptr, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qfcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL qfcvt)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qfcvt))(__val, __ndigit, __decptr, __sign); })
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
@@ -1522,7 +1522,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char *
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpmatch,(char const *__response),(__response))
 #else /* __CRT_HAVE_rpmatch */
 #include <local/stdlib/rpmatch.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(rpmatch, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rpmatch)(char const *__response) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rpmatch))(__response); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rpmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rpmatch)(char const *__response) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rpmatch))(__response); })
 #endif /* !__CRT_HAVE_rpmatch */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_mkstemps64
@@ -1539,7 +1539,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps64,(cha
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,rand_r,(unsigned int *__restrict __pseed),(__pseed))
 #else /* __CRT_HAVE_rand_r */
 #include <local/stdlib/rand_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(rand_r, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rand_r)(unsigned int *__restrict __pseed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand_r))(__pseed); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rand_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL rand_r)(unsigned int *__restrict __pseed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand_r))(__pseed); })
 #endif /* !__CRT_HAVE_rand_r */
 #endif /* __USE_POSIX */
 
@@ -1570,7 +1570,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], int __nelem),(
 __CDECLARE(__ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,valloc,(__SIZE_TYPE__ __n_bytes),(__n_bytes))
 #elif defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/malloc/valloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(valloc, __FORCELOCAL __ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL valloc)(__SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(valloc))(__n_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(valloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL valloc)(__SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(valloc))(__n_bytes); })
 #else /* ... */
 #undef __valloc_defined
 #endif /* !... */
@@ -1587,7 +1587,7 @@ __CEIDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_memalign,(void **__rest
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),(__pp,__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #include <local/malloc/posix_memalign.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_memalign, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL posix_memalign)(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_memalign))(__pp, __alignment, __n_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_memalign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL posix_memalign)(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_memalign))(__pp, __alignment, __n_bytes); })
 #else /* ... */
 #undef __posix_memalign_defined
 #endif /* !... */
@@ -1618,7 +1618,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(size_t __alignment, size_t __n_bytes),(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_posix_memalign)
 #include <local/malloc/memalign.h>
-__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(size_t __alignment, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __n_bytes); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(size_t __alignment, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __n_bytes); }
 #else /* ... */
 #undef __aligned_alloc_defined
 #endif /* !... */
@@ -1663,7 +1663,7 @@ __CDECLARE(,long,__NOTHROW_NCX,random,(void),())
 __CREDIRECT(,long,__NOTHROW_NCX,random,(void),rand,())
 #else /* ... */
 #include <local/stdlib/random.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(random, __FORCELOCAL long __NOTHROW_NCX(__LIBCCALL random)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(random))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(random, __FORCELOCAL __ATTR_ARTIFICIAL long __NOTHROW_NCX(__LIBCCALL random)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(random))(); })
 #endif /* !... */
 #ifdef __CRT_HAVE_srandom
 __CDECLARE_VOID(,__NOTHROW_NCX,srandom,(unsigned int __seed),(__seed))
@@ -1671,7 +1671,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,srandom,(unsigned int __seed),(__seed))
 __CREDIRECT_VOID(,__NOTHROW_NCX,srandom,(unsigned int __seed),srand,(__seed))
 #else /* ... */
 #include <local/stdlib/srandom.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(srandom, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL srandom)(unsigned int __seed) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(srandom))(__seed); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(srandom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL srandom)(unsigned int __seed) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(srandom))(__seed); })
 #endif /* !... */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,initstate,(unsigned int __seed, char *__statebuf, __SIZE_TYPE__ __statelen),(__seed,__statebuf,__statelen))
 __CDECLARE_OPT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,setstate,(char *__statebuf),(__statebuf))
@@ -1732,13 +1732,13 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpath
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setenv,(char const *__varname, char const *__val, int __replace),(__varname,__val,__replace))
 #elif defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s)
 #include <local/stdlib/setenv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(setenv, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL setenv)(char const *__varname, char const *__val, int __replace) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setenv))(__varname, __val, __replace); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(setenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL setenv)(char const *__varname, char const *__val, int __replace) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setenv))(__varname, __val, __replace); })
 #endif /* ... */
 #ifdef __CRT_HAVE_unsetenv
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,unsetenv,(char const *__varname),(__varname))
 #elif defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
 #include <local/stdlib/unsetenv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL unsetenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unsetenv))(__varname); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL unsetenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unsetenv))(__varname); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 
@@ -1769,7 +1769,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,ecvt,(doub
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,ecvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <local/stdlib/ecvt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ecvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL ecvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt))(__val, __ndigit, __decptr, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ecvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL ecvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt))(__val, __ndigit, __decptr, __sign); })
 #endif /* !... */
 #ifdef __CRT_HAVE_fcvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,fcvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
@@ -1777,7 +1777,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,fcvt,(doub
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,fcvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <local/stdlib/fcvt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fcvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL fcvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt))(__val, __ndigit, __decptr, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL fcvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt))(__val, __ndigit, __decptr, __sign); })
 #endif /* !... */
 #endif /* !__NO_FPU */
 #endif /* ... */
@@ -1786,7 +1786,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fcvt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,getsubopt,(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep),(__optionp,__tokens,__valuep))
 #else /* __CRT_HAVE_getsubopt */
 #include <local/stdlib/getsubopt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getsubopt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL getsubopt)(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getsubopt))(__optionp, __tokens, __valuep); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getsubopt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL getsubopt)(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getsubopt))(__optionp, __tokens, __valuep); })
 #endif /* !__CRT_HAVE_getsubopt */
 #if defined(__CRT_HAVE_mkstemp64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),mkstemp64,(__template_))
@@ -1796,7 +1796,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *_
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),mkstemp64,(__template_))
 #elif defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #include <local/stdlib/mkstemp.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemp, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mkstemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemp))(__template_); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mkstemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemp))(__template_); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_mkstemp64
@@ -1805,7 +1805,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp64,(char 
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp64,(char *__template_),mkstemp,(__template_))
 #elif defined(__CRT_HAVE_mkstemp) || defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #include <local/stdlib/mkstemp64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemp64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mkstemp64)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemp64))(__template_); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemp64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mkstemp64)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemp64))(__template_); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
@@ -1862,13 +1862,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol_l,(char const *__restr
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG__ == 4
 #include <local/stdlib/strto32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG__ == 8
 #include <local/stdlib/strto64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtol_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtol_l, __FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtol_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoul_l
 __CDECLARE(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
@@ -1894,13 +1894,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char cons
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG__ == 4
 #include <local/stdlib/strtou32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG__ == 8
 #include <local/stdlib/strtou64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtoul_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoul_l, __FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoul_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE_strtoll_l
@@ -1927,13 +1927,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG_LONG__ == 4
 #include <local/stdlib/strto64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG_LONG__ == 8
 #include <local/stdlib/strto32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtoll_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoll_l, __FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoull_l
 __CDECLARE(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
@@ -1953,13 +1953,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG_LONG__ == 4
 #include <local/stdlib/strtou64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG_LONG__ == 8
 #include <local/stdlib/strtou32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtoull_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoull_l, __FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull_l))(__nptr, __endptr, __base, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoull_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
 #endif /* __LONGLONG */
 #ifndef __NO_FPU
@@ -1977,7 +1977,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod_l,(char const *__res
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/stdlib/strtod_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtod_l, __FORCELOCAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL strtod_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod_l))(__nptr, __endptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtod_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL strtod_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod_l))(__nptr, __endptr, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtof_l
 __CDECLARE(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
@@ -1987,7 +1987,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof_l,(char const *__rest
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtof_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/stdlib/strtof_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtof_l, __FORCELOCAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof_l))(__nptr, __endptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtof_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof_l))(__nptr, __endptr, __locale); })
 #endif /* !... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_strtold_l
@@ -2004,7 +2004,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/stdlib/strtold_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtold_l, __FORCELOCAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold_l))(__nptr, __endptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtold_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold_l))(__nptr, __endptr, __locale); })
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
@@ -2055,7 +2055,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemps64,(ch
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/malloc/reallocarray.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarray)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarray)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); })
 #else /* ... */
 #undef __reallocarray_defined
 #endif /* !... */
@@ -2069,7 +2069,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_MALL_DEFAULT_A
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,recalloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <local/malloc/recalloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recalloc))(__mallptr, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recalloc))(__mallptr, __num_bytes); })
 #else /* ... */
 #undef __recalloc_defined
 #endif /* !... */
@@ -2080,7 +2080,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGN
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/malloc/reallocarray.h>
-__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocv)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocv)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
 #else /* ... */
 #undef __reallocv_defined
 #endif /* !... */
@@ -2093,7 +2093,7 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),_recalloc,(__mallptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <local/malloc/recallocv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(recallocv, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recallocv)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recallocv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recallocv)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); })
 #else /* ... */
 #undef __recallocv_defined
 #endif /* !... */
@@ -2132,7 +2132,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __
 } /* extern "C++" */
 #include <local/malloc/reallocarray.h>
 extern "C++" {
-__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
 #endif /* ... */
 #ifdef __CRT_HAVE_recallocv
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,recalloc,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),recallocv,(__mallptr,__elem_count,__elem_size))
@@ -2142,7 +2142,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3))
 } /* extern "C++" */
 #include <local/malloc/recallocv.h>
 extern "C++" {
-__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL recalloc)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); }
 #endif /* ... */
 } /* extern "C++" */
 #else /* __cplusplus */
@@ -2180,7 +2180,7 @@ __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdlib/reallocf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
 #endif /* ... */
 #ifdef __CRT_HAVE_recallocarray
 /* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
@@ -2192,7 +2192,7 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),
 /* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
 #endif /* ... */
 #ifdef __CRT_HAVE_freezero
 /* Same as `free(mallptr)', but also ensure that the memory region
@@ -2206,7 +2206,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,freezero,(void *__mallptr, __SIZE_TYPE__ __num_by
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL freezero)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(freezero))(__mallptr, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL freezero)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(freezero))(__mallptr, __num_bytes); })
 #endif /* ... */
 #endif /* __USE_BSD */
 
@@ -2463,7 +2463,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 #ifdef __LOCAL_program_invocation_name_p
 #include <local/stdlib/__p__pgmptr.h>
 /* Alias for argv[0], as passed to main() */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
 #else /* __LOCAL_program_invocation_name_p */
 #undef ____p__pgmptr_defined
 #endif /* !__LOCAL_program_invocation_name_p */
@@ -2538,14 +2538,14 @@ __CDECLARE(,errno_t,__NOTHROW_NCX,_get_pgmptr,(char **__pvalue),(__pvalue))
 #include <local/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name
 #include <local/stdlib/_get_pgmptr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_get_pgmptr, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _get_pgmptr)(char **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_pgmptr))(__pvalue); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_get_pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _get_pgmptr)(char **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_pgmptr))(__pvalue); })
 #endif /* __LOCAL_program_invocation_name */
 #endif /* !__CRT_HAVE__get_pgmptr */
 #ifdef __CRT_HAVE__get_wpgmptr
 __CDECLARE(,errno_t,__NOTHROW_NCX,_get_wpgmptr,(wchar_t **__pvalue),(__pvalue))
 #elif defined(__CRT_HAVE___p__wpgmptr)
 #include <local/stdlib/_get_wpgmptr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_get_wpgmptr, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _get_wpgmptr)(wchar_t **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_wpgmptr))(__pvalue); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_get_wpgmptr, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _get_wpgmptr)(wchar_t **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_wpgmptr))(__pvalue); })
 #endif /* ... */
 
 #ifdef __CRT_HAVE__fmode
@@ -2583,13 +2583,13 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),imaxabs,(__x))
 #elif __SIZEOF_INT__ == 8
 #include <local/stdlib/abs.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__INT64_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abs))((int)__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__INT64_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abs))((int)__x); }
 #elif __SIZEOF_LONG_LONG__ == 8
 #include <local/stdlib/llabs.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__INT64_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))((__LONGLONG)__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__INT64_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))((__LONGLONG)__x); }
 #else /* ... */
 #include <local/stdlib/_abs64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_abs64, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_abs64))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_abs64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_abs64))(__x); })
 #endif /* !... */
 #endif /* !_MSC_VER */
 #endif /* __INT64_TYPE__ */
@@ -2598,7 +2598,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_abs64, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,_atof_l,(char const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
 #else /* __CRT_HAVE__atof_l */
 #include <local/stdlib/_atof_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atof_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _atof_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atof_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atof_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _atof_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atof_l))(__nptr, __locale); })
 #endif /* !__CRT_HAVE__atof_l */
 #endif /* !__NO_FPU */
 #ifdef __CRT_HAVE__atoi_l
@@ -2609,7 +2609,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_at
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_atoi_l,(char const *__restrict __nptr, __locale_t __locale),_atoll_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_atoi_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoi_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _atoi_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoi_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoi_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _atoi_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoi_l))(__nptr, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE__atol_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_atol_l,(char const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
@@ -2619,7 +2619,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__NOTHROW_NC
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_atol_l,(char const *__restrict __nptr, __locale_t __locale),_atoll_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_atol_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atol_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long int __NOTHROW_NCX(__LIBCCALL _atol_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atol_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atol_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long int __NOTHROW_NCX(__LIBCCALL _atol_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atol_l))(__nptr, __locale); })
 #endif /* !... */
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE__atoll_l
@@ -2630,7 +2630,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_atoll_l,(char const *__restrict __nptr, __locale_t __locale),_atoi_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_atoll_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _atoll_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoll_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _atoll_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoll_l))(__nptr, __locale); })
 #endif /* !... */
 #endif /* __LONGLONG */
 
@@ -2646,20 +2646,20 @@ extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__,__NOTHROW_NCX,_byteswap_ushort,(__UINT16_TYPE__ __val),(__val))
 #else /* __CRT_HAVE__byteswap_ushort */
 #include <local/stdlib/_byteswap_ushort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ushort, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_ushort)(__UINT16_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ushort))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ushort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_ushort)(__UINT16_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ushort))(__val); })
 #endif /* !__CRT_HAVE__byteswap_ushort */
 #ifdef __CRT_HAVE__byteswap_ulong
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,_byteswap_ulong,(__UINT32_TYPE__ __val),(__val))
 #else /* __CRT_HAVE__byteswap_ulong */
 #include <local/stdlib/_byteswap_ulong.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ulong, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_ulong)(__UINT32_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ulong))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_ulong, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_ulong)(__UINT32_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_ulong))(__val); })
 #endif /* !__CRT_HAVE__byteswap_ulong */
 #ifdef __UINT64_TYPE__
 #ifdef __CRT_HAVE__byteswap_uint64
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW_NCX,_byteswap_uint64,(__UINT64_TYPE__ __val),(__val))
 #else /* __CRT_HAVE__byteswap_uint64 */
 #include <local/stdlib/_byteswap_uint64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_uint64, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_uint64)(__UINT64_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_uint64))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_uint64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_uint64)(__UINT64_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_uint64))(__val); })
 #endif /* !__CRT_HAVE__byteswap_uint64 */
 #endif /* __UINT64_TYPE__ */
 #define _byteswap_ushort(x) __hybrid_bswap16(x)
@@ -2684,13 +2684,13 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_bsearch_s */
 #include <local/stdlib/bsearch_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_s)(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_s))(__key, __base, __elem_count, __elem_size, __compar, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_s)(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_s))(__key, __base, __elem_count, __elem_size, __compar, __arg); })
 #endif /* !__CRT_HAVE_bsearch_s */
 #ifdef __CRT_HAVE_qsort_s
 __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_s,(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg),(__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_qsort_s */
 #include <local/stdlib/qsort_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_s)(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_s))(__base, __elem_count, __elem_size, __compar, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_s)(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_s))(__base, __elem_count, __elem_size, __compar, __arg); })
 #endif /* !__CRT_HAVE_qsort_s */
 #endif  /* _CRT_ALGO_DEFINED */
 
@@ -2710,7 +2710,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_itoa,(int __val, char *__b
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_itoa,(int __val, char *__buf, int __radix),_i64toa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/itoa.h>
-__FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _itoa)(int __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(itoa))(__val, __buf, __radix); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _itoa)(int __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(itoa))(__val, __buf, __radix); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ltoa
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ltoa,(long __val, char *__buf, int __radix),ltoa,(__val,__buf,__radix))
@@ -2724,7 +2724,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ltoa,(long __val, char *__
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ltoa,(long __val, char *__buf, int __radix),_i64toa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/ltoa.h>
-__FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _ltoa)(long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ltoa))(__val, __buf, __radix); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _ltoa)(long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ltoa))(__val, __buf, __radix); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ultoa
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ultoa,(unsigned long __val, char *__buf, int __radix),ultoa,(__val,__buf,__radix))
@@ -2734,7 +2734,7 @@ __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ultoa,(unsigned long __val,
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ultoa,(unsigned long __val, char *__buf, int __radix),_ui64toa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/ultoa.h>
-__FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _ultoa)(unsigned long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ultoa))(__val, __buf, __radix); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _ultoa)(unsigned long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ultoa))(__val, __buf, __radix); }
 #endif /* !... */
 #ifdef __CRT_HAVE__itoa_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
@@ -2744,7 +2744,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_itoa_s,(int __val, char *
 __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 #include <local/stdlib/_itoa_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_itoa_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _itoa_s)(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itoa_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_itoa_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _itoa_s)(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itoa_s))(__val, __buf, __buflen, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE__ltoa_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
@@ -2754,7 +2754,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ltoa_s,(long __val, char 
 __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 #include <local/stdlib/_ltoa_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ltoa_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ltoa_s)(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltoa_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ltoa_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ltoa_s)(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltoa_s))(__val, __buf, __buflen, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE__ultoa_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
@@ -2762,7 +2762,7 @@ __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ultoa_s,(unsigned long __v
 __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 #include <local/stdlib/_ultoa_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ultoa_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ultoa_s)(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultoa_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ultoa_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ultoa_s)(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultoa_s))(__val, __buf, __buflen, __radix); })
 #endif /* !... */
 
 #ifdef __UINT64_TYPE__
@@ -2778,7 +2778,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_i64toa,(__INT64_TYPE__ __v
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_i64toa,(__INT64_TYPE__ __val, char *__buf, int __radix),_ltoa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/_i64toa.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_i64toa, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _i64toa)(__INT64_TYPE__ __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64toa))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_i64toa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _i64toa)(__INT64_TYPE__ __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64toa))(__val, __buf, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE__ui64toa
 __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ui64toa,(__UINT64_TYPE__ __val, char *__buf, int __radix),(__val,__buf,__radix))
@@ -2788,7 +2788,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ui64toa,(__UINT64_TYPE__ _
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_ui64toa,(__UINT64_TYPE__ __val, char *__buf, int __radix),_ultoa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/_ui64toa.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64toa, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _ui64toa)(__UINT64_TYPE__ __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64toa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _ui64toa)(__UINT64_TYPE__ __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa))(__val, __buf, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE__i64toa_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
@@ -2798,7 +2798,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_i64toa_s,(__INT64_TYPE__ 
 __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 #include <local/stdlib/_i64toa_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_i64toa_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _i64toa_s)(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64toa_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_i64toa_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _i64toa_s)(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64toa_s))(__val, __buf, __buflen, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE__ui64toa_s
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
@@ -2806,7 +2806,7 @@ __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ui64toa_s,(__UINT64_TYPE__
 __CREDIRECT(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 #include <local/stdlib/_ui64toa_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64toa_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ui64toa_s)(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64toa_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ui64toa_s)(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa_s))(__val, __buf, __buflen, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto64,(__nptr,__endptr,__base))
@@ -2822,7 +2822,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/stdlib/strto64.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoi64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoi64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtou64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou64,(__nptr,__endptr,__base))
@@ -2838,7 +2838,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strto
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/stdlib/strtou64.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoui64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoui64)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strto64_l
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strto64_l,(__nptr,__endptr,__base,__locale))
@@ -2864,7 +2864,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_strtoi64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/stdlib/strto64_l.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoi64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoi64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtou64_l
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtou64_l,(__nptr,__endptr,__base,__locale))
@@ -2890,7 +2890,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strto
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_strtoui64_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/stdlib/strtou64_l.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoui64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _strtoui64_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE__atoi64
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_atoi64,(char const *__restrict __nptr),(__nptr))
@@ -2902,7 +2902,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_atoi64,(char const *__restrict __nptr),atoll,(__nptr))
 #else /* ... */
 #include <local/stdlib/_atoi64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoi64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _atoi64)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoi64))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _atoi64)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoi64))(__nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE__atoi64_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_atoi64_l,(char const *__restrict __nptr, __locale_t __locale),(__nptr,__locale))
@@ -2914,74 +2914,74 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_atoi64_l,(char const *__restrict __nptr, __locale_t __locale),_atoll_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_atoi64_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoi64_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _atoi64_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoi64_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoi64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _atoi64_l)(char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoi64_l))(__nptr, __locale); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
 #ifdef __CRT_HAVE__mbstrlen
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_mbstrlen,(char const *__str),(__str))
 #else /* __CRT_HAVE__mbstrlen */
 #include <local/stdlib/_mbstrlen.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrlen, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrlen)(char const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrlen))(__str); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrlen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrlen)(char const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrlen))(__str); })
 #endif /* !__CRT_HAVE__mbstrlen */
 #ifdef __CRT_HAVE__mbstrnlen
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_mbstrnlen,(char const *__str, __SIZE_TYPE__ __maxlen),(__str,__maxlen))
 #else /* __CRT_HAVE__mbstrnlen */
 #include <local/stdlib/_mbstrnlen.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrnlen, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrnlen)(char const *__str, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrnlen))(__str, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrnlen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrnlen)(char const *__str, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrnlen))(__str, __maxlen); })
 #endif /* !__CRT_HAVE__mbstrnlen */
 #ifdef __CRT_HAVE__mbstrlen_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_mbstrlen_l,(char const *__str, __locale_t __locale),(__str,__locale))
 #else /* __CRT_HAVE__mbstrlen_l */
 #include <local/stdlib/_mbstrlen_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrlen_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrlen_l)(char const *__str, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrlen_l))(__str, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrlen_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrlen_l)(char const *__str, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrlen_l))(__str, __locale); })
 #endif /* !__CRT_HAVE__mbstrlen_l */
 #ifdef __CRT_HAVE__mbstrnlen_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_mbstrnlen_l,(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__str,__maxlen,__locale))
 #else /* __CRT_HAVE__mbstrnlen_l */
 #include <local/stdlib/_mbstrnlen_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrnlen_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrnlen_l)(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrnlen_l))(__str, __maxlen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstrnlen_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstrnlen_l)(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrnlen_l))(__str, __maxlen, __locale); })
 #endif /* !__CRT_HAVE__mbstrnlen_l */
 #ifdef __CRT_HAVE__mblen_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_mblen_l,(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__str,__maxlen,__locale))
 #else /* __CRT_HAVE__mblen_l */
 #include <local/stdlib/_mblen_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mblen_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _mblen_l)(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mblen_l))(__str, __maxlen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mblen_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _mblen_l)(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mblen_l))(__str, __maxlen, __locale); })
 #endif /* !__CRT_HAVE__mblen_l */
 #ifdef __CRT_HAVE__mbtowc_l
 __CDECLARE(,int,__NOTHROW_NCX,_mbtowc_l,(wchar_t *__dst, char const *__src, __SIZE_TYPE__ __srclen, __locale_t __locale),(__dst,__src,__srclen,__locale))
 #else /* __CRT_HAVE__mbtowc_l */
 #include <local/stdlib/_mbtowc_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbtowc_l, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _mbtowc_l)(wchar_t *__dst, char const *__src, __SIZE_TYPE__ __srclen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbtowc_l))(__dst, __src, __srclen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbtowc_l, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _mbtowc_l)(wchar_t *__dst, char const *__src, __SIZE_TYPE__ __srclen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbtowc_l))(__dst, __src, __srclen, __locale); })
 #endif /* !__CRT_HAVE__mbtowc_l */
 #ifdef __CRT_HAVE__mbstowcs_l
 __CDECLARE(,__SIZE_TYPE__,__NOTHROW_NCX,_mbstowcs_l,(wchar_t *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),(__dst,__src,__dstlen,__locale))
 #else /* __CRT_HAVE__mbstowcs_l */
 #include <local/stdlib/_mbstowcs_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_l, __FORCELOCAL __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstowcs_l)(wchar_t *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_l))(__dst, __src, __dstlen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_l, __FORCELOCAL __ATTR_ARTIFICIAL __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _mbstowcs_l)(wchar_t *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_l))(__dst, __src, __dstlen, __locale); })
 #endif /* !__CRT_HAVE__mbstowcs_l */
 #ifdef __CRT_HAVE__mbstowcs_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,_mbstowcs_s,(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen),(__presult,__dst,__dstsize,__src,__dstlen))
 #else /* __CRT_HAVE__mbstowcs_s */
 #include <local/stdlib/_mbstowcs_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _mbstowcs_s)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s))(__presult, __dst, __dstsize, __src, __dstlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_s, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _mbstowcs_s)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s))(__presult, __dst, __dstsize, __src, __dstlen); })
 #endif /* !__CRT_HAVE__mbstowcs_s */
 #ifdef __CRT_HAVE_mbstowcs_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,mbstowcs_s,(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen),(__presult,__dst,__dstsize,__src,__dstlen))
 #else /* __CRT_HAVE_mbstowcs_s */
 #include <local/stdlib/mbstowcs_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mbstowcs_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL mbstowcs_s)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs_s))(__presult, __dst, __dstsize, __src, __dstlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mbstowcs_s, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL mbstowcs_s)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs_s))(__presult, __dst, __dstsize, __src, __dstlen); })
 #endif /* !__CRT_HAVE_mbstowcs_s */
 #ifdef __CRT_HAVE__mbstowcs_s_l
 __CDECLARE(,errno_t,__NOTHROW_NCX,_mbstowcs_s_l,(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),(__presult,__dst,__dstsize,__src,__dstlen,__locale))
 #else /* __CRT_HAVE__mbstowcs_s_l */
 #include <local/stdlib/_mbstowcs_s_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_s_l, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _mbstowcs_s_l)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__presult, __dst, __dstsize, __src, __dstlen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_s_l, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _mbstowcs_s_l)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__presult, __dst, __dstsize, __src, __dstlen, __locale); })
 #endif /* !__CRT_HAVE__mbstowcs_s_l */
 #ifdef __CRT_HAVE_rand_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,rand_s,(unsigned int *__restrict __randval),(__randval))
 #else /* __CRT_HAVE_rand_s */
 #include <local/stdlib/rand_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(rand_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL rand_s)(unsigned int *__restrict __randval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand_s))(__randval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rand_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL rand_s)(unsigned int *__restrict __randval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand_s))(__randval); })
 #endif /* !__CRT_HAVE_rand_s */
 #ifdef __CRT_HAVE_strtol_l
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_strtol_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtol_l,(__nptr,__endptr,__base,__locale))
@@ -3007,13 +3007,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_strtol_l,(char const *__rest
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_strtol_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG__ == 4
 #include <local/stdlib/strto32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG__ == 8
 #include <local/stdlib/strto64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtol_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _strtol_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoul_l
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_strtoul_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoul_l,(__nptr,__endptr,__base,__locale))
@@ -3039,13 +3039,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_strtoul_l,(char con
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_strtoul_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG__ == 4
 #include <local/stdlib/strtou32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG__ == 8
 #include <local/stdlib/strtou64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (unsigned long)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtoul_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _strtoul_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoll_l
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_strtoll_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoll_l,(__nptr,__endptr,__base,__locale))
@@ -3071,13 +3071,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_strtoll_l,(char const 
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_strtoll_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG_LONG__ == 4
 #include <local/stdlib/strto64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG_LONG__ == 8
 #include <local/stdlib/strto32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtoll_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _strtoll_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoull_l
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_strtoull_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),strtoull_l,(__nptr,__endptr,__base,__locale))
@@ -3097,13 +3097,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_strtoull_l,(char cons
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_strtoull_l,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__strtoumax_l,(__nptr,__endptr,__base,__locale))
 #elif __SIZEOF_LONG_LONG__ == 4
 #include <local/stdlib/strtou64_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64_l))(__nptr, __endptr, __base, __locale); }
 #elif __SIZEOF_LONG_LONG__ == 8
 #include <local/stdlib/strtou32_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32_l))(__nptr, __endptr, __base, __locale); }
 #else /* ... */
 #include <local/stdlib/strtoull_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _strtoull_l)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoull_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE_strtod_l
@@ -3120,7 +3120,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_strtod_l,(char const *__re
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/stdlib/strtod_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _strtod_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod_l))(__nptr, __endptr, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _strtod_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE_strtof_l
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtof_l,(__nptr,__endptr,__locale))
@@ -3130,7 +3130,7 @@ __CDECLARE(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_strtof_l,(char const *__rest
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtof_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/stdlib/strtof_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL _strtof_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof_l))(__nptr, __endptr, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL _strtof_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_strtold_l
@@ -3147,7 +3147,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char cons
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/stdlib/strtold_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _strtold_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold_l))(__nptr, __endptr, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _strtold_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
@@ -3160,7 +3160,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _strtold_
 __CDECLARE(,int,__NOTHROW_NCX,_wctomb_l,(char *__buf, wchar_t __wc, __locale_t __locale),(__buf,__wc,__locale))
 #else /* __CRT_HAVE__wctomb_l */
 #include <local/stdlib/_wctomb_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_l, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _wctomb_l)(char *__buf, wchar_t __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wctomb_l))(__buf, __wc, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_l, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _wctomb_l)(char *__buf, wchar_t __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wctomb_l))(__buf, __wc, __locale); })
 #endif /* !__CRT_HAVE__wctomb_l */
 
 #ifdef __USE_DOS_SLIB
@@ -3168,32 +3168,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_l, __FORCELOCAL int __NOTHROW_NCX(__LIBC
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,wctomb_s,(int *__presult, char *__buf, rsize_t __buflen, wchar_t __wc),(__presult,__buf,__buflen,__wc))
 #else /* __CRT_HAVE_wctomb_s */
 #include <local/stdlib/wctomb_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wctomb_s, __FORCELOCAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_NCX(__LIBCCALL wctomb_s)(int *__presult, char *__buf, rsize_t __buflen, wchar_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb_s))(__presult, __buf, __buflen, __wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wctomb_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_NCX(__LIBCCALL wctomb_s)(int *__presult, char *__buf, rsize_t __buflen, wchar_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb_s))(__presult, __buf, __buflen, __wc); })
 #endif /* !__CRT_HAVE_wctomb_s */
 #endif /* __USE_DOS_SLIB */
 #ifdef __CRT_HAVE__wctomb_s_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,_wctomb_s_l,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t __wc, __locale_t __locale),(__presult,__buf,__buflen,__wc,__locale))
 #else /* __CRT_HAVE__wctomb_s_l */
 #include <local/stdlib/_wctomb_s_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_s_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_NCX(__LIBCCALL _wctomb_s_l)(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wctomb_s_l))(__presult, __buf, __buflen, __wc, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_NCX(__LIBCCALL _wctomb_s_l)(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wctomb_s_l))(__presult, __buf, __buflen, __wc, __locale); })
 #endif /* !__CRT_HAVE__wctomb_s_l */
 #ifdef __CRT_HAVE__wcstombs_s_l
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,_wcstombs_s_l,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__presult,__buf,__buflen,__src,__maxlen,__locale))
 #else /* __CRT_HAVE__wcstombs_s_l */
 #include <local/stdlib/_wcstombs_s_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wcstombs_s_l, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL _wcstombs_s_l)(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcstombs_s_l))(__presult, __buf, __buflen, __src, __maxlen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wcstombs_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL _wcstombs_s_l)(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcstombs_s_l))(__presult, __buf, __buflen, __src, __maxlen, __locale); })
 #endif /* !__CRT_HAVE__wcstombs_s_l */
 #ifdef __CRT_HAVE__wcstombs_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcstombs_l,(char *__dst, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__dst,__src,__maxlen,__locale))
 #else /* __CRT_HAVE__wcstombs_l */
 #include <local/stdlib/_wcstombs_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wcstombs_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstombs_l)(char *__dst, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcstombs_l))(__dst, __src, __maxlen, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wcstombs_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstombs_l)(char *__dst, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcstombs_l))(__dst, __src, __maxlen, __locale); })
 #endif /* !__CRT_HAVE__wcstombs_l */
 #ifdef __CRT_HAVE_wcstombs_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen),(__presult,__buf,__buflen,__src,__maxlen))
 #else /* __CRT_HAVE_wcstombs_s */
 #include <local/stdlib/wcstombs_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs_s, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL wcstombs_s)(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs_s))(__presult, __buf, __buflen, __src, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL wcstombs_s)(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs_s))(__presult, __buf, __buflen, __src, __maxlen); })
 #endif /* !__CRT_HAVE_wcstombs_s */
 
 /* DOS malloc extensions */
@@ -3203,55 +3203,55 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3))
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_recalloc,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <local/malloc/recallocv.h>
-__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _recalloc)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _recalloc)(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocv))(__mallptr, __elem_count, __elem_size); }
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_malloc
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),(__num_bytes,__min_alignment))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/stdlib/_aligned_malloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc))(__num_bytes, __min_alignment); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc))(__num_bytes, __min_alignment); })
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_offset_malloc
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__num_bytes,__min_alignment,__offset))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/stdlib/_aligned_offset_malloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__num_bytes, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_malloc)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__num_bytes, __min_alignment, __offset); })
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_realloc
 __CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_aligned_realloc,(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment),(__aligned_mallptr,__newsize,__min_alignment))
 #elif (defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdlib/_aligned_realloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_realloc)(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc))(__aligned_mallptr, __newsize, __min_alignment); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_realloc)(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc))(__aligned_mallptr, __newsize, __min_alignment); })
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_recalloc
 __CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_aligned_recalloc,(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),(__aligned_mallptr,__count,__num_bytes,__min_alignment))
 #elif (defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdlib/_aligned_recalloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_recalloc)(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc))(__aligned_mallptr, __count, __num_bytes, __min_alignment); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_recalloc)(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc))(__aligned_mallptr, __count, __num_bytes, __min_alignment); })
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_offset_realloc
 __CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_aligned_offset_realloc,(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__aligned_mallptr,__newsize,__min_alignment,__offset))
 #elif (defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdlib/_aligned_offset_realloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_realloc)(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_realloc))(__aligned_mallptr, __newsize, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_realloc)(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_realloc))(__aligned_mallptr, __newsize, __min_alignment, __offset); })
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_offset_recalloc
 __CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_aligned_offset_recalloc,(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__aligned_mallptr,__count,__num_bytes,__min_alignment,__offset))
 #elif (defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stdlib/_aligned_offset_recalloc.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_recalloc)(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_recalloc))(__aligned_mallptr, __count, __num_bytes, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_recalloc)(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_recalloc))(__aligned_mallptr, __count, __num_bytes, __min_alignment, __offset); })
 #endif /* ... */
 #ifdef __CRT_HAVE__aligned_msize
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,_aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__aligned_mallptr,__min_alignment,__offset))
 #else /* __CRT_HAVE__aligned_msize */
 #include <local/stdlib/_aligned_msize.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _aligned_msize)(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))(__aligned_mallptr, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _aligned_msize)(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))(__aligned_mallptr, __min_alignment, __offset); })
 #endif /* !__CRT_HAVE__aligned_msize */
 #ifdef __CRT_HAVE__aligned_free
 __CDECLARE_VOID(,__NOTHROW_NCX,_aligned_free,(void *__aligned_mallptr),(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/stdlib/_aligned_free.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _aligned_free)(void *__aligned_mallptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free))(__aligned_mallptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _aligned_free)(void *__aligned_mallptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free))(__aligned_mallptr); })
 #endif /* ... */
 
 #define _CVTBUFSIZE   349
@@ -3261,19 +3261,19 @@ __CDECLARE_OPT(,char *,__NOTHROW_RPC,_fullpath,(char *__buf, char const *__path,
 __CDECLARE(__ATTR_NONNULL((1, 5, 6)),errno_t,__NOTHROW_NCX,_ecvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__buf,__buflen,__val,__ndigit,__decptr,__sign))
 #else /* __CRT_HAVE__ecvt_s */
 #include <local/stdlib/_ecvt_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ecvt_s, __FORCELOCAL __ATTR_NONNULL((1, 5, 6)) errno_t __NOTHROW_NCX(__LIBCCALL _ecvt_s)(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ecvt_s))(__buf, __buflen, __val, __ndigit, __decptr, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ecvt_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 5, 6)) errno_t __NOTHROW_NCX(__LIBCCALL _ecvt_s)(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ecvt_s))(__buf, __buflen, __val, __ndigit, __decptr, __sign); })
 #endif /* !__CRT_HAVE__ecvt_s */
 #ifdef __CRT_HAVE__fcvt_s
 __CDECLARE(__ATTR_NONNULL((1, 5, 6)),errno_t,__NOTHROW_NCX,_fcvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__buf,__buflen,__val,__ndigit,__decptr,__sign))
 #else /* __CRT_HAVE__fcvt_s */
 #include <local/stdlib/_fcvt_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_fcvt_s, __FORCELOCAL __ATTR_NONNULL((1, 5, 6)) errno_t __NOTHROW_NCX(__LIBCCALL _fcvt_s)(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fcvt_s))(__buf, __buflen, __val, __ndigit, __decptr, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_fcvt_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 5, 6)) errno_t __NOTHROW_NCX(__LIBCCALL _fcvt_s)(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fcvt_s))(__buf, __buflen, __val, __ndigit, __decptr, __sign); })
 #endif /* !__CRT_HAVE__fcvt_s */
 #ifdef __CRT_HAVE__gcvt_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_gcvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit),(__buf,__buflen,__val,__ndigit))
 #else /* __CRT_HAVE__gcvt_s */
 #include <local/stdlib/_gcvt_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_gcvt_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _gcvt_s)(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_gcvt_s))(__buf, __buflen, __val, __ndigit); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_gcvt_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _gcvt_s)(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_gcvt_s))(__buf, __buflen, __val, __ndigit); })
 #endif /* !__CRT_HAVE__gcvt_s */
 #ifdef __CRT_HAVE_ecvt
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,_ecvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),ecvt,(__val,__ndigit,__decptr,__sign))
@@ -3281,7 +3281,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,_ecvt,(do
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,_ecvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <local/stdlib/ecvt.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL _ecvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt))(__val, __ndigit, __decptr, __sign); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL _ecvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt))(__val, __ndigit, __decptr, __sign); }
 #endif /* !... */
 #ifdef __CRT_HAVE_fcvt
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,_fcvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),fcvt,(__val,__ndigit,__decptr,__sign))
@@ -3289,7 +3289,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,_fcvt,(do
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,_fcvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <local/stdlib/fcvt.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL _fcvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt))(__val, __ndigit, __decptr, __sign); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL _fcvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt))(__val, __ndigit, __decptr, __sign); }
 #endif /* !... */
 #ifdef __CRT_HAVE_gcvt
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,_gcvt,(double __val, int __ndigit, char *__buf),gcvt,(__val,__ndigit,__buf))
@@ -3297,19 +3297,19 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,_gcvt,(doubl
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,_gcvt,(double __val, int __ndigit, char *__buf),(__val,__ndigit,__buf))
 #else /* ... */
 #include <local/stdlib/gcvt.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL _gcvt)(double __val, int __ndigit, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gcvt))(__val, __ndigit, __buf); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL _gcvt)(double __val, int __ndigit, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gcvt))(__val, __ndigit, __buf); }
 #endif /* !... */
 #ifdef __CRT_HAVE__atoflt
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoflt,(float *__restrict __result, char const *__restrict __nptr),(__result,__nptr))
 #else /* __CRT_HAVE__atoflt */
 #include <local/stdlib/_atoflt.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoflt, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoflt)(float *__restrict __result, char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoflt))(__result, __nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoflt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoflt)(float *__restrict __result, char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoflt))(__result, __nptr); })
 #endif /* !__CRT_HAVE__atoflt */
 #ifdef __CRT_HAVE__atoflt_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoflt_l,(float *__restrict __result, char const *__restrict __nptr, __locale_t __locale),(__result,__nptr,__locale))
 #else /* __CRT_HAVE__atoflt_l */
 #include <local/stdlib/_atoflt_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoflt_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoflt_l)(float *__restrict __result, char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoflt_l))(__result, __nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoflt_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoflt_l)(float *__restrict __result, char const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoflt_l))(__result, __nptr, __locale); })
 #endif /* !__CRT_HAVE__atoflt_l */
 #ifdef __CRT_HAVE__atodbl
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atodbl,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),(__result,__nptr))
@@ -3317,7 +3317,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atodbl,(double *__restrict 
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atodbl,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),_atoldbl,(__result,__nptr))
 #else /* ... */
 #include <local/stdlib/_atodbl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atodbl, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atodbl)(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atodbl))(__result, __nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atodbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atodbl)(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atodbl))(__result, __nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE__atodbl_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atodbl_l,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),(__result,__nptr,__locale))
@@ -3325,7 +3325,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atodbl_l,(double *__restric
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atodbl_l,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),_atoldbl_l,(__result,__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_atodbl_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atodbl_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atodbl_l)(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atodbl_l))(__result, __nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atodbl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atodbl_l)(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atodbl_l))(__result, __nptr, __locale); })
 #endif /* !... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE__atoldbl
@@ -3334,7 +3334,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoldbl,(__LONGDOUBLE *__re
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoldbl,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),_atodbl,(__result,__nptr))
 #else /* ... */
 #include <local/stdlib/_atoldbl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoldbl, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoldbl)(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoldbl))(__result, __nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoldbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoldbl)(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoldbl))(__result, __nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE__atoldbl_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoldbl_l,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),(__result,__nptr,__locale))
@@ -3342,7 +3342,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoldbl_l,(__LONGDOUBLE *__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_atoldbl_l,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),_atodbl_l,(__result,__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_atoldbl_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_atoldbl_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoldbl_l)(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoldbl_l))(__result, __nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_atoldbl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _atoldbl_l)(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atoldbl_l))(__result, __nptr, __locale); })
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
@@ -3354,7 +3354,7 @@ __CREDIRECT(__ATTR_CONST,unsigned int,__NOTHROW,_rotl,(unsigned int __val, int _
 __CREDIRECT(__ATTR_CONST,unsigned int,__NOTHROW,_rotl,(unsigned int __val, int __shift),_rotl64,(__val,__shift))
 #else /* ... */
 #include <local/stdlib/_rotl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_rotl, __FORCELOCAL __ATTR_CONST unsigned int __NOTHROW(__LIBCCALL _rotl)(unsigned int __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotl))(__val, __shift); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_rotl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned int __NOTHROW(__LIBCCALL _rotl)(unsigned int __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotl))(__val, __shift); })
 #endif /* !... */
 #ifdef __CRT_HAVE__rotr
 __CDECLARE(__ATTR_CONST,unsigned int,__NOTHROW,_rotr,(unsigned int __val, int __shift),(__val,__shift))
@@ -3364,7 +3364,7 @@ __CREDIRECT(__ATTR_CONST,unsigned int,__NOTHROW,_rotr,(unsigned int __val, int _
 __CREDIRECT(__ATTR_CONST,unsigned int,__NOTHROW,_rotr,(unsigned int __val, int __shift),_rotr64,(__val,__shift))
 #else /* ... */
 #include <local/stdlib/_rotr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_rotr, __FORCELOCAL __ATTR_CONST unsigned int __NOTHROW(__LIBCCALL _rotr)(unsigned int __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotr))(__val, __shift); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_rotr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned int __NOTHROW(__LIBCCALL _rotr)(unsigned int __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotr))(__val, __shift); })
 #endif /* !... */
 #ifdef __UINT64_TYPE__
 #ifdef __CRT_HAVE__rotl64
@@ -3375,7 +3375,7 @@ __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotl64,(__UINT64_TYPE__ __va
 __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotl64,(__UINT64_TYPE__ __val, int __shift),_rotl,(__val,__shift))
 #else /* ... */
 #include <local/stdlib/_rotl64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_rotl64, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__LIBCCALL _rotl64)(__UINT64_TYPE__ __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotl64))(__val, __shift); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_rotl64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__LIBCCALL _rotl64)(__UINT64_TYPE__ __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotl64))(__val, __shift); })
 #endif /* !... */
 #ifdef __CRT_HAVE__rotr64
 __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotr64,(__UINT64_TYPE__ __val, int __shift),(__val,__shift))
@@ -3385,7 +3385,7 @@ __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotr64,(__UINT64_TYPE__ __va
 __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotr64,(__UINT64_TYPE__ __val, int __shift),_rotr,(__val,__shift))
 #else /* ... */
 #include <local/stdlib/_rotr64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_rotr64, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__LIBCCALL _rotr64)(__UINT64_TYPE__ __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotr64))(__val, __shift); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_rotr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__LIBCCALL _rotr64)(__UINT64_TYPE__ __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotr64))(__val, __shift); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
 #ifdef __CRT_HAVE__lrotl
@@ -3396,7 +3396,7 @@ __CREDIRECT(__ATTR_CONST,unsigned long,__NOTHROW,_lrotl,(unsigned long __val, in
 __CREDIRECT(__ATTR_CONST,unsigned long,__NOTHROW,_lrotl,(unsigned long __val, int __shift),_rotl64,(__val,__shift))
 #else /* ... */
 #include <local/stdlib/_lrotl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_lrotl, __FORCELOCAL __ATTR_CONST unsigned long __NOTHROW(__LIBCCALL _lrotl)(unsigned long __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lrotl))(__val, __shift); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_lrotl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned long __NOTHROW(__LIBCCALL _lrotl)(unsigned long __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lrotl))(__val, __shift); })
 #endif /* !... */
 #ifdef __CRT_HAVE__lrotr
 __CDECLARE(__ATTR_CONST,unsigned long,__NOTHROW,_lrotr,(unsigned long __val, int __shift),(__val,__shift))
@@ -3406,7 +3406,7 @@ __CREDIRECT(__ATTR_CONST,unsigned long,__NOTHROW,_lrotr,(unsigned long __val, in
 __CREDIRECT(__ATTR_CONST,unsigned long,__NOTHROW,_lrotr,(unsigned long __val, int __shift),_rotr64,(__val,__shift))
 #else /* ... */
 #include <local/stdlib/_lrotr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_lrotr, __FORCELOCAL __ATTR_CONST unsigned long __NOTHROW(__LIBCCALL _lrotr)(unsigned long __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lrotr))(__val, __shift); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_lrotr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned long __NOTHROW(__LIBCCALL _lrotr)(unsigned long __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lrotr))(__val, __shift); })
 #endif /* !... */
 
 #ifndef _CRT_PERROR_DEFINED
@@ -3440,7 +3440,7 @@ __CDECLARE_VOID(,__NOTHROW_RPC,perror,(char const *__message),(__message))
  * >> } else {
  * >>     fprintf(stderr, "%s\n", strerror(errno));
  * >> } */
-__NAMESPACE_LOCAL_USING_OR_IMPL(perror, __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL perror)(char const *__message) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(perror))(__message); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(perror, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL perror)(char const *__message) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(perror))(__message); })
 #else /* !__NO_STDSTREAMS && __libc_geterrno && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite) */
 #undef __perror_defined
 #endif /* __NO_STDSTREAMS || !__libc_geterrno || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite) */
@@ -3468,44 +3468,44 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,_swab,(void const *__restri
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL _swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL _swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); }
 #endif /* !... */
 #ifdef __CRT_HAVE__putenv_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,_putenv_s,(char const *__varname, char const *__val),(__varname,__val))
 #elif defined(__CRT_HAVE_setenv)
 #include <local/stdlib/_putenv_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_putenv_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _putenv_s)(char const *__varname, char const *__val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_putenv_s))(__varname, __val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_putenv_s, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _putenv_s)(char const *__varname, char const *__val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_putenv_s))(__varname, __val); })
 #endif /* ... */
 #ifdef __CRT_HAVE__searchenv
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC,_searchenv,(char const *__file, char const *__envvar, char *__restrict __resultpath),(__file,__envvar,__resultpath))
 #elif defined(__CRT_HAVE__searchenv_s)
 #include <local/stdlib/_searchenv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_searchenv, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_RPC(__LIBCCALL _searchenv)(char const *__file, char const *__envvar, char *__restrict __resultpath) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_searchenv))(__file, __envvar, __resultpath); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_searchenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_RPC(__LIBCCALL _searchenv)(char const *__file, char const *__envvar, char *__restrict __resultpath) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_searchenv))(__file, __envvar, __resultpath); })
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),(__file,__envvar,__resultpath,__buflen))
 #ifdef __CRT_HAVE__makepath
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_makepath,(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext),(__buf,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__makepath */
 #include <local/stdlib/_makepath.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_makepath, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _makepath)(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_makepath))(__buf, __drive, __dir, __file, __ext); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_makepath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _makepath)(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_makepath))(__buf, __drive, __dir, __file, __ext); })
 #endif /* !__CRT_HAVE__makepath */
 #ifdef __CRT_HAVE__splitpath
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_splitpath,(char const *__restrict __abspath, char *__drive, char *__dir, char *__file, char *__ext),(__abspath,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__splitpath */
 #include <local/stdlib/_splitpath.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_splitpath, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _splitpath)(char const *__restrict __abspath, char *__drive, char *__dir, char *__file, char *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath))(__abspath, __drive, __dir, __file, __ext); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_splitpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _splitpath)(char const *__restrict __abspath, char *__drive, char *__dir, char *__file, char *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath))(__abspath, __drive, __dir, __file, __ext); })
 #endif /* !__CRT_HAVE__splitpath */
 #ifdef __CRT_HAVE__makepath_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_makepath_s,(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext),(__buf,__buflen,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__makepath_s */
 #include <local/stdlib/_makepath_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_makepath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _makepath_s)(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_makepath_s))(__buf, __buflen, __drive, __dir, __file, __ext); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_makepath_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _makepath_s)(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_makepath_s))(__buf, __buflen, __drive, __dir, __file, __ext); })
 #endif /* !__CRT_HAVE__makepath_s */
 #ifdef __CRT_HAVE__splitpath_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_splitpath_s,(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen),(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
 #else /* __CRT_HAVE__splitpath_s */
 #include <local/stdlib/_splitpath_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_splitpath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _splitpath_s)(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_splitpath_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _splitpath_s)(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
 #endif /* !__CRT_HAVE__splitpath_s */
 
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_seterrormode,(int __mode),(__mode))
@@ -3520,7 +3520,7 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,_sleep,(__UINT32_TYPE__ __duration),sleep,(__dur
 #include <local/unistd/sleep.h>
 /* >> sleep(3)
  * Sleep for up to `SECONDS' seconds */
-__FORCELOCAL void __NOTHROW_RPC(__LIBCCALL _sleep)(__UINT32_TYPE__ __duration) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sleep))((unsigned int)__duration); }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL _sleep)(__UINT32_TYPE__ __duration) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sleep))((unsigned int)__duration); }
 #endif /* ... */
 
 #ifndef __cplusplus
@@ -3572,7 +3572,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,swab,(void const *__restri
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-__NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); })
 #endif /* !... */
 #endif /* !__swab_defined */
 
@@ -3590,7 +3590,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,itoa,(int __val, char *__bu
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,itoa,(int __val, char *__buf, int __radix),_i64toa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/itoa.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(itoa, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL itoa)(int __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(itoa))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(itoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL itoa)(int __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(itoa))(__val, __buf, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE_ltoa
 __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ltoa,(long __val, char *__buf, int __radix),(__val,__buf,__radix))
@@ -3604,7 +3604,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ltoa,(long __val, char *__b
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ltoa,(long __val, char *__buf, int __radix),_i64toa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/ltoa.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ltoa, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ltoa)(long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ltoa))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ltoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ltoa)(long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ltoa))(__val, __buf, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE_ultoa
 __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ultoa,(unsigned long __val, char *__buf, int __radix),(__val,__buf,__radix))
@@ -3614,7 +3614,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ultoa,(unsigned long __val,
 __CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ultoa,(unsigned long __val, char *__buf, int __radix),_ui64toa,(__val,__buf,__radix))
 #else /* ... */
 #include <local/stdlib/ultoa.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ultoa, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ultoa)(unsigned long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ultoa))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ultoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ultoa)(unsigned long __val, char *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ultoa))(__val, __buf, __radix); })
 #endif /* !... */
 #ifdef __CRT_HAVE_onexit
 __CREDIRECT(,onexit_t,__NOTHROW_NCX,_onexit,(onexit_t __func),onexit,(__func))
@@ -3682,7 +3682,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t c
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/wchar/wcstol.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstol, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wcstol)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wcstol)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstol_defined */
 #ifndef __wcstoll_defined
@@ -3705,7 +3705,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wc
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/wchar/wcstoll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoll, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wcstoll)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wcstoll)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstoll_defined */
 #ifndef __wcstoul_defined
@@ -3728,7 +3728,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/wchar/wcstoul.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoul, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL wcstoul)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL wcstoul)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstoul_defined */
 #ifndef __wcstoull_defined
@@ -3751,7 +3751,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/wchar/wcstoull.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoull, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstoull_defined */
 #ifndef ___wcstol_l_defined
@@ -3764,7 +3764,7 @@ __CDECLARE(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wcstol_l,(wchar_t const *__re
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wcstol_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstol_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/wchar/wcstol_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wcstol_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wcstol_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstol_l_defined */
 #ifndef ___wcstoul_l_defined
@@ -3777,7 +3777,7 @@ __CDECLARE(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_wcstoul_l,(wchar_t c
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_wcstoul_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoul_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/wchar/wcstoul_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _wcstoul_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _wcstoul_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoul_l_defined */
 #ifndef __NO_FPU
@@ -3789,7 +3789,7 @@ __NAMESPACE_STD_USING(wcstof)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,wcstof,(wchar_t const *__restrict __nptr, wchar_t **__endptr),(__nptr,__endptr))
 #else /* ... */
 #include <local/wchar/wcstof.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstof, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL wcstof)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof))(__nptr, __endptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL wcstof)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__wcstof_defined */
 #ifndef __wcstod_defined
@@ -3800,7 +3800,7 @@ __NAMESPACE_STD_USING(wcstod)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,wcstod,(wchar_t const *__restrict __nptr, wchar_t **__endptr),(__nptr,__endptr))
 #else /* ... */
 #include <local/wchar/wcstod.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstod, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL wcstod)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod))(__nptr, __endptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL wcstod)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__wcstod_defined */
 #ifndef ___wcstof_l_defined
@@ -3813,7 +3813,7 @@ __CDECLARE(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_wcstof_l,(wchar_t const *__r
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_wcstof_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),__wcstof_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/wchar/wcstof_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL _wcstof_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof_l))(__nptr, __endptr, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL _wcstof_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* !___wcstof_l_defined */
 #ifndef ___wcstod_l_defined
@@ -3826,7 +3826,7 @@ __CDECLARE(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wcstod_l,(wchar_t const *__
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wcstod_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/wchar/wcstod_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wcstod_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod_l))(__nptr, __endptr, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wcstod_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* !___wcstod_l_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -3838,7 +3838,7 @@ __NAMESPACE_STD_USING(wcstold)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,wcstold,(wchar_t const *__restrict __nptr, wchar_t **__endptr),(__nptr,__endptr))
 #else /* ... */
 #include <local/wchar/wcstold.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstold, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL wcstold)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold))(__nptr, __endptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL wcstold)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__wcstold_defined */
 #ifndef ___wcstold_l_defined
@@ -3851,7 +3851,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_wcstold_l,(wchar_t co
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_wcstold_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),__wcstold_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <local/wchar/wcstold_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _wcstold_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold_l))(__nptr, __endptr, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _wcstold_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* !___wcstold_l_defined */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -3861,7 +3861,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _wcstold_
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wtof,(wchar_t const *__nptr),(__nptr))
 #else /* __CRT_HAVE__wtof */
 #include <local/stdlib/_wtof.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtof, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wtof)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtof))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wtof)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtof))(__nptr); })
 #endif /* !__CRT_HAVE__wtof */
 #endif /* !___wtof_defined */
 #ifndef ___wtof_l_defined
@@ -3870,7 +3870,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtof, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED _
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wtof_l,(wchar_t const *__nptr, __locale_t __locale),(__nptr,__locale))
 #else /* __CRT_HAVE__wtof_l */
 #include <local/stdlib/_wtof_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtof_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wtof_l)(wchar_t const *__nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtof_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtof_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wtof_l)(wchar_t const *__nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtof_l))(__nptr, __locale); })
 #endif /* !__CRT_HAVE__wtof_l */
 #endif /* !___wtof_l_defined */
 #endif /* !__NO_FPU */
@@ -3880,7 +3880,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtof_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_itow,(int __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__itow */
 #include <local/stdlib/_itow.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_itow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _itow)(int __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_itow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _itow)(int __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow))(__val, __buf, __radix); })
 #endif /* !__CRT_HAVE__itow */
 #endif /* !___itow_defined */
 #ifndef ___ltow_defined
@@ -3889,7 +3889,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_itow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t 
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_ltow,(long __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__ltow */
 #include <local/stdlib/_ltow.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ltow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _ltow)(long __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ltow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _ltow)(long __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow))(__val, __buf, __radix); })
 #endif /* !__CRT_HAVE__ltow */
 #endif /* !___ltow_defined */
 #ifndef ___ultow_defined
@@ -3898,7 +3898,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ltow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t 
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_ultow,(unsigned long __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__ultow */
 #include <local/stdlib/_ultow.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ultow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _ultow)(unsigned long __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ultow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _ultow)(unsigned long __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow))(__val, __buf, __radix); })
 #endif /* !__CRT_HAVE__ultow */
 #endif /* !___ultow_defined */
 #ifndef ___i64tow_defined
@@ -3907,7 +3907,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ultow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_i64tow,(__INT64_TYPE__ __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__i64tow */
 #include <local/stdlib/_i64tow.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _i64tow)(__INT64_TYPE__ __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _i64tow)(__INT64_TYPE__ __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow))(__val, __buf, __radix); })
 #endif /* !__CRT_HAVE__i64tow */
 #endif /* !___i64tow_defined */
 #ifndef ___ui64tow_defined
@@ -3916,7 +3916,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_
 __CDECLARE(__ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,_ui64tow,(__UINT64_TYPE__ __val, wchar_t *__buf, int __radix),(__val,__buf,__radix))
 #else /* __CRT_HAVE__ui64tow */
 #include <local/stdlib/_ui64tow.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow, __FORCELOCAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _ui64tow)(__UINT64_TYPE__ __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64tow))(__val, __buf, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) wchar_t *__NOTHROW_NCX(__LIBCCALL _ui64tow)(__UINT64_TYPE__ __val, wchar_t *__buf, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64tow))(__val, __buf, __radix); })
 #endif /* !__CRT_HAVE__ui64tow */
 #endif /* !___ui64tow_defined */
 #ifndef ___itow_s_defined
@@ -3925,7 +3925,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow, __FORCELOCAL __ATTR_NONNULL((2)) wchar
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_itow_s,(int __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__itow_s */
 #include <local/stdlib/_itow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_itow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _itow_s)(int __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_itow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _itow_s)(int __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow_s))(__val, __buf, __buflen, __radix); })
 #endif /* !__CRT_HAVE__itow_s */
 #endif /* !___itow_s_defined */
 #ifndef ___ltow_s_defined
@@ -3934,7 +3934,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_itow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ltow_s,(long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ltow_s */
 #include <local/stdlib/_ltow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ltow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ltow_s)(long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ltow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ltow_s)(long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow_s))(__val, __buf, __buflen, __radix); })
 #endif /* !__CRT_HAVE__ltow_s */
 #endif /* !___ltow_s_defined */
 #ifndef ___ultow_s_defined
@@ -3943,7 +3943,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ltow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ultow_s,(unsigned long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ultow_s */
 #include <local/stdlib/_ultow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ultow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ultow_s)(unsigned long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ultow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ultow_s)(unsigned long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow_s))(__val, __buf, __buflen, __radix); })
 #endif /* !__CRT_HAVE__ultow_s */
 #endif /* !___ultow_s_defined */
 #ifndef ___i64tow_s_defined
@@ -3952,7 +3952,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ultow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_i64tow_s,(__INT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__i64tow_s */
 #include <local/stdlib/_i64tow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _i64tow_s)(__INT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _i64tow_s)(__INT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow_s))(__val, __buf, __buflen, __radix); })
 #endif /* !__CRT_HAVE__i64tow_s */
 #endif /* !___i64tow_s_defined */
 #ifndef ___ui64tow_s_defined
@@ -3961,7 +3961,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow_s, __FORCELOCAL __ATTR_NONNULL((2)) errn
 __CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_ui64tow_s,(__UINT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ui64tow_s */
 #include <local/stdlib/_ui64tow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow_s, __FORCELOCAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ui64tow_s)(__UINT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64tow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _ui64tow_s)(__UINT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64tow_s))(__val, __buf, __buflen, __radix); })
 #endif /* !__CRT_HAVE__ui64tow_s */
 #endif /* !___ui64tow_s_defined */
 #ifndef ___wtoi_defined
@@ -3982,7 +3982,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wt
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <local/parts.wchar.stdlib/wtoi.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _wtoi)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))(__nptr); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _wtoi)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))(__nptr); }
 #endif /* !... */
 #endif /* !___wtoi_defined */
 #ifndef ___wtol_defined
@@ -4003,7 +4003,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_w
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <local/parts.wchar.stdlib/wtol.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wtol)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))(__nptr); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wtol)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))(__nptr); }
 #endif /* !... */
 #endif /* !___wtol_defined */
 #ifndef ___wtoi64_defined
@@ -4018,7 +4018,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wtoi64,(wchar_t const *__restrict __nptr),_wtoll,(__nptr))
 #else /* ... */
 #include <local/stdlib/_wtoi64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wtoi64)(wchar_t const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi64))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wtoi64)(wchar_t const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi64))(__nptr); })
 #endif /* !... */
 #endif /* !___wtoi64_defined */
 #ifndef ___wcstoi64_defined
@@ -4037,7 +4037,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/wchar/wcsto64.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* !___wcstoi64_defined */
 #ifndef ___wcstoui64_defined
@@ -4056,7 +4056,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcsto
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <local/wchar/wcstou64.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))(__nptr, __endptr, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* !___wcstoui64_defined */
 #ifndef ___wtoi_l_defined
@@ -4071,7 +4071,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wt
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi_l,(wchar_t const *__restrict __nptr, __locale_t __locale),_wtoi64_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_wtoi_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _wtoi_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _wtoi_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi_l))(__nptr, __locale); })
 #endif /* !... */
 #endif /* !___wtoi_l_defined */
 #ifndef ___wtol_l_defined
@@ -4086,7 +4086,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__NOTHROW_NC
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_wtol_l,(wchar_t const *__restrict __nptr, __locale_t __locale),_wtoi64_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_wtol_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtol_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long int __NOTHROW_NCX(__LIBCCALL _wtol_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtol_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtol_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long int __NOTHROW_NCX(__LIBCCALL _wtol_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtol_l))(__nptr, __locale); })
 #endif /* !... */
 #endif /* !___wtol_l_defined */
 #ifndef ___wtoi64_l_defined
@@ -4101,7 +4101,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wtoi64_l,(wchar_t const *__restrict __nptr, __locale_t __locale),_wtoll_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_wtoi64_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wtoi64_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi64_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wtoi64_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi64_l))(__nptr, __locale); })
 #endif /* !... */
 #endif /* !___wtoi64_l_defined */
 #ifndef ___wcstoi64_l_defined
@@ -4130,7 +4130,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/wchar/wcsto64_l.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoi64_l_defined */
 #ifndef ___wcstoui64_l_defined
@@ -4159,7 +4159,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcsto
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/wchar/wcstou64_l.h>
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoui64_l_defined */
 #ifdef __LONGLONG
@@ -4187,7 +4187,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t con
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/wchar/wcstoll_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wcstoll_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wcstoll_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoll_l_defined */
 #ifndef ___wcstoull_l_defined
@@ -4212,7 +4212,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t c
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <local/wchar/wcstoull_l.h>
-__FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _wcstoull_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull_l))(__nptr, __endptr, __base, __locale); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _wcstoull_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoull_l_defined */
 #ifndef ___wtoll_defined
@@ -4233,7 +4233,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <local/parts.wchar.stdlib/wtoll.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wtoll)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))(__nptr); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wtoll)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))(__nptr); }
 #endif /* !... */
 #endif /* !___wtoll_defined */
 #ifndef ___wtoll_l_defined
@@ -4248,7 +4248,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll_l,(wchar_t const *__restrict __nptr, __locale_t __locale),_wtoi64_l,(__nptr,__locale))
 #else /* ... */
 #include <local/stdlib/_wtoll_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wtoll_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoll_l))(__nptr, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wtoll_l)(wchar_t const *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoll_l))(__nptr, __locale); })
 #endif /* !... */
 #endif /* !___wtoll_l_defined */
 #endif /* __LONGLONG */
@@ -4269,7 +4269,7 @@ __CDECLARE(,wchar_t *,__NOTHROW_NCX,_wfullpath,(wchar_t *__buf, wchar_t const *_
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_wmakepath_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext),(__buf,__buflen,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__wmakepath_s */
 #include <local/stdlib/_wmakepath_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _wmakepath_s)(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wmakepath_s))(__buf, __buflen, __drive, __dir, __file, __ext); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _wmakepath_s)(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wmakepath_s))(__buf, __buflen, __drive, __dir, __file, __ext); })
 #endif /* !__CRT_HAVE__wmakepath_s */
 #endif /* !___wmakepath_s_defined */
 #ifndef ___wmakepath_defined
@@ -4278,7 +4278,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath_s, __FORCELOCAL __ATTR_NONNULL((1)) e
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_wmakepath,(wchar_t *__restrict __buf, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext),(__buf,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__wmakepath */
 #include <local/stdlib/_wmakepath.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _wmakepath)(wchar_t *__restrict __buf, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wmakepath))(__buf, __drive, __dir, __file, __ext); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _wmakepath)(wchar_t *__restrict __buf, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wmakepath))(__buf, __drive, __dir, __file, __ext); })
 #endif /* !__CRT_HAVE__wmakepath */
 #endif /* !___wmakepath_defined */
 #ifndef _CRT_WPERROR_DEFINED
@@ -4290,7 +4290,7 @@ __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restric
 #include <parts/errno.h>
 #if !defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite))
 #include <local/stdio/_wperror.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_COLD void (__LIBCCALL _wperror)(__WCHAR_TYPE__ const *__restrict __message) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wperror))(__message); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD void (__LIBCCALL _wperror)(__WCHAR_TYPE__ const *__restrict __message) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wperror))(__message); })
 #else /* !__NO_STDSTREAMS && __libc_geterrno && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite) */
 #undef _CRT_WPERROR_DEFINED
 #endif /* __NO_STDSTREAMS || !__libc_geterrno || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite) */
@@ -4326,7 +4326,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_wsearchenv_s,(wchar_
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC,_wsearchenv,(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath),(__file,__envvar,__resultpath))
 #elif defined(__CRT_HAVE__wsearchenv_s)
 #include <local/stdlib/_wsearchenv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wsearchenv, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_RPC(__LIBCCALL _wsearchenv)(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsearchenv))(__file, __envvar, __resultpath); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsearchenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_RPC(__LIBCCALL _wsearchenv)(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsearchenv))(__file, __envvar, __resultpath); })
 #else /* ... */
 #undef ___wsearchenv_defined
 #endif /* !... */
@@ -4337,7 +4337,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wsearchenv, __FORCELOCAL __ATTR_NONNULL((1, 2, 
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_wsplitpath,(wchar_t const *__restrict __abspath, wchar_t *__drive, wchar_t *__dir, wchar_t *__file, wchar_t *__ext),(__abspath,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__wsplitpath */
 #include <local/stdlib/_wsplitpath.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _wsplitpath)(wchar_t const *__restrict __abspath, wchar_t *__drive, wchar_t *__dir, wchar_t *__file, wchar_t *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsplitpath))(__abspath, __drive, __dir, __file, __ext); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _wsplitpath)(wchar_t const *__restrict __abspath, wchar_t *__drive, wchar_t *__dir, wchar_t *__file, wchar_t *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsplitpath))(__abspath, __drive, __dir, __file, __ext); })
 #endif /* !__CRT_HAVE__wsplitpath */
 #endif /* !___wsplitpath_defined */
 #ifndef ___wsplitpath_s_defined
@@ -4346,7 +4346,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath, __FORCELOCAL __ATTR_NONNULL((1)) vo
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_wsplitpath_s,(wchar_t const *__restrict __abspath, wchar_t *__drive, __SIZE_TYPE__ __drivelen, wchar_t *__dir, __SIZE_TYPE__ __dirlen, wchar_t *__file, __SIZE_TYPE__ __filelen, wchar_t *__ext, __SIZE_TYPE__ __extlen),(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
 #else /* __CRT_HAVE__wsplitpath_s */
 #include <local/stdlib/_wsplitpath_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _wsplitpath_s)(wchar_t const *__restrict __abspath, wchar_t *__drive, __SIZE_TYPE__ __drivelen, wchar_t *__dir, __SIZE_TYPE__ __dirlen, wchar_t *__file, __SIZE_TYPE__ __filelen, wchar_t *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsplitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _wsplitpath_s)(wchar_t const *__restrict __abspath, wchar_t *__drive, __SIZE_TYPE__ __drivelen, wchar_t *__dir, __SIZE_TYPE__ __dirlen, wchar_t *__file, __SIZE_TYPE__ __filelen, wchar_t *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsplitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
 #endif /* !__CRT_HAVE__wsplitpath_s */
 #endif /* !___wsplitpath_s_defined */
 #endif /* !_WSTDLIBP_DEFINED */

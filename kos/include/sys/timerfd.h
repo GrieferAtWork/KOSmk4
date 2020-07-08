@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3407d554 */
+/* HASH CRC-32:0x450e3ecd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, 
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL timerfd_settime)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime))(__ufd, __flags, __utmr, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL timerfd_settime)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime))(__ufd, __flags, __utmr, __otmr); })
 #endif /* ... */
 #if defined(__CRT_HAVE_timerfd_gettime64) && defined(__USE_TIME_BITS64)
 /* Return the next expiration time of UFD */
@@ -94,7 +94,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, 
 #elif defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
 #include <local/sys.timerfd/timerfd_gettime.h>
 /* Return the next expiration time of UFD */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_timerfd_settime64
@@ -112,7 +112,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __uf
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime64, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL timerfd_settime64)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime64))(__ufd, __flags, __utmr, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL timerfd_settime64)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime64))(__ufd, __flags, __utmr, __otmr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_timerfd_gettime64
 /* Return the next expiration time of UFD */
@@ -123,7 +123,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __uf
 #elif defined(__CRT_HAVE_timerfd_gettime)
 #include <local/sys.timerfd/timerfd_gettime64.h>
 /* Return the next expiration time of UFD */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime64, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime64)(__fd_t __ufd, struct itimerspec64 *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime64))(__ufd, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime64)(__fd_t __ufd, struct itimerspec64 *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime64))(__ufd, __otmr); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __CC__ */

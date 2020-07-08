@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c7491f5 */
+/* HASH CRC-32:0xd4064dc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path
 #else /* __CRT_HAVE_dirname */
 #include <local/libgen/dirname.h>
 /* Return directory part of PATH or "." if none is available */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* !__CRT_HAVE_dirname */
 #ifdef __CRT_HAVE___xpg_basename
 /* Return final component of PATH.
@@ -56,7 +56,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filena
  * modify its argument. Therefore we normally use the GNU version (in
  * <string.h>) and only if this header is included make the XPG
  * version available under the real name */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
 #endif /* !__CRT_HAVE___xpg_basename */
 #define basename(path) __xpg_basename(path)
 

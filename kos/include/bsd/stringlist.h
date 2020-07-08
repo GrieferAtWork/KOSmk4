@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d3170eb */
+/* HASH CRC-32:0x1d4ead65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_delete,(st
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sl_delete, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sl_delete)(struct _stringlist *__sl, char const *__name, int __freeit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_delete))(__sl, __name, __freeit); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sl_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sl_delete)(struct _stringlist *__sl, char const *__name, int __freeit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_delete))(__sl, __name, __freeit); })
 #endif /* !__CRT_HAVE_sl_delete */
 #endif /* !__sl_delete_defined */
 #endif /* __CC__ */

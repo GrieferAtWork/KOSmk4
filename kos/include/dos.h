@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f237fd0 */
+/* HASH CRC-32:0xa3b5b311 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),__crtSleep,(__mill))
 #elif defined(__CRT_HAVE_usleep)
 #include <local/dos/delay.h>
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL delay)(unsigned int __mill) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delay))(__mill); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL delay)(unsigned int __mill) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delay))(__mill); })
 #endif /* ... */
 #ifdef __CRT_HAVE__getdiskfree
 __CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
@@ -127,7 +127,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_u
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
 #else /* ... */
 #undef __unlink_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14da20b1 */
+/* HASH CRC-32:0xabfc869a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ __CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TY
 __CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
 #elif defined(__CRT_HAVE__endthreadex)
 #include <local/process/_endthread.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
 #endif /* ... */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
 
@@ -131,7 +131,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,())
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
 #include <local/stdlib/abort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
 #else /* ... */
 #undef __abort_defined
 #endif /* !... */
@@ -160,7 +160,7 @@ __CDECLARE_VOID_OPT(,__THROWING,_cexit,(void),())
 __CDECLARE_VOID(,__THROWING,_c_exit,(void),())
 #else /* __CRT_HAVE__c_exit */
 #include <local/process/_c_exit.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
 #endif /* !__CRT_HAVE__c_exit */
 #ifdef __CRT_HAVE_getpid
 /* >> getpid(2)

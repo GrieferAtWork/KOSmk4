@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a563ab9 */
+/* HASH CRC-32:0x6fd18f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -198,7 +198,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char 
 #elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <local/dirent/opendir.h>
 /* Open and return a new directory stream for reading, referring to `name' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
 #endif /* ... */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
@@ -208,7 +208,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,fopendirat,(__
 #elif defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
 #include <local/dirent/fopendirat.h>
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL fopendirat)(__fd_t __dirfd, char const *__name, __oflag_t __oflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))(__dirfd, __name, __oflags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL fopendirat)(__fd_t __dirfd, char const *__name, __oflag_t __oflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))(__dirfd, __name, __oflags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_opendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
@@ -216,7 +216,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,opendirat,(__f
 #elif defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/dirent/opendirat.h>
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL opendirat)(__fd_t __dirfd, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))(__dirfd, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL opendirat)(__fd_t __dirfd, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))(__dirfd, __name); })
 #endif /* ... */
 #endif /* __USE_KOS && __USE_ATFILE */
 
@@ -309,7 +309,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,scandir,(char const *__rest
 #elif defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <local/dirent/scandir.h>
 /* Scan a directory `DIR' for all contained directory entries */
-__NAMESPACE_LOCAL_USING_OR_IMPL(scandir, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL scandir)(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir))(__dir, __namelist, __selector, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(scandir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL scandir)(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir))(__dir, __namelist, __selector, __cmp); })
 #endif /* ... */
 
 #if defined(__CRT_HAVE_alphasort) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
@@ -321,7 +321,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort,(stru
 #else /* ... */
 #include <local/dirent/alphasort.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would */
-__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL alphasort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL alphasort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort))(__e1, __e2); })
 #endif /* !... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_alphasort64
@@ -333,7 +333,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort64,(st
 #else /* ... */
 #include <local/dirent/alphasort64.h>
 /* 64-bit variant of `alphasort()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort64, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL alphasort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort64))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL alphasort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort64))(__e1, __e2); })
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 
@@ -361,7 +361,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,scandir64,(char const *__re
 #elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
 #include <local/dirent/scandir64.h>
 /* 64-bit variant of `scandir()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(scandir64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL scandir64)(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir64))(__dir, __namelist, __selector, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(scandir64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL scandir64)(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir64))(__dir, __namelist, __selector, __cmp); })
 #endif /* ... */
 #ifdef __CRT_HAVE_scandirat64
 /* 64-bit variant of `scandirat()' */
@@ -403,7 +403,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort,(st
 #else /* ... */
 #include <local/dirent/versionsort.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL versionsort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL versionsort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort))(__e1, __e2); })
 #endif /* !... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_versionsort64
@@ -415,7 +415,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort64,(
 #else /* ... */
 #include <local/dirent/versionsort64.h>
 /* 64-bit variant of `versionsort()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort64, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL versionsort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort64))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL versionsort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort64))(__e1, __e2); })
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
@@ -451,7 +451,7 @@ __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddir,(__fd_t __fd, s
  *                    stream will only be advanced when this value is >= 'BUFSIZE'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(kreaddir, __FORCELOCAL __ATTR_WUNUSED __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL kreaddir)(__fd_t __fd, struct dirent *__buf, size_t __bufsize, unsigned int __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(kreaddir))(__fd, __buf, __bufsize, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(kreaddir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL kreaddir)(__fd_t __fd, struct dirent *__buf, size_t __bufsize, unsigned int __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(kreaddir))(__fd, __buf, __bufsize, __mode); })
 #endif /* ... */
 #if defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* The KOS-specific system call for reading a single directory entry
@@ -487,7 +487,7 @@ __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddir64,(__fd_t __fd,
 #elif defined(__CRT_HAVE_kreaddirf64) || (defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64))
 #include <local/dirent/kreaddir64.h>
 /* 64-bit variant of `kreaddir()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(kreaddir64, __FORCELOCAL __ATTR_WUNUSED __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL kreaddir64)(__fd_t __fd, struct dirent64 *__buf, size_t __bufsize, unsigned int __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(kreaddir64))(__fd, __buf, __bufsize, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(kreaddir64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL kreaddir64)(__fd_t __fd, struct dirent64 *__buf, size_t __bufsize, unsigned int __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(kreaddir64))(__fd, __buf, __bufsize, __mode); })
 #endif /* ... */
 #ifdef __CRT_HAVE_kreaddirf64
 /* 64-bit variant of `kreaddirf()' */

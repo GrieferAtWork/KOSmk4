@@ -467,7 +467,7 @@
 #define __VREDIRECT_ENUM_VALUES(n)         __VREDIRECT_ENUM_VALUES##n
 
 #ifndef __LOCAL_REDIRECT
-#define __LOCAL_REDIRECT  __LOCAL
+#define __LOCAL_REDIRECT __LOCAL __ATTR_ARTIFICIAL
 #endif /* !__LOCAL_REDIRECT */
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)  __LOCAL_REDIRECT attr Treturn nothrow(cc name) param code
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)     __LOCAL_REDIRECT attr void nothrow(cc name) param code

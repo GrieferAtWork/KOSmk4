@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf59ec292 */
+/* HASH CRC-32:0xdc39a55c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,Creat,(char con
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,Creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open) || (defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)))
 #include <local/kos.fcntl/Creat.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(Creat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__LIBCCALL Creat)(char const *__filename, __mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Creat))(__filename, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(Creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__LIBCCALL Creat)(char const *__filename, __mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Creat))(__filename, __mode); })
 #else /* ... */
 #undef __Creat_defined
 #endif /* !... */
@@ -96,7 +96,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,Creat64,(char co
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,Creat64,(char const *__filename, __mode_t __mode),Creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 #include <local/kos.fcntl/Creat64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(Creat64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__LIBCCALL Creat64)(char const *__filename, __mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Creat64))(__filename, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(Creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__LIBCCALL Creat64)(char const *__filename, __mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Creat64))(__filename, __mode); })
 #else /* ... */
 #undef __Creat64_defined
 #endif /* !... */

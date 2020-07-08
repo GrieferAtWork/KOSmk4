@@ -42,6 +42,7 @@ global SystemHeader;
 global final LIBC_LINKAGE_DECLS = { "__LIBC", "LIBC" };
 global final NAMESPACE_IMPORT_DECL = "__FORCELOCAL";
 global final DEFAULT_DECL = "__LIBC";
+global final INJECTED_WRAPPER_FUNCTION_ATTRIBUTES = { "ATTR_ARTIFICIAL" };
 
 global final function keyLocalDep(symbolName: string): string {
 	return "__localdep_" + symbolName;
@@ -938,7 +939,8 @@ class FunctionPrototype {
 			explicitCastAllTypes: bool = false, callToEscapeMode: int = none) {
 		if (callToEscapeMode is none)
 			callToEscapeMode = escapeMode;
-		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
+		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName,
+			injectedAttributes: INJECTED_WRAPPER_FUNCTION_ATTRIBUTES);
 		fp << " { ";
 		if (!returnType.isVoid)
 			fp << "return ";

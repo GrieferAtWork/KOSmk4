@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5c93482 */
+/* HASH CRC-32:0xcf9f3878 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __CDECLARE(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, off
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL __ATTR_ARTIFICIAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_sendfile64
@@ -93,7 +93,7 @@ __CREDIRECT(,ssize_t,__NOTHROW_NCX,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, 
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile64, __FORCELOCAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile64)(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile64))(__out_fd, __in_fd, __offset, __count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile64, __FORCELOCAL __ATTR_ARTIFICIAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile64)(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile64))(__out_fd, __in_fd, __offset, __count); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd0c35f4 */
+/* HASH CRC-32:0x1aceca84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,7 +116,7 @@ __CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *__value),(__
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #include <local/sys.eventfd/eventfd_read.h>
 /* Read event counter and possibly wait for events */
-__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, __value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, __value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_eventfd_write
 /* Increment event counter */
@@ -124,7 +124,7 @@ __CDECLARE(,int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t __value),(__
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <local/sys.eventfd/eventfd_write.h>
 /* Increment event counter */
-__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t __value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write))(__fd, __value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t __value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write))(__fd, __value); })
 #endif /* ... */
 #endif /* __CC__ */
 

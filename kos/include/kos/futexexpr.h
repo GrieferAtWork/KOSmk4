@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25a92c84 */
+/* HASH CRC-32:0xe9d01089 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -256,7 +256,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZ
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* ... */
 #if defined(__CRT_HAVE_lfutexlockexpr64) && defined(__USE_TIME_BITS64)
 /* >> lfutexlockexpr(2)
@@ -345,7 +345,7 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *__
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr, __FORCELOCAL __ATTR_NONNULL((1, 4)) int __NOTHROW_RPC(__LIBCCALL lfutexlockexpr)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexlockexpr))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_RPC(__LIBCCALL lfutexlockexpr)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexlockexpr))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -436,7 +436,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr64)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr64))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr64)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr64))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_lfutexlockexpr64
 /* >> lfutexlockexpr(2)
@@ -525,7 +525,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr64,(lfutex_t 
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr64, __FORCELOCAL __ATTR_NONNULL((1, 4)) int __NOTHROW_RPC(__LIBCCALL lfutexlockexpr64)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexlockexpr64))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_RPC(__LIBCCALL lfutexlockexpr64)(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexlockexpr64))(__ulockaddr, __base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 

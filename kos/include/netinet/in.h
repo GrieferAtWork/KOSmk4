@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef749f30 */
+/* HASH CRC-32:0x98d8cf6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@ __CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __h
 __CREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),ntohs,(__hostword))
 #else /* ... */
 #include <local/netinet.in/htons.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htons, __FORCELOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htons))(__hostword); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(htons, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htons))(__hostword); })
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohs
 __CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),(__netshort))
@@ -253,7 +253,7 @@ __CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __n
 __CREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),htons,(__netshort))
 #else /* ... */
 #include <local/netinet.in/ntohs.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohs, __FORCELOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohs))(__netshort); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ntohs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohs))(__netshort); })
 #endif /* !... */
 #ifdef __CRT_HAVE_htonl
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),(__hostlong))
@@ -261,7 +261,7 @@ __CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __h
 __CREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),ntohl,(__hostlong))
 #else /* ... */
 #include <local/netinet.in/htonl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htonl, __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonl))(__hostlong); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(htonl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonl))(__hostlong); })
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohl
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),(__netlong))
@@ -269,7 +269,7 @@ __CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __n
 __CREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),htonl,(__netlong))
 #else /* ... */
 #include <local/netinet.in/ntohl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohl, __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__netlong); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ntohl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__netlong); })
 #endif /* !... */
 #if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 #ifdef __CRT_HAVE_htonq
@@ -278,7 +278,7 @@ __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __h
 __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),ntohq,(__hostquad))
 #else /* ... */
 #include <local/netinet.in/htonq.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htonq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonq))(__hostquad); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(htonq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonq))(__hostquad); })
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohq
 __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),(__netquad))
@@ -286,7 +286,7 @@ __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __n
 __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),htonq,(__netquad))
 #else /* ... */
 #include <local/netinet.in/ntohq.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohq))(__netquad); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohq))(__netquad); })
 #endif /* !... */
 #endif /* __USE_KOS && __UINT64_TYPE__ */
 

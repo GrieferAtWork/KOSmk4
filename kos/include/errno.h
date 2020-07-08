@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8faa115 */
+/* HASH CRC-32:0x3dd509de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -619,7 +619,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 #ifdef __LOCAL_program_invocation_name_p
 #include <local/stdlib/__p__pgmptr.h>
 /* Alias for argv[0], as passed to main() */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
 #else /* __LOCAL_program_invocation_name_p */
 #undef ____p__pgmptr_defined
 #endif /* !__LOCAL_program_invocation_name_p */
@@ -658,7 +658,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,_
 #ifdef __LOCAL_program_invocation_short_name_p
 #include <local/errno/__p_program_invocation_short_name.h>
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__p_program_invocation_short_name, __FORCELOCAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p_program_invocation_short_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p_program_invocation_short_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p_program_invocation_short_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(); })
 #else /* __LOCAL_program_invocation_short_name_p */
 #undef ____p_program_invocation_short_name_defined
 #endif /* !__LOCAL_program_invocation_short_name_p */

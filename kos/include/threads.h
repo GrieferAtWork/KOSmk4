@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fc939b4 */
+/* HASH CRC-32:0x85e2c88b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -187,7 +187,7 @@ __CDECLARE(,int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, thrd_start_t __func, v
 #include <local/threads/thrd_create.h>
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, thrd_start_t __func, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, thrd_start_t __func, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* Compare two thread identifiers */
@@ -232,7 +232,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec con
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep)(struct timespec const *__time_point, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep))(__time_point, __remaining); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep)(struct timespec const *__time_point, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep))(__time_point, __remaining); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_thrd_sleep64
@@ -259,7 +259,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec6
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep64)(struct timespec64 const *__time_point, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep64))(__time_point, __remaining); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep64)(struct timespec64 const *__time_point, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep64))(__time_point, __remaining); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_thrd_exit
@@ -272,7 +272,7 @@ __CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thrd_exit,(int __res),(__res))
 /* Terminate current thread execution, cleaning up any thread local
  * storage and freeing resources. Returns the value specified in RES
  * s.a. `pthread_exit()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_NORETURN void (__LIBCCALL thrd_exit)(int __res) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_exit))(__res); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL thrd_exit)(int __res) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_exit))(__res); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thrd_detach
 /* Detach the thread identified by THR from the current
@@ -284,7 +284,7 @@ __CDECLARE(,int,__NOTHROW_NCX,thrd_detach,(thrd_t __thr),(__thr))
 /* Detach the thread identified by THR from the current
  * environment (it does not allow join or wait for it)
  * s.a. `pthread_detach()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_detach, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL thrd_detach)(thrd_t __thr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_detach))(__thr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_detach, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_detach)(thrd_t __thr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_detach))(__thr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thrd_join
 /* Block current thread until execution of THR is complete.
@@ -296,7 +296,7 @@ __CDECLARE(,int,__NOTHROW_RPC,thrd_join,(thrd_t __thr, int *__res),(__thr,__res)
 /* Block current thread until execution of THR is complete.
  * In case that RES is not NULL, will store the return value of THR when exiting
  * s.a. `pthread_join()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_join, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL thrd_join)(thrd_t __thr, int *__res) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_join))(__thr, __res); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_join, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL thrd_join)(thrd_t __thr, int *__res) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_join))(__thr, __res); })
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_yield
 /* Stop current thread execution and call the scheduler to decide which
@@ -337,7 +337,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_init,(mtx_t *__restrict __m
 /* Creates a new mutex object with type TYPE.
  * If successful the new object is pointed by MUTEX
  * s.a. `pthread_mutex_init()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_init, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_init)(mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_init))(__mutex, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_init)(mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_init))(__mutex, __type); })
 #endif /* ... */
 #ifdef __CRT_HAVE_mtx_lock
 /* Block the current thread until the mutex pointed to by MUTEX is
@@ -349,7 +349,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mtx_lock,(mtx_t *__restrict __m
 /* Block the current thread until the mutex pointed to by MUTEX is
  * unlocked.  In that case current thread will not be blocked
  * s.a. `pthread_mutex_lock()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_lock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mtx_lock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_lock))(__mutex); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mtx_lock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_lock))(__mutex); })
 #endif /* ... */
 #if defined(__CRT_HAVE_mtx_timedlock64) && defined(__USE_TIME_BITS64)
 /* Block the current thread until the mutex pointed by MUTEX
@@ -369,7 +369,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__rest
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
  * s.a. `pthread_mutex_timedlock()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock)(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock))(__mutex, __time_point); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock)(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock))(__mutex, __time_point); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_mtx_timedlock64
@@ -390,7 +390,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__r
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
  * s.a. `pthread_mutex_timedlock()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock64)(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock64))(__mutex, __time_point); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock64)(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock64))(__mutex, __time_point); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_mtx_trylock
@@ -405,7 +405,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_trylock,(mtx_t *__restrict 
  * If the mutex is free the current threads takes control of
  * it, otherwise it returns immediately
  * s.a. `pthread_mutex_trylock()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_trylock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_trylock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_trylock))(__mutex); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_trylock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_trylock))(__mutex); })
 #endif /* ... */
 #ifdef __CRT_HAVE_mtx_unlock
 /* Unlock the mutex pointed by MUTEX.
@@ -417,7 +417,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_unlock,(mtx_t *__restrict _
 /* Unlock the mutex pointed by MUTEX.
  * It may potentially awake other threads waiting on this mutex
  * s.a. `pthread_mutex_unlock()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_unlock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_unlock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_unlock))(__mutex); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mtx_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mtx_unlock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_unlock))(__mutex); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutex_destroy
 /* Destroy the mutex object pointed by MUTEX
@@ -451,7 +451,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_init,(cnd_t *__restrict __c
 #include <local/threads/cnd_init.h>
 /* Initialize new condition variable pointed by COND
  * s.a. `pthread_cond_init()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_init, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_init)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_init))(__cond); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_init)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_init))(__cond); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_signal
 /* Unblock one thread that currently waits on condition variable pointed by COND
@@ -461,7 +461,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_signal,(cnd_t *__restrict _
 #include <local/threads/cnd_signal.h>
 /* Unblock one thread that currently waits on condition variable pointed by COND
  * s.a. `pthread_cond_signal()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_signal, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_signal)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_signal))(__cond); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_signal)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_signal))(__cond); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_broadcast
 /* Unblock all threads currently waiting on condition variable pointed by COND
@@ -471,7 +471,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_broadcast,(cnd_t *__restric
 #include <local/threads/cnd_broadcast.h>
 /* Unblock all threads currently waiting on condition variable pointed by COND
  * s.a. `pthread_cond_broadcast()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_broadcast, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_broadcast)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_broadcast))(__cond); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_broadcast, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_broadcast)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_broadcast))(__cond); })
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_wait
 /* Block current thread on the condition variable pointed by COND
@@ -481,7 +481,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,cnd_wait,(cnd_t *__restrict 
 #include <local/threads/cnd_wait.h>
 /* Block current thread on the condition variable pointed by COND
  * s.a. `pthread_cond_wait()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_wait, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL cnd_wait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_wait))(__cond, __mutex); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_wait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL cnd_wait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_wait))(__cond, __mutex); })
 #endif /* ... */
 #if defined(__CRT_HAVE_cnd_timedwait64) && defined(__USE_TIME_BITS64)
 /* Block current thread on the condition variable until condition variable
@@ -498,7 +498,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__r
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait))(__cond, __mutex, __time_point); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait))(__cond, __mutex, __time_point); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_cnd_timedwait64
@@ -516,7 +516,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait64, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait64)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait64))(__cond, __mutex, __time_point); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait64)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait64))(__cond, __mutex, __time_point); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_pthread_cond_destroy
@@ -542,7 +542,7 @@ __CDECLARE(,int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, tss_dtor_t __destruct
 /* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
  * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
  * s.a. `pthread_key_create()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tss_create, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL tss_create)(tss_t *__tss_id, tss_dtor_t __destructor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_create))(__tss_id, __destructor); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tss_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tss_create)(tss_t *__tss_id, tss_dtor_t __destructor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_create))(__tss_id, __destructor); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_getspecific
 /* Return the value held in thread-specific storage
@@ -565,7 +565,7 @@ __CDECLARE(,int,__NOTHROW_NCX,tss_set,(tss_t __tss_id, void *__val),(__tss_id,__
 /* Sets the value of the thread-specific storage
  * identified by TSS_ID for the current thread to VAL
  * s.a. `pthread_setspecific()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tss_set, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL tss_set)(tss_t __tss_id, void *__val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_set))(__tss_id, __val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tss_set, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tss_set)(tss_t __tss_id, void *__val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_set))(__tss_id, __val); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_key_delete
 /* Destroys the thread-specific storage identified by TSS_ID.

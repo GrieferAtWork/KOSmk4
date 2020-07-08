@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x994bc6ee */
+/* HASH CRC-32:0xeb89408b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__res
 #elif defined(__CRT_HAVE_sem_timedwait64) || defined(__CRT_HAVE_sem_timedwait)
 #include <local/semaphore/sem_timedwait.h>
 /* Similar to `sem_wait' but wait only until ABSTIME */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait)(sem_t *__restrict __sem, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait))(__sem, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait)(sem_t *__restrict __sem, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait))(__sem, __abstime); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -94,7 +94,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__re
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 #include <local/semaphore/sem_timedwait64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait64)(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait64))(__sem, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait64)(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait64))(__sem, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */

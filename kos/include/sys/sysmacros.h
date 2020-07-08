@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaff19284 */
+/* HASH CRC-32:0x705ccdda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,19 +39,19 @@ __SYSDECL_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__major_t,__NOTHROW,gnu_dev_major,(__dev_t __dev),(__dev))
 #else /* __CRT_HAVE_gnu_dev_major */
 #include <local/sys.sysmacros/gnu_dev_major.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_major, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __major_t __NOTHROW(__LIBCCALL gnu_dev_major)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_major))(__dev); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_major, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __major_t __NOTHROW(__LIBCCALL gnu_dev_major)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_major))(__dev); })
 #endif /* !__CRT_HAVE_gnu_dev_major */
 #ifdef __CRT_HAVE_gnu_dev_minor
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__minor_t,__NOTHROW,gnu_dev_minor,(__dev_t __dev),(__dev))
 #else /* __CRT_HAVE_gnu_dev_minor */
 #include <local/sys.sysmacros/gnu_dev_minor.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_minor, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __minor_t __NOTHROW(__LIBCCALL gnu_dev_minor)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_minor))(__dev); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_minor, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __minor_t __NOTHROW(__LIBCCALL gnu_dev_minor)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_minor))(__dev); })
 #endif /* !__CRT_HAVE_gnu_dev_minor */
 #ifdef __CRT_HAVE_gnu_dev_makedev
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__dev_t,__NOTHROW,gnu_dev_makedev,(__major_t __major, __minor_t __minor),(__major,__minor))
 #else /* __CRT_HAVE_gnu_dev_makedev */
 #include <local/sys.sysmacros/gnu_dev_makedev.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_makedev, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __dev_t __NOTHROW(__LIBCCALL gnu_dev_makedev)(__major_t __major, __minor_t __minor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major, __minor); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_makedev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __dev_t __NOTHROW(__LIBCCALL gnu_dev_makedev)(__major_t __major, __minor_t __minor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major, __minor); })
 #endif /* !__CRT_HAVE_gnu_dev_makedev */
 
 /* Access the functions with their traditional names.  */
