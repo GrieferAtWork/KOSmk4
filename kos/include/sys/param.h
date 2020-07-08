@@ -31,75 +31,92 @@
 #include <limits.h>
 #include <signal.h>
 
-__SYSDECL_BEGIN
-
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
-#define NBBY              CHAR_BIT
+#ifndef NBBY
+#define NBBY CHAR_BIT
+#endif /* !NBBY */
+
 #if !defined(NGROUPS) && defined(NGROUPS_MAX)
-#   define NGROUPS        NGROUPS_MAX
-#endif
+#define NGROUPS NGROUPS_MAX
+#endif /* !NGROUPS && NGROUPS_MAX */
+
 #if !defined(MAXSYMLINKS) && defined(SYMLOOP_MAX)
-#   define MAXSYMLINKS    SYMLOOP_MAX
-#endif
+#define MAXSYMLINKS SYMLOOP_MAX
+#endif /* !MAXSYMLINKS && SYMLOOP_MAX */
+
 #if !defined(CANBSIZ) && defined(MAX_CANON)
-#   define CANBSIZ        MAX_CANON
-#endif
+#define CANBSIZ MAX_CANON
+#endif /* !CANBSIZ && MAX_CANON */
+
 #if !defined(MAXPATHLEN) && defined(PATH_MAX)
-#   define MAXPATHLEN     PATH_MAX
-#endif
+#define MAXPATHLEN PATH_MAX
+#endif /* !MAXPATHLEN && PATH_MAX */
+
 #if !defined(NOFILE) && defined(OPEN_MAX)
-#   define NOFILE         OPEN_MAX
-#endif
+#define NOFILE OPEN_MAX
+#endif /* !NOFILE && OPEN_MAX */
+
 #if !defined(MAXHOSTNAMELEN) && defined(HOST_NAME_MAX)
-#   define MAXHOSTNAMELEN HOST_NAME_MAX
-#endif
+#define MAXHOSTNAMELEN HOST_NAME_MAX
+#endif /* !MAXHOSTNAMELEN && HOST_NAME_MAX */
+
 #ifndef NCARGS
 #ifdef ARG_MAX
-#   define NCARGS         ARG_MAX
-#else
-#   define NCARGS         INT_MAX
-#endif
-#endif
+#define NCARGS ARG_MAX
+#else /* ARG_MAX */
+#define NCARGS INT_MAX
+#endif /* !ARG_MAX */
+#endif /* !NCARGS */
+
 #ifndef NOGROUP
-#   define NOGROUP    65535
-#endif
+#define NOGROUP 65535
+#endif /* !NOGROUP */
+
 #ifndef NODEV
-#   define NODEV     ((dev_t)-1)
-#endif
+#define NODEV ((dev_t)-1)
+#endif /* !NODEV */
+
 #ifndef DEV_BSIZE
-#   define DEV_BSIZE   512
-#endif
+#define DEV_BSIZE 512
+#endif /* !DEV_BSIZE */
 
 #ifndef setbit
-#define setbit(a,i)     ((a)[(i)/NBBY]|=1<<((i)%NBBY))
+#define setbit(a, i) ((a)[(i) / NBBY] |= 1 << ((i) % NBBY))
 #endif /* !setbit */
+
 #ifndef clrbit
-#define clrbit(a,i)     ((a)[(i)/NBBY]&=~(1<<((i)%NBBY)))
+#define clrbit(a, i) ((a)[(i) / NBBY] &= ~(1 << ((i) % NBBY)))
 #endif /* !clrbit */
+
 #ifndef isset
-#define isset(a,i)      ((a)[(i)/NBBY]&(1<<((i)%NBBY)))
+#define isset(a, i) ((a)[(i) / NBBY] & (1 << ((i) % NBBY)))
 #endif /* !isset */
+
 #ifndef isclr
-#define isclr(a,i)    (!((a)[(i)/NBBY]&(1<<((i)%NBBY))))
+#define isclr(a, i) (!((a)[(i) / NBBY] & (1 << ((i) % NBBY))))
 #endif /* !isclr */
+
 #ifndef howmany
-#define howmany(x,y)  (((x)+((y)-1))/(y))
+#define howmany(x, y) (((x) + ((y)-1)) / (y))
 #endif /* !howmany */
+
 #ifndef powerof2
-#define powerof2(x)      (!(((x)-1)&(x)))
+#define powerof2(x) (!(((x)-1) & (x)))
 #endif /* !powerof2 */
+
 #ifndef roundup
 #ifndef __NO_builtin_constant_p
-#   define roundup(x,y)  (__builtin_constant_p(y) && powerof2(y) ? \
-                         (((x)+(y)-1)&~((y)-1)) : ((((x)+((y)-1))/(y))*(y)))
+#define roundup(x, y)                       \
+	(__builtin_constant_p(y) && powerof2(y) \
+	 ? (((x) + (y)-1) & ~((y)-1))           \
+	 : ((((x) + ((y)-1)) / (y)) * (y)))
 #else /* !__NO_builtin_constant_p */
-#   define roundup(x,y)  ((((x)+((y)-1))/(y))*(y))
+#define roundup(x, y) \
+	((((x) + ((y)-1)) / (y)) * (y))
 #endif /* __NO_builtin_constant_p */
 #endif /* !roundup */
-
-__SYSDECL_END
 
 #endif /* !_SYS_PARAM_H */
