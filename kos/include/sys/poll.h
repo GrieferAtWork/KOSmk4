@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x709dfad1 */
+/* HASH CRC-32:0x2992a033 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,6 +128,12 @@ __SYSDECL_BEGIN
 #define POLLSELECT_EXCEPTFDS __POLLSELECT_EXCEPTFDS /* exceptfds */
 #endif /* __POLLSELECT_EXCEPTFDS */
 #endif /* __USE_KOS */
+
+#ifdef __USE_BSD
+#ifndef INFTIM
+#define INFTIM (-1)
+#endif /* !INFTIM */
+#endif /* __USE_BSD */
 
 #ifdef __CC__
 #ifndef __nfds_t_defined

@@ -131,6 +131,12 @@ __SYSDECL_BEGIN
 #endif /* __POLLSELECT_EXCEPTFDS */
 #endif /* __USE_KOS */
 
+#ifdef __USE_BSD
+#ifndef INFTIM
+#define INFTIM (-1)
+#endif /* !INFTIM */
+#endif /* __USE_BSD */
+
 #ifdef __CC__
 #ifndef __nfds_t_defined
 #define __nfds_t_defined 1

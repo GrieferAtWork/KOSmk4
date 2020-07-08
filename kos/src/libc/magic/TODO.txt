@@ -21,6 +21,10 @@ Add support for *_chk variants (using __builtin_object_size())
 <timeconv.h>
 <tgmath.h>
 <wordexp.h>
+<readpassphrase.h> (contains a single function: https://man.bsd.lv/readpassphrase.3)
+<bsd/readpassphrase.h> (alias for readpassphrase.h) (https://linux.die.net/man/3/readpassphrase)
+<bsd/[...].h> (all of those libbsd headers should be magic-generated and contain `%[insert:extern()]' decls!)
+
 
 <rpc/auth.h>
 <rpc/auth_des.h>
