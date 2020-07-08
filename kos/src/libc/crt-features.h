@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc9565d4 */
+/* HASH CRC-32:0xcdcf9689 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -984,6 +984,7 @@
 #define __CRT_HAVE_DOS$format_wwidth 1
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$fparseln 1
 #define __CRT_HAVE_DOS$fpathconf 1
 #define __CRT_HAVE_DOS$fprintf 1
 #define __CRT_HAVE_DOS$fprintf_unlocked 1
@@ -1802,6 +1803,7 @@
 #define __CRT_HAVE_DOS$openat64 1
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$opendev 1
 #define __CRT_HAVE_DOS$opendir 1
 #define __CRT_HAVE_DOS$opendirat 1
 #define __CRT_HAVE_DOS$openlog 1
@@ -3934,6 +3936,7 @@
 #define __CRT_HAVE_format_wto16 1
 #define __CRT_HAVE_format_wto32 1
 #define __CRT_HAVE_format_wto8 1
+#define __CRT_HAVE_fparseln 1
 #define __CRT_HAVE_fpathconf 1
 #define __CRT_HAVE_fpreset 1
 #define __CRT_HAVE_fprintf 1
@@ -4808,6 +4811,7 @@
 #define __CRT_HAVE_open_wmemstream 1
 #define __CRT_HAVE_openat 1
 #define __CRT_HAVE_openat64 1
+#define __CRT_HAVE_opendev 1
 #define __CRT_HAVE_opendir 1
 #define __CRT_HAVE_opendirat 1
 #define __CRT_HAVE_openlog 1

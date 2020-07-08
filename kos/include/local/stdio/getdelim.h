@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62ade490 */
+/* HASH CRC-32:0x5791a927 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,6 +131,7 @@ __LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 			                         sizeof(char));
 			if __unlikely(!__buffer)
 				return -1;
+			__bufsize  = __new_bufsize;
 			*__lineptr = __buffer;
 			*__pcount  = __bufsize;
 		}

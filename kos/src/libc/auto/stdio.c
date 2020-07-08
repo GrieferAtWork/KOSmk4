@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f027f41 */
+/* HASH CRC-32:0xe9571336 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -565,6 +565,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)
 			                         sizeof(char));
 			if unlikely(!buffer)
 				return -1;
+			bufsize  = new_bufsize;
 			*lineptr = buffer;
 			*pcount  = bufsize;
 		}
@@ -806,6 +807,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 			                         sizeof(char));
 			if unlikely(!buffer)
 				return -1;
+			bufsize  = new_bufsize;
 			*lineptr = buffer;
 			*pcount  = bufsize;
 		}

@@ -64,19 +64,19 @@ __SYSDECL_BEGIN
 
 @@Make FD be the controlling terminal, stdin, stdout, and stderr;
 @@then close FD. Returns 0 on success, nonzero on error
-[[cp_kos, section(".text.crt{|.dos}.io.tty")]]
+[[guard, cp_kos, section(".text.crt{|.dos}.io.tty")]]
 int login_tty($fd_t fd);
 
 @@Write the given entry into utmp and wtmp
-[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
+[[guard, cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 void login([[nonnull]] struct utmp const *entry);
 
 @@Write the utmp entry to say the user on UT_LINE has logged out
-[[cp_kos]]
+[[guard, cp_kos]]
 int logout([[nonnull]] char const *ut_line);
 
 @@Append to wtmp an entry for the current time and the given info
-[[cp_kos]]
+[[guard, cp_kos]]
 void logwtmp([[nonnull]] char const *ut_line,
              [[nonnull]] char const *ut_name,
              [[nonnull]] char const *ut_host);

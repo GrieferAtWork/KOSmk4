@@ -1701,6 +1701,7 @@
 #define __CRT_HAVE_format_wto32 1
 #define __CRT_HAVE_format_wto8 1
 #define __CRT_HAVE_format_wwidth 1
+#define __CRT_HAVE_fparseln 1
 #define __CRT_HAVE_fpathconf 1
 #define __CRT_HAVE_fpclassify 1
 #define __CRT_HAVE_fpclassifyf 1
@@ -2558,6 +2559,7 @@
 #define __CRT_HAVE_open_wmemstream 1
 #define __CRT_HAVE_openat 1
 #define __CRT_HAVE_openat64 1
+#define __CRT_HAVE_opendev 1
 #define __CRT_HAVE_opendir 1
 #define __CRT_HAVE_opendirat 1
 #define __CRT_HAVE_openlog 1
@@ -5932,6 +5934,7 @@
 #define __CRT_HAVE_KOS$format_wto32 1
 #define __CRT_HAVE_KOS$format_wto8 1
 #define __CRT_HAVE_KOS$format_wwidth 1
+#define __CRT_HAVE_KOS$fparseln 1
 #define __CRT_HAVE_KOS$fpathconf 1
 #define __CRT_HAVE_KOS$fpclassify 1
 #define __CRT_HAVE_KOS$fpclassifyf 1
@@ -6725,6 +6728,7 @@
 #define __CRT_HAVE_KOS$open_wmemstream 1
 #define __CRT_HAVE_KOS$openat 1
 #define __CRT_HAVE_KOS$openat64 1
+#define __CRT_HAVE_KOS$opendev 1
 #define __CRT_HAVE_KOS$opendir 1
 #define __CRT_HAVE_KOS$opendirat 1
 #define __CRT_HAVE_KOS$openlog 1
@@ -9302,6 +9306,7 @@
 #define __CRT_HAVE_DOS$format_wto32 1
 #define __CRT_HAVE_DOS$format_wto8 1
 #define __CRT_HAVE_DOS$format_wwidth 1
+#define __CRT_HAVE_DOS$fparseln 1
 #define __CRT_HAVE_DOS$fpathconf 1
 #define __CRT_HAVE_DOS$fpclassify 1
 #define __CRT_HAVE_DOS$fpclassifyf 1
@@ -10095,6 +10100,7 @@
 #define __CRT_HAVE_DOS$open_wmemstream 1
 #define __CRT_HAVE_DOS$openat 1
 #define __CRT_HAVE_DOS$openat64 1
+#define __CRT_HAVE_DOS$opendev 1
 #define __CRT_HAVE_DOS$opendir 1
 #define __CRT_HAVE_DOS$opendirat 1
 #define __CRT_HAVE_DOS$openlog 1

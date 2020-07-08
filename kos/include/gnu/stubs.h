@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72e3cb4f */
+/* HASH CRC-32:0x9d98fcab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -388,6 +388,7 @@
 #define __stub_ntp_gettimex64 1
 #define __stub_obstack_vprintf 1
 #define __stub_open_wmemstream 1
+#define __stub_opendev 1
 #define __stub_openlog 1
 #define __stub_pkey_alloc 1
 #define __stub_pkey_free 1

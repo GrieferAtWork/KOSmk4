@@ -1,0 +1,100 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_FPARSELN_CTEST
+#define GUARD_LIBC_LIBC_FPARSELN_CTEST 1
+#define _KOS_SOURCE 1
+
+#include <hybrid/compiler.h>
+
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <util.h>
+
+DECL_BEGIN
+
+static char const text[] =
+"ln\\#0\n"
+"ln\\#1\r"
+"ln\\#2\r\n"
+"ln\\#3# bar baz\n"
+"ln\\#4# bar baz\r"
+"ln\\#5# bar baz\r\n"
+"\n"
+"\r"
+"\r\n"
+"l\\\rn\\\n\\#\\\r\n6\n"
+"l\\\rn\\\n\\#\\\r\n7\r"
+"l\\\rn\\\n\\#\\\r\n8\r\n"
+"ln\\#9# bar baz\\\nmore\n"
+"ln\\#10# bar baz\\\nmore\r"
+"ln\\#11# bar baz\\\nmore\r\n"
+"ln\\#12# bar baz\\\rmore\n"
+"ln\\#13# bar baz\\\rmore\r"
+"ln\\#14# bar baz\\\rmore\r\n"
+"ln\\#15# bar baz\\\r\nmore\n"
+"ln\\#16# bar baz\\\r\nmore\r"
+"ln\\#17# bar baz\\\r\nmore\r\n";
+
+DEFINE_TEST(fparseln_works) {
+	unsigned int readlines = 0;
+	unsigned int empty_lines = 0;
+	char *line;
+	FILE *fp = fmemopen((char *)text, COMPILER_STRLEN(text), "r");
+	assertf(fp, "%d:%s:%s", errno, strerrorname_s(errno), strerror_s(errno));
+	for (;;) {
+		unsigned long lno;
+		char *endptr;
+		line = fparseln(fp, NULL, NULL, NULL, FPARSELN_UNESCALL);
+		assertf(line, "%d:%s:%s", errno, strerrorname_s(errno), strerror_s(errno));
+		if (!*line) {
+			free(line);
+			if (readlines == 6) {
+				++empty_lines;
+				assert(!feof(fp));
+				continue;
+			}
+			/* Empty lines are also returned for end-of-file */
+			assert(feof(fp));
+			break;
+		}
+		assertf(line[0] == 'l', "%q", line);
+		assertf(line[1] == 'n', "%q", line);
+		assertf(line[2] == '#', "%q", line);
+		lno = strtoul(line + 3, &endptr, 10);
+		assertf(*endptr == 0, "%q (%q)", line, endptr);
+		assertf(lno == readlines, "%q (%lu != %u)", line, lno, readlines);
+		free(line);
+		++readlines;
+	}
+	assertf(readlines == 18, "%u", readlines);
+	assertf(empty_lines == 3, "%u", empty_lines);
+	fclose(fp);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_FPARSELN_CTEST */

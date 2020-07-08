@@ -1704,6 +1704,7 @@
 #define __CRT_HAVE_format_wto32 1
 #define __CRT_HAVE_format_wto8 1
 #define __CRT_HAVE_format_wwidth 1
+#define __CRT_HAVE_fparseln 1
 #define __CRT_HAVE_fpathconf 1
 #define __CRT_HAVE_fpclassify 1
 #define __CRT_HAVE_fpclassifyf 1
@@ -2561,6 +2562,7 @@
 #define __CRT_HAVE_open_wmemstream 1
 #define __CRT_HAVE_openat 1
 #define __CRT_HAVE_openat64 1
+#define __CRT_HAVE_opendev 1
 #define __CRT_HAVE_opendir 1
 #define __CRT_HAVE_opendirat 1
 #define __CRT_HAVE_openlog 1

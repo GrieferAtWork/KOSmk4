@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaff35add */
+/* HASH CRC-32:0x24f93d36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2388,6 +2388,10 @@ DFUN(".text.crt.dos.string.memory", libd_swab, libc_swab, TV, 3, TP, TP, TD)
 DFUN(".text.crt.dos.io.tty", libd_ctermid, libc_ctermid, TP, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
+
+/* util */
+DFUN(".text.crt.dos.io.tty", libd_opendev, libc_opendev, TIn(__SIZEOF_FD_T__), 4, TP, TIn(__SIZEOF_OFLAG_T__), TD, TP)
+DFUN(".text.crt.dos.FILE.locked.read.read", libd_fparseln, libc_fparseln, TP, 5, TP, TP, TP, TP, TD)
 
 /* utime */
 DFUN(".text.crt.dos.fs.modify_time", libd_utime, libc_utime, TD, 2, TP, TP)

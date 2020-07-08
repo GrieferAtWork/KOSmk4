@@ -1299,7 +1299,7 @@ $FILE *open_memstream(char **bufloc, $size_t *sizeloc);
 
 [[cp_stdio, wunused, alias("getdelim_unlocked"), export_alias("__getdelim")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("getdelim_unlocked")]]
-[[requires($has_function(realloc) && $has_function(fgetc) && $has_function(ungetc))]]
+[[requires_function(realloc, fgetc, ungetc)]]
 [[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
                   [[nonnull]] $size_t *__restrict pcount, int delimiter,
@@ -1321,6 +1321,7 @@ $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
 			                         sizeof(char));
 			if unlikely(!buffer)
 				return -1;
+			bufsize  = new_bufsize;
 			*lineptr = buffer;
 			*pcount  = bufsize;
 		}
@@ -1988,6 +1989,7 @@ $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
 			                         sizeof(char));
 			if unlikely(!buffer)
 				return -1;
+			bufsize  = new_bufsize;
 			*lineptr = buffer;
 			*pcount  = bufsize;
 		}

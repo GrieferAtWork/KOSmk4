@@ -150,22 +150,12 @@ typedef void (__LIBCCALL *PERROR_PRINT_PROGNAME)(void);
 DECLARE_NOREL_GLOBAL_META(PERROR_PRINT_PROGNAME, error_print_progname);
 DECLARE_NOREL_GLOBAL_META(unsigned int, error_message_count);
 DECLARE_NOREL_GLOBAL_META(int, error_one_per_line);
-#define __LOCAL_error_print_progname          GET_NOREL_GLOBAL(error_print_progname)
-#define __LOCAL_error_message_count           GET_NOREL_GLOBAL(error_message_count)
-#define __LOCAL_error_one_per_line            GET_NOREL_GLOBAL(error_one_per_line)
-#define error_print_progname                  GET_NOREL_GLOBAL(error_print_progname)
-#define error_message_count                   GET_NOREL_GLOBAL(error_message_count)
-#define error_one_per_line                    GET_NOREL_GLOBAL(error_one_per_line)
-
-
-/* <unistd.h> */
-#undef environ
-#undef __environ_defined
-DECLARE_NOREL_GLOBAL_META(char **, environ);
-#define __environ_defined 1
-#define environ  GET_NOREL_GLOBAL(environ)
-
-
+#define __LOCAL_error_print_progname GET_NOREL_GLOBAL(error_print_progname)
+#define __LOCAL_error_message_count  GET_NOREL_GLOBAL(error_message_count)
+#define __LOCAL_error_one_per_line   GET_NOREL_GLOBAL(error_one_per_line)
+#define error_print_progname         GET_NOREL_GLOBAL(error_print_progname)
+#define error_message_count          GET_NOREL_GLOBAL(error_message_count)
+#define error_one_per_line           GET_NOREL_GLOBAL(error_one_per_line)
 
 
 /* <regex.h> */
@@ -188,12 +178,12 @@ DECLARE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options);
 DECLARE_NOREL_GLOBAL_META(char *, tzname);
 DECLARE_NOREL_GLOBAL_META(longptr_t, timezone);
 DECLARE_NOREL_GLOBAL_META(int, daylight);
-#define __tzname    GET_NOREL_GLOBAL(tzname)
-#define __timezone  GET_NOREL_GLOBAL(timezone)
-#define __daylight  GET_NOREL_GLOBAL(daylight)
-#define tzname      GET_NOREL_GLOBAL(tzname)
-#define timezone    GET_NOREL_GLOBAL(timezone)
-#define daylight    GET_NOREL_GLOBAL(daylight)
+#define __tzname   GET_NOREL_GLOBAL(tzname)
+#define __timezone GET_NOREL_GLOBAL(timezone)
+#define __daylight GET_NOREL_GLOBAL(daylight)
+#define tzname     GET_NOREL_GLOBAL(tzname)
+#define timezone   GET_NOREL_GLOBAL(timezone)
+#define daylight   GET_NOREL_GLOBAL(daylight)
 
 
 /* <getopt.h> */
