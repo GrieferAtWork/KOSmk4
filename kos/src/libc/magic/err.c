@@ -51,11 +51,11 @@ void vwarn(char const *format, $va_list args) {
 %
 %#ifdef __USE_BSD
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n'
-[[cp_stdio, ATTR_LIBC_PRINTF(1, 2), decl_include("<bits/types.h>")]]
+[[guard, cp_stdio, ATTR_LIBC_PRINTF(1, 2), decl_include("<bits/types.h>")]]
 void warnc($errno_t used_errno, char const *format, ...)
 	%{printf("vwarnc")}
 
-[[cp_stdio, doc_alias("warnc"), ATTR_LIBC_PRINTF(1, 0)]]
+[[guard, cp_stdio, doc_alias("warnc"), ATTR_LIBC_PRINTF(1, 0)]]
 [[impl_include("<local/stdstreams.h>"), decl_include("<bits/types.h>")]]
 [[impl_include("<local/program_invocation_name.h>")]]
 [[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
@@ -119,12 +119,12 @@ void verr(int status, char const *format, $va_list args) {
 %
 %#ifdef __USE_BSD
 @@Same as `warnc()', but follow up by calling `exit(status)'
-[[throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
+[[guard, throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
 [[decl_include("<bits/types.h>")]]
 void errc(int status, $errno_t used_errno, char const *format, ...)
 	%{printf("verrc")}
 
-[[doc_alias("errc"), throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 0)]]
+[[guard, doc_alias("errc"), throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 0)]]
 [[decl_include("<bits/types.h>")]]
 [[requires_function(vwarnc, exit)]]
 void verrc(int status, $errno_t used_errno, char const *format, $va_list args) {
