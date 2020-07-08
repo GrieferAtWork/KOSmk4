@@ -245,6 +245,8 @@
 #define __ATTR_WUNUSED                    /* Nothing */
 #define __NO_ATTR_TRANSPARENT_UNION       1
 #define __ATTR_TRANSPARENT_UNION          /* Nothing */
+#define __NO_ATTR_ARTIFICIAL              1
+#define __ATTR_ARTIFICIAL                 /* nothing */
 
 #define __IF0    __pragma(warning(suppress: 4127)) if(0)
 #define __IF1    __pragma(warning(suppress: 4127)) if(0)
@@ -293,6 +295,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __FORCELOCAL             static __forceinline
 #define __NO_EXTERN_INLINE       1
 #define __EXTERN_INLINE          static __inline
+#define __EXTERN_FORCEINLINE     static __forceinline
 #define __LONGLONG               long long
 #define __ULONGLONG              unsigned long long
 #define __NO_builtin_constant_p  1
@@ -317,6 +320,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #if (defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
      defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) ||     \
      defined(_WIN64) || defined(WIN64))
+#define __USER_LABEL_PREFIX_IS_EMPTY 1
 #define __USER_LABEL_PREFIX__    /* nothing */
 #else
 #define __USER_LABEL_PREFIX__    _

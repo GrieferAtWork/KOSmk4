@@ -127,8 +127,9 @@
 #endif
 #if __GCC_VERSION_NUM >= 40300
 #define __GCC_HAS_ATTRIBUTE___alloc_size__
-#define __GCC_HAS_ATTRIBUTE___hot__
+#define __GCC_HAS_ATTRIBUTE___artificial__
 #define __GCC_HAS_ATTRIBUTE___cold__
+#define __GCC_HAS_ATTRIBUTE___hot__
 #endif
 #if __GCC_VERSION_NUM >= 40400
 #define __GCC_HAS_ATTRIBUTE___optimize__
@@ -145,6 +146,9 @@
 #if __GCC_VERSION_NUM >= 70000
 #define __GCC_HAS_ATTRIBUTE___fallthrough__
 #endif
+#if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
+#define __GCC_HAS_ATTRIBUTE___gnu_inline__
+#endif /* __GNUC_GNU_INLINE__ || __GNUC_STDC_INLINE__ */
 #define __has_attribute(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_ATTRIBUTE_##x)
 #endif /* !__has_attribute */
 
@@ -659,9 +663,30 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __ATTR_FORCEINLINE    /* Nothing */
 #endif
 
-#define __LOCAL         static __ATTR_INLINE
-#define __FORCELOCAL    static __ATTR_FORCEINLINE
-#define __EXTERN_INLINE extern __ATTR_INLINE __attribute__((__gnu_inline__)) /* XXX: When did this become available? */
+#if __GCC_VERSION_NUM >= 40300
+#define __ATTR_ARTIFICIAL __attribute__((__artificial__))
+#else /* __GCC_VERSION_NUM >= 40300 */
+#define __NO_ATTR_ARTIFICIAL 1
+#define __ATTR_ARTIFICIAL /* nothing */
+#endif /* __GCC_VERSION_NUM < 40300 */
+
+#define __LOCAL              static __ATTR_INLINE
+#define __FORCELOCAL         static __ATTR_FORCEINLINE
+
+#if __has_attribute(__gnu_inline__)
+#define __EXTERN_INLINE        extern __ATTR_INLINE __attribute__((__gnu_inline__))
+#define __EXTERN_FORCEINLINE   extern __ATTR_FORCEINLINE __attribute__((__gnu_inline__))
+#elif defined(__GNUC_GNU_INLINE__)
+#define __extern_inline        extern __ATTR_INLINE
+#define __extern_always_inline extern __ATTR_FORCEINLINE
+#elif defined(__GNUC_STDC_INLINE__) || __has_attribute(__gnu_inline__)
+#define __EXTERN_INLINE        extern __ATTR_INLINE __attribute__((__gnu_inline__))
+#define __EXTERN_FORCEINLINE   extern __ATTR_FORCEINLINE __attribute__((__gnu_inline__))
+#else /* ... */
+#define __NO_EXTERN_INLINE 1
+#define __EXTERN_INLINE        __LOCAL
+#define __EXTERN_FORCEINLINE   __FORCELOCAL
+#endif /* !... */
 
 #ifndef __LONGLONG
 #ifdef __CC__
@@ -676,27 +701,30 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #ifndef __restrict
 #if defined(restrict) || (defined(__STDC_VERSION__) && (__STDC_VERSION__+0) >= 199901L)
 #define __restrict restrict
-#else
+#else /* restrict || ... */
 #define __restrict /* Nothing */
-#endif
+#endif /* !restrict && !... */
 #endif /* !__restrict */
 #ifndef __restrict__
 #define __restrict__   __restrict
 #endif /* !__restrict__ */
-#endif
+#endif /* __GCC_VERSION_NUM < 29200 */
 
 #if __GCC_VERSION_NUM >= 30100 && !defined(__GNUG__)
 #define __restrict_arr __restrict
-#else
+#else /* __GCC_VERSION_NUM >= 30100 && !__GNUG__ */
 #define __restrict_arr /* Nothing */
-#endif
+#endif /* __GCC_VERSION_NUM < 30100 || __GNUG__ */
 
+
+#if __GCC_VERSION_NUM >= 20970
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS 1
+#endif /* __GCC_VERSION_NUM >= 20970 */
 
 #ifdef __INTELLISENSE__
 /* Intellisense doesn't get it, so try to work around that... */
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
-#elif 1
+#elif defined(__COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS)
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[]
 #elif 1
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) __extension__ T x[0]
@@ -704,8 +732,8 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #endif
 
-#define __STATIC_IF(x)   if(x)
 
+#define __STATIC_IF(x)   if(x)
 #if 1
 #define __STATIC_ELSE(x) else
 #else
@@ -725,8 +753,8 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #endif /* !__cplusplus */
 
 #ifdef __cplusplus
-#if !defined(__INTEL_VERSION__) || __INTEL_VERSION__ >= 600 || \
-    (_WCHAR_T_DEFINED+0 != 0) || (_WCHAR_T+0 != 0)
+#if (!defined(__INTEL_VERSION__) || __INTEL_VERSION__ >= 600 || \
+     (_WCHAR_T_DEFINED + 0 != 0) || (_WCHAR_T + 0 != 0))
 #define __native_wchar_t_defined 1
 #define __wchar_t_defined 1
 #endif

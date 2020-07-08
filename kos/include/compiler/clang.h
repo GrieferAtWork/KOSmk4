@@ -637,6 +637,13 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __ATTR_FORCEINLINE __ATTR_INLINE /* Nothing */
 #endif /* !__always_inline__ */
 
+#if __has_attribute(__artificial__)
+#define __ATTR_ARTIFICIAL __attribute__((__artificial__))
+#else /* __has_attribute(__artificial__) */
+#define __NO_ATTR_ARTIFICIAL 1
+#define __ATTR_ARTIFICIAL /* nothing */
+#endif /* !__has_attribute(__artificial__) */
+
 #define __ATTR_LEAF_P   __ATTR_LEAF
 #define __ATTR_PURE_P   __ATTR_PURE
 #define __ATTR_CONST_P  __ATTR_CONST
@@ -645,12 +652,31 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __LOCAL        static __ATTR_INLINE
 #define __FORCELOCAL   static __ATTR_FORCEINLINE
 
+
+#ifdef __GNUC_STDC_INLINE__
+#if defined(__GNUC_STDC_INLINE__) || defined(__cplusplus)
+#define __extern_inline        extern __inline __attribute__((__gnu_inline__))
+#define __extern_always_inline extern __always_inline __attribute__((__gnu_inline__))
+#else
+#define __extern_inline        extern __inline
+#define __extern_always_inline extern __always_inline
+#endif
+#endif
+
 #if __has_attribute(__gnu_inline__)
-#define __EXTERN_INLINE extern __ATTR_INLINE __attribute__((__gnu_inline__))
-#else /* __gnu_inline__ */
+#define __EXTERN_INLINE        extern __ATTR_INLINE __attribute__((__gnu_inline__))
+#define __EXTERN_FORCEINLINE   extern __ATTR_FORCEINLINE __attribute__((__gnu_inline__))
+#elif defined(__GNUC_GNU_INLINE__)
+#define __extern_inline        extern __ATTR_INLINE
+#define __extern_always_inline extern __ATTR_FORCEINLINE
+#elif defined(__GNUC_STDC_INLINE__) || __has_attribute(__gnu_inline__)
+#define __EXTERN_INLINE        extern __ATTR_INLINE __attribute__((__gnu_inline__))
+#define __EXTERN_FORCEINLINE   extern __ATTR_FORCEINLINE __attribute__((__gnu_inline__))
+#else /* ... */
 #define __NO_EXTERN_INLINE 1
-#define __EXTERN_INLINE __LOCAL
-#endif /* !__gnu_inline__ */
+#define __EXTERN_INLINE        __LOCAL
+#define __EXTERN_FORCEINLINE   __FORCELOCAL
+#endif /* !... */
 
 #define __LONGLONG   signed long long
 #define __ULONGLONG  unsigned long long

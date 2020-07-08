@@ -520,6 +520,7 @@
 #define __STDC_UTF_16__                    1
 #define __STDC_UTF_32__                    1
 #define __STDC_VERSION__                   199901L
+#define __USER_LABEL_PREFIX_IS_EMPTY 1
 #define __USER_LABEL_PREFIX__
 #define __VERSION__                       "6.2.0"
 

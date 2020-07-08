@@ -198,6 +198,7 @@
 #define PRIVATE             __PRIVATE
 #define FORCELOCAL          __FORCELOCAL
 #define EXTERN_INLINE       __EXTERN_INLINE
+#define EXTERN_FORCEINLINE  __EXTERN_FORCEINLINE
 #define LOCAL               __LOCAL
 #define DFL                 __DFL
 

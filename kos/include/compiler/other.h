@@ -257,6 +257,8 @@
 #define __ATTR_INLINE            /* nothing */
 #define __NO_ATTR_FORCEINLINE    1
 #define __ATTR_FORCEINLINE       /* nothing */
+#define __NO_ATTR_ARTIFICIAL     1
+#define __ATTR_ARTIFICIAL        /* nothing */
 
 #define __NO_XBLOCK              1
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
@@ -270,6 +272,7 @@
 #define __FORCELOCAL             /* nothing */
 #define __NO_EXTERN_INLINE       1
 #define __EXTERN_INLINE          /* nothing */
+#define __EXTERN_FORCEINLINE     /* nothing */
 #define __NO_builtin_constant_p  1
 
 #ifdef __LINKER__
