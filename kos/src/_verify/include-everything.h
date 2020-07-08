@@ -179,7 +179,6 @@ incdir("", "../../include");
 #include <argz.h>
 #include <arpa/inet.h>
 #include <asm/bitsperlong.h>
-#include <asm/byteswap.h>
 #include <asm/cacheline.h>
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
@@ -238,7 +237,6 @@ incdir("", "../../include");
 #include <attr/xattr.h>
 #include <bits/acct.h>
 #include <bits/auxv.h>
-#include <bits/byteswap.h>
 #include <bits/cmsghdr-struct.h>
 #include <bits/crt/confname.h>
 #include <bits/crt/db/group.h>

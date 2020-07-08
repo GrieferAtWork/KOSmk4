@@ -22,10 +22,10 @@
 
 #include <features.h>
 
-#include <bits/byteswap.h>
+#include <hybrid/__byteswap.h>
 
-#define bswap_16(x) __bswap_16(x)
-#define bswap_32(x) __bswap_32(x)
-#define bswap_64(x) __bswap_64(x)
+#define bswap_16(x) __hybrid_bswap16(x)
+#define bswap_32(x) __hybrid_bswap32(x)
+#define bswap_64(x) __hybrid_bswap64(x)
 
 #endif /* !_BYTESWAP_H */

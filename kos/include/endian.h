@@ -29,10 +29,10 @@
 #define __ORDER_LITTLE_ENDIAN__ 1234
 #endif /* !__ORDER_LITTLE_ENDIAN__ */
 #ifndef __ORDER_BIG_ENDIAN__
-#define __ORDER_BIG_ENDIAN__    4321
+#define __ORDER_BIG_ENDIAN__ 4321
 #endif /* !__ORDER_BIG_ENDIAN__ */
 #ifndef __ORDER_PDP_ENDIAN__
-#define __ORDER_PDP_ENDIAN__    3412
+#define __ORDER_PDP_ENDIAN__ 3412
 #endif /* !__ORDER_PDP_ENDIAN__ */
 
 #ifndef __LITTLE_ENDIAN
@@ -58,31 +58,30 @@
 #define BIG_ENDIAN    __ORDER_BIG_ENDIAN__
 #define PDP_ENDIAN    __ORDER_PDP_ENDIAN__
 #ifndef BYTE_ORDER
-#define BYTE_ORDER    __BYTE_ORDER__
+#define BYTE_ORDER __BYTE_ORDER__
 #endif /* !BYTE_ORDER */
 #endif /* !__USE_MISC */
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define __LONG_LONG_PAIR(hi,lo) lo,hi
+#define __LONG_LONG_PAIR(hi, lo) lo, hi
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __LONG_LONG_PAIR(hi,lo) hi,lo
+#define __LONG_LONG_PAIR(hi, lo) hi, lo
 #endif
 
 #ifdef __USE_MISC
-#include <bits/byteswap.h>
 #include <hybrid/__byteswap.h>
-#define htobe16(x)  __hybrid_htobe16(x)
-#define htole16(x)  __hybrid_htole16(x)
-#define be16toh(x)  __hybrid_betoh16(x)
-#define le16toh(x)  __hybrid_letoh16(x)
-#define htobe32(x)  __hybrid_htobe32(x)
-#define htole32(x)  __hybrid_htole32(x)
-#define be32toh(x)  __hybrid_betoh32(x)
-#define le32toh(x)  __hybrid_letoh32(x)
-#define htobe64(x)  __hybrid_htobe64(x)
-#define htole64(x)  __hybrid_htole64(x)
-#define be64toh(x)  __hybrid_betoh64(x)
-#define le64toh(x)  __hybrid_letoh64(x)
+#define htobe16(x) __hybrid_htobe16(x)
+#define htole16(x) __hybrid_htole16(x)
+#define be16toh(x) __hybrid_betoh16(x)
+#define le16toh(x) __hybrid_letoh16(x)
+#define htobe32(x) __hybrid_htobe32(x)
+#define htole32(x) __hybrid_htole32(x)
+#define be32toh(x) __hybrid_betoh32(x)
+#define le32toh(x) __hybrid_letoh32(x)
+#define htobe64(x) __hybrid_htobe64(x)
+#define htole64(x) __hybrid_htole64(x)
+#define be64toh(x) __hybrid_betoh64(x)
+#define le64toh(x) __hybrid_letoh64(x)
 #endif /* __USE_MISC */
 
 #endif /* !_ENDIAN_H */

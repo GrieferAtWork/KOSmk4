@@ -64,7 +64,7 @@
 #endif /* __USE_MISC */
 
 #ifdef __USE_DOS
-#include <bits/byteswap.h>
+#include <hybrid/__byteswap.h>
 #include <bits/crt/sys_errlist.h>
 #include <xlocale.h>
 #endif /* __USE_DOS */
@@ -2404,6 +2404,13 @@ $u64 _byteswap_uint64($u64 val) {
 	return __hybrid_bswap64(val);
 }
 %#endif /* __UINT64_TYPE__ */
+%{
+#define _byteswap_ushort(x) __hybrid_bswap16(x)
+#define _byteswap_ulong(x)  __hybrid_bswap32(x)
+#ifdef __UINT64_TYPE__
+#define _byteswap_uint64(x) __hybrid_bswap64(x)
+#endif /* __UINT64_TYPE__ */
+}
 %#endif /* !_MSC_VER */
 
 %#ifdef __USE_DOS_SLIB
