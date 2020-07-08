@@ -115,6 +115,7 @@ __afail(char const *expr, char const *file,
 	aargs.pc   = __builtin_return_address(0);
 	assertion_failure_core(&aargs);
 }
+
 INTERN ATTR_COLD ATTR_NORETURN void VLIBCCALL
 __afailf(char const *expr, char const *file,
          unsigned int line, char const *func,

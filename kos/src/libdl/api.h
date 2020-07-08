@@ -124,6 +124,9 @@
 #define __CRT_HAVE___stack_chk_fail_local 1
 #endif /* !NDEBUG */
 
+#undef __LIBC
+#define __LIBC __INTDEF
+
 #include <hybrid/compiler.h>
 #include <hybrid/host.h>
 #include <kos/types.h>
