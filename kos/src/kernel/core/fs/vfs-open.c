@@ -40,6 +40,7 @@
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <malloca.h>
 
 DECL_BEGIN
