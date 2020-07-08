@@ -187,7 +187,7 @@ DATDEF unsigned int task_start_default_flags;
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 	return task_start(thread, task_start_default_flags);
 }
@@ -297,7 +297,7 @@ NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0,0)));
 #ifdef __cplusplus
 #ifdef __USE_MISC
 extern "C++" {
-FORCELOCAL ATTR_NORETURN void
+FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(union wait status) {
 	task_exit(status.w_status);
 }
@@ -336,7 +336,7 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 #ifndef CONFIG_NO_SMP
 FUNDEF NOBLOCK void NOTHROW(KCALL task_pause)(void);
 #else /* !CONFIG_NO_SMP */
-FORCELOCAL NOBLOCK void NOTHROW(KCALL task_pause)(void) { }
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void NOTHROW(KCALL task_pause)(void) { }
 #endif /* CONFIG_NO_SMP */
 
 /* Try to yield execution in the calling thread, but never thrown an exception.

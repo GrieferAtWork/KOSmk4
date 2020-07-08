@@ -82,56 +82,62 @@ void __NOTHROW(__LIBCCALL io_delay)(void);
 #endif
 
 
-#define __MAKEIN(T, sfx, r, n, count)                                               \
-	__FORCELOCAL T __NOTHROW(__LIBCCALL in##sfx)(__IOPORT_T __port) {               \
-		__register T __rv;                                                          \
-		__asm__ __volatile__("in" #sfx " %w1, %0"                                   \
-		                     : "=a" (__rv)                                          \
-		                     : "Nd" (__port));                                      \
-		return __rv;                                                                \
-	}                                                                               \
-	__FORCELOCAL T __NOTHROW(__LIBCCALL in##sfx##_p)(__IOPORT_T __port) {           \
-		__register T __rv;                                                          \
-		__asm__ __volatile__("in" #sfx " %w1, %0" __IO_SLOWDOWN                     \
-		                     : "=a" (__rv)                                          \
-		                     : "Nd" (__port));                                      \
-		return __rv;                                                                \
-	}                                                                               \
-	__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL ins##sfx)(__IOPORT_T __port,         \
-	                                                     void *__buf,               \
-	                                                     __SIZE_TYPE__ count) {     \
-		__asm__ __volatile__("rep; ins" #sfx                                        \
-		                     : "=D" (__buf)                                         \
-		                     , "=c" (count)                                         \
-		                     , "=m" (__COMPILER_ASM_BUFFER(T, count, __buf))        \
-		                     : "d" (__port)                                         \
-		                     , "0" (__buf)                                          \
-		                     , "1" (count));                                        \
+#define __MAKEIN(T, sfx, r, n, count)                                        \
+	__FORCELOCAL __ATTR_ARTIFICIAL T                                         \
+	__NOTHROW(__LIBCCALL in##sfx)(__IOPORT_T __port) {                       \
+		__register T __rv;                                                   \
+		__asm__ __volatile__("in" #sfx " %w1, %0"                            \
+		                     : "=a" (__rv)                                   \
+		                     : "Nd" (__port));                               \
+		return __rv;                                                         \
+	}                                                                        \
+	__FORCELOCAL __ATTR_ARTIFICIAL T                                         \
+	__NOTHROW(__LIBCCALL in##sfx##_p)(__IOPORT_T __port) {                   \
+		__register T __rv;                                                   \
+		__asm__ __volatile__("in" #sfx " %w1, %0" __IO_SLOWDOWN              \
+		                     : "=a" (__rv)                                   \
+		                     : "Nd" (__port));                               \
+		return __rv;                                                         \
+	}                                                                        \
+	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void                  \
+	__NOTHROW_NCX(__LIBCCALL ins##sfx)(__IOPORT_T __port,                    \
+	                                   void *__buf,                          \
+	                                   __SIZE_TYPE__ count) {                \
+		__asm__ __volatile__("rep; ins" #sfx                                 \
+		                     : "=D" (__buf)                                  \
+		                     , "=c" (count)                                  \
+		                     , "=m" (__COMPILER_ASM_BUFFER(T, count, __buf)) \
+		                     : "d" (__port)                                  \
+		                     , "0" (__buf)                                   \
+		                     , "1" (count));                                 \
 	}
 
-#define __MAKEOUT(T, sfx, s1, r, n, count)                                                      \
-	__FORCELOCAL void __NOTHROW(__LIBCCALL out##sfx)(__IOPORT_T __port, T __val) {              \
-		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1"                                        \
-		                     :                                                                  \
-		                     : "a" (__val)                                                      \
-		                     , "Nd" (__port));                                                  \
-	}                                                                                           \
-	__FORCELOCAL void __NOTHROW(__LIBCCALL out##sfx##_p)(__IOPORT_T __port, T __val) {          \
-		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1" __IO_SLOWDOWN                          \
-		                     :                                                                  \
-		                     : "a" (__val)                                                      \
-		                     , "Nd" (__port));                                                  \
-	}                                                                                           \
-	__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL outs##sfx)(__IOPORT_T __port,                    \
-	                                                      void const *__buf,                    \
-	                                                      __SIZE_TYPE__ count) {                \
-		__asm__ __volatile__("rep; outs" #sfx                                                   \
-		                     : "=S" (__buf)                                                     \
-		                     , "=c" (count)                                                     \
-		                     : "d" (__port)                                                     \
-		                     , "0" (__buf)                                                      \
-		                     , "1" (count)                                                      \
-		                     , "m" (__COMPILER_ASM_BUFFER(T, count, __buf)));                   \
+#define __MAKEOUT(T, sfx, s1, r, n, count)                                    \
+	__FORCELOCAL __ATTR_ARTIFICIAL void                                       \
+	__NOTHROW(__LIBCCALL out##sfx)(__IOPORT_T __port, T __val) {              \
+		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1"                      \
+		                     :                                                \
+		                     : "a" (__val)                                    \
+		                     , "Nd" (__port));                                \
+	}                                                                         \
+	__FORCELOCAL __ATTR_ARTIFICIAL void                                       \
+	__NOTHROW(__LIBCCALL out##sfx##_p)(__IOPORT_T __port, T __val) {          \
+		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1" __IO_SLOWDOWN        \
+		                     :                                                \
+		                     : "a" (__val)                                    \
+		                     , "Nd" (__port));                                \
+	}                                                                         \
+	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void                   \
+	__NOTHROW_NCX(__LIBCCALL outs##sfx)(__IOPORT_T __port,                    \
+	                                    void const *__buf,                    \
+	                                    __SIZE_TYPE__ count) {                \
+		__asm__ __volatile__("rep; outs" #sfx                                 \
+		                     : "=S" (__buf)                                   \
+		                     , "=c" (count)                                   \
+		                     : "d" (__port)                                   \
+		                     , "0" (__buf)                                    \
+		                     , "1" (count)                                    \
+		                     , "m" (__COMPILER_ASM_BUFFER(T, count, __buf))); \
 	}
 
 
@@ -143,7 +149,8 @@ __MAKEOUT(__UINT16_TYPE__, w, "w", "r", 2, __n_words)
 __MAKEOUT(__UINT32_TYPE__, l, "", "r", 4, __n_dwords)
 
 #if defined(__USE_KOS_KERNEL)
-__FORCELOCAL void __NOTHROW(__LIBCCALL io_delay)(void) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL io_delay)(void) {
 	__asm__ __volatile__(__IO_SLOWDOWN
 	                     :
 	                     :
@@ -194,111 +201,112 @@ __NAMESPACE_INT_END
 #define __IO_SLOWDOWN_IMPL __asm { out 0x80, al }
 #endif
 #if 0
-#define __IO_SLOWDOWN  __IO_SLOWDOWN_IMPL \
-                       __IO_SLOWDOWN_IMPL \
-                       __IO_SLOWDOWN_IMPL
+#define __IO_SLOWDOWN  \
+	__IO_SLOWDOWN_IMPL \
+	__IO_SLOWDOWN_IMPL \
+	__IO_SLOWDOWN_IMPL
 #else
 #define __IO_SLOWDOWN  __IO_SLOWDOWN_IMPL
 #endif
 
-__FORCELOCAL __UINT8_TYPE__ __NOTHROW(__LIBCCALL inb)(__IOPORT_T __port) {
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
+__NOTHROW(__LIBCCALL inb)(__IOPORT_T __port) {
 	return (__NAMESPACE_INT_SYM __inbyte)(__port);
 }
 
-__FORCELOCAL __UINT16_TYPE__ __NOTHROW(__LIBCCALL inw)(__IOPORT_T __port) {
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
+__NOTHROW(__LIBCCALL inw)(__IOPORT_T __port) {
 	return (__NAMESPACE_INT_SYM __inword)(__port);
 }
 
-__FORCELOCAL __UINT32_TYPE__ __NOTHROW(__LIBCCALL inl)(__IOPORT_T __port) {
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
+__NOTHROW(__LIBCCALL inl)(__IOPORT_T __port) {
 	return (__UINT32_TYPE__)(__NAMESPACE_INT_SYM __indword)(__port);
 }
 
-__FORCELOCAL __UINT8_TYPE__ __NOTHROW(__LIBCCALL inb_p)(__IOPORT_T __port) {
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
+__NOTHROW(__LIBCCALL inb_p)(__IOPORT_T __port) {
 	__UINT8_TYPE__ __res = (__NAMESPACE_INT_SYM __inbyte)(__port);
 	__IO_SLOWDOWN return __res;
 }
 
-__FORCELOCAL __UINT16_TYPE__ __NOTHROW(__LIBCCALL inw_p)(__IOPORT_T __port) {
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
+__NOTHROW(__LIBCCALL inw_p)(__IOPORT_T __port) {
 	__UINT16_TYPE__ __res = (__NAMESPACE_INT_SYM __inword)(__port);
 	__IO_SLOWDOWN return __res;
 }
 
-__FORCELOCAL __UINT32_TYPE__ __NOTHROW(__LIBCCALL inl_p)(__IOPORT_T __port) {
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
+__NOTHROW(__LIBCCALL inl_p)(__IOPORT_T __port) {
 	__UINT32_TYPE__ __res = (__UINT32_TYPE__)(__NAMESPACE_INT_SYM __indword)(__port);
 	__IO_SLOWDOWN return __res;
 }
 
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL insb)(__IOPORT_T __port,
-                                                 void *__buf,
-                                                 __SIZE_TYPE__ __n_bytes) {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
+__NOTHROW_NCX(__LIBCCALL insb)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes) {
 	(__NAMESPACE_INT_SYM __inbytestring)(__port, (__UINT8_TYPE__ *)__buf, (__LONGSIZE_TYPE__)__n_bytes);
 }
 
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL insw)(__IOPORT_T __port,
-                                                 void *__buf,
-                                                 __SIZE_TYPE__ __n_words) {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
+__NOTHROW_NCX(__LIBCCALL insw)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words) {
 	(__NAMESPACE_INT_SYM __inwordstring)(__port, (__UINT16_TYPE__ *)__buf, (__LONGSIZE_TYPE__)__n_words);
 }
 
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL insl)(__IOPORT_T __port,
-                                                 void *__buf,
-                                                 __SIZE_TYPE__ __n_dwords) {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
+__NOTHROW_NCX(__LIBCCALL insl)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_dwords) {
 	(__NAMESPACE_INT_SYM __indwordstring)(__port, (__ULONG32_TYPE__ *)__buf, (__LONGSIZE_TYPE__)__n_dwords);
 }
 
-__FORCELOCAL void __NOTHROW(__LIBCCALL outb)(__IOPORT_T __port,
-                                             __UINT8_TYPE__ __val) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL outb)(__IOPORT_T __port, __UINT8_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outbyte)(__port, __val);
 }
 
-__FORCELOCAL void __NOTHROW(__LIBCCALL outw)(__IOPORT_T __port,
-                                             __UINT16_TYPE__ __val) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL outw)(__IOPORT_T __port, __UINT16_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outword)(__port, __val);
 }
 
-__FORCELOCAL void __NOTHROW(__LIBCCALL outl)(__IOPORT_T __port,
-                                             __UINT32_TYPE__ __val) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL outl)(__IOPORT_T __port, __UINT32_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outdword)(__port, (__ULONG32_TYPE__)__val);
 }
 
-__FORCELOCAL void __NOTHROW(__LIBCCALL outb_p)(__IOPORT_T __port,
-                                               __UINT8_TYPE__ __val) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outbyte)(__port, __val);
 	__IO_SLOWDOWN
 }
 
-__FORCELOCAL void __NOTHROW(__LIBCCALL outw_p)(__IOPORT_T __port,
-                                               __UINT16_TYPE__ __val) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outword)(__port, __val);
 	__IO_SLOWDOWN
 }
 
-__FORCELOCAL void __NOTHROW(__LIBCCALL outl_p)(__IOPORT_T __port,
-                                               __UINT32_TYPE__ __val) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW(__LIBCCALL outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outdword)(__port, (__ULONG32_TYPE__)__val);
 	__IO_SLOWDOWN
 }
 
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL outsb)(__IOPORT_T __port,
-                                                  void const *__buf,
-                                                  __SIZE_TYPE__ __n_bytes) {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
+__NOTHROW_NCX(__LIBCCALL outsb)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes) {
 	(__NAMESPACE_INT_SYM __outbytestring)(__port, (__UINT8_TYPE__ *)__buf, (__SIZE_TYPE__)__n_bytes);
 }
 
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL outsw)(__IOPORT_T __port,
-                                                  void const *__buf,
-                                                  __SIZE_TYPE__ __n_words) {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
+__NOTHROW_NCX(__LIBCCALL outsw)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words) {
 	(__NAMESPACE_INT_SYM __outwordstring)(__port, (__UINT16_TYPE__ *)__buf, (__SIZE_TYPE__)__n_words);
 }
 
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL outsl)(__IOPORT_T __port,
-                                                  void const *__buf,
-                                                  __SIZE_TYPE__ __n_dwords) {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
+__NOTHROW_NCX(__LIBCCALL outsl)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_dwords) {
 	(__NAMESPACE_INT_SYM __outdwordstring)(__port, (__ULONG32_TYPE__ *)__buf, (__SIZE_TYPE__)__n_dwords);
 }
 
 #if defined(__USE_KOS_KERNEL)
-__FORCELOCAL void __NOTHROW(__LIBCCALL io_delay)(void) { __IO_SLOWDOWN }
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL io_delay)(void) { __IO_SLOWDOWN }
 #endif /* __USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

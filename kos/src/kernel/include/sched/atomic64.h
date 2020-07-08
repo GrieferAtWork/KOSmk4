@@ -131,7 +131,7 @@ struct atomic64 {
 
 #elif defined(CONFIG_ATOMIC64_SUPPORT_NEVER)
 
-FORCELOCAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_read)(struct atomic64 *__restrict self) {
 	u64 result;
 	atomic_rwlock_read(&self->a_lock);
@@ -139,7 +139,8 @@ NOTHROW(FCALL atomic64_read)(struct atomic64 *__restrict self) {
 	atomic_rwlock_endread(&self->a_lock);
 	return result;
 }
-FORCELOCAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
+
+LOCAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_read_r)(struct atomic64 *__restrict self) {
 	u64 result;
 	pflag_t was = PREEMPTION_PUSHOFF();
@@ -152,14 +153,14 @@ NOTHROW(FCALL atomic64_read_r)(struct atomic64 *__restrict self) {
 
 #define atomic64_lock(self)     atomic_rwlock_write(&(self)->a_lock)
 #define atomic64_unlock(self)   atomic_rwlock_endwrite(&(self)->a_lock)
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) void
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) void
 NOTHROW(FCALL atomic64_write)(struct atomic64 *__restrict self, u64 value) {
 	atomic64_lock(self);
 	self->a_value = value;
 	atomic64_unlock(self);
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
 NOTHROW(FCALL atomic64_cmpxch)(struct atomic64 *__restrict self,
                                u64 oldval, u64 newval) {
 	__BOOL result;
@@ -171,7 +172,7 @@ NOTHROW(FCALL atomic64_cmpxch)(struct atomic64 *__restrict self,
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_cmpxch_val)(struct atomic64 *__restrict self,
                                    u64 oldval, u64 newval) {
 	u64 result;
@@ -183,7 +184,7 @@ NOTHROW(FCALL atomic64_cmpxch_val)(struct atomic64 *__restrict self,
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_xch)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	atomic64_lock(self);
@@ -193,7 +194,7 @@ NOTHROW(FCALL atomic64_xch)(struct atomic64 *__restrict self, u64 value) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchadd)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	atomic64_lock(self);
@@ -203,7 +204,7 @@ NOTHROW(FCALL atomic64_fetchadd)(struct atomic64 *__restrict self, u64 value) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchand)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	atomic64_lock(self);
@@ -213,7 +214,7 @@ NOTHROW(FCALL atomic64_fetchand)(struct atomic64 *__restrict self, u64 value) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchor)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	atomic64_lock(self);
@@ -223,7 +224,7 @@ NOTHROW(FCALL atomic64_fetchor)(struct atomic64 *__restrict self, u64 value) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchxor)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	atomic64_lock(self);
@@ -242,14 +243,14 @@ NOTHROW(FCALL atomic64_fetchxor)(struct atomic64 *__restrict self, u64 value) {
 #define REENTRANT_END         \
 		PREEMPTION_POP(_was); \
 	}
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) void
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) void
 NOTHROW(FCALL atomic64_write_r)(struct atomic64 *__restrict self, u64 value) {
 	REENTRANT_BEGIN
 	atomic64_write(self, value);
 	REENTRANT_END
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
 NOTHROW(FCALL atomic64_cmpxch_r)(struct atomic64 *__restrict self,
                                  u64 oldval, u64 newval) {
 	__BOOL result;
@@ -259,7 +260,7 @@ NOTHROW(FCALL atomic64_cmpxch_r)(struct atomic64 *__restrict self,
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_cmpxch_val_r)(struct atomic64 *__restrict self,
                                      u64 oldval, u64 newval) {
 	u64 result;
@@ -269,7 +270,7 @@ NOTHROW(FCALL atomic64_cmpxch_val_r)(struct atomic64 *__restrict self,
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_xch_r)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	REENTRANT_BEGIN
@@ -278,7 +279,7 @@ NOTHROW(FCALL atomic64_xch_r)(struct atomic64 *__restrict self, u64 value) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchadd_r)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	REENTRANT_BEGIN
@@ -287,7 +288,7 @@ NOTHROW(FCALL atomic64_fetchadd_r)(struct atomic64 *__restrict self, u64 value) 
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchand_r)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	REENTRANT_BEGIN
@@ -296,7 +297,7 @@ NOTHROW(FCALL atomic64_fetchand_r)(struct atomic64 *__restrict self, u64 value) 
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchor_r)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	REENTRANT_BEGIN
@@ -305,7 +306,7 @@ NOTHROW(FCALL atomic64_fetchor_r)(struct atomic64 *__restrict self, u64 value) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchxor_r)(struct atomic64 *__restrict self, u64 value) {
 	u64 result;
 	REENTRANT_BEGIN

@@ -809,10 +809,9 @@ PRIVATE mall_ver_t mall_leak_version = 0;
 
 /* Analyze a pointer, or data block for reachable pointers,
  * returning the number of reachable mall pointers. */
-FORCELOCAL NOBLOCK size_t NOTHROW(KCALL mall_reachable_pointer)(void *ptr);
 PRIVATE NOBLOCK size_t NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes);
 
-FORCELOCAL NOBLOCK size_t
+PRIVATE NOBLOCK size_t
 NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 	struct mallnode *node;
 	if (!ptr)

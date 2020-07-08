@@ -71,16 +71,16 @@ LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_mcontext(
 #ifdef __cplusplus
 extern "C++" {
 #ifdef __NO_ASMNAME
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct ucpustate const *__restrict __data) { return regdump_ucpustate(__self, __data); }
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct lcpustate const *__restrict __data) { return regdump_lcpustate(__self, __data); }
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct kcpustate const *__restrict __data) { return regdump_kcpustate(__self, __data); }
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct fcpustate const *__restrict __data) { return regdump_fcpustate(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct ucpustate const *__restrict __data) { return regdump_ucpustate(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct lcpustate const *__restrict __data) { return regdump_lcpustate(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct kcpustate const *__restrict __data) { return regdump_kcpustate(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct fcpustate const *__restrict __data) { return regdump_fcpustate(__self, __data); }
 #ifdef __KERNEL__
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct icpustate const *__restrict __data) { return regdump_icpustate(__self, __data); }
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct scpustate const *__restrict __data) { return regdump_scpustate(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct icpustate const *__restrict __data) { return regdump_icpustate(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct scpustate const *__restrict __data) { return regdump_scpustate(__self, __data); }
 #else /* __KERNEL__ */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct ucontext const *__restrict __data) { return regdump_ucontext(__self, __data); }
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct mcontext const *__restrict __data) { return regdump_mcontext(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct ucontext const *__restrict __data) { return regdump_ucontext(__self, __data); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct mcontext const *__restrict __data) { return regdump_mcontext(__self, __data); }
 #endif /* !__KERNEL__ */
 #else /* __NO_ASMNAME */
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump(struct regdump_printer * __restrict __self, struct ucpustate const *__restrict __data) __ASMNAME("regdump_ucpustate");

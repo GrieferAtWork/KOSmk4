@@ -75,17 +75,17 @@ DECL_BEGIN
 
 
 /* generic VGA port read/write */
-FORCELOCAL NOBLOCK ATTR_DBGTEXT u8 
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_DBGTEXT u8 
 NOTHROW(KCALL vga_r)(port_t port) {
 	return inb_p(port);
 }
 
-FORCELOCAL NOBLOCK ATTR_DBGTEXT void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_DBGTEXT void
 NOTHROW(KCALL vga_w)(port_t port, u8 val) {
 	outb_p(port, val);
 }
 
-FORCELOCAL NOBLOCK ATTR_DBGTEXT void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_DBGTEXT void
 NOTHROW(KCALL vga_w_fast)(port_t port, u8 reg, u8 val) {
 	outw(port, VGA_OUT16VAL(val, reg));
 }

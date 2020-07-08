@@ -32,7 +32,7 @@ __NAMESPACE_FAST_BEGIN
 
 #if !defined(__fast_error_defined) && defined(____libc_slow_error_defined)
 #define __fast_error_defined 1
-__FORCELOCAL __ATTR_LIBC_PRINTF(3, 4) void
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void
 (__VLIBCCALL __LIBC_FAST_NAME(error))(int __status, __errno_t __errnum,
                                       const char *__format, ...) {
 	__libc_slow_error(__status, __errnum, __format, __builtin_va_arg_pack());
@@ -44,7 +44,7 @@ __FORCELOCAL __ATTR_LIBC_PRINTF(3, 4) void
 
 #if !defined(__fast_error_at_line_defined) && defined(____libc_slow_error_at_line_defined)
 #define __fast_error_at_line_defined 1
-__FORCELOCAL __ATTR_LIBC_PRINTF(5, 6) void
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void
 (__VLIBCCALL __LIBC_FAST_NAME(error_at_line))(int __status, __errno_t __errnum,
                                               char const *__filename, unsigned int __line,
                                               char const *__format, ...) {

@@ -152,7 +152,7 @@ FUNDEF void KCALL path_mount(struct path *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_FSERROR_PATH_ALREADY_MOUNTED, E_FSERROR_DELETED, ...);
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL NONNULL((1, 2)) void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 path_mount(struct path *__restrict self,
            struct superblock_type *__restrict filesystem_mount_type,
            struct basic_block_device *filesystem_mount_device,
@@ -171,7 +171,7 @@ path_mount(struct path *__restrict self,
 	path_mount(self, sb, override_existing);
 }
 
-FORCELOCAL NONNULL((1, 2)) void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 path_mount(struct path *__restrict self,
            struct superblock_type *__restrict filesystem_mount_type,
            USER CHECKED char const *filesystem_mount_device,
@@ -190,7 +190,7 @@ path_mount(struct path *__restrict self,
 	path_mount(self, sb, override_existing);
 }
 
-FORCELOCAL NONNULL((1, 2)) void KCALL
+LOCAL NONNULL((1, 2)) void KCALL
 path_mount(struct path *__restrict self,
            struct superblock_type *__restrict filesystem_mount_type,
            uintptr_t filesystem_mount_flags DFL(SUPERBLOCK_FNORMAL),
@@ -207,7 +207,7 @@ path_mount(struct path *__restrict self,
 	path_mount(self, sb, override_existing);
 }
 
-FORCELOCAL NONNULL((1)) void KCALL
+LOCAL NONNULL((1)) void KCALL
 path_mount(struct path *__restrict self,
            USER CHECKED char const *filesystem_mount_type,
            struct basic_block_device *filesystem_mount_device,
@@ -226,7 +226,7 @@ path_mount(struct path *__restrict self,
 	path_mount(self, sb, override_existing);
 }
 
-FORCELOCAL NONNULL((1)) void KCALL
+LOCAL NONNULL((1)) void KCALL
 path_mount(struct path *__restrict self,
            USER CHECKED char const *filesystem_mount_type,
            USER CHECKED char const *filesystem_mount_device,
@@ -245,7 +245,7 @@ path_mount(struct path *__restrict self,
 	path_mount(self, sb, override_existing);
 }
 
-FORCELOCAL NONNULL((1)) void KCALL
+LOCAL NONNULL((1)) void KCALL
 path_mount(struct path *__restrict self,
            USER CHECKED char const *filesystem_mount_type,
            uintptr_t filesystem_mount_flags DFL(SUPERBLOCK_FNORMAL),
@@ -919,7 +919,7 @@ DATDEF ATTR_PERTASK REF struct fs *this_fs;
 #define fs_getuid(f) (f)->f_fsuid
 #define fs_getgid(f) (f)->f_fsgid
 
-FORCELOCAL NOBLOCK WUNUSED fsmode_t
+LOCAL NOBLOCK WUNUSED fsmode_t
 NOTHROW(KCALL fs_getmode)(atflag_t flags) {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
@@ -932,7 +932,7 @@ NOTHROW(KCALL fs_getmode)(atflag_t flags) {
 	return (flags & mode.f_atmask) | mode.f_atflag;
 }
 
-FORCELOCAL NOBLOCK WUNUSED fsmode_t
+LOCAL NOBLOCK WUNUSED fsmode_t
 NOTHROW(KCALL fs_getmode_for)(struct fs *__restrict self, atflag_t flags) {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {

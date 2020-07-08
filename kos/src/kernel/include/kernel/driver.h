@@ -703,7 +703,7 @@ NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL WUNUSED NONNULL((1)) __BOOL KCALL
+LOCAL WUNUSED NONNULL((1)) __BOOL KCALL
 driver_symbol_ex(struct driver *__restrict self,
                  /*in*/ USER CHECKED char const *name,
                  /*out*/ void **psymbol_addr,
@@ -715,10 +715,11 @@ driver_symbol_ex(struct driver *__restrict self,
 	                        name,
 	                        psymbol_addr,
 	                        psymbol_size,
-	                       &hash_elf,
-	                       &hash_gnu);
+	                        &hash_elf,
+	                        &hash_gnu);
 }
-FORCELOCAL WUNUSED NONNULL((1)) ElfW(Sym) const *KCALL
+
+LOCAL WUNUSED NONNULL((1)) ElfW(Sym) const *KCALL
 driver_local_symbol(struct driver *__restrict self,
                     /*in*/ USER CHECKED char const *name)
 		THROWS(E_SEGFAULT) {

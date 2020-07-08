@@ -329,7 +329,7 @@ typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_
 #define CPUSET_INSERT(x, id)   (void)((x)[(id) / BITS_PER_POINTER] |= ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
 #define CPUSET_REMOVE(x, id)   (void)((x)[(id) / BITS_PER_POINTER] &= ~((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
 #define CPUSET_COUNT(x) cpuset_count_impl(x)
-FORCELOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
+LOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 	size_t result = 0;
 	cpuid_t i;
 	for (i = 0; i < cpu_count; ++i) {
@@ -339,7 +339,7 @@ FORCELOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 	return result;
 }
 #define CPUSET_ISEMPTY(x) cpuset_isempty_impl(x)
-FORCELOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
+LOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
 	cpuid_t i;
 	for (i = 0; i < cpu_count; ++i) {
 		if (CPUSET_CONTAINS(self, i))

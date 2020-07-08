@@ -250,43 +250,43 @@ FUNDEF NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict
 #ifdef __cplusplus
 extern "C++" {
 
-FORCELOCAL NOBLOCK struct handle const &
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK struct handle const &
 NOTHROW(KCALL incref)(struct handle const &__restrict self) {
 	handle_incref(self);
 	return self;
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL decref)(struct handle const &__restrict self) {
 	handle_decref(self);
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL decref_likely)(struct handle const &__restrict self) {
 	handle_decref(self);
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL decref_unlikely)(struct handle const &__restrict self) {
 	handle_decref(self);
 }
 
-FORCELOCAL NOBLOCK NONNULL((1)) struct handle const *
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) struct handle const *
 NOTHROW(KCALL incref)(struct handle const *__restrict self) {
 	return &incref(*self);
 }
 
-FORCELOCAL NOBLOCK NONNULL((1)) void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL decref)(struct handle const *__restrict self) {
 	decref(*self);
 }
 
-FORCELOCAL NOBLOCK NONNULL((1)) void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL decref_likely)(struct handle const *__restrict self) {
 	decref_likely(*self);
 }
 
-FORCELOCAL NOBLOCK NONNULL((1)) void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL decref_unlikely)(struct handle const *__restrict self) {
 	decref_unlikely(*self);
 }

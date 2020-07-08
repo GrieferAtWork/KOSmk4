@@ -1159,7 +1159,7 @@ inode_preadv_blocking(struct inode *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL inode_changed)(struct inode *__restrict self,
                              uintptr_t what DFL(INODE_FCHANGED));
-FORCELOCAL NOBLOCK NONNULL((1)) bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL inode_changedattr)(struct inode *__restrict self) {
 	return inode_changed(self, INODE_FATTRCHANGED);
 }
@@ -1255,7 +1255,7 @@ inode_chmod(struct inode *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL NONNULL((1)) mode_t KCALL
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) mode_t KCALL
 inode_chmod(struct inode *__restrict self, mode_t new_perm)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...) {
@@ -1365,25 +1365,29 @@ directory_getcaseentry(struct directory_node *__restrict self,
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
 directory_getentry(struct directory_node *__restrict self,
                    CHECKED USER /*utf-8*/ char const *name, u16 namelen)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, ...) {
-	return directory_getentry(self, name, namelen, directory_entry_hash(name, namelen));
+	return directory_getentry(self, name, namelen,
+	                          directory_entry_hash(name,
+	                                               namelen));
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
 directory_getcaseentry(struct directory_node *__restrict self,
                        CHECKED USER /*utf-8*/ char const *name, u16 namelen)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, ...) {
-	return directory_getcaseentry(self, name, namelen, directory_entry_hash(name, namelen));
+	return directory_getcaseentry(self, name, namelen,
+	                              directory_entry_hash(name,
+	                                                   namelen));
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
 directory_getentry(struct directory_node *__restrict self,
                    CHECKED USER /*utf-8*/ char const *name)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
@@ -1392,7 +1396,7 @@ directory_getentry(struct directory_node *__restrict self,
 	return directory_getentry(self, name, __libc_strlen(name));
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
 directory_getcaseentry(struct directory_node *__restrict self,
                        CHECKED USER /*utf-8*/ char const *name)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT,
@@ -1439,7 +1443,7 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL WUNUSED NONNULL((1, 4)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 4)) struct directory_entry **KCALL
 directory_getentry_p(struct directory_node *__restrict self,
                      CHECKED USER /*utf-8*/ char const *name, u16 namelen,
                      /*out*/ REF struct directory_entry **__restrict poneshot_entry)
@@ -1451,7 +1455,7 @@ directory_getentry_p(struct directory_node *__restrict self,
 	                            poneshot_entry);
 }
 
-FORCELOCAL WUNUSED NONNULL((1, 4)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 4)) struct directory_entry **KCALL
 directory_getcaseentry_p(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *name, u16 namelen,
                          /*out*/ REF struct directory_entry **__restrict poneshot_entry)
@@ -1463,7 +1467,7 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 	                                poneshot_entry);
 }
 
-FORCELOCAL WUNUSED NONNULL((1, 3)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 3)) struct directory_entry **KCALL
 directory_getentry_p(struct directory_node *__restrict self,
                      CHECKED USER /*utf-8*/ char const *name,
                      /*out*/ REF struct directory_entry **__restrict poneshot_entry)
@@ -1473,7 +1477,7 @@ directory_getentry_p(struct directory_node *__restrict self,
 	return directory_getentry_p(self, name, __libc_strlen(name), poneshot_entry);
 }
 
-FORCELOCAL WUNUSED NONNULL((1, 3)) struct directory_entry **KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1, 3)) struct directory_entry **KCALL
 directory_getcaseentry_p(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *name,
                          /*out*/ REF struct directory_entry **__restrict poneshot_entry)
@@ -1516,7 +1520,7 @@ directory_getcasenode(struct directory_node *__restrict self,
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL WUNUSED NONNULL((1)) REF struct inode *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getnode(struct directory_node *__restrict self,
                   CHECKED USER /*utf-8*/ char const *name, u16 namelen,
                   REF struct directory_entry **pentry DFL(__NULLPTR))
@@ -1524,11 +1528,11 @@ directory_getnode(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getnode(self, name, namelen,
-							 directory_entry_hash(name, namelen),
-							 pentry);
+	                         directory_entry_hash(name, namelen),
+	                         pentry);
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct inode *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getcasenode(struct directory_node *__restrict self,
                       CHECKED USER /*utf-8*/ char const *name, u16 namelen,
                       REF struct directory_entry **pentry DFL(__NULLPTR))
@@ -1540,7 +1544,7 @@ directory_getcasenode(struct directory_node *__restrict self,
 								 pentry);
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct inode *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getnode(struct directory_node *__restrict self,
                   CHECKED USER /*utf-8*/ char const *name,
                   REF struct directory_entry **pentry DFL(__NULLPTR))
@@ -1550,7 +1554,7 @@ directory_getnode(struct directory_node *__restrict self,
 	return directory_getnode(self, name, __libc_strlen(name), pentry);
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct inode *KCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct inode *KCALL
 directory_getcasenode(struct directory_node *__restrict self,
                       CHECKED USER /*utf-8*/ char const *name,
                       REF struct directory_entry **pentry DFL(__NULLPTR))
@@ -2209,7 +2213,7 @@ unregister_filesystem_type(struct superblock_type *__restrict type)
 #ifdef __cplusplus
 extern "C++" {
 /* Convenience overloads */
-FORCELOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
+LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 (KCALL superblock_open)(USER CHECKED char const *filesystem_type_name,
                         struct basic_block_device *device,
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
@@ -2226,7 +2230,8 @@ FORCELOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 	FINALLY_DECREF_UNLIKELY(type);
 	return superblock_open(type, device, flags, args, pnew_superblock_created);
 }
-FORCELOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
+
+LOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 (KCALL superblock_open)(USER CHECKED char const *filesystem_type_name,
                         USER CHECKED char const *device_name,
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
@@ -2243,7 +2248,8 @@ FORCELOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 	FINALLY_DECREF_UNLIKELY(dev);
 	return superblock_open(filesystem_type_name, dev, flags, args, pnew_superblock_created);
 }
-FORCELOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
+
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
 (KCALL superblock_open)(struct superblock_type *__restrict type,
                         USER CHECKED char const *device_name,
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
@@ -2260,7 +2266,8 @@ FORCELOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
 	FINALLY_DECREF_UNLIKELY(dev);
 	return superblock_open(type, dev, flags, args, pnew_superblock_created);
 }
-FORCELOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
+
+FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 (KCALL superblock_open)(USER CHECKED char const *filesystem_type_name,
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),
@@ -2275,7 +2282,8 @@ FORCELOCAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 	                       args,
 	                       pnew_superblock_created);
 }
-FORCELOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
+
+FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct superblock *
 (KCALL superblock_open)(struct superblock_type *__restrict type,
                         uintptr_t flags DFL(SUPERBLOCK_FNORMAL),
                         UNCHECKED USER char *args DFL(__NULLPTR),

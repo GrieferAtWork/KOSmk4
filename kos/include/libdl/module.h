@@ -89,7 +89,7 @@ INTDEF NONNULL((1)) void LIBDL_CC DlSection_Decref(DlSection *__restrict self);
 	 (DL_API_SYMBOL(DlSection_Destroy)(self), 0))
 #endif /* !__INTELLISENSE__ */
 
-FORCELOCAL NONNULL((1)) bool LIBDL_CC
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC
 DlSection_TryIncref(DlSection *__restrict self) {
 	refcnt_t refcnt;
 	do {
@@ -274,7 +274,7 @@ INTDEF NONNULL((1)) bool LIBDL_CC DlModule_DecrefNoKill(DlModule *__restrict sel
 #define DlModule_DecrefNoKill(self) (__hybrid_atomic_fetchdec((self)->dm_refcnt, __ATOMIC_SEQ_CST))
 #endif /* !__INTELLISENSE__ */
 
-FORCELOCAL NONNULL((1)) bool LIBDL_CC
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC
 DlModule_TryIncref(DlModule *__restrict self) {
 	refcnt_t refcnt;
 	do {

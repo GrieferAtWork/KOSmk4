@@ -786,7 +786,7 @@ NOTHROW(KCALL inode_changed)(struct inode *__restrict self, uintptr_t what) {
 }
 
 
-FORCELOCAL NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void KCALL
 inode_check_deleted(struct inode *__restrict self,
                     uintptr_t reason = E_FILESYSTEM_DELETED_FILE)
                     THROWS(E_FSERROR_DELETED) {
@@ -797,7 +797,7 @@ inode_check_deleted(struct inode *__restrict self,
 	}
 }
 
-FORCELOCAL NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void KCALL
 inode_loadattr_and_check_deleted(struct inode *__restrict self,
                                  uintptr_t reason = E_FILESYSTEM_DELETED_FILE)
 		THROWS(E_FSERROR_DELETED, E_IOERROR, ...) {

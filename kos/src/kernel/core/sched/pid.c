@@ -1596,12 +1596,14 @@ NOTHROW(KCALL kernel_initialize_bootpid)(void) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_GETTID
 DEFINE_SYSCALL0(pid_t, gettid) {
+	COMPILER_IMPURE();
 	return task_gettid();
 }
 #endif /* __ARCH_WANT_SYSCALL_GETTID */
 
 #ifdef __ARCH_WANT_SYSCALL_GETPID
 DEFINE_SYSCALL0(pid_t, getpid) {
+	COMPILER_IMPURE();
 	return task_getpid();
 }
 #endif /* __ARCH_WANT_SYSCALL_GETPID */

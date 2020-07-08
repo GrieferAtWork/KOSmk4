@@ -197,7 +197,7 @@ typedef union {
 #define ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET 1
 #ifdef __CC__
 /* Low-level Get/Set the physical address of the currently active page directory. */
-FORCELOCAL NOBLOCK ATTR_PURE WUNUSED PHYS pagedir_t *
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED PHYS pagedir_t *
 NOTHROW(KCALL pagedir_get)(void) {
 	pagedir_t *result;
 	__asm__("movl %%cr3, %0"
@@ -207,7 +207,7 @@ NOTHROW(KCALL pagedir_get)(void) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 	__asm__("movl %0, %%cr3"
 	        :
@@ -266,7 +266,8 @@ typedef pae_pagedir_pushval_t pagedir_pushval_t;
  * Note that this function may only sync all user-space mappings. If the
  * intent is to also sync all of kernel-space, `pagedir_syncall()'
  * must be used instead. */
-FORCELOCAL NOBLOCK void NOTHROW(FCALL pagedir_syncall_user)(void) {
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
+NOTHROW(FCALL pagedir_syncall_user)(void) {
 	__register u32 temp;
 	__asm__("movl %%cr3, %0\n\t"
 	        "movl %0, %%cr3"
@@ -294,7 +295,7 @@ NOTHROW(FCALL arch_pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *addr);
 
 /* Synchronize mappings within the given address range. */
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS

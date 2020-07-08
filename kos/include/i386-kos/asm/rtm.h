@@ -55,7 +55,7 @@ __DECL_BEGIN
 /* Start a transaction (s.a. `sys_rtm_begin()')
  * @return: _XBEGIN_STARTED: Transaction started.
  * @return: _XABORT_* :      Transaction failed. */
-__FORCELOCAL __UINT32_TYPE__(__xbegin)(void)
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__(__xbegin)(void)
 #if __has_builtin(__builtin_ia32_xbegin)
 {
 	return (__UINT32_TYPE__)__builtin_ia32_xbegin();
@@ -77,7 +77,7 @@ __FORCELOCAL __UINT32_TYPE__(__xbegin)(void)
  * If the transaction failed, `__xbegin()' returns `_XABORT_*'
  * If no transaction was in progress, trigger #GP(0) that is propagated to user-space as
  * `E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE:E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f01, 2)' */
-__FORCELOCAL void(__xend)(void)
+__FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void)
 #if __has_builtin(__builtin_ia32_xend)
 {
 	__builtin_ia32_xend();
@@ -103,9 +103,9 @@ __FORCELOCAL void(__xend)(void)
 
 /* Check if a transaction is currently in progress (s.a. `sys_rtm_test()') */
 #ifdef __KOS__ /* Always available under KOS */
-__FORCELOCAL __BOOL __NOTHROW(__xtest)(void)
+__FORCELOCAL __ATTR_ARTIFICIAL __BOOL __NOTHROW(__xtest)(void)
 #else /* __KOS__ */
-__FORCELOCAL __BOOL(__xtest)(void)
+__FORCELOCAL __ATTR_ARTIFICIAL __BOOL(__xtest)(void)
 #endif /* !__KOS__ */
 #if __has_builtin(__builtin_ia32_xtest)
 {

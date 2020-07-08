@@ -41,13 +41,13 @@ DECL_BEGIN
 
 #ifdef __CC__
 #define task_pause()    x86_pause()
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_pause)(void) {
 	__asm__ __volatile__("pause");
 }
 
 /* Preemption control. */
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_enable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti"
@@ -57,7 +57,7 @@ NOTHROW(KCALL x86_interrupt_enable)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
@@ -68,7 +68,7 @@ NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
@@ -80,7 +80,7 @@ NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL void
+FORCELOCAL ATTR_ARTIFICIAL void
 NOTHROW(KCALL x86_interrupt_wait)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("hlt"
@@ -90,7 +90,7 @@ NOTHROW(KCALL x86_interrupt_wait)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL ATTR_NORETURN void
+FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
 NOTHROW(KCALL x86_interrupt_halt)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("cli\n\t"
@@ -103,7 +103,7 @@ NOTHROW(KCALL x86_interrupt_halt)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_enable_p)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
@@ -114,7 +114,7 @@ NOTHROW(KCALL x86_interrupt_enable_p)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_interrupt_disable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("cli"

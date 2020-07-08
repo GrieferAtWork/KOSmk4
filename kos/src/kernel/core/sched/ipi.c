@@ -574,8 +574,6 @@ unset_waking:
 
 
 
-
-
 PUBLIC void NOTHROW(KCALL cpu_deepsleep)(void) {
 	struct cpu *me = THIS_CPU;
 	assertf(THIS_TASK == &FORCPU(me, thiscpu_idle),

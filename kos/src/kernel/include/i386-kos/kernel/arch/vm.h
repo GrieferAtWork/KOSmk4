@@ -102,7 +102,7 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_rep_outsl)();
  * @return: >0: The contents of the 2 buffers differ from each other.
  * @return:  0: The contents of the 2 buffers are identical.
  * @return: <0: At least one of the 2 buffers is faulty. */
-FORCELOCAL NOBLOCK WUNUSED ssize_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ssize_t
 NOTHROW(KCALL memeq_nopf)(USER CHECKED void const *lhs,
                           USER CHECKED void const *rhs,
                           size_t num_bytes) {
@@ -125,7 +125,7 @@ NOTHROW(KCALL memeq_nopf)(USER CHECKED void const *lhs,
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL insb_nopf)(port_t port, void *buf, size_t num_bytes) {
 	__register size_t result;
 	__asm__ __volatile__("call x86_nopf_rep_insb"
@@ -138,7 +138,7 @@ NOTHROW(KCALL insb_nopf)(port_t port, void *buf, size_t num_bytes) {
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL insw_nopf)(port_t port, void *buf, size_t num_words) {
 	__register size_t result;
 	__asm__ __volatile__("call x86_nopf_rep_insw"
@@ -151,7 +151,7 @@ NOTHROW(KCALL insw_nopf)(port_t port, void *buf, size_t num_words) {
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL insl_nopf)(port_t port, void *buf, size_t num_dwords) {
 	__register size_t result;
 	__asm__ __volatile__("call x86_nopf_rep_insl"
@@ -164,7 +164,7 @@ NOTHROW(KCALL insl_nopf)(port_t port, void *buf, size_t num_dwords) {
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL outsb_nopf)(port_t port, void const *buf, size_t num_bytes) {
 	__register size_t result;
 	__asm__ __volatile__("call x86_nopf_rep_outsb"
@@ -177,7 +177,7 @@ NOTHROW(KCALL outsb_nopf)(port_t port, void const *buf, size_t num_bytes) {
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL outsw_nopf)(port_t port, void const *buf, size_t num_words) {
 	__register size_t result;
 	__asm__ __volatile__("call x86_nopf_rep_outsw"
@@ -190,7 +190,7 @@ NOTHROW(KCALL outsw_nopf)(port_t port, void const *buf, size_t num_words) {
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL outsl_nopf)(port_t port, void const *buf, size_t num_dwords) {
 	__register size_t result;
 	__asm__ __volatile__("call x86_nopf_rep_outsl"
@@ -218,7 +218,7 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_rax_Pcx)(); /* movq %rax, (%rc
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL readb_nopf)(USER CHECKED void const *addr,
                           u8 *presult) {
 	bool error;
@@ -232,7 +232,7 @@ NOTHROW(KCALL readb_nopf)(USER CHECKED void const *addr,
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL readw_nopf)(USER CHECKED void const *addr,
                           u16 *presult) {
 	bool error;
@@ -246,7 +246,7 @@ NOTHROW(KCALL readw_nopf)(USER CHECKED void const *addr,
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL readl_nopf)(USER CHECKED void const *addr,
                           u32 *presult) {
 	bool error;
@@ -260,7 +260,7 @@ NOTHROW(KCALL readl_nopf)(USER CHECKED void const *addr,
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL readq_nopf)(USER CHECKED void const *addr,
                           u64 *presult) {
 #ifdef __x86_64__
@@ -279,7 +279,7 @@ NOTHROW(KCALL readq_nopf)(USER CHECKED void const *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr,
                            u8 value) {
 	bool error;
@@ -293,7 +293,7 @@ NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr,
                            u16 value) {
 	bool error;
@@ -307,7 +307,7 @@ NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr,
                            u32 value) {
 	bool error;
@@ -321,7 +321,7 @@ NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr,
                            u64 value) {
 #ifdef __x86_64__
@@ -359,7 +359,7 @@ NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr,
  *              The affected memory ranges are:
  *               - `dst + num_bytes - return ... dst + num_bytes - 1'
  *               - `src + num_bytes - return ... src + num_bytes - 1' */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL memcpy_nopf)(USER CHECKED void *dst,
                            USER CHECKED void const *src,
                            size_t num_bytes) {
@@ -375,7 +375,7 @@ NOTHROW(KCALL memcpy_nopf)(USER CHECKED void *dst,
 }
 
 /* @return: * : The # of bytes that could not be accessed */
-FORCELOCAL NOBLOCK WUNUSED size_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL memset_nopf)(USER CHECKED void *dst,
                            int byte,
                            size_t num_bytes) {

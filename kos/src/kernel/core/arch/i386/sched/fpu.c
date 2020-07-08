@@ -353,7 +353,8 @@ PRIVATE ATTR_FREERODATA byte_t const savexmm_nosse[] = {
 	0xc3                                           /* ret                                        */
 };
 
-FORCELOCAL ATTR_FREETEXT void KCALL inject_jmp(void *addr, void const *dst) {
+PRIVATE ATTR_FREETEXT void KCALL
+inject_jmp(void *addr, void const *dst) {
 	*(byte_t *)addr = 0xe9;
 	*((s32 *)((byte_t *)addr + 1)) = (s32)((intptr_t)dst - ((intptr_t)addr + 5));
 }

@@ -124,7 +124,7 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-FORCELOCAL size_t
+PRIVATE size_t
 NOTHROW_NX(KCALL FUNC(get_realloc_size))(size_t n_bytes) {
 	size_t result;
 	if unlikely(OVERFLOW_UADD(n_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result))

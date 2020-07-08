@@ -96,21 +96,21 @@ PRIVATE ssize_t CC libterminal_flush_obuf(struct terminal *__restrict self, iomo
 
 
 /* Special text sequences. */
-PRIVATE byte_t const slash[] = { '/' };
+PRIVATE byte_t const slash[]     = { '/' };
 PRIVATE byte_t const backslash[] = { '\\' };
-PRIVATE byte_t const crlf[] = { '\r', '\n' };
-PRIVATE byte_t const lf[] = { '\n' };
-PRIVATE byte_t const bell[] = { '\7' };
-PRIVATE byte_t const erase1[] = { '\b', ' ', '\b' };
+PRIVATE byte_t const crlf[]      = { '\r', '\n' };
+PRIVATE byte_t const lf[]        = { '\n' };
+PRIVATE byte_t const bell[]      = { '\7' };
+PRIVATE byte_t const erase1[]    = { '\b', ' ', '\b' };
 
-FORCELOCAL ssize_t CC
+FORCELOCAL ATTR_ARTIFICIAL ssize_t CC
 libterminal_do_owrite_direct(struct terminal *__restrict self,
                              __USER __CHECKED void const *src,
                              size_t num_bytes, iomode_t mode) {
 	return (*self->t_oprint)(self, src, num_bytes, mode);
 }
 
-FORCELOCAL KERNEL_SELECT(size_t, ssize_t) CC
+FORCELOCAL ATTR_ARTIFICIAL KERNEL_SELECT(size_t, ssize_t) CC
 libterminal_do_iwrite_direct(struct terminal *__restrict self,
                              __USER __CHECKED void const *src,
                              size_t num_bytes, iomode_t mode) {
@@ -120,6 +120,7 @@ libterminal_do_iwrite_direct(struct terminal *__restrict self,
 	         : ringbuffer_write(&self->t_ibuf, src, num_bytes);
 	return result;
 }
+
 FORCELOCAL void CC
 libterminal_do_iwrite_set_eofing(struct terminal *__restrict self) {
 	/* Set the EOFing bit */

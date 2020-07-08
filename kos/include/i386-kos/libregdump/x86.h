@@ -139,16 +139,16 @@ LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_idt(struc
 #ifdef __cplusplus
 extern "C++" {
 #ifdef __NO_ASMNAME
-#define LIBREGDUMP_DEFINE_DUMPER(type, name)                    \
-	__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC \
-	regdump(struct regdump_printer *__restrict __self,          \
-	        type const *__restrict __data) {                    \
-		return name(self, data);                                \
+#define LIBREGDUMP_DEFINE_DUMPER(type, name)                                      \
+	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC \
+	regdump(struct regdump_printer *__restrict __self,                            \
+	        type const *__restrict __data) {                                      \
+		return name(self, data);                                                  \
 	}
 #else /* __NO_ASMNAME */
-#define LIBREGDUMP_DEFINE_DUMPER(type, name)                    \
-	__FORCELOCAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC \
-	regdump(struct regdump_printer *__restrict __self,          \
+#define LIBREGDUMP_DEFINE_DUMPER(type, name)                       \
+	LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC \
+	regdump(struct regdump_printer *__restrict __self,             \
 	        type const *__restrict __data) __ASMNAME(#name);
 #endif /* !__NO_ASMNAME */
 LIBREGDUMP_DEFINE_DUMPER(struct gpregs, regdump_gpregs)

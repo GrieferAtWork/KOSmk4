@@ -38,10 +38,10 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Return a reference to the controlling terminal of the calling/given process. */
-FORCELOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty(void) THROWS(E_WOULDBLOCK);
-FORCELOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_nx)(void);
-FORCELOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-FORCELOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread);
+LOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty(void) THROWS(E_WOULDBLOCK);
+LOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_nx)(void);
+LOCAL WUNUSED REF struct ttybase_device *KCALL task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+LOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread);
 
 
 /* The character device made available under /dev/ttybase_device
@@ -55,7 +55,7 @@ DATDEF struct character_device dev_tty;
 #ifndef __INTELLISENSE__
 
 
-FORCELOCAL WUNUSED REF struct ttybase_device *KCALL
+LOCAL WUNUSED REF struct ttybase_device *KCALL
 task_getctty(void) THROWS(E_WOULDBLOCK) {
 	REF struct ttybase_device *result;
 	REF struct task *session_leader;
@@ -67,7 +67,7 @@ task_getctty(void) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-FORCELOCAL WUNUSED REF struct ttybase_device *
+LOCAL WUNUSED REF struct ttybase_device *
 NOTHROW(KCALL task_getctty_nx)(void) {
 	REF struct ttybase_device *result;
 	REF struct task *session_leader;
@@ -79,7 +79,7 @@ NOTHROW(KCALL task_getctty_nx)(void) {
 	return result;
 }
 
-FORCELOCAL WUNUSED REF struct ttybase_device *KCALL
+LOCAL WUNUSED REF struct ttybase_device *KCALL
 task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct ttybase_device *result;
 	REF struct task *session_leader;
@@ -91,7 +91,7 @@ task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-FORCELOCAL WUNUSED REF struct ttybase_device *
+LOCAL WUNUSED REF struct ttybase_device *
 NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
 	REF struct ttybase_device *result;
 	REF struct task *session_leader;

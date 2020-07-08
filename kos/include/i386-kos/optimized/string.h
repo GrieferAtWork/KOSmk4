@@ -60,7 +60,7 @@ extern __ATTR_ERROR("memcpy(): The `DST' and `SRC' buffers overlap - Use `memmov
 
 #define __fast_memcpy_defined 1
 /* Copy memory between non-overlapping memory blocks. */
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
                                                    void const *__restrict __src,
                                                    __SIZE_TYPE__ __n_bytes) {
@@ -269,7 +269,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 }
 
 #define __fast_mempcpy_defined 1
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
                                                     void const *__restrict __src,
                                                     __SIZE_TYPE__ __n_bytes) {

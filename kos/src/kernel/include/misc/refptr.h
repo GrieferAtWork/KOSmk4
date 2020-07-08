@@ -37,14 +37,20 @@ template<class T> class inherited_reference {
 private:
 	T *m_ptr;
 public:
-	__CXX_FORCEINLINE NOBLOCK operator T *() const __CXX_NOEXCEPT { return m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK inherited_reference(T *ptr) __CXX_NOEXCEPT: m_ptr(ptr) {}
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK
+	operator T *() const __CXX_NOEXCEPT {
+		return m_ptr;
+	}
+
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK
+	inherited_reference(T *ptr) __CXX_NOEXCEPT
+	    : m_ptr(ptr) { }
 };
 
 
 struct __inherited_reference_tag {
 public:
-	template<class T> __CXX_FORCEINLINE
+	template<class T> __CXX_FORCEINLINE ATTR_ARTIFICIAL
 	inherited_reference<T> operator ->* (T *ptr) __CXX_NOEXCEPT {
 		return ptr;
 	}
@@ -62,20 +68,20 @@ private:
 	T *m_ptr; /* [0..1][const] The pointed-to object. */
 public:
     typedef REFCNT_METHODS(T) rm;
-	__CXX_FORCEINLINE NOBLOCK ~refptr() __CXX_NOEXCEPT { if (m_ptr) rm::decref(m_ptr); }
-	__CXX_FORCEINLINE NOBLOCK refptr() __CXX_NOEXCEPT: m_ptr(__NULLPTR) {}
-	__CXX_FORCEINLINE NOBLOCK refptr(T *ptr) __CXX_NOEXCEPT: m_ptr(ptr) { if (ptr) rm::incref(ptr); }
-	__CXX_FORCEINLINE NOBLOCK refptr(inherited_reference<T> ptr) __CXX_NOEXCEPT: m_ptr(ptr) {}
-	__CXX_FORCEINLINE NOBLOCK refptr(refptr const &other) __CXX_NOEXCEPT: m_ptr(other.m_ptr) { if (this->m_ptr) rm::incref(this->m_ptr); }
-	__CXX_FORCEINLINE NOBLOCK refptr(refptr &&other) __CXX_NOEXCEPT: m_ptr(other.m_ptr) { other.m_ptr = __NULLPTR; }
-	__CXX_FORCEINLINE NOBLOCK T *ptr() const __CXX_NOEXCEPT { return this->m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK T **operator & () __CXX_NOEXCEPT { return &this->m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK T *const *operator & () const __CXX_NOEXCEPT { return &this->m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK T &operator * () const __CXX_NOEXCEPT { return *this->m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK T *operator -> () const __CXX_NOEXCEPT { return this->m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK operator T *() const __CXX_NOEXCEPT { return this->m_ptr; }
-	__CXX_FORCEINLINE NOBLOCK bool operator !() const __CXX_NOEXCEPT { return this->m_ptr == NULL; }
-	__CXX_FORCEINLINE NOBLOCK operator bool() const __CXX_NOEXCEPT { return this->m_ptr != NULL; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK ~refptr() __CXX_NOEXCEPT { if (m_ptr) rm::decref(m_ptr); }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK refptr() __CXX_NOEXCEPT: m_ptr(__NULLPTR) {}
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK refptr(T *ptr) __CXX_NOEXCEPT: m_ptr(ptr) { if (ptr) rm::incref(ptr); }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK refptr(inherited_reference<T> ptr) __CXX_NOEXCEPT: m_ptr(ptr) {}
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK refptr(refptr const &other) __CXX_NOEXCEPT: m_ptr(other.m_ptr) { if (this->m_ptr) rm::incref(this->m_ptr); }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK refptr(refptr &&other) __CXX_NOEXCEPT: m_ptr(other.m_ptr) { other.m_ptr = __NULLPTR; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK T *ptr() const __CXX_NOEXCEPT { return this->m_ptr; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK T **operator & () __CXX_NOEXCEPT { return &this->m_ptr; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK T *const *operator & () const __CXX_NOEXCEPT { return &this->m_ptr; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK T &operator * () const __CXX_NOEXCEPT { return *this->m_ptr; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK T *operator -> () const __CXX_NOEXCEPT { return this->m_ptr; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK operator T *() const __CXX_NOEXCEPT { return this->m_ptr; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK bool operator !() const __CXX_NOEXCEPT { return this->m_ptr == __NULLPTR; }
+	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK operator bool() const __CXX_NOEXCEPT { return this->m_ptr != __NULLPTR; }
 	__CXX_FORCEINLINE NOBLOCK T *release() __CXX_NOEXCEPT {
 		T *result   = this->m_ptr;
 		this->m_ptr = __NULLPTR;
@@ -144,7 +150,9 @@ template<class T> ATTR_ERROR(ERROR_MESSAGE_AUTOPTR("incref")) T *incref(refptr<T
 template<class T> ATTR_ERROR(ERROR_MESSAGE_AUTOPTR("xincref")) T *xincref(refptr<T> const&);
 template<class T> ATTR_ERROR(ERROR_MESSAGE_AUTOPTR("tryincref")) __BOOL tryincref(refptr<T> const&);
 #undef ERROR_MESSAGE_AUTOPTR
-template<class T> void destroy(refptr<T> &self) { refptr<T>::rm::destroy(self.release()); }
+template<class T> void destroy(refptr<T> &self) {
+	refptr<T>::rm::destroy(self.release());
+}
 
 
 

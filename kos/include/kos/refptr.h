@@ -40,14 +40,14 @@ template<class __T>
 class __inheritptr {
 public:
 	__REF __T *__m_ptr; /* [0..1] Referenced object. */
-	__NOBLOCK __CXX_CLASSMEMBER __inheritptr() __CXX_NOEXCEPT: __m_ptr(__NULLPTR) {}
-	__NOBLOCK __CXX_CLASSMEMBER __inheritptr(__REF __T *__ptr) __CXX_NOEXCEPT: __m_ptr(__ptr) {}
+	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL __inheritptr() __CXX_NOEXCEPT: __m_ptr(__NULLPTR) {}
+	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL __inheritptr(__REF __T *__ptr) __CXX_NOEXCEPT: __m_ptr(__ptr) {}
 	__CXX_DEFAULT_COPY_NOEXCEPT(__inheritptr, __other,
 	                            : __m_ptr(__other.__m_ptr) {});
 };
 
 template<class __T>
-__CXX_FORCEINLINE __ATTR_CONST __inheritptr<__T> inherit(__REF __T *__ptr) __CXX_NOEXCEPT {
+__CXX_FORCEINLINE __ATTR_ARTIFICIAL __ATTR_CONST __inheritptr<__T> inherit(__REF __T *__ptr) __CXX_NOEXCEPT {
 	return __inheritptr<__T>(__ptr);
 }
 
@@ -58,51 +58,60 @@ private:
 	typedef __REFCNT_METHODS(__T) __refctrl;
 	__REF __T *__m_ptr; /* [0..1] Referenced object. */
 public: /* Helper functions */
-	__NOBLOCK __CXX_CLASSMEMBER __ATTR_WUNUSED __T *get() const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL
+	__NOBLOCK __ATTR_WUNUSED __T *get() const __CXX_NOEXCEPT {
 		return __m_ptr;
 	}
-	__NOBLOCK __CXX_CLASSMEMBER __ATTR_WUNUSED __REF __T *incref() const __CXX_NOEXCEPT {
+
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED
+	__REF __T *incref() const __CXX_NOEXCEPT {
 		__REF __T *__res = __m_ptr;
 		if (__res)
 			__refctrl::incref(__res);
 		return __res;
 	}
-	__NOBLOCK __CXX_CLASSMEMBER __ATTR_WUNUSED __REF __T *release() __CXX_NOEXCEPT {
+
+	__CXX_CLASSMEMBER __NOBLOCK __ATTR_WUNUSED
+	__REF __T *release() __CXX_NOEXCEPT {
 		__REF __T *__res = __m_ptr;
 		__m_ptr = __NULLPTR;
 		return __res;
 	}
-	__NOBLOCK __CXX_CLASSMEMBER void clear() __CXX_NOEXCEPT {
+
+	__CXX_CLASSMEMBER __NOBLOCK void clear() __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __NULLPTR;
 		if (__optr)
 			__refctrl::decref(__optr);
 	}
-	__NOBLOCK __CXX_CLASSMEMBER void clear_likely() __CXX_NOEXCEPT {
+
+	__CXX_CLASSMEMBER __NOBLOCK void clear_likely() __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __NULLPTR;
 		if (__optr)
 			__refctrl::decref_likely(__optr);
 	}
-	__NOBLOCK __CXX_CLASSMEMBER void clear_unlikely() __CXX_NOEXCEPT {
+
+	__CXX_CLASSMEMBER __NOBLOCK void clear_unlikely() __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __NULLPTR;
 		if (__optr)
 			__refctrl::decref_unlikely(__optr);
 	}
+
 public: /* conversion */
-	__NOBLOCK __CXX_CLASSMEMBER operator __T*() const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK operator __T*() const __CXX_NOEXCEPT {
 		return __m_ptr;
 	}
 public: /* Deref */
-	__NOBLOCK __CXX_CLASSMEMBER __T &operator*() const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK __T &operator*() const __CXX_NOEXCEPT {
 		return *__m_ptr;
 	}
-	__NOBLOCK __CXX_CLASSMEMBER __T *operator->() const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK __T *operator->() const __CXX_NOEXCEPT {
 		return __m_ptr;
 	}
 public: /* Assignment */
-	template<class __SCT> __NOBLOCK __CXX_CLASSMEMBER
+	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK
 	typename std::enable_if<std::is_base_of<__T, __SCT>::value, refptr &>::type
 	operator = (__inheritptr<__SCT> const &__other) {
 		__REF __T *__optr = __m_ptr;
@@ -111,7 +120,7 @@ public: /* Assignment */
 			__refctrl::decref(__optr);
 		return *this;
 	}
-	template<class __SCT> __NOBLOCK __CXX_CLASSMEMBER
+	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK
 	typename std::enable_if<std::is_base_of<__T, __SCT>::value, refptr &>::type
 	operator = (__SCT *__other) {
 		__REF __T *__optr = __m_ptr;
@@ -120,14 +129,14 @@ public: /* Assignment */
 			__refctrl::decref(__optr);
 		return *this;
 	}
-	__NOBLOCK __CXX_CLASSMEMBER refptr &operator = (refptr const &__other) __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __NOBLOCK refptr &operator = (refptr const &__other) __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.incref();
 		if (__optr)
 			__refctrl::decref(__optr);
 		return *this;
 	}
-	template<class __SCT> __NOBLOCK __CXX_CLASSMEMBER
+	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK
 	typename std::enable_if<std::is_base_of<__T, __SCT>::value, refptr &>::type
 	operator = (refptr<__SCT> const &__other) {
 		__REF __T *__optr = __m_ptr;
@@ -137,14 +146,14 @@ public: /* Assignment */
 		return *this;
 	}
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
-	__NOBLOCK __CXX_CLASSMEMBER refptr &operator = (refptr &&__other) __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __NOBLOCK refptr &operator = (refptr &&__other) __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.release();
 		if (__optr)
 			__refctrl::decref(__optr);
 		return *this;
 	}
-	template<class __SCT> __NOBLOCK __CXX_CLASSMEMBER
+	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK
 	typename std::enable_if<std::is_base_of<__T, __SCT>::value, refptr &>::type
 	operator = (refptr<__SCT> &&__other) {
 		__REF __T *__optr = __m_ptr;
@@ -155,33 +164,38 @@ public: /* Assignment */
 	}
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 public: /* Constructor / Destructor */
-	__NOBLOCK __CXX_CLASSMEMBER ~refptr() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK ~refptr() __CXX_NOEXCEPT {
 		if (__m_ptr)
 			__refctrl::decref(__m_ptr);
 	}
-	__NOBLOCK __CXX_CLASSMEMBER refptr() __CXX_NOEXCEPT: __m_ptr(__NULLPTR) {}
-	__NOBLOCK __CXX_CLASSMEMBER refptr(refptr const &__other) __CXX_NOEXCEPT: __m_ptr(__other.incref()) {}
-	template<class __SCT>
-	__NOBLOCK __CXX_CLASSMEMBER refptr(__inheritptr<__SCT> const &__other,
-	                                   typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0)
-	__CXX_NOEXCEPT: __m_ptr(__other.__m_ptr) {}
-	template<class __SCT>
-	__NOBLOCK __CXX_CLASSMEMBER refptr(__SCT *__other,
-	                                   typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0)
-	__CXX_NOEXCEPT: __m_ptr(__other) {
+
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK refptr() __CXX_NOEXCEPT
+	    : __m_ptr(__NULLPTR) { }
+
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK refptr(refptr const &__other) __CXX_NOEXCEPT
+	    : __m_ptr(__other.incref()) { }
+
+	template<class __SCT> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK
+	refptr(__inheritptr<__SCT> const &__other, typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0) __CXX_NOEXCEPT
+	    : __m_ptr(__other.__m_ptr) { }
+
+	template<class __SCT> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK
+	refptr(__SCT *__other, typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0) __CXX_NOEXCEPT
+	    : __m_ptr(__other) {
 		if (__other)
 			__refctrl::incref(__other);
 	}
-	template<class __SCT>
-	__NOBLOCK __CXX_CLASSMEMBER refptr(refptr<__SCT> const &__other,
-	                                   typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0)
-	__CXX_NOEXCEPT: __m_ptr(__other.incref()) {}
+
+	template<class __SCT> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK
+	refptr(refptr<__SCT> const &__other, typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0) __CXX_NOEXCEPT
+	    : __m_ptr(__other.incref()) { }
+
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
-	__NOBLOCK __CXX_CLASSMEMBER refptr(refptr &&__other) __CXX_NOEXCEPT: __m_ptr(__other.release()) {}
-	template<class __SCT>
-	__NOBLOCK __CXX_CLASSMEMBER refptr(refptr<__SCT> &&__other,
-	                                   typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0)
-	__CXX_NOEXCEPT: __m_ptr(__other.release()) {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK refptr(refptr &&__other) __CXX_NOEXCEPT
+	    : __m_ptr(__other.release()) { }
+	template<class __SCT> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __NOBLOCK
+	refptr(refptr<__SCT> &&__other, typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0) __CXX_NOEXCEPT
+	    : __m_ptr(__other.release()) { }
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 };
 

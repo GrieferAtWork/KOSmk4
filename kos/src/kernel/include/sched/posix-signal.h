@@ -418,7 +418,7 @@ NOTHROW(KCALL task_raisesignalprocessgroup_nx)(struct task *__restrict target,
 #ifdef __cplusplus
 extern "C++" {
 /* Simplified variants of the functions above that directly take a kernel-space SIGNO */
-FORCELOCAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
                        u32 signo,
                        gfp_t rpc_flags DFL(GFP_NORMAL))
@@ -429,7 +429,8 @@ task_raisesignalthread(struct task *__restrict target,
 	info.si_signo = signo;
 	return task_raisesignalprocess(target, &info, rpc_flags);
 }
-FORCELOCAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
+
+LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
                                          u32 signo,
                                          gfp_t rpc_flags DFL(GFP_NORMAL)) {
@@ -439,7 +440,7 @@ NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
 	return task_raisesignalthread_nx(target, &info, rpc_flags);
 }
 
-FORCELOCAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
                         u32 signo,
                         gfp_t rpc_flags DFL(GFP_NORMAL))
@@ -451,7 +452,7 @@ task_raisesignalprocess(struct task *__restrict target,
 	return task_raisesignalprocess(target, &info, rpc_flags);
 }
 
-FORCELOCAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
+LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
                                           u32 signo,
                                           gfp_t rpc_flags DFL(GFP_NORMAL)) {
@@ -461,7 +462,7 @@ NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
 	return task_raisesignalprocess_nx(target, &info, rpc_flags);
 }
 
-FORCELOCAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
+LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
                              u32 signo,
                              gfp_t rpc_flags DFL(GFP_NORMAL))
@@ -473,7 +474,7 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 	return task_raisesignalprocessgroup(target, &info, rpc_flags);
 }
 
-FORCELOCAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) ssize_t
+LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) ssize_t
 NOTHROW(KCALL task_raisesignalprocessgroup_nx)(struct task *__restrict target,
                                                u32 signo,
                                                gfp_t rpc_flags DFL(GFP_NORMAL)) {

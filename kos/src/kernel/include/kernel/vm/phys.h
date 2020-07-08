@@ -97,7 +97,7 @@ FUNDEF void KCALL vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src
 FUNDEF void KCALL __os_vm_copyfromphys(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("vm_copyfromphys");
 FUNDEF void KCALL __os_vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("vm_copytophys");
 
-FORCELOCAL void KCALL
+FORCELOCAL ATTR_ARTIFICIAL void KCALL
 vm_copyfromphys(USER CHECKED void *dst,
                 PHYS vm_phys_t src,
                 size_t num_bytes)
@@ -127,7 +127,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 	__os_vm_copyfromphys(dst, src, num_bytes);
 }
 
-FORCELOCAL void KCALL
+FORCELOCAL ATTR_ARTIFICIAL void KCALL
 vm_copytophys(PHYS vm_phys_t dst,
               USER CHECKED void const *src,
               size_t num_bytes)

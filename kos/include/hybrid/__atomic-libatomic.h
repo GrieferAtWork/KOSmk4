@@ -493,11 +493,11 @@ template<class __T, class __TN> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1
 #ifdef __NO_XBLOCK
 /* Work-around for compilers without expression block support */
 #define __HYBRID_DEFINE_ATOMIC_CMPXCH_N(T, n)                                           \
-	__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __BOOL                                 \
+	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __BOOL               \
 	(__hybrid_atomic_cmpxch_##n)(T * __x, T __ov, T __nv, int __succ, int __fail) {     \
 		return __hybrid_atomic_compare_exchange_##n(__x, &__ov, __nv, __succ, __fail);  \
 	}                                                                                   \
-	__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) T                                      \
+	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) T                    \
 	(__hybrid_atomic_cmpxch_val_##n)(T * __x, T __ov, T __nv, int __succ, int __fail) { \
 		__hybrid_atomic_compare_exchange_##n(__x, &__ov, __nv, __succ, __fail);         \
 		return __ov;                                                                    \

@@ -69,7 +69,7 @@ struct task;
 
 
 #define THIS_TASK   __get_this_task()
-FORCELOCAL ATTR_CONST WUNUSED
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST WUNUSED
 struct task *NOTHROW(KCALL __get_this_task)(void) {
 	__register struct task *__result;
 #ifdef __X86_SEG_TASK
@@ -83,7 +83,7 @@ struct task *NOTHROW(KCALL __get_this_task)(void) {
 }
 
 #define PERTASK(x) (*(__typeof__(&(x)))__get_per_task((void *)&(x)))
-FORCELOCAL ATTR_CONST WUNUSED
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST WUNUSED
 void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
 	__register void *__result;
 #ifdef __X86_SEG_TASK

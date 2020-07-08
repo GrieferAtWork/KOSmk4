@@ -63,14 +63,14 @@ struct cmos_realtime_clock_struct
 
 
 /* Read CMOS control register `reg' */
-FORCELOCAL NOBLOCK u8
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK u8
 NOTHROW(KCALL cmos_rd)(u8 reg) {
 	outb(CMOS_ADDR, reg | cmos_realtime_clock.cr_nmi);
 	return inb(CMOS_DATA);
 }
 
 /* Write CMOS control register `reg' */
-FORCELOCAL NOBLOCK void
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL cmos_wr)(u8 reg, u8 val) {
 	outb(CMOS_ADDR, reg | cmos_realtime_clock.cr_nmi);
 	outb(CMOS_DATA, val);

@@ -121,12 +121,12 @@
 #else /* ... */
 #define __CXX_DEFAULT_CTOR(T)                             T() {}
 #define __CXX_DEFAULT_DTOR(T)                             ~T() {}
-#define __CXX_DEFAULT_COPY(T, other, ...)                 T(T const &other) __VA_ARGS__
-#define __CXX_DEFAULT_COPY_ASSIGN(T, other, ...)          T &operator = (T const &other) __VA_ARGS__
+#define __CXX_DEFAULT_COPY(T, other, ...)                 __ATTR_ARTIFICIAL T(T const &other) __VA_ARGS__
+#define __CXX_DEFAULT_COPY_ASSIGN(T, other, ...)          __ATTR_ARTIFICIAL T &operator = (T const &other) __VA_ARGS__
 #define __CXX_DEFAULT_CTOR_NOEXCEPT(T)                    T() __CXX_NOEXCEPT {}
 #define __CXX_DEFAULT_DTOR_NOEXCEPT(T)                    ~T() __CXX_NOEXCEPT {}
-#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...)        T(T const &other) __CXX_NOEXCEPT __VA_ARGS__
-#define __CXX_DEFAULT_COPY_ASSIGN_NOEXCEPT(T, other, ...) T &operator = (T const &other) __CXX_NOEXCEPT __VA_ARGS__
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...)        __ATTR_ARTIFICIAL T(T const &other) __CXX_NOEXCEPT __VA_ARGS__
+#define __CXX_DEFAULT_COPY_ASSIGN_NOEXCEPT(T, other, ...) __ATTR_ARTIFICIAL T &operator = (T const &other) __CXX_NOEXCEPT __VA_ARGS__
 #endif /* !... */
 #define __CXX_DEFAULT_COPY_CTOR_AND_ASSIGN(decl, T, other, ...) \
 	decl __CXX_DEFAULT_COPY(T, other, __VA_ARGS__);             \

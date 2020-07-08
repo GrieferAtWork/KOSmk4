@@ -215,8 +215,9 @@ extern "C++" {
 
 template<class __T, class __OV, class __NV>
 #define __hybrid_atomic_cmpxch_val __hybrid_atomic_cmpxch_val
-__FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv, __NV __newv,
-                                                           int __UNUSED(__succ), int __UNUSED(__fail)) {
+__FORCELOCAL __ATTR_ARTIFICIAL __T
+__NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv, __NV __newv,
+                                          int __UNUSED(__succ), int __UNUSED(__fail)) {
 	return (__T)__impl_hybrid_atomic_cmpxch_val_seqcst(__x, __oldv, __newv);
 }
 
@@ -262,7 +263,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv
 	})
 #else /* __NO_XBLOCK */
 #define __DEFINE_WRAPPER(n)                                                      \
-	__FORCELOCAL __UINT##n##_TYPE__                                              \
+	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                            \
 	__NOTHROW_NCX(__impl_hybrid_atomic_cmpxch_val##n)(void *__x,                 \
 	                                                  __UINT##n##_TYPE__ __oldv, \
 	                                                  __UINT##n##_TYPE__ __newv, \
@@ -291,7 +292,8 @@ __NAMESPACE_INT_END
 extern "C++" {
 
 template<class __T, class __V>
-__FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv, __V __newv, int __succ, int __fail) {
+__FORCELOCAL __ATTR_ARTIFICIAL __T
+__NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv, __V __newv, int __succ, int __fail) {
 	__STATIC_IF(sizeof(__T) == 1) {
 		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val8((void *)&__x, (__UINT8_TYPE__)__oldv, (__UINT8_TYPE__)__newv, __succ, __fail);
 	}
@@ -362,7 +364,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv,
 	})
 #else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #define __DEFINE_WRAPPER(n)                                                                           \
-	__FORCELOCAL __UINT##n##_TYPE__                                                                   \
+	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                                 \
 	__NOTHROW_NCX(__impl_hybrid_atomic_load##n)(void *__x, int __order) {                             \
 		register __UINT##n##_TYPE__ __res;                                                            \
 		if (__order >= __ATOMIC_SEQ_CST)                                                              \
@@ -389,7 +391,8 @@ extern "C++" {
 
 template<class __T>
 #define __hybrid_atomic_load __hybrid_atomic_load
-__FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_load)(__T &__x, int __order) {
+__FORCELOCAL __ATTR_ARTIFICIAL __T
+__NOTHROW_NCX(__hybrid_atomic_load)(__T &__x, int __order) {
 	__STATIC_IF(sizeof(__T) == 1) {
 		return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_load8((void *)&__x, __order);
 	}
@@ -444,7 +447,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_load)(__T &__x, int __order) {
 	})
 #else /* !__NO_XBLOCK */
 #define __DEFINE_WRAPPER(n)                                                                        \
-	__FORCELOCAL void                                                                              \
+	__FORCELOCAL __ATTR_ARTIFICIAL void                                                            \
 	__NOTHROW_NCX(__impl_hybrid_atomic_store##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
 		if (__order >= __ATOMIC_SEQ_CST)                                                           \
 			__impl_hybrid_atomic_store_seqcst(*(__UINT##n##_TYPE__ *)__x, __v);                    \
@@ -468,7 +471,8 @@ __NAMESPACE_INT_END
 extern "C++" {
 template<class __T, class __V>
 #define __hybrid_atomic_store __hybrid_atomic_store
-__FORCELOCAL void __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __order) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __order) {
 	__STATIC_IF(sizeof(__T) == 1) {
 		__NAMESPACE_INT_SYM __impl_hybrid_atomic_store8((void *)&__x, (__UINT8_TYPE__)__v, __order);
 	}
@@ -523,7 +527,7 @@ __FORCELOCAL void __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __
 	})
 #else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #define __DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, n, opfun)                           \
-	__FORCELOCAL __UINT##n##_TYPE__                                                             \
+	__FORCELOCAL __ATTR_ARTIFICIAL __UINT##n##_TYPE__                                           \
 	__NOTHROW_NCX(__impl_hybrid_atomic_##name##n##_seqcst)(void *__x, __UINT##n##_TYPE__ __v) { \
 		__register __UINT##n##_TYPE__ __res;                                                    \
 		do {                                                                                    \
@@ -551,7 +555,7 @@ __FORCELOCAL void __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __
 	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 64, opfun)                                                                       \
 	__NAMESPACE_INT_END extern "C++" {                                                                                                   \
 		template<class __T, class __V>                                                                                                   \
-		__FORCELOCAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetch##name##_seqcst)(__T & __x, __V __v) {                                  \
+		__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetch##name##_seqcst)(__T & __x, __V __v) {                \
 			__STATIC_IF(sizeof(__T) == 1) {                                                                                              \
 				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetch##name##8_seqcst((void *)&__x, (__UINT8_TYPE__)__v);           \
 			}                                                                                                                            \
@@ -727,7 +731,8 @@ __INLINE_hybrid_atomic_fetchop_seqcst(fetchnand, __hybrid_opfun_nand)
 #define __hybrid_atomic_signal_fence(order) \
 	(__NAMESPACE_INT_SYM __impl_hybrid_atomic_signal_fence(order))
 __NAMESPACE_INT_BEGIN
-__FORCELOCAL void __NOTHROW_NCX(__impl_hybrid_atomic_signal_fence)(int __order) {
+__FORCELOCAL __ATTR_ARTIFICIAL void
+__NOTHROW_NCX(__impl_hybrid_atomic_signal_fence)(int __order) {
 	/* Fallback: Emit compiler barriers to implement atomic signal fencing.
 	 * HINT: If available, compiler barriers are implemented using intrinsic
 	 *       signal fences, meaning that they are literally the same thing.

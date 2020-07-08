@@ -68,16 +68,16 @@ LIBCPUSTATE_DECL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_app
 #ifdef __cplusplus
 extern "C++" {
 #ifdef __NO_ASMNAME
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct ucpustate const *__restrict __state) { cpu_apply_ucpustate(__state); }
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct lcpustate const *__restrict __state) { cpu_apply_lcpustate(__state); }
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct kcpustate const *__restrict __state) { cpu_apply_kcpustate(__state); }
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct fcpustate const *__restrict __state) { cpu_apply_fcpustate(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct ucpustate const *__restrict __state) { cpu_apply_ucpustate(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct lcpustate const *__restrict __state) { cpu_apply_lcpustate(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct kcpustate const *__restrict __state) { cpu_apply_kcpustate(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct fcpustate const *__restrict __state) { cpu_apply_fcpustate(__state); }
 #ifdef __KERNEL__
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct icpustate const *__restrict __state) { cpu_apply_icpustate(__state); }
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct scpustate const *__restrict __state) { cpu_apply_scpustate(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct icpustate const *__restrict __state) { cpu_apply_icpustate(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct scpustate const *__restrict __state) { cpu_apply_scpustate(__state); }
 #else /* __KERNEL__ */
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct ucontext const *__restrict __state) { cpu_apply_ucontext(__state); }
-__FORCELOCAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct mcontext const *__restrict __state) { cpu_apply_mcontext(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct ucontext const *__restrict __state) { cpu_apply_ucontext(__state); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct mcontext const *__restrict __state) { cpu_apply_mcontext(__state); }
 #endif /* !__KERNEL__ */
 #else /* __NO_ASMNAME */
 LIBCPUSTATE_DECL __ATTR_NORETURN __ATTR_NONNULL((1)) void LIBCPUSTATE_CC cpu_apply(struct ucpustate const *__restrict __state) __ASMNAME("cpu_apply_ucpustate");

@@ -81,26 +81,26 @@ DECL_BEGIN
 __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_TABLES_METADATA)
 #undef DEFINE_KERNEL_SYSCALL_TABLES_METADATA
 
-FORCELOCAL ATTR_CONST NOBLOCK __BOOL
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST NOBLOCK __BOOL
 NOTHROW(KCALL __kernel_syscall_iscp)(__UINT8_TYPE__ const *__restrict base,
                                      __syscall_ulong_t rel_sysno) {
 	return (base[rel_sysno / 8] >> (rel_sysno % 8)) & 1;
 }
 
-FORCELOCAL ATTR_CONST NOBLOCK __UINT8_TYPE__
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST NOBLOCK __UINT8_TYPE__
 NOTHROW(KCALL __kernel_syscall_restartmode)(__UINT8_TYPE__ const *__restrict base,
                                             __syscall_ulong_t rel_sysno) {
 	return (base[rel_sysno / 4] >> (2 * (rel_sysno % 4))) & 3;
 }
 
-FORCELOCAL ATTR_CONST NOBLOCK __UINT8_TYPE__
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST NOBLOCK __UINT8_TYPE__
 NOTHROW(KCALL __kernel_syscall_regcnt)(__UINT8_TYPE__ const *__restrict base,
                                        __syscall_ulong_t rel_sysno) {
 	return rel_sysno & 1
 	       ? (base[rel_sysno / 2] & 0x70) >> 4
 	       : (base[rel_sysno / 2] & 0x07);
 }
-FORCELOCAL ATTR_CONST NOBLOCK __BOOL
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST NOBLOCK __BOOL
 NOTHROW(KCALL __kernel_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base,
                                            __syscall_ulong_t rel_sysno) {
 	return rel_sysno & 1

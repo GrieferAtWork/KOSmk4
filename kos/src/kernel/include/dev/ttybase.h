@@ -147,12 +147,12 @@ NOTHROW(KCALL ttybase_device_fini)(struct character_device *__restrict self);
 
 /* Returns a reference to the controlling- or foreground process's
  * PID descriptor, or NULL if the specified field hasn't been set. */
-FORCELOCAL WUNUSED NONNULL((1)) REF struct taskpid *
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(KCALL ttybase_device_getcproc)(struct ttybase_device *__restrict self) {
 	return self->t_cproc.get();
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct taskpid *
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(KCALL ttybase_device_getfproc)(struct ttybase_device *__restrict self) {
 	return self->t_fproc.get();
 }

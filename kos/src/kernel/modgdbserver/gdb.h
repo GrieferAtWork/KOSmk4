@@ -253,7 +253,7 @@ INTDEF NONNULL((1, 2)) bool NOTHROW(FCALL GDB_GetPC)(struct task *__restrict thr
 INTDEF NONNULL((1)) bool NOTHROW(FCALL GDB_SetPC)(struct task *__restrict thread, void *pc);
 #else /* __INTELLISENSE__ */
 #define GDB_GetPC(thread, ppc) (GDB_GetRegister(thread, GDB_REGISTER_PC, ppc, sizeof(void *)) != 0)
-FORCELOCAL NONNULL((1)) bool
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool
 NOTHROW(FCALL GDB_SetPC)(struct task *__restrict thread, void *pc) {
 	return GDB_SetRegister(thread, GDB_REGISTER_PC, &pc, sizeof(void *)) != 0;
 }

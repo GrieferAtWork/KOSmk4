@@ -41,10 +41,10 @@ DECL_BEGIN
  * >> }
  */
 #if defined(__cplusplus) && defined(__CC__)
-#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite)                                                                                  \
-	extern "C++" {                                                                                                                    \
-	FORCELOCAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollread)(T *__restrict self) THROWS(E_BADALLOC) { return _pollread(self); }   \
-	FORCELOCAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollwrite)(T *__restrict self) THROWS(E_BADALLOC) { return _pollwrite(self); } \
+#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite)                                                                                                  \
+	extern "C++" {                                                                                                                                    \
+	FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollread)(T *__restrict self) THROWS(E_BADALLOC) { return _pollread(self); }   \
+	FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollwrite)(T *__restrict self) THROWS(E_BADALLOC) { return _pollwrite(self); } \
 	}
 #else /* __cplusplus && __CC__ */
 #define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite) /* nothing */

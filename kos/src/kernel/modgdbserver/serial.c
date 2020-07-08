@@ -80,7 +80,7 @@ NOTHROW(FCALL GDBSerial_InterruptHandler)(void *UNUSED(arg)) {
 	return true;
 }
 
-FORCELOCAL bool FCALL GDBSerial_IO_IsTransmitEmpty(void) {
+FORCELOCAL ATTR_ARTIFICIAL bool FCALL GDBSerial_IO_IsTransmitEmpty(void) {
 	return inb(SERIAL_IOADDR_LSR(GDBSerial_IO_PortBase)) & SERIAL_LSR_THRE;
 }
 
