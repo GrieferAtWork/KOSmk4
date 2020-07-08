@@ -967,8 +967,8 @@ class FunctionPrototype {
 	}
 
 	@@Print a declaration akin to:
-	@@> __REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,
-	@@>            __LIBCCALL,strlen,(char const *__str),strlen_alias,(__str))
+	@@> __COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,
+	@@>                     __LIBCCALL,strlen,(char const *__str),strlen_alias,(__str))
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintREDIRECT(
 			fp: CWriter, escapeMode: int, decl: string,

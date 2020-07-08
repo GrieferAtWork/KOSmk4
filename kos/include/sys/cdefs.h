@@ -20,12 +20,10 @@
 #ifndef _SYS_CDEFS_H
 #define _SYS_CDEFS_H 1
 
-/* XXX: Get rid of this header? (The `__REDIRECT' defined here breaks ours) */
-
 #include <__stdinc.h>
 #ifndef _FEATURES_H
 #include <features.h>
-#endif
+#endif /* !_FEATURES_H */
 
 /* NOTE: KOS doesn't actually make use of this header!
  *    >> It is only provided to define all the stuff glibc does,
@@ -110,7 +108,7 @@
 #   define __flexarr    [1]
 #endif
 #if defined(__GNUC__) && __GNUC__ >= 2
-//#   define __REDIRECT(name,proto,alias) name proto __asm__(__ASMNAMESTR(#alias))
+#   define __REDIRECT(name,proto,alias) name proto __asm__(__ASMNAMESTR(#alias))
 #ifdef __cplusplus
 #   define __REDIRECT_NTH(name,proto,alias)   name proto __THROW __asm__(__ASMNAMESTR(#alias))
 #   define __REDIRECT_NTHNL(name,proto,alias) name proto __THROWNL __asm__(__ASMNAMESTR(#alias))

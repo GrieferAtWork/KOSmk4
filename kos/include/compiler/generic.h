@@ -824,11 +824,6 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #endif /* !__MWERKS__ || __option(wchar_type) */
 #endif /* __cplusplus */
 
-#if defined(__TINYC__) && defined(__REDIRECT) && defined(__KOS_SYSTEM_HEADERS__)
-#undef __REDIRECT
-#undef __REDIRECT_NTH
-#endif /* __TINYC__ && __REDIRECT && __KOS_SYSTEM_HEADERS */
-
 #if defined(c_plusplus) && !defined(__cplusplus)
 #if (c_plusplus+0) != 0
 #define __cplusplus (c_plusplus + 0)

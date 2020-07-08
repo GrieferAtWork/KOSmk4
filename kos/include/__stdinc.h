@@ -57,17 +57,11 @@
        defined(__unix__) || defined(__unix) || defined(unix))
 #define __ELF__ 1
 #elif defined(__TINYC__)
-/* TCC predefines its own redirect macro incompatible with our's.
- * That's no good, but there is one pretty neat thing we can take
- * out of this: It does so when targeting ELF, meaning that by
- * deleting this predefinition, we can easily detect when compiling
- * for ELF, and conversely when compiling for PE. */
+/* TCC predefines its own redirect macro when targeting ELF, meaning
+ * that by testing for this predefinition, we can easily detect when
+ * compiling for ELF, and conversely when compiling for PE. */
 #ifdef __REDIRECT
 #define __ELF__ 1
-#ifdef __KOS_SYSTEM_HEADERS__
-#undef __REDIRECT
-#undef __REDIRECT_NTH
-#endif /* __KOS_SYSTEM_HEADERS__ */
 #else /* __REDIRECT */
 #define __PE__  1
 #endif /* !__REDIRECT */
@@ -598,18 +592,5 @@
 #endif
 #endif /* !__COMPILER_REDIRECT */
 
-
-#ifdef __KOS_SYSTEM_HEADERS__
-#define __REDIRECT        __COMPILER_REDIRECT
-#define __REDIRECT_VOID   __COMPILER_REDIRECT_VOID
-#define __VREDIRECT       __COMPILER_VREDIRECT
-#define __VREDIRECT_VOID  __COMPILER_VREDIRECT_VOID
-#define __VFREDIRECT      __COMPILER_VFREDIRECT
-#define __VFREDIRECT_VOID __COMPILER_VFREDIRECT_VOID
-#define __XREDIRECT       __COMPILER_XREDIRECT
-#define __XREDIRECT_VOID  __COMPILER_XREDIRECT_VOID
-#define __EIDECLARE       __COMPILER_EIDECLARE
-#define __EIREDIRECT      __COMPILER_EIREDIRECT
-#endif /* __KOS_SYSTEM_HEADERS__ */
 
 #endif /* !___STDINC_H */

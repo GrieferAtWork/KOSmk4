@@ -287,8 +287,8 @@ __NOTHROW_NCX(__DLFCN_CC dlclose)(void *__handle);
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *
 __NOTHROW_NCX(__DLFCN_CC dlsym)(void *__handle, char const *__restrict __symbol_name);
 #elif defined(__CRT_HAVE_dlfunc)
-__REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,__NOTHROW_NCX,__DLFCN_CC,
-           dlsym,(void *__handle, char const *__restrict __symbol_name),dlfunc,(__handle,__symbol_name))
+__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,__NOTHROW_NCX,__DLFCN_CC,
+                    dlsym,(void *__handle, char const *__restrict __symbol_name),dlfunc,(__handle,__symbol_name))
 #endif /* ... */
 
 /* Return and clear the current libdl error message string, such that for
@@ -324,8 +324,8 @@ typedef void (*dlfunc_t)(struct __dlfunc_arg);
  * extends upon this by specifying that no data is lost when such a cast is
  * performed) */
 #ifdef __CRT_HAVE_dlsym
-__REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),dlfunc_t,__NOTHROW_NCX,__DLFCN_CC,
-           dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle,__symbol_name))
+__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),dlfunc_t,__NOTHROW_NCX,__DLFCN_CC,
+                    dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle,__symbol_name))
 #elif defined(__CRT_HAVE_dlfunc)
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) dlfunc_t
 __NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol_name);
@@ -341,8 +341,8 @@ __NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol
  *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
  *               or'd with any of the other `RTLD_*' flags. */
 #ifdef __CRT_HAVE_dlfopen
-__REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CC,
-           fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode))
+__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CC,
+                    fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode))
 #elif defined(__CRT_HAVE_fdlopen)
 __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC fdlopen)(/*inherit(on_success)*/ __fd_t __fd, int __mode);
 #endif /* ... */

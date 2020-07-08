@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBRT_CC aio_init)(struct aioinit const *__init);
 
 #ifdef __USE_FILE_OFFSET64
 #define __AIO_REDIRECT(attr, Treturn, nothrow, name, param, args) \
-	__REDIRECT(__LIBRT_DECL, attr, Treturn, nothrow, __LIBRT_CC, name, param, name##64, args)
+	__COMPILER_REDIRECT(__LIBRT_DECL, attr, Treturn, nothrow, __LIBRT_CC, name, param, name##64, args)
 #else /* __USE_FILE_OFFSET64 */
 #define __AIO_REDIRECT(attr, Treturn, nothrow, name, param, args) \
 	__LIBRT_DECL attr Treturn nothrow(__LIBRT_CC name) param;
@@ -131,15 +131,15 @@ __AIO_REDIRECT(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__a
 #define __aio_suspend_defined 1
 #ifdef __USE_TIME_BITS64
 #ifdef __USE_FILE_OFFSET64
-__REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend,
-           (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-            struct timespec const *__restrict __timeout),aio_suspend64t64,
-           (__list, __nent, __timeout))
+__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend,
+                    (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
+                     struct timespec const *__restrict __timeout),aio_suspend64t64,
+                    (__list, __nent, __timeout))
 #else /* __USE_FILE_OFFSET64 */
-__REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend,
-           (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-            struct timespec const *__restrict __timeout),aio_suspendt64,
-           (__list, __nent, __timeout))
+__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend,
+                    (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
+                     struct timespec const *__restrict __timeout),aio_suspendt64,
+                    (__list, __nent, __timeout))
 #endif /* !__USE_FILE_OFFSET64 */
 #else /* __USE_TIME_BITS64 */
 __AIO_REDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,
@@ -207,9 +207,9 @@ __NOTHROW_NCX(__LIBRT_CC aio_cancel64)(__fd_t __fildes, struct aiocb64 *__aiocbp
 #ifndef __aio_suspend64_defined
 #define __aio_suspend64_defined 1
 #ifdef __USE_TIME_BITS64
-__REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend64,
-           (struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),
-           aio_suspend64t64,(__list, __nent, __timeout))
+__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend64,
+                    (struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),
+                    aio_suspend64t64,(__list, __nent, __timeout))
 #else /* __USE_TIME_BITS64 */
 __LIBRT_DECL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBRT_CC aio_suspend64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
@@ -231,9 +231,9 @@ __NOTHROW_NCX(__LIBRT_CC aio_fsync64)(int __operation, struct aiocb64 *__aiocbp)
 #ifndef __aio_suspendt64_defined
 #define __aio_suspendt64_defined 1
 #ifdef __USE_FILE_OFFSET64
-__REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspendt64,
-           (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),
-           aio_suspend64t64,(__list, __nent, __timeout))
+__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspendt64,
+                    (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),
+                    aio_suspend64t64,(__list, __nent, __timeout))
 #else /* __USE_FILE_OFFSET64 */
 __LIBRT_DECL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBRT_CC aio_suspendt64)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,

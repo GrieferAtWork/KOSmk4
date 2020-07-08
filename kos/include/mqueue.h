@@ -135,11 +135,11 @@ __NOTHROW_RPC(__LIBRT_CC mq_send)(mqd_t __mqdes, char const *__msg_ptr,
 #ifndef __mq_timedreceive_defined
 #define __mq_timedreceive_defined 1
 #ifdef __USE_TIME_BITS64
-__REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((2, 5)),__ssize_t,__NOTHROW_RPC,__LIBRT_CC,
-           mq_timedreceive,(mqd_t __mqdes, char *__restrict __msg_ptr,
-                            __size_t __msg_len, unsigned int *__pmsg_prio,
-                            struct timespec const *__restrict __abs_timeout),
-           mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((2, 5)),__ssize_t,__NOTHROW_RPC,__LIBRT_CC,
+                    mq_timedreceive,(mqd_t __mqdes, char *__restrict __msg_ptr,
+                                     __size_t __msg_len, unsigned int *__pmsg_prio,
+                                     struct timespec const *__restrict __abs_timeout),
+                    mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #else /* __USE_TIME_BITS64 */
 __LIBRT_DECL __ATTR_NONNULL((2, 5)) __ssize_t
 __NOTHROW_RPC(__LIBRT_CC mq_timedreceive)(mqd_t __mqdes, char *__restrict __msg_ptr,
@@ -153,11 +153,11 @@ __NOTHROW_RPC(__LIBRT_CC mq_timedreceive)(mqd_t __mqdes, char *__restrict __msg_
 #ifndef __mq_timedsend_defined
 #define __mq_timedsend_defined 1
 #ifdef __USE_TIME_BITS64
-__REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__LIBRT_CC,
-           mq_timedsend,(mqd_t __mqdes, char const *__msg_ptr,
-                         __size_t __msg_len, unsigned int __msg_prio,
-                         struct timespec const *__abs_timeout),
-           mq_timedsend64,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__LIBRT_CC,
+                    mq_timedsend,(mqd_t __mqdes, char const *__msg_ptr,
+                                  __size_t __msg_len, unsigned int __msg_prio,
+                                  struct timespec const *__abs_timeout),
+                    mq_timedsend64,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #else /* __USE_TIME_BITS64 */
 __LIBRT_DECL __ATTR_NONNULL((2, 5)) int
 __NOTHROW_RPC(__LIBRT_CC mq_timedsend)(mqd_t __mqdes, char const *__msg_ptr,
