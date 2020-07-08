@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e0ba855 */
+/* HASH CRC-32:0x1d32af27 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2330,6 +2330,7 @@ DEFINE_PUBLIC_ALIAS(DOS$strmode, libd_strmode);
 DEFINE_PUBLIC_ALIAS(DOS$sl_add, libd_sl_add);
 DEFINE_PUBLIC_ALIAS(DOS$sl_free, libd_sl_free);
 DEFINE_PUBLIC_ALIAS(DOS$sl_find, libd_sl_find);
+DEFINE_PUBLIC_ALIAS(DOS$sl_delete, libd_sl_delete);
 
 /* stropts */
 DEFINE_PUBLIC_ALIAS(DOS$isastream, libd_isastream);

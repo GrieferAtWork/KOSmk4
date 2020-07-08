@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5559f15c */
+/* HASH CRC-32:0xd04f2e30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,10 +18,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_sl_find_defined
-#define __local_sl_find_defined 1
+#ifndef __local_sl_delete_defined
+#define __local_sl_delete_defined 1
 #include <__crt.h>
-#include <features.h>
 #ifndef ___stringlist_defined
 #define ___stringlist_defined 1
 typedef struct _stringlist {
@@ -31,6 +30,35 @@ typedef struct _stringlist {
 } StringList;
 #endif
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
+#elif defined(__CRT_HAVE_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
+#elif defined(__CRT_HAVE_cfree)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+/* Dependency: memmovedownc from string */
+#ifndef __local___localdep_memmovedownc_defined
+#define __local___localdep_memmovedownc_defined 1
+#ifdef __CRT_HAVE_memmovedownc
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
+#else /* __CRT_HAVE_memmovedownc */
+__NAMESPACE_LOCAL_END
+#include <local/string/memmovedownc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
+#endif /* !__CRT_HAVE_memmovedownc */
+#endif /* !__local___localdep_memmovedownc_defined */
 /* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
@@ -48,23 +76,35 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-/* Search for `NAME' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `SL' (i.e. the
- * pointer originally passed to `sl_add()' to insert that string).
- * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
-__LOCAL_LIBC(sl_find) __ATTR_PURE __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_find))(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) {
+/* Remove an entry `name' from `sl'
+ * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
+ * @return: 0:  Successfully removed a string equal to `name'
+ * @return: -1: No string equal to `name' was found in `sl' */
+__LOCAL_LIBC(sl_delete) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_delete))(struct _stringlist *__sl, char const *__name, int __freeit) {
 	__SIZE_TYPE__ __i, __count = __sl->sl_cur;
 	for (__i = 0; __i < __count; ++__i) {
 		char *__s = __sl->sl_str[__i];
-		if (__localdep_strcmp(__s, __name) == 0)
-			return __s;
+		if (__localdep_strcmp(__s, __name) != 0)
+			continue;
+		/* Found it! */
+		__sl->sl_cur = --__count;
+		__localdep_memmovedownc(&__sl->sl_str[__i],
+		             &__sl->sl_str[__i + 1],
+		             __count - __i,
+		             sizeof(char *));
+		if (__freeit) {
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+			__localdep_free(__s);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+		}
+		return 0;
 	}
-	return __NULLPTR;
+	return -1; /* Not found */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_sl_find_defined
-#define __local___localdep_sl_find_defined 1
-#define __localdep_sl_find __LIBC_LOCAL_NAME(sl_find)
-#endif /* !__local___localdep_sl_find_defined */
-#endif /* !__local_sl_find_defined */
+#ifndef __local___localdep_sl_delete_defined
+#define __local___localdep_sl_delete_defined 1
+#define __localdep_sl_delete __LIBC_LOCAL_NAME(sl_delete)
+#endif /* !__local___localdep_sl_delete_defined */
+#endif /* !__local_sl_delete_defined */

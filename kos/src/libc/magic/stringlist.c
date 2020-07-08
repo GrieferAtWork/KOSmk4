@@ -54,7 +54,7 @@ typedef struct @_stringlist@ {
 
 @@Allocates and returns a new StringList object. Upon error, `NULL' is returned
 [[wunused, decl_prefix(DEFINE_STRINGLIST)]]
-[[userimpl, requires($has_function(malloc) && $has_function(free))]]
+[[requires_function(malloc, free)]]
 struct _stringlist *sl_init() {
 	struct _stringlist *result;
 	result = (struct _stringlist *)malloc(sizeof(struct _stringlist));
@@ -74,7 +74,7 @@ struct _stringlist *sl_init() {
 @@Append a given `NAME' to `SL'. `NAME' is considered
 @@inherited if the StringList is destroyed with `1'
 [[decl_prefix(DEFINE_STRINGLIST)]]
-[[userimpl, requires_function(realloc)]]
+[[requires_function(realloc)]]
 int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 	if unlikely(sl->@sl_cur@ >= sl->@sl_max@) {
 		char **new_vector;
@@ -95,7 +95,7 @@ int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 @@string pointers (as previously added with `sl_add()') will also
 @@be `free(3)'ed.
 [[decl_prefix(DEFINE_STRINGLIST)]]
-[[userimpl, requires_function(free)]]
+[[requires_function(free)]]
 void sl_free([[nullable]] struct _stringlist *sl, int all) {
 	if unlikely(!sl)
 		return;
@@ -120,8 +120,8 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 [[ATTR_PURE, decl_prefix(DEFINE_STRINGLIST)]]
 [[nullable]] char *sl_find([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
                            [[nonnull]] char const *name) {
-	size_t i;
-	for (i = 0; i < sl->@sl_cur@; ++i) {
+	size_t i, count = sl->@sl_cur@;
+	for (i = 0; i < count; ++i) {
 		char *s = sl->@sl_str@[i];
 		if (strcmp(s, name) == 0)
 			return s;
@@ -129,7 +129,37 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 	return NULL;
 }
 
+%#ifdef __USE_BSD
+@@Remove an entry `name' from `sl'
+@@When `freeit' is non-zero, a removed string is deallocated using `free(3)'
+@@@return: 0:  Successfully removed a string equal to `name'
+@@@return: -1: No string equal to `name' was found in `sl'
+[[guard, wunused, decl_prefix(DEFINE_STRINGLIST)]]
+int sl_delete([[nonnull]] struct _stringlist *sl,
+              [[nonnull]] char const *name,
+              int freeit) {
+	size_t i, count = sl->@sl_cur@;
+	for (i = 0; i < count; ++i) {
+		char *s = sl->@sl_str@[i];
+		if (strcmp(s, name) != 0)
+			continue;
+		/* Found it! */
+		sl->@sl_cur@ = --count;
+		memmovedownc(&sl->@sl_str@[i],
+		             &sl->@sl_str@[i + 1],
+		             count - i,
+		             sizeof(char *));
+		if (freeit) {
+@@pp_if $has_function(free)@@
+			free(s);
+@@pp_endif@@
+		}
+		return 0;
+	}
+	return -1; /* Not found */
+}
 
+%#endif /* __USE_BSD */
 
 %{
 #endif /* __CC__ */

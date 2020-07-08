@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x5a72bb45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_STRINGLIST_H
-#define GUARD_LIBC_USER_STRINGLIST_H 1
 
-#include "../api.h"
-#include "../auto/stringlist.h"
+%[define_replacement(errno_t = __errno_t)]
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
+%{
 #include <stringlist.h>
 
-DECL_BEGIN
+__SYSDECL_BEGIN
 
-#ifndef __KERNEL__
-/* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
-INTDEF WUNUSED struct _stringlist *NOTHROW_NCX(LIBCCALL libc_sl_init)(void);
-/* Append a given `NAME' to `SL'. `NAME' is considered
- * inherited if the StringList is destroyed with `1' */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl, char *name);
-/* Free a given string list. When `ALL' is non-zero, all contained
- * string pointers (as previously added with `sl_add()') will also
- * be `free(3)'ed. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int all);
-#endif /* !__KERNEL__ */
+#ifdef __CC__
+}
 
-DECL_END
+%[insert:extern(sl_delete)]
 
-#endif /* !GUARD_LIBC_USER_STRINGLIST_H */
+%{
+#endif /* __CC__ */
+
+__SYSDECL_END
+
+}
+

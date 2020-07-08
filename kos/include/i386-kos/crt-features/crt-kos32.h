@@ -3086,6 +3086,7 @@
 #define __CRT_HAVE_sinhl 1
 #define __CRT_HAVE_sinl 1
 #define __CRT_HAVE_sl_add 1
+#define __CRT_HAVE_sl_delete 1
 #define __CRT_HAVE_sl_find 1
 #define __CRT_HAVE_sl_free 1
 #define __CRT_HAVE_sl_init 1

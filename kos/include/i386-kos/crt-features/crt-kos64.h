@@ -3083,6 +3083,7 @@
 #define __CRT_HAVE_sinhl 1
 #define __CRT_HAVE_sinl 1
 #define __CRT_HAVE_sl_add 1
+#define __CRT_HAVE_sl_delete 1
 #define __CRT_HAVE_sl_find 1
 #define __CRT_HAVE_sl_free 1
 #define __CRT_HAVE_sl_init 1
@@ -7221,6 +7222,7 @@
 #define __CRT_HAVE_KOS$sinhl 1
 #define __CRT_HAVE_KOS$sinl 1
 #define __CRT_HAVE_KOS$sl_add 1
+#define __CRT_HAVE_KOS$sl_delete 1
 #define __CRT_HAVE_KOS$sl_find 1
 #define __CRT_HAVE_KOS$sl_free 1
 #define __CRT_HAVE_KOS$sleep 1
@@ -10593,6 +10595,7 @@
 #define __CRT_HAVE_DOS$sinhl 1
 #define __CRT_HAVE_DOS$sinl 1
 #define __CRT_HAVE_DOS$sl_add 1
+#define __CRT_HAVE_DOS$sl_delete 1
 #define __CRT_HAVE_DOS$sl_find 1
 #define __CRT_HAVE_DOS$sl_free 1
 #define __CRT_HAVE_DOS$sleep 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24f93d36 */
+/* HASH CRC-32:0xdcbd4c07 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1859,6 +1859,7 @@ DFUN(".text.crt.dos.bsd.strstat", libd_strmode, libc_strmode, TV, 2, TIn(__SIZEO
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_add, libc_sl_add, TD, 2, TP, TP)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_free, libc_sl_free, TV, 2, TP, TD)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_find, libc_sl_find, TP, 2, TP, TP)
+DFUN(".text.crt.dos.bsd.stringlist", libd_sl_delete, libc_sl_delete, TD, 3, TP, TP, TD)
 
 /* stropts */
 DFUN(".text.crt.dos.io.stropts", libd_isastream, libc_isastream, TD, 1, TIn(__SIZEOF_FD_T__))
