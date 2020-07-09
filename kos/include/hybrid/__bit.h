@@ -83,19 +83,23 @@ __DECL_BEGIN
 		}                                                                        \
 		return __result;                                                         \
 	}
-#define ____IMPL_DO_CLRSB(T, i)                                \
-	{                                                          \
-		unsigned int __result = 0;                             \
-		T __mask              = (T)1 << ((sizeof(T) * 8) - 1); \
-		T __sbit              = (T)i & __mask;                 \
-		for (;;) {                                             \
-			__mask >>= 1;                                      \
-			__sbit >>= 1;                                      \
-			if (((T)i & __mask) != __sbit)                     \
-				break;                                         \
-			++__result;                                        \
-		}                                                      \
-		return __result;                                       \
+#define ____IMPL_DO_CLRSB(T, i)                   \
+	{                                             \
+		unsigned int __result;                    \
+		T __mask, __sbit;                         \
+		if __unlikely(!__mask)                    \
+			return (sizeof(T) * 8) - 1;           \
+		__mask   = (T)1 << ((sizeof(T) * 8) - 1); \
+		__sbit   = (T)i & __mask;                 \
+		__result = 0;                             \
+		for (;;) {                                \
+			__mask >>= 1;                         \
+			__sbit >>= 1;                         \
+			if (((T)i & __mask) != __sbit)        \
+				break;                            \
+			++__result;                           \
+		}                                         \
+		return __result;                          \
 	}
 
 /* Parallel bit deposit (s.a. `https://www.felixcloutier.com/x86/pdep') */
@@ -129,383 +133,543 @@ __DECL_BEGIN
 
 
 
-
-
+/************************************************************************/
+/* unsigned int __hybrid_ffs[8|16|32|64](unsigned Integer X)            */
+/************************************************************************/
 #ifdef __UINT64_TYPE__
 #ifndef __hybrid_ffs64
 #if __has_builtin(__builtin_ffs) && __SIZEOF_INT__ >= 8
-#define __hybrid_ffs64(i)   (unsigned int)__builtin_ffs(i)
+#define __hybrid_ffs64(i) (unsigned int)__builtin_ffs((int)(unsigned int)(__UINT64_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsl) && __SIZEOF_LONG__ >= 8
-#define __hybrid_ffs64(i)   (unsigned int)__builtin_ffsl(i)
+#define __hybrid_ffs64(i) (unsigned int)__builtin_ffsl((long)(unsigned long)(__UINT64_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsll) && __SIZEOF_LONG_LONG__ >= 8
-#define __hybrid_ffs64(i)   (unsigned int)__builtin_ffsll(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs64)(__INT64_TYPE__ __i) ____IMPL_DO_FFS(__UINT64_TYPE__, __i)
-#endif
+#define __hybrid_ffs64(i) (unsigned int)__builtin_ffsll((__LONGLONG)(__ULONGLONG)(__UINT64_TYPE__)(i))
+#endif /* ... */
 #endif /* !__hybrid_ffs64 */
 #endif /* __UINT64_TYPE__ */
+
 #ifndef __hybrid_ffs32
 #if __has_builtin(__builtin_ffs) && __SIZEOF_INT__ >= 4
-#define __hybrid_ffs32(i)   (unsigned int)__builtin_ffs(i)
+#define __hybrid_ffs32(i) (unsigned int)__builtin_ffs((int)(unsigned int)(__UINT32_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsl) && __SIZEOF_LONG__ >= 4
-#define __hybrid_ffs32(i)   (unsigned int)__builtin_ffsl(i)
+#define __hybrid_ffs32(i) (unsigned int)__builtin_ffsl((long)(unsigned long)(__UINT32_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsll) && __SIZEOF_LONG_LONG__ >= 4
-#define __hybrid_ffs32(i)   (unsigned int)__builtin_ffsll(i)
-#elif defined(__hybrid_ffs64)
-#define __hybrid_ffs32(i)    __hybrid_ffs64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs32)(__INT32_TYPE__ __i) ____IMPL_DO_FFS(__UINT32_TYPE__, __i)
-#endif
+#define __hybrid_ffs32(i) (unsigned int)__builtin_ffsll((__LONGLONG)(__ULONGLONG)(__UINT32_TYPE__)(i))
+#endif /* ... */
 #endif /* !__hybrid_ffs32 */
+
 #ifndef __hybrid_ffs16
 #if __has_builtin(__builtin_ffs) && __SIZEOF_INT__ >= 2
-#define __hybrid_ffs16(i)   (unsigned int)__builtin_ffs(i)
+#define __hybrid_ffs16(i) (unsigned int)__builtin_ffs((int)(unsigned int)(__UINT16_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsl) && __SIZEOF_LONG__ >= 2
-#define __hybrid_ffs16(i)   (unsigned int)__builtin_ffsl(i)
+#define __hybrid_ffs16(i) (unsigned int)__builtin_ffsl((long)(unsigned long)(__UINT16_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsll) && __SIZEOF_LONG_LONG__ >= 2
-#define __hybrid_ffs16(i)   (unsigned int)__builtin_ffsll(i)
-#elif defined(__hybrid_ffs32)
-#define __hybrid_ffs16(i)    __hybrid_ffs32(i)
-#elif defined(__hybrid_ffs64)
-#define __hybrid_ffs16(i)    __hybrid_ffs64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs16)(__INT16_TYPE__ __i) ____IMPL_DO_FFS(__UINT16_TYPE__, __i)
-#endif
+#define __hybrid_ffs16(i) (unsigned int)__builtin_ffsll((__LONGLONG)(__ULONGLONG)(__UINT16_TYPE__)(i))
+#endif /* ... */
 #endif /* !__hybrid_ffs16 */
+
 #ifndef __hybrid_ffs8
 #if __has_builtin(__builtin_ffs) && __SIZEOF_INT__ >= 1
-#define __hybrid_ffs8(i)   (unsigned int)__builtin_ffs(i)
+#define __hybrid_ffs8(i) (unsigned int)__builtin_ffs((int)(unsigned int)(__UINT8_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsl) && __SIZEOF_LONG__ >= 1
-#define __hybrid_ffs8(i)   (unsigned int)__builtin_ffsl(i)
+#define __hybrid_ffs8(i) (unsigned int)__builtin_ffsl((long)(unsigned long)(__UINT8_TYPE__)(i))
 #elif __has_builtin(__builtin_ffsll) && __SIZEOF_LONG_LONG__ >= 1
-#define __hybrid_ffs8(i)   (unsigned int)__builtin_ffsll(i)
+#define __hybrid_ffs8(i) (unsigned int)__builtin_ffsll((__LONGLONG)(__ULONGLONG)(__UINT8_TYPE__)(i))
 #elif defined(__hybrid_ffs16)
-#define __hybrid_ffs8(i)    __hybrid_ffs16(i)
+#define __hybrid_ffs8(i) __hybrid_ffs16(i)
 #elif defined(__hybrid_ffs32)
-#define __hybrid_ffs8(i)    __hybrid_ffs32(i)
+#define __hybrid_ffs8(i) __hybrid_ffs32(i)
 #elif defined(__hybrid_ffs64)
-#define __hybrid_ffs8(i)    __hybrid_ffs64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs8)(__INT8_TYPE__ __i) ____IMPL_DO_FFS(__UINT8_TYPE__, __i)
-#endif
+#define __hybrid_ffs8(i) __hybrid_ffs64(i)
+#else /* ... */
+#define __hybrid_ffs8(i) __hybrid_ffs8((__UINT8_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs8)(__UINT8_TYPE__ __i) ____IMPL_DO_FFS(__UINT8_TYPE__, __i)
+#endif /* !... */
 #endif /* !__hybrid_ffs8 */
 
+#ifndef __hybrid_ffs16
+#ifdef __hybrid_ffs32
+#define __hybrid_ffs16(i) __hybrid_ffs32(i)
+#elif defined(__hybrid_ffs64)
+#define __hybrid_ffs16(i) __hybrid_ffs64(i)
+#else /* ... */
+#define __hybrid_ffs16(i) __hybrid_ffs16((__UINT16_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs16)(__UINT16_TYPE__ __i) ____IMPL_DO_FFS(__UINT16_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_ffs16 */
+
+#ifndef __hybrid_ffs32
+#ifdef __hybrid_ffs64
+#define __hybrid_ffs32(i) __hybrid_ffs64(i)
+#else /* __hybrid_ffs64 */
+#define __hybrid_ffs32(i) __hybrid_ffs32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs32)(__UINT32_TYPE__ __i) ____IMPL_DO_FFS(__UINT32_TYPE__, __i)
+#endif /* !__hybrid_ffs64 */
+#endif /* !__hybrid_ffs32 */
+
+#ifdef __UINT64_TYPE__
+#ifndef __hybrid_ffs64
+#define __hybrid_ffs64(i) __hybrid_ffs64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ffs64)(__UINT64_TYPE__ __i) ____IMPL_DO_FFS(__UINT64_TYPE__, __i)
+#endif /* !__hybrid_ffs64 */
+#endif /* __UINT64_TYPE__ */
+
+
+
+
+
+/************************************************************************/
+/* unsigned int __hybrid_clz[8|16|32|64](unsigned Integer X)            */
+/************************************************************************/
 #ifdef __UINT64_TYPE__
 #ifndef __hybrid_clz64
-#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ >= 8
-#define __hybrid_clz64(i)   (unsigned int)__builtin_clz(i)
-#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ >= 8
-#define __hybrid_clz64(i)   (unsigned int)__builtin_clzl(i)
-#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ >= 8
-#define __hybrid_clz64(i)   (unsigned int)__builtin_clzll(i)
+#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ == 8
+#define __hybrid_clz64(i) (unsigned int)__builtin_clz((unsigned int)(i))
+#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ == 8
+#define __hybrid_clz64(i) (unsigned int)__builtin_clzl((unsigned long)(i))
+#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ == 8
+#define __hybrid_clz64(i) (unsigned int)__builtin_clzll((__ULONGLONG)(i))
 #elif defined(_MSC_VER) && defined(__x86_64__)
 extern unsigned char (__cdecl _BitScanReverse64)(unsigned long *__index, unsigned __int64 __mask);
 #pragma intrinsic(_BitScanReverse64)
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz64)(__INT64_TYPE__ __i) { unsigned long __res; _BitScanReverse64(&__res,(__UINT64_TYPE__)__i); return (unsigned int)__res; }
-#define __hybrid_clz64 __hybrid_clz64
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz64)(__INT64_TYPE__ __i) ____IMPL_DO_CLZ(__UINT64_TYPE__, __i)
-#endif
+#define __hybrid_clz64(i) __hybrid_clz64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz64)(__UINT64_TYPE__ __i) {
+	unsigned long __res;
+	_BitScanReverse64(&__res, (__UINT64_TYPE__)__i);
+	return (unsigned int)__res;
+}
+#endif /* ... */
 #endif /* !__hybrid_clz64 */
 #endif /* __UINT64_TYPE__ */
+
 #ifndef __hybrid_clz32
-#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ >= 4
-#define __hybrid_clz32(i)   (unsigned int)__builtin_clz(i)
-#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ >= 4
-#define __hybrid_clz32(i)   (unsigned int)__builtin_clzl(i)
-#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ >= 4
-#define __hybrid_clz32(i)   (unsigned int)__builtin_clzll(i)
-#elif defined(__hybrid_clz64)
-#define __hybrid_clz32(i)    __hybrid_clz64(i)
+#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ == 4
+#define __hybrid_clz32(i) (unsigned int)__builtin_clz((unsigned int)(i))
+#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ == 4
+#define __hybrid_clz32(i) (unsigned int)__builtin_clzl((unsigned long)(i))
+#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ == 4
+#define __hybrid_clz32(i) (unsigned int)__builtin_clzll((__ULONGLONG)(i))
 #elif defined(_MSC_VER)
 extern unsigned char (__cdecl _BitScanReverse)(unsigned long *__index, unsigned long __mask);
 #pragma intrinsic(_BitScanReverse)
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz32)(__INT32_TYPE__ __i) { unsigned long __res; _BitScanReverse(&__res,(unsigned long)__i); return (unsigned int)__res; }
-#define __hybrid_clz32 __hybrid_clz32
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz32)(__INT32_TYPE__ __i) ____IMPL_DO_CLZ(__UINT32_TYPE__, __i)
-#endif
+#define __hybrid_clz32(i) __hybrid_clz32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz32)(__UINT32_TYPE__ __i) {
+	unsigned long __res;
+	_BitScanReverse(&__res, (unsigned long)__i);
+	return (unsigned int)__res;
+}
+#endif /* ... */
 #endif /* !__hybrid_clz32 */
+
 #ifndef __hybrid_clz16
-#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ >= 2
-#define __hybrid_clz16(i)   (unsigned int)__builtin_clz(i)
-#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ >= 2
-#define __hybrid_clz16(i)   (unsigned int)__builtin_clzl(i)
-#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ >= 2
-#define __hybrid_clz16(i)   (unsigned int)__builtin_clzll(i)
-#elif defined(__hybrid_clz32)
-#define __hybrid_clz16(i)    __hybrid_clz32(i)
-#elif defined(__hybrid_clz64)
-#define __hybrid_clz16(i)    __hybrid_clz64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz16)(__INT16_TYPE__ __i) ____IMPL_DO_CLZ(__UINT16_TYPE__, __i)
-#endif
+#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ == 2
+#define __hybrid_clz16(i) (unsigned int)__builtin_clz((unsigned int)(i))
+#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ == 2
+#define __hybrid_clz16(i) (unsigned int)__builtin_clzl((unsigned long)(i))
+#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ == 2
+#define __hybrid_clz16(i) (unsigned int)__builtin_clzll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_clz16 */
+
 #ifndef __hybrid_clz8
-#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ >= 1
-#define __hybrid_clz8(i)   (unsigned int)__builtin_clz(i)
-#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ >= 1
-#define __hybrid_clz8(i)   (unsigned int)__builtin_clzl(i)
-#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ >= 1
-#define __hybrid_clz8(i)   (unsigned int)__builtin_clzll(i)
+#if __has_builtin(__builtin_clz) && __SIZEOF_INT__ == 1
+#define __hybrid_clz8(i) (unsigned int)__builtin_clz((unsigned int)(i))
+#elif __has_builtin(__builtin_clzl) && __SIZEOF_LONG__ == 1
+#define __hybrid_clz8(i) (unsigned int)__builtin_clzl((unsigned long)(i))
+#elif __has_builtin(__builtin_clzll) && __SIZEOF_LONG_LONG__ == 1
+#define __hybrid_clz8(i) (unsigned int)__builtin_clzll((__ULONGLONG)(i))
 #elif defined(__hybrid_clz16)
-#define __hybrid_clz8(i)    __hybrid_clz16(i)
+#define __hybrid_clz8(i) (unsigned int)(__hybrid_clz16((__UINT16_TYPE__)(__UINT8_TYPE__)(i)) - 8)
 #elif defined(__hybrid_clz32)
-#define __hybrid_clz8(i)    __hybrid_clz32(i)
+#define __hybrid_clz8(i) (unsigned int)(__hybrid_clz32((__UINT32_TYPE__)(__UINT8_TYPE__)(i)) - 24)
 #elif defined(__hybrid_clz64)
-#define __hybrid_clz8(i)    __hybrid_clz64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz8)(__INT8_TYPE__ __i) ____IMPL_DO_CLZ(__UINT8_TYPE__, __i)
-#endif
+#define __hybrid_clz8(i) (unsigned int)(__hybrid_clz64((__UINT64_TYPE__)(__UINT8_TYPE__)(i)) - 56)
+#else /* ... */
+#define __hybrid_clz8(i) __hybrid_clz8((__UINT8_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz8)(__UINT8_TYPE__ __i) ____IMPL_DO_CTZ(__UINT8_TYPE__, __i)
+#endif /* !... */
 #endif /* !__hybrid_clz8 */
 
+#ifndef __hybrid_clz16
+#ifdef __hybrid_clz32
+#define __hybrid_clz16(i) (unsigned int)(__hybrid_clz32((__UINT32_TYPE__)(__UINT16_TYPE__)(i)) - 16)
+#elif defined(__hybrid_clz64)
+#define __hybrid_clz16(i) (unsigned int)(__hybrid_clz64((__UINT64_TYPE__)(__UINT16_TYPE__)(i)) - 48)
+#else /* ... */
+#define __hybrid_clz16(i) __hybrid_clz16((__UINT16_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz16)(__UINT16_TYPE__ __i) ____IMPL_DO_CTZ(__UINT16_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_clz16 */
 
+#ifndef __hybrid_clz32
+#ifdef __hybrid_clz64
+#define __hybrid_clz32(i) (unsigned int)(__hybrid_clz64((__UINT64_TYPE__)(__UINT32_TYPE__)(i)) - 32)
+#else /* __hybrid_clz64 */
+#define __hybrid_clz32(i) __hybrid_clz32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz32)(__UINT32_TYPE__ __i) ____IMPL_DO_CTZ(__UINT32_TYPE__, __i)
+#endif /* !__hybrid_clz64 */
+#endif /* !__hybrid_clz32 */
+
+#ifdef __UINT64_TYPE__
+#ifndef __hybrid_clz64
+#define __hybrid_clz64(i) __hybrid_clz64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clz64)(__UINT64_TYPE__ __i) ____IMPL_DO_CTZ(__UINT64_TYPE__, __i)
+#endif /* !__hybrid_clz64 */
+#endif /* __UINT64_TYPE__ */
+
+
+
+
+/************************************************************************/
+/* unsigned int __hybrid_ctz[8|16|32|64](unsigned Integer X)            */
+/************************************************************************/
 #ifdef __UINT64_TYPE__
 #ifndef __hybrid_ctz64
 #if __has_builtin(__builtin_ctz) && __SIZEOF_INT__ >= 8
-#define __hybrid_ctz64(i)   (unsigned int)__builtin_ctz(i)
+#define __hybrid_ctz64(i) (unsigned int)__builtin_ctz((unsigned int)(i))
 #elif __has_builtin(__builtin_ctzl) && __SIZEOF_LONG__ >= 8
-#define __hybrid_ctz64(i)   (unsigned int)__builtin_ctzl(i)
+#define __hybrid_ctz64(i) (unsigned int)__builtin_ctzl((unsigned long)(i))
 #elif __has_builtin(__builtin_ctzll) && __SIZEOF_LONG_LONG__ >= 8
-#define __hybrid_ctz64(i)   (unsigned int)__builtin_ctzll(i)
+#define __hybrid_ctz64(i) (unsigned int)__builtin_ctzll((__ULONGLONG)(i))
 #elif defined(_MSC_VER) && defined(__x86_64__)
 extern unsigned char (__cdecl _BitScanForward64)(unsigned long *__index, unsigned __int64 __mask);
 #pragma intrinsic(_BitScanForward64)
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz64)(__INT64_TYPE__ __i) { unsigned long __res; _BitScanForward64(&__res,(__UINT64_TYPE__)__i); return (unsigned int)__res; }
-#define __hybrid_ctz64 __hybrid_ctz64
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz64)(__INT64_TYPE__ __i) ____IMPL_DO_CTZ(__UINT64_TYPE__, __i)
-#endif
+#define __hybrid_ctz64(i) __hybrid_ctz64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz64)(__UINT64_TYPE__ __i) {
+	unsigned long __res;
+	_BitScanForward64(&__res, (__UINT64_TYPE__)__i);
+	return (unsigned int)__res;
+}
+#endif /* ... */
 #endif /* !__hybrid_ctz64 */
 #endif /* __UINT64_TYPE__ */
+
 #ifndef __hybrid_ctz32
 #if __has_builtin(__builtin_ctz) && __SIZEOF_INT__ >= 4
-#define __hybrid_ctz32(i)   (unsigned int)__builtin_ctz(i)
+#define __hybrid_ctz32(i) (unsigned int)__builtin_ctz((unsigned int)(i))
 #elif __has_builtin(__builtin_ctzl) && __SIZEOF_LONG__ >= 4
-#define __hybrid_ctz32(i)   (unsigned int)__builtin_ctzl(i)
+#define __hybrid_ctz32(i) (unsigned int)__builtin_ctzl((unsigned long)(i))
 #elif __has_builtin(__builtin_ctzll) && __SIZEOF_LONG_LONG__ >= 4
-#define __hybrid_ctz32(i)   (unsigned int)__builtin_ctzll(i)
-#elif defined(__hybrid_ctz64)
-#define __hybrid_ctz32(i)    __hybrid_ctz64(i)
+#define __hybrid_ctz32(i) (unsigned int)__builtin_ctzll((__ULONGLONG)(i))
 #elif defined(_MSC_VER)
 extern unsigned char (__cdecl _BitScanForward)(unsigned long *__index, unsigned long __mask);
 #pragma intrinsic(_BitScanForward)
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz32)(__INT32_TYPE__ __i) { unsigned long __res; _BitScanForward(&__res,(unsigned long)__i); return (unsigned int)__res; }
-#define __hybrid_ctz64 __hybrid_ctz64
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz32)(__INT32_TYPE__ __i) ____IMPL_DO_CTZ(__UINT32_TYPE__, __i)
-#endif
+#define __hybrid_ctz32(i) __hybrid_ctz32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz32)(__UINT32_TYPE__ __i) {
+	unsigned long __res;
+	_BitScanForward(&__res, (unsigned long)__i);
+	return (unsigned int)__res;
+}
+#endif /* ... */
 #endif /* !__hybrid_ctz32 */
+
 #ifndef __hybrid_ctz16
 #if __has_builtin(__builtin_ctz) && __SIZEOF_INT__ >= 2
-#define __hybrid_ctz16(i)   (unsigned int)__builtin_ctz(i)
+#define __hybrid_ctz16(i) (unsigned int)__builtin_ctz((unsigned int)(i))
 #elif __has_builtin(__builtin_ctzl) && __SIZEOF_LONG__ >= 2
-#define __hybrid_ctz16(i)   (unsigned int)__builtin_ctzl(i)
+#define __hybrid_ctz16(i) (unsigned int)__builtin_ctzl((unsigned long)(i))
 #elif __has_builtin(__builtin_ctzll) && __SIZEOF_LONG_LONG__ >= 2
-#define __hybrid_ctz16(i)   (unsigned int)__builtin_ctzll(i)
-#elif defined(__hybrid_ctz32)
-#define __hybrid_ctz16(i)    __hybrid_ctz32(i)
-#elif defined(__hybrid_ctz64)
-#define __hybrid_ctz16(i)    __hybrid_ctz64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz16)(__INT16_TYPE__ __i) ____IMPL_DO_CTZ(__UINT16_TYPE__, __i)
-#endif
+#define __hybrid_ctz16(i) (unsigned int)__builtin_ctzll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_ctz16 */
+
 #ifndef __hybrid_ctz8
 #if __has_builtin(__builtin_ctz) && __SIZEOF_INT__ >= 1
-#define __hybrid_ctz8(i)   (unsigned int)__builtin_ctz(i)
+#define __hybrid_ctz8(i) (unsigned int)__builtin_ctz((unsigned int)(i))
 #elif __has_builtin(__builtin_ctzl) && __SIZEOF_LONG__ >= 1
-#define __hybrid_ctz8(i)   (unsigned int)__builtin_ctzl(i)
+#define __hybrid_ctz8(i) (unsigned int)__builtin_ctzl((unsigned long)(i))
 #elif __has_builtin(__builtin_ctzll) && __SIZEOF_LONG_LONG__ >= 1
-#define __hybrid_ctz8(i)   (unsigned int)__builtin_ctzll(i)
+#define __hybrid_ctz8(i) (unsigned int)__builtin_ctzll((__ULONGLONG)(i))
 #elif defined(__hybrid_ctz16)
-#define __hybrid_ctz8(i)    __hybrid_ctz16(i)
+#define __hybrid_ctz8(i) __hybrid_ctz16(i)
 #elif defined(__hybrid_ctz32)
-#define __hybrid_ctz8(i)    __hybrid_ctz32(i)
+#define __hybrid_ctz8(i) __hybrid_ctz32(i)
 #elif defined(__hybrid_ctz64)
-#define __hybrid_ctz8(i)    __hybrid_ctz64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz8)(__INT8_TYPE__ __i) ____IMPL_DO_CTZ(__UINT8_TYPE__, __i)
-#endif
+#define __hybrid_ctz8(i) __hybrid_ctz64(i)
+#else /* ... */
+#define __hybrid_ctz8(i) __hybrid_ctz8((__UINT8_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz8)(__UINT8_TYPE__ __i) ____IMPL_DO_CLZ(__UINT8_TYPE__, __i)
+#endif /* !... */
 #endif /* !__hybrid_ctz8 */
 
+#ifndef __hybrid_ctz16
+#if defined(__hybrid_ctz32)
+#define __hybrid_ctz16(i) __hybrid_ctz32(i)
+#elif defined(__hybrid_ctz64)
+#define __hybrid_ctz16(i) __hybrid_ctz64(i)
+#else /* ... */
+#define __hybrid_ctz16(i) __hybrid_ctz16((__UINT16_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz16)(__UINT16_TYPE__ __i) ____IMPL_DO_CLZ(__UINT16_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_ctz16 */
+
+#ifndef __hybrid_ctz32
+#ifdef __hybrid_ctz64
+#define __hybrid_ctz32(i) __hybrid_ctz64(i)
+#else /* __hybrid_ctz64 */
+#define __hybrid_ctz32(i) __hybrid_ctz32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz32)(__UINT32_TYPE__ __i) ____IMPL_DO_CLZ(__UINT32_TYPE__, __i)
+#endif /* !__hybrid_ctz64 */
+#endif /* !__hybrid_ctz32 */
+
+#ifdef __UINT64_TYPE__
+#ifndef __hybrid_ctz64
+#define __hybrid_ctz64(i) __hybrid_ctz64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_ctz64)(__UINT64_TYPE__ __i) ____IMPL_DO_CLZ(__UINT64_TYPE__, __i)
+#endif /* !__hybrid_ctz64 */
+#endif /* __UINT64_TYPE__ */
+
+
+
+
+
+/************************************************************************/
+/* unsigned int __hybrid_popcount[8|16|32|64](unsigned Integer X)       */
+/************************************************************************/
 #ifdef __UINT64_TYPE__
 #ifndef __hybrid_popcount64
 #if __has_builtin(__builtin_popcount) && __SIZEOF_INT__ >= 8
-#define __hybrid_popcount64(i)   (unsigned int)__builtin_popcount(i)
+#define __hybrid_popcount64(i) (unsigned int)__builtin_popcount((unsigned int)(i))
 #elif __has_builtin(__builtin_popcountl) && __SIZEOF_LONG__ >= 8
-#define __hybrid_popcount64(i)   (unsigned int)__builtin_popcountl(i)
+#define __hybrid_popcount64(i) (unsigned int)__builtin_popcountl((unsigned long)(i))
 #elif __has_builtin(__builtin_popcountll) && __SIZEOF_LONG_LONG__ >= 8
-#define __hybrid_popcount64(i)   (unsigned int)__builtin_popcountll(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount64)(__INT64_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT64_TYPE__, __i)
-#endif
+#define __hybrid_popcount64(i) (unsigned int)__builtin_popcountll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_popcount64 */
 #endif /* __UINT64_TYPE__ */
+
 #ifndef __hybrid_popcount32
 #if __has_builtin(__builtin_popcount) && __SIZEOF_INT__ >= 4
-#define __hybrid_popcount32(i)   (unsigned int)__builtin_popcount(i)
+#define __hybrid_popcount32(i) (unsigned int)__builtin_popcount((unsigned int)(i))
 #elif __has_builtin(__builtin_popcountl) && __SIZEOF_LONG__ >= 4
-#define __hybrid_popcount32(i)   (unsigned int)__builtin_popcountl(i)
+#define __hybrid_popcount32(i) (unsigned int)__builtin_popcountl((unsigned long)(i))
 #elif __has_builtin(__builtin_popcountll) && __SIZEOF_LONG_LONG__ >= 4
-#define __hybrid_popcount32(i)   (unsigned int)__builtin_popcountll(i)
-#elif defined(__hybrid_popcount64)
-#define __hybrid_popcount32(i)    __hybrid_popcount64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount32)(__INT32_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT32_TYPE__, __i)
-#endif
+#define __hybrid_popcount32(i) (unsigned int)__builtin_popcountll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_popcount32 */
+
 #ifndef __hybrid_popcount16
 #if __has_builtin(__builtin_popcount) && __SIZEOF_INT__ >= 2
-#define __hybrid_popcount16(i)   (unsigned int)__builtin_popcount(i)
+#define __hybrid_popcount16(i) (unsigned int)__builtin_popcount((unsigned int)(i))
 #elif __has_builtin(__builtin_popcountl) && __SIZEOF_LONG__ >= 2
-#define __hybrid_popcount16(i)   (unsigned int)__builtin_popcountl(i)
+#define __hybrid_popcount16(i) (unsigned int)__builtin_popcountl((unsigned long)(i))
 #elif __has_builtin(__builtin_popcountll) && __SIZEOF_LONG_LONG__ >= 2
-#define __hybrid_popcount16(i)   (unsigned int)__builtin_popcountll(i)
-#elif defined(__hybrid_popcount32)
-#define __hybrid_popcount16(i)    __hybrid_popcount32(i)
-#elif defined(__hybrid_popcount64)
-#define __hybrid_popcount16(i)    __hybrid_popcount64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount16)(__INT16_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT16_TYPE__, __i)
-#endif
+#define __hybrid_popcount16(i) (unsigned int)__builtin_popcountll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_popcount16 */
+
 #ifndef __hybrid_popcount8
 #if __has_builtin(__builtin_popcount) && __SIZEOF_INT__ >= 1
-#define __hybrid_popcount8(i)   (unsigned int)__builtin_popcount(i)
+#define __hybrid_popcount8(i) (unsigned int)__builtin_popcount((unsigned int)(i))
 #elif __has_builtin(__builtin_popcountl) && __SIZEOF_LONG__ >= 1
-#define __hybrid_popcount8(i)   (unsigned int)__builtin_popcountl(i)
+#define __hybrid_popcount8(i) (unsigned int)__builtin_popcountl((unsigned long)(i))
 #elif __has_builtin(__builtin_popcountll) && __SIZEOF_LONG_LONG__ >= 1
-#define __hybrid_popcount8(i)   (unsigned int)__builtin_popcountll(i)
+#define __hybrid_popcount8(i) (unsigned int)__builtin_popcountll((__ULONGLONG)(i))
 #elif defined(__hybrid_popcount16)
-#define __hybrid_popcount8(i)    __hybrid_popcount16(i)
+#define __hybrid_popcount8(i) __hybrid_popcount16(i)
 #elif defined(__hybrid_popcount32)
-#define __hybrid_popcount8(i)    __hybrid_popcount32(i)
+#define __hybrid_popcount8(i) __hybrid_popcount32(i)
 #elif defined(__hybrid_popcount64)
-#define __hybrid_popcount8(i)    __hybrid_popcount64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount8)(__INT8_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT8_TYPE__, __i)
-#endif
+#define __hybrid_popcount8(i) __hybrid_popcount64(i)
+#else /* ... */
+#define __hybrid_popcount8(i) __hybrid_popcount8((__UINT8_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount8)(__UINT8_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT8_TYPE__, __i)
+#endif /* !... */
 #endif /* !__hybrid_popcount8 */
 
+#ifndef __hybrid_popcount16
+#ifdef __hybrid_popcount32
+#define __hybrid_popcount16(i) __hybrid_popcount32(i)
+#elif defined(__hybrid_popcount64)
+#define __hybrid_popcount16(i) __hybrid_popcount64(i)
+#else /* ... */
+#define __hybrid_popcount16(i) __hybrid_popcount16((__UINT16_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount16)(__UINT16_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT16_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_popcount16 */
+
+#ifndef __hybrid_popcount32
+#ifdef __hybrid_popcount64
+#define __hybrid_popcount32(i) __hybrid_popcount64(i)
+#else /* __hybrid_popcount64 */
+#define __hybrid_popcount32(i) __hybrid_popcount32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount32)(__UINT32_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT32_TYPE__, __i)
+#endif /* !__hybrid_popcount64 */
+#endif /* !__hybrid_popcount32 */
+
+#ifdef __UINT64_TYPE__
+#ifndef __hybrid_popcount64
+#define __hybrid_popcount64(i) __hybrid_popcount64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_popcount64)(__UINT64_TYPE__ __i) ____IMPL_DO_POPCOUNT(__UINT64_TYPE__, __i)
+#endif /* !__hybrid_popcount64 */
+#endif /* __UINT64_TYPE__ */
+
+
+/************************************************************************/
+/* unsigned int __hybrid_parity[8|16|32|64](unsigned Integer X)         */
+/************************************************************************/
 #ifdef __UINT64_TYPE__
 #ifndef __hybrid_parity64
 #if __has_builtin(__builtin_parity) && __SIZEOF_INT__ >= 8
-#define __hybrid_parity64(i)   (unsigned int)__builtin_parity(i)
+#define __hybrid_parity64(i) (unsigned int)__builtin_parity((unsigned int)(i))
 #elif __has_builtin(__builtin_parityl) && __SIZEOF_LONG__ >= 8
-#define __hybrid_parity64(i)   (unsigned int)__builtin_parityl(i)
+#define __hybrid_parity64(i) (unsigned int)__builtin_parityl((unsigned long)(i))
 #elif __has_builtin(__builtin_parityll) && __SIZEOF_LONG_LONG__ >= 8
-#define __hybrid_parity64(i)   (unsigned int)__builtin_parityll(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity64)(__INT64_TYPE__ __i) ____IMPL_DO_PARITY(__UINT64_TYPE__, __i)
-#endif
+#define __hybrid_parity64(i) (unsigned int)__builtin_parityll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_parity64 */
 #endif /* __UINT64_TYPE__ */
+
 #ifndef __hybrid_parity32
 #if __has_builtin(__builtin_parity) && __SIZEOF_INT__ >= 4
-#define __hybrid_parity32(i)   (unsigned int)__builtin_parity(i)
+#define __hybrid_parity32(i) (unsigned int)__builtin_parity((unsigned int)(i))
 #elif __has_builtin(__builtin_parityl) && __SIZEOF_LONG__ >= 4
-#define __hybrid_parity32(i)   (unsigned int)__builtin_parityl(i)
+#define __hybrid_parity32(i) (unsigned int)__builtin_parityl((unsigned long)(i))
 #elif __has_builtin(__builtin_parityll) && __SIZEOF_LONG_LONG__ >= 4
-#define __hybrid_parity32(i)   (unsigned int)__builtin_parityll(i)
-#elif defined(__hybrid_parity64)
-#define __hybrid_parity32(i)    __hybrid_parity64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity32)(__INT32_TYPE__ __i) ____IMPL_DO_PARITY(__UINT32_TYPE__, __i)
-#endif
+#define __hybrid_parity32(i) (unsigned int)__builtin_parityll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_parity32 */
+
 #ifndef __hybrid_parity16
 #if __has_builtin(__builtin_parity) && __SIZEOF_INT__ >= 2
-#define __hybrid_parity16(i)   (unsigned int)__builtin_parity(i)
+#define __hybrid_parity16(i) (unsigned int)__builtin_parity((unsigned int)(i))
 #elif __has_builtin(__builtin_parityl) && __SIZEOF_LONG__ >= 2
-#define __hybrid_parity16(i)   (unsigned int)__builtin_parityl(i)
+#define __hybrid_parity16(i) (unsigned int)__builtin_parityl((unsigned long)(i))
 #elif __has_builtin(__builtin_parityll) && __SIZEOF_LONG_LONG__ >= 2
-#define __hybrid_parity16(i)   (unsigned int)__builtin_parityll(i)
-#elif defined(__hybrid_parity32)
-#define __hybrid_parity16(i)    __hybrid_parity32(i)
-#elif defined(__hybrid_parity64)
-#define __hybrid_parity16(i)    __hybrid_parity64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity16)(__INT16_TYPE__ __i) ____IMPL_DO_PARITY(__UINT16_TYPE__, __i)
-#endif
+#define __hybrid_parity16(i) (unsigned int)__builtin_parityll((__ULONGLONG)(i))
+#endif /* ... */
 #endif /* !__hybrid_parity16 */
+
 #ifndef __hybrid_parity8
 #if __has_builtin(__builtin_parity) && __SIZEOF_INT__ >= 1
-#define __hybrid_parity8(i)   (unsigned int)__builtin_parity(i)
+#define __hybrid_parity8(i) (unsigned int)__builtin_parity((unsigned int)(i))
 #elif __has_builtin(__builtin_parityl) && __SIZEOF_LONG__ >= 1
-#define __hybrid_parity8(i)   (unsigned int)__builtin_parityl(i)
+#define __hybrid_parity8(i) (unsigned int)__builtin_parityl((unsigned long)(i))
 #elif __has_builtin(__builtin_parityll) && __SIZEOF_LONG_LONG__ >= 1
-#define __hybrid_parity8(i)   (unsigned int)__builtin_parityll(i)
+#define __hybrid_parity8(i) (unsigned int)__builtin_parityll((__ULONGLONG)(i))
 #elif defined(__hybrid_parity16)
-#define __hybrid_parity8(i)    __hybrid_parity16(i)
+#define __hybrid_parity8(i) __hybrid_parity16(i)
 #elif defined(__hybrid_parity32)
-#define __hybrid_parity8(i)    __hybrid_parity32(i)
+#define __hybrid_parity8(i) __hybrid_parity32(i)
 #elif defined(__hybrid_parity64)
-#define __hybrid_parity8(i)    __hybrid_parity64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity8)(__INT8_TYPE__ __i) ____IMPL_DO_PARITY(__UINT8_TYPE__, __i)
-#endif
+#define __hybrid_parity8(i) __hybrid_parity64(i)
+#else /* ... */
+#define __hybrid_parity8(i) __hybrid_parity8((__UINT8_TYPE__)i)
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity8)(__UINT8_TYPE__ __i) ____IMPL_DO_PARITY(__UINT8_TYPE__, __i)
+#endif /* !... */
 #endif /* !__hybrid_parity8 */
 
+#ifndef __hybrid_parity16
+#ifdef __hybrid_parity32
+#define __hybrid_parity16(i) __hybrid_parity32(i)
+#elif defined(__hybrid_parity64)
+#define __hybrid_parity16(i) __hybrid_parity64(i)
+#else /* ... */
+#define __hybrid_parity16(i) __hybrid_parity16((__UINT16_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity16)(__UINT16_TYPE__ __i) ____IMPL_DO_PARITY(__UINT16_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_parity16 */
+
+#ifndef __hybrid_parity32
+#ifdef __hybrid_parity64
+#define __hybrid_parity32(i) __hybrid_parity64(i)
+#else /* __hybrid_parity64 */
+#define __hybrid_parity32(i) __hybrid_parity32((__UINT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity32)(__UINT32_TYPE__ __i) ____IMPL_DO_PARITY(__UINT32_TYPE__, __i)
+#endif /* !__hybrid_parity64 */
+#endif /* !__hybrid_parity32 */
+
+#ifdef __UINT64_TYPE__
+#ifndef __hybrid_parity64
+#define __hybrid_parity64(i) __hybrid_parity64((__UINT64_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_parity64)(__UINT64_TYPE__ __i) ____IMPL_DO_PARITY(__UINT64_TYPE__, __i)
+#endif /* !__hybrid_parity64 */
+#endif /* __UINT64_TYPE__ */
+
+
+/************************************************************************/
+/* unsigned int __hybrid_clrsb[8|16|32|64](signed Integer X)            */
+/************************************************************************/
+#ifdef __UINT64_TYPE__
+#ifndef __hybrid_clrsb64
+#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ == 8
+#define __hybrid_clrsb64(i) (unsigned int)__builtin_clrsb((int)(i))
+#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ == 8
+#define __hybrid_clrsb64(i) (unsigned int)__builtin_clrsbl((long)(i))
+#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ == 8
+#define __hybrid_clrsb64(i) (unsigned int)__builtin_clrsbll((__LONGLONG)(i))
+#endif /* ... */
+#endif /* !__hybrid_clrsb64 */
+#endif /* __UINT64_TYPE__ */
+
+#ifndef __hybrid_clrsb32
+#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ == 4
+#define __hybrid_clrsb32(i) (unsigned int)__builtin_clrsb((int)(i))
+#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ == 4
+#define __hybrid_clrsb32(i) (unsigned int)__builtin_clrsbl((long)(i))
+#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ == 4
+#define __hybrid_clrsb32(i) (unsigned int)__builtin_clrsbll((__LONGLONG)(i))
+#endif /* ... */
+#endif /* !__hybrid_clrsb32 */
+
+#ifndef __hybrid_clrsb16
+#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ == 2
+#define __hybrid_clrsb16(i) (unsigned int)__builtin_clrsb((int)(i))
+#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ == 2
+#define __hybrid_clrsb16(i) (unsigned int)__builtin_clrsbl((long)(i))
+#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ == 2
+#define __hybrid_clrsb16(i) (unsigned int)__builtin_clrsbll((__LONGLONG)(i))
+#endif /* ... */
+#endif /* !__hybrid_clrsb16 */
+
+#ifndef __hybrid_clrsb8
+#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ == 1
+#define __hybrid_clrsb8(i) (unsigned int)__builtin_clrsb((int)(i))
+#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ == 1
+#define __hybrid_clrsb8(i) (unsigned int)__builtin_clrsbl((long)(i))
+#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ == 1
+#define __hybrid_clrsb8(i) (unsigned int)__builtin_clrsbll((__LONGLONG)(i))
+#elif defined(__hybrid_clrsb16)
+#define __hybrid_clrsb8(i) (unsigned int)(__hybrid_clrsb16((__INT16_TYPE__)(__INT8_TYPE__)(i)) - 8)
+#elif defined(__hybrid_clrsb32)
+#define __hybrid_clrsb8(i) (unsigned int)(__hybrid_clrsb32((__INT32_TYPE__)(__INT8_TYPE__)(i)) - 24)
+#elif defined(__hybrid_clrsb64)
+#define __hybrid_clrsb8(i) (unsigned int)(__hybrid_clrsb64((__INT64_TYPE__)(__INT8_TYPE__)(i)) - 56)
+#else /* ... */
+#define __hybrid_clrsb8(i) __hybrid_clrsb8((__INT8_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb8)(__INT8_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT8_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_clrsb8 */
+
+#ifndef __hybrid_clrsb16
+#ifdef __hybrid_clrsb32
+#define __hybrid_clrsb16(i) (unsigned int)(__hybrid_clrsb32((__INT32_TYPE__)(__INT16_TYPE__)(i)) - 16)
+#elif defined(__hybrid_clrsb64)
+#define __hybrid_clrsb16(i) (unsigned int)(__hybrid_clrsb64((__INT64_TYPE__)(__INT16_TYPE__)(i)) - 48)
+#else /* ... */
+#define __hybrid_clrsb16(i) __hybrid_clrsb16((__INT16_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb16)(__INT16_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT16_TYPE__, __i)
+#endif /* !... */
+#endif /* !__hybrid_clrsb16 */
+
+#ifndef __hybrid_clrsb32
+#ifdef __hybrid_clrsb64
+#define __hybrid_clrsb32(i) (unsigned int)(__hybrid_clrsb64((__INT64_TYPE__)(__INT32_TYPE__)(i)) - 32)
+#else /* __hybrid_clrsb64 */
+#define __hybrid_clrsb32(i) __hybrid_clrsb32((__INT32_TYPE__)(i))
+__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb32)(__INT32_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT32_TYPE__, __i)
+#endif /* !__hybrid_clrsb64 */
+#endif /* !__hybrid_clrsb32 */
 
 #ifdef __UINT64_TYPE__
 #ifndef __hybrid_clrsb64
-#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ >= 8
-#define __hybrid_clrsb64(i)   (unsigned int)__builtin_clrsb(i)
-#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ >= 8
-#define __hybrid_clrsb64(i)   (unsigned int)__builtin_clrsbl(i)
-#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ >= 8
-#define __hybrid_clrsb64(i)   (unsigned int)__builtin_clrsbll(i)
-#else
+#define __hybrid_clrsb64(i) __hybrid_clrsb64((__INT64_TYPE__)(i))
 __LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb64)(__INT64_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT64_TYPE__, __i)
-#endif
 #endif /* !__hybrid_clrsb64 */
 #endif /* __UINT64_TYPE__ */
-#ifndef __hybrid_clrsb32
-#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ >= 4
-#define __hybrid_clrsb32(i)   (unsigned int)__builtin_clrsb(i)
-#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ >= 4
-#define __hybrid_clrsb32(i)   (unsigned int)__builtin_clrsbl(i)
-#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ >= 4
-#define __hybrid_clrsb32(i)   (unsigned int)__builtin_clrsbll(i)
-#elif defined(__hybrid_clrsb64)
-#define __hybrid_clrsb32(i)    __hybrid_clrsb64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb32)(__INT32_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT32_TYPE__, __i)
-#endif
-#endif /* !__hybrid_clrsb32 */
-#ifndef __hybrid_clrsb16
-#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ >= 2
-#define __hybrid_clrsb16(i)   (unsigned int)__builtin_clrsb(i)
-#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ >= 2
-#define __hybrid_clrsb16(i)   (unsigned int)__builtin_clrsbl(i)
-#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ >= 2
-#define __hybrid_clrsb16(i)   (unsigned int)__builtin_clrsbll(i)
-#elif defined(__hybrid_clrsb32)
-#define __hybrid_clrsb16(i)    __hybrid_clrsb32(i)
-#elif defined(__hybrid_clrsb64)
-#define __hybrid_clrsb16(i)    __hybrid_clrsb64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb16)(__INT16_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT16_TYPE__, __i)
-#endif
-#endif /* !__hybrid_clrsb16 */
-#ifndef __hybrid_clrsb8
-#if __has_builtin(__builtin_clrsb) && __SIZEOF_INT__ >= 1
-#define __hybrid_clrsb8(i)   (unsigned int)__builtin_clrsb(i)
-#elif __has_builtin(__builtin_clrsbl) && __SIZEOF_LONG__ >= 1
-#define __hybrid_clrsb8(i)   (unsigned int)__builtin_clrsbl(i)
-#elif __has_builtin(__builtin_clrsbll) && __SIZEOF_LONG_LONG__ >= 1
-#define __hybrid_clrsb8(i)   (unsigned int)__builtin_clrsbll(i)
-#elif defined(__hybrid_clrsb16)
-#define __hybrid_clrsb8(i)    __hybrid_clrsb16(i)
-#elif defined(__hybrid_clrsb32)
-#define __hybrid_clrsb8(i)    __hybrid_clrsb32(i)
-#elif defined(__hybrid_clrsb64)
-#define __hybrid_clrsb8(i)    __hybrid_clrsb64(i)
-#else
-__LOCAL __ATTR_WUNUSED __ATTR_CONST unsigned int (__hybrid_clrsb8)(__INT8_TYPE__ __i) ____IMPL_DO_CLRSB(__UINT8_TYPE__, __i)
-#endif
-#endif /* !__hybrid_clrsb8 */
+
+
+
 
 
 #if defined(__cplusplus) && !defined(__INTELLISENSE__)
@@ -556,81 +720,81 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __UINT64_TYPE__ (__hybrid_pext64)(__UINT64_T
 
 #ifdef __UINT64_TYPE__
 #ifndef __NO_builtin_choose_expr
-#define __hybrid_ffs(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ffs32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 8, __hybrid_ffs64((__INT64_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ffs16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_ffs8((__INT8_TYPE__)(i)))))
-#define __hybrid_clz(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clz32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 8, __hybrid_clz64((__INT64_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clz16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_clz8((__INT8_TYPE__)(i)))))
-#define __hybrid_ctz(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ctz32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 8, __hybrid_ctz64((__INT64_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ctz16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_ctz8((__INT8_TYPE__)(i)))))
-#define __hybrid_popcount(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_popcount32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 8, __hybrid_popcount64((__INT64_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_popcount16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_popcount8((__INT8_TYPE__)(i)))))
-#define __hybrid_parity(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_parity32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 8, __hybrid_parity64((__INT64_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_parity16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_parity8((__INT8_TYPE__)(i)))))
-#define __hybrid_clrsb(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clrsb32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 8, __hybrid_clrsb64((__INT64_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clrsb16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_clrsb8((__INT8_TYPE__)(i)))))
+#define __hybrid_ffs(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ffs32(i), \
+	__builtin_choose_expr(sizeof(i) == 8, __hybrid_ffs64(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ffs16(i), \
+	                                      __hybrid_ffs8(i))))
+#define __hybrid_clz(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clz32(i), \
+	__builtin_choose_expr(sizeof(i) == 8, __hybrid_clz64(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clz16(i), \
+	                                      __hybrid_clz8(i))))
+#define __hybrid_ctz(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ctz32(i), \
+	__builtin_choose_expr(sizeof(i) == 8, __hybrid_ctz64(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ctz16(i), \
+	                                      __hybrid_ctz8(i))))
+#define __hybrid_popcount(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_popcount32(i), \
+	__builtin_choose_expr(sizeof(i) == 8, __hybrid_popcount64(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_popcount16(i), \
+	                                      __hybrid_popcount8(i))))
+#define __hybrid_parity(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_parity32(i), \
+	__builtin_choose_expr(sizeof(i) == 8, __hybrid_parity64(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_parity16(i), \
+	                                      __hybrid_parity8(i))))
+#define __hybrid_clrsb(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clrsb32(i), \
+	__builtin_choose_expr(sizeof(i) == 8, __hybrid_clrsb64(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clrsb16(i), \
+	                                      __hybrid_clrsb8(i))))
 #ifndef __hybrid_pdep
 #define __hybrid_pdep(value, mask)                                                                                                \
 	__builtin_choose_expr(sizeof(mask) == 4, (__UINT32_TYPE__)__hybrid_pdep32((__UINT32_TYPE__)(value), (__UINT32_TYPE__)(mask)), \
 	__builtin_choose_expr(sizeof(mask) == 8, (__UINT64_TYPE__)__hybrid_pdep64((__UINT64_TYPE__)(value), (__UINT64_TYPE__)(mask)), \
 	__builtin_choose_expr(sizeof(mask) == 2, (__UINT16_TYPE__)__hybrid_pdep16((__UINT16_TYPE__)(value), (__UINT16_TYPE__)(mask)), \
-	                                        (__UINT8_TYPE__)__hybrid_pdep8((__UINT8_TYPE__)(value), (__UINT8_TYPE__)(mask)))))
+	                                         (__UINT8_TYPE__)__hybrid_pdep8((__UINT8_TYPE__)(value), (__UINT8_TYPE__)(mask)))))
 #endif /* !__hybrid_pdep */
 #ifndef __hybrid_pext
 #define __hybrid_pext(value, mask)                                                                                                \
 	__builtin_choose_expr(sizeof(mask) == 4, (__UINT32_TYPE__)__hybrid_pext32((__UINT32_TYPE__)(value), (__UINT32_TYPE__)(mask)), \
 	__builtin_choose_expr(sizeof(mask) == 8, (__UINT64_TYPE__)__hybrid_pext64((__UINT64_TYPE__)(value), (__UINT64_TYPE__)(mask)), \
 	__builtin_choose_expr(sizeof(mask) == 2, (__UINT16_TYPE__)__hybrid_pext16((__UINT16_TYPE__)(value), (__UINT16_TYPE__)(mask)), \
-	                                        (__UINT8_TYPE__)__hybrid_pext8((__UINT8_TYPE__)(value), (__UINT8_TYPE__)(mask)))))
+	                                         (__UINT8_TYPE__)__hybrid_pext8((__UINT8_TYPE__)(value), (__UINT8_TYPE__)(mask)))))
 #endif /* !__hybrid_pext */
 #else /* !__NO_builtin_choose_expr */
-#define __hybrid_ffs(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_ffs32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 8 ? __hybrid_ffs64((__INT64_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_ffs16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_ffs8((__INT8_TYPE__)(i)))
-#define __hybrid_clz(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_clz32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 8 ? __hybrid_clz64((__INT64_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_clz16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_clz8((__INT8_TYPE__)(i)))
-#define __hybrid_ctz(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_ctz32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 8 ? __hybrid_ctz64((__INT64_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_ctz16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_ctz8((__INT8_TYPE__)(i)))
-#define __hybrid_popcount(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_popcount32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 8 ? __hybrid_popcount64((__INT64_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_popcount16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_popcount8((__INT8_TYPE__)(i)))
-#define __hybrid_parity(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_parity32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 8 ? __hybrid_parity64((__INT64_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_parity16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_parity8((__INT8_TYPE__)(i)))
-#define __hybrid_clrsb(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_clrsb32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 8 ? __hybrid_clrsb64((__INT64_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_clrsb16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_clrsb8((__INT8_TYPE__)(i)))
+#define __hybrid_ffs(i)                   \
+	(sizeof(i) == 4 ? __hybrid_ffs32(i) : \
+	 sizeof(i) == 8 ? __hybrid_ffs64(i) : \
+	 sizeof(i) == 2 ? __hybrid_ffs16(i) : \
+	                  __hybrid_ffs8(i))
+#define __hybrid_clz(i)                   \
+	(sizeof(i) == 4 ? __hybrid_clz32(i) : \
+	 sizeof(i) == 8 ? __hybrid_clz64(i) : \
+	 sizeof(i) == 2 ? __hybrid_clz16(i) : \
+	                  __hybrid_clz8(i))
+#define __hybrid_ctz(i)                   \
+	(sizeof(i) == 4 ? __hybrid_ctz32(i) : \
+	 sizeof(i) == 8 ? __hybrid_ctz64(i) : \
+	 sizeof(i) == 2 ? __hybrid_ctz16(i) : \
+	                  __hybrid_ctz8(i))
+#define __hybrid_popcount(i)                   \
+	(sizeof(i) == 4 ? __hybrid_popcount32(i) : \
+	 sizeof(i) == 8 ? __hybrid_popcount64(i) : \
+	 sizeof(i) == 2 ? __hybrid_popcount16(i) : \
+	                  __hybrid_popcount8(i))
+#define __hybrid_parity(i)                   \
+	(sizeof(i) == 4 ? __hybrid_parity32(i) : \
+	 sizeof(i) == 8 ? __hybrid_parity64(i) : \
+	 sizeof(i) == 2 ? __hybrid_parity16(i) : \
+	                  __hybrid_parity8(i))
+#define __hybrid_clrsb(i)                   \
+	(sizeof(i) == 4 ? __hybrid_clrsb32(i) : \
+	 sizeof(i) == 8 ? __hybrid_clrsb64(i) : \
+	 sizeof(i) == 2 ? __hybrid_clrsb16(i) : \
+	                  __hybrid_clrsb8(i))
 #ifndef __hybrid_pdep
 #define __hybrid_pdep(value, mask)                                                                             \
 	(sizeof(mask) == 4 ? (__UINT32_TYPE__)__hybrid_pdep32((__UINT32_TYPE__)(value), (__UINT32_TYPE__)(mask)) : \
@@ -648,30 +812,30 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __UINT64_TYPE__ (__hybrid_pext64)(__UINT64_T
 #endif /* __NO_builtin_choose_expr */
 #else /* __UINT64_TYPE__ */
 #ifndef __NO_builtin_choose_expr
-#define __hybrid_ffs(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ffs32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ffs16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_ffs8((__INT8_TYPE__)(i))))
-#define __hybrid_clz(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clz32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clz16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_clz8((__INT8_TYPE__)(i))))
-#define __hybrid_ctz(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ctz32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ctz16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_ctz8((__INT8_TYPE__)(i))))
-#define __hybrid_popcount(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_popcount32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_popcount16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_popcount8((__INT8_TYPE__)(i))))
-#define __hybrid_parity(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_parity32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_parity16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_parity8((__INT8_TYPE__)(i))))
-#define __hybrid_clrsb(i)                                                        \
-	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clrsb32((__INT32_TYPE__)(i)), \
-	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clrsb16((__INT16_TYPE__)(i)), \
-	                                     __hybrid_clrsb8((__INT8_TYPE__)(i))))
+#define __hybrid_ffs(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ffs32(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ffs16(i), \
+	                                     __hybrid_ffs8(i)))
+#define __hybrid_clz(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clz32(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clz16(i), \
+	                                     __hybrid_clz8(i)))
+#define __hybrid_ctz(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_ctz32(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_ctz16(i), \
+	                                     __hybrid_ctz8(i)))
+#define __hybrid_popcount(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_popcount32(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_popcount16(i), \
+	                                     __hybrid_popcount8(i)))
+#define __hybrid_parity(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_parity32(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_parity16(i), \
+	                                     __hybrid_parity8(i)))
+#define __hybrid_clrsb(i)                                      \
+	__builtin_choose_expr(sizeof(i) == 4, __hybrid_clrsb32(i), \
+	__builtin_choose_expr(sizeof(i) == 2, __hybrid_clrsb16(i), \
+	                                     __hybrid_clrsb8(i)))
 #ifndef __hybrid_pdep
 #define __hybrid_pdep(value, mask)                                                                                                \
 	__builtin_choose_expr(sizeof(mask) == 4, (__UINT32_TYPE__)__hybrid_pdep32((__UINT32_TYPE__)(value), (__UINT32_TYPE__)(mask)), \
@@ -685,30 +849,30 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __UINT64_TYPE__ (__hybrid_pext64)(__UINT64_T
 	                                        (__UINT8_TYPE__)__hybrid_pext8((__UINT8_TYPE__)(value), (__UINT8_TYPE__)(mask))))
 #endif /* !__hybrid_pext */
 #else /* !__NO_builtin_choose_expr */
-#define __hybrid_ffs(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_ffs32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_ffs16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_ffs8((__INT8_TYPE__)(i)))
-#define __hybrid_clz(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_clz32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_clz16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_clz8((__INT8_TYPE__)(i)))
-#define __hybrid_ctz(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_ctz32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_ctz16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_ctz8((__INT8_TYPE__)(i)))
-#define __hybrid_popcount(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_popcount32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_popcount16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_popcount8((__INT8_TYPE__)(i)))
-#define __hybrid_parity(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_parity32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_parity16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_parity8((__INT8_TYPE__)(i)))
-#define __hybrid_clrsb(i)                                     \
-	(sizeof(i) == 4 ? __hybrid_clrsb32((__INT32_TYPE__)(i)) : \
-	 sizeof(i) == 2 ? __hybrid_clrsb16((__INT16_TYPE__)(i)) : \
-	                  __hybrid_clrsb8((__INT8_TYPE__)(i)))
+#define __hybrid_ffs(i)                   \
+	(sizeof(i) == 4 ? __hybrid_ffs32(i) : \
+	 sizeof(i) == 2 ? __hybrid_ffs16(i) : \
+	                  __hybrid_ffs8(i))
+#define __hybrid_clz(i)                   \
+	(sizeof(i) == 4 ? __hybrid_clz32(i) : \
+	 sizeof(i) == 2 ? __hybrid_clz16(i) : \
+	                  __hybrid_clz8(i))
+#define __hybrid_ctz(i)                   \
+	(sizeof(i) == 4 ? __hybrid_ctz32(i) : \
+	 sizeof(i) == 2 ? __hybrid_ctz16(i) : \
+	                  __hybrid_ctz8(i))
+#define __hybrid_popcount(i)                   \
+	(sizeof(i) == 4 ? __hybrid_popcount32(i) : \
+	 sizeof(i) == 2 ? __hybrid_popcount16(i) : \
+	                  __hybrid_popcount8(i))
+#define __hybrid_parity(i)                   \
+	(sizeof(i) == 4 ? __hybrid_parity32(i) : \
+	 sizeof(i) == 2 ? __hybrid_parity16(i) : \
+	                  __hybrid_parity8(i))
+#define __hybrid_clrsb(i)                   \
+	(sizeof(i) == 4 ? __hybrid_clrsb32(i) : \
+	 sizeof(i) == 2 ? __hybrid_clrsb16(i) : \
+	                  __hybrid_clrsb8(i))
 #ifndef __hybrid_pdep
 #define __hybrid_pdep(value, mask)                                                                             \
 	(sizeof(mask) == 4 ? (__UINT32_TYPE__)__hybrid_pdep32((__UINT32_TYPE__)(value), (__UINT32_TYPE__)(mask)) : \
