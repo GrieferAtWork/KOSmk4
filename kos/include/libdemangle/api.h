@@ -42,6 +42,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBDEMANGLE_LIBRARY_NAME     "libdemangle.so"
+#define LIBDEMANGLE_LIBRARY_NAME "libdemangle.so"
 
 #endif /* !_LIBDEMANGLE_API_H */

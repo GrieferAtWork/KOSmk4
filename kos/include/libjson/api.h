@@ -25,9 +25,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBJSON_CC    __ATTR_STDCALL
+#define LIBJSON_CC __ATTR_STDCALL
 #else
-#define LIBJSON_CC    /* nothing */
+#define LIBJSON_CC /* nothing */
 #endif
 
 #if !defined(LIBJSON_WANT_PROTOTYPES) && \
@@ -37,14 +37,14 @@
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBJSON_DECL  __PUBDEF
+#define LIBJSON_DECL __PUBDEF
 #elif defined(__LIBJSON_STATIC)
-#define LIBJSON_DECL  __INTDEF
+#define LIBJSON_DECL __INTDEF
 #else
-#define LIBJSON_DECL  __IMPDEF
+#define LIBJSON_DECL __IMPDEF
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBJSON_LIBRARY_NAME     "libjson.so"
+#define LIBJSON_LIBRARY_NAME "libjson.so"
 
 #endif /* !_LIBJSON_API_H */

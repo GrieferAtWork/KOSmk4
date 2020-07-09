@@ -19,13 +19,9 @@
  */
 
 BEGIN
-	/* libdl should always be optimized for size, rather than speed!
-	 * NOTE: Don't turn this on in debug-mode, as it breaks meta-data... */
-	REMOVE_GCC_FLAGS("-O3")
-	if (!CONFIG_DEBUG) {
-		GCC_FLAGS({ "-Os" })
-	}
-	GCC_FLAGS({ "-fno-rtti", "-ffreestanding" })
+	/* libdl should always be optimized for size, rather than speed! */
+	REMOVE_GCC_FLAGS({ "-O2", "-O3" })
+	GCC_FLAGS({ "-Os", "-fno-rtti", "-ffreestanding" })
 
 	if (TARGET_ARCH == "x86_64") {
 		CC_FLAGS({

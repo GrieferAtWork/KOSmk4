@@ -143,7 +143,8 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __s
 			__hybrid_assertf(__temp != 0, "No remaining read-locks");
 			__newval = __temp-1;
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __newval, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __newval,
+	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __newval == 0;
 }
 
@@ -154,13 +155,15 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwl
 		if __untraced(__temp & __ATOMIC_RWLOCK_WFLAG)
 			return 0;
 		__hybrid_assert((__temp&__ATOMIC_RWLOCK_RMASK) != __ATOMIC_RWLOCK_RMASK);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __temp + 1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __temp + 1,
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self) {
-	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock, 0, __ATOMIC_RWLOCK_WFLAG, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock, 0, __ATOMIC_RWLOCK_WFLAG,
+	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
 	return 1;

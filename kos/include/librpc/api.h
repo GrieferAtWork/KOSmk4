@@ -43,6 +43,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBRPC_LIBRARY_NAME     "librpc.so"
+#define LIBRPC_LIBRARY_NAME "librpc.so"
 
 #endif /* !_LIBRPC_API_H */

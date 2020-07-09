@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBTERM_LIBRARY_NAME     "libterm.so"
+#define LIBTERM_LIBRARY_NAME "libterm.so"
 
 #endif /* !_LIBTERM_API_H */

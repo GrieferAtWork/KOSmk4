@@ -24,9 +24,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIDEO_WINDOW_CC    __ATTR_STDCALL
+#define LIBVIDEO_WINDOW_CC __ATTR_STDCALL
 #else
-#define LIBVIDEO_WINDOW_CC    /* nothing */
+#define LIBVIDEO_WINDOW_CC /* nothing */
 #endif
 
 #if !defined(LIBVIDEO_WINDOW_WANT_PROTOTYPES) && \
@@ -36,14 +36,14 @@
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBVIDEO_WINDOW_DECL  __PUBDEF
+#define LIBVIDEO_WINDOW_DECL __PUBDEF
 #elif defined(__LIBVIDEO_WINDOW_STATIC)
-#define LIBVIDEO_WINDOW_DECL  __INTDEF
+#define LIBVIDEO_WINDOW_DECL __INTDEF
 #else
-#define LIBVIDEO_WINDOW_DECL  __IMPDEF
+#define LIBVIDEO_WINDOW_DECL __IMPDEF
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBVIDEO_WINDOW_LIBRARY_NAME     "libvideo-window.so"
+#define LIBVIDEO_WINDOW_LIBRARY_NAME "libvideo-window.so"
 
 #endif /* !_LIBVIDEO_WINDOW_API_H */

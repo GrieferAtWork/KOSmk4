@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBCMDLINE_LIBRARY_NAME     "libcmdline.so"
+#define LIBCMDLINE_LIBRARY_NAME "libcmdline.so"
 
 #endif /* !_LIBCMDLINE_API_H */

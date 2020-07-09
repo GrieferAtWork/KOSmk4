@@ -22,9 +22,10 @@
 
 #include <__crt.h>
 
-#define LIBM_CC           __LIBCCALL
-#define LIBM_VCC          __VLIBCCALL
-#define LIBM_DECL         __LIBC
+#define LIBM_CC   __LIBCCALL
+#define LIBM_VCC  __VLIBCCALL
+#define LIBM_DECL __LIBC
+
 #define LIBM_LIBRARY_NAME "libm.so"
 
 #endif /* !_LIBM_API_H */

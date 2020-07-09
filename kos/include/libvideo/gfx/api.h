@@ -24,9 +24,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIDEO_GFX_CC    __ATTR_STDCALL
+#define LIBVIDEO_GFX_CC __ATTR_STDCALL
 #else
-#define LIBVIDEO_GFX_CC    /* nothing */
+#define LIBVIDEO_GFX_CC /* nothing */
 #endif
 
 #if !defined(LIBVIDEO_GFX_WANT_PROTOTYPES) && \
@@ -36,14 +36,14 @@
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBVIDEO_GFX_DECL  __PUBDEF
+#define LIBVIDEO_GFX_DECL __PUBDEF
 #elif defined(__LIBVIDEO_GFX_STATIC)
-#define LIBVIDEO_GFX_DECL  __INTDEF
+#define LIBVIDEO_GFX_DECL __INTDEF
 #else
-#define LIBVIDEO_GFX_DECL  __IMPDEF
+#define LIBVIDEO_GFX_DECL __IMPDEF
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBVIDEO_GFX_LIBRARY_NAME     "libvideo-gfx.so"
+#define LIBVIDEO_GFX_LIBRARY_NAME "libvideo-gfx.so"
 
 #endif /* !_LIBVIDEO_GFX_API_H */

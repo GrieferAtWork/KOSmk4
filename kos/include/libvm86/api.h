@@ -24,9 +24,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVM86_CC    __ATTR_STDCALL
+#define LIBVM86_CC __ATTR_STDCALL
 #else
-#define LIBVM86_CC    /* nothing */
+#define LIBVM86_CC /* nothing */
 #endif
 
 #if !defined(LIBVM86_WANT_PROTOTYPES) && \
@@ -36,14 +36,14 @@
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBVM86_DECL  __PUBDEF
+#define LIBVM86_DECL __PUBDEF
 #elif defined(__LIBVM86_STATIC)
-#define LIBVM86_DECL  __INTDEF
+#define LIBVM86_DECL __INTDEF
 #else
-#define LIBVM86_DECL  __IMPDEF
+#define LIBVM86_DECL __IMPDEF
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBVM86_LIBRARY_NAME     "libvm86.so"
+#define LIBVM86_LIBRARY_NAME "libvm86.so"
 
 #endif /* !_LIBVM86_API_H */

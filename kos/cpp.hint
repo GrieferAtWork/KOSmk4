@@ -73,19 +73,85 @@
 #define __FCALL
 #define VCALL
 #define LIBCCALL
-#define LIBKCALL
-#define LIBDCALL
-#define VLIBCCALL
-#define VLIBKCALL
-#define VLIBDCALL
 #define __LIBCCALL
+#define LIBKCALL
 #define __LIBKCALL
+#define LIBDCALL
 #define __LIBDCALL
+#define VLIBCCALL
 #define __VLIBCCALL
+#define VLIBKCALL
 #define __VLIBKCALL
+#define VLIBDCALL
 #define __VLIBDCALL
 #define __LIBC
 #define CC
+#define VCC
+
+#define LIBANSITTY_CC
+#define LIBANSITTY_DECL
+#define LIBBUFFER_CC
+#define LIBBUFFER_DECL
+#define LIBCMDLINE_CC
+#define LIBCMDLINE_DECL
+#define LIBCPUSTATE_CC
+#define LIBCPUSTATE_DECL
+#define LIBDEBUGINFO_CC
+#define LIBDEBUGINFO_DECL
+#define LIBDEMANGLE_CC
+#define LIBDEMANGLE_VCC
+#define LIBDEMANGLE_DECL
+#define LIBDISASM_CC
+#define LIBDISASM_DECL
+#define LIBDL_CC
+#define LIBDL_VCC
+#define LIBDL_DECL
+#define LIBEMU86_CC
+#define LIBEMU86_DECL
+#define LIBEMU86_IMPL
+#define LIBINSTRLEN_CC
+#define LIBINSTRLEN_DECL
+#define LIBJSON_CC
+#define LIBJSON_DECL
+#define LIBKEYMAP_CC
+#define LIBKEYMAP_DECL
+#define LIBM_CC
+#define LIBM_VCC
+#define LIBM_DECL
+#define LIBREGDUMP_CC
+#define LIBREGDUMP_DECL
+#define LIBREGEX_CC
+#define LIBREGEX_DECL
+#define LIBRPC_CC
+#define LIBRPC_VCC
+#define LIBRPC_DECL
+#define LIBRT_CC
+#define __LIBRT_CC
+#define LIBRT_VCC
+#define __LIBRT_VCC
+#define LIBRT_DECL
+#define __LIBRT_DECL
+#define LIBSCTRACE_CC
+#define LIBSCTRACE_DECL
+#define LIBTERM_CC
+#define LIBTERM_DECL
+#define LIBUNWIND_CC
+#define LIBUNWIND_DECL
+#define LIBVIDEO_CODEC_CC
+#define LIBVIDEO_CODEC_DECL
+#define LIBVIDEO_GFX_CC
+#define LIBVIDEO_GFX_DECL
+#define LIBVIDEO_WINDOW_CC
+#define LIBVIDEO_WINDOW_DECL
+#define LIBVIO_CC
+#define LIBVIO_DECL
+#define LIBVIOCORE_CC
+#define LIBVIOCORE_DECL
+#define LIBVM86_CC
+#define LIBVM86_DECL
+#define LIBZLIB_CC
+#define LIBZLIB_DECL
+
 
 #define NOTHROW(x) x
 #define __NOTHROW(x) x
@@ -236,14 +302,14 @@
 #define __ATTR_WUNUSED
 #define UNUSED(x) x
 #define __UNUSED(x) x
-#define IMPDEF extern
-#define __IMPDEF extern
-#define EXPDEF extern
-#define __EXPDEF extern
-#define FUNDEF extern
-#define __PUBDEF extern
-#define DATDEF extern
-#define __PUBDEF extern
+#define IMPDEF
+#define __IMPDEF
+#define EXPDEF
+#define __EXPDEF
+#define FUNDEF
+#define __PUBDEF
+#define DATDEF
+#define __PUBDEF
 #define PUBLIC
 #define __PUBLIC
 #define INTERN
@@ -252,8 +318,12 @@
 #define __PUBLIC_CONST
 #define INTERN_CONST
 #define __INTERN_CONST
-#define INTDEF extern
-#define __INTDEF extern
+#define INTERN_COMDAT
+#define __INTERN_COMDAT
+#define PUBLIC_COMDAT
+#define __PUBLIC_COMDAT
+#define INTDEF
+#define __INTDEF
 #define PRIVATE
 #define __PRIVATE
 #define FORCELOCAL

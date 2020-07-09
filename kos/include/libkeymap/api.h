@@ -42,6 +42,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBKEYMAP_LIBRARY_NAME     "libkeymap.so"
+#define LIBKEYMAP_LIBRARY_NAME "libkeymap.so"
 
 #endif /* !_LIBKEYMAP_API_H */

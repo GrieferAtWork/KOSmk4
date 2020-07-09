@@ -331,23 +331,9 @@
 
 
 
-/* Define a missing libc function inline within a header.
- * These functions are linked as:
- *   #1: __declspec(selectany) -> COMDAT definition
- *   #2: c++ inline (noinline) -> COMDAT definition
- *   #3: c inline (noinline)   -> ???  (implementation defined)
- *   #4: static                -> Once in every compilation unit (only if used)
- */
+/* Linkage for local function substitutions. */
 #ifndef __LOCAL_LIBC
-#ifndef __NO_ATTR_SELECTANY
-#define __LOCAL_LIBC(name) __INTERN __ATTR_SELECTANY __ATTR_UNUSED
-#elif defined(__cplusplus) && !defined(__NO_ATTR_NOINLINE) && !defined(__NO_ATTR_VISIBILITY)
-#define __LOCAL_LIBC(name) inline __ATTR_NOINLINE __ATTR_VISIBILITY("hidden") __ATTR_UNUSED
-#elif !defined(__NO_ATTR_INLINE) && !defined(__NO_ATTR_NOINLINE)
-#define __LOCAL_LIBC(name) __LOCAL __ATTR_NOINLINE __ATTR_UNUSED
-#else /* ... */
-#define __LOCAL_LIBC(name) __PRIVATE __ATTR_UNUSED
-#endif /* !... */
+#define __LOCAL_LIBC(name) __INTERN_COMDAT __ATTR_SECTION(".text.local." #name)
 #endif /* !__LOCAL_LIBC */
 
 #ifndef __NO_ATTR_SECTION

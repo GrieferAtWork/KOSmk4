@@ -169,38 +169,49 @@
 #define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)
 #endif /* !__REDIRECT_WSUPPRESS_BEGIN */
 
-#define PP_PRIVATE_STR      __PP_PRIVATE_STR
-#define PP_STR              __PP_STR
-#define PP_PRIVATE_CAT2     __PP_PRIVATE_CAT2
-#define PP_PRIVATE_CAT3     __PP_PRIVATE_CAT3
-#define PP_PRIVATE_CAT4     __PP_PRIVATE_CAT4
-#define PP_CAT2             __PP_CAT2
-#define PP_CAT3             __PP_CAT3
-#define PP_CAT4             __PP_CAT4
-#define PP_PRIVATE_MUL8     __PP_PRIVATE_MUL8
-#define PP_MUL8             __PP_MUL8
-#define STATIC_ASSERT       __STATIC_ASSERT
-#define STATIC_ASSERT_MSG   __STATIC_ASSERT_MSG
-#define NONNULL             __ATTR_NONNULL
-#define NONNULL_CXX         __ATTR_NONNULL_CXX
-#define WUNUSED             __ATTR_WUNUSED
-#define UNUSED              __UNUSED
-#define IMPDAT              __IMPDAT
-#define IMPDEF              __IMPDEF
-#define EXPDEF              __EXPDEF
-#define FUNDEF              __PUBDEF
-#define DATDEF              __PUBDEF
-#define PUBLIC              __PUBLIC
-#define INTERN              __INTERN
-#define PUBLIC_CONST        __PUBLIC_CONST
-#define INTERN_CONST        __INTERN_CONST
-#define INTDEF              __INTDEF
-#define PRIVATE             __PRIVATE
-#define FORCELOCAL          __FORCELOCAL
-#define EXTERN_INLINE       __EXTERN_INLINE
-#define EXTERN_FORCEINLINE  __EXTERN_FORCEINLINE
-#define LOCAL               __LOCAL
-#define DFL                 __DFL
+/* Preprocessor macros */
+#define PP_PRIVATE_STR  __PP_PRIVATE_STR
+#define PP_STR          __PP_STR
+#define PP_PRIVATE_CAT2 __PP_PRIVATE_CAT2
+#define PP_PRIVATE_CAT3 __PP_PRIVATE_CAT3
+#define PP_PRIVATE_CAT4 __PP_PRIVATE_CAT4
+#define PP_CAT2         __PP_CAT2
+#define PP_CAT3         __PP_CAT3
+#define PP_CAT4         __PP_CAT4
+#define PP_PRIVATE_MUL8 __PP_PRIVATE_MUL8
+#define PP_MUL8         __PP_MUL8
+
+/* Static assertion */
+#define STATIC_ASSERT     __STATIC_ASSERT
+#define STATIC_ASSERT_MSG __STATIC_ASSERT_MSG
+
+/* Attributes without ATTR_* prefix */
+#define NONNULL     __ATTR_NONNULL
+#define NONNULL_CXX __ATTR_NONNULL_CXX
+#define WUNUSED     __ATTR_WUNUSED
+#define UNUSED      __UNUSED
+
+/* C++ default arguments */
+#define DFL __DFL
+
+/* Linkage macros */
+#define IMPDAT             __IMPDAT
+#define IMPDEF             __IMPDEF
+#define EXPDEF             __EXPDEF
+#define FUNDEF             __PUBDEF
+#define DATDEF             __PUBDEF
+#define PUBLIC             __PUBLIC
+#define INTDEF             __INTDEF
+#define INTERN             __INTERN
+#define PUBLIC_CONST       __PUBLIC_CONST
+#define INTERN_CONST       __INTERN_CONST
+#define INTERN_COMDAT      __INTERN_COMDAT
+#define PUBLIC_COMDAT      __PUBLIC_COMDAT
+#define PRIVATE            __PRIVATE
+#define LOCAL              __LOCAL
+#define FORCELOCAL         __FORCELOCAL
+#define EXTERN_INLINE      __EXTERN_INLINE
+#define EXTERN_FORCEINLINE __EXTERN_FORCEINLINE
 
 #ifdef __ASSEMBLER__
 #include "__assembly.h"

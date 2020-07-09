@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBBUFFER_LIBRARY_NAME     "libbuffer.so"
+#define LIBBUFFER_LIBRARY_NAME "libbuffer.so"
 
 #endif /* !_LIBBUFFER_API_H */

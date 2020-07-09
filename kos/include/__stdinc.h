@@ -204,9 +204,9 @@
 #define __COMPILER_UNUSED(expr) __XBLOCK({ __auto_type __expr = (expr); __expr; })
 #elif defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_XBLOCK)
 #define __COMPILER_UNUSED(expr) __XBLOCK({ __typeof__(expr) __expr = (expr); __expr; })
-#else
+#else /* ... */
 #define __COMPILER_UNUSED(expr) (expr)
-#endif
+#endif /* !... */
 
 #define __COMPILER_OFFSETAFTER(s, m) ((__SIZE_TYPE__)(&((s *)0)->m + 1))
 #define __COMPILER_CONTAINER_OF(ptr, type, member) \
@@ -272,6 +272,8 @@
 #define __INTERN        /* Nothing */
 #define __PUBLIC_CONST  /* Nothing */
 #define __INTERN_CONST  /* Nothing */
+#define __PUBLIC_COMDAT /* Nothing */
+#define __INTERN_COMDAT /* Nothing */
 #elif defined(__INTELLISENSE__)
 #define __IMPDEF        extern
 #define __IMPDAT        extern
@@ -283,6 +285,8 @@
 #define __INTERN        /* Nothing */
 #define __PUBLIC_CONST  /* Nothing */
 #define __INTERN_CONST  /* Nothing */
+#define __PUBLIC_COMDAT /* Nothing */
+#define __INTERN_COMDAT /* Nothing */
 #elif defined(__PE__)
 #define __IMPDEF        extern __ATTR_DLLIMPORT
 #define __IMPDAT        extern __ATTR_DLLIMPORT
@@ -310,8 +314,7 @@
  * As such, this feature is implement as opt-in on a per-file basis, with the
  * user having to `#define __WANT_NO_PLT_RELOCATIONS' prior to including any
  * system header file. */
-#if (__has_attribute(__noplt__) && \
-     (__has_attribute(__visibility__) || defined(__GNUC__) || defined(__ELF__) || defined(__TINYC__)))
+#if __has_attribute(__noplt__) && __has_attribute(__visibility__)
 #define __HAVE_NO_PLT_RELOCATIONS 1 /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
 #define __IMPDEF        extern __attribute__((__noplt__, __visibility__("default")))
 #elif !defined(__NO_ATTR_VISIBILITY) && !defined(__NO_ATTR_NOPLT)
@@ -322,9 +325,9 @@
 #elif !defined(__NO_ATTR_NOPLT)
 #define __HAVE_NO_PLT_RELOCATIONS 1 /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
 #define __IMPDEF        extern __ATTR_NOPLT
-#else
+#else /* ... */
 #define __IMPDEF        extern
-#endif
+#endif /* !... */
 #elif defined(__NO_ATTR_VISIBILITY)
 #define __IMPDEF        extern
 #else /* __ELF__ */
@@ -363,6 +366,53 @@
 #endif /* __NO_ATTR_VISIBILITY */
 #endif
 
+/* COMDAT function definitions:
+ * When applied to a function, an attempt will be made to ensure that multiple
+ * instances of the same function, which may exist in multiple compilation units
+ * get merged into a single instance at link-time. No guaranty is made that this
+ * will actually be the case, meaning that as a fall-back, these macros are allowed
+ * to simply declare functions as static (with the exception of `__PUBLIC_COMDAT',
+ * which will define `__NO_PUBLIC_COMDAT' if the function cannot be provided as
+ * part of the containing programs export table)
+ *   - __INTERN_COMDAT: Combination of __PRIVATE, in that the symbol is only
+ *                      guarantied to be visible within the declaring compilation
+ *                      unit, but also similar to `__INTERN', in that the final
+ *                      run-time address of the symbol may be identical between
+ *                      multiple compilation units.
+ *                      Note that unlike `__INTERN', declaration with this visibility
+ *                      should appear in headers, rather than source files!
+ *   - __PUBLIC_COMDAT: An optional extension to `__INTERN_COMDAT' that exists mainly
+ *                      in c++, where the annotated function (may) also be exported
+ *                      from the associated program, and relocations (may) be generated
+ *                      to ensure that a single, common address is used in the event
+ *                      that other linked components export the same symbol.
+ *                      If this macro is a simple alias for `__INTERN_COMDAT', then the
+ *                      macro `__NO_PUBLIC_COMDAT' is defined to `1' */
+#ifndef __INTERN_COMDAT
+#ifndef __NO_ATTR_SELECTANY
+#define __INTERN_COMDAT __INTERN __ATTR_UNUSED __ATTR_SELECTANY __ATTR_VISIBILITY("hidden")
+#elif defined(__cplusplus)
+#define __INTERN_COMDAT inline __ATTR_NOINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+#elif !defined(__NO_ATTR_WEAK)
+#define __INTERN_COMDAT __ATTR_UNUSED __ATTR_WEAK __ATTR_VISIBILITY("hidden")
+#else /* ... */
+#define __INTERN_COMDAT static __ATTR_UNUSED
+#endif /* !... */
+#endif /* !__INTERN_COMDAT */
+#ifndef __PUBLIC_COMDAT
+#ifndef __NO_ATTR_SELECTANY
+#define __PUBLIC_COMDAT __PUBLIC __ATTR_SELECTANY
+#elif defined(__cplusplus)
+#define __INTERN_COMDAT __PUBLIC inline __ATTR_NOINLINE
+#elif !defined(__NO_ATTR_WEAK)
+#define __INTERN_COMDAT __PUBLIC __ATTR_WEAK
+#else /* ... */
+#define __NO_PUBLIC_COMDAT 1
+#define __INTERN_COMDAT __INTERN_COMDAT
+#endif /* !... */
+#endif /* !__PUBLIC_COMDAT */
+
+
 
 #ifndef __UNUSED
 #ifdef __INTELLISENSE__
@@ -376,13 +426,13 @@
 #elif defined(_MSC_VER)
 #define __UNUSED(name)   name
 #pragma warning(disable: 4100)
-#else
+#else /* ... */
 #define __UNUSED(name)   name
-#endif
+#endif /* !... */
 #endif /* !__UNUSED */
 
 
-#define ____PRIVATE_VREDIRECT_UNPACK(...)  __VA_ARGS__
+#define ____PRIVATE_VREDIRECT_UNPACK(...) __VA_ARGS__
 
 /* General purpose redirection implementation. */
 #ifndef __COMPILER_REDIRECT
@@ -443,7 +493,7 @@
 #define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERN_INLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __pragma(redefine_extname name asmname) __EXTERN_INLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #endif /* !__NO_EXTERN_INLINE */
-#else
+#else /* ... */
 
 #ifdef __NO_EXTERN_INLINE
 #define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
@@ -589,7 +639,7 @@
 		__builtin_va_end(____va_args);                                                                                         \
 	}
 #endif /* !__cplusplus */
-#endif
+#endif /* !... */
 #endif /* !__COMPILER_REDIRECT */
 
 

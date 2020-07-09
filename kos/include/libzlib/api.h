@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBZLIB_LIBRARY_NAME     "libzlbi.so"
+#define LIBZLIB_LIBRARY_NAME "libzlbi.so"
 
 #endif /* !_LIBZLIB_API_H */

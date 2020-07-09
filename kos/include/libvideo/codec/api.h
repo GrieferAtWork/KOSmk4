@@ -24,9 +24,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIDEO_CODEC_CC    __ATTR_FASTCALL
+#define LIBVIDEO_CODEC_CC __ATTR_FASTCALL
 #else
-#define LIBVIDEO_CODEC_CC    /* nothing */
+#define LIBVIDEO_CODEC_CC /* nothing */
 #endif
 
 #if !defined(LIBVIDEO_CODEC_WANT_PROTOTYPES) && \
@@ -36,14 +36,14 @@
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBVIDEO_CODEC_DECL  __PUBDEF
+#define LIBVIDEO_CODEC_DECL __PUBDEF
 #elif defined(__LIBVIDEO_CODEC_STATIC)
-#define LIBVIDEO_CODEC_DECL  __INTDEF
+#define LIBVIDEO_CODEC_DECL __INTDEF
 #else
-#define LIBVIDEO_CODEC_DECL  __IMPDEF
+#define LIBVIDEO_CODEC_DECL __IMPDEF
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBVIDEO_CODEC_LIBRARY_NAME     "libvideo-codec.so"
+#define LIBVIDEO_CODEC_LIBRARY_NAME "libvideo-codec.so"
 
 #endif /* !_LIBVIDEO_CODEC_API_H */

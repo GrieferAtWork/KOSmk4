@@ -24,9 +24,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBUNWIND_CC    __ATTR_STDCALL
+#define LIBUNWIND_CC __ATTR_STDCALL
 #else
-#define LIBUNWIND_CC    /* nothing */
+#define LIBUNWIND_CC /* nothing */
 #endif
 
 #if !defined(LIBUNWIND_WANT_PROTOTYPES) && \
@@ -44,7 +44,7 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBUNWIND_LIBRARY_NAME     "libunwind.so"
+#define LIBUNWIND_LIBRARY_NAME "libunwind.so"
 
 
 /* Unwind error codes. */

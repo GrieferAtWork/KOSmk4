@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBREGDUMP_LIBRARY_NAME     "libregdump.so"
+#define LIBREGDUMP_LIBRARY_NAME "libregdump.so"
 
 #endif /* !_LIBREGDUMP_API_H */

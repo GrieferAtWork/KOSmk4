@@ -167,13 +167,13 @@
  *       request of a call to `dllocksection()' when given a handle
  *       for the RTLD core library. */
 #define BUILTIN_SECTIONS_COUNT 6
-#define BUILTIN_SECTIONS_ENUMERATE(callback)                                                    \
-	callback(0, ".text",             text,             SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR) \
-	callback(1, ".rodata",           rodata,           SHT_PROGBITS, SHF_ALLOC)                 \
-	callback(2, ".eh_frame",         eh_frame,         SHT_PROGBITS, SHF_ALLOC)                 \
-	callback(3, ".gcc_except_table", gcc_except_table, SHT_PROGBITS, SHF_ALLOC)                 \
-	callback(4, ".data",             data,             SHT_PROGBITS, SHF_ALLOC | SHF_WRITE)     \
-	callback(5, ".bss",              bss,              SHT_NOBITS,   SHF_ALLOC | SHF_WRITE)
+#define BUILTIN_SECTIONS_ENUMERATE(cb)                                                    \
+	cb(0, ".text",             text,             SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR) \
+	cb(1, ".rodata",           rodata,           SHT_PROGBITS, SHF_ALLOC)                 \
+	cb(2, ".eh_frame",         eh_frame,         SHT_PROGBITS, SHF_ALLOC)                 \
+	cb(3, ".gcc_except_table", gcc_except_table, SHT_PROGBITS, SHF_ALLOC)                 \
+	cb(4, ".data",             data,             SHT_PROGBITS, SHF_ALLOC | SHF_WRITE)     \
+	cb(5, ".bss",              bss,              SHT_NOBITS,   SHF_ALLOC | SHF_WRITE)
 
 /* For the purpose of being able to safely handle exceptions the same way
  * loaded modules do, a couple of global functions that aren't defined by
@@ -193,12 +193,12 @@
  * NOTE: The behavior of these functions is specified and standardized in different
  *       places. - Search around the project and on the internet to find out what
  *       each of these has to do, and how it has to do exactly that. */
-#define BUILTIN_GLOBALS_ENUMERATE(callback) \
-	callback(__gxx_personality_v0)          \
-	callback(__cxa_begin_catch)             \
-	callback(__cxa_end_catch)               \
-	callback(__cxa_rethrow)                 \
-	callback(_Unwind_Resume)
+#define BUILTIN_GLOBALS_ENUMERATE(cb) \
+	cb(__gxx_personality_v0)          \
+	cb(__cxa_begin_catch)             \
+	cb(__cxa_end_catch)               \
+	cb(__cxa_rethrow)                 \
+	cb(_Unwind_Resume)
 
 
 /* TODO: Add a way of extending the RTLD driver with custom executable format

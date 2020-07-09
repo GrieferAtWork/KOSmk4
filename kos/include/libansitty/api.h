@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBANSITTY_LIBRARY_NAME     "libansitty.so"
+#define LIBANSITTY_LIBRARY_NAME "libansitty.so"
 
 #endif /* !_LIBANSITTY_API_H */

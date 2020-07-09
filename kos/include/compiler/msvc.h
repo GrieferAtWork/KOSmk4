@@ -446,28 +446,30 @@ typedef System::ArgIterator __builtin_va_list;
 #else /* __cplusplus */
 #define __MSVC_VA_ADDROF(v)   &(v)
 #endif /* !__cplusplus */
-#if defined(__i386__) || defined(__i386) || defined(i386) || \
-    defined(__I86__) || defined(_M_IX86) || defined(__X86__) || \
-    defined(_X86_) || defined(__THW_INTEL__) || defined(__INTEL__)
+#if (defined(__i386__) || defined(__i386) || defined(i386) || \
+     defined(__I86__) || defined(_M_IX86) || defined(__X86__) || \
+     defined(_X86_) || defined(__THW_INTEL__) || defined(__INTEL__))
 #define __VA_SIZEOF(n)                   ((sizeof(n) + 3) & ~3)
 #define __builtin_va_start(ap, last_arg) (void)((ap) = (__builtin_va_list)__MSVC_VA_ADDROF(last_arg) + __VA_SIZEOF(last_arg))
 #define __builtin_va_arg(ap, T)          (*(T *)(((ap) += __VA_SIZEOF(T)) - __VA_SIZEOF(T)))
 #define __builtin_va_end(ap)             (void)0
-#elif defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
-      defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
-      defined(_WIN64) || defined(WIN64)
+#elif (defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
+       defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
+       defined(_WIN64) || defined(WIN64))
 #ifdef __cplusplus
-namespace __intern { extern "C" {
+namespace __intern {
+extern "C" {
 extern void (__cdecl __va_start)(__builtin_va_list *, ...);
 extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __builtin_va_list);
-} }
-#define __builtin_va_start(ap,x) ::__intern::__va_start(&ap,x)
-#define __builtin_va_copy(dstap,srcap) ::__intern::_vacopy(&(dstap),srcap)
+} /* extern "C" */
+} /* namespace __intern */
+#define __builtin_va_start(ap, x)       ::__intern::__va_start(&ap, x)
+#define __builtin_va_copy(dstap, srcap) ::__intern::_vacopy(&(dstap), srcap)
 #else /* __cplusplus */
 extern void (__cdecl __va_start)(__builtin_va_list *, ...);
 extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __builtin_va_list);
-#define __builtin_va_start(ap,x) __va_start(&ap,x)
-#define __builtin_va_copy(dstap,srcap) _vacopy(&(dstap),srcap)
+#define __builtin_va_start(ap, x)       __va_start(&ap, x)
+#define __builtin_va_copy(dstap, srcap) _vacopy(&(dstap), srcap)
 #endif /* !__cplusplus */
 #define __builtin_va_arg(ap, T)                            \
 	((sizeof(T) > 8 || (sizeof(T) & (sizeof(T) - 1)) != 0) \
@@ -491,7 +493,7 @@ extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __built
 #undef __builtin_va_end
 void __builtin_va_end(__builtin_va_list &__ap);
 #define __builtin_va_end  __builtin_va_end
-#endif
+#endif /* __INTELLISENSE__ && __cplusplus */
 
 #pragma warning(disable: 4514) /* Unused inline function was removed. */
 #pragma warning(disable: 4574) /* Nonsensical preprocessor warning. */

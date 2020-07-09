@@ -149,9 +149,8 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc
 	                        absolute_pc,
 	                        result,
 	                        sizeof(void *));
-	if unlikely(error != UNWIND_SUCCESS) {
+	if unlikely(error != UNWIND_SUCCESS)
 		return error;
-	}
 	assert(absolute_pc >= result->f_pcstart);
 	assert(absolute_pc < result->f_pcend);
 

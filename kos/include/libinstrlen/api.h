@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBINSTRLEN_LIBRARY_NAME     "libinstrlen.so"
+#define LIBINSTRLEN_LIBRARY_NAME "libinstrlen.so"
 
 #endif /* !_LIBINSTRLEN_API_H */

@@ -24,9 +24,9 @@
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBDEBUGINFO_CC    __ATTR_STDCALL
+#define LIBDEBUGINFO_CC __ATTR_STDCALL
 #else
-#define LIBDEBUGINFO_CC    /* nothing */
+#define LIBDEBUGINFO_CC /* nothing */
 #endif
 
 #if !defined(LIBDEBUGINFO_WANT_PROTOTYPES) && \
@@ -44,14 +44,11 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBDEBUGINFO_LIBRARY_NAME     "libdebuginfo.so"
-
+#define LIBDEBUGINFO_LIBRARY_NAME "libdebuginfo.so"
 
 /* Debug info error codes. */
 #define DEBUG_INFO_ERROR_SUCCESS 0 /* Function completed successfully. */
 #define DEBUG_INFO_ERROR_NOFRAME 1 /* No debug information associated with the given location. */
 #define DEBUG_INFO_ERROR_CORRUPT 2 /* Debug information has been corrupted. */
-
-
 
 #endif /* !_LIBDEBUGINFO_API_H */

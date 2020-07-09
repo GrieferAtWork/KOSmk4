@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBCCALL syslog_printer)(void *arg,
 
 #ifndef NDEBUG
 INTERN uintptr_t __stack_chk_guard = 0x123baf37;
-DEFINE_INTERN_ALIAS(__stack_chk_fail,__stack_chk_fail_local);
+DEFINE_INTERN_ALIAS(__stack_chk_fail, __stack_chk_fail_local);
 INTERN ATTR_NORETURN void __stack_chk_fail_local(void) {
 	struct debugtrap_reason r;
 	void *pc = __builtin_return_address(0);
@@ -1938,6 +1938,10 @@ PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
 }
 
 
+
+/* XXX: The function `dlsym_builtin()' is extremely large (3.41K bytes)!
+ *      Instead of implementing it in C, we should use assembly
+ *      to make use of `.wordrel' for encoding function pointers! */
 
 /* Return the address of a builtin function (e.g. `dlopen()') */
 INTERN WUNUSED ATTR_PURE NONNULL((1)) void *FCALL

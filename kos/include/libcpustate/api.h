@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBCPUSTATE_LIBRARY_NAME     "libcpustate.so"
+#define LIBCPUSTATE_LIBRARY_NAME "libcpustate.so"
 
 #endif /* !_LIBCPUSTATE_API_H */

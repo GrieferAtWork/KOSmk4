@@ -36,6 +36,8 @@ PHDRS {
 #define PHDR(x) :x
 #endif
 
+#undef likely
+#undef unlikely
 
 
 ENTRY(linker_entry)
@@ -47,13 +49,17 @@ SECTIONS {
 		PROVIDE_HIDDEN(__rtld_start = .);
 		PROVIDE_HIDDEN(__rtld_text_start = .);
 		*(.text.linker_entry)
-		*(.text.__x86.* .text .text.crt.*)
+		*(.text.hot .text.hot.* .text.likely .text.likely.*)
+		*(.text.__x86.* .text .text.crt.* .text.local.*)
+		*(.text.cold .text.cold.* .text.unlikely .text.unlikely.*)
 		PROVIDE_HIDDEN(__rtld_text_end = .);
 	} PHDR(text)
 
 	.rodata BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_rodata_start = .);
-		*(.rodata .rodata.str* .rodata.cst* .rodata.*.str* .rodata.*.cst* .rodata.crt.* .rodata.dos.*)
+		*(.rodata.hot .rodata.hot.* .rodata.likely .rodata.likely.*)
+		*(.rodata .rodata.str* .rodata.cst* .rodata.*.str* .rodata.*.cst* .rodata.crt.* .rodata.local.*)
+		*(.rodata.cold .rodata.cold.* .rodata.unlikely .rodata.unlikely.*)
 		PROVIDE_HIDDEN(__rtld_rodata_end = .);
 	} PHDR(text)
 
@@ -73,13 +79,17 @@ SECTIONS {
 
 	.data BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_data_start = .);
-		*(.data .data.crt.* .data.dos.*)
+		*(.data.hot .data.hot.* .data.likely .data.likely.*)
+		*(.data .data.crt.* .data.local.*)
+		*(.data.cold .data.cold.* .data.unlikely .data.unlikely.*)
 		PROVIDE_HIDDEN(__rtld_data_end = .);
 	} PHDR(data)
 
 	.bss BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_bss_start = .);
-		*(.bss .bss.crt.* .bss.dos.*)
+		*(.bss.hot .bss.hot.* .bss.likely .bss.likely.*)
+		*(.bss .bss.crt.* .bss.local.*)
+		*(.bss.cold .bss.cold.* .bss.unlikely .bss.unlikely.*)
 		PROVIDE_HIDDEN(__rtld_bss_end = .);
 		PROVIDE_HIDDEN(__rtld_end = .);
 	} PHDR(data)

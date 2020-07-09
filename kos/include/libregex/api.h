@@ -40,6 +40,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBREGEX_LIBRARY_NAME     "libregex.so"
+#define LIBREGEX_LIBRARY_NAME "libregex.so"
 
 #endif /* !_LIBREGEX_API_H */

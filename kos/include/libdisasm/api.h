@@ -44,6 +44,6 @@
 #endif
 
 /* Library name for use with `dlopen()' */
-#define LIBDISASM_LIBRARY_NAME     "libdisasm.so"
+#define LIBDISASM_LIBRARY_NAME "libdisasm.so"
 
 #endif /* !_LIBDISASM_API_H */
