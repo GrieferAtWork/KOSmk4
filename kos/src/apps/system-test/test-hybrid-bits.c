@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_HYBRID_BITS_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_HYBRID_BITS_C 1
-#define _KOS_SOURCE                               1
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
 
@@ -44,7 +44,12 @@ DECL_BEGIN
 		assertf(pure_func(_varg0) == (expected), "pure_func(_varg0) = %u", (unsigned int)pure_func(_varg0)); \
 	}
 
-DEFINE_TEST(hybrid_bits) {
+#ifdef __HYBRID_BIT_NO_BUILTIN
+DEFINE_TEST(hybrid_bits_nobuiltin)
+#else /* __HYBRID_BIT_NO_BUILTIN */
+DEFINE_TEST(hybrid_bits)
+#endif /* !__HYBRID_BIT_NO_BUILTIN */
+{
 	/* Make sure that functions from <hybrid/bit.h> work correctly */
 
 	/* FFS (FindFirstSet) */
@@ -191,7 +196,6 @@ DEFINE_TEST(hybrid_bits) {
 	ASSERT_BITCALL_1(0, CLRSB, __hybrid_clrsb16, u16, UINT16_C(0x8001));
 	ASSERT_BITCALL_1(0, CLRSB, __hybrid_clrsb32, u32, UINT32_C(0x80000001));
 	ASSERT_BITCALL_1(0, CLRSB, __hybrid_clrsb64, u64, UINT64_C(0x8000000000000001));
-
 }
 
 
