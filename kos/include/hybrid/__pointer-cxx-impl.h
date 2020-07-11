@@ -26,7 +26,7 @@ __NAMESPACE_INT_BEGIN
 
 #ifndef __POINTER_CXX_CV_QUAL
 #define __POINTER_CXX_CV_QUAL /* nothing */
-#endif
+#endif /* !__POINTER_CXX_CV_QUAL */
 
 
 template<
@@ -39,8 +39,8 @@ class __hybrid_ptr
 #ifdef __POINTER_CXX_IS_VOID
 #define __PTR_T void
 	<void __POINTER_CXX_CV_QUAL, __I>
-#elif defined(__POINTER_CXX_CV_QUAL_IS_CONST) || \
-    defined(__POINTER_CXX_CV_QUAL_IS_VOLATILE)
+#elif (defined(__POINTER_CXX_CV_QUAL_IS_CONST) || \
+       defined(__POINTER_CXX_CV_QUAL_IS_VOLATILE))
 	<__PTR_T __POINTER_CXX_CV_QUAL, __I>
 #endif
 {
@@ -108,7 +108,7 @@ public:
 #elif defined(__POINTER_CXX_CV_QUAL_IS_CONST) || defined(__POINTER_CXX_CV_QUAL_IS_VOLATILE)
 	__CXX_CLASSMEMBER explicit operator __PTR_T *() const __CXX_NOEXCEPT { return (__PTR_T *)(__UINTPTR_TYPE__)__m_ptr; }
 	__CXX_CLASSMEMBER explicit operator __PTR_T *() const volatile __CXX_NOEXCEPT { return (__PTR_T *)(__UINTPTR_TYPE__)__m_ptr; }
-#endif
+#endif /* ... */
 
 #ifdef __POINTER_CXX_IS_VOID
 #ifdef __COMPILER_HAVE_VOID_ARITHMETIC
@@ -236,7 +236,7 @@ public:
 	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
-#else
+#else /* ... */
 	__CXX_CLASSMEMBER __hybrid_ptr(__PTR_T *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
 	explicit __CXX_CLASSMEMBER __hybrid_ptr(__PTR_T const *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
 	explicit __CXX_CLASSMEMBER __hybrid_ptr(__PTR_T volatile *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
@@ -255,7 +255,7 @@ public:
 	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
-#endif
+#endif /* !... */
 
 	/* Pointer difference operators */
 #ifdef __POINTER_CXX_IS_VOID
