@@ -1787,17 +1787,17 @@ PRIVATE struct instruction const ops[] = {
 	I(0xff, IF_MODRM|IF_REG1,         "decl\t" OP_RM32),
 	I(0xff, IF_MODRM|IF_REXW|IF_REG1, "decq\t" OP_RM64),
 
-	I(0xff, IF_66|IF_MODRM|IF_REG2,   "callw\t" OP_XRM16),
-	I(0xff, IF_MODRM|IF_REG2,         "calll\t" OP_XRM32),
-	I(0xff, IF_MODRM|IF_REXW|IF_REG2, "callq\t" OP_XRM64),
+	I(0xff, IF_X32|IF_66|IF_MODRM|IF_REG2,   "callw\t" OP_XRM16),
+	I(0xff, IF_X32|IF_MODRM|IF_REG2,         "calll\t" OP_XRM32),
+	I(0xff, IF_X64|IF_MODRM|IF_REG2,         "callq\t" OP_XRM64),
 
 	I(0xff, IF_RMM|IF_66|IF_MODRM|IF_REG3,   "lcallw\t" OP_XRM16),
 	I(0xff, IF_RMM|IF_MODRM|IF_REG3,         "lcalll\t" OP_XRM32),
 	I(0xff, IF_RMM|IF_MODRM|IF_REXW|IF_REG3, "lcallq\t" OP_XRM64),
 
-	I(0xff, IF_66|IF_MODRM|IF_REG4,   "jmpw\t" OP_XRM16),
-	I(0xff, IF_MODRM|IF_REG4,         "jmpl\t" OP_XRM32),
-	I(0xff, IF_MODRM|IF_REXW|IF_REG4, "jmpq\t" OP_XRM64),
+	I(0xff, IF_X32|IF_66|IF_MODRM|IF_REG4,   "jmpw\t" OP_XRM16),
+	I(0xff, IF_X32|IF_MODRM|IF_REG4,         "jmpl\t" OP_XRM32),
+	I(0xff, IF_X64|IF_MODRM|IF_REG4,         "jmpq\t" OP_XRM64),
 
 	I(0xff, IF_RMM|IF_66|IF_MODRM|IF_REG5,   "ljmpw\t" OP_XRM16),
 	I(0xff, IF_RMM|IF_MODRM|IF_REG5,         "ljmpl\t" OP_XRM32),

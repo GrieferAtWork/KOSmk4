@@ -176,6 +176,32 @@
 		})                                                             \
 	} __WHILE0
 
+/* [66] XX push64  (in 64-bit mode)
+ *  66  XX push16  (outside 64-bit mode)
+ *      XX push32  (outside 64-bit mode) */
+#define EMU86_PUSH163264_FORCE64(value16, value32, value64)            \
+	do {                                                               \
+		byte_t *sp;                                                    \
+		sp = EMU86_GETSTACKPTR();                                      \
+		IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {      \
+			sp -= 8;                                                   \
+			EMU86_EMULATE_PUSH(sp, 8);                                 \
+			EMU86_WRITE_USER_MEMORY(sp, 8);                            \
+			EMU86_MEMWRITEQ(sp, value64);                              \
+		} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT(if (IS_16BIT()) { \
+			sp -= 2;                                                   \
+			EMU86_EMULATE_PUSH(sp, 2);                                 \
+			EMU86_WRITE_USER_MEMORY(sp, 2);                            \
+			EMU86_MEMWRITEW(sp, value16);                              \
+		} else {                                                       \
+			sp -= 4;                                                   \
+			EMU86_EMULATE_PUSH(sp, 4);                                 \
+			EMU86_WRITE_USER_MEMORY(sp, 4);                            \
+			EMU86_MEMWRITEL(sp, value32);                              \
+		})                                                             \
+		EMU86_SETSTACKPTR(sp);                                         \
+	} __WHILE0
+
 /* 66 XX pop16
  *    XX pop32  (in 32-bit mode)
  *    XX pop64  (in 64-bit mode) */

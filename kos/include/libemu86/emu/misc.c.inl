@@ -164,9 +164,10 @@ case EMU86_OPCODE_ENCODE(0xff):
 		/* FF /2      CALL r/m32      Call near, absolute indirect, address given in r/m32 */
 		/* FF /2      CALL r/m64      Call near, absolute indirect, address given in r/m64 */
 		EMU86_UREG_TYPE dest_ip;
-		EMU86_PUSH163264((dest_ip = MODRM_GETRMW(), (u16)REAL_IP()),
-		                 (dest_ip = MODRM_GETRML(), (u32)REAL_IP()),
-		                 (dest_ip = MODRM_GETRMQ(), (u64)REAL_IP()));
+		/* NOTE: 66h-prefix isn't allowed in 64-bit mode! */
+		EMU86_PUSH163264_FORCE64((dest_ip = MODRM_GETRMW(), (u16)REAL_IP()),
+		                         (dest_ip = MODRM_GETRML(), (u32)REAL_IP()),
+		                         (dest_ip = MODRM_GETRMQ(), (u64)REAL_IP()));
 		EMU86_SETIPREG(dest_ip);
 		goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
@@ -276,11 +277,11 @@ case EMU86_OPCODE_ENCODE(0xff):
 		/* FF /2      JMP r/m32      Jump near, absolute indirect, address given in r/m32 */
 		/* FF /2      JMP r/m64      Jump near, absolute indirect, address given in r/m64 */
 		EMU86_UREG_TYPE dest_ip;
-		if (IS_16BIT()) {
-			dest_ip = MODRM_GETRMW();
-		} IF_64BIT(else IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
+		IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
 			dest_ip = MODRM_GETRMQ();
-		}) IF_16BIT_OR_32BIT(else {
+		} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT(if (IS_16BIT()) {
+			dest_ip = MODRM_GETRMW();
+		} else {
 			dest_ip = MODRM_GETRML();
 		})
 		EMU86_SETIPREG(dest_ip);
