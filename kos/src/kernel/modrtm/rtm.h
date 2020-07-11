@@ -29,10 +29,23 @@
 #error "Architecture doesn't have RTM support (please don't compile this driver for this architecture)"
 #endif /* !ARCH_VM_HAVE_RTM */
 
-/* TODO: Config option: CONFIG_RTM_USERSPACE_ONLY
+/* Config option: CONFIG_RTM_USERSPACE_ONLY
  * When defined, RTM can only be used in user-space.
  * This is enforced by making all conditional is-user checks mandatory,
  * as well as simplifying a lot of code by removing is-kernel branches. */
+#ifdef CONFIG_NO_RTM_USERSPACE_ONLY
+#undef CONFIG_RTM_USERSPACE_ONLY
+#define CONFIG_RTM_USERSPACE_ONLY 0
+#elif !defined(CONFIG_RTM_USERSPACE_ONLY)
+#define CONFIG_RTM_USERSPACE_ONLY 1
+#elif (CONFIG_RTM_USERSPACE_ONLY + 0) == 0
+#undef CONFIG_RTM_USERSPACE_ONLY
+#define CONFIG_RTM_USERSPACE_ONLY 0
+#else /* ... */
+#undef CONFIG_RTM_USERSPACE_ONLY
+#define CONFIG_RTM_USERSPACE_ONLY 1
+#endif /* !... */
+
 
 DECL_BEGIN
 

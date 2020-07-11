@@ -527,10 +527,15 @@ struct rtm_machstate {
 #define rtm_machstate_get_csbase(self) 0
 #define rtm_machstate_get_ssbase(self) 0
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_fsbase, r_fsbase, (uintptr_t)__rdfsbase())
+#if CONFIG_RTM_USERSPACE_ONLY
+DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_gsbase, r_gsbase,
+                           (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE))
+#else /* CONFIG_RTM_USERSPACE_ONLY */
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_gsbase, r_gsbase,
                            self->r_mem.rm_chkuser
                            ? (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE)
                            : (uintptr_t)__rdgsbase())
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 #else /* __x86_64__ */
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_esbase, r_esbase, i386_getsegment_base(self->r_icstate, EMU86_R_ES))
 #define rtm_machstate_get_csbase(self) (uintptr_t)(self)->r_csbase /* i386_getsegment_base(self->r_icstate, EMU86_R_CS)) */
@@ -784,17 +789,29 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 #define EMU86_GETCR4_PCE_IS_ZERO 1 /* Allow user-space use of `rdpmc' */
 
 
+#if CONFIG_RTM_USERSPACE_ONLY
+#define EMU86_ISUSER() 1
+#define EMU86_ISUSER_IS_ONE 1
+#else /* CONFIG_RTM_USERSPACE_ONLY */
 #define EMU86_ISUSER() self->r_mem.rm_chkuser
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 
 #ifdef __x86_64__
 #define EMU86_EMULATE_CONFIG_VM86 0
 #define EMU86_ISUSER_NOVM86()     EMU86_ISUSER()
+#ifdef EMU86_ISUSER_IS_ONE
+#define EMU86_ISUSER_NOVM86_IS_ONE 1
+#endif /* EMU86_ISUSER_IS_ONE */
 #else /* __x86_64__ */
 #define EMU86_EMULATE_CONFIG_VM86             1
 #define EMU86_EMULATE_VM86_GETIF()            0 /* TODO */
 #define EMU86_EMULATE_VM86_SETIF(v)           (void)0
 #define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() DONT_USE
+#if CONFIG_RTM_USERSPACE_ONLY
+#define EMU86_ISUSER_NOVM86()                 (!icpustate32_isvm86(self->r_icstate))
+#else /* CONFIG_RTM_USERSPACE_ONLY */
 #define EMU86_ISUSER_NOVM86()                 (self->r_mem.rm_chkuser && !icpustate32_isvm86(self->r_icstate))
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 #define EMU86_ISVM86()                        (icpustate32_isvm86(self->r_icstate))
 #endif /* !__x86_64__ */
 

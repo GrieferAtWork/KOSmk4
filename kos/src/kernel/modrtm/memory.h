@@ -54,9 +54,11 @@ struct rtm_memory {
 	                                        * regions. (though in practice, most programs will only ever use 2 regions:
 	                                        * one for the calling program's stack, and the other for the parts of memory
 	                                        * that the program is actually intending to modify) */
+#if !CONFIG_RTM_USERSPACE_ONLY
 	bool                       rm_chkuser; /* [const] When true, verify that `addr' doesn't point into kernel-space
 	                                        * as part of the execution of `rtm_memory_read()' and `rtm_memory_write()'
 	                                        * before constructing a new, or extending an existing RTM memory region. */
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 };
 
 /* Max amount of kernel heap memory that may be used by
@@ -65,6 +67,7 @@ INTDEF size_t rtm_memory_limit;
 
 
 /* Initialize a given `struct rtm_memory' */
+#if !CONFIG_RTM_USERSPACE_ONLY
 #define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR, chkuser }
 #define rtm_memory_init(self, chkuser)      \
 	((self)->rm_mem_avl = rtm_memory_limit, \
@@ -77,6 +80,18 @@ INTDEF size_t rtm_memory_limit;
 	 __hybrid_assert((self)->rm_regionv == __NULLPTR), \
 	 (self)->rm_mem_avl = rtm_memory_limit,            \
 	 (self)->rm_chkuser = (chkuser))
+#else /* !CONFIG_RTM_USERSPACE_ONLY */
+#define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR }
+#define rtm_memory_init(self, chkuser)      \
+	((self)->rm_mem_avl = rtm_memory_limit, \
+	 (self)->rm_regionc = 0,                \
+	 (self)->rm_regionv = __NULLPTR)
+#define rtm_memory_cinit(self, chkuser)                \
+	(__hybrid_assert((self)->rm_mem_avl == 0),         \
+	 __hybrid_assert((self)->rm_regionc == 0),         \
+	 __hybrid_assert((self)->rm_regionv == __NULLPTR), \
+	 (self)->rm_mem_avl = rtm_memory_limit)
+#endif /* CONFIG_RTM_USERSPACE_ONLY */
 
 /* Finalize a given `struct rtm_memory' */
 INTDEF NOBLOCK NONNULL((1)) void

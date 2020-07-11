@@ -344,7 +344,10 @@ again_rw_region:
 	 * -> Must allocate a new one, or try to extend an existing one.
 	 *
 	 * But first off: Check that the given `addr' is valid when `rm_chkuser' is set. */
-	if (self->rm_chkuser) {
+#if !CONFIG_RTM_USERSPACE_ONLY
+	if likely(self->rm_chkuser)
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+	{
 		if (write) {
 			validate_writable(addr, num_bytes);
 		} else {
@@ -359,8 +362,11 @@ again_rw_region:
 		size_t j, access_bytes;
 		/* Next, acquire a lock to the effective VM */
 #ifdef KERNELSPACE_HIGHMEM
+#if !CONFIG_RTM_USERSPACE_ONLY
 		effective_vm = &vm_kernel;
-		if (ADDR_ISUSER(addr)) {
+		if (ADDR_ISUSER(addr))
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+		{
 			size_t maxsize;
 			effective_vm = THIS_VM;
 			/* Check if the entire address range is apart of user-space. */
@@ -378,11 +384,14 @@ again_rw_region:
 			if (ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
 				uintptr_t context;
 				context = E_SEGFAULT_CONTEXT_FAULT |
-				          E_SEGFAULT_CONTEXT_NONCANON;
+				          E_SEGFAULT_CONTEXT_NONCANON |
+				          E_SEGFAULT_CONTEXT_USERCODE;
 				if (write)
 					context |= E_SEGFAULT_CONTEXT_WRITING;
-				if (self->rm_chkuser)
-					context |= E_SEGFAULT_CONTEXT_USERCODE;
+#if !CONFIG_RTM_USERSPACE_ONLY
+				if unlikely(!self->rm_chkuser)
+					context &= ~E_SEGFAULT_CONTEXT_USERCODE;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 				THROW(E_SEGFAULT_UNMAPPED,
 				      (byte_t *)addr + num_bytes - 1,
 				      context);
@@ -391,15 +400,19 @@ again_rw_region:
 		}
 #else /* KERNELSPACE_HIGHMEM */
 		effective_vm = THIS_VM;
+#if !CONFIG_RTM_USERSPACE_ONLY
 		if (ADDR_ISKERN(addr)) {
 			size_t maxsize;
 			if unlikely((byte_t *)addr + num_bytes < (byte_t *)addr) {
 				uintptr_t context;
-				context = E_SEGFAULT_CONTEXT_FAULT;
+				context = E_SEGFAULT_CONTEXT_FAULT |
+				          E_SEGFAULT_CONTEXT_USERCODE;
 				if (write)
 					context |= E_SEGFAULT_CONTEXT_WRITING;
-				if (self->rm_chkuser)
-					context |= E_SEGFAULT_CONTEXT_USERCODE;
+#if !CONFIG_RTM_USERSPACE_ONLY
+				if unlikely(!self->rm_chkuser)
+					context &= ~E_SEGFAULT_CONTEXT_USERCODE;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 				THROW(E_SEGFAULT_UNMAPPED, 0, context);
 			}
 			effective_vm = &vm_kernel;
@@ -410,11 +423,14 @@ again_rw_region:
 				if (ADDR_IS_NONCANON((byte_t *)KERNELSPACE_END) {
 					uintptr_t context;
 					context = E_SEGFAULT_CONTEXT_FAULT |
-					          E_SEGFAULT_CONTEXT_NONCANON;
+					          E_SEGFAULT_CONTEXT_NONCANON |
+					          E_SEGFAULT_CONTEXT_USERCODE;
 					if (write)
 						context |= E_SEGFAULT_CONTEXT_WRITING;
-					if (self->rm_chkuser)
-						context |= E_SEGFAULT_CONTEXT_USERCODE;
+#if !CONFIG_RTM_USERSPACE_ONLY
+					if unlikely(!self->rm_chkuser)
+						context &= ~E_SEGFAULT_CONTEXT_USERCODE;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 					THROW(E_SEGFAULT_UNMAPPED,
 					      (byte_t *)KERNELSPACE_END,
 					      context);
@@ -429,6 +445,7 @@ again_rw_region:
 				num_bytes = maxsize;
 			}
 		}
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 #endif /* !KERNELSPACE_HIGHMEM */
 		/* Force the address range to be faulted. */
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -452,7 +469,8 @@ again_lock_effective_vm:
 #endif /* !LIBVIO_CONFIG_ENABLED */
 		{
 			uintptr_t context;
-			context = E_SEGFAULT_CONTEXT_FAULT;
+			context = E_SEGFAULT_CONTEXT_FAULT |
+			          E_SEGFAULT_CONTEXT_USERCODE;
 #ifdef LIBVIO_CONFIG_ENABLED
 			if (node && node->vn_part &&
 			    node->vn_part->dp_state == VM_DATAPART_STATE_VIOPRT)
@@ -460,8 +478,10 @@ again_lock_effective_vm:
 #endif /* LIBVIO_CONFIG_ENABLED */
 			sync_endread(effective_vm);
 			/* Unmapped address! */
-			if (self->rm_chkuser)
-				context |= E_SEGFAULT_CONTEXT_USERCODE;
+#if !CONFIG_RTM_USERSPACE_ONLY
+			if unlikely(!self->rm_chkuser)
+				context &= ~E_SEGFAULT_CONTEXT_USERCODE;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			if (write)
 				context |= E_SEGFAULT_CONTEXT_WRITING;
 			THROW(E_SEGFAULT_UNMAPPED, addr, context);
@@ -474,9 +494,11 @@ again_lock_effective_vm:
 			uintptr_t context;
 			sync_endread(effective_vm);
 			/* Unmapped address! */
-			context = 0;
-			if (self->rm_chkuser)
-				context |= E_SEGFAULT_CONTEXT_USERCODE;
+			context = E_SEGFAULT_CONTEXT_USERCODE;
+#if !CONFIG_RTM_USERSPACE_ONLY
+			if unlikely(!self->rm_chkuser)
+				context &= ~E_SEGFAULT_CONTEXT_USERCODE;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			if (write) {
 				THROW(E_SEGFAULT_READONLY, addr,
 				      E_SEGFAULT_CONTEXT_WRITING |
@@ -541,7 +563,9 @@ verify_access_range:
 		 * make sure that no other region already describes this one! */
 		for (j = 0; j < self->rm_regionc; ++j) {
 			struct vm_node *aliasing_node;
+#if !CONFIG_RTM_USERSPACE_ONLY
 			struct vm *aliasing_node_vm;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			size_t access_offset_into_node;
 			byte_t *aliasing_region_node_start;
 			region = self->rm_regionv[j];
@@ -557,10 +581,13 @@ verify_access_range:
 			 * that if the data parts are identical, then both of the VM node
 			 * mappings will have identical sizes, since the size of a vm_node is
 			 * always identical to the size of an associated vm_datapart!) */
+#if !CONFIG_RTM_USERSPACE_ONLY
 			aliasing_node_vm = &vm_kernel;
 			if (ADDR_ISUSER(region->mr_addrlo))
 				aliasing_node_vm = THIS_VM;
-			if likely(aliasing_node_vm == effective_vm) {
+			if likely(aliasing_node_vm == effective_vm)
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+			{
 				aliasing_node = vm_getnodeofaddress(effective_vm, region->mr_addrlo);
 				if (aliasing_node == node) {
 					size_t old_region_size;
@@ -628,7 +655,9 @@ verify_access_range:
 					}
 					goto do_access_region;
 				}
-			} else {
+			}
+#if !CONFIG_RTM_USERSPACE_ONLY
+			else {
 				if unlikely(!sync_tryread(aliasing_node_vm)) {
 					sync_endread(effective_vm);
 					while (!sync_canread(aliasing_node_vm))
@@ -637,6 +666,7 @@ verify_access_range:
 				}
 				aliasing_node = vm_getnodeofaddress(effective_vm, region->mr_addrlo);
 			}
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			assert(aliasing_node != node);
 			/* Figure out access offsets so we can translate `addr' */
 			access_offset_into_node    = (size_t)((byte_t *)addr - (byte_t *)vm_node_getstart(node));
@@ -645,8 +675,10 @@ verify_access_range:
 			       vm_node_getmin(node), vm_node_getmax(node),
 			       vm_node_getmin(aliasing_node), vm_node_getmax(aliasing_node),
 			       addr, aliasing_region_node_start + access_offset_into_node);
+#if !CONFIG_RTM_USERSPACE_ONLY
 			if unlikely(aliasing_node_vm != effective_vm)
 				sync_endread(aliasing_node_vm);
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			sync_endread(effective_vm);
 			/* Calculate the translated address for the aliasing mapping, and try again. */
 			addr = aliasing_region_node_start +
@@ -807,12 +839,19 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
 #endif /* !VM_FORCEFAULT_FLAG_NOVIO */
 
 PRIVATE void FCALL
-prefault_memory_for_writing(USER void *addr, size_t num_bytes) {
+prefault_memory_for_writing(struct vm *__restrict myvm,
+                            USER void *addr, size_t num_bytes) {
+#if !CONFIG_RTM_USERSPACE_ONLY
 	vm_forcefault_p(ADDR_ISKERN(addr) ? &vm_kernel
-	                                  : THIS_VM,
+	                                  : myvm,
 	                addr, num_bytes,
 	                VM_FORCEFAULT_FLAG_WRITE |
 	                VM_FORCEFAULT_FLAG_NOVIO_OPT);
+#else /* !CONFIG_RTM_USERSPACE_ONLY */
+	vm_forcefault_p(myvm, addr, num_bytes,
+	                VM_FORCEFAULT_FLAG_WRITE |
+	                VM_FORCEFAULT_FLAG_NOVIO_OPT);
+#endif /* CONFIG_RTM_USERSPACE_ONLY */
 }
 
 
@@ -853,10 +892,15 @@ NOTHROW(FCALL rtm_verify_writable_nopf)(USER CHECKED void *addr,
  * @return: false: Version of memory inconsistency detected (try again) */
 INTERN NONNULL((1)) bool FCALL
 rtm_memory_apply(struct rtm_memory const *__restrict self) {
+#if CONFIG_RTM_USERSPACE_ONLY
+#define effective_vm myvm
+#endif /* CONFIG_RTM_USERSPACE_ONLY */
 	struct vm *myvm;
 	size_t i;
 	bool must_allocate_missing_futex_controllers;
+#if !CONFIG_RTM_USERSPACE_ONLY
 	bool has_modified_kern;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	bool has_modified_user;
 	myvm  = THIS_VM;
 again_forcefault:
@@ -868,7 +912,7 @@ again_forcefault:
 		if (!rtm_memory_region_waschanged(region))
 			continue; /* Not modified... */
 		/* Prefault memory. */
-		prefault_memory_for_writing(region->mr_addrlo,
+		prefault_memory_for_writing(myvm, region->mr_addrlo,
 		                            rtm_memory_region_getsize(region));
 	}
 
@@ -883,11 +927,13 @@ again_acquire_region_locks:
 		part   = rtm_memory_region_getpart(region);
 		{
 			struct vm_node *node;
-			struct vm *effective_vm = myvm;
 			size_t node_size_after_addr;
 			pageid_t region_start_page;
+#if !CONFIG_RTM_USERSPACE_ONLY
+			struct vm *effective_vm = myvm;
 			if unlikely(ADDR_ISKERN(region->mr_addrlo))
 				effective_vm = &vm_kernel;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			region_start_page = PAGEID_ENCODE(region->mr_addrlo);
 			if unlikely(!sync_tryread(effective_vm)) {
 				rtm_memory_endwrite_modified_parts(self, i);
@@ -1019,17 +1065,22 @@ again_allocate_ftx_controller_for_part:
 
 	/* Step #3: Verify that all modified in-memory data ranges can be
 	 *          written to without any chance of triggering a pagefault. */
-	has_modified_kern = false;
 	has_modified_user = false;
+#if !CONFIG_RTM_USERSPACE_ONLY
+	has_modified_kern = false;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	for (i = 0; i < self->rm_regionc; ++i) {
 		struct rtm_memory_region *region;
 		struct vm_datapart *part;
+#if !CONFIG_RTM_USERSPACE_ONLY
 		struct vm *effective_vm;
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 		region = self->rm_regionv[i];
 		if (!rtm_memory_region_waschanged(region))
 			continue; /* Unchanged region. */
 		part = rtm_memory_region_getpart(region);
 		assert(sync_writing(part));
+#if !CONFIG_RTM_USERSPACE_ONLY
 		effective_vm = myvm;
 		if unlikely(ADDR_ISKERN(region->mr_addrlo))
 			effective_vm = &vm_kernel;
@@ -1040,14 +1091,19 @@ again_allocate_ftx_controller_for_part:
 					goto again_acquire_region_locks_for_vm_lock;
 				has_modified_kern = true;
 			}
-		} else {
+		} else
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+		{
 			/* Ensure that we've for a read-lock to the user's VM */
 			if (!has_modified_user) {
 				if unlikely(!sync_tryread(effective_vm)) {
+#if !CONFIG_RTM_USERSPACE_ONLY
 again_acquire_region_locks_for_vm_lock:
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 					rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
-					while (!sync_canread(effective_vm))
+					while (!sync_canread(effective_vm)) {
 						task_yield();
+					}
 					goto again_acquire_region_locks;
 				}
 				has_modified_user = true;
@@ -1058,8 +1114,10 @@ again_acquire_region_locks_for_vm_lock:
 		 * which we'd have to jump back to if memory isn't writable any more. */
 		if unlikely(!rtm_verify_writable_nopf(region->mr_addrlo,
 		                                      rtm_memory_region_getsize(region))) {
+#if !CONFIG_RTM_USERSPACE_ONLY
 			if unlikely(has_modified_kern)
 				sync_endread(&vm_kernel);
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 			if (has_modified_user)
 				sync_endread(myvm);
 			rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
@@ -1116,14 +1174,19 @@ again_acquire_region_locks_for_vm_lock:
 		/* Release our lock to this part. */
 		sync_endwrite(part);
 	}
+#if !CONFIG_RTM_USERSPACE_ONLY
 	if unlikely(has_modified_kern)
 		sync_endread(&vm_kernel);
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	if (has_modified_user)
 		sync_endread(myvm);
 	return true;
 partially_release_locks_and_retry:
 	rtm_memory_endwrite_modified_parts(self, i);
 	return false;
+#if CONFIG_RTM_USERSPACE_ONLY
+#undef effective_vm
+#endif /* CONFIG_RTM_USERSPACE_ONLY */
 }
 
 
