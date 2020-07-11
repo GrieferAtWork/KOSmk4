@@ -200,9 +200,9 @@ err:
 
 /* Dump a traceback for the given cpu state.
  * Tracebacks are printed using `addr2line_printf()' */
-PUBLIC ATTR_WEAK ATTR_SECTION(".text.kernel.print_traceback") ssize_t FCALL
-print_traceback(pformatprinter printer, void *arg,
-                unsigned int n_skip) {
+PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.print_traceback")
+ssize_t FCALL print_traceback(pformatprinter printer, void *arg,
+                              unsigned int n_skip) {
 	struct ucpustate st;
 	ucpustate_current(&st);
 	return do_print_traceback(printer, arg, &st, sizeof(st),
@@ -284,9 +284,16 @@ print_traceback_fcpustate(pformatprinter printer, void *arg,
 }
 
 /* Print a traceback to the system log, using `KERN_RAW' */
-PUBLIC ATTR_WEAK ATTR_SECTION(".text.kernel.tb")
-void FCALL tb(unsigned int n_skip) {
+PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.tbn")
+void FCALL tbn(unsigned int n_skip) {
 	print_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, n_skip + 1);
+	__asm__ __volatile__(""); /* Prevent `print_traceback()' being turned into a tail-call */
+}
+
+PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.tb")
+void FCALL tb(void) {
+	print_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, 1);
+	__asm__ __volatile__(""); /* Prevent `print_traceback()' being turned into a tail-call */
 }
 
 

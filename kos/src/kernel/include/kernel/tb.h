@@ -48,7 +48,8 @@ FUNDEF ssize_t FCALL print_traceback_scpustate(__pformatprinter printer, void *a
 FUNDEF ssize_t FCALL print_traceback_fcpustate(__pformatprinter printer, void *arg, struct fcpustate const *__restrict state, unsigned int n_skip DFL(0));
 
 /* Print a traceback to the system log, using `KERN_RAW' */
-FUNDEF void FCALL tb(unsigned int n_skip DFL(0));
+FUNDEF void FCALL tb(void);
+FUNDEF void FCALL tbn(unsigned int n_skip);
 LOCAL void FCALL tb_ucpustate(struct ucpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_ucpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
 LOCAL void FCALL tb_lcpustate(struct lcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_lcpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
 LOCAL void FCALL tb_kcpustate(struct kcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_kcpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
@@ -58,6 +59,7 @@ LOCAL void FCALL tb_fcpustate(struct fcpustate const *__restrict state, unsigned
 
 #ifdef __cplusplus
 extern "C++" {
+FUNDEF void FCALL tb(unsigned int n_skip) ASMNAME("tbn");
 LOCAL void FCALL tb(struct ucpustate const *__restrict state, unsigned int n_skip DFL(0)) { tb_ucpustate(state, n_skip); }
 LOCAL void FCALL tb(struct lcpustate const *__restrict state, unsigned int n_skip DFL(0)) { tb_lcpustate(state, n_skip); }
 LOCAL void FCALL tb(struct kcpustate const *__restrict state, unsigned int n_skip DFL(0)) { tb_kcpustate(state, n_skip); }
