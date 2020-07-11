@@ -47,3 +47,5 @@ __signed__
 __unsigned
 __unsigned__
 __restrict__
+__complex
+__complex__

@@ -490,6 +490,28 @@ typename __intern::____INTELLISENSE_enableif<
 bool>::__type __builtin_mul_overflow(__TA __lhs, __TB __rhs, __TR *__res);
 
 
+template<class __TA, class __TB, class __TR>
+typename __intern::____INTELLISENSE_enableif<
+	__intern::____INTELLISENSE_isarith<__TA>::__value &&
+	__intern::____INTELLISENSE_isarith<__TB>::__value &&
+	__intern::____INTELLISENSE_isarith<__TR>::__value,
+bool>::__type __builtin_add_overflow_p(__TA __lhs, __TB __rhs, __TR __res_type);
+
+template<class __TA, class __TB, class __TR>
+typename __intern::____INTELLISENSE_enableif<
+	__intern::____INTELLISENSE_isarith<__TA>::__value &&
+	__intern::____INTELLISENSE_isarith<__TB>::__value &&
+	__intern::____INTELLISENSE_isarith<__TR>::__value,
+bool>::__type __builtin_sub_overflow_p(__TA __lhs, __TB __rhs, __TR __res_type);
+
+template<class __TA, class __TB, class __TR>
+typename __intern::____INTELLISENSE_enableif<
+	__intern::____INTELLISENSE_isarith<__TA>::__value &&
+	__intern::____INTELLISENSE_isarith<__TB>::__value &&
+	__intern::____INTELLISENSE_isarith<__TR>::__value,
+bool>::__type __builtin_mul_overflow_p(__TA __lhs, __TB __rhs, __TR __res_type);
+
+
 bool __builtin_sadd_overflow(int __a, int __b, int *__res);
 bool __builtin_saddl_overflow(long __a, long __b, long *__res);
 bool __builtin_saddll_overflow(long long __a, long long __b, long long *__res);
