@@ -224,17 +224,14 @@ again_printlevel:
 				va_copy(copy, args);
 				temp = format_vprintf(printer, arg, message_format, copy);
 				va_end(copy);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
 			} else
 #endif
 			{
 				temp = format_vprintf(printer, arg, message_format, args);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
 			}
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
 		}
 		temp = (*printer)(arg, "\n", 1);
 		if unlikely(temp < 0)
@@ -242,7 +239,7 @@ again_printlevel:
 		result += temp;
 		if (++level < info.al_levelcnt) {
 			/* Print additional levels */
-			error = addr2line(ainfo, start_pc, &info, level);
+			error = addr2line(ainfo, module_relative_start_pc, &info, level);
 			if (error == DEBUG_INFO_ERROR_SUCCESS)
 				goto again_printlevel;
 		}
