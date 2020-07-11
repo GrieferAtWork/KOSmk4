@@ -2698,20 +2698,50 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setregp))
 
 
 
-
 /* Calculate the memory address of a given modrm */
-#ifndef EMU86_MODRM_MEMADDR
-#define EMU86_MODRM_MEMADDR(modrm, op_flags) \
+#ifdef EMU86_MODRM_MEMADDR
+#ifndef EMU86_MODRM_MEMADDR_NEED_REAL_IP
+#define EMU86_MODRM_MEMADDR_NEED_REAL_IP CONFIG_LIBEMU86_WANT_64BIT
+#endif /* !EMU86_MODRM_MEMADDR_NEED_REAL_IP */
+#else /* EMU86_MODRM_MEMADDR */
+#undef EMU86_MODRM_MEMADDR_NEED_REAL_IP
+#define EMU86_MODRM_MEMADDR_NEED_REAL_IP CONFIG_LIBEMU86_WANT_64BIT
+#if CONFIG_LIBEMU86_WANT_64BIT
+#define EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags, real_ip))
+#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#define EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip) \
 	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr))(EMU86_EMULATE_HELPER_ARGS_
                                                                                        struct emu86_modrm const *__restrict modrm,
-                                                                                       emu86_opflags_t op_flags) {
+                                                                                       emu86_opflags_t op_flags
+#if CONFIG_LIBEMU86_WANT_64BIT
+                                                                                       ,
+                                                                                       uintptr_t real_ip
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+                                                                                       ) {
 	uintptr_t result;
 	(void)op_flags;
 	result = modrm->mi_offset;
-	if (modrm->mi_rm != 0xff)
-		result += EMU86_GETREGP(modrm->mi_rm, op_flags);
+	if (modrm->mi_rm != 0xff) {
+#if CONFIG_LIBEMU86_WANT_64BIT
+		if (modrm->mi_rm == EMU86_R_RIP) {
+#if __SIZEOF_POINTER__ > 4
+			if unlikely(op_flags & EMU86_F_67) {
+				result += real_ip & UINT32_C(0xffffffff);
+			} else
+#endif /* __SIZEOF_POINTER__ > 4 */
+			{
+				result += real_ip;
+			}
+		} else
+#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+		{
+			result += EMU86_GETREGP(modrm->mi_rm, op_flags);
+		}
+	}
 	if (modrm->mi_index != 0xff)
 		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
 #ifndef EMU86_GETSEGBASE_IS_NOOP_ALL
@@ -2737,22 +2767,45 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 }
 #endif /* !EMU86_MODRM_MEMADDR */
 
+#undef EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP
+#if EMU86_MODRM_MEMADDR_NEED_REAL_IP
+#define EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(...) __VA_ARGS__
+#else /* EMU86_MODRM_MEMADDR_NEED_REAL_IP */
+#define EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(...) /* nothing */
+#endif /* !EMU86_MODRM_MEMADDR_NEED_REAL_IP */
+
 #ifndef EMU86_MODRM_MEMADDR_NOSEGBASE
 #ifdef EMU86_GETSEGBASE_IS_NOOP_ALL
-#define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags) \
-	EMU86_MODRM_MEMADDR(modrm, op_flags)
+#define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags, real_ip) \
+	EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip)
 #else /* EMU86_GETSEGBASE_IS_NOOP_ALL */
-#define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_MODRM_MEMADDR_NOSEGBASE(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED ATTR_PURE EMU86_EMULATE_HELPER_ATTR byte_t *
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_memaddr_nosegbase))(EMU86_EMULATE_HELPER_ARGS_
                                                                                                  struct emu86_modrm const *__restrict modrm,
-                                                                                                 emu86_opflags_t op_flags) {
+                                                                                                 emu86_opflags_t op_flags
+                                                                                                 EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	uintptr_t result;
 	(void)op_flags;
 	result = modrm->mi_offset;
-	if (modrm->mi_rm != 0xff)
-		result += EMU86_GETREGP(modrm->mi_rm, op_flags);
+	if (modrm->mi_rm != 0xff) {
+#if EMU86_MODRM_MEMADDR_NEED_REAL_IP
+		if (modrm->mi_rm == EMU86_R_RIP) {
+#if __SIZEOF_POINTER__ > 4
+			if unlikely(op_flags & EMU86_F_67) {
+				result += real_ip & UINT32_C(0xffffffff);
+			} else
+#endif /* __SIZEOF_POINTER__ > 4 */
+			{
+				result += real_ip;
+			}
+		} else
+#endif /* EMU86_MODRM_MEMADDR_NEED_REAL_IP */
+		{
+			result += EMU86_GETREGP(modrm->mi_rm, op_flags);
+		}
+	}
 	if (modrm->mi_index != 0xff)
 		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
 	return (byte_t *)result;
@@ -2766,18 +2819,19 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 
 /* Get/Set the R/M operand from a given modrm */
 #ifndef EMU86_GETMODRM_RMB
-#define EMU86_GETMODRM_RMB(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMB(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      emu86_opflags_t op_flags) {
+                                                                                      emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGB(modrm->mi_rm, op_flags);
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 1);
@@ -2787,12 +2841,13 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMB */
 
 #ifndef EMU86_SETMODRM_RMB
-#define EMU86_SETMODRM_RMB(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmb)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMB(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmb)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      u8 value, emu86_opflags_t op_flags) {
+                                                                                      u8 value, emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGB(modrm->mi_rm, value, op_flags);
@@ -2800,7 +2855,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
-		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+		addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 1);
@@ -2811,18 +2866,19 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_SETMODRM_RMB */
 
 #ifndef EMU86_GETMODRM_RMW
-#define EMU86_GETMODRM_RMW(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMW(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      emu86_opflags_t op_flags) {
+                                                                                      emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGW(modrm->mi_rm);
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 2);
@@ -2832,12 +2888,13 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMW */
 
 #ifndef EMU86_SETMODRM_RMW
-#define EMU86_SETMODRM_RMW(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmw)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMW(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmw)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      u16 value, emu86_opflags_t op_flags) {
+                                                                                      u16 value, emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGW(modrm->mi_rm, value);
@@ -2845,7 +2902,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
-		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+		addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 2);
@@ -2856,18 +2913,19 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_SETMODRM_RMW */
 
 #ifndef EMU86_GETMODRM_RML
-#define EMU86_GETMODRM_RML(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RML(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      emu86_opflags_t op_flags) {
+                                                                                      emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGL(modrm->mi_rm);
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 4);
@@ -2877,12 +2935,13 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RML */
 
 #ifndef EMU86_SETMODRM_RML
-#define EMU86_SETMODRM_RML(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RML(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      u32 value, emu86_opflags_t op_flags) {
+                                                                                      u32 value, emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGL(modrm->mi_rm, value);
@@ -2890,7 +2949,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
-		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+		addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 4);
@@ -2902,18 +2961,19 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 
 #if CONFIG_LIBEMU86_WANT_64BIT
 #ifndef EMU86_GETMODRM_RMQ
-#define EMU86_GETMODRM_RMQ(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMQ(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      emu86_opflags_t op_flags) {
+                                                                                      emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type))
 		return EMU86_GETREGQ(modrm->mi_rm);
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 8);
@@ -2923,12 +2983,13 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMQ */
 
 #ifndef EMU86_SETMODRM_RMQ
-#define EMU86_SETMODRM_RMQ(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmq)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMQ(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmq)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                       struct emu86_modrm const *__restrict modrm,
-                                                                                      u64 value, emu86_opflags_t op_flags) {
+                                                                                      u64 value, emu86_opflags_t op_flags
+                                                                                      EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 	if (EMU86_MODRM_ISREG(modrm->mi_type)) {
 		EMU86_SETREGQ(modrm->mi_rm, value);
@@ -2936,7 +2997,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 	{
 		byte_t *addr;
-		addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+		addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 		if (EMU86_ISUSER())
 			EMU86_VALIDATE_WRITABLE(addr, 8);
@@ -2952,14 +3013,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 /* Get/Set the R/M operand from a given modrm (when the modrm is known to be memory) */
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #ifndef EMU86_GETMODRM_RMMEMB
-#define EMU86_GETMODRM_RMMEMB(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMMEMB(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u8
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         emu86_opflags_t op_flags) {
+                                                                                         emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 1);
@@ -2969,14 +3031,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMMEMB */
 
 #ifndef EMU86_SETMODRM_RMMEMB
-#define EMU86_SETMODRM_RMMEMB(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMMEMB(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemb)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemb))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         u8 value, emu86_opflags_t op_flags) {
+                                                                                         u8 value, emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 1);
@@ -2986,14 +3049,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_SETMODRM_RMMEMB */
 
 #ifndef EMU86_GETMODRM_RMMEMW
-#define EMU86_GETMODRM_RMMEMW(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMMEMW(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u16
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         emu86_opflags_t op_flags) {
+                                                                                         emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 2);
@@ -3003,14 +3067,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMMEMW */
 
 #ifndef EMU86_SETMODRM_RMMEMW
-#define EMU86_SETMODRM_RMMEMW(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMMEMW(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemw)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemw))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         u16 value, emu86_opflags_t op_flags) {
+                                                                                         u16 value, emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 2);
@@ -3020,14 +3085,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 #endif /* !EMU86_SETMODRM_RMMEMW */
 
 #ifndef EMU86_GETMODRM_RMMEML
-#define EMU86_GETMODRM_RMMEML(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMMEML(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rml)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u32
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmeml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         emu86_opflags_t op_flags) {
+                                                                                         emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 4);
@@ -3037,14 +3103,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMMEML */
 
 #ifndef EMU86_SETMODRM_RMMEML
-#define EMU86_SETMODRM_RMMEML(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmeml)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMMEML(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmeml)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmeml))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         u32 value, emu86_opflags_t op_flags) {
+                                                                                         u32 value, emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 4);
@@ -3055,14 +3122,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_
 
 #if CONFIG_LIBEMU86_WANT_64BIT
 #ifndef EMU86_GETMODRM_RMMEMQ
-#define EMU86_GETMODRM_RMMEMQ(modrm, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags))
+#define EMU86_GETMODRM_RMMEMQ(modrm, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED __ATTR_PURE EMU86_EMULATE_HELPER_ATTR u64
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_rmmemq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         emu86_opflags_t op_flags) {
+                                                                                         emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_READABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_READABLE(addr, 8);
@@ -3072,14 +3140,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getmodrm_
 #endif /* !EMU86_GETMODRM_RMMEMQ */
 
 #ifndef EMU86_SETMODRM_RMMEMQ
-#define EMU86_SETMODRM_RMMEMQ(modrm, value, op_flags) \
-	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags))
+#define EMU86_SETMODRM_RMMEMQ(modrm, value, op_flags, real_ip) \
+	(EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemq)(EMU86_EMULATE_HELPER_PARAM_ modrm, value, op_flags EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, real_ip)))
 EMU86_EMULATE_HELPER_DECL __ATTR_UNUSED EMU86_EMULATE_HELPER_ATTR void
 EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_setmodrm_rmmemq))(EMU86_EMULATE_HELPER_ARGS_
                                                                                          struct emu86_modrm const *__restrict modrm,
-                                                                                         u64 value, emu86_opflags_t op_flags) {
+                                                                                         u64 value, emu86_opflags_t op_flags
+                                                                                         EMU86_IF_MODRM_MEMADDR_NEED_REAL_IP(, uintptr_t real_ip)) {
 	byte_t *addr;
-	addr = EMU86_MODRM_MEMADDR(modrm, op_flags);
+	addr = EMU86_MODRM_MEMADDR(modrm, op_flags, real_ip);
 #if EMU86_EMULATE_CONFIG_CHECKUSER && !defined(EMU86_VALIDATE_WRITABLE_IS_NOOP)
 	if (EMU86_ISUSER())
 		EMU86_VALIDATE_WRITABLE(addr, 8);
@@ -3289,17 +3358,17 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 #define EMU86_OPCODE() EMU86_OPCODE_DECODE(tiny_opcode)
 
-#define MODRM_MEMADDR()           EMU86_MODRM_MEMADDR(&modrm, op_flags)
-#define MODRM_MEMADDR_NOSEGBASE() EMU86_MODRM_MEMADDR_NOSEGBASE(&modrm, op_flags)
-#define MODRM_GETRMB()   EMU86_GETMODRM_RMB(&modrm, op_flags)
-#define MODRM_GETRMW()   EMU86_GETMODRM_RMW(&modrm, op_flags)
-#define MODRM_GETRML()   EMU86_GETMODRM_RML(&modrm, op_flags)
-#define MODRM_SETRMB(v)  EMU86_SETMODRM_RMB(&modrm, v, op_flags)
-#define MODRM_SETRMW(v)  EMU86_SETMODRM_RMW(&modrm, v, op_flags)
-#define MODRM_SETRML(v)  EMU86_SETMODRM_RML(&modrm, v, op_flags)
+#define MODRM_MEMADDR()           EMU86_MODRM_MEMADDR(&modrm, op_flags, REAL_IP())
+#define MODRM_MEMADDR_NOSEGBASE() EMU86_MODRM_MEMADDR_NOSEGBASE(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRMB()   EMU86_GETMODRM_RMB(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRMW()   EMU86_GETMODRM_RMW(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRML()   EMU86_GETMODRM_RML(&modrm, op_flags, REAL_IP())
+#define MODRM_SETRMB(v)  EMU86_SETMODRM_RMB(&modrm, v, op_flags, REAL_IP())
+#define MODRM_SETRMW(v)  EMU86_SETMODRM_RMW(&modrm, v, op_flags, REAL_IP())
+#define MODRM_SETRML(v)  EMU86_SETMODRM_RML(&modrm, v, op_flags, REAL_IP())
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define MODRM_GETRMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags)
-#define MODRM_SETRMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags)
+#define MODRM_GETRMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags, REAL_IP())
+#define MODRM_SETRMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags, REAL_IP())
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 
 
@@ -3424,26 +3493,26 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 
 
 #if EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMB(&modrm, op_flags)
-#define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMW(&modrm, op_flags)
-#define MODRM_GETRMMEML()   EMU86_GETMODRM_RML(&modrm, op_flags)
-#define MODRM_SETRMMEMB(v)  EMU86_SETMODRM_RMB(&modrm, v, op_flags)
-#define MODRM_SETRMMEMW(v)  EMU86_SETMODRM_RMW(&modrm, v, op_flags)
-#define MODRM_SETRMMEML(v)  EMU86_SETMODRM_RML(&modrm, v, op_flags)
+#define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMB(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMW(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRMMEML()   EMU86_GETMODRM_RML(&modrm, op_flags, REAL_IP())
+#define MODRM_SETRMMEMB(v)  EMU86_SETMODRM_RMB(&modrm, v, op_flags, REAL_IP())
+#define MODRM_SETRMMEMW(v)  EMU86_SETMODRM_RMW(&modrm, v, op_flags, REAL_IP())
+#define MODRM_SETRMMEML(v)  EMU86_SETMODRM_RML(&modrm, v, op_flags, REAL_IP())
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags)
-#define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags)
+#define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMQ(&modrm, op_flags, REAL_IP())
+#define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMQ(&modrm, v, op_flags, REAL_IP())
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #else /* EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-#define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMMEMB(&modrm, op_flags)
-#define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMMEMW(&modrm, op_flags)
-#define MODRM_GETRMMEML()   EMU86_GETMODRM_RMMEML(&modrm, op_flags)
-#define MODRM_SETRMMEMB(v)  EMU86_SETMODRM_RMMEMB(&modrm, v, op_flags)
-#define MODRM_SETRMMEMW(v)  EMU86_SETMODRM_RMMEMW(&modrm, v, op_flags)
-#define MODRM_SETRMMEML(v)  EMU86_SETMODRM_RMMEML(&modrm, v, op_flags)
+#define MODRM_GETRMMEMB()   EMU86_GETMODRM_RMMEMB(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRMMEMW()   EMU86_GETMODRM_RMMEMW(&modrm, op_flags, REAL_IP())
+#define MODRM_GETRMMEML()   EMU86_GETMODRM_RMMEML(&modrm, op_flags, REAL_IP())
+#define MODRM_SETRMMEMB(v)  EMU86_SETMODRM_RMMEMB(&modrm, v, op_flags, REAL_IP())
+#define MODRM_SETRMMEMW(v)  EMU86_SETMODRM_RMMEMW(&modrm, v, op_flags, REAL_IP())
+#define MODRM_SETRMMEML(v)  EMU86_SETMODRM_RMMEML(&modrm, v, op_flags, REAL_IP())
 #if CONFIG_LIBEMU86_WANT_64BIT
-#define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMMEMQ(&modrm, op_flags)
-#define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMMEMQ(&modrm, v, op_flags)
+#define MODRM_GETRMMEMQ()   EMU86_GETMODRM_RMMEMQ(&modrm, op_flags, REAL_IP())
+#define MODRM_SETRMMEMQ(v)  EMU86_SETMODRM_RMMEMQ(&modrm, v, op_flags, REAL_IP())
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
@@ -4482,6 +4551,16 @@ notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq:
 #endif /* NEED_notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq */
 
 
+#ifdef NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed_pushwlq
+#undef NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed_pushwlq
+#include "emu/push-pop-util.h"
+notsup_modrm_getwlq64_rmreg_modrm_parsed_pushwlq:
+		EMU86_PUSH163264_FORCE64_NOSUP();
+		goto notsup_modrm_getwlq64_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed
+#endif /* NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed_pushwlq */
+
+
 #ifdef NEED_notsup_modrm_getwlq_rmreg_modrm_parsed
 #undef NEED_notsup_modrm_getwlq_rmreg_modrm_parsed
 notsup_modrm_getwlq_rmreg_modrm_parsed:
@@ -4489,6 +4568,18 @@ notsup_modrm_getwlq_rmreg_modrm_parsed:
 		goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* NEED_notsup_modrm_getwlq_rmreg_modrm_parsed */
+
+
+#ifdef NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed
+#undef NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed
+notsup_modrm_getwlq64_rmreg_modrm_parsed:
+		/* IN_64_BIT_MODE ? 8 : PREFIX_66h_GIVEN ? 2 : 4 */
+		MODRM_NOSUP_GETRMZ(IF_64BIT(IF_16BIT_OR_32BIT(EMU86_F_IS64(op_flags) ? ) 8
+		                            IF_16BIT_OR_32BIT(:))
+		                   IF_16BIT_OR_32BIT(IS_16BIT() ? 2 : 4));
+		goto return_unsupported_instruction_rmreg;
+#define NEED_return_unsupported_instruction_rmreg
+#endif /* NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed */
 
 
 #ifdef NEED_notsup_modrm_getwlq

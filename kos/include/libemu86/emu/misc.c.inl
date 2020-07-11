@@ -174,8 +174,8 @@ case EMU86_OPCODE_ENCODE(0xff):
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 	case 2:
-#define NEED_notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq
-		goto notsup_modrm_getwlq_rmreg_modrm_parsed_pushwlq;
+#define NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed_pushwlq
+		goto notsup_modrm_getwlq64_rmreg_modrm_parsed_pushwlq;
 #endif /* ... */
 
 
@@ -290,8 +290,8 @@ case EMU86_OPCODE_ENCODE(0xff):
 	}
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 	case 4:
-		goto notsup_modrm_getwlq_rmreg_modrm_parsed;
-#define NEED_notsup_modrm_getwlq_rmreg_modrm_parsed
+		goto notsup_modrm_getwlq64_rmreg_modrm_parsed;
+#define NEED_notsup_modrm_getwlq64_rmreg_modrm_parsed
 #endif /* ... */
 
 
