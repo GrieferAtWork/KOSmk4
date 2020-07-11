@@ -414,10 +414,11 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 		va_end(vargs);
 		printk(KERN_RAW "\n");
 	}
-	{
+	TRY {
 		struct ucpustate temp;
 		kcpustate_to_ucpustate(&args->aa_state, &temp);
 		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &temp);
+	} EXCEPT {
 	}
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())

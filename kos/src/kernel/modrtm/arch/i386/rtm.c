@@ -37,7 +37,6 @@
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/printk.h>
 #include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
@@ -56,6 +55,13 @@
 
 #include "../../memory.h"
 #include "../../rtm.h"
+
+#ifndef NDEBUG
+#include <kernel/printk.h>
+#include <kernel/syslog.h>
+
+#include <libdisasm/disassembler.h>
+#endif /* !NDEBUG */
 
 DECL_BEGIN
 
@@ -1161,6 +1167,16 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 	for (;;) {
 		/* Execute the next instruction */
 		TRY {
+#ifndef NDEBUG
+			printk(KERN_TRACE "[rtm] Emulate %p: ",
+			       (void *)mach.r_pip);
+			disasm_single(&syslog_printer,
+			              SYSLOG_LEVEL_TRACE,
+			              (void *)mach.r_pip,
+			              DISASSEMBLER_TARGET_CURRENT,
+			              DISASSEMBLER_FNOADDR);
+			printk(KERN_TRACE "\n");
+#endif /* !NDEBUG */
 			status = x86_emulate_rtm_instruction(&mach);
 		} EXCEPT {
 			mach.r_pax = rtm_handle_exception();

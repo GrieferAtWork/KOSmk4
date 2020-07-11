@@ -620,14 +620,14 @@ unlock_treelock_and_throw_segfault:
 		minpageid = vm_node_getmaxpageid(node) + 1;
 		if (minpageid > maxpageid)
 			goto done; /* This was the last mapping! */
-		node      = node->vn_byaddr.ln_next;
+		node = node->vn_byaddr.ln_next;
 		goto again_with_node;
 	}
 #endif /* LIBVIO_CONFIG_ENABLED */
 	incref(part);
 	node_prot = node->vn_prot;
 	/* Figure out the address range that should get faulted, in related to `node' itself. */
-	assert(minpageid == vm_node_getminpageid(node));
+	assert(minpageid >= vm_node_getminpageid(node));
 	node_prefault_maxpageid = vm_node_getmaxpageid(node);
 	if (node_prefault_maxpageid > maxpageid)
 		node_prefault_maxpageid = maxpageid;
@@ -725,10 +725,23 @@ again_acquire_part_lock:
 				goto again_acquire_treelock;
 			}
 			assertf(vm_node_getmaxpageid(node) >=
-			        minpageid + node_prefault_vpage_offset + fault_count - 1,
+			        minpageid - node_prefault_vpage_offset + fault_count - 1,
 			        "This should have been ensured by us holding a lock to the part "
 			        "that is being mapped by this node, meaning that the node's size "
-			        "shouldn't have been able to change");
+			        "shouldn't have been able to change\n"
+			        "node: %p..%p (%p...%p)\n"
+			        "minpageid                  = %p\n"
+			        "node_prefault_vpage_offset = %Iu\n"
+			        "fault_count                = %Iu\n"
+			        "minpageid - ... + ... - 1  = %p\n",
+			        (uintptr_t)vm_node_getminpageid(node),
+			        (uintptr_t)vm_node_getmaxpageid(node),
+			        (uintptr_t)vm_node_getmin(node),
+			        (uintptr_t)vm_node_getmax(node),
+			        minpageid,
+			        node_prefault_vpage_offset,
+			        fault_count,
+			        minpageid - node_prefault_vpage_offset + fault_count - 1);
 
 			/* Now to map `ppage' into the page at `addr + fault_index * PAGESIZE' */
 			pagedir_prot = node_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
@@ -799,6 +812,22 @@ again_acquire_part_lock:
 	}
 	decref_unlikely(part);
 	goto again_acquire_treelock;
+}
+
+
+/* Same as `vm_forcefault()', but automatically extend the faulted range
+ * to all pages that are be touched by the given `addr...+=num_bytes' */
+PUBLIC size_t FCALL
+vm_forcefault_p(struct vm *__restrict self,
+                UNCHECKED void *addr, size_t num_bytes,
+                unsigned int flags)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+	size_t result;
+	num_bytes += (uintptr_t)addr & PAGEMASK;
+	addr      = (UNCHECKED void *)((uintptr_t)addr & ~PAGEMASK);
+	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
+	result    = vm_forcefault(self, addr, num_bytes, flags);
+	return result;
 }
 
 

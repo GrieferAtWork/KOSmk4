@@ -668,6 +668,9 @@ int main_rtm(int argc, char *argv[], char *envp[]) {
 		printf("\tc = %d\n", c); /* 20  */
 	} else {
 		printf("RTM error: %#Ix\n", error);
+		printf("\ta = %d\n", a); /* 10 */
+		printf("\tb = %d\n", b); /* 20 */
+		printf("\tc = %d\n", c); /* 30 */
 	}
 	return 0;
 }

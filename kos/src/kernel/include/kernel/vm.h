@@ -2254,6 +2254,14 @@ vm_forcefault(struct vm *__restrict self,
               unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
+/* Same as `vm_forcefault()', but automatically extend the faulted range
+ * to all pages that are be touched by the given `addr...+=num_bytes' */
+FUNDEF size_t FCALL
+vm_forcefault_p(struct vm *__restrict self,
+                UNCHECKED void *addr, size_t num_bytes,
+                unsigned int flags)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+
 
 /* Lock and (possibly) unshare some given datapart for the purpose of performing
  * writes to its backing memory in the context of the given vm `self'.
