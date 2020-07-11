@@ -48,6 +48,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <errno.h>
 #include <int128.h>
 #include <string.h>
 
@@ -55,6 +56,12 @@
 
 #include "../../memory.h"
 #include "../../rtm.h"
+
+/* System call numbers */
+#include <syscall.h>
+#ifdef __x86_64__
+#include <asm/syscalls32_d.h>
+#endif /* __x86_64__ */
 
 #ifndef NDEBUG
 #include <kernel/printk.h>
@@ -552,9 +559,79 @@ x86_emulate_rtm_instruction(struct rtm_machstate *__restrict self);
 PRIVATE NONNULL((1)) x86_rtm_status_t FCALL
 x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
                                     emu86_opflags_t op_flags) {
-	(void)self;
-	(void)op_flags;
-	/* TODO */
+	syscall_ulong_t sysno;
+	sysno = self->r_pax;
+	printk(KERN_TRACE "[rtm] syscall: %#Ix\n", sysno);
+
+#ifdef __x86_64__
+	if (EMU86_F_IS32(op_flags)) {
+		sysno = sysno & UINT32_C(0xffffffff);
+		switch (sysno) {
+
+		case __NR32_rtm_test:
+			sysno = SYS_rtm_test;
+			break;
+
+		case __NR32_rtm_abort:
+			/* Explicit RTM abort
+			 * HINT: %ebx is the first system call argument register in 32-bit mode. */
+			return ABORT_WITH(_XABORT_EXPLICIT |
+			                  (((u32)self->r_ebx << _XABORT_CODE_S) &
+			                   _XABORT_CODE_M));
+
+		case __NR32_rtm_end:
+			sysno = SYS_rtm_end;
+			break;
+
+		case __NR32_rtm_begin:
+			sysno = SYS_rtm_begin;
+			break;
+
+		default:
+			/* Unsupported system call! */
+			sysno = SYS_exit; /* Anything that isn't supported will do here! */
+			break;
+		}
+	}
+#endif /* __x86_64__ */
+	switch (sysno) {
+
+	case SYS_rtm_begin:
+		/* Nested RTM support */
+		++self->r_nesting;
+		self->r_pax = RTM_STARTED; /* System call return value */
+		return X86_RTM_STATUS_CONTINUE;
+
+	case SYS_rtm_end:
+		/* End an RTM operation (but do support nesting!) */
+		if (!self->r_nesting)
+			return X86_RTM_STATUS_COMPLETE;
+		--self->r_nesting;
+		self->r_pax = -EOK; /* System call return value */
+		return X86_RTM_STATUS_CONTINUE;
+
+	case SYS_rtm_abort:
+		/* Explicit RTM abort
+		 * HINT: %ebx is the first system call argument register in 32-bit mode.
+		 * HINT: %rdi is the first system call argument register in 64-bit mode. */
+#ifdef __x86_64__
+		return ABORT_WITH(_XABORT_EXPLICIT |
+		                  ((self->r_edi << _XABORT_CODE_S) &
+		                   _XABORT_CODE_M));
+#else /* __x86_64__ */
+		return ABORT_WITH(_XABORT_EXPLICIT |
+		                  ((self->r_ebx << _XABORT_CODE_S) &
+		                   _XABORT_CODE_M));
+#endif /* !__x86_64__ */
+
+	case SYS_rtm_test:
+		self->r_pax = 1; /* System call return value */
+		return X86_RTM_STATUS_CONTINUE;
+
+	default:
+		break;
+	}
+	/* Any unsupported system call will result in an RTM abort. */
 	return ABORT_WITH(_XABORT_FAILED);
 }
 
