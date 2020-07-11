@@ -456,7 +456,9 @@ again_rw_region:
 		vm_forcefault_p(effective_vm, addr, num_bytes,
 		                VM_FORCEFAULT_FLAG_READ);
 #endif /* !LIBVIO_CONFIG_ENABLED */
+#if !CONFIG_RTM_USERSPACE_ONLY
 again_lock_effective_vm:
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 		sync_read(effective_vm);
 		/* Locate the VM node that is backing the storage for `addr' */
 		node = vm_getnodeofaddress(effective_vm, (void *)addr);
