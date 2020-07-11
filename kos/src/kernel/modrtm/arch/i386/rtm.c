@@ -936,17 +936,24 @@ NOTHROW(KCALL cpuid)(struct rtm_machstate *__restrict self) {
 #define EMU86_GETREGB(regno, ...)        REG8(regno)
 #define EMU86_SETREGB(regno, value, ...) REG8(regno) = (u8)(value)
 #define EMU86_GETREGW(regno)             REG16(regno)
-#define EMU86_SETREGW(regno, value)      REG32(regno) = (u32)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
 #define EMU86_GETREGL(regno)             REG32(regno)
-#define EMU86_SETREGL(regno, value)      REG32(regno) = (u32)(value)
 #ifdef __x86_64__
 #define EMU86_GETREGQ(regno)             REG64(regno)
-#define EMU86_SETREGQ(regno, value)      REG64(regno) = (u32)(value)
-#endif /* __x86_64__ */
-#define EMU86_GETIP()           self->r_ip
+#define EMU86_SETREGW(regno, value)      REG64(regno) = (u64)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
+#define EMU86_SETREGL(regno, value)      REG64(regno) = (u64)(u32)(value) /* 16-bit register writes clear the upper 16 bits */
+#define EMU86_SETREGQ(regno, value)      REG64(regno) = (u64)(value)
+#else /* __x86_64__ */
+#define EMU86_SETREGW(regno, value)      REG32(regno) = (u32)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
+#define EMU86_SETREGL(regno, value)      REG32(regno) = (u32)(value)
+#endif /* !__x86_64__ */
+#define EMU86_GETIP()           (u16)self->r_ip
 #define EMU86_SETIP(v)          self->r_ip = (u16)(v)
-#define EMU86_GETEIP()          (u32)self->r_ip
-#define EMU86_SETEIP(v)         self->r_ip = (u16)(u32)(v)
+#define EMU86_GETEIP()          (u32)self->r_eip
+#define EMU86_SETEIP(v)         self->r_eip = (u32)(v)
+#ifdef __x86_64__
+#define EMU86_GETRIP()          (u64)self->r_rip
+#define EMU86_SETRIP(v)         self->r_rip = (u64)(v)
+#endif /* __x86_64__ */
 #define EMU86_GETAL()           self->r_al
 #define EMU86_GETCL()           self->r_cl
 #define EMU86_GETDL()           self->r_dl
@@ -1021,14 +1028,14 @@ NOTHROW(KCALL cpuid)(struct rtm_machstate *__restrict self) {
 #define EMU86_GETPBP(...)       self->r_pbp
 #define EMU86_GETPSI(...)       self->r_psi
 #define EMU86_GETPDI(...)       self->r_pdi
-#define EMU86_SETPAX(v, ...)    self->r_pax = (u32)(u16)(v)
-#define EMU86_SETPCX(v, ...)    self->r_pcx = (u32)(u16)(v)
-#define EMU86_SETPDX(v, ...)    self->r_pdx = (u32)(u16)(v)
-#define EMU86_SETPBX(v, ...)    self->r_pbx = (u32)(u16)(v)
-#define EMU86_SETPSP(v, ...)    self->r_psp = (u32)(u16)(v)
-#define EMU86_SETPBP(v, ...)    self->r_pbp = (u32)(u16)(v)
-#define EMU86_SETPSI(v, ...)    self->r_psi = (u32)(u16)(v)
-#define EMU86_SETPDI(v, ...)    self->r_pdi = (u32)(u16)(v)
+#define EMU86_SETPAX(v, ...)    self->r_pax = (uintptr_t)(v)
+#define EMU86_SETPCX(v, ...)    self->r_pcx = (uintptr_t)(v)
+#define EMU86_SETPDX(v, ...)    self->r_pdx = (uintptr_t)(v)
+#define EMU86_SETPBX(v, ...)    self->r_pbx = (uintptr_t)(v)
+#define EMU86_SETPSP(v, ...)    self->r_psp = (uintptr_t)(v)
+#define EMU86_SETPBP(v, ...)    self->r_pbp = (uintptr_t)(v)
+#define EMU86_SETPSI(v, ...)    self->r_psi = (uintptr_t)(v)
+#define EMU86_SETPDI(v, ...)    self->r_pdi = (uintptr_t)(v)
 
 
 /* Memory accessors */
