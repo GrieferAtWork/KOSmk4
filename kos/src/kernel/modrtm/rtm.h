@@ -29,6 +29,11 @@
 #error "Architecture doesn't have RTM support (please don't compile this driver for this architecture)"
 #endif /* !ARCH_VM_HAVE_RTM */
 
+/* TODO: Config option: CONFIG_RTM_USERSPACE_ONLY
+ * When defined, RTM can only be used in user-space.
+ * This is enforced by making all conditional is-user checks mandatory,
+ * as well as simplifying a lot of code by removing is-kernel branches. */
+
 DECL_BEGIN
 
 /* Reminder on how transactional memory works:

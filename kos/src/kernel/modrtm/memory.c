@@ -712,7 +712,7 @@ verify_access_range:
 		}
 		/* Populate the accessed `region' with data from the VM
 		 * NOTE: We use `memcpy_nopf()' for this to ensure that the current memory state
-		 *       remains consistent with what was set-up by the `vm_forcefault()' above. */
+		 *       remains consistent with what was set-up by the `vm_forcefault_p()' above. */
 		{
 			size_t copy_error;
 			copy_error = memcpy_nopf(region->mr_data,
@@ -808,11 +808,11 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
 
 PRIVATE void FCALL
 prefault_memory_for_writing(USER void *addr, size_t num_bytes) {
-	vm_forcefault(ADDR_ISKERN(addr) ? &vm_kernel
-	                                : THIS_VM,
-	              addr, num_bytes,
-	              VM_FORCEFAULT_FLAG_WRITE |
-	              VM_FORCEFAULT_FLAG_NOVIO_OPT);
+	vm_forcefault_p(ADDR_ISKERN(addr) ? &vm_kernel
+	                                  : THIS_VM,
+	                addr, num_bytes,
+	                VM_FORCEFAULT_FLAG_WRITE |
+	                VM_FORCEFAULT_FLAG_NOVIO_OPT);
 }
 
 
@@ -886,9 +886,15 @@ again_acquire_region_locks:
 			struct vm *effective_vm = myvm;
 			size_t node_size_after_addr;
 			pageid_t region_start_page;
-			if (ADDR_ISKERN(region->mr_addrlo))
+			if unlikely(ADDR_ISKERN(region->mr_addrlo))
 				effective_vm = &vm_kernel;
 			region_start_page = PAGEID_ENCODE(region->mr_addrlo);
+			if unlikely(!sync_tryread(effective_vm)) {
+				rtm_memory_endwrite_modified_parts(self, i);
+				while (!sync_canread(effective_vm))
+					task_yield();
+				goto again_acquire_region_locks;
+			}
 			node = vm_getnodeofpageid(myvm, region_start_page);
 			if unlikely(!node || node->vn_part != part) {
 				sync_endread(effective_vm);
@@ -901,7 +907,7 @@ again_acquire_region_locks:
 			node_size_after_addr -= region_start_page;
 			node_size_after_addr *= PAGESIZE;
 			node_size_after_addr += PAGESIZE - ((uintptr_t)region->mr_addrlo & PAGEMASK);
-			if (rtm_memory_region_getsize(region) > node_size_after_addr)
+			if unlikely(rtm_memory_region_getsize(region) > node_size_after_addr)
 				goto partially_release_locks_and_retry;
 		}
 		if (rtm_memory_region_waschanged(region)) {
@@ -928,7 +934,7 @@ endwrite_par_and_release_locks_and_retry:
 				must_allocate_missing_futex_controllers = true;
 			}
 		} else {
-			if (!sync_tryread(part)) {
+			if unlikely(!sync_tryread(part)) {
 				rtm_memory_endwrite_modified_parts(self, i);
 				/* Poll until the lock becomes available. - _then_ try acquiring locks again */
 				while (!sync_canread(part))
@@ -1025,19 +1031,19 @@ again_allocate_ftx_controller_for_part:
 		part = rtm_memory_region_getpart(region);
 		assert(sync_writing(part));
 		effective_vm = myvm;
-		if (ADDR_ISKERN(region->mr_addrlo))
+		if unlikely(ADDR_ISKERN(region->mr_addrlo))
 			effective_vm = &vm_kernel;
-		if (effective_vm == &vm_kernel) {
+		if unlikely(effective_vm == &vm_kernel) {
 			/* Ensure that we've for a read-lock to the kernel's VM */
 			if (!has_modified_kern) {
-				if (!sync_tryread(&vm_kernel))
+				if unlikely(!sync_tryread(&vm_kernel))
 					goto again_acquire_region_locks_for_vm_lock;
 				has_modified_kern = true;
 			}
 		} else {
 			/* Ensure that we've for a read-lock to the user's VM */
 			if (!has_modified_user) {
-				if (!sync_tryread(effective_vm)) {
+				if unlikely(!sync_tryread(effective_vm)) {
 again_acquire_region_locks_for_vm_lock:
 					rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
 					while (!sync_canread(effective_vm))
@@ -1052,10 +1058,10 @@ again_acquire_region_locks_for_vm_lock:
 		 * which we'd have to jump back to if memory isn't writable any more. */
 		if unlikely(!rtm_verify_writable_nopf(region->mr_addrlo,
 		                                      rtm_memory_region_getsize(region))) {
-			if (has_modified_kern)
-				sync_endwrite(&vm_kernel);
+			if unlikely(has_modified_kern)
+				sync_endread(&vm_kernel);
 			if (has_modified_user)
-				sync_endwrite(myvm);
+				sync_endread(myvm);
 			rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
 			goto again_forcefault;
 		}
@@ -1110,10 +1116,10 @@ again_acquire_region_locks_for_vm_lock:
 		/* Release our lock to this part. */
 		sync_endwrite(part);
 	}
-	if (has_modified_kern)
-		sync_endwrite(&vm_kernel);
+	if unlikely(has_modified_kern)
+		sync_endread(&vm_kernel);
 	if (has_modified_user)
-		sync_endwrite(myvm);
+		sync_endread(myvm);
 	return true;
 partially_release_locks_and_retry:
 	rtm_memory_endwrite_modified_parts(self, i);
