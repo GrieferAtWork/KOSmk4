@@ -79,8 +79,9 @@ function splitWords(text: string): {string...} {
 			continue;
 		}
 		local start = i;
-		do ++i;
-		while (i < len && text.issymcont(i));
+		do {
+			++i;
+		} while (i < len && text.issymcont(i));
 		yield text[start:i];
 	}
 }

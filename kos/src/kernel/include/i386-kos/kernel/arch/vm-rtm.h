@@ -28,7 +28,7 @@
 
 /* Enable RTM support in VM data structures.
  * Note however that RTM emulation is not actually implemented
- * as part of the kernel core, but gets be loaded as a separate
+ * as part of the kernel core, but is loaded as a separate
  * driver `/os/drivers/rtm' upon first use.
  * HINT: RTM stands for RestrictedTransactionalMemory.
  *       To get an overview on what this is, and how it works,
@@ -66,11 +66,10 @@ struct vm_rtm_hooks_struct {
  * architecture. */
 LOCAL ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *FCALL
 vm_rtm_execute(struct vm_rtm_hooks_struct const *__restrict hooks,
-			   struct icpustate *__restrict state) {
+               struct icpustate *__restrict state) {
 	gpregs_setpax(&state->ics_gpregs, RTM_STARTED);
 	return (*hooks->rh_xbegin)(state, icpustate_getpc(state));
 }
-
 
 #endif /* __CC__ */
 
