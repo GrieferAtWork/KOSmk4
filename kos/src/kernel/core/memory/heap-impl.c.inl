@@ -884,7 +884,9 @@ again:
 		if (pageaddr == CORE_PAGE_MALLOC_ERROR)
 			return 0;
 #ifdef CONFIG_DEBUG_HEAP
-		memsetl(pageaddr, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
+		/* Fill the page as no-mans-land if it's not supposed to be zero-initialized */
+		if (!(flags & GFP_CALLOC))
+			memsetl(pageaddr, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
 		/* Release the page to the heap and allocate again.
 		 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
