@@ -172,7 +172,7 @@ again_printlevel:
 		dbg_putc('\n');
 		if (++level < info.al_levelcnt) {
 			/* Print additional levels */
-			error = addr2line(ainfo, start_pc, &info, level);
+			error = addr2line(ainfo, module_relative_start_pc, &info, level);
 			if (error == DEBUG_INFO_ERROR_SUCCESS)
 				goto again_printlevel;
 		}
