@@ -1027,7 +1027,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
 		/* Allocate the new missing part. */
 		IFELSE_NX(, TRY) {
 			part = FUNC(heap_allat_partial)(self,
-			                                (void *)((uintptr_t)ptr + result),
+			                                (byte_t *)ptr + result,
 			                                flags);
 		} IFELSE_NX(if (!part), EXCEPT) {
 			if (result)
@@ -1050,7 +1050,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
 	unused_size = result - alloc_size;
 	if (unused_size >= HEAP_MINSIZE) {
 		heap_free_untraced(self,
-		                   (void *)((uintptr_t)ptr + alloc_size),
+		                   (byte_t *)ptr + alloc_size,
 		                   unused_size, flags);
 		result = alloc_size;
 	}
@@ -1311,7 +1311,7 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(new_bytes < HEAP_MINSIZE)
-		new_bytes     = HEAP_MINSIZE;
+		new_bytes = HEAP_MINSIZE;
 	result.hp_ptr = old_ptr;
 	result.hp_siz = old_bytes;
 	if (new_bytes <= old_bytes) {

@@ -151,6 +151,12 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc
 	                        sizeof(void *));
 	if unlikely(error != UNWIND_SUCCESS)
 		return error;
+	/* Don't try to cache the results if we've been poisoned.
+	 * If the problem is related to a heap violation, then we can no
+	 * longer trust that heap memory hasn't been corrupted beyond
+	 * repair! */
+	if (kernel_poisoned())
+		goto done;
 	assert(absolute_pc >= result->f_pcstart);
 	assert(absolute_pc < result->f_pcend);
 
@@ -193,6 +199,7 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc
 		                   nodeptr.hp_siz,
 		                   GFP_LOCKED);
 	}
+done:
 	return UNWIND_SUCCESS;
 }
 

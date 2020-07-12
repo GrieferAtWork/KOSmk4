@@ -579,9 +579,8 @@ ATREE_NOTHROW(ATREE_CALL ATREE(remove_at))(T **__restrict proot, Tkey key,
 	T **remove_head;
 	remove_head = ATREE(plocate_at)(proot, key, &addr_semi, &addr_level);
 	return remove_head != ATREE_NULL
-		? ATREE(pop_at)(remove_head, addr_semi, addr_level)
-		: ATREE_NULL
-		;
+	       ? ATREE(pop_at)(remove_head, addr_semi, addr_level)
+	       : ATREE_NULL;
 }
 
 ATREE_IMP __ATTR_UNUSED __ATTR_NONNULL((1)) T *

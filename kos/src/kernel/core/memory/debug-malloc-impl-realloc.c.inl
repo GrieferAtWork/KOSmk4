@@ -236,7 +236,7 @@ realloc_unchanged:
 		num_allocated = heap_allat_untraced_nx(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 		                                       extension_base, num_extend, extension_flags | GFP_ATOMIC);
 		if (!num_allocated) {
-			/* The extension fail, but that may have just been because of the `GFP_ATOMIC'
+			/* The extension failed, but that may have just been because of the `GFP_ATOMIC'
 			 * -> Restore the user's node, unlock `mall_lock', then try again without `GFP_ATOMIC'. */
 			mallnode_tree_insert(&mall_tree, node);
 			mall_release();

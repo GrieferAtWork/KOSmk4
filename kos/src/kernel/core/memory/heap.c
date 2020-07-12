@@ -206,16 +206,11 @@ DEFINE_DBG_BZERO_OBJECT(vm_datablock_debugheap.db_lock);
 #endif /* CONFIG_DEBUG_HEAP */
 
 
-#if 0 /* Don't do this. - The debugger may try to use the heap for optional caches (s.a. `debug_info.c'),
-       * in which case some suspended thread already holding a lock to the heap must prevent the debugger
-       * from being able to allocate memory!
-       * NOTE: The same also goes for the FDE cache found in `driver.c' */
 /* Unlock the kernel heaps while inside of the debugger. */
 DEFINE_DBG_BZERO_VECTOR(&kernel_heaps[0].h_lock,
                          __GFP_HEAPCOUNT,
                          sizeof(kernel_heaps[0].h_lock),
                          sizeof(kernel_heaps[0]));
-#endif
 
 DEFINE_VALIDATABLE_HEAP(kernel_default_heap);
 DEFINE_VALIDATABLE_HEAP(kernel_locked_heap);
@@ -299,18 +294,21 @@ NOTHROW(KCALL mfree_set_checksum)(struct mfree *__restrict self) {
 
 PRIVATE bool
 NOTHROW(KCALL quick_verify_mfree)(struct mfree *__restrict self) {
+	if __untraced(!IS_ALIGNED((uintptr_t)self, HEAP_ALIGNMENT))
+		goto bad;
 	TRY {
-		if __untraced(!IS_ALIGNED((uintptr_t)self, HEAP_ALIGNMENT))
-			return false;
+		struct mfree **pself;
 		if __untraced(!IS_ALIGNED(self->mf_size, HEAP_ALIGNMENT))
-			return false;
-		if __untraced(*self->mf_lsize.ln_pself != self)
-			return false;
+			goto bad;
+		pself = self->mf_lsize.ln_pself;
+		if __untraced(!ADDR_ISKERN(pself))
+			goto bad;
+		if __untraced(*pself != self)
+			goto bad;
 		return true;
 	} EXCEPT {
-		if (!was_thrown(E_SEGFAULT) && !was_thrown(E_WOULDBLOCK))
-			RETHROW(); /* This causes panic because we're NOTHROW */
 	}
+bad:
 	return false;
 }
 
@@ -331,10 +329,11 @@ NOTHROW(KCALL heap_validate_all)(void) {
 PUBLIC NOBLOCK ATTR_NOINLINE NONNULL((1)) void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	unsigned int i;
-#ifdef CONFIG_HAVE_HEAP_NOVALIDATE
-	if (PERTASK_GET(heap_novalidate))
+	/* If we're already poisoned, then there's no point in trying to look for more errors.
+	 * -> We're already screwed, and our caller probably knows that. But we may not be
+	 *    screwed badly enough to actually cause our caller's operation to break... */
+	if (kernel_poisoned())
 		return;
-#endif /* CONFIG_HAVE_HEAP_NOVALIDATE */
 	if (!sync_tryread(&self->h_lock))
 		return;
 #if 0
@@ -353,19 +352,19 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        piter, (uintptr_t)piter + sizeof(void *) - 1, iter, piter);
 			assertf(iter->mf_size >= HEAP_MINSIZE,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p is too small (%Iu bytes) (size bucket %Iu/%Iu)\n",
+			        "Free node at %p is too small (%Iu=%#Ix bytes) (size bucket %Iu/%Iu)\n",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
-			        iter, iter->mf_size, i, COMPILER_LENOF(self->h_size));
+			        iter, iter->mf_size, iter->mf_size, i, COMPILER_LENOF(self->h_size));
 			assertf((uintptr_t)iter + iter->mf_size > (uintptr_t)iter,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p is too large (%Iu bytes) (size bucket %Iu/%Iu)\n"
+			        "Free node at %p is too large (%Iu=%#Ix bytes) (size bucket %Iu/%Iu)\n"
 			        "PHYS: %I64p",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
-			        iter, iter->mf_size, i, COMPILER_LENOF(self->h_size),
+			        iter, iter->mf_size, iter->mf_size, i, COMPILER_LENOF(self->h_size),
 			        (u64)pagedir_translate(&iter->mf_size));
 			assertf(IS_ALIGNED(iter->mf_size, HEAP_ALIGNMENT),
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Size of free node at %p...%p (%Iu;%#Ix bytes) isn't aligned by `HEAP_ALIGNMENT'",
+			        "Size of free node at %p...%p (%Iu=%#Ix bytes) isn't aligned by `HEAP_ALIGNMENT'",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
 			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_size, iter->mf_size);
 			assertf(!(iter->mf_flags & ~MFREE_FMASK),

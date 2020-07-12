@@ -1480,7 +1480,7 @@ fail:
 	               (void *)MALLNODE_BEGIN(self),
 	               MALLNODE_SIZE(self), 16, FORMAT_HEXDUMP_FNORMAL);
 	printk(KERN_CRIT "\n");
-	mallnode_print_traceback(self, &syslog_printer, SYSLOG_LEVEL_CRIT);
+	mallnode_print_traceback(self, &syslog_printer, SYSLOG_LEVEL_RAW);
 	kernel_panic("Corrupt MALL header or tail");
 	return false;
 }

@@ -262,7 +262,13 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		if (self->db_vio) {
 			struct vio_args args;
 			args.va_ops = self->i_type->it_file.f_vio;
-			assert(args.va_ops);
+			assertf(args.va_ops,
+			        "self         = %p\n"
+			        "self->db_vio = %p\n"
+			        "self->i_type = %p\n",
+			        self,
+			        self->db_vio,
+			        self->i_type);
 			args.va_block        = self;
 			args.va_part         = NULL;
 			args.va_acmap_page   = 0;

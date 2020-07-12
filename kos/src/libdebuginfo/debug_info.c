@@ -52,6 +52,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/config.h>
 #include <debugger/rt.h>
 #include <kernel/heap.h>
+#include <kernel/panic.h> /* kernel_poisoned() */
 
 #include <hybrid/atomic.h>
 #else /* __KERNEL__ */
@@ -113,9 +114,11 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 PRIVATE NOBLOCK WUNUSED ATTR_MALLOC void *
 NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 	struct heapptr ptr;
+	if (kernel_poisoned())
+		return NULL; /* Don't access the heap after a poisoning! */
 	MY_KMALLOC_ACQUIRE_LOCK();
 	ptr = heap_alloc_untraced_nx(MY_KMALLOC_HEAP,
-	                             num_bytes + sizeof(size_t),
+	                             sizeof(size_t) + num_bytes,
 	                             flags | MY_KMALLOC_GFP);
 	MY_KMALLOC_RELEASE_LOCK();
 	if (!ptr.hp_siz)
@@ -127,6 +130,8 @@ NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 PRIVATE NOBLOCK WUNUSED void *
 NOTHROW(CC my_krealloc_untraced_nx)(void *oldptr, size_t num_bytes, gfp_t flags) {
 	struct heapptr ptr;
+	if (kernel_poisoned())
+		return NULL; /* Don't access the heap after a poisoning! */
 	MY_KMALLOC_ACQUIRE_LOCK();
 	ptr = heap_realloc_untraced_nx(MY_KMALLOC_HEAP,
 	                               (size_t *)oldptr - 1,
@@ -145,6 +150,8 @@ PRIVATE NOBLOCK void
 NOTHROW(CC my_kfree_untraced)(void *ptr) {
 	if (!ptr)
 		return;
+	if (kernel_poisoned())
+		return; /* Don't access the heap after a poisoning! */
 	heap_free_untraced(MY_KMALLOC_HEAP,
 	                   (size_t *)ptr - 1,
 	                   ((size_t *)ptr)[-1],

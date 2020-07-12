@@ -116,8 +116,8 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushq_cfi_r %rcx
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rbx
-	pushq_cfi %rsp
-	addq   $(56), 0(%rsp)
+	leaq   48(%rsp), %rax
+	pushq_cfi %rax
 	.cfi_rel_offset %rsp, 0
 	pushq_cfi_r %rbp
 	pushq_cfi_r %rsi
