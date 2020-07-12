@@ -26,30 +26,30 @@ EMU86_INTELLISENSE_BEGIN(cmpxchg) {
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG
 
 /* Perform a CMPXCHG operation on MODRM.RM */
-#define DEFINE_CMPXCHG_modrm_rm(bwlq, BWLQ, Nbits, Nbytes, get_want_oldval)          \
-	u##Nbits real_oldval, want_oldval, newval;                                       \
-	MODRM_DECODE();                                                                  \
-	want_oldval = get_want_oldval;                                                   \
-	newval      = MODRM_GETREG##BWLQ();                                              \
-	NIF_ONLY_MEMORY(                                                                 \
-	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                          \
-		real_oldval = MODRM_GETRMREG##BWLQ();                                        \
-		if (real_oldval == want_oldval)                                              \
-			MODRM_SETRMREG##BWLQ(newval);                                            \
-	} else) {                                                                        \
-		byte_t *addr = MODRM_MEMADDR();                                              \
-		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                       \
-		real_oldval = EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, want_oldval, newval,       \
-		                                            EMU86_HASLOCK());                \
-	}                                                                                \
-	EMU86_MSKFLAGS(~EMU86_GETEFLAGS_CMP_MASK,                                        \
-	               emu86_geteflags_cmp##bwlq(want_oldval,                            \
+#define DEFINE_CMPXCHG_modrm_rm(bwlq, BWLQ, Nbits, Nbytes, get_want_oldval)   \
+	u##Nbits real_oldval, want_oldval, newval;                                \
+	want_oldval = get_want_oldval;                                            \
+	newval      = MODRM_GETREG##BWLQ();                                       \
+	NIF_ONLY_MEMORY(                                                          \
+	if (EMU86_MODRM_ISREG(modrm.mi_type)) {                                   \
+		real_oldval = MODRM_GETRMREG##BWLQ();                                 \
+		if (real_oldval == want_oldval)                                       \
+			MODRM_SETRMREG##BWLQ(newval);                                     \
+	} else) {                                                                 \
+		byte_t *addr = MODRM_MEMADDR();                                       \
+		EMU86_WRITE_USER_MEMORY(addr, Nbytes);                                \
+		real_oldval = EMU86_MEM_ATOMIC_CMPXCH##BWLQ(addr, want_oldval,        \
+		                                            newval, EMU86_HASLOCK()); \
+	}                                                                         \
+	EMU86_MSKFLAGS(~EMU86_GETEFLAGS_CMP_MASK,                                 \
+	               emu86_geteflags_cmp##bwlq(want_oldval,                     \
 	                                         real_oldval));
 
 
 case EMU86_OPCODE_ENCODE(0x0fb0): {
 	/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is
 	 *                                    loaded into r/m8. Else, clear ZF and load r/m8 into AL */
+	MODRM_DECODE();
 	DEFINE_CMPXCHG_modrm_rm(b, B, 8, 1, EMU86_GETAL())
 	goto done;
 }

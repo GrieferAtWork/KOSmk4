@@ -124,7 +124,7 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict
 	__UINTPTR_TYPE__ __f;
 	do {
 		__f = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
-		__hybrid_assertf(!(__f & __ATOMIC_RWLOCK_WFLAG),"Lock is in write-mode (%x)",__f);
+		__hybrid_assertf(!(__f & __ATOMIC_RWLOCK_WFLAG), "Lock is in write-mode (%x)", __f);
 		__hybrid_assertf(__f != 0, "Lock isn't held by anyone");
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, __f - 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f == 1;
