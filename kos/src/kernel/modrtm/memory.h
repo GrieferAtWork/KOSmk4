@@ -31,21 +31,73 @@
 
 #include "rtm.h"
 
+/* Config option: CONFIG_RTM_FAR_REGIONS
+ * When enabled, so-called far regions can be made use of that
+ * can alias the data parts of adjacent memory regions without
+ * having to load all memory in-between accessed locations. */
+#ifdef CONFIG_NO_RTM_FAR_REGIONS
+#undef CONFIG_RTM_FAR_REGIONS
+#define CONFIG_RTM_FAR_REGIONS 0
+#elif !defined(CONFIG_RTM_FAR_REGIONS)
+#define CONFIG_RTM_FAR_REGIONS 1
+#elif (CONFIG_RTM_FAR_REGIONS + 0) == 0
+#undef CONFIG_RTM_FAR_REGIONS
+#define CONFIG_RTM_FAR_REGIONS 0
+#else /* ... */
+#undef CONFIG_RTM_FAR_REGIONS
+#define CONFIG_RTM_FAR_REGIONS 1
+#endif /* !... */
+
+
+#if CONFIG_RTM_FAR_REGIONS
+/* Threshold: Create far regions if the alternative require at least
+ *            this many bytes of memory to be loaded, that hadn't
+ *            actually been required by the user up until this point. */
+#ifndef CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD
+#define CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD 64
+#endif /* !CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD */
+/* When defined as non-zero, re-merge far regions if/when they end
+ * up running into each other. */
+#ifndef CONFIG_RTM_FAR_REGION_REMERGE
+#ifdef __OPTIMIZE_SIZE__
+#define CONFIG_RTM_FAR_REGION_REMERGE 0
+#else /* __OPTIMIZE_SIZE__ */
+#define CONFIG_RTM_FAR_REGION_REMERGE 1
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !CONFIG_RTM_FAR_REGION_REMERGE */
+#endif /* CONFIG_RTM_FAR_REGIONS */
+
+
 DECL_BEGIN
 
 struct rtm_memory_region {
 	void                           *mr_addrlo; /* Lowest region address. (1-byte granularity) */
 	void                           *mr_addrhi; /* Greatest region address. */
 	REF /*struct vm_datapart*/void *mr_part;   /* [1..1] The datapart used for backing this region.
-	                                            * NOTE: The least significant bit of this pointer is
-	                                            *       used to indicate if `mr_data' has been modified. */
+	                                            * NOTE: The least significant 2 bits has special use. */
 	uintptr_t                       mr_vers;   /* Region RTM version before the initial read. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mr_data);  /* [rtm_memory_region_getsize(self)] Cached RTM region data. */
 };
-#define rtm_memory_region_getsize(self)    ((size_t)((byte_t *)(self)->mr_addrhi - (byte_t *)(self)->mr_addrlo) + 1)
-#define rtm_memory_region_getpart(self)    ((struct vm_datapart *)((uintptr_t)(self)->mr_part & ~1))
-#define rtm_memory_region_waschanged(self) (((uintptr_t)(self)->mr_part & 1) != 0)
-#define rtm_memory_region_setchanged(self) (void)((self)->mr_part = (void *)((uintptr_t)(self)->mr_part | 1))
+#define rtm_memory_region_getsize(self)     ((size_t)((byte_t *)(self)->mr_addrhi - (byte_t *)(self)->mr_addrlo) + 1)
+#define rtm_memory_region_getpart(self)     ((struct vm_datapart *)((uintptr_t)(self)->mr_part & ~3))
+#define RTM_MEMORY_REGION_CHANGED_FLAG      1 /* Flag for `mr_part': was changed */
+#define rtm_memory_region_waschanged(self)  (((uintptr_t)(self)->mr_part & 1) != 0)
+#define rtm_memory_region_setchanged(self)  (void)((self)->mr_part = (void *)((uintptr_t)(self)->mr_part | 1))
+#if CONFIG_RTM_FAR_REGIONS
+/* Far regions can be used to describe holes between RTM memory regions that don't have to
+ * be loaded into memory when data from both ends has been accessed. However,
+ * NOTE: Far regions can only be marked as changed when the adjacent base region has also
+ *       been marked as changed. Alternatively, when the far region is the first one to be
+ *       modified, then the base region can be turned into the far region, and what would
+ *       originally have been a far region can become a base region.
+ * NOTE: The `mr_vers' value of a far region must be equal to the `mr_vers' of the adjacent
+ *       base region. */
+#define RTM_MEMORY_REGION_ISFARREGION_FLAG  2 /* Flag for `mr_part': far region */
+#define rtm_memory_region_isfarregion(self) (((uintptr_t)(self)->mr_part & 2) != 0)
+#define rtm_memory_region_waschanged_and_no_farregion(self) (((uintptr_t)(self)->mr_part & 3) == 1)
+#else /* CONFIG_RTM_FAR_REGIONS */
+#define rtm_memory_region_waschanged_and_no_farregion(self) rtm_memory_region_waschanged(self)
+#endif /* !CONFIG_RTM_FAR_REGIONS */
 
 
 

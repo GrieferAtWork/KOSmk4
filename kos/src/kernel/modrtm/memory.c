@@ -39,6 +39,7 @@
 
 #include <hybrid/__assert.h>
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
 #include <kos/except/inval.h>
@@ -59,6 +60,23 @@ INTERN size_t rtm_memory_limit = 4 * PAGESIZE;
 /* NOTE: The caller must be holding a read- or write-lock to `self' */
 #define vm_datapart_get_rtm_version(self) \
 	((self)->dp_futex ? (self)->dp_futex->fc_rtm_vers : 0)
+
+#if !defined(NDEBUG) || 1
+#define assert_rtm_memory_region(self) (void)0
+#else /* !NDEBUG */
+#define assert_rtm_memory_region(self)                    \
+	assertf(kmalloc_usable_size(self) >=                  \
+	        offsetof(struct rtm_memory_region, mr_data) + \
+	        rtm_memory_region_getsize(self),              \
+	        "Allocated region size is too small:\n"       \
+	        "region: %p (%p..%p)\n"                       \
+	        "usable_size:   %Iu\n"                        \
+	        "required_size: %Iu\n",                       \
+	        self, (self)->mr_addrlo, (self)->mr_addrhi,   \
+	        kmalloc_usable_size(self),                    \
+	        offsetof(struct rtm_memory_region, mr_data) + \
+	        rtm_memory_region_getsize(self))
+#endif /* NDEBUG */
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -223,6 +241,7 @@ rtm_memory_realloc(struct rtm_memory *__restrict self,
 		if unlikely(!result)
 			return ptr; /* Shouldn't happen (tm) */
 		result_bytes = kmalloc_usable_size(result);
+		assert(result_bytes >= num_bytes);
 		assert(result_bytes <= old_bytes);
 		self->rm_mem_avl += old_bytes;
 		self->rm_mem_avl -= result_bytes;
@@ -237,6 +256,7 @@ do_throw_badalloc_missing:
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		      missing);
 	}
+#if 0
 	/* Must increase the available memory. */
 	result = krealloc_in_place(ptr, num_bytes, GFP_NORMAL);
 	if (result) {
@@ -258,6 +278,7 @@ again_check_missing_after_inplace:
 		self->rm_mem_avl -= missing;
 		return result;
 	}
+#endif
 	/* The memory block is being extended, but cannot be done so in-place.
 	 * -> Must allocate a new (larger) block to which we can then copy
 	 *    the old block's data. */
@@ -394,7 +415,7 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
 	ent->rps_data = (uintptr_half_t)level;
 	ent->rps_syslog.rps_text  = str_copy; /* Inherit */
 	ent->rps_syslog.rps_size  = len;
-	printk(KERN_TRACE "[rtm] sys_syslog(%Iu, %$q)\n", level, len, str_copy);
+//	printk(KERN_TRACE "[rtm] sys_syslog(%Iu, %$q)\n", level, len, str_copy);
 }
 
 /* Execute system calls that have been scheduled as pending.
@@ -421,7 +442,278 @@ NOTHROW(FCALL rtm_memory_exec_pending_syscalls)(struct rtm_memory const *__restr
 #endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 
 
+#if CONFIG_RTM_FAR_REGIONS
+/* Mark the given `region' as changed whilst correctly accounting for far regions. */
+PRIVATE NOBLOCK NONNULL((1, 3)) void
+NOTHROW(FCALL rtm_memory_mark_region_as_changed)(struct rtm_memory *__restrict self,
+                                                 size_t region_index,
+                                                 struct rtm_memory_region *__restrict region) {
+	size_t i;
+	struct rtm_memory_region *base_region;
+	struct vm_datapart *mypart;
+	assert(region_index < self->rm_regionc);
+	assert(self->rm_regionv[region_index] == region);
+	if (rtm_memory_region_waschanged(region))
+		return; /* Nothing to do here! */
+	if (!rtm_memory_region_isfarregion(region)) {
+		/* Simple case: this isn't a far region, so we can just mark it as changed. */
+		rtm_memory_region_setchanged(region);
+		return;
+	}
+	/* The complicated case: We're dealing with a far region.
+	 * The rule that we must follow here is:
+	 *    A far region can only be marked as changed if the
+	 *    associated base region has already been marked as changed.
+	 * As such, we must first find our base region. */
+	assert(self->rm_regionc >= 2);
+	mypart = rtm_memory_region_getpart(region);
+	if (region_index > 0) {
+		i = region_index - 1;
+		for (;;) {
+			base_region = self->rm_regionv[i];
+			if (rtm_memory_region_getpart(base_region) != mypart)
+				break; /* The base region must be located above `region_index' */
+			if (!rtm_memory_region_isfarregion(base_region))
+				goto found_base_region;
+			if (!i)
+				break;
+			--i;
+		}
+	}
+	i = region_index + 1;
+	for (;;) {
+		assert(i < self->rm_regionc);
+		base_region = self->rm_regionv[i];
+		assert(rtm_memory_region_getpart(base_region) == mypart);
+		if (!rtm_memory_region_isfarregion(base_region))
+			break; /* Found it! */
+		++i;
+	}
+found_base_region:
+	/* With the base region found, check if it has already been marked as changed */
+	if (rtm_memory_region_waschanged(base_region)) {
+		/* The base region was already marked as changed.
+		 * -> We can just mark ourself as changed, too. */
+		rtm_memory_region_setchanged(region);
+		return;
+	}
+	/* The last case: We are the first region from `base_region's set of
+	 *                regions that has been modified. - As such, we can
+	 *                simply handle this case by becoming the new base
+	 *                region! */
+	base_region->mr_part = (REF void *)((uintptr_t)mypart | RTM_MEMORY_REGION_ISFARREGION_FLAG);
+	region->mr_part      = (REF void *)((uintptr_t)mypart | RTM_MEMORY_REGION_CHANGED_FLAG);
+}
 
+#if CONFIG_RTM_FAR_REGION_REMERGE
+/* Try to merge 2 adjacent regions into a singular, new one. */
+PRIVATE NONNULL((1, 3)) bool
+NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
+                                            size_t region_lo_index,
+                                            struct rtm_memory_region *__restrict region_lo,
+                                            struct rtm_memory_region *__restrict region_hi) {
+	size_t losize, hisize, region_lo_oldavl, region_hi_oldavl;
+	size_t effective_avail_without_merge, merged_avl;
+	assert_rtm_memory_region(region_lo);
+	assert_rtm_memory_region(region_hi);
+	assert(self->rm_regionc >= 2);
+	assert(region_lo_index + 1 < self->rm_regionc);
+	assert(self->rm_regionv[region_lo_index + 0] == region_lo);
+	assert(self->rm_regionv[region_lo_index + 1] == region_hi);
+	assert((byte_t *)region_lo->mr_addrhi + 1 == (byte_t *)region_hi->mr_addrlo);
+	assert(rtm_memory_region_getpart(region_lo) ==
+	       rtm_memory_region_getpart(region_hi));
+	losize = rtm_memory_region_getsize(region_lo);
+	hisize = rtm_memory_region_getsize(region_hi);
+	region_lo_oldavl = kmalloc_usable_size(region_lo);
+	region_hi_oldavl = kmalloc_usable_size(region_hi);
+	/* (try to) resize `region_lo' to allocate space for the missing `hisize' */
+	region_lo = (struct rtm_memory_region *)krealloc_nx(region_lo,
+	                                                    offsetof(struct rtm_memory_region, mr_data) +
+	                                                    losize + hisize,
+	                                                    GFP_NORMAL);
+	if unlikely(!region_lo)
+		return false; /* Merge optimization failed... */
+	/* Make sure that the newly allocated `region_lo' doesn't have too much
+	 * overhead that would cause it to be too large for us to be allowed to use. */
+	merged_avl = kmalloc_usable_size(region_lo);
+	effective_avail_without_merge = self->rm_mem_avl +
+	                                region_lo_oldavl +
+	                                region_hi_oldavl;
+	if unlikely(merged_avl > effective_avail_without_merge) {
+		struct rtm_memory_region *downsized;
+		/* The reallocated `region_lo' is too large for us to be allowed to use it.
+		 * Down-size it again (and hope that doing so frees up the illegal overhead) */
+		downsized = (struct rtm_memory_region *)krealloc_nx(region_lo,
+		                                                    offsetof(struct rtm_memory_region, mr_data) +
+		                                                    losize,
+		                                                    GFP_NORMAL);
+		if unlikely(!downsized) {
+			self->rm_regionv[region_lo_index] = region_lo;
+			self->rm_mem_avl = 0; /* Prevent underflow... */
+			return false;
+		}
+		self->rm_regionv[region_lo_index] = downsized;
+		merged_avl = kmalloc_usable_size(region_lo);
+		self->rm_mem_avl += region_lo_oldavl;
+		if unlikely(OVERFLOW_USUB(self->rm_mem_avl, merged_avl, &self->rm_mem_avl))
+			self->rm_mem_avl = 0; /* Prevent underflow... */
+		return false;
+	}
+	/* All right! The reallocated `region_lo' now has enough
+	 *            storage for all data from `region_hi'
+	 * -> Now to copy over all of the data, as well as memory attributes. */
+	memcpy(region_lo->mr_data + losize, region_hi->mr_data, hisize);
+	region_lo->mr_addrhi = region_hi->mr_addrhi;
+	/* If the deleted region was changed, force our region to be marked as changed */
+	if (rtm_memory_region_waschanged(region_hi))
+		rtm_memory_region_setchanged(region_lo);
+	if (!rtm_memory_region_isfarregion(region_hi)) {
+		assert(rtm_memory_region_isfarregion(region_lo));
+		/* Become the base region if the deleted
+		 * region used to be the base region before. */
+		region_lo->mr_part = (REF void *)((uintptr_t)region_lo->mr_part & ~RTM_MEMORY_REGION_ISFARREGION_FLAG);
+	}
+	/* Drop the one reference to the associated part that was held by the deleted region.
+	 * Since our region uses the same part, we know that at least 2 references _must_
+	 * exist to said part, meaning that we can use `decref_nokill()' here! */
+	decref_nokill(rtm_memory_region_getpart(region_hi));
+
+	/* Free the old region_hi */
+	kfree(region_hi);
+
+	/* Update memory accounting and fix-up the list of regions. */
+	self->rm_mem_avl = effective_avail_without_merge - merged_avl;
+	self->rm_regionv[region_lo_index] = region_lo; /* Inherit */
+	--self->rm_regionc;
+	memmovedownc(&self->rm_regionv[region_lo_index + 1],
+	             &self->rm_regionv[region_lo_index + 2],
+	             self->rm_regionc - region_lo_index,
+	             sizeof(struct rtm_memory_region *));
+	return true;
+}
+#endif /* CONFIG_RTM_FAR_REGION_REMERGE */
+
+
+#else /* CONFIG_RTM_FAR_REGIONS */
+#define rtm_memory_mark_region_as_changed(self, region_index, region) \
+	rtm_memory_region_setchanged(region)
+#endif /* !CONFIG_RTM_FAR_REGIONS */
+
+
+/* Copy `num_bytes' from `src', but throw an exception if VIO memory is accessed. */
+PRIVATE void FCALL
+rtm_memcpy_prefault(struct vm *__restrict effective_vm,
+                    void *__restrict dst,
+                    USER void const *src,
+                    size_t num_bytes) {
+	size_t copy_error;
+	while ((copy_error = memcpy_nopf(dst, src, num_bytes)) != 0) {
+		size_t copy_ok;
+		assert(copy_error <= num_bytes);
+		/* Account for data that could be copied. */
+		copy_ok = num_bytes - copy_error;
+		dst = (byte_t *)dst + copy_ok;
+		src = (byte_t *)src + copy_ok;
+		num_bytes = copy_error;
+		/* Prefault the missing area. */
+#ifdef LIBVIO_CONFIG_ENABLED
+		vm_forcefault_p(effective_vm, (USER void *)src, num_bytes,
+		                VM_FORCEFAULT_FLAG_READ |
+		                VM_FORCEFAULT_FLAG_NOVIO);
+#else /* LIBVIO_CONFIG_ENABLED */
+		vm_forcefault_p(effective_vm, (USER void *)src, num_bytes,
+		                VM_FORCEFAULT_FLAG_READ);
+#endif /* !LIBVIO_CONFIG_ENABLED */
+	}
+}
+
+/* Insert `region' into `self' at index `index', or
+ * free() it before re-throwing a bad-alloc exception. */
+PRIVATE void FCALL
+rtm_memory_insert_region(struct rtm_memory *__restrict self, size_t index,
+                         /*inherit(always)*/ struct rtm_memory_region *__restrict region) {
+	size_t avl_vector_size;
+	size_t req_vector_size;
+	avl_vector_size = kmalloc_usable_size(self->rm_regionv);
+	req_vector_size = (self->rm_regionc + 1) * sizeof(struct rtm_memory_region *);
+	if (req_vector_size > avl_vector_size) {
+		/* Must increase the allocated vector size. */
+		struct rtm_memory_region **newvec;
+		TRY {
+			newvec = (struct rtm_memory_region **)rtm_memory_realloc(self,
+			                                                         self->rm_regionv,
+			                                                         req_vector_size);
+		} EXCEPT {
+			decref(rtm_memory_region_getpart(region));
+			rtm_memory_free(self, region);
+			RETHROW();
+		}
+		self->rm_regionv = newvec;
+	}
+	assert(index <= self->rm_regionc);
+	memmoveupc(&self->rm_regionv[index + 1],
+	           &self->rm_regionv[index],
+	           self->rm_regionc - index,
+	           sizeof(struct rtm_memory_region *));
+	self->rm_regionv[index] = region; /* Inherit */
+	++self->rm_regionc;
+	/* Assert that the region's address range is consistent with its neighbors. */
+	assertf(index == 0 ||
+	        self->rm_regionv[index - 1]->mr_addrhi < region->mr_addrlo,
+	        "prev = %p...%p\n"
+	        "curr = %p...%p\n",
+	        self->rm_regionv[index - 1]->mr_addrlo,
+	        self->rm_regionv[index - 1]->mr_addrhi,
+	        region->mr_addrlo, region->mr_addrhi);
+	assertf(index == self->rm_regionc - 1 ||
+	        self->rm_regionv[index + 1]->mr_addrlo > region->mr_addrhi,
+	        "curr = %p...%p\n"
+	        "next = %p...%p\n",
+	        region->mr_addrlo, region->mr_addrhi,
+	        self->rm_regionv[index + 1]->mr_addrlo,
+	        self->rm_regionv[index + 1]->mr_addrhi);
+}
+
+
+#if CONFIG_RTM_FAR_REGIONS
+PRIVATE ATTR_RETNONNULL struct rtm_memory_region *FCALL
+rtm_memory_create_far_region(struct rtm_memory *__restrict self,
+                             size_t region_insert_index,
+                             USER void *region_min,
+                             USER void *region_max,
+                             struct vm *__restrict effective_vm,
+                             struct vm_datapart *__restrict part,
+                             uintptr_t version) {
+	size_t region_size;
+	struct rtm_memory_region *result;
+	region_size = (size_t)((byte_t *)region_max -
+	                       (byte_t *)region_min) +
+	              1;
+	result = (struct rtm_memory_region *)rtm_memory_malloc(self,
+	                                                       offsetof(struct rtm_memory_region, mr_data) +
+	                                                       region_size);
+	/* Copy read data from main memory. */
+	TRY {
+		rtm_memcpy_prefault(effective_vm,
+		                    result->mr_data,
+		                    region_min,
+		                    region_size);
+	} EXCEPT {
+		rtm_memory_free(self, result);
+		RETHROW();
+	}
+	/* Fill in all of the remaining region meta-data */
+	result->mr_addrlo = region_min;
+	result->mr_addrhi = region_max;
+	result->mr_part   = (REF void *)((uintptr_t)incref(part) | RTM_MEMORY_REGION_ISFARREGION_FLAG);
+	result->mr_vers   = version;
+	/* Insert the newly created region into the memory manager */
+	rtm_memory_insert_region(self, region_insert_index, result); /* Inherit: result */
+	return result;
+}
+
+#endif /* CONFIG_RTM_FAR_REGIONS */
 
 
 
@@ -457,7 +749,7 @@ again_rw_region:
 			/* All data is already available */
 			if (write) {
 				buf = mempcpy(rdat, buf, num_bytes);
-				rtm_memory_region_setchanged(region);
+				rtm_memory_mark_region_as_changed(self, i, region);
 			} else {
 				buf = mempcpy(buf, rdat, num_bytes);
 			}
@@ -465,7 +757,7 @@ again_rw_region:
 		}
 		if (write) {
 			buf = mempcpy(rdat, buf, avail_bytes);
-			rtm_memory_region_setchanged(region);
+			rtm_memory_mark_region_as_changed(self, i, region);
 		} else {
 			buf = mempcpy(buf, rdat, avail_bytes);
 		}
@@ -722,6 +1014,47 @@ verify_access_range:
 			/* Welp... There's an overlap with this region's datapart. */
 			assert((byte_t *)region->mr_addrhi < (byte_t *)addr ||
 			       (byte_t *)region->mr_addrlo > (byte_t *)addr + access_bytes - 1);
+#if CONFIG_RTM_FAR_REGIONS
+			/* In order to properly deal with far regions, we must select the region
+			 * that is closest to the accessed address range, so we may then either
+			 * extend it, or create yet another far region.
+			 * Right now, `j' points at the first `region' apart of a variable-sized
+			 * far region range, so if `addr' is greater than its end, we should look
+			 * forward for a closer region. */
+			if (addr > region->mr_addrhi) {
+				for (;;) {
+					size_t next_j;
+					size_t distance_to_prev;
+					size_t distance_to_next;
+					struct rtm_memory_region *next_region;
+					next_j = j + 1;
+					if (next_j >= self->rm_regionc)
+						break;
+					next_region = self->rm_regionv[next_j];
+					if (rtm_memory_region_getpart(next_region) != node_part)
+						break; /* Not one of ours. */
+					if (addr > next_region->mr_addrhi) {
+						/* Access is still located above this region! */
+						region = next_region;
+						j      = next_j;
+						continue;
+					}
+					/* The access happens between `region' and `next_region' */
+					assert((byte_t *)region->mr_addrhi < (byte_t *)addr);
+					assert((byte_t *)next_region->mr_addrlo > (byte_t *)addr + access_bytes - 1);
+					/* Figure out which one of `region' and `next_region' is closer
+					 * to the address range that is actually being accessed. */
+					distance_to_prev = (size_t)((byte_t *)addr - ((byte_t *)region->mr_addrhi + 1));
+					distance_to_next = (size_t)((byte_t *)next_region->mr_addrlo - ((byte_t *)addr + access_bytes));
+					if (distance_to_next < distance_to_prev) {
+						/* Use `next_region' instead! */
+						region = next_region;
+						j      = next_j;
+					}
+					break;
+				}
+			}
+#endif /* CONFIG_RTM_FAR_REGIONS */
 			/* Check if this region is mapped by the same VM node. - If it is, then 
 			 * we have to extend this region to also contain `addr...+=access_bytes'.
 			 * Otherwise, we have to perform an address translation so that the
@@ -744,9 +1077,27 @@ verify_access_range:
 					old_region_size = rtm_memory_region_getsize(region);
 					if (addr < region->mr_addrlo) {
 						/* Extend downwards */
-						size_t missing_bytes, copy_error;
+						size_t missing_bytes;
 						missing_bytes = (size_t)((byte_t *)region->mr_addrlo - (byte_t *)addr);
 						assert(missing_bytes);
+#if CONFIG_RTM_FAR_REGIONS
+						/* Check if we should create a far region instead of extending an existing region. */
+						if ((byte_t *)addr + access_bytes < (byte_t *)region->mr_addrlo) {
+							size_t filler_bytes;
+							filler_bytes = (size_t)((byte_t *)region->mr_addrlo - ((byte_t *)addr + access_bytes));
+							if (filler_bytes >= CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD) {
+								/* Create a new far region. */
+do_create_far_region:
+								i = j; /* Index may later be needed by `rtm_memory_mark_region_as_changed()' */
+								region = rtm_memory_create_far_region(self, j,
+								                                      (byte_t *)addr,
+								                                      (byte_t *)addr + access_bytes - 1,
+								                                      effective_vm, node_part,
+								                                      region->mr_vers);
+								goto do_access_region;
+							}
+						}
+#endif /* CONFIG_RTM_FAR_REGIONS */
 						region = rtm_memory_realloc_region(self, region,
 						                                   old_region_size +
 						                                   missing_bytes);
@@ -755,11 +1106,14 @@ verify_access_range:
 						          region->mr_data, old_region_size);
 						region->mr_addrlo = (byte_t *)region->mr_addrlo - missing_bytes;
 						self->rm_regionv[j] = region; /* Inherit */
+						assert_rtm_memory_region(region);
 						/* Fill in the missing area. */
-						copy_error = memcpy_nopf(region->mr_data,
-						                         region->mr_addrlo,
-						                         missing_bytes);
-						if unlikely(copy_error != 0) {
+						TRY {
+							rtm_memcpy_prefault(effective_vm,
+							                    region->mr_data,
+							                    region->mr_addrlo,
+							                    missing_bytes);
+						} EXCEPT {
 							/* Failed to load region data.
 							 * -> Since we're extending downwards, `region' now contains a hole of
 							 *    uninitialized data. But since RTM regions must be continuous, the
@@ -769,12 +1123,28 @@ verify_access_range:
 							            region->mr_data + missing_bytes,
 							            old_region_size);
 							region->mr_addrlo = (byte_t *)region->mr_addrlo + missing_bytes;
-							goto again;
+							RETHROW();
 						}
 						assert((byte_t *)addr == (byte_t *)region->mr_addrlo);
+#if CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE
+						/* With far regions, check for the case where we've run into another region. */
+						if (j > 0) {
+							struct rtm_memory_region *lower_region;
+							lower_region = self->rm_regionv[j - 1];
+							if (rtm_memory_region_getpart(lower_region) == node_part &&
+							    (byte_t *)lower_region->mr_addrhi + 1 == (byte_t *)region->mr_addrlo &&
+							    (rtm_memory_region_waschanged(lower_region) ==
+							     (write || rtm_memory_region_waschanged(region)))) {
+								/* Yes! Do try to merge these two regions. */
+								if (rtm_memory_try_merge_regions(self, j - 1, lower_region, region))
+									goto again;
+								region = self->rm_regionv[j];
+							}
+						}
+#endif /* CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE */
 					} else {
 						/* Extend upwards */
-						size_t missing_bytes, copy_error;
+						size_t missing_bytes;
 						USER byte_t *missing_addr_start;
 						assertf((byte_t *)addr + access_bytes - 1 > region->mr_addrhi,
 						        "addr + .... - 1    = %p\n"
@@ -784,23 +1154,61 @@ verify_access_range:
 						missing_bytes = (size_t)(((byte_t *)addr + access_bytes) -
 						                         ((byte_t *)region->mr_addrhi + 1));
 						assert(missing_bytes);
+#if CONFIG_RTM_FAR_REGIONS
+						/* Check if we should create a far region instead of extending an existing region. */
+						if (addr > region->mr_addrhi) {
+							size_t filler_bytes;
+							filler_bytes = (size_t)((byte_t *)addr - ((byte_t *)region->mr_addrhi + 1));
+							if (filler_bytes >= CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD) {
+								/* Create a new far region. */
+								++j; /* Insert above `region' */
+								goto do_create_far_region;
+							}
+						}
+#endif /* CONFIG_RTM_FAR_REGIONS */
 						region = rtm_memory_realloc_region(self, region,
 						                                   old_region_size +
 						                                   missing_bytes);
 						missing_addr_start = (USER byte_t *)region->mr_addrhi + 1;
-						region->mr_addrhi = (byte_t *)region->mr_addrhi + missing_bytes;
+						region->mr_addrhi  = (byte_t *)region->mr_addrhi + missing_bytes;
+						assert((byte_t *)region->mr_addrhi ==
+						       (byte_t *)region->mr_addrlo + old_region_size + missing_bytes - 1);
 						self->rm_regionv[j] = region; /* Inherit */
+						assert_rtm_memory_region(region);
 						/* Fill in the missing area. */
-						copy_error = memcpy_nopf(region->mr_data + old_region_size,
-						                         missing_addr_start, missing_bytes);
-						if unlikely(copy_error != 0) {
+						TRY {
+							rtm_memcpy_prefault(effective_vm,
+							                    region->mr_data + old_region_size,
+							                    missing_addr_start,
+							                    missing_bytes);
+						} EXCEPT {
 							/* Re-truncate the region so we can at least
 							 * account for what we were able to copy! */
-							region->mr_addrhi = (byte_t *)region->mr_addrhi - copy_error;
-							goto again;
+							region->mr_addrhi = (byte_t *)region->mr_addrhi - missing_bytes;
+							RETHROW();
 						}
 						assert((byte_t *)addr + access_bytes - 1 == (byte_t *)region->mr_addrhi);
+#if CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE
+						/* With far regions, check for the case where we've run into another region. */
+						if ((j + 1) < self->rm_regionc) {
+							struct rtm_memory_region *upper_region;
+							upper_region = self->rm_regionv[j + 1];
+							if (rtm_memory_region_getpart(upper_region) == node_part &&
+							    (byte_t *)region->mr_addrhi + 1 == (byte_t *)upper_region->mr_addrlo &&
+							    (rtm_memory_region_waschanged(upper_region) ==
+							     (write || rtm_memory_region_waschanged(region)))) {
+								/* Yes! Do try to merge these two regions. */
+								rtm_memory_try_merge_regions(self, j, region, upper_region);
+								region = self->rm_regionv[j];
+							}
+						}
+
+#endif /* CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE */
 					}
+#if CONFIG_RTM_FAR_REGIONS
+					/* Far region set-modified code requires that `self->rm_regionv[i] == region' */
+					i = j;
+#endif /* CONFIG_RTM_FAR_REGIONS */
 					goto do_access_region;
 				}
 			}
@@ -847,7 +1255,7 @@ verify_access_range:
 		region->mr_addrlo = (byte_t *)addr;
 		region->mr_addrhi = (byte_t *)addr + access_bytes - 1;
 		region->mr_part   = node_part; /* Inherit reference */
-		region->mr_vers   = 0;
+		region->mr_vers = 0;
 		if (ATOMIC_READ(node_part->dp_futex) != NULL) {
 			/* Check for non-zero version counter. */
 			struct vm_futex_controller *ftx;
@@ -864,32 +1272,7 @@ verify_access_range:
 			sync_endread(node_part);
 		}
 		/* Insert `region' into the vector at index `i' */
-		{
-			size_t avl_vector_size;
-			size_t req_vector_size;
-			avl_vector_size = kmalloc_usable_size(self->rm_regionv);
-			req_vector_size = (self->rm_regionc + 1) * sizeof(struct rtm_memory_region *);
-			if (req_vector_size > avl_vector_size) {
-				/* Must increase the allocated vector size. */
-				struct rtm_memory_region **newvec;
-				TRY {
-					newvec = (struct rtm_memory_region **)rtm_memory_realloc(self,
-					                                                         self->rm_regionv,
-					                                                         req_vector_size);
-				} EXCEPT {
-					rtm_memory_free(self, region);
-					decref(node_part);
-					RETHROW();
-				}
-				self->rm_regionv = newvec;
-			}
-			memmoveupc(&self->rm_regionv[i + 1],
-			           &self->rm_regionv[i],
-			           self->rm_regionc - i,
-			           sizeof(struct rtm_memory_region *));
-			++self->rm_regionc;
-			self->rm_regionv[i] = region; /* Inherit */
-		}
+		rtm_memory_insert_region(self, i, region); /* Inherit: region */
 		/* Populate the accessed `region' with data from the VM
 		 * NOTE: We use `memcpy_nopf()' for this to ensure that the current memory state
 		 *       remains consistent with what was set-up by the `vm_forcefault_p()' above. */
@@ -921,8 +1304,13 @@ verify_access_range:
 			}
 		}
 do_access_region:
-		assert((byte_t *)addr >= (byte_t *)region->mr_addrlo);
-		assert((byte_t *)addr + access_bytes - 1 <= (byte_t *)region->mr_addrhi);
+		assert_rtm_memory_region(region);
+		assertf((byte_t *)addr >= (byte_t *)region->mr_addrlo &&
+		        (byte_t *)addr + access_bytes - 1 <= (byte_t *)region->mr_addrhi,
+		        "access: %p...%p\n"
+		        "region: %p...%p\n",
+		        (byte_t *)addr, (byte_t *)addr + access_bytes - 1,
+		        region->mr_addrlo, region->mr_addrhi);
 		{
 			byte_t *rdat;
 			rdat = region->mr_data + (size_t)((byte_t *)addr -
@@ -930,7 +1318,7 @@ do_access_region:
 			/* Copy accessed data. */
 			if (write) {
 				memcpy(rdat, buf, access_bytes);
-				rtm_memory_region_setchanged(region);
+				rtm_memory_mark_region_as_changed(self, i, region);
 			} else {
 				memcpy(buf, rdat, access_bytes);
 			}
@@ -1011,7 +1399,7 @@ NOTHROW(FCALL rtm_memory_endwrite_modified_parts)(struct rtm_memory const *__res
 		struct rtm_memory_region *region;
 		--i;
 		region = self->rm_regionv[i];
-		if (rtm_memory_region_waschanged(region))
+		if (rtm_memory_region_waschanged_and_no_farregion(region))
 			sync_endwrite(rtm_memory_region_getpart(region));
 	}
 }
@@ -1104,8 +1492,19 @@ again_acquire_region_locks:
 			if unlikely(rtm_memory_region_getsize(region) > node_size_after_addr)
 				goto partially_release_locks_and_retry;
 		}
+#if CONFIG_RTM_FAR_REGIONS
+		if (rtm_memory_region_isfarregion(region)) {
+			/* Far regions are checked implicitly through an adjacent base region. */
+			printk(KERN_DEBUG "[rtm] Far region at %p...%p (part: %p)\n",
+			       region->mr_addrlo, region->mr_addrhi,
+			       rtm_memory_region_getpart(region));
+		} else
+#endif /* CONFIG_RTM_FAR_REGIONS */
 		if (rtm_memory_region_waschanged(region)) {
 			struct vm_futex_controller *fxc;
+			printk(KERN_DEBUG "[rtm] Changed region at %p...%p (part: %p)\n",
+			       region->mr_addrlo, region->mr_addrhi,
+			       rtm_memory_region_getpart(region));
 			if (!sync_trywrite(part)) {
 				rtm_memory_endwrite_modified_parts(self, i);
 				/* Poll until the lock becomes available. - _then_ try acquiring locks again */
@@ -1150,7 +1549,7 @@ endwrite_par_and_release_locks_and_retry:
 			struct vm_datapart *part;
 			struct vm_futex_controller *ftx;
 			region = self->rm_regionv[i];
-			if (!rtm_memory_region_waschanged(region))
+			if (!rtm_memory_region_waschanged_and_no_farregion(region))
 				continue;
 			part = rtm_memory_region_getpart(region);
 			ftx  = part->dp_futex;
@@ -1196,7 +1595,7 @@ again_allocate_ftx_controller_for_part:
 				 * having to fill them in one-at-a-time. */
 				for (++i; i < self->rm_regionc; ++i) {
 					region = self->rm_regionv[i];
-					if (!rtm_memory_region_waschanged(region))
+					if (!rtm_memory_region_waschanged_and_no_farregion(region))
 						continue; /* Not needed */
 					part = rtm_memory_region_getpart(region);
 					if (ATOMIC_READ(part->dp_futex))
@@ -1285,7 +1684,9 @@ again_acquire_region_locks_for_vm_lock:
 		if (!rtm_memory_region_waschanged(region))
 			continue; /* Unchanged region. */
 		part = rtm_memory_region_getpart(region);
-		assert(sync_writing(part));
+		assertf(sync_writing(part),
+		        "No lock held for part %p (used by region %p...%p)",
+		        part, region->mr_addrlo, region->mr_addrhi);
 		/* Copy modified memory.
 		 * NOTE: We've verified that all of this memory can be written without
 		 *       causing a pagefault in step #3, and we know that the associated
@@ -1317,11 +1718,38 @@ again_acquire_region_locks_for_vm_lock:
 #endif /* !NDEBUG */
 		/* Increment the RTM version counter of this part. */
 		assert(part->dp_futex);
-		++part->dp_futex->fc_rtm_vers;
+#if CONFIG_RTM_FAR_REGIONS
+		/* Only increase the version counter if this isn't an aliasing far region! */
+		if (!rtm_memory_region_isfarregion(region))
+#endif /* CONFIG_RTM_FAR_REGIONS */
+		{
+			++part->dp_futex->fc_rtm_vers;
+		}
 		COMPILER_BARRIER();
 		/* Release our lock to this part. */
+#if !CONFIG_RTM_FAR_REGIONS
+		sync_endwrite(part);
+#endif /* !CONFIG_RTM_FAR_REGIONS */
+	}
+#if CONFIG_RTM_FAR_REGIONS
+	/* With far regions, we must release datapart locks during a second
+	 * pass, as far regions may re-use locks of adjacent dataparts! */
+	i = self->rm_regionc;
+	while (i) {
+		struct rtm_memory_region *region;
+		struct vm_datapart *part;
+		--i;
+		region = self->rm_regionv[i];
+		if (!rtm_memory_region_waschanged_and_no_farregion(region))
+			continue; /* Unchanged region. */
+		part = rtm_memory_region_getpart(region);
+		assertf(sync_writing(part),
+		        "No lock held for part %p (used by region %p...%p)",
+		        part, region->mr_addrlo, region->mr_addrhi);
 		sync_endwrite(part);
 	}
+#endif /* CONFIG_RTM_FAR_REGIONS */
+
 #if !CONFIG_RTM_USERSPACE_ONLY
 	if unlikely(has_modified_kern)
 		sync_endread(&vm_kernel);
