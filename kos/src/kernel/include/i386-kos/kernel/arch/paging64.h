@@ -241,7 +241,7 @@ union p64_pdir_e2 {
 		u64          d_unused2_ign : 8;  /* [valid_if(d_present)] Ignored...  (Bits 52:58) */
 		u64          d_prot_key : 3;     /* [valid_if(d_present)] P64_PAGE_FPROTKEY */
 		u64          d_noexec : 1;       /* [valid_if(d_present)] P64_PAGE_FNOEXEC */
-	} p_2mib; /* [valid_if(p_2mib.d_2mib_1 == 0)] */
+	} p_2mib; /* [valid_if(p_2mib.d_2mib_1 == 1)] */
 };
 
 union p64_pdir_e3 {
@@ -293,7 +293,7 @@ union p64_pdir_e3 {
 union p64_pdir_e4 {
 	/* TIER#4 page-directory entry:
 	 *   - 4-Level PML4 Entry (PML4E) that References a Page-Directory-Pointer Table
-	 * NOTE: These is no 512GiB page extension! */
+	 * NOTE: There is no 512GiB page extension! */
 	u64                      p_word;     /* Mapping data. */
 #define P64_PDIR_E4_ISVEC3(e3_word)       ((e3_word) & P64_PAGE_FPRESENT)
 #define P64_PDIR_E4_ISUNUSED(e3_word)     ((e3_word) == P64_PAGE_ABSENT)

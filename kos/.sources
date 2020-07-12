@@ -131,6 +131,7 @@ GCC_FLAGS({
  *    libdebuginfo will allow testing of --config=OD kernels on real hardware!
  */
 //GCC_FLAGS({ "-gz" })
+//GCC_FLAGS({ "-fdebug-types-section" }) // TODO: Play around with this
 
 /* TODO: Make use of `-fsanitize=alignment' */
 /* TODO: Also enable `-fsanitize-recover' (which would allow the

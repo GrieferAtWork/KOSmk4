@@ -816,7 +816,7 @@ again_acquire_part_lock:
 
 
 /* Same as `vm_forcefault()', but automatically extend the faulted range
- * to all pages that are be touched by the given `addr...+=num_bytes' */
+ * to all pages that are touched by the given `addr...+=num_bytes' */
 PUBLIC size_t FCALL
 vm_forcefault_p(struct vm *__restrict self,
                 UNCHECKED void *addr, size_t num_bytes,

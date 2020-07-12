@@ -52,7 +52,7 @@ __SYSDECL_BEGIN
  *
  * Also: Since these segment indices are visible to user-space, make sure that any
  *       segment that may be useful to user-space (such as all of the SEGMENT_USER_*
- *       segments) has the same value between 32-bit and 64-bit mode, irregardless
+ *       segments) have the same value between 32-bit and 64-bit mode, irregardless
  *       of user-space being hosted by a 32-bit or 64-bit kernel.
  *       User-space should be allowed to hard-code expected segment values when it
  *       deems that doing so may be beneficial.

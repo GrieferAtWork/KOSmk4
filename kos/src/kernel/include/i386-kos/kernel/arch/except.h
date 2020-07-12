@@ -105,7 +105,7 @@ struct x86_asm_except_entry {
  *       though all other registers have the same value as they would have had after a
  *       throwing function had returned normally, or after a throwing instruction had
  *       completed normally (with the obvious exception of `%eip')
- *       Separately, you may include `DW_CFA_GNU_args_size' directies within your function,
+ *       Separately, you may include `DW_CFA_GNU_args_size' directives within your function,
  *       which are recognized as adjustments for `%esp' and are applied prior to execution
  *       or the specified handler. */
 FUNDEF unsigned int

@@ -1083,7 +1083,7 @@ NOTHROW(FCALL pae_pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	}
 }
 
-/* Return the given of the given page, or NULL if no hint has been mapped. */
+/* Return the hint of the given page, or NULL if no hint has been mapped. */
 INTERN NOBLOCK WUNUSED void *
 NOTHROW(FCALL pae_pagedir_gethint)(VIRT void *addr) {
 	uintptr_t word;

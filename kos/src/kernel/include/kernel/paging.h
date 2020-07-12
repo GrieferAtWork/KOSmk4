@@ -103,7 +103,7 @@ typedef uintptr_t pagedir_pushval_t;
 #ifdef __CC__
 /* The physical and virtual address bindings of the kernel's page directory.
  * This is the initial page directory active when KOS boots, as well as the
- * the directory later used for thread running in kernel-space only. */
+ * the directory later used for threads running in kernel-space only. */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_KERNEL
 DATDEF VIRT pagedir_t pagedir_kernel;
 DATDEF PHYS pagedir_t pagedir_kernel_phys;
@@ -301,7 +301,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(PAGEDIR_P_SE
  *        will not undo already successfully made preparations after a later one fails.
  *        This will include the undoing of redundant preparations of the given range that
  *        were made in prior calls.
- * WARNING: prepare() + unprepare() _DONT_ work recursively, and are also not thread-safe
+ * WARNING: prepare() + unprepare() _DONT_ work recursively, and are also
+ *          not thread-safe when called for overlapping ranges in parallel!
  * WARNING: unprepare() should always be called with the same range as prepare()
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
@@ -419,7 +420,7 @@ NOTHROW(FCALL pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_MAPHINT */
 
-/* Return the given of the given page, or NULL if no hint has been mapped. */
+/* Return the hint of the given page, or NULL if no hint has been mapped. */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETHINT
 FUNDEF NOBLOCK WUNUSED void *NOTHROW(FCALL pagedir_gethint)(VIRT void *addr);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETHINT */

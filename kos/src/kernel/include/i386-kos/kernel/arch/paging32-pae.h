@@ -193,7 +193,7 @@ union pae_pdir_e2 {
 		u64          d_addr : 31;        /* [valid_if(d_present)] PAE_PAGE_FADDR_2MIB */
 		u64          d_reserved2_0 : 11; /* [valid_if(v_present)] Must be 0  (Reserved...) */
 		u64          d_noexec : 1;       /* [valid_if(d_present)] PAE_PAGE_FNOEXEC */
-	} p_2mib; /* [valid_if(p_2mib.d_2mib_1 == 0)] */
+	} p_2mib; /* [valid_if(p_2mib.d_2mib_1 == 1)] */
 };
 
 union pae_pdir_e3 {
@@ -362,7 +362,7 @@ NOTHROW(FCALL pae_pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
                                    VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 
-/* Return the given of the given page, or NULL if no hint has been mapped. */
+/* Return the hint of the given page, or NULL if no hint has been mapped. */
 INTDEF NOBLOCK WUNUSED void *
 NOTHROW(FCALL pae_pagedir_gethint)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 

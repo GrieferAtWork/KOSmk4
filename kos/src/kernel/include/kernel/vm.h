@@ -2255,7 +2255,7 @@ vm_forcefault(struct vm *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 /* Same as `vm_forcefault()', but automatically extend the faulted range
- * to all pages that are be touched by the given `addr...+=num_bytes' */
+ * to all pages that are touched by the given `addr...+=num_bytes' */
 FUNDEF size_t FCALL
 vm_forcefault_p(struct vm *__restrict self,
                 UNCHECKED void *addr, size_t num_bytes,

@@ -330,7 +330,7 @@ NOTHROW(FCALL p32_pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
                                    VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 
-/* Return the given of the given page, or NULL if no hint has been mapped. */
+/* Return the hint of the given page, or NULL if no hint has been mapped. */
 INTDEF NOBLOCK WUNUSED void *
 NOTHROW(FCALL p32_pagedir_gethint)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 

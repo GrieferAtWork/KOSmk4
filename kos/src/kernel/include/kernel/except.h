@@ -98,7 +98,7 @@ typedef __errno_t errno_t;
  * >> } EXCEPT {
  * >>     EXCEPT_ALLOW_NESTING;
  * >>     TRY {
- * >>         ...         // Some other code that can cause further excpetion
+ * >>         ...         // Some other code that can cause further excepetions
  * >>     } EXCEPT {
  * >>     }
  * >>     RETHROW();
