@@ -30,6 +30,7 @@
 #include <kernel/malloc.h>
 #include <kernel/paging.h> /* PAGESIZE */
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
@@ -39,6 +40,8 @@
 #include <hybrid/__assert.h>
 #include <hybrid/atomic.h>
 #include <hybrid/sequence/bsearch.h>
+
+#include <kos/except/inval.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -109,6 +112,29 @@ NOTHROW(FCALL rtm_memory_truncate)(struct rtm_memory *__restrict self,
 	return true;
 }
 
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+/* Try to reclaim memory from the given pending system call. */
+PRIVATE NONNULL((1)) bool
+NOTHROW(FCALL rtm_pending_syscall_reclaim)(struct rtm_memory *__restrict self,
+                                           struct rtm_pending_syscall *__restrict sc,
+                                           void *protected_pointer) {
+	bool result = false;
+	switch (sc->rps_kind) {
+
+	case RTM_PENDING_SYSCALL_SYSLOG:
+		result = rtm_memory_truncate(self,
+		                             (void **)&sc->rps_syslog.rps_text,
+		                             sc->rps_syslog.rps_size,
+		                             protected_pointer);
+		break;
+
+	default:
+		break;
+	}
+	return result;
+}
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+
 
 /* Try to reclaim unused memory by truncating heap pointers reachable from `self'
  * Note however that a heap pointer `protected_pointer' will not be truncated! */
@@ -131,6 +157,18 @@ NOTHROW(FCALL rtm_memory_reclaim)(struct rtm_memory *__restrict self,
 		                              rtm_memory_region_getsize(*pregion),
 		                              protected_pointer);
 	}
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+	if (self->rm_sysc) {
+		for (i = 0; i < self->rm_sysc; ++i) {
+			result |= rtm_pending_syscall_reclaim(self,
+			                                      &self->rm_sysv[i],
+			                                      protected_pointer);
+		}
+		result |= rtm_memory_truncate(self, (void **)&self->rm_sysv,
+		                              self->rm_sysc * sizeof(struct rtm_pending_syscall),
+		                              protected_pointer);
+	}
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 	return result;
 }
 
@@ -263,6 +301,22 @@ rtm_memory_realloc_region(struct rtm_memory *__restrict self,
 }
 
 
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+/* Finalize the given pending system call. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL rtm_pending_syscall_fini)(struct rtm_pending_syscall *__restrict self) {
+	switch (self->rps_kind) {
+
+	case RTM_PENDING_SYSCALL_SYSLOG:
+		kfree(self->rps_syslog.rps_text);
+		break;
+
+	default:
+		break;
+	}
+}
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+
 /* Finalize a given `struct rtm_memory' */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL rtm_memory_fini)(struct rtm_memory *__restrict self) {
@@ -276,7 +330,99 @@ NOTHROW(FCALL rtm_memory_fini)(struct rtm_memory *__restrict self) {
 		kfree(region);
 	}
 	kfree(self->rm_regionv);
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+	if (self->rm_sysc) {
+		for (i = 0; i < self->rm_sysc; ++i)
+			rtm_pending_syscall_fini(&self->rm_sysv[i]);
+		kfree(self->rm_sysv);
+	}
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 }
+
+
+
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+
+/* Allocate a new entry for a pending system call in `self'
+ * The returned entry isn't initialized yet, but is already
+ * accounted for in `self->rm_sysc' */
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct rtm_pending_syscall *FCALL
+rtm_memory_schedule_syscall(struct rtm_memory *__restrict self) {
+	struct rtm_pending_syscall *result;
+	size_t avlsize, reqsize;
+	result  = self->rm_sysv;
+	avlsize = kmalloc_usable_size(result);
+	reqsize = (self->rm_sysc + 1) * sizeof(struct rtm_pending_syscall);
+	if (reqsize > avlsize) {
+		result = (struct rtm_pending_syscall *)rtm_memory_realloc(self,
+		                                                          result,
+		                                                          reqsize);
+		self->rm_sysv = result;
+	}
+	result += self->rm_sysc++;
+	return result;
+}
+
+
+/* Schedule a pending call to `sys_syslog()', to-be executed
+ * unconditionally just before a true-return of `rtm_memory_apply()' */
+INTERN NONNULL((1)) void FCALL
+rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
+                               syscall_ulong_t level,
+                               USER char const *str, size_t len) {
+	struct rtm_pending_syscall *ent;
+	char *str_copy;
+	/* Verify that the `level' argument is valid. */
+	if unlikely(level >= SYSLOG_LEVEL_COUNT) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL,
+		      level);
+	}
+	/* Allocate a local copy of `str...+=len' */
+	str_copy = (char *)rtm_memory_malloc(self, len);
+	TRY {
+		/* Copy `str...+=len' into our local copy. */
+		rtm_memory_read(self, str, str_copy, len);
+		/* Allocate a new pending system call entry. */
+		ent = rtm_memory_schedule_syscall(self);
+	} EXCEPT {
+		rtm_memory_free(self, str_copy);
+		RETHROW();
+	}
+	/* Fill in the pending system call. */
+	ent->rps_kind = RTM_PENDING_SYSCALL_SYSLOG;
+	ent->rps_data = (uintptr_half_t)level;
+	ent->rps_syslog.rps_text  = str_copy; /* Inherit */
+	ent->rps_syslog.rps_size  = len;
+	printk(KERN_TRACE "[rtm] sys_syslog(%Iu, %$q)\n", level, len, str_copy);
+}
+
+/* Execute system calls that have been scheduled as pending.
+ * Called prior to a true-return of `rtm_memory_apply()' */
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL rtm_memory_exec_pending_syscalls)(struct rtm_memory const *__restrict self) {
+	size_t i;
+	for (i = 0; i < self->rm_sysc; ++i) {
+		struct rtm_pending_syscall const *sc;
+		sc = &self->rm_sysv[i];
+		switch (sc->rps_kind) {
+
+		case RTM_PENDING_SYSCALL_SYSLOG:
+			syslog_printer((void *)(uintptr_t)sc->rps_data,
+			               sc->rps_syslog.rps_text,
+			               sc->rps_syslog.rps_size);
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+
+
+
+
 
 
 /* Read/Write RTM memory.
@@ -1182,6 +1328,9 @@ again_acquire_region_locks_for_vm_lock:
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 	if (has_modified_user)
 		sync_endread(myvm);
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+	rtm_memory_exec_pending_syscalls(self);
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 	return true;
 partially_release_locks_and_retry:
 	rtm_memory_endwrite_modified_parts(self, i);

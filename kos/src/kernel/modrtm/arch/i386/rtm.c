@@ -37,6 +37,7 @@
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/user.h>
 #include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
@@ -510,6 +511,30 @@ struct rtm_machstate {
 	uintptr_t               r_nesting; /* RTM nesting level (when > 0, RTM is being nested) */
 };
 
+/* Helpers for system call argument register access */
+#define RTM_MACHSTATE_SYSCALL_I386_ARG0(self) (self)->r_ebx
+#define RTM_MACHSTATE_SYSCALL_I386_ARG1(self) (self)->r_ecx
+#define RTM_MACHSTATE_SYSCALL_I386_ARG2(self) (self)->r_edx
+#define RTM_MACHSTATE_SYSCALL_I386_ARG3(self) (self)->r_esi
+#ifdef __x86_64__
+#define RTM_MACHSTATE_SYSCALL_X86_64_ARG0(self) (self)->r_rdi
+#define RTM_MACHSTATE_SYSCALL_X86_64_ARG1(self) (self)->r_rsi
+#define RTM_MACHSTATE_SYSCALL_X86_64_ARG2(self) (self)->r_rdx
+#define RTM_MACHSTATE_SYSCALL_X86_64_ARG3(self) (self)->r_r10
+#define RTM_MACHSTATE_SYSCALL_ARG0 RTM_MACHSTATE_SYSCALL_X86_64_ARG0
+#define RTM_MACHSTATE_SYSCALL_ARG1 RTM_MACHSTATE_SYSCALL_X86_64_ARG1
+#define RTM_MACHSTATE_SYSCALL_ARG2 RTM_MACHSTATE_SYSCALL_X86_64_ARG2
+#define RTM_MACHSTATE_SYSCALL_ARG3 RTM_MACHSTATE_SYSCALL_X86_64_ARG3
+#else /* __x86_64__ */
+#define RTM_MACHSTATE_SYSCALL_ARG0 RTM_MACHSTATE_SYSCALL_I386_ARG0
+#define RTM_MACHSTATE_SYSCALL_ARG1 RTM_MACHSTATE_SYSCALL_I386_ARG1
+#define RTM_MACHSTATE_SYSCALL_ARG2 RTM_MACHSTATE_SYSCALL_I386_ARG2
+#define RTM_MACHSTATE_SYSCALL_ARG3 RTM_MACHSTATE_SYSCALL_I386_ARG3
+#endif /* !__x86_64__ */
+
+
+
+
 #define DEFINE_SEGMENT_BASE_GETTER(name, field, getvalue)        \
 	PRIVATE NOBLOCK WUNUSED NONNULL((1)) uintptr_t               \
 	NOTHROW(FCALL name)(struct rtm_machstate *__restrict self) { \
@@ -581,7 +606,7 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
 			/* Explicit RTM abort
 			 * HINT: %ebx is the first system call argument register in 32-bit mode. */
 			return ABORT_WITH(_XABORT_EXPLICIT |
-			                  (((u32)self->r_ebx << _XABORT_CODE_S) &
+			                  ((RTM_MACHSTATE_SYSCALL_I386_ARG0(self) << _XABORT_CODE_S) &
 			                   _XABORT_CODE_M));
 
 		case __NR32_rtm_end:
@@ -592,9 +617,43 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
 			sysno = SYS_rtm_begin;
 			break;
 
+		/* Custom system calls. */
+#ifdef rtm_sys_syslog
+		case __NR32_syslog:
+			self->r_pax = rtm_sys_syslog(&self->r_mem,
+			                             (syscall_ulong_t)RTM_MACHSTATE_SYSCALL_I386_ARG0(self),
+			                             (char const *)(uintptr_t)RTM_MACHSTATE_SYSCALL_I386_ARG1(self),
+			                             (size_t)RTM_MACHSTATE_SYSCALL_I386_ARG2(self));
+			return X86_RTM_STATUS_CONTINUE;
+#endif /* rtm_sys_syslog */
+
+#ifdef rtm_sys_rpc_service
+		case __NR32_rpc_service:
+			sysno = SYS_rpc_service;
+			break;
+#endif /* rtm_sys_rpc_service */
+
+#ifdef rtm_sys_gettid
+		case __NR32_gettid:
+			sysno = SYS_gettid;
+			break;
+#endif /* rtm_sys_gettid */
+
+#ifdef rtm_sys_getpid
+		case __NR32_getpid:
+			sysno = SYS_getpid;
+			break;
+#endif /* rtm_sys_getpid */
+
+#ifdef rtm_sys_sched_yield
+		case __NR32_sched_yield:
+			sysno = SYS_sched_yield;
+			break;
+#endif /* rtm_sys_sched_yield */
+
 		default:
 			/* Unsupported system call! */
-			sysno = SYS_exit; /* Anything that isn't supported will do here! */
+			sysno = SYS_pause; /* Anything that isn't supported will do here! */
 			break;
 		}
 	}
@@ -619,19 +678,47 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
 		/* Explicit RTM abort
 		 * HINT: %ebx is the first system call argument register in 32-bit mode.
 		 * HINT: %rdi is the first system call argument register in 64-bit mode. */
-#ifdef __x86_64__
 		return ABORT_WITH(_XABORT_EXPLICIT |
-		                  ((self->r_edi << _XABORT_CODE_S) &
+		                  (((u32)RTM_MACHSTATE_SYSCALL_ARG0(self) << _XABORT_CODE_S) &
 		                   _XABORT_CODE_M));
-#else /* __x86_64__ */
-		return ABORT_WITH(_XABORT_EXPLICIT |
-		                  ((self->r_ebx << _XABORT_CODE_S) &
-		                   _XABORT_CODE_M));
-#endif /* !__x86_64__ */
 
 	case SYS_rtm_test:
 		self->r_pax = 1; /* System call return value */
 		return X86_RTM_STATUS_CONTINUE;
+
+	/* Custom system calls. */
+#ifdef rtm_sys_syslog
+	case SYS_syslog:
+		self->r_pax = rtm_sys_syslog(&self->r_mem,
+		                             (syscall_ulong_t)RTM_MACHSTATE_SYSCALL_ARG0(self),
+		                             (char const *)(uintptr_t)RTM_MACHSTATE_SYSCALL_ARG1(self),
+		                             (size_t)RTM_MACHSTATE_SYSCALL_ARG2(self));
+		return X86_RTM_STATUS_CONTINUE;
+#endif /* rtm_sys_syslog */
+
+#ifdef rtm_sys_rpc_service
+	case SYS_rpc_service:
+		self->r_pax = rtm_sys_rpc_service(&self->r_mem);
+		return X86_RTM_STATUS_CONTINUE;
+#endif /* rtm_sys_rpc_service */
+
+#ifdef rtm_sys_gettid
+	case SYS_gettid:
+		self->r_pax = rtm_sys_gettid(&self->r_mem);
+		return X86_RTM_STATUS_CONTINUE;
+#endif /* rtm_sys_gettid */
+
+#ifdef rtm_sys_getpid
+	case SYS_getpid:
+		self->r_pax = rtm_sys_getpid(&self->r_mem);
+		return X86_RTM_STATUS_CONTINUE;
+#endif /* rtm_sys_getpid */
+
+#ifdef rtm_sys_sched_yield
+	case SYS_sched_yield:
+		self->r_pax = rtm_sys_sched_yield(&self->r_mem);
+		return X86_RTM_STATUS_CONTINUE;
+#endif /* rtm_sys_sched_yield */
 
 	default:
 		break;
@@ -1196,6 +1283,17 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 #define EMU86_VALIDATE_WRITABLE_IS_NOOP  1
 #define EMU86_VALIDATE_READWRITE_IS_NOOP 1
 
+/* Verify that we only ever run user-space code in user-space */
+#if CONFIG_RTM_USERSPACE_ONLY
+#define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(start_pc) \
+	validate_executable((void *)(start_pc))
+#else /* CONFIG_RTM_USERSPACE_ONLY */
+#define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(start_pc) \
+	do {                                                      \
+		if (mach.r_mem.rm_mem_avl.rm_chkuser)                 \
+			validate_executable((void *)(start_pc));          \
+	} __WHILE0
+#endif /* !CONFIG_RTM_USERSPACE_ONLY */
 
 
 /* RTM instruction emulation to allow for nesting. */
@@ -1266,7 +1364,6 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 	mach.r_nesting = 0;
 	for (;;) {
-		/* Execute the next instruction */
 		TRY {
 #ifndef NDEBUG
 			printk(KERN_TRACE "[rtm] Emulate %p: ",
@@ -1276,8 +1373,21 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 			              (void *)mach.r_pip,
 			              DISASSEMBLER_TARGET_CURRENT,
 			              DISASSEMBLER_FNOADDR);
-			printk(KERN_TRACE "\n");
+			printk(KERN_TRACE "\t# a=%#Ix c=%#Ix d=%#Ix b=%#Ix sp=%#Ix bp=%#Ix si=%#Ix di=%#Ix "
+#ifdef __x86_64__
+			                  "8=%#Ix 9=%#Ix 10=%#Ix 11=%#Ix 12=%#Ix 13=%#Ix 14=%#Ix 15=%#Ix"
+#endif /* __x86_64__ */
+			                  "\n",
+			       mach.r_pax, mach.r_pcx, mach.r_pdx, mach.r_pbx,
+			       mach.r_psp, mach.r_pbp, mach.r_psi, mach.r_pdi
+#ifdef __x86_64__
+			       ,
+			       mach.r_r8, mach.r_r9, mach.r_r10, mach.r_r11,
+			       mach.r_r12, mach.r_r13, mach.r_r14, mach.r_r15
+#endif /* __x86_64__ */
+			       );
 #endif /* !NDEBUG */
+			/* Execute the next instruction */
 			status = x86_emulate_rtm_instruction(&mach);
 		} EXCEPT {
 			mach.r_pax = rtm_handle_exception();

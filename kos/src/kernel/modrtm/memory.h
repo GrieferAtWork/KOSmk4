@@ -24,6 +24,8 @@
 
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <sched/pid.h>
+#include <sched/rpc.h>
 
 #include <hybrid/__assert.h>
 
@@ -45,19 +47,43 @@ struct rtm_memory_region {
 #define rtm_memory_region_waschanged(self) (((uintptr_t)(self)->mr_part & 1) != 0)
 #define rtm_memory_region_setchanged(self) (void)((self)->mr_part = (void *)((uintptr_t)(self)->mr_part | 1))
 
+
+
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#define RTM_PENDING_SYSCALL_NONE   0x0000 /* No system call (never used) */
+#define RTM_PENDING_SYSCALL_SYSLOG 0x0001 /* Pending call to `sys_syslog()' (`rps_data' is the syslog level) */
+
+struct rtm_pending_syscall {
+	uintptr_half_t rps_kind; /* System call kind (one of `RTM_PENDING_SYSCALL_*') */
+	uintptr_half_t rps_data; /* System-call-kind-specific data. */
+	union {
+		struct {
+			char   *rps_text;  /* [1..rps_size][owned] The text that's supposed to be printed. */
+			size_t  rps_size;  /* [!0] Length of `rps_text' (in characters) */
+		} rps_syslog; /* RTM_PENDING_SYSCALL_SYSLOG */
+	};
+};
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+
+
+
 struct rtm_memory {
-	size_t                     rm_mem_avl; /* Amount of heap memory that is still available */
-	size_t                     rm_regionc; /* # of elements from `rm_regionv' that are currently in use. */
-	struct rtm_memory_region **rm_regionv; /* [1..1][owned][0..rm_regionc][owned] Vector of in-use memory regions.
-	                                        * Sorted ascendingly by `mr_addrlo', meaning that an bsearch with a worst
-	                                        * case lookup time of O(log2(n)) can be used for locating specific memory
-	                                        * regions. (though in practice, most programs will only ever use 2 regions:
-	                                        * one for the calling program's stack, and the other for the parts of memory
-	                                        * that the program is actually intending to modify) */
+	size_t                      rm_mem_avl; /* Amount of heap memory that is still available */
+	size_t                      rm_regionc; /* # of elements from `rm_regionv' that are currently in use. */
+	struct rtm_memory_region  **rm_regionv; /* [1..1][owned][0..rm_regionc][owned] Vector of in-use memory regions.
+	                                         * Sorted ascendingly by `mr_addrlo', meaning that an bsearch with a worst
+	                                         * case lookup time of O(log2(n)) can be used for locating specific memory
+	                                         * regions. (though in practice, most programs will only ever use 2 regions:
+	                                         * one for the calling program's stack, and the other for the parts of memory
+	                                         * that the program is actually intending to modify) */
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+	size_t                      rm_sysc;    /* # of pending system calls. */
+	struct rtm_pending_syscall *rm_sysv;    /* [0..rm_sysc][owned] Vector of pending system calls. */
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 #if !CONFIG_RTM_USERSPACE_ONLY
-	bool                       rm_chkuser; /* [const] When true, verify that `addr' doesn't point into kernel-space
-	                                        * as part of the execution of `rtm_memory_read()' and `rtm_memory_write()'
-	                                        * before constructing a new, or extending an existing RTM memory region. */
+	bool                        rm_chkuser; /* [const] When true, verify that `addr' doesn't point into kernel-space
+	                                         * as part of the execution of `rtm_memory_read()' and `rtm_memory_write()'
+	                                         * before constructing a new, or extending an existing RTM memory region. */
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 };
 
@@ -66,30 +92,49 @@ struct rtm_memory {
 INTDEF size_t rtm_memory_limit;
 
 
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#define _RTM_MEMBER_INIT_SYSV , 0, __NULLPTR
+#define _rtm_member_init_sysv(self) \
+	, (self)->rm_sysc = 0,          \
+	  (self)->rm_sysv = __NULLPTR
+#define _rtm_member_cinit_sysv(self)         \
+	, __hybrid_assert((self)->rm_sysc == 0), \
+	__hybrid_assert((self)->rm_sysv == __NULLPTR)
+#else /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#define _RTM_MEMBER_INIT_SYSV        /* nothing */
+#define _rtm_member_init_sysv(self)  /* nothing */
+#define _rtm_member_cinit_sysv(self) /* nothing */
+#endif /* !CONFIG_RTM_PENDING_SYSTEM_CALLS */
+
+
 /* Initialize a given `struct rtm_memory' */
 #if !CONFIG_RTM_USERSPACE_ONLY
-#define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR, chkuser }
+#define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR _RTM_MEMBER_INIT_SYSV, chkuser }
 #define rtm_memory_init(self, chkuser)      \
 	((self)->rm_mem_avl = rtm_memory_limit, \
 	 (self)->rm_regionc = 0,                \
-	 (self)->rm_regionv = __NULLPTR,        \
+	 (self)->rm_regionv = __NULLPTR         \
+	 _rtm_member_init_sysv(self),           \
 	 (self)->rm_chkuser = (chkuser))
-#define rtm_memory_cinit(self, chkuser)                \
-	(__hybrid_assert((self)->rm_mem_avl == 0),         \
-	 __hybrid_assert((self)->rm_regionc == 0),         \
-	 __hybrid_assert((self)->rm_regionv == __NULLPTR), \
-	 (self)->rm_mem_avl = rtm_memory_limit,            \
+#define rtm_memory_cinit(self, chkuser)               \
+	(__hybrid_assert((self)->rm_mem_avl == 0),        \
+	 __hybrid_assert((self)->rm_regionc == 0),        \
+	 __hybrid_assert((self)->rm_regionv == __NULLPTR) \
+	 _rtm_member_cinit_sysv(self),                    \
+	 (self)->rm_mem_avl = rtm_memory_limit,           \
 	 (self)->rm_chkuser = (chkuser))
 #else /* !CONFIG_RTM_USERSPACE_ONLY */
-#define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR }
+#define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR _RTM_MEMBER_INIT_SYSV }
 #define rtm_memory_init(self, chkuser)      \
 	((self)->rm_mem_avl = rtm_memory_limit, \
 	 (self)->rm_regionc = 0,                \
-	 (self)->rm_regionv = __NULLPTR)
-#define rtm_memory_cinit(self, chkuser)                \
-	(__hybrid_assert((self)->rm_mem_avl == 0),         \
-	 __hybrid_assert((self)->rm_regionc == 0),         \
-	 __hybrid_assert((self)->rm_regionv == __NULLPTR), \
+	 (self)->rm_regionv = __NULLPTR         \
+	 _rtm_member_init_sysv(self))
+#define rtm_memory_cinit(self, chkuser)               \
+	(__hybrid_assert((self)->rm_mem_avl == 0),        \
+	 __hybrid_assert((self)->rm_regionc == 0),        \
+	 __hybrid_assert((self)->rm_regionv == __NULLPTR) \
+	 _rtm_member_cinit_sysv(self),                    \
 	 (self)->rm_mem_avl = rtm_memory_limit)
 #endif /* CONFIG_RTM_USERSPACE_ONLY */
 
@@ -118,6 +163,56 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
  * @return: false: Version of memory inconsistency detected (try again) */
 INTDEF NONNULL((1)) bool FCALL
 rtm_memory_apply(struct rtm_memory const *__restrict self);
+
+
+
+/* A certain (small) set of system calls can actually be performed whilst in RTM mode:
+ *
+ *  - sys_rtm_begin: Nested RTM block (simply increments a counter, such that +1
+ *                   additional `sys_rtm_end()' are needed in order to exit RTM mode)
+ *  - sys_rtm_end:   Exit RTM mode with a success status
+ *  - sys_rtm_abort: Abort RTM with an error code
+ *  - sys_rtm_test:  Always returns `1'
+ *
+ * Additionally, the following system calls can be used, though some with somewhat
+ * altered behavior to prevent any possible modifications from being performed
+ * immediately, instead causing them to be done at a later point in time.
+ *
+ * #if CONFIG_RTM_PENDING_SYSTEM_CALLS
+ *  - sys_syslog:      Remember arguments, and copy the to-be printed string into a
+ *                     buffer for pending system call operations that is stored alongside
+ *                     the current `struct rtm_memory', to-be printed (in order) after a
+ *                     successful completion of RTM emulation.
+ *                     The return value always indicates success (any error is instead
+ *                     handled as an RTM abort reason)
+ * #endif // CONFIG_RTM_PENDING_SYSTEM_CALLS
+ *  - sys_rpc_service: Normal behavior
+ *  - sys_gettid:      Normal behavior
+ *  - sys_getpid:      Normal behavior
+ *  - sys_sched_yield: Normal behavior
+ *
+ * XXX:
+ *  - sys_sigprocmask() - Allow for atomic signal mask modifications (needed by `sys_sigreturn()')
+ *  - sys_sigreturn()   - Allow RTM to be entered in signal handlers,
+ *                        and left after the signal handler returns.
+ *                        Only allowed with a NULL-sc_info argument
+ */
+#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+
+/* Schedule a pending call to `sys_syslog()', to-be executed
+ * unconditionally just before a true-return of `rtm_memory_apply()' */
+INTDEF NONNULL((1)) void FCALL
+rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
+                               syscall_ulong_t level,
+                               USER char const *str, size_t len);
+#define rtm_sys_syslog(mem, level, str, len) (rtm_memory_schedule_sys_syslog(mem, level, str, len), (ssize_t)(len))
+#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#define rtm_sys_rpc_service(mem) (task_serve() ? 1 : 0)
+#define rtm_sys_gettid(mem)      task_gettid()
+#define rtm_sys_getpid(mem)      task_getpid()
+#define rtm_sys_sched_yield(mem) (task_yield(), 0)
+
+
 
 
 DECL_END

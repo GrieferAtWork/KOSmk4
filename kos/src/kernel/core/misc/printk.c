@@ -77,8 +77,11 @@ vprintk(char const *__restrict format, va_list args) {
 DEFINE_SYSCALL3(ssize_t, syslog,
                 syscall_ulong_t, level,
                 USER UNCHECKED char const *, str, size_t, len) {
-	if unlikely(level >= SYSLOG_LEVEL_COUNT)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL, level);
+	if unlikely(level >= SYSLOG_LEVEL_COUNT) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL,
+		      level);
+	}
 	validate_readable(str, len);
 	return syslog_printer((void *)(uintptr_t)level, str, len);
 }

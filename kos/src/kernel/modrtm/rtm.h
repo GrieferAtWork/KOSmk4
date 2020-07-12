@@ -30,7 +30,7 @@
 #endif /* !ARCH_VM_HAVE_RTM */
 
 /* Config option: CONFIG_RTM_USERSPACE_ONLY
- * When defined, RTM can only be used in user-space.
+ * When enabled, RTM can only be used in user-space.
  * This is enforced by making all conditional is-user checks mandatory,
  * as well as simplifying a lot of code by removing is-kernel branches. */
 #ifdef CONFIG_NO_RTM_USERSPACE_ONLY
@@ -44,6 +44,24 @@
 #else /* ... */
 #undef CONFIG_RTM_USERSPACE_ONLY
 #define CONFIG_RTM_USERSPACE_ONLY 1
+#endif /* !... */
+
+
+/* Config option: CONFIG_RTM_PENDING_SYSTEM_CALLS
+ * When enabled, certain system calls will be tracked as pending,
+ * such that they will be executed only upon successful completion
+ * of RTM emulation. */
+#ifdef CONFIG_NO_RTM_PENDING_SYSTEM_CALLS
+#undef CONFIG_RTM_PENDING_SYSTEM_CALLS
+#define CONFIG_RTM_PENDING_SYSTEM_CALLS 0
+#elif !defined(CONFIG_RTM_PENDING_SYSTEM_CALLS)
+#define CONFIG_RTM_PENDING_SYSTEM_CALLS 1
+#elif (CONFIG_RTM_PENDING_SYSTEM_CALLS + 0) == 0
+#undef CONFIG_RTM_PENDING_SYSTEM_CALLS
+#define CONFIG_RTM_PENDING_SYSTEM_CALLS 0
+#else /* ... */
+#undef CONFIG_RTM_PENDING_SYSTEM_CALLS
+#define CONFIG_RTM_PENDING_SYSTEM_CALLS 1
 #endif /* !... */
 
 
