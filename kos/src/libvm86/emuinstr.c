@@ -39,6 +39,10 @@ opt.append("-Os");
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
+#include <stddef.h>
+
+#include <libemu86/emu86.h>
+
 #include "emulator.h"
 
 DECL_BEGIN
@@ -130,9 +134,19 @@ DECL_END
 		RETHROW();                  \
 	}
 #define EMU86_EMULATE_GETOPFLAGS() EMU86_F_NORMAL
-#define REG8(id)                                                    \
-	(*((id) >= 4 ? &self->vr_regs.vr_regdatab[(((id) - 4) * 4) + 1] \
-	             : &self->vr_regs.vr_regdatab[(id) * 4]))
+
+PRIVATE uintptr_t const vm86_breg_offset[8] = {
+	[EMU86_R_AL] = offsetof(vm86_state_t, vr_regs.vr_al), /* %al */
+	[EMU86_R_CL] = offsetof(vm86_state_t, vr_regs.vr_cl), /* %cl */
+	[EMU86_R_DL] = offsetof(vm86_state_t, vr_regs.vr_dl), /* %dl */
+	[EMU86_R_BL] = offsetof(vm86_state_t, vr_regs.vr_bl), /* %bl */
+	[EMU86_R_AH] = offsetof(vm86_state_t, vr_regs.vr_ah), /* %ah */
+	[EMU86_R_CH] = offsetof(vm86_state_t, vr_regs.vr_ch), /* %ch */
+	[EMU86_R_DH] = offsetof(vm86_state_t, vr_regs.vr_dh), /* %dh */
+	[EMU86_R_BH] = offsetof(vm86_state_t, vr_regs.vr_bh), /* %bh */
+};
+
+#define REG8(id)  (*((u8 *)self + vm86_breg_offset[id]))
 #define REG16(id) self->vr_regs.vr_regdataw[(id) * 2]
 #define REG32(id) self->vr_regs.vr_regdatal[id]
 #undef EMU86_EMULATE_TRANSLATEADDR_IS_NOOP

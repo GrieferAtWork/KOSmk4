@@ -1074,14 +1074,14 @@ PRIVATE uintptr_t const mach_breg_offset[2][16] = {
 #define EMU86_SETREGQ(regno, value)      REG64(regno) = (u64)(value)
 #else /* __x86_64__ */
 PRIVATE uintptr_t const mach_breg_offset[8] = {
-	[EMU86_R_AL]   = offsetof(struct rtm_machstate, r_al),  /* %al */
-	[EMU86_R_CL]   = offsetof(struct rtm_machstate, r_cl),  /* %cl */
-	[EMU86_R_DL]   = offsetof(struct rtm_machstate, r_dl),  /* %dl */
-	[EMU86_R_BL]   = offsetof(struct rtm_machstate, r_bl),  /* %bl */
-	[EMU86_R_AH]   = offsetof(struct rtm_machstate, r_ah),  /* %ah */
-	[EMU86_R_CH]   = offsetof(struct rtm_machstate, r_ch),  /* %ch */
-	[EMU86_R_DH]   = offsetof(struct rtm_machstate, r_dh),  /* %dh */
-	[EMU86_R_BH]   = offsetof(struct rtm_machstate, r_bh),  /* %bh */
+	[EMU86_R_AL] = offsetof(struct rtm_machstate, r_al), /* %al */
+	[EMU86_R_CL] = offsetof(struct rtm_machstate, r_cl), /* %cl */
+	[EMU86_R_DL] = offsetof(struct rtm_machstate, r_dl), /* %dl */
+	[EMU86_R_BL] = offsetof(struct rtm_machstate, r_bl), /* %bl */
+	[EMU86_R_AH] = offsetof(struct rtm_machstate, r_ah), /* %ah */
+	[EMU86_R_CH] = offsetof(struct rtm_machstate, r_ch), /* %ch */
+	[EMU86_R_DH] = offsetof(struct rtm_machstate, r_dh), /* %dh */
+	[EMU86_R_BH] = offsetof(struct rtm_machstate, r_bh), /* %bh */
 };
 #define REG8(id, ...)                    (*((u8 *)self + mach_breg_offset[id]))
 #define REG16(id)                        self->r_gpregsw[(id)*2]
