@@ -170,8 +170,10 @@ __next:
 		goto __end;
 	if (__ch != '%')
 		goto __next;
-	if (__FORMAT_FORMAT-1 != __flush_start) {
-		__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __flush_start, (__SIZE_TYPE__)((__FORMAT_FORMAT - 1) - __flush_start));
+	if (__FORMAT_FORMAT - 1 != __flush_start) {
+		__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __flush_start,
+		                             (__SIZE_TYPE__)((__FORMAT_FORMAT - 1) -
+		                                             __flush_start));
 		if __unlikely(__temp < 0)
 			goto __err;
 		__result += __temp;

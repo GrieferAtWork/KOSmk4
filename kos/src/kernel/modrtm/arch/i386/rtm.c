@@ -1023,33 +1023,77 @@ NOTHROW(KCALL cpuid)(struct rtm_machstate *__restrict self) {
 #endif /* EMU86_EMULATE_CONFIG_WANT_CPUID */
 
 #ifdef __x86_64__
-#define REG8(id)                                          \
-	(*((id) >= 4 ? &self->r_gpregsb[(((id) - 4) * 8) + 1] \
-	             : &self->r_gpregsb[(id) * 8]))
-#define REG16(id) self->r_gpregsw[(id) * 4]
-#define REG32(id) self->r_gpregsl[(id) * 2]
-#define REG64(id) self->r_gpregsq[id]
-#else /* __x86_64__ */
-#define REG8(id)                                          \
-	(*((id) >= 4 ? &self->r_gpregsb[(((id) - 4) * 4) + 1] \
-	             : &self->r_gpregsb[(id) * 4]))
-#define REG16(id) self->r_gpregsw[(id) * 2]
-#define REG32(id) self->r_gpregsl[id]
-#endif /* !__x86_64__ */
+/* Offsets to 8-bit registers, both with and without EMU86_F_HASREX */
+PRIVATE uintptr_t const mach_breg_offset[2][16] = {
+	[/* EMU86_F_HASREX = */ 0] = {
+		[EMU86_R_AL]   = offsetof(struct rtm_machstate, r_al),  /* %al */
+		[EMU86_R_CL]   = offsetof(struct rtm_machstate, r_cl),  /* %cl */
+		[EMU86_R_DL]   = offsetof(struct rtm_machstate, r_dl),  /* %dl */
+		[EMU86_R_BL]   = offsetof(struct rtm_machstate, r_bl),  /* %bl */
+		[EMU86_R_AH]   = offsetof(struct rtm_machstate, r_ah),  /* %ah */
+		[EMU86_R_CH]   = offsetof(struct rtm_machstate, r_ch),  /* %ch */
+		[EMU86_R_DH]   = offsetof(struct rtm_machstate, r_dh),  /* %dh */
+		[EMU86_R_BH]   = offsetof(struct rtm_machstate, r_bh),  /* %bh */
+		[EMU86_R_R8L]  = offsetof(struct rtm_machstate, r_r8),  /* %r8l */
+		[EMU86_R_R9L]  = offsetof(struct rtm_machstate, r_r9),  /* %r9l */
+		[EMU86_R_R10L] = offsetof(struct rtm_machstate, r_r10), /* %r10l */
+		[EMU86_R_R11L] = offsetof(struct rtm_machstate, r_r11), /* %r11l */
+		[EMU86_R_R12L] = offsetof(struct rtm_machstate, r_r12), /* %r12l */
+		[EMU86_R_R13L] = offsetof(struct rtm_machstate, r_r13), /* %r13l */
+		[EMU86_R_R14L] = offsetof(struct rtm_machstate, r_r14), /* %r14l */
+		[EMU86_R_R15L] = offsetof(struct rtm_machstate, r_r15), /* %r15l */
+	},
+	[/* EMU86_F_HASREX = */ 1] = {
+		[EMU86_R_AL]   = offsetof(struct rtm_machstate, r_al),  /* %al */
+		[EMU86_R_CL]   = offsetof(struct rtm_machstate, r_cl),  /* %cl */
+		[EMU86_R_DL]   = offsetof(struct rtm_machstate, r_dl),  /* %dl */
+		[EMU86_R_BL]   = offsetof(struct rtm_machstate, r_bl),  /* %bl */
+		[EMU86_R_SPL]  = offsetof(struct rtm_machstate, r_spl), /* %spl */
+		[EMU86_R_BPL]  = offsetof(struct rtm_machstate, r_bpl), /* %bpl */
+		[EMU86_R_SIL]  = offsetof(struct rtm_machstate, r_sil), /* %sil */
+		[EMU86_R_DIL]  = offsetof(struct rtm_machstate, r_dil), /* %dil */
+		[EMU86_R_R8L]  = offsetof(struct rtm_machstate, r_r8),  /* %r8l */
+		[EMU86_R_R9L]  = offsetof(struct rtm_machstate, r_r9),  /* %r9l */
+		[EMU86_R_R10L] = offsetof(struct rtm_machstate, r_r10), /* %r10l */
+		[EMU86_R_R11L] = offsetof(struct rtm_machstate, r_r11), /* %r11l */
+		[EMU86_R_R12L] = offsetof(struct rtm_machstate, r_r12), /* %r12l */
+		[EMU86_R_R13L] = offsetof(struct rtm_machstate, r_r13), /* %r13l */
+		[EMU86_R_R14L] = offsetof(struct rtm_machstate, r_r14), /* %r14l */
+		[EMU86_R_R15L] = offsetof(struct rtm_machstate, r_r15), /* %r15l */
+	}
+};
 
-#define EMU86_GETREGB(regno, ...)        REG8(regno)
-#define EMU86_SETREGB(regno, value, ...) REG8(regno) = (u8)(value)
-#define EMU86_GETREGW(regno)             REG16(regno)
-#define EMU86_GETREGL(regno)             REG32(regno)
-#ifdef __x86_64__
+#define REG8(id, op_flags) \
+	(*((u8 *)self + mach_breg_offset[!!((op_flags) & EMU86_F_HASREX)][id]))
+#define REG16(id)                        self->r_gpregsw[(id)*4]
+#define REG32(id)                        self->r_gpregsl[(id)*2]
+#define REG64(id)                        self->r_gpregsq[id]
 #define EMU86_GETREGQ(regno)             REG64(regno)
 #define EMU86_SETREGW(regno, value)      REG64(regno) = (u64)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
-#define EMU86_SETREGL(regno, value)      REG64(regno) = (u64)(u32)(value) /* 16-bit register writes clear the upper 16 bits */
+#define EMU86_SETREGL(regno, value)      REG64(regno) = (u64)(u32)(value) /* 32-bit register writes clear the upper 32 bits */
 #define EMU86_SETREGQ(regno, value)      REG64(regno) = (u64)(value)
 #else /* __x86_64__ */
+PRIVATE uintptr_t const mach_breg_offset[8] = {
+	[EMU86_R_AL]   = offsetof(struct rtm_machstate, r_al),  /* %al */
+	[EMU86_R_CL]   = offsetof(struct rtm_machstate, r_cl),  /* %cl */
+	[EMU86_R_DL]   = offsetof(struct rtm_machstate, r_dl),  /* %dl */
+	[EMU86_R_BL]   = offsetof(struct rtm_machstate, r_bl),  /* %bl */
+	[EMU86_R_AH]   = offsetof(struct rtm_machstate, r_ah),  /* %ah */
+	[EMU86_R_CH]   = offsetof(struct rtm_machstate, r_ch),  /* %ch */
+	[EMU86_R_DH]   = offsetof(struct rtm_machstate, r_dh),  /* %dh */
+	[EMU86_R_BH]   = offsetof(struct rtm_machstate, r_bh),  /* %bh */
+};
+#define REG8(id, ...)                    (*((u8 *)self + mach_breg_offset[id]))
+#define REG16(id)                        self->r_gpregsw[(id)*2]
+#define REG32(id)                        self->r_gpregsl[id]
 #define EMU86_SETREGW(regno, value)      REG32(regno) = (u32)(u16)(value) /* 16-bit register writes clear the upper 16 bits */
 #define EMU86_SETREGL(regno, value)      REG32(regno) = (u32)(value)
 #endif /* !__x86_64__ */
+#define EMU86_GETREGB(regno, op_flags)        REG8(regno, op_flags)
+#define EMU86_SETREGB(regno, value, op_flags) REG8(regno, op_flags) = (u8)(value)
+#define EMU86_GETREGW(regno)                  REG16(regno)
+#define EMU86_GETREGL(regno)                  REG32(regno)
+
 #define EMU86_GETIP()           (u16)self->r_ip
 #define EMU86_SETIP(v)          self->r_ip = (u16)(v)
 #define EMU86_GETEIP()          (u32)self->r_eip
@@ -1283,7 +1327,9 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 #define EMU86_VALIDATE_WRITABLE_IS_NOOP  1
 #define EMU86_VALIDATE_READWRITE_IS_NOOP 1
 
-/* Verify that we only ever run user-space code in user-space */
+/* Verify that we only ever run user-space code in user-space
+ * TODO: When the PC-pointer is part of kernel-space, we should
+ *       instead dispatch to UKERN and emulate `userkern_syscall()'! */
 #if CONFIG_RTM_USERSPACE_ONLY
 #define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(start_pc) \
 	validate_executable((void *)(start_pc))

@@ -415,7 +415,7 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
 	ent->rps_data = (uintptr_half_t)level;
 	ent->rps_syslog.rps_text  = str_copy; /* Inherit */
 	ent->rps_syslog.rps_size  = len;
-//	printk(KERN_TRACE "[rtm] sys_syslog(%Iu, %$q)\n", level, len, str_copy);
+	printk(KERN_TRACE "[rtm] sys_syslog(%Iu, %$q)\n", level, len, str_copy);
 }
 
 /* Execute system calls that have been scheduled as pending.

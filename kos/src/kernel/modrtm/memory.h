@@ -257,7 +257,8 @@ INTDEF NONNULL((1)) void FCALL
 rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
                                syscall_ulong_t level,
                                USER char const *str, size_t len);
-#define rtm_sys_syslog(mem, level, str, len) (rtm_memory_schedule_sys_syslog(mem, level, str, len), (ssize_t)(len))
+#define rtm_sys_syslog(mem, level, str, len) \
+	(rtm_memory_schedule_sys_syslog(mem, level, str, len), (ssize_t)(len))
 #endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
 #define rtm_sys_rpc_service(mem) (task_serve() ? 1 : 0)
 #define rtm_sys_gettid(mem)      task_gettid()
