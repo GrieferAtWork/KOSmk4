@@ -1365,8 +1365,11 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 #define EMU86_EMULATE_XTEST_IS_ONE 1
 
 /* Handle the current exception by returning the `_XABORT_*' exit code. */
-PRIVATE NOBLOCK u32 NOTHROW(KCALL rtm_handle_exception)(void) {
+PRIVATE u32 KCALL rtm_handle_exception(void) {
 	u32 result;
+	if (was_thrown(E_EXIT_THREAD) ||
+	    was_thrown(E_EXIT_PROCESS))
+		RETHROW();
 #ifndef NDEBUG
 	error_printf("Emulating RTM");
 #endif /* !NDEBUG */
