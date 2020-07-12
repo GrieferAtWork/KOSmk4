@@ -51,6 +51,13 @@
 
 #include "rtm.h"
 
+#if !defined(NDEBUG) && 0
+#define RTM_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
+#else /* !NDEBUG */
+#define RTM_DEBUG(...) (void)0
+#endif /* NDEBUG */
+
+
 DECL_BEGIN
 
 /* Max amount of kernel heap memory that may be used by
@@ -415,7 +422,6 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
 	ent->rps_data = (uintptr_half_t)level;
 	ent->rps_syslog.rps_text  = str_copy; /* Inherit */
 	ent->rps_syslog.rps_size  = len;
-	printk(KERN_TRACE "[rtm] sys_syslog(%Iu, %$q)\n", level, len, str_copy);
 }
 
 /* Execute system calls that have been scheduled as pending.
@@ -1227,10 +1233,10 @@ do_create_far_region:
 			/* Figure out access offsets so we can translate `addr' */
 			access_offset_into_node    = (size_t)((byte_t *)addr - (byte_t *)vm_node_getstart(node));
 			aliasing_region_node_start = (byte_t *)vm_node_getstart(aliasing_node);
-			printk(KERN_DEBUG "[rtm] Region redirect: data from %p...%p is already mapped at %p...%p (map %p -> %p)\n",
-			       vm_node_getmin(node), vm_node_getmax(node),
-			       vm_node_getmin(aliasing_node), vm_node_getmax(aliasing_node),
-			       addr, aliasing_region_node_start + access_offset_into_node);
+			RTM_DEBUG("[rtm] Region redirect: data from %p...%p is already mapped at %p...%p (map %p -> %p)\n",
+			          vm_node_getmin(node), vm_node_getmax(node),
+			          vm_node_getmin(aliasing_node), vm_node_getmax(aliasing_node),
+			          addr, aliasing_region_node_start + access_offset_into_node);
 #if !CONFIG_RTM_USERSPACE_ONLY
 			if unlikely(aliasing_node_vm != effective_vm)
 				sync_endread(aliasing_node_vm);
@@ -1495,16 +1501,10 @@ again_acquire_region_locks:
 #if CONFIG_RTM_FAR_REGIONS
 		if (rtm_memory_region_isfarregion(region)) {
 			/* Far regions are checked implicitly through an adjacent base region. */
-			printk(KERN_DEBUG "[rtm] Far region at %p...%p (part: %p)\n",
-			       region->mr_addrlo, region->mr_addrhi,
-			       rtm_memory_region_getpart(region));
 		} else
 #endif /* CONFIG_RTM_FAR_REGIONS */
 		if (rtm_memory_region_waschanged(region)) {
 			struct vm_futex_controller *fxc;
-			printk(KERN_DEBUG "[rtm] Changed region at %p...%p (part: %p)\n",
-			       region->mr_addrlo, region->mr_addrhi,
-			       rtm_memory_region_getpart(region));
 			if (!sync_trywrite(part)) {
 				rtm_memory_endwrite_modified_parts(self, i);
 				/* Poll until the lock becomes available. - _then_ try acquiring locks again */

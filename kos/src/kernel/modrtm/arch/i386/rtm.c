@@ -64,7 +64,9 @@
 #include <asm/syscalls32_d.h>
 #endif /* __x86_64__ */
 
-#ifndef NDEBUG
+#undef HAVE_RTM_EMULATION_TRACE
+#if !defined(NDEBUG) && 0
+#define HAVE_RTM_EMULATION_TRACE 1
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 
@@ -591,7 +593,9 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
                                     emu86_opflags_t op_flags) {
 	syscall_ulong_t sysno;
 	sysno = self->r_pax;
+#ifdef HAVE_RTM_EMULATION_TRACE
 	printk(KERN_TRACE "[rtm] syscall: %#Ix\n", sysno);
+#endif /* HAVE_RTM_EMULATION_TRACE */
 
 #ifdef __x86_64__
 	if (EMU86_F_IS32(op_flags)) {
@@ -1411,7 +1415,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 	mach.r_nesting = 0;
 	for (;;) {
 		TRY {
-#ifndef NDEBUG
+#ifdef HAVE_RTM_EMULATION_TRACE
 			printk(KERN_TRACE "[rtm] Emulate %p: ",
 			       (void *)mach.r_pip);
 			disasm_single(&syslog_printer,
@@ -1432,7 +1436,7 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 			       mach.r_r12, mach.r_r13, mach.r_r14, mach.r_r15
 #endif /* __x86_64__ */
 			       );
-#endif /* !NDEBUG */
+#endif /* HAVE_RTM_EMULATION_TRACE */
 			/* Execute the next instruction */
 			status = x86_emulate_rtm_instruction(&mach);
 		} EXCEPT {
