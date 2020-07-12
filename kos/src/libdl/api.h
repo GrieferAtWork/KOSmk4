@@ -60,6 +60,10 @@
 /* Commit our custom configuration by using it to setup-CRT definitions. */
 #include <__crt.h>
 
+#ifdef __CRT_HAVE_memcpy
+#error "Bad configuration"
+#endif /* __CRT_HAVE_memcpy */
+
 /* Define CRT features which may be exposed in
  * headers, that we are explicitly implementing. */
 

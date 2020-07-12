@@ -403,12 +403,12 @@
 #ifndef __NO_ATTR_SELECTANY
 #define __PUBLIC_COMDAT __PUBLIC __ATTR_SELECTANY
 #elif defined(__cplusplus)
-#define __INTERN_COMDAT __PUBLIC inline __ATTR_NOINLINE
+#define __PUBLIC_COMDAT __PUBLIC inline __ATTR_NOINLINE
 #elif !defined(__NO_ATTR_WEAK)
-#define __INTERN_COMDAT __PUBLIC __ATTR_WEAK
+#define __PUBLIC_COMDAT __PUBLIC __ATTR_WEAK
 #else /* ... */
 #define __NO_PUBLIC_COMDAT 1
-#define __INTERN_COMDAT __INTERN_COMDAT
+#define __PUBLIC_COMDAT __INTERN_COMDAT
 #endif /* !... */
 #endif /* !__PUBLIC_COMDAT */
 
