@@ -594,7 +594,7 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 	--self->rm_regionc;
 	memmovedownc(&self->rm_regionv[region_lo_index + 1],
 	             &self->rm_regionv[region_lo_index + 2],
-	             self->rm_regionc - region_lo_index,
+	             self->rm_regionc - (region_lo_index + 1),
 	             sizeof(struct rtm_memory_region *));
 	return true;
 }
