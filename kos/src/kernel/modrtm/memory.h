@@ -263,7 +263,29 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
 #define rtm_sys_rpc_service(mem) (task_serve() ? 1 : 0)
 #define rtm_sys_gettid(mem)      task_gettid()
 #define rtm_sys_getpid(mem)      task_getpid()
+
+
+/* This ~could~ be emulated, but that's actually not a good idea:
+ * If the RTM code decides to call some sub-system that makes use of atomic
+ * locks, then we might end up emulating code like this:
+ * >> while (!try_lock())
+ * >>     sched_yield();
+ * The problem here is that if try_lock() failed the first time around, then
+ * it will most definitely keep on failing since during the second time, the
+ * memory that is used for backing the lock's is-acquired state will have
+ * been cached in the RTM memory controller, such that even if some other
+ * thread ends up releasing the lock while our thread is still in RTM mode,
+ * we may not necessarily to see this this when it happens since RTM is
+ * designed to only read from any memory location once, in order to ensure
+ * a consistent memory view (such that any modifications made to memory by
+ * other threads are hidden until the very end when memory is synced)
+ *
+ * As such, sys_sched_yield() is actually a very important marker to indicate
+ * that RTM _should_ be aborted!
+ */
+#if 0
 #define rtm_sys_sched_yield(mem) (task_yield(), 0)
+#endif
 
 
 
