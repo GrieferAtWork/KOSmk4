@@ -414,6 +414,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Have libc export symbols `alloca()' and `_alloca()' that do exactly as
 	 *       they're supposed to do. - Other c libraries also export these by-name! */
 
+	/* TODO: Many places that use `__LIBCCALL' should actually be using `__LIBKCALL'!
+	 *       Most importantly: `pformatprinter' should be using `__LIBKCALL'! */
+
 	return state;
 }
 
