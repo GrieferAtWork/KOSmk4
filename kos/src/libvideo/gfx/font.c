@@ -164,7 +164,7 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
 	context = (struct video_fontprinter_data *)arg;
 	/* Print the string one character at a time. */
 	for (i = 0; i < datalen; ++i) {
-		libvideo_fontprinterch(context, data[i]);
+		libvideo_fontprintch(context, data[i]);
 	}
 	return (ssize_t)datalen;
 }
@@ -175,8 +175,8 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
 INTERN NONNULL((1)) size_t CC
-libvideo_fontprinterch(struct video_fontprinter_data *__restrict self,
-                       char32_t ch) {
+libvideo_fontprintch(struct video_fontprinter_data *__restrict self,
+                     char32_t ch) {
 	size_t result;
 	switch (ch) {
 
@@ -227,7 +227,7 @@ again_do_render:
 DEFINE_PUBLIC_ALIAS(video_font_lookup, libvideo_font_lookup);
 DEFINE_PUBLIC_ALIAS(video_fontprinter, libvideo_fontprinter);
 DEFINE_PUBLIC_ALIAS(video_fontprinter32, libvideo_fontprinter32);
-DEFINE_PUBLIC_ALIAS(video_fontprinterch, libvideo_fontprinterch);
+DEFINE_PUBLIC_ALIAS(video_fontprintch, libvideo_fontprintch);
 
 
 DECL_END

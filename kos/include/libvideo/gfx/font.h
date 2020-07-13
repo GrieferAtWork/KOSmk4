@@ -161,12 +161,12 @@ video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
 typedef __ATTR_NONNULL((1)) __size_t
-(LIBVIDEO_GFX_CC *PVIDEO_FONTPRINTCHAR)(struct video_fontprinter_data *__restrict __self,
-                                        __CHAR32_TYPE__ __ch);
+(LIBVIDEO_GFX_CC *PVIDEO_FONTPRINTCH)(struct video_fontprinter_data *__restrict __self,
+                                      __CHAR32_TYPE__ __ch);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_NONNULL((1)) __size_t LIBVIDEO_GFX_CC
-video_fontprinterch(struct video_fontprinter_data *__restrict __self,
-                    __CHAR32_TYPE__ __ch);
+video_fontprintch(struct video_fontprinter_data *__restrict __self,
+                  __CHAR32_TYPE__ __ch);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 

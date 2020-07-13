@@ -54,8 +54,8 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
 INTDEF NONNULL((1)) size_t CC
-libvideo_fontprinterch(struct video_fontprinter_data *__restrict self,
-                       char32_t ch);
+libvideo_fontprintch(struct video_fontprinter_data *__restrict self,
+                     char32_t ch);
 
 
 DECL_END
