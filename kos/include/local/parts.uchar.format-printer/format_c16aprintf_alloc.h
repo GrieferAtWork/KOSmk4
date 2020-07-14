@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d4fa39 */
+/* HASH CRC-32:0x816cbbc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ struct format_waprintf_data {
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif
+#endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined

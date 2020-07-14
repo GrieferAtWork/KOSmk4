@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1a10edb */
+/* HASH CRC-32:0xe8e1d53c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@ struct __format_snprintf_data {
 	char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
 };
-#endif
+#endif /* !____format_snprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */

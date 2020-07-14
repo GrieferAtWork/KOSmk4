@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99736399 */
+/* HASH CRC-32:0xa332f911 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: localtime32 from time */
 #ifndef __local___localdep_localtime32_defined
@@ -92,7 +92,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_localtime && !__CRT_HAVE__localtime32) */
 __NAMESPACE_LOCAL_BEGIN
 /* Return the `struct tm' representation of *TIMER in the local timezone */

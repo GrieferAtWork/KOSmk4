@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62329d7b */
+/* HASH CRC-32:0xed269542 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -780,7 +780,7 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
                                  int ndigit,
@@ -797,7 +797,7 @@ NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
                                  int ndigit,
@@ -823,7 +823,7 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
                                 int ndigit,
@@ -840,7 +840,7 @@ NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
                                 int ndigit,

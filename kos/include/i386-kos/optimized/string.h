@@ -27,9 +27,9 @@
 #if !defined(__NO_ATTR_FORCEINLINE) && \
     !defined(__NO_builtin_constant_p)
 #include <hybrid/host.h>
-#ifndef _LIBC_SLOW_STRING_H
+#ifndef _LIBC_CORE_STRING_H
 #include <libc/core/string.h>
-#endif /* !_LIBC_SLOW_STRING_H */
+#endif /* !_LIBC_CORE_STRING_H */
 #ifndef __COMPILER_HAVE_GCC_ASM
 #include <asm/intrin.h>
 #endif /* !__COMPILER_HAVE_GCC_ASM */

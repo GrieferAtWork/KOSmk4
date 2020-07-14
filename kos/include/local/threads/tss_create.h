@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff954ae3 */
+/* HASH CRC-32:0xda11e9fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_END
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
 typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
-#endif
+#endif /* !____pthread_destr_function_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data

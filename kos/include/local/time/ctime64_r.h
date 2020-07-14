@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf53e52a */
+/* HASH CRC-32:0xd4890253 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: asctime_r from time */
 #ifndef __local___localdep_asctime_r_defined

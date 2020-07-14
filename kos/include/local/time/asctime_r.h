@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3881bbe */
+/* HASH CRC-32:0xa22901a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_asctime_s from time */
 #if !defined(__local___localdep_crt_asctime_s_defined) && defined(__CRT_HAVE_asctime_s)
@@ -102,14 +102,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_wday_names) char const __abbr_wday_names[7][4] =
 	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_TIME_ABBR_WDAY_NAMES_DEFINED */
 #ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
 	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
 __NAMESPACE_LOCAL_BEGIN
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"

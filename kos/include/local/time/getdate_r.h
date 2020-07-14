@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab645e91 */
+/* HASH CRC-32:0xfa3658ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Since `getdate' is not reentrant because of the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8280075 */
+/* HASH CRC-32:0xb07625bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #else /* ... */
 #undef ___local_sys_errlist_defined
 #endif /* !... */
-#endif
+#endif /* !___local_sys_errlist_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(__errno_t __errnum) {

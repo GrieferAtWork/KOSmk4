@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5017067 */
+/* HASH CRC-32:0x77f3a86f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lseek from unistd */

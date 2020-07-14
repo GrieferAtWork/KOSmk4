@@ -423,7 +423,10 @@ twochar:
 				}
 				break;
 			}
-			return getUserString(exprStart, tokStart);
+			local exprEnd = tokStart;
+			while (exprEnd > exprStart && text.isspace(exprEnd - 1))
+				--exprEnd;
+			return getUserString(exprStart, exprEnd);
 		}
 		if (isCString(tok)) {
 			next();
@@ -437,19 +440,19 @@ twochar:
 	function parseAllUntilRParenAsString(): string {
 		local tok = this.tok;
 		local resultStart = tokStart;
-		local resultEnd = tokEnd;
 		for (;;) {
 			if (tok in "([{") {
 				skipPair();
-				resultEnd = tokEnd;
 				tok = next();
 				continue;
 			}
 			if (tok in ")]},")
 				break;
-			resultEnd = tokEnd;
 			tok = next();
 		}
+		local resultEnd = tokStart;
+		while (resultEnd > resultStart && text.isspace(resultEnd - 1))
+			--resultEnd;
 		return text[resultStart:resultEnd];
 	}
 
@@ -457,19 +460,19 @@ twochar:
 	function parseAllUntilRParen(): UserString | string {
 		local tok = this.tok;
 		local resultStart = tokStart;
-		local resultEnd = tokEnd;
 		for (;;) {
 			if (tok in "([{") {
 				skipPair();
-				resultEnd = tokEnd;
 				tok = next();
 				continue;
 			}
 			if (tok in ")]},")
 				break;
-			resultEnd = tokEnd;
 			tok = next();
 		}
+		local resultEnd = tokStart;
+		while (resultEnd > resultStart && text.isspace(resultEnd - 1))
+			--resultEnd;
 		return getUserString(resultStart, resultEnd);
 	}
 

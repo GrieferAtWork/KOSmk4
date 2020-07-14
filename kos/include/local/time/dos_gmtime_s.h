@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x618aa171 */
+/* HASH CRC-32:0xf1ce6905 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_gmtime32_s from time */
 #if !defined(__local___localdep_dos_gmtime32_s_defined) && defined(__CRT_HAVE__gmtime32_s)

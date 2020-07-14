@@ -45,12 +45,16 @@
 %{
 #include <features.h>
 
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 #include <bits/huge_val.h>
 #include <bits/crt/math-vector.h>
 
+}%[insert:prefix(
 #include <ieee754.h>
+)]%{
 
 #ifdef __USE_ISOC99
 #include <bits/huge_valf.h>

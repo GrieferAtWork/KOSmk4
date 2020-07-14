@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91388164 */
+/* HASH CRC-32:0x559f739e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qecvt) __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qecvt))(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48b863bb */
+/* HASH CRC-32:0x7f48cfc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -779,7 +779,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 	                                      : __strcpy_chk(buf, src, __ssp_bos0(buf)))
 #else /* ... */
 #undef strcpy
-#define strcpy(buf, src)  __strcpy_chk(buf, src, __ssp_bos0(buf))
+#define strcpy(buf, src) __strcpy_chk(buf, src, __ssp_bos0(buf))
 #endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat) && \
      defined(__CRT_HAVE___strcat_chk) && __has_builtin(__builtin___strcat_chk))
@@ -789,7 +789,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 	                                      : __strcat_chk(buf, src, __ssp_bos0(buf)))
 #else /* ... */
 #undef strcat
-#define strcat(buf, src)  __strcat_chk(buf, src, __ssp_bos0(buf))
+#define strcat(buf, src) __strcat_chk(buf, src, __ssp_bos0(buf))
 #endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy) && \
      defined(__CRT_HAVE___strncpy_chk) && __has_builtin(__builtin___strncpy_chk))
@@ -799,7 +799,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 	                                      : __strncpy_chk(buf, src, buflen, __ssp_bos0(buf)))
 #else /* ... */
 #undef strncpy
-#define strncpy(buf, src, buflen)  __strncpy_chk(buf, src, buflen, __ssp_bos0(buf))
+#define strncpy(buf, src, buflen) __strncpy_chk(buf, src, buflen, __ssp_bos0(buf))
 #endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncat) && \
      defined(__CRT_HAVE___strncat_chk) && __has_builtin(__builtin___strncat_chk))
@@ -809,7 +809,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 	                                      : __strncat_chk(buf, src, buflen, __ssp_bos0(buf)))
 #else /* ... */
 #undef strncat
-#define strncat(buf, src, buflen)  __strncat_chk(buf, src, buflen, __ssp_bos0(buf))
+#define strncat(buf, src, buflen) __strncat_chk(buf, src, buflen, __ssp_bos0(buf))
 #endif /* !... */
 #ifdef __USE_XOPEN2K8
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy) && \
@@ -820,7 +820,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 	                                      : __stpcpy_chk(buf, src, __ssp_bos0(buf)))
 #else /* ... */
 #undef stpcpy
-#define stpcpy(buf, src)  __stpcpy_chk(buf, src, __ssp_bos0(buf))
+#define stpcpy(buf, src) __stpcpy_chk(buf, src, __ssp_bos0(buf))
 #endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpncpy) && \
      defined(__CRT_HAVE___stpncpy_chk) && __has_builtin(__builtin___stpncpy_chk))
@@ -830,7 +830,7 @@ __NAMESPACE_STD_USING(__forward_voidp)
 	                                      : __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf)))
 #else /* ... */
 #undef stpncpy
-#define stpncpy(buf, src, buflen)  __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf))
+#define stpncpy(buf, src, buflen) __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf))
 #endif /* !... */
 #endif /* __USE_XOPEN2K8 */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd04f2e30 */
+/* HASH CRC-32:0xa53a00c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ typedef struct _stringlist {
 	__SIZE_TYPE__   sl_max;
 	__SIZE_TYPE__   sl_cur;
 } StringList;
-#endif
+#endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined

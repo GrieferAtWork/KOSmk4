@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe43a6b0 */
+/* HASH CRC-32:0x56275021 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mktime32 from time */
 #ifndef __local___localdep_mktime32_defined
@@ -75,7 +75,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
-#endif
+#endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 /* Return the `time_t' representation of TP and normalize TP */
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t

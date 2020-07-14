@@ -392,6 +392,36 @@ function builtin_crt_has_function(
 	return result;
 }
 
+@@Builtin macro function @"$extended_prefix(PREFIX)"
+function builtin_extended_prefix(
+		self: CParser, fp: File | CWriter, escapeMode: int,
+		extendedPrefixes: List | none): int {
+	self.next();
+	self.skip("(");
+	extendedPrefixes.append(self.parseAllUntilRParen());
+	local result = self.tokEnd;
+	self.skip(")");
+	return result;
+}
+
+@@Builtin macro function @"$extended_include_prefix(HEADER_NAME)"
+function builtin_extended_include_prefix(
+		self: CParser, fp: File | CWriter, escapeMode: int,
+		extendedPrefixes: List | none): int {
+	self.next();
+	self.skip("(");
+	do {
+		extendedPrefixes.append("#include " +
+			self.parseCStringOrAllUntilRParenAsString());
+		if (self.tok != ",")
+			break;
+		self.next();
+	} while (self.tok != ")");
+	local result = self.tokEnd;
+	self.skip(")");
+	return result;
+}
+
 @@Custom keyword-style macro handlers.
 @@The associated values are either @(string)s that are pasted as-is, or @(Callable)s
 @@that are invoked as @(Callable(self: CParser, fp: File | CWriter, escapeMode: int, extendedPrefixes: List | none): int), where
@@ -401,8 +431,10 @@ function builtin_crt_has_function(
 @@The Callable's return value is the new `flushStart`-value from which normal text
 @@printing should be resumed.
 global final keywordMacros: {string: string | Callable with (CParser, File | CWriter, int)} = Dict({
-	"$has_function"     : builtin_has_function,
-	"$crt_has_function" : builtin_crt_has_function,
+	"$extended_prefix"         : builtin_extended_prefix,
+	"$extended_include_prefix" : builtin_extended_include_prefix,
+	"$has_function"            : builtin_has_function,
+	"$crt_has_function"        : builtin_crt_has_function,
 });
 
 

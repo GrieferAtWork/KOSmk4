@@ -23,9 +23,11 @@
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+}%[insert:prefix(
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
+)]%{
 
 __SYSDECL_BEGIN
 

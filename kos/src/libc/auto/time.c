@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2812cf58 */
+/* HASH CRC-32:0x5f7abba6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 }
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
-#endif
+#endif /* !__yearstodays */
 /* Return the `time_t' representation of TP and normalize TP */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
@@ -80,7 +80,7 @@ NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
 /* Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
@@ -103,7 +103,7 @@ NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
@@ -127,7 +127,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
@@ -177,7 +177,7 @@ NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
@@ -215,7 +215,7 @@ DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
-#endif
+#endif /* !__yearstodays */
 /* Return the `time_t' representation of TP and normalize TP */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
@@ -251,7 +251,7 @@ DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
 /* Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
@@ -275,7 +275,7 @@ DEFINE_INTERN_ALIAS(libc_gmtime64, libc_gmtime);
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32) */
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
@@ -300,7 +300,7 @@ DEFINE_INTERN_ALIAS(libc_localtime64, libc_localtime);
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_localtime && !__CRT_HAVE__localtime32) */
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *
@@ -330,7 +330,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
 }
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
-#endif
+#endif /* !__isleap */
 /* Return the number of days in YEAR */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year) {
@@ -415,13 +415,13 @@ NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
 #ifdef __BUILDING_LIBC
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
-#endif
+#endif /* !__isleap */
 #ifndef __daystoyears
 #define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
-#endif
+#endif /* !__daystoyears */
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
-#endif
+#endif /* !__yearstodays */
 #ifndef ____TIME_MONTHSTART_YDAY_DEFINED
 #define ____TIME_MONTHSTART_YDAY_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
@@ -536,13 +536,13 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE__gmtime64_s && !__CRT_HAVE__gmtime32_s) */
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
-#endif
+#endif /* !__isleap */
 #ifndef __daystoyears
 #define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
-#endif
+#endif /* !__daystoyears */
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
-#endif
+#endif /* !__yearstodays */
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
@@ -677,14 +677,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_wday_names) char const __abbr_wday_names[7][4] =
 	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_TIME_ABBR_WDAY_NAMES_DEFINED */
 #ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
 	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */

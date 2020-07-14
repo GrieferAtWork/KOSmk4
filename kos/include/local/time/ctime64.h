@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee414844 */
+/* HASH CRC-32:0xd914618d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),ctime64_r,(__timer,__buf))
@@ -109,7 +109,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))
@@ -128,7 +128,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
 __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime(localtime(timer))' */

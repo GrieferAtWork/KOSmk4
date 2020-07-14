@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe890eae0 */
+/* HASH CRC-32:0x497737d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -309,7 +309,7 @@ struct format_aprintf_data {
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif
+#endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T

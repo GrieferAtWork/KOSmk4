@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c6c2a8b */
+/* HASH CRC-32:0xdfa62800 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_mempmovedown
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmovedown,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_mempmovedown */
+#elif defined(__CRT_HAVE_mempmove)
+/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmovedown.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 #define __localdep_mempmovedown __LIBC_LOCAL_NAME(mempmovedown)
-#endif /* !__CRT_HAVE_mempmovedown */
+#endif /* !... */
 #endif /* !__local___localdep_mempmovedown_defined */
 /* Dependency: mempmovedownl from string */
 #ifndef __local___localdep_mempmovedownl_defined

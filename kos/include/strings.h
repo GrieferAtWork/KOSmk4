@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x911b9cc9 */
+/* HASH CRC-32:0x4d136d17 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bcopy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !__bcopy_defined */
 #ifndef __bcmp_defined
 #define __bcmp_defined 1
-#ifdef __CRT_HAVE_memcmp
+#if defined(__fast_memcmp_defined) && defined(__CRT_HAVE_memcmp)
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, size_t __n_bytes),memcmp,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); })
+#elif defined(__fast_memcmp_defined)
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, size_t __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); }
+#elif defined(__CRT_HAVE_memcmp)
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
@@ -146,8 +158,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rindex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PU
 
 #ifndef __bzero_defined
 #define __bzero_defined 1
-#ifdef __fast_bzero_defined
-__NAMESPACE_FAST_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#if defined(__fast_bzero_defined) && defined(__CRT_HAVE_bzero)
+__CEIDECLARE(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif defined(__fast_bzero_defined) && defined(__CRT_HAVE___bzero)
+__CEIREDIRECT(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif defined(__fast_bzero_defined) && defined(__CRT_HAVE_explicit_bzero)
+__CEIREDIRECT(__ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif defined(__fast_bzero_defined)
+__FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); }
 #elif defined(__CRT_HAVE_bzero)
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),(__dst,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
@@ -160,14 +178,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !... */
 #if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 extern "C++" {
-#ifdef __CRT_HAVE_bzeroc
+#if defined(__fast_bzeroc_defined) && defined(__CRT_HAVE_bzeroc)
+__CEIREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))(__dst, __elem_count, __elem_size); })
+#elif defined(__fast_bzeroc_defined)
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))(__dst, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_bzeroc)
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
-#else /* __CRT_HAVE_bzeroc */
+#else /* ... */
 } /* extern "C++" */
 #include <local/string/bzeroc.h>
 extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc))(__dst, __elem_count, __elem_size); }
-#endif /* !__CRT_HAVE_bzeroc */
+#endif /* !... */
 } /* extern "C++" */
 #endif /* __cplusplus && __USE_STRING_OVERLOADS */
 #endif /* !__bzero_defined */
@@ -175,8 +197,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NC
 #ifdef __USE_STRING_BWLQ
 #ifndef __bzerow_defined
 #define __bzerow_defined 1
-#ifdef __fast_bzerow_defined
-__NAMESPACE_FAST_USING_OR_IMPL(bzerow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerow)(void *__restrict __dst, __SIZE_TYPE__ __num_words) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerow))(__dst, __num_words); })
+#if defined(__fast_bzerow_defined) && defined(__CRT_HAVE_bzerow)
+__CEIDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzerow,(void *__restrict __dst, __SIZE_TYPE__ __num_words),{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerow))(__dst, __num_words); })
+#elif defined(__fast_bzerow_defined)
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerow)(void *__restrict __dst, __SIZE_TYPE__ __num_words) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerow))(__dst, __num_words); }
 #elif defined(__CRT_HAVE_bzerow)
 __CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerow,(void *__restrict __dst, __SIZE_TYPE__ __num_words),(__dst,__num_words))
 #else /* ... */
@@ -186,8 +210,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bzerow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !__bzerow_defined */
 #ifndef __bzerol_defined
 #define __bzerol_defined 1
-#ifdef __fast_bzerol_defined
-__NAMESPACE_FAST_USING_OR_IMPL(bzerol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerol)(void *__restrict __dst, __SIZE_TYPE__ __num_dwords) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerol))(__dst, __num_dwords); })
+#if defined(__fast_bzerol_defined) && defined(__CRT_HAVE_bzerol)
+__CEIDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerol))(__dst, __num_dwords); })
+#elif defined(__fast_bzerol_defined)
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerol)(void *__restrict __dst, __SIZE_TYPE__ __num_dwords) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerol))(__dst, __num_dwords); }
 #elif defined(__CRT_HAVE_bzerol)
 __CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),(__dst,__num_dwords))
 #else /* ... */
@@ -197,8 +223,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bzerol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #endif /* !__bzerol_defined */
 #ifndef __bzeroq_defined
 #define __bzeroq_defined 1
-#ifdef __fast_bzeroq_defined
-__NAMESPACE_FAST_USING_OR_IMPL(bzeroq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroq)(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))(__dst, __num_qwords); })
+#if defined(__fast_bzeroq_defined) && defined(__CRT_HAVE_bzeroq)
+__CEIDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzeroq,(void *__restrict __dst, __SIZE_TYPE__ __num_qwords),{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))(__dst, __num_qwords); })
+#elif defined(__fast_bzeroq_defined)
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroq)(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))(__dst, __num_qwords); }
 #elif defined(__CRT_HAVE_bzeroq)
 __CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzeroq,(void *__restrict __dst, __SIZE_TYPE__ __num_qwords),(__dst,__num_qwords))
 #else /* ... */
@@ -211,8 +239,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bzeroq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #ifdef __USE_KOS
 #ifndef __bzeroc_defined
 #define __bzeroc_defined 1
-#ifdef __fast_bzeroc_defined
-__NAMESPACE_FAST_USING_OR_IMPL(bzeroc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroc)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))(__dst, __elem_count, __elem_size); })
+#if defined(__fast_bzeroc_defined) && defined(__CRT_HAVE_bzeroc)
+__CEIDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))(__dst, __elem_count, __elem_size); })
+#elif defined(__fast_bzeroc_defined)
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzeroc)(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))(__dst, __elem_count, __elem_size); }
 #elif defined(__CRT_HAVE_bzeroc)
 __CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__dst,__elem_count,__elem_size))
 #else /* ... */

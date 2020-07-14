@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8068fd39 */
+/* HASH CRC-32:0xb8131e10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -601,7 +601,7 @@ err:
 #else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
 #endif /* __KERNEL__ && __KOS__ */
-#endif
+#endif /* !__NO_PRINTF_VINFO */
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings

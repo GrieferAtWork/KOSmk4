@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc183828d */
+/* HASH CRC-32:0x2c7c96ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32ftime from parts.uchar.time */
 #ifndef __local___localdep_c32ftime_defined

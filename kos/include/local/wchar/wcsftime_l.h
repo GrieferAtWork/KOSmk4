@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0060d6c */
+/* HASH CRC-32:0xffc6a7b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcsftime from wchar */
 #ifndef __local___localdep_wcsftime_defined

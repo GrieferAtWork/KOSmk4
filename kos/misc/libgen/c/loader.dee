@@ -55,6 +55,11 @@ global final DEFAULT_LIBFUN_COND     = "!defined(__KERNEL__)";
 global final DEFAULT_KOS_SECTION     = ".text.crt.unsorted";
 global final DEFAULT_DOS_SECTION     = ".text.crt.dos.unsorted";
 global final INCLUDE_KOS_ANNO        = "#include <kos/anno.h>";
+global final IF_FAST_DEFINED_PATTERN = "$extended_prefix("
+                                       "#ifdef __LIBC_BIND_OPTIMIZATIONS\n"
+                                       "#include <optimized/{}.h>\n"
+                                       "#endif /* __LIBC_BIND_OPTIMIZATIONS */"
+                                       ")defined(@__fast_{}_defined@)";
 
 @@Simple return type annotations which (when used) will be converted into attributes
 global final SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
@@ -1016,11 +1021,11 @@ class FunctionFeatures {
 			delNamespaceUsingBinding("std"); /* Disallow importing from std:: */
 			goto oneword_nocond;
 
-		case "fast":
+		case "fast": /* TODO: REMOVE_ME */
 			addNamespaceUsingBinding("fast");
 			goto oneword_nocond;
 
-		case "nofast":
+		case "nofast": /* TODO: REMOVE_ME */
 			delNamespaceUsingBinding("fast");
 			goto oneword_nocond;
 
@@ -1832,6 +1837,41 @@ again_parse_default_annotation:
 			.format({ tok }));
 	}
 
+	@@>> %[insert:prefix(
+	@@>> #ifdef __LIBC_BIND_OPTIMIZATIONS
+	@@>> #include <optimized/string.h>
+	@@>> #endif /* __LIBC_BIND_OPTIMIZATIONS */
+	@@>> )]
+	@@Print a given prefix, but mark it as already having been printed for this header
+	public function parseInsertDirective_prefix(functionName: string = "printPrefix") {
+		local self = this.self;
+		self.next();
+		self.skip("(");
+		local text = self.parseAllUntilRParenAsString();
+		result.order_header.append([](fp: CWriter, escapeMode: int) {
+			fp.forceStartOfLine();
+			return fp.operator . (functionName)(text);
+		});
+		self.skip(")");
+	}
+	public function parseInsertDirective_pp_if() {
+		return parseInsertDirective_prefix("ppIf");
+	}
+	public function parseInsertDirective_pp_elif() {
+		return parseInsertDirective_prefix("ppElif");
+	}
+	public function parseInsertDirective_pp_include() {
+		return parseInsertDirective_prefix("ppInclude");
+	}
+	public function parseInsertDirective_pp_else(functionName: string = "ppElse") {
+		local self = this.self;
+		self.next();
+		result.order_header.append([](fp: CWriter, escapeMode: int) -> fp.operator . (functionName)());
+	}
+	public function parseInsertDirective_pp_endif() {
+		parseInsertDirective_pp_else("ppEndif");
+	}
+
 	public function parseInsertDirective_std_function() {
 		parseInsertDirective_function(std: true, using: true);
 	}
@@ -2459,6 +2499,23 @@ again_parse_annotations:
 					}
 				}	break;
 
+				case "if_fast_defined": {
+					/* Conditional annotations */
+					self.next();
+					self.skip("(");
+					local ppAddend = IF_FAST_DEFINED_PATTERN.format({
+						headerName,
+						self.parseCStringOrAllUntilRParen()
+					});
+					self.skip(")");
+					if (currentConditions is none)
+						currentConditions = ppAddend;
+					else {
+						currentConditions = "({}) && ({})"
+							.format({ currentConditions, ppAddend });
+					}
+				}	break;
+
 				case "doc": {
 					if (current.documentation !is string)
 						self.err("[doc(...)] used alongside [doc_alias(...)]");
@@ -2676,6 +2733,199 @@ again_parse_annotations:
 					self.skip(")");
 					break;
 
+				case "fastbind":
+				case "preferred_fastbind": {
+					/* Simplified binding for compile-time inline-optimizations
+					 *
+					 * >> [[fastbind]]
+					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+					 *
+					 * Same as:
+					 * >> [[fastbind(memcpy)]]
+					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+					 *
+					 * Same as:
+					 * >> [[fastbind(memcpy(dst, src, num_bytes))]]
+					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+					 *
+					 * Same as:
+					 * >> [[fastbind(memcpy(dst, src, num_bytes), ["memcpy"])]]
+					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+					 *
+					 * Same as:
+					 * >> [[if_fast_defined(memcpy), preferred_fast_extern_inline("memcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpy@))(dst, src, n_bytes); })]]
+					 * >> [[if_fast_defined(memcpy), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpy@))(dst, src, n_bytes); })]]
+					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+					 *
+					 * Syntax:
+					 * >> '[' [IF(...),] ('preferred_fastbind' | 'fastbind') '('
+					 * >>      FAST_FUNCTION_NAME ['(' FAST_FUNCTION_ARGUMENT_LIST ')']
+					 * >>      [',' '[' [(',' ~~ ASMNAME)...] ']']   // Defaults to `["<FAST_FUNCTION_NAME>"]`
+					 * >> ')' ']'
+					 */
+					self.next();
+					if (self.tok != "(") {
+						/* Most simplified case: deduce everything automatically */
+						local bindingsGenerator = []{
+							local fastFunctionName = current.name;
+							local baseCond = IF_FAST_DEFINED_PATTERN
+								.format({ headerName, fastFunctionName });
+							if (currentConditions !is none)
+								baseCond = "({})&&{}".format({ currentConditions, baseCond });
+							File.Writer bodyFp;
+							bodyFp << "{ ";
+							if (!currentPrototype.returnType.isVoid)
+								bodyFp << "return ";
+							bodyFp << "(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@"
+								<< fastFunctionName << "@))(";
+							local isFirst: bool = true;
+							for (local a: currentPrototype.argv) {
+								if (!isFirst)
+									bodyFp << ", ";
+								isFirst = false;
+								bodyFp << a.name;
+							}
+							if (currentPrototype.hasEllipsis)
+								bodyFp << "__builtin_va_arg_pack()";
+							bodyFp << "); }";
+							local fastWrapperImpl = FunctionImplementation(
+								body: bodyFp.string,
+								name: fastFunctionName);
+							yield FunctionBinding(
+								ppCond:     "{}&&{}".format({ baseCond, keyCrtHave(fastFunctionName) }),
+								prototypes: currentPrototypes,
+								binding:    [] -> InlineFunction(
+									mode:                "__EXTERN_INLINE",
+									impl:                fastWrapperImpl,
+									externInlineAsmname: fastFunctionName,
+									isFastBinding:       true));
+							yield FunctionBinding(
+								ppCond:     baseCond,
+								prototypes: currentPrototypes,
+								binding:    [] -> InlineFunction(
+									mode:          "FORCELOCAL",
+									impl:          fastWrapperImpl,
+									isFastBinding: true));
+						};
+						if (tok.startswith("preferred_")) {
+							current.bindings.insert(numPreferredBindings, bindingsGenerator);
+							++numPreferredBindings;
+						} else {
+							current.bindings.append(bindingsGenerator);
+						}
+						break;
+					}
+					self.skip("(");
+					local fastFunctionReturnCast: string = "";
+					if (self.tok == "(") {
+						local fastFunctionReturnCastStart = self.tokStart;
+						self.skipPair();
+						fastFunctionReturnCast = self.text[fastFunctionReturnCastStart:self.tokEnd];
+						self.next();
+					}
+					local fastFunctionName: string = self.parseCStringOrKeyword();
+					local fastFunctionArgumentList: string = none;
+					if (self.tok == "(") {
+						self.next();
+						local fastFunctionArgumentListStart = self.tokStart;
+						self.skipPair("(", ")");
+						local fastFunctionArgumentListEnd = self.tokStart;
+						while (fastFunctionArgumentListEnd > fastFunctionArgumentListStart &&
+						       self.text.isspace(fastFunctionArgumentListEnd - 1))
+							--fastFunctionArgumentListEnd;
+						fastFunctionArgumentList = self.text[
+							fastFunctionArgumentListStart:fastFunctionArgumentListEnd];
+						self.next();
+					}
+					local externInlineAssemblyNames: {string...};
+					if (self.tok == ",") {
+						self.next();
+						if (self.tok == "[") {
+							self.next();
+							externInlineAssemblyNames = [];
+							while (self.tok != "]") {
+								externInlineAssemblyNames.append(
+									self.parseCStringOrKeyword());
+								if (self.tok != ",")
+									break;
+								self.next();
+							}
+							self.skip("]");
+						}
+					} else {
+						externInlineAssemblyNames = { fastFunctionName };
+					}
+					local baseCond = IF_FAST_DEFINED_PATTERN
+						.format({ headerName, fastFunctionName });
+					if (currentConditions !is none)
+						baseCond = "({})&&{}".format({ currentConditions, baseCond });
+					local inlineImplementationCell: Cell with FunctionImplementation = Cell();
+					function getInlineImplementation(): FunctionImplementation {
+						if (inlineImplementationCell)
+							return inlineImplementationCell.value;
+						File.Writer bodyFp;
+						bodyFp << "{ ";
+						if (!currentPrototype.returnType.isVoid)
+							bodyFp << "return ";
+						bodyFp << fastFunctionReturnCast
+							<< "(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@"
+							<< fastFunctionName << "@))(";
+						if (fastFunctionArgumentList !is none)
+							bodyFp << fastFunctionArgumentList;
+						else {
+							/* Automatically pass all arguments from own prototype */
+							local isFirst: bool = true;
+							for (local a: currentPrototype.argv) {
+								if (!isFirst)
+									bodyFp << ", ";
+								isFirst = false;
+								bodyFp << a.name;
+							}
+							if (currentPrototype.hasEllipsis)
+								bodyFp << "__builtin_va_arg_pack()";
+						}
+						bodyFp << "); }";
+						local result = FunctionImplementation(
+							body: bodyFp.string,
+							name: current.name);
+						inlineImplementationCell.value = result;
+						return result;
+					}
+					/* Bind extern-inline variants */
+					for (local eiAsmname: externInlineAssemblyNames) {
+						local bindingCond = "{}&&{}".format({
+							baseCond, keyCrtHave(eiAsmname) });
+						local binding = FunctionBinding(
+							ppCond:     bindingCond,
+							prototypes: currentPrototypes,
+							binding:    [] -> InlineFunction(
+								mode:                "__EXTERN_INLINE",
+								impl:                getInlineImplementation(),
+								externInlineAsmname: eiAsmname,
+								isFastBinding:       true));
+						if (tok.startswith("preferred_")) {
+							current.bindings.insert(numPreferredBindings, binding);
+							++numPreferredBindings;
+						} else {
+							current.bindings.append(binding);
+						}
+					}
+					local binding = FunctionBinding(
+						ppCond:     baseCond,
+						prototypes: currentPrototypes,
+						binding:    [] -> InlineFunction(
+							mode:          "FORCELOCAL",
+							impl:          getInlineImplementation(),
+							isFastBinding: true));
+					if (tok.startswith("preferred_")) {
+						current.bindings.insert(numPreferredBindings, binding);
+						++numPreferredBindings;
+					} else {
+						current.bindings.append(binding);
+					}
+					self.skip(")");
+				}	break;
+
 				case "inline":
 				case "forceinline":
 				case "extern_inline":
@@ -2684,6 +2934,14 @@ again_parse_annotations:
 				case "preferred_forceinline":
 				case "preferred_extern_inline":
 				case "preferred_raw_extern_inline":
+				case "fast_inline":
+				case "fast_forceinline":
+				case "fast_extern_inline":
+				case "fast_raw_extern_inline":
+				case "preferred_fast_inline":
+				case "preferred_fast_forceinline":
+				case "preferred_fast_extern_inline":
+				case "preferred_fast_raw_extern_inline":
 					/* >> '[' 'inline'      ']'    // Defaultable
 					 * >> '[' 'forceinline' ']'    // Defaultable
 					 * >> '[' [IF(...),] ('preferred_inline' | 'inline') '(' BODY ')' ']'
@@ -2704,7 +2962,7 @@ again_parse_annotations:
 							body = truncateInlineFunctionImplementation(str(body));
 						self.skip(")");
 						local bindingCond = currentConditions is none ? "1" : currentConditions;
-						if (!tok.endswith("raw_extern_inline")) {
+						if (tok.endswith("extern_inline") && !tok.endswith("raw_extern_inline")) {
 							local ppHave = keyCrtHave(externSymbolName);
 							if (bindingCond == "1")
 								bindingCond = ppHave;
@@ -2716,18 +2974,19 @@ again_parse_annotations:
 							ppCond:     bindingCond,
 							prototypes: currentPrototypes,
 							binding:    []{
-							local ifun = InlineFunction(
-								impl: FunctionImplementation(
-									body: body,
-									name: current.name));
-							if (tok.endswith("extern_inline")) {
-								ifun.mode                = "__EXTERN_INLINE";
-								ifun.externInlineAsmname = externSymbolName;
-							} else if ("force" in tok) {
-								ifun.mode = "FORCELOCAL";
-							}
-							return ifun;
-						});
+								local ifun = InlineFunction(
+									impl: FunctionImplementation(
+										body: body,
+										name: current.name),
+									isFastBinding: "fast_" in tok);
+								if (tok.endswith("extern_inline")) {
+									ifun.mode                = "__EXTERN_INLINE";
+									ifun.externInlineAsmname = externSymbolName;
+								} else if ("force" in tok) {
+									ifun.mode = "FORCELOCAL";
+								}
+								return ifun;
+							});
 						if (tok.startswith("preferred_")) {
 							current.bindings.insert(numPreferredBindings, binding);
 							++numPreferredBindings;
@@ -4886,6 +5145,8 @@ done_function:
 				headerName.replace(".", "/"),
 				context.result_ccompatHeaderName
 			}));
+		result.order_header.insert(1, [](fp: CWriter, escapeMode: int)
+			-> fp.clearGlobalPrintedPrefixes());
 		result.order_header.insert(1,
 			"#undef {0}\n"
 			"#endif /* !__CXX_SYSTEM_HEADER */\n"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51fc5c49 */
+/* HASH CRC-32:0xa9d595ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_gmtime64_s from time */
 #ifndef __local___localdep_dos_gmtime64_s_defined
@@ -85,13 +85,13 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE__gmtime64_s && !__CRT_HAVE__gmtime32_s) */
 #ifndef __isleap
 #define __isleap(__year) ((__year)%4 == 0 && ((__year)%100 != 0 || (__year)%400 == 0))
-#endif
+#endif /* !__isleap */
 #ifndef __daystoyears
 #define __daystoyears(__n_days)  ((400*((__n_days)+1))/146097)
-#endif
+#endif /* !__daystoyears */
 #ifndef __yearstodays
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
-#endif
+#endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) __STRUCT_TM *

@@ -61,9 +61,11 @@
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+}%[insert:prefix(
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
+)]%{
 
 __SYSDECL_BEGIN
 
@@ -188,35 +190,9 @@ typedef size_t rsize_t;
 }
 
 
-/* TODO: [[fast]] is somewhat broken at the moment, though
- *       I'm also not entirely sure on how to fix it.
- *
- * The current way of using namespace-import-bindings is flawed, as
- * it doesn't allow for the user to take the address of a function
- * that has been linked against a fast implementation (since the
- * fast implementations are inline functions, they don't get linked
- * against libc)
- *
- * The alternative would be to use (with memcpy as an example):
- * >> [[libc, std, kernel, ATTR_LEAF]]
- * >> [[if(defined(__fast_memcpy_defined)), preferred_extern_inline("memcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))(dst, src, n_bytes); })]]
- * >> [[if(defined(__fast_memcpy_defined)), preferred_inline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))(dst, src, n_bytes); })]]
- * >> [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
- * >> [[nonnull]] void *memcpy([[nonnull]] void *__restrict dst,
- * >>                          [[nonnull]] void const *__restrict src,
- * >>                          size_t n_bytes) {
- * >>     ...
- * >> }
- *
- * But this way, we're not taking advantage of namespacing, _and_ only adding on-to
- * the already immense bloat found in headers (though this is probably still what
- * we'll eventually have to end up using, whilst scrapping the [[fast]] annotation
- * altogether...)
- */
-
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[[fast, libc, std, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, std, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
 [[nonnull]] void *memcpy([[nonnull]] void *__restrict dst,
                          [[nonnull]] void const *__restrict src,
@@ -231,7 +207,7 @@ typedef size_t rsize_t;
 
 @@Move memory between potentially overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[[fast, libc, std, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, std, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVE))]]
 [[nonnull]] void *memmove([[nonnull]] void *dst,
                           [[nonnull]] void const *src,
@@ -253,7 +229,7 @@ typedef size_t rsize_t;
 
 @@Fill memory with a given byte
 @@@return: * : Always re-returns `dst'
-[[fast, libc, std, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, std, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSET))]]
 [[nonnull]] void *memset([[nonnull]] void *__restrict dst,
                          int byte, size_t n_bytes) {
@@ -267,7 +243,7 @@ typedef size_t rsize_t;
 @@@return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
 @@@return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
 @@@return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes'
-[[std, libc, fast, kernel, wunused, ATTR_PURE, alias("bcmp")]]
+[[preferred_fastbind, std, libc, kernel, wunused, ATTR_PURE, alias("bcmp")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMP))]]
 [[if(!defined(__KERNEL__)), kos_export_as("bcmp")]]
 int memcmp([[nonnull]] void const *s1,
@@ -282,7 +258,7 @@ int memcmp([[nonnull]] void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, std, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, std, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHR))]]
 void *memchr([[nonnull]] void const *__restrict haystack, int needle, size_t n_bytes)
 	[([[nonnull]] void *__restrict haystack, int needle, size_t n_bytes): void *]
@@ -881,8 +857,9 @@ int strverscmp([[nonnull]] char const *s1,
 %[insert:function(__mempcpy = mempcpy)]
 
 @@Same as `memcpy', but return `DST + N_BYTES', rather than `DST'
-[[guard, libc, kernel, fast, ATTR_LEAF, alias("__mempcpy")]]
+[[guard, libc, kernel, ATTR_LEAF, alias("__mempcpy")]]
 [[if(!defined(__KERNEL__)), kos_export_as("__mempcpy")]]
+[[preferred_fastbind(mempcpy, ["mempcpy", "__mempcpy"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPY))]]
 mempcpy:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
@@ -1047,8 +1024,9 @@ void bcopy([[nonnull]] void const *src,
  * with any meaningful value)
  * So rather than dealing with that headache, just don't link bzero() against its builtin
  * counterpart! */
-[[fast, libc, kernel, /*crtbuiltin,*/ alias("__bzero", "explicit_bzero")]]
+[[libc, kernel, /*crtbuiltin,*/ alias("__bzero", "explicit_bzero")]]
 [[if(!defined(__KERNEL__)), export_as("__bzero", "explicit_bzero")]]
+[[preferred_fastbind(bzero, ["bzero", "__bzero", "explicit_bzero"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZERO))]]
 void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
@@ -1061,19 +1039,26 @@ void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 
 %
 %#ifdef __USE_STRING_BWLQ
-[[guard, fast, libc, kernel, ATTR_LEAF]]
+
+[[ATTR_LEAF, nocrt, alias("bzero", "__bzero", "explicit_bzero")]]
+[[preferred_fastbind(bzero, ["bzero", "__bzero", "explicit_bzero"])]]
+[[bind_local_function("bzero")]]
+void bzerob([[nonnull]] void *__restrict dst, $size_t num_bytes);
+
+
+[[preferred_fastbind, guard, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROW))]]
 void bzerow([[nonnull]] void *__restrict dst, $size_t num_words) {
 	memsetw(dst, 0, num_words);
 }
 
-[[guard, fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, guard, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROL))]]
 void bzerol([[nonnull]] void *__restrict dst, $size_t num_dwords) {
 	memsetl(dst, 0, num_dwords);
 }
 
-[[guard, fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, guard, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROQ))]]
 void bzeroq([[nonnull]] void *__restrict dst, $size_t num_qwords) {
 #ifdef __UINT64_TYPE__
@@ -1087,7 +1072,7 @@ void bzeroq([[nonnull]] void *__restrict dst, $size_t num_qwords) {
 
 %
 %#ifdef __USE_KOS
-[[guard, fast, kernel, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, guard, kernel, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 void bzeroc([[nonnull]] void *__restrict dst,
             $size_t elem_count, $size_t elem_size) {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
@@ -1276,23 +1261,31 @@ void *memccpy([[nonnull]] void *__restrict dst,
 %#ifdef __USE_STRING_BWLQ
 
 @@Copy memory between non-overlapping memory blocks.
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("memcpy")]]
+[[preferred_fastbind(($uint8_t *)memcpy(dst, src, n_bytes))]]
+[[bind_local_function("memcpy")]]
 memcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
          [[nonnull]] /*aligned(1)*/ void const *__restrict src,
-         $size_t n_bytes) -> [[== dst]] $uint8_t * = memcpy;
+         $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memcpyb', but return `DST + N_BYTES', rather than `DST'
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("mempcpy", "__mempcpy")]]
+[[preferred_fastbind(($uint8_t *)mempcpy(dst, src, n_bytes), ["mempcpy", "__mempcpy"])]]
+[[bind_local_function("mempcpy")]]
 mempcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
           [[nonnull]] /*aligned(1)*/ void const *__restrict src,
-          $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempcpy;
+          $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t *;
 
 @@Copy memory between non-overlapping memory blocks.
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcpy")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemcpy")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemcpy")]]
+[[if_fast_defined(memcpyw), preferred_fast_extern_inline("memcpyw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(memcpyw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(memcpyw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(memcpyw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYW))]]
 memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
          [[nonnull]] /*aligned(2)*/ void const *__restrict src,
@@ -1306,11 +1299,15 @@ memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 
 @@Same as `memcpyw', but return `DST + N_WORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempcpy")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmempcpy")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmempcpy")]]
+[[if_fast_defined(mempcpyw), preferred_fast_extern_inline("mempcpyw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempcpyw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempcpyw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempcpyw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYW))]]
 mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
           [[nonnull]] /*aligned(2)*/ void const *__restrict src,
@@ -1319,10 +1316,14 @@ mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 }
 
 @@Copy memory between non-overlapping memory blocks.
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcpy")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemcpy")]]
+[[if_fast_defined(memcpyl), preferred_fast_extern_inline("memcpyl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memcpyl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memcpyl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memcpyl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcpyl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYL))]]
 memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
          [[nonnull]] /*aligned(4)*/ void const *__restrict src,
@@ -1335,10 +1336,14 @@ memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 }
 
 @@Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempcpy")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempcpy")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmempcpy")]]
+[[if_fast_defined(mempcpyl), preferred_fast_extern_inline("mempcpyl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempcpyl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempcpyl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempcpyl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempcpyl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYL))]]
 mempcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
           [[nonnull]] /*aligned(4)*/ void const *__restrict src,
@@ -1348,23 +1353,31 @@ mempcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 
 @@Move memory between potentially overlapping memory blocks.
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("memmove")]]
+[[preferred_fastbind(($uint8_t *)memmove(dst, src, n_bytes))]]
+[[bind_local_function("memmove")]]
 memmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
           [[nonnull]] /*aligned(1)*/ void const *src,
-          $size_t n_bytes) -> [[== dst]] $uint8_t * = memmove;
+          $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST'
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("mempmove")]]
+[[preferred_fastbind(($uint8_t *)mempmove(dst, src, n_bytes))]]
+[[bind_local_function("mempmove")]]
 mempmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
            [[nonnull]] /*aligned(1)*/ void const *src,
-           $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmove;
+           $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t *;
 
 @@Move memory between potentially overlapping memory blocks.
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemmove")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemmove")]]
+[[if_fast_defined(memmovew), preferred_fast_extern_inline("memmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovew), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovew), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovew), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovew@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEW))]]
 memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
           [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1385,11 +1398,15 @@ memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmempmove")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmempmove")]]
+[[if_fast_defined(mempmovew), preferred_fast_extern_inline("mempmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovew), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovew), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovew), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovew@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEW))]]
 mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
            [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1398,10 +1415,14 @@ mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks.
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemmove")]]
+[[if_fast_defined(memmovel), preferred_fast_extern_inline("memmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovel), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovel), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovel), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovel@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEL))]]
 memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
           [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1422,10 +1443,14 @@ memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmempmove")]]
+[[if_fast_defined(mempmovel), preferred_fast_extern_inline("mempmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovel), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovel), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovel), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovel@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEL))]]
 mempmovel:([[nonnull]] /*aligned(4)*/ void *dst,
            [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1435,33 +1460,46 @@ mempmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 
 %#ifdef __USE_KOS
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_BYTES')
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("memmoveup")]]
+[[preferred_fastbind(($uint8_t *)memmoveup(dst, src, n_bytes))]]
+[[bind_local_function("memmoveup")]]
 memmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
             [[nonnull]] /*aligned(1)*/ void const *src,
-            $size_t n_bytes) -> [[== dst]] $uint8_t * = memmoveup;
+            $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_BYTES')
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("memmovedown")]]
+[[preferred_fastbind(($uint8_t *)memmovedown(dst, src, n_bytes))]]
+[[bind_local_function("memmovedown")]]
 memmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
               [[nonnull]] /*aligned(1)*/ void const *src,
-              $size_t n_bytes) -> [[== dst]] $uint8_t * = memmovedown;
+              $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("mempmoveup")]]
+[[preferred_fastbind(($uint8_t *)mempmoveup(dst, src, n_bytes))]]
+[[bind_local_function("mempmoveup")]]
 mempmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
              [[nonnull]] /*aligned(1)*/ void const *src,
-             $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmoveup;
+             $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t *;
 
 @@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("mempmovedown")]]
+[[preferred_fastbind(($uint8_t *)mempmovedown(dst, src, n_bytes))]]
+[[bind_local_function("mempmovedown")]]
 mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
                [[nonnull]] /*aligned(1)*/ void const *src,
-               $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmovedown;
+               $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t *;
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("memmovew")]]
+[[libc, kernel, ATTR_LEAF, alias("memmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
+[[if_fast_defined(memmoveupw), preferred_fast_extern_inline("memmoveupw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmoveupw), preferred_fast_extern_inline("memmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmoveupw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmoveupw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmoveupw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupw@))(dst, src, n_words); })]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPW))]]
 memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
@@ -1477,9 +1515,14 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("memmovew")]]
+[[libc, kernel, ATTR_LEAF, alias("memmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
+[[if_fast_defined(memmovedownw), preferred_fast_extern_inline("memmovedownw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovedownw), preferred_fast_extern_inline("memmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovedownw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovedownw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(memmovedownw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownw@))(dst, src, n_words); })]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNW))]]
 memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
@@ -1495,9 +1538,14 @@ memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
+[[libc, kernel, ATTR_LEAF, alias("mempmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
+[[if_fast_defined(mempmoveupw), preferred_fast_extern_inline("mempmoveupw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmoveupw), preferred_fast_extern_inline("mempmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmoveupw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmoveupw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmoveupw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPW))]]
 mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
              [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1506,9 +1554,14 @@ mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
+[[libc, kernel, ATTR_LEAF, alias("mempmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
+[[if_fast_defined(mempmovedownw), preferred_fast_extern_inline("mempmovedownw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovedownw), preferred_fast_extern_inline("mempmovew", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovedownw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovedownw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
+[[if_fast_defined(mempmovedownw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownw@))(dst, src, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNW))]]
 mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
                [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1517,9 +1570,14 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS')
-[[fast, libc, kernel, alias("memmovel"), ATTR_LEAF]]
+[[libc, kernel, alias("memmovel"), ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
+[[if_fast_defined(memmoveupl), preferred_fast_extern_inline("memmoveupl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmoveupl), preferred_fast_extern_inline("memmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmoveupl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmoveupl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmoveupl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmoveupl@))(dst, src, n_dwords); })]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPL))]]
 memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
@@ -1535,9 +1593,14 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("memmovel")]]
+[[libc, kernel, ATTR_LEAF, alias("memmovel")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
+[[if_fast_defined(memmovedownl), preferred_fast_extern_inline("memmovedownl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovedownl), preferred_fast_extern_inline("memmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovedownl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovedownl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(memmovedownl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memmovedownl@))(dst, src, n_dwords); })]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNL))]]
 memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
@@ -1553,9 +1616,14 @@ memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
+[[libc, kernel, ATTR_LEAF, alias("mempmovel")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
+[[if_fast_defined(mempmoveupl), preferred_fast_extern_inline("mempmoveupl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmoveupl), preferred_fast_extern_inline("mempmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmoveupl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmoveupl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmoveupl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmoveupl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPL))]]
 mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
              [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1564,9 +1632,14 @@ mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
+[[libc, kernel, ATTR_LEAF, alias("mempmovel")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
+[[if_fast_defined(mempmovedownl), preferred_fast_extern_inline("mempmovedownl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovedownl), preferred_fast_extern_inline("mempmovel", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovedownl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovedownl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempmove", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
+[[if_fast_defined(mempmovedownl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempmovedownl@))(dst, src, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNL))]]
 mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
                [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1578,21 +1651,29 @@ mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 
 @@Fill memory with a given byte
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("memset")]]
+[[preferred_fastbind(($uint8_t *)memset(dst, byte, n_bytes))]]
+[[bind_local_function("memset")]]
 memsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
-         int byte, $size_t n_bytes) -> [[== dst]] $uint8_t * = memset;
+         int byte, $size_t n_bytes) -> [[== dst]] $uint8_t *;
 
 @@Same as `memsetb', but return `DST + N_BYTES', rather than `DST'
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("mempset")]]
+[[preferred_fastbind(($uint8_t *)mempset(dst, byte, n_bytes))]]
+[[bind_local_function("mempset")]]
 mempsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
-          int byte, $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempset;
+          int byte, $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t *;
 
 @@Fill memory with a given word
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemset")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemset")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemset")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemset")]]
+[[if_fast_defined(memsetw), preferred_fast_extern_inline("memsetw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(memsetw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(memsetw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(memsetw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetw@))(dst, word, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETW))]]
 memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
          $uint16_t word, $size_t n_words) -> [[== dst]] $uint16_t * {
@@ -1604,11 +1685,15 @@ memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 
 @@Same as `memsetw', but return `DST + N_WORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempset")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempset")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmempset")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmempset")]]
+[[if_fast_defined(mempsetw), preferred_fast_extern_inline("mempsetw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(mempsetw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(mempsetw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
+[[if_fast_defined(mempsetw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetw@))(dst, word, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETW))]]
 mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
           $uint16_t word, $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1616,10 +1701,14 @@ mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 }
 
 @@Fill memory with a given dword
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemset")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemset")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemset")]]
+[[if_fast_defined(memsetl), preferred_fast_extern_inline("memsetl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(memsetl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(memsetl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(memsetl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memsetl@))(dst, dword, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETL))]]
 memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
          $uint32_t dword, $size_t n_dwords) -> [[== dst]] $uint32_t * {
@@ -1630,10 +1719,14 @@ memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 }
 
 @@Same as `memsetl', but return `DST + N_DWORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempset")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempset")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmempset")]]
+[[if_fast_defined(mempsetl), preferred_fast_extern_inline("mempsetl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(mempsetl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(mempsetl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmempset", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
+[[if_fast_defined(mempsetl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@mempsetl@))(dst, dword, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETL))]]
 mempsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
           $uint32_t dword, $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1648,11 +1741,15 @@ int memcmpb([[nonnull]] /*aligned(1)*/ void const *s1,
             $size_t n_bytes) = memcmp;
 
 @@Compare memory buffers and return the difference of the first non-matching word
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcmp")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemcmp")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemcmp")]]
+[[if_fast_defined(memcmpw), preferred_fast_extern_inline("memcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPW))]]
 $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
                  [[nonnull]] /*aligned(2)*/ void const *s2, $size_t n_words) {
@@ -1665,10 +1762,14 @@ $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
 }
 
 @@Compare memory buffers and return the difference of the first non-matching dword
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcmp")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemcmp")]]
+[[if_fast_defined(memcmpl), preferred_fast_extern_inline("memcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPL))]]
 $int32_t memcmpl([[nonnull]] /*aligned(4)*/ void const *s1,
                  [[nonnull]] /*aligned(4)*/ void const *s2,
@@ -1682,18 +1783,23 @@ $int32_t memcmpl([[nonnull]] /*aligned(4)*/ void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, nocrt, alias("memchr")]]
+[[preferred_fastbind(($uint8_t *)memchr(haystack, byte, n_bytes))]]
+[[bind_local_function("memchr")]]
 $uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
 	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
-	= memchr;
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *];
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemchr")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemchr")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemchr")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemchr")]]
+[[if_fast_defined(memchrw), preferred_fast_extern_inline("memchrw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
+[[if_fast_defined(memchrw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
+[[if_fast_defined(memchrw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
+[[if_fast_defined(memchrw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRW))]]
 $uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
 	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
@@ -1708,10 +1814,14 @@ $uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemchr")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemchr")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemchr")]]
+[[if_fast_defined(memchrl), preferred_fast_extern_inline("memchrl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
+[[if_fast_defined(memchrl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
+[[if_fast_defined(memchrl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
+[[if_fast_defined(memchrl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRL))]]
 $uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
 	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
@@ -1726,14 +1836,15 @@ $uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, nocrt, alias("memrchr")]]
+[[preferred_fastbind(($uint8_t *)memrchr(haystack, byte, n_bytes))]]
+[[bind_local_function("memrchr")]]
 $uint8_t *memrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
 	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
-	= memrchr;
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *];
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHRW))]]
 $uint16_t *memrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
 	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
@@ -1748,7 +1859,7 @@ $uint16_t *memrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, 
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHRL))]]
 $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
 	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
@@ -1839,14 +1950,15 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 
 
 @@Same as `memchrb', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, nocrt, alias("memend")]]
+[[preferred_fastbind(($uint8_t *)memend(haystack, byte, n_bytes))]]
+[[bind_local_function("memend")]]
 [[nonnull]] $uint8_t *memendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
 	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
-	= memend;
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *];
 
 @@Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMENDW))]]
 [[nonnull]] $uint16_t *memendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes)
 	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t *]
@@ -1861,7 +1973,7 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 }
 
 @@Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMENDL))]]
 [[nonnull]] $uint32_t *memendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes)
 	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t *]
@@ -1876,14 +1988,15 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 }
 
 @@Same as `memrchrb', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, nocrt, alias("memrend")]]
+[[preferred_fastbind(($uint8_t *)memrend(haystack, byte, n_bytes))]]
+[[bind_local_function("memrend")]]
 [[nonnull]] $uint8_t *memrendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
 	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
-	= memrend;
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *];
 
 @@Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRENDW))]]
 [[nonnull]] $uint16_t *memrendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
 	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t *]
@@ -1902,7 +2015,7 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 }
 
 @@Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRENDL))]]
 [[nonnull]] $uint32_t *memrendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
 	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t *]
@@ -2015,7 +2128,7 @@ $size_t rawmemrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 
 %#ifdef __UINT64_TYPE__
 @@Copy memory between non-overlapping memory blocks.
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYQ))]]
 memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
          [[nonnull]] /*aligned(8)*/ void const *__restrict src,
@@ -2037,7 +2150,7 @@ memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYQ))]]
 mempcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
           [[nonnull]] /*aligned(8)*/ void const *__restrict src,
@@ -2046,7 +2159,7 @@ mempcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Move memory between potentially overlapping memory blocks.
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEQ))]]
 memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
           [[nonnull]] /*aligned(8)*/ void const *src,
@@ -2086,7 +2199,7 @@ memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEQ))]]
 mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
            [[nonnull]] /*aligned(8)*/ void const *__restrict src,
@@ -2097,7 +2210,8 @@ mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 %#ifdef __USE_KOS
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("memmoveq")]]
+[[libc, kernel, ATTR_LEAF, alias("memmoveq")]]
+[[preferred_fastbind(memmoveupq, ["memmoveupq", "memmoveq"])]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPQ))]]
 memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
@@ -2124,7 +2238,8 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("memmoveq")]]
+[[libc, kernel, ATTR_LEAF, alias("memmoveq")]]
+[[preferred_fastbind(memmovedownq, ["memmovedownq", "memmoveq"])]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNQ))]]
 memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
@@ -2151,7 +2266,8 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
+[[libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
+[[preferred_fastbind(mempmoveupq, ["mempmoveupq", "mempmoveq"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPQ))]]
 mempmoveupq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
              [[nonnull]] /*aligned(8)*/ void const *__restrict src,
@@ -2160,7 +2276,8 @@ mempmoveupq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS')
-[[fast, libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
+[[libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
+[[preferred_fastbind(mempmovedownq, ["mempmovedownq", "mempmoveq"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNQ))]]
 mempmovedownq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                [[nonnull]] /*aligned(8)*/ void const *__restrict src,
@@ -2172,7 +2289,7 @@ mempmovedownq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 
 
 @@Fill memory with a given qword
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETQ))]]
 memsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
          $uint64_t qword, $size_t n_qwords) -> [[== dst]] $uint64_t * {
@@ -2183,7 +2300,7 @@ memsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Same as `memsetq', but return `DST + N_QWORDS', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETQ))]]
 mempsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
           $uint64_t qword, $size_t n_qwords) -> [[== dst + n_qwords * 8]] $uint64_t * {
@@ -2191,7 +2308,7 @@ mempsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Compare memory buffers and return the difference of the first non-matching qword
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPQ))]]
 $int64_t memcmpq([[nonnull]] /*aligned(8)*/ void const *s1,
                  [[nonnull]] /*aligned(8)*/ void const *s2, $size_t n_dwords) {
@@ -2204,7 +2321,7 @@ $int64_t memcmpq([[nonnull]] /*aligned(8)*/ void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRQ))]]
 $uint64_t *memchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
 	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
@@ -2219,7 +2336,7 @@ $uint64_t *memchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHRQ))]]
 $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
 	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
@@ -2264,7 +2381,7 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 }
 
 @@Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMENDQ))]]
 [[nonnull]] $uint64_t *memendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes)
 	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t *]
@@ -2279,7 +2396,7 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 }
 
 @@Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRENDQ))]]
 [[nonnull]] $uint64_t *memrendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
 	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t *]
@@ -2299,7 +2416,7 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 
 @@Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `N_QWORDS' if the given `NEEDLE' wasn't found
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLENQ))]]
 $size_t memlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
                 $uint64_t qword, $size_t n_qwords) {
@@ -2308,7 +2425,7 @@ $size_t memlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 
 @@Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRLENQ))]]
 $size_t memrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
                  $uint64_t qword, $size_t n_qwords) {
@@ -2316,14 +2433,14 @@ $size_t memrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 }
 
 @@Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMLENQ))]]
 $size_t rawmemlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
 	return (size_t)(rawmemchrq(haystack, qword) - (u64 *)haystack);
 }
 
 @@Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRLENQ))]]
 $size_t rawmemrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
 	return (size_t)(rawmemrchrq(haystack, qword) - (u64 *)haystack);
@@ -2896,7 +3013,8 @@ $size_t rawmemrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF, alias("memmove")]]
+[[preferred_fastbind(memmoveup, ["memmoveup", "memmove"])]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUP))]]
 memmoveup:([[nonnull]] void *dst,
@@ -2913,7 +3031,8 @@ memmoveup:([[nonnull]] void *dst,
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF, alias("memmove")]]
+[[preferred_fastbind(memmovedown, ["memmovedown", "memmove"])]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWN))]]
 memmovedown:([[nonnull]] void *dst,
@@ -2933,7 +3052,7 @@ memmovedown:([[nonnull]] void *dst,
 
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memcpyc:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
          $size_t elem_count, $size_t elem_size)
@@ -2963,7 +3082,7 @@ memcpyc:([[nonnull]] void *__restrict dst,
 }
 
 @@Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST'
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempcpyc:([[nonnull]] void *__restrict dst,
           [[nonnull]] void const *__restrict src,
           $size_t elem_count, $size_t elem_size)
@@ -2994,7 +3113,7 @@ mempcpyc:([[nonnull]] void *__restrict dst,
 
 @@Move memory between potentially overlapping memory blocks
 @@@return: * : Always re-returns `dst'
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memmovec:([[nonnull]] void *dst,
           [[nonnull]] void const *src,
           $size_t elem_count, $size_t elem_size)
@@ -3024,7 +3143,7 @@ memmovec:([[nonnull]] void *dst,
 }
 
 @@Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST'
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempmovec:([[nonnull]] void *dst,
            [[nonnull]] void const *src,
            $size_t elem_count, $size_t elem_size)
@@ -3055,7 +3174,7 @@ mempmovec:([[nonnull]] void *dst,
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
 @@@return: * : Always re-returns `dst'
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memmoveupc:([[nonnull]] void *dst,
             [[nonnull]] void const *src,
             $size_t elem_count, $size_t elem_size)
@@ -3085,7 +3204,7 @@ memmoveupc:([[nonnull]] void *dst,
 }
 
 @@Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempmoveupc:([[nonnull]] void *dst,
              [[nonnull]] void const *src,
              $size_t elem_count, $size_t elem_size)
@@ -3116,7 +3235,7 @@ mempmoveupc:([[nonnull]] void *dst,
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
 @@@return: * : Always re-returns `dst'
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memmovedownc:([[nonnull]] void *dst,
               [[nonnull]] void const *src,
               $size_t elem_count, $size_t elem_size)
@@ -3146,7 +3265,7 @@ memmovedownc:([[nonnull]] void *dst,
 }
 
 @@Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
-[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
+[[preferred_fastbind, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempmovedownc:([[nonnull]] void *dst,
                [[nonnull]] void const *src,
                $size_t elem_count, $size_t elem_size)
@@ -3304,28 +3423,30 @@ $size_t strnroff([[nonnull]] char const *__restrict haystack, int needle, $size_
 
 
 @@Same as `memset', but return `DST + N_BYTES', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSET))]]
 mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== dst + n_bytes]] void * {
 	return (void *)((byte_t *)memset(dst, byte, n_bytes) + n_bytes);
 }
 
 @@Same as `memmove', but return `DST + N_BYTES', rather than `DST'
-[[fast, libc, kernel, ATTR_LEAF]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVE))]]
 [[nonnull]] void *mempmove:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) {
 	return (void *)((byte_t *)memmove(dst, src, n_bytes) + n_bytes);
 }
 
 @@Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF, alias("mempmove")]]
+[[preferred_fastbind(mempmoveup, ["mempmoveup", "mempmove"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUP))]]
 [[nonnull]] void *mempmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) {
 	return (void *)((byte_t *)memmoveup(dst, src, n_bytes) + n_bytes);
 }
 
 @@Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
-[[fast, libc, kernel, ATTR_LEAF]]
+[[libc, kernel, ATTR_LEAF, alias("mempmove")]]
+[[preferred_fastbind(mempmovedown, ["mempmovedown", "mempmove"])]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWN))]]
 [[nonnull]] void *mempmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) {
 	return (void *)((byte_t *)memmovedown(dst, src, n_bytes) + n_bytes);
@@ -3357,7 +3478,7 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 
 
 /* This could be an idea. - But it may also turn out like memxch(), and never be used... */
-//[[fast, libc, kernel, wunused, ATTR_PURE]]
+//[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 //memdiff:([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *
 //	[([[nonnull]] void *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *]
 //	[([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void const *]
@@ -3370,7 +3491,7 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 //	}
 //	return NULL;
 //}
-//[[fast, libc, kernel, wunused, ATTR_PURE]]
+//[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 //memrdiff:([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *
 //	[([[nonnull]] void *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *]
 //	[([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void const *]
@@ -3385,7 +3506,7 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 //}
 
 @@Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMEND))]]
 [[nonnull]] void *memend([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
 	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void *]
@@ -3400,7 +3521,7 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 }
 
 @@Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMREND))]]
 [[nonnull]] void *memrend([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
 	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void *]
@@ -3420,7 +3541,7 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 
 @@Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `n_bytes' if the given `NEEDLE' wasn't found
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLEN))]]
 $size_t memlen([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) {
 	return (size_t)((byte_t *)memend(haystack, needle, n_bytes) - (byte_t *)haystack);
@@ -3428,7 +3549,7 @@ $size_t memlen([[nonnull]] void const *__restrict haystack, int needle, $size_t 
 
 @@Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1' if the given `NEEDLE' wasn't found
-[[fast, libc, kernel, wunused, ATTR_PURE]]
+[[preferred_fastbind, libc, kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRLEN))]]
 $size_t memrlen([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) {
 	return (size_t)((byte_t *)memrend(haystack, needle, n_bytes) - (byte_t *)haystack);
@@ -3486,12 +3607,14 @@ void *memrmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]]
 
 
 @@Same as `memsetb', but repeat a 1-byte pattern on aligned addresses.
-[[ATTR_LEAF]]
+[[ATTR_LEAF, nocrt, alias("memset")]]
+[[preferred_fastbind(memset(dst, pattern, n_bytes))]]
+[[bind_local_function("memset")]]
 mempatb:([[nonnull]] void *__restrict dst,
-         int pattern, $size_t n_bytes) -> [[== dst]] void * = memset;
+         int pattern, $size_t n_bytes) -> [[== dst]] void *;
 
 @@Same as `memsetw', but repeat a 2-byte pattern on aligned addresses.
-[[fast, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPATW))]]
 mempatw([[nonnull]] void *__restrict dst,
         $uint16_t pattern, $size_t n_bytes) -> [[== dst]] void * {
@@ -3508,7 +3631,7 @@ mempatw([[nonnull]] void *__restrict dst,
 }
 
 @@Same as `memsetl', but repeat a 4-byte pattern on aligned addresses.
-[[fast, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPATL))]]
 mempatl([[nonnull]] void *__restrict dst,
         $uint32_t pattern, $size_t n_bytes) -> [[== dst]] void * {
@@ -3523,7 +3646,7 @@ mempatl([[nonnull]] void *__restrict dst,
 
 %#ifdef __UINT64_TYPE__
 @@Same as `memsetq', but repeat an 8-byte pattern on aligned addresses.
-[[fast, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
+[[preferred_fastbind, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPATQ))]]
 mempatq([[nonnull]] void *__restrict dst,
         $uint64_t pattern, $size_t n_bytes) -> [[== dst]] void * {

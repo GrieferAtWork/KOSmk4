@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60bd94bb */
+/* HASH CRC-32:0xbf74d9bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memmovedown */
+#elif defined(__CRT_HAVE_memmove)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmovedown.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedown __LIBC_LOCAL_NAME(memmovedown)
-#endif /* !__CRT_HAVE_memmovedown */
+#endif /* !... */
 #endif /* !__local___localdep_memmovedown_defined */
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __LOCAL_LIBC(mempmovedown) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *

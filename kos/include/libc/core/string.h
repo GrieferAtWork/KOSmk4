@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f1552b0 */
+/* HASH CRC-32:0xd575a1ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -790,22 +790,30 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memmoveup */
+#elif defined(__CRT_HAVE_memmove)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
+#else /* ... */
 #include <local/string/memmoveup.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmoveup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveup))
-#endif /* !__CRT_HAVE_memmoveup */
+#endif /* !... */
 #ifdef __CRT_HAVE_memmovedown
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memmovedown */
+#elif defined(__CRT_HAVE_memmove)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
+#else /* ... */
 #include <local/string/memmovedown.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))
-#endif /* !__CRT_HAVE_memmovedown */
+#endif /* !... */
 #ifdef __CRT_HAVE_memcpyc
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
@@ -913,19 +921,25 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #ifdef __CRT_HAVE_mempmoveup
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_mempmoveup */
+#elif defined(__CRT_HAVE_mempmove)
+/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
+#else /* ... */
 #include <local/string/mempmoveup.h>
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 #define __libc_core_mempmoveup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup))
-#endif /* !__CRT_HAVE_mempmoveup */
+#endif /* !... */
 #ifdef __CRT_HAVE_mempmovedown
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmovedown,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_mempmovedown */
+#elif defined(__CRT_HAVE_mempmove)
+/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
+#else /* ... */
 #include <local/string/mempmovedown.h>
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 #define __libc_core_mempmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown))
-#endif /* !__CRT_HAVE_mempmovedown */
+#endif /* !... */
 #ifdef __CRT_HAVE_memend
 /* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_memend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memend,(__haystack,__needle,__n_bytes))

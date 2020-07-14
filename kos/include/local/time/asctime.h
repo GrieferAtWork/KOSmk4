@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88dba62a */
+/* HASH CRC-32:0x17938aaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ struct tm {
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif
+#endif /* !__STRUCT_TM */
 __NAMESPACE_LOCAL_BEGIN
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
@@ -78,7 +78,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
-#endif
+#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 __NAMESPACE_LOCAL_BEGIN
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */

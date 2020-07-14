@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4360d6d */
+/* HASH CRC-32:0x63e979dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1146,7 +1146,7 @@ err:
 #else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
 #endif /* __KERNEL__ && __KOS__ */
-#endif
+#endif /* !__NO_PRINTF_VINFO */
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1285,7 +1285,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
 #endif /* __KERNEL__ && __KOS__ */
-#endif
+#endif /* !__NO_PRINTF_VINFO */
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings

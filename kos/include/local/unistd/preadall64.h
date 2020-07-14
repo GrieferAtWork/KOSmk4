@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1dabcc */
+/* HASH CRC-32:0x2b38fff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> pread64(2)
  * Read data from a file at a specific offset */
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> pread64(2)
  * Read data from a file at a specific offset */
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> pread64(2)
  * Read data from a file at a specific offset */

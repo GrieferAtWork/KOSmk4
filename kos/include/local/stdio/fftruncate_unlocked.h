@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55531c11 */
+/* HASH CRC-32:0x8c6ef943 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fileno_unlocked from stdio */

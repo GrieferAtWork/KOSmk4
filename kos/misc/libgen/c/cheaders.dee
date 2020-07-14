@@ -1320,7 +1320,34 @@ class FunctionImplementation {
 				guardName:   namespace.keyDefaultGuard(depName),
 				preferBindingMacros:       true,
 				printDeclarationPrefixes:  true,
-				onlyPrintPrimaryPrototype: true);
+				onlyPrintPrimaryPrototype: true,
+				/* FIXME: Must currently ignore fast function bindings to prevent dependency loops:
+				 *
+				 *     <stdlib.h>
+				 *     <local/wchar/wcsrtombs.h>
+				 *     <optimized/string.h>      (for dependency `mempcpy()'; `__local___localdep_mempcpy_defined' was already defined)
+				 *     <libc/core/string.h>
+				 *     <local/string/mempcpyc.h>
+				 *
+				 * The local implementation for `mempcpyc()' now won't pull in `mempcpy()',
+				 * since `__local___localdep_mempcpy_defined' is already defined, even though
+				 * the associated function hasn't been declared, yet.
+				 *
+				 * (Temporary) solution:
+				 *     Break the dependency loop in <local/wchar/wcsrtombs.h> by not including
+				 *     <optimized/string.h>, which is done by ignoring fast bindings.
+				 *
+				 * (Better) solution:
+				 *     Have one <optimized/string/xxx.h> file for every function that provides
+				 *     inline optimizations (possibly auto-generate these files via a seperate
+				 *     generator script).
+				 *     That way, `mempcpy()' wouldn't have an implicit dependency on `mempcpyc()',
+				 *     as it is this loop that makes it impossible to form a proper tree of
+				 *     dependencies between <local/...> implementations, <libc/core/...> bindings,
+				 *     and <optimized/...> wrappers.
+				 */
+				ignoreFastBindings:        true
+				);
 		}
 		if (implPrefix) {
 			fp.namespace = GLOBAL_NAMESPACE;
@@ -1611,6 +1638,11 @@ class InlineFunction {
 	@@Name of the assembly symbol against which
 	@@to link in case @(mode == "__EXTERN_INLINE")
 	public member externInlineAsmname: string | UserString;
+
+	@@Set to true for so-called `fast` function bindings. Such bindings will
+	@@not be linked in `<libc/core/string.h>`, through fast bindings will then
+	@@still be linked everywhere else, including in `<libc/string.h>`
+	public member isFastBinding: bool = false;
 
 	@@Returns @impl, but will unwind @Callable wrappers
 	public property functionImpl: FunctionImplementation = {
@@ -2330,6 +2362,20 @@ class Function {
 		return false;
 	}
 
+	@@Check if @this @Function has any fast bindings
+	public property hasFastBindings: bool = {
+		get(): bool {
+			for (local b: functionBindings) {
+				b = b.functionBinding;
+				if (b is InlineFunction && b.isFastBinding)
+					return true;
+			}
+			if (hasNamespaceImportBinding(NAMESPACES["fast"])) /* TODO: REMOVE_ME */
+				return true;
+			return false;
+		}
+	}
+
 	public function preload() {
 		try {
 			documentationString;
@@ -2432,15 +2478,32 @@ no_usable_bindings:
 	@@@param: printDeclarationPrefixes:  Print prototype declaration prefixes
 	@@@param: onlyPrintPrimaryPrototype: Try to only bind against primary prototypes
 	@@@param: ignoreNamespaceBindings:   Ignore namespace import bindings
+	@@@param: ignoreFastBindings:        True if bindings with @FunctionBinding.isFastBinding should be ignored
 	public function cprintHeaderDeclaration(
 			fp: CWriter, escapeMode: int, decl: string = "__LIBC",
 			exposedName: string = none, guardName: string | bool = none,
 			preferBindingMacros: bool = false,
 			printDeclarationPrefixes: bool = false,
 			onlyPrintPrimaryPrototype: bool = false,
-			ignoreNamespaceBindings: bool = false) {
+			ignoreNamespaceBindings: bool = false,
+			ignoreFastBindings: bool = false) {
 		try {
 			local usedBindings = functionBindings;
+			if (ignoreFastBindings) {
+				for (local b: usedBindings) {
+					b = b.functionBinding;
+					if (b !is InlineFunction || !b.isFastBinding)
+						continue;
+					local realUsedBindings = [];
+					for (local b: usedBindings) {
+						local bBind = b.functionBinding;
+						if (bBind !is InlineFunction || !bBind.isFastBinding)
+							realUsedBindings.append(b);
+					}
+					usedBindings = realUsedBindings;
+					break;
+				}
+			}
 			if (!usedBindings)
 				return; /* No bindings -> Noop */
 			local doc = documentationString;
@@ -2569,8 +2632,8 @@ normal_guardName_binding:
 				local extendedPrefixes = bind.ppCondPrefix;
 handle_extendedPrefixes:
 				for (local text: extendedPrefixes) {
-					text = escapeText(text, escapeMode,
-						extendedPrefixes: newExtendedPrefixes)
+					text = str(escapeText(text, escapeMode,
+						extendedPrefixes: newExtendedPrefixes))
 						.rstrip().lstrip("\n");
 					if (fp._wasPrefixPrinted(text))
 						continue;
@@ -3080,26 +3143,13 @@ class SystemHeader {
 				part(fp, escapeMode);
 			} else {
 				fp << part;
-				/* Clear known, globally printed prefixes, since `part'
-				 * may contain explicit preprocessor block directives
-				 * that could encapsulate known, printed prefixes. */
-				fp.clearGlobalPrintedPrefixes();
 			}
 		}
 	}
 
 	@@Print the header <libc/string.h>
 	public function cprintLibcHeader(fp: CWriter) {
-		local hasFastBindings = false;
 		local nsFast = NAMESPACES["fast"];
-		for (local part: order_libcHeader) {
-			if (part !is Function)
-				continue;
-			if (part.hasNamespaceImportBinding(nsFast)) {
-				hasFastBindings = true;
-				break;
-			}
-		}
 		local guardName = "_LIBC_{}_H"
 			.format({ name.replace("-", "_").replace(".", "_").upper() });
 		fp << "#ifndef " << guardName << "\n"
@@ -3109,10 +3159,15 @@ class SystemHeader {
 			"\n"
 			"#ifdef __CC__\n"
 			"#include <__crt.h>\n";
-		if (hasFastBindings) {
-			fp << "#ifdef __LIBC_BIND_OPTIMIZATIONS\n"
-				"#include <optimized/" << name << ".h>\n"
-				"#endif /* __LIBC_BIND_OPTIMIZATIONS */\n";
+		for (local part: order_libcHeader) {
+			if (part !is Function)
+				continue;
+			if (part.hasFastBindings) {
+				fp << "#ifdef __LIBC_BIND_OPTIMIZATIONS\n"
+					"#include <optimized/" << name << ".h>\n"
+					"#endif /* __LIBC_BIND_OPTIMIZATIONS */\n";
+				break;
+			}
 		}
 		fp << "#include \"core/" << name << ".h\"\n"
 			"\n";
@@ -3125,8 +3180,8 @@ class SystemHeader {
 			if (rc === false)
 				continue;
 			local partName = part.name;
-			local partDoc = part.documentationString;
-			local partFast = hasFastBindings && part.hasNamespaceImportBinding(nsFast);
+			local partDoc  = part.documentationString;
+			local partFast = part.hasFastBindings;
 			if (rc is none) {
 				/* Conditionally link against some guard. */
 				local coreGuardName = "____libc_core_{}_defined".format({ partName });
@@ -3208,7 +3263,8 @@ class SystemHeader {
 				preferBindingMacros:       true,
 				printDeclarationPrefixes:  true,
 				onlyPrintPrimaryPrototype: true,
-				ignoreNamespaceBindings:   true);
+				ignoreNamespaceBindings:   true,
+				ignoreFastBindings:        true);
 		}
 		fp << "\n"
 			"__SYSDECL_END\n"

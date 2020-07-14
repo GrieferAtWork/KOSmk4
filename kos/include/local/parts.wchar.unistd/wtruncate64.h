@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x669c3842 */
+/* HASH CRC-32:0x5c386f90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -140,7 +140,7 @@ __NAMESPACE_LOCAL_END
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
-#endif
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */

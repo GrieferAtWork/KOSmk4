@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1133fbe3 */
+/* HASH CRC-32:0xa4c03d17 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -556,7 +556,7 @@ __NAMESPACE_LOCAL_END
 #else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
 #endif /* __KERNEL__ && __KOS__ */
-#endif
+#endif /* !__NO_PRINTF_VINFO */
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these

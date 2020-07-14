@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac3f79bb */
+/* HASH CRC-32:0x7e48e112 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __LIBC char const *const sys_siglist[_NSIG] __ASMNAME("_sys_siglist");
 #endif /* __NO_ASMNAME */
 __LIBC char const *const _sys_siglist[_NSIG];
 #endif /* sys_siglist... */
-#endif
+#endif /* !___local_sys_siglist_defined */
 #include <bits/signum-values.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strsignal_s) __ATTR_CONST __ATTR_WUNUSED char const *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3fc01bc */
+/* HASH CRC-32:0x5a4c5980 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -430,7 +430,7 @@ struct __format_snprintf_data {
 	char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
 };
-#endif
+#endif /* !____format_snprintf_data_defined */
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
@@ -720,7 +720,7 @@ struct format_aprintf_data {
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif
+#endif /* !__format_aprintf_data_defined */
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 INTERN ATTR_SECTION(".text.crt.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr,
