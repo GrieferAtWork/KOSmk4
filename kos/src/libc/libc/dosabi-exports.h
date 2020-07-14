@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d32af27 */
+/* HASH CRC-32:0x403bef9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,13 +250,8 @@ DEFINE_PUBLIC_ALIAS(DOS$format_escape, libd_format_escape);
 DEFINE_PUBLIC_ALIAS(DOS$format_hexdump, libd_format_hexdump);
 DEFINE_PUBLIC_ALIAS(DOS$format_vprintf, libd_format_vprintf);
 DEFINE_PUBLIC_ALIAS(DOS$format_vscanf, libd_format_vscanf);
-DEFINE_PUBLIC_ALIAS(DOS$format_sprintf_printer, libd_format_sprintf_printer);
-DEFINE_PUBLIC_ALIAS(DOS$format_snprintf_printer, libd_format_snprintf_printer);
-DEFINE_PUBLIC_ALIAS(DOS$format_width, libd_format_width);
-DEFINE_PUBLIC_ALIAS(DOS$format_length, libd_format_length);
 DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_pack, libd_format_aprintf_pack);
 DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_alloc, libd_format_aprintf_alloc);
-DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_printer, libd_format_aprintf_printer);
 
 /* getopt */
 DEFINE_PUBLIC_ALIAS(DOS$getopt, libd_getopt);
@@ -1689,8 +1684,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_IO_fgetpos64, libd_fgetpos64);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpos64, libd_fgetpos64);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fsetpos64, libd_fsetpos64);
 DEFINE_PUBLIC_ALIAS(DOS$fsetpos64, libd_fsetpos64);
-DEFINE_PUBLIC_ALIAS(DOS$file_printer, libd_file_printer);
-DEFINE_PUBLIC_ALIAS(DOS$file_printer_unlocked, libd_file_printer_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$vasprintf, libd_vasprintf);
 DEFINE_PUBLIC_ALIAS(DOS$fdreopen, libd_fdreopen);
 DEFINE_PUBLIC_ALIAS(DOS$fdreopen_unlocked, libd_fdreopen_unlocked);
@@ -1789,8 +1782,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__fsetlocking, libd___fsetlocking);
 /* stdlib */
 DEFINE_PUBLIC_ALIAS(DOS$qsort_r, libd_qsort_r);
 DEFINE_PUBLIC_ALIAS(DOS$bsearch_r, libd_bsearch_r);
-DEFINE_PUBLIC_ALIAS(DOS$qsort, libd_qsort);
-DEFINE_PUBLIC_ALIAS(DOS$bsearch, libd_bsearch);
 DEFINE_PUBLIC_ALIAS(DOS$labs, libd_labs);
 DEFINE_PUBLIC_ALIAS(DOS$llabs, libd_llabs);
 DEFINE_PUBLIC_ALIAS(DOS$ldiv, libd_ldiv);
@@ -1801,9 +1792,7 @@ DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(DOS$mblen, libd_mblen);
 DEFINE_PUBLIC_ALIAS(DOS$system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$exit, libd_exit);
-DEFINE_PUBLIC_ALIAS(DOS$atexit, libd_atexit);
 DEFINE_PUBLIC_ALIAS(DOS$quick_exit, libd_quick_exit);
-DEFINE_PUBLIC_ALIAS(DOS$at_quick_exit, libd_at_quick_exit);
 DEFINE_PUBLIC_ALIAS(DOS$_exit, libd__Exit);
 DEFINE_PUBLIC_ALIAS(DOS$_Exit, libd__Exit);
 DEFINE_PUBLIC_ALIAS(DOS$malloc, libd_malloc);
@@ -2545,7 +2534,6 @@ DEFINE_PUBLIC_ALIAS(DOS$sysinfo, libd_sysinfo);
 DEFINE_PUBLIC_ALIAS(DOS$openlog, libd_openlog);
 DEFINE_PUBLIC_ALIAS(DOS$setlogmask, libd_setlogmask);
 DEFINE_PUBLIC_ALIAS(DOS$vsyslog, libd_vsyslog);
-DEFINE_PUBLIC_ALIAS(DOS$syslog_printer, libd_syslog_printer);
 
 /* sys.sysmacros */
 DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_major, libd_gnu_dev_major);

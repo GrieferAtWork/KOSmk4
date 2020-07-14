@@ -186,7 +186,7 @@ NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
  *       that format's width, while the remainder of the string always follows UTF-8
  * NOTE: Another special encoding also exists for an empty string:
  * BEFORE:  \"\"
- * AFTER:   \1\1 -- Additional \1 character may follow
+ * AFTER:   \1\1 -- Additional \1 characters may follow
  * @param: plength: When non-NULL, write the length of the returned string here.
  * @return: * :     A pointer to the start of the inlined utf-8 string
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:

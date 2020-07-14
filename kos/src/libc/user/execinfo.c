@@ -269,6 +269,9 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 	for (i = 0; i < size; ++i) {
 		PRIVATE SECTION_DEBUG_STRING("debug_lf") char const debug_lf[1] = { '\n' };
 		PRIVATE SECTION_DEBUG_STRING("debug_unknown_name") char const debug_unknown_name[1] = { '?' };
+#ifndef __LIBCCALL_IS_FORMATPRINTER_CC
+#error "Shouldn't happen?"
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC */
 		error = print_function_name(array[i],
 		                            (pformatprinter)(void *)&write,
 		                            (void *)(uintptr_t)(unsigned int)fd);

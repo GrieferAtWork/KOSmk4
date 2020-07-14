@@ -41,6 +41,8 @@
 %[define_str2wcs_replacement(format_sprintf_printer  = format_wsprintf_printer)]
 %[define_str2wcs_replacement(format_snprintf_data    = format_wsnprintf_data)]
 %[define_str2wcs_replacement(format_snprintf_printer = format_wsnprintf_printer)]
+%[define_str2wcs_replacement(FORMATPRINTER_CC        = WFORMATPRINTER_CC)]
+%[define_str2wcs_replacement(__FORMATPRINTER_CC      = __WFORMATPRINTER_CC)]
 
 %[define_str2wcs_replacement(ATTR_LIBC_PRINTF   = ATTR_LIBC_WPRINTF)]
 %[define_str2wcs_replacement(ATTR_LIBC_PRINTF_P = ATTR_LIBC_WPRINTF_P)]
@@ -80,6 +82,11 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+/* Calling convention used by `pformatprinter' */
+#ifndef FORMATPRINTER_CC
+#define FORMATPRINTER_CC __FORMATPRINTER_CC
+#endif /* !FORMATPRINTER_CC */
 
 #ifndef __pformatprinter_defined
 #define __pformatprinter_defined 1
@@ -918,7 +925,8 @@ $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
 %
 @@Format-printer implementation for printing to a string buffer like `sprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
-[[kernel]]
+[[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/format-printer.h>")]]
 $ssize_t format_sprintf_printer([[nonnull]] /*char ***/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data,
                                 $size_t datalen) {
@@ -948,7 +956,8 @@ struct format_snprintf_data {
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
 @@      the sum of return values of all calls to `format_snprintf_printer()'
-[[kernel]]
+[[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/format-printer.h>")]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
                                  [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	struct __local_format_snprintf_data {
@@ -969,7 +978,11 @@ $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ vo
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
 [[kernel, ATTR_PURE, impl_include("<local/unicode_utf8seqlen.h>")]]
-$ssize_t format_width(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
+[[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/format-printer.h>")]]
+$ssize_t format_width(void *arg,
+                      [[nonnull]] /*utf-8*/ char const *__restrict data,
+                      $size_t datalen) {
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -987,7 +1000,11 @@ $ssize_t format_width(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict da
 
 @@Always re-return `datalen' and ignore all other arguments
 [[ATTR_CONST, kos_export_alias("format_wwidth")]]
-$ssize_t format_length(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) {
+[[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/format-printer.h>")]]
+$ssize_t format_length(void *arg,
+                       /*utf-8*/ char const *__restrict data,
+                       $size_t datalen) {
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;
@@ -1158,6 +1175,8 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 @@This function is intended to be used as a pformatprinter-compatibile printer sink
 [[wunused, requires_function(format_aprintf_alloc)]]
+[[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/format-printer.h>")]]
 $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	char *buf;

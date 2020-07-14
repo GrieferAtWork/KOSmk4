@@ -35,6 +35,7 @@
 #include <kos/keyboard.h>
 
 #include <assert.h>
+#include <format-printer.h> /* FORMATPRINTER_CC */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -3326,7 +3327,7 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch) {
 /* pformatprinter-compatible prototype for printing to an ANSI TTY
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
-INTERN NONNULL((1)) ssize_t __LIBCCALL
+INTERN NONNULL((1)) ssize_t FORMATPRINTER_CC
 libansitty_printer(void *arg, char const *data, size_t datalen) {
 	size_t i;
 	struct ansitty *self;

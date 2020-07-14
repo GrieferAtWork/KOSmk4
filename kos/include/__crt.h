@@ -249,6 +249,27 @@
  *       - __LIBDCALL_CALLER_CLEANUP
  */
 #ifdef __x86_64__
+#ifdef __CRT_KOS_KERNEL
+/* Use SYSVABI for everything in kernel-space! */
+#   define __LIBKCALL  __ATTR_SYSVABI
+#   define __VLIBKCALL __ATTR_SYSVABI
+#   define __LIBDCALL  __ATTR_SYSVABI
+#   define __VLIBDCALL __ATTR_SYSVABI
+#   define __LIBCCALL  __ATTR_SYSVABI
+#   define __VLIBCCALL __ATTR_SYSVABI
+#   define __LIBCCALL_IS_LIBKCALL 1
+#   define __LIBCCALL_IS_LIBDCALL 1
+#   define __LIBDCALL_IS_LIBKCALL 1
+#   define __VLIBCCALL_IS_VLIBKCALL 1
+#   define __VLIBCCALL_IS_VLIBDCALL 1
+#   define __VLIBDCALL_IS_VLIBKCALL 1
+#   define __VLIBCCALL_IS_LIBCCALL 1
+#   define __VLIBDCALL_IS_LIBDCALL 1
+#   define __VLIBKCALL_IS_LIBKCALL 1
+#   define __LIBCCALL_CALLER_CLEANUP 1
+#   define __LIBKCALL_CALLER_CLEANUP 1
+#   define __LIBDCALL_CALLER_CLEANUP 1
+#else /* __CRT_KOS_KERNEL */
 #   define __LIBKCALL  __ATTR_SYSVABI
 #   define __VLIBKCALL __ATTR_SYSVABI
 #   define __LIBDCALL  __ATTR_MSABI
@@ -270,6 +291,7 @@
 #   define __VLIBCCALL_IS_VLIBKCALL 1
 #   define __VLIBCCALL  __VLIBKCALL
 #endif /* !__PE__ */
+#endif /* !__CRT_KOS_KERNEL */
 #elif defined(__i386__)
 #ifdef __CRT_KOS_KERNEL
 #   define __LIBCCALL  __KCALL

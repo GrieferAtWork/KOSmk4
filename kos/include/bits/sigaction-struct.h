@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined 1
-typedef void (__LIBCCALL *__sighandler_t)(int __signo);
+typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 
 #ifdef __USE_POSIX199309
@@ -56,9 +56,9 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 	union {
 		__sighandler_t sa_handler; /* Used if SA_SIGINFO is not set. */
 #ifdef __USE_KOS
-		void (__LIBCCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx); /* Used if SA_SIGINFO is set. */
+		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx); /* Used if SA_SIGINFO is set. */
 #else /* __USE_KOS */
-		void (__LIBCCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, void *__ctx); /* Used if SA_SIGINFO is set. */
+		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, void *__ctx); /* Used if SA_SIGINFO is set. */
 #endif /* !__USE_KOS */
 	};
 #else /* __USE_POSIX199309 */
@@ -69,7 +69,7 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
 	__byte_t __sa_bad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
-	void (__LIBCCALL *sa_restorer)(void); /* Restore handler. */
+	void (__LIBKCALL *sa_restorer)(void); /* Restore handler. */
 };
 #endif /* __CC__ */
 

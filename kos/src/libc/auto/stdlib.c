@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3e160ad */
+/* HASH CRC-32:0x62329d7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,10 +42,9 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
                         __compar_d_fn_t cmp,
                         void *arg) THROWS(...) {
 	/* DISCALIMER: The qsort() implementation below has been taken directly
-	 *             from glibc (`/stdlib/qsort.c'), before being retuned and
+	 *             from glibc (`/stdlib/qsort.c'), before being re-tuned and
 	 *             formatted to best work with KOS.
-	 *          >> For better source documentation, consult the original function!
-	 */
+	 * >> For better source documentation, consult the original function! */
 	/* Copyright (C) 1991-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.
 	   Written by Douglas C. Schmidt (schmidt@ics.uci.edu).
@@ -1057,7 +1056,7 @@ struct __invoke_compare_helper_s_data {
 	void               *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }
@@ -1085,7 +1084,7 @@ struct __invoke_compare_helper_s_data {
 	void               *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }

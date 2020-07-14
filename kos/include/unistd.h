@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3809c911 */
+/* HASH CRC-32:0xcb4e8957 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2030,7 +2030,7 @@ __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
      (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
 #ifndef ____pthread_atfork_func_t_defined
 #define ____pthread_atfork_func_t_defined 1
-typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #endif /* !____pthread_atfork_func_t_defined */
 
 #ifndef __pthread_atfork_defined

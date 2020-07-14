@@ -40,13 +40,19 @@ DECL_BEGIN
 /*[[[start:implementation]]]*/
 
 
+#ifdef __NO_ATTR_STDCALL
+#define _BEGINTHREADEX_CC __LIBDCALL
+#else /* __NO_ATTR_STDCALL */
+#define _BEGINTHREADEX_CC __ATTR_STDCALL
+#endif /* !__NO_ATTR_STDCALL */
+
 struct simple_thread_data {
-	void (LIBCCALL *std_entry)(void *arg); /* [1..1] Entry callback. */
+	void (LIBDCALL *std_entry)(void *arg); /* [1..1] Entry callback. */
 	void           *std_arg;               /* Entry argument. */
 };
 
 PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread.simple_thread_entry") u32
-ATTR_STDCALL simple_thread_entry(void *arg) {
+_BEGINTHREADEX_CC simple_thread_entry(void *arg) {
 	struct simple_thread_data data;
 	memcpy(&data, arg, sizeof(struct simple_thread_data));
 	free(arg);
@@ -84,8 +90,8 @@ NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
 
 
 struct dos_thread_data {
-	u32 (ATTR_STDCALL *dtd_entry)(void *arg); /* [1..1] Entry callback. */
-	void              *dtd_arg;               /* Entry argument. */
+	u32 (_BEGINTHREADEX_CC *dtd_entry)(void *arg); /* [1..1] Entry callback. */
+	void                   *dtd_arg;               /* Entry argument. */
 };
 PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread.dos_thread_entry")
 int LIBCCALL dos_thread_entry(void *arg) {

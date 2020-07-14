@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce3f5dce */
+/* HASH CRC-32:0xde5dbbca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <bits/syslog-path.h>
+
+#ifdef __USE_KOS
+#include <bits/format-printer.h>
+#endif /* __USE_KOS */
+
 
 /*
  * Copyright (c) 1982, 1986, 1988, 1993
@@ -161,8 +167,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
+#ifdef __CRT_HAVE_syslog_printer
 /* Helper functions for printing to the system log */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__LIBC __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_RPC(__FORMATPRINTER_CC syslog_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("syslog_printer");
+#endif /* __CRT_HAVE_syslog_printer */
 #define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(__STDC_INT_AS_UINT_T)(level))
 #endif /* __USE_KOS */
 

@@ -107,8 +107,8 @@ DlSection_Destroy(DlSection *__restrict self);
 #endif /* __BUILDING_LIBDL */
 
 struct dlmodule_finalizer {
-	void (__LIBCCALL *df_func)(void *arg); /* [1..1] Finalizer callback. */
-	void             *df_arg;              /* [?..?] Callback argument. */
+	void (LIBDL_CC *df_func)(void *arg); /* [1..1] Finalizer callback. */
+	void           *df_arg;              /* [?..?] Callback argument. */
 };
 
 struct dlmodule_finalizers {

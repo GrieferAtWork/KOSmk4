@@ -22,11 +22,12 @@
 
 #include <__crt.h>
 #include <__stdcxx.h>
+#include <__stdinc.h>
 
 __CXXDECL_BEGIN
 __NAMESPACE_INT_BEGIN
-template<class __T> __CXX_FORCEINLINE __ATTR_CONST __T *__LIBCCALL
-__addressof(__T &__obj) __CXX_NOEXCEPT {
+template<class __T> __CXX_FORCEINLINE __ATTR_CONST __T *
+__NOTHROW(__LIBCCALL __addressof)(__T &__obj) {
 	return reinterpret_cast<__T *>(&const_cast<char &>(reinterpret_cast<const volatile char &>(__obj)));
 }
 __NAMESPACE_INT_END

@@ -49,6 +49,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -645,7 +646,7 @@ syslog_packet_append(struct syslog_packet *__restrict self,
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
  * @except: May only throw exceptions as the result of accessing memory in `*data'
  * @return: * : Always re-returns `datalen' */
-PUBLIC ssize_t KCALL
+PUBLIC ssize_t FORMATPRINTER_CC
 syslog_printer(void *level,
                USER CHECKED char const *data,
                size_t datalen)

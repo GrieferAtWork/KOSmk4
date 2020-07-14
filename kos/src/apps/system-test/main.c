@@ -41,7 +41,7 @@ PRIVATE struct testdecl *ctest_current_test = NULL;
 #define EL "\e[K" /* EL(ANSITTY_EL_AFTER); */
 
 PRIVATE void
-NOTHROW_NCX(__LIBCCALL do_ctest_vsubtestf)(char const *__restrict format,
+NOTHROW_NCX(__LIBKCALL do_ctest_vsubtestf)(char const *__restrict format,
                                            va_list args, bool is_status) {
 	va_list args_copy;
 	syslog(LOG_DEBUG, "[test:%s] %s:%d: ",
@@ -62,13 +62,13 @@ NOTHROW_NCX(__LIBCCALL do_ctest_vsubtestf)(char const *__restrict format,
 }
 
 INTERN void
-NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict format,
+NOTHROW_NCX(__LIBKCALL ctest_vsubtestf)(char const *__restrict format,
                                         va_list args) {
 	do_ctest_vsubtestf(format, args, false);
 }
 
 INTERN void
-NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict format, ...) {
+NOTHROW_NCX(__VLIBKCALL ctest_subtestf)(char const *__restrict format, ...) {
 	va_list args;
 	va_start(args, format);
 	ctest_vsubtestf(format, args);
@@ -76,13 +76,13 @@ NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict format, ...) {
 }
 
 INTERN void
-NOTHROW_NCX(__LIBCCALL ctest_vsubstatf)(char const *__restrict format,
+NOTHROW_NCX(__LIBKCALL ctest_vsubstatf)(char const *__restrict format,
                                         va_list args) {
 	do_ctest_vsubtestf(format, args, true);
 }
 
 INTERN void
-NOTHROW_NCX(__VLIBCCALL ctest_substatf)(char const *__restrict format, ...) {
+NOTHROW_NCX(__VLIBKCALL ctest_substatf)(char const *__restrict format, ...) {
 	va_list args;
 	va_start(args, format);
 	ctest_vsubstatf(format, args);

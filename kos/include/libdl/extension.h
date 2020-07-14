@@ -136,7 +136,7 @@ struct dl_sect_info {
 #define ____dl_iterator_callback_defined 1
 struct dl_phdr_info;
 /* Callback prototype for `dl_iterate_phdr()' */
-typedef int (__LIBCCALL *__dl_iterator_callback)(struct dl_phdr_info *__info,
+typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
                                                  __size_t __info_size, void *__arg);
 #endif /* !____dl_iterator_callback_defined */
 

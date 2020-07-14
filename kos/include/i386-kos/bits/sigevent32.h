@@ -89,8 +89,8 @@ typedef struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 		__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                             * TID (pid_t) of the thread to receive the signal. */
 		struct {
-			__HYBRID_FUNCPTR32(void, __LIBCCALL, sigev_notify_function,(union __sigvalx32 __val)); /* Function to start. */
-			__HYBRID_PTR32(pthread_attr_t)       sigev_notify_attributes;                          /* Thread attributes. */
+			__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sigev_notify_function,(union __sigvalx32 __val)); /* Function to start. */
+			__HYBRID_PTR32(pthread_attr_t)         sigev_notify_attributes;                          /* Thread attributes. */
 		};
 	};
 #if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
@@ -99,8 +99,8 @@ typedef struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                       * TID (pid_t) of the thread to receive the signal. */
 		struct {
-			__HYBRID_FUNCPTR32(void, __LIBCCALL, _function,(union __sigvalx32 __val)); /* Function to start. */
-			__HYBRID_PTR32(pthread_attr_t)       _attribute;                           /* Thread attributes. */
+			__HYBRID_FUNCPTR32(void, __ATTR_CDECL, _function,(union __sigvalx32 __val)); /* Function to start. */
+			__HYBRID_PTR32(pthread_attr_t)         _attribute;                           /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 	};
@@ -111,8 +111,8 @@ typedef struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                       * TID (pid_t) of the thread to receive the signal. */
 		struct {
-			__HYBRID_FUNCPTR32(void, __LIBCCALL, _function,(union __sigvalx32 __val)); /* Function to start. */
-			__HYBRID_PTR32(pthread_attr_t)       _attribute;                           /* Thread attributes. */
+			__HYBRID_FUNCPTR32(void, __ATTR_CDECL, _function,(union __sigvalx32 __val)); /* Function to start. */
+			__HYBRID_PTR32(pthread_attr_t)         _attribute;                           /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 #define _sigev_data             _sigev_un._data

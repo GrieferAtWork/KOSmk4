@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa157508b */
+/* HASH CRC-32:0x169e6cd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -140,9 +140,9 @@ INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos64)(FILE *__restrict stream, fp
 /* 64-bit variant of `fsetpos' */
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
-INTDEF NONNULL((1, 2)) ssize_t (LIBCCALL libc_file_printer)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
+INTDEF NONNULL((1, 2)) ssize_t (__FORMATPRINTER_CC libc_file_printer)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-INTDEF NONNULL((1, 2)) ssize_t (LIBCCALL libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
+INTDEF NONNULL((1, 2)) ssize_t (__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
 /* Re-open the given `STREAM' as a file-stream for accessing `FD' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* Re-open the given `STREAM' as a file-stream for accessing `FD' */

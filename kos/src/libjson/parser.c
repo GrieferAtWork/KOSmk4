@@ -1137,7 +1137,7 @@ struct format_compare_data {
 	size_t                len;
 };
 
-PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
 format_compare_string(void *arg,
                       /*utf-8*/ char const *__restrict data,
                       size_t datalen) {
@@ -1315,7 +1315,7 @@ done:
 
 
 
-PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
 json_inline_convert_string(void *arg,
                            /*utf-8*/ char const *__restrict data,
                            size_t datalen) {
@@ -1343,7 +1343,7 @@ INTERN_CONST char const libjson_empty_string[1] = { 0 };
  *       that format's width, while the remainder of the string always follows UTF-8
  * NOTE: Another special encoding also exists for an empty string:
  * BEFORE:  \"\"
- * AFTER:   \1\1 -- Additional \1 character may follow
+ * AFTER:   \1\1 -- Additional \1 characters may follow
  * @param: plength: When non-NULL, write the length of the returned string here.
  * @return: * :     A pointer to the start of the inlined utf-8 string
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa76b554f */
+/* HASH CRC-32:0x825d2e57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
 #include <kos/anno.h>
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fwrite from stdio */
 #ifndef __local___localdep_fwrite_defined
@@ -57,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fwrite_defined */
 /* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
 __LOCAL_LIBC(file_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(file_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
+(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(file_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	return (__SSIZE_TYPE__)__localdep_fwrite(__data, sizeof(char), __datalen, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END

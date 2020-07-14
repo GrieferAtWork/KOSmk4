@@ -120,7 +120,7 @@ typedef struct __sigset_struct { __ULONGPTR_TYPE__ __val[_SIGSET_NWORDS]; } __si
 		}                                                                          \
 		__XRETURN 0;                                                               \
 	})
-#endif
+#endif /* __USE_GNU */
 
 #define __SIGSETFN(at, name, body, const)                                               \
 	__LOCAL at int __NOTHROW_NCX(__LIBCCALL name)(__sigset_t const *__set, int __sig) { \

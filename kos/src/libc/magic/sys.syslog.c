@@ -23,7 +23,13 @@
 
 %{
 #include <features.h>
+
 #include <bits/syslog-path.h>
+
+#ifdef __USE_KOS
+#include <bits/format-printer.h>
+#endif /* __USE_KOS */
+
 
 /*
  * Copyright (c) 1982, 1986, 1988, 1993
@@ -166,7 +172,8 @@ void vsyslog(__STDC_INT_AS_UINT_T level,
 %
 %#ifdef __USE_KOS
 @@Helper functions for printing to the system log
-[[cp]]
+[[cp, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/format-printer.h>")]]
 $ssize_t syslog_printer(void *arg,
                         [[nonnull]] char const *__restrict data,
                         $size_t datalen);

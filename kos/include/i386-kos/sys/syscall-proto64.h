@@ -88,8 +88,8 @@
 #define SYSCALL64_PROTO(name, decl) __PRIVATE_SYSCALL64_PROTO(name, __NR64AC_##name, decl)
 
 /* Construct a prototype for a given system call pointer:
- * >> (SYSCALL64_PROTO_POINTER(open)) // Expands to `(fd_t (__LIBCCALL *)(char const *, oflag_t, mode_t))'
- * Same as `SYSCALL64_PROTO(<name>, (__LIBCCALL *))' */
-#define SYSCALL64_PROTO_POINTER(name) __PRIVATE_SYSCALL64_PROTO(name, __NR64AC_##name, (__LIBCCALL *))
+ * >> (SYSCALL64_PROTO_POINTER(open)) // Expands to `(fd_t (__LIBKCALL *)(char const *, oflag_t, mode_t))'
+ * Same as `SYSCALL64_PROTO(<name>, (__LIBKCALL *))' */
+#define SYSCALL64_PROTO_POINTER(name) __PRIVATE_SYSCALL64_PROTO(name, __NR64AC_##name, (__LIBKCALL *))
 
 #endif /* !_I386_KOS_SYS_SYSCALL_PROTO64_H */

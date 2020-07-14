@@ -266,48 +266,48 @@ __NAMESPACE_INT_BEGIN
 #if defined(__KOS__) && defined(__KERNEL__)
 #ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 #undef __malloca_mayfail
-__LOCAL void *(__LIBCCALL __local_malloca_heap)(__SIZE_TYPE__ __s) {
+__LOCAL void *(__local_malloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
 	__res  = (__BYTE_TYPE__ *)kmalloc(__s + __MALLOCA_ALIGN, GFP_NORMAL);
 	*__res = __MALLOCA_KEY_MALLOC;
 	__res += __MALLOCA_ALIGN;
 	return (void *)__res;
 }
-__LOCAL void *(__LIBCCALL __local_calloca_heap)(__SIZE_TYPE__ __s) {
+__LOCAL void *(__local_calloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
 	__res  = (__BYTE_TYPE__ *)kmalloc(__s + __MALLOCA_ALIGN, GFP_CALLOC);
 	*__res = __MALLOCA_KEY_MALLOC;
 	__res += __MALLOCA_ALIGN;
 	return (void *)__res;
 }
-__LOCAL void(__LIBCCALL __local_afree)(void *__p) {
+__LOCAL void __NOTHROW(__local_afree)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		__os_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
 #else  /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #undef __malloca_mayfail
-__LOCAL void *(__LIBCCALL __local_malloca_heap)(__SIZE_TYPE__ __s) {
+__LOCAL void *(__local_malloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
 	__res  = (__BYTE_TYPE__ *)kmalloc(__s + __MALLOCA_ALIGN, GFP_NORMAL);
 	*__res = __MALLOCA_KEY_MALLOC;
 	__res += __MALLOCA_ALIGN;
 	return (void *)__res;
 }
-__LOCAL void *(__LIBCCALL __local_calloca_heap)(__SIZE_TYPE__ __s) {
+__LOCAL void *(__local_calloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
 	__res  = (__BYTE_TYPE__ *)kmalloc(__s + __MALLOCA_ALIGN, GFP_CALLOC);
 	*__res = __MALLOCA_KEY_MALLOC;
 	__res += __MALLOCA_ALIGN;
 	return (void *)__res;
 }
-__LOCAL void(__LIBCCALL __local_afree)(void *__p) {
+__LOCAL void __NOTHROW(__local_afree)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		kfree((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #else  /* __KOS__ && __KERNEL__ */
 #define __malloca_mayfail 1
-__LOCAL void *(__LIBCCALL __local_malloca_heap)(__SIZE_TYPE__ __s) {
+__LOCAL void *__NOTHROW_NCX(__local_malloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
 	__res = (__BYTE_TYPE__ *)__libc_malloc(__s + __MALLOCA_ALIGN);
 	if (__res) {
@@ -316,7 +316,7 @@ __LOCAL void *(__LIBCCALL __local_malloca_heap)(__SIZE_TYPE__ __s) {
 	}
 	return (void *)__res;
 }
-__LOCAL void *(__LIBCCALL __local_calloca_heap)(__SIZE_TYPE__ __s) {
+__LOCAL void *__NOTHROW_NCX(__local_calloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
 	__res = (__BYTE_TYPE__ *)__libc_calloc(1, __s + __MALLOCA_ALIGN);
 	if (__res) {
@@ -325,16 +325,16 @@ __LOCAL void *(__LIBCCALL __local_calloca_heap)(__SIZE_TYPE__ __s) {
 	}
 	return (void *)__res;
 }
-__LOCAL void(__LIBCCALL __local_afree)(void *__p) {
+__LOCAL void __NOTHROW_NCX(__local_afree)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		__libc_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
 #endif /* !__KOS__ || !__KERNEL__ */
-__LOCAL void *(__LIBCCALL __local_minita_stack)(void *__p, __SIZE_TYPE__ __s) {
+__LOCAL void *__NOTHROW_NCX(__local_minita_stack)(void *__p, __SIZE_TYPE__ __s) {
 	*(__BYTE_TYPE__ *)__p = __MALLOCA_KEY_ALLOCA;
 	return __MALLOCA_SKEW_ALLOCA((__BYTE_TYPE__ *)__p + __MALLOCA_ALIGN, __s);
 }
-__LOCAL void *(__LIBCCALL __local_cinita_stack)(void *__p, __SIZE_TYPE__ __s) {
+__LOCAL void *__NOTHROW_NCX(__local_cinita_stack)(void *__p, __SIZE_TYPE__ __s) {
 	*(__BYTE_TYPE__ *)__p = __MALLOCA_KEY_ALLOCA;
 	return __libc_memset((__BYTE_TYPE__ *)__p + __MALLOCA_ALIGN, 0, __s);
 }

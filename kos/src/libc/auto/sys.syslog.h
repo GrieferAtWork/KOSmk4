@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9e6622b */
+/* HASH CRC-32:0x137b2e0b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,10 +43,6 @@ INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) void NOTHROW_RPC(LIBDCALL libd_vsyslo
 #ifndef __KERNEL__
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) void NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level, char const *format, va_list args);
 #endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Helper functions for printing to the system log */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_syslog_printer)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

@@ -98,6 +98,61 @@ bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 }
 
 
+/* Provide wrappers for `qsort()', `bsearch()', `atexit()' and `at_quick_exit()'
+ * for DOS-mode, that take function pointers to LIBDCALL functions, rather than
+ * `LIBKCALL' ones.
+ * All other functions that take functions pointers (such as `bsearch_r()') always
+ * take these pointers in the form of `LIBKCALL' prototypes, since these functions
+ * don't normally exist under DOS. (if I'm wrong about this, we might have to add
+ * those functions to this list at some point...) */
+#ifndef __LIBDCALL_IS_LIBKCALL
+typedef void (__LIBDCALL *__dos_atexit_func_t)(void);
+typedef int (__LIBDCALL *__dos_compar_fn_t)(void const *__a, void const *__b);
+
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.process.libd_atexit_wrapper") void
+NOTHROW_NCX(LIBCCALL libd_atexit_wrapper)(int status, void *arg) {
+	(void)status;
+	(*(__dos_atexit_func_t)arg)();
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$atexit, libd_atexit);
+INTERN ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libd_atexit)(__dos_atexit_func_t func) {
+	return on_exit(&libd_atexit_wrapper, (void *)func);
+}
+
+/* Not really correct, but prevents having to re-design
+ * the KOS-mode `at_quick_exit()' function... */
+DEFINE_PUBLIC_ALIAS(DOS$at_quick_exit, libd_atexit);
+
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+(__LIBCCALL dos_invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(__dos_compar_fn_t)__arg)(__a, __b);
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$qsort, libd_qsort);
+INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+(LIBCCALL libd_qsort)(void *pbase, size_t item_count,
+                      size_t item_size, __dos_compar_fn_t cmp) THROWS(...) {
+	libc_qsort_r(pbase, item_count, item_size,
+	             &dos_invoke_compare_helper,
+	             (void *)cmp);
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$bsearch, libd_bsearch);
+INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+(LIBCCALL libd_bsearch)(void const *pkey, void const *pbase,
+                        size_t item_count, size_t item_size,
+                        __dos_compar_fn_t cmp) THROWS(...) {
+	return (void *)libc_bsearch_r(pkey, pbase, item_count, item_size,
+	                              &dos_invoke_compare_helper,
+	                              (void *)cmp);
+}
+
+
+#endif /* !__LIBDCALL_IS_LIBKCALL */
+
+
 
 /* TODO: Add support for: __cxa_thread_atexit */
 /* TODO: Add support for: __cxa_thread_atexit_impl  */

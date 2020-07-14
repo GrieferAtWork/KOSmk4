@@ -90,35 +90,10 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBDISASM_CC *diasm_symbol_printer_t)(struct disassembler *__restrict self,
                                        void *symbol_addr);
 
-#ifndef __pformatprinter_defined
-#define __pformatprinter_defined 1
-/* Callback functions prototypes provided to format functions.
- * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
- * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
- * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
- * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
- *                  Note that this is an exact value, meaning that a NUL-character appearing
- *                  before then should not terminate printing prematurely, but be printed as well.
- * @return: < 0:    An error occurred and the calling function shall return with this same value.
- * @return: >= 0:   The print was successful.
- *                  Usually, the return value is added to a sum of values which is then
- *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success is 'DATALEN'. */
-typedef __pformatprinter pformatprinter;
-
-/* Read and return one character.
- * @return: >= 0:  The character that was read.
- * @return: EOF:   The input stream has ended.
- * @return: < EOF: An error occurred (Return the same value to the caller) */
-typedef __pformatgetc pformatgetc;
-typedef __pformatungetc pformatungetc;
-#endif /* !__pformatprinter_defined */
-
-
 struct disassembler {
 	__byte_t              *d_pc;              /* [1..1] Next address to-be disassembled. */
 	__ptrdiff_t            d_baseoff;         /* Offset added to `d_pc' for the purpose of relative relocations. */
-	pformatprinter         d_printer;         /* [1..1][const] The printer used to output disassembly text. */
+	__pformatprinter       d_printer;         /* [1..1][const] The printer used to output disassembly text. */
 	void                  *d_arg;             /* [const] Argument passed to `d_printer'. */
 	__ssize_t              d_result;          /* Sum of all calls to `d_printer' (When negative, don't print anymore) */
 	diasm_symbol_printer_t d_symbol;          /* [0..1][const] An optional callback for printing symbol names.
@@ -140,7 +115,7 @@ struct disassembler {
 /* Initialize a given disassembler structure. */
 __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(LIBDISASM_CC disasm_init)(struct disassembler *__restrict self,
-                                        pformatprinter printer, void *arg, void const *pc,
+                                        __pformatprinter printer, void *arg, void const *pc,
                                         __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
                                         __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL),
                                         __ptrdiff_t baseoff __DFL(0)) {
@@ -229,12 +204,12 @@ disasm_print_format(struct disassembler *__restrict self,
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBDISASM_CC *PDISASM)(pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
+(LIBDISASM_CC *PDISASM)(__pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
                         __UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/,
                         __UINTPTR_HALF_TYPE__ flags /*__DFL(DISASSEMBLER_FNORMAL)*/);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
-disasm(pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
+disasm(__pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
        __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
        __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL));
 #endif /* LIBDISASM_WANT_PROTOTYPES */
@@ -254,12 +229,12 @@ disasm(pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBDISASM_CC *PDISASM_SINGLE)(pformatprinter printer, void *arg, void *pc,
+(LIBDISASM_CC *PDISASM_SINGLE)(__pformatprinter printer, void *arg, void *pc,
                                __UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/,
                                __UINTPTR_HALF_TYPE__ flags /*__DFL(DISASSEMBLER_FNORMAL)*/);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
-disasm_single(pformatprinter printer, void *arg, void *pc,
+disasm_single(__pformatprinter printer, void *arg, void *pc,
               __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
               __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL));
 #endif /* LIBDISASM_WANT_PROTOTYPES */

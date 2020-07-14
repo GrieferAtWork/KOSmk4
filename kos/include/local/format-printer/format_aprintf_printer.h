@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e36735a */
+/* HASH CRC-32:0x42c78ada */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_format_aprintf_printer_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_aprintf_alloc from format-printer */
 #ifndef __local___localdep_format_aprintf_alloc_defined
@@ -76,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 __LOCAL_LIBC(format_aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_aprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	char *__buf;
 	__buf = __localdep_format_aprintf_alloc((struct format_aprintf_data *)__arg,
 	                           __datalen);

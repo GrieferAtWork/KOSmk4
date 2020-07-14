@@ -30,6 +30,9 @@
 %[define_wchar_replacement(__pwformatprinter = __pc16formatprinter, __pc32formatprinter)]
 %[define_wchar_replacement(format_wsnprintf_data = format_c16snprintf_data, format_c32snprintf_data)]
 %[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]
+%[define_wchar_replacement(WFORMATPRINTER_CC = C16FORMATPRINTER_CC, C32FORMATPRINTER_CC)]
+%[define_wchar_replacement(__WFORMATPRINTER_CC = __C16FORMATPRINTER_CC, __C32FORMATPRINTER_CC)]
+
 %[default:section(".text.crt{|.dos}.wchar.string.format")]
 
 
@@ -77,15 +80,20 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+/* Calling convention used by `pwformatprinter' */
+#ifndef WFORMATPRINTER_CC
+#define WFORMATPRINTER_CC __WFORMATPRINTER_CC
+#endif /* !WFORMATPRINTER_CC */
+
 #ifndef __pwformatprinter_defined
 #define __pwformatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
- * NOTE: '__pformatprinter' usually returns the number of characters printed, but isn't required to.
+ * NOTE: 'pwformatprinter' usually returns the number of characters printed, but isn't required to.
+ * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
  * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
  *                  Note that this is an exact value, meaning that a NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
- * @param: CLOSURE: The user-defined closure parameter passed alongside this function pointer.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
@@ -243,7 +251,7 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 }
 
 
-[[ATTR_CONST]]
+[[ATTR_CONST, cc(__WFORMATPRINTER_CC), decl_include("<bits/wformat-printer.h>")]]
 $ssize_t format_wlength(void *arg, wchar_t const *__restrict data,
                         $size_t datalen) = format_length;
 

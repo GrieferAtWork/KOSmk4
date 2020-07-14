@@ -25,6 +25,8 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <bits/format-printer.h>
+
 DECL_BEGIN
 
 #ifndef CONFIG_SYSLOG_LINEMAX
@@ -137,7 +139,7 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
  * @except: May only throw exceptions as the result of accessing memory in `*data'
  * @return: * : Always re-returns `datalen' */
-FUNDEF ssize_t KCALL
+FUNDEF ssize_t __FORMATPRINTER_CC
 syslog_printer(void *level,
                USER CHECKED char const *data,
                size_t datalen)

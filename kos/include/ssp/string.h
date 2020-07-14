@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7afb18b2 */
+/* HASH CRC-32:0x48b863bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -713,7 +713,7 @@ __NAMESPACE_STD_BEGIN
 #ifdef __forward_voidp_defined
 __NAMESPACE_GLB_USING(__forward_voidp)
 #else /* __forward_voidp_defined */
-__FORCELOCAL __ATTR_CONST void *__NOTHROW(__LIBCCALL __forward_voidp)(void *__x) { return __x; }
+__FORCELOCAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(void *__x) { return __x; }
 #endif /* !__forward_voidp_defined */
 __NAMESPACE_STD_END
 #ifndef __forward_voidp_defined

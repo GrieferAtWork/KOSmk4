@@ -768,7 +768,7 @@ done:
 %{
 #ifndef __ACTION_FN_T
 #define __ACTION_FN_T 1
-typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
+typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
 #endif /* !__ACTION_FN_T */
 }
 %[define_type_class(__action_fn_t = "TP")]

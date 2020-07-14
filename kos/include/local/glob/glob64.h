@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaacf463f */
+/* HASH CRC-32:0xd19315b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #ifndef ____glob_errfunc_t_defined
 #define ____glob_errfunc_t_defined 1
-typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
+typedef int (__LIBKCALL *__glob_errfunc_t)(char const *__path, int __flags);
 #endif /* !____glob_errfunc_t_defined */
 struct __glob64_struct;
 __NAMESPACE_LOCAL_BEGIN

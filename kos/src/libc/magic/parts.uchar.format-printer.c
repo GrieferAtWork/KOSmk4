@@ -37,15 +37,25 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+/* Calling convention used by `pc16formatprinter' */
+#ifndef C16FORMATPRINTER_CC
+#define C16FORMATPRINTER_CC __C16FORMATPRINTER_CC
+#endif /* !C16FORMATPRINTER_CC */
+
+/* Calling convention used by `pc32formatprinter' */
+#ifndef C32FORMATPRINTER_CC
+#define C32FORMATPRINTER_CC __C32FORMATPRINTER_CC
+#endif /* !C32FORMATPRINTER_CC */
+
 #ifndef __pc16formatprinter_defined
 #define __pc16formatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
- * NOTE: '__pformatprinter' usually returns the number of characters printed, but isn't required to.
+ * NOTE: 'pc(16|32)formatprinter' usually returns the number of characters printed, but isn't required to.
+ * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
  * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
  *                  Note that this is an exact value, meaning that a NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
- * @param: CLOSURE: The user-defined closure parameter passed alongside this function pointer.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
@@ -113,7 +123,10 @@ format_c32snprintf_printer(*) %{uchar("format_wsnprintf_printer")}
 format_c16width(*) %{uchar("format_wwidth")}
 format_c32width(*) %{uchar("format_wwidth")}
 
+[[ATTR_CONST, cc(__C16FORMATPRINTER_CC), decl_include("<bits/uformat-printer.h>")]]
 $ssize_t format_c16length(void *arg, char16_t const *__restrict data, $size_t datalen) = format_length;
+
+[[ATTR_CONST, cc(__C32FORMATPRINTER_CC), decl_include("<bits/uformat-printer.h>")]]
 $ssize_t format_c32length(void *arg, char32_t const *__restrict data, $size_t datalen) = format_length;
 
 

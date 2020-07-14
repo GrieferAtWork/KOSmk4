@@ -66,10 +66,10 @@ __DECL_BEGIN
 #endif /* !____libc_free_defined */
 
 #if defined(____libc_malloc_defined) && defined(____libc_realloc_defined)
-__LOCAL char **(__LIBCCALL __capture_exec_args)(char *__first,
-                                                __builtin_va_list __args,
-                                                char ***__penviron) {
-	/* TODO: Can't use malloc(). - Might corrupt heap in vfork() scenario */
+__LOCAL char **(__capture_exec_args)(char *__first,
+                                     __builtin_va_list __args,
+                                     char ***__penviron) {
+	/* TODO: Can't use malloc(). - Might corrupt heap in vfork() scenarios */
 	char **__new_result, **__result = __NULLPTR;
 	char *__arg;
 	__SIZE_TYPE__ __count = 1;
@@ -97,11 +97,11 @@ __LOCAL char **(__LIBCCALL __capture_exec_args)(char *__first,
 	return __result;
 }
 
-__LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
-                                                 __builtin_va_list __args,
-                                                 char ***__penviron,
-                                                 int *__pflags) {
-	/* TODO: Can't use malloc(). - Might corrupt heap in vfork() scenario */
+__LOCAL char **(__capture_exec_argsf)(char *__first,
+                                      __builtin_va_list __args,
+                                      char ***__penviron,
+                                      int *__pflags) {
+	/* TODO: Can't use malloc(). - Might corrupt heap in vfork() scenarios */
 	char **__new_result, **__result = __NULLPTR;
 	char *__arg;
 	__SIZE_TYPE__ __count = 1;
@@ -130,16 +130,16 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 	return __result;
 }
 #else /* ____libc_malloc_defined && ____libc_realloc_defined */
-__LOCAL char **(__LIBCCALL __capture_exec_args)(char *__UNUSED(__first),
-                                                __builtin_va_list __UNUSED(__args),
-                                                char ***__UNUSED(__penviron)) {
+__LOCAL char **(__capture_exec_args)(char *__UNUSED(__first),
+                                     __builtin_va_list __UNUSED(__args),
+                                     char ***__UNUSED(__penviron)) {
 	return __NULLPTR;
 }
 
-__LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__UNUSED(__first),
-                                                 __builtin_va_list __UNUSED(__args),
-                                                 char ***__UNUSED(__penviron),
-                                                 int *__UNUSED(__pflags)) {
+__LOCAL char **(__capture_exec_argsf)(char *__UNUSED(__first),
+                                      __builtin_va_list __UNUSED(__args),
+                                      char ***__UNUSED(__penviron),
+                                      int *__UNUSED(__pflags)) {
 	return __NULLPTR;
 }
 #endif /* !____libc_malloc_defined || !____libc_realloc_defined */

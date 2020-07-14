@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d985be4 */
+/* HASH CRC-32:0xe9d8d920 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_snprintf_printer_defined
 #define __local_format_snprintf_printer_defined 1
 #include <__crt.h>
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
@@ -44,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
  *       the sum of return values of all calls to `format_snprintf_printer()' */
 __LOCAL_LIBC(format_snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_snprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_snprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_snprintf_data {
 		char  *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */

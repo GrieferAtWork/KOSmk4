@@ -895,7 +895,7 @@ int pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
 
 
 %
-%typedef void (__LIBCCALL *__pthread_once_routine_t)(void);
+%typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 %[define_type_class(__pthread_once_routine_t = "TP")]
 
 %
@@ -956,7 +956,7 @@ typedef struct {
 
 /* Structure to hold the cleanup handler information. */
 struct __pthread_cleanup_frame {
-	void (__LIBCCALL *__cancel_routine) (void *);
+	void (__LIBKCALL *__cancel_routine)(void *);
 	void             *__cancel_arg;
 	int               __do_it;
 	int               __cancel_type;
@@ -969,12 +969,12 @@ struct __pthread_cleanup_frame {
 #ifdef __cplusplus
 /* Class to handle cancellation handler invocation. */
 class __pthread_cleanup_class {
-	void (__LIBCCALL *__cancel_routine) (void *);
+	void (__LIBKCALL *__cancel_routine)(void *);
 	void             *__cancel_arg;
 	int               __do_it;
 	int               __cancel_type;
 public:
-	__CXX_CLASSMEMBER __pthread_cleanup_class (void (__LIBCCALL *__fct)(void *), void *__arg)
+	__CXX_CLASSMEMBER __pthread_cleanup_class (void (__LIBKCALL *__fct)(void *), void *__arg)
 		: __cancel_routine(__fct), __cancel_arg(__arg), __do_it(1)
 	{ }
 	__CXX_CLASSMEMBER ~__pthread_cleanup_class() {
@@ -1093,7 +1093,7 @@ void __pthread_cleanup_routine([[nonnull]] struct __pthread_cleanup_frame *frame
 %#define pthread_cleanup_push(routine, arg)                                                                    \
 %	do {                                                                                                      \
 %		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-%		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
+%		void (__LIBKCALL *__cancel_routine)(void *) = (routine);                                              \
 %		void *__cancel_arg                          = (arg);                                                  \
 %		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 %		if __unlikely(__not_first_call) {                                                                     \
@@ -1138,7 +1138,7 @@ void __pthread_unregister_cancel([[nonnull]] __pthread_unwind_buf_t *buf);
 %#define pthread_cleanup_push_defer_np(routine, arg)                                                           \
 %	do {                                                                                                      \
 %		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-%		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
+%		void (__LIBKCALL *__cancel_routine)(void *) = (routine);                                              \
 %		void *__cancel_arg               = (arg);                                                             \
 %		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 %		if __unlikely(__not_first_call) {                                                                     \
@@ -1735,7 +1735,7 @@ int pthread_barrierattr_setpshared([[nonnull]] pthread_barrierattr_t *attr, int 
 %{
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
-typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
+typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 #endif /* !____pthread_destr_function_t_defined */
 }
 %[define_type_class(__pthread_destr_function_t = "TP")]
@@ -1751,7 +1751,7 @@ typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
 [[decl_prefix(
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
-typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
+typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 #endif /* !____pthread_destr_function_t_defined */
 )]]
 int pthread_key_create([[nonnull]] pthread_key_t *key,
@@ -1780,7 +1780,7 @@ int pthread_getcpuclockid(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id
 %
 %#ifndef ____pthread_atfork_func_t_defined
 %#define ____pthread_atfork_func_t_defined 1
-%typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+%typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 %#endif /* !____pthread_atfork_func_t_defined */
 %[define_type_class(__pthread_atfork_func_t = "TP")]
 

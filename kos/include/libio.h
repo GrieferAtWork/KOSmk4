@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb2f59ec */
+/* HASH CRC-32:0x3a64bec0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ typedef __WINT_TYPE__ wint_t;
 
 /* Read NBYTES bytes from COOKIE into a buffer pointed to by BUF.
  * Return number of bytes read. */
-typedef __ssize_t (__LIBCCALL __io_read_fn)(void *__cookie, char *__buf, __size_t __num_bytes);
+typedef __ssize_t (__LIBKCALL __io_read_fn)(void *__cookie, char *__buf, __size_t __num_bytes);
 
 /* Write N bytes pointed to by BUF to COOKIE. Write all N bytes
  * unless there is an error. Return number of bytes written. If
@@ -93,7 +93,7 @@ typedef __ssize_t (__LIBCCALL __io_read_fn)(void *__cookie, char *__buf, __size_
  * has been opened for append (mode.append set), then set the file
  * pointer to the end of the file and then do the write; if not, just
  * write at the current file pointer. */
-typedef __ssize_t (__LIBCCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __num_bytes);
+typedef __ssize_t (__LIBKCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __num_bytes);
 
 /* Move COOKIE's file position to *POS bytes from the
  * beginning of the file (if WHENCE is SEEK_SET),
@@ -102,13 +102,13 @@ typedef __ssize_t (__LIBCCALL __io_write_fn)(void *__cookie, const char *__buf, 
  * Set *POS to the new file position.
  * Returns zero if successful, nonzero if not. */
 #ifdef __USE_KOS
-typedef int (__LIBCCALL __io_seek_fn)(void *__cookie, __pos64_t *__pos, int __whence);
+typedef int (__LIBKCALL __io_seek_fn)(void *__cookie, __pos64_t *__pos, int __whence);
 #else /* __USE_KOS */
-typedef int (__LIBCCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __whence);
+typedef int (__LIBKCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __whence);
 #endif /* !__USE_KOS */
 
 /* Close COOKIE. */
-typedef int (__LIBCCALL __io_close_fn)(void *__cookie);
+typedef int (__LIBKCALL __io_close_fn)(void *__cookie);
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("read")

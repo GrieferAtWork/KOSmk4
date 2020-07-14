@@ -44,7 +44,7 @@ struct argv_append_data {
 	os_heap_gfpvar  (aad_gfp)  /* [const] Malloc flags. */
 };
 
-PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
 argv_append(void *__restrict arg,
             /*utf-8*/ char const *__restrict data,
             size_t UNUSED(len)) {
@@ -316,7 +316,7 @@ err:
 
 
 
-PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
 cmdline_flatten_callback(void *arg,
                          char const *__restrict data,
                          size_t datalen) {

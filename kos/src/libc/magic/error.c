@@ -49,9 +49,9 @@ __SYSDECL_BEGIN
 #define __LOCAL_error_print_progname error_print_progname
 @@pp_elif defined(__CRT_HAVE_error_print_progname)@@
 @@pp_ifdef __NO_ASMNAME@@
-__LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 @@pp_else@@
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname         error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 @@pp_endif@@
@@ -205,7 +205,7 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
  * When non-NULL, this function should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s: ", basename(argv[0])); */
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname error_print_progname
 #endif /* __CRT_HAVE_error_print_progname */
 #endif /* !error_print_progname */

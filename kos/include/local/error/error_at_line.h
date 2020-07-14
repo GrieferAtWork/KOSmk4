@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5edb4a44 */
+/* HASH CRC-32:0x487243f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -257,9 +257,9 @@ __NAMESPACE_LOCAL_END
 #define __LOCAL_error_print_progname __error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
-__LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 #else /* __NO_ASMNAME */
-__LIBC void (__LIBCCALL *__error_print_progname)(void);
+__LIBC void (__LIBKCALL *__error_print_progname)(void);
 #define __error_print_progname         __error_print_progname
 #define __LOCAL_error_print_progname __error_print_progname
 #endif /* !__NO_ASMNAME */

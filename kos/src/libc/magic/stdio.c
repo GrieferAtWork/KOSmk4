@@ -99,6 +99,10 @@
 
 #include <libio.h>
 
+#ifdef __USE_KOS
+#include <bits/format-printer.h>
+#endif /* __USE_KOS */
+
 #ifdef __USE_DOS
 #include <bits/crt/sys_errlist.h>
 #include <xlocale.h>
@@ -884,14 +888,14 @@ __STDC_INT_AS_SSIZE_T printf([[nonnull]] char const *__restrict format, ...)
 [[decl_include("<features.h>"), dependency(fgetc)]]
 [[impl_include("<hybrid/typecore.h>"), impl_prefix(
 @@push_namespace(local)@@
-@@pp_if __SIZEOF_SIZE_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__@@
 __LOCAL_LIBC(@vfscanf_getc@) ssize_t
-(__LIBCCALL vfscanf_getc)(void *arg) {
+(__FORMATPRINTER_CC vfscanf_getc)(void *arg) {
 	return (ssize_t)fgetc((FILE *)arg);
 }
 @@pp_endif@@
 __LOCAL_LIBC(@vfscanf_ungetc@) ssize_t
-(__LIBCCALL vfscanf_ungetc)(void *arg, char32_t ch) {
+(__FORMATPRINTER_CC vfscanf_ungetc)(void *arg, char32_t ch) {
 	return ungetc((int)(unsigned int)ch, (FILE *)arg);
 }
 @@pop_namespace@@
@@ -899,7 +903,7 @@ __LOCAL_LIBC(@vfscanf_ungetc@) ssize_t
 __STDC_INT_AS_SIZE_T vfscanf([[nonnull]] FILE *__restrict stream,
                              [[nonnull]] char const *__restrict format,
                              $va_list args) {
-@@pp_if __SIZEOF_SIZE_T__ == __SIZEOF_INT__@@
+@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__@@
 	return format_vscanf(*(pformatgetc)&fgetc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
@@ -970,13 +974,15 @@ char *gets([[nonnull]] char *__restrict buf) {
 [[decl_include("<features.h>")]]
 [[guard, std, guard, crtbuiltin, impl_include("<asm/crt/stdio.h>")]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
-[[impl_include("<hybrid/typecore.h>"), impl_prefix(
+[[impl_include("<hybrid/typecore.h>", "<bits/format-printer.h>"), impl_prefix(
 @@push_namespace(local)@@
-__LOCAL_LIBC(@vsscanf_getc@) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
+__LOCAL_LIBC(@vsscanf_getc@) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result = unicode_readutf8((char const **)__arg);
 	return __result ? __result : __EOF;
 }
-__LOCAL_LIBC(@vsscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+__LOCAL_LIBC(@vsscanf_ungetc@) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	unicode_readutf8_rev((char const **)__arg);
 	return 0;
 }
@@ -1077,18 +1083,19 @@ __STDC_INT_AS_SIZE_T snprintf([[outp_opt(min(return, buflen))]] char *__restrict
 %
 %#ifdef __USE_XOPEN2K8
 [[section(".text.crt{|.dos}.io.write"), decl_include("<features.h>")]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>", "<bits/format-printer.h>")]]
 [[cp, requires_dependent_function(write), impl_prefix(
-@@pp_if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__@@
 @@push_namespace(local)@@
-__LOCAL_LIBC(@vdprintf_printer@) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
+__LOCAL_LIBC(@vdprintf_printer@) __ssize_t
+(__FORMATPRINTER_CC __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
 @@pop_namespace@@
 @@pp_endif@@
 ), ATTR_LIBC_PRINTF(2, 0)]]
 __STDC_INT_AS_SSIZE_T vdprintf($fd_t fd, [[nonnull]] char const *__restrict format, $va_list args) {
-@@pp_if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__@@
 	return format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
@@ -1748,7 +1755,7 @@ int fsetpos64([[nonnull]] $FILE *__restrict stream,
 %#ifdef __USE_KOS
 %[default:section(".text.crt{|.dos}.FILE.locked.write.write")]
 @@For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument
-[[cp_stdio]]
+[[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/format-printer.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_printer_unlocked")]]
 [[alias("file_printer_unlocked"), userimpl, requires_function(fwrite)]]
 $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
@@ -1759,7 +1766,8 @@ $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.write.write")]
 @@Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[[cp_stdio, alias("file_printer"), userimpl, requires_function(fwrite_unlocked)]]
+[[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/format-printer.h>")]]
+[[alias("file_printer"), userimpl, requires_function(fwrite_unlocked)]]
 $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
                                [[inp(datalen)]] char const *__restrict data,
                                $size_t datalen) {
@@ -2222,14 +2230,14 @@ __STDC_INT_AS_SSIZE_T printf_unlocked([[nonnull]] char const *__restrict format,
 [[decl_include("<features.h>"), dependency(fgetc_unlocked)]]
 [[impl_include("<hybrid/typecore.h>"), impl_prefix(
 @@push_namespace(local)@@
-@@pp_if __SIZEOF_SIZE_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__@@
 __LOCAL_LIBC(@vfscanf_getc_unlocked@) ssize_t
-(__LIBCCALL vfscanf_getc_unlocked)(void *arg) {
+(__FORMATPRINTER_CC vfscanf_getc_unlocked)(void *arg) {
 	return (ssize_t)fgetc_unlocked((FILE *)arg);
 }
 @@pp_endif@@
 __LOCAL_LIBC(@vfscanf_ungetc_unlocked@) ssize_t
-(__LIBCCALL vfscanf_ungetc_unlocked)(void *arg, char32_t ch) {
+(__FORMATPRINTER_CC vfscanf_ungetc_unlocked)(void *arg, char32_t ch) {
 	return ungetc_unlocked((int)(unsigned int)ch, (FILE *)arg);
 }
 @@pop_namespace@@
@@ -2237,7 +2245,7 @@ __LOCAL_LIBC(@vfscanf_ungetc_unlocked@) ssize_t
 __STDC_INT_AS_SIZE_T vfscanf_unlocked([[nonnull]] $FILE *__restrict stream,
                                       [[nonnull]] char const *__restrict format,
                                       $va_list args) {
-@@pp_if __SIZEOF_SIZE_T__ == __SIZEOF_INT__@@
+@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__@@
 	return format_vscanf(*(pformatgetc)&fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
@@ -2474,15 +2482,14 @@ struct __vsnscanf_data {
 	char const *__end;
 };
 __LOCAL_LIBC(@vsnscanf_getc@) __SSIZE_TYPE__
-(__LIBCCALL __vsnscanf_getc)(void *__arg) {
+(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
 	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? __result : __EOF;
 }
-
 __LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
-(__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }

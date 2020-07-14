@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dd67f2e */
+/* HASH CRC-32:0x19b4448a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@ DECL_BEGIN
 #define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
-__LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 #else /* __NO_ASMNAME */
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname         error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 #endif /* !__NO_ASMNAME */
@@ -107,9 +107,9 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
 #define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
-__LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 #else /* __NO_ASMNAME */
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname         error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 #endif /* !__NO_ASMNAME */
@@ -171,9 +171,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 #define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
-__LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 #else /* __NO_ASMNAME */
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname         error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 #endif /* !__NO_ASMNAME */
@@ -268,9 +268,9 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 #define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
-__LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 #else /* __NO_ASMNAME */
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname         error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 #endif /* !__NO_ASMNAME */

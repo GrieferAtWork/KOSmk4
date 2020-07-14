@@ -5866,8 +5866,6 @@
 #define __CRT_HAVE_KOS$fgetws 1
 #define __CRT_HAVE_KOS$fgetws_unlocked 1
 #define __CRT_HAVE_KOS$fgetxattr 1
-#define __CRT_HAVE_KOS$file_printer 1
-#define __CRT_HAVE_KOS$file_printer_unlocked 1
 #define __CRT_HAVE_KOS$file_wprinter 1
 #define __CRT_HAVE_KOS$file_wprinter_unlocked 1
 #define __CRT_HAVE_KOS$fileno 1
@@ -5908,16 +5906,12 @@
 #define __CRT_HAVE_KOS$format_8to32 1
 #define __CRT_HAVE_KOS$format_aprintf_alloc 1
 #define __CRT_HAVE_KOS$format_aprintf_pack 1
-#define __CRT_HAVE_KOS$format_aprintf_printer 1
 #define __CRT_HAVE_KOS$format_escape 1
 #define __CRT_HAVE_KOS$format_hexdump 1
-#define __CRT_HAVE_KOS$format_length 1
 #define __CRT_HAVE_KOS$format_printf 1
 #define __CRT_HAVE_KOS$format_quote 1
 #define __CRT_HAVE_KOS$format_repeat 1
 #define __CRT_HAVE_KOS$format_scanf 1
-#define __CRT_HAVE_KOS$format_snprintf_printer 1
-#define __CRT_HAVE_KOS$format_sprintf_printer 1
 #define __CRT_HAVE_KOS$format_vprintf 1
 #define __CRT_HAVE_KOS$format_vscanf 1
 #define __CRT_HAVE_KOS$format_vwprintf 1
@@ -5926,7 +5920,6 @@
 #define __CRT_HAVE_KOS$format_waprintf_printer 1
 #define __CRT_HAVE_KOS$format_wescape 1
 #define __CRT_HAVE_KOS$format_whexdump 1
-#define __CRT_HAVE_KOS$format_width 1
 #define __CRT_HAVE_KOS$format_wprintf 1
 #define __CRT_HAVE_KOS$format_wrepeat 1
 #define __CRT_HAVE_KOS$format_wsnprintf_printer 1
@@ -7395,7 +7388,6 @@
 #define __CRT_HAVE_KOS$sysconf 1
 #define __CRT_HAVE_KOS$sysinfo 1
 #define __CRT_HAVE_KOS$syslog 1
-#define __CRT_HAVE_KOS$syslog_printer 1
 #define __CRT_HAVE_KOS$system 1
 #define __CRT_HAVE_KOS$sysv_signal 1
 #define __CRT_HAVE_KOS$tan 1
@@ -9239,8 +9231,6 @@
 #define __CRT_HAVE_DOS$fgetws 1
 #define __CRT_HAVE_DOS$fgetws_unlocked 1
 #define __CRT_HAVE_DOS$fgetxattr 1
-#define __CRT_HAVE_DOS$file_printer 1
-#define __CRT_HAVE_DOS$file_printer_unlocked 1
 #define __CRT_HAVE_DOS$file_wprinter 1
 #define __CRT_HAVE_DOS$file_wprinter_unlocked 1
 #define __CRT_HAVE_DOS$fileno 1
@@ -9281,16 +9271,12 @@
 #define __CRT_HAVE_DOS$format_8to32 1
 #define __CRT_HAVE_DOS$format_aprintf_alloc 1
 #define __CRT_HAVE_DOS$format_aprintf_pack 1
-#define __CRT_HAVE_DOS$format_aprintf_printer 1
 #define __CRT_HAVE_DOS$format_escape 1
 #define __CRT_HAVE_DOS$format_hexdump 1
-#define __CRT_HAVE_DOS$format_length 1
 #define __CRT_HAVE_DOS$format_printf 1
 #define __CRT_HAVE_DOS$format_quote 1
 #define __CRT_HAVE_DOS$format_repeat 1
 #define __CRT_HAVE_DOS$format_scanf 1
-#define __CRT_HAVE_DOS$format_snprintf_printer 1
-#define __CRT_HAVE_DOS$format_sprintf_printer 1
 #define __CRT_HAVE_DOS$format_vprintf 1
 #define __CRT_HAVE_DOS$format_vscanf 1
 #define __CRT_HAVE_DOS$format_vwprintf 1
@@ -9299,7 +9285,6 @@
 #define __CRT_HAVE_DOS$format_waprintf_printer 1
 #define __CRT_HAVE_DOS$format_wescape 1
 #define __CRT_HAVE_DOS$format_whexdump 1
-#define __CRT_HAVE_DOS$format_width 1
 #define __CRT_HAVE_DOS$format_wprintf 1
 #define __CRT_HAVE_DOS$format_wrepeat 1
 #define __CRT_HAVE_DOS$format_wsnprintf_printer 1
@@ -10768,7 +10753,6 @@
 #define __CRT_HAVE_DOS$sysconf 1
 #define __CRT_HAVE_DOS$sysinfo 1
 #define __CRT_HAVE_DOS$syslog 1
-#define __CRT_HAVE_DOS$syslog_printer 1
 #define __CRT_HAVE_DOS$system 1
 #define __CRT_HAVE_DOS$sysv_signal 1
 #define __CRT_HAVE_DOS$tan 1

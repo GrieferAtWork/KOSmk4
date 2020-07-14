@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd004b82 */
+/* HASH CRC-32:0xbd3b1072 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -342,7 +342,7 @@ __SYSDECL_BEGIN
 
 
 #if defined(__USE_GNU) || defined(__USE_KOS)
-typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
+typedef int (__LIBKCALL *__clone_func_t)(void *__arg);
 #ifdef __CRT_HAVE_clone
 __LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg, ...) __CASMNAME_SAME("clone");
 #elif defined(__CRT_HAVE___clone)

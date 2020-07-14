@@ -54,6 +54,7 @@ function isLibcLinkage(
 		asmname: string | UserString, hasEllipsis: bool): bool {
 	if (decl !in LIBC_LINKAGE_DECLS)
 		return false;
+	cc = str(cc);
 	if (hasEllipsis != (cc.startswith("V") || cc.startswith("__V")))
 		return false;
 	switch (cc) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d857d8d */
+/* HASH CRC-32:0xe890eae0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,9 +80,12 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_aprintf_printer_defined
 #define __local___localdep_format_aprintf_printer_defined 1
 #ifdef __CRT_HAVE_format_aprintf_printer
+__NAMESPACE_LOCAL_END
+#include <bits/format-printer.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_aprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_END
 #include <local/format-printer/format_aprintf_printer.h>

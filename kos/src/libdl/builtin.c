@@ -45,9 +45,9 @@
 DECL_BEGIN
 
 INTERN NONNULL((2)) ssize_t
-NOTHROW_RPC(LIBCCALL syslog_printer)(void *arg,
-                                     char const *__restrict data,
-                                     size_t datalen) {
+NOTHROW_RPC(FORMATPRINTER_CC syslog_printer)(void *arg,
+                                             char const *__restrict data,
+                                             size_t datalen) {
 	return sys_syslog((syscall_ulong_t)arg,
 	                  data,
 	                  datalen);
@@ -1565,9 +1565,9 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 
 	case DLAUXCTRL_ADD_FINALIZER: {
 		struct dlmodule_finalizers *flz;
-		void (__LIBCCALL *func)(void *);
+		void (LIBDL_CC *func)(void *);
 		void *arg;
-		func = va_arg(args, void (__LIBCCALL *)(void *));
+		func = va_arg(args, void (LIBDL_CC *)(void *));
 		arg  = va_arg(args, void *);
 again_add_finalizer_read_list:
 		flz = ATOMIC_READ(self->dm_finalize);

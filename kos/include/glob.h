@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb51ab0e8 */
+/* HASH CRC-32:0x359ba4b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,19 +112,19 @@ typedef struct __glob_struct {
 	int      gl_flags; /* Set to FLAGS, maybe | GLOB_MAGCHAR.  */
 	/* If the GLOB_ALTDIRFUNC flag is set, the following functions
 	 * are used instead of the normal file access functions. */
-	void (__LIBCCALL *gl_closedir)(void *);
+	void (__LIBKCALL *gl_closedir)(void *);
 #ifdef __USE_GNU
-	struct dirent *(__LIBCCALL *gl_readdir)(void *);
+	struct dirent *(__LIBKCALL *gl_readdir)(void *);
 #else /* __USE_GNU */
-	void *(__LIBCCALL *gl_readdir)(void *);
+	void *(__LIBKCALL *gl_readdir)(void *);
 #endif /* !__USE_GNU */
-	void *(__LIBCCALL *gl_opendir)(char const *);
+	void *(__LIBKCALL *gl_opendir)(char const *);
 #ifdef __USE_GNU
-	int (__LIBCCALL *gl_lstat)(char const *__restrict, struct stat *__restrict);
-	int (__LIBCCALL *gl_stat)(char const *__restrict, struct stat *__restrict);
+	int (__LIBKCALL *gl_lstat)(char const *__restrict, struct stat *__restrict);
+	int (__LIBKCALL *gl_stat)(char const *__restrict, struct stat *__restrict);
 #else /* __USE_GNU */
-	int (__LIBCCALL *gl_lstat)(char const *__restrict, void *__restrict);
-	int (__LIBCCALL *gl_stat)(char const *__restrict, void *__restrict);
+	int (__LIBKCALL *gl_lstat)(char const *__restrict, void *__restrict);
+	int (__LIBKCALL *gl_stat)(char const *__restrict, void *__restrict);
 #endif /* !__USE_GNU */
 } glob_t;
 
@@ -140,19 +140,19 @@ typedef struct __glob64_struct {
 	int      gl_flags;
 	/* If the GLOB_ALTDIRFUNC flag is set, the following functions
 	 * are used instead of the normal file access functions.  */
-	void (__LIBCCALL *gl_closedir)(void *);
+	void (__LIBKCALL *gl_closedir)(void *);
 #ifdef __USE_GNU
-	struct dirent64 *(__LIBCCALL *gl_readdir)(void *);
+	struct dirent64 *(__LIBKCALL *gl_readdir)(void *);
 #else /* __USE_GNU */
-	void *(__LIBCCALL *gl_readdir)(void *);
+	void *(__LIBKCALL *gl_readdir)(void *);
 #endif /* !__USE_GNU */
-	void *(__LIBCCALL *gl_opendir)(char const *);
+	void *(__LIBKCALL *gl_opendir)(char const *);
 #ifdef __USE_GNU
-	int (__LIBCCALL *gl_lstat)(char const *__restrict, struct stat64 *__restrict);
-	int (__LIBCCALL *gl_stat)(char const *__restrict, struct stat64 *__restrict);
+	int (__LIBKCALL *gl_lstat)(char const *__restrict, struct stat64 *__restrict);
+	int (__LIBKCALL *gl_stat)(char const *__restrict, struct stat64 *__restrict);
 #else /* __USE_GNU */
-	int (__LIBCCALL *gl_lstat)(char const *__restrict, void *__restrict);
-	int (__LIBCCALL *gl_stat)(char const *__restrict, void *__restrict);
+	int (__LIBKCALL *gl_lstat)(char const *__restrict, void *__restrict);
+	int (__LIBKCALL *gl_stat)(char const *__restrict, void *__restrict);
 #endif /* !__USE_GNU */
 } glob64_t;
 #endif /* __USE_LARGEFILE64 */
@@ -160,7 +160,7 @@ typedef struct __glob64_struct {
 
 #ifndef ____glob_errfunc_t_defined
 #define ____glob_errfunc_t_defined 1
-typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
+typedef int (__LIBKCALL *__glob_errfunc_t)(char const *__path, int __flags);
 #endif /* !____glob_errfunc_t_defined */
 
 #if defined(__CRT_HAVE_glob64) && defined(__USE_FILE_OFFSET64)

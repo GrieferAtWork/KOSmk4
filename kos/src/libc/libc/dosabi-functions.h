@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcbd4c07 */
+/* HASH CRC-32:0x2c8a54cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -247,13 +247,8 @@ DFUN(".text.crt.dos.string.format", libd_format_escape, libc_format_escape, TI, 
 DFUN(".text.crt.dos.string.format", libd_format_hexdump, libc_format_hexdump, TI, 6, TP, TP, TP, TI, TI, TD)
 DFUN(".text.crt.dos.string.format", libd_format_vprintf, libc_format_vprintf, TI, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.string.format", libd_format_vscanf, libc_format_vscanf, TI, 5, TP, TP, TP, TP, TP)
-DFUN(".text.crt.dos.string.format", libd_format_sprintf_printer, libc_format_sprintf_printer, TI, 3, TP, TP, TI)
-DFUN(".text.crt.dos.string.format", libd_format_snprintf_printer, libc_format_snprintf_printer, TI, 3, TP, TP, TI)
-DFUN(".text.crt.dos.string.format", libd_format_width, libc_format_width, TI, 3, TP, TP, TI)
-DFUN(".text.crt.dos.string.format", libd_format_length, libc_format_length, TI, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.format", libd_format_aprintf_pack, libc_format_aprintf_pack, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.format", libd_format_aprintf_alloc, libc_format_aprintf_alloc, TP, 2, TP, TI)
-DFUN(".text.crt.dos.string.format", libd_format_aprintf_printer, libc_format_aprintf_printer, TI, 3, TP, TP, TI)
 
 /* getopt */
 DFUN(".text.crt.dos.application.options", libd_getopt, libc_getopt, TD, 3, TD, TP, TP)
@@ -1323,8 +1318,6 @@ DFUN(".text.crt.dos.FILE.locked.access", libd_fopen64, libc_fopen64, TP, 2, TP, 
 DFUN(".text.crt.dos.FILE.locked.access", libd_freopen64, libc_freopen64, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.seek.pos", libd_fgetpos64, libc_fgetpos64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.seek.pos", libd_fsetpos64, libc_fsetpos64, TD, 2, TP, TP)
-DFUN(".text.crt.dos.FILE.locked.write.write", libd_file_printer, libc_file_printer, TI, 3, TP, TP, TI)
-DFUN(".text.crt.dos.FILE.unlocked.write.write", libd_file_printer_unlocked, libc_file_printer_unlocked, TI, 3, TP, TP, TI)
 DFUN(".text.crt.dos.heap.strdup", libd_vasprintf, libc_vasprintf, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_fdreopen, libc_fdreopen, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.access", libd_fdreopen_unlocked, libc_fdreopen_unlocked, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)
@@ -1409,8 +1402,6 @@ DFUN(".text.crt.dos.FILE.utility.ext", libd___fsetlocking, libc___fsetlocking, T
 /* stdlib */
 DFUN(".text.crt.dos.utility.stdlib", libd_qsort_r, libc_qsort_r, TV, 5, TP, TI, TI, TP, TP)
 DFUN(".text.crt.dos.utility.stdlib", libd_bsearch_r, libc_bsearch_r, TP, 6, TP, TP, TI, TI, TP, TP)
-DFUN(".text.crt.dos.utility.stdlib", libd_qsort, libc_qsort, TV, 4, TP, TI, TI, TP)
-DFUN(".text.crt.dos.utility.stdlib", libd_bsearch, libc_bsearch, TP, 5, TP, TP, TI, TI, TP)
 DFUN(".text.crt.dos.math.utility", libd_labs, libc_labs, TL, 1, TL)
 DFUN(".text.crt.dos.math.utility", libd_llabs, libc_llabs, TLL, 1, TLL)
 DFUN(".text.crt.dos.math.utility", libd_ldiv, libc_ldiv, TS(__SIZEOF_LDIV_STRUCT), 2, TL, TL)
@@ -1421,9 +1412,7 @@ DFUN(".text.crt.dos.fs.environ", libd_getenv, libc_getenv, TP, 1, TP)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_mblen, libc_mblen, TD, 2, TP, TI)
 DFUN(".text.crt.dos.fs.exec.system", libd_system, libc_system, TD, 1, TP)
 DFUN(".text.crt.dos.application.exit", libd_exit, libc_exit, TV, 1, TD)
-DFUN(".text.crt.dos.sched.process", libd_atexit, libc_atexit, TD, 1, TP)
 DFUN(".text.crt.dos.sched.process", libd_quick_exit, libc_quick_exit, TV, 1, TD)
-DFUN(".text.crt.dos.sched.process", libd_at_quick_exit, libc_at_quick_exit, TD, 1, TP)
 DFUN(".text.crt.dos.application.exit", libd__Exit, libc__Exit, TV, 1, TD)
 DFUN(".text.crt.dos.heap.malloc", libd_malloc, libc_malloc, TP, 1, TI)
 DFUN(".text.crt.dos.heap.malloc", libd_calloc, libc_calloc, TP, 2, TI, TI)
@@ -2061,7 +2050,6 @@ DFUN(".text.crt.dos.system.info", libd_sysinfo, libc_sysinfo, TD, 1, TP)
 DFUN(".text.crt.dos.system.syslog", libd_openlog, libc_openlog, TV, 3, TP, TD, TD)
 DFUN(".text.crt.dos.system.syslog", libd_setlogmask, libc_setlogmask, TD, 1, TD)
 DFUN(".text.crt.dos.system.syslog", libd_vsyslog, libc_vsyslog, TV, 3, TD, TP, TP)
-DFUN(".text.crt.dos.system.syslog", libd_syslog_printer, libc_syslog_printer, TI, 3, TP, TP, TI)
 
 /* sys.sysmacros */
 DFUN(".text.crt.dos.system.utility", libd_gnu_dev_major, libc_gnu_dev_major, TIn(__SIZEOF_MAJOR_T__), 1, TIn(__SIZEOF_DEV_T__))

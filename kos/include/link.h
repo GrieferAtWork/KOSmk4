@@ -80,7 +80,7 @@ struct dl_phdr_info {
 #ifndef ____dl_iterator_callback_defined
 #define ____dl_iterator_callback_defined 1
 /* Callback prototype for `dl_iterate_phdr()' */
-typedef int (__LIBCCALL *__dl_iterator_callback)(struct dl_phdr_info *__info,
+typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
                                                  __size_t __info_size, void *__arg);
 #endif /* !____dl_iterator_callback_defined */
 

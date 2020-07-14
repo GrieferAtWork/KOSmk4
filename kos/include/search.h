@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73183e8 */
+/* HASH CRC-32:0x3e6cbd5f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,7 +298,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tdelete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* ... */
 #ifndef __ACTION_FN_T
 #define __ACTION_FN_T 1
-typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
+typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
 #endif /* !__ACTION_FN_T */
 #ifdef __CRT_HAVE_twalk
 /* Walk through the whole tree and call the ACTION callback for every node or leaf */

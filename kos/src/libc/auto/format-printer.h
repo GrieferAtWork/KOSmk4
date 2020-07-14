@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52a58e8b */
+/* HASH CRC-32:0xbd54d79d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -547,41 +547,20 @@ INTDEF ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t (VLIBDCALL libd_format_s
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTDEF ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t (VLIBCCALL libc_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...) THROWS(...);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_sprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Format-printer implementation for printing to a string buffer like `sprintf' would
- * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
  *       the sum of return values of all calls to `format_snprintf_printer()' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_snprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
- * WARNING: No trailing NUL-character is implicitly appended
- * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
- * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_width)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg, char const *__restrict data, size_t datalen);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Always re-return `datalen' and ignore all other arguments */
-INTDEF ATTR_CONST ssize_t NOTHROW_NCX(LIBDCALL libd_format_length)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg, char const *__restrict data, size_t datalen);
 #ifndef __KERNEL__
 /* Always re-return `datalen' and ignore all other arguments */
-INTDEF ATTR_CONST ssize_t NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg, char const *__restrict data, size_t datalen);
+INTDEF ATTR_CONST ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Pack and finalize a given aprintf format printer
@@ -644,16 +623,9 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNUL
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
-INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_aprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
-INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
+INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END

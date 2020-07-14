@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ad02966 */
+/* HASH CRC-32:0x340f4cba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_USING(error_at_line)
  * When non-NULL, this function should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s: ", basename(argv[0])); */
-__LIBC void (__LIBCCALL *error_print_progname)(void);
+__LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname error_print_progname
 #endif /* __CRT_HAVE_error_print_progname */
 #endif /* !error_print_progname */

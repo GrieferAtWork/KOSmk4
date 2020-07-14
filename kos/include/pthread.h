@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83697349 */
+/* HASH CRC-32:0x524413ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -808,7 +808,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,pthread_setaffinity_np,(pth
 __CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t *__cpuset),(__pthread,__cpusetsize,__cpuset))
 #endif /* __USE_GNU */
 
-typedef void (__LIBCCALL *__pthread_once_routine_t)(void);
+typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 
 /* Functions for handling initialization. */
 
@@ -869,7 +869,7 @@ typedef struct {
 
 /* Structure to hold the cleanup handler information. */
 struct __pthread_cleanup_frame {
-	void (__LIBCCALL *__cancel_routine) (void *);
+	void (__LIBKCALL *__cancel_routine)(void *);
 	void             *__cancel_arg;
 	int               __do_it;
 	int               __cancel_type;
@@ -878,12 +878,12 @@ struct __pthread_cleanup_frame {
 #ifdef __cplusplus
 /* Class to handle cancellation handler invocation. */
 class __pthread_cleanup_class {
-	void (__LIBCCALL *__cancel_routine) (void *);
+	void (__LIBKCALL *__cancel_routine)(void *);
 	void             *__cancel_arg;
 	int               __do_it;
 	int               __cancel_type;
 public:
-	__CXX_CLASSMEMBER __pthread_cleanup_class (void (__LIBCCALL *__fct)(void *), void *__arg)
+	__CXX_CLASSMEMBER __pthread_cleanup_class (void (__LIBKCALL *__fct)(void *), void *__arg)
 		: __cancel_routine(__fct), __cancel_arg(__arg), __do_it(1)
 	{ }
 	__CXX_CLASSMEMBER ~__pthread_cleanup_class() {
@@ -1000,7 +1000,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__pthread_cleanup_routine, __FORCELOCAL __ATTR_A
 #define pthread_cleanup_push(routine, arg)                                                                    \
 	do {                                                                                                      \
 		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
+		void (__LIBKCALL *__cancel_routine)(void *) = (routine);                                              \
 		void *__cancel_arg                          = (arg);                                                  \
 		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 		if __unlikely(__not_first_call) {                                                                     \
@@ -1030,7 +1030,7 @@ __CDECLARE_VOID_OPT(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__
 #define pthread_cleanup_push_defer_np(routine, arg)                                                           \
 	do {                                                                                                      \
 		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
+		void (__LIBKCALL *__cancel_routine)(void *) = (routine);                                              \
 		void *__cancel_arg               = (arg);                                                             \
 		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 		if __unlikely(__not_first_call) {                                                                     \
@@ -1445,7 +1445,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_barrierattr_setpsha
 /* Functions for handling thread-specific data. */
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
-typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
+typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 #endif /* !____pthread_destr_function_t_defined */
 
 /* Create a key value identifying a location in the thread-specific
@@ -1482,7 +1482,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,pthread_getcpuclockid,(pthr
 
 #ifndef ____pthread_atfork_func_t_defined
 #define ____pthread_atfork_func_t_defined 1
-typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #endif /* !____pthread_atfork_func_t_defined */
 
 #ifndef __pthread_atfork_defined

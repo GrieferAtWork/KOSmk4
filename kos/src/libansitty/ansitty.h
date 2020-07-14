@@ -27,6 +27,8 @@
 #include <kos/anno.h>
 #include <kos/types.h>
 
+#include <format-printer.h> /* FORMATPRINTER_CC */
+
 #include <libansitty/ansitty.h>
 
 DECL_BEGIN
@@ -49,7 +51,7 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch);
 /* pformatprinter-compatible prototype for printing to an ANSI TTY
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
-INTDEF NONNULL((1)) ssize_t __LIBCCALL
+INTDEF NONNULL((1)) ssize_t FORMATPRINTER_CC
 libansitty_printer(void *arg, char const *data, size_t datalen);
 
 /* Translate a given unicode input character `ch' (which should originate form

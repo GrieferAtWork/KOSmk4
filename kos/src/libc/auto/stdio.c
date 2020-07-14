@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9571336 */
+/* HASH CRC-32:0xd3fc01bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -223,14 +223,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2)
 }
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc) ssize_t
-(__LIBCCALL vfscanf_getc)(void *arg) {
+(__FORMATPRINTER_CC vfscanf_getc)(void *arg) {
 	return (ssize_t)libc_fgetc((FILE *)arg);
 }
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc) ssize_t
-(__LIBCCALL vfscanf_ungetc)(void *arg, char32_t ch) {
+(__FORMATPRINTER_CC vfscanf_ungetc)(void *arg, char32_t ch) {
 	return ungetc((int)(unsigned int)ch, (FILE *)arg);
 }
 __NAMESPACE_LOCAL_END
@@ -240,17 +240,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 (LIBCCALL libc_vfscanf)(FILE *__restrict stream,
                         char const *__restrict format,
                         va_list args) THROWS(...) {
-#if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
+#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
 	return libc_format_vscanf(*(pformatgetc)&libc_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
-#else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
+#else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
 	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
 #include <local/stdstreams.h>
 /* Scan data from `stdin', following `FORMAT'
@@ -326,12 +326,15 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 }
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
+__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result = libc_unicode_readutf8((char const **)__arg);
 	return __result ? __result : __EOF;
 }
-__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	libc_unicode_readutf8_rev((char const **)__arg);
 	return 0;
 }
@@ -478,26 +481,28 @@ NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
 #include <hybrid/host.h>
-#if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
+#include <bits/format-printer.h>
+#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vdprintf_printer) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
+__LOCAL_LIBC(vdprintf_printer) __ssize_t
+(__FORMATPRINTER_CC __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)libc_write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__ */
 INTERN ATTR_SECTION(".text.crt.io.write") ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
                                     char const *__restrict format,
                                     va_list args) {
-#if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
+#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__
 	return libc_format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
-#else /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
+#else /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__ */
 	return libc_format_vprintf((pformatprinter)(void *)&libc_write,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
-#endif /* __SIZEOF_INT__ == __SIZEOF_POINTER__ || __x86_64__ */
+#endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -916,14 +921,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 
 }
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) ssize_t
-(__LIBCCALL vfscanf_getc_unlocked)(void *arg) {
+(__FORMATPRINTER_CC vfscanf_getc_unlocked)(void *arg) {
 	return (ssize_t)libc_fgetc_unlocked((FILE *)arg);
 }
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) ssize_t
-(__LIBCCALL vfscanf_ungetc_unlocked)(void *arg, char32_t ch) {
+(__FORMATPRINTER_CC vfscanf_ungetc_unlocked)(void *arg, char32_t ch) {
 	return ungetc_unlocked((int)(unsigned int)ch, (FILE *)arg);
 }
 __NAMESPACE_LOCAL_END
@@ -933,17 +938,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream,
                                  char const *__restrict format,
                                  va_list args) THROWS(...) {
-#if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
+#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
 	return libc_format_vscanf(*(pformatgetc)&libc_fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);
-#else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
+#else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
 	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
 #include <local/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
@@ -1039,15 +1044,14 @@ struct __vsnscanf_data {
 	char const *__end;
 };
 __LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
-(__LIBCCALL __vsnscanf_getc)(void *__arg) {
+(__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
 	__result = libc_unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? __result : __EOF;
 }
-
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
-(__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	libc_unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }

@@ -40,7 +40,7 @@ __NAMESPACE_FAST_BEGIN
 #if !defined(__CRT_HAVE_feclearexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_feclearexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(feclearexcept))(int __excepts) {
+__NOTHROW(__LIBC_FAST_NAME(feclearexcept))(int __excepts) {
 	__inline_feclearexcept(__excepts);
 	return 0;
 }
@@ -51,7 +51,7 @@ __NOTHROW(__LIBCCALL __LIBC_FAST_NAME(feclearexcept))(int __excepts) {
 #if !defined(__CRT_HAVE_feraiseexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_feraiseexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL int
-(__LIBCCALL __LIBC_FAST_NAME(feraiseexcept))(int __excepts) {
+(__LIBC_FAST_NAME(feraiseexcept))(int __excepts) {
 	__inline_feraiseexcept(__excepts);
 	return 0;
 }
@@ -62,7 +62,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL int
 #if !defined(__CRT_HAVE_fegetexceptflag) || !defined(__inline_fegetexceptflag) || defined(__WANT_FENV_INLINE)
 #define __fast_fegetexceptflag_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fegetexceptflag))(__fexcept_t *__flagp, int __excepts) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(fegetexceptflag))(__fexcept_t *__flagp, int __excepts) {
 #ifdef __inline_fegetexceptflag
 	__inline_fegetexceptflag(__flagp, __excepts);
 #else /* __inline_fegetexceptflag */
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fegetexceptflag))(__fexcept_t *__flagp
 #if !defined(__CRT_HAVE_fesetexceptflag) || !defined(__inline_fesetexceptflag) || defined(__WANT_FENV_INLINE)
 #define __fast_fesetexceptflag_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fesetexceptflag))(__fexcept_t const *__flagp, int __excepts) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(fesetexceptflag))(__fexcept_t const *__flagp, int __excepts) {
 #ifdef __inline_fesetexceptflag
 	__inline_fesetexceptflag(__flagp, __excepts);
 #else /* __inline_fesetexceptflag */
@@ -95,7 +95,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fesetexceptflag))(__fexcept_t const *_
 #if !defined(__CRT_HAVE_fetestexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_fetestexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fetestexcept))(int __excepts) {
+__NOTHROW(__LIBC_FAST_NAME(fetestexcept))(int __excepts) {
 	return __inline_fetestexcept(__excepts);
 }
 #endif /* !__CRT_HAVE_fetestexcept || __WANT_FENV_INLINE */
@@ -105,7 +105,7 @@ __NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fetestexcept))(int __excepts) {
 #if !defined(__CRT_HAVE_fegetround) || defined(__WANT_FENV_INLINE)
 #define __fast_fegetround_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fegetround))(void) {
+__NOTHROW(__LIBC_FAST_NAME(fegetround))(void) {
 	return __inline_fegetround();
 }
 #endif /* !__CRT_HAVE_fegetround || __WANT_FENV_INLINE */
@@ -115,7 +115,7 @@ __NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fegetround))(void) {
 #if !defined(__CRT_HAVE_fesetround) || defined(__WANT_FENV_INLINE)
 #define __fast_fesetround_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fesetround))(int __rounding_direction) {
+__NOTHROW(__LIBC_FAST_NAME(fesetround))(int __rounding_direction) {
 	return __inline_fesetround(__rounding_direction);
 }
 #endif /* !__CRT_HAVE_fesetround || __WANT_FENV_INLINE */
@@ -125,7 +125,7 @@ __NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fesetround))(int __rounding_direction) {
 #if !defined(__CRT_HAVE_fegetenv) || defined(__WANT_FENV_INLINE)
 #define __fast_fegetenv_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fegetenv))(struct __fenv_struct *envp) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(fegetenv))(struct __fenv_struct *envp) {
 	__inline_fegetenv(envp);
 	return 0;
 }
@@ -136,7 +136,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fegetenv))(struct __fenv_struct *envp)
 #if !defined(__CRT_HAVE_feholdexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_feholdexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(feholdexcept))(struct __fenv_struct *envp) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(feholdexcept))(struct __fenv_struct *envp) {
 	__inline_feholdexcept(envp);
 	return 0;
 }
@@ -147,7 +147,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(feholdexcept))(struct __fenv_struct *e
 #if !defined(__CRT_HAVE_fesetenv) || defined(__WANT_FENV_INLINE)
 #define __fast_fesetenv_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fesetenv))(struct __fenv_struct const *envp) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(fesetenv))(struct __fenv_struct const *envp) {
 	__inline_fesetenv(envp);
 	return 0;
 }
@@ -158,7 +158,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(fesetenv))(struct __fenv_struct const 
 #if !defined(__CRT_HAVE_feupdateenv) || defined(__WANT_FENV_INLINE)
 #define __fast_feupdateenv_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(feupdateenv))(struct __fenv_struct const *envp) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(feupdateenv))(struct __fenv_struct const *envp) {
 	__inline_feupdateenv(envp);
 	return 0;
 }
@@ -169,7 +169,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(feupdateenv))(struct __fenv_struct con
 #if !defined(__CRT_HAVE_feenableexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_feenableexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(feenableexcept))(int __excepts) {
+__NOTHROW(__LIBC_FAST_NAME(feenableexcept))(int __excepts) {
 	return __inline_feenableexcept(__excepts);
 }
 #endif /* !__CRT_HAVE_feenableexcept || __WANT_FENV_INLINE */
@@ -179,7 +179,7 @@ __NOTHROW(__LIBCCALL __LIBC_FAST_NAME(feenableexcept))(int __excepts) {
 #if !defined(__CRT_HAVE_fedisableexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_fedisableexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fedisableexcept))(int __excepts) {
+__NOTHROW(__LIBC_FAST_NAME(fedisableexcept))(int __excepts) {
 	return __inline_fedisableexcept(__excepts);
 }
 #endif /* !__CRT_HAVE_fedisableexcept || __WANT_FENV_INLINE */
@@ -189,7 +189,7 @@ __NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fedisableexcept))(int __excepts) {
 #if !defined(__CRT_HAVE_fegetexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_fegetexcept_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE int
-__NOTHROW(__LIBCCALL __LIBC_FAST_NAME(fegetexcept))(void) {
+__NOTHROW(__LIBC_FAST_NAME(fegetexcept))(void) {
 	return __inline_fegetexcept();
 }
 #endif /* !__CRT_HAVE_fegetexcept || __WANT_FENV_INLINE */

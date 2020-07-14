@@ -647,7 +647,7 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
                                              * module handle, or alternatively `NULL' for the root application, and all other
                                              * arguments are ignored. Always returns `NULL', but doesn't set an error */
 #define DLAUXCTRL_ADD_FINALIZER      0xd103 /* Register a dynamic finalizer callback for `HANDLE':
-                                             * >> CALLBACK = va_arg(void(__LIBCCALL *)(void *));
+                                             * >> CALLBACK = va_arg(void(__DLFCN_CC *)(void *));
                                              * >> ARG      = va_arg(void *);
                                              * NOTE: When returning `HANDLE', and `HANDLE' was `NULL', the
                                              *       handle for the root application is returned instead.

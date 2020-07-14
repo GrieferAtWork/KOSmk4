@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5c9d122 */
+/* HASH CRC-32:0xe6cab48a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -487,27 +487,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf16_chk, __FORCELOCAL __ATTR_ARTI
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UNICODE_H_PROTO)
 extern "C++" {
 /* Read a single Unicode character from a given UTF-32 string. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(*__ptext)++; }
 /* Read a single Unicode character from a given UTF-32 string. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(*__ptext)++; }
 /* Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* Same as `unicode_readutf16', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(--*__ptext); }
 /* Same as `unicode_readutf16', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(--*__ptext); }
 /* Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { __CHAR32_TYPE__ __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { __CHAR32_TYPE__ __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* Same as `unicode_readutf32()', but don't read past `text_end'. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -518,12 +518,12 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __result;
 }
 /* Same as `unicode_readutf32()', but don't read past `text_end'. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
 	return unicode_readutf32_n((__CHAR32_TYPE__ const **)__ptext,__text_end);
 }
 /* Same as `unicode_readutf32()', but don't read before `text_start'. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -534,12 +534,12 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __result;
 }
 /* Same as `unicode_readutf32()', but don't read before `text_start'. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
 	return unicode_readutf32_rev_n((__CHAR32_TYPE__ const **)__ptext,__text_start);
 }
 /* Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -550,12 +550,12 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __hybrid_bswap32(__result);
 }
 /* Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
 	return unicode_readutf32_swap_n((__CHAR32_TYPE__ const **)__ptext,__text_end);
 }
 /* Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -566,19 +566,19 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __hybrid_bswap32(__result);
 }
 /* Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
 	return unicode_readutf32_swap_rev_n((__CHAR32_TYPE__ const **)__ptext,__text_start);
 }
 }
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* Read a single Unicode character from a given UTF-32 string. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
 	return *(*__ptext)++;
 }
 /* Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
 	__CHAR32_TYPE__ __res = *(*__ptext++);
 	return __hybrid_bswap32(__res);
@@ -586,18 +586,18 @@ __FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 /* Same as `unicode_readutf32', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
 	return *(--*__ptext);
 }
 /* Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
 	__CHAR32_TYPE__ __res = *(--*__ptext);
 	return __hybrid_bswap32(__res);
 }
 /* Same as `unicode_readutf32()', but don't read past `text_end'. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -608,7 +608,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __result;
 }
 /* Same as `unicode_readutf32()', but don't read before `text_start'. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -619,7 +619,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __result;
 }
 /* Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -630,7 +630,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 	return __hybrid_bswap32(__result);
 }
 /* Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
+__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 (__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
 	__CHAR32_TYPE__ __result;
 	__CHAR32_TYPE__ const *__text = *__ptext;
@@ -680,7 +680,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF32_CURLEN' bytes to `dst' */
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
+__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 (__LIBCCALL unicode_writeutf32)(/*utf-32*/ __CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	*__dst++ = __ch;
 	return __dst;
@@ -1062,7 +1062,7 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #include <libc/ctype.h>
 
 #define UNICODE_FOLDED_MAX 1
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
+__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;
 	return __buf + 1;

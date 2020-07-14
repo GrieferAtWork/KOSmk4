@@ -70,8 +70,8 @@ struct _diskfree_t {
 %{
 
 #if defined(__i386__) || defined(__x86_64__)
-__FORCELOCAL void (__LIBCCALL _disable)(void) { __cli(); }
-__FORCELOCAL void (__LIBCCALL _enable)(void) { __sti(); }
+__FORCELOCAL void (_disable)(void) { __cli(); }
+__FORCELOCAL void (_enable)(void) { __sti(); }
 #endif /* __i386__ || __x86_64__ */
 
 }
@@ -99,14 +99,14 @@ void dos_sleep(unsigned int duration);
 %{
 
 #if defined(__i386__) || defined(__x86_64__)
-__LOCAL __INT8_TYPE__ (__LIBCCALL inp)(__UINT16_TYPE__ __port) { return __inb(__port); }
-__LOCAL __UINT8_TYPE__ (__LIBCCALL inportb)(__UINT16_TYPE__ __port) { return __inb(__port); }
-__LOCAL __UINT16_TYPE__ (__LIBCCALL inpw)(__UINT16_TYPE__ __port) { return __inw(__port); }
-__LOCAL __UINT16_TYPE__ (__LIBCCALL inport)(__UINT16_TYPE__ __port) { return __inw(__port); }
-__LOCAL __INT8_TYPE__ (__LIBCCALL outp)(__UINT16_TYPE__ __port, __INT8_TYPE__ __val) { __outb(__port, (__UINT8_TYPE__)__val); return __val; }
-__LOCAL void (__LIBCCALL outportb)(__UINT16_TYPE__ __port, __UINT8_TYPE__ __val) { __outb(__port, __val); }
-__LOCAL __UINT16_TYPE__ (__LIBCCALL outpw)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); return __val; }
-__LOCAL void (__LIBCCALL outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); }
+__LOCAL __INT8_TYPE__ (inp)(__UINT16_TYPE__ __port) { return __inb(__port); }
+__LOCAL __UINT8_TYPE__ (inportb)(__UINT16_TYPE__ __port) { return __inb(__port); }
+__LOCAL __UINT16_TYPE__ (inpw)(__UINT16_TYPE__ __port) { return __inw(__port); }
+__LOCAL __UINT16_TYPE__ (inport)(__UINT16_TYPE__ __port) { return __inw(__port); }
+__LOCAL __INT8_TYPE__ (outp)(__UINT16_TYPE__ __port, __INT8_TYPE__ __val) { __outb(__port, (__UINT8_TYPE__)__val); return __val; }
+__LOCAL void (outportb)(__UINT16_TYPE__ __port, __UINT8_TYPE__ __val) { __outb(__port, __val); }
+__LOCAL __UINT16_TYPE__ (outpw)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); return __val; }
+__LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); }
 #define disable           _disable
 #define enable            _enable
 #endif /* __i386__ || __x86_64__ */

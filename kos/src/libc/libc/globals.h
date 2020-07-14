@@ -146,7 +146,7 @@ DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
 #undef error_message_count
 #undef error_print_progname
 #undef error_one_per_line
-typedef void (__LIBCCALL *PERROR_PRINT_PROGNAME)(void);
+typedef void (LIBKCALL *PERROR_PRINT_PROGNAME)(void);
 DECLARE_NOREL_GLOBAL_META(PERROR_PRINT_PROGNAME, error_print_progname);
 DECLARE_NOREL_GLOBAL_META(unsigned int, error_message_count);
 DECLARE_NOREL_GLOBAL_META(int, error_one_per_line);

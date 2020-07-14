@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f9b978f */
+/* HASH CRC-32:0x55e311cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,15 +42,25 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+/* Calling convention used by `pc16formatprinter' */
+#ifndef C16FORMATPRINTER_CC
+#define C16FORMATPRINTER_CC __C16FORMATPRINTER_CC
+#endif /* !C16FORMATPRINTER_CC */
+
+/* Calling convention used by `pc32formatprinter' */
+#ifndef C32FORMATPRINTER_CC
+#define C32FORMATPRINTER_CC __C32FORMATPRINTER_CC
+#endif /* !C32FORMATPRINTER_CC */
+
 #ifndef __pc16formatprinter_defined
 #define __pc16formatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
- * NOTE: '__pformatprinter' usually returns the number of characters printed, but isn't required to.
+ * NOTE: 'pc(16|32)formatprinter' usually returns the number of characters printed, but isn't required to.
+ * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
  * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
  *                  Note that this is an exact value, meaning that a NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
- * @param: CLOSURE: The user-defined closure parameter passed alongside this function pointer.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
@@ -1928,25 +1938,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32width, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !... */
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth)
 /* Always re-return `datalen' and ignore all other arguments */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 #include <local/format-printer/format_length.h>
 /* Always re-return `datalen' and ignore all other arguments */
-__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_c16length)(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__C16FORMATPRINTER_CC format_c16length)(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
 #endif /* !... */
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth)
 /* Always re-return `datalen' and ignore all other arguments */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 #include <local/format-printer/format_length.h>
 /* Always re-return `datalen' and ignore all other arguments */
-__FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_c32length)(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__C32FORMATPRINTER_CC format_c32length)(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
 #endif /* !... */
 
 #ifndef __format_c16aprintf_data_defined

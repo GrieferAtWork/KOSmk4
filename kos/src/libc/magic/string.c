@@ -4762,7 +4762,7 @@ extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
 #elif defined(__NO_XBLOCK)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __mstrdupa_init)(void *__buf, char const *__restrict __string) {
+__NOTHROW_NCX(__mstrdupa_init)(void *__buf, char const *__restrict __string) {
 #ifdef __malloca_mayfail
 	if __likely(__buf)
 #endif /* __malloca_mayfail */
@@ -4772,7 +4772,7 @@ __NOTHROW_NCX(__LIBCCALL __mstrdupa_init)(void *__buf, char const *__restrict __
 	return (char *)__buf;
 }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict __string, __size_t __maxlen) {
+__NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __size_t __maxlen) {
 #ifdef __malloca_mayfail
 	if __likely(__buf)
 #endif /* __malloca_mayfail */
@@ -6023,7 +6023,7 @@ $errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen
 #ifndef __std___forward_size_defined
 #define __std___forward_size_defined 1
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__LIBCCALL __forward_size)(size_t __x) { return __x; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
 __NAMESPACE_STD_END
 #endif /* !__std___forward_size_defined */
 #ifndef __CXX_SYSTEM_HEADER
@@ -6046,7 +6046,7 @@ extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strndupa)(char const *__restrict __string, __size_t __maxlen);
 #elif defined(__NO_XBLOCK)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __strndupa_init)(void *__restrict __buf, char const *__restrict __string, __size_t __maxlen) {
+__NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __string, __size_t __maxlen) {
 	__size_t __buflen = __NAMESPACE_STD_SYM strnlen(__string, __maxlen) * sizeof(char);
 #ifdef __mempcpy_defined
 	*(char *)mempcpy(__buf, __string, __buflen) = 0;

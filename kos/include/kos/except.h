@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x129751e1 */
+/* HASH CRC-32:0x8f818e9c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -847,7 +847,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,error_register_state_t 
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the returned register state should then be loaded. */
 #ifndef __ERROR_UNWIND_CC
-#define __ERROR_UNWIND_CC __LIBCCALL
+#define __ERROR_UNWIND_CC __LIBKCALL
 #endif /* !__ERROR_UNWIND_CC */
 __LIBC __ATTR_WUNUSED error_register_state_t *
 __NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict state)
@@ -911,11 +911,11 @@ __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,was_thrown,(error_code_t code),(c
 #else /* __INTELLISENSE__ */
 
 #ifndef __ERROR_THROW_CC
-#define __ERROR_THROW_CC __LIBCCALL
+#define __ERROR_THROW_CC __LIBKCALL
 #endif /* !__ERROR_THROW_CC */
 
 #ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBCCALL
+#define __ERROR_THROWN_CC __LIBKCALL
 #endif /* !__ERROR_THROWN_CC */
 
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code

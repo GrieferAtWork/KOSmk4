@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7714834a */
+/* HASH CRC-32:0x2e72f285 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,12 +120,15 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
+__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8)((char const **)__arg);
 	return __result ? __result : __EOF;
 }
-__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
 	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_rev)((char const **)__arg);
 	return 0;
 }

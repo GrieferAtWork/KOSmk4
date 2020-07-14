@@ -108,7 +108,8 @@ STATIC_ASSERT(offsetof(struct pthread, pt_stacksize) == OFFSET_PTHREAD_STACKSIZE
 STATIC_ASSERT(offsetof(struct pthread, pt_flags) == OFFSET_PTHREAD_FLAGS);
 
 
-LOCAL void
+/* Destroy a given `pthread' `self' */
+LOCAL NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	free(self);
 }
@@ -223,6 +224,7 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 		libc_pthread_unmap_stack_and_exit(stack_addr,
 		                                  stack_size,
 		                                  exitcode);
+		__builtin_unreachable();
 	}
 	libc_pthread_onexit(me);
 	/* Reminder: `sys_exit()' only terminates the calling thread.
@@ -1424,7 +1426,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	 * NOTE: This is _NOT_ unsafe, even when the target thread has already
 	 *       unmapped its stack within `libc_pthread_unmap_stack_and_exit()'
 	 *       The reason for this is the `RPC_SCHEDULE_SYNC' which only allows
-	 *       the RPC to be executed as the result of a blocking operation! */
+	 *       the RPC to be executed as the result of a blocking operation,
+	 *       none of which happen anymore once the stack has gone away in
+	 *       said function! */
 	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0) != 0)
 		return libc_geterrno();
 	return EOK;

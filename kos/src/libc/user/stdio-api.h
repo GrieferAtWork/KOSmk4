@@ -177,6 +177,8 @@ struct iofile_data: iofile_data_novtab {
 #define file_endread(x)     atomic_owner_rwlock_endread(&(x)->if_exdata->io_lock)
 #define file_endwrite(x)    atomic_owner_rwlock_endwrite(&(x)->if_exdata->io_lock)
 
+/* TODO: Use <kos/refcnt.h> for reference counting, rather than these inline functions here! */
+
 LOCAL NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_tryincref")
 WUNUSED bool LIBCCALL file_tryincref(FILE *__restrict self) {
 	refcnt_t refcnt;

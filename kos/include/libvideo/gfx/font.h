@@ -25,7 +25,9 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
 
+#include <bits/format-printer.h> /* __FORMATPRINTER_CC */
 #include <bits/types.h>
+#include <bits/uformat-printer.h> /* __C32FORMATPRINTER_CC */
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 
@@ -136,22 +138,22 @@ struct video_fontprinter_data {
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
 typedef __ATTR_NONNULL((1, 2)) __ssize_t
-(__LIBCCALL *PVIDEO_FONTPRINTER)(/*struct video_fontprinter_data **/ void *__arg,
-                                 /*utf-8*/ char const *__restrict __data,
-                                 __size_t __datalen);
+(__FORMATPRINTER_CC *PVIDEO_FONTPRINTER)(/*struct video_fontprinter_data **/ void *__arg,
+                                         /*utf-8*/ char const *__restrict __data,
+                                         __size_t __datalen);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_NONNULL((1, 2)) __ssize_t __LIBCCALL
+LIBVIDEO_GFX_DECL __ATTR_NONNULL((1, 2)) __ssize_t __FORMATPRINTER_CC
 video_fontprinter(/*struct video_fontprinter_data **/ void *__arg,
                   /*utf-8*/ char const *__restrict __data, __size_t __datalen);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Same as `video_fontprinter()', but used to directly print UTF-32 text. */
 typedef __ATTR_NONNULL((1, 2)) __ssize_t
-(__LIBCCALL *PVIDEO_FONTPRINTER32)(/*struct video_fontprinter_data **/ void *__arg,
-                                   __CHAR32_TYPE__ const *__restrict __data,
-                                   __size_t __datalen);
+(__C32FORMATPRINTER_CC *PVIDEO_FONTPRINTER32)(/*struct video_fontprinter_data **/ void *__arg,
+                                              __CHAR32_TYPE__ const *__restrict __data,
+                                              __size_t __datalen);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ssize_t __LIBCCALL
+LIBVIDEO_GFX_DECL __ssize_t __C32FORMATPRINTER_CC
 video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
                     __CHAR32_TYPE__ const *__restrict __data, __size_t __datalen);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */

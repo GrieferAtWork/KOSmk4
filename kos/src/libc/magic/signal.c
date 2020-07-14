@@ -120,7 +120,7 @@ typedef __uid_t uid_t;
 
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined 1
-typedef void (__LIBCCALL *__sighandler_t)(int __signo);
+typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 
 #ifdef __USE_GNU

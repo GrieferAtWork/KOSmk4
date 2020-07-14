@@ -2042,12 +2042,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") WUNUSED NONNULL((1, 4
 }
 /*[[[end:libc_fwrite_unlocked]]]*/
 
-/*[[[head:libc_file_printer,hash:CRC-32=0xd053ce65]]]*/
+/*[[[head:libc_file_printer,hash:CRC-32=0x2d96cf1e]]]*/
 /* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
-(LIBCCALL libc_file_printer)(void *arg,
-                             char const *__restrict data,
-                             size_t datalen) THROWS(...)
+(__FORMATPRINTER_CC libc_file_printer)(void *arg,
+                                       char const *__restrict data,
+                                       size_t datalen) THROWS(...)
 /*[[[body:libc_file_printer]]]*/
 {
 	FILE *me = (FILE *)arg;
@@ -2067,12 +2067,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 }
 /*[[[end:libc_file_printer]]]*/
 
-/*[[[head:libc_file_printer_unlocked,hash:CRC-32=0x4a294865]]]*/
+/*[[[head:libc_file_printer_unlocked,hash:CRC-32=0xceaefce8]]]*/
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
-(LIBCCALL libc_file_printer_unlocked)(void *arg,
-                                      char const *__restrict data,
-                                      size_t datalen) THROWS(...)
+(__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg,
+                                                char const *__restrict data,
+                                                size_t datalen) THROWS(...)
 /*[[[body:libc_file_printer_unlocked]]]*/
 {
 	FILE *me = (FILE *)arg;

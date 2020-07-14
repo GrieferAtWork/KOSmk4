@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7f374b0 */
+/* HASH CRC-32:0xbd30803f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <kos/anno.h>
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fwrite_unlocked from stdio */
 #ifndef __local___localdep_fwrite_unlocked_defined
@@ -51,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fwrite_unlocked_defined */
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(file_printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(file_printer_unlocked))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
+(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(file_printer_unlocked))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	return (__SSIZE_TYPE__)__localdep_fwrite_unlocked(__data, sizeof(char), __datalen, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END

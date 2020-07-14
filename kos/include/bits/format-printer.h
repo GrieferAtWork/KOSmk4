@@ -28,20 +28,30 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __FORMATPRINTER_CC
+#define __FORMATPRINTER_CC __LIBKCALL
+#define __LIBKCALL_IS_FORMATPRINTER_CC 1
+#ifdef __LIBCCALL_IS_LIBKCALL
+#define __LIBCCALL_IS_FORMATPRINTER_CC 1
+#endif /* __LIBCCALL_IS_LIBKCALL */
+#ifdef __LIBDCALL_IS_LIBKCALL
+#define __LIBDCALL_IS_FORMATPRINTER_CC 1
+#endif /* __LIBDCALL_IS_LIBKCALL */
+#endif /* !__FORMATPRINTER_CC */
+
 #if __KOS_VERSION__ >= 400
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatprinter)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef /*utf-32*/ __SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatungetc)(void *__arg, /*utf-32*/ __CHAR32_TYPE__ __ch);
+typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatprinter)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen);
+typedef /*utf-32*/ __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatgetc)(void *__arg);
+typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(void *__arg, /*utf-32*/ __CHAR32_TYPE__ __ch);
 #else /* __KOS_VERSION__ >= 400 */
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatprinter)(/*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen, void *__arg);
-typedef /*utf-32*/ __SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatungetc)(/*utf-32*/ __CHAR32_TYPE__ __ch, void *__arg);
+typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatprinter)(/*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen, void *__arg);
+typedef /*utf-32*/ __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatgetc)(void *__arg);
+typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(/*utf-32*/ __CHAR32_TYPE__ __ch, void *__arg);
 #endif /* __KOS_VERSION__ < 400 */
 
 /* Read up to `NUM_BYTES' bytes into `BUF', returning the actual number of
  * read bytes, or a negative error value to-be propagated up the call-stack. */
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatreader)(void *__arg, void *__restrict __buf, __SIZE_TYPE__ __num_bytes);
-
+typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatreader)(void *__arg, void *__restrict __buf, __SIZE_TYPE__ __num_bytes);
 
 __SYSDECL_END
 #endif /* __CC__ */

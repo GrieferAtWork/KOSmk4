@@ -193,7 +193,7 @@ typedef __compar_fn_t comparison_fn_t;
 
 #ifndef ____atexit_func_t_defined
 #define ____atexit_func_t_defined 1
-typedef void (*__LIBCCALL __atexit_func_t)(void);
+typedef void (__LIBCCALL *__atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 
 }
@@ -202,7 +202,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 %{
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
 
@@ -210,7 +210,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 %[define(DEFINE_COMPAR_D_FN_T =
 @@pp_ifndef __compar_d_fn_t_defined@@
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 @@pp_endif@@
 )]
 
@@ -220,10 +220,9 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
 	/* DISCALIMER: The qsort() implementation below has been taken directly
-	 *             from glibc (`/stdlib/qsort.c'), before being retuned and
+	 *             from glibc (`/stdlib/qsort.c'), before being re-tuned and
 	 *             formatted to best work with KOS.
-	 *          >> For better source documentation, consult the original function!
-	 */
+	 * >> For better source documentation, consult the original function! */
 	/* Copyright (C) 1991-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.
 	   Written by Douglas C. Schmidt (schmidt@ics.uci.edu).
@@ -359,7 +358,7 @@ jump_over:
 %{
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
 
@@ -438,7 +437,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 %(auto_source)#endif /* ____invoke_compare_helper_defined */
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_FN_T)]]
+[[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std]]
 void qsort([[nonnull]] void *pbase, size_t item_count,
            size_t item_size, [[nonnull]] __compar_fn_t cmp) {
@@ -448,7 +447,7 @@ void qsort([[nonnull]] void *pbase, size_t item_count,
 }
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_FN_T)]]
+[[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), wunused, std, throws]]
 void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void *]
@@ -660,18 +659,21 @@ void exit(int status);
 %[define(DEFINE_ATEXIT_FUNC_T =
 #ifndef ____atexit_func_t_defined
 #define ____atexit_func_t_defined 1
-typedef void (*__LIBCCALL __atexit_func_t)(void);
+typedef void (__LIBCCALL *__atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 )]
 
 %[default:section(".text.crt{|.dos}.sched.process")]
+[[no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
 [[std, alias("at_quick_exit"), decl_prefix(DEFINE_ATEXIT_FUNC_T)]]
 int atexit([[nonnull]] __atexit_func_t func);
+
 
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 [[std, ATTR_NORETURN, throws, alias("exit", "_exit", "_Exit")]]
 void quick_exit(int status);
 
+[[no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
 [[std, alias("atexit"), decl_prefix(DEFINE_ATEXIT_FUNC_T)]]
 int at_quick_exit([[nonnull]] __atexit_func_t func);
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
@@ -1317,7 +1319,7 @@ int initstate_r(unsigned int seed, [[nonnull]] char *__restrict statebuf, $size_
 int setstate_r([[nonnull]] char *__restrict statebuf, [[nonnull]] struct random_data *__restrict buf);
 
 %[default:section(".text.crt{|.dos}.sched.process")]
-%typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
+%typedef void (__LIBKCALL *__on_exit_func_t)(int __status, void *__arg);
 int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
 
 %[default:section(".text.crt{|.dos}.fs.environ")]
@@ -1997,7 +1999,7 @@ typedef int errno_t;
 
 #ifndef _ONEXIT_T_DEFINED
 #define _ONEXIT_T_DEFINED 1
-typedef int (__LIBCCALL *_onexit_t)(void);
+typedef int (__LIBDCALL *_onexit_t)(void);
 #endif  /* _ONEXIT_T_DEFINED */
 #ifndef onexit_t
 #define onexit_t _onexit_t
@@ -2242,14 +2244,14 @@ __LIBC wchar_t **__winitenv;
 %{
 #ifndef ___purecall_handler_defined
 #define ___purecall_handler_defined 1
-typedef void (__LIBCCALL *_purecall_handler)(void);
+typedef void (__LIBDCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 }
 
 %[define(DEFINE_PURECALL_HANDLER =
 #ifndef ___purecall_handler_defined
 #define ___purecall_handler_defined 1
-typedef void (__LIBCCALL *_purecall_handler)(void);
+typedef void (__LIBDCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 )]
 %[define_replacement(_purecall_handler = _purecall_handler)]
@@ -2267,14 +2269,14 @@ _purecall_handler _get_purecall_handler();
 %{
 #ifndef ___invalid_parameter_handler_defined
 #define ___invalid_parameter_handler_defined 1
-typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
 }
 
 %[define(DEFINE_INVALID_PARAMETER_HANDLER =
 #ifndef ___invalid_parameter_handler_defined
 #define ___invalid_parameter_handler_defined 1
-typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
 )]
 %[define_replacement(_invalid_parameter_handler = _invalid_parameter_handler)]
@@ -2330,10 +2332,10 @@ unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 
 %
 %#ifdef __INT64_TYPE__
-%#ifdef _MSC_VER
-%extern __ATTR_CONST __INT64_TYPE__ (__LIBCCALL _abs64)(__INT64_TYPE__ __x);
+%#if defined(_MSC_VER) && defined(__LIBCCALL_IS_LIBDCALL)
+%extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
 %#pragma intrinsic(_abs64)
-%#else /* _MSC_VER */
+%#else /* _MSC_VER && __LIBCCALL_IS_LIBDCALL */
 %[default:section(".text.crt.dos.math.utility")]
 [[ATTR_CONST, wunused, nothrow]]
 [[alt_variant_of(__SIZEOF_INT__ == 8, abs)]]
@@ -2344,7 +2346,7 @@ unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 __INT64_TYPE__ _abs64(__INT64_TYPE__ x) {
 	return x < 0 ? -x : x;
 }
-%#endif /* !_MSC_VER */
+%#endif /* !_MSC_VER || !__LIBCCALL_IS_LIBDCALL */
 %#endif /* __INT64_TYPE__ */
 
 
@@ -2427,7 +2429,7 @@ typedef __SIZE_TYPE__ rsize_t;
 %{
 #ifndef __dos_compar_d_fn_t_defined
 #define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
+typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
 #endif /* !__dos_compar_d_fn_t_defined */
 }
 
@@ -2436,7 +2438,7 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 %[define(DEFINE_DOS_COMPAR_D_FN_T =
 @@pp_ifndef __dos_compar_d_fn_t_defined@@
 #define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
+typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
 @@pp_endif@@
 )]
 %[define_replacement(__dos_compar_d_fn_t = __dos_compar_d_fn_t)]
@@ -2451,7 +2453,7 @@ struct __invoke_compare_helper_s_data {
 	void               *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }
@@ -3512,7 +3514,7 @@ char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 %[define(DEFINE_ONEXIT_T =
 #ifndef _ONEXIT_T_DEFINED
 #define _ONEXIT_T_DEFINED 1
-typedef int (__LIBCCALL *_onexit_t)(void);
+typedef int (__LIBDCALL *_onexit_t)(void);
 #endif  /* _ONEXIT_T_DEFINED */
 )]
 %[define_type_class(onexit_t  = "TP")]

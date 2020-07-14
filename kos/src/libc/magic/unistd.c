@@ -1809,7 +1809,7 @@ char *ctermid(char *s);
 %     (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
 %#ifndef ____pthread_atfork_func_t_defined
 %#define ____pthread_atfork_func_t_defined 1
-%typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
+%typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 %#endif /* !____pthread_atfork_func_t_defined */
 %
 %[insert:extern(pthread_atfork)]

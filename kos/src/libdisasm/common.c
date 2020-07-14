@@ -401,9 +401,9 @@ generic_print_symbol_addr:
 
 
 PRIVATE ssize_t
-NOTHROW(__LIBCCALL stub_printer)(void *UNUSED(arg),
-                                 /*utf-8*/ char const *__restrict UNUSED(data),
-                                 size_t UNUSED(datalen)) {
+NOTHROW(FORMATPRINTER_CC stub_printer)(void *UNUSED(arg),
+                                       /*utf-8*/ char const *__restrict UNUSED(data),
+                                       size_t UNUSED(datalen)) {
 	return 0;
 }
 

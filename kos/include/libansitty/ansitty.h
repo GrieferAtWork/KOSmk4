@@ -24,6 +24,7 @@
 
 #include <hybrid/__byteorder.h>
 
+#include <bits/format-printer.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -420,9 +421,9 @@ ansitty_putuni(struct ansitty *__restrict self, __CHAR32_TYPE__ ch);
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(__LIBCCALL *PANSITTY_PRINTER)(void *arg, char const *data, __size_t datalen);
+(__FORMATPRINTER_CC *PANSITTY_PRINTER)(void *arg, char const *data, __size_t datalen);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
-LIBANSITTY_DECL __ATTR_NONNULL((1)) __ssize_t __LIBCCALL
+LIBANSITTY_DECL __ATTR_NONNULL((1)) __ssize_t __FORMATPRINTER_CC
 ansitty_printer(void *arg, char const *data, __size_t datalen);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 

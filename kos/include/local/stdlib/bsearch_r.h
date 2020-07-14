@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24124a49 */
+/* HASH CRC-32:0x2fdde9b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN

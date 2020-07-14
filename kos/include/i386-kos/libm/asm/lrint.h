@@ -25,6 +25,8 @@
 #include <libm/asm/builtin.h>
 
 #if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
+#include <__crt.h>
+
 #include <hybrid/typecore.h>
 
 #include <libm/fdlibm.h>

@@ -88,8 +88,8 @@
 #define SYSCALL_PROTO(name, decl) __PRIVATE_SYSCALL_PROTO(name, __NRAC_##name, decl)
 
 /* Construct a prototype for a given system call pointer:
- * >> (SYSCALL_PROTO_POINTER(open)) // Expands to `(fd_t (__LIBCCALL *)(char const *, oflag_t, mode_t))'
- * Same as `SYSCALL_PROTO(<name>, (__LIBCCALL *))' */
-#define SYSCALL_PROTO_POINTER(name) __PRIVATE_SYSCALL_PROTO(name, __NRAC_##name, (__LIBCCALL *))
+ * >> (SYSCALL_PROTO_POINTER(open)) // Expands to `(fd_t (__LIBKCALL *)(char const *, oflag_t, mode_t))'
+ * Same as `SYSCALL_PROTO(<name>, (__LIBKCALL *))' */
+#define SYSCALL_PROTO_POINTER(name) __PRIVATE_SYSCALL_PROTO(name, __NRAC_##name, (__LIBKCALL *))
 
 #endif /* !_SYS_SYSCALL_PROTO_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ef817b7 */
+/* HASH CRC-32:0xa85e149a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,14 +139,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc) __SSIZE_TYPE__
-(__LIBCCALL __vfscanf_getc)(void *__arg) {
+(__FORMATPRINTER_CC __vfscanf_getc)(void *__arg) {
 	return (__SSIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_fgetc)((__FILE *)__arg);
 }
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc) __SSIZE_TYPE__
-(__LIBCCALL __vfscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __ch) {
+(__FORMATPRINTER_CC __vfscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __ch) {
 	return __ungetc((int)(unsigned int)__ch, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END
@@ -155,17 +155,17 @@ __NAMESPACE_LOCAL_BEGIN
  * Return the number of successfully scanned data items */
 __LOCAL_LIBC(vfscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
-#if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
+#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
 	return __localdep_format_vscanf(*(__pformatgetc)&__localdep_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc,
 	                     (void *)__stream,
 	                     __format, __args);
-#else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
+#else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
 	return __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vfscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc,
 	                     (void *)__stream,
 	                     __format, __args);
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vfscanf_defined

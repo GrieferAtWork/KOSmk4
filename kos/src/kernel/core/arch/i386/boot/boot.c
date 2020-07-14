@@ -379,10 +379,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       When the dec files already exist, this error is thrown instead.
 	 *
 	 * TODO: Deemon's SystemFile.size() function always uses lseek64()
-	         Change this to where it first attempts to use fstat() (if available)
+	 *       Change this to where it first attempts to use fstat() (if available)
 	 * TODO: Deemon's main() function should try to re-configure mallopt() during
 	 *       init in order to optimize itself for using large amounts of memory.
-	 *       Currently, running deemon cases the system log to be spammed with
+	 *       Currently, running deemon causes the system log to be spammed with
 	 *       calls to mmap() (an overallocation of 32768 bytes might work well...)
 	 * TODO: When opening a dec file, use mmap() (if available) and malloc()+read()
 	 *       as fall-back, rather than always using malloc()+read() */
@@ -398,9 +398,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Play around with `no_caller_saved_registers'
 	 *       It may be possible to cut down on boiler-plate assembly needed to wrap
 	 *       simple C-level interrupt handlers and/or system calls, by not needing
-	 *       to save registers that would be used in any case! */
+	 *       to save registers that wouldn't be used in any case! */
 
-	/* TODO: Create a separate driver for transactional memory emulation. */
 	/* TODO: Create another separate driver (that makes use of the transactional
 	 *       instruction emulator) to emulate instruction execution for the child-
 	 *       process branch after a call to fork().
@@ -410,12 +409,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       instead we'd be able to spawn() a new process!) */
 
 	/* TODO: renameat2() is missing from <stdio.h> */
-
-	/* TODO: Have libc export symbols `alloca()' and `_alloca()' that do exactly as
-	 *       they're supposed to do. - Other c libraries also export these by-name! */
-
-	/* TODO: Many places that use `__LIBCCALL' should actually be using `__LIBKCALL'!
-	 *       Most importantly: `pformatprinter' should be using `__LIBKCALL'! */
 
 	return state;
 }

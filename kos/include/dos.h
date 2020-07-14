@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3b5b311 */
+/* HASH CRC-32:0xbdb3512c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,8 +82,8 @@ __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struc
 #endif /* !_GETDISKFREE_DEFINED */
 
 #if defined(__i386__) || defined(__x86_64__)
-__FORCELOCAL void (__LIBCCALL _disable)(void) { __cli(); }
-__FORCELOCAL void (__LIBCCALL _enable)(void) { __sti(); }
+__FORCELOCAL void (_disable)(void) { __cli(); }
+__FORCELOCAL void (_enable)(void) { __sti(); }
 #endif /* __i386__ || __x86_64__ */
 
 #ifdef __USE_OLD_DOS
@@ -134,14 +134,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !__unlink_defined */
 
 #if defined(__i386__) || defined(__x86_64__)
-__LOCAL __INT8_TYPE__ (__LIBCCALL inp)(__UINT16_TYPE__ __port) { return __inb(__port); }
-__LOCAL __UINT8_TYPE__ (__LIBCCALL inportb)(__UINT16_TYPE__ __port) { return __inb(__port); }
-__LOCAL __UINT16_TYPE__ (__LIBCCALL inpw)(__UINT16_TYPE__ __port) { return __inw(__port); }
-__LOCAL __UINT16_TYPE__ (__LIBCCALL inport)(__UINT16_TYPE__ __port) { return __inw(__port); }
-__LOCAL __INT8_TYPE__ (__LIBCCALL outp)(__UINT16_TYPE__ __port, __INT8_TYPE__ __val) { __outb(__port, (__UINT8_TYPE__)__val); return __val; }
-__LOCAL void (__LIBCCALL outportb)(__UINT16_TYPE__ __port, __UINT8_TYPE__ __val) { __outb(__port, __val); }
-__LOCAL __UINT16_TYPE__ (__LIBCCALL outpw)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); return __val; }
-__LOCAL void (__LIBCCALL outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); }
+__LOCAL __INT8_TYPE__ (inp)(__UINT16_TYPE__ __port) { return __inb(__port); }
+__LOCAL __UINT8_TYPE__ (inportb)(__UINT16_TYPE__ __port) { return __inb(__port); }
+__LOCAL __UINT16_TYPE__ (inpw)(__UINT16_TYPE__ __port) { return __inw(__port); }
+__LOCAL __UINT16_TYPE__ (inport)(__UINT16_TYPE__ __port) { return __inw(__port); }
+__LOCAL __INT8_TYPE__ (outp)(__UINT16_TYPE__ __port, __INT8_TYPE__ __val) { __outb(__port, (__UINT8_TYPE__)__val); return __val; }
+__LOCAL void (outportb)(__UINT16_TYPE__ __port, __UINT8_TYPE__ __val) { __outb(__port, __val); }
+__LOCAL __UINT16_TYPE__ (outpw)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); return __val; }
+__LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(__port, __vall); }
 #define disable           _disable
 #define enable            _enable
 #endif /* __i386__ || __x86_64__ */

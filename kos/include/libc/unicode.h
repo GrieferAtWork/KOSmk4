@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x200792d8 */
+/* HASH CRC-32:0xa8ecf182 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,7 +144,7 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #include <libc/ctype.h>
 
 #define __LIBC_UNICODE_FOLDED_MAX 1
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
+__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[__LIBC_UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;
 	return __buf + 1;

@@ -36,26 +36,26 @@
 __DECL_BEGIN
 
 struct testdecl {
-	char const  *td_name;         /* [1..1] Test name */
-	char const  *td_file;         /* [1..1] Test filename */
-	unsigned int td_line;         /* Test line number */
-	void       (*td_func)(void);  /* [1..1] Test function */
+	char const       *td_name;         /* [1..1] Test name */
+	char const       *td_file;         /* [1..1] Test filename */
+	unsigned int      td_line;         /* Test line number */
+	void (__LIBKCALL *td_func)(void);  /* [1..1] Test function */
 };
 
 #define DEFINE_TEST(name)                                                                        \
-	__PRIVATE __ATTR_USED void test_##name(void);                                                \
+	__PRIVATE __ATTR_USED void __LIBKCALL test_##name(void);                                     \
 	__PRIVATE __ATTR_USED __ATTR_SECTION(".data.system_tests") struct testdecl __decl_##name = { \
 		.td_name = #name,                                                                        \
 		.td_file = __FILE__,                                                                     \
 		.td_line = __LINE__,                                                                     \
 		.td_func = &test_##name,                                                                 \
 	};                                                                                           \
-	__PRIVATE __ATTR_USED void test_##name(void)
+	__PRIVATE __ATTR_USED void __LIBKCALL test_##name(void)
 
-__INTDEF void __NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict __format, ...);
-__INTDEF void __NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict __format, __builtin_va_list __args);
-__INTDEF void __NOTHROW_NCX(__VLIBCCALL ctest_substatf)(char const *__restrict __format, ...);
-__INTDEF void __NOTHROW_NCX(__LIBCCALL ctest_vsubstatf)(char const *__restrict __format, __builtin_va_list __args);
+__INTDEF void __NOTHROW_NCX(__VLIBKCALL ctest_subtestf)(char const *__restrict __format, ...);
+__INTDEF void __NOTHROW_NCX(__LIBKCALL ctest_vsubtestf)(char const *__restrict __format, __builtin_va_list __args);
+__INTDEF void __NOTHROW_NCX(__VLIBKCALL ctest_substatf)(char const *__restrict __format, ...);
+__INTDEF void __NOTHROW_NCX(__LIBKCALL ctest_vsubstatf)(char const *__restrict __format, __builtin_va_list __args);
 
 
 __DECL_END

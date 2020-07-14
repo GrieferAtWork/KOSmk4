@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc22912de */
+/* HASH CRC-32:0xeafa79b2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #include <kos/anno.h>
 #include <hybrid/__minmax.h>
@@ -31,10 +31,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {
 	/* DISCALIMER: The qsort() implementation below has been taken directly
-	 *             from glibc (`/stdlib/qsort.c'), before being retuned and
+	 *             from glibc (`/stdlib/qsort.c'), before being re-tuned and
 	 *             formatted to best work with KOS.
-	 *          >> For better source documentation, consult the original function!
-	 */
+	 * >> For better source documentation, consult the original function! */
 	/* Copyright (C) 1991-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.
 	   Written by Douglas C. Schmidt (schmidt@ics.uci.edu).

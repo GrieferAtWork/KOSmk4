@@ -20,9 +20,12 @@
 #ifndef GUARD_LIBM_API_H
 #define GUARD_LIBM_API_H 1
 
-#include <hybrid/compiler.h>
 #include <__crt.h>
+#include <hybrid/compiler.h>
 
-#define CC __LIBCCALL
+#include <libm/api.h>
+
+#define CC  LIBM_CC
+#define VCC LIBM_VCC
 
 #endif /* !GUARD_LIBM_API_H */

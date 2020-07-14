@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23b011b2 */
+/* HASH CRC-32:0x1110d334 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,11 @@
 #ifndef __local_format_length_defined
 #define __local_format_length_defined 1
 #include <__crt.h>
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Always re-return `datalen' and ignore all other arguments */
 __LOCAL_LIBC(format_length) __ATTR_CONST __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_length))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_length))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	(void)__arg;
 	(void)__data;
 	return (__SSIZE_TYPE__)__datalen;

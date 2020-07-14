@@ -227,15 +227,15 @@ enum {
 #ifdef __CRT_HAVE___cmsg_nxthdr
 __CDECLARE(__ATTR_WUNUSED,struct cmsghdr *,__NOTHROW_NCX,__cmsg_nxthdr,(struct msghdr *__mhdr, struct cmsghdr *__cmsg),(__mhdr,__cmsg))
 #else /* __CRT_HAVE___cmsg_nxthdr */
-__LOCAL __ATTR_WUNUSED struct cmsghdr *
-__NOTHROW_NCX(__LIBCCALL __cmsg_nxthdr)(struct msghdr *__mhdr, struct cmsghdr *__cmsg) {
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct cmsghdr *
+__NOTHROW_NCX(__cmsg_nxthdr)(struct msghdr *__mhdr, struct cmsghdr *__cmsg) {
 	if ((__size_t)__cmsg->cmsg_len < __OFFSET_CMSGHDR_DATA)
-		return (struct cmsghdr *)0;
+		return __NULLPTR;
 	__cmsg = (struct cmsghdr *)((__byte_t *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len));
 	if ((__byte_t *)(__cmsg + 1) > ((__byte_t *)__mhdr->msg_control + __mhdr->msg_controllen) ||
 	    ((__byte_t *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len) >
 	     ((__byte_t *)__mhdr->msg_control + __mhdr->msg_controllen)))
-		return (struct cmsghdr *)0;
+		return __NULLPTR;
 	return __cmsg;
 }
 #endif /* !__CRT_HAVE___cmsg_nxthdr */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3b37373 */
+/* HASH CRC-32:0x893e9ceb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -642,7 +642,6 @@
 #define __CRT_HAVE_DOS$asinhl 1
 #define __CRT_HAVE_DOS$asinl 1
 #define __CRT_HAVE_DOS$asprintf 1
-#define __CRT_HAVE_DOS$at_quick_exit 1
 #define __CRT_HAVE_DOS$atan 1
 #define __CRT_HAVE_DOS$atan2 1
 #define __CRT_HAVE_DOS$atan2f 1
@@ -652,7 +651,6 @@
 #define __CRT_HAVE_DOS$atanhf 1
 #define __CRT_HAVE_DOS$atanhl 1
 #define __CRT_HAVE_DOS$atanl 1
-#define __CRT_HAVE_DOS$atexit 1
 #define __CRT_HAVE_DOS$atof 1
 #define __CRT_HAVE_DOS$atoi 1
 #define __CRT_HAVE_DOS$atol 1
@@ -671,7 +669,6 @@
 #define __CRT_HAVE_DOS$bsd_signal 1
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$bsearch 1
 #define __CRT_HAVE_DOS$bsearch_r 1
 #define __CRT_HAVE_DOS$bsearch_s 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -905,8 +902,6 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fgetxattr 1
-#define __CRT_HAVE_DOS$file_printer 1
-#define __CRT_HAVE_DOS$file_printer_unlocked 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$file_wprinter 1
@@ -950,15 +945,11 @@
 #define __CRT_HAVE_DOS$format_8to32 1
 #define __CRT_HAVE_DOS$format_aprintf_alloc 1
 #define __CRT_HAVE_DOS$format_aprintf_pack 1
-#define __CRT_HAVE_DOS$format_aprintf_printer 1
 #define __CRT_HAVE_DOS$format_escape 1
 #define __CRT_HAVE_DOS$format_hexdump 1
-#define __CRT_HAVE_DOS$format_length 1
 #define __CRT_HAVE_DOS$format_printf 1
 #define __CRT_HAVE_DOS$format_repeat 1
 #define __CRT_HAVE_DOS$format_scanf 1
-#define __CRT_HAVE_DOS$format_snprintf_printer 1
-#define __CRT_HAVE_DOS$format_sprintf_printer 1
 #define __CRT_HAVE_DOS$format_vprintf 1
 #define __CRT_HAVE_DOS$format_vscanf 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -969,11 +960,6 @@
 #define __CRT_HAVE_DOS$format_waprintf_printer 1
 #define __CRT_HAVE_DOS$format_wescape 1
 #define __CRT_HAVE_DOS$format_whexdump 1
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$format_width 1
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$format_wprintf 1
 #define __CRT_HAVE_DOS$format_wrepeat 1
 #define __CRT_HAVE_DOS$format_wsnprintf_printer 1
@@ -2031,7 +2017,6 @@
 #define __CRT_HAVE_DOS$qfcvt 1
 #define __CRT_HAVE_DOS$qfcvt_r 1
 #define __CRT_HAVE_DOS$qgcvt 1
-#define __CRT_HAVE_DOS$qsort 1
 #define __CRT_HAVE_DOS$qsort_r 1
 #define __CRT_HAVE_DOS$qsort_s 1
 #define __CRT_HAVE_DOS$quick_exit 1
@@ -2488,7 +2473,6 @@
 #define __CRT_HAVE_DOS$sysconf 1
 #define __CRT_HAVE_DOS$sysinfo 1
 #define __CRT_HAVE_DOS$syslog 1
-#define __CRT_HAVE_DOS$syslog_printer 1
 #define __CRT_HAVE_DOS$system 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

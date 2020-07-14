@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe5e9a81 */
+/* HASH CRC-32:0xe1a10edb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_snprintf_printer_defined
 #define __local___localdep_format_snprintf_printer_defined 1
 #ifdef __CRT_HAVE_format_snprintf_printer
+__NAMESPACE_LOCAL_END
+#include <bits/format-printer.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
  *       the sum of return values of all calls to `format_snprintf_printer()' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_snprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_snprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_snprintf_printer */
 __NAMESPACE_LOCAL_END
 #include <local/format-printer/format_snprintf_printer.h>

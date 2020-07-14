@@ -59,7 +59,7 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
 		__pid_t _tid;
 		struct {
-			void (__LIBCCALL *sigev_notify_function)(sigval_t __val); /* Function to start. */
+			void (__LIBKCALL *sigev_notify_function)(sigval_t __val); /* Function to start. */
 			pthread_attr_t   *sigev_notify_attributes;                /* Thread attributes. */
 		};
 	};
@@ -69,7 +69,7 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
 		__pid_t _tid;
 		struct {
-			void (__LIBCCALL *_function)(sigval_t __val); /* Function to start. */
+			void (__LIBKCALL *_function)(sigval_t __val); /* Function to start. */
 			pthread_attr_t   *_attribute;                 /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;

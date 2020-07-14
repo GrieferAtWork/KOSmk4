@@ -24,6 +24,7 @@
 /* DISCLAIMER: This file is based off of cygwin's `/usr/include/_ansi.h' */
 
 #include <__stdinc.h>
+#include <__crt.h>
 #include <newlib.h>
 #include <sys/config.h>
 

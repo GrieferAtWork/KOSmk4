@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x648561bb */
+/* HASH CRC-32:0xcbb17021 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <kos/anno.h>
 #ifndef __dos_compar_d_fn_t_defined
 #define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
+typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
 #endif /* !__dos_compar_d_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: qsort_r from stdlib */
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),qsort_r,(__pbase,__item_count,__item_size,__cmp,__arg))
@@ -54,7 +54,7 @@ struct __invoke_compare_helper_s_data {
 	void               *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }

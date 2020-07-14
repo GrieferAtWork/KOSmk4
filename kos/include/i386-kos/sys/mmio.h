@@ -61,30 +61,30 @@ public:
 }
 __NAMESPACE_INT_END
 
-__UINT8_TYPE__ __NOTHROW(__LIBCCALL peekb)(__MEMPORT_T __addr);
-__UINT16_TYPE__ __NOTHROW(__LIBCCALL peekw)(__MEMPORT_T __addr);
-__UINT32_TYPE__ __NOTHROW(__LIBCCALL peekl)(__MEMPORT_T __addr);
-void __NOTHROW(__LIBCCALL pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val);
-void __NOTHROW(__LIBCCALL pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val);
-void __NOTHROW(__LIBCCALL pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL peeksb)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_bytes);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL peeksw)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_words);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL peeksl)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_dwords);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesb)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_bytes);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesw)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_words);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesl)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_dwords);
+__UINT8_TYPE__ __NOTHROW(peekb)(__MEMPORT_T __addr);
+__UINT16_TYPE__ __NOTHROW(peekw)(__MEMPORT_T __addr);
+__UINT32_TYPE__ __NOTHROW(peekl)(__MEMPORT_T __addr);
+void __NOTHROW(pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val);
+void __NOTHROW(pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val);
+void __NOTHROW(pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val);
+__ATTR_NONNULL((2)) void __NOTHROW(peeksb)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_bytes);
+__ATTR_NONNULL((2)) void __NOTHROW(peeksw)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_words);
+__ATTR_NONNULL((2)) void __NOTHROW(peeksl)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_dwords);
+__ATTR_NONNULL((2)) void __NOTHROW(pokesb)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_bytes);
+__ATTR_NONNULL((2)) void __NOTHROW(pokesw)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_words);
+__ATTR_NONNULL((2)) void __NOTHROW(pokesl)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_dwords);
 #if defined(__x86_64__) && defined(__UINT64_TYPE__)
-__UINT64_TYPE__ __NOTHROW(__LIBCCALL peekq)(__MEMPORT_T __addr);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL peeksq)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_qword);
-void __NOTHROW(__LIBCCALL pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val);
-__ATTR_NONNULL((2)) void __NOTHROW(__LIBCCALL pokesq)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_qword);
+__UINT64_TYPE__ __NOTHROW(peekq)(__MEMPORT_T __addr);
+__ATTR_NONNULL((2)) void __NOTHROW(peeksq)(__MEMPORT_T __addr, void *__buf, __SIZE_TYPE__ __n_qword);
+void __NOTHROW(pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val);
+__ATTR_NONNULL((2)) void __NOTHROW(pokesq)(__MEMPORT_T __addr, void const *__buf, __SIZE_TYPE__ __n_qword);
 #endif /* __x86_64__ && __UINT64_TYPE__ */
 
 #elif defined(__COMPILER_HAVE_GCC_ASM)
 
 #define peekb(port) peekb((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekb)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekb)(__MEMPORT_T __addr) {
 	__register __UINT8_TYPE__ __rv;
 	__COMPILER_READ_BARRIER();
 	__asm__ __volatile__("movb %1, %0"
@@ -95,9 +95,9 @@ __NOTHROW_NCX(__LIBCCALL peekb)(__MEMPORT_T __addr) {
 
 #define peeksb(port, addr, num_bytes) peeksb((__MEMPORT_T)(port), addr, num_bytes)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksb)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_bytes) {
+__NOTHROW_NCX(peeksb)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_bytes) {
 	if (__num_bytes) {
 		__register __UINT8_TYPE__ __temp;
 		__COMPILER_READ_BARRIER();
@@ -115,7 +115,7 @@ __NOTHROW_NCX(__LIBCCALL peeksb)(__MEMPORT_T __addr,
 
 #define pokeb(port, val) pokeb((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val) {
+__NOTHROW_NCX(pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val) {
 	__asm__ __volatile__("movb %1, %0"
 	                     : "=m" (*(__UINT8_TYPE__ volatile *)__addr)
 	                     : "q" (__val));
@@ -124,9 +124,9 @@ __NOTHROW_NCX(__LIBCCALL pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val) {
 
 #define pokesb(port, addr, num_bytes) pokesb((__MEMPORT_T)(port), addr, num_bytes)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesb)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_bytes) {
+__NOTHROW_NCX(pokesb)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_bytes) {
 	if (__num_bytes) {
 		__register __UINT8_TYPE__ __temp;
 		__asm__ __volatile__("1:\n\t"
@@ -144,7 +144,7 @@ __NOTHROW_NCX(__LIBCCALL pokesb)(__MEMPORT_T __addr,
 
 #define peekw(port) peekw((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekw)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekw)(__MEMPORT_T __addr) {
 	__register __UINT16_TYPE__ __rv;
 	__COMPILER_READ_BARRIER();
 	__asm__ __volatile__("movw %1, %0"
@@ -155,9 +155,9 @@ __NOTHROW_NCX(__LIBCCALL peekw)(__MEMPORT_T __addr) {
 
 #define peeksw(port, addr, num_words) peeksw((__MEMPORT_T)(port), addr, num_words)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksw)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_words) {
+__NOTHROW_NCX(peeksw)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_words) {
 	if (__num_words) {
 		__register __UINT16_TYPE__ __temp;
 		__COMPILER_READ_BARRIER();
@@ -175,7 +175,7 @@ __NOTHROW_NCX(__LIBCCALL peeksw)(__MEMPORT_T __addr,
 
 #define pokew(port, val) pokew((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val) {
+__NOTHROW_NCX(pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val) {
 	__asm__ __volatile__("movw %1, %0"
 	                     : "=m" (*(__UINT16_TYPE__ volatile *)__addr)
 	                     : "r" (__val));
@@ -184,9 +184,9 @@ __NOTHROW_NCX(__LIBCCALL pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val) {
 
 #define pokesw(port, addr, num_words) pokesw((__MEMPORT_T)(port), addr, num_words)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesw)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_words) {
+__NOTHROW_NCX(pokesw)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_words) {
 	if (__num_words) {
 		__register __UINT16_TYPE__ __temp;
 		__asm__ __volatile__("1:\n\t"
@@ -204,7 +204,7 @@ __NOTHROW_NCX(__LIBCCALL pokesw)(__MEMPORT_T __addr,
 
 #define peekl(port) peekl((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekl)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekl)(__MEMPORT_T __addr) {
 	__register __UINT32_TYPE__ __rv;
 	__COMPILER_READ_BARRIER();
 	__asm__ __volatile__("movl %1, %0"
@@ -215,9 +215,9 @@ __NOTHROW_NCX(__LIBCCALL peekl)(__MEMPORT_T __addr) {
 
 #define peeksl(port, addr, num_dwords) peeksl((__MEMPORT_T)(port), addr, num_dwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksl)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_dwords) {
+__NOTHROW_NCX(peeksl)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_dwords) {
 	if (__num_dwords) {
 		__register __UINT32_TYPE__ __temp;
 		__COMPILER_READ_BARRIER();
@@ -235,7 +235,7 @@ __NOTHROW_NCX(__LIBCCALL peeksl)(__MEMPORT_T __addr,
 
 #define pokel(port, val) pokel((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val) {
+__NOTHROW_NCX(pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val) {
 	__asm__ __volatile__("movl %1, %0"
 	                     : "=m" (*(__UINT32_TYPE__ volatile *)__addr)
 	                     : "r" (__val));
@@ -244,9 +244,9 @@ __NOTHROW_NCX(__LIBCCALL pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val) {
 
 #define pokesl(port, addr, num_dwords) pokesl((__MEMPORT_T)(port), addr, num_dwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesl)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_dwords) {
+__NOTHROW_NCX(pokesl)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_dwords) {
 	if (__num_dwords) {
 		__register __UINT32_TYPE__ __temp;
 		__asm__ __volatile__("1:\n\t"
@@ -265,7 +265,7 @@ __NOTHROW_NCX(__LIBCCALL pokesl)(__MEMPORT_T __addr,
 #if defined(__x86_64__) && defined(__UINT64_TYPE__)
 #define peekq(port) peekq((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT64_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekq)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekq)(__MEMPORT_T __addr) {
 	__register __UINT64_TYPE__ __rv;
 	__COMPILER_READ_BARRIER();
 	__asm__ __volatile__("movq %1, %0"
@@ -276,9 +276,9 @@ __NOTHROW_NCX(__LIBCCALL peekq)(__MEMPORT_T __addr) {
 
 #define peeksq(port, addr, num_qwords) peeksq((__MEMPORT_T)(port), addr, num_qwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksq)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_qwords) {
+__NOTHROW_NCX(peeksq)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_qwords) {
 	if (__num_qwords) {
 		__register __UINT64_TYPE__ __temp;
 		__COMPILER_READ_BARRIER();
@@ -296,7 +296,7 @@ __NOTHROW_NCX(__LIBCCALL peeksq)(__MEMPORT_T __addr,
 
 #define pokeq(port, val) pokeq((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val) {
+__NOTHROW_NCX(pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val) {
 	__asm__ __volatile__("movq %1, %0"
 	                     : "=m" (*(__UINT64_TYPE__ volatile *)__addr)
 	                     : "r" (__val));
@@ -305,9 +305,9 @@ __NOTHROW_NCX(__LIBCCALL pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val) {
 
 #define pokesq(port, addr, num_qwords) pokesq((__MEMPORT_T)(port), addr, num_qwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesq)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_qwords) {
+__NOTHROW_NCX(pokesq)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_qwords) {
 	if (__num_qwords) {
 		__register __UINT64_TYPE__ __temp;
 		__asm__ __volatile__("1:\n\t"
@@ -328,16 +328,16 @@ __NOTHROW_NCX(__LIBCCALL pokesq)(__MEMPORT_T __addr,
 
 #define peekb(port) peekb((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekb)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekb)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
 	return *(__UINT8_TYPE__ volatile const *)__addr;
 }
 
 #define peeksb(port, addr, num_bytes) peeksb((__MEMPORT_T)(port), addr, num_bytes)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksb)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_bytes) {
+__NOTHROW_NCX(peeksb)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_bytes) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_bytes; --__num_bytes, __buf = (__UINT8_TYPE__ *)__buf + 1) {
 		*(__UINT8_TYPE__ *)__buf = *(__UINT8_TYPE__ volatile const *)__addr;
@@ -346,16 +346,16 @@ __NOTHROW_NCX(__LIBCCALL peeksb)(__MEMPORT_T __addr,
 
 #define pokeb(port, val) pokeb((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val) {
+__NOTHROW_NCX(pokeb)(__MEMPORT_T __addr, __UINT8_TYPE__ __val) {
 	*(__UINT8_TYPE__ volatile *)__addr = __val;
 	__COMPILER_WRITE_BARRIER();
 }
 
 #define pokesb(port, addr, num_bytes) pokesb((__MEMPORT_T)(port), addr, num_bytes)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesb)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_bytes) {
+__NOTHROW_NCX(pokesb)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_bytes) {
 	for (; __num_bytes; --__num_bytes, __buf = (__UINT8_TYPE__ *)__buf + 1) {
 		*(__UINT8_TYPE__ volatile *)__addr = *(__UINT8_TYPE__ *)__buf;
 	}
@@ -364,16 +364,16 @@ __NOTHROW_NCX(__LIBCCALL pokesb)(__MEMPORT_T __addr,
 
 #define peekw(port) peekw((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekw)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekw)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
 	return *(__UINT16_TYPE__ volatile const *)__addr;
 }
 
 #define peeksw(port, addr, num_words) peeksw((__MEMPORT_T)(port), addr, num_words)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksw)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_words) {
+__NOTHROW_NCX(peeksw)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_words) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_words; --__num_words, __buf = (__UINT16_TYPE__ *)__buf + 1) {
 		*(__UINT16_TYPE__ *)__buf = *(__UINT16_TYPE__ volatile const *)__addr;
@@ -382,16 +382,16 @@ __NOTHROW_NCX(__LIBCCALL peeksw)(__MEMPORT_T __addr,
 
 #define pokew(port, val) pokew((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val) {
+__NOTHROW_NCX(pokew)(__MEMPORT_T __addr, __UINT16_TYPE__ __val) {
 	*(__UINT16_TYPE__ volatile *)__addr = __val;
 	__COMPILER_WRITE_BARRIER();
 }
 
 #define pokesw(port, addr, num_words) pokesw((__MEMPORT_T)(port), addr, num_words)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesw)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_words) {
+__NOTHROW_NCX(pokesw)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_words) {
 	for (; __num_words; --__num_words, __buf = (__UINT16_TYPE__ *)__buf + 1) {
 		*(__UINT16_TYPE__ volatile *)__addr = *(__UINT16_TYPE__ *)__buf;
 	}
@@ -400,16 +400,16 @@ __NOTHROW_NCX(__LIBCCALL pokesw)(__MEMPORT_T __addr,
 
 #define peekl(port) peekl((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekl)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekl)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
 	return *(__UINT32_TYPE__ volatile const *)__addr;
 }
 
 #define peeksl(port, addr, num_dwords) peeksl((__MEMPORT_T)(port), addr, num_dwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksl)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_dwords) {
+__NOTHROW_NCX(peeksl)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_dwords) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_dwords; --__num_dwords, __buf = (__UINT32_TYPE__ *)__buf + 1) {
 		*(__UINT32_TYPE__ *)__buf = *(__UINT32_TYPE__ volatile const *)__addr;
@@ -418,16 +418,16 @@ __NOTHROW_NCX(__LIBCCALL peeksl)(__MEMPORT_T __addr,
 
 #define pokel(port, val) pokel((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val) {
+__NOTHROW_NCX(pokel)(__MEMPORT_T __addr, __UINT32_TYPE__ __val) {
 	*(__UINT32_TYPE__ volatile *)__addr = __val;
 	__COMPILER_WRITE_BARRIER();
 }
 
 #define pokesl(port, addr, num_dwords) pokesl((__MEMPORT_T)(port), addr, num_dwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesl)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_dwords) {
+__NOTHROW_NCX(pokesl)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_dwords) {
 	for (; __num_dwords; --__num_dwords, __buf = (__UINT32_TYPE__ *)__buf + 1) {
 		*(__UINT32_TYPE__ volatile *)__addr = *(__UINT32_TYPE__ *)__buf;
 	}
@@ -437,16 +437,16 @@ __NOTHROW_NCX(__LIBCCALL pokesl)(__MEMPORT_T __addr,
 #if defined(__x86_64__) && defined(__UINT64_TYPE__)
 #define peekq(port) peekq((__MEMPORT_T)(port))
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT64_TYPE__
-__NOTHROW_NCX(__LIBCCALL peekq)(__MEMPORT_T __addr) {
+__NOTHROW_NCX(peekq)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
 	return *(__UINT64_TYPE__ volatile const *)__addr;
 }
 
 #define peeksq(port, addr, num_qwords) peeksq((__MEMPORT_T)(port), addr, num_qwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL peeksq)(__MEMPORT_T __addr,
-                                 void *__buf,
-                                 __SIZE_TYPE__ __num_qwords) {
+__NOTHROW_NCX(peeksq)(__MEMPORT_T __addr,
+                      void *__buf,
+                      __SIZE_TYPE__ __num_qwords) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_qwords; --__num_qwords, __buf = (__UINT64_TYPE__ *)__buf + 1) {
 		*(__UINT64_TYPE__ *)__buf = *(__UINT64_TYPE__ volatile const *)__addr;
@@ -455,16 +455,16 @@ __NOTHROW_NCX(__LIBCCALL peeksq)(__MEMPORT_T __addr,
 
 #define pokeq(port, val) pokeq((__MEMPORT_T)(port), val)
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_NCX(__LIBCCALL pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val) {
+__NOTHROW_NCX(pokeq)(__MEMPORT_T __addr, __UINT64_TYPE__ __val) {
 	*(__UINT64_TYPE__ volatile *)__addr = __val;
 	__COMPILER_WRITE_BARRIER();
 }
 
 #define pokesq(port, addr, num_qwords) pokesq((__MEMPORT_T)(port), addr, num_qwords)
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL pokesq)(__MEMPORT_T __addr,
-                                 void const *__buf,
-                                 __SIZE_TYPE__ __num_qwords) {
+__NOTHROW_NCX(pokesq)(__MEMPORT_T __addr,
+                      void const *__buf,
+                      __SIZE_TYPE__ __num_qwords) {
 	for (; __num_qwords; --__num_qwords, __buf = (__UINT64_TYPE__ *)__buf + 1) {
 		*(__UINT64_TYPE__ volatile *)__addr = *(__UINT64_TYPE__ *)__buf;
 	}

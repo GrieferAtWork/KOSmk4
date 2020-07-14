@@ -263,7 +263,7 @@ NOTHROW(KCALL is_pc)(void *pc) {
 	return (node->vn_prot & VM_PROT_EXEC) != 0;
 }
 
-PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t __LIBCCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t LIBDISASM_CC
 debug_da_formater(struct disassembler *__restrict UNUSED(self),
                   unsigned int format_option) {
 	char const *string;

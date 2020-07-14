@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabfc869a */
+/* HASH CRC-32:0x5d85463e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,8 +84,12 @@ typedef __uintptr_t uintptr_t;
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
-typedef void (__LIBCCALL *__dos_beginthread_entry_t)(void *__arg);
+typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
+#ifdef __NO_ATTR_STDCALL
+typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#else /* __NO_ATTR_STDCALL */
 typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#endif /* !__NO_ATTR_STDCALL */
 
 __CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthread,(__dos_beginthread_entry_t __entry, __UINT32_TYPE__ __stacksz, void *__arg),(__entry,__stacksz,__arg))
 __CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TYPE__ __stacksz, __dos_beginthreadex_entry_t __entry, void *__arg, __UINT32_TYPE__ __flags, __UINT32_TYPE__ *__threadaddr),(__sec,__stacksz,__entry,__arg,__flags,__threadaddr))
@@ -397,7 +401,7 @@ __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 __CDECLARE_OPT(,intptr_t,__THROWING,_loaddll,(char __KOS_FIXED_CONST *__file),(__file))
 __CDECLARE_OPT(,int,__THROWING,_unloaddll,(intptr_t __hnd),(__hnd))
 
-typedef int (__LIBCCALL *__procfun)(void);
+typedef int (*__procfun)(void);
 __CDECLARE_OPT(,__procfun,__THROWING,_getdllprocaddr,(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord),(__hnd,__symname,__ord))
 
 #ifndef __wchar_t_defined

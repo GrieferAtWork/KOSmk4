@@ -971,17 +971,22 @@ __check_string_error_and_print_tail:
 #ifndef __NO_PRINTF_GEN
 		if (__COMPARE_NAME("gen")) {
 #if __CHAR_SIZE == __SIZEOF_CHAR__
-#define __PFORMATPRINTER_TYPE __pformatprinter
+#define __PFORMATPRINTER_TYPE  __pformatprinter
+#define __PFORMATPRINTER_GENCC __FORMATPRINTER_CC
 #elif __CHAR_SIZE == __SIZEOF_WCHAR_T__
-#define __PFORMATPRINTER_TYPE __pwformatprinter
+#define __PFORMATPRINTER_TYPE  __pwformatprinter
+#define __PFORMATPRINTER_GENCC __WFORMATPRINTER_CC
 #elif __CHAR_SIZE == 2
-#define __PFORMATPRINTER_TYPE __pc16formatprinter
-#else
-#define __PFORMATPRINTER_TYPE __pc32formatprinter
-#endif
+#define __PFORMATPRINTER_TYPE  __pc16formatprinter
+#define __PFORMATPRINTER_GENCC __C16FORMATPRINTER_CC
+#else /* __CHAR_SIZE == ... */
+#define __PFORMATPRINTER_TYPE  __pc32formatprinter
+#define __PFORMATPRINTER_GENCC __C32FORMATPRINTER_CC
+#endif /* __CHAR_SIZE != ... */
 			if (!__xformat_argsize) {
+
 				/* Generator without closure */
-				typedef __SSIZE_TYPE__ (__LIBCCALL *__gen_t)(__PFORMATPRINTER_TYPE, void*);
+				typedef __SSIZE_TYPE__ (__PFORMATPRINTER_GENCC *__gen_t)(__PFORMATPRINTER_TYPE, void *);
 				__gen_t __gen = __builtin_va_arg(__FORMAT_ARGS, __gen_t);
 				__temp = (*__gen)((__PFORMATPRINTER_TYPE)__FORMAT_PRINTER, __FORMAT_ARG);
 				if __unlikely(__temp < 0)
@@ -992,15 +997,15 @@ __check_string_error_and_print_tail:
 			if (__xformat_argsize == 1 && __xformat_arg[0] == 'c') {
 				/* Generator with closure */
 				switch (__length & 0xf0) {
-#define __DEFINE_GENERATOR_IMPLEMENTATION(__T, __va_type)                                                 \
-				{                                                                                         \
-					typedef __SSIZE_TYPE__(__LIBCCALL *__gen_t)(__T, __PFORMATPRINTER_TYPE, void *);      \
-					__gen_t __gen;                                                                        \
-					__T __genarg;                                                                         \
-					__gen    = __builtin_va_arg(__FORMAT_ARGS, __gen_t);                                  \
-					__genarg = (__T) __builtin_va_arg(__FORMAT_ARGS, __va_type);                          \
-					__temp   = (*__gen)(__genarg, (__PFORMATPRINTER_TYPE)__FORMAT_PRINTER, __FORMAT_ARG); \
-				}                                                                                         \
+#define __DEFINE_GENERATOR_IMPLEMENTATION(__T, __va_type)                                                        \
+				{                                                                                                \
+					typedef __SSIZE_TYPE__(__PFORMATPRINTER_GENCC *__gen_t)(__T, __PFORMATPRINTER_TYPE, void *); \
+					__gen_t __gen;                                                                               \
+					__T __genarg;                                                                                \
+					__gen    = __builtin_va_arg(__FORMAT_ARGS, __gen_t);                                         \
+					__genarg = (__T)__builtin_va_arg(__FORMAT_ARGS, __va_type);                                  \
+					__temp   = (*__gen)(__genarg, (__PFORMATPRINTER_TYPE)__FORMAT_PRINTER, __FORMAT_ARG);        \
+				}                                                                                                \
 				break;
 #if __SIZEOF_POINTER__ < 2
 				default:
@@ -1043,6 +1048,7 @@ __check_string_error_and_print_tail:
 				__result += __temp;
 				break;
 			}
+#undef __PFORMATPRINTER_GENCC
 #undef __PFORMATPRINTER_TYPE
 			goto __broken_format;
 		}

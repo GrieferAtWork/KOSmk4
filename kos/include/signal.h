@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b23acff */
+/* HASH CRC-32:0xb10dfbc9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ typedef __uid_t uid_t;
 
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined 1
-typedef void (__LIBCCALL *__sighandler_t)(int __signo);
+typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 
 #ifdef __USE_GNU

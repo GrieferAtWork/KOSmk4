@@ -27,8 +27,8 @@
 #define LIBDL_CC  __ATTR_STDCALL
 #define LIBDL_VCC __ATTR_CDECL
 #else /* __i386__ && !__x86_64__ */
-#define LIBDL_CC  __LIBCCALL
-#define LIBDL_VCC __VLIBCCALL
+#define LIBDL_CC  __LIBKCALL
+#define LIBDL_VCC __VLIBKCALL
 #endif /* !__i386__ || __x86_64__ */
 
 #if 0

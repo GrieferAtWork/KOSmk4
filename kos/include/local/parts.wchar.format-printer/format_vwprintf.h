@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c2106b4 */
+/* HASH CRC-32:0x2c7237e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -449,8 +449,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_width_defined
 #define __local___localdep_format_width_defined 1
 #ifdef __CRT_HAVE_format_width
+__NAMESPACE_LOCAL_END
+#include <bits/format-printer.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
+__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_width */
 __NAMESPACE_LOCAL_END
 #include <local/format-printer/format_width.h>

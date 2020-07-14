@@ -2252,10 +2252,10 @@ extern "C++" {
 #ifdef fpclassify
 #ifndef __std_fpclassify_defined
 #define __std_fpclassify_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(float __x) { return fpclassify(__x); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(double __x) { return fpclassify(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(fpclassify)(float __x) { return fpclassify(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(fpclassify)(double __x) { return fpclassify(__x); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(__LONGDOUBLE __x) { return fpclassify(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(fpclassify)(__LONGDOUBLE __x) { return fpclassify(__x); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_fpclassify_defined */
 #undef fpclassify
@@ -2263,10 +2263,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(__
 #ifdef signbit
 #ifndef __std_signbit_defined
 #define __std_signbit_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(float __x) { return signbit(__x); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(double __x) { return signbit(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(signbit)(float __x) { return signbit(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(signbit)(double __x) { return signbit(__x); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(__LONGDOUBLE __x) { return signbit(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(signbit)(__LONGDOUBLE __x) { return signbit(__x); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_signbit_defined */
 #undef signbit
@@ -2274,10 +2274,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(__
 #ifdef isnormal
 #ifndef __std_isnormal_defined
 #define __std_isnormal_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(float __x) { return isnormal(__x); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(double __x) { return isnormal(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isnormal)(float __x) { return isnormal(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isnormal)(double __x) { return isnormal(__x); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(__LONGDOUBLE __x) { return isnormal(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isnormal)(__LONGDOUBLE __x) { return isnormal(__x); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isnormal_defined */
 #undef isnormal
@@ -2285,10 +2285,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(_
 #ifdef isfinite
 #ifndef __std_isfinite_defined
 #define __std_isfinite_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(float __x) { return isfinite(__x); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(double __x) { return isfinite(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isfinite)(float __x) { return isfinite(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isfinite)(double __x) { return isfinite(__x); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(__LONGDOUBLE __x) { return isfinite(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isfinite)(__LONGDOUBLE __x) { return isfinite(__x); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isfinite_defined */
 #undef isfinite
@@ -2296,10 +2296,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(_
 #ifdef isnan
 #ifndef __std_isnan_defined
 #define __std_isnan_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(float __x) { return isnan(__x); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(double __x) { return isnan(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isnan)(float __x) { return isnan(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isnan)(double __x) { return isnan(__x); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(__LONGDOUBLE __x) { return isnan(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isnan)(__LONGDOUBLE __x) { return isnan(__x); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isnan_defined */
 #undef isnan
@@ -2307,10 +2307,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(__LO
 #ifdef isinf
 #ifndef __std_isinf_defined
 #define __std_isinf_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(float __x) { return isinf(__x); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(double __x) { return isinf(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isinf)(float __x) { return isinf(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isinf)(double __x) { return isinf(__x); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(__LONGDOUBLE __x) { return isinf(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isinf)(__LONGDOUBLE __x) { return isinf(__x); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isinf_defined */
 #undef isinf
@@ -2318,10 +2318,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(__LO
 #ifdef isunordered
 #ifndef __std_isunordered_defined
 #define __std_isunordered_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered)(float __x, float __y) { return isunordered(__x, __y); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered)(double __x, double __y) { return isunordered(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isunordered)(float __x, float __y) { return isunordered(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isunordered)(double __x, double __y) { return isunordered(__x, __y); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isunordered(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isunordered)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isunordered(__x, __y); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isunordered_defined */
 #undef isunordered
@@ -2329,10 +2329,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered
 #ifdef isgreater
 #ifndef __std_isgreater_defined
 #define __std_isgreater_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(float __x, float __y) { return isgreater(__x, __y); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(double __x, double __y) { return isgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isgreater)(float __x, float __y) { return isgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isgreater)(double __x, double __y) { return isgreater(__x, __y); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isgreater)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isgreater(__x, __y); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isgreater_defined */
 #undef isgreater
@@ -2340,10 +2340,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(
 #ifdef isgreaterequal
 #ifndef __std_isgreaterequal_defined
 #define __std_isgreaterequal_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreaterequal)(float __x, float __y) { return isgreaterequal(__x, __y); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreaterequal)(double __x, double __y) { return isgreaterequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isgreaterequal)(float __x, float __y) { return isgreaterequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isgreaterequal)(double __x, double __y) { return isgreaterequal(__x, __y); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreaterequal)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isgreaterequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isgreaterequal)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isgreaterequal(__x, __y); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isgreaterequal_defined */
 #undef isgreaterequal
@@ -2351,10 +2351,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreatereq
 #ifdef isless
 #ifndef __std_isless_defined
 #define __std_isless_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(float __x, float __y) { return isless(__x, __y); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(double __x, double __y) { return isless(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isless)(float __x, float __y) { return isless(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isless)(double __x, double __y) { return isless(__x, __y); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isless(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(isless)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return isless(__x, __y); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_isless_defined */
 #undef isless
@@ -2362,10 +2362,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(__L
 #ifdef islessequal
 #ifndef __std_islessequal_defined
 #define __std_islessequal_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal)(float __x, float __y) { return islessequal(__x, __y); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal)(double __x, double __y) { return islessequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(islessequal)(float __x, float __y) { return islessequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(islessequal)(double __x, double __y) { return islessequal(__x, __y); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return islessequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(islessequal)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return islessequal(__x, __y); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_islessequal_defined */
 #undef islessequal
@@ -2373,10 +2373,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal
 #ifdef islessgreater
 #ifndef __std_islessgreater_defined
 #define __std_islessgreater_defined 1
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessgreater)(float __x, float __y) { return islessgreater(__x, __y); }
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessgreater)(double __x, double __y) { return islessgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(islessgreater)(float __x, float __y) { return islessgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(islessgreater)(double __x, double __y) { return islessgreater(__x, __y); }
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessgreater)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return islessgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(islessgreater)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return islessgreater(__x, __y); }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__std_islessgreater_defined */
 #undef islessgreater

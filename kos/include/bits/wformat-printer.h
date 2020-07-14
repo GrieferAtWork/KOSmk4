@@ -20,14 +20,27 @@
 #ifndef _BITS_WFORMAT_PRINTER_H
 #define _BITS_WFORMAT_PRINTER_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/format-printer.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pwformatprinter)(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
+#ifndef __WFORMATPRINTER_CC
+#ifdef __PE__
+#define __WFORMATPRINTER_CC __LIBDCALL
+#elif defined(__ELF__)
+#define __WFORMATPRINTER_CC __LIBKCALL
+#else /* ... */
+#define __WFORMATPRINTER_CC __LIBCCALL
+#endif /* !... */
+#endif /* !__WFORMATPRINTER_CC */
+
+typedef __SSIZE_TYPE__ (__WFORMATPRINTER_CC *__pwformatprinter)(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
 
 __SYSDECL_END
 #endif /* __CC__ */

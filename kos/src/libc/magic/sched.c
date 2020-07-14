@@ -348,7 +348,7 @@ __SYSDECL_BEGIN
 %[default:section(".text.crt{|.dos}.sched.utility")];
 
 %#if defined(__USE_GNU) || defined(__USE_KOS)
-%typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
+%typedef int (__LIBKCALL *__clone_func_t)(void *__arg);
 %[define_type_class(__clone_func_t = "TP")]
 
 [[section(".text.crt{|.dos}.sched.access")]]

@@ -25,13 +25,15 @@
 #include <libm/asm/builtin.h>
 
 #if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
+#include <__crt.h>
+
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 /* NOTE: We manually encode `fld1' because having gcc fill
- *       in that register for us produces in-optimal text on x86_64:
+ *       in that register for us produces sub-optimal text on x86_64:
  *       >> __asm__("fpatan" : "=t" (__res) : "u" (__x), "0" (1.0) : "st(1)");
  * x86_64:
  *     movsd  CSWTCH.3+0xae0, %xmm1   # Loads 1.0 into %xmm1

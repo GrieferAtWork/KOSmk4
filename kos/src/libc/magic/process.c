@@ -89,8 +89,14 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 
 %[default:section(".text.crt.dos.sched.thread")]
-%typedef void (__LIBCCALL *__dos_beginthread_entry_t)(void *__arg);
-%typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+%typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
+%{
+#ifdef __NO_ATTR_STDCALL
+typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#else /* __NO_ATTR_STDCALL */
+typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#endif /* !__NO_ATTR_STDCALL */
+}
 %
 
 %[define_type_class(__dos_beginthread_entry_t = "TP")]
@@ -184,7 +190,7 @@ intptr_t _loaddll(char __KOS_FIXED_CONST *file);
 int _unloaddll(intptr_t hnd);
 
 %
-%typedef int (__LIBCCALL *__procfun)(void);
+%typedef int (*__procfun)(void);
 %[define_replacement(__procfun = __procfun)]
 %[define_type_class(__procfun = "TP")]
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b34f32b */
+/* HASH CRC-32:0x8068fd39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1031,9 +1031,9 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL((1,
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg,
-                                                  char const *__restrict data,
-                                                  size_t datalen) {
+NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg,
+                                                            char const *__restrict data,
+                                                            size_t datalen) {
 	*(char **)arg = (char *)libc_mempcpyc(*(char **)arg, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
 }
@@ -1043,9 +1043,9 @@ NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg,
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
  *       the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg,
-                                                   char const *__restrict data,
-                                                   size_t datalen) {
+NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
+                                                             char const *__restrict data,
+                                                             size_t datalen) {
 	struct __local_format_snprintf_data {
 		char  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t sd_bufsiz; /* Remaining buffer size. */
@@ -1063,9 +1063,9 @@ NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg,
 #include <local/unicode_utf8seqlen.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_PURE NONNULL((2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
-                                        char const *__restrict data,
-                                        size_t datalen) {
+NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
+                                                  char const *__restrict data,
+                                                  size_t datalen) {
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -1083,9 +1083,9 @@ NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
 #ifndef __KERNEL__
 /* Always re-return `datalen' and ignore all other arguments */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg,
-                                         char const *__restrict data,
-                                         size_t datalen) {
+NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
+                                                   char const *__restrict data,
+                                                   size_t datalen) {
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;
@@ -1203,9 +1203,9 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__re
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 INTERN ATTR_SECTION(".text.crt.string.format") WUNUSED NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(void *arg,
-                                                  char const *__restrict data,
-                                                  size_t datalen) {
+NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg,
+                                                            char const *__restrict data,
+                                                            size_t datalen) {
 	char *buf;
 	buf = libc_format_aprintf_alloc((struct format_aprintf_data *)arg,
 	                           datalen);

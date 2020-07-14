@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c671641 */
+/* HASH CRC-32:0x455367ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -289,13 +289,13 @@ typedef __compar_fn_t comparison_fn_t;
 
 #ifndef ____atexit_func_t_defined
 #define ____atexit_func_t_defined 1
-typedef void (*__LIBCCALL __atexit_func_t)(void);
+typedef void (__LIBCCALL *__atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 
 #ifdef __USE_GNU
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_qsort_r
 __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg))
@@ -308,7 +308,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #ifdef __USE_KOS
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_bsearch_r
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
@@ -1510,7 +1510,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,random_r,(struct random_
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srandom_r,(unsigned int __seed, struct random_data *__buf),(__seed,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_NCX,initstate_r,(unsigned int __seed, char *__restrict __statebuf, __SIZE_TYPE__ __statelen, struct random_data *__restrict __buf),(__seed,__statebuf,__statelen,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__restrict __statebuf, struct random_data *__restrict __buf),(__statebuf,__buf))
-typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
+typedef void (__LIBKCALL *__on_exit_func_t)(int __status, void *__arg);
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __func, void *__arg),(__func,__arg))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,clearenv,(void),())
 #if defined(__CRT_HAVE_mkstemps64) && defined(__USE_FILE_OFFSET64)
@@ -2257,7 +2257,7 @@ typedef int errno_t;
 
 #ifndef _ONEXIT_T_DEFINED
 #define _ONEXIT_T_DEFINED 1
-typedef int (__LIBCCALL *_onexit_t)(void);
+typedef int (__LIBDCALL *_onexit_t)(void);
 #endif  /* _ONEXIT_T_DEFINED */
 #ifndef onexit_t
 #define onexit_t _onexit_t
@@ -2520,14 +2520,14 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 
 #ifndef ___purecall_handler_defined
 #define ___purecall_handler_defined 1
-typedef void (__LIBCCALL *_purecall_handler)(void);
+typedef void (__LIBDCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 __CDECLARE_OPT(,_purecall_handler,__NOTHROW_NCX,_set_purecall_handler,(_purecall_handler __handler),(__handler))
 __CDECLARE_OPT(,_purecall_handler,__NOTHROW_NCX,_get_purecall_handler,(void),())
 
 #ifndef ___invalid_parameter_handler_defined
 #define ___invalid_parameter_handler_defined 1
-typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
 __CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_set_invalid_parameter_handler,(_invalid_parameter_handler __handler),(__handler))
 __CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_get_invalid_parameter_handler,(void),())
@@ -2569,10 +2569,10 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_fmode,(int *__pmode),(__pmode))
 __CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,_set_abort_behavior,(unsigned int __flags, unsigned int __mask),(__flags,__mask))
 
 #ifdef __INT64_TYPE__
-#ifdef _MSC_VER
-extern __ATTR_CONST __INT64_TYPE__ (__LIBCCALL _abs64)(__INT64_TYPE__ __x);
+#if defined(_MSC_VER) && defined(__LIBCCALL_IS_LIBDCALL)
+extern __ATTR_CONST __INT64_TYPE__ (__LIBDCALL _abs64)(__INT64_TYPE__ __x);
 #pragma intrinsic(_abs64)
-#else /* _MSC_VER */
+#else /* _MSC_VER && __LIBCCALL_IS_LIBDCALL */
 #ifdef __CRT_HAVE__abs64
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW,_abs64,(__INT64_TYPE__ __x),(__x))
 #elif defined(__CRT_HAVE_abs) && __SIZEOF_INT__ == 8
@@ -2591,7 +2591,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTH
 #include <local/stdlib/_abs64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_abs64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW(__LIBCCALL _abs64)(__INT64_TYPE__ __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_abs64))(__x); })
 #endif /* !... */
-#endif /* !_MSC_VER */
+#endif /* !_MSC_VER || !__LIBCCALL_IS_LIBDCALL */
 #endif /* __INT64_TYPE__ */
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE__atof_l
@@ -2678,7 +2678,7 @@ typedef __SIZE_TYPE__ rsize_t;
 #define _CRT_ALGO_DEFINED 1
 #ifndef __dos_compar_d_fn_t_defined
 #define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
+typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
 #endif /* !__dos_compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_bsearch_s
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))

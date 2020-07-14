@@ -501,7 +501,7 @@ int main_sgbase(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
-PRIVATE ssize_t __LIBCCALL
+PRIVATE ssize_t FORMATPRINTER_CC
 debug_printer(void *UNUSED(arg), char const *message, size_t len) {
 	struct debugtrap_reason r;
 	r.dtr_signo  = (uint32_t)len;

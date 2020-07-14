@@ -25,11 +25,21 @@
 
 #include <hybrid/typecore.h>
 
+#include <bits/format-printer.h>
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-typedef __SSIZE_TYPE__ (__LIBDCALL *__pc16formatprinter)(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef __SSIZE_TYPE__ (__LIBKCALL *__pc32formatprinter)(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
+#ifndef __C16FORMATPRINTER_CC
+#define __C16FORMATPRINTER_CC __LIBDCALL
+#endif /* !__C16FORMATPRINTER_CC */
+
+#ifndef __C32FORMATPRINTER_CC
+#define __C32FORMATPRINTER_CC __LIBKCALL
+#endif /* !__C32FORMATPRINTER_CC */
+
+typedef __SSIZE_TYPE__ (__C16FORMATPRINTER_CC *__pc16formatprinter)(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
+typedef __SSIZE_TYPE__ (__C32FORMATPRINTER_CC *__pc32formatprinter)(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
 
 __SYSDECL_END
 #endif /* __CC__ */

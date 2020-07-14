@@ -21,6 +21,7 @@
 #define _I386_KOS_OPTIMIZED_STRING_H 1
 
 #include <__stdinc.h>
+#include <__crt.h>
 
 /* Platform-dependent, optimized string.h functions. */
 #if !defined(__NO_ATTR_FORCEINLINE) && \
@@ -61,9 +62,9 @@ extern __ATTR_ERROR("memcpy(): The `DST' and `SRC' buffers overlap - Use `memmov
 #define __fast_memcpy_defined 1
 /* Copy memory between non-overlapping memory blocks. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
-                                                   void const *__restrict __src,
-                                                   __SIZE_TYPE__ __n_bytes) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
+                                        void const *__restrict __src,
+                                        __SIZE_TYPE__ __n_bytes) {
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_bytes);
 #if 1 /* Work-around for a weird GCC-bug... */
 	if __untraced(__builtin_constant_p(__n_bytes * 2))
@@ -270,9 +271,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 
 #define __fast_mempcpy_defined 1
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
-                                                    void const *__restrict __src,
-                                                    __SIZE_TYPE__ __n_bytes) {
+__NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
+                                         void const *__restrict __src,
+                                         __SIZE_TYPE__ __n_bytes) {
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_bytes);
 #if 1 /* Work-around for a weird GCC-bug... */
 	if __untraced(__builtin_constant_p(__n_bytes * 2))
