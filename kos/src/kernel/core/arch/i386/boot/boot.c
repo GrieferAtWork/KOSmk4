@@ -410,6 +410,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: renameat2() is missing from <stdio.h> */
 
+	/* TODO: Refactor <local/...> to <libc/local/...> */
+
 	return state;
 }
 

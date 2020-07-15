@@ -1484,7 +1484,7 @@ __err_vinfo:
 		 *       want it to happen _every_ _time_ user-code makes use of a printf()-like
 		 *       function. That's just wasteful!
 		 *    -> I hope that by using dedicated functions instead of builtins, that
-		 *       problem can be solved, but until them, let's just keep this disabled... */
+		 *       problem can be solved, but until then, let's just keep this disabled... */
 #if (__has_builtin(__builtin_isinf) && __has_builtin(__builtin_isnan)) && 0
 		if (__builtin_isinf(__val)) {
 			__buf[1] = 'I';

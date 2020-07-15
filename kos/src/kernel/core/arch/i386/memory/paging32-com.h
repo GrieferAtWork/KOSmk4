@@ -67,11 +67,11 @@ INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = P32_PAGE_FGLOBAL; /* C
 #elif !defined(CONFIG_NO_PAGING_PAE)
 #if PAE_PAGE_FGLOBAL <= 0xffffffff /* This is faster because GCC can assume that the upper 32 bits are 0 */
 INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = (u32)PAE_PAGE_FGLOBAL; /* Cleared during init if unsupported */
-#else
+#else /* PAE_PAGE_FGLOBAL <= 0xffffffff */
 INTERN ATTR_PAGING_READMOSTLY u64 used_pxx_page_fglobal = PAE_PAGE_FGLOBAL; /* Cleared during init if unsupported */
-#endif
+#endif /* PAE_PAGE_FGLOBAL > 0xffffffff */
 #define USED_PAE_PAGE_FGLOBAL     used_pxx_page_fglobal
-#endif
+#endif /* ... */
 
 
 #ifndef CONFIG_NO_PAGING_P32

@@ -75,19 +75,19 @@ __SYSDECL_BEGIN
 #ifndef _CRTIMP2
 #if defined(_DLL) && !defined(_STATIC_CPPLIB)
 #define _CRTIMP2 __ATTR_DLLIMPORT
-#else
+#else /* _DLL && !_STATIC_CPPLIB */
 #define _CRTIMP2 /* nothing */
-#endif
+#endif /* !_DLL || _STATIC_CPPLIB */
 #endif /* !_CRTIMP2 */
 
 #ifndef _CRTIMP_ALTERNATIVE
 #ifdef _DLL
 #ifdef _CRT_ALTERNATIVE_INLINES
 #define _CRTIMP_ALTERNATIVE        /* nothing */
-#else
+#else /* _CRT_ALTERNATIVE_INLINES */
 #define _CRTIMP_ALTERNATIVE        _CRTIMP
 #define _CRT_ALTERNATIVE_IMPORTED
-#endif
+#endif /* !_CRT_ALTERNATIVE_INLINES */
 #else /* _DLL */
 #define _CRTIMP_ALTERNATIVE        /* nothing */
 #endif /* !_DLL */
@@ -100,63 +100,63 @@ __SYSDECL_BEGIN
 #ifndef _MRTIMP2
 #if defined(_DLL) && !defined(_STATIC_CPPLIB)
 #define _MRTIMP2 __ATTR_DLLIMPORT
-#else
+#else /* _DLL && !_STATIC_CPPLIB */
 #define _MRTIMP2 /* nothing */
-#endif
+#endif /* !_DLL || _STATIC_CPPLIB */
 #endif /* !_MRTIMP2 */
 
 #ifndef __CLR_OR_THIS_CALL
 #ifdef _M_CEE_PURE
-#define __CLR_OR_THIS_CALL  __ATTR_CLRCALL
-#else
-#define __CLR_OR_THIS_CALL  /* nothing */
-#endif
+#define __CLR_OR_THIS_CALL __ATTR_CLRCALL
+#else /* _M_CEE_PURE */
+#define __CLR_OR_THIS_CALL /* nothing */
+#endif /* !_M_CEE_PURE */
 #endif /* !__CLR_OR_THIS_CALL */
 #ifndef __CLRCALL_OR_CDECL
 #ifdef _M_CEE_PURE
 #define __CLRCALL_OR_CDECL __ATTR_CLRCALL
-#else
+#else /* _M_CEE_PURE */
 #define __CLRCALL_OR_CDECL __ATTR_CDECL
-#endif
+#endif /* !_M_CEE_PURE */
 #endif /* !__CLRCALL_OR_CDECL */
 
 #ifndef _CRTIMP_PURE
 #if defined(_M_CEE_PURE) || defined(_STATIC_CPPLIB)
 #define _CRTIMP_PURE /* nothing */
-#else
+#else /* _M_CEE_PURE || _STATIC_CPPLIB */
 #define _CRTIMP_PURE _CRTIMP
-#endif
+#endif /* !_M_CEE_PURE && !_STATIC_CPPLIB */
 #endif /* !_CRTIMP_PURE */
 
 #ifndef _PGLOBAL
 #ifdef _M_CEE
-#if defined(__cplusplus_cli) && \
-   (defined(_MSC_VER) || __has_declspec_attribute(process))
+#if (defined(__cplusplus_cli) && \
+     (defined(_MSC_VER) || __has_declspec_attribute(process)))
 #define _PGLOBAL __declspec(process)
-#else
+#else /* ... */
 #define _PGLOBAL /* nothing */
-#endif
+#endif /* !... */
 #else /* _M_CEE */
 #define _PGLOBAL /* nothing */
 #endif /* _M_CEE */
 #endif /* !_PGLOBAL */
 
 #ifndef _AGLOBAL
-#if defined(_M_CEE) && \
-   (defined(_MSC_VER) || __has_declspec_attribute(appdomain))
+#if (defined(_M_CEE) && \
+     (defined(_MSC_VER) || __has_declspec_attribute(appdomain)))
 #define _AGLOBAL __declspec(appdomain)
-#else
+#else /* ... */
 #define _AGLOBAL /* nothing */
-#endif
+#endif /* !... */
 #endif /* !_AGLOBAL */
 
 #ifndef _CRT_GUARDOVERFLOW
-#if defined(_GUARDOVERFLOW_CRT_ALLOCATORS) && \
-   (defined(_MSC_VER) || __has_declspec_attribute(guard))
+#if (defined(_GUARDOVERFLOW_CRT_ALLOCATORS) && \
+     (defined(_MSC_VER) || __has_declspec_attribute(guard)))
 #define _CRT_GUARDOVERFLOW __declspec(guard(overflow))
-#else
+#else /* ... */
 #define _CRT_GUARDOVERFLOW /* nothing */
-#endif
+#endif /* !... */
 #endif /* !_CRT_GUARDOVERFLOW */
 
 #ifdef _M_CEE
@@ -231,12 +231,12 @@ __SYSDECL_BEGIN
 #endif  /* _CRT_BUILD_DESKTOP_APP */
 
 #ifndef _CRT_JIT_INTRINSIC
-#if defined(_M_CEE) && defined(_M_X64) && \
-   (defined(_MSC_VER) || __has_declspec_attribute(jitintrinsic))
+#if (defined(_M_CEE) && defined(_M_X64) && \
+     (defined(_MSC_VER) || __has_declspec_attribute(jitintrinsic)))
 #define _CRT_JIT_INTRINSIC __declspec(jitintrinsic)
-#else
+#else /* ... */
 #define _CRT_JIT_INTRINSIC /* nothing */
-#endif
+#endif /* !... */
 #endif /* !_CRT_JIT_INTRINSIC */
 
 #ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
@@ -388,17 +388,17 @@ typedef __time64_t time_t;
 #ifdef __cplusplus
 #define _CONST_RETURN  const
 #define _CRT_CONST_CORRECT_OVERLOADS 1
-#else
+#else /* __cplusplus */
 #define _CONST_RETURN  /* nothing */
-#endif
+#endif /* !__cplusplus */
 #endif /* !_CONST_RETURN */
 
 #ifndef _UNALIGNED
 #if defined(_M_X64) || defined(_M_ARM)
 #define _UNALIGNED __unaligned /* XXX: Compiler-independent? */
-#else
+#else /* _M_X64 || _M_ARM */
 #define _UNALIGNED /* nothing */
-#endif
+#endif /* !_M_X64 && !_M_ARM */
 #endif /* !_UNALIGNED */
 
 #ifndef _CRT_ALIGN
@@ -420,16 +420,17 @@ typedef __time64_t time_t;
 #endif /* !__CRTDECL */
 
 #ifndef _STR2WSTR
-#define __STR2WSTR(str)    L##str
-#define _STR2WSTR(str)     __STR2WSTR(str)
+#define __STR2WSTR(str) L##str
+#define _STR2WSTR(str)  __STR2WSTR(str)
 #endif /* !_STR2WSTR */
 #ifndef __FILEW__
-#define __FILEW__          _STR2WSTR(__FILE__)
+#define __FILEW__ _STR2WSTR(__FILE__)
 #endif /* !__FILEW__ */
 #ifndef __FUNCTIONW__
-#define __FUNCTIONW__      _STR2WSTR(__FUNCTION__)
+#define __FUNCTIONW__ _STR2WSTR(__FUNCTION__)
 #endif /* !__FUNCTIONW__ */
 
+#ifdef __CC__
 #ifdef _DEBUG
 #ifdef __CRT_HAVE__invalid_parameter
 _CRTIMP void (__ATTR_CDECL _invalid_parameter)(__WCHAR16_TYPE__ const *,
@@ -486,6 +487,7 @@ __LOCAL __ATTR_NORETURN void
 	_invalid_parameter_noinfo_noreturn()
 #endif /* !_DEBUG */
 #endif /* !_CRT_SECURE_INVALID_PARAMETER */
+#endif /* __CC__ */
 
 #ifndef _ARGMAX
 #define _ARGMAX 100
@@ -635,47 +637,47 @@ __LOCAL __ATTR_NORETURN void
 	__LOCAL return_type __CRTDECL name(dsttype *dst, t1 a1, t2 a2, t3 a3)
 #define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
 #else /* __CC__ */
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_CGETS(return_type, attr, name, destattr, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_2_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_3_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_4_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3, t4, a4)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1_EX(return_type, return_pol, attr, name, secname, ht1, ha1, destattr, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_2_0_EX(return_type, return_pol, attr, name, secname, ht1, ha1, ht2, ha2, destattr, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_ARGLIST_EX(return_type, return_pol, attr, name, secname, vname, _SecureVFuncName, destattr, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_2_ARGLIST_EX(return_type, return_pol, attr, name, vname, _SecureVFuncName, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_2_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_3_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_0_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_0_GETS(return_type, return_pol, attr, name, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_1_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_3_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_4_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3, t4, a4)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_1_1_EX(return_type, return_pol, attr, name, secname, ht1, ha1, destattr, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_2_0_EX(return_type, return_pol, attr, name, secname, ht1, ha1, ht2, ha2, destattr, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_1_ARGLIST_EX(return_type, return_pol, attr, name, secname, vname, _SecureVFuncName, destattr, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_ARGLIST(return_type, return_pol, attr, name, vname, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_ARGLIST_EX(return_type, return_pol, attr, name, vname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_3_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)
-#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)
-#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)
-#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)
-#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)
-#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)
-#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2)
-#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)
-#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2, t3, a3)
-#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst)                                                      /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_0_CGETS(return_type, attr, name, destattr, dsttype, dst)                                                                        /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1)                                 /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_2_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                         /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_3_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)                 /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_4_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3, t4, a4)                      /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1_EX(return_type, return_pol, attr, name, secname, ht1, ha1, destattr, dsttype, dst, t1, a1)                                    /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_2_0_EX(return_type, return_pol, attr, name, secname, ht1, ha1, ht2, ha2, destattr, dsttype, dst)                                  /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_ARGLIST_EX(return_type, return_pol, attr, name, secname, vname, _SecureVFuncName, destattr, dsttype, dst, t1, a1)             /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_2_ARGLIST_EX(return_type, return_pol, attr, name, vname, _SecureVFuncName, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2) /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_2_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                                             /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_3_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)                                     /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_0_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst)                                                     /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_0_GETS(return_type, return_pol, attr, name, dsttype, dst)                                                                      /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_1_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1)                                /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                        /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_3_EX(return_type, return_pol, attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)                /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_4_EX(return_type, return_pol, attr, name, secname, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3, t4, a4)                     /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_1_1_EX(return_type, return_pol, attr, name, secname, ht1, ha1, destattr, dsttype, dst, t1, a1)                                   /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_2_0_EX(return_type, return_pol, attr, name, secname, ht1, ha1, ht2, ha2, destattr, dsttype, dst)                                 /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_1_ARGLIST_EX(return_type, return_pol, attr, name, secname, vname, _SecureVFuncName, destattr, dsttype, dst, t1, a1)            /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_ARGLIST(return_type, return_pol, attr, name, vname, destattr, dsttype, dst, t1, a1, t2, a2)                                  /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_ARGLIST_EX(return_type, return_pol, attr, name, vname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                  /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                                            /* nothing */
+#define __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_3_SIZE_EX(attr, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)                                    /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)                                                          /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)                                                           /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)                                                  /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)                                                   /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2)                                          /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                                 /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_FUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2, t3, a3)                                  /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_FUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)                         /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)                                                         /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_0_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst)                                                          /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)                                                 /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_1_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1)                                                  /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2)                                         /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_2_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2)                                /* nothing */
+#define __DECLARE_CPP_OVERLOAD_INLINE_NFUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, dsttype, dst, t1, a1, t2, a2, t3, a3)                                 /* nothing */
+#define __DEFINE_CPP_OVERLOAD_INLINE_NFUNC_0_3_EX(return_type, return_pol, name, secname, sec_dsttype, destattr, dsttype, dst, t1, a1, t2, a2, t3, a3)                        /* nothing */
 #endif /* !__CC__ */
 
 
@@ -814,25 +816,25 @@ typedef struct threadlocaleinfostruct {
 #ifndef _Check_return_opt_
 #if defined(_PREFAST_) && defined(_CA_SHOULD_CHECK_RETURN)
 #define _Check_return_opt_ _Check_return_
-#else
+#else /* _PREFAST_ && _CA_SHOULD_CHECK_RETURN */
 #define _Check_return_opt_ /* nothing */
-#endif
+#endif /* !_PREFAST_ || !_CA_SHOULD_CHECK_RETURN */
 #endif /* !_Check_return_opt_ */
 
 #ifndef _Check_return_wat_
 #if defined(_PREFAST_) && defined(_CA_SHOULD_CHECK_RETURN_WER)
 #define _Check_return_wat_ _Check_return_
-#else
+#else /* _PREFAST_ && _CA_SHOULD_CHECK_RETURN_WER */
 #define _Check_return_wat_ /* nothing */
-#endif
+#endif /* !_PREFAST_ || !_CA_SHOULD_CHECK_RETURN_WER */
 #endif /* !_Check_return_wat_ */
 
 #ifndef __crt_typefix
 #if defined(_MSC_VER) && (!defined(__midl) && !defined(MIDL_PASS) && defined(_PREFAST_))
-#define __crt_typefix(ctype)  __declspec("SAL_typefix(" __CRT_STRINGIZE(ctype) ")")
-#else
+#define __crt_typefix(ctype) __declspec("SAL_typefix(" __CRT_STRINGIZE(ctype) ")")
+#else /* ... */
 #define __crt_typefix(ctype)
-#endif
+#endif /* !... */
 #endif /* !__crt_typefix */
 
 #ifdef __midl

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d80449e */
+/* HASH CRC-32:0xac21fe34 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,12 @@
 #ifndef __local_memmoveq_defined
 #define __local_memmoveq_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. */
 __LOCAL_LIBC(memmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords) {
-#if __SIZEOF_POINTER__ >= 8
+#if __SIZEOF_BUSINT__ >= 8
 	__UINT64_TYPE__ *__pdst, *__psrc;
 	if (__dst <= __src) {
 		__pdst = (__UINT64_TYPE__ *)__dst;
@@ -38,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst, void const *_
 		while (__n_qwords--)
 			*--__pdst = *--__psrc;
 	}
-#else /* __SIZEOF_POINTER__ >= 8 */
+#else /* __SIZEOF_BUSINT__ >= 8 */
 	__UINT32_TYPE__ *__pdst, *__psrc;
 	if (__dst <= __src) {
 		__pdst = (__UINT32_TYPE__ *)__dst;
@@ -55,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst, void const *_
 			*--__pdst = *--__psrc;
 		}
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_BUSINT__ < 8 */
 	return (__UINT64_TYPE__ *)__dst;
 }
 __NAMESPACE_LOCAL_END

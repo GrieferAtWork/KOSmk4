@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55d880e4 */
+/* HASH CRC-32:0xcf30a4e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1522,24 +1522,25 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRLENL */
 #ifndef LIBC_ARCH_HAVE_MEMCPYQ
+#include <hybrid/typecore.h>
 /* Copy memory between non-overlapping memory blocks. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memcpyq)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_qwords) {
-#if __SIZEOF_POINTER__ >= 8
+#if __SIZEOF_BUSINT__ >= 8
 	u64 *pdst = (u64 *)dst;
 	u64 *psrc = (u64 *)src;
 	while (n_qwords--)
 		*pdst++ = *psrc++;
-#else /* __SIZEOF_POINTER__ >= 8 */
+#else /* __SIZEOF_BUSINT__ >= 8 */
 	u32 *pdst = (u32 *)dst;
 	u32 *psrc = (u32 *)src;
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_BUSINT__ < 8 */
 	return (u64 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPYQ */
@@ -1553,12 +1554,13 @@ NOTHROW_NCX(LIBCCALL libc_mempcpyq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPCPYQ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEQ
+#include <hybrid/typecore.h>
 /* Move memory between potentially overlapping memory blocks. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
                                     void const *src,
                                     size_t n_qwords) {
-#if __SIZEOF_POINTER__ >= 8
+#if __SIZEOF_BUSINT__ >= 8
 	u64 *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (u64 *)dst;
@@ -1571,7 +1573,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
 		while (n_qwords--)
 			*--pdst = *--psrc;
 	}
-#else /* __SIZEOF_POINTER__ >= 8 */
+#else /* __SIZEOF_BUSINT__ >= 8 */
 	u32 *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
@@ -1588,7 +1590,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
 			*--pdst = *--psrc;
 		}
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_BUSINT__ < 8 */
 	return (u64 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEQ */
@@ -1602,20 +1604,21 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEQ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPQ
+#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
                                       void const *src,
                                       size_t n_qwords) {
-#if __SIZEOF_POINTER__ >= 8
+#if __SIZEOF_BUSINT__ >= 8
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst + n_qwords;
 	psrc = (u64 *)src + n_qwords;
 	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*--pdst = *--psrc;
-#else /* __SIZEOF_POINTER__ >= 8 */
+#else /* __SIZEOF_BUSINT__ >= 8 */
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
 	psrc = (u32 *)src + (n_qwords * 2);
@@ -1624,25 +1627,26 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
 		*--pdst = *--psrc;
 		*--pdst = *--psrc;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_BUSINT__ < 8 */
 	return (u64 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEUPQ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNQ
+#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
                                         void const *src,
                                         size_t n_qwords) {
-#if __SIZEOF_POINTER__ >= 8
+#if __SIZEOF_BUSINT__ >= 8
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst;
 	psrc = (u64 *)src;
 	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*pdst++ = *psrc++;
-#else /* __SIZEOF_POINTER__ >= 8 */
+#else /* __SIZEOF_BUSINT__ >= 8 */
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 *)src;
@@ -1651,7 +1655,7 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_BUSINT__ < 8 */
 	return (u64 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNQ */

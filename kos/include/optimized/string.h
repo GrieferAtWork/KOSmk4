@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyq))(/*aligned(8)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_qwords * 8);
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -121,7 +121,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyl))(/*aligned(4)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_dwords * 4);
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -237,7 +237,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_words * 2);
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -369,7 +369,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restrict __dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memcpyq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_memcpyq(__dst, __src, __n_words >> 2);
 		case 1:
@@ -417,7 +417,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(/*aligned(1)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_bytes);
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -625,7 +625,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(/*aligned(1)*/ void *__restrict __dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memcpyq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_memcpyq(__dst, __src, __n_bytes >> 3);
 		case 1:
@@ -649,7 +649,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(/*aligned(1)*/ void *__restrict __dst,
 #endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memcpyl)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_memcpyl(__dst, __src, __n_bytes >> 2);
 		case 1:
@@ -699,7 +699,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyq))(/*aligned(8)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_qwords * 8);
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -759,7 +759,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyl))(/*aligned(4)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_dwords * 4);
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -875,7 +875,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyw))(/*aligned(2)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_words * 2);
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -1007,7 +1007,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpyw))(/*aligned(2)*/ void *__restrict __dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempcpyq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_mempcpyq(__dst, __src, __n_words >> 2);
 		case 1:
@@ -1055,7 +1055,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restrict __dst,
 	__ASSERT_MEMCPY_CT(__dst, __src, __n_bytes);
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -1263,7 +1263,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restrict __dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempcpyq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_mempcpyq(__dst, __src, __n_bytes >> 3);
 		case 1:
@@ -1287,7 +1287,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restrict __dst,
 #endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempcpyl)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_mempcpyl(__dst, __src, __n_bytes >> 2);
 		case 1:
@@ -1343,7 +1343,7 @@ __NOTHROW_NCX(__private_bzero_constant)(void *__restrict __dst,
 #define __private_bzero_constant_ifaligned(n, tt) tt
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
                                         ) {
-	switch (__n_bytes) {
+	switch __untraced(__n_bytes) {
 
 	case 0:
 		return;
@@ -1901,7 +1901,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_qwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_qwords) {
+			switch __untraced(__n_qwords) {
 			case 0:
 				return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -1990,7 +1990,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_dwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_dwords) {
+			switch __untraced(__n_dwords) {
 			case 0:
 				return (__UINT32_TYPE__ *)__dst;
 			case 1:
@@ -2124,7 +2124,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_words)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_words) {
+			switch __untraced(__n_words) {
 			case 0:
 				return (__UINT16_TYPE__ *)__dst;
 			case 1:
@@ -2262,7 +2262,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restrict __dst,
 		__temp = __libc_core_mempsetq(__dst,
 		                             (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001)),
 		                              __n_words >> 2);
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		default: break;
 		case 1:
 			((__UINT16_TYPE__ *)__temp)[0] = __word;
@@ -2312,7 +2312,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_bytes)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_bytes) {
+			switch __untraced(__n_bytes) {
 			case 0:
 				return __dst;
 			case 1:
@@ -2532,7 +2532,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restrict __dst,
 		__temp = __libc_core_mempsetq(__dst,
 		                             (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101)),
 		                              __n_bytes >> 3);
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		default: break;
 		case 1:
 			((__UINT8_TYPE__ *)__temp)[0] = (__UINT8_TYPE__)(__byte & __UINT8_C(0xff));
@@ -2567,7 +2567,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restrict __dst,
 		__temp = __libc_core_mempsetl(__dst,
 		                             (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101)),
 		                              __n_bytes >> 2);
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		default: break;
 		case 1:
 			((__UINT8_TYPE__ *)__temp)[0] = (__UINT8_TYPE__)(__byte & __UINT8_C(0xff));
@@ -2604,7 +2604,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_qwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_qwords) {
+			switch __untraced(__n_qwords) {
 			case 0:
 				return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -2695,7 +2695,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_dwords)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_dwords) {
+			switch __untraced(__n_dwords) {
 			case 0:
 				return (__UINT32_TYPE__ *)__dst;
 			case 1:
@@ -2837,7 +2837,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_words)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_words) {
+			switch __untraced(__n_words) {
 			case 0:
 				return (__UINT16_TYPE__ *)__dst;
 			case 1:
@@ -2980,7 +2980,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__restrict __dst,
 		__dst = __libc_core_mempsetq(__dst,
 		                            (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001)),
 		                             __n_words >> 2);
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		default: break;
 		case 1:
 			((__UINT16_TYPE__ *)__dst)[0] = __word;
@@ -3032,7 +3032,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restrict __dst,
 		}
 		if __untraced(__builtin_constant_p(__n_bytes)) {
 			/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-			switch (__n_bytes) {
+			switch __untraced(__n_bytes) {
 			case 0:
 				return __dst;
 			case 1:
@@ -3251,7 +3251,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restrict __dst,
 		__dst = __libc_core_mempsetq(__dst,
 		                            (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101)),
 		                             __n_bytes >> 3);
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		default: break;
 		case 1:
 			((__UINT8_TYPE__ *)__dst)[0] = (__UINT8_TYPE__)(__byte & __UINT8_C(0xff));
@@ -3285,7 +3285,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restrict __dst,
 		__dst = __libc_core_mempsetl(__dst,
 		                            (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101)),
 		                             __n_bytes >> 2);
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		default: break;
 		case 1:
 			((__UINT8_TYPE__ *)__dst)[0] = (__UINT8_TYPE__)(__byte & __UINT8_C(0xff));
@@ -3313,7 +3313,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchr))(/*aligned(1)*/ void const *__restrict __haystack,
                                         int __needle, __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__n_bytes)) {
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __NULLPTR;
 		case 1:
@@ -3357,7 +3357,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                          __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	if __untraced(__builtin_constant_p(__n_words)) {
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return __NULLPTR;
 		case 1:
@@ -3401,7 +3401,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                          __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
 	if __untraced(__builtin_constant_p(__n_dwords)) {
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return __NULLPTR;
 		case 1:
@@ -3445,7 +3445,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrq))(/*aligned(8)*/ void const *__restrict __haystack,
                                          __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	if __untraced(__builtin_constant_p(__n_qwords)) {
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return __NULLPTR;
 		case 1:
@@ -3491,7 +3491,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchr))(/*aligned(1)*/ void const *__restrict __haystack,
                                          int __needle, __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__n_bytes)) {
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 4:
 			if __untraced(((__UINT8_TYPE__ *)__haystack)[3] == (__UINT8_TYPE__)__needle)
 				return (__UINT8_TYPE__ *)__haystack + 3;
@@ -3523,7 +3523,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                           __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	if __untraced(__builtin_constant_p(__n_words)) {
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 4:
 			if __untraced(((__UINT16_TYPE__ *)__haystack)[3] == __word)
 				return (__UINT16_TYPE__ *)__haystack + 3;
@@ -3555,7 +3555,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                           __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
 	if __untraced(__builtin_constant_p(__n_dwords)) {
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 4:
 			if __untraced(((__UINT32_TYPE__ *)__haystack)[3] == __dword)
 				return (__UINT32_TYPE__ *)__haystack + 3;
@@ -3587,7 +3587,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *__restrict __haystack,
                                           __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	if __untraced(__builtin_constant_p(__n_qwords)) {
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 4:
 			if __untraced(((__UINT64_TYPE__ *)__haystack)[3] == __qword)
@@ -3751,7 +3751,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 		/* Add constant cases all compares with less than 2 memory lookups. */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return 0;
 		case 1:
@@ -4043,7 +4043,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict _
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 		/* Add constant cases all compares with less than 2 memory lookups. */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return 0;
 		case 1:
@@ -4235,7 +4235,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict _
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 		/* Add constant cases all compares with less than 2 memory lookups. */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return 0;
 		case 1:
@@ -4383,7 +4383,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict _
 #endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 		/* Add constant cases all compares with less than 2 memory lookups. */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return 0;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -4476,7 +4476,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownq))(/*aligned(8)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -4539,7 +4539,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownl))(/*aligned(4)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -4667,7 +4667,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownw))(/*aligned(2)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -4822,7 +4822,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownw))(/*aligned(2)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memmovedownq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_memmovedownq(__dst, __src, __n_words >> 2);
 		case 1:
@@ -4868,7 +4868,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedown))(/*aligned(1)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -5114,7 +5114,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedown))(/*aligned(1)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memmovedownq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_memmovedownq(__dst, __src, __n_bytes >> 3);
 		case 1:
@@ -5138,7 +5138,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedown))(/*aligned(1)*/ void *__dst,
 #endif /* __CRT_HAVE_memmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovedownl)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_memmovedownl(__dst, __src, __n_bytes >> 2);
 		case 1:
@@ -5186,7 +5186,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownq))(/*aligned(8)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -5250,7 +5250,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownl))(/*aligned(4)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -5378,7 +5378,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownw))(/*aligned(2)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -5533,7 +5533,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedownw))(/*aligned(2)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempmovedownq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_mempmovedownq(__dst, __src, __n_words >> 2);
 		case 1:
@@ -5579,7 +5579,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedown))(/*aligned(1)*/ void *__dst,
 	__ASSERT_MEMMOVEDOWN_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -5825,7 +5825,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedown))(/*aligned(1)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempmovedownq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_mempmovedownq(__dst, __src, __n_bytes >> 3);
 		case 1:
@@ -5849,7 +5849,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovedown))(/*aligned(1)*/ void *__dst,
 #endif /* __CRT_HAVE_mempmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovedownl)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_mempmovedownl(__dst, __src, __n_bytes >> 2);
 		case 1:
@@ -5903,7 +5903,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupq))(/*aligned(8)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -5966,7 +5966,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupl))(/*aligned(4)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -6094,7 +6094,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -6249,7 +6249,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memmoveupq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_memmoveupq(__dst, __src, __n_words >> 2);
 		case 1:
@@ -6295,7 +6295,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -6541,7 +6541,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memmoveupq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_memmoveupq(__dst, __src, __n_bytes >> 3);
 		case 1:
@@ -6565,7 +6565,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst,
 #endif /* __CRT_HAVE_memmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmoveupl)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_memmoveupl(__dst, __src, __n_bytes >> 2);
 		case 1:
@@ -6613,7 +6613,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupq))(/*aligned(8)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -6677,7 +6677,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupl))(/*aligned(4)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -6805,7 +6805,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupw))(/*aligned(2)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -6960,7 +6960,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveupw))(/*aligned(2)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempmoveupq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_mempmoveupq(__dst, __src, __n_words >> 2);
 		case 1:
@@ -7006,7 +7006,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__dst,
 	__ASSERT_MEMMOVEUP_CT(__dst, __src);
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -7252,7 +7252,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempmoveupq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_mempmoveupq(__dst, __src, __n_bytes >> 3);
 		case 1:
@@ -7276,7 +7276,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__dst,
 #endif /* __CRT_HAVE_mempmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmoveupl)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_mempmoveupl(__dst, __src, __n_bytes >> 2);
 		case 1:
@@ -7335,7 +7335,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -7429,7 +7429,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovel))(/*aligned(4)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -7620,7 +7620,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -7857,7 +7857,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memmoveq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_memmoveq(__dst, __src, __n_words >> 2);
 		case 1: {
@@ -7921,7 +7921,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -8336,7 +8336,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_memmoveq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_memmoveq(__dst, __src, __n_bytes >> 3);
 		case 1: {
@@ -8372,7 +8372,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 #endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovel)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_memmovel(__dst, __src, __n_bytes >> 2);
 		case 1: {
@@ -8438,7 +8438,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmoveq))(/*aligned(8)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_qwords)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_qwords) {
+		switch __untraced(__n_qwords) {
 		case 0:
 			return (__UINT64_TYPE__ *)__dst;
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -8533,7 +8533,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_dwords)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_dwords) {
+		switch __untraced(__n_dwords) {
 		case 0:
 			return (__UINT32_TYPE__ *)__dst;
 		case 1:
@@ -8725,7 +8725,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_words)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_words) {
+		switch __untraced(__n_words) {
 		case 0:
 			return (__UINT16_TYPE__ *)__dst;
 		case 1:
@@ -8962,7 +8962,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempmoveq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_words & 3) {
+		switch __untraced(__n_words & 3) {
 		case 0:
 			return (__UINT16_TYPE__ *)__libc_core_mempmoveq(__dst, __src, __n_words >> 2);
 		case 1: {
@@ -9025,7 +9025,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 	if __untraced(__builtin_constant_p(__n_bytes)) {
 		/* Optimizations when the move can be done using
 		 * at most 2 read/writes, and at most 1 temporary. */
-		switch (__n_bytes) {
+		switch __untraced(__n_bytes) {
 		case 0:
 			return __dst;
 		case 1:
@@ -9438,7 +9438,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__CRT_HAVE_mempmoveq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 7) {
+		switch __untraced(__n_bytes & 7) {
 		case 0:
 			return __libc_core_mempmoveq(__dst, __src, __n_bytes >> 3);
 		case 1: {
@@ -9473,7 +9473,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 #endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovel)
 #ifndef __OPTIMIZE_SIZE__
-		switch (__n_bytes & 3) {
+		switch __untraced(__n_bytes & 3) {
 		case 0:
 			return __libc_core_mempmovel(__dst, __src, __n_bytes >> 2);
 		case 1: {
@@ -9598,7 +9598,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 	                                         __SIZE_TYPE__ __elem_count,                                    \
 	                                         __SIZE_TYPE__ __elem_size) {                                   \
 		if __untraced(__builtin_constant_p(__elem_size)) {                                                  \
-			switch (__elem_size) {                                                                          \
+			switch __untraced(__elem_size) {                                                                          \
 			case 1: return (memcpy)(__dst, __src, __elem_count);                                            \
 			case 2: return (memcpyw)(__dst, __src, __elem_count);                                           \
 			case 4: return (memcpyl)(__dst, __src, __elem_count);                                           \
@@ -9613,7 +9613,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 				return (memcpyw)(__dst, __src, __elem_count * (__elem_size / 2));                           \
 		}                                                                                                   \
 		if __untraced(__builtin_constant_p(__elem_count)) {                                                 \
-			switch (__elem_count) {                                                                         \
+			switch __untraced(__elem_count) {                                                                         \
 			case 1: return (memcpy)(__dst, __src, __elem_size);                                             \
 			case 2: return (memcpyw)(__dst, __src, __elem_size);                                            \
 			case 4: return (memcpyl)(__dst, __src, __elem_size);                                            \
@@ -9637,7 +9637,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 	                                         __SIZE_TYPE__ __elem_count,                                    \
 	                                         __SIZE_TYPE__ __elem_size) {                                   \
 		if __untraced(__builtin_constant_p(__elem_size)) {                                                  \
-			switch (__elem_size) {                                                                          \
+			switch __untraced(__elem_size) {                                                                          \
 			case 1: return (memcpy)(__dst, __src, __elem_count);                                            \
 			case 2: return (memcpyw)(__dst, __src, __elem_count);                                           \
 			case 4: return (memcpyl)(__dst, __src, __elem_count);                                           \
@@ -9649,7 +9649,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 				return (memcpyw)(__dst, __src, __elem_count * (__elem_size / 2));                           \
 		}                                                                                                   \
 		if __untraced(__builtin_constant_p(__elem_count)) {                                                 \
-			switch (__elem_count) {                                                                         \
+			switch __untraced(__elem_count) {                                                                         \
 			case 1: return (memcpy)(__dst, __src, __elem_size);                                             \
 			case 2: return (memcpyw)(__dst, __src, __elem_size);                                            \
 			case 4: return (memcpyl)(__dst, __src, __elem_size);                                            \

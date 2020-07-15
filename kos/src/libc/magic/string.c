@@ -2130,22 +2130,23 @@ $size_t rawmemrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Copy memory between non-overlapping memory blocks.
 [[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYQ))]]
+[[impl_include("<hybrid/typecore.h>")]]
 memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
          [[nonnull]] /*aligned(8)*/ void const *__restrict src,
          $size_t n_qwords) -> [[== dst]] $uint64_t * {
-#if __SIZEOF_POINTER__ >= 8
+@@pp_if __SIZEOF_BUSINT__ >= 8@@
 	u64 *pdst = (u64 *)dst;
 	u64 *psrc = (u64 *)src;
 	while (n_qwords--)
 		*pdst++ = *psrc++;
-#else /* __SIZEOF_POINTER__ >= 8 */
+@@pp_else@@
 	u32 *pdst = (u32 *)dst;
 	u32 *psrc = (u32 *)src;
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+@@pp_endif@@
 	return (u64 *)dst;
 }
 
@@ -2161,10 +2162,11 @@ mempcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 @@Move memory between potentially overlapping memory blocks.
 [[preferred_fastbind, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEQ))]]
+[[impl_include("<hybrid/typecore.h>")]]
 memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
           [[nonnull]] /*aligned(8)*/ void const *src,
           $size_t n_qwords) -> [[== dst]] $uint64_t * {
-#if __SIZEOF_POINTER__ >= 8
+@@pp_if __SIZEOF_BUSINT__ >= 8@@
 	u64 *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (u64 *)dst;
@@ -2177,7 +2179,7 @@ memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
 		while (n_qwords--)
 			*--pdst = *--psrc;
 	}
-#else /* __SIZEOF_POINTER__ >= 8 */
+@@pp_else@@
 	u32 *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
@@ -2194,7 +2196,7 @@ memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
 			*--pdst = *--psrc;
 		}
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+@@pp_endif@@
 	return (u64 *)dst;
 }
 
@@ -2212,19 +2214,19 @@ mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmoveq")]]
 [[preferred_fastbind(memmoveupq, ["memmoveupq", "memmoveq"])]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPQ))]]
 memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
             [[nonnull]] /*aligned(8)*/ void const *src,
             $size_t n_qwords) -> [[== dst]] $uint64_t * {
-#if __SIZEOF_POINTER__ >= 8
+@@pp_if __SIZEOF_BUSINT__ >= 8@@
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst + n_qwords;
 	psrc = (u64 *)src + n_qwords;
 	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*--pdst = *--psrc;
-#else /* __SIZEOF_POINTER__ >= 8 */
+@@pp_else@@
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
 	psrc = (u32 *)src + (n_qwords * 2);
@@ -2233,26 +2235,26 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 		*--pdst = *--psrc;
 		*--pdst = *--psrc;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+@@pp_endif@@
 	return (u64 *)dst;
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS')
 [[libc, kernel, ATTR_LEAF, alias("memmoveq")]]
 [[preferred_fastbind(memmovedownq, ["memmovedownq", "memmoveq"])]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNQ))]]
 memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
               [[nonnull]] /*aligned(8)*/ void const *src,
               $size_t n_qwords) -> [[== dst]] $uint64_t * {
-#if __SIZEOF_POINTER__ >= 8
+@@pp_if __SIZEOF_BUSINT__ >= 8@@
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst;
 	psrc = (u64 *)src;
 	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*pdst++ = *psrc++;
-#else /* __SIZEOF_POINTER__ >= 8 */
+@@pp_else@@
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 *)src;
@@ -2261,7 +2263,7 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+@@pp_endif@@
 	return (u64 *)dst;
 }
 
@@ -6491,4 +6493,38 @@ __SYSDECL_END
 #endif /* __SSP_FORTIFY_LEVEL */
 
 }
+
+// [[requires_include("<hybrid/typecore.h>")]] /* defined(__UINT64_TYPE__) */
+// [[requires(defined(__UINT64_TYPE__))]]
+// [[impl_include("<hybrid/typecore.h>")]] /* __SIZEOF_BUSINT__ */
+// [[impl_include("<optimized/string.h>")]]
+// memcpyq(dst, src, n_qwords) >>>> {
+// 	if __untraced(__builtin_constant_p(dst == src) && (dst == src))
+// 		return (u64 *)dst;
+// 	__ASSERT_MEMCPY_CT(dst, src, n_qwords * 8);
+// 	if __untraced(__builtin_constant_p(n_qwords)) {
+// 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
+// 		switch __untraced(n_qwords) {
+// 		case 0: return (u64 *)dst;
+// @@pp_if __SIZEOF_BUSINT__ >= 8@@
+// 		case 1: @@c:inline_memcpy(dst, src, u64[1])@@; return (u64 *)dst;
+// 		case 2: @@c:inline_memcpy(dst, src, u64[2])@@; return (u64 *)dst;
+// @@pp_else@@
+// 		case 1: @@c:inline_memcpy(dst, src, u32[2])@@; return (u64 *)dst;
+// @@pp_endif@@
+// 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
+// @@pp_ifndef __OPTIMIZE_SIZE__@@
+// @@pp_if __SIZEOF_BUSINT__ >= 8@@
+// 		case 3: @@c:inline_memcpy(dst, src, u64[3])@@; return (u64 *)dst;
+// 		case 4: @@c:inline_memcpy(dst, src, u64[4])@@; return (u64 *)dst;
+// @@pp_else@@
+// 		case 2: @@c:inline_memcpy(dst, src, u32[4])@@; return (u64 *)dst;
+// @@pp_endif@@
+// @@pp_endif@@
+// 		default: break;
+// 		}
+// 	}
+// 	return memcpyq(dst, src, n_qwords);
+// }
+
 

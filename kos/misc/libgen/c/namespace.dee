@@ -111,9 +111,31 @@ global final LOCAL_NAMESPACE: Namespace = Namespace(
 		return "__local_{}_defined".format({ symbolName });
 	});
 
+@@The namespace used to encapsulate <optimized/...> functions
+global final FAST_NAMESPACE: Namespace = Namespace(
+	name:     "fast",
+	enter:    "__NAMESPACE_FAST_BEGIN\n",
+	leave:    "__NAMESPACE_FAST_END\n",
+	prefix:   "__NAMESPACE_FAST_SYM",
+	keyUsing: [](fp: File, name: string) {
+		fp << "__NAMESPACE_FAST_USING(" << name << ")\n";
+	},
+	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+		fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << name << ", ";
+		impl();
+		fp << ")\n";
+	},
+	keyCSymbolName: [](symbolName: string): string {
+		return "__LIBC_FAST_NAME({})".format({ symbolName });
+	},
+	keyDefaultGuard: [](symbolName: string): string {
+		return "__fast_{}_defined".format({ symbolName });
+	});
+
 global NAMESPACES: {string: Namespace} = Dict {
 	""      : GLOBAL_NAMESPACE,
 	"local" : LOCAL_NAMESPACE,
+	"fast"  : FAST_NAMESPACE,
 	"std"   : Namespace(
 		name:           "std",
 		enter:          "__NAMESPACE_STD_BEGIN\n",
@@ -124,25 +146,6 @@ global NAMESPACES: {string: Namespace} = Dict {
 		keyCSymbolName: functools.identity,
 		keyDefaultGuard: [](symbolName: string) {
 			return "__std_{}_defined".format({ symbolName });
-		}),
-	"fast"  : Namespace(
-		name:     "fast",
-		enter:    "__NAMESPACE_FAST_BEGIN\n",
-		leave:    "__NAMESPACE_FAST_END\n",
-		prefix:   "__NAMESPACE_FAST_SYM",
-		keyUsing: [](fp: File, name: string) {
-			fp << "__NAMESPACE_FAST_USING(" << name << ")\n";
-		},
-		keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
-			fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << name << ", ";
-			impl();
-			fp << ")\n";
-		},
-		keyCSymbolName: [](symbolName: string): string {
-			return "__LIBC_FAST_NAME({})".format({ symbolName });
-		},
-		keyDefaultGuard: [](symbolName: string): string {
-			return "__fast_{}_defined".format({ symbolName });
 		}),
 };
 

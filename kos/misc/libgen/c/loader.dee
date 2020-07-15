@@ -42,7 +42,7 @@ import Function from .cheaders;
  * >>     return USE_USER_IMPL;
  * >> } */
 
-
+global loadSystemHeaderDefinitions;
 
 global final CXX_SYSTEM_HEADER_START = "#ifndef __CXX_SYSTEM_HEADER\n";
 global final CXX_SYSTEM_HEADER_END   = "#endif /* !__CXX_SYSTEM_HEADER */\n";
@@ -1365,6 +1365,8 @@ err_unexpected_if:
 			return "[no_]crt_dos_variant";
 		if (crt_noDosWrapper !== defaultFeatures.crt_noDosWrapper)
 			return "[no_]crt_dos_wrapper";
+		if (decl !== defaultFeatures.decl)
+			return "decl";
 		return none;
 	}
 
@@ -1825,6 +1827,37 @@ again_parse_default_annotation:
 			if (self.tok != "]")
 				goto again_parse_default_annotation;
 		}
+	}
+
+	public function parseDirective_include() {
+		/* %[include(...)] Set default function annotations */
+		local self = this.self;
+		self.next();
+		self.skip("(");
+		local filenamePos = self.tokStart;
+		local incFileName = self.parseCString();
+		import fs;
+		if (!fs.isabs(incFileName)) {
+			local baseDir = self.filename;
+			if (baseDir in ["", "?"])
+				baseDir = fs.getcwd();
+			else {
+				baseDir = fs.headof(baseDir);
+			}
+			incFileName = fs.abspath(incFileName, baseDir);
+		}
+		local incFileParser;
+		with (local fp = File.open(incFileName))
+			incFileParser = CParser(fp, filename: incFileName);
+		try {
+			loadSystemHeaderDefinitions(
+				incFileParser, headerName,
+				customDirectivesParser, this);
+		} catch (Error as e) {
+			self.errAt(filenamePos, "Included from here... ({})"
+				.format({ e.message }));
+		}
+		self.skip(")");
 	}
 
 	public function parseDirective_insert() {
@@ -2317,30 +2350,40 @@ function replaceFunctionPrototypeDefaultCCWithDefaultDosCC(
 @@                                parser should point at the trailing @"," or @"]"
 function loadSystemHeaderDefinitions(
 		self: CParser, headerName: string,
-		customDirectivesParser: Callable with LoaderContext = none): SystemHeader {
-	final local result: SystemHeader = SystemHeader(name: headerName);
-	if (!allSystemHeaders.setnew(headerName, result))
-		throw Error("Duplicate system header: {!r}".format({ headerName }));
-	final local context: LoaderContext = LoaderContext(
-		self: self, headerName: headerName, result: result,
-		customDirectivesParser: customDirectivesParser);
+		customDirectivesParser: Callable with LoaderContext = none,
+		context: LoaderContext = none): SystemHeader {
+	local result: SystemHeader;
+	local isPrimaryDefinitionsFile = true;
+	if (context !is none) {
+		result = context.result;
+		isPrimaryDefinitionsFile = false;
+	} else {
+		result = SystemHeader(name: headerName);
+		if (!allSystemHeaders.setnew(headerName, result))
+			throw Error("Duplicate system header: {!r}".format({ headerName }));
+		context = LoaderContext(
+			self: self, headerName: headerName, result: result,
+			customDirectivesParser: customDirectivesParser);
+	}
 	local tok = self.tok;
 	if (!tok)
 		tok = self.next();
 	/* Standard system header prefix */
-	result.order_header.append(
-		"#include {0[0]}\n"
-		"#include {0[1]}\n"
-		"\n"
-		"#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER\n"
-		"#pragma GCC system_header\n"
-		"#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */\n"
-		"\n"
-		.format({
-			"." in headerName
-				? ('<__stdinc.h>', '<__crt.h>')
-				: ('"__stdinc.h"', '"__crt.h"')
-			}));
+	if (isPrimaryDefinitionsFile) {
+		result.order_header.append(
+			"#include {0[0]}\n"
+			"#include {0[1]}\n"
+			"\n"
+			"#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER\n"
+			"#pragma GCC system_header\n"
+			"#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */\n"
+			"\n"
+			.format({
+				"." in headerName
+					? ('<__stdinc.h>', '<__crt.h>')
+					: ('"__stdinc.h"', '"__crt.h"')
+				}));
+	}
 	while (tok) {
 		if (tok == "%") {
 			/* Directive / text-injections */
@@ -4966,7 +5009,127 @@ handle_eq_after_prototype:
 			self.skip(";");
 		}	break;
 
+#if 0 /* TODO? */
+		case ">>": {
+			/* Optimized function implementation */
+			if (self.text.substr(self.tokEnd, self.tokEnd + 2) != ">>")
+				goto default_function_implementation_token;
+			self.next();
+			self.next();
+			if (self.tok != "{") {
+				self.err("Expected '{' after '>>>>', but got {!r}"
+					.format({ self.tok }));
+			}
+			if (current.documentation !is string || current.documentation)
+				self.errAt(currentNameTokStart, "Optimized function {!r} with custom documentation"
+					.format({ currentName }));
+			@@The names of the arguments taken by the optimized function, or @none to automatically deduce
+			local argumentNames = none;
+			if (currentPrototype !is none) {
+				if (#currentPrototypes != 1 || currentPrototypes[0][0] != "1" ||
+				    (#currentPrototypes[0][1] != 1 || currentPrototypes[0][1][0] !== currentPrototype))
+					self.errAt(currentNameTokStart, "Optimized function {!r} with c++ overloaded prototypes is not allowed"
+						.format({ currentName }));
+				if (currentPrototype.attributes)
+					self.errAt(currentNameTokStart, "Optimized function {!r} has custom attributes {!r}"
+						.format({ currentName, currentPrototype.attributes }));
+				if (currentPrototype.nothrow !== DEFAULT_NOTHROW)
+					self.errAt(currentNameTokStart, "Optimized function {!r} has a throws-annotation {!r}"
+						.format({ currentName, currentPrototype.nothrow }));
+				if (currentPrototype.cc is bound &&
+				    currentPrototype.cc !== (currentPrototype.hasEllipsis ? DEFAULT_VCC : DEFAULT_CC) &&
+				    currentPrototype.cc !== (currentPrototype.hasEllipsis ? DEFAULT_DOS_VCC : DEFAULT_DOS_CC))
+					self.errAt(currentNameTokStart, "Optimized function {!r} has a custom calling convention {!r}"
+						.format({ currentName, currentPrototype.cc }));
+				if (currentPrototype.returnType is bound &&
+				    (currentPrototype.returnType.beforeName != "void" ||
+				     currentPrototype.returnType.afterName))
+					self.errAt(currentNameTokStart, "Optimized function {!r} has a custom return type {!r}"
+						.format({ currentName, str(currentPrototype.returnType) }));
+				if (currentPrototype.ellipsisArgumentTypes !is none)
+					self.errAt(currentNameTokStart, "Optimized function {!r} has ellipsis argument types {!r}"
+						.format({ currentName, currentPrototype.ellipsisArgumentTypes }));
+				if (currentPrototype.declPrefix)
+					self.errAt(currentNameTokStart, "Optimized function {!r} has a custom declaration prefix {!r}"
+						.format({ currentName, currentPrototype.declPrefix }));
+				/* Optimized functions are written as:
+				 * >> memcpyq(dst, src, n_qwords) >>>> {
+				 * >>     ...
+				 * >> }
+				 * As such, the regular argument list parser will have set-up what are
+				 * actually the argument names as the argument types. */
+				argumentNames = [];
+				for (local a: currentPrototype.argv) {
+					if (a.name || a.protoTypeName || a.ctype.afterName || !a.ctype.beforeName) {
+						self.errAt(currentNameTokStart, "Optimized function {!r} has a malformed argument {!r}"
+							.format({ currentName, a }));
+					}
+					argumentNames.append(a.ctype.beforeName);
+				}
+			}
+			local badField;
+			if (currentFeatures.std != context.defaultFeatures.std)
+				badField = "[no_]std";
+			else if (currentFeatures.namespaces != context.defaultFeatures.namespaces)
+				badField = "namespace";
+			else if (currentFeatures.libc != context.defaultFeatures.libc)
+				badField = "[no_]libc";
+			else if (currentFeatures.exposedName != context.defaultFeatures.exposedName)
+				badField = "[no_]exposed_name";
+			else if (currentFeatures.inline != context.defaultFeatures.inline)
+				badField = "[no_]inline";
+			else if (currentFeatures.noInlineTruncate != context.defaultFeatures.noInlineTruncate)
+				badField = "[no_]inline_truncate";
+			else if (currentFeatures.noExternInline != context.defaultFeatures.noExternInline)
+				badField = "[no_]extern_inline";
+			else if (currentFeatures.noLocal != context.defaultFeatures.noLocal)
+				badField = "[no_]local";
+			else if (currentFeatures.macroBinding != context.defaultFeatures.macroBinding)
+				badField = "[no_]macros";
+			else if (currentFeatures.guard != context.defaultFeatures.guard)
+				badField = "[no_]guard";
+			else if (currentFeatures.exposedName != context.defaultFeatures.exposedName)
+				badField = "[default_]exposed_name";
+			else if (currentFeatures.wchar != context.defaultFeatures.wchar)
+				badField = "[no_]wchar";
+			else if (currentFeatures.crt_userimpl != context.defaultFeatures.crt_userimpl)
+				badField = "[no_]userimpl";
+			else {
+				badField = currentFeatures.assertSymbolicAliasOnly(context.defaultFeatures);
+			}
+			if (badField !is none) {
+				self.errAt(currentNameTokStart, "Annotation {!r} cannot be used on optimized function {!r}"
+					.format({ badField, currentName }));
+			}
+			local optimizedImplStart = self.tokStart;
+			self.skipPair();
+			local body: UserString = self.getUserString(optimizedImplStart, self.tokEnd);
+			@@The actual optimized function as a @LocalFunction object
+			local optiFunction: LocalFunction = LocalFunction(
+				name:                     currentName,
+				originalSystemHeaderName: headerName,
+				prototype:                currentPrototype, /* TODO: Inherit */
+				ppCond:                   currentFeatures.requires,
+				ppCondPrefix:             currentFeatures.requiresPrefix,
+				impl: FunctionImplementation(
+					body:         body,
+					name:         currentName,
+					implPrefix:   currentFeatures.implPrefix,
+					dependencies: scanForNamesOfDependentFunctions(
+						body, "", currentPrototype,
+						forcedDependencies:       currentFeatures.forcedDependencies,
+						unforcedDependencies:     currentFeatures.unforcedDependencies,
+						noAutoDependencyScanning: currentFeatures.noAutoDependencyScanning)
+					),
+				documentation: current.documentation /* TODO: Inherit */
+				);
+			self.next();
+			goto continue_main_loop;
+		}	break;
+#endif
+
 		default:
+//default_function_implementation_token:
 			self.err("Unexpected token {!r} when function implementation (as '%', '=', '{{' or ';') was expected"
 				.format({ tok }));
 		}
@@ -5106,8 +5269,11 @@ done_function:
 			result.order_libcHeader.append(current);
 			result.order_libcCoreHeader.append(current);
 		}
+//continue_main_loop:
 		tok = self.tok;
 	}
+	if (!isPrimaryDefinitionsFile)
+		return result;
 	/* Finalize @result.order_header */
 	if (context.result_order_header_in_CXX_SYSTEM_HEADER) {
 		result.order_header.append(CXX_SYSTEM_HEADER_END);

@@ -148,7 +148,7 @@ function printFunction(local attr, returnType, nothrow, name, args, dst, n_bytes
 		print v,;
 	}
 	if (multiplier > 1)
-		print " *",multiplier,;
+		print " *", multiplier,;
 	print ", ",;
 	print dst,;
 	print "_objsize);";

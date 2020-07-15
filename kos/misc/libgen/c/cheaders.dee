@@ -105,6 +105,10 @@ again:
 class CType {
 	this = default;
 
+	public operator str(): string {
+		return beforeName + afterName;
+	}
+
 	@@A string to insert before the name of the associated variable (e.g. @"fd_t")
 	@@NOTE: This string will have already been stripped of leading/trailing spaces
 	public member beforeName: string | UserString;
@@ -222,7 +226,6 @@ do_handle_struct_type:
 			return none;
 		}
 	}
-
 
 	@@Returns @true if @this @CType is implicitly convertible to @other
 	public function implicitlyConvertibleTo(other: CType): bool {
@@ -1491,14 +1494,17 @@ class LocalFunction {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintLocalFunctionHeader(
 			fp: CWriter, escapeMode: int, dependencyDecl: string,
-			keyDependency: Callable with string = none, printCopyright: bool = true) {
+			keyDependency: Callable with string = none,
+			printCopyright: bool = true, namespace: Namespace = none) {
 		try {
 			if (keyDependency is none)
 				keyDependency = keyLocalDep;
+			if (namespace is none)
+				namespace = LOCAL_NAMESPACE;
 			if (printCopyright)
 				fp << COPYRIGHT << "\n";
 			local usedPrototype = functionPrototype;
-			local localGuardName = LOCAL_NAMESPACE.keyDefaultGuard(name);
+			local localGuardName = namespace.keyDefaultGuard(name);
 			fp.ppIfndef(localGuardName);
 			fp.ppDefine(localGuardName, "1");
 			fp.ppInclude("<__crt.h>");
@@ -1514,14 +1520,14 @@ class LocalFunction {
 			functionImpl.cprintLocalFunctionImplementation(
 				fp, escapeMode, name, usedPrototype,
 				dependencyDecl, documentationString,
-				LOCAL_NAMESPACE, keyDependency);
+				namespace, keyDependency);
 			local myLocalDepName = keyLocalDep(name);
-			local myLocalDepGuard = LOCAL_NAMESPACE.keyDefaultGuard(myLocalDepName);
+			local myLocalDepGuard = namespace.keyDefaultGuard(myLocalDepName);
 			fp.forceStartOfLine();
 			/* Also bind ourself as a local dependency function */
 			fp << "#ifndef " << myLocalDepGuard << "\n"
 				"#define " << myLocalDepGuard << " 1\n"
-				"#define " << myLocalDepName << " " << LOCAL_NAMESPACE.keyCSymbolName(name) << "\n"
+				"#define " << myLocalDepName << " " << namespace.keyCSymbolName(name) << "\n"
 				"#endif /* !" << myLocalDepGuard << " */\n";
 			fp.ppElse();
 			fp.ppUndef(localGuardName);

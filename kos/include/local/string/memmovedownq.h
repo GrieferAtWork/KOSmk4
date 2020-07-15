@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9914bc1 */
+/* HASH CRC-32:0x435ee650 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,20 @@
 #ifndef __local_memmovedownq_defined
 #define __local_memmovedownq_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 __LOCAL_LIBC(memmovedownq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownq))(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords) {
-#if __SIZEOF_POINTER__ >= 8
+#if __SIZEOF_BUSINT__ >= 8
 	__UINT64_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT64_TYPE__ *)__dst;
 	__psrc = (__UINT64_TYPE__ *)__src;
 	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
 	while (__n_qwords--)
 		*__pdst++ = *__psrc++;
-#else /* __SIZEOF_POINTER__ >= 8 */
+#else /* __SIZEOF_BUSINT__ >= 8 */
 	__UINT32_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT32_TYPE__ *)__dst;
 	__psrc = (__UINT32_TYPE__ *)__src;
@@ -42,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownq))(void *__dst, void cons
 		*__pdst++ = *__psrc++;
 		*__pdst++ = *__psrc++;
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif /* __SIZEOF_BUSINT__ < 8 */
 	return (__UINT64_TYPE__ *)__dst;
 }
 __NAMESPACE_LOCAL_END

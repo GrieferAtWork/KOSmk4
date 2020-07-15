@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_CRT0_I386_CRT0S_64_S
 #define GUARD_CRT0_I386_CRT0S_64_S 1
+#define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 

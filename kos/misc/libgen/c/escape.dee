@@ -867,6 +867,81 @@ handle_numLines_after_pp_directive:
 				self.next();
 				goto handle_numLines_after_pp_directive;
 
+			case "c":
+				self.next();
+				tok = self.skip(":");
+				switch (tok) {
+
+				case "inline_memcpy": {
+					self.next();
+					self.skip("(");
+					/* @@c:inline_memcpy(void *dst, void const *src, HOW)@@
+					 *
+					 * HOW ::= '+' ~~ (
+					 *     ('u8' | 'u16' | 'u32' | 'u64') '[' COUNT_AS_IMMEDIATE_INTEGER ']'
+					 * )...;
+					 */
+					local dstExpr = self.parseAllUntilRParenAsString();
+					self.skip(",");
+					local srcExpr = self.parseAllUntilRParenAsString();
+					self.skip(",");
+					if (!dstExpr.issymbol())
+						dstExpr = "({})".format({ dstExpr.strip() });
+					if (!srcExpr.issymbol())
+						srcExpr = "({})".format({ srcExpr.strip() });
+					local offset = 0;
+					local isFirst = true;
+					for (;;) {
+						local typName = self.tok;
+						local typSize = {
+							"u8"  : 1,
+							"u16" : 2,
+							"u32" : 4,
+							"u64" : 8,
+						}.get(typName);
+						if (typSize is none)
+							self.err("Unknown type for inline_memcpy (must be one of u8, u16, u32 or u64)");
+						self.next();
+						self.skip("[");
+						local count;
+						try {
+							count = int(self.tok);
+						} catch (Error as e) {
+							self.err(e.message);
+						}
+						self.next();
+						self.skip("]");
+						while (count) {
+							local typeIdx = offset / typSize;
+							local typeOff = offset % typSize;
+							local usedDst = dstExpr;
+							local usedSrc = srcExpr;
+							if (typeOff != 0) {
+								usedDst = "((u8 *){} + {})".format({ usedDst, typeOff });
+								usedSrc = "((u8 const *){} + {})".format({ usedSrc, typeOff });
+							}
+							if (!isFirst)
+								fp << ", ";
+							fp << "((" << typName << " *)" << usedDst << ")[" << typeIdx << "] = "
+								"((" << typName << " const *)" << usedSrc << ")[" << typeIdx << "]";
+							isFirst = false;
+							offset += typSize;
+							--count;
+						}
+						if (self.tok in ["", ")"])
+							break;
+						self.skip("+");
+					}
+					self.skip(")");
+				}	break;
+
+				default:
+					self.err("Unknown directive: {!r}"
+						.format({ "c:" + tok }));
+					break;
+				}
+				break;
+
 			default:
 				self.err("Unknown directive: {!r}"
 					.format({ tok }));
