@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb32549a4 */
+/* HASH CRC-32:0x36f34527 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/pwd.h"
+#include "../user/io.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
@@ -102,14 +103,29 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream,
                                             char const *filtered_name) {
 	int retval = 0;
 	char *dbline;
-	fpos64_t oldpos;
-	if (libc_fgetpos64_unlocked(stream, &oldpos))
-		goto err;
+	fpos64_t startpos, curpos;
+	fpos64_t maxpos = (fpos64_t)-1;
+	if (libc_fgetpos64(stream, &startpos))
+		goto err_nodbline;
+	curpos = startpos;
 again_parseln:
 	dbline = libc_fparseln(stream, NULL, NULL, "\0\0#", 0);
 	if unlikely(!dbline)
 		goto err_restore;
 	if (!*dbline) {
+		if ((filtered_uid != (uid_t)-1 || filtered_name != NULL) && startpos != 0) {
+			maxpos   = startpos;
+			startpos = 0;
+#if defined(__CRT_HAVE_rewind) || defined(__CRT_HAVE_rewind_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
+			libc_rewind(stream);
+#else /* __CRT_HAVE_rewind || __CRT_HAVE_rewind_unlocked || __CRT_HAVE_fseeko64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE__fseeki64 || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || __CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */
+			if (libc_fsetpos64(stream, &startpos))
+				goto err;
+#endif /* !__CRT_HAVE_rewind && !__CRT_HAVE_rewind_unlocked && !__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && !__CRT_HAVE_fsetpos_unlocked && !__CRT_HAVE_fsetpos64 && !__CRT_HAVE__IO_fsetpos64 && !__CRT_HAVE_fsetpos64_unlocked && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock */
+			/* Search for the requested uid/name prior to the initial search-start position. */
+			goto again_parseln;
+		}
+libc__eof:
 		/* End-of-file */
 #ifdef ENOENT
 		retval = ENOENT;
@@ -218,28 +234,40 @@ done_free_dbline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	libc_free(dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-done:
 	*result = retval ? NULL : resultbuf;
 	return retval;
+
 err_ERANGE:
 #ifdef ERANGE
 	__libc_seterrno(ERANGE);
 #endif /* ERANGE */
+	/* FALLTHRU */
 err_restore:
 	retval = __libc_geterrno_or(1);
-	libc_fsetpos64_unlocked(stream, &oldpos);
-	goto done;
+	if unlikely(libc_fsetpos64(stream, &curpos))
+		goto err;
+	goto done_free_dbline;
+
+err_nodbline:
+	dbline = NULL;
+	/* FALLTHRU */
 err:
 	retval = __libc_geterrno_or(1);
-	goto done;
+	goto done_free_dbline;
+
 badline:
 #if defined(LOG_ERR) && (defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer))
 	libc_syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
 #endif /* LOG_ERR && (__CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer) */
+	/* FALLTHRU */
 nextline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	libc_free(dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	if unlikely(libc_fgetpos64(stream, &curpos))
+		goto err_nodbline;
+	if (curpos >= maxpos)
+		goto libc__eof;
 	goto again_parseln;
 }
 #include <bits/types.h>

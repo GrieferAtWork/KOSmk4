@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9e92075 */
+/* HASH CRC-32:0xdf9d071b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,38 +26,63 @@
 #include <bits/types.h>
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetpos64_unlocked from stdio */
-#ifndef __local___localdep_fgetpos64_unlocked_defined
-#define __local___localdep_fgetpos64_unlocked_defined 1
-#ifdef __CRT_HAVE_fgetpos64_unlocked
+/* Dependency: eof from io */
+#ifndef __local___localdep_eof_defined
+#define __local___localdep_eof_defined 1
+#ifdef __CRT_HAVE__eof
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_eof,(__fd_t __fd),_eof,(__fd))
+#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+__NAMESPACE_LOCAL_END
+#include <local/io/eof.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_eof __LIBC_LOCAL_NAME(eof)
+#else /* ... */
+#undef __local___localdep_eof_defined
+#endif /* !... */
+#endif /* !__local___localdep_eof_defined */
+/* Dependency: fgetpos64 from stdio */
+#ifndef __local___localdep_fgetpos64_defined
+#define __local___localdep_fgetpos64_defined 1
+#if defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
+#elif defined(__CRT_HAVE_fgetpos) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
-#elif defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
+#elif defined(__CRT_HAVE_fgetpos64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __pos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 __NAMESPACE_LOCAL_END
-#include <local/stdio/fgetpos64_unlocked.h>
+#include <local/stdio/fgetpos64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_fgetpos64_unlocked __LIBC_LOCAL_NAME(fgetpos64_unlocked)
+/* 64-bit variant of `fgetpos' */
+#define __localdep_fgetpos64 __LIBC_LOCAL_NAME(fgetpos64)
 #else /* ... */
-#undef __local___localdep_fgetpos64_unlocked_defined
+#undef __local___localdep_fgetpos64_defined
 #endif /* !... */
-#endif /* !__local___localdep_fgetpos64_unlocked_defined */
+#endif /* !__local___localdep_fgetpos64_defined */
 /* Dependency: fparseln from util */
 #ifndef __local___localdep_fparseln_defined
 #define __local___localdep_fparseln_defined 1
@@ -120,38 +145,49 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: fsetpos64_unlocked from stdio */
-#ifndef __local___localdep_fsetpos64_unlocked_defined
-#define __local___localdep_fsetpos64_unlocked_defined 1
-#ifdef __CRT_HAVE_fsetpos64_unlocked
+/* Dependency: fsetpos64 from stdio */
+#ifndef __local___localdep_fsetpos64_defined
+#define __local___localdep_fsetpos64_defined 1
+#if defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos64,(__stream,__pos))
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos64,(__stream,__pos))
+#elif defined(__CRT_HAVE_fsetpos) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
-#elif defined(__CRT_HAVE_fsetpos_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
+#elif defined(__CRT_HAVE_fsetpos64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64_unlocked,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __pos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
 __NAMESPACE_LOCAL_END
-#include <local/stdio/fsetpos64_unlocked.h>
+#include <local/stdio/fsetpos64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_fsetpos64_unlocked __LIBC_LOCAL_NAME(fsetpos64_unlocked)
+/* 64-bit variant of `fsetpos' */
+#define __localdep_fsetpos64 __LIBC_LOCAL_NAME(fsetpos64)
 #else /* ... */
-#undef __local___localdep_fsetpos64_unlocked_defined
+#undef __local___localdep_fsetpos64_defined
 #endif /* !... */
-#endif /* !__local___localdep_fsetpos64_unlocked_defined */
+#endif /* !__local___localdep_fsetpos64_defined */
 /* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
@@ -169,6 +205,37 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
+/* Dependency: rewind from stdio */
+#ifndef __local___localdep_rewind_defined
+#define __local___localdep_rewind_defined 1
+#if defined(__CRT_HAVE_rewind_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Rewind the current in-file position of `STREAM' to its starting position */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
+#elif defined(__CRT_HAVE_rewind)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Rewind the current in-file position of `STREAM' to its starting position */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind,(__stream))
+#elif defined(__CRT_HAVE_rewind_unlocked)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Rewind the current in-file position of `STREAM' to its starting position */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
+__NAMESPACE_LOCAL_END
+#include <local/stdio/rewind.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Rewind the current in-file position of `STREAM' to its starting position */
+#define __localdep_rewind __LIBC_LOCAL_NAME(rewind)
+#else /* ... */
+#undef __local___localdep_rewind_defined
+#endif /* !... */
+#endif /* !__local___localdep_rewind_defined */
 /* Dependency: strchrnul from string */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
@@ -288,14 +355,29 @@ __LOCAL_LIBC(fgetpwfiltered_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwfiltered_r))(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result, __uid_t __filtered_uid, char const *__filtered_name) {
 	int __retval = 0;
 	char *__dbline;
-	__pos64_t __oldpos;
-	if (__localdep_fgetpos64_unlocked(__stream, &__oldpos))
-		goto __err;
+	__pos64_t __startpos, __curpos;
+	__pos64_t __maxpos = (__pos64_t)-1;
+	if (__localdep_fgetpos64(__stream, &__startpos))
+		goto __err_nodbline;
+	__curpos = __startpos;
 __again_parseln:
 	__dbline = __localdep_fparseln(__stream, __NULLPTR, __NULLPTR, "\0\0#", 0);
 	if __unlikely(!__dbline)
 		goto __err_restore;
 	if (!*__dbline) {
+		if ((__filtered_uid != (__uid_t)-1 || __filtered_name != __NULLPTR) && __startpos != 0) {
+			__maxpos   = __startpos;
+			__startpos = 0;
+#if defined(__CRT_HAVE_rewind) || defined(__CRT_HAVE_rewind_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
+			__localdep_rewind(__stream);
+#else /* __CRT_HAVE_rewind || __CRT_HAVE_rewind_unlocked || __CRT_HAVE_fseeko64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE__fseeki64 || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || __CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */
+			if (__localdep_fsetpos64(__stream, &__startpos))
+				goto __err;
+#endif /* !__CRT_HAVE_rewind && !__CRT_HAVE_rewind_unlocked && !__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && !__CRT_HAVE_fsetpos_unlocked && !__CRT_HAVE_fsetpos64 && !__CRT_HAVE__IO_fsetpos64 && !__CRT_HAVE_fsetpos64_unlocked && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock */
+			/* Search for the requested uid/name prior to the initial search-start position. */
+			goto __again_parseln;
+		}
+__localdep_eof:
 		/* End-of-file */
 #ifdef __ENOENT
 		__retval = __ENOENT;
@@ -404,28 +486,40 @@ __done_free_dbline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	__localdep_free(__dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-__done:
 	*__result = __retval ? __NULLPTR : __resultbuf;
 	return __retval;
+
 __err_ERANGE:
 #ifdef __ERANGE
 	__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
+	/* FALLTHRU */
 __err_restore:
 	__retval = __libc_geterrno_or(1);
-	__localdep_fsetpos64_unlocked(__stream, &__oldpos);
-	goto __done;
+	if __unlikely(__localdep_fsetpos64(__stream, &__curpos))
+		goto __err;
+	goto __done_free_dbline;
+
+__err_nodbline:
+	__dbline = __NULLPTR;
+	/* FALLTHRU */
 __err:
 	__retval = __libc_geterrno_or(1);
-	goto __done;
+	goto __done_free_dbline;
+
 __badline:
 #if defined(__LOG_ERR) && (defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer))
 	__localdep_syslog(__LOG_ERR, "[passwd] Bad password line %q\n", __dbline);
 #endif /* __LOG_ERR && (__CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer) */
+	/* FALLTHRU */
 __nextline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	__localdep_free(__dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	if __unlikely(__localdep_fgetpos64(__stream, &__curpos))
+		goto __err_nodbline;
+	if (__curpos >= __maxpos)
+		goto __localdep_eof;
 	goto __again_parseln;
 }
 __NAMESPACE_LOCAL_END

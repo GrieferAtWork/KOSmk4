@@ -198,7 +198,7 @@ $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
 @@@param: filtered_name: When not `NULL', require this username
 [[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 [[impl_include("<parts/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
-[[requires_function(fgetpos64_unlocked, fsetpos64_unlocked, fparseln)]]
+[[requires_function(fgetpos64, fsetpos64, fparseln)]]
 $errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
                           [[nonnull]] struct passwd *__restrict resultbuf,
                           [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -206,14 +206,29 @@ $errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
                           $uid_t filtered_uid, char const *filtered_name) {
 	int retval = 0;
 	char *dbline;
-	fpos64_t oldpos;
-	if (fgetpos64_unlocked(stream, &oldpos))
-		goto err;
+	fpos64_t startpos, curpos;
+	fpos64_t maxpos = (fpos64_t)-1;
+	if (fgetpos64(stream, &startpos))
+		goto err_nodbline;
+	curpos = startpos;
 again_parseln:
 	dbline = fparseln(stream, NULL, NULL, "\0\0#", 0);
 	if unlikely(!dbline)
 		goto err_restore;
 	if (!*dbline) {
+		if ((filtered_uid != (uid_t)-1 || filtered_name != NULL) && startpos != 0) {
+			maxpos   = startpos;
+			startpos = 0;
+@@pp_if $has_function(rewind)@@
+			rewind(stream);
+@@pp_else@@
+			if (fsetpos64(stream, &startpos))
+				goto err;
+@@pp_endif@@
+			/* Search for the requested uid/name prior to the initial search-start position. */
+			goto again_parseln;
+		}
+eof:
 		/* End-of-file */
 @@pp_ifdef ENOENT@@
 		retval = ENOENT;
@@ -322,28 +337,40 @@ done_free_dbline:
 @@pp_if $has_function(free)@@
 	free(dbline);
 @@pp_endif@@
-done:
 	*result = retval ? NULL : resultbuf;
 	return retval;
+
 err_ERANGE:
 @@pp_ifdef ERANGE@@
 	__libc_seterrno(ERANGE);
 @@pp_endif@@
+	/* FALLTHRU */
 err_restore:
 	retval = __libc_geterrno_or(1);
-	fsetpos64_unlocked(stream, &oldpos);
-	goto done;
+	if unlikely(fsetpos64(stream, &curpos))
+		goto err;
+	goto done_free_dbline;
+
+err_nodbline:
+	dbline = NULL;
+	/* FALLTHRU */
 err:
 	retval = __libc_geterrno_or(1);
-	goto done;
+	goto done_free_dbline;
+
 badline:
 @@pp_if defined(LOG_ERR) && $has_function(syslog)@@
 	syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
 @@pp_endif@@
+	/* FALLTHRU */
 nextline:
 @@pp_if $has_function(free)@@
 	free(dbline);
 @@pp_endif@@
+	if unlikely(fgetpos64(stream, &curpos))
+		goto err_nodbline;
+	if (curpos >= maxpos)
+		goto eof;
 	goto again_parseln;
 }
 
