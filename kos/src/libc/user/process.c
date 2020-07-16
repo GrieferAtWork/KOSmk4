@@ -193,22 +193,6 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") __procfun
 }
 /*[[[end:libc__getdllprocaddr]]]*/
 
-/*[[[head:libc_cwait,hash:CRC-32=0x2a9de04f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") pid_t
-NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
-                                 pid_t pid,
-                                 int action)
-/*[[[body:libc_cwait]]]*/
-{
-	/* This one's pretty simple, because it's literally just a waitpid() system call...
-	 * (It even returns the same thing, that being the PID of the joined process...) */
-	/* NOTE: Apparently, the `action' argument is completely ignored... */
-	(void)action;
-	return waitpid(pid, tstat, WEXITED);
-}
-/*[[[end:libc_cwait]]]*/
-
-
 /*[[[head:libc_spawnve,hash:CRC-32=0x341aa5f1]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
@@ -233,7 +217,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xaf87a255]]]*/
+/*[[[start:exports,hash:CRC-32=0x19691861]]]*/
 DEFINE_PUBLIC_ALIAS(_beginthread, libc__beginthread);
 DEFINE_PUBLIC_ALIAS(_beginthreadex, libc__beginthreadex);
 DEFINE_PUBLIC_ALIAS(_endthreadex, libc__endthreadex);
@@ -241,8 +225,6 @@ DEFINE_PUBLIC_ALIAS(_cexit, libc__cexit);
 DEFINE_PUBLIC_ALIAS(_loaddll, libc__loaddll);
 DEFINE_PUBLIC_ALIAS(_unloaddll, libc__unloaddll);
 DEFINE_PUBLIC_ALIAS(_getdllprocaddr, libc__getdllprocaddr);
-DEFINE_PUBLIC_ALIAS(_cwait, libc_cwait);
-DEFINE_PUBLIC_ALIAS(cwait, libc_cwait);
 DEFINE_PUBLIC_ALIAS(_spawnve, libc_spawnve);
 DEFINE_PUBLIC_ALIAS(spawnve, libc_spawnve);
 /*[[[end:exports]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd961f3f */
+/* HASH CRC-32:0x8b6c866c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include "../user/process.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
+#include "../user/sys.wait.h"
 
 DECL_BEGIN
 
@@ -38,6 +39,16 @@ NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
 }
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 (LIBCCALL libc__c_exit)(void) THROWS(...) {
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") pid_t
+NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
+                                 pid_t pid,
+                                 int action) {
+	/* This one's pretty simple, because it's literally just a waitpid() system call...
+	 * (It even returns the same thing, that being the PID of the joined process...) */
+	/* NOTE: Apparently, the `action' argument is completely ignored... */
+	(void)action;
+	return libc_waitpid(pid, tstat, WEXITED);
 }
 #include <local/environ.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
@@ -197,6 +208,8 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_endthread, libc__endthread);
 DEFINE_PUBLIC_ALIAS(_c_exit, libc__c_exit);
+DEFINE_PUBLIC_ALIAS(_cwait, libc_cwait);
+DEFINE_PUBLIC_ALIAS(cwait, libc_cwait);
 DEFINE_PUBLIC_ALIAS(_spawnv, libc_spawnv);
 DEFINE_PUBLIC_ALIAS(spawnv, libc_spawnv);
 DEFINE_PUBLIC_ALIAS(_spawnvp, libc_spawnvp);

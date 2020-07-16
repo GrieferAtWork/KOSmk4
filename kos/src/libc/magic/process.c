@@ -296,8 +296,14 @@ intptr_t _wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict path,
 %[insert:extern(execlpe)]
 
 %[default:section(".text.crt.dos.fs.exec.spawn")]
-[[cp, export_alias("_cwait")]]
-$pid_t cwait(int *tstat, $pid_t pid, int action);
+[[cp, export_alias("_cwait"), requires_function(waitpid)]]
+$pid_t cwait(int *tstat, $pid_t pid, int action) {
+	/* This one's pretty simple, because it's literally just a waitpid() system call...
+	 * (It even returns the same thing, that being the PID of the joined process...) */
+	/* NOTE: Apparently, the `action' argument is completely ignored... */
+	(void)action;
+	return waitpid(pid, tstat, WEXITED);
+}
 
 %[default:section(".text.crt{|.dos}.fs.exec.spawn")]
 
