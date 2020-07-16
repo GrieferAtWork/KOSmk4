@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf935b8a5 */
+/* HASH CRC-32:0x989bd277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__
 /* Write the given entry onto the given stream */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_putpwent)(struct passwd const *__restrict p, FILE *__restrict f);
 /* Search for an entry with a matching user ID */
-INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_getpwuid_r)(__uid_t __uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_getpwuid_r)(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* Search for an entry with a matching username */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_getpwnam_r)(const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* Read an entry from the password-file stream, opening it if necessary */
@@ -52,11 +52,29 @@ INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwent_r)(FILE
 INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Filtered read from `stream'
+ * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
+ * @param: filtered_name: When not `NULL', require this username */
+INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwfiltered_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result, uid_t filtered_uid, char const *filtered_name);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Filtered read from `stream'
+ * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
+ * @param: filtered_name: When not `NULL', require this username */
+INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result, uid_t filtered_uid, char const *filtered_name);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Re-construct the password-file line for the given uid in the
  * given buffer. This knows the format that the caller will
  * expect, but this need not be the format of the password file */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_getpw)(__uid_t uid, char *buffer);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_getpw)(uid_t uid, char *buffer);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Re-construct the password-file line for the given uid in the
+ * given buffer. This knows the format that the caller will
+ * expect, but this need not be the format of the password file */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getpw)(uid_t uid, char *buffer);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -121,17 +121,17 @@ NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict p,
 }
 /*[[[end:libc_putpwent]]]*/
 
-/*[[[head:libc_getpwuid_r,hash:CRC-32=0xa1720d03]]]*/
+/*[[[head:libc_getpwuid_r,hash:CRC-32=0xd36fa09a]]]*/
 /* Search for an entry with a matching user ID */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((2, 3, 5)) int
-NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(__uid_t __uid,
+NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(uid_t uid,
                                       struct passwd *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,
                                       struct passwd **__restrict result)
 /*[[[body:libc_getpwuid_r]]]*/
 /*AUTO*/{
-	(void)__uid;
+	(void)uid;
 	(void)resultbuf;
 	(void)buffer;
 	(void)buflen;
@@ -182,28 +182,11 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 }
 /*[[[end:libc_getpwent_r]]]*/
 
-/*[[[head:libc_getpw,hash:CRC-32=0x23d394cf]]]*/
-/* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
- * expect, but this need not be the format of the password file */
-INTERN ATTR_SECTION(".text.crt.database.pwd") int
-NOTHROW_RPC(LIBCCALL libc_getpw)(__uid_t uid,
-                                 char *buffer)
-/*[[[body:libc_getpw]]]*/
-/*AUTO*/{
-	(void)uid;
-	(void)buffer;
-	CRT_UNIMPLEMENTED("getpw"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_getpw]]]*/
-
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xebe9263d]]]*/
+/*[[[start:exports,hash:CRC-32=0x5e89ffdf]]]*/
 DEFINE_PUBLIC_ALIAS(setpwent, libc_setpwent);
 DEFINE_PUBLIC_ALIAS(endpwent, libc_endpwent);
 DEFINE_PUBLIC_ALIAS(getpwent, libc_getpwent);
@@ -214,7 +197,6 @@ DEFINE_PUBLIC_ALIAS(putpwent, libc_putpwent);
 DEFINE_PUBLIC_ALIAS(getpwuid_r, libc_getpwuid_r);
 DEFINE_PUBLIC_ALIAS(getpwnam_r, libc_getpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpwent_r, libc_getpwent_r);
-DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
 /*[[[end:exports]]]*/
 
 DECL_END

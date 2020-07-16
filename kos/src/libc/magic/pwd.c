@@ -125,7 +125,7 @@ int putpwent([[nonnull]] struct passwd const *__restrict p,
 %
 %#ifdef __USE_POSIX
 [[cp, doc_alias("getpwuid"), decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-int getpwuid_r(__uid_t __uid,
+int getpwuid_r($uid_t uid,
                [[nonnull]] struct passwd *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct passwd **__restrict result);
@@ -145,12 +145,26 @@ $errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
 
 @@Read an entry from STREAM. This function is not standardized and probably never will
 [[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
-[[impl_include("<parts/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
-[[requires_function(fgetpos64_unlocked, fsetpos64_unlocked, fparseln)]]
+[[requires_function(fgetpwfiltered_r)]]
 $errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] struct passwd *__restrict resultbuf,
                      [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                      [[nonnull]] struct passwd **__restrict result) {
+	return fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, (uid_t)-1, NULL);
+}
+
+@@Filtered read from `stream'
+@@@param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
+@@@param: filtered_name: When not `NULL', require this username
+[[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
+[[impl_include("<parts/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
+[[requires_function(fgetpos64_unlocked, fsetpos64_unlocked, fparseln)]]
+$errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
+                          [[nonnull]] struct passwd *__restrict resultbuf,
+                          [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                          [[nonnull]] struct passwd **__restrict result,
+                          $uid_t filtered_uid, char const *filtered_name) {
 	int retval = 0;
 	char *dbline;
 	fpos64_t oldpos;
@@ -212,16 +226,26 @@ again_parseln:
 				goto badline;
 		}
 got_all_fields:
+		if (filtered_name) {
+			if (strcmp(field_starts[0], filtered_name) != 0)
+				goto nextline;
+		}
 		/* All right! we've got all of the fields!
 		 * Now to fill in the 2 numeric fields (since those
 		 * might still contain errors that would turn this
 		 * entry into a bad line) */
-		if unlikely(!*field_starts[2] || !*field_starts[3])
+		if unlikely(!*field_starts[2])
 			goto badline;
-		resultbuf->@pw_gid@ = (gid_t)strtoul(field_starts[2], &iter, 10);
+		resultbuf->@pw_uid@ = (gid_t)strtoul(field_starts[2], &iter, 10);
 		if unlikely(*iter)
 			goto badline;
-		resultbuf->@pw_uid@ = (gid_t)strtoul(field_starts[3], &iter, 10);
+		if (filtered_uid != (uid_t)-1) {
+			if (resultbuf->@pw_uid@ != filtered_uid)
+				goto nextline;
+		}
+		if unlikely(!*field_starts[3])
+			goto badline;
+		resultbuf->@pw_gid@ = (gid_t)strtoul(field_starts[3], &iter, 10);
 		if unlikely(*iter)
 			goto badline;
 		/* All right! Now to fill in all of the string fields.
@@ -277,6 +301,7 @@ badline:
 @@pp_if defined(LOG_ERR) && $has_function(syslog)@@
 	syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
 @@pp_endif@@
+nextline:
 @@pp_if $has_function(free)@@
 	free(dbline);
 @@pp_endif@@
@@ -291,7 +316,29 @@ badline:
 @@given buffer. This knows the format that the caller will
 @@expect, but this need not be the format of the password file
 [[cp, decl_include("<bits/types.h>")]]
-int getpw(__uid_t uid, char *buffer);
+[[impl_include("<bits/types.h>", "<bits/crt/inttypes.h>")]]
+[[requires_function(getpwuid)]]
+int getpw($uid_t uid, char *buffer) {
+	struct passwd *ent;
+	ent = getpwuid(uid);
+	if unlikely(!ent)
+		goto err;
+	sprintf(buffer,
+	        "%s:%s:"
+	        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
+	        "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"
+	        "%s:%s:%s\n",
+	        ent->@pw_name@,
+	        ent->@pw_passwd@,
+	        ent->@pw_uid@,
+	        ent->@pw_gid@,
+	        ent->@pw_gecos@,
+	        ent->@pw_dir@,
+	        ent->@pw_shell@);
+	return 0;
+err:
+	return -1;
+}
 %#endif /* __USE_GNU */
 
 

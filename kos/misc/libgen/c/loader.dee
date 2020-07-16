@@ -986,15 +986,18 @@ class FunctionFeatures {
 
 		case "static":
 			/* static function:
-			 *   - Doesn't actually exist in libc
-			 *   - Isn't actually exposed in system headers
-			 *   - Can only be used lazily as a dependency from other functions
-			 *   - HINT: Can be used in conjunction with [[inline]]
+			 *  - Only exists in libc or <local/...> headers if used
+			 *  - Isn't actually exposed in system headers
+			 *  - Can only be used lazily as a dependency from other functions
+			 *  - HINT: Can be used in conjunction with [[inline]]
 			 */
-			namespaces   = ();
-			macroBinding = true;
-			guard        = false;
-			/* FALLTHRU */
+			namespaces       = ();
+			macroBinding     = true;
+			guard            = false;
+			crt_noSelfImport = true;
+			crt_noSelfExport = true;
+			goto oneword_nocond;
+
 		case "nocrt":
 		case "no_crt":
 			crt_noImpl       = true;

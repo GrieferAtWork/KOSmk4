@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x893e9ceb */
+/* HASH CRC-32:0x2007eb82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -889,6 +889,7 @@
 #define __CRT_HAVE_DOS$fgetpos_unlocked 1
 #define __CRT_HAVE_DOS$fgetpwent 1
 #define __CRT_HAVE_DOS$fgetpwent_r 1
+#define __CRT_HAVE_DOS$fgetpwfiltered_r 1
 #define __CRT_HAVE_DOS$fgets 1
 #define __CRT_HAVE_DOS$fgets_unlocked 1
 #define __CRT_HAVE_DOS$fgetspent 1
@@ -3838,6 +3839,7 @@
 #define __CRT_HAVE_fgetpos_unlocked 1
 #define __CRT_HAVE_fgetpwent 1
 #define __CRT_HAVE_fgetpwent_r 1
+#define __CRT_HAVE_fgetpwfiltered_r 1
 #define __CRT_HAVE_fgets 1
 #define __CRT_HAVE_fgets_unlocked 1
 #define __CRT_HAVE_fgetspent 1

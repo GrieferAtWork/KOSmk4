@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4f0d2fc */
+/* HASH CRC-32:0x50323a45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <parts/errno.h>
-#include <hybrid/typecore.h>
-#include <asm/syslog.h>
 /* Read an entry from STREAM. This function is not standardized and probably never will */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 5)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
@@ -44,6 +41,23 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
                                        char *__restrict buffer,
                                        size_t buflen,
                                        struct passwd **__restrict result) {
+	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, (uid_t)-1, NULL);
+}
+#include <parts/errno.h>
+#include <hybrid/typecore.h>
+#include <asm/syslog.h>
+/* Filtered read from `stream'
+ * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
+ * @param: filtered_name: When not `NULL', require this username */
+INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 5)) errno_t
+NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream,
+                                            struct passwd *__restrict resultbuf,
+                                            char *__restrict buffer,
+                                            size_t buflen,
+                                            struct passwd **__restrict result,
+                                            uid_t filtered_uid,
+                                            char const *filtered_name) {
 	int retval = 0;
 	char *dbline;
 	fpos64_t oldpos;
@@ -105,16 +119,26 @@ again_parseln:
 				goto badline;
 		}
 got_all_fields:
+		if (filtered_name) {
+			if (libc_strcmp(field_starts[0], filtered_name) != 0)
+				goto nextline;
+		}
 		/* All right! we've got all of the fields!
 		 * Now to fill in the 2 numeric fields (since those
 		 * might still contain errors that would turn this
 		 * entry into a bad line) */
-		if unlikely(!*field_starts[2] || !*field_starts[3])
+		if unlikely(!*field_starts[2])
 			goto badline;
-		resultbuf->pw_gid = (gid_t)libc_strtoul(field_starts[2], &iter, 10);
+		resultbuf->pw_uid = (gid_t)libc_strtoul(field_starts[2], &iter, 10);
 		if unlikely(*iter)
 			goto badline;
-		resultbuf->pw_uid = (gid_t)libc_strtoul(field_starts[3], &iter, 10);
+		if (filtered_uid != (uid_t)-1) {
+			if (resultbuf->pw_uid != filtered_uid)
+				goto nextline;
+		}
+		if unlikely(!*field_starts[3])
+			goto badline;
+		resultbuf->pw_gid = (gid_t)libc_strtoul(field_starts[3], &iter, 10);
 		if unlikely(*iter)
 			goto badline;
 		/* All right! Now to fill in all of the string fields.
@@ -170,10 +194,39 @@ badline:
 #if defined(LOG_ERR) && (defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer))
 	libc_syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
 #endif /* LOG_ERR && (__CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer) */
+nextline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	libc_free(dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	goto again_parseln;
+}
+#include <bits/types.h>
+#include <bits/crt/inttypes.h>
+/* Re-construct the password-file line for the given uid in the
+ * given buffer. This knows the format that the caller will
+ * expect, but this need not be the format of the password file */
+INTERN ATTR_SECTION(".text.crt.database.pwd") int
+NOTHROW_RPC(LIBCCALL libc_getpw)(uid_t uid,
+                                 char *buffer) {
+	struct passwd *ent;
+	ent = libc_getpwuid(uid);
+	if unlikely(!ent)
+		goto err;
+	libc_sprintf(buffer,
+	        "%s:%s:"
+	        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
+	        "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"
+	        "%s:%s:%s\n",
+	        ent->pw_name,
+	        ent->pw_passwd,
+	        ent->pw_uid,
+	        ent->pw_gid,
+	        ent->pw_gecos,
+	        ent->pw_dir,
+	        ent->pw_shell);
+	return 0;
+err:
+	return -1;
 }
 #endif /* !__KERNEL__ */
 
@@ -181,6 +234,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
+DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PWD_C */
