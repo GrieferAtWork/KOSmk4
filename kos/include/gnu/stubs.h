@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68962331 */
+/* HASH CRC-32:0xbbcdc619 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -503,7 +503,6 @@
 #define __stub_putgrent 1
 #define __stub_putmsg 1
 #define __stub_putpmsg 1
-#define __stub_putpwent 1
 #define __stub_putspent 1
 #define __stub_pututline 1
 #define __stub_pututxline 1

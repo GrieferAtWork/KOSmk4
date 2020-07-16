@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50323a45 */
+/* HASH CRC-32:0xb32549a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,26 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <bits/crt/inttypes.h>
+/* Write the given entry `ent' into the given `stream' */
+INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2)) int
+NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
+                                    FILE *__restrict stream) {
+	__STDC_INT_AS_SSIZE_T error;
+	error = libc_fprintf(stream,
+	                "%s:%s:"
+	                "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
+	                "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"
+	                "%s:%s:%s\n",
+	                ent->pw_name,
+	                ent->pw_passwd,
+	                ent->pw_uid,
+	                ent->pw_gid,
+	                ent->pw_gecos,
+	                ent->pw_dir,
+	                ent->pw_shell);
+	return error >= 0 ? 0 : -1;
+}
 /* Read an entry from STREAM. This function is not standardized and probably never will */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 5)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
@@ -255,6 +275,7 @@ err:
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(putpwent, libc_putpwent);
 DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
 DEFINE_PUBLIC_ALIAS(fgetpwuid_r, libc_fgetpwuid_r);
 DEFINE_PUBLIC_ALIAS(fgetpwnam_r, libc_fgetpwnam_r);

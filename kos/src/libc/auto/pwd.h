@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x989bd277 */
+/* HASH CRC-32:0x86115eed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,8 +36,14 @@ INTDEF struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwuid)(uid_t uid);
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(const char *name);
 /* Read an entry from STREAM */
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
-/* Write the given entry onto the given stream */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_putpwent)(struct passwd const *__restrict p, FILE *__restrict f);
+/* Write the given entry `ent' into the given `stream' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Write the given entry `ent' into the given `stream' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Search for an entry with a matching user ID */
 INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBDCALL libd_getpwuid_r)(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* Search for an entry with a matching username */

@@ -116,10 +116,26 @@ struct passwd *getpwnam([[nonnull]] const char *name);
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
 struct passwd *fgetpwent([[nonnull]] $FILE *__restrict stream);
 
-@@Write the given entry onto the given stream
+@@Write the given entry `ent' into the given `stream'
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
-int putpwent([[nonnull]] struct passwd const *__restrict p,
-             [[nonnull]] $FILE *__restrict f);
+[[requires_function(fprintf), impl_include("<bits/crt/inttypes.h>")]]
+int putpwent([[nonnull]] struct passwd const *__restrict ent,
+             [[nonnull]] $FILE *__restrict stream) {
+	__STDC_INT_AS_SSIZE_T error;
+	error = fprintf(stream,
+	                "%s:%s:"
+	                "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
+	                "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"
+	                "%s:%s:%s\n",
+	                ent->@pw_name@,
+	                ent->@pw_passwd@,
+	                ent->@pw_uid@,
+	                ent->@pw_gid@,
+	                ent->@pw_gecos@,
+	                ent->@pw_dir@,
+	                ent->@pw_shell@);
+	return error >= 0 ? 0 : -1;
+}
 %#endif /* __USE_MISC */
 
 %

@@ -106,20 +106,6 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetpwent]]]*/
 
-/*[[[head:libc_putpwent,hash:CRC-32=0x1348ea31]]]*/
-/* Write the given entry onto the given stream */
-INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict p,
-                                    FILE *__restrict f)
-/*[[[body:libc_putpwent]]]*/
-/*AUTO*/{
-	(void)p;
-	(void)f;
-	CRT_UNIMPLEMENTED("putpwent"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_putpwent]]]*/
 
 /*[[[head:libc_getpwuid_r,hash:CRC-32=0xd36fa09a]]]*/
 /* Search for an entry with a matching user ID */
@@ -186,14 +172,13 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5e89ffdf]]]*/
+/*[[[start:exports,hash:CRC-32=0x2a2c5bfc]]]*/
 DEFINE_PUBLIC_ALIAS(setpwent, libc_setpwent);
 DEFINE_PUBLIC_ALIAS(endpwent, libc_endpwent);
 DEFINE_PUBLIC_ALIAS(getpwent, libc_getpwent);
 DEFINE_PUBLIC_ALIAS(getpwuid, libc_getpwuid);
 DEFINE_PUBLIC_ALIAS(getpwnam, libc_getpwnam);
 DEFINE_PUBLIC_ALIAS(fgetpwent, libc_fgetpwent);
-DEFINE_PUBLIC_ALIAS(putpwent, libc_putpwent);
 DEFINE_PUBLIC_ALIAS(getpwuid_r, libc_getpwuid_r);
 DEFINE_PUBLIC_ALIAS(getpwnam_r, libc_getpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpwent_r, libc_getpwent_r);

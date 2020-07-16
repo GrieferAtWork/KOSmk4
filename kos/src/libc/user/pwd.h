@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72a307e8 */
+/* HASH CRC-32:0x5302f9cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,8 +43,6 @@ INTDEF struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid);
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name);
 /* Read an entry from STREAM */
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream);
-/* Write the given entry onto the given stream */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict p, FILE *__restrict f);
 /* Search for an entry with a matching user ID */
 INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* Search for an entry with a matching username */
