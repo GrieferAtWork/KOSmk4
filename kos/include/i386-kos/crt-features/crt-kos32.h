@@ -1624,6 +1624,8 @@
 #define __CRT_HAVE_fgetpos_unlocked 1
 #define __CRT_HAVE_fgetpwent 1
 #define __CRT_HAVE_fgetpwent_r 1
+#define __CRT_HAVE_fgetpwnam_r 1
+#define __CRT_HAVE_fgetpwuid_r 1
 #define __CRT_HAVE_fgets 1
 #define __CRT_HAVE_fgets_unlocked 1
 #define __CRT_HAVE_fgetspent 1

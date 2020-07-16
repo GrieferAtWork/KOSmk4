@@ -154,6 +154,29 @@ $errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
 	                        result, (uid_t)-1, NULL);
 }
 
+%#ifdef __USE_KOS
+[[cp, doc_alias("getpwuid"), decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[requires_function(fgetpwfiltered_r)]]
+$errno_t fgetpwuid_r([[nonnull]] $FILE *__restrict stream, $uid_t uid,
+                     [[nonnull]] struct passwd *__restrict resultbuf,
+                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[nonnull]] struct passwd **__restrict result) {
+	return fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, uid, NULL);
+}
+
+[[cp, doc_alias("getpwnam"), decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[requires_function(fgetpwfiltered_r)]]
+$errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
+                     [[nonnull]] const char *__restrict name,
+                     [[nonnull]] struct passwd *__restrict resultbuf,
+                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[nonnull]] struct passwd **__restrict result) {
+	return fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, (uid_t)-1, name);
+}
+%#endif /* __USE_KOS */
+
 @@Filtered read from `stream'
 @@@param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
 @@@param: filtered_name: When not `NULL', require this username

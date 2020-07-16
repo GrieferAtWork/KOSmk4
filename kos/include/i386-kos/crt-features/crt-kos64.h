@@ -1621,6 +1621,8 @@
 #define __CRT_HAVE_fgetpos_unlocked 1
 #define __CRT_HAVE_fgetpwent 1
 #define __CRT_HAVE_fgetpwent_r 1
+#define __CRT_HAVE_fgetpwnam_r 1
+#define __CRT_HAVE_fgetpwuid_r 1
 #define __CRT_HAVE_fgets 1
 #define __CRT_HAVE_fgets_unlocked 1
 #define __CRT_HAVE_fgetspent 1
@@ -5857,6 +5859,8 @@
 #define __CRT_HAVE_KOS$fgetpos_unlocked 1
 #define __CRT_HAVE_KOS$fgetpwent 1
 #define __CRT_HAVE_KOS$fgetpwent_r 1
+#define __CRT_HAVE_KOS$fgetpwnam_r 1
+#define __CRT_HAVE_KOS$fgetpwuid_r 1
 #define __CRT_HAVE_KOS$fgets 1
 #define __CRT_HAVE_KOS$fgets_unlocked 1
 #define __CRT_HAVE_KOS$fgetspent 1
@@ -9222,6 +9226,8 @@
 #define __CRT_HAVE_DOS$fgetpos_unlocked 1
 #define __CRT_HAVE_DOS$fgetpwent 1
 #define __CRT_HAVE_DOS$fgetpwent_r 1
+#define __CRT_HAVE_DOS$fgetpwnam_r 1
+#define __CRT_HAVE_DOS$fgetpwuid_r 1
 #define __CRT_HAVE_DOS$fgets 1
 #define __CRT_HAVE_DOS$fgets_unlocked 1
 #define __CRT_HAVE_DOS$fgetspent 1

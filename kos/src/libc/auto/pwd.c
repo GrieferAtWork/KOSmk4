@@ -44,6 +44,28 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
 	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                        result, (uid_t)-1, NULL);
 }
+/* Search for an entry with a matching user ID */
+INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 3, 4, 6)) errno_t
+NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
+                                       uid_t uid,
+                                       struct passwd *__restrict resultbuf,
+                                       char *__restrict buffer,
+                                       size_t buflen,
+                                       struct passwd **__restrict result) {
+	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, uid, NULL);
+}
+/* Search for an entry with a matching username */
+INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 4, 6)) errno_t
+NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
+                                       const char *__restrict name,
+                                       struct passwd *__restrict resultbuf,
+                                       char *__restrict buffer,
+                                       size_t buflen,
+                                       struct passwd **__restrict result) {
+	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, (uid_t)-1, name);
+}
 #include <parts/errno.h>
 #include <hybrid/typecore.h>
 #include <asm/syslog.h>
@@ -234,6 +256,8 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
+DEFINE_PUBLIC_ALIAS(fgetpwuid_r, libc_fgetpwuid_r);
+DEFINE_PUBLIC_ALIAS(fgetpwnam_r, libc_fgetpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
 #endif /* !__KERNEL__ */
 

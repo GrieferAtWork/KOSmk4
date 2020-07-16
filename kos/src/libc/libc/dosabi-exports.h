@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x403bef9a */
+/* HASH CRC-32:0x394dab55 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1334,6 +1334,8 @@ DEFINE_PUBLIC_ALIAS(DOS$getpwuid_r, libd_getpwuid_r);
 DEFINE_PUBLIC_ALIAS(DOS$getpwnam_r, libd_getpwnam_r);
 DEFINE_PUBLIC_ALIAS(DOS$getpwent_r, libd_getpwent_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpwent_r, libd_fgetpwent_r);
+DEFINE_PUBLIC_ALIAS(DOS$fgetpwuid_r, libd_fgetpwuid_r);
+DEFINE_PUBLIC_ALIAS(DOS$fgetpwnam_r, libd_fgetpwnam_r);
 DEFINE_PUBLIC_ALIAS(DOS$getpw, libd_getpw);
 
 /* regex */
