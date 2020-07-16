@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb4e8957 */
+/* HASH CRC-32:0x829dd6ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -226,13 +226,6 @@ __LIBC char **__environ __ASMNAME("environ");
 __LIBC char **__environ __ASMNAME("_environ");
 #define __environ __environ
 #define __environ __environ
-#elif defined(__CRT_HAVE__environ)
-#undef _environ
-#ifndef ___environ_defined
-#define ___environ_defined 1
-__LIBC char **_environ;
-#endif /* !___environ_defined */
-#define __environ _environ
 #elif defined(__CRT_HAVE_environ)
 #undef environ
 #ifndef __environ_defined
@@ -240,6 +233,16 @@ __LIBC char **_environ;
 __LIBC char **environ;
 #endif /* !__environ_defined */
 #define __environ environ
+#elif defined(__CRT_HAVE__environ)
+#undef _environ
+#ifndef ___environ_defined
+#define ___environ_defined 1
+__LIBC char **_environ;
+#endif /* !___environ_defined */
+#define __environ _environ
+#elif defined(__CRT_HAVE___environ)
+__LIBC char **__environ;
+#define __environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
@@ -269,7 +272,16 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restric
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),_execv,(__path,___argv))
 #else /* ... */
+#include <local/environ.h>
+#if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
+#include <local/unistd/execv.h>
+/* >> execv(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, ___argv); })
+#else /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
 #undef __execv_defined
+#endif /* (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ */
 #endif /* !... */
 #endif /* !__execv_defined */
 #ifndef __execve_defined
@@ -311,7 +323,17 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restri
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
 #else /* ... */
+#include <local/environ.h>
+#include <hybrid/__alloca.h>
+#if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
+#include <local/unistd/execvp.h>
+/* >> execvp(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, ___argv); })
+#else /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ */
 #undef __execvp_defined
+#endif /* (!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca)) || !__LOCAL_environ */
 #endif /* !... */
 #endif /* !__execvp_defined */
 #ifndef __execl_defined
@@ -331,7 +353,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("_execl");
-#elif defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)
+#else /* ... */
+#include <local/environ.h>
+#if defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
 #include <local/unistd/execl.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -341,8 +365,9 @@ __NAMESPACE_LOCAL_USING(execl)
 #else /* __cplusplus */
 #define execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))
 #endif /* !__cplusplus */
-#else /* ... */
+#else /* __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ) */
 #undef __execl_defined
+#endif /* !__CRT_HAVE_execv && !__CRT_HAVE__execv && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ) */
 #endif /* !... */
 #endif /* !__execl_defined */
 #ifndef __execle_defined
@@ -397,7 +422,10 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlp");
-#elif defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
+#else /* ... */
+#include <local/environ.h>
+#include <hybrid/__alloca.h>
+#if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 #include <local/unistd/execlp.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -407,8 +435,9 @@ __NAMESPACE_LOCAL_USING(execlp)
 #else /* __cplusplus */
 #define execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))
 #endif /* !__cplusplus */
-#else /* ... */
+#else /* __CRT_HAVE_execvp || __CRT_HAVE__execvp || ((__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ) */
 #undef __execlp_defined
+#endif /* !__CRT_HAVE_execvp && !__CRT_HAVE__execvp && ((!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca)) || !__LOCAL_environ) */
 #endif /* !... */
 #endif /* !__execlp_defined */
 #if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU)
@@ -425,7 +454,17 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__re
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #else /* ... */
+#include <hybrid/__alloca.h>
+#include <local/environ.h>
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
+#include <local/unistd/execvpe.h>
+/* >> execvpe(3)
+ * Replace the calling process with the application image referred to by `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
+#else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
 #undef __execvpe_defined
+#endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca */
 #endif /* !... */
 #endif /* !__execvpe_defined */
 #endif /* __USE_KOS || __USE_DOS || __USE_GNU */
@@ -442,7 +481,10 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlpe");
-#elif defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe)
+#else /* ... */
+#include <hybrid/__alloca.h>
+#include <local/environ.h>
+#if defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))
 #include <local/unistd/execlpe.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -452,8 +494,9 @@ __NAMESPACE_LOCAL_USING(execlpe)
 #else /* __cplusplus */
 #define execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))
 #endif /* !__cplusplus */
-#else /* ... */
+#else /* __CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca) */
 #undef __execlpe_defined
+#endif /* !__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca) */
 #endif /* !... */
 #endif /* !__execlpe_defined */
 #endif /* __USE_KOS || __USE_DOS */
@@ -1353,21 +1396,31 @@ __LIBC char **environ;
 __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
-#undef _environ
 #ifndef ___environ_defined
 #define ___environ_defined 1
+#undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
 #define environ _environ
+#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
+__LIBC char **environ __ASMNAME("__environ");
+#define environ environ
+#elif defined(__CRT_HAVE___environ)
+#ifndef ____environ_defined
+#define ____environ_defined 1
+#undef __environ
+__LIBC char **__environ;
+#endif /* !____environ_defined */
+#define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
-#define environ   (*__p__environ())
-#else
+#define environ (*__p__environ())
+#else /* ... */
 #undef __environ_defined
-#endif
+#endif /* !... */
 #endif /* !__environ_defined */
 #ifdef __CRT_HAVE_pipe2
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
@@ -1535,25 +1588,6 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fexecve,(__fd_t __fd, __TARG
 #endif /* !__CRT_HAVE_fexecve */
 #endif /* !__fexecve_defined */
 #endif /* __USE_XOPEN2K8 */
-
-#ifdef __USE_GNU
-#ifndef __execvpe_defined
-#define __execvpe_defined 1
-#ifdef __CRT_HAVE_execvpe
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
-#elif defined(__CRT_HAVE__execvpe)
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
-#else /* ... */
-#undef __execvpe_defined
-#endif /* !... */
-#endif /* !__execvpe_defined */
-#endif /* __USE_GNU */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifdef __CRT_HAVE_nice

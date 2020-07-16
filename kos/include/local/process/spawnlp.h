@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb23e8196 */
+/* HASH CRC-32:0x7fed0c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,9 @@
 #ifndef __local_spawnlp_defined
 #define __local_spawnlp_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp)
+#include <local/environ.h>
+#include <hybrid/__alloca.h>
+#if defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp) || ((defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: spawnvp from process */
 #ifndef __local___localdep_spawnvp_defined
@@ -30,6 +32,11 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_spawnvp,(int __mode, char const *__restrict __file, __TARGV),spawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE__spawnvp)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_spawnvp,(int __mode, char const *__restrict __file, __TARGV),_spawnvp,(__mode,__file,___argv))
+#elif (defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
+__NAMESPACE_LOCAL_END
+#include <local/process/spawnvp.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_spawnvp __LIBC_LOCAL_NAME(spawnvp)
 #else /* ... */
 #undef __local___localdep_spawnvp_defined
 #endif /* !... */
@@ -46,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_spawnlp_defined 1
 #define __localdep_spawnlp __LIBC_LOCAL_NAME(spawnlp)
 #endif /* !__local___localdep_spawnlp_defined */
-#else /* __CRT_HAVE_spawnvp || __CRT_HAVE__spawnvp */
+#else /* __CRT_HAVE_spawnvp || __CRT_HAVE__spawnvp || ((__CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve) && __hybrid_alloca)) && __LOCAL_environ) */
 #undef __local_spawnlp_defined
-#endif /* !__CRT_HAVE_spawnvp && !__CRT_HAVE__spawnvp */
+#endif /* !__CRT_HAVE_spawnvp && !__CRT_HAVE__spawnvp && ((!__CRT_HAVE_spawnvpe && !__CRT_HAVE__spawnvpe && ((!__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve) || !__hybrid_alloca)) || !__LOCAL_environ) */
 #endif /* !__local_spawnlp_defined */

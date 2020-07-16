@@ -564,9 +564,9 @@ __LIBC __ATTR_THREAD int errno;
 
 #ifndef __libc_seterrno
 #ifdef __errno
-#define __libc_seterrno(val) (void)(__errno=(val))
+#define __libc_seterrno(val) (__errno = (val), -1)
 #else /* __errno */
-#define __libc_seterrno(val) (void)0
+#define __libc_seterrno(val) (-1)
 #endif /* !__errno */
 #endif /* !__libc_seterrno */
 

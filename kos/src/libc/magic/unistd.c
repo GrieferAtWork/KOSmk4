@@ -36,6 +36,7 @@
 %[define_replacement(syscall_slong_t = __syscall_slong_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 
+%(auto_source)#include "../libc/globals.h"
 
 %{
 #include <features.h>
@@ -236,13 +237,6 @@ __LIBC char **__environ __ASMNAME("environ");
 __LIBC char **__environ __ASMNAME("_environ");
 #define __environ __environ
 #define __environ __environ
-#elif defined(__CRT_HAVE__environ)
-#undef _environ
-#ifndef ___environ_defined
-#define ___environ_defined 1
-__LIBC char **_environ;
-#endif /* !___environ_defined */
-#define __environ _environ
 #elif defined(__CRT_HAVE_environ)
 #undef environ
 #ifndef __environ_defined
@@ -250,6 +244,16 @@ __LIBC char **_environ;
 __LIBC char **environ;
 #endif /* !__environ_defined */
 #define __environ environ
+#elif defined(__CRT_HAVE__environ)
+#undef _environ
+#ifndef ___environ_defined
+#define ___environ_defined 1
+__LIBC char **_environ;
+#endif /* !___environ_defined */
+#define __environ _environ
+#elif defined(__CRT_HAVE___environ)
+__LIBC char **__environ;
+#define __environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
@@ -275,7 +279,11 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 [[cp, guard, export_alias("_execv"), argument_names(path, ___argv)]]
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
-int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
+[[requires_include("<local/environ.h>"), requires($has_function(execve) && defined(__LOCAL_environ))]]
+[[impl_include("<local/environ.h>")]]
+int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
+	return execve(path, ___argv, __LOCAL_environ);
+}
 
 @@>> execve(2)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -291,14 +299,18 @@ int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnu
 [[cp, guard, export_alias("_execvp"), argument_names(file, ___argv)]]
 [[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execvp, { return __builtin_execvp(file, (char *const *)___argv); })]]
-int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
+[[requires_include("<local/environ.h>"), requires($has_function(execvpe) && defined(__LOCAL_environ))]]
+[[impl_include("<local/environ.h>")]]
+int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
+	return execvpe(file, ___argv, __LOCAL_environ);
+}
 
 
 @@>> execl(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
 [[cp, guard, ATTR_SENTINEL, export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
-[[userimpl, requires_dependent_function(execv), crtbuiltin]]
+[[requires_dependent_function(execv), crtbuiltin]]
 int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execv, path, args)
 }
@@ -308,7 +320,7 @@ int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (ch
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execle"), crtbuiltin]]
-[[userimpl, requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
+[[requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
 int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execve, path, args)
 }
@@ -317,7 +329,7 @@ int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (c
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlp")]]
-[[userimpl, requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
+[[requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
 int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
@@ -327,7 +339,61 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 @@Replace the calling process with the application image referred to by `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
 [[cp, guard, export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
-int execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+[[requires_include("<hybrid/__alloca.h>")]]
+[[requires($has_function(getenv) && $has_function(execve) && defined(__hybrid_alloca))]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[impl_include("<parts/errno.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+__LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
+(__LIBCCALL __execvpe_impl)(char const *__restrict path, $size_t path_len,
+                            char const *__restrict file, $size_t file_len,
+                            __TARGV, __TENVP) {
+	char *fullpath, *dst;
+@@pp_ifdef _WIN32@@
+	while (path_len && (path[path_len - 1] == '/' ||
+	                    path[path_len - 1] == '\\'))
+		--path_len;
+@@pp_else@@
+	while (path_len && path[path_len - 1] == '/')
+		--path_len;
+@@pp_endif@@
+	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
+	                                   sizeof(char));
+	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	*dst++ = '/';
+	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	*dst = '\0';
+	return execve(fullpath, ___argv, ___envp);
+}
+@@pop_namespace@@
+)]]
+int execvpe([[nonnull]] char const *__restrict file,
+            [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
+	size_t filelen = strlen(file);
+	char *env_path = getenv("PATH");
+	if (env_path && *env_path) {
+		for (;;) {
+			char *path_end;
+@@pp_ifdef _WIN32@@
+			path_end = strchrnul(env_path, ';');
+@@pp_else@@
+			path_end = strchrnul(env_path, ':');
+@@pp_endif@@
+			(__NAMESPACE_LOCAL_SYM __execvpe_impl)(env_path, (size_t)(path_end - env_path),
+			                                       file, filelen, ___argv, ___envp);
+			if (!*path_end)
+				break;
+			env_path = path_end + 1;
+		}
+	} else {
+@@pp_ifdef ENOENT@@
+		__libc_seterrno(ENOENT);
+@@pp_endif@@
+	}
+	return -1;
+}
+
 %#endif /* __USE_KOS || __USE_DOS || __USE_GNU */
 
 %#if defined(__USE_KOS) || defined(__USE_DOS)
@@ -335,9 +401,9 @@ int execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonn
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlpe")]]
-[[userimpl, requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
+[[requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
 int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
-	__REDIRECT_EXECLE(char, execvp, file, args)
+	__REDIRECT_EXECLE(char, execvpe, file, args)
 }
 %#endif /* __USE_KOS || __USE_DOS */
 
@@ -1162,21 +1228,31 @@ __LIBC char **environ;
 __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
-#undef _environ
 #ifndef ___environ_defined
 #define ___environ_defined 1
+#undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
 #define environ _environ
+#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
+__LIBC char **environ __ASMNAME("__environ");
+#define environ environ
+#elif defined(__CRT_HAVE___environ)
+#ifndef ____environ_defined
+#define ____environ_defined 1
+#undef __environ
+__LIBC char **__environ;
+#endif /* !____environ_defined */
+#define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
-#define environ   (*__p__environ())
-#else
+#define environ (*__p__environ())
+#else /* ... */
 #undef __environ_defined
-#endif
+#endif /* !... */
 #endif /* !__environ_defined */
 }
 
@@ -1393,12 +1469,6 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 int fexecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
-
-%
-%#ifdef __USE_GNU
-%[insert:extern(execvpe)]
-%#endif /* __USE_GNU */
-
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)

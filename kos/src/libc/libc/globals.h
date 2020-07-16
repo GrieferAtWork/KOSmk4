@@ -79,6 +79,7 @@ DECL_BEGIN
 #undef __LOCAL_program_invocation_short_name_p
 #undef program_invocation_short_name
 #undef __progname
+#undef __LOCAL_environ
 #undef __environ
 #undef _environ
 #undef environ
@@ -101,6 +102,7 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);   /* aka. `_environ', `__environ' *
 #define __LOCAL_program_invocation_short_name_p GET_NOREL_GLOBAL(__progname)
 #define program_invocation_short_name           GET_NOREL_GLOBAL(__progname)
 #define __progname                              GET_NOREL_GLOBAL(__progname)
+#define __LOCAL_environ                         GET_NOREL_GLOBAL(environ)
 #define __environ                               GET_NOREL_GLOBAL(environ)
 #define _environ                                GET_NOREL_GLOBAL(environ)
 #define environ                                 GET_NOREL_GLOBAL(environ)
@@ -199,8 +201,6 @@ DECLARE_NOREL_GLOBAL_META(int, optopt);
 #define optind GET_NOREL_GLOBAL(optind)
 #define opterr GET_NOREL_GLOBAL(opterr)
 #define optopt GET_NOREL_GLOBAL(optopt)
-
-
 
 #endif /* !__KERNEL__ */
 #endif /* __CC__ */

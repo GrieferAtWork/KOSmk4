@@ -208,21 +208,6 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
 }
 /*[[[end:libc_cwait]]]*/
 
-/*[[[head:libc_spawnv,hash:CRC-32=0xc7e90c99]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
-NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode,
-                                  char const *__restrict path,
-                                  __TARGV)
-/*[[[body:libc_spawnv]]]*/
-/*AUTO*/{
-	(void)mode;
-	(void)path;
-	(void)___argv;
-	CRT_UNIMPLEMENTED("spawnv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_spawnv]]]*/
 
 /*[[[head:libc_spawnve,hash:CRC-32=0x341aa5f1]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
@@ -242,45 +227,13 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
 }
 /*[[[end:libc_spawnve]]]*/
 
-/*[[[head:libc_spawnvp,hash:CRC-32=0xeae20bf8]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
-NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
-                                   char const *__restrict file,
-                                   __TARGV)
-/*[[[body:libc_spawnvp]]]*/
-/*AUTO*/{
-	(void)mode;
-	(void)file;
-	(void)___argv;
-	CRT_UNIMPLEMENTED("spawnvp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_spawnvp]]]*/
 
-/*[[[head:libc_spawnvpe,hash:CRC-32=0xa1d26ca]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
-NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode,
-                                    char const *__restrict file,
-                                    __TARGV,
-                                    __TENVP)
-/*[[[body:libc_spawnvpe]]]*/
-/*AUTO*/{
-	(void)mode;
-	(void)file;
-	(void)___argv;
-	(void)___envp;
-	CRT_UNIMPLEMENTED("spawnvpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_spawnvpe]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x93589655]]]*/
+/*[[[start:exports,hash:CRC-32=0xaf87a255]]]*/
 DEFINE_PUBLIC_ALIAS(_beginthread, libc__beginthread);
 DEFINE_PUBLIC_ALIAS(_beginthreadex, libc__beginthreadex);
 DEFINE_PUBLIC_ALIAS(_endthreadex, libc__endthreadex);
@@ -290,14 +243,8 @@ DEFINE_PUBLIC_ALIAS(_unloaddll, libc__unloaddll);
 DEFINE_PUBLIC_ALIAS(_getdllprocaddr, libc__getdllprocaddr);
 DEFINE_PUBLIC_ALIAS(_cwait, libc_cwait);
 DEFINE_PUBLIC_ALIAS(cwait, libc_cwait);
-DEFINE_PUBLIC_ALIAS(_spawnv, libc_spawnv);
-DEFINE_PUBLIC_ALIAS(spawnv, libc_spawnv);
-DEFINE_PUBLIC_ALIAS(_spawnvp, libc_spawnvp);
-DEFINE_PUBLIC_ALIAS(spawnvp, libc_spawnvp);
 DEFINE_PUBLIC_ALIAS(_spawnve, libc_spawnve);
 DEFINE_PUBLIC_ALIAS(spawnve, libc_spawnve);
-DEFINE_PUBLIC_ALIAS(_spawnvpe, libc_spawnvpe);
-DEFINE_PUBLIC_ALIAS(spawnvpe, libc_spawnvpe);
 /*[[[end:exports]]]*/
 
 DECL_END

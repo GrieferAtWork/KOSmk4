@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc74376f */
+/* HASH CRC-32:0xdd961f3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,12 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/process.h"
+#include "../user/stdlib.h"
+#include "../user/string.h"
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.sched.thread") void
 NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
@@ -35,6 +38,77 @@ NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
 }
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 (LIBCCALL libc__c_exit)(void) THROWS(...) {
+}
+#include <local/environ.h>
+INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
+NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode,
+                                  char const *__restrict path,
+                                  __TARGV) {
+	return libc_spawnve(mode, path, ___argv, __LOCAL_environ);
+}
+#include <local/environ.h>
+INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
+NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
+                                   char const *__restrict file,
+                                   __TARGV) {
+	return libc_spawnvpe(mode, file, ___argv, __LOCAL_environ);
+}
+#include <hybrid/typecore.h>
+#include <parts/errno.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) pid_t
+(__LIBCCALL __spawnvpe_impl)(int mode,
+                             char const *__restrict path, size_t path_len,
+                             char const *__restrict file, size_t file_len,
+                             __TARGV, __TENVP) {
+	char *fullpath, *dst;
+#ifdef _WIN32
+	while (path_len && (path[path_len - 1] == '/' ||
+	                    path[path_len - 1] == '\\'))
+		--path_len;
+#else /* _WIN32 */
+	while (path_len && path[path_len - 1] == '/')
+		--path_len;
+#endif /* !_WIN32 */
+	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
+	                                   sizeof(char));
+	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	*dst++ = '/';
+	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	*dst = '\0';
+	return spawnve(mode, fullpath, ___argv, ___envp);
+}
+__NAMESPACE_LOCAL_END
+INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
+NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode,
+                                    char const *__restrict file,
+                                    __TARGV,
+                                    __TENVP) {
+	size_t filelen = libc_strlen(file);
+	char *env_path = libc_getenv("PATH");
+	if (env_path && *env_path) {
+		for (;;) {
+			pid_t result;
+			char *path_end;
+#ifdef _WIN32
+			path_end = libc_strchrnul(env_path, ';');
+#else /* _WIN32 */
+			path_end = libc_strchrnul(env_path, ':');
+#endif /* !_WIN32 */
+			result = (__NAMESPACE_LOCAL_SYM __spawnvpe_impl)(mode, env_path, (size_t)(path_end - env_path),
+			                                                 file, filelen, ___argv, ___envp);
+			if (result >= 0)
+				return result;
+			if (!*path_end)
+				break;
+			env_path = path_end + 1;
+		}
+	} else {
+#ifdef ENOENT
+		__libc_seterrno(ENOENT);
+#endif /* ENOENT */
+	}
+	return -1;
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -123,6 +197,12 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_endthread, libc__endthread);
 DEFINE_PUBLIC_ALIAS(_c_exit, libc__c_exit);
+DEFINE_PUBLIC_ALIAS(_spawnv, libc_spawnv);
+DEFINE_PUBLIC_ALIAS(spawnv, libc_spawnv);
+DEFINE_PUBLIC_ALIAS(_spawnvp, libc_spawnvp);
+DEFINE_PUBLIC_ALIAS(spawnvp, libc_spawnvp);
+DEFINE_PUBLIC_ALIAS(_spawnvpe, libc_spawnvpe);
+DEFINE_PUBLIC_ALIAS(spawnvpe, libc_spawnvpe);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_spawnl, libd_spawnl);

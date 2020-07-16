@@ -44,9 +44,7 @@
 %[define_type_class(__compar_fn_t      = "TP")]
 %[define_type_class(__compar_d_fn_t    = "TP")]
 
-%(auto_source){
-#include "../libc/globals.h"
-}
+%(auto_source)#include "../libc/globals.h"
 
 
 %{
@@ -605,7 +603,28 @@ struct __div_struct div(int numer, int denom) {
 %(std)#endif /* __cplusplus */
 
 [[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
-char *getenv([[nonnull]] char const *varname);
+[[requires_include("<local/environ.h>")]]
+[[userimpl, requires(defined(__LOCAL_environ))]]
+char *getenv([[nonnull]] char const *varname) {
+	size_t namelen;
+	char *result, **envp;
+	if unlikely(!varname)
+		return NULL;
+	namelen = strlen(varname);
+	envp = __LOCAL_environ;
+	if unlikely(!envp)
+		result = NULL;
+	else {
+		for (; (result = *envp) != NULL; ++envp) {
+			if (memcmp(result, varname, namelen * sizeof(char)) != 0 ||
+			    result[namelen] != '=')
+				continue;
+			result += namelen + 1;
+			break;
+		}
+	}
+	return result;
+}
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")]
 [[std]]
@@ -2052,17 +2071,27 @@ errno_t _set_doserrno($u32 err);
 #undef _environ
 #if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
 __LIBC char **_environ __ASMNAME("environ");
-#elif defined(__CRT_HAVE__environ)
-__LIBC char **_environ;
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **_environ __ASMNAME("__environ");
+#define _environ _environ
 #elif defined(__CRT_HAVE_environ)
-#undef environ
 #ifndef __environ_defined
 #define __environ_defined 1
+#undef environ
 __LIBC char **environ;
 #endif /* !__environ_defined */
 #define _environ environ
+#elif defined(__CRT_HAVE__environ)
+__LIBC char **_environ;
+#define _environ _environ
+#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
+__LIBC char **_environ __ASMNAME("__environ");
+#define _environ _environ
+#elif defined(__CRT_HAVE___environ)
+#ifndef ____environ_defined
+#define ____environ_defined 1
+#undef __environ
+__LIBC char **__environ;
+#endif /* !____environ_defined */
+#define _environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
@@ -3454,21 +3483,31 @@ __LIBC char **environ;
 __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
-#undef _environ
 #ifndef ___environ_defined
 #define ___environ_defined 1
+#undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
 #define environ _environ
+#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
+__LIBC char **environ __ASMNAME("__environ");
+#define environ environ
+#elif defined(__CRT_HAVE___environ)
+#ifndef ____environ_defined
+#define ____environ_defined 1
+#undef __environ
+__LIBC char **__environ;
+#endif /* !____environ_defined */
+#define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
-#define environ   (*__p__environ())
-#else
+#define environ (*__p__environ())
+#else /* ... */
 #undef __environ_defined
-#endif
+#endif /* !... */
 #endif /* !__environ_defined */
 }
 

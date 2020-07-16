@@ -24,6 +24,8 @@
 %[define_type_class(__TARGV = "TP")]
 %[define_type_class(__TENVP = "TP")]
 
+%(auto_source)#include "../libc/globals.h"
+
 %{
 #include <features.h>
 #include <bits/types.h>
@@ -300,16 +302,84 @@ $pid_t cwait(int *tstat, $pid_t pid, int action);
 %[default:section(".text.crt{|.dos}.fs.exec.spawn")]
 
 [[cp, guard, argument_names(mode, path, ___argv), export_alias("_spawnv")]]
-$pid_t spawnv(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
+[[requires_include("<local/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
+[[impl_include("<local/environ.h>")]]
+$pid_t spawnv(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
+	return spawnve(mode, path, ___argv, __LOCAL_environ);
+}
 
 [[cp, guard, argument_names(mode, file, ___argv), export_alias("_spawnvp")]]
-$pid_t spawnvp(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
+[[requires_include("<local/environ.h>"), requires($has_function(spawnvpe) && defined(__LOCAL_environ))]]
+[[impl_include("<local/environ.h>")]]
+$pid_t spawnvp(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
+	return spawnvpe(mode, file, ___argv, __LOCAL_environ);
+}
 
 [[cp, guard, argument_names(mode, path, ___argv, ___envp), export_alias("_spawnve")]]
-$pid_t spawnve(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+$pid_t spawnve(int mode,
+               [[nonnull]] char const *__restrict path,
+               [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 [[cp, guard, argument_names(mode, file, ___argv, ___envp), export_alias("_spawnvpe")]]
-$pid_t spawnvpe(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+[[requires_include("<hybrid/__alloca.h>")]]
+[[requires($has_function(getenv) && $has_function(spawnve) && defined(__hybrid_alloca))]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[impl_include("<parts/errno.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+__LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) $pid_t
+(__LIBCCALL __spawnvpe_impl)(int mode,
+                             char const *__restrict path, $size_t path_len,
+                             char const *__restrict file, $size_t file_len,
+                             __TARGV, __TENVP) {
+	char *fullpath, *dst;
+@@pp_ifdef _WIN32@@
+	while (path_len && (path[path_len - 1] == '/' ||
+	                    path[path_len - 1] == '\\'))
+		--path_len;
+@@pp_else@@
+	while (path_len && path[path_len - 1] == '/')
+		--path_len;
+@@pp_endif@@
+	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
+	                                   sizeof(char));
+	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	*dst++ = '/';
+	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	*dst = '\0';
+	return spawnve(mode, fullpath, ___argv, ___envp);
+}
+@@pop_namespace@@
+)]]
+$pid_t spawnvpe(int mode,
+                [[nonnull]] char const *__restrict file,
+                [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
+	size_t filelen = strlen(file);
+	char *env_path = getenv("PATH");
+	if (env_path && *env_path) {
+		for (;;) {
+			$pid_t result;
+			char *path_end;
+@@pp_ifdef _WIN32@@
+			path_end = strchrnul(env_path, ';');
+@@pp_else@@
+			path_end = strchrnul(env_path, ':');
+@@pp_endif@@
+			result = (__NAMESPACE_LOCAL_SYM __spawnvpe_impl)(mode, env_path, (size_t)(path_end - env_path),
+			                                                 file, filelen, ___argv, ___envp);
+			if (result >= 0)
+				return result;
+			if (!*path_end)
+				break;
+			env_path = path_end + 1;
+		}
+	} else {
+@@pp_ifdef ENOENT@@
+		__libc_seterrno(ENOENT);
+@@pp_endif@@
+	}
+	return -1;
+}
 
 [[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function("spawnv"), export_alias("_spawnl")]]

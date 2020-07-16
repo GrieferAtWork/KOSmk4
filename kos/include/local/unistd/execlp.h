@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c88af0 */
+/* HASH CRC-32:0xc2407aee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,9 @@
 #ifndef __local_execlp_defined
 #define __local_execlp_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
+#include <local/environ.h>
+#include <hybrid/__alloca.h>
+#if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: execvp from unistd */
 #ifndef __local___localdep_execvp_defined
@@ -41,6 +43,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_execvp,(char con
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
+#elif (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
+__NAMESPACE_LOCAL_END
+#include <local/unistd/execvp.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> execvp(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+#define __localdep_execvp __LIBC_LOCAL_NAME(execvp)
 #else /* ... */
 #undef __local___localdep_execvp_defined
 #endif /* !... */
@@ -60,7 +70,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_execlp_defined 1
 #define __localdep_execlp __LIBC_LOCAL_NAME(execlp)
 #endif /* !__local___localdep_execlp_defined */
-#else /* __CRT_HAVE_execvp || __CRT_HAVE__execvp */
+#else /* __CRT_HAVE_execvp || __CRT_HAVE__execvp || ((__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ) */
 #undef __local_execlp_defined
-#endif /* !__CRT_HAVE_execvp && !__CRT_HAVE__execvp */
+#endif /* !__CRT_HAVE_execvp && !__CRT_HAVE__execvp && ((!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca)) || !__LOCAL_environ) */
 #endif /* !__local_execlp_defined */

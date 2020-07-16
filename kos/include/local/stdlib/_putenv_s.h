@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeffaa09c */
+/* HASH CRC-32:0xec4caed2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local__putenv_s_defined
 #define __local__putenv_s_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_setenv) || (defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s))
+#include <local/environ.h>
+#if defined(__CRT_HAVE_setenv) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setenv from stdlib */
@@ -29,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_setenv_defined 1
 #ifdef __CRT_HAVE_setenv
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_setenv,(char const *__varname, char const *__val, int __replace),setenv,(__varname,__val,__replace))
-#elif defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s)
+#elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/setenv.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__putenv_s_defined 1
 #define __localdep__putenv_s __LIBC_LOCAL_NAME(_putenv_s)
 #endif /* !__local___localdep__putenv_s_defined */
-#else /* __CRT_HAVE_setenv || (__CRT_HAVE_getenv && __CRT_HAVE__putenv_s) */
+#else /* __CRT_HAVE_setenv || ((__CRT_HAVE_getenv || __LOCAL_environ) && __CRT_HAVE__putenv_s) */
 #undef __local__putenv_s_defined
-#endif /* !__CRT_HAVE_setenv && (!__CRT_HAVE_getenv || !__CRT_HAVE__putenv_s) */
+#endif /* !__CRT_HAVE_setenv && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || !__CRT_HAVE__putenv_s) */
 #endif /* !__local__putenv_s_defined */

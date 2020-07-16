@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcdfbc23 */
+/* HASH CRC-32:0x616201ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,9 +48,24 @@ INTDEF int (LIBDCALL libd__unloaddll)(intptr_t hnd) THROWS(...);
 INTDEF __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
 INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, int action);
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnv)(int mode, char const *__restrict path, __TARGV);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode, char const *__restrict path, __TARGV);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvp)(int mode, char const *__restrict file, __TARGV);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode, char const *__restrict file, __TARGV);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnve)(int mode, char const *__restrict path, __TARGV, __TENVP);
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvpe)(int mode, char const *__restrict file, __TARGV, __TENVP);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode, char const *__restrict file, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnl)(int mode, char const *__restrict path, char const *args, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

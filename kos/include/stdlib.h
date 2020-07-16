@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x455367ba */
+/* HASH CRC-32:0x2e39bafb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,9 +56,10 @@ __NAMESPACE_STD_USING(lldiv)
 #endif /* __USE_ISOC99 */
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(div)
-#ifdef __CRT_HAVE_getenv
+#include <local/environ.h>
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 __NAMESPACE_STD_USING(getenv)
-#endif /* __CRT_HAVE_getenv */
+#endif /* __CRT_HAVE_getenv || __LOCAL_environ */
 __NAMESPACE_STD_USING(mblen)
 __NAMESPACE_STD_USING(mbtowc)
 __NAMESPACE_STD_USING(wctomb)
@@ -607,7 +608,19 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHRO
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __CORRECT_ISO_CPP_MATH_H_PROTO && !__NO_FPU */
 #endif /* __cplusplus */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,getenv,(char const *__varname),(__varname))
+#ifdef __CRT_HAVE_getenv
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,getenv,(char const *__varname),(__varname))
+#else /* __CRT_HAVE_getenv */
+__NAMESPACE_STD_END
+#include <local/environ.h>
+__NAMESPACE_STD_BEGIN
+#ifdef __LOCAL_environ
+__NAMESPACE_STD_END
+#include <local/stdlib/getenv.h>
+__NAMESPACE_STD_BEGIN
+__NAMESPACE_LOCAL_USING_OR_IMPL(getenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL getenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getenv))(__varname); })
+#endif /* __LOCAL_environ */
+#endif /* !__CRT_HAVE_getenv */
 #ifdef __CRT_HAVE_mblen
 __CDECLARE(,int,__NOTHROW_NCX,mblen,(char const *__str, size_t __maxlen),(__str,__maxlen))
 #else /* __CRT_HAVE_mblen */
@@ -1069,9 +1082,10 @@ __NAMESPACE_STD_USING(lldiv)
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(div)
-#ifdef __CRT_HAVE_getenv
+#include <local/environ.h>
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 __NAMESPACE_STD_USING(getenv)
-#endif /* __CRT_HAVE_getenv */
+#endif /* __CRT_HAVE_getenv || __LOCAL_environ */
 __NAMESPACE_STD_USING(mblen)
 __NAMESPACE_STD_USING(mbtowc)
 __NAMESPACE_STD_USING(wctomb)
@@ -1730,7 +1744,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpath
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_setenv
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setenv,(char const *__varname, char const *__val, int __replace),(__varname,__val,__replace))
-#elif defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s)
+#elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
 #include <local/stdlib/setenv.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(setenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL setenv)(char const *__varname, char const *__val, int __replace) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setenv))(__varname, __val, __replace); })
 #endif /* ... */
@@ -2305,17 +2319,27 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__e
 #undef _environ
 #if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
 __LIBC char **_environ __ASMNAME("environ");
-#elif defined(__CRT_HAVE__environ)
-__LIBC char **_environ;
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **_environ __ASMNAME("__environ");
+#define _environ _environ
 #elif defined(__CRT_HAVE_environ)
-#undef environ
 #ifndef __environ_defined
 #define __environ_defined 1
+#undef environ
 __LIBC char **environ;
 #endif /* !__environ_defined */
 #define _environ environ
+#elif defined(__CRT_HAVE__environ)
+__LIBC char **_environ;
+#define _environ _environ
+#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
+__LIBC char **_environ __ASMNAME("__environ");
+#define _environ _environ
+#elif defined(__CRT_HAVE___environ)
+#ifndef ____environ_defined
+#define ____environ_defined 1
+#undef __environ
+__LIBC char **__environ;
+#endif /* !____environ_defined */
+#define _environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
@@ -3538,21 +3562,31 @@ __LIBC char **environ;
 __LIBC char **environ __ASMNAME("_environ");
 #define environ environ
 #elif defined(__CRT_HAVE__environ)
-#undef _environ
 #ifndef ___environ_defined
 #define ___environ_defined 1
+#undef _environ
 __LIBC char **_environ;
 #endif /* !___environ_defined */
 #define environ _environ
+#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
+__LIBC char **environ __ASMNAME("__environ");
+#define environ environ
+#elif defined(__CRT_HAVE___environ)
+#ifndef ____environ_defined
+#define ____environ_defined 1
+#undef __environ
+__LIBC char **__environ;
+#endif /* !____environ_defined */
+#define environ __environ
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
-#define environ   (*__p__environ())
-#else
+#define environ (*__p__environ())
+#else /* ... */
 #undef __environ_defined
-#endif
+#endif /* !... */
 #endif /* !__environ_defined */
 
 #ifndef __swab_defined

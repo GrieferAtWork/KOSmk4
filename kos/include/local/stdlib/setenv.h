@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7124bc77 */
+/* HASH CRC-32:0xb1391237 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_setenv_defined
 #define __local_setenv_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s)
+#include <local/environ.h>
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_putenv_s from stdlib */
 #ifndef __local___localdep_dos_putenv_s_defined
@@ -31,7 +32,16 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_dos_putenv_s,(ch
 /* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
+#ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+#elif defined(__LOCAL_environ)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/getenv.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_getenv __LIBC_LOCAL_NAME(getenv)
+#else /* ... */
+#undef __local___localdep_getenv_defined
+#endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
 __LOCAL_LIBC(setenv) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setenv))(char const *__varname, char const *__val, int __replace) {
@@ -44,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setenv_defined 1
 #define __localdep_setenv __LIBC_LOCAL_NAME(setenv)
 #endif /* !__local___localdep_setenv_defined */
-#else /* __CRT_HAVE_getenv && __CRT_HAVE__putenv_s */
+#else /* (__CRT_HAVE_getenv || __LOCAL_environ) && __CRT_HAVE__putenv_s */
 #undef __local_setenv_defined
-#endif /* !__CRT_HAVE_getenv || !__CRT_HAVE__putenv_s */
+#endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || !__CRT_HAVE__putenv_s */
 #endif /* !__local_setenv_defined */
