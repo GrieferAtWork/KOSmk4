@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e1773bb */
+/* HASH CRC-32:0x406c69a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <asm/crt/stdio.h>
 #include <asm/stdio.h>
 #include <asm/util.h>
 /* Parse one line of text from `stream', whilst accounting for
@@ -43,7 +44,13 @@ DECL_BEGIN
  *                     delim[1]: The line-continuation character (defaults to '\\')
  *                     delim[2]: The line-comment character (defaults to '#')
  * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * : */
+ * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
+ *                  line, that must be `free(3)'ed by the caller once they are done
+ *                  using it.
+ *                  The the result would be empty as the result of `feof(stream)' upon
+ *                  return of this function, `strdup("")' will be returned. (i.e. NULL
+ *                  is only returned in case of an error; _NOT_ in case of end-of-file)
+ * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream,
                                     size_t *plen,

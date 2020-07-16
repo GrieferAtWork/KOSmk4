@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde37cee0 */
+/* HASH CRC-32:0x772dd91d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,13 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *
  *                     delim[1]: The line-continuation character (defaults to '\\')
  *                     delim[2]: The line-comment character (defaults to '#')
  * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * : */
+ * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
+ *                  line, that must be `free(3)'ed by the caller once they are done
+ *                  using it.
+ *                  The the result would be empty as the result of `feof(stream)' upon
+ *                  return of this function, `strdup("")' will be returned. (i.e. NULL
+ *                  is only returned in case of an error; _NOT_ in case of end-of-file)
+ * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -54,7 +60,13 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stre
  *                     delim[1]: The line-continuation character (defaults to '\\')
  *                     delim[2]: The line-comment character (defaults to '#')
  * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * : */
+ * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
+ *                  line, that must be `free(3)'ed by the caller once they are done
+ *                  using it.
+ *                  The the result would be empty as the result of `feof(stream)' upon
+ *                  return of this function, `strdup("")' will be returned. (i.e. NULL
+ *                  is only returned in case of an error; _NOT_ in case of end-of-file)
+ * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 

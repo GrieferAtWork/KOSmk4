@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff1759a6 */
+/* HASH CRC-32:0x37520aa8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,9 +50,7 @@ INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(__uid_t __ui
 /* Search for an entry with a matching username */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* Read an entry from the password-file stream, opening it if necessary */
-INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
-/* Read an entry from STREAM. This function is not standardized and probably never will */
-INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* Re-construct the password-file line for the given uid in the
  * given buffer. This knows the format that the caller will
  * expect, but this need not be the format of the password file */

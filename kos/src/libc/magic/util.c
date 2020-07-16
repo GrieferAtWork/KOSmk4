@@ -106,9 +106,15 @@ $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
 @@                    delim[1]: The line-continuation character (defaults to '\\')
 @@                    delim[2]: The line-comment character (defaults to '#')
 @@@param: flags:   Set of `FPARSELN_UNESC*'
-@@@return: * :     
+@@@return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
+@@                 line, that must be `free(3)'ed by the caller once they are done
+@@                 using it.
+@@                 The the result would be empty as the result of `feof(stream)' upon
+@@                 return of this function, `strdup("")' will be returned. (i.e. NULL
+@@                 is only returned in case of an error; _NOT_ in case of end-of-file)
+@@@return: NULL:   Error (s.a. `errno' and `ferror(stream)')
 [[cp, wunused, decl_include("<features.h>")]]
-[[impl_include("<asm/stdio.h>", "<asm/util.h>")]]
+[[impl_include("<asm/crt/stdio.h>", "<asm/stdio.h>", "<asm/util.h>")]]
 [[requires_function(getline, fgetc, ungetc, realloc)]]
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]
 char *fparseln([[nonnull]] FILE *stream,

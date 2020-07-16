@@ -21,6 +21,8 @@
 #define GUARD_LIBC_USER_PWD_C 1
 
 #include "../api.h"
+/**/
+
 #include "pwd.h"
 
 DECL_BEGIN
@@ -161,9 +163,9 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name,
 }
 /*[[[end:libc_getpwnam_r]]]*/
 
-/*[[[head:libc_getpwent_r,hash:CRC-32=0xa8695877]]]*/
+/*[[[head:libc_getpwent_r,hash:CRC-32=0xaee80bd2]]]*/
 /* Read an entry from the password-file stream, opening it if necessary */
-INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 4)) int
+INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 4)) errno_t
 NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,
@@ -179,27 +181,6 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 	return 0;
 }
 /*[[[end:libc_getpwent_r]]]*/
-
-/*[[[head:libc_fgetpwent_r,hash:CRC-32=0x9740f0db]]]*/
-/* Read an entry from STREAM. This function is not standardized and probably never will */
-INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 5)) int
-NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
-                                       struct passwd *__restrict resultbuf,
-                                       char *__restrict buffer,
-                                       size_t buflen,
-                                       struct passwd **__restrict result)
-/*[[[body:libc_fgetpwent_r]]]*/
-/*AUTO*/{
-	(void)stream;
-	(void)resultbuf;
-	(void)buffer;
-	(void)buflen;
-	(void)result;
-	CRT_UNIMPLEMENTED("fgetpwent_r"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_fgetpwent_r]]]*/
 
 /*[[[head:libc_getpw,hash:CRC-32=0x23d394cf]]]*/
 /* Re-construct the password-file line for the given uid in the
@@ -222,7 +203,7 @@ NOTHROW_RPC(LIBCCALL libc_getpw)(__uid_t uid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1ee579b4]]]*/
+/*[[[start:exports,hash:CRC-32=0xebe9263d]]]*/
 DEFINE_PUBLIC_ALIAS(setpwent, libc_setpwent);
 DEFINE_PUBLIC_ALIAS(endpwent, libc_endpwent);
 DEFINE_PUBLIC_ALIAS(getpwent, libc_getpwent);
@@ -233,7 +214,6 @@ DEFINE_PUBLIC_ALIAS(putpwent, libc_putpwent);
 DEFINE_PUBLIC_ALIAS(getpwuid_r, libc_getpwuid_r);
 DEFINE_PUBLIC_ALIAS(getpwnam_r, libc_getpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpwent_r, libc_getpwent_r);
-DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
 DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
 /*[[[end:exports]]]*/
 

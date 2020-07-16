@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8b72e9b */
+/* HASH CRC-32:0x640a2d34 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,7 +170,6 @@
 #define __stub_fgetgrent 1
 #define __stub_fgetgrent_r 1
 #define __stub_fgetpwent 1
-#define __stub_fgetpwent_r 1
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
 #define __stub__fpreset 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde5dbbca */
+/* HASH CRC-32:0x15ef1fda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 
 #include <features.h>
 
+#include <asm/syslog.h>
 #include <bits/syslog-path.h>
 
 #ifdef __USE_KOS
@@ -70,15 +71,34 @@
 
 __SYSDECL_BEGIN
 
-#define LOG_EMERG   0    /* system is unusable */
-#define LOG_ALERT   1    /* action must be taken immediately */
-#define LOG_CRIT    2    /* critical conditions */
-#define LOG_ERR     3    /* error conditions */
-#define LOG_WARNING 4    /* warning conditions */
-#define LOG_NOTICE  5    /* normal but significant condition */
-#define LOG_INFO    6    /* informational */
-#define LOG_DEBUG   7    /* debug-level messages */
-#define LOG_PRIMASK 0x07 /* mask to extract priority part (internal) */
+#ifdef __LOG_EMERG
+#define LOG_EMERG   __LOG_EMERG   /* system is unusable */
+#endif /* __LOG_EMERG */
+#ifdef __LOG_ALERT
+#define LOG_ALERT   __LOG_ALERT   /* action must be taken immediately */
+#endif /* __LOG_ALERT */
+#ifdef __LOG_CRIT
+#define LOG_CRIT    __LOG_CRIT    /* critical conditions */
+#endif /* __LOG_CRIT */
+#ifdef __LOG_ERR
+#define LOG_ERR     __LOG_ERR     /* error conditions */
+#endif /* __LOG_ERR */
+#ifdef __LOG_WARNING
+#define LOG_WARNING __LOG_WARNING /* warning conditions */
+#endif /* __LOG_WARNING */
+#ifdef __LOG_NOTICE
+#define LOG_NOTICE  __LOG_NOTICE  /* normal but significant condition */
+#endif /* __LOG_NOTICE */
+#ifdef __LOG_INFO
+#define LOG_INFO    __LOG_INFO    /* informational */
+#endif /* __LOG_INFO */
+#ifdef __LOG_DEBUG
+#define LOG_DEBUG   __LOG_DEBUG   /* debug-level messages */
+#endif /* __LOG_DEBUG */
+#ifdef __LOG_PRIMASK
+#define LOG_PRIMASK __LOG_PRIMASK /* mask to extract priority part (internal) */
+#endif /* __LOG_PRIMASK */
+
 /* extract priority */
 #define LOG_PRI(p)           ((p)&LOG_PRIMASK)
 #define LOG_MAKEPRI(fac,pri) ((fac)|(pri))

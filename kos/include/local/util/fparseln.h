@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5b6a93 */
+/* HASH CRC-32:0x2ff2abcc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,6 +216,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, _
 #endif /* !... */
 #endif /* !__local___localdep_ungetc_defined */
 __NAMESPACE_LOCAL_END
+#include <asm/crt/stdio.h>
 #include <asm/stdio.h>
 #include <asm/util.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -228,7 +229,13 @@ __NAMESPACE_LOCAL_BEGIN
  *                     delim[1]: The line-continuation character (defaults to '\\')
  *                     delim[2]: The line-comment character (defaults to '#')
  * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * : */
+ * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
+ *                  line, that must be `free(3)'ed by the caller once they are done
+ *                  using it.
+ *                  The the result would be empty as the result of `feof(stream)' upon
+ *                  return of this function, `strdup("")' will be returned. (i.e. NULL
+ *                  is only returned in case of an error; _NOT_ in case of end-of-file)
+ * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 __LOCAL_LIBC(fparseln) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
 	char *__result;

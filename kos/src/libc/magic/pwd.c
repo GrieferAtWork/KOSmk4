@@ -137,17 +137,152 @@ int getpwnam_r([[nonnull]] const char *__restrict name,
                [[nonnull]] struct passwd **__restrict result);
 
 %#ifdef __USE_MISC
-[[cp, doc_alias("getpwent"), decl_include("<bits/crt/db/passwd.h>")]]
-getpwent_r:([[nonnull]] struct passwd *__restrict resultbuf,
-            [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-            [[nonnull]] struct passwd **__restrict result) -> int;
+[[cp, doc_alias("getpwent")]]
+[[decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
+$errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
+                    [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                    [[nonnull]] struct passwd **__restrict result);
 
 @@Read an entry from STREAM. This function is not standardized and probably never will
-[[cp, decl_include("<bits/crt/db/passwd.h>")]]
-int fgetpwent_r([[nonnull]] $FILE *__restrict stream,
-                [[nonnull]] struct passwd *__restrict resultbuf,
-                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                [[nonnull]] struct passwd **__restrict result);
+[[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
+[[impl_include("<parts/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
+[[requires_function(fgetpos64_unlocked, fsetpos64_unlocked, fparseln)]]
+$errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
+                     [[nonnull]] struct passwd *__restrict resultbuf,
+                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[nonnull]] struct passwd **__restrict result) {
+	int retval = 0;
+	char *dbline;
+	fpos64_t oldpos;
+	if (fgetpos64_unlocked(stream, &oldpos))
+		goto err;
+again_parseln:
+	dbline = fparseln(stream, NULL, NULL, "\0\0#", 0);
+	if unlikely(!dbline)
+		goto err_restore;
+	if (!*dbline) {
+		/* End-of-file */
+@@pp_ifdef ENOENT@@
+		retval = ENOENT;
+@@pp_else@@
+		retval = 1;
+@@pp_endif@@
+		goto done_free_dbline;
+	}
+	/* Accepted formats:
+	 *     pw_name:pw_passwd:pw_uid:pw_gid:pw_gecos:pw_dir:pw_shell
+	 *     pw_name:pw_passwd:pw_uid:pw_gid:pw_dir:pw_shell
+	 *     pw_name:pw_passwd:pw_uid:pw_gid */
+	{
+		char *field_starts[7];
+		char *iter = dbline;
+		unsigned int i;
+		field_starts[4] =             /* pw_gecos */
+		field_starts[5] =             /* pw_dir */
+		field_starts[6] = (char *)""; /* pw_shell */
+		for (i = 0; i < 4; ++i) {
+			field_starts[i] = iter;
+			iter = strchrnul(iter, ':');
+			if unlikely(!*iter) {
+				if (i == 3)
+					goto got_all_fields; /* This is allowed! */
+				goto badline;
+			}
+			*iter++ = '\0';
+		}
+		/* Right now, `iter' points at the start of `pw_gecos' or `pw_dir' */
+		field_starts[4] = iter; /* pw_gecos */
+		iter = strchrnul(iter, ':');
+		if unlikely(!*iter)
+			goto badline;
+		*iter++ = '\0';
+		field_starts[5] = iter; /* pw_dir */
+		iter = strchrnul(iter, ':');
+		if (!*iter) {
+			/* pw_gecos wasn't given. */
+			field_starts[6] = field_starts[5]; /* pw_shell */
+			field_starts[5] = field_starts[4]; /* pw_dir */
+			field_starts[4] = (char *)"";      /* pw_gecos */
+		} else {
+			*iter++ = '\0';
+			field_starts[6] = iter; /* pw_shell */
+			/* Make sure there aren't any more fields! */
+			iter = strchrnul(iter, ':');
+			if unlikely(*iter)
+				goto badline;
+		}
+got_all_fields:
+		/* All right! we've got all of the fields!
+		 * Now to fill in the 2 numeric fields (since those
+		 * might still contain errors that would turn this
+		 * entry into a bad line) */
+		if unlikely(!*field_starts[2] || !*field_starts[3])
+			goto badline;
+		resultbuf->@pw_gid@ = (gid_t)strtoul(field_starts[2], &iter, 10);
+		if unlikely(*iter)
+			goto badline;
+		resultbuf->@pw_uid@ = (gid_t)strtoul(field_starts[3], &iter, 10);
+		if unlikely(*iter)
+			goto badline;
+		/* All right! Now to fill in all of the string fields.
+		 * We've already turned all of them into NUL-terminated strings pointing
+		 * into the heap-allocated `dbline' string, however the prototype of this
+		 * function requires that they be pointing into `buffer...+=buflen' */
+		for (i = 0; i < 7; ++i) {
+			static uintptr_t const offsets[7] = {
+				offsetof(struct passwd, @pw_name@),
+				offsetof(struct passwd, @pw_passwd@),
+				(uintptr_t)-1,
+				(uintptr_t)-1,
+				offsetof(struct passwd, @pw_gecos@),
+				offsetof(struct passwd, @pw_dir@),
+				offsetof(struct passwd, @pw_shell@),
+			};
+			char *str;
+			size_t len;
+			uintptr_t offset = offsets[i];
+			if (offset == (uintptr_t)-1)
+				continue;
+			str = field_starts[i];
+			len = (strlen(str) + 1) * sizeof(char);
+			/* Ensure that sufficient space is available in the user-provided buffer. */
+			if unlikely(buflen < len)
+				goto err_ERANGE;
+			/* Set the associated pointer in `resultbuf' */
+			*(char **)((byte_t *)resultbuf + offset) = buffer;
+			/* Copy the string to the user-provided buffer. */
+			buffer = (char *)mempcpy(buffer, str, len);
+			buflen -= len;
+		}
+	}
+done_free_dbline:
+@@pp_if $has_function(free)@@
+	free(dbline);
+@@pp_endif@@
+done:
+	*result = retval ? NULL : resultbuf;
+	return retval;
+err_ERANGE:
+@@pp_ifdef ERANGE@@
+	__libc_seterrno(ERANGE);
+@@pp_endif@@
+err_restore:
+	retval = __libc_geterrno_or(1);
+	fsetpos64_unlocked(stream, &oldpos);
+	goto done;
+err:
+	retval = __libc_geterrno_or(1);
+	goto done;
+badline:
+@@pp_if defined(LOG_ERR) && $has_function(syslog)@@
+	syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(dbline);
+@@pp_endif@@
+	goto again_parseln;
+}
+
 %#endif /* __USE_MISC */
 %#endif	/* __USE_POSIX */
 
