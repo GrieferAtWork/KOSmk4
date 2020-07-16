@@ -1248,6 +1248,7 @@ with_next_token:
 			 * printf("%d, %d", error, 5); // Not a dependency on error()
 			 * printf("%d", error);        // Not a dependency on error()
 			 * printf("%d", &error);       // Is a dependency on error() (unless 'error' was already used in a different context)
+			 * error:                      // Not a dependency on error()
 			 */
 			if (prevToken == "&") {
 				knownNonDependencies.insert(tok);
@@ -1256,7 +1257,7 @@ with_next_token:
 			}
 			prevToken = tok;
 			tok = parser.next();
-			if (tok in [")", ";", ",", "="]) {
+			if (tok in [")", ";", ",", "=", ":"]) {
 				knownNonDependencies.insert(prevToken);
 				goto with_next_token;
 			}

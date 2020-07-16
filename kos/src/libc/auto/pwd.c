@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36f34527 */
+/* HASH CRC-32:0xfcca3942 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/pwd.h"
-#include "../user/io.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
@@ -125,7 +124,7 @@ again_parseln:
 			/* Search for the requested uid/name prior to the initial search-start position. */
 			goto again_parseln;
 		}
-libc__eof:
+eof:
 		/* End-of-file */
 #ifdef ENOENT
 		retval = ENOENT;
@@ -267,7 +266,7 @@ nextline:
 	if unlikely(libc_fgetpos64(stream, &curpos))
 		goto err_nodbline;
 	if (curpos >= maxpos)
-		goto libc__eof;
+		goto eof;
 	goto again_parseln;
 }
 #include <bits/types.h>

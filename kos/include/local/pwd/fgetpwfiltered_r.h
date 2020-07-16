@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf9d071b */
+/* HASH CRC-32:0xb2a5ee52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,20 +26,6 @@
 #include <bits/types.h>
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: eof from io */
-#ifndef __local___localdep_eof_defined
-#define __local___localdep_eof_defined 1
-#ifdef __CRT_HAVE__eof
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_eof,(__fd_t __fd),_eof,(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
-__NAMESPACE_LOCAL_END
-#include <local/io/eof.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_eof __LIBC_LOCAL_NAME(eof)
-#else /* ... */
-#undef __local___localdep_eof_defined
-#endif /* !... */
-#endif /* !__local___localdep_eof_defined */
 /* Dependency: fgetpos64 from stdio */
 #ifndef __local___localdep_fgetpos64_defined
 #define __local___localdep_fgetpos64_defined 1
@@ -377,7 +363,7 @@ __again_parseln:
 			/* Search for the requested uid/name prior to the initial search-start position. */
 			goto __again_parseln;
 		}
-__localdep_eof:
+__eof:
 		/* End-of-file */
 #ifdef __ENOENT
 		__retval = __ENOENT;
@@ -519,7 +505,7 @@ __nextline:
 	if __unlikely(__localdep_fgetpos64(__stream, &__curpos))
 		goto __err_nodbline;
 	if (__curpos >= __maxpos)
-		goto __localdep_eof;
+		goto __eof;
 	goto __again_parseln;
 }
 __NAMESPACE_LOCAL_END
