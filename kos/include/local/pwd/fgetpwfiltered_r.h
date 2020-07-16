@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2a5ee52 */
+/* HASH CRC-32:0x7e1a3e39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -336,10 +336,16 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
- * @param: filtered_name: When not `NULL', require this username */
+ * @param: filtered_name: When not `NULL', require this username
+ * @return: 0 :     Success (`*result' is made to point at `resultbuf')
+ * @return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
+ *                  Note that in this case, `errno' will have not been changed
+ * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+ *                  Note that in this case, `errno' will have also been set to `ERANGE'
+ * @return: * :     Error (one of `E*' from `<errno.h>') */
 __LOCAL_LIBC(fgetpwfiltered_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwfiltered_r))(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result, __uid_t __filtered_uid, char const *__filtered_name) {
-	int __retval = 0;
+	__errno_t __retval = 0;
 	char *__dbline;
 	__pos64_t __startpos, __curpos;
 	__pos64_t __maxpos = (__pos64_t)-1;

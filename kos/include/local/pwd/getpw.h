@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f55ecc7 */
+/* HASH CRC-32:0xef7ecfa5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,10 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Search for an entry with a matching user ID */
+/* Search for an entry with a matching user ID
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CREDIRECT(,struct passwd *,__NOTHROW_RPC,__localdep_getpwuid,(__uid_t __uid),getpwuid,(__uid))
 #endif /* !__local___localdep_getpwuid_defined */
 /* Dependency: sprintf from stdio */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbcdc619 */
+/* HASH CRC-32:0x8918ebfe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,7 +145,6 @@
 #define __stub_endnetent 1
 #define __stub_endnetgrent 1
 #define __stub_endprotoent 1
-#define __stub_endpwent 1
 #define __stub_endrpcent 1
 #define __stub_endservent 1
 #define __stub_endspent 1
@@ -169,7 +168,6 @@
 #define __stub_fdetach 1
 #define __stub_fgetgrent 1
 #define __stub_fgetgrent_r 1
-#define __stub_fgetpwent 1
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
 #define __stub__fpreset 1
@@ -236,12 +234,6 @@
 #define __stub_getprotoent 1
 #define __stub_getprotoent_r 1
 #define __stub_getpt 1
-#define __stub_getpwent 1
-#define __stub_getpwent_r 1
-#define __stub_getpwnam 1
-#define __stub_getpwnam_r 1
-#define __stub_getpwuid 1
-#define __stub_getpwuid_r 1
 #define __stub_getrlimit64 1
 #define __stub_getrpcbyname 1
 #define __stub_getrpcbyname_r 1
@@ -545,7 +537,6 @@
 #define __stub_setnetent 1
 #define __stub_setnetgrent 1
 #define __stub_setprotoent 1
-#define __stub_setpwent 1
 #define __stub_setrlimit64 1
 #define __stub_setrpcent 1
 #define __stub_setservent 1

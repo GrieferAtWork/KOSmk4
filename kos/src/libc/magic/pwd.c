@@ -97,22 +97,34 @@ void setpwent();
 void endpwent();
 
 @@Read an entry from the password-file stream, opening it if necessary
+@@return: * :                         A pointer to the read password entry
+@@return: NULL: (errno = <unchanged>) The last entry has already been read (use `setpwent()' to rewind the database)
+@@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
 struct passwd *getpwent();
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 
 @@Search for an entry with a matching user ID
+@@return: * :                         A pointer to the read password entry
+@@return: NULL: (errno = <unchanged>) No entry for `uid' exists
+@@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
 struct passwd *getpwuid($uid_t uid);
 
 @@Search for an entry with a matching username
+@@return: * :                         A pointer to the read password entry
+@@return: NULL: (errno = <unchanged>) No entry for `name' exists
+@@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
 struct passwd *getpwnam([[nonnull]] const char *name);
 
 %
 %#ifdef __USE_MISC
 @@Read an entry from STREAM
+@@return: * :                         A pointer to the read password entry
+@@return: NULL: (errno = <unchanged>) The last entry has already been read (use `rewind(stream)' to rewind the database)
+@@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
 struct passwd *fgetpwent([[nonnull]] $FILE *__restrict stream);
 
@@ -134,32 +146,48 @@ int putpwent([[nonnull]] struct passwd const *__restrict ent,
 	                ent->@pw_gecos@,
 	                ent->@pw_dir@,
 	                ent->@pw_shell@);
-	return error >= 0 ? 0 : -1;
+	return likely(error >= 0) ? 0 : -1;
 }
 %#endif /* __USE_MISC */
 
 %
 %#ifdef __USE_POSIX
-[[cp, doc_alias("getpwuid"), decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-int getpwuid_r($uid_t uid,
-               [[nonnull]] struct passwd *__restrict resultbuf,
-               [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct passwd **__restrict result);
+@@Search for an entry with a matching user ID
+@@@return: 0 : (*result != NULL) Success
+@@@return: 0 : (*result == NULL) No entry for `uid'
+@@@return: * : Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+$errno_t getpwuid_r($uid_t uid,
+                    [[nonnull]] struct passwd *__restrict resultbuf,
+                    [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                    [[nonnull]] struct passwd **__restrict result);
 
-[[cp, doc_alias("getpwnam"), decl_include("<bits/crt/db/passwd.h>")]]
-int getpwnam_r([[nonnull]] const char *__restrict name,
-               [[nonnull]] struct passwd *__restrict resultbuf,
-               [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct passwd **__restrict result);
+@@Search for an entry with a matching username
+@@@return: 0 : (*result != NULL) Success
+@@@return: 0 : (*result == NULL) No entry for `name'
+@@@return: * : Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/crt/db/passwd.h>")]]
+$errno_t getpwnam_r([[nonnull]] const char *__restrict name,
+                    [[nonnull]] struct passwd *__restrict resultbuf,
+                    [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                    [[nonnull]] struct passwd **__restrict result);
 
 %#ifdef __USE_MISC
-[[cp, doc_alias("getpwent")]]
-[[decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
+@@Read an entry from the password-file stream, opening it if necessary
+@@@return: 0 :     Success (`*result' is made to point at `resultbuf')
+@@@return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
+@@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+@@@return: * :     Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 $errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                     [[nonnull]] struct passwd **__restrict result);
 
 @@Read an entry from STREAM. This function is not standardized and probably never will
+@@@return: 0 :     Success (`*result' is made to point at `resultbuf')
+@@@return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
+@@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+@@@return: * :     Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 [[requires_function(fgetpwfiltered_r)]]
 $errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
@@ -171,31 +199,57 @@ $errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
 }
 
 %#ifdef __USE_KOS
-[[cp, doc_alias("getpwuid"), decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-[[requires_function(fgetpwfiltered_r)]]
+@@Search for an entry with a matching user ID
+@@@return: 0 : (*result != NULL) Success
+@@@return: 0 : (*result == NULL) No entry for `uid'
+@@@return: * : Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[requires_function(fgetpwfiltered_r), impl_include("<parts/errno.h>")]]
 $errno_t fgetpwuid_r([[nonnull]] $FILE *__restrict stream, $uid_t uid,
                      [[nonnull]] struct passwd *__restrict resultbuf,
                      [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                      [[nonnull]] struct passwd **__restrict result) {
-	return fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
-	                        result, uid, NULL);
+	$errno_t error;
+	error = fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                         result, uid, NULL);
+@@pp_ifdef ENOENT@@
+	if (error == ENOENT)
+		error = 0;
+@@pp_endif@@
+	return error;
 }
 
-[[cp, doc_alias("getpwnam"), decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-[[requires_function(fgetpwfiltered_r)]]
+@@Search for an entry with a matching username
+@@@return: 0 : (*result != NULL) Success
+@@@return: 0 : (*result == NULL) No entry for `name'
+@@@return: * : Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[requires_function(fgetpwfiltered_r), impl_include("<parts/errno.h>")]]
 $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] const char *__restrict name,
                      [[nonnull]] struct passwd *__restrict resultbuf,
                      [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                      [[nonnull]] struct passwd **__restrict result) {
-	return fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
-	                        result, (uid_t)-1, name);
+	$errno_t error;
+	error = fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                         result, (uid_t)-1, name);
+@@pp_ifdef ENOENT@@
+	if (error == ENOENT)
+		error = 0;
+@@pp_endif@@
+	return error;
 }
 %#endif /* __USE_KOS */
 
 @@Filtered read from `stream'
 @@@param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
 @@@param: filtered_name: When not `NULL', require this username
+@@@return: 0 :     Success (`*result' is made to point at `resultbuf')
+@@@return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
+@@                 Note that in this case, `errno' will have not been changed
+@@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+@@                 Note that in this case, `errno' will have also been set to `ERANGE'
+@@@return: * :     Error (one of `E*' from `<errno.h>')
 [[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 [[impl_include("<parts/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
 [[requires_function(fgetpos64, fsetpos64, fparseln)]]
@@ -204,7 +258,7 @@ $errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
                           [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                           [[nonnull]] struct passwd **__restrict result,
                           $uid_t filtered_uid, char const *filtered_name) {
-	int retval = 0;
+	$errno_t retval = 0;
 	char *dbline;
 	fpos64_t startpos, curpos;
 	fpos64_t maxpos = (fpos64_t)-1;

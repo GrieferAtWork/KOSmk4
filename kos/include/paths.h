@@ -93,6 +93,11 @@ __SYSDECL_BEGIN
 #define _PATH_VARRUN "/var/run/"
 #define _PATH_VARTMP "/var/tmp/"
 
+#ifdef __USE_KOS
+#define _PATH_PASSWD "/etc/passwd"
+#define _PATH_GROUP  "/etc/group"
+#endif /* __USE_KOS */
+
 #ifdef __CRT_GLC
 #define _PATH_CONSOLE  "/dev/console"
 #define _PATH_DEVDB    "/var/run/dev.db"

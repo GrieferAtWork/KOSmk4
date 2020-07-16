@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87b97379 */
+/* HASH CRC-32:0x787b3e16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,16 +96,28 @@ __NAMESPACE_STD_USING(FILE)
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setpwent,(void),())
 /* Close the password-file stream */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endpwent,(void),())
-/* Read an entry from the password-file stream, opening it if necessary */
+/* Read an entry from the password-file stream, opening it if necessary
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) The last entry has already been read (use `setpwent()' to rewind the database)
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwent,(void),())
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
-/* Search for an entry with a matching user ID */
+/* Search for an entry with a matching user ID
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwuid,(__uid_t __uid),(__uid))
-/* Search for an entry with a matching username */
+/* Search for an entry with a matching username
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) No entry for `name' exists
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(const char *__name),(__name))
 
 #ifdef __USE_MISC
-/* Read an entry from STREAM */
+/* Read an entry from STREAM
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *__restrict __stream),(__stream))
 #ifdef __CRT_HAVE_putpwent
 /* Write the given entry `ent' into the given `stream' */
@@ -118,44 +130,74 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(putpwent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __USE_MISC */
 
 #ifdef __USE_POSIX
-/* Search for an entry with a matching user ID */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,getpwuid_r,(__uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__uid,__resultbuf,__buffer,__buflen,__result))
-/* Search for an entry with a matching username */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getpwnam_r,(const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
+/* Search for an entry with a matching user ID
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `uid'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3, 5)),__errno_t,__NOTHROW_RPC,getpwuid_r,(__uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__uid,__resultbuf,__buffer,__buflen,__result))
+/* Search for an entry with a matching username
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `name'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),__errno_t,__NOTHROW_RPC,getpwnam_r,(const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
 #ifdef __USE_MISC
-/* Read an entry from the password-file stream, opening it if necessary */
+/* Read an entry from the password-file stream, opening it if necessary
+ * @return: 0 :     Success (`*result' is made to point at `resultbuf')
+ * @return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
+ * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+ * @return: * :     Error (one of `E*' from `<errno.h>') */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),__errno_t,__NOTHROW_RPC,getpwent_r,(struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__resultbuf,__buffer,__buflen,__result))
 #ifdef __CRT_HAVE_fgetpwent_r
-/* Read an entry from STREAM. This function is not standardized and probably never will */
+/* Read an entry from STREAM. This function is not standardized and probably never will
+ * @return: 0 :     Success (`*result' is made to point at `resultbuf')
+ * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+ * @return: * :     Error (one of `E*' from `<errno.h>') */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),__errno_t,__NOTHROW_RPC,fgetpwent_r,(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__stream,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetpwent_r */
 #include <asm/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)))
 #include <local/pwd/fgetpwent_r.h>
-/* Read an entry from STREAM. This function is not standardized and probably never will */
+/* Read an entry from STREAM. This function is not standardized and probably never will
+ * @return: 0 :     Success (`*result' is made to point at `resultbuf')
+ * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+ * @return: * :     Error (one of `E*' from `<errno.h>') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwent_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3, 5)) __errno_t __NOTHROW_RPC(__LIBCCALL fgetpwent_r)(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpwent_r))(__stream, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE__ftelli64 || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock || __CRT_HAVE__IO_ftell) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && __CRT_HAVE_realloc)) */
 #endif /* !__CRT_HAVE_fgetpwent_r */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_fgetpwuid_r
-/* Search for an entry with a matching user ID */
+/* Search for an entry with a matching user ID
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `uid'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4, 6)),__errno_t,__NOTHROW_RPC,fgetpwuid_r,(__FILE *__restrict __stream, __uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__stream,__uid,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetpwuid_r */
 #include <asm/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)))
 #include <local/pwd/fgetpwuid_r.h>
-/* Search for an entry with a matching user ID */
+/* Search for an entry with a matching user ID
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `uid'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwuid_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL fgetpwuid_r)(__FILE *__restrict __stream, __uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpwuid_r))(__stream, __uid, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE__ftelli64 || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock || __CRT_HAVE__IO_ftell) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && __CRT_HAVE_realloc)) */
 #endif /* !__CRT_HAVE_fgetpwuid_r */
 #ifdef __CRT_HAVE_fgetpwnam_r
-/* Search for an entry with a matching username */
+/* Search for an entry with a matching username
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `name'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 4, 6)),__errno_t,__NOTHROW_RPC,fgetpwnam_r,(__FILE *__restrict __stream, const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__stream,__name,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetpwnam_r */
 #include <asm/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)))
 #include <local/pwd/fgetpwnam_r.h>
-/* Search for an entry with a matching username */
+/* Search for an entry with a matching username
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `name'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3, 4, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL fgetpwnam_r)(__FILE *__restrict __stream, const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpwnam_r))(__stream, __name, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE__ftelli64 || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock || __CRT_HAVE__IO_ftell) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && __CRT_HAVE_realloc)) */
 #endif /* !__CRT_HAVE_fgetpwnam_r */

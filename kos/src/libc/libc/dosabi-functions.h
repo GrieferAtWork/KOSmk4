@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e52ddfc */
+/* HASH CRC-32:0x8f5103f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1037,8 +1037,8 @@ DFUN(".text.crt.dos.database.pwd", libd_getpwuid, libc_getpwuid, TP, 1, TIn(__SI
 DFUN(".text.crt.dos.database.pwd", libd_getpwnam, libc_getpwnam, TP, 1, TP)
 DFUN(".text.crt.dos.database.pwd", libd_fgetpwent, libc_fgetpwent, TP, 1, TP)
 DFUN(".text.crt.dos.database.pwd", libd_putpwent, libc_putpwent, TD, 2, TP, TP)
-DFUN(".text.crt.dos.database.pwd", libd_getpwuid_r, libc_getpwuid_r, TD, 5, TIn(__SIZEOF_UID_T__), TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.pwd", libd_getpwnam_r, libc_getpwnam_r, TD, 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.pwd", libd_getpwuid_r, libc_getpwuid_r, TIn(__SIZEOF_ERRNO_T__), 5, TIn(__SIZEOF_UID_T__), TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.pwd", libd_getpwnam_r, libc_getpwnam_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
 DFUN(".text.crt.dos.database.pwd", libd_getpwent_r, libc_getpwent_r, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.database.pwd", libd_fgetpwent_r, libc_fgetpwent_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
 DFUN(".text.crt.dos.database.pwd", libd_fgetpwuid_r, libc_fgetpwuid_r, TIn(__SIZEOF_ERRNO_T__), 6, TP, TIn(__SIZEOF_UID_T__), TP, TP, TI, TP)

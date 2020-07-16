@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcca3942 */
+/* HASH CRC-32:0x18f2e20c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,9 +52,13 @@ NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
 	                ent->pw_gecos,
 	                ent->pw_dir,
 	                ent->pw_shell);
-	return error >= 0 ? 0 : -1;
+	return likely(error >= 0) ? 0 : -1;
 }
-/* Read an entry from STREAM. This function is not standardized and probably never will */
+/* Read an entry from STREAM. This function is not standardized and probably never will
+ * @return: 0 :     Success (`*result' is made to point at `resultbuf')
+ * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+ * @return: * :     Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 5)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
                                        struct passwd *__restrict resultbuf,
@@ -64,7 +68,11 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
 	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                        result, (uid_t)-1, NULL);
 }
-/* Search for an entry with a matching user ID */
+#include <parts/errno.h>
+/* Search for an entry with a matching user ID
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `uid'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 3, 4, 6)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
                                        uid_t uid,
@@ -72,10 +80,20 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
                                        char *__restrict buffer,
                                        size_t buflen,
                                        struct passwd **__restrict result) {
-	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
-	                        result, uid, NULL);
+	errno_t error;
+	error = libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                         result, uid, NULL);
+#ifdef ENOENT
+	if (error == ENOENT)
+		error = 0;
+#endif /* ENOENT */
+	return error;
 }
-/* Search for an entry with a matching username */
+#include <parts/errno.h>
+/* Search for an entry with a matching username
+ * @return: 0 : (*result != NULL) Success
+ * @return: 0 : (*result == NULL) No entry for `name'
+ * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 4, 6)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
                                        const char *__restrict name,
@@ -83,15 +101,27 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
                                        char *__restrict buffer,
                                        size_t buflen,
                                        struct passwd **__restrict result) {
-	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
-	                        result, (uid_t)-1, name);
+	errno_t error;
+	error = libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
+	                         result, (uid_t)-1, name);
+#ifdef ENOENT
+	if (error == ENOENT)
+		error = 0;
+#endif /* ENOENT */
+	return error;
 }
 #include <parts/errno.h>
 #include <hybrid/typecore.h>
 #include <asm/syslog.h>
 /* Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
- * @param: filtered_name: When not `NULL', require this username */
+ * @param: filtered_name: When not `NULL', require this username
+ * @return: 0 :     Success (`*result' is made to point at `resultbuf')
+ * @return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
+ *                  Note that in this case, `errno' will have not been changed
+ * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+ *                  Note that in this case, `errno' will have also been set to `ERANGE'
+ * @return: * :     Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2, 3, 5)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream,
                                             struct passwd *__restrict resultbuf,
@@ -100,7 +130,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream,
                                             struct passwd **__restrict result,
                                             uid_t filtered_uid,
                                             char const *filtered_name) {
-	int retval = 0;
+	errno_t retval = 0;
 	char *dbline;
 	fpos64_t startpos, curpos;
 	fpos64_t maxpos = (fpos64_t)-1;

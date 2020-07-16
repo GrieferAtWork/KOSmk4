@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ea97823 */
+/* HASH CRC-32:0xce5fde0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(putpwent))(struct passwd const *__res
 	                __ent->pw_gecos,
 	                __ent->pw_dir,
 	                __ent->pw_shell);
-	return __error >= 0 ? 0 : -1;
+	return __likely(__error >= 0) ? 0 : -1;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putpwent_defined
