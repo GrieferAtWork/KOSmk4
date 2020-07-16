@@ -178,7 +178,7 @@
 		__PRIVATE_EXEC_CAPTURE_VARARGSN(T, args, __execargv, __execargs)            \
 		__execenvp = __builtin_va_arg(__execargs, T __PRIVATE_ARGV_CONST *const *); \
 		__builtin_va_end(__execargs);                                               \
-		return spawnve(path, __execargv, __execenvp);                               \
+		return spawnve(mode, path, __execargv, __execenvp);                         \
 	}
 #define __REDIRECT_FEXECLAT(T, fexecvat, dfd, path, args)                \
 	{                                                                    \
@@ -257,7 +257,7 @@
 		__PRIVATE_XEXEC_CAPTURE_VARARGSN(T, args, __execargv, __execargs)           \
 		__execenvp = __builtin_va_arg(__execargs, T __PRIVATE_ARGV_CONST *const *); \
 		__builtin_va_end(__execargs);                                               \
-		return Spawnve(path, __execargv, __execenvp);                               \
+		return Spawnve(mode, path, __execargv, __execenvp);                         \
 	}
 #define __REDIRECT_XFEXECLAT(T, FExecvAt, dfd, path, args)                \
 	{                                                                     \
