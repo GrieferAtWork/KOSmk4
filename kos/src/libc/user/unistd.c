@@ -3273,12 +3273,12 @@ NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_freadlinkat]]]*/
 
-/*[[[head:libc_readall,hash:CRC-32=0xab651c4f]]]*/
+/*[[[head:libc_readall,hash:CRC-32=0x1811c1fc]]]*/
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
+ * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTERN ATTR_SECTION(".text.crt.io.read") NONNULL((2)) ssize_t

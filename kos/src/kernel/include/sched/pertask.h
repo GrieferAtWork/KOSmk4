@@ -44,9 +44,9 @@ template<class __T> __T &(FORVM)(struct vm *__restrict self, __T &x);
 template<class __T> __T const &(FORVM)(struct vm const *__restrict self, __T const &x);
 }
 #else /* __INTELLISENSE__ && __cplusplus */
-#define FORTASK(self,x)  (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self)+(__UINTPTR_TYPE__)&(x)))
-#define FORCPU(self,x)   (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self)+(__UINTPTR_TYPE__)&(x)))
-#define FORVM(self,x)    (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self)+(__UINTPTR_TYPE__)&(x)))
+#define FORTASK(self, x) (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(x)))
+#define FORCPU(self, x)  (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(x)))
+#define FORVM(self, x)   (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self) + (__UINTPTR_TYPE__)&(x)))
 #endif /* !__INTELLISENSE__ || !__cplusplus */
 
 
@@ -59,7 +59,7 @@ template<class __T> __T const &(FORVM)(struct vm const *__restrict self, __T con
 #endif /* !PERTASK_GET */
 
 #ifndef PERTASK_SET
-#define PERTASK_SET(x,value) (void)(PERTASK(x)=(value))
+#define PERTASK_SET(x, value) (void)(PERTASK(x) = (value))
 #endif /* !PERTASK_SET */
 
 #ifndef THIS_TASK
@@ -104,30 +104,34 @@ DECL_END
 #define PERTASK_TEST(x) (!!PERTASK_GET(x))
 #endif /* !PERTASK_TEST */
 #ifndef PERTASK_INC
-#define PERTASK_INC(x)  (void)++PERTASK(x)
+#define PERTASK_INC(x) (void)++PERTASK(x)
 #endif /* !PERTASK_INC */
 #ifndef PERTASK_DEC
-#define PERTASK_DEC(x)  (void)--PERTASK(x)
+#define PERTASK_DEC(x) (void)--PERTASK(x)
 #endif /* !PERTASK_DEC */
 
 #endif /* __CC__ */
 
 /* >> void KCALL func(struct task *__restrict self);
  * Invoked during task_alloc(). */
-#define DEFINE_PERTASK_INIT(func) DEFINE_CALLBACK(".rodata.callback.pertask.init", func)
+#define DEFINE_PERTASK_INIT(func) \
+	DEFINE_CALLBACK(".rodata.callback.pertask.init", func)
 
 /* >> NOBLOCK void NOTHROW(KCALL func)(struct task *__restrict self);
  * Invoked during task_destroy(). */
-#define DEFINE_PERTASK_FINI(func) DEFINE_CALLBACK(".rodata.callback.pertask.fini", func)
+#define DEFINE_PERTASK_FINI(func) \
+	DEFINE_CALLBACK(".rodata.callback.pertask.fini", func)
 
 /* >> void KCALL func(struct task *__restrict new_thread, uintptr_t flags);
  * Invoked to initialize a given clone `new_thread' of the calling thread.
  * @param: flags: Set of `CLONE_*' from `<bits/sched.h>' */
-#define DEFINE_PERTASK_CLONE(func) DEFINE_CALLBACK(".rodata.callback.pertask.clone", func)
+#define DEFINE_PERTASK_CLONE(func) \
+	DEFINE_CALLBACK(".rodata.callback.pertask.clone", func)
 
 /* >> void NOTHROW(KCALL func)(void);
  * Invoked during task_exit(). */
-#define DEFINE_PERTASK_ONEXIT(func) DEFINE_CALLBACK(".rodata.callback.pertask.onexit", func)
+#define DEFINE_PERTASK_ONEXIT(func) \
+	DEFINE_CALLBACK(".rodata.callback.pertask.onexit", func)
 
 
 

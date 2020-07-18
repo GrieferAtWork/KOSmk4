@@ -370,12 +370,12 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 
 
 
-/*[[[head:libc_ReadAll,hash:CRC-32=0x65a5d0e4]]]*/
+/*[[[head:libc_ReadAll,hash:CRC-32=0xe2662843]]]*/
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
+ * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t

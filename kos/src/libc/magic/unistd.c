@@ -699,7 +699,7 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 @@Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
 @@`readall()' to immediately return `0') or the entirety of the given buffer has been
 @@filled (in which case `bufsize' is returned).
-@@If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
+@@If an error occurs before all data could be read, try to use SEEK_CUR to rewind
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
 [[cp, guard, section(".text.crt{|.dos}.io.read"), impl_include("<parts/errno.h>")]]

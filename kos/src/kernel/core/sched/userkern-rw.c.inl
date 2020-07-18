@@ -192,13 +192,13 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 	}	break;
 
 	case offsetof(USERKERN_STRUCT, uk_uid):
-		IFELSE_RW(result = cred_getuid(),
-		          cred_setuid(value));
+		IFELSE_RW(result = cred_getruid(),
+		          cred_setruid(value));
 		break;
 
 	case offsetof(USERKERN_STRUCT, uk_gid):
-		IFELSE_RW(result = cred_getgid(),
-		          cred_setgid(value));
+		IFELSE_RW(result = cred_getrgid(),
+		          cred_setrgid(value));
 		break;
 
 	case offsetof(USERKERN_STRUCT, uk_euid):

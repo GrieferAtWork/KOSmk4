@@ -1968,6 +1968,7 @@ struct superblock_features {
 #endif /* !SUPERBLOCK_FNORMAL */
 #define SUPERBLOCK_FDOATIME     0x0001 /* [lock(atomic,weak)] Keep track of last-accessed timestamps (when opening streams to files). */
 #define SUPERBLOCK_FNOMTIME     0x0002 /* [lock(atomic,weak)] Do not update last-modified timestamps. */
+#define SUPERBLOCK_FNOSUID      0x0004 /* [lock(atomic,weak)] Ignore set-user-id/set-group-id on programs. */
 #define SUPERBLOCK_FUNMOUNTED   0x4000 /* [lock(WRITE_ONCE)] The superblock has been unmounted. */
 #define SUPERBLOCK_FMUSTUNMOUNT 0x8000 /* [lock(WRITE_ONCE)] The superblock has been prepared to be unmounted (used internally). */
 

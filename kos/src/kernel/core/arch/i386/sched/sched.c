@@ -38,6 +38,7 @@
 #include <kernel/x86/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 
@@ -171,6 +172,8 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	thread->t_sched.s_state = state;
 	if (!FORTASK(thread, this_fs))
 		FORTASK(thread, this_fs) = incref(&fs_kernel);
+	if (!FORTASK(thread, this_cred))
+		FORTASK(thread, this_cred) = incref(&cred_kernel);
 	if (!FORTASK(thread, this_handle_manager))
 		FORTASK(thread, this_handle_manager) = incref(&handle_manager_kernel);
 	return thread;

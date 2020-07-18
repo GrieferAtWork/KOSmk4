@@ -2972,7 +2972,7 @@ DEFINE_SYSCALL3(ssize_t, readlink,
 typedef void(KCALL *kernel_pervm_onexec_t)(void);
 INTDEF kernel_pervm_onexec_t __kernel_pervm_onexec_start[];
 INTDEF kernel_pervm_onexec_t __kernel_pervm_onexec_end[];
-LOCAL void KCALL run_pertask_onexec(void) {
+LOCAL void KCALL run_pervm_onexec(void) {
 	kernel_pervm_onexec_t *iter;
 	for (iter = __kernel_pervm_onexec_start;
 	     iter < __kernel_pervm_onexec_end; ++iter)
@@ -3044,7 +3044,10 @@ kernel_do_execveat(struct icpustate *__restrict state,
 #endif /* __ARCH_HAVE_COMPAT */
 			                );
 			/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
-			run_pertask_onexec();
+			run_pervm_onexec();
+#ifndef CONFIG_EVERYONE_IS_ROOT
+			cred_onexec(exec_node);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
 			{
 				struct debugtrap_reason r;
 				r.dtr_signo  = SIGTRAP;
@@ -3074,7 +3077,10 @@ kernel_do_execveat(struct icpustate *__restrict state,
 #endif /* __ARCH_HAVE_COMPAT */
 		                );
 		/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
-		run_pertask_onexec();
+		run_pervm_onexec();
+#ifndef CONFIG_EVERYONE_IS_ROOT
+		cred_onexec(exec_node);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
 	}
 	return state;
 }

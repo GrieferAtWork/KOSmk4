@@ -236,9 +236,40 @@ continue_parsing_enum_value:
 			} else {
 				local ch = input[iter];
 				if (ch == "#") {
-					iter = input.find("\n", iter + 1);
-					if (iter < 0)
+					local eol = input.find("\n", iter + 1);
+					if (eol < 0)
 						break;
+					local lastCommentStart = input.find("/*", iter, eol);
+again_with_eol_on_directive_line:
+					if (lastCommentStart >= 0) {
+						local lastCommentEnd = input.find("*/", lastCommentStart);
+						if (lastCommentEnd < 0)
+							break;
+						if (lastCommentEnd > eol) {
+							eol = input.find("\n", lastCommentEnd);
+							if (eol < 0)
+								break;
+							lastCommentStart = input.find("/*", lastCommentEnd, eol);
+							goto again_with_eol_on_directive_line;
+						}
+					}
+					while (eol < input_len && input.isspace(eol))
+						++eol;
+					//if (prefixStart == iter) {
+					//	/* Special case: Don't include `#define' directives in mirrors! */
+					//	local nameStart = iter + 1;
+					//	while (nameStart < eol && input.isspace(nameStart))
+					//		++nameStart;
+					//	if (nameStart < eol && input.issymstrt(nameStart)) {
+					//		local nameEnd = nameStart + 1;
+					//		while (nameEnd < eol && input.issymcont(nameEnd))
+					//			++nameEnd;
+					//		local directiveName = input[nameStart:nameEnd];
+					//		if (directiveName == "define")
+					//			prefixStart = eol;
+					//	}
+					//}
+					iter = eol;
 				} else if (ch == "/" && iter + 1 < input_len) {
 					ch = input[iter + 1];
 					if (ch == "/") {

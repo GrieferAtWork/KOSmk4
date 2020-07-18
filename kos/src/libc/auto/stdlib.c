@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed269542 */
+/* HASH CRC-32:0x6c228aad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@
 DECL_BEGIN
 
 #include "../libc/globals.h"
-#ifndef __KERNEL__
 #include <hybrid/__minmax.h>
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
@@ -171,6 +170,7 @@ jump_over:
 #undef MAX_THRESH
 #undef SWAP
 }
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBCCALL libc_bsearch_r)(void const *pkey,
                           void const *pbase,
@@ -217,7 +217,6 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 #ifdef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_USING(__invoke_compare_helper)
 #endif /* ____invoke_compare_helper_defined */
-#ifndef __KERNEL__
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_compare_helper_defined 1
@@ -236,15 +235,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	        (void *)cmp);
 }
-#ifndef ____invoke_compare_helper_defined
-__NAMESPACE_LOCAL_BEGIN
-#define ____invoke_compare_helper_defined 1
-__LOCAL_LIBC(__invoke_compare_helper) int
-(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
-	return (*(__compar_fn_t)__arg)(__a, __b);
-}
-__NAMESPACE_LOCAL_END
-#endif /* !____invoke_compare_helper_defined */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBCCALL libc_bsearch)(void const *pkey,
                         void const *pbase,
@@ -3019,10 +3010,12 @@ err_range:
 
 DECL_END
 
-#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(qsort_r, libc_qsort_r);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch_r, libc_bsearch_r);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(qsort, libc_qsort);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch, libc_bsearch);
 DEFINE_PUBLIC_ALIAS(labs, libc_labs);
 DEFINE_PUBLIC_ALIAS(llabs, libc_llabs);

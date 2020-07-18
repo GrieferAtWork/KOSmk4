@@ -52,7 +52,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then
 	done
 	cmd wait
 	# Build and link against ncurses
-	echo "link: $CC -o $EXEFILE $TS_OBJECTS -lncursesw"
+	echo "link: $CC -g -o $EXEFILE $TS_OBJECTS -lncursesw"
 	cmd "$CC" -g -o "$EXEFILE" "$TS_OBJECTS" -lncursesw
 fi
 

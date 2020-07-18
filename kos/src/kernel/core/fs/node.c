@@ -688,12 +688,15 @@ inode_tryaccess(struct inode *__restrict self, unsigned int type)
 		if (mode & how)
 			continue; /* Access is allowed for everyone. */
 		if (mode & (how << 3)) {
-			if (cred_isgroupmember(self->i_filegid))
+			if (cred_isfsgroupmember(self->i_filegid))
 				continue; /* The calling thread's user is part of the file owner's group */
 		}
 		if (mode & (how << 6)) {
 			if (self->i_fileuid == cred_getsuid())
 				continue; /* The calling thread's user is the file's owner */
+			/* CAP_FOWNER: ... Ignore filesystem-uid checks ... */
+			if (capable(CAP_FOWNER))
+				continue;
 		}
 		return false;
 	}

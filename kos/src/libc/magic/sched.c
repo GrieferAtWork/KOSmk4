@@ -168,6 +168,12 @@ __SYSDECL_BEGIN
 #define CLONE_SIGHAND __CLONE_SIGHAND
 #endif /* __CLONE_SIGHAND */
 
+/* Set if credentials (user/group ids and special permissions) are shared.
+ * Note that during an exec() credentials are unshared unconditionalls. */
+#ifdef __CLONE_CRED
+#define CLONE_CRED __CLONE_CRED
+#endif /* __CLONE_CRED */
+
 /* Set if tracing continues on the child. */
 #ifdef __CLONE_PTRACE
 #define CLONE_PTRACE __CLONE_PTRACE
@@ -307,6 +313,11 @@ __SYSDECL_BEGIN
 #else /* __CLONE_SIGHAND */
 #define __PRIVATE_CLONE_SIGHAND 0
 #endif /* !__CLONE_SIGHAND */
+#ifdef __CLONE_CRED
+#define __PRIVATE_CLONE_CRED __CLONE_CRED
+#else /* __CLONE_CRED */
+#define __PRIVATE_CLONE_CRED 0
+#endif /* !__CLONE_CRED */
 #ifdef __CLONE_IO
 #define __PRIVATE_CLONE_IO __CLONE_IO
 #else /* __CLONE_IO */
@@ -322,6 +333,7 @@ __SYSDECL_BEGIN
 	 __PRIVATE_CLONE_FS |      \
 	 __PRIVATE_CLONE_FILES |   \
 	 __PRIVATE_CLONE_SIGHAND | \
+	 __PRIVATE_CLONE_CRED |    \
 	 __PRIVATE_CLONE_IO)
 
 /* Same flags as used by fork() */

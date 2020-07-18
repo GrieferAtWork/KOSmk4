@@ -36,6 +36,7 @@
 #include <kernel/vm/phys.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -269,6 +270,8 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 
 	FORTASK(&_boottask, this_fs)             = &fs_kernel;
 	FORTASK(&_bootidle, this_fs)             = &fs_kernel;
+	FORTASK(&_boottask, this_cred)           = &cred_kernel;
+	FORTASK(&_bootidle, this_cred)           = &cred_kernel;
 	FORTASK(&_boottask, this_handle_manager) = &handle_manager_kernel;
 	FORTASK(&_bootidle, this_handle_manager) = &handle_manager_kernel;
 

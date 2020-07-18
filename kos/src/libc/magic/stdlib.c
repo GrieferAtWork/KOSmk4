@@ -214,7 +214,7 @@ typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[impl_include("<hybrid/__minmax.h>")]]
-[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws]]
+[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, kernel]]
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
 	/* DISCALIMER: The qsort() implementation below has been taken directly
@@ -436,7 +436,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std, kernel]]
 void qsort([[nonnull]] void *pbase, size_t item_count,
            size_t item_size, [[nonnull]] __compar_fn_t cmp) {
 	qsort_r(pbase, item_count, item_size,

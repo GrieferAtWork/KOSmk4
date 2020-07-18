@@ -23,14 +23,17 @@
 #include <__crt.h>
 #include <__stdinc.h>
 
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#if defined(__KOS__) || defined(__linux__)
 
 #define __CSIGNAL              0x000000ff /* Signal mask to be sent at exit. */
 #define __CLONE_VM             0x00000100 /* Set if VM shared between processes. */
 #define __CLONE_FS             0x00000200 /* Set if fs info shared between processes. */
 #define __CLONE_FILES          0x00000400 /* Set if open files shared between processes. */
 #define __CLONE_SIGHAND        0x00000800 /* Set if signal handlers shared. */
-/*      __CLONE_               0x00001000  * ... */
+#ifdef __KOS__
+#define __CLONE_CRED           0x00001000 /* Set if credentials (user/group ids and special permissions) are shared.
+                                           * Note that during an exec() credentials are unshared unconditionalls. */
+#endif /* __KOS__ */
 #define __CLONE_PTRACE         0x00002000 /* Set if tracing continues on the child. */
 #define __CLONE_VFORK          0x00004000 /* Set if the parent wants the child to wake it up on mm_release. */
 #define __CLONE_PARENT         0x00008000 /* Set if we want to have the same parent as the cloner. */
@@ -58,6 +61,6 @@
 #define __SCHED_IDLE          0x00000005 /* ... */
 #define __SCHED_RESET_ON_FORK 0x40000000 /* ... */
 
-#endif /* ... */
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_SCHED_H */

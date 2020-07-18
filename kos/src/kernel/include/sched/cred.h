@@ -21,8 +21,141 @@
 #define GUARD_KERNEL_INCLUDE_SCHED_CRED_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
 #include <sched/arch/cred.h>
+
+#include <hybrid/__atomic.h>
+#include <hybrid/sync/atomic-rwlock.h>
+
+#include <kos/capability.h>
+#include <sched/pertask.h>
+
+
+/* ===== How the whole CAP_* system works on linux (and KOS) =====
+ * - r/e/s-uid/gid ???
+ * - caps.permitted     -- Capabilities that can be acquired by anyone, at any time
+ * - caps.inheritable   -- Capabilities that ~can~ be inherited by privileged programs during exec()
+ * - caps.effective     -- Capabilities current in effect
+ * - caps.bounding      -- - Caps that can be made permitted by privileged programs
+ *                         - Caps that can be added to `caps.inheritable' by `capset()'
+ * - caps.ambient       -- Capabilities that always become permitted in privileged programs during exec()
+ *                         Note the invariant that this one is always a subset of permitted & inheritable
+ *
+ * Invariants:
+ *   - caps.ambient   SUBSET (caps.permitted & caps.inheritable)
+ *   - caps.effective SUBSET caps.permitted
+ *
+ * exec():
+ *   >> new_caps = old_caps;
+ *   >> new_euid = geteuid();
+ *   >> new_egid = getegid();
+ *   >> bool isuid = !no_new_privs && (stat.st_mode & S_ISUID) && !(FILE_SUPERBLOCK_MOUNT_FLAGS & MS_NOSUID);
+ *   >> bool isgid = !no_new_privs && (stat.st_mode & (S_ISGID | S_IXGRP)) == (S_ISGID | S_IXGRP) && !(FILE_SUPERBLOCK_MOUNT_FLAGS & MS_NOSUID);
+ *   >> if (isuid)
+ *   >>     new_euid = stat.st_uid;
+ *   >> if (isgid)
+ *   >>     new_egid = stat.st_gid;
+ *   >> if (isuid || isgid)
+ *   >>     new_caps.ambient = 0;
+ *   >> if ((ruid == 0 || new_euid == 0) && !(securebits & SECBIT_NOROOT)) {
+ *   >>     new_caps.permitted = old_caps.inheritable | caps.bounding;
+ *   >>     new_caps.effective = new_caps.permitted;
+ *   >> } else {
+ *   >>     file_caps = 0;
+ *   >>     if (FILE_HAS_ATTRIBTE("security.capability") && !KERNEL_WAS_BOOTED_WITH("no_file_caps")) {
+ *   >>         file_caps = DECODE_FILE_CAPABILITIES("security.capability");
+ *   >>         new_caps.ambient = 0;
+ *   >>     }
+ *   >>     new_caps.permitted = (old_caps.inheritable & file_caps.inheritable) |
+ *   >>                          (caps.bounding & file_caps.permitted) |
+ *   >>                          (new_caps.ambient);
+ *   >>     new_caps.effective = file_caps.is_effective ? new_caps.permitted : new_caps.ambient;
+ *   >> }
+ *
+ * setuid(), setfsuid(), setresuid():
+ *   >> if (!capable(CAP_SETUID))
+ *   >>     ERROR(); // Noop if IDs wouldn't have changed...
+ *   >> if (!(securebits & SECBIT_NO_SETUID_FIXUP)) {
+ *   >>     if (((old_ruid == 0) || (old_euid == 0) || (old_suid == 0)) &&
+ *   >>         ((new_ruid != 0) && (new_euid != 0) && (new_suid != 0))) {
+ *   >>         if (!(securebits & SECBIT_KEEP_CAPS))
+ *   >>             caps.permitted = EMPTY;
+ *   >>         caps.effective = EMPTY;
+ *   >>         caps.ambient   = EMPTY;
+ *   >>     } else {
+ *   >>         if (old_euid == 0 && new_euid != 0) {
+ *   >>             caps.effective = EMPTY;
+ *   >>         } else if (old_euid != 0 && new_euid == 0) {
+ *   >>             caps.effective = caps.permitted;
+ *   >>         }
+ *   >>     }
+ *   >>     if (old_fsuid == 0 && new_fsuid != 0) {
+ *   >>         caps.effective \= {
+ *   >>             CAP_CHOWN, CAP_DAC_OVERRIDE, CAP_DAC_READ_SEARCH, CAP_FOWNER,
+ *   >>             CAP_FSETID, CAP_LINUX_IMMUTABLE, CAP_MAC_OVERRIDE, CAP_MKNOD };
+ *   >>     } else if (old_fsuid != 0 && new_fsuid == 0) {
+ *   >>         caps.effective |= caps.permitted & {
+ *   >>             CAP_CHOWN, CAP_DAC_OVERRIDE, CAP_DAC_READ_SEARCH, CAP_FOWNER,
+ *   >>             CAP_FSETID, CAP_LINUX_IMMUTABLE, CAP_MAC_OVERRIDE, CAP_MKNOD };
+ *   >>     }
+ *   >> }
+ *   >> caps.ruid  = new_ruid;
+ *   >> caps.euid  = new_euid;
+ *   >> caps.suid  = new_suid;
+ *   >> caps.fsuid = new_fsuid;
+ *
+ * setgid(), setfsgid(), setresgid(), setgroups():
+ *   >> if (!capable(CAP_SETGID))
+ *   >>     ERROR(); // Noop if IDs wouldn't have changed...
+ *   >> // Changing GIDs doesn't affect cap bitsets.
+ *   >> caps.rgid   = new_rgid;
+ *   >> caps.egid   = new_egid;
+ *   >> caps.sgid   = new_sgid;
+ *   >> caps.fsgid  = new_fsgid;
+ *   >> caps.groups = new_groups;
+ *
+ * capset():
+ *   >> if (!capable(CAP_SETPCAP))
+ *   >>     assert(new_caps.inheritable SUBSET (old_caps.inheritable | old_caps.permitted));
+ *   >> assert(new_caps.inheritable SUBSET (old_caps.inheritable | caps.bounding));
+ *   >> assert(new_caps.permitted SUBSET old_caps.permitted);
+ *   >> assert(new_caps.effective SUBSET new_caps.permitted);
+ *   >> caps.inheritable = new_caps.inheritable;
+ *   >> caps.permitted   = new_caps.permitted;
+ *   >> caps.effective   = new_caps.effective;
+ *   >> caps.ambient    &= (caps.permitted & caps.inheritable);
+ *
+ * prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE):
+ *   >> if (securebits & SECBIT_NO_CAP_AMBIENT_RAISE)
+ *   >>     ERROR();
+ *   >> if (cap !IN caps.permitted || cap !IN caps.inheritable)
+ *   >>     ERROR();
+ *   >> caps.ambient |= | { cap };
+ *
+ * prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_LOWER):
+ *   >> caps.ambient \= { cap };
+ *
+ * prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_CLEAR_ALL):
+ *   >> caps.ambient = 0;
+ *
+ * prctl(PR_CAPBSET_DROP):
+ *   >> if (!capable(CAP_ALLOW_PR_CAPBSET_DROP = CAP_SETPCAP))
+ *   >>     ERROR();
+ *   >> caps.bounding \= { cap };
+ *
+ * prctl(PR_SET_SECUREBITS):
+ *   >> if (!capable(CAP_ALLOW_PR_SET_SECUREBITS = CAP_SETPCAP))
+ *   >>     ERROR();
+ *   >> securebits = value;
+ *
+ */
+
+
+#undef CONFIG_EVERYONE_IS_ROOT
+#if 0 /* TODO: Disable me */
+#define CONFIG_EVERYONE_IS_ROOT 1
+#endif
 
 /* Credential checking. */
 
@@ -30,21 +163,284 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-/* TODO */
-#define cred_getuid()    0
-#define cred_getgid()    0
-#define cred_geteuid()   0
-#define cred_getegid()   0
-#define cred_getsuid()   0
-#define cred_getsgid()   0
-#define cred_setuid(v)  (void)0
-#define cred_setgid(v)  (void)0
-#define cred_seteuid(v) (void)0
-#define cred_setegid(v) (void)0
-#define cred_setsuid(v) (void)0
-#define cred_setsgid(v) (void)0
+#ifndef CONFIG_EVERYONE_IS_ROOT
+/* Credential-Capabilities */
+#define CREDCAP_COUNT ((CAP_LAST_CAP - CAP_FIRST_CAP) + 1)
+#define CREDCAP_ENCODE(capno)          __CCAST(syscall_ulong_t)((capno) - CAP_FIRST_CAP)
+#define CREDCAP_DECODE(internal_capno) __CCAST(syscall_slong_t)((internal_capno) + CAP_FIRST_CAP)
+#define _CREDCAP_BYTECOUNT ((CREDCAP_COUNT + 7) / 8)
 
-#define cred_isgroupmember(gid) 1
+struct credcap {
+	byte_t cc_caps[_CREDCAP_BYTECOUNT]; /* Bitset of capabilities */
+};
+
+#if (CREDCAP_COUNT & 7) == 0
+#define _CREDCAP_INIT_LASTBYTE 0xff
+#else /* (CREDCAP_COUNT & 7) == 0 */
+#define _CREDCAP_INIT_LASTBYTE (__CCAST(byte_t)((1u << (CREDCAP_COUNT & 7)) - 1))
+#endif /* (CREDCAP_COUNT & 7) != 0 */
+
+#if _CREDCAP_BYTECOUNT == 1
+#define CREDCAP_INIT_FULL { _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 2
+#define CREDCAP_INIT_FULL { 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 3
+#define CREDCAP_INIT_FULL { 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 4
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 5
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 6
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 7
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 8
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 9
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 10
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 11
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#elif _CREDCAP_BYTECOUNT == 12
+#define CREDCAP_INIT_FULL { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, _CREDCAP_INIT_LASTBYTE }
+#else /* _CREDCAP_BYTECOUNT == ... */
+#error "Unsupported `_CREDCAP_BYTECOUNT' (please extend)"
+#endif /* _CREDCAP_BYTECOUNT != ... */
+
+
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL credcap_capable)(struct credcap const *__restrict self,
+                               syscall_slong_t capno) {
+	syscall_ulong_t icap = CREDCAP_ENCODE(capno);
+	return (self->cc_caps[icap / 8] & (1 << (icap % 8))) != 0;
+}
+
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL credcap_turnon)(struct credcap *__restrict self,
+                              syscall_slong_t capno) {
+	syscall_ulong_t icap = CREDCAP_ENCODE(capno);
+	self->cc_caps[icap / 8] |= (1 << (icap % 8));
+}
+
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL credcap_turnoff)(struct credcap *__restrict self,
+                               syscall_slong_t capno) {
+	syscall_ulong_t icap = CREDCAP_ENCODE(capno);
+	self->cc_caps[icap / 8] &= ~(1 << (icap % 8));
+}
+
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL credcap_copyfrom)(struct credcap *__restrict self,
+                                struct credcap const *__restrict src,
+                                syscall_slong_t capno) {
+	syscall_ulong_t icap;
+	size_t index;
+	byte_t mask;
+	icap  = CREDCAP_ENCODE(capno);
+	index = icap / 8;
+	mask  = 1 << (icap % 8);
+	self->cc_caps[index] &= ~mask;
+	self->cc_caps[index] |= src->cc_caps[index] & mask;
+}
+
+LOCAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL credcap_orset)(struct credcap *dst,
+                             struct credcap const *src1,
+                             struct credcap const *src2) {
+	syscall_ulong_t i;
+	for (i = 0; i < _CREDCAP_BYTECOUNT; ++i)
+		dst->cc_caps[i] = src1->cc_caps[i] | src2->cc_caps[i];
+}
+
+LOCAL NOBLOCK NONNULL((1, 2, 3)) void
+NOTHROW(FCALL credcap_andset)(struct credcap *dst,
+                              struct credcap const *src1,
+                              struct credcap const *src2) {
+	syscall_ulong_t i;
+	for (i = 0; i < _CREDCAP_BYTECOUNT; ++i)
+		dst->cc_caps[i] = src1->cc_caps[i] & src2->cc_caps[i];
+}
+
+
+
+struct cred {
+	REF refcnt_t         c_refcnt;          /* Reference counter. */
+	struct atomic_rwlock c_lock;            /* Lock for the credentials controller. */
+	WEAK uid_t           c_ruid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real user ID */
+	WEAK gid_t           c_rgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real group ID */
+	WEAK uid_t           c_euid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective user ID
+	                                         * Used to determine permissions for accessing
+	                                         * shared resources (mainly shared memory)
+	                                         * When this field is set, you must also set `c_fsuid' */
+	WEAK gid_t           c_egid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Effective group ID (s.a. `c_euid') */
+	WEAK uid_t           c_suid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved user ID
+	                                         * When an `S_ISUID' / `S_ISGID' program is executed,
+	                                         * what would have otherwise been `c_euid' / `c_egid'
+	                                         * is stored here (and `c_euid' / `c_egid' will become
+	                                         * the `struct stat::st_uid/st_gid' of the executable) */
+	WEAK gid_t           c_sgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Saved group ID (s.a. `c_suid') */
+	WEAK uid_t           c_fsuid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem user ID
+	                                         * Used to determine permissions for accessing files */
+	WEAK gid_t           c_fsgid;           /* [lock(READ(ATOMIC), WRITE(c_lock))] Filesystem group ID */
+	size_t               c_ngroups;         /* [lock(c_lock)] # of supplementary group IDs. */
+	gid_t               *c_groups;          /* [0..c_ngroups][owned][lock(c_lock)] Supplementary group IDs.
+	                                         * These are used as extensions to `c_fsgid'.
+	                                         * NOTE: This list may or may not contain `c_fsgid', but is sorted
+	                                         *       ascendingly, meaning that BSEARCH can be used to scan it. */
+	WEAK struct credcap  c_cap_permitted;   /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that can be acquired by anyone, at any time. */
+	WEAK struct credcap  c_cap_inheritable; /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that ~can~ be inherited by privileged programs during exec(). */
+	WEAK struct credcap  c_cap_effective;   /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities current in effect. */
+	WEAK struct credcap  c_cap_bounding;    /* [lock(READ(ATOMIC), WRITE(c_lock))] - Caps that can be made permitted by privileged programs
+	                                         *                                     - Caps that can be added to `caps.inheritable' by `capset()' */
+	WEAK struct credcap  c_cap_ambient;     /* [lock(READ(ATOMIC), WRITE(c_lock))] Capabilities that always become permitted in privileged programs
+	                                         * during exec(). Note the invariant that this one is always a subset of permitted & inheritable. */
+	WEAK uint8_t         c_securebits;      /* [lock(READ(ATOMIC), WRITE(c_lock))] Secure capability bits. (set of `SECBIT_*' from <kos/capability.h>) */
+	WEAK uint8_t         c_no_new_privs;    /* [lock(READ(ATOMIC), WRITE(c_lock))] When non-zero, exec() calls do not  */
+};
+
+/* Destroy the given credentials controller. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL cred_destroy)(struct cred *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct cred, c_refcnt, cred_destroy)
+
+/* Clone the given credentials controller `self' and return the copy */
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct cred *FCALL
+cred_clone(struct cred *__restrict self) THROWS(E_BADALLOC);
+
+/* [1..1] Per-thread filesystem information.
+ * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
+DATDEF ATTR_PERTASK REF struct cred *this_cred;
+#define THIS_CRED PERTASK_GET(this_cred)
+
+/* Generic kernel credentials / credentials for /bin/init */
+DATDEF struct cred cred_kernel;
+
+
+/* Check if the calling thread has a given capability
+ * `capno' (one of `CAP_*' from <kos/capability.h>) */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK ATTR_PURE __BOOL
+NOTHROW(FCALL capable)(syscall_slong_t capno) {
+	return credcap_capable(&THIS_CRED->c_cap_effective, capno);
+}
+
+/* Ensure that the calling thread is `capable(capno)'
+ * If the calling thread isn't, throw an `E_INSUFFICIENT_RIGHTS' exception */
+FUNDEF void FCALL require(syscall_slong_t capno)
+		THROWS(E_INSUFFICIENT_RIGHTS);
+
+
+
+/* Get the calling thread's real user ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_getruid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_ruid, __ATOMIC_ACQUIRE);
+}
+
+/* Get the calling thread's real group ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getrgid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_rgid, __ATOMIC_ACQUIRE);
+}
+
+/* Get the calling thread's effective user ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_geteuid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_euid, __ATOMIC_ACQUIRE);
+}
+
+/* Get the calling thread's effective group ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getegid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_egid, __ATOMIC_ACQUIRE);
+}
+
+
+/* Get the calling thread's saved user ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_getsuid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_suid, __ATOMIC_ACQUIRE);
+}
+
+/* Get the calling thread's saved group ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getsgid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_sgid, __ATOMIC_ACQUIRE);
+}
+
+/* Get the calling thread's filesystem user ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_getfsuid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_fsuid, __ATOMIC_ACQUIRE);
+}
+
+/* Get the calling thread's filesystem group ID */
+EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getfsgid)(void) {
+	return __hybrid_atomic_load(THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE);
+}
+
+/* Set user IDs. IDs that should not be set may be passed as `(uid_t)-1'.
+ * @param: chk_rights: When true, check if the calling thread has the right to do this. */
+FUNDEF void FCALL
+cred_setuid(uid_t ruid, uid_t euid, uid_t suid, uid_t fsuid, __BOOL chk_rights DFL(1))
+		THROWS(E_INSUFFICIENT_RIGHTS);
+FUNDEF void FCALL
+cred_setgid(gid_t rgid, gid_t egid, gid_t sgid, gid_t fsgid, __BOOL chk_rights DFL(1))
+		THROWS(E_INSUFFICIENT_RIGHTS);
+
+/* Set the list of supplementary group ids of the calling thread. */
+FUNDEF void FCALL
+cred_setgroups(size_t ngroups, USER CHECKED gid_t const *groups, __BOOL chk_rights DFL(1))
+		THROWS(E_INSUFFICIENT_RIGHTS, E_SEGFAULT);
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+/* Update program credentials as has to be done as part of an exec() system call. */
+INTDEF void FCALL
+cred_onexec(struct inode *__restrict program_inode)
+		THROWS(E_BADALLOC);
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+/* Check if the calling thread is considered to be apart of the given group `gid' */
+EXTERN_INLINE WUNUSED __BOOL FCALL cred_isfsgroupmember(gid_t gid) {
+	size_t i;
+	__BOOL result;
+	struct cred *self = THIS_CRED;
+	/* Check for simple case: `gid' is the actual, current filesystem group ID */
+	if (__hybrid_atomic_load(THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE) == gid)
+		return 1;
+	result = 0;
+	atomic_rwlock_read(&self->c_lock);
+	for (i = 0; i < self->c_ngroups; ++i) {
+		if (self->c_groups[i] == gid) {
+			result = 1;
+			break;
+		}
+	}
+	atomic_rwlock_endread(&self->c_lock);
+	return result;
+}
+#else /* !CONFIG_EVERYONE_IS_ROOT */
+#define capable(capno)                            1
+#define require(capno)                            (void)0
+#define cred_getruid()                            (uid_t)0
+#define cred_getrgid()                            (gid_t)0
+#define cred_geteuid()                            (uid_t)0
+#define cred_getegid()                            (gid_t)0
+#define cred_getsuid()                            (uid_t)0
+#define cred_getsgid()                            (gid_t)0
+#define cred_getfsuid()                           (uid_t)0
+#define cred_getfsgid()                           (gid_t)0
+#define cred_setuid(ruid, euid, suid, fsuid, ...) (void)0
+#define cred_setgid(rgid, egid, sgid, fsgid, ...) (void)0
+#define cred_setgroups(ngroups, groups, ...)      (void)0
+#define cred_isfsgroupmember(gid)                 0 /* Yes, this has to be `0'! */
+#endif /* CONFIG_EVERYONE_IS_ROOT */
+
+/* Helper macros for only setting specific IDs */
+#define cred_setruid(/*uid_t*/ ruid)   cred_setuid(ruid, (uid_t)-1, (uid_t)-1, (uid_t)-1, 1)
+#define cred_seteuid(/*uid_t*/ euid)   cred_setuid((uid_t)-1, euid, (uid_t)-1, euid, 1)
+#define cred_setsuid(/*uid_t*/ suid)   cred_setuid((uid_t)-1, (uid_t)-1, suid, (uid_t)-1, 1)
+#define cred_setfsuid(/*uid_t*/ fsuid) cred_setuid((uid_t)-1, (uid_t)-1, (uid_t)-1, fsuid, 1)
+#define cred_setrgid(/*gid_t*/ rgid)   cred_setgid(rgid, (gid_t)-1, (gid_t)-1, (gid_t)-1, 1)
+#define cred_setegid(/*gid_t*/ egid)   cred_setgid((gid_t)-1, egid, (gid_t)-1, egid, 1)
+#define cred_setsgid(/*gid_t*/ sgid)   cred_setgid((gid_t)-1, (gid_t)-1, sgid, (gid_t)-1, 1)
+#define cred_setfsgid(/*gid_t*/ fsgid) cred_setgid((gid_t)-1, (gid_t)-1, (gid_t)-1, fsgid, 1)
+
+#define cred_setresuid(/*uid_t*/ ruid, /*uid_t*/ euid, /*uid_t*/ suid) cred_setuid(ruid, euid, suid, euid, 1)
+#define cred_setreshid(/*gid_t*/ rgid, /*gid_t*/ egid, /*gid_t*/ sgid) cred_setgid(rgid, egid, sgid, egid, 1)
 
 
 /* Credential assertion (throw an error if the caller doesn't have the required credential) */
@@ -54,10 +450,10 @@ struct vm;
 #define cred_allow_ctty_stealing() cred_has_sys_admin()
 
 /* Caller can directly access hardware I/O. */
-FUNDEF void KCALL
+FUNDEF void FCALL
 cred_require_hwio(void)
 		THROWS(E_INSUFFICIENT_RIGHTS);
-FUNDEF void KCALL
+FUNDEF void FCALL
 cred_require_hwio_r(port_t from, port_t num)
 		THROWS(E_INSUFFICIENT_RIGHTS);
 

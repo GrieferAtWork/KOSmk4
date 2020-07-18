@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7240b7 */
+/* HASH CRC-32:0xeb0d2b0d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
+ * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __LOCAL_LIBC(ReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__

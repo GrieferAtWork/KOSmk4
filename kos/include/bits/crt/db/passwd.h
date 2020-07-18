@@ -47,6 +47,7 @@ __SYSDECL_BEGIN
  *       Additionally, the following special values for `pw_passwd' exist:
  *  - "*":    No password has yet to be set (assign one with `passwd(1)')
  *  - "*NP*": A shadow record may be obtained from a NIS+ server.
+ *  - "":     No password is needed
  *
  * For processing, libc uses `fparseln()' with default with `delim = "\0\0#"'
  *
