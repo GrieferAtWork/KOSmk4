@@ -58,7 +58,8 @@ INTERN_FUNCTION(libc_pthread_clone)
 	movq   $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
 	         CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
 	         CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID |      \
-	         CLONE_IO | CLONE_PARENT_SETTID), %rdi /* int flags */
+	         CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED), \
+	       %rdi /* int flags */
 	/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
 	movq   $(SYS_clone), %rax
 	syscall

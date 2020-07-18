@@ -56,7 +56,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	pushl_cfi $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
 	            CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
 	            CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_CHILD_SETTID |       \
-	            CLONE_IO | CLONE_PARENT_SETTID)
+	            CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED)
 	lcall  $(7), $(SYS_clone)
 
 	/* Check if we're inside of the child thread
