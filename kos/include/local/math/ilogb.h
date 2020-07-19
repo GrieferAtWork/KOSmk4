@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4df86225 */
+/* HASH CRC-32:0xcc5e24de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,14 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
+#include <bits/mathdef.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the binary exponent of X, which must be nonzero */
 __LOCAL_LIBC(ilogb) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogb))(double __x) {
 	int __result;
 	__result = __LIBM_MATHFUNI(ilogb, __x);
-	if (__result == __LIBM_FP_ILOGB0 || __result == __LIBM_FP_ILOGBNAN || __result == __INT_MAX__)
+	if (__result == __FP_ILOGB0 || __result == __FP_ILOGBNAN || __result == __INT_MAX__)
 		__kernel_standard(__x, __x, __x, __LIBM_KMATHERRF_ILOGB);
 	return __result;
 }

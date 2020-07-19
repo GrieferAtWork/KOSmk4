@@ -34,7 +34,7 @@
 
 /* NOTE: Many of these builtins probably also worked this way before 9.1.0,
  *       however that's the version for which I've checked the GCC source
- *       to find those functions to which these conditions apply. */
+ *       to find those functions to which the above conditions apply. */
 #if defined(__GNUC__) && __GCC_VERSION_NUM >= 90100
 #define __LIBM_HAVE_BUILTIN_ASM_FABS           1
 #define __LIBM_HAVE_BUILTIN_ASM_FABSF          1

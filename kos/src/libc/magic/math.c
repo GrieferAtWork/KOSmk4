@@ -40,6 +40,10 @@
 %[define_double_replacement(__DECL_SIMD_log = __DECL_SIMD_logf, __DECL_SIMD_logl)]
 %[define_double_replacement(__DECL_SIMD_exp = __DECL_SIMD_expf, __DECL_SIMD_expl)]
 %[define_double_replacement(__DECL_SIMD_pow = __DECL_SIMD_powf, __DECL_SIMD_powl)]
+%[define_double_replacement(HUGE_VAL = HUGE_VALF, HUGE_VALL)]
+%[define_double_replacement(__HUGE_VAL = __HUGE_VALF, __HUGE_VALL)]
+%[define_double_replacement(__INFINITY = __INFINITYF, __INFINITYL)]
+%[define_double_replacement(__NAN = __NANF, __NANL)]
 
 %(c, ccompat)#ifndef __NO_FPU
 %{
@@ -49,27 +53,25 @@
 #include <hybrid/typecore.h>
 )]%{
 
-#include <bits/huge_val.h>
+}%[insert:prefix(
+#include <bits/math-constants.h>
+)]%[insert:prefix(
 #include <bits/crt/math-vector.h>
+)]%{
 
 }%[insert:prefix(
 #include <ieee754.h>
 )]%{
 
 #ifdef __USE_ISOC99
-#include <bits/huge_valf.h>
-#include <bits/huge_vall.h>
-#include <bits/inf.h>
-#include <bits/nan.h>
-#include <asm/fp_type.h>
+#include <asm/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
+#include <bits/mathdef.h> /* __float_t, __double_t */
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_MISC
-#include <asm/crt/math-libc_version.h>
 #include <asm/crt/math-exception.h>
+#include <asm/crt/math-libc_version.h>
 #endif /* __USE_MISC */
-
-#include <bits/mathdef.h>
 
 /* Documentation comments have been taken from GLIBc */
 /* Declarations for math functions.
@@ -130,6 +132,55 @@ __SYSDECL_BEGIN
 #endif /* __USE_GNU && __COMPILER_HAVE_LONGDOUBLE */
 
 
+#ifdef __HUGE_VAL
+#define HUGE_VAL __HUGE_VAL /* double HUGE_VAL; */
+#endif /* __HUGE_VAL */
+
+#ifdef __USE_ISOC99
+#ifdef __HUGE_VALF
+#define HUGE_VALF __HUGE_VALF /* double HUGE_VALF; */
+#endif /* __HUGE_VALF */
+
+#ifdef __HUGE_VALL
+#define HUGE_VALL __HUGE_VALL /* double HUGE_VALL; */
+#endif /* __HUGE_VALL */
+
+#ifdef __INFINITYF
+#define INFINITY __INFINITYF /* float INFINITY; */
+#endif /* __INFINITYF */
+
+#ifdef __NANF
+#define NAN __NANF /* float NAN; */
+#endif /* __NANF */
+
+/* This value is returned by `ilogb(0)'. */
+#ifdef __FP_ILOGB0
+#define FP_ILOGB0 __FP_ILOGB0 /* int FP_ILOGB0; */
+#endif /* __FP_ILOGB0 */
+
+/* This value is returned by `ilogb(NAN)'. */
+#ifdef __FP_ILOGBNAN
+#define FP_ILOGBNAN __FP_ILOGBNAN /* int FP_ILOGBNAN; */
+#endif /* __FP_ILOGBNAN */
+
+/* Define if fma(x, y, z) is at least as ~fast~ as `x * y + z' */
+#ifdef __FP_FAST_FMA
+#define FP_FAST_FMA 1
+#endif /* __FP_FAST_FMA */
+
+/* Define if fmaf(x, y, z) is at least as ~fast~ as `x * y + z' */
+#ifdef __FP_FAST_FMAF
+#define FP_FAST_FMAF 1
+#endif /* __FP_FAST_FMAF */
+
+/* Define if fmal(x, y, z) is at least as ~fast~ as `x * y + z' */
+#ifdef __FP_FAST_FMAL
+#define FP_FAST_FMAL 1
+#endif /* __FP_FAST_FMAL */
+
+#endif /* __USE_ISOC99 */
+
+
 #ifdef __CC__
 }
 
@@ -164,14 +215,14 @@ double atan(double x) {
 
 @@Arc tangent of Y/X
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__atan2")]]
-[[impl_include("<bits/huge_val.h>", "<libm/matherr.h>")]]
+[[impl_include("<bits/math-constants.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/atan2.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double  atan2(double y, double x){
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0 && y == 0.0)
-		return __kernel_standard(y, x, @HUGE_VAL@, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
+		return __kernel_standard(y, x, __HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 	return __LIBM_MATHFUN2(@atan2@, y, x);
 }
 
@@ -743,7 +794,7 @@ double remainder(double x, double p) {
 
 @@Return the binary exponent of X, which must be nonzero
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ilogb")]]
-[[impl_include("<libm/ilogb.h>", "<libm/matherr.h>")]]
+[[impl_include("<libm/ilogb.h>", "<libm/matherr.h>", "<bits/mathdef.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -751,7 +802,7 @@ double remainder(double x, double p) {
 int ilogb(double x) {
 	int result;
 	result = __LIBM_MATHFUNI(@ilogb@, x);
-	if (result == __LIBM_FP_ILOGB0 || result == __LIBM_FP_ILOGBNAN || result == INT_MAX)
+	if (result == __FP_ILOGB0 || result == __FP_ILOGBNAN || result == INT_MAX)
 		__kernel_standard(x, x, x, __LIBM_KMATHERRF_ILOGB);
 	return result;
 }
@@ -1309,15 +1360,19 @@ void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONG
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 @@Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity
 [[wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__isinf")]]
-[[requires_include("<ieee754.h>"), impl_include("<libm/isinf.h>")]]
+[[impl_include("<libm/isinf.h>")]]
+[[requires_include("<ieee754.h>", "<bits/math-constants.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
-           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__INFINITY) || defined(__HUGE_VAL))]]
 int isinf(double x) {
 @@pp_ifdef __LIBM_MATHFUNI@@
 	return __LIBM_MATHFUNI(@isinf@, x);
+@@pp_elif defined(__INFINITY)@@
+	return x == __INFINITY;
 @@pp_else@@
-	return x == @HUGE_VAL@;
+	return x == __HUGE_VAL;
 @@pp_endif@@
 }
 %#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
@@ -2142,7 +2197,11 @@ enum {
 /*[[[end]]]*/
 #endif /* ... */
 
+/* `float' expressions are evaluated as this. */
+typedef __float_t  float_t;
 
+/* `double' expressions are evaluated as this. */
+typedef __double_t double_t;
 
 
 #ifndef __OPTIMIZE_SIZE__

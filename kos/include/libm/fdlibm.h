@@ -30,13 +30,6 @@
 
 #include <ieee754.h>
 
-#ifndef __LIBM_FP_ILOGB0
-/* The values returned by `ilogb' for 0 and NaN respectively.  */
-#define __LIBM_FP_ILOGB0   (-__INT_MAX__ - 1)
-#define __LIBM_FP_ILOGBNAN (__INT_MAX__)
-#endif /* !__LIBM_FP_ILOGB0 */
-
-
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -62,7 +55,6 @@ __DECL_BEGIN
  * is preserved.
  * ====================================================
  */
-
 
 #ifdef __IEEE754_FLOAT_TYPE__
 

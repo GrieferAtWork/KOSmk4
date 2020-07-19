@@ -21,37 +21,34 @@
 #define _I386_KOS_BITS_ELF_H 1
 
 #include <__stdinc.h>
-#include <features.h>
+
 #include <bits/elf-types.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
 
 /* NOTE: Data structures in this header follow ELF naming and syntax contentions,
  *       but their names are non-standardized and should not be expected to be
  *       available on platforms other than KOS. */
 
-__SYSDECL_BEGIN
-
 /* Data structures for core file note segments. */
-#define NT_PRSTATUS     1               /* Contains copy of prstatus struct */
-#define NT_FPREGSET     2               /* Contains copy of fpregset struct */
-#define NT_PRPSINFO     3               /* Contains copy of prpsinfo struct */
-#define NT_PRXREG       4               /* Contains copy of prxregset struct */
-#define NT_TASKSTRUCT   4               /* Contains copy of task structure */
-#define NT_PLATFORM     5               /* String from sysinfo(SI_PLATFORM) */
-#define NT_AUXV         6               /* Contains copy of auxv array */
-#define NT_GWINDOWS     7               /* Contains copy of gwindows struct */
-#define NT_ASRS         8               /* Contains copy of asrset struct */
-#define NT_PSTATUS      10              /* Contains copy of pstatus struct */
-#define NT_PSINFO       13              /* Contains copy of psinfo struct */
-#define NT_PRCRED       14              /* Contains copy of prcred struct */
-#define NT_UTSNAME      15              /* Contains copy of utsname struct */
-#define NT_LWPSTATUS    16              /* Contains copy of lwpstatus struct */
-#define NT_LWPSINFO     17              /* Contains copy of lwpinfo struct */
-#define NT_PRFPXREG     20              /* Contains copy of fprxregset struct*/
-
+#define NT_PRSTATUS   1  /* Contains copy of prstatus struct */
+#define NT_FPREGSET   2  /* Contains copy of fpregset struct */
+#define NT_PRPSINFO   3  /* Contains copy of prpsinfo struct */
+#define NT_PRXREG     4  /* Contains copy of prxregset struct */
+#define NT_TASKSTRUCT 4  /* Contains copy of task structure */
+#define NT_PLATFORM   5  /* String from sysinfo(SI_PLATFORM) */
+#define NT_AUXV       6  /* Contains copy of auxv array */
+#define NT_GWINDOWS   7  /* Contains copy of gwindows struct */
+#define NT_ASRS       8  /* Contains copy of asrset struct */
+#define NT_PSTATUS    10 /* Contains copy of pstatus struct */
+#define NT_PSINFO     13 /* Contains copy of psinfo struct */
+#define NT_PRCRED     14 /* Contains copy of prcred struct */
+#define NT_UTSNAME    15 /* Contains copy of utsname struct */
+#define NT_LWPSTATUS  16 /* Contains copy of lwpstatus struct */
+#define NT_LWPSINFO   17 /* Contains copy of lwpinfo struct */
+#define NT_PRFPXREG   20 /* Contains copy of fprxregset struct*/
 
 #ifdef __CC__
+__DECL_BEGIN
+
 typedef Elf32_Sword Elf32_pid_t;
 typedef Elf64_Sword Elf64_pid_t;
 typedef Elf32_Word  Elf32_greg_t;
@@ -287,9 +284,8 @@ typedef struct {
 	Elf32_Sword padding[56];
 } Elf32_Prxfpreg;
 /* XXX: There doesn't seem to be the equivalent of 'Elf64_Prxfpreg'... */
+
+__DECL_END
 #endif /* __CC__ */
-
-
-__SYSDECL_END
 
 #endif /* !_I386_KOS_BITS_ELF_H */

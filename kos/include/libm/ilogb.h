@@ -25,6 +25,7 @@
 #ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
+#include <bits/mathdef.h> /* __FP_ILOGB0, __FP_ILOGBNAN */
 #include <bits/types.h>
 
 #include <libm/fdlibm.h>
@@ -51,7 +52,7 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
 	__hx &= __INT32_C(0x7fffffff);
 	if (__hx < __INT32_C(0x00800000)) {
 		if (__hx == 0)
-			return __LIBM_FP_ILOGB0; /* ilogb(0) = FP_ILOGB0 */
+			return __FP_ILOGB0; /* ilogb(0) = FP_ILOGB0 */
 		/* subnormal x */
 		for (__ix = -126, __hx <<= 8; __hx > 0; __hx <<= 1)
 			__ix -= 1;
@@ -59,12 +60,12 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
 	}
 	if (__hx < __INT32_C(0x7f800000))
 		return (int)((__hx >> IEEE754_FLOAT_SHIFT) - IEEE754_FLOAT_BIAS);
-#if __LIBM_FP_ILOGBNAN != __INT_MAX__
+#if __FP_ILOGBNAN != __INT_MAX__
 	/* ISO C99 requires ilogbf(+-Inf) == INT_MAX.  */
 	if (__hx == __INT32_C(0x7f800000))
 		return __INT_MAX__;
-#endif /* __LIBM_FP_ILOGBNAN != __INT_MAX__ */
-	return __LIBM_FP_ILOGBNAN;
+#endif /* __FP_ILOGBNAN != __INT_MAX__ */
+	return __FP_ILOGBNAN;
 }
 
 #endif /* __IEEE754_FLOAT_TYPE__ */
@@ -90,7 +91,7 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
 	if (__hx < __INT32_C(0x00100000)) {
 		__LIBM_GET_LOW_WORD(__lx, __x);
 		if ((__hx | __lx) == 0)
-			return __LIBM_FP_ILOGB0; /* ilogb(0) = FP_ILOGB0 */
+			return __FP_ILOGB0; /* ilogb(0) = FP_ILOGB0 */
 		/* subnormal x */
 		if (__hx == 0) {
 			for (__ix = -1043; __lx > 0; __lx <<= 1)
@@ -103,13 +104,13 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
 	}
 	if (__hx < __INT32_C(0x7ff00000))
 		return (int)((__hx >> IEEE754_DOUBLE_SHIFT) - IEEE754_DOUBLE_BIAS);
-#if __LIBM_FP_ILOGBNAN != __INT_MAX__
+#if __FP_ILOGBNAN != __INT_MAX__
 	/* ISO C99 requires ilogb(+-Inf) == INT_MAX.  */
 	__LIBM_GET_LOW_WORD(__lx, __x);
 	if (((__hx ^ __INT32_C(0x7ff00000)) | __lx) == 0)
 		return __INT_MAX__;
-#endif /* __LIBM_FP_ILOGBNAN != __INT_MAX__ */
-	return __LIBM_FP_ILOGBNAN;
+#endif /* __FP_ILOGBNAN != __INT_MAX__ */
+	return __FP_ILOGBNAN;
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
@@ -135,7 +136,7 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
 		__LIBM_GET_LDOUBLE_WORDS(__es, __hx, __lx, __x);
 		__hx &= __INT32_C(0x7fffffff);
 		if ((__hx | __lx) == 0)
-			return __LIBM_FP_ILOGB0; /* ilogbl(0) = FP_ILOGB0 */
+			return __FP_ILOGB0; /* ilogbl(0) = FP_ILOGB0 */
 		/* subnormal x */
 		if (__hx == 0) {
 			for (__ix = -16414; __lx > 0; __lx <<= 1)
@@ -148,13 +149,13 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
 	}
 	if (__es < 0x7fff)
 		return (int)__es - 0x3fff;
-#if __LIBM_FP_ILOGBNAN != __INT_MAX__
+#if __FP_ILOGBNAN != __INT_MAX__
 	__LIBM_GET_LDOUBLE_WORDS(__es, __hx, __lx, __x);
 	if (((__hx & __INT32_C(0x7fffffff)) | __lx) == 0)
 		/* ISO C99 requires ilogbl(+-Inf) == INT_MAX.  */
 		return __INT_MAX__;
-#endif /* __LIBM_FP_ILOGBNAN != __INT_MAX__ */
-	return __LIBM_FP_ILOGBNAN;
+#endif /* __FP_ILOGBNAN != __INT_MAX__ */
+	return __FP_ILOGBNAN;
 }
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 

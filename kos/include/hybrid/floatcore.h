@@ -25,16 +25,16 @@
 
 #ifndef __FLT_EVAL_METHOD__
 #if defined(_M_FP_FAST)
-#   define __FLT_EVAL_METHOD__ (-1)
+#define __FLT_EVAL_METHOD__ (-1)
 #elif defined(_M_IX86)
-#if defined(_M_IX86_FP) && _M_IX86_FP == 2
-#   define __FLT_EVAL_METHOD__   0
-#else
-#   define __FLT_EVAL_METHOD__   2
-#endif
-#else
-#   define __FLT_EVAL_METHOD__   0
-#endif
+#if defined(_M_IX86_FP) && (_M_IX86_FP + 0) == 2
+#define __FLT_EVAL_METHOD__ 0
+#else /* _M_IX86_FP == 2 */
+#define __FLT_EVAL_METHOD__ 2
+#endif /* _M_IX86_FP != 2 */
+#else /* ... */
+#define __FLT_EVAL_METHOD__ 0
+#endif /* !... */
 #endif /* !__FLT_EVAL_METHOD__ */
 
 #ifndef __FLT_DECIMAL_DIG__
@@ -87,13 +87,13 @@
 #define __DBL_DECIMAL_DIG__        17
 #endif /* !__DBL_DECIMAL_DIG__ */
 #ifndef __DBL_DENORM_MIN__
-#define __DBL_DENORM_MIN__       ((double)4.94065645841246544177e-324L)
+#define __DBL_DENORM_MIN__         __CCAST(double)4.94065645841246544177e-324L
 #endif /* !__DBL_DENORM_MIN__ */
 #ifndef __DBL_DIG__
 #define __DBL_DIG__                15
 #endif /* !__DBL_DIG__ */
 #ifndef __DBL_EPSILON__
-#define __DBL_EPSILON__          ((double)2.22044604925031308085e-16L)
+#define __DBL_EPSILON__            __CCAST(double)2.22044604925031308085e-16L
 #endif /* !__DBL_EPSILON__ */
 #ifndef __DBL_HAS_DENORM__
 #define __DBL_HAS_DENORM__         1
@@ -114,10 +114,10 @@
 #define __DBL_MAX_EXP__            1024
 #endif /* !__DBL_MAX_EXP__ */
 #ifndef __DBL_MIN__
-#define __DBL_MIN__              ((double)2.22507385850720138309e-308L)
+#define __DBL_MIN__                __CCAST(double)2.22507385850720138309e-308L
 #endif /* !__DBL_MIN__ */
 #ifndef __DBL_MAX__
-#define __DBL_MAX__              ((double)1.79769313486231570815e+308L)
+#define __DBL_MAX__                __CCAST(double)1.79769313486231570815e+308L
 #endif /* !__DBL_MAX__ */
 #ifndef __DBL_MIN_10_EXP__
 #define __DBL_MIN_10_EXP__       (-307)
@@ -141,7 +141,7 @@
 #define __LDBL_MIN_10_EXP__        __DBL_MIN_10_EXP__
 #define __LDBL_MIN_EXP__           __DBL_MIN_EXP__
 #define __LDBL_MIN__               __DBL_MIN__
-#else
+#else /* _MSC_VER */
 #ifndef __LDBL_DENORM_MIN__
 #define __LDBL_DENORM_MIN__        3.64519953188247460253e-4951L
 #endif /* !__LDBL_DENORM_MIN__ */
@@ -173,15 +173,15 @@
 #define __LDBL_MAX__               1.18973149535723176502e+4932L
 #endif /* !__LDBL_MAX__ */
 #ifndef __LDBL_MIN_10_EXP__
-#define __LDBL_MIN_10_EXP__      (-4931)
+#define __LDBL_MIN_10_EXP__        (-4931)
 #endif /* !__LDBL_MIN_10_EXP__ */
 #ifndef __LDBL_MIN_EXP__
-#define __LDBL_MIN_EXP__         (-16381)
+#define __LDBL_MIN_EXP__           (-16381)
 #endif /* !__LDBL_MIN_EXP__ */
 #ifndef __LDBL_MIN__
 #define __LDBL_MIN__               3.36210314311209350626e-4932L
 #endif /* !__LDBL_MIN__ */
-#endif
+#endif /* !_MSC_VER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #ifndef __DECIMAL_DIG__
@@ -209,7 +209,7 @@
 #define __DEC128_MAX__             9.999999999999999999999999999999999E6144DL
 #endif /* !__DEC128_MAX__ */
 #ifndef __DEC128_MIN_EXP__
-#define __DEC128_MIN_EXP__       (-6142)
+#define __DEC128_MIN_EXP__         (-6142)
 #endif /* !__DEC128_MIN_EXP__ */
 #ifndef __DEC128_MIN__
 #define __DEC128_MIN__             1E-6143DL
@@ -231,7 +231,7 @@
 #define __DEC32_MAX__              9.999999E96DF
 #endif /* !__DEC32_MAX__ */
 #ifndef __DEC32_MIN_EXP__
-#define __DEC32_MIN_EXP__        (-94)
+#define __DEC32_MIN_EXP__          (-94)
 #endif /* !__DEC32_MIN_EXP__ */
 #ifndef __DEC32_MIN__
 #define __DEC32_MIN__              1E-95DF
@@ -253,7 +253,7 @@
 #define __DEC64_MAX__              9.999999999999999E384DD
 #endif /* !__DEC64_MAX__ */
 #ifndef __DEC64_MIN_EXP__
-#define __DEC64_MIN_EXP__        (-382)
+#define __DEC64_MIN_EXP__          (-382)
 #endif /* !__DEC64_MIN_EXP__ */
 #ifndef __DEC64_MIN__
 #define __DEC64_MIN__              1E-383DD

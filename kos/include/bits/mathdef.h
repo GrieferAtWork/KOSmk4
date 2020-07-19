@@ -21,17 +21,37 @@
 #define _BITS_MATHDEF_H 1
 
 #include <__stdinc.h>
-#include <features.h>
+#include <hybrid/limitcore.h>
 
 #ifdef __CC__
-#ifdef __USE_ISOC99
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
-typedef float  float_t;
-typedef double double_t;
+#if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+typedef __LONGDOUBLE __float_t;
+typedef __LONGDOUBLE __double_t;
+#else /* __COMPILER_HAVE_LONGDOUBLE */
+typedef double __float_t;
+typedef double __double_t;
+#endif /* !__COMPILER_HAVE_LONGDOUBLE */
+#elif (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 1)
+typedef double __float_t;
+typedef double __double_t;
+#else /* __FLT_EVAL_METHOD__ == ... */
+typedef float  __float_t;
+typedef double __double_t;
+#endif /* __FLT_EVAL_METHOD__ != ... */
 
-__SYSDECL_END
-#endif /* __USE_ISOC99 */
+__DECL_END
 #endif /* __CC__ */
+
+/* The values returned by `ilogb' for 0 and NaN respectively. */
+#define __FP_ILOGB0   __INT_MIN__
+#define __FP_ILOGBNAN __INT_MAX__
+
+/* #define __FP_FAST_FMA 1 */
+/* #define __FP_FAST_FMAF 1 */
+/* #define __FP_FAST_FMAL 1 */
+
 
 #endif /* !_BITS_MATHDEF_H */

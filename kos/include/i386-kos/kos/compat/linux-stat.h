@@ -126,6 +126,12 @@ struct linux_statx32_64 {
 	__ULONG64_TYPE__ st_ino;
 };
 
+/* __unused is a <sys/cdefs.h> macro with `__USE_BSD' */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__unused")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __unused
+
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L83 */
 struct linux_statx64 {
 	__ULONG64_TYPE__ st_dev;
@@ -147,6 +153,11 @@ struct linux_statx64 {
 	__ULONG64_TYPE__ st_ctime_nsec;
 	__LONG64_TYPE__  __unused[3];
 };
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__unused")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
 
 __DECL_END
 #endif /* __CC__ */

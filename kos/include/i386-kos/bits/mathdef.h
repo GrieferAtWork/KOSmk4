@@ -20,53 +20,24 @@
 #ifndef _I386_KOS_BITS_MATHDEF_H
 #define _I386_KOS_BITS_MATHDEF_H 1
 
-/* Copyright (C) 2001-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #include <__stdinc.h>
-#include <features.h>
+#include <hybrid/limitcore.h> /* __INT_MIN__ */
 
 #ifdef __CC__
-#ifdef __USE_ISOC99
-__SYSDECL_BEGIN
-
-#if defined(__x86_64__) || \
-   (defined(__FLT_EVAL_METHOD__) && __FLT_EVAL_METHOD__ == 0)
-typedef float        float_t;  /* `float' expressions are evaluated as `float'.  */
-typedef double       double_t; /* `double' expressions are evaluated as `double'.  */
-#else
-typedef __LONGDOUBLE float_t;  /* `float' expressions are evaluated as `long double'.  */
-typedef __LONGDOUBLE double_t; /* `double' expressions are evaluated as `long double'.  */
-#endif
-/* The values returned by `ilogb' for 0 and NaN respectively.  */
-#   define FP_ILOGB0    (-2147483647-1)
-#   define FP_ILOGBNAN  (-2147483647-1)
-#ifdef __FP_FAST_FMA
-#   define FP_FAST_FMA  1
-#endif
-#ifdef __FP_FAST_FMAF
-#   define FP_FAST_FMAF 1
-#endif
-#ifdef __FP_FAST_FMAL
-#   define FP_FAST_FMAL 1
-#endif
-
-__SYSDECL_END
-#endif /* __USE_ISOC99 */
+__DECL_BEGIN
+#if (defined(__x86_64__) || \
+     (defined(__FLT_EVAL_METHOD__) && __FLT_EVAL_METHOD__ == 0))
+typedef float  __float_t;  /* `float' expressions are evaluated as `float'.  */
+typedef double __double_t; /* `double' expressions are evaluated as `double'.  */
+#else /* __x86_64__ || __FLT_EVAL_METHOD__ == 0 */
+typedef __LONGDOUBLE __float_t;  /* `float' expressions are evaluated as `long double'.  */
+typedef __LONGDOUBLE __double_t; /* `double' expressions are evaluated as `long double'.  */
+#endif /* !__x86_64__ && __FLT_EVAL_METHOD__ != 0 */
+__DECL_END
 #endif /* __CC__ */
+
+/* The values returned by `ilogb' for 0 and NaN respectively. */
+#define __FP_ILOGB0   __INT_MIN__
+#define __FP_ILOGBNAN __INT_MIN__
 
 #endif /* !_I386_KOS_BITS_MATHDEF_H */

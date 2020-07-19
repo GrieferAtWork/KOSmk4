@@ -27,13 +27,24 @@
 
 #include <ieee754.h>
 
-#include <bits/nan.h>
+#include <bits/math-constants.h>
 #include <bits/types.h>
 
 #include <libm/fabs.h>
 #include <libm/fdlibm.h>
 #include <libm/scalbn.h>
 #include <libm/sqrt.h>
+
+#if defined(__IEEE754_FLOAT_TYPE__) || defined(__IEEE754_DOUBLE_TYPE__)
+#if ((!defined(__NANF) && (defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||       \
+                           defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))) ||    \
+     (!defined(__NAN) && (defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||       \
+                          defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__))) ||    \
+     (!defined(__NANL) && (defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || \
+                           defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__))))
+#include <libm/nan.h>
+#endif /* ... */
+#endif /* __IEEE754_FLOAT_TYPE__ || __IEEE754_DOUBLE_TYPE__ */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -120,7 +131,15 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		if (__ix == 0x3f800000)
 			return __LIBM_LOCAL_VALUE(onef);
 		else {
-			return NAN;
+#if defined(__NANF) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+			return __NANF;
+#elif defined(__NAN) && defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+			return __NAN;
+#elif defined(__NANL) && defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+			return __NANL;
+#else /* ... */
+			return __ieee754_nanf("");
+#endif /* !... */
 		}
 	}
 
@@ -426,7 +445,15 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		if (((__ix - 0x3ff00000) | __lx) == 0)
 			return __LIBM_LOCAL_VALUE(one);
 		else {
-			return NAN;
+#if defined(__NAN) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
+			return __NAN;
+#elif defined(__NANF) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+			return __NANF;
+#elif defined(__NANL) && defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+			return __NANL;
+#else /* ... */
+			return __ieee754_nan("");
+#endif /* !... */
 		}
 	}
 

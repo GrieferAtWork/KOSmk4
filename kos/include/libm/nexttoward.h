@@ -25,10 +25,19 @@
 #ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
-#include <bits/nan.h>
+#include <bits/math-constants.h>
 #include <bits/types.h>
 
 #include <libm/fdlibm.h>
+
+#ifdef __IEEE754_DOUBLE_TYPE__
+#if ((!defined(__NANF) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) || \
+     (!defined(__NAN) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)) || \
+     (!defined(__NANL) && defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)))
+#include <libm/nan.h>
+#endif /* ... */
+#endif /* __IEEE754_DOUBLE_TYPE__ */
+
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -119,9 +128,18 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__ix = __hx & __INT32_C(0x7fffffff);       /* |x| */
 	__iy = __esy & IEEE854_LONG_DOUBLE_MAXEXP; /* |y| */
 	/* Intel's extended format has the normally implicit 1 explicit present. Sigh! */
-	if (((__ix >= __INT32_C(0x7ff00000)) && ((__ix - __INT32_C(0x7ff00000)) | __lx) != 0) ||     /* x is nan */
-	    ((__iy >= IEEE854_LONG_DOUBLE_MAXEXP) && ((__hy & __UINT32_C(0x7fffffff)) | __ly) != 0)) /* y is nan */
-		return NAN;
+	if (((__ix >= __INT32_C(0x7ff00000)) && ((__ix - __INT32_C(0x7ff00000)) | __lx) != 0) ||       /* x is nan */
+	    ((__iy >= IEEE854_LONG_DOUBLE_MAXEXP) && ((__hy & __UINT32_C(0x7fffffff)) | __ly) != 0)) { /* y is nan */
+#if defined(__NAN) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
+		return __NAN;
+#elif defined(__NANF) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+		return __NANF;
+#elif defined(__NANL) && defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+		return __NANL;
+#else /* ... */
+		return __ieee754_nan("");
+#endif /* !... */
+	}
 	if ((__IEEE854_LONG_DOUBLE_TYPE__)__x == __y)
 		return __y; /* x=y, return y */
 	if ((__ix | __lx) == 0) { /* x == 0 */

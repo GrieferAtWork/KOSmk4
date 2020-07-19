@@ -41,14 +41,13 @@
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __IEEE_BYTES_LITTLE_ENDIAN 1
 #endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-#else
+#else /* __FLOAT_WORD_ORDER__ == ... */
 #error "Unsupported endian"
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != ... */
 
 #if __SIZEOF_DOUBLE__ == 4
 #define _DOUBLE_IS_32BITS 1
 #endif /* __SIZEOF_DOUBLE__ == 4 */
-
 
 /* #define _FLOAT_ARG float */
 /* #define __OBSOLETE_MATH_DEFAULT 0/1 */

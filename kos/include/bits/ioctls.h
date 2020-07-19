@@ -104,9 +104,9 @@
 
 
 /* ARP cache control calls. */
-/*                         _IO(0x89, 0x50)  *< obsolete calls, don't re-use. */
-/*                         _IO(0x89, 0x51)  *< obsolete calls, don't re-use. */
-/*                         _IO(0x89, 0x52)  *< obsolete calls, don't re-use. */
+/*                         _IO(0x89, 0x50)  * obsolete call, don't re-use. */
+/*                         _IO(0x89, 0x51)  * obsolete call, don't re-use. */
+/*                         _IO(0x89, 0x52)  * obsolete call, don't re-use. */
 #define SIOCDARP           _IO(0x89, 0x53) /* delete ARP table entry. */
 #define SIOCGARP           _IO(0x89, 0x54) /* get ARP table entry. */
 #define SIOCSARP           _IO(0x89, 0x55) /* set ARP table entry. */

@@ -17,11 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef AT_NULL
+#ifndef _BITS_ELF_H
+#define _BITS_ELF_H 1
 
-/* This file only needs to contain all of the AT_* macros (e.g. `AT_NULL', `AT_IGNORE', ...)
- * Those macros (and much more) are already defined in <elf.h>, so to prevent redundancy we
- * simply include that header here. */
-#include <elf.h>
+/* To-be populated with arch-specific type definitions. */
 
-#endif /* !AT_NULL */
+#endif /* !_BITS_ELF_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa5f6f5c */
+/* HASH CRC-32:0x26294d7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <bits/huge_val.h>
+#include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/atan2.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atan2) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2))(double __y, double __x) {
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && __x == 0.0 && __y == 0.0)
-		return __kernel_standard(__y, __x, HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
+		return __kernel_standard(__y, __x, __HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 	return __LIBM_MATHFUN2(atan2, __y, __x);
 }
 __NAMESPACE_LOCAL_END

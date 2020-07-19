@@ -25,16 +25,15 @@
 
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
-
-#undef  _DIRENT_HAVE_D_RECLEN
+#undef _DIRENT_HAVE_D_RECLEN
 #define _DIRENT_HAVE_D_NAMLEN
 #define _DIRENT_HAVE_D_TYPE      1
 #define _DIRENT_HAVE_D_FILENO    1 /* Backwards compatibility. */
 #define _DIRENT_MATCHES_DIRENT64 1
 
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifdef _DIRENT_HAVE_D_FILENO
 #undef d_fileno
 #endif /* _DIRENT_HAVE_D_FILENO */
@@ -168,8 +167,8 @@ struct dirent64 {
 #endif /* !d_fileno */
 #endif /* _DIRENT_HAVE_D_FILENO */
 
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_BITS_DIRENT_H */

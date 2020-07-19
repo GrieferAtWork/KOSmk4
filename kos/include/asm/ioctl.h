@@ -5,6 +5,7 @@
  * NOTE: Do not add a license header to this file!*/
 
 #include <__stdinc.h>
+#include <features.h>
 
 /* ioctl command encoding: 32 bits total, command in lower 16 bits,
  * size of the parameter structure in the lower 14 bits of the upper 16 bits.
@@ -92,10 +93,17 @@
 #define _IOC_DIR(nr)   (((nr) >> _IOC_DIRSHIFT) & _IOC_DIRMASK)
 
 /* ...and for the drivers/sound files... */
-#define IOC_IN        (_IOC_WRITE << _IOC_DIRSHIFT)
-#define IOC_OUT       (_IOC_READ << _IOC_DIRSHIFT)
-#define IOC_INOUT     ((_IOC_WRITE | _IOC_READ) << _IOC_DIRSHIFT)
-#define IOCSIZE_MASK  (_IOC_SIZEMASK << _IOC_SIZESHIFT)
-#define IOCSIZE_SHIFT (_IOC_SIZESHIFT)
+#define _IOC_IN        (_IOC_WRITE << _IOC_DIRSHIFT)
+#define _IOC_OUT       (_IOC_READ << _IOC_DIRSHIFT)
+#define _IOC_INOUT     ((_IOC_WRITE | _IOC_READ) << _IOC_DIRSHIFT)
+#define _IOCSIZE_MASK  (_IOC_SIZEMASK << _IOC_SIZESHIFT)
+#define _IOCSIZE_SHIFT (_IOC_SIZESHIFT)
+#ifdef __USE_KOS_KERNEL
+#define IOC_IN         _IOC_IN
+#define IOC_OUT        _IOC_OUT
+#define IOC_INOUT      _IOC_INOUT
+#define IOCSIZE_MASK   _IOCSIZE_MASK
+#define IOCSIZE_SHIFT  _IOCSIZE_SHIFT
+#endif /* __USE_KOS_KERNEL */
 
 #endif /* !_ASM_IOCTL_H */

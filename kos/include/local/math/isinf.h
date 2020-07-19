@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x874b39dc */
+/* HASH CRC-32:0x425316e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_isinf_defined 1
 #include <__crt.h>
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <bits/math-constants.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 #include <libm/isinf.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
@@ -30,16 +31,18 @@ __LOCAL_LIBC(isinf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isinf))(double __x) {
 #ifdef __LIBM_MATHFUNI
 	return __LIBM_MATHFUNI(isinf, __x);
-#else /* __LIBM_MATHFUNI */
-	return __x == HUGE_VAL;
-#endif /* !__LIBM_MATHFUNI */
+#elif defined(__INFINITY)
+	return __x == __INFINITY;
+#else /* ... */
+	return __x == __HUGE_VAL;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isinf_defined
 #define __local___localdep_isinf_defined 1
 #define __localdep_isinf __LIBC_LOCAL_NAME(isinf)
 #endif /* !__local___localdep_isinf_defined */
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL */
 #undef __local_isinf_defined
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ && !__INFINITY && !__HUGE_VAL */
 #endif /* !__local_isinf_defined */

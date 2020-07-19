@@ -225,6 +225,7 @@ incdir("", "../../include");
 #include <asm/syscalls-trace.h>
 #include <asm/syscalls-types.h>
 #include <asm/syscalls.h>
+#include <asm/syslog.h>
 #include <asm/termbits.h>
 #include <asm/termios.h>
 #include <asm/time.h>
@@ -237,7 +238,6 @@ incdir("", "../../include");
 #include <assert.h>
 #include <attr/xattr.h>
 #include <bits/acct.h>
-#include <bits/auxv.h>
 #include <bits/cmsghdr-struct.h>
 #include <bits/crt/confname.h>
 #include <bits/crt/db/group.h>
@@ -252,6 +252,7 @@ incdir("", "../../include");
 #include <bits/crt/environments.h>
 #include <bits/crt/fenv-inline.h>
 #include <bits/crt/fenv.h>
+#include <bits/crt/inttypes.h>
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
 #include <bits/crt/locale.h>
@@ -269,12 +270,8 @@ incdir("", "../../include");
 #include <bits/file_handle-struct.h>
 #include <bits/flock-struct.h>
 #include <bits/format-printer.h>
-#include <bits/huge_val.h>
-#include <bits/huge_valf.h>
-#include <bits/huge_vall.h>
 #include <bits/hwcap.h>
 #include <bits/in.h>
-#include <bits/inf.h>
 #include <bits/ioctl-types.h>
 #include <bits/ioctls.h>
 #include <bits/iovec-struct.h>
@@ -282,6 +279,7 @@ incdir("", "../../include");
 #include <bits/itimerspec.h>
 #include <bits/itimerval.h>
 #include <bits/local_lim.h>
+#include <bits/math-constants.h>
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
 #include <bits/mman.h>
@@ -289,7 +287,6 @@ incdir("", "../../include");
 #include <bits/msgbuf.h>
 #include <bits/msghdr-struct.h>
 #include <bits/msq.h>
-#include <bits/nan.h>
 #include <bits/os_defines.h>
 #include <bits/param.h>
 #include <bits/pollfd.h>
@@ -400,6 +397,8 @@ incdir("", "../../include");
 #include <bsd/libutil.h>
 #include <bsd/stringlist.h>
 #include <bsd/sys/bitstring.h>
+#include <bsd/sys/cdefs.h>
+#include <bsd/sys/endian.h>
 #include <bsd/sys/param.h>
 #include <bsd/sys/poll.h>
 #include <byteswap.h>
@@ -594,6 +593,7 @@ incdir("", "../../include");
 #include <kos/bits/uaio.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
+#include <kos/capability.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
 #include <kos/except/fs.h>

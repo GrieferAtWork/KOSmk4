@@ -23,7 +23,6 @@
 
 %{
 #include <elf.h>
-#include <bits/auxv.h>
 #include <bits/hwcap.h>
 
 __SYSDECL_BEGIN
