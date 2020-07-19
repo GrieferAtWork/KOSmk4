@@ -331,7 +331,6 @@ incdir("", "../../include");
 #include <bits/statfs-convert.h>
 #include <bits/statfs.h>
 #include <bits/statvfs.h>
-#include <bits/stdio_lim.h>
 #include <bits/stropts.h>
 #include <bits/syscalls.h>
 #include <bits/syslog-path.h>
