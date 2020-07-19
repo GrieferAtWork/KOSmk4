@@ -46,7 +46,7 @@ ansitty_device_write(struct character_device *__restrict self,
                      USER CHECKED void const *src,
                      size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 	printk(KERN_DEBUG "[ansitty_device_write] %$q\n", num_bytes, src);
 #endif
 	return (size_t)ansitty_printer(&me->at_ansi, (char const *)src, num_bytes);
