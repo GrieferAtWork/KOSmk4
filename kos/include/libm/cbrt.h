@@ -34,6 +34,7 @@
 #include <libm/frexp.h>
 #include <libm/ldexp.h>
 #include <libm/fpclassify.h>
+#include <asm/fp_type.h>
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 #ifdef __CC__
@@ -227,12 +228,12 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	/* Reduce X.  XM now is an range 1.0 to 0.5.  */
 	xm = __ieee854_frexpl(__ieee854_fabsl(x), &xe);
 	/* If X is not finite or is null return it (with raising exceptions
-	   if necessary.
-	   Note: *Our* version of `frexp' sets XE to zero if the argument is
-	   Inf or NaN.  This is not portable but faster.  */
+	 * if necessary.
+	 * Note: *Our* version of `frexp' sets XE to zero if the argument is
+	 * Inf or NaN.  This is not portable but faster.  */
 	if (xe == 0 &&
-	    ((x_class = __ieee854_fpclassifyl(x)) == __LIBM_FP_ZERO ||
-	     x_class == __LIBM_FP_NAN || x_class == __LIBM_FP_INFINITE))
+	    ((x_class = __ieee854_fpclassifyl(x)) == __FP_ZERO ||
+	     x_class == __FP_NAN || x_class == __FP_INFINITE))
 		return x + x;
 	u = (((__IEEE854_LONG_DOUBLE_C(-1.34661104733595206551E-1) * xm +
 	       __IEEE854_LONG_DOUBLE_C(5.46646013663955245034E-1)) *
