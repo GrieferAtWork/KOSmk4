@@ -854,7 +854,18 @@ double scalbln(double x, long int n) {
 @@pp_endif@@
 }
 
-nearbyint(*) = rint;
+@@Return the integer nearest X in the direction of the prevailing rounding mode
+@@This function is similar to `rint()', but does not tend to produce wrong results (so use this one)
+[[std, wunused, nothrow, ATTR_CONST, nocrt, alias("nearbyint", "__nearbyint", "rint", "__rint")]]
+[[if(__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("nearbyint", { return __builtin_nearbyint(x); })]]
+[[if($extended_include_prefix("<ieee754.h>")defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+                                            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+                                            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)),
+  bind_local_function(rint)]]
+double nearbyint(double x);
+
+
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin, export_alias("__round")]]
@@ -1003,7 +1014,15 @@ float scalbnf(float x, int n) %{generate(double2float("scalbn"))}
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnf")]]
 float scalblnf(float x, long int n) %{generate(double2float("scalbln"))}
 
-nearbyintf(*) = rintf;
+[[std, wunused, nothrow, ATTR_CONST, doc_alias(nearbyint)]]
+[[nocrt, alias("nearbyintf", "__nearbyintf", "rintf", "__rintf")]]
+[[if(__has_builtin(__builtin_nearbyintf) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("nearbyintf", { return __builtin_nearbyintf(x); })]]
+[[if($extended_include_prefix("<ieee754.h>")defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+                                            defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+                                            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)),
+  bind_local_function(rintf)]]
+float nearbyintf(float x);
 
 [[std, crtbuiltin, export_alias("__roundf")]]  roundf(*)  %{generate(double2float("round"))}
 [[std, crtbuiltin, export_alias("__truncf")]]  truncf(*)  %{generate(double2float("trunc"))}
@@ -1046,7 +1065,15 @@ __LONGDOUBLE scalbnl(__LONGDOUBLE x, int n) %{generate(double2ldouble("scalbn"))
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
 __LONGDOUBLE scalblnl(__LONGDOUBLE x, long int n) %{generate(double2ldouble("scalbln"))}
 
-nearbyintl(*) = rintl;
+[[std, wunused, nothrow, ATTR_CONST, doc_alias(nearbyint)]]
+[[nocrt, alias("nearbyintl", "__nearbyintl", "rintl", "__rintl")]]
+[[if(__has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("nearbyintl", { return __builtin_nearbyintl(x); })]]
+[[if($extended_include_prefix("<ieee754.h>")defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+                                            defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+                                            defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)),
+  bind_local_function(rintl)]]
+__LONGDOUBLE nearbyintl(__LONGDOUBLE x);
 
 [[std, crtbuiltin, export_alias("__roundl")]]  roundl(*)  %{generate(double2ldouble("round"))}
 [[std, crtbuiltin, export_alias("__truncl")]]  truncl(*)  %{generate(double2ldouble("trunc"))}
