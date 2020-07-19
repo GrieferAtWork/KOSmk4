@@ -24,10 +24,13 @@
 
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/posix2_lim.h> /* LINE_MAX */
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/hybrid/sched-signal.h>
+
+#ifndef _POSIX_MAX_INPUT
+#include <limits.h>
+#endif /* !_POSIX_MAX_INPUT */
 
 #ifdef __KERNEL__
 #include <kernel/heap.h> /* heap_free */
@@ -93,7 +96,7 @@ struct linebuffer {
 };
 
 /* Static initialization */
-#define LINEBUFFER_DEFAULT_LIMIT  LINE_MAX
+#define LINEBUFFER_DEFAULT_LIMIT  _POSIX_MAX_INPUT
 #define LINEBUFFER_INIT_EX(limit) { ATOMIC_RWLOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT }
 #define LINEBUFFER_INIT           LINEBUFFER_INIT_EX(LINEBUFFER_DEFAULT_LIMIT)
 

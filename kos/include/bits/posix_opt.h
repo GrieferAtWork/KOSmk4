@@ -102,10 +102,9 @@
 #endif
 #define _POSIX_TIMEOUTS                      200809L /* We support the Timeouts option. */
 #define _POSIX_SPIN_LOCKS                    200809L /* We support spinlocks. */
-#if defined(__CRT_HAVE_posix_spawn) || defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE_spawnvpe) || \
-    defined(__CRT_HAVE__spawnve) || defined(__CRT_HAVE__spawnvpe)
+#ifdef __CRT_HAVE_posix_spawn
 #define _POSIX_SPAWN                         200809L /* The `spawn' function family is supported. */
-#endif
+#endif /* __CRT_HAVE_posix_spawn */
 #define _POSIX_TIMERS                        200809L /* We have POSIX timers. */
 #define _POSIX_BARRIERS                      200809L /* The barrier functions are available. */
 #define _POSIX_MESSAGE_PASSING               200809L /* POSIX message queues are available. */

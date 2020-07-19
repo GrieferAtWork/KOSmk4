@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fd18f0 */
+/* HASH CRC-32:0x8ae1946e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,12 @@ enum {
 #endif /* !IFTODT */
 
 #if defined(__USE_XOPEN2K8) && !defined(MAXNAMLEN)
-#define MAXNAMLEN 255 /* == 'NAME_MAX' from <linux/limits.h> */
+#include <asm/limits.h>
+#if defined(__NAME_MAX) && (__NAME_MAX + 0) != -1
+#define MAXNAMLEN __NAME_MAX /* Max # chars in a file name */
+#else /* __NAME_MAX != -1 */
+#define MAXNAMLEN 255        /* Max # chars in a file name */
+#endif /* __NAME_MAX == -1 */
 #endif /* __USE_XOPEN2K8 && !MAXNAMLEN */
 #endif /* __USE_MISC */
 

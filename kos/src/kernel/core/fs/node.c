@@ -56,7 +56,6 @@
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/except/io.h>
-#include <linux/limits.h>
 #include <linux/magic.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>

@@ -135,7 +135,7 @@ again:
 	peb_total_size = (offsetafter(peb_t, pp_envp) +
 	                  (argc_inject + argc_user + envc_user + 2) * OU_POINTERSIZE +
 	                  strings_total_size);
-	/* XXX: Check if `peb_total_size' is too large? */
+	/* XXX: Check if `peb_total_size' is too large? (>= ARG_MAX) */
 
 	/* Create a temporary kernel-space mapping for initializing the PEB */
 	peb_total_size = CEIL_ALIGN(peb_total_size, PAGESIZE);

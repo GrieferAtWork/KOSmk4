@@ -39,7 +39,6 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/jccN.h>
-#include <asm/param.h>
 #include <kos/kernel/cpu-state.h>
 
 

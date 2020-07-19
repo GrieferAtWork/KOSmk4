@@ -180,6 +180,7 @@ incdir("", "../../include");
 #include <arpa/inet.h>
 #include <asm/bitsperlong.h>
 #include <asm/cacheline.h>
+#include <asm/crt/limits.h>
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
 #include <asm/crt/math-libc_version.h>
@@ -199,13 +200,13 @@ incdir("", "../../include");
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
 #include <asm/ioctls.h>
+#include <asm/limits.h>
 #include <asm/ls-syscalls.h>
 #include <asm/mman.h>
 #include <asm/mount.h>
 #include <asm/oflags.h>
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
-#include <asm/param.h>
 #include <asm/poll.h>
 #include <asm/posix_types.h>
 #include <asm/ptrace.h>
@@ -265,6 +266,7 @@ incdir("", "../../include");
 #include <bits/crt/threads.h>
 #include <bits/dirent.h>
 #include <bits/elf-types.h>
+#include <bits/elf.h>
 #include <bits/epoll.h>
 #include <bits/f_owner_ex-struct.h>
 #include <bits/file_handle-struct.h>
@@ -278,7 +280,6 @@ incdir("", "../../include");
 #include <bits/ipc.h>
 #include <bits/itimerspec.h>
 #include <bits/itimerval.h>
-#include <bits/local_lim.h>
 #include <bits/math-constants.h>
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
@@ -290,8 +291,6 @@ incdir("", "../../include");
 #include <bits/os_defines.h>
 #include <bits/param.h>
 #include <bits/pollfd.h>
-#include <bits/posix1_lim.h>
-#include <bits/posix2_lim.h>
 #include <bits/posix_opt.h>
 #include <bits/posix_spawn.h>
 #include <bits/ptrace.h>
@@ -389,7 +388,6 @@ incdir("", "../../include");
 #include <bits/wchar.h>
 #include <bits/wformat-printer.h>
 #include <bits/wordsize.h>
-#include <bits/xopen_lim.h>
 #include <bits/xtitypes.h>
 #include <bitstring.h>
 #include <bsd/bitstring.h>

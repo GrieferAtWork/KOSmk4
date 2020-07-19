@@ -44,7 +44,6 @@
 #include <asm/instr/interrupt.h>
 #include <asm/instr/kgsbase.h>
 #include <asm/instr/movzxq.h>
-#include <asm/param.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 

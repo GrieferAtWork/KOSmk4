@@ -27,7 +27,7 @@
 #include <debugger/hook.h>
 #include <fs/vfs.h>
 
-#include <bits/param.h>
+#include <limits.h> /* SYMLOOP_MAX */
 
 DECL_BEGIN
 
@@ -70,7 +70,7 @@ PUBLIC struct fs fs_kernel = {
 	.f_cwd      = (struct path *)&vfs_kernel,
 	.f_dcwd     = { NULL, },
 	.f_umask    = CONFIG_FS_UMASK_DEFAULT,
-	.f_lnkmax   = MAXSYMLINKS,
+	.f_lnkmax   = SYMLOOP_MAX,
 	.f_fsuid    = 0,
 	.f_fsgid    = 0,
 	{{

@@ -31,7 +31,7 @@
 
 #include <asm/instr/compat.h>
 #include <asm/instr/jccN.h>
-#include <asm/param.h>
+#include <sys/param.h> /* HZ */
 
 #ifdef __x86_64__
 #include <asm/instr/movzxq.h>

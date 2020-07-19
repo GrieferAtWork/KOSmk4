@@ -20,26 +20,5 @@
 #ifndef _BITS_PARAM_H
 #define _BITS_PARAM_H 1
 
-#ifndef ARG_MAX
-#define __undef_ARG_MAX
-#endif /* !ARG_MAX */
-
-#include <linux/limits.h>
-#include <linux/param.h>
-
-#ifdef __undef_ARG_MAX
-#undef ARG_MAX
-#undef __undef_ARG_MAX
-#endif /* __undef_ARG_MAX */
-
-#ifndef MAXSYMLINKS
-#define MAXSYMLINKS 20
-#endif /* !MAXSYMLINKS */
-#ifndef NOFILE
-#define NOFILE      256
-#endif /* !NOFILE */
-#ifndef NCARGS
-#define NCARGS      131072
-#endif /* !NCARGS */
 
 #endif /* !_BITS_PARAM_H */

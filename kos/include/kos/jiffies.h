@@ -25,7 +25,7 @@
 #include <__stdinc.h>
 #include <bits/types.h>
 #include <features.h>
-#include <asm/param.h>
+#include <asm/limits.h>
 
 #if defined(__cplusplus) && defined(__USE_KOS)
 #include <kos/anno.h>
@@ -35,9 +35,9 @@
 #error "KOS-only system header"
 #endif /* !__KOS__ */
 
-#define JIFFIES_PER_SECOND         HZ
-#define JIFFIES_PER_MINUTE        (HZ*60)
-#define JIFFIES_PER_HOUR          (HZ*3600)
+#define JIFFIES_PER_SECOND         __HZ
+#define JIFFIES_PER_MINUTE        (__HZ*60)
+#define JIFFIES_PER_HOUR          (__HZ*3600)
 #define JIFFIES_FROM_HOURS(x)    ((x)*JIFFIES_PER_HOUR)
 #define JIFFIES_FROM_MINUTES(x)  ((x)*JIFFIES_PER_MINUTE)
 #define JIFFIES_FROM_SECONDS(x)  ((x)*JIFFIES_PER_SECOND)
@@ -156,27 +156,27 @@ typedef struct __qtime {
 
 	/* Add seconds */
 	__CXX_CLASSMEMBER __NOBLOCK void add_seconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		this->q_jtime += (__uint64_t)__n * HZ;
+		this->q_jtime += (__uint64_t)__n * __HZ;
 	}
 	__CXX_CLASSMEMBER __NOBLOCK void add_seconds64(__uint64_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		this->q_jtime += (__uint64_t)__n * HZ;
+		this->q_jtime += (__uint64_t)__n * __HZ;
 	}
 	__CXX_CLASSMEMBER __NOBLOCK void sub_seconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		this->q_jtime -= (__uint64_t)__n * HZ;
+		this->q_jtime -= (__uint64_t)__n * __HZ;
 	}
 	__CXX_CLASSMEMBER __NOBLOCK void sub_seconds64(__uint64_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		this->q_jtime -= (__uint64_t)__n * HZ;
+		this->q_jtime -= (__uint64_t)__n * __HZ;
 	}
 
 	/* Add milliseconds (1/1_000 seconds) */
 	__CXX_CLASSMEMBER __NOBLOCK void add_milliseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		__uint64_t __hz_adjusted = (__uint64_t)__n * __HZ;
 		this->q_jtime += __hz_adjusted / 1000;
 		__hz_adjusted %= 1000;
 		this->add_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000);
 	}
 	__CXX_CLASSMEMBER __NOBLOCK void sub_milliseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		__uint64_t __hz_adjusted = (__uint64_t)__n * __HZ;
 		this->q_jtime -= __hz_adjusted / 1000;
 		__hz_adjusted %= 1000;
 		this->sub_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000);
@@ -184,13 +184,13 @@ typedef struct __qtime {
 
 	/* Add microseconds (1/1_000_000 seconds) */
 	__CXX_CLASSMEMBER __NOBLOCK void add_microseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		__uint64_t __hz_adjusted = (__uint64_t)__n * __HZ;
 		this->q_jtime += __hz_adjusted / 1000000;
 		__hz_adjusted %= 1000000;
 		this->add_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000);
 	}
 	__CXX_CLASSMEMBER __NOBLOCK void sub_microseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		__uint64_t __hz_adjusted = (__uint64_t)__n * __HZ;
 		this->q_jtime -= __hz_adjusted / 1000000;
 		__hz_adjusted %= 1000000;
 		this->sub_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000);
@@ -198,13 +198,13 @@ typedef struct __qtime {
 
 	/* Add nanoseconds (1/1_000_000_000 seconds) */
 	__CXX_CLASSMEMBER __NOBLOCK void add_nanoseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		__uint64_t __hz_adjusted = (__uint64_t)__n * __HZ;
 		this->q_jtime += __hz_adjusted / 1000000000;
 		__hz_adjusted %= 1000000000;
 		this->add_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000000);
 	}
 	__CXX_CLASSMEMBER __NOBLOCK void sub_nanoseconds(__uintptr_t __n) __THROWS(E_DIVIDE_BY_ZERO) {
-		__uint64_t __hz_adjusted = (__uint64_t)__n * HZ;
+		__uint64_t __hz_adjusted = (__uint64_t)__n * __HZ;
 		this->q_jtime -= __hz_adjusted / 1000000000;
 		__hz_adjusted %= 1000000000;
 		this->sub_quantum((quantum_diff_t)(__hz_adjusted * this->q_qsize) / 1000000000);

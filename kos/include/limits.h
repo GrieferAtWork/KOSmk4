@@ -20,11 +20,14 @@
 #ifndef _LIMITS_H
 #define _LIMITS_H 1
 
-#include <__crt.h> /* Must be here because some programs need <limits.h> to `#define __stub_XXX' macros. */
+#include <__crt.h>
 #include <__stdinc.h>
 #include <features.h>
 
 #include <hybrid/limitcore.h>
+
+#include <asm/crt/limits.h>
+#include <asm/limits.h>
 
 /* You should really just always using 'MB_CUR_MAX'... */
 #ifdef __CRT_DOS_PRIMARY
@@ -35,8 +38,6 @@
 #else /* ... */
 #define MB_LEN_MAX 16
 #endif /* !... */
-
-__SYSDECL_BEGIN
 
 #define CHAR_BIT    __CHAR_BIT__
 #define SCHAR_MIN   __SCHAR_MIN__
@@ -91,18 +92,875 @@ __SYSDECL_BEGIN
 
 #endif /* __USE_DOS */
 
-__SYSDECL_END
 
-#ifdef __USE_POSIX
-#include <bits/posix1_lim.h>
+#undef __USE_ALL_LIMITS
+#if defined(_ALL_LIMITS_SOURCE)
+#define __USE_ALL_LIMITS 1
+#endif /* _ALL_LIMITS_SOURCE */
+
+
+/************************************************************************/
+/* POSIX.1                                                              */
+/************************************************************************/
+#if defined(__USE_POSIX) || defined(__DEEMON__)
+#ifdef __USE_XOPEN2K
+#define _POSIX_CHILD_MAX   25 /* Maximum simultaneous processes per real user ID. */
+#define _POSIX_NGROUPS_MAX 8  /* Number of simultaneous supplementary group IDs per process. */
+#define _POSIX_OPEN_MAX    20 /* Number of files one process can have open at once. */
+#define _POSIX_TZNAME_MAX  6  /* Maximum length of a timezone name (element of `tzname'). */
+#else /* !__USE_XOPEN2K */
+#define _POSIX_CHILD_MAX   6  /* Maximum simultaneous processes per real user ID. */
+#define _POSIX_NGROUPS_MAX 0  /* Number of simultaneous supplementary group IDs per process. */
+#define _POSIX_OPEN_MAX    16 /* Number of files one process can have open at once. */
+#define _POSIX_TZNAME_MAX  3  /* Maximum length of a timezone name (element of `tzname'). */
+#endif /* !__USE_XOPEN2K */
+#if !defined(__USE_XOPEN2K) || defined(__USE_GNU)
+#define _POSIX_FD_SETSIZE _POSIX_OPEN_MAX /* Number of descriptors that a process may examine with `pselect' or `select'. */
+#define _POSIX_QLIMIT     1               /* Maximum # of connections that can be queued on a socket. */
+#define _POSIX_HIWAT      _POSIX_PIPE_BUF /* Maximum # of bytes that can be buffered on a socket for send or receive. */
+#define _POSIX_UIO_MAXIOV 16              /* Maximum # of elements in an `iovec' array. */
+#endif /* !__USE_XOPEN2K || __USE_GNU */
+
+#define _POSIX_SSIZE_MAX 32767  /* Largest value of a `ssize_t'. */
+#define SSIZE_MAX __SSIZE_MAX__
+
+/*[[[deemon
+@@List of (alwaysUseMinimum, name, posixName, posixMinimum, doc)
+local limits = {
+	(0, "CHILD_MAX",                    "", "_POSIX_CHILD_MAX",                            "Maximum simultaneous processes per real user ID."),
+	(1, "NGROUPS_MAX",                  "", "_POSIX_NGROUPS_MAX",                          "Number of simultaneous supplementary group IDs per process."),
+	(1, "OPEN_MAX",                     "", "_POSIX_OPEN_MAX",                             "Number of files one process can have open at once."),
+	(0, "TZNAME_MAX",                   "", "_POSIX_TZNAME_MAX",                           "Maximum length of a timezone name (element of `tzname')."),
+	(0, "AIO_LISTIO_MAX",               "_POSIX_AIO_LISTIO_MAX",               "2",        "Minimum # of operations in one list I/O call."),
+	(0, "AIO_MAX",                      "_POSIX_AIO_MAX",                      "1",        "Minimal # of outstanding asynchronous I/O operations."),
+	(1, "ARG_MAX",                      "_POSIX_ARG_MAX",                      "4096",     "Maximum length of arguments to `execve', including environment."),
+	(0, "DELAYTIMER_MAX",               "_POSIX_DELAYTIMER_MAX",               "32",       "Minimal # of timer expiration overruns."),
+	(0, "HOST_NAME_MAX",                "_POSIX_HOST_NAME_MAX",                "255",      "Maximum length of a host name (not including the terminating null) as returned by `gethostname(2)'."),
+	(1, "LINK_MAX",                     "_POSIX_LINK_MAX",                     "8",        "Maximum link count of a file."),
+	(0, "LOGIN_NAME_MAX",               "_POSIX_LOGIN_NAME_MAX",               "9",        "Maximum length of login name."),
+	(1, "MAX_CANON",                    "_POSIX_MAX_CANON",                    "255",      "Number of bytes in a terminal canonical input queue."),
+	(1, "MAX_INPUT",                    "_POSIX_MAX_INPUT",                    "255",      "Number of bytes for which space will be available in a terminal input queue."),
+	(0, "MQ_OPEN_MAX",                  "_POSIX_MQ_OPEN_MAX",                  "8",        "Maximum # of message queues open for a process."),
+	(0, "MQ_PRIO_MAX",                  "_POSIX_MQ_PRIO_MAX",                  "32",       "Maximum # of supported message priorities."),
+	(1, "NAME_MAX",                     "_POSIX_NAME_MAX",                     "14",       "Number of bytes in a filename."),
+	(1, "PATH_MAX",                     "_POSIX_PATH_MAX",                     "256",      "Number of bytes in a pathname."),
+	(0, "PIPE_BUF",                     "_POSIX_PIPE_BUF",                     "512",      "Number of bytes than can be written atomically to a pipe."),
+	(1, "RE_DUP_MAX",                   "_POSIX_RE_DUP_MAX",                   "255",      "The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation."),
+	(1, "RTSIG_MAX",                    "_POSIX_RTSIG_MAX",                    "8",        "Minimal # of realtime signals reserved for the application."),
+	(0, "SEM_NSEMS_MAX",                "_POSIX_SEM_NSEMS_MAX",                "256",      "Number of semaphores a process can have."),
+	(0, "SEM_VALUE_MAX",                "_POSIX_SEM_VALUE_MAX",                "32767",    "Maximal value of a semaphore."),
+	(0, "SIGQUEUE_MAX",                 "_POSIX_SIGQUEUE_MAX",                 "32",       "Number of pending realtime signals."),
+	(0, "STREAM_MAX",                   "_POSIX_STREAM_MAX",                   "8",        "Number of streams a process can have open at once."),
+	(0, "SYMLINK_MAX",                  "_POSIX_SYMLINK_MAX",                  "255",      "The # of bytes in a symbolic link."),
+	(1, "SYMLOOP_MAX",                  "_POSIX_SYMLOOP_MAX",                  "8",        "The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop."),
+	(0, "TIMER_MAX",                    "_POSIX_TIMER_MAX",                    "32",       "Number of timer for a process."),
+	(0, "TTY_NAME_MAX",                 "_POSIX_TTY_NAME_MAX",                 "9",        "Maximum # of characters in a tty name."),
+	(0, "CLOCKRES_MIN",                 "_POSIX_CLOCKRES_MIN",                 "20000000", "Maximum clock resolution in nanoseconds."),
+	(0, "THREAD_KEYS_MAX",              "_POSIX_THREAD_KEYS_MAX",              "128",      "The # of data keys per process."),
+	(0, "THREAD_DESTRUCTOR_ITERATIONS", "_POSIX_THREAD_DESTRUCTOR_ITERATIONS", "4",        "Controlling the iterations of destructors for thread-specific data."),
+	(0, "THREAD_THREADS_MAX",           "_POSIX_THREAD_THREADS_MAX",           "64",       "The # of threads per process."),
+};
+
+local longestPosixNameLength    = limits.each[2].length > ...;
+local longestPosixMinimumLength = (for (local x: limits) x[2] ? #x[3] : 0) > ...;
+
+print("/" "* Posix-mandated minimum limits. *" "/");
+for (local none, none, posixName, posixMinimum, doc: limits) {
+	if (!posixName)
+		continue;
+	print("#define ", posixName, " " * (longestPosixNameLength - #posixName),
+		" ", posixMinimum, " " * (longestPosixMinimumLength - #posixMinimum),
+		" /" "* ", doc, " *" "/");
+}
+print;
+print;
+print("/" "* Substitute unknown system/crt limits. *" "/");
+for (local none, name, posixName, posixMinimum, doc: limits) {
+	print("#ifndef __", name);
+	print("#define __", name, " ",
+		posixName ? posixName : posixMinimum,
+		" /" "* ", doc, " *" "/");
+	print("#endif /" "* !__", name, " *" "/");
+}
+print;
+print;
+print("/" "* Actual implementation limits. *" "/");
+for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
+	print();
+	print("/" "* ", doc, " *" "/");
+	print("#if __", name, " != -1");
+	print("#define ", name, " __", name);
+	if (alwaysUseMinimum) {
+		print("#else /" "* __", name, " != -1 *" "/");
+		print("#define ", name, " ", posixName ? posixName : posixMinimum);
+		print("#endif /" "* __", name, " == -1 *" "/");
+	} else {
+		print("#elif defined(__USE_ALL_LIMITS)");
+		print("#define ", name, " ", posixName ? posixName : posixMinimum);
+		print("#endif /" "* ... *" "/");
+	}
+}
+]]]*/
+/* Posix-mandated minimum limits. */
+#define _POSIX_AIO_LISTIO_MAX               2        /* Minimum # of operations in one list I/O call. */
+#define _POSIX_AIO_MAX                      1        /* Minimal # of outstanding asynchronous I/O operations. */
+#define _POSIX_ARG_MAX                      4096     /* Maximum length of arguments to `execve', including environment. */
+#define _POSIX_DELAYTIMER_MAX               32       /* Minimal # of timer expiration overruns. */
+#define _POSIX_HOST_NAME_MAX                255      /* Maximum length of a host name (not including the terminating null) as returned by `gethostname(2)'. */
+#define _POSIX_LINK_MAX                     8        /* Maximum link count of a file. */
+#define _POSIX_LOGIN_NAME_MAX               9        /* Maximum length of login name. */
+#define _POSIX_MAX_CANON                    255      /* Number of bytes in a terminal canonical input queue. */
+#define _POSIX_MAX_INPUT                    255      /* Number of bytes for which space will be available in a terminal input queue. */
+#define _POSIX_MQ_OPEN_MAX                  8        /* Maximum # of message queues open for a process. */
+#define _POSIX_MQ_PRIO_MAX                  32       /* Maximum # of supported message priorities. */
+#define _POSIX_NAME_MAX                     14       /* Number of bytes in a filename. */
+#define _POSIX_PATH_MAX                     256      /* Number of bytes in a pathname. */
+#define _POSIX_PIPE_BUF                     512      /* Number of bytes than can be written atomically to a pipe. */
+#define _POSIX_RE_DUP_MAX                   255      /* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
+#define _POSIX_RTSIG_MAX                    8        /* Minimal # of realtime signals reserved for the application. */
+#define _POSIX_SEM_NSEMS_MAX                256      /* Number of semaphores a process can have. */
+#define _POSIX_SEM_VALUE_MAX                32767    /* Maximal value of a semaphore. */
+#define _POSIX_SIGQUEUE_MAX                 32       /* Number of pending realtime signals. */
+#define _POSIX_STREAM_MAX                   8        /* Number of streams a process can have open at once. */
+#define _POSIX_SYMLINK_MAX                  255      /* The # of bytes in a symbolic link. */
+#define _POSIX_SYMLOOP_MAX                  8        /* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
+#define _POSIX_TIMER_MAX                    32       /* Number of timer for a process. */
+#define _POSIX_TTY_NAME_MAX                 9        /* Maximum # of characters in a tty name. */
+#define _POSIX_CLOCKRES_MIN                 20000000 /* Maximum clock resolution in nanoseconds. */
+#define _POSIX_THREAD_KEYS_MAX              128      /* The # of data keys per process. */
+#define _POSIX_THREAD_DESTRUCTOR_ITERATIONS 4        /* Controlling the iterations of destructors for thread-specific data. */
+#define _POSIX_THREAD_THREADS_MAX           64       /* The # of threads per process. */
+
+
+/* Substitute unknown system/crt limits. */
+#ifndef __CHILD_MAX
+#define __CHILD_MAX _POSIX_CHILD_MAX /* Maximum simultaneous processes per real user ID. */
+#endif /* !__CHILD_MAX */
+#ifndef __NGROUPS_MAX
+#define __NGROUPS_MAX _POSIX_NGROUPS_MAX /* Number of simultaneous supplementary group IDs per process. */
+#endif /* !__NGROUPS_MAX */
+#ifndef __OPEN_MAX
+#define __OPEN_MAX _POSIX_OPEN_MAX /* Number of files one process can have open at once. */
+#endif /* !__OPEN_MAX */
+#ifndef __TZNAME_MAX
+#define __TZNAME_MAX _POSIX_TZNAME_MAX /* Maximum length of a timezone name (element of `tzname'). */
+#endif /* !__TZNAME_MAX */
+#ifndef __AIO_LISTIO_MAX
+#define __AIO_LISTIO_MAX _POSIX_AIO_LISTIO_MAX /* Minimum # of operations in one list I/O call. */
+#endif /* !__AIO_LISTIO_MAX */
+#ifndef __AIO_MAX
+#define __AIO_MAX _POSIX_AIO_MAX /* Minimal # of outstanding asynchronous I/O operations. */
+#endif /* !__AIO_MAX */
+#ifndef __ARG_MAX
+#define __ARG_MAX _POSIX_ARG_MAX /* Maximum length of arguments to `execve', including environment. */
+#endif /* !__ARG_MAX */
+#ifndef __DELAYTIMER_MAX
+#define __DELAYTIMER_MAX _POSIX_DELAYTIMER_MAX /* Minimal # of timer expiration overruns. */
+#endif /* !__DELAYTIMER_MAX */
+#ifndef __HOST_NAME_MAX
+#define __HOST_NAME_MAX _POSIX_HOST_NAME_MAX /* Maximum length of a host name (not including the terminating null) as returned by `gethostname(2)'. */
+#endif /* !__HOST_NAME_MAX */
+#ifndef __LINK_MAX
+#define __LINK_MAX _POSIX_LINK_MAX /* Maximum link count of a file. */
+#endif /* !__LINK_MAX */
+#ifndef __LOGIN_NAME_MAX
+#define __LOGIN_NAME_MAX _POSIX_LOGIN_NAME_MAX /* Maximum length of login name. */
+#endif /* !__LOGIN_NAME_MAX */
+#ifndef __MAX_CANON
+#define __MAX_CANON _POSIX_MAX_CANON /* Number of bytes in a terminal canonical input queue. */
+#endif /* !__MAX_CANON */
+#ifndef __MAX_INPUT
+#define __MAX_INPUT _POSIX_MAX_INPUT /* Number of bytes for which space will be available in a terminal input queue. */
+#endif /* !__MAX_INPUT */
+#ifndef __MQ_OPEN_MAX
+#define __MQ_OPEN_MAX _POSIX_MQ_OPEN_MAX /* Maximum # of message queues open for a process. */
+#endif /* !__MQ_OPEN_MAX */
+#ifndef __MQ_PRIO_MAX
+#define __MQ_PRIO_MAX _POSIX_MQ_PRIO_MAX /* Maximum # of supported message priorities. */
+#endif /* !__MQ_PRIO_MAX */
+#ifndef __NAME_MAX
+#define __NAME_MAX _POSIX_NAME_MAX /* Number of bytes in a filename. */
+#endif /* !__NAME_MAX */
+#ifndef __PATH_MAX
+#define __PATH_MAX _POSIX_PATH_MAX /* Number of bytes in a pathname. */
+#endif /* !__PATH_MAX */
+#ifndef __PIPE_BUF
+#define __PIPE_BUF _POSIX_PIPE_BUF /* Number of bytes than can be written atomically to a pipe. */
+#endif /* !__PIPE_BUF */
+#ifndef __RE_DUP_MAX
+#define __RE_DUP_MAX _POSIX_RE_DUP_MAX /* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
+#endif /* !__RE_DUP_MAX */
+#ifndef __RTSIG_MAX
+#define __RTSIG_MAX _POSIX_RTSIG_MAX /* Minimal # of realtime signals reserved for the application. */
+#endif /* !__RTSIG_MAX */
+#ifndef __SEM_NSEMS_MAX
+#define __SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX /* Number of semaphores a process can have. */
+#endif /* !__SEM_NSEMS_MAX */
+#ifndef __SEM_VALUE_MAX
+#define __SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX /* Maximal value of a semaphore. */
+#endif /* !__SEM_VALUE_MAX */
+#ifndef __SIGQUEUE_MAX
+#define __SIGQUEUE_MAX _POSIX_SIGQUEUE_MAX /* Number of pending realtime signals. */
+#endif /* !__SIGQUEUE_MAX */
+#ifndef __STREAM_MAX
+#define __STREAM_MAX _POSIX_STREAM_MAX /* Number of streams a process can have open at once. */
+#endif /* !__STREAM_MAX */
+#ifndef __SYMLINK_MAX
+#define __SYMLINK_MAX _POSIX_SYMLINK_MAX /* The # of bytes in a symbolic link. */
+#endif /* !__SYMLINK_MAX */
+#ifndef __SYMLOOP_MAX
+#define __SYMLOOP_MAX _POSIX_SYMLOOP_MAX /* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
+#endif /* !__SYMLOOP_MAX */
+#ifndef __TIMER_MAX
+#define __TIMER_MAX _POSIX_TIMER_MAX /* Number of timer for a process. */
+#endif /* !__TIMER_MAX */
+#ifndef __TTY_NAME_MAX
+#define __TTY_NAME_MAX _POSIX_TTY_NAME_MAX /* Maximum # of characters in a tty name. */
+#endif /* !__TTY_NAME_MAX */
+#ifndef __CLOCKRES_MIN
+#define __CLOCKRES_MIN _POSIX_CLOCKRES_MIN /* Maximum clock resolution in nanoseconds. */
+#endif /* !__CLOCKRES_MIN */
+#ifndef __THREAD_KEYS_MAX
+#define __THREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX /* The # of data keys per process. */
+#endif /* !__THREAD_KEYS_MAX */
+#ifndef __THREAD_DESTRUCTOR_ITERATIONS
+#define __THREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS /* Controlling the iterations of destructors for thread-specific data. */
+#endif /* !__THREAD_DESTRUCTOR_ITERATIONS */
+#ifndef __THREAD_THREADS_MAX
+#define __THREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX /* The # of threads per process. */
+#endif /* !__THREAD_THREADS_MAX */
+
+
+/* Actual implementation limits. */
+
+/* Maximum simultaneous processes per real user ID. */
+#if __CHILD_MAX != -1
+#define CHILD_MAX __CHILD_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define CHILD_MAX _POSIX_CHILD_MAX
+#endif /* ... */
+
+/* Number of simultaneous supplementary group IDs per process. */
+#if __NGROUPS_MAX != -1
+#define NGROUPS_MAX __NGROUPS_MAX
+#else /* __NGROUPS_MAX != -1 */
+#define NGROUPS_MAX _POSIX_NGROUPS_MAX
+#endif /* __NGROUPS_MAX == -1 */
+
+/* Number of files one process can have open at once. */
+#if __OPEN_MAX != -1
+#define OPEN_MAX __OPEN_MAX
+#else /* __OPEN_MAX != -1 */
+#define OPEN_MAX _POSIX_OPEN_MAX
+#endif /* __OPEN_MAX == -1 */
+
+/* Maximum length of a timezone name (element of `tzname'). */
+#if __TZNAME_MAX != -1
+#define TZNAME_MAX __TZNAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define TZNAME_MAX _POSIX_TZNAME_MAX
+#endif /* ... */
+
+/* Minimum # of operations in one list I/O call. */
+#if __AIO_LISTIO_MAX != -1
+#define AIO_LISTIO_MAX __AIO_LISTIO_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define AIO_LISTIO_MAX _POSIX_AIO_LISTIO_MAX
+#endif /* ... */
+
+/* Minimal # of outstanding asynchronous I/O operations. */
+#if __AIO_MAX != -1
+#define AIO_MAX __AIO_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define AIO_MAX _POSIX_AIO_MAX
+#endif /* ... */
+
+/* Maximum length of arguments to `execve', including environment. */
+#if __ARG_MAX != -1
+#define ARG_MAX __ARG_MAX
+#else /* __ARG_MAX != -1 */
+#define ARG_MAX _POSIX_ARG_MAX
+#endif /* __ARG_MAX == -1 */
+
+/* Minimal # of timer expiration overruns. */
+#if __DELAYTIMER_MAX != -1
+#define DELAYTIMER_MAX __DELAYTIMER_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define DELAYTIMER_MAX _POSIX_DELAYTIMER_MAX
+#endif /* ... */
+
+/* Maximum length of a host name (not including the terminating null) as returned by `gethostname(2)'. */
+#if __HOST_NAME_MAX != -1
+#define HOST_NAME_MAX __HOST_NAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#endif /* ... */
+
+/* Maximum link count of a file. */
+#if __LINK_MAX != -1
+#define LINK_MAX __LINK_MAX
+#else /* __LINK_MAX != -1 */
+#define LINK_MAX _POSIX_LINK_MAX
+#endif /* __LINK_MAX == -1 */
+
+/* Maximum length of login name. */
+#if __LOGIN_NAME_MAX != -1
+#define LOGIN_NAME_MAX __LOGIN_NAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define LOGIN_NAME_MAX _POSIX_LOGIN_NAME_MAX
+#endif /* ... */
+
+/* Number of bytes in a terminal canonical input queue. */
+#if __MAX_CANON != -1
+#define MAX_CANON __MAX_CANON
+#else /* __MAX_CANON != -1 */
+#define MAX_CANON _POSIX_MAX_CANON
+#endif /* __MAX_CANON == -1 */
+
+/* Number of bytes for which space will be available in a terminal input queue. */
+#if __MAX_INPUT != -1
+#define MAX_INPUT __MAX_INPUT
+#else /* __MAX_INPUT != -1 */
+#define MAX_INPUT _POSIX_MAX_INPUT
+#endif /* __MAX_INPUT == -1 */
+
+/* Maximum # of message queues open for a process. */
+#if __MQ_OPEN_MAX != -1
+#define MQ_OPEN_MAX __MQ_OPEN_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define MQ_OPEN_MAX _POSIX_MQ_OPEN_MAX
+#endif /* ... */
+
+/* Maximum # of supported message priorities. */
+#if __MQ_PRIO_MAX != -1
+#define MQ_PRIO_MAX __MQ_PRIO_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define MQ_PRIO_MAX _POSIX_MQ_PRIO_MAX
+#endif /* ... */
+
+/* Number of bytes in a filename. */
+#if __NAME_MAX != -1
+#define NAME_MAX __NAME_MAX
+#else /* __NAME_MAX != -1 */
+#define NAME_MAX _POSIX_NAME_MAX
+#endif /* __NAME_MAX == -1 */
+
+/* Number of bytes in a pathname. */
+#if __PATH_MAX != -1
+#define PATH_MAX __PATH_MAX
+#else /* __PATH_MAX != -1 */
+#define PATH_MAX _POSIX_PATH_MAX
+#endif /* __PATH_MAX == -1 */
+
+/* Number of bytes than can be written atomically to a pipe. */
+#if __PIPE_BUF != -1
+#define PIPE_BUF __PIPE_BUF
+#elif defined(__USE_ALL_LIMITS)
+#define PIPE_BUF _POSIX_PIPE_BUF
+#endif /* ... */
+
+/* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
+#if __RE_DUP_MAX != -1
+#define RE_DUP_MAX __RE_DUP_MAX
+#else /* __RE_DUP_MAX != -1 */
+#define RE_DUP_MAX _POSIX_RE_DUP_MAX
+#endif /* __RE_DUP_MAX == -1 */
+
+/* Minimal # of realtime signals reserved for the application. */
+#if __RTSIG_MAX != -1
+#define RTSIG_MAX __RTSIG_MAX
+#else /* __RTSIG_MAX != -1 */
+#define RTSIG_MAX _POSIX_RTSIG_MAX
+#endif /* __RTSIG_MAX == -1 */
+
+/* Number of semaphores a process can have. */
+#if __SEM_NSEMS_MAX != -1
+#define SEM_NSEMS_MAX __SEM_NSEMS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX
+#endif /* ... */
+
+/* Maximal value of a semaphore. */
+#if __SEM_VALUE_MAX != -1
+#define SEM_VALUE_MAX __SEM_VALUE_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX
+#endif /* ... */
+
+/* Number of pending realtime signals. */
+#if __SIGQUEUE_MAX != -1
+#define SIGQUEUE_MAX __SIGQUEUE_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define SIGQUEUE_MAX _POSIX_SIGQUEUE_MAX
+#endif /* ... */
+
+/* Number of streams a process can have open at once. */
+#if __STREAM_MAX != -1
+#define STREAM_MAX __STREAM_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define STREAM_MAX _POSIX_STREAM_MAX
+#endif /* ... */
+
+/* The # of bytes in a symbolic link. */
+#if __SYMLINK_MAX != -1
+#define SYMLINK_MAX __SYMLINK_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define SYMLINK_MAX _POSIX_SYMLINK_MAX
+#endif /* ... */
+
+/* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
+#if __SYMLOOP_MAX != -1
+#define SYMLOOP_MAX __SYMLOOP_MAX
+#else /* __SYMLOOP_MAX != -1 */
+#define SYMLOOP_MAX _POSIX_SYMLOOP_MAX
+#endif /* __SYMLOOP_MAX == -1 */
+
+/* Number of timer for a process. */
+#if __TIMER_MAX != -1
+#define TIMER_MAX __TIMER_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define TIMER_MAX _POSIX_TIMER_MAX
+#endif /* ... */
+
+/* Maximum # of characters in a tty name. */
+#if __TTY_NAME_MAX != -1
+#define TTY_NAME_MAX __TTY_NAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define TTY_NAME_MAX _POSIX_TTY_NAME_MAX
+#endif /* ... */
+
+/* Maximum clock resolution in nanoseconds. */
+#if __CLOCKRES_MIN != -1
+#define CLOCKRES_MIN __CLOCKRES_MIN
+#elif defined(__USE_ALL_LIMITS)
+#define CLOCKRES_MIN _POSIX_CLOCKRES_MIN
+#endif /* ... */
+
+/* The # of data keys per process. */
+#if __THREAD_KEYS_MAX != -1
+#define THREAD_KEYS_MAX __THREAD_KEYS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define THREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX
+#endif /* ... */
+
+/* Controlling the iterations of destructors for thread-specific data. */
+#if __THREAD_DESTRUCTOR_ITERATIONS != -1
+#define THREAD_DESTRUCTOR_ITERATIONS __THREAD_DESTRUCTOR_ITERATIONS
+#elif defined(__USE_ALL_LIMITS)
+#define THREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+#endif /* ... */
+
+/* The # of threads per process. */
+#if __THREAD_THREADS_MAX != -1
+#define THREAD_THREADS_MAX __THREAD_THREADS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define THREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX
+#endif /* ... */
+//[[[end]]]
+
+/* Max # of supplemental group IDs that may be set (s.a. `setgroups(2)') */
+#if __NGROUPS_MAX != -1
+#define NGROUPS_MAX __NGROUPS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define NGROUPS_MAX _POSIX_NGROUPS_MAX
+#endif /* ... */
+
+/* Max size of the canonical input queue */
+#if __MAX_CANON != -1
+#define MAX_CANON __MAX_CANON
+#elif defined(__USE_ALL_LIMITS)
+#define MAX_CANON _POSIX_MAX_CANON
+#endif /* ... */
+
+/* Max size of the type-ahead buffer */
+#if __MAX_INPUT != -1
+#define MAX_INPUT __MAX_INPUT
+#elif defined(__USE_ALL_LIMITS)
+#define MAX_INPUT _POSIX_MAX_INPUT
+#endif /* ... */
+
+/* Max size of the type-ahead buffer */
+#if __NAME_MAX != -1
+#define NAME_MAX __NAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define NAME_MAX _POSIX_NAME_MAX
+#endif /* ... */
+
+/* Max # chars in a path name including nul */
+#if __PATH_MAX != -1
+#define PATH_MAX __PATH_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define PATH_MAX _POSIX_PATH_MAX
+#endif /* ... */
+
+/* Max # bytes in atomic write to a pipe (Default value, assuming
+ * that backing memory isn't VIO or re-mapped during a write) */
+#if __PIPE_BUF != -1
+#define PIPE_BUF __PIPE_BUF
+#elif defined(__USE_ALL_LIMITS)
+#define PIPE_BUF _POSIX_PIPE_BUF
+#endif /* ... */
+
+/* # of realtime signals */
+#if __RTSIG_MAX != -1
+#define RTSIG_MAX __RTSIG_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define RTSIG_MAX _POSIX_RTSIG_MAX
+#endif /* ... */
+
+/* The # of data keys per process. */
+#if __PTHREAD_KEYS_MAX != -1
+#define PTHREAD_KEYS_MAX __PTHREAD_KEYS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define PTHREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX
+#endif /* ... */
+
+/* Minimum size for a thread. */
+#if __PTHREAD_STACK_MIN != -1
+#define PTHREAD_STACK_MIN __PTHREAD_STACK_MIN
+#elif defined(__USE_ALL_LIMITS)
+#define PTHREAD_STACK_MIN _POSIX_THREAD_STACK_MIN
+#endif /* ... */
+
+/* Number of iterations this implementation does. */
+#if __PTHREAD_DESTRUCTOR_ITERATIONS != -1
+#define PTHREAD_DESTRUCTOR_ITERATIONS __PTHREAD_DESTRUCTOR_ITERATIONS
+#elif defined(__USE_ALL_LIMITS)
+#define PTHREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+#endif /* ... */
+
+/* The # of threads per process. */
+#if __PTHREAD_THREADS_MAX != -1
+#define PTHREAD_THREADS_MAX __PTHREAD_THREADS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define PTHREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX
+#endif /* ... */
+
+/* Maximum amount by which a process can decrease its asynchronous I/O priority level. */
+#if __AIO_PRIO_DELTA_MAX != -1
+#define AIO_PRIO_DELTA_MAX __AIO_PRIO_DELTA_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define AIO_PRIO_DELTA_MAX 0
+#endif /* ... */
+
+/* Maximum # of timer expiration overruns. */
+#if __DELAYTIMER_MAX != -1
+#define DELAYTIMER_MAX __DELAYTIMER_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define DELAYTIMER_MAX _POSIX_DELAYTIMER_MAX
+#endif /* ... */
+
+/* Maximum tty name length. */
+#if __TTY_NAME_MAX != -1
+#define TTY_NAME_MAX __TTY_NAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define TTY_NAME_MAX _POSIX_TTY_NAME_MAX
+#endif /* ... */
+
 #endif /* __USE_POSIX */
 
-#ifdef __USE_POSIX2
-#include <bits/posix2_lim.h>
+
+
+/************************************************************************/
+/* POSIX.2                                                              */
+/************************************************************************/
+#if defined(__USE_POSIX2) || defined(__DEEMON__)
+#define _POSIX2_RE_DUP_MAX 255 /* The maximum number of repeated occurrences of a regular expression permitted when using the interval notation `\{M,N\}'. */
+/* The maximum number of repeated occurrences of a regular expression permitted when using the interval notation `\{M,N\}'. */
+#ifndef RE_DUP_MAX
+#ifndef __RE_DUP_MAX
+#define __RE_DUP_MAX _POSIX2_RE_DUP_MAX
+#endif /* !__RE_DUP_MAX */
+#if __RE_DUP_MAX != -1
+#define RE_DUP_MAX __RE_DUP_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define RE_DUP_MAX _POSIX2_RE_DUP_MAX
+#endif /* ... */
+#endif /* !RE_DUP_MAX */
+
+
+/*[[[deemon
+@@List of (name, posixName, posixMinimum, doc)
+local limits = {
+	(0, "BC_BASE_MAX",        "_POSIX2_BC_BASE_MAX",        "99",   "The maximum `ibase' and `obase' values allowed by the `bc' utility."),
+	(0, "BC_DIM_MAX",         "_POSIX2_BC_DIM_MAX",         "2048", "The maximum number of elements allowed in an array by the `bc' utility."),
+	(0, "BC_SCALE_MAX",       "_POSIX2_BC_SCALE_MAX",       "99",   "The maximum `scale' value allowed by the `bc' utility."),
+	(0, "BC_STRING_MAX",      "_POSIX2_BC_STRING_MAX",      "1000", "The maximum length of a string constant accepted by the `bc' utility."),
+	(0, "COLL_WEIGHTS_MAX",   "_POSIX2_COLL_WEIGHTS_MAX",   "2",    "The maximum number of weights that can be assigned to an entry of the LC_COLLATE `order' keyword in the locale definition file."),
+	(0, "EXPR_NEST_MAX",      "_POSIX2_EXPR_NEST_MAX",      "32",   "The maximum number of expressions that can be nested within parentheses by the `expr' utility."),
+	(1, "LINE_MAX",           "_POSIX2_LINE_MAX",           "2048", "The maximum length, in bytes, of an input line."),
+	(0, "CHARCLASS_NAME_MAX", "_POSIX2_CHARCLASS_NAME_MAX", "14",   "The maximum number of bytes in a character class name.  We have no fixed limit, 2048 is a high number."),
+};
+
+local longestPosixNameLength    = limits.each[2].length > ...;
+local longestPosixMinimumLength = (for (local x: limits) x[2] ? #x[3] : 0) > ...;
+
+print("/" "* Posix-mandated minimum limits. *" "/");
+for (local none, none, posixName, posixMinimum, doc: limits) {
+	if (!posixName)
+		continue;
+	print("#define ", posixName, " " * (longestPosixNameLength - #posixName),
+		" ", posixMinimum, " " * (longestPosixMinimumLength - #posixMinimum),
+		" /" "* ", doc, " *" "/");
+}
+print;
+print;
+print("/" "* Substitute unknown system/crt limits. *" "/");
+for (local none, name, posixName, posixMinimum, doc: limits) {
+	print("#ifndef __", name);
+	print("#define __", name, " ",
+		posixName ? posixName : posixMinimum,
+		" /" "* ", doc, " *" "/");
+	print("#endif /" "* !__", name, " *" "/");
+}
+print;
+print;
+print("/" "* Actual implementation limits. *" "/");
+for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
+	print();
+	print("/" "* ", doc, " *" "/");
+	print("#if __", name, " != -1");
+	print("#define ", name, " __", name);
+	if (alwaysUseMinimum) {
+		print("#else /" "* __", name, " != -1 *" "/");
+		print("#define ", name, " ", posixName ? posixName : posixMinimum);
+		print("#endif /" "* __", name, " == -1 *" "/");
+	} else {
+		print("#elif defined(__USE_ALL_LIMITS)");
+		print("#define ", name, " ", posixName ? posixName : posixMinimum);
+		print("#endif /" "* ... *" "/");
+	}
+}
+]]]*/
+/* Posix-mandated minimum limits. */
+#define _POSIX2_BC_BASE_MAX        99   /* The maximum `ibase' and `obase' values allowed by the `bc' utility. */
+#define _POSIX2_BC_DIM_MAX         2048 /* The maximum number of elements allowed in an array by the `bc' utility. */
+#define _POSIX2_BC_SCALE_MAX       99   /* The maximum `scale' value allowed by the `bc' utility. */
+#define _POSIX2_BC_STRING_MAX      1000 /* The maximum length of a string constant accepted by the `bc' utility. */
+#define _POSIX2_COLL_WEIGHTS_MAX   2    /* The maximum number of weights that can be assigned to an entry of the LC_COLLATE `order' keyword in the locale definition file. */
+#define _POSIX2_EXPR_NEST_MAX      32   /* The maximum number of expressions that can be nested within parentheses by the `expr' utility. */
+#define _POSIX2_LINE_MAX           2048 /* The maximum length, in bytes, of an input line. */
+#define _POSIX2_CHARCLASS_NAME_MAX 14   /* The maximum number of bytes in a character class name.  We have no fixed limit, 2048 is a high number. */
+
+
+/* Substitute unknown system/crt limits. */
+#ifndef __BC_BASE_MAX
+#define __BC_BASE_MAX _POSIX2_BC_BASE_MAX /* The maximum `ibase' and `obase' values allowed by the `bc' utility. */
+#endif /* !__BC_BASE_MAX */
+#ifndef __BC_DIM_MAX
+#define __BC_DIM_MAX _POSIX2_BC_DIM_MAX /* The maximum number of elements allowed in an array by the `bc' utility. */
+#endif /* !__BC_DIM_MAX */
+#ifndef __BC_SCALE_MAX
+#define __BC_SCALE_MAX _POSIX2_BC_SCALE_MAX /* The maximum `scale' value allowed by the `bc' utility. */
+#endif /* !__BC_SCALE_MAX */
+#ifndef __BC_STRING_MAX
+#define __BC_STRING_MAX _POSIX2_BC_STRING_MAX /* The maximum length of a string constant accepted by the `bc' utility. */
+#endif /* !__BC_STRING_MAX */
+#ifndef __COLL_WEIGHTS_MAX
+#define __COLL_WEIGHTS_MAX _POSIX2_COLL_WEIGHTS_MAX /* The maximum number of weights that can be assigned to an entry of the LC_COLLATE `order' keyword in the locale definition file. */
+#endif /* !__COLL_WEIGHTS_MAX */
+#ifndef __EXPR_NEST_MAX
+#define __EXPR_NEST_MAX _POSIX2_EXPR_NEST_MAX /* The maximum number of expressions that can be nested within parentheses by the `expr' utility. */
+#endif /* !__EXPR_NEST_MAX */
+#ifndef __LINE_MAX
+#define __LINE_MAX _POSIX2_LINE_MAX /* The maximum length, in bytes, of an input line. */
+#endif /* !__LINE_MAX */
+#ifndef __CHARCLASS_NAME_MAX
+#define __CHARCLASS_NAME_MAX _POSIX2_CHARCLASS_NAME_MAX /* The maximum number of bytes in a character class name.  We have no fixed limit, 2048 is a high number. */
+#endif /* !__CHARCLASS_NAME_MAX */
+
+
+/* Actual implementation limits. */
+
+/* The maximum `ibase' and `obase' values allowed by the `bc' utility. */
+#if __BC_BASE_MAX != -1
+#define BC_BASE_MAX __BC_BASE_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define BC_BASE_MAX _POSIX2_BC_BASE_MAX
+#endif /* ... */
+
+/* The maximum number of elements allowed in an array by the `bc' utility. */
+#if __BC_DIM_MAX != -1
+#define BC_DIM_MAX __BC_DIM_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define BC_DIM_MAX _POSIX2_BC_DIM_MAX
+#endif /* ... */
+
+/* The maximum `scale' value allowed by the `bc' utility. */
+#if __BC_SCALE_MAX != -1
+#define BC_SCALE_MAX __BC_SCALE_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define BC_SCALE_MAX _POSIX2_BC_SCALE_MAX
+#endif /* ... */
+
+/* The maximum length of a string constant accepted by the `bc' utility. */
+#if __BC_STRING_MAX != -1
+#define BC_STRING_MAX __BC_STRING_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define BC_STRING_MAX _POSIX2_BC_STRING_MAX
+#endif /* ... */
+
+/* The maximum number of weights that can be assigned to an entry of the LC_COLLATE `order' keyword in the locale definition file. */
+#if __COLL_WEIGHTS_MAX != -1
+#define COLL_WEIGHTS_MAX __COLL_WEIGHTS_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define COLL_WEIGHTS_MAX _POSIX2_COLL_WEIGHTS_MAX
+#endif /* ... */
+
+/* The maximum number of expressions that can be nested within parentheses by the `expr' utility. */
+#if __EXPR_NEST_MAX != -1
+#define EXPR_NEST_MAX __EXPR_NEST_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define EXPR_NEST_MAX _POSIX2_EXPR_NEST_MAX
+#endif /* ... */
+
+/* The maximum length, in bytes, of an input line. */
+#if __LINE_MAX != -1
+#define LINE_MAX __LINE_MAX
+#else /* __LINE_MAX != -1 */
+#define LINE_MAX _POSIX2_LINE_MAX
+#endif /* __LINE_MAX == -1 */
+
+/* The maximum number of bytes in a character class name.  We have no fixed limit, 2048 is a high number. */
+#if __CHARCLASS_NAME_MAX != -1
+#define CHARCLASS_NAME_MAX __CHARCLASS_NAME_MAX
+#elif defined(__USE_ALL_LIMITS)
+#define CHARCLASS_NAME_MAX _POSIX2_CHARCLASS_NAME_MAX
+#endif /* ... */
+//[[[end]]]
 #endif /* __USE_POSIX2 */
 
-#ifdef __USE_XOPEN
-#include <bits/xopen_lim.h>
+
+
+/************************************************************************/
+/* X/OPEN                                                               */
+/************************************************************************/
+#if defined(__USE_XOPEN) || defined(__DEEMON__)
+#include <asm/pagesize.h>
+
+/* System memory page size */
+#if !defined(PAGESIZE) && !defined(__ARCH_PAGESIZE)
+#define PAGESIZE __ARCH_PAGESIZE
+#endif /* !PAGESIZE && __ARCH_PAGESIZE */
+
+/* System memory page size */
+#if !defined(PAGE_SIZE) && !defined(__ARCH_PAGESIZE)
+#define PAGE_SIZE __ARCH_PAGESIZE
+#endif /* !PAGE_SIZE && __ARCH_PAGESIZE */
+
+#if !defined(NZERO) && defined(__NZERO)
+#define NZERO __NZERO /* Default process priority. */
+#endif /* !NZERO && __NZERO */
+
+#ifndef WORD_BIT
+#if __INT_MAX__ == __INT8_MAX__
+#define WORD_BIT 8 /* Number of bits in a word of type `int'. */
+#elif __INT_MAX__ == __INT16_MAX__
+#define WORD_BIT 16 /* Number of bits in a word of type `int'. */
+#elif __INT_MAX__ == __INT32_MAX__
+#define WORD_BIT 32 /* Number of bits in a word of type `int'. */
+#elif __INT_MAX__ == __INT64_MAX__
+#define WORD_BIT 64 /* Number of bits in a word of type `int'. */
+#else /* __INT_MAX__ == ... */
+#define WORD_BIT (__SIZEOF_INT__ * 8) /* Number of bits in a word of type `int'. */
+#endif /* __INT_MAX__ != ... */
+#endif /* !WORD_BIT */
+
+#ifndef LONG_BIT
+#if __LONG_MAX__ == __INT8_MAX__
+#define LONG_BIT 8 /* Number of bits in a word of type `long int'. */
+#elif __LONG_MAX__ == __INT16_MAX__
+#define LONG_BIT 16 /* Number of bits in a word of type `long int'. */
+#elif __LONG_MAX__ == __INT32_MAX__
+#define LONG_BIT 32 /* Number of bits in a word of type `long int'. */
+#elif __LONG_MAX__ == __INT64_MAX__
+#define LONG_BIT 64 /* Number of bits in a word of type `long int'. */
+#else /* __LONG_MAX__ == ... */
+#define LONG_BIT (__SIZEOF_INT__ * 8) /* Number of bits in a word of type `long int'. */
+#endif /* __LONG_MAX__ != ... */
+#endif /* !LONG_BIT */
+
+/* X/Open-mandated minimum limits. */
+#define _XOPEN_IOV_MAX 16 /* [default:_POSIX_UIO_MAXIOV] Max # of elements in a `struct iovec' vector. */
+
+
+/* Substitute unknown system/crt limits. */
+#ifndef __IOV_MAX
+#define __IOV_MAX _XOPEN_IOV_MAX /* [default:_POSIX_UIO_MAXIOV] Max # of elements in a `struct iovec' vector. */
+#endif /* !__IOV_MAX */
+#ifndef __NL_ARGMAX
+#define __NL_ARGMAX 4096 /* [default:_POSIX_ARG_MAX] Maximum value of `digit' in calls to the `printf' and `scanf' functions. */
+#endif /* !__NL_ARGMAX */
+#ifndef __NL_LANGMAX
+#define __NL_LANGMAX 2048 /* [default:_POSIX2_LINE_MAX] Maximum number of bytes in a `LANG' name. */
+#endif /* !__NL_LANGMAX */
+#ifndef __NL_MSGMAX
+#define __NL_MSGMAX __INT_MAX__ /* Maximum message number. */
+#endif /* !__NL_MSGMAX */
+#ifndef __NL_NMAX
+#define __NL_NMAX __INT_MAX__ /* Maximum number of bytes in N-to-1 collation mapping. */
+#endif /* !__NL_NMAX */
+#ifndef __NL_SETMAX
+#define __NL_SETMAX __INT_MAX__ /* Maximum set number. */
+#endif /* !__NL_SETMAX */
+#ifndef __NL_TEXTMAX
+#define __NL_TEXTMAX __INT_MAX__ /* Maximum number of bytes in a message. */
+#endif /* !__NL_TEXTMAX */
+
+
+/* Actual implementation limits. */
+
+/* [default:_POSIX_UIO_MAXIOV] Max # of elements in a `struct iovec' vector. */
+#ifndef IOV_MAX
+#if __IOV_MAX != -1
+#define IOV_MAX __IOV_MAX
+#else /* __IOV_MAX != -1 */
+#define IOV_MAX _XOPEN_IOV_MAX
+#endif /* __IOV_MAX == -1 */
+#endif /* !IOV_MAX */
+
+/* [default:_POSIX_ARG_MAX] Maximum value of `digit' in calls to the `printf' and `scanf' functions. */
+#if __NL_ARGMAX != -1
+#define NL_ARGMAX __NL_ARGMAX
+#elif defined(__USE_ALL_LIMITS)
+#define NL_ARGMAX 4096
+#endif /* ... */
+
+/* [default:_POSIX2_LINE_MAX] Maximum number of bytes in a `LANG' name. */
+#if __NL_LANGMAX != -1
+#define NL_LANGMAX __NL_LANGMAX
+#elif defined(__USE_ALL_LIMITS)
+#define NL_LANGMAX 2048
+#endif /* ... */
+
+/* Maximum message number. */
+#if __NL_MSGMAX != -1
+#define NL_MSGMAX __NL_MSGMAX
+#elif defined(__USE_ALL_LIMITS)
+#define NL_MSGMAX __INT_MAX__
+#endif /* ... */
+
+/* Maximum number of bytes in N-to-1 collation mapping. */
+#if __NL_NMAX != -1
+#define NL_NMAX __NL_NMAX
+#elif defined(__USE_ALL_LIMITS)
+#define NL_NMAX __INT_MAX__
+#endif /* ... */
+
+/* Maximum set number. */
+#if __NL_SETMAX != -1
+#define NL_SETMAX __NL_SETMAX
+#elif defined(__USE_ALL_LIMITS)
+#define NL_SETMAX __INT_MAX__
+#endif /* ... */
+
+/* Maximum number of bytes in a message. */
+#if __NL_TEXTMAX != -1
+#define NL_TEXTMAX __NL_TEXTMAX
+#elif defined(__USE_ALL_LIMITS)
+#define NL_TEXTMAX __INT_MAX__
+#endif /* ... */
+
 #endif /* __USE_XOPEN */
 
 #endif /* !_LIMITS_H */

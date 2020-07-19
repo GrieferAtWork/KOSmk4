@@ -42,10 +42,10 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/param.h>
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/hop/path.h>
+#include <limits.h> /* SYMLOOP_MAX */
 
 #include <assert.h>
 #include <format-printer.h>
@@ -2045,7 +2045,7 @@ REF struct fs *(KCALL fs_alloc)(void) THROWS(E_BADALLOC) {
 #if CONFIG_FS_UMASK_DEFAULT != 0
 	result->f_umask = CONFIG_FS_UMASK_DEFAULT;
 #endif /* CONFIG_FS_UMASK_DEFAULT != 0 */
-	result->f_lnkmax = MAXSYMLINKS;
+	result->f_lnkmax = SYMLOOP_MAX;
 	result->f_atmask = FS_MODE_FALWAYS1MASK | (~FS_MODE_FALWAYS0MASK);
 #if FS_MODE_FALWAYS1FLAG != 0
 	result->f_atflag = FS_MODE_FALWAYS1FLAG;

@@ -38,9 +38,10 @@
 #include <hybrid/overflow.h>
 
 #include <kos/jiffies.h>
+#include <sys/param.h> /* HZ */
 
-#include <int128.h>
 #include <assert.h>
+#include <int128.h>
 #include <inttypes.h>
 #include <stdint.h>
 

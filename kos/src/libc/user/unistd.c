@@ -2451,15 +2451,9 @@ for (local id: [:idCount]) {
 	/* [  0] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_ARG_MAX */
 	/* [  1] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_CHILD_MAX */
 	/* [  2] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_CLK_TCK */
-	/* [  3] = */ NGROUPS_MAX, /* _SC_NGROUPS_MAX */
+	/* [  3] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NGROUPS_MAX */
 	/* [  4] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_OPEN_MAX */
-#ifdef STREAM_MAX
-	/* [  5] = */ STREAM_MAX, /* _SC_STREAM_MAX */
-#elif defined(FOPEN_MAX)
-	/* [  5] = */ FOPEN_MAX, /* _SC_STREAM_MAX */
-#else /* ... */
 	/* [  5] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_STREAM_MAX */
-#endif /* !... */
 	/* [  6] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TZNAME_MAX */
 	/* [  7] = */ _POSIX_JOB_CONTROL, /* _SC_JOB_CONTROL */
 	/* [  8] = */ _POSIX_SAVED_IDS, /* _SC_SAVED_IDS */
@@ -2753,12 +2747,36 @@ for (local id: [:idCount]) {
 #else /* USHRT_MAX <= INT32_MAX */
 	/* [118] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_USHRT_MAX */
 #endif /* USHRT_MAX > INT32_MAX */
+#ifdef NL_ARGMAX
 	/* [119] = */ NL_ARGMAX, /* _SC_NL_ARGMAX */
+#else /* NL_ARGMAX */
+	/* [119] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NL_ARGMAX */
+#endif /* !NL_ARGMAX */
+#ifdef NL_LANGMAX
 	/* [120] = */ NL_LANGMAX, /* _SC_NL_LANGMAX */
+#else /* NL_LANGMAX */
+	/* [120] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NL_LANGMAX */
+#endif /* !NL_LANGMAX */
+#ifdef NL_MSGMAX
 	/* [121] = */ NL_MSGMAX, /* _SC_NL_MSGMAX */
+#else /* NL_MSGMAX */
+	/* [121] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NL_MSGMAX */
+#endif /* !NL_MSGMAX */
+#ifdef NL_NMAX
 	/* [122] = */ NL_NMAX, /* _SC_NL_NMAX */
+#else /* NL_NMAX */
+	/* [122] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NL_NMAX */
+#endif /* !NL_NMAX */
+#ifdef NL_SETMAX
 	/* [123] = */ NL_SETMAX, /* _SC_NL_SETMAX */
+#else /* NL_SETMAX */
+	/* [123] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NL_SETMAX */
+#endif /* !NL_SETMAX */
+#ifdef NL_TEXTMAX
 	/* [124] = */ NL_TEXTMAX, /* _SC_NL_TEXTMAX */
+#else /* NL_TEXTMAX */
+	/* [124] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NL_TEXTMAX */
+#endif /* !NL_TEXTMAX */
 	/* [125] = */ SYSCONF_ENTRY_UNDEFINED, /* 125 */
 	/* [126] = */ SYSCONF_ENTRY_UNDEFINED, /* 126 */
 	/* [127] = */ SYSCONF_ENTRY_UNDEFINED, /* 127 */
@@ -3244,7 +3262,7 @@ for (local name: SYSCONF_VALUES_LO_INT32) {
 		break;
 
 	case _SC_SYMLOOP_MAX:
-		result = MAXSYMLINKS; /* TODO: Kernel:`THIS_FS->f_lnkmax' */
+		result = SYMLOOP_MAX; /* TODO: Kernel:`THIS_FS->f_lnkmax' */
 		break;
 
 	default:

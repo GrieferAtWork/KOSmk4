@@ -50,10 +50,10 @@
 #include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
-#include <asm/param.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/tss-compat.h>
 #include <kos/kernel/tss.h>
+#include <sys/param.h> /* HZ */
 
 #include <assert.h>
 #include <stddef.h>

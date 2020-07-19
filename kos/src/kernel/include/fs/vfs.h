@@ -818,7 +818,7 @@ struct fs {
 	WEAK mode_t          f_umask;                /* The currently effective UMASK.
 	                                              * NOTE: All bits not masked by `0777' _MUST_ always be ZERO(0)! */
 	WEAK u32             f_lnkmax;               /* The max number of symbolic links allowed during resolution of a path.
-	                                              * This field defaults to `MAXSYMLINKS'. */
+	                                              * This field defaults to `SYMLOOP_MAX'. */
 	uid_t                f_fsuid;                /* Filesystem user ID */
 	gid_t                f_fsgid;                /* Filesystem group ID */
 	union ATTR_PACKED {

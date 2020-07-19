@@ -36,7 +36,8 @@
 #include <bits/crt/pthreadtypes.h>
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
-__SYSDECL_BEGIN
+#ifdef __CC__
+__DECL_BEGIN
 
 #ifdef __USE_KOS
 #ifndef __byte_t_defined
@@ -282,6 +283,7 @@ typedef __typedef_off_t _off_t;
 #endif /* !_OFF_T_DEFINED */
 #endif /* __USE_DOS */
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_TYPES_H */

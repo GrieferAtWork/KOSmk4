@@ -21,6 +21,7 @@
 #define _BITS_STDIO_LIM_H 1
 
 #include <__crt.h>
+#include <asm/limits.h>
 
 #ifndef L_tmpnam
 #ifdef __CRT_DOS_PRIMARY
@@ -66,7 +67,12 @@
 #endif /* !FOPEN_MAX */
 
 #ifndef IOV_MAX
-#define IOV_MAX 1024
+/* [default:_POSIX_UIO_MAXIOV] Max # of elements in a `struct iovec' vector. */
+#if defined(__IOV_MAX) && __IOV_MAX != -1
+#define IOV_MAX __IOV_MAX
+#else /* __IOV_MAX != -1 */
+#define IOV_MAX 16 /* 16 == _XOPEN_IOV_MAX */
+#endif /* __IOV_MAX == -1 */
 #endif /* !IOV_MAX */
 
 #endif /* !_BITS_STDIO_LIM_H */

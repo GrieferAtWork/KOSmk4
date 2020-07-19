@@ -21,9 +21,14 @@
 #define _ASM_UTSNAME_H 1
 
 #include <__stdinc.h>
+#include <asm/limits.h> /* __HOST_NAME_MAX */
 
 #ifndef _UTSNAME_LENGTH
+#if defined(__HOST_NAME_MAX) && (__HOST_NAME_MAX + 0) != -1
+#define _UTSNAME_LENGTH (__HOST_NAME_MAX + 1)
+#else /* __HOST_NAME_MAX != -1 */
 #define _UTSNAME_LENGTH 65
+#endif /* __HOST_NAME_MAX == -1 */
 #endif /* !_UTSNAME_LENGTH */
 
 #ifndef _UTSNAME_DOMAIN_LENGTH

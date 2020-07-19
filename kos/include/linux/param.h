@@ -20,6 +20,23 @@
 #ifndef _LINUX_PARAM_H
 #define _LINUX_PARAM_H 1
 
-#include <asm/param.h>
+#include <asm/limits.h>
+#include <asm/pagesize.h>
+
+#if !defined(EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
+#define EXEC_PAGESIZE __ARCH_PAGESIZE
+#endif /* !EXEC_PAGESIZE && __ARCH_PAGESIZE */
+
+#if !defined(NOGROUP) && defined(__NGROUPS_MAX) && (__NGROUPS_MAX + 0) != -1
+#define NOGROUP __NGROUPS_MAX /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
+#endif /* !NOGROUP && __NGROUPS_MAX != -1 */
+
+#if !defined(MAXHOSTNAMELEN) && defined(__HOST_NAME_MAX) && (__HOST_NAME_MAX + 0) != -1
+#define MAXHOSTNAMELEN __HOST_NAME_MAX /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
+#endif /* !MAXHOSTNAMELEN && __HOST_NAME_MAX != -1 */
+
+#if !defined(HZ) && defined(__HZ)
+#define HZ __HZ /* Scheduler frequency */
+#endif /* !HZ && __HZ != -1 */
 
 #endif /* !_LINUX_PARAM_H */

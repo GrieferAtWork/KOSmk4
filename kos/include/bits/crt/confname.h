@@ -105,9 +105,9 @@ enum {
 	_SC_ARG_MAX,                            /* [== unlimited, ARG_MAX] */
 	_SC_CHILD_MAX,                          /* [== unlimited, CHILD_MAX] */
 	_SC_CLK_TCK,                            /* [== custom, CLK_TCK] */
-	_SC_NGROUPS_MAX,                        /* [== NGROUPS_MAX] */
+	_SC_NGROUPS_MAX,                        /* [== unlimited, NGROUPS_MAX] */
 	_SC_OPEN_MAX,                           /* [== unlimited, OPEN_MAX] */
-	_SC_STREAM_MAX,                         /* [== STREAM_MAX, FOPEN_MAX, unlimited] */
+	_SC_STREAM_MAX,                         /* [== unlimited, STREAM_MAX, FOPEN_MAX] */
 	_SC_TZNAME_MAX,                         /* [== unlimited, _POSIX_TZNAME_MAX] */
 	_SC_JOB_CONTROL,                        /* [== _POSIX_JOB_CONTROL] */
 	_SC_SAVED_IDS,                          /* [== _POSIX_SAVED_IDS] */
@@ -224,12 +224,12 @@ enum {
 	_SC_UINT_MAX,                           /* [== UINT_MAX] */
 	_SC_ULONG_MAX,                          /* [== ULONG_MAX] */
 	_SC_USHRT_MAX,                          /* [== USHRT_MAX] */
-	_SC_NL_ARGMAX,                          /* [== NL_ARGMAX] */
-	_SC_NL_LANGMAX,                         /* [== NL_LANGMAX] */
-	_SC_NL_MSGMAX,                          /* [== NL_MSGMAX] */
-	_SC_NL_NMAX,                            /* [== NL_NMAX] */
-	_SC_NL_SETMAX,                          /* [== NL_SETMAX] */
-	_SC_NL_TEXTMAX,                         /* [== NL_TEXTMAX] */
+	_SC_NL_ARGMAX,                          /* [== NL_ARGMAX, unlimited] */
+	_SC_NL_LANGMAX,                         /* [== NL_LANGMAX, unlimited] */
+	_SC_NL_MSGMAX,                          /* [== NL_MSGMAX, unlimited] */
+	_SC_NL_NMAX,                            /* [== NL_NMAX, unlimited] */
+	_SC_NL_SETMAX,                          /* [== NL_SETMAX, unlimited] */
+	_SC_NL_TEXTMAX,                         /* [== NL_TEXTMAX, unlimited] */
 	_SC_XBS5_ILP32_OFF32,                   /* ... */
 	_SC_XBS5_ILP32_OFFBIG,                  /* ... */
 	_SC_XBS5_LP64_OFF64,                    /* ... */
@@ -329,9 +329,9 @@ enum {
 #define _SC_ARG_MAX                      _SC_ARG_MAX                      /* [== unlimited, ARG_MAX] */
 #define _SC_CHILD_MAX                    _SC_CHILD_MAX                    /* [== unlimited, CHILD_MAX] */
 #define _SC_CLK_TCK                      _SC_CLK_TCK                      /* [== custom, CLK_TCK] */
-#define _SC_NGROUPS_MAX                  _SC_NGROUPS_MAX                  /* [== NGROUPS_MAX] */
+#define _SC_NGROUPS_MAX                  _SC_NGROUPS_MAX                  /* [== unlimited, NGROUPS_MAX] */
 #define _SC_OPEN_MAX                     _SC_OPEN_MAX                     /* [== unlimited, OPEN_MAX] */
-#define _SC_STREAM_MAX                   _SC_STREAM_MAX                   /* [== STREAM_MAX, FOPEN_MAX, unlimited] */
+#define _SC_STREAM_MAX                   _SC_STREAM_MAX                   /* [== unlimited, STREAM_MAX, FOPEN_MAX] */
 #define _SC_TZNAME_MAX                   _SC_TZNAME_MAX                   /* [== unlimited, _POSIX_TZNAME_MAX] */
 #define _SC_JOB_CONTROL                  _SC_JOB_CONTROL                  /* [== _POSIX_JOB_CONTROL] */
 #define _SC_SAVED_IDS                    _SC_SAVED_IDS                    /* [== _POSIX_SAVED_IDS] */
@@ -448,12 +448,12 @@ enum {
 #define _SC_UINT_MAX                     _SC_UINT_MAX                     /* [== UINT_MAX] */
 #define _SC_ULONG_MAX                    _SC_ULONG_MAX                    /* [== ULONG_MAX] */
 #define _SC_USHRT_MAX                    _SC_USHRT_MAX                    /* [== USHRT_MAX] */
-#define _SC_NL_ARGMAX                    _SC_NL_ARGMAX                    /* [== NL_ARGMAX] */
-#define _SC_NL_LANGMAX                   _SC_NL_LANGMAX                   /* [== NL_LANGMAX] */
-#define _SC_NL_MSGMAX                    _SC_NL_MSGMAX                    /* [== NL_MSGMAX] */
-#define _SC_NL_NMAX                      _SC_NL_NMAX                      /* [== NL_NMAX] */
-#define _SC_NL_SETMAX                    _SC_NL_SETMAX                    /* [== NL_SETMAX] */
-#define _SC_NL_TEXTMAX                   _SC_NL_TEXTMAX                   /* [== NL_TEXTMAX] */
+#define _SC_NL_ARGMAX                    _SC_NL_ARGMAX                    /* [== NL_ARGMAX, unlimited] */
+#define _SC_NL_LANGMAX                   _SC_NL_LANGMAX                   /* [== NL_LANGMAX, unlimited] */
+#define _SC_NL_MSGMAX                    _SC_NL_MSGMAX                    /* [== NL_MSGMAX, unlimited] */
+#define _SC_NL_NMAX                      _SC_NL_NMAX                      /* [== NL_NMAX, unlimited] */
+#define _SC_NL_SETMAX                    _SC_NL_SETMAX                    /* [== NL_SETMAX, unlimited] */
+#define _SC_NL_TEXTMAX                   _SC_NL_TEXTMAX                   /* [== NL_TEXTMAX, unlimited] */
 #define _SC_XBS5_ILP32_OFF32             _SC_XBS5_ILP32_OFF32             /* ... */
 #define _SC_XBS5_ILP32_OFFBIG            _SC_XBS5_ILP32_OFFBIG            /* ... */
 #define _SC_XBS5_LP64_OFF64              _SC_XBS5_LP64_OFF64              /* ... */
@@ -550,9 +550,9 @@ enum {
 #define _SC_ARG_MAX                      0                             /* [== unlimited, ARG_MAX] */
 #define _SC_CHILD_MAX                    1                             /* [== unlimited, CHILD_MAX] */
 #define _SC_CLK_TCK                      2                             /* [== custom, CLK_TCK] */
-#define _SC_NGROUPS_MAX                  3                             /* [== NGROUPS_MAX] */
+#define _SC_NGROUPS_MAX                  3                             /* [== unlimited, NGROUPS_MAX] */
 #define _SC_OPEN_MAX                     4                             /* [== unlimited, OPEN_MAX] */
-#define _SC_STREAM_MAX                   5                             /* [== STREAM_MAX, FOPEN_MAX, unlimited] */
+#define _SC_STREAM_MAX                   5                             /* [== unlimited, STREAM_MAX, FOPEN_MAX] */
 #define _SC_TZNAME_MAX                   6                             /* [== unlimited, _POSIX_TZNAME_MAX] */
 #define _SC_JOB_CONTROL                  7                             /* [== _POSIX_JOB_CONTROL] */
 #define _SC_SAVED_IDS                    8                             /* [== _POSIX_SAVED_IDS] */
@@ -669,12 +669,12 @@ enum {
 #define _SC_UINT_MAX                     116                           /* [== UINT_MAX] */
 #define _SC_ULONG_MAX                    117                           /* [== ULONG_MAX] */
 #define _SC_USHRT_MAX                    118                           /* [== USHRT_MAX] */
-#define _SC_NL_ARGMAX                    119                           /* [== NL_ARGMAX] */
-#define _SC_NL_LANGMAX                   120                           /* [== NL_LANGMAX] */
-#define _SC_NL_MSGMAX                    121                           /* [== NL_MSGMAX] */
-#define _SC_NL_NMAX                      122                           /* [== NL_NMAX] */
-#define _SC_NL_SETMAX                    123                           /* [== NL_SETMAX] */
-#define _SC_NL_TEXTMAX                   124                           /* [== NL_TEXTMAX] */
+#define _SC_NL_ARGMAX                    119                           /* [== NL_ARGMAX, unlimited] */
+#define _SC_NL_LANGMAX                   120                           /* [== NL_LANGMAX, unlimited] */
+#define _SC_NL_MSGMAX                    121                           /* [== NL_MSGMAX, unlimited] */
+#define _SC_NL_NMAX                      122                           /* [== NL_NMAX, unlimited] */
+#define _SC_NL_SETMAX                    123                           /* [== NL_SETMAX, unlimited] */
+#define _SC_NL_TEXTMAX                   124                           /* [== NL_TEXTMAX, unlimited] */
 #define _SC_XBS5_ILP32_OFF32             125                           /* ... */
 #define _SC_XBS5_ILP32_OFFBIG            126                           /* ... */
 #define _SC_XBS5_LP64_OFF64              127                           /* ... */

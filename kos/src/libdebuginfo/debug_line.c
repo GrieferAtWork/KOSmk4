@@ -191,6 +191,16 @@ typedef struct {
 } dl_registers_t;
 
 
+/* GCC warns that members of `old_state' may be uninitialized after `found_state',
+ * because it doesn't understand that `old_state.address' is set to (uintptr_t)-1
+ * at the beginning, which prevents `found_state' from being reached until all of
+ * the other fields of `old_state' have also been populated. */
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* __GNUC__ */
+
+
 /* Scan the given .debug_line unit `self' for information related to the given
  * `module_relative_pc', and store that information into `*result' upon success.
  * @param: module_relative_pc: The starting address of the instruction to scan for.
@@ -386,6 +396,10 @@ found_state:
 done:
 	return DEBUG_INFO_ERROR_NOFRAME;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
 
 
 DEFINE_PUBLIC_ALIAS(debugline_loadunit, libdi_debugline_loadunit);

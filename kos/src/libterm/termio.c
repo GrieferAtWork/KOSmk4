@@ -28,11 +28,13 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h> /* _POSIX_MAX_INPUT, _POSIX_MAX_CANON */
 #include <signal.h>
 #include <string.h>
 #include <termios.h>
@@ -81,10 +83,10 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
 	self->t_oprint      = oprinter;
 	self->t_raise       = raisefunc;
 	self->t_chk_sigttou = chk_sigttou;
-	ringbuffer_init(&self->t_ibuf);
-	linebuffer_init(&self->t_canon);
-	linebuffer_init(&self->t_opend);
-	linebuffer_init(&self->t_ipend);
+	ringbuffer_init_ex(&self->t_ibuf, _POSIX_MAX_INPUT * 4);
+	linebuffer_init_ex(&self->t_canon, _POSIX_MAX_CANON * 4);
+	linebuffer_init_ex(&self->t_opend, MAX(_POSIX_MAX_INPUT / 2, 64));
+	linebuffer_init_ex(&self->t_ipend, MAX(_POSIX_MAX_INPUT / 2, 64));
 	/* Initialize the IOS to default values. */
 	cfmakesane(&self->t_ios);
 }

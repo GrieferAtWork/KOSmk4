@@ -20,25 +20,60 @@
 #ifndef _LINUX_LIMITS_H
 #define _LINUX_LIMITS_H 1
 
-/* DISCLAIMER: _STRONGLY_ Based on '/usr/include/linux/limits.h' */
-
 #include <__stdinc.h>
 
-#define NR_OPEN         1024 /* # of open files (dynamic in KOS; really is up
-                              *   to INT_MAX, but also limited by avail. RAM) */
-#define NGROUPS_MAX    65536 /* supplemental group IDs are available */
-#define ARG_MAX       131072 /* # bytes of args + environ for exec(); */
-#define LINK_MAX         127 /* # links a file may have (fs-dependent in KOS) */
-#define MAX_CANON        255 /* size of the canonical input queue */
-#define MAX_INPUT        255 /* size of the type-ahead buffer */
-#define NAME_MAX         255 /* # chars in a file name (2^16 in KOS) */
-#define PATH_MAX        4096 /* # chars in a path name including nul (Unlimited in KOS) */
-#define PIPE_BUF        4096 /* # bytes in atomic write to a pipe (Default value) */
+#include <asm/limits.h>
+
+#if !defined(NR_OPEN) && defined(__OPEN_MAX) && (__OPEN_MAX + 0) != -1
+#define NR_OPEN __OPEN_MAX /* Max # of open files handles */
+#endif /* !NR_OPEN && __OPEN_MAX != -1 */
+
+#if !defined(NGROUPS_MAX) && defined(__NGROUPS_MAX) && (__NGROUPS_MAX + 0) != -1
+#define NGROUPS_MAX __NGROUPS_MAX /* Max # of supplemental group IDs that may be set () */
+#endif /* !NGROUPS_MAX && __NGROUPS_MAX != -1 */
+
+#if !defined(ARG_MAX) && defined(__ARG_MAX) && (__ARG_MAX + 0) != -1
+#define ARG_MAX __ARG_MAX /* Max # bytes of args + environ for exec(); */
+#endif /* !ARG_MAX && __ARG_MAX != -1 */
+
+#if !defined(LINK_MAX) && defined(__LINK_MAX) && (__LINK_MAX + 0) != -1
+#define LINK_MAX __LINK_MAX /* Max # links a file may have (fs-dependent) */
+#endif /* !LINK_MAX && __LINK_MAX != -1 */
+
+#if !defined(MAX_CANON) && defined(__MAX_CANON) && (__MAX_CANON + 0) != -1
+#define MAX_CANON __MAX_CANON /* Max size of the canonical input queue */
+#endif /* !MAX_CANON && __MAX_CANON != -1 */
+
+#if !defined(MAX_INPUT) && defined(__MAX_INPUT) && (__MAX_INPUT + 0) != -1
+#define MAX_INPUT __MAX_INPUT /* Max size of the type-ahead buffer */
+#endif /* !MAX_INPUT && __MAX_INPUT != -1 */
+
+#if !defined(NAME_MAX) && defined(__NAME_MAX) && (__NAME_MAX + 0) != -1
+#define NAME_MAX __NAME_MAX /* Max # chars in a file name */
+#endif /* !NAME_MAX && __NAME_MAX != -1 */
+
+#if !defined(PATH_MAX) && defined(__PATH_MAX) && (__PATH_MAX + 0) != -1
+#define PATH_MAX __PATH_MAX /* Max # chars in a path name including nul */
+#endif /* !PATH_MAX && __PATH_MAX != -1 */
+
+#if !defined(PIPE_BUF) && defined(__PIPE_BUF) && (__PIPE_BUF + 0) != -1
+#define PIPE_BUF __PIPE_BUF /* Max # bytes in atomic write to a pipe (Default value, assuming that backing memory isn't VIO or re-mapped during a write) */
+#endif /* !PIPE_BUF && __PIPE_BUF != -1 */
+
+#if !defined(RTSIG_MAX) && defined(__RTSIG_MAX) && (__RTSIG_MAX + 0) != -1
+#define RTSIG_MAX __RTSIG_MAX /* # of realtime signals */
+#endif /* !RTSIG_MAX && __RTSIG_MAX != -1 */
+
 #if 0
-#define XATTR_NAME_MAX   255 /* # chars in an extended attribute name */
-#define XATTR_SIZE_MAX 65536 /* size of an extended attribute value (64k) */
-#define XATTR_LIST_MAX 65536 /* size of extended attribute namelist (64k) */
+#if !defined(XATTR_NAME_MAX) && defined(__XATTR_NAME_MAX) && (__XATTR_NAME_MAX + 0) != -1
+#define XATTR_NAME_MAX __XATTR_NAME_MAX /* Max # chars in an extended attribute name */
+#endif /* !XATTR_NAME_MAX && __XATTR_NAME_MAX != -1 */
+#if !defined(XATTR_SIZE_MAX) && defined(__XATTR_SIZE_MAX) && (__XATTR_SIZE_MAX + 0) != -1
+#define XATTR_SIZE_MAX __XATTR_SIZE_MAX /* Max size of an extended attribute value (64k) */
+#endif /* !XATTR_SIZE_MAX && __XATTR_SIZE_MAX != -1 */
+#if !defined(XATTR_LIST_MAX) && defined(__XATTR_LIST_MAX) && (__XATTR_LIST_MAX + 0) != -1
+#define XATTR_LIST_MAX __XATTR_LIST_MAX /* Max size of extended attribute namelist (64k) */
+#endif /* !XATTR_LIST_MAX && __XATTR_LIST_MAX != -1 */
 #endif
-#define RTSIG_MAX         32
 
 #endif /* !_LINUX_LIMITS_H */
