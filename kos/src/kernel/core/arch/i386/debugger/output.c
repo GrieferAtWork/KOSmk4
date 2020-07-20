@@ -221,7 +221,8 @@ NOTHROW(FCALL vga_enable_cursor)(void) {
 	if (!vga_cursor_is_shown) {
 		if (vga_suppress_update == 0) {
 			vga_wcrt(VGA_CRTC_CURSOR_START,
-			         vga_rcrt(VGA_CRTC_CURSOR_START) & ~(VGA_CRA_FCURSOR_DISABLE));
+			         vga_rcrt(VGA_CRTC_CURSOR_START) &
+			         ~(VGA_CRA_FCURSOR_DISABLE));
 		}
 		vga_cursor_is_shown = true;
 	}
@@ -232,7 +233,8 @@ NOTHROW(FCALL vga_disable_cursor)(void) {
 	if (vga_cursor_is_shown) {
 		if (vga_suppress_update == 0) {
 			vga_wcrt(VGA_CRTC_CURSOR_START,
-			         vga_rcrt(VGA_CRTC_CURSOR_START) | VGA_CRA_FCURSOR_DISABLE);
+			         vga_rcrt(VGA_CRTC_CURSOR_START) |
+			         VGA_CRA_FCURSOR_DISABLE);
 		}
 		vga_cursor_is_shown = false;
 	}
@@ -245,8 +247,8 @@ NOTHROW(FCALL vga_update_cursor_pos)(void) {
 	} else {
 		unsigned int pos;
 		pos = (unsigned int)(vga_terminal_cur - vga_terminal_start);
-		vga_wcrt(VGA_CRTC_CURSOR_HI, (pos >> 8));
-		vga_wcrt(VGA_CRTC_CURSOR_LO, (u8)pos);
+		vga_wcrt(VGA_CRTC_CURSOR_HI, (u8)(pos >> 8));
+		vga_wcrt(VGA_CRTC_CURSOR_LO, (u8)(pos));
 		vga_enable_cursor();
 	}
 }
@@ -254,9 +256,12 @@ NOTHROW(FCALL vga_update_cursor_pos)(void) {
 
 PRIVATE ATTR_DBGBSS u16 vga_backlog_screen[VGA_WIDTH * VGA_HEIGHT] = { 0 };
 PRIVATE ATTR_DBGBSS unsigned int vga_backlog_scrollpos = 0;
-#define vga_backlog_scrollmax  \
-   (vga_terminal_backlog_full ? (VGA_BACKLOG_NUMSCREENS * VGA_HEIGHT) : \
-   (unsigned int)((size_t)(vga_terminal_backlog_cur - vga_terminal_backlog) / VGA_WIDTH))
+#define vga_backlog_scrollmax                             \
+	(vga_terminal_backlog_full                            \
+	 ? (VGA_BACKLOG_NUMSCREENS * VGA_HEIGHT)              \
+	 : (unsigned int)((size_t)(vga_terminal_backlog_cur - \
+	                           vga_terminal_backlog) /    \
+	                  VGA_WIDTH))
 
 
 

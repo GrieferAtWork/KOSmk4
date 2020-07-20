@@ -384,7 +384,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restrict __dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 7))
-			return (__UINT16_TYPE__ *)__libc_core_memcpyq(__dst, __src, __n_words >> 3);
+			return (__UINT16_TYPE__ *)__libc_core_memcpyq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memcpyl)
@@ -396,7 +396,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restrict __dst,
 		return (__UINT16_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return __libc_core_memcpyw(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_memcpyl(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
@@ -4837,7 +4837,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmovedownw))(/*aligned(2)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 7))
-			return (__UINT16_TYPE__ *)__libc_core_memmovedownq(__dst, __src, __n_words >> 3);
+			return (__UINT16_TYPE__ *)__libc_core_memmovedownq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovedownl)
@@ -6264,7 +6264,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 7))
-			return (__UINT16_TYPE__ *)__libc_core_memmoveupq(__dst, __src, __n_words >> 3);
+			return (__UINT16_TYPE__ *)__libc_core_memmoveupq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmoveupl)
