@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8918ebfe */
+/* HASH CRC-32:0xf5b428ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -330,7 +330,6 @@
 #define __stub_lgamma 1
 #define __stub___lgamma_r 1
 #define __stub_lgamma_r 1
-#define __stub_localeconv 1
 #define __stub_lockf64 1
 #define __stub___log 1
 #define __stub_log 1

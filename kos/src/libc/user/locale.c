@@ -35,6 +35,34 @@ DECL_BEGIN
 PRIVATE ATTR_SECTION(".data.crt.unsorted.current_locale")
 char current_locale[] = "C.UTF-8";
 
+PRIVATE ATTR_SECTION(".data.crt.unsorted.current_lconv")
+struct lconv current_lconv = {
+	/* .decimal_point      = */ NULL,
+	/* .thousands_sep      = */ NULL,
+	/* .grouping           = */ NULL,
+	/* .int_curr_symbol    = */ NULL,
+	/* .currency_symbol    = */ NULL,
+	/* .mon_decimal_point  = */ NULL,
+	/* .mon_thousands_sep  = */ NULL,
+	/* .mon_grouping       = */ NULL,
+	/* .positive_sign      = */ NULL,
+	/* .negative_sign      = */ NULL,
+	/* .int_frac_digits    = */ CHAR_MAX,
+	/* .frac_digits        = */ CHAR_MAX,
+	/* .p_cs_precedes      = */ CHAR_MAX,
+	/* .p_sep_by_space     = */ CHAR_MAX,
+	/* .n_cs_precedes      = */ CHAR_MAX,
+	/* .n_sep_by_space     = */ CHAR_MAX,
+	/* .p_sign_posn        = */ CHAR_MAX,
+	/* .n_sign_posn        = */ CHAR_MAX,
+	/* .int_p_cs_precedes  = */ CHAR_MAX,
+	/* .int_p_sep_by_space = */ CHAR_MAX,
+	/* .int_n_cs_precedes  = */ CHAR_MAX,
+	/* .int_n_sep_by_space = */ CHAR_MAX,
+	/* .int_p_sign_posn    = */ CHAR_MAX,
+	/* .int_n_sign_posn    = */ CHAR_MAX
+};
+
 
 /*[[[start:implementation]]]*/
 
@@ -57,10 +85,22 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
 INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL struct lconv *
 NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 /*[[[body:libc_localeconv]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("localeconv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+{
+	if (!current_lconv.negative_sign) {
+		/* Initialize as mandated by the standard for the "C" locale. */
+		current_lconv.decimal_point      = (char *)".";
+		current_lconv.thousands_sep      = (char *)"";
+		current_lconv.grouping           = (char *)"";
+		current_lconv.int_curr_symbol    = (char *)"";
+		current_lconv.currency_symbol    = (char *)"";
+		current_lconv.mon_decimal_point  = (char *)"";
+		current_lconv.mon_thousands_sep  = (char *)"";
+		current_lconv.mon_grouping       = (char *)"";
+		current_lconv.positive_sign      = (char *)"";
+		COMPILER_WRITE_BARRIER();
+		current_lconv.negative_sign = (char *)"";
+	}
+	return &current_lconv;
 }
 /*[[[end:libc_localeconv]]]*/
 
