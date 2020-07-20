@@ -23,20 +23,24 @@
 #include <asm/limits.h>
 #include <asm/pagesize.h>
 
+/* System memory page size */
 #if !defined(EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
 #define EXEC_PAGESIZE __ARCH_PAGESIZE
 #endif /* !EXEC_PAGESIZE && __ARCH_PAGESIZE */
 
+/* Max # of characters in a hostname (s.a. `sethostname(2)'). */
 #if !defined(NOGROUP) && defined(__NGROUPS_MAX) && (__NGROUPS_MAX + 0) != -1
-#define NOGROUP __NGROUPS_MAX /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
+#define NOGROUP __NGROUPS_MAX
 #endif /* !NOGROUP && __NGROUPS_MAX != -1 */
 
+/* Max # of characters in a hostname (s.a. `sethostname(2)'). */
 #if !defined(MAXHOSTNAMELEN) && defined(__HOST_NAME_MAX) && (__HOST_NAME_MAX + 0) != -1
-#define MAXHOSTNAMELEN __HOST_NAME_MAX /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
+#define MAXHOSTNAMELEN __HOST_NAME_MAX
 #endif /* !MAXHOSTNAMELEN && __HOST_NAME_MAX != -1 */
 
+/* Scheduler frequency */
 #if !defined(HZ) && defined(__HZ)
-#define HZ __HZ /* Scheduler frequency */
+#define HZ __HZ
 #endif /* !HZ && __HZ != -1 */
 
 #endif /* !_LINUX_PARAM_H */

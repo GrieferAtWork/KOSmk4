@@ -384,7 +384,6 @@ incdir("", "../../include");
 #include <bits/waitflags.h>
 #include <bits/waitmacros.h>
 #include <bits/waitstatus.h>
-#include <bits/wchar.h>
 #include <bits/wformat-printer.h>
 #include <bits/wordsize.h>
 #include <bits/xtitypes.h>

@@ -52,9 +52,9 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
 }
 /*[[[end:libc_setlocale]]]*/
 
-/*[[[head:libc_localeconv,hash:CRC-32=0x13457b38]]]*/
+/*[[[head:libc_localeconv,hash:CRC-32=0xe1c635d9]]]*/
 /* Return the numeric/monetary information for the current locale */
-INTERN ATTR_SECTION(".text.crt.unsorted") struct lconv *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL struct lconv *
 NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 /*[[[body:libc_localeconv]]]*/
 /*AUTO*/{

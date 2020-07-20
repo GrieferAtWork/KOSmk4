@@ -21,9 +21,12 @@
 #define _LINUX_MSDOS_FS_H 1
 
 #include <__stdinc.h>
+#include <features.h>
+
 #include <hybrid/typecore.h>
-#include <linux/types.h>
+
 #include <asm/ioctl.h>
+#include <linux/types.h>
 
 __DECL_BEGIN
 
@@ -53,15 +56,24 @@ struct __fat_dirent {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CC__ */
 
-#ifndef __KERNEL__
-#define ATTR_NONE   0  /* no attribute bits */
-#define ATTR_RO     1  /* read-only */
-#define ATTR_HIDDEN 2  /* hidden */
-#define ATTR_SYS    4  /* system */
-#define ATTR_VOLUME 8  /* volume label */
-#define ATTR_DIR    16 /* directory */
-#define ATTR_ARCH   32 /* archived */
-#endif
+#define FATATTR_NONE   0  /* no attribute bits */
+#define FATATTR_RO     1  /* read-only */
+#define FATATTR_HIDDEN 2  /* hidden */
+#define FATATTR_SYS    4  /* system */
+#define FATATTR_VOLUME 8  /* volume label */
+#define FATATTR_DIR    16 /* directory */
+#define FATATTR_ARCH   32 /* archived */
+
+/* Don't intrude on the ATTR_* namespace when using pure system headers! */
+#ifndef __USE_KOS_PURE
+#define ATTR_NONE   FATATTR_NONE   /* no attribute bits */
+#define ATTR_RO     FATATTR_RO     /* read-only */
+#define ATTR_HIDDEN FATATTR_HIDDEN /* hidden */
+#define ATTR_SYS    FATATTR_SYS    /* system */
+#define ATTR_VOLUME FATATTR_VOLUME /* volume label */
+#define ATTR_DIR    FATATTR_DIR    /* directory */
+#define ATTR_ARCH   FATATTR_ARCH   /* archived */
+#endif /* !__USE_KOS_PURE */
 
 /* ioctl commands */
 #define VFAT_IOCTL_READDIR_BOTH  _IOR('r', 1, struct __fat_dirent[2])

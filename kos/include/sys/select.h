@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9fe70f7 */
+/* HASH CRC-32:0x9a52b088 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,10 @@
 #include <bits/timeval.h>  /* struct timeval */
 #include <bits/types.h>
 
+#ifdef __FD_SETSIZE
+#define FD_SETSIZE __FD_SETSIZE
+#endif /* __FD_SETSIZE */
+
 __SYSDECL_BEGIN
 
 #ifdef __CC__
@@ -56,10 +60,11 @@ typedef __sigset_t sigset_t;
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 
+#define __SIZEOF_FD_MASK__ __SIZEOF_POINTER__
 typedef __intptr_t __fd_mask;
 
 #undef __NFDBITS
-#define __NFDBITS    (8 * sizeof(__fd_mask))
+#define __NFDBITS    (8 * __SIZEOF_FD_MASK__)
 #define __FD_ELT(d)  ((d) / __NFDBITS)
 #define __FD_MASK(d) ((__fd_mask)1 << ((d) % __NFDBITS))
 
@@ -72,7 +77,6 @@ typedef struct __fd_set_struct {
 #define __FDS_BITS(set) ((set)->__fds_bits)
 #endif /* !__USE_XOPEN */
 } fd_set;
-#define FD_SETSIZE __FD_SETSIZE
 
 #ifdef __USE_MISC
 typedef __fd_mask fd_mask;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcee0147e */
+/* HASH CRC-32:0xd336b707 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -226,7 +226,7 @@ __NAMESPACE_STD_BEGIN
 /* Set and/or return the current locale */
 __CDECLARE_OPT(,char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale),(__category,__locale))
 /* Return the numeric/monetary information for the current locale */
-__CDECLARE_OPT(,struct lconv *,__NOTHROW_NCX,localeconv,(void),())
+__CDECLARE_OPT(__ATTR_RETNONNULL,struct lconv *,__NOTHROW_NCX,localeconv,(void),())
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifdef __CRT_HAVE_setlocale

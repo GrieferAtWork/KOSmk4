@@ -29,29 +29,29 @@ __SYSDECL_BEGIN
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	FE_INVALID   = 0x01, /* == FSW_IE */
-	__FE_DENORM  = 0x02, /* == FSW_DE */
-	FE_DIVBYZERO = 0x04, /* == FSW_ZE */
-	FE_OVERFLOW  = 0x08, /* == FSW_OE */
-	FE_UNDERFLOW = 0x10, /* == FSW_UE */
-	FE_INEXACT   = 0x20  /* == FSW_PE */
+	FE_INVALID   = 0x01,
+	__FE_DENORM  = 0x02,
+	FE_DIVBYZERO = 0x04,
+	FE_OVERFLOW  = 0x08,
+	FE_UNDERFLOW = 0x10,
+	FE_INEXACT   = 0x20
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define FE_INVALID   FE_INVALID   /* == FSW_IE */
-#define __FE_DENORM  __FE_DENORM  /* == FSW_DE */
-#define FE_DIVBYZERO FE_DIVBYZERO /* == FSW_ZE */
-#define FE_OVERFLOW  FE_OVERFLOW  /* == FSW_OE */
-#define FE_UNDERFLOW FE_UNDERFLOW /* == FSW_UE */
-#define FE_INEXACT   FE_INEXACT   /* == FSW_PE */
+#define FE_INVALID   FE_INVALID
+#define __FE_DENORM  __FE_DENORM
+#define FE_DIVBYZERO FE_DIVBYZERO
+#define FE_OVERFLOW  FE_OVERFLOW
+#define FE_UNDERFLOW FE_UNDERFLOW
+#define FE_INEXACT   FE_INEXACT
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FE_INVALID   0x01 /* == FSW_IE */
-#define __FE_DENORM  0x02 /* == FSW_DE */
-#define FE_DIVBYZERO 0x04 /* == FSW_ZE */
-#define FE_OVERFLOW  0x08 /* == FSW_OE */
-#define FE_UNDERFLOW 0x10 /* == FSW_UE */
-#define FE_INEXACT   0x20 /* == FSW_PE */
+#define FE_INVALID   0x01
+#define __FE_DENORM  0x02
+#define FE_DIVBYZERO 0x04
+#define FE_OVERFLOW  0x08
+#define FE_UNDERFLOW 0x10
+#define FE_INEXACT   0x20
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -70,15 +70,15 @@ enum {
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define FE_TONEAREST  FE_TONEAREST  /* == FCW_RC_NEAREST */
-#define FE_DOWNWARD   FE_DOWNWARD   /* == FCW_RC_DOWN */
-#define FE_UPWARD     FE_UPWARD     /* == FCW_RC_UP */
-#define FE_TOWARDZERO FE_TOWARDZERO /* == FCW_RC_TRUNC */
+#define FE_TONEAREST  FE_TONEAREST  /* round() */
+#define FE_DOWNWARD   FE_DOWNWARD   /* floor() */
+#define FE_UPWARD     FE_UPWARD     /* ceil() */
+#define FE_TOWARDZERO FE_TOWARDZERO /* trunc() */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FE_TONEAREST  0x0000 /* == FCW_RC_NEAREST */
-#define FE_DOWNWARD   0x0001 /* == FCW_RC_DOWN */
-#define FE_UPWARD     0x0002 /* == FCW_RC_UP */
-#define FE_TOWARDZERO 0x0003 /* == FCW_RC_TRUNC */
+#define FE_TONEAREST  0x0000 /* round() */
+#define FE_DOWNWARD   0x0001 /* floor() */
+#define FE_UPWARD     0x0002 /* ceil() */
+#define FE_TOWARDZERO 0x0003 /* trunc() */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

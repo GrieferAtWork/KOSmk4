@@ -24,6 +24,7 @@
 #include <__crt.h>
 
 #include <hybrid/typecore.h>
+#include <hybrid/__va_size.h> /* __VA_SIZE */
 
 /* Since `__VA_SIZE >= sizeof(int)', and `sizeof(int) != 0',
  * we also know that `sizeof(int) >= 1', meaning that any 8-bit
@@ -46,9 +47,9 @@
 #define __PRI2_PREFIX "hh"
 #elif __SIZEOF_LONG_LONG__ == 2
 #define __PRI2_PREFIX "ll"
-#else
+#else /* ... == 2 */
 #define __PRI2_PREFIX "I16" /* XXX: non-portable */
-#endif
+#endif /* ... != 2 */
 #endif /* !__PRI2_PREFIX */
 
 #ifndef __PRI4_PREFIX
@@ -64,9 +65,9 @@
 #define __PRI4_PREFIX "hh"
 #elif __SIZEOF_LONG_LONG__ == 4
 #define __PRI4_PREFIX "ll"
-#else
+#else /* ... == 4 */
 #define __PRI4_PREFIX "I32" /* XXX: non-portable */
-#endif
+#endif /* ... != 4 */
 #endif /* !__PRI4_PREFIX */
 
 #ifndef __PRI8_PREFIX
@@ -80,9 +81,9 @@
 #define __PRI8_PREFIX "I"
 #elif __SIZEOF_LONG_LONG__ == 8
 #define __PRI8_PREFIX "ll"
-#else
+#else /* ... == 8 */
 #define __PRI8_PREFIX "I64" /* XXX: non-portable */
-#endif
+#endif /* ... != 8 */
 #endif /* !__PRI8_PREFIX */
 
 #ifndef __PRIP_PREFIX
@@ -94,19 +95,19 @@
 #define __PRIP_PREFIX "j"
 #elif defined(__CRT_KOS) || defined(__CRT_DOS)
 #define __PRIP_PREFIX "I"
-#endif
+#endif /* ... */
 #endif /* !__PRIP_PREFIX */
 
 #define __PRIN2_PREFIX(n) __PRI##n##_PREFIX
-#define __PRIN_PREFIX(n) __PRIN2_PREFIX(n)
-#define __PRIL1_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST8_T__)
-#define __PRIL2_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST16_T__)
-#define __PRIL4_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST32_T__)
-#define __PRIL8_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST64_T__)
-#define __PRIF1_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST8_T__)
-#define __PRIF2_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST16_T__)
-#define __PRIF4_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST32_T__)
-#define __PRIF8_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST64_T__)
+#define __PRIN_PREFIX(n)  __PRIN2_PREFIX(n)
+#define __PRIL1_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST8_T__)
+#define __PRIL2_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST16_T__)
+#define __PRIL4_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST32_T__)
+#define __PRIL8_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST64_T__)
+#define __PRIF1_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST8_T__)
+#define __PRIF2_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST16_T__)
+#define __PRIF4_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST32_T__)
+#define __PRIF8_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST64_T__)
 
 
 #ifndef __SCA1_PREFIX
@@ -116,9 +117,9 @@
 #define __SCA1_PREFIX "h"
 #elif __SIZEOF_CHAR__ == 1
 #define __SCA1_PREFIX "hh"
-#else
+#else /* ... == 1 */
 #define __SCA1_PREFIX "I8"
-#endif
+#endif /* ... != 1 */
 #endif /* !__SCA1_PREFIX */
 
 #ifndef __SCA2_PREFIX
@@ -130,9 +131,9 @@
 #define __SCA2_PREFIX "l"
 #elif __SIZEOF_POINTER__ == 2
 #define __SCA2_PREFIX "I"
-#else
+#else /* ... == 2 */
 #define __SCA2_PREFIX "I16"
-#endif
+#endif /* ... != 2 */
 #endif /* !__SCA2_PREFIX */
 
 #ifndef __SCA4_PREFIX
@@ -147,9 +148,9 @@
 #define __SCA4_PREFIX "I"
 #elif __SIZEOF_LONG_LONG__ == 4
 #define __SCA4_PREFIX "ll"
-#else
+#else /* ... == 4 */
 #define __SCA4_PREFIX "I32"
-#endif
+#endif /* ... != 4 */
 #endif /* !__SCA4_PREFIX */
 
 #ifndef __SCA8_PREFIX
@@ -164,9 +165,9 @@
 #define __SCA8_PREFIX "I"
 #elif __SIZEOF_LONG_LONG__ == 8
 #define __SCA8_PREFIX "ll"
-#else
+#else /* ... == 8 */
 #define __SCA8_PREFIX "I64"
-#endif
+#endif /* ... != 8 */
 #endif /* !__SCA8_PREFIX */
 
 #ifndef __SCAP_PREFIX
@@ -176,21 +177,20 @@
 #define __SCAP_PREFIX "l"
 #elif __SIZEOF_INTMAX_T__ == __SIZEOF_POINTER__
 #define __SCAP_PREFIX "j"
-#else
+#else /* ... == __SIZEOF_POINTER__ */
 #define __SCAP_PREFIX "I"
-#endif
+#endif /* ... != __SIZEOF_POINTER__ */
 #endif /* !__SCAP_PREFIX */
 
 #define __SCAN2_PREFIX(n) __SCA##n##_PREFIX
-#define __SCAN_PREFIX(n) __SCAN2_PREFIX(n)
-#define __SCAL1_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST8_T__)
-#define __SCAL2_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST16_T__)
-#define __SCAL4_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST32_T__)
-#define __SCAL8_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST64_T__)
-#define __SCAF1_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST8_T__)
-#define __SCAF2_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST16_T__)
-#define __SCAF4_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST32_T__)
-#define __SCAF8_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST64_T__)
-
+#define __SCAN_PREFIX(n)  __SCAN2_PREFIX(n)
+#define __SCAL1_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_LEAST8_T__)
+#define __SCAL2_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_LEAST16_T__)
+#define __SCAL4_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_LEAST32_T__)
+#define __SCAL8_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_LEAST64_T__)
+#define __SCAF1_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_FAST8_T__)
+#define __SCAF2_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_FAST16_T__)
+#define __SCAF4_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_FAST32_T__)
+#define __SCAF8_PREFIX    __SCAN_PREFIX(__SIZEOF_INT_FAST64_T__)
 
 #endif /* !_BITS_CRT_INTTYPES_H */

@@ -213,7 +213,7 @@ char *setlocale(int category, char const *locale);
 
 @@Return the numeric/monetary information for the current locale
 [[std, decl_include("<bits/crt/lconv.h>")]]
-struct lconv *localeconv();
+[[nonnull]] struct lconv *localeconv();
 
 %
 %#ifdef __USE_XOPEN2K8

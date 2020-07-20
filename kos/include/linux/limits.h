@@ -24,55 +24,69 @@
 
 #include <asm/limits.h>
 
+/* Max # of open files handles */
 #if !defined(NR_OPEN) && defined(__OPEN_MAX) && (__OPEN_MAX + 0) != -1
-#define NR_OPEN __OPEN_MAX /* Max # of open files handles */
+#define NR_OPEN __OPEN_MAX
 #endif /* !NR_OPEN && __OPEN_MAX != -1 */
 
+/* Max # of supplemental group IDs that may be set () */
 #if !defined(NGROUPS_MAX) && defined(__NGROUPS_MAX) && (__NGROUPS_MAX + 0) != -1
-#define NGROUPS_MAX __NGROUPS_MAX /* Max # of supplemental group IDs that may be set () */
+#define NGROUPS_MAX __NGROUPS_MAX
 #endif /* !NGROUPS_MAX && __NGROUPS_MAX != -1 */
 
+/* Max # bytes of args + environ for exec(); */
 #if !defined(ARG_MAX) && defined(__ARG_MAX) && (__ARG_MAX + 0) != -1
-#define ARG_MAX __ARG_MAX /* Max # bytes of args + environ for exec(); */
+#define ARG_MAX __ARG_MAX
 #endif /* !ARG_MAX && __ARG_MAX != -1 */
 
+/* Max # links a file may have (fs-dependent) */
 #if !defined(LINK_MAX) && defined(__LINK_MAX) && (__LINK_MAX + 0) != -1
-#define LINK_MAX __LINK_MAX /* Max # links a file may have (fs-dependent) */
+#define LINK_MAX __LINK_MAX
 #endif /* !LINK_MAX && __LINK_MAX != -1 */
 
+/* Max size of the canonical input queue */
 #if !defined(MAX_CANON) && defined(__MAX_CANON) && (__MAX_CANON + 0) != -1
-#define MAX_CANON __MAX_CANON /* Max size of the canonical input queue */
+#define MAX_CANON __MAX_CANON
 #endif /* !MAX_CANON && __MAX_CANON != -1 */
 
+/* Max size of the type-ahead buffer */
 #if !defined(MAX_INPUT) && defined(__MAX_INPUT) && (__MAX_INPUT + 0) != -1
-#define MAX_INPUT __MAX_INPUT /* Max size of the type-ahead buffer */
+#define MAX_INPUT __MAX_INPUT
 #endif /* !MAX_INPUT && __MAX_INPUT != -1 */
 
+/* Max # chars in a file name */
 #if !defined(NAME_MAX) && defined(__NAME_MAX) && (__NAME_MAX + 0) != -1
-#define NAME_MAX __NAME_MAX /* Max # chars in a file name */
+#define NAME_MAX __NAME_MAX
 #endif /* !NAME_MAX && __NAME_MAX != -1 */
 
+/* Max # chars in a path name including nul */
 #if !defined(PATH_MAX) && defined(__PATH_MAX) && (__PATH_MAX + 0) != -1
-#define PATH_MAX __PATH_MAX /* Max # chars in a path name including nul */
+#define PATH_MAX __PATH_MAX
 #endif /* !PATH_MAX && __PATH_MAX != -1 */
 
+/* Max # bytes in atomic write to a pipe (Default value, assuming
+ * that backing memory isn't VIO or re-mapped during a write) */
 #if !defined(PIPE_BUF) && defined(__PIPE_BUF) && (__PIPE_BUF + 0) != -1
-#define PIPE_BUF __PIPE_BUF /* Max # bytes in atomic write to a pipe (Default value, assuming that backing memory isn't VIO or re-mapped during a write) */
+#define PIPE_BUF __PIPE_BUF
 #endif /* !PIPE_BUF && __PIPE_BUF != -1 */
 
+/* # of realtime signals */
 #if !defined(RTSIG_MAX) && defined(__RTSIG_MAX) && (__RTSIG_MAX + 0) != -1
-#define RTSIG_MAX __RTSIG_MAX /* # of realtime signals */
+#define RTSIG_MAX __RTSIG_MAX
 #endif /* !RTSIG_MAX && __RTSIG_MAX != -1 */
 
 #if 0
+/* Max # chars in an extended attribute name */
 #if !defined(XATTR_NAME_MAX) && defined(__XATTR_NAME_MAX) && (__XATTR_NAME_MAX + 0) != -1
-#define XATTR_NAME_MAX __XATTR_NAME_MAX /* Max # chars in an extended attribute name */
+#define XATTR_NAME_MAX __XATTR_NAME_MAX
 #endif /* !XATTR_NAME_MAX && __XATTR_NAME_MAX != -1 */
+/* Max size of an extended attribute value (64k) */
 #if !defined(XATTR_SIZE_MAX) && defined(__XATTR_SIZE_MAX) && (__XATTR_SIZE_MAX + 0) != -1
-#define XATTR_SIZE_MAX __XATTR_SIZE_MAX /* Max size of an extended attribute value (64k) */
+#define XATTR_SIZE_MAX __XATTR_SIZE_MAX
 #endif /* !XATTR_SIZE_MAX && __XATTR_SIZE_MAX != -1 */
+/* Max size of extended attribute namelist (64k) */
 #if !defined(XATTR_LIST_MAX) && defined(__XATTR_LIST_MAX) && (__XATTR_LIST_MAX + 0) != -1
-#define XATTR_LIST_MAX __XATTR_LIST_MAX /* Max size of extended attribute namelist (64k) */
+#define XATTR_LIST_MAX __XATTR_LIST_MAX
 #endif /* !XATTR_LIST_MAX && __XATTR_LIST_MAX != -1 */
 #endif
 

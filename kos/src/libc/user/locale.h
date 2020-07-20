@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebabf12d */
+/* HASH CRC-32:0x769ee8dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 /* Set and/or return the current locale */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_setlocale)(int category, char const *locale);
 /* Return the numeric/monetary information for the current locale */
-INTDEF struct lconv *NOTHROW_NCX(LIBCCALL libc_localeconv)(void);
+INTDEF ATTR_RETNONNULL struct lconv *NOTHROW_NCX(LIBCCALL libc_localeconv)(void);
 /* Return a reference to a data structure representing a set of locale
  * datasets. Unlike for the CATEGORY parameter for `setlocale' the
  * CATEGORY_MASK parameter here uses a single bit for each category,
