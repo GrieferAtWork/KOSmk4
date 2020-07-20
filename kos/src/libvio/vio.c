@@ -217,74 +217,74 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				resp_size = sizeof(resp.rq);
 			}	break;
 
-#define DEFINE_UVIO_OPERATION_BWL(add, ADD)                       \
-	case UVIO_OPCODE_##ADD##B:                                    \
-		resp.rb.ur_result = libvio_##add##b(&args, req.uq_addr,   \
-		                                    req.uq_args[0].ura_b, \
-		                                    FORCE_ATOMIC());      \
-		resp_size = sizeof(resp.rb);                              \
-		break;                                                    \
-	                                                              \
-	case UVIO_OPCODE_##ADD##W:                                    \
-		resp.rw.ur_result = libvio_##add##w(&args, req.uq_addr,   \
-		                                    req.uq_args[0].ura_w, \
-		                                    FORCE_ATOMIC());      \
-		resp_size = sizeof(resp.rw);                              \
-		break;                                                    \
-	                                                              \
-	case UVIO_OPCODE_##ADD##L:                                    \
-		resp.rl.ur_result = libvio_##add##l(&args, req.uq_addr,   \
-		                                    req.uq_args[0].ura_l, \
-		                                    FORCE_ATOMIC());      \
-		resp_size = sizeof(resp.rl);                              \
-		break;
+#define DEFINE_UVIO_OPERATION_BWL(add, ADD)                               \
+			case UVIO_OPCODE_##ADD##B:                                    \
+				resp.rb.ur_result = libvio_##add##b(&args, req.uq_addr,   \
+				                                    req.uq_args[0].ura_b, \
+				                                    FORCE_ATOMIC());      \
+				resp_size = sizeof(resp.rb);                              \
+				break;                                                    \
+			                                                              \
+			case UVIO_OPCODE_##ADD##W:                                    \
+				resp.rw.ur_result = libvio_##add##w(&args, req.uq_addr,   \
+				                                    req.uq_args[0].ura_w, \
+				                                    FORCE_ATOMIC());      \
+				resp_size = sizeof(resp.rw);                              \
+				break;                                                    \
+			                                                              \
+			case UVIO_OPCODE_##ADD##L:                                    \
+				resp.rl.ur_result = libvio_##add##l(&args, req.uq_addr,   \
+				                                    req.uq_args[0].ura_l, \
+				                                    FORCE_ATOMIC());      \
+				resp_size = sizeof(resp.rl);                              \
+				break;
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)                     \
-	case UVIO_OPCODE_##ADD##Q:                                    \
-		resp.rq.ur_result = libvio_##add##q(&args, req.uq_addr,   \
-		                                    req.uq_args[0].ura_q, \
-		                                    FORCE_ATOMIC());      \
-		resp_size = sizeof(resp.rq);                              \
-		break;
+#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)                             \
+			case UVIO_OPCODE_##ADD##Q:                                    \
+				resp.rq.ur_result = libvio_##add##q(&args, req.uq_addr,   \
+				                                    req.uq_args[0].ura_q, \
+				                                    FORCE_ATOMIC());      \
+				resp_size = sizeof(resp.rq);                              \
+				break;
 #elif defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
-#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)                \
-	case UVIO_OPCODE_##ADD##Q: {                             \
-		union qword q;                                       \
-		for (;;) {                                           \
-			q.l[0] = libvio_readl(&args, req.uq_addr + 0);   \
-			q.l[1] = libvio_readl(&args, req.uq_addr + 4);   \
-			if (libvio_cmpxchq(&args, req.uq_addr, q.q,      \
-			                   q.q op req.uq_args[0].ura_q,  \
-			                   FORCE_ATOMIC()))              \
-				break;                                       \
-			pthread_yield();                                 \
-		}                                                    \
-		resp.rq.ur_lresult[0] = q.l[0];                      \
-		resp.rq.ur_lresult[1] = q.l[1];                      \
-		resp_size = sizeof(resp.rq);                         \
-	} break;
+#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)                       \
+			case UVIO_OPCODE_##ADD##Q: {                            \
+				union qword q;                                      \
+				for (;;) {                                          \
+					q.l[0] = libvio_readl(&args, req.uq_addr + 0);  \
+					q.l[1] = libvio_readl(&args, req.uq_addr + 4);  \
+					if (libvio_cmpxchq(&args, req.uq_addr, q.q,     \
+					                   q.q op req.uq_args[0].ura_q, \
+					                   FORCE_ATOMIC()))             \
+						break;                                      \
+					pthread_yield();                                \
+				}                                                   \
+				resp.rq.ur_lresult[0] = q.l[0];                     \
+				resp.rq.ur_lresult[1] = q.l[1];                     \
+				resp_size = sizeof(resp.rq);                        \
+			}	break;
 #else /* LIBVIO_CONFIG_HAVE_QWORD */
-#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)               \
-	case UVIO_OPCODE_##ADD##Q: {                            \
-		union qword oldval, newval;                         \
-		oldval.l[0] = libvio_readl(&args, req.uq_addr + 0); \
-		oldval.l[1] = libvio_readl(&args, req.uq_addr + 4); \
-		newval.q    = oldval.q op req.uq_args[0].ura_q;     \
-		if (FORCE_ATOMIC()) {                               \
-			THROW(E_SEGFAULT_NOTATOMIC,                     \
-			      vio_args_faultaddr(&args, req.uq_addr),   \
-			      0,                                        \
-			      8,                                        \
-			      oldval.l[0 + LSW],                        \
-			      oldval.l[0 + MSW],                        \
-			      newval.l[2 + LSW],                        \
-			      newval.l[2 + MSW]);                       \
-		}                                                   \
-		libvio_writel(&args, req.uq_addr + 0, newval.l[0]); \
-		libvio_writel(&args, req.uq_addr + 4, newval.l[1]); \
-		resp_size = sizeof(resp.rq);                        \
-	} break;
+#define DEFINE_UVIO_OPERATION_Q(add, ADD, op)                       \
+			case UVIO_OPCODE_##ADD##Q: {                            \
+				union qword oldval, newval;                         \
+				oldval.l[0] = libvio_readl(&args, req.uq_addr + 0); \
+				oldval.l[1] = libvio_readl(&args, req.uq_addr + 4); \
+				newval.q    = oldval.q op req.uq_args[0].ura_q;     \
+				if (FORCE_ATOMIC()) {                               \
+					THROW(E_SEGFAULT_NOTATOMIC,                     \
+					      vio_args_faultaddr(&args, req.uq_addr),   \
+					      0,                                        \
+					      8,                                        \
+					      oldval.l[0 + LSW],                        \
+					      oldval.l[0 + MSW],                        \
+					      newval.l[2 + LSW],                        \
+					      newval.l[2 + MSW]);                       \
+				}                                                   \
+				libvio_writel(&args, req.uq_addr + 0, newval.l[0]); \
+				libvio_writel(&args, req.uq_addr + 4, newval.l[1]); \
+				resp_size = sizeof(resp.rq);                        \
+			}	break;
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 #define DEFINE_UVIO_OPERATION(add, ADD, op) \
 	DEFINE_UVIO_OPERATION_BWL(add, ADD)     \
@@ -441,6 +441,7 @@ spawn_uvio_service_thread(fd_t fd,
 	                       args /* inherit */);
 	if (error != EOK)
 		goto err_args;
+	/* Let the thread do its thing... */
 	pthread_detach(thread);
 	return 0;
 err_args:

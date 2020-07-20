@@ -508,6 +508,29 @@ DEFINE_TEST(segfault_special_addresses) {
 	test_addr((void *)UINT32_C(0xc0000000), true, true);  /* Min kernel-space address */
 	test_addr((void *)UINT32_C(0xffffffff), true, true);  /* Max kernel-space address */
 #endif /* !__x86_64__ */
+
+	/* FIXME: When a mapping exists for BFFFF000-BFFFFFFF, and an access is made
+	 *        at an address that overlaps with the far end of this address range
+	 *        (for this purpose, perform a 4-byte access at `BFFFFFFF'), #PF is
+	 *        triggered with %cr2=C0000000, which in turn results in VIO emulation
+	 *        being triggered as well. However, vio will then find that the access
+	 *        is actually happening at `BFFFFFFF', which causes it to not be
+	 *        dispatched through vio (since only addresses >= C0000000 are handled
+	 *        via VIO). As a result, the kernel will re-trigger the same #PF that
+	 *        originally caused the fault, and after a whole bunch of recursion,
+	 *        the kernel will end up double-faulting.
+	 * Solution: In `kos/src/libviocore/arch/i386/viocore.c', all of the range-checking
+	 *           dispatch functions must handle the case where an address is accessed
+	 *           that is only partially overlapping with VIO. This should then be handled
+	 *           by performing both a normal memory access, as well as a VIO access.
+	 *           In the event of such an access being performed in the context of an
+	 *           atomic operation, the kernel should throw an `E_SEGFAULT_UNALIGNED'
+	 *           exception.
+	 * TODO: Also add a test that intentionally creates a situation where a partial VIO
+	 *       access is performed to ensure that the kernel will forever handle this case
+	 *       correctly. (at least once it's been fixed)
+	 */
+
 }
 
 DECL_END
