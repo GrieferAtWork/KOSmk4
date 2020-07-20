@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_HYBRID_ARCH_I386_ASSERT32_S
 #define GUARD_LIBC_HYBRID_ARCH_I386_ASSERT32_S 1
+#define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>

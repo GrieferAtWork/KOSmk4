@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP64_S
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP64_S 1
+#define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
 #include <asm/cfi.h>
@@ -29,8 +30,7 @@
 .section .xdata
 PUBLIC_FUNCTION(kernel_debugtrap)
 	/* PUBLIC void FCALL
-	 * kernel_debugtrap(syscall_ulong_t trapno,
-	 *                  char const *trap_regs); */
+	 * kernel_debugtrap(struct debugtrap_reason *reason); */
 	.cfi_startproc
 	.cfi_signal_frame
 	ret
@@ -61,9 +61,8 @@ PUBLIC_FUNCTION(kernel_debugtrap)
 	pushq_cfi_r %r13                  /* [P] General purpose register #13 */
 	pushq_cfi_r %r14                  /* [P] General purpose register #14 */
 	pushq_cfi_r %r15                  /* [P] General purpose register #15 */
-	movq   %rsi, %rdx      /* char const *trap_regs */
-	movq   %rdi, %rsi      /* syscall_ulong_t trapno */
-	movq   %rsp, %rdi      /* struct icpustate *__restrict state */
+	movq   %rdi, %rsi      /* struct debugtrap_reason *reason */
+	movq   %rsp, %rdi      /* struct icpustate *state */
 	call   kernel_debugtrap_icpustate
 	.cfi_endproc
 END(kernel_debugtrap)

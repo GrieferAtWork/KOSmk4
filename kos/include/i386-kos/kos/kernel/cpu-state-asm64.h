@@ -384,6 +384,31 @@
 	ASM_PUSH_SGBASE_CFI_R                        \
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 
+/* Push everything necessary to create an `kcpustate'.
+ * This macro assumes that before being used, `%rip' already exists in `0(%rsp)'.
+ * @param: clobber_gpreg: 64-bit gp-register which may be clobbered. */
+#define ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(clobber_gpreg, sp_addend)    \
+	__ASM_L(pushfq_cfi_r)                                            \
+	__ASM_L(pushq_cfi_r %rax) /* [C] Accumulator register */         \
+	__ASM_L(pushq_cfi_r %rcx) /* [C] Count register */               \
+	__ASM_L(pushq_cfi_r %rdx) /* [C] Data register */                \
+	__ASM_L(pushq_cfi_r %rbx) /* [P] Base register */                \
+	__ASM_L(leaq   ((6*8) + (sp_addend))(%rsp), clobber_gpreg)       \
+	__ASM_L(pushq_cfi   clobber_gpreg) /* [P] Stack pointer */       \
+	__ASM_L(pushq_cfi_r %rbp) /* [P] Frame base pointer */           \
+	__ASM_L(pushq_cfi_r %rsi) /* [C] Source pointer */               \
+	__ASM_L(pushq_cfi_r %rdi) /* [C] Destination pointer */          \
+	__ASM_L(pushq_cfi_r %r8)  /* [C] General purpose register #8 */  \
+	__ASM_L(pushq_cfi_r %r9)  /* [C] General purpose register #9 */  \
+	__ASM_L(pushq_cfi_r %r10) /* [C] General purpose register #10 */ \
+	__ASM_L(pushq_cfi_r %r11) /* [C] General purpose register #11 */ \
+	__ASM_L(pushq_cfi_r %r12) /* [P] General purpose register #12 */ \
+	__ASM_L(pushq_cfi_r %r13) /* [P] General purpose register #13 */ \
+	__ASM_L(pushq_cfi_r %r14) /* [P] General purpose register #14 */ \
+	__ASM_L(pushq_cfi_r %r15) /* [P] General purpose register #15 */
+#define ASM_PUSH_KCPUSTATE_AFTER_RIP \
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_EX(%rax, 0)
+
 #endif /* __x86_64__ */
 
 

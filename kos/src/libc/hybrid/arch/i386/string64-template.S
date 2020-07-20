@@ -139,8 +139,8 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempcpy),
 	.cfi_startproc
 	BEGIN_CLD
 	NIF_PCPY(movq %rdi, %rax)
-#if N == 1
 	movq   %rdx, %rcx
+#if N == 1
 	shrq   $(3), %rcx
 	rep    movsq
 	jnc    1f /* if (!(n_bytes & 4)) goto 1f; */
@@ -153,7 +153,6 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempcpy),
 	movsb
 1:
 #elif N == 2
-	movq   %rdx, %rcx
 	shrq   $(2), %rcx
 	rep    movsq
 	jnc    1f /* if (!(n_words & 2)) goto 1f; */
@@ -163,16 +162,14 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempcpy),
 	movsw
 1:
 #elif N == 4
-	movq   %rdx, %rcx
 	shrq   $(1), %rcx
 	rep    movsq
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
 	movsl
 1:
-#else /* N... */
-	movq   %rdx, %rcx
+#else /* N == ... */
 	rep    movsq
-#endif /* !N... */
+#endif /* N != ... */
 	IF_PCPY(movq %rdi, %rax)
 	END_CLD
 	ret
@@ -456,7 +453,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempset),
 	jz     1f /* if (!(n_words & 1)) goto 1f; */
 	stosw
 1:	movq   IFELSE_PCPY(%rdi, %r8), %rax
-#else /* N == 1 */
+#else /* N == ... */
 	movb   %sil, %al
 	movb   %al, %ah
 	movw   %ax, %si
@@ -478,7 +475,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempset),
 	jz     1f /* if (!(n_bytes & 1)) goto 1f; */
 	stosb
 1:	movq   IFELSE_PCPY(%rdi, %r8), %rax
-#endif /* N == ... */
+#endif /* N != ... */
 	END_CLD
 	ret
 	.cfi_endproc
@@ -530,9 +527,9 @@ INTERN_FUNCTION(F(libc_bzero))
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
 	stosl
 1:
-#else /* N... */
+#else /* N == ... */
 	rep    stosq
-#endif /* !N... */
+#endif /* N != ... */
 	END_CLD
 	ret
 	.cfi_endproc
@@ -555,7 +552,7 @@ INTERN_FUNCTION(F(libc_memcmp))
 	 * num_Tword: %rdx */
 	movq   %rdx, %rcx /* count */
 	/* Compare DS:ESI (lhs) with ES:EDI (rhs) */
-	xorq   %rax, %rax /* result = 0; // HINT: This also forces %eflags to an equal-state to
+	xorq   %rax, %rax /* result = 0; // HINT: This also forces %eflags into a je=1 state to
 	                   *             //       handle %ecx==0 (where cmps won't update %eflags) */
 	repe   I(cmps)    /* Do the actual compare */
 	/* jb -> return -1; */
@@ -569,7 +566,6 @@ INTERN_FUNCTION(F(libc_memcmp))
 	.cfi_endproc
 END(F(libc_memcmp))
 DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
-
 
 /* TODO: memchr[b|w|l]()      (scas) */
 /* TODO: memrchr[b|w|l]()     (scas) */

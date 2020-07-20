@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S
 #define GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S 1
+#define __ASSEMBLER__ 1
 
 #if 1
 #define N 1

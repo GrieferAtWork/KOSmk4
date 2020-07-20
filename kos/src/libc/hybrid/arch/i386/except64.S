@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S
 #define GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S 1
+#define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
@@ -79,38 +80,13 @@ EXTERN(this_exception_state)
 #endif /* !__KERNEL__ */
 
 
-#define PUSH_KCPUSTATE_ON_FUNCTION_ENTRY                                           \
-	/* pushed by the caller: `0(%rsp) == %rip' */                                  \
-	pushfq_cfi_r; /* kcs_rflags */                                                 \
-	pushq_cfi_r %rax;  /* kcs_gpregs.gp_rax -- [C] Accumulator register */         \
-	pushq_cfi_r %rcx;  /* kcs_gpregs.gp_rcx -- [C] Count register */               \
-	pushq_cfi_r %rdx;  /* kcs_gpregs.gp_rdx -- [C] Data register */                \
-	pushq_cfi_r %rbx;  /* kcs_gpregs.gp_rbx -- [P] Base register */                \
-	leaq   48(%rsp), %rax;                                                         \
-	pushq_cfi   %rax;  /* kcs_gpregs.gp_rsp -- [P] Stack pointer */                \
-/*	.cfi_rel_offset %rsp, 0; */                                                    \
-	pushq_cfi_r %rbp;  /* kcs_gpregs.gp_rbp -- [P] Frame base pointer */           \
-	pushq_cfi_r %rsi;  /* kcs_gpregs.gp_rsi -- [C] Source pointer */               \
-	pushq_cfi_r %rdi;  /* kcs_gpregs.gp_rdi -- [C] Destination pointer */          \
-	pushq_cfi_r %r8;   /* kcs_gpregs.gp_r8  -- [C] General purpose register #8 */  \
-	pushq_cfi_r %r9;   /* kcs_gpregs.gp_r9  -- [C] General purpose register #9 */  \
-	pushq_cfi_r %r10;  /* kcs_gpregs.gp_r10 -- [C] General purpose register #10 */ \
-	pushq_cfi_r %r11;  /* kcs_gpregs.gp_r11 -- [C] General purpose register #11 */ \
-	pushq_cfi_r %r12;  /* kcs_gpregs.gp_r12 -- [P] General purpose register #12 */ \
-	pushq_cfi_r %r13;  /* kcs_gpregs.gp_r13 -- [P] General purpose register #13 */ \
-	pushq_cfi_r %r14;  /* kcs_gpregs.gp_r14 -- [P] General purpose register #14 */ \
-	pushq_cfi_r %r15;  /* kcs_gpregs.gp_r15 -- [P] General purpose register #15 */
-
-
-
 .section S_EXCEPT_TEXT(error_rethrow)
 DEFINE_PUBLIC_ALIAS(error_rethrow, libc_error_rethrow)
 INTERN_FUNCTION(libc_error_rethrow)
 	/* ATTR_NORETURN void error_rethrow(void) */
 	.cfi_startproc
 	.cfi_signal_frame
-	.cfi_def_cfa %rsp, 8
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 	orq    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
@@ -195,7 +171,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_error_rethrow)
 PUBLIC_FUNCTION(_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 	jmp    .Ldo_unwind_rsp
 	.cfi_endproc
 END(_Unwind_Resume)
@@ -209,7 +185,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, error_rethrow)
 INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
 	.cfi_signal_frame
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
 	INTERN(libc_Unwind_RaiseException_impl)
@@ -224,7 +200,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_RaiseException, libc_Unwind_RaiseException)
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
 	INTERN(libc_Unwind_Resume_impl)
@@ -239,7 +215,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
 	.cfi_signal_frame
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
 	INTERN(libc_Unwind_Resume_or_Rethrow_impl)
@@ -254,7 +230,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume_or_Rethrow, libc_Unwind_Resume_or_Rethrow)
 INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	.cfi_startproc
 	.cfi_signal_frame
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 	movq   %rdx, %rcx /* void *stop_arg */
 	movq   %rsi, %rdx /* _Unwind_Stop_Fn stop */
 	movq   %rdi, %rsi /* struct _Unwind_Exception *__restrict exception_object */
@@ -272,7 +248,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_ForcedUnwind, libc_Unwind_ForcedUnwind)
 INTERN_FUNCTION(libc_Unwind_Backtrace)
 	.cfi_startproc
 	.cfi_signal_frame
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 	movq   %rsi, %rdx /* void *arg */
 	movq   %rdi, %rsi /* _Unwind_Trace_Fn func */
 	movq   %rsp, %rdi /* error_register_state_t *__restrict state */
@@ -334,7 +310,7 @@ DEFINE_PUBLIC_ALIAS(error_thrown, libc_error_thrown)
 INTERN_FUNCTION(libc_error_thrown)
 	/* ATTR_NORETURN void error_thrown(error_code_t code, unsigned int argc, ...) */
 	.cfi_startproc
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 /*	.cfi_rel_offset %rsp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP */
@@ -455,7 +431,7 @@ INTERN_FUNCTION(libc_error_throw)
 	.cfi_startproc
 	/* ATTR_NORETURN void FCALL error_throw(error_code_t code) */
 IU(	.cfi_remember_state)
-IU(	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY)
+IU(	ASM_PUSH_KCPUSTATE_AFTER_RIP)
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 IU(	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)(%rsp), %rdi)
@@ -472,7 +448,7 @@ IU(	.cfi_restore_state)
 DEFINE_PUBLIC_ALIAS(error_throw_current, libc_error_throw_current)
 INTERN_FUNCTION(libc_error_throw_current)
 	/* ATTR_NORETURN void error_throw_current(void) */
-	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
+	ASM_PUSH_KCPUSTATE_AFTER_RIP
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
 IU(1:)
@@ -589,11 +565,11 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 	COPYSTATE(%rbp, OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBP, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBP)
 #if OFFSET_KCPUSTATE_RFLAGS != OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS
 #error "This code assumes that kcpustate:%rflags shares its offset with icpustate:%cs"
-#endif
+#endif /* OFFSET_KCPUSTATE_RFLAGS != OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS */
 	COPYSTATE(%rflags, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS, OFFSET_KCPUSTATE_RFLAGS)
 #if OFFSET_KCPUSTATE_RIP != OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS
 #error "This code assumes that kcpustate:%rip shares its offset with icpustate:%rflags"
-#endif
+#endif /* OFFSET_KCPUSTATE_RIP != OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS */
 	COPYSTATE(%rip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP, OFFSET_KCPUSTATE_RIP)
 	/* Copy unaligned GP registers from the back to the first, thus not
 	 * overwriting anything in regards to the gap that has to be created for %rsp */

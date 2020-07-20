@@ -18,9 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #include <kernel/compiler.h>
+
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-
 
 
 
@@ -54,11 +54,11 @@ END(PP_CAT3(__x86_trigger_debugtrap_,CPUSTATE,_call_offset))
 	movl   %eax, %esp
 	EXTERN(PP_CAT3(cpu_apply_,CPUSTATE,_esp))
 	jmp    PP_CAT3(cpu_apply_,CPUSTATE,_esp)
-#else
+#else /* CPUSTATE_IS_ICPUSTATE || CPUSTATE_IS_SCPUSTATE */
 	movl   %eax, %ecx
 	EXTERN(PP_CAT2(cpu_apply_,CPUSTATE))
 	jmp    PP_CAT2(cpu_apply_,CPUSTATE)
-#endif
+#endif /* !CPUSTATE_IS_ICPUSTATE && !CPUSTATE_IS_SCPUSTATE */
 	.cfi_endproc
 END(PP_CAT2(trigger_debugtrap_,CPUSTATE))
 
