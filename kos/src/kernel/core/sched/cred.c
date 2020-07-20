@@ -641,12 +641,12 @@ do_set_new_group:
 
 
 
-PUBLIC void KCALL
+PUBLIC void FCALL
 cred_require_hwio(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* TODO */
 }
 
-PUBLIC void KCALL
+PUBLIC void FCALL
 cred_require_hwio_r(port_t from, port_t num)
 		THROWS(E_INSUFFICIENT_RIGHTS) {
 	(void)from;

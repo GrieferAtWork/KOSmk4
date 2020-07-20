@@ -584,13 +584,24 @@ x86_emulate_rtm_instruction(struct rtm_machstate *__restrict self);
 
 
 
+#ifdef __x86_64__
 #define EMU86_EMULATE_RETURN_AFTER_SYSCALL() \
 	return x86_emulate_rtm_instruction_syscall(self, op_flags)
 #define EMU86_EMULATE_RETURN_AFTER_SYSENTER() \
 	return x86_emulate_rtm_instruction_syscall(self, op_flags)
+#else /* __x86_64__ */
+#define EMU86_EMULATE_RETURN_AFTER_SYSCALL() \
+	return x86_emulate_rtm_instruction_syscall(self)
+#define EMU86_EMULATE_RETURN_AFTER_SYSENTER() \
+	return x86_emulate_rtm_instruction_syscall(self)
+#endif /* !__x86_64__ */
 PRIVATE NONNULL((1)) x86_rtm_status_t FCALL
-x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
-                                    emu86_opflags_t op_flags) {
+x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
+#ifdef __x86_64__
+                                    ,
+                                    emu86_opflags_t op_flags
+#endif /* __x86_64__ */
+                                    ) {
 	syscall_ulong_t sysno;
 	sysno = self->r_pax;
 #ifdef HAVE_RTM_EMULATION_TRACE
@@ -731,14 +742,28 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self,
 	return ABORT_WITH(_XABORT_FAILED);
 }
 
+#ifdef __x86_64__
 #define EMU86_EMULATE_RETURN_AFTER_INT(intno) \
 	return x86_emulate_rtm_instruction_int(self, intno, op_flags)
+#else /* __x86_64__ */
+#define EMU86_EMULATE_RETURN_AFTER_INT(intno) \
+	return x86_emulate_rtm_instruction_int(self, intno)
+#endif /* !__x86_64__ */
 PRIVATE NONNULL((1)) x86_rtm_status_t FCALL
 x86_emulate_rtm_instruction_int(struct rtm_machstate *__restrict self,
-                                u8 intno, emu86_opflags_t op_flags) {
+                                u8 intno
+#ifdef __x86_64__
+                                ,
+                                emu86_opflags_t op_flags
+#endif /* __x86_64__ */
+                                ) {
 	if (intno == 0x80) {
 		/* syscall emulation */
+#ifdef __x86_64__
 		return x86_emulate_rtm_instruction_syscall(self, op_flags);
+#else /* __x86_64__ */
+		return x86_emulate_rtm_instruction_syscall(self);
+#endif /* !__x86_64__ */
 	}
 	if (intno == 0x03)
 		return ABORT_WITH(_XABORT_DEBUG);
