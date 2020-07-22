@@ -20,22 +20,17 @@
 
 %{
 #include <features.h>
+#include <hybrid/typecore.h>
+#include <bits/crt/_diskfree_t.h>
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef _DISKFREE_T_DEFINED
-#define _DISKFREE_T_DEFINED 1
-}%[push_macro @undef { total_clusters avail_clusters sectors_per_cluster bytes_per_sector }]%{
-struct _diskfree_t {
-	__UINT32_TYPE__ total_clusters;
-	__UINT32_TYPE__ avail_clusters;
-	__UINT32_TYPE__ sectors_per_cluster;
-	__UINT32_TYPE__ bytes_per_sector;
-};
-}%[pop_macro]%{
-#endif /* !_DISKFREE_T_DEFINED */
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __SIZE_TYPE__ size_t;
+#endif /* !__size_t_defined */
 
 }
 
@@ -45,19 +40,21 @@ struct _diskfree_t {
 
 %[default:section(".text.crt.dos.fs.property")]
 %#define _getdcwd_nolock _getdcwd
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 char *_getdcwd(int drive, char *buf, size_t size);
 
-[[cp]] int _chdrive(int drive);
-[[cp]] int _getdrive();
-[[cp]] __ULONG32_TYPE__ _getdrives();
+[[cp]]
+int _chdrive(int drive);
+
+[[cp]]
+int _getdrive();
+
+[[cp, decl_include("<hybrid/typecore.h>")]]
+__ULONG32_TYPE__ _getdrives();
 
 %
-%#ifndef _GETDISKFREE_DEFINED
-%#define _GETDISKFREE_DEFINED 1
-[[cp, guard]]
+[[cp, guard("_GETDISKFREE_DEFINED"), decl_include("<bits/crt/_diskfree_t.h>")]]
 unsigned int _getdiskfree(unsigned int drive, struct _diskfree_t *diskfree);
-%#endif /* !_GETDISKFREE_DEFINED */
 
 /* A small hand full of functions defined in '<direct.h>' */
 %[insert:extern(getcwd)];

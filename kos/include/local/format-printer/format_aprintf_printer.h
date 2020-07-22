@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42c78ada */
+/* HASH CRC-32:0xdf0e8716 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_aprintf_alloc from format-printer */
 #ifndef __local___localdep_format_aprintf_alloc_defined

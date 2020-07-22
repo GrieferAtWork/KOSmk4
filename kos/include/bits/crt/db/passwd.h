@@ -24,9 +24,8 @@
 
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 /*
  * C structure for describing a password database entry from /etc/passwd
@@ -64,8 +63,7 @@ struct passwd {
 	char   *pw_shell;  /* [1..1] Shell program. (empty string if not set) */
 };
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_DB_PASSWD_H */

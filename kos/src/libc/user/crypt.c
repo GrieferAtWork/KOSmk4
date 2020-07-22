@@ -60,11 +60,11 @@ NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 }
 /*[[[end:libc_setkey]]]*/
 
-/*[[[head:libc_encrypt,hash:CRC-32=0xeae8bd88]]]*/
+/*[[[head:libc_encrypt,hash:CRC-32=0x6927dc3f]]]*/
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
-                                   int edflag)
+                                   __STDC_INT_AS_UINT_T edflag)
 /*[[[body:libc_encrypt]]]*/
 /*AUTO*/{
 	(void)glibc_block;

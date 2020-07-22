@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7729b3 */
+/* HASH CRC-32:0x7450ab4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_argz_add_sep_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined

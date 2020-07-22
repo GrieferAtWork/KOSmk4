@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8413ba11 */
+/* HASH CRC-32:0x1baa2159 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_strtoimax_l_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtoimax from inttypes */
 #ifndef __local___localdep_strtoimax_defined

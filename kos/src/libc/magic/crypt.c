@@ -23,6 +23,10 @@
 %{
 #include <features.h>
 
+#ifdef __USE_GNU
+#include <bits/crt/crypt_data.h>
+#endif /* __USE_GNU */
+
 /* Derived from GLibc: /usr/include/crypt.h */
 /*
  * UFC-crypt: ultra fast crypt(3) implementation
@@ -60,40 +64,25 @@ void setkey([[nonnull]] char const *key);
 char *crypt([[nonnull]] char const *key, [[nonnull]] char const *salt);
 
 @@Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place
-[[guard]]
-void encrypt([[nonnull]] char *glibc_block, int edflag);
+[[guard, decl_include("<features.h>")]]
+void encrypt([[nonnull]] char *glibc_block, __STDC_INT_AS_UINT_T edflag);
 
 %
 %#ifdef __USE_GNU
 %/* Reentrant versions of the functions above.
 % * The additional argument points to a structure where the results are placed in.  */
-%[push_macro @undef { keysched sb0 sb1 sb2 sb3 crypt_3_buf current_salt current_saltbits direction initialized }]%{
-struct crypt_data {
-	char             keysched[16 * 8];
-	char             sb0[32768];
-	char             sb1[32768];
-	char             sb2[32768];
-	char             sb3[32768];
-	/* end-of-aligment-critical-data */
-	char             crypt_3_buf[14];
-	char             current_salt[2];
-	__LONGPTR_TYPE__ current_saltbits;
-	__INT32_TYPE__   direction;
-	__INT32_TYPE__   initialized;
-};
-}%[pop_macro]
 %
 
-[[doc_alias("crypt")]]
+[[doc_alias("crypt"), decl_include("<bits/crt/crypt_data.h>")]]
 char *crypt_r([[nonnull]] char const *key,
               [[nonnull]] char const *salt,
               [[nonnull]] struct crypt_data *__restrict data);
 
-[[doc_alias("setkey")]]
+[[doc_alias("setkey"), decl_include("<bits/crt/crypt_data.h>")]]
 void setkey_r([[nonnull]] char const *key,
               [[nonnull]] struct crypt_data *__restrict data);
 
-[[doc_alias("encrypt")]]
+[[doc_alias("encrypt"), decl_include("<bits/crt/crypt_data.h>")]]
 void encrypt_r([[nonnull]] char *glibc_block, int edflag,
                [[nonnull]] struct crypt_data *__restrict data);
 

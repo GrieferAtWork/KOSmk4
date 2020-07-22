@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd6be319 */
+/* HASH CRC-32:0x299c3d4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2007,7 +2007,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key,
 #define __encrypt_defined 1
 #ifdef __CRT_HAVE_encrypt
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, int __edflag),(__glibc_block,__edflag))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
 #else /* __CRT_HAVE_encrypt */
 #undef __encrypt_defined
 #endif /* !__CRT_HAVE_encrypt */

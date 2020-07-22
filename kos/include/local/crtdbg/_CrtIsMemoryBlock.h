@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a0eee6 */
+/* HASH CRC-32:0x55066b7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local__CrtIsMemoryBlock_defined
 #define __local__CrtIsMemoryBlock_defined 1
 #include <__crt.h>
+#include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtIsMemoryBlock) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line) {

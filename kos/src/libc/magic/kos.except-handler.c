@@ -249,7 +249,7 @@ typedef __except_handler_t except_handler_t;
 @@@param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
-[[nothrow]]
+[[nothrow, decl_include("<kos/bits/except-handler.h>")]]
 int set_exception_handler(unsigned int mode, except_handler_t handler, void *handler_sp);
 
 @@Get the current exception handler mode for the calling thread.
@@ -265,6 +265,7 @@ int set_exception_handler(unsigned int mode, except_handler_t handler, void *han
 @@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
 @@@return: 0 :         Success.
 @@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
+[[decl_include("<kos/bits/except-handler.h>")]]
 int get_exception_handler([[nullable]] unsigned int *pmode,
                           [[nullable]] except_handler_t *phandler,
                           [[nullable]] void **phandler_sp);

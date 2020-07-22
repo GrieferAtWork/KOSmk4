@@ -378,6 +378,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), bind_local_function(labs)]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), bind_local_function(llabs)]]
 [[section(".text.crt{|.dos}.math.utility")]]
+[[decl_include("<hybrid/typecore.h>")]]
 $intmax_t imaxabs($intmax_t x) {
 	return x < 0 ? -x : x;
 }
@@ -402,7 +403,7 @@ imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("strto32")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strto32)]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $intmax_t strtoimax([[nonnull]] char const *__restrict nptr,
                     [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 @@pp_if __SIZEOF_INTMAX_T__ <= 4@@
@@ -420,7 +421,7 @@ $intmax_t strtoimax([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("strtou32")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strtou32)]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $uintmax_t strtoumax([[nonnull]] char const *__restrict nptr,
                      [[nullable]] char ** endptr, __STDC_INT_AS_UINT_T base) {
 @@pp_if __SIZEOF_INTMAX_T__ <= 4@@
@@ -439,7 +440,7 @@ $uintmax_t strtoumax([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("wcsto32")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcsto32)]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $intmax_t wcstoimax([[nonnull]] $wchar_t const *__restrict nptr,
                     [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base)
 	%{generate(str2wcs("strtoimax"))}
@@ -452,7 +453,7 @@ $intmax_t wcstoimax([[nonnull]] $wchar_t const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstou32")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcstou32)]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
                      [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base)
 	%{generate(str2wcs("strtoumax"))}
@@ -473,7 +474,7 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64_l)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strto32_l)]]
 [[section(".text.crt{|.dos}.unicode.locale.convert")]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $intmax_t strtoimax_l([[nonnull]] char const *__restrict nptr,
                       [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                       $locale_t locale) {
@@ -490,7 +491,7 @@ $intmax_t strtoimax_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64_l)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strtou32_l)]]
 [[section(".text.crt{|.dos}.unicode.locale.convert")]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $uintmax_t strtoumax_l([[nonnull]] char const *__restrict nptr,
                        [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                        $locale_t locale) {
@@ -506,7 +507,7 @@ $uintmax_t strtoumax_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64_l)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcsto32_l)]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $intmax_t wcstoimax_l([[nonnull]] $wchar_t const *__restrict nptr,
                       [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base,
                       $locale_t locale)
@@ -520,7 +521,7 @@ $intmax_t wcstoimax_l([[nonnull]] $wchar_t const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64_l)]]
 [[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcstou32_l)]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
                        [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base,
                        $locale_t locale)

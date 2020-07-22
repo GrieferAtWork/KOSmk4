@@ -219,7 +219,7 @@ DIR *opendir([[nonnull]] char const *name) {
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
 [[userimpl, requires_function(fdopendir, openat)]]
 DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 	DIR *result;
@@ -251,7 +251,7 @@ int closedir([[nonnull]] DIR *dirp);
 %
 %#ifdef __USE_BSD
 @@Same as `closedir()', but instead of closing the underlying file descriptor, return it
-[[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
 $fd_t fdclosedir([[nonnull]] DIR *dirp);
 %#endif /* __USE_BSD */
 
@@ -272,7 +272,7 @@ void rewinddir([[nonnull]] DIR *__restrict dirp);
 %
 %#ifdef __USE_XOPEN2K8
 @@Create a new directory stream by inheriting the given `FD' as stream handle
-[[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
 DIR *fdopendir($fd_t fd);
 %#endif /* __USE_XOPEN2K8 */
 
@@ -312,12 +312,12 @@ int readdir64_r([[nonnull]] DIR *__restrict dirp,
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
 
 @@Get the directory stream position
-[[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
 void seekdir([[nonnull]] DIR *__restrict dirp, $longptr_t pos);
 
 @@Get the directory stream position
-[[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
-long int telldir([[nonnull]] DIR *__restrict dirp);
+[[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
+$longptr_t telldir([[nonnull]] DIR *__restrict dirp);
 
 %#endif /* __USE_MISC || __USE_XOPEN */
 
@@ -326,7 +326,7 @@ long int telldir([[nonnull]] DIR *__restrict dirp);
 %
 %#ifdef __USE_XOPEN2K8
 @@Return the underlying file descriptor of the given directory stream
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[ATTR_PURE, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 $fd_t dirfd([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp);
 
@@ -482,7 +482,7 @@ int versionsort64([[nonnull]] struct dirent64 const **e1,
 @@                   stream will only be advanced when this value is >= 'BUFSIZE'
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
-[[decl_include("<bits/dirent.h>")]]
+[[decl_include("<bits/dirent.h>", "<bits/types.h>")]]
 [[if(defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddir64")]]
 [[cp, wunused, userimpl, requires_function(kreaddirf)]]
 $ssize_t kreaddir($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode) {

@@ -140,14 +140,25 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 %#ifdef __USE_DOS
 %#ifdef __CC__
 
+[[decl_include("<hybrid/typecore.h>")]]
 $uint32_t _clearfp();
+
+[[decl_include("<hybrid/typecore.h>")]]
 $uint32_t _controlfp($uint32_t newval, $uint32_t mask);
-_set_controlfp($uint32_t newval, $uint32_t mask);
+
+[[decl_include("<hybrid/typecore.h>")]]
+void _set_controlfp($uint32_t newval, $uint32_t mask);
+
+[[decl_include("<hybrid/typecore.h>")]]
 $errno_t _controlfp_s($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask);
+
+[[decl_include("<hybrid/typecore.h>")]]
 $uint32_t _statusfp();
 
 %[insert:function(_fpreset = fpreset)]
-_statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
+
+[[decl_include("<hybrid/typecore.h>")]]
+void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 
 %#endif /* __CC__ */
 %{
@@ -201,12 +212,16 @@ _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #ifdef __CC__
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 $uint32_t _control87($uint32_t newval, $uint32_t mask);
+
 %#if defined(__x86_64__) || defined(__i386__)
+[[decl_include("<hybrid/typecore.h>")]]
 int __control87_2($uint32_t newval, $uint32_t mask,
                   $uint32_t *x86_control_word,
                   $uint32_t *sse2_control_word);
 %#endif /* X64... */
+
 [[guard]] int *__fpecode();
 %{
 #ifdef ____fpecode_defined

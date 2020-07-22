@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x523d34b7 */
+/* HASH CRC-32:0x14cc6a96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_envz_strip_defined
 #define __local_envz_strip_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined

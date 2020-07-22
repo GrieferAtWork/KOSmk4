@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e1a3e39 */
+/* HASH CRC-32:0x50d40f19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,6 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_fparseln
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.

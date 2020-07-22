@@ -23,6 +23,8 @@
 
 #include <hybrid/host.h> /* __i386__, __x86_64__ */
 
+#include <bits/crt/_diskfree_t.h>
+
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>
 #ifndef SEEK_SET
@@ -48,24 +50,11 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-/* Use the better name by default. */
-#define _diskfree_t diskfree_t
-#ifndef _DISKFREE_T_DEFINED
-#define _DISKFREE_T_DEFINED 1
-struct _diskfree_t {
-	__UINT32_TYPE__ total_clusters;
-	__UINT32_TYPE__ avail_clusters;
-	__UINT32_TYPE__ sectors_per_cluster;
-	__UINT32_TYPE__ bytes_per_sector;
-};
-#endif /* !_DISKFREE_T_DEFINED */
+#define diskfree_t _diskfree_t
 
 }
 
-%#ifndef _GETDISKFREE_DEFINED
-%#define _GETDISKFREE_DEFINED 1
-%[insert:extern(_getdiskfree)]
-%#endif /* !_GETDISKFREE_DEFINED */
+%[insert:function(_getdiskfree = _getdiskfree, guardName: "_GETDISKFREE_DEFINED")]
 
 %{
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc248a224 */
+/* HASH CRC-32:0xfd0045ec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_argz_replace_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmem from string */
 #ifndef __local___localdep_memmem_defined

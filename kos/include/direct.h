@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa78b22b8 */
+/* HASH CRC-32:0x991073a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,36 +29,17 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <hybrid/typecore.h>
+#include <bits/crt/_diskfree_t.h>
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef _DISKFREE_T_DEFINED
-#define _DISKFREE_T_DEFINED 1
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("total_clusters")
-#pragma push_macro("avail_clusters")
-#pragma push_macro("sectors_per_cluster")
-#pragma push_macro("bytes_per_sector")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef total_clusters
-#undef avail_clusters
-#undef sectors_per_cluster
-#undef bytes_per_sector
-struct _diskfree_t {
-	__UINT32_TYPE__ total_clusters;
-	__UINT32_TYPE__ avail_clusters;
-	__UINT32_TYPE__ sectors_per_cluster;
-	__UINT32_TYPE__ bytes_per_sector;
-};
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("bytes_per_sector")
-#pragma pop_macro("sectors_per_cluster")
-#pragma pop_macro("avail_clusters")
-#pragma pop_macro("total_clusters")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !_DISKFREE_T_DEFINED */
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __SIZE_TYPE__ size_t;
+#endif /* !__size_t_defined */
 
 #ifdef __CRT_HAVE_getcwd
 /* >> getcwd(2)
@@ -100,14 +81,11 @@ __CDECLARE_OPT(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 
 #ifndef _GETDISKFREE_DEFINED
 #define _GETDISKFREE_DEFINED 1
-#ifndef ___getdiskfree_defined
-#define ___getdiskfree_defined 1
 #ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #else /* __CRT_HAVE__getdiskfree */
-#undef ___getdiskfree_defined
+#undef _GETDISKFREE_DEFINED
 #endif /* !__CRT_HAVE__getdiskfree */
-#endif /* !___getdiskfree_defined */
 #endif /* !_GETDISKFREE_DEFINED */
 #ifndef __getcwd_defined
 #define __getcwd_defined 1

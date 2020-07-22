@@ -24,9 +24,8 @@
 
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 /*
  * C structure for describing a password database entry from /etc/group
@@ -48,8 +47,7 @@ struct group {
 	char  **gr_mem;    /* [0..1][1..1] Member list. (`NULL' is used as sentinel) */
 };
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_DB_GROUP_H */

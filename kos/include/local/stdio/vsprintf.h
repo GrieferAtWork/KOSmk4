@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76905a0e */
+/* HASH CRC-32:0x9cf62e56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_sprintf_printer
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
@@ -49,6 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these

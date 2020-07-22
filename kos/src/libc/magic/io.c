@@ -22,8 +22,11 @@
 %[define_replacement(oflag_t = __oflag_t)]
 
 %{
+
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -41,7 +44,7 @@ __SYSDECL_BEGIN
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef __size_t_defined
@@ -65,7 +68,7 @@ typedef __UINT32_TYPE__ _fsize_t;
 #endif /* _FSIZE_T_DEFINED */
 
 struct _finddata32_t;
-struct __finddata64_t; /* I guess something else already using the more obvious choice... */
+struct __finddata64_t; /* I guess something else is already using the more obvious choice... */
 struct _finddata32i64_t;
 struct _finddata64i32_t;
 
@@ -107,6 +110,7 @@ struct _finddata64i32_t;
 %[insert:function(_chmod = chmod)]
 
 [[cp, section(".text.crt.dos.fs.property")]]
+[[decl_include("<bits/types.h>")]]
 errno_t _access_s([[nonnull]] char const *filename, int type);
 
 %[insert:function(_chsize = chsize)]
@@ -130,38 +134,39 @@ errno_t _access_s([[nonnull]] char const *filename, int type);
 %
 %
 %[default:section(".text.crt.dos.fs.dir")]
+[[decl_include("<hybrid/typecore.h>")]]
 int _findclose(intptr_t findfd);
 
-[[cp, wunused, export_alias("_findfirst")]]
+[[cp, wunused, export_alias("_findfirst"), decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst32([[nonnull]] char const *__restrict filename,
                       [[nonnull]] struct _finddata32_t *__restrict finddata);
 
-[[cp, wunused, export_alias("_findfirsti64")]]
+[[cp, wunused, export_alias("_findfirsti64"), decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst32i64([[nonnull]] char const *__restrict filename,
                          [[nonnull]] struct _finddata32i64_t *__restrict finddata);
 
-[[cp, wunused, export_alias("_findfirst64i32")]]
+[[cp, wunused, export_alias("_findfirst64i32"), decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst64([[nonnull]] char const *__restrict filename,
                       [[nonnull]] struct __finddata64_t *__restrict finddata);
 
-[[cp, wunused]]
+[[cp, wunused, decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst64i32([[nonnull]] char const *__restrict filename,
                          [[nonnull]] struct _finddata64i32_t *__restrict finddata)
 	= _findfirst64;
 
-[[cp, export_alias("_findnext")]]
+[[cp, export_alias("_findnext"), decl_include("<hybrid/typecore.h>")]]
 int _findnext32(intptr_t findfd,
                 [[nonnull]] struct _finddata32_t *__restrict finddata);
 
-[[cp, export_alias("_findnexti64")]]
+[[cp, export_alias("_findnexti64"), decl_include("<hybrid/typecore.h>")]]
 int _findnext32i64(intptr_t findfd,
                    [[nonnull]] struct _finddata32i64_t *__restrict finddata);
 
-[[cp, export_alias("_findnext64i32")]]
+[[cp, export_alias("_findnext64i32"), decl_include("<hybrid/typecore.h>")]]
 int _findnext64(intptr_t findfd,
                 [[nonnull]] struct __finddata64_t *__restrict finddata);
 
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int _findnext64i32(intptr_t findfd,
                    [[nonnull]] struct _finddata64i32_t *__restrict finddata)
 	= _findnext64;
@@ -244,9 +249,9 @@ $int64_t _telli64($fd_t fd) {
 
 %[default:section(".text.crt.dos.fs.basic_property")]
 
-[[impl_include("<parts/errno.h>")]]
 [[decl_include("<bits/types.h>")]]
-[[requires($has_function(umask))]]
+[[requires_function(umask)]]
+[[impl_include("<parts/errno.h>")]]
 errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 	if (!oldmode) {
 @@pp_ifdef EINVAL@@

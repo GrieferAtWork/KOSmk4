@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f5103f7 */
+/* HASH CRC-32:0x71205f09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,7 @@ DFUN(".text.crt.dos.fs.dir", libd_readdir64, libc_readdir64, TP, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_readdir_r, libc_readdir_r, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_readdir64_r, libc_readdir64_r, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_seekdir, libc_seekdir, TV, 2, TP, TP)
-DFUN(".text.crt.dos.fs.dir", libd_telldir, libc_telldir, TL, 1, TP)
+DFUN(".text.crt.dos.fs.dir", libd_telldir, libc_telldir, TP, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_dirfd, libc_dirfd, TIn(__SIZEOF_FD_T__), 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd_scandir, libc_scandir, TD, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.dir", libd_alphasort, libc_alphasort, TD, 2, TP, TP)

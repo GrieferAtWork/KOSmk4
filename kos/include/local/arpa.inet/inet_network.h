@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeeaff90 */
+/* HASH CRC-32:0xbb9e76f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,15 @@
 #ifndef __local_inet_network_defined
 #define __local_inet_network_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: inet_paton from arpa.inet */
 #ifndef __local___localdep_inet_paton_defined
 #define __local___localdep_inet_paton_defined 1
 #ifdef __CRT_HAVE_inet_paton
+__NAMESPACE_LOCAL_END
+#include <netinet/bits/in.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `inet_aton()', but update `*pcp' to point after the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)

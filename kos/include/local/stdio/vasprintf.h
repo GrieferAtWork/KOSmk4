@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x497737d5 */
+/* HASH CRC-32:0xac7760b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,6 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_aprintf_printer
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
@@ -104,6 +105,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these

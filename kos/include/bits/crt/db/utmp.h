@@ -27,7 +27,6 @@
 #include <bits/types.h>
 #include <bits/timeval.h>
 
-__DECL_BEGIN
 
 /* The `struct utmp' type, describing entries in the utmp file.  GNU version.
    Copyright (C) 1993-2016 Free Software Foundation, Inc.
@@ -52,6 +51,8 @@ __DECL_BEGIN
 #define UT_HOSTSIZE    256
 
 #ifdef __CC__
+__DECL_BEGIN
+
 /* The structure describing an entry in the database of previous logins. */
 struct lastlog {
 	__time32_t ll_time;
@@ -93,6 +94,8 @@ struct utmp {
 	};
 	char __glibc_reserved[20];         /* Reserved for future use. */
 };
+
+__DECL_END
 #endif /* __CC__ */
 
 /* Values for the `ut_type' field of a `struct utmp'. */
@@ -117,7 +120,5 @@ struct utmp {
 #define _HAVE_UT_ID     1
 #define _HAVE_UT_TV     1
 #define _HAVE_UT_HOST   1
-
-__DECL_END
 
 #endif /* !_BITS_CRT_DB_UTMP_H */

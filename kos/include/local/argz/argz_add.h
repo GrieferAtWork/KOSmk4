@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63afd0ac */
+/* HASH CRC-32:0xb4d78ad1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_argz_add_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: argz_append from argz */
 #ifndef __local___localdep_argz_append_defined

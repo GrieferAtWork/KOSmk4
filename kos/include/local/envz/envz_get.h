@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbf725a9 */
+/* HASH CRC-32:0x53fc1792 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_envz_get_defined
 #define __local_envz_get_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: envz_entry from envz */
 #ifndef __local___localdep_envz_entry_defined

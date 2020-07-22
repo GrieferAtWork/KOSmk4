@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57ff69bc */
+/* HASH CRC-32:0x2f60ebf5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local_inet_lnaof_defined
 #define __local_inet_lnaof_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
+#include <netinet/bits/in.h>
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN

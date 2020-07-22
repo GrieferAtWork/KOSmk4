@@ -23,7 +23,7 @@
 
 #include <features.h>
 
-#include <asm/util.h>
+#include <asm/crt/util.h>
 #include <bits/types.h>
 
 /*#include <sys/types.h>*/
@@ -89,7 +89,7 @@ typedef __SIZE_TYPE__ size_t;
 %[insert:extern(logwtmp)]
 
 @@@param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK'
-[[cp, wunused, decl_include("<features.h>")]]
+[[cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
               __STDC_INT_AS_UINT_T dflags,
               [[nullable]] char **realpath);
@@ -113,8 +113,8 @@ $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
 @@                 return of this function, `strdup("")' will be returned. (i.e. NULL
 @@                 is only returned in case of an error; _NOT_ in case of end-of-file)
 @@@return: NULL:   Error (s.a. `errno' and `ferror(stream)')
-[[cp, wunused, decl_include("<features.h>")]]
-[[impl_include("<asm/crt/stdio.h>", "<asm/stdio.h>", "<asm/util.h>")]]
+[[cp, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<asm/crt/stdio.h>", "<asm/stdio.h>", "<asm/crt/util.h>")]]
 [[requires_function(getline, fgetc, ungetc, realloc)]]
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]
 char *fparseln([[nonnull]] FILE *stream,

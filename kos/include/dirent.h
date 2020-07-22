@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ae1946e */
+/* HASH CRC-32:0x992e5fde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -293,7 +293,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__rest
 /* Get the directory stream position */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
 /* Get the directory stream position */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __USE_XOPEN2K8

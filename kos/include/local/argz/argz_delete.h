@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a70b55d */
+/* HASH CRC-32:0xb3631fdb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_argz_delete_defined
 #define __local_argz_delete_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined

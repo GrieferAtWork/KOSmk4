@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdb3512c */
+/* HASH CRC-32:0xde3e9cff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@
 
 #include <hybrid/host.h> /* __i386__, __x86_64__ */
 
+#include <bits/crt/_diskfree_t.h>
+
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>
 #ifndef SEEK_SET
@@ -57,28 +59,15 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-/* Use the better name by default. */
-#define _diskfree_t diskfree_t
-#ifndef _DISKFREE_T_DEFINED
-#define _DISKFREE_T_DEFINED 1
-struct _diskfree_t {
-	__UINT32_TYPE__ total_clusters;
-	__UINT32_TYPE__ avail_clusters;
-	__UINT32_TYPE__ sectors_per_cluster;
-	__UINT32_TYPE__ bytes_per_sector;
-};
-#endif /* !_DISKFREE_T_DEFINED */
+#define diskfree_t _diskfree_t
 
 #ifndef _GETDISKFREE_DEFINED
 #define _GETDISKFREE_DEFINED 1
-#ifndef ___getdiskfree_defined
-#define ___getdiskfree_defined 1
 #ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #else /* __CRT_HAVE__getdiskfree */
-#undef ___getdiskfree_defined
+#undef _GETDISKFREE_DEFINED
 #endif /* !__CRT_HAVE__getdiskfree */
-#endif /* !___getdiskfree_defined */
 #endif /* !_GETDISKFREE_DEFINED */
 
 #if defined(__i386__) || defined(__x86_64__)

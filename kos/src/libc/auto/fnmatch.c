@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15bafb */
+/* HASH CRC-32:0xab563939 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.string.match") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
                                    char const *name,
-                                   int match_flags) {
+                                   __STDC_INT_AS_UINT_T match_flags) {
 	char card_post;
 	for (;;) {
 		if (!*name) {

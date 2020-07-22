@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d8d920 */
+/* HASH CRC-32:0xbe102071 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_format_snprintf_printer_defined 1
 #include <__crt.h>
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined

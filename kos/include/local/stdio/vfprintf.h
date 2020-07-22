@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab6d8df6 */
+/* HASH CRC-32:0x8ff84b8b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,6 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_vprintf
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these

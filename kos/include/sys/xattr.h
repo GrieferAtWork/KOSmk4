@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x397f7be3 */
+/* HASH CRC-32:0x90bb6990 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,11 @@ enum {
 #define __size_t_defined 1
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
+
+#ifndef __ssize_t_defined
+#define __ssize_t_defined 1
+typedef __ssize_t ssize_t;
+#endif /* !__ssize_t_defined */
 
 /* Set the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors

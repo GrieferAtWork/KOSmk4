@@ -24,9 +24,8 @@
 
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 struct ttyent {
 	char           *ty_name;    /* terminal device name */
@@ -40,8 +39,7 @@ struct ttyent {
 	char           *ty_comment; /* comment field */
 };
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_DB_TTYENT_H */

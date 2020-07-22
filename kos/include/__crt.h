@@ -124,12 +124,16 @@
 #define __ATTR_LIBC_WSCANF(a, b)    /* nothing */
 
 #ifndef __LIBC_MALLOC_ALIGNMENT
+#ifdef __INTELLISENSE__ /* Don't include <hybrid/typecore.h> */
+#define __LIBC_MALLOC_ALIGNMENT 16
+#else /* __INTELLISENSE__ */
 #include <hybrid/typecore.h>
 #ifdef __ALIGNOF_MAX_ALIGN_T__
 #define __LIBC_MALLOC_ALIGNMENT __ALIGNOF_MAX_ALIGN_T__
 #else /* __ALIGNOF_MAX_ALIGN_T__ */
 #define __LIBC_MALLOC_ALIGNMENT __SIZEOF_POINTER__
 #endif /* !__ALIGNOF_MAX_ALIGN_T__ */
+#endif /* !__INTELLISENSE__ */
 #endif /* !__LIBC_MALLOC_ALIGNMENT */
 
 #ifndef __ATTR_MALL_DEFAULT_ALIGNED

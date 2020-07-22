@@ -28,17 +28,19 @@
 #define __SIZEOF_SEM_T   16
 #elif __SIZEOF_POINTER__ == 8
 #define __SIZEOF_SEM_T   32
-#else
+#else /* ... */
 #define __SIZEOF_SEM_T   (__SIZEOF_POINTER__ * 4)
-#endif
+#endif /* !... */
 #endif /* !__SIZEOF_SEM_T */
 
-__SYSDECL_BEGIN
-
 /* Value returned by `sem_open' upon failure. */
-#define SEM_FAILED      (__CCAST(sem_t *)0)
+#ifndef SEM_FAILED
+#define SEM_FAILED (__CCAST(sem_t *) 0)
+#endif /* !SEM_FAILED */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifndef __sem_t_defined
 #define __sem_t_defined 1
 typedef union {
@@ -46,8 +48,8 @@ typedef union {
 	void         *__align;
 } sem_t;
 #endif /* !__sem_t_defined */
-#endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !_BITS_CRT_SEMAPHORE_H */

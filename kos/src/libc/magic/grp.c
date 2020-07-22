@@ -84,7 +84,7 @@ __NAMESPACE_STD_USING(FILE)
 
 
 @@Search for an entry with a matching group ID
-[[cp, decl_include("<bits/crt/db/group.h>")]]
+[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 struct group *getgrgid($gid_t gid);
 
 @@Search for an entry with a matching group name
@@ -116,12 +116,12 @@ int putgrent([[nonnull]] struct group const *__restrict entry,
 
 %
 %#ifdef __USE_POSIX
-[[cp, doc_alias(getgrgid), decl_include("<bits/crt/db/group.h>")]]
+[[cp, doc_alias(getgrgid), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrgid_r($gid_t gid, [[nonnull]] struct group *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct group **__restrict result);
 
-[[cp, doc_alias(getgrnam), decl_include("<bits/crt/db/group.h>")]]
+[[cp, doc_alias(getgrnam), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrnam_r([[nonnull]] char const *__restrict name,
                [[nonnull]] struct group *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -129,7 +129,7 @@ int getgrnam_r([[nonnull]] char const *__restrict name,
 
 %
 %#ifdef __USE_GNU
-[[cp, doc_alias(getgrent), decl_include("<bits/crt/db/group.h>")]]
+[[cp, doc_alias(getgrent), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrent_r([[nonnull]] struct group *__restrict resultbuf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct group **__restrict result);
@@ -137,7 +137,7 @@ int getgrent_r([[nonnull]] struct group *__restrict resultbuf,
 
 %
 %#ifdef __USE_MISC
-[[cp, doc_alias(fgetgrent), decl_include("<bits/crt/db/group.h>")]]
+[[cp, doc_alias(fgetgrent), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct group *__restrict resultbuf,
                 [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -152,21 +152,23 @@ int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
 struct group *fgetgrent([[nonnull]] $FILE *__restrict stream);
 
 @@Set the group set for the current user to GROUPS (N of them)
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int setgroups(size_t count, [[inp_opt(count)]] $gid_t const *groups);
 
 @@Store at most *NGROUPS members of the group set for USER into
 @@*GROUPS. Also include GROUP. The actual number of groups found is
 @@returned in *NGROUPS.  Return -1 if the if *NGROUPS is too small
-[[cp, decl_include("<bits/crt/db/group.h>")]]
+[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 int getgrouplist([[nonnull]] char const *user, $gid_t group,
-                 [[outp(*ngroups)]] $gid_t *groups, [[nonnull]] int *ngroups);
+                 [[outp(*ngroups)]] $gid_t *groups,
+                 [[nonnull]] int *ngroups);
 
 @@Initialize the group set for the current user
 @@by reading the group database and using all groups
 @@of which USER is a member. Also include GROUP.
-[[cp, decl_include("<bits/crt/db/group.h>")]]
-int initgroups([[nonnull]] char const *user, $gid_t group);
+[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+int initgroups([[nonnull]] char const *user,
+               $gid_t group);
 %#endif /* __USE_MISC */
 
 

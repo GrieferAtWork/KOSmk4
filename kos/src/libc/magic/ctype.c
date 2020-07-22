@@ -58,12 +58,15 @@ char const *__locale_ctype_ptr();
 char const *__locale_ctype_ptr_l($locale_t locale);
 
 [[ignore, wunused, ATTR_PURE, nothrow]]
+[[decl_include("<hybrid/typecore.h>")]]
 $uint16_t const **__ctype_b_loc();
 
 [[ignore, wunused, ATTR_PURE, nothrow]]
+[[decl_include("<hybrid/typecore.h>")]]
 $int32_t const **__ctype_tolower_loc();
 
 [[ignore, wunused, ATTR_PURE, nothrow]]
+[[decl_include("<hybrid/typecore.h>")]]
 $int32_t const **__ctype_toupper_loc();
 
 [[ignore, ATTR_CONST, wunused, nothrow]]
@@ -83,20 +86,20 @@ int iscntrl(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 9);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 1);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 040) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0020);
-#else
+@@pp_else@@
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -107,20 +110,20 @@ int isspace(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 5);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 13);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 010) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0008);
-#else
+@@pp_else@@
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -130,20 +133,20 @@ int isupper(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 0);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 8);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) == 1;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0001);
-#else
+@@pp_else@@
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -154,20 +157,20 @@ int islower(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 1);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 9);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) == 2;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0002);
-#else
+@@pp_else@@
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -177,20 +180,20 @@ int isalpha(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return libc_isupper(ch) || libc_islower(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 2);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 10);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0103);
-#else
+@@pp_else@@
 	return isupper(ch) || islower(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -200,20 +203,20 @@ int isdigit(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 3);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 11);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 4) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0004);
-#else
+@@pp_else@@
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -225,22 +228,22 @@ int isxdigit(int ch) {
 	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
 	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 4);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 12);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0104) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0080);
-#else
+@@pp_else@@
 	return isdigit(ch) ||
 	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
 	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -250,20 +253,20 @@ int isalnum(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return isupper(ch) || islower(ch) || isdigit(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 11);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 3);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 7) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0107);
-#else
+@@pp_else@@
 	return isupper(ch) || islower(ch) || isdigit(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -276,23 +279,23 @@ int ispunct(int ch)  {
 	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
 	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 10);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 2);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 020) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0010);
-#else
+@@pp_else@@
 	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
 	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
 	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
 	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -302,20 +305,20 @@ int isgraph(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 7);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 15);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 027) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0117);
-#else
+@@pp_else@@
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -325,20 +328,20 @@ int isprint(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 6);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 14);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0227) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
 	return _isctype(ch, 0x0157);
-#else
+@@pp_else@@
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -380,18 +383,18 @@ int isblank(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return (*__ctype_b_loc())[ch] & (1 << 8);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return (*__ctype_b_loc())[ch] & (1 << 0);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
-#else
+@@pp_else@@
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 %{
@@ -409,22 +412,22 @@ int iscntrl_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return iscntrl(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 9);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 1);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 040) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0020, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return iscntrl(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -436,22 +439,22 @@ int isspace_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isspace(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 5);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 13);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 010) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0008, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isspace(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -462,22 +465,22 @@ int isupper_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isupper(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 0);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 8);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) == 1;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0001, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isupper(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -488,22 +491,22 @@ int islower_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return islower(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 1);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 9);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) == 2;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0002, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return islower(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -514,22 +517,22 @@ int isalpha_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isalpha(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 2);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 10);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0103, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isalpha(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -540,22 +543,22 @@ int isdigit_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isdigit(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 3);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 11);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 4) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0004, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isdigit(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -566,22 +569,22 @@ int isxdigit_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isxdigit(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 4);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 12);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0104) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0080, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isxdigit(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -592,22 +595,22 @@ int isalnum_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isalnum(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 11);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 3);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 7) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0107, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isalnum(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -618,22 +621,22 @@ int ispunct_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return ispunct(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 10);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 2);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 020) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0010, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return ispunct(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -644,22 +647,22 @@ int isgraph_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isgraph(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 7);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 15);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 027) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0117, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isgraph(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -670,22 +673,22 @@ int isprint_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isprint(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 6);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 14);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0227) != 0;
-#elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)
+@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
 	return _isctype_l(ch, 0x0157, locale);
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isprint(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -696,20 +699,20 @@ int isblank_l(int ch, __locale_t locale) {
 	COMPILER_IMPURE();
 	return isblank(ch);
 @@pp_else@@
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
 #include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return locale->__ctype_b[ch] & (1 << 8);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+@@pp_else@@
 	return locale->__ctype_b[ch] & (1 << 0);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)
+@@pp_endif@@
+@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
-#else
+@@pp_else@@
 	(void)locale;
 	COMPILER_IMPURE();
 	return isblank(ch);
-#endif
+@@pp_endif@@
 @@pp_endif@@
 }
 
@@ -770,7 +773,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isblank)
 #ifdef __USE_ISOC99
 #define __ascii_isblank(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch == 0x09 || __ac_ch == 0x20; })
 #endif /* __USE_ISOC99 */
-#else
+#else /* ... */
 #define __ascii_iscntrl(ch)  ((__UINT8_TYPE__)(ch) <= 0x1f || (__UINT8_TYPE__)(ch) == 0x7f)
 #define __ascii_isspace(ch) (((__UINT8_TYPE__)(ch) >= 0x09 && (__UINT8_TYPE__)(ch) <= 0x0d) || \
                               (__UINT8_TYPE__)(ch) == 0x20)
@@ -793,7 +796,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isblank)
 #ifdef __USE_ISOC99
 #define __ascii_isblank(ch)  ((__UINT8_TYPE__)(ch) == 0x09 || (__UINT8_TYPE__)(ch) == 0x20)
 #endif /* __USE_ISOC99 */
-#endif
+#endif /* !... */
 
 
 #if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)

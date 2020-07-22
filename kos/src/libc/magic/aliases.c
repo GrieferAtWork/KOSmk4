@@ -56,7 +56,11 @@
 
 %{
 #include <features.h>
+#include <bits/crt/db/aliases.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/aliases.h */
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
@@ -76,23 +80,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
-
-}
-%[push_macro @undef { alias_name alias_members_len alias_members alias_local }]
-%{
-/* Structure to represent one entry of the alias data base. */
-struct aliasent {
-	char          *alias_name;
-	size_t         alias_members_len;
-	char         **alias_members;
-	__INT32_TYPE__ alias_local;
-};
-}
-%[pop_macro]
-%{
+__SYSDECL_BEGIN
 
 }
 
@@ -105,21 +94,21 @@ void setaliasent();
 void endaliasent();
 
 @@Get the next entry from the alias data base
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
 struct aliasent *getaliasent();
 
 @@Get the next entry from the alias data base and put it in RESULT_BUF
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/aliases.h>", "<hybrid/typecore.h>")]]
 int getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
                   [[nonnull]] char *__restrict buffer, size_t buflen,
                   [[nonnull]] struct aliasent **__restrict result);
 
 @@Get alias entry corresponding to NAME
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
 struct aliasent *getaliasbyname([[nonnull]] char const *name);
 
 @@Get alias entry corresponding to NAME and put it in RESULT_BUF
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/aliases.h>", "<hybrid/typecore.h>")]]
 int getaliasbyname_r([[nonnull]] char const *__restrict name,
                      [[nonnull]] struct aliasent *__restrict result_buf,
                      [[nonnull]] char *__restrict buffer, size_t buflen,
@@ -128,8 +117,8 @@ int getaliasbyname_r([[nonnull]] char const *__restrict name,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

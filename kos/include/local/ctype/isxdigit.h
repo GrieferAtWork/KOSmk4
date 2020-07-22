@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3d089ac */
+/* HASH CRC-32:0xb6949e44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: __ctype_b_loc from ctype */
 #if !defined(__local___localdep___ctype_b_loc_defined) && defined(__CRT_HAVE___ctype_b_loc)
 #define __local___localdep___ctype_b_loc_defined 1
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__localdep___ctype_b_loc,(void),__ctype_b_loc,())
 #endif /* !__local___localdep___ctype_b_loc_defined && __CRT_HAVE___ctype_b_loc */
 /* Dependency: __locale_ctype_ptr from ctype */
@@ -69,11 +72,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isxdigit))(int __ch) {
 	return ((__localdep___locale_ctype_ptr() + 1)[__ch & 0xff] & 0104) != 0;
 #elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
 	return __localdep__isctype(__ch, 0x0080);
-#else
+#else /* ... */
 	return __localdep_isdigit(__ch) ||
 	       ((__UINT8_TYPE__)__ch >= 0x41 && (__UINT8_TYPE__)__ch <= 0x46) ||
 	       ((__UINT8_TYPE__)__ch >= 0x61 && (__UINT8_TYPE__)__ch <= 0x66);
-#endif
+#endif /* !... */
 
 }
 __NAMESPACE_LOCAL_END

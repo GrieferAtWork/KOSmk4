@@ -72,10 +72,10 @@ __SYSDECL_BEGIN
 
 @@Match NAME against the filename pattern PATTERN,
 @@returning zero if it matches, FNM_NOMATCH if not
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, decl_include("<features.h>")]]
 int fnmatch([[nonnull]] char const *pattern,
             [[nonnull]] char const *name,
-            int match_flags) {
+            __STDC_INT_AS_UINT_T match_flags) {
 	char card_post;
 	for (;;) {
 		if (!*name) {

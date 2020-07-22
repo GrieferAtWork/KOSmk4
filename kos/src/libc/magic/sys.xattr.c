@@ -91,13 +91,18 @@ enum {
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
+#ifndef __ssize_t_defined
+#define __ssize_t_defined 1
+typedef __ssize_t ssize_t;
+#endif /* !__ssize_t_defined */
+
 }
 
 
 @@Set the attribute NAME of the file pointed to by PATH to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int setxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
              [[inp(bufsize)]] void const *buf, size_t bufsize,
              __STDC_INT_AS_UINT_T flags);
@@ -106,7 +111,7 @@ int setxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
 @@SIZE bytes long), not following symlinks for the last pathname component.
 @@Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int lsetxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
               [[inp(bufsize)]] void const *buf, size_t bufsize,
               __STDC_INT_AS_UINT_T flags);
@@ -114,21 +119,21 @@ int lsetxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
 @@Set the attribute NAME of the file descriptor FD to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int fsetxattr($fd_t fd, [[nonnull]] char const *name,
               [[inp(bufsize)]] void const *buf, size_t bufsize,
               __STDC_INT_AS_UINT_T flags);
 
 @@Get the attribute NAME of the file pointed to by PATH to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t getxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
                  [[outp(bufsize)]] void *buf, size_t bufsize);
 
 @@Get the attribute NAME of the file pointed to by PATH to VALUE (which is
 @@SIZE bytes long), not following symlinks for the last pathname component.
 @@Return 0 on success, -1 for errors
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t lgetxattr([[nonnull]] char const *path,
                   [[nonnull]] char const *name,
                   [[outp(bufsize)]] void *buf,
@@ -136,14 +141,14 @@ ssize_t lgetxattr([[nonnull]] char const *path,
 
 @@Get the attribute NAME of the file descriptor FD to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 ssize_t fgetxattr($fd_t fd, [[nonnull]] char const *name,
                   [[outp(bufsize)]] void *buf, size_t bufsize);
 
 @@List attributes of the file pointed to by PATH into the
 @@user-supplied buffer LIST (which is SIZE bytes big).
 @@Return 0 on success, -1 for errors
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t listxattr([[nonnull]] char const *path,
                   [[outp(listbufsize)]] char *listbuf,
                   size_t listbufsize);
@@ -151,14 +156,14 @@ ssize_t listxattr([[nonnull]] char const *path,
 @@List attributes of the file pointed to by PATH into the user-supplied
 @@buffer LIST (which is SIZE bytes big), not following symlinks for the
 @@last pathname component. Return 0 on success, -1 for errors
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 ssize_t llistxattr([[nonnull]] char const *path,
                    [[outp(listbufsize)]] char *listbuf,
                    size_t listbufsize);
 
 @@List attributes of the file descriptor FD into the user-supplied buffer
 @@LIST (which is SIZE bytes big). Return 0 on success, -1 for errors
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 ssize_t flistxattr($fd_t fd, [[outp(listbufsize)]] char *listbuf, size_t listbufsize);
 
 @@Remove the attribute NAME from the file pointed to by PATH.

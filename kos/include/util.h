@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x793e1206 */
+/* HASH CRC-32:0xe9957c70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 
 #include <features.h>
 
-#include <asm/util.h>
+#include <asm/crt/util.h>
 #include <bits/types.h>
 
 /*#include <sys/types.h>*/

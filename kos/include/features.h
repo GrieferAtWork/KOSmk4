@@ -341,11 +341,11 @@
 #define _POSIX_C_SOURCE 199506L
 #elif defined(_XOPEN_SOURCE) && _XOPEN_SOURCE+0 < 700
 #define _POSIX_C_SOURCE 200112L
-#else
+#else /* ... */
 #define _POSIX_C_SOURCE 200809L
-#endif
+#endif /* !... */
 #define __USE_POSIX_IMPLICITLY 1
-#endif
+#endif /* ... */
 
 #if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE)
 #define __USE_POSIX 1
@@ -355,19 +355,19 @@
    (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 2)
 #define __POSIX_VISIBLE 199209
 #define __USE_POSIX2 1
-#endif
+#endif /* _POSIX_C_SOURCE >= 2 */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199309L
 #undef __POSIX_VISIBLE
 #define __POSIX_VISIBLE 199309
 #define __USE_POSIX199309 1
-#endif
+#endif /* _POSIX_C_SOURCE >= 199309L */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199506L
 #undef __POSIX_VISIBLE
 #define __POSIX_VISIBLE 199506
 #define __USE_POSIX199506 1
-#endif
+#endif /* _POSIX_C_SOURCE >= 199506L */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200112L
 #undef __POSIX_VISIBLE
@@ -377,7 +377,7 @@
 #define __USE_ISOC95 1
 #undef __USE_ISOC99
 #define __USE_ISOC99 1
-#endif
+#endif /* _POSIX_C_SOURCE >= 200112L */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200809L
 #undef __POSIX_VISIBLE
@@ -385,40 +385,40 @@
 #define __USE_XOPEN2K8 1
 #undef _ATFILE_SOURCE
 #define _ATFILE_SOURCE 1
-#endif
+#endif /* _POSIX_C_SOURCE >= 200809L */
 
 #ifdef _XOPEN_SOURCE
-#   define __USE_XOPEN 1
-#   if _XOPEN_SOURCE + 0 >= 500
-#       define __USE_XOPEN_EXTENDED 1
-#       define __USE_UNIX98 1
-#       undef _LARGEFILE_SOURCE
-#       define _LARGEFILE_SOURCE 1
-#       if _XOPEN_SOURCE >= 600
-#           if _XOPEN_SOURCE >= 700
-#               define __XSI_VISIBLE 700
-#               define __USE_XOPEN2K8 1
-#               define __USE_XOPEN2K8XSI 1
-#           else /* _XOPEN_SOURCE >= 700 */
-#               define __XSI_VISIBLE 600
-#           endif /* _XOPEN_SOURCE < 700 */
-#           define __USE_XOPEN2K 1
-#           define __USE_XOPEN2KXSI 1
-#           undef __USE_ISOC95
-#           define __USE_ISOC95 1
-#           undef __USE_ISOC99
-#           define __USE_ISOC99 1
-#       else /* _XOPEN_SOURCE >= 700 */
-#           define __XSI_VISIBLE 500
-#       endif /* _XOPEN_SOURCE+0 >= 600 */
-#   else /* _XOPEN_SOURCE+0 >= 500 */
-#       ifdef _XOPEN_SOURCE_EXTENDED
-#           define __USE_XOPEN_EXTENDED 1
-#           define __XSI_VISIBLE 4
-#       else /* _XOPEN_SOURCE_EXTENDED */
-#           define __XSI_VISIBLE 1
-#       endif /* !_XOPEN_SOURCE_EXTENDED */
-#   endif /* _XOPEN_SOURCE+0 < 500 */
+#define __USE_XOPEN 1
+#if _XOPEN_SOURCE + 0 >= 500
+#define __USE_XOPEN_EXTENDED 1
+#define __USE_UNIX98         1
+#undef _LARGEFILE_SOURCE
+#define _LARGEFILE_SOURCE 1
+#if _XOPEN_SOURCE + 0 >= 600
+#if _XOPEN_SOURCE + 0 >= 700
+#define __XSI_VISIBLE     700
+#define __USE_XOPEN2K8    1
+#define __USE_XOPEN2K8XSI 1
+#else /* _XOPEN_SOURCE >= 700 */
+#define __XSI_VISIBLE 600
+#endif /* _XOPEN_SOURCE < 700 */
+#define __USE_XOPEN2K    1
+#define __USE_XOPEN2KXSI 1
+#undef __USE_ISOC95
+#define __USE_ISOC95 1
+#undef __USE_ISOC99
+#define __USE_ISOC99 1
+#else /* _XOPEN_SOURCE >= 700 */
+#define __XSI_VISIBLE 500
+#endif /* _XOPEN_SOURCE >= 600 */
+#else  /* _XOPEN_SOURCE >= 500 */
+#ifdef _XOPEN_SOURCE_EXTENDED
+#define __USE_XOPEN_EXTENDED 1
+#define __XSI_VISIBLE        4
+#else /* _XOPEN_SOURCE_EXTENDED */
+#define __XSI_VISIBLE 1
+#endif /* !_XOPEN_SOURCE_EXTENDED */
+#endif /* _XOPEN_SOURCE < 500 */
 #endif /* _XOPEN_SOURCE */
 
 #ifdef _LARGEFILE_SOURCE
@@ -677,20 +677,54 @@
 #define __STDC_UINT_AS_SIZE_T   /* nothing */
 #define __STDC_UINT32_AS_SIZE_T /* nothing */
 #define __STDC_INT_AS_UINT_T    /* nothing */
-#elif defined(__USE_KOS)
-#if !defined(__SIZEOF_SIZE_T__) || !defined(__SIZEOF_INT__)
+#elif defined(__INTELLISENSE__)
+#ifdef __USE_KOS
+#ifdef __INTELLISENSE_SSIZE_TYPE__
+#define __STDC_INT_AS_SSIZE_T   __INTELLISENSE_SSIZE_TYPE__
+#define __STDC_INT32_AS_SSIZE_T __INTELLISENSE_SSIZE_TYPE__
+#else /* __INTELLISENSE_SSIZE_TYPE__ */
+#ifndef __SSIZE_TYPE__
 #include "hybrid/typecore.h"
-#endif /* !__SIZEOF_SIZE_T__ || !__SIZEOF_INT__ */
+#endif /* !__SSIZE_TYPE__ */
+#define __STDC_INT_AS_SSIZE_T   __SSIZE_TYPE__
+#define __STDC_INT32_AS_SSIZE_T __SSIZE_TYPE__
+#endif /* !__INTELLISENSE_SSIZE_TYPE__ */
+#ifdef __INTELLISENSE_SIZE_TYPE__
+#define __STDC_INT_AS_SIZE_T    __INTELLISENSE_SIZE_TYPE__
+#define __STDC_INT32_AS_SIZE_T  __INTELLISENSE_SIZE_TYPE__
+#define __STDC_UINT_AS_SIZE_T   __INTELLISENSE_SIZE_TYPE__
+#define __STDC_UINT32_AS_SIZE_T __INTELLISENSE_SIZE_TYPE__
+#else /* __INTELLISENSE_SIZE_TYPE__ */
+#ifndef __SIZE_TYPE__
+#include "hybrid/typecore.h"
+#endif /* !__SIZE_TYPE__ */
+#define __STDC_INT_AS_SIZE_T    __SIZE_TYPE__
+#define __STDC_INT32_AS_SIZE_T  __SIZE_TYPE__
+#define __STDC_UINT_AS_SIZE_T   __SIZE_TYPE__
+#define __STDC_UINT32_AS_SIZE_T __SIZE_TYPE__
+#endif /* !__INTELLISENSE_SIZE_TYPE__ */
+#define __STDC_INT_AS_UINT_T    unsigned int
+#else /* __USE_KOS */
+#define __STDC_INT_AS_SSIZE_T   int
+#define __STDC_INT_AS_SIZE_T    int
+#define __STDC_INT32_AS_SSIZE_T int
+#define __STDC_INT32_AS_SIZE_T  int
+#define __STDC_UINT_AS_SIZE_T   unsigned int
+#define __STDC_UINT32_AS_SIZE_T unsigned int
+#define __STDC_INT_AS_UINT_T    int
+#endif /* !__USE_KOS */
+#elif defined(__USE_KOS)
+#include "hybrid/typecore.h"
 #if __SIZEOF_SIZE_T__ <= __SIZEOF_INT__
-#define __STDC_INT_AS_SSIZE_T   __ssize_t
-#define __STDC_INT_AS_SIZE_T    __size_t
+#define __STDC_INT_AS_SSIZE_T   __SSIZE_TYPE__
+#define __STDC_INT_AS_SIZE_T    __SIZE_TYPE__
 #else /* __SIZEOF_SIZE_T__ <= __SIZEOF_INT__ */
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    unsigned int
 #endif /* __SIZEOF_SIZE_T__ > __SIZEOF_INT__ */
 #if __SIZEOF_SIZE_T__ <= 4
-#define __STDC_INT32_AS_SSIZE_T __ssize_t
-#define __STDC_INT32_AS_SIZE_T  __size_t
+#define __STDC_INT32_AS_SSIZE_T __SSIZE_TYPE__
+#define __STDC_INT32_AS_SIZE_T  __SIZE_TYPE__
 #else /* __SIZEOF_SIZE_T__ <= 4 */
 #define __STDC_INT32_AS_SSIZE_T __INT32_TYPE__
 #define __STDC_INT32_AS_SIZE_T  __UINT32_TYPE__
@@ -699,6 +733,9 @@
 #define __STDC_UINT32_AS_SIZE_T __STDC_INT32_AS_SIZE_T
 #define __STDC_INT_AS_UINT_T    unsigned int
 #else /* __USE_KOS */
+#if !defined(__INT32_TYPE__) || !defined(__UINT32_TYPE__)
+#include "hybrid/typecore.h"
+#endif /* !__INT32_TYPE__ || !__UINT32_TYPE__ */
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    int
 #define __STDC_INT32_AS_SSIZE_T __INT32_TYPE__

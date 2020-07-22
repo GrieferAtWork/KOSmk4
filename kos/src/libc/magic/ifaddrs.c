@@ -95,10 +95,10 @@ struct ifaddrs {
 @@list in *IFAP and return 0. On errors, return -1 and set `errno'.
 @@The storage returned in *IFAP is allocated dynamically and can
 @@only be properly freed by passing it to `freeifaddrs'
-getifaddrs:(struct ifaddrs **ifap) -> int;
+int getifaddrs(struct ifaddrs **ifap);
 
 @@Reclaim the storage allocated by a previous `getifaddrs' call
-freeifaddrs:(struct ifaddrs *ifa);
+void freeifaddrs(struct ifaddrs *ifa);
 
 %{
 

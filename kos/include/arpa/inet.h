@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd8130f3 */
+/* HASH CRC-32:0x78267526 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,9 +51,8 @@
    <http://www.gnu.org/licenses/>.  */
 
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __socklen_t_defined
 #define __socklen_t_defined 1
@@ -246,8 +245,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet_pton,(int __af, char const *__restric
  * result in buffer of length LEN starting at BUF */
 __CDECLARE_OPT(,char const *,__NOTHROW_RPC_KOS,inet_ntop,(int __af, void const *__restrict __cp, char *__restrict __buf, socklen_t __len),(__af,__cp,__buf,__len))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_ARPA_INET_H */

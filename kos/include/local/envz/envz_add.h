@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48678d7 */
+/* HASH CRC-32:0x87158b18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,21 @@
 #define __local_envz_add_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: argz_add from argz */
 #ifndef __local___localdep_argz_add_defined
 #define __local___localdep_argz_add_defined 1
 #ifdef __CRT_HAVE_argz_add
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
 #else /* ... */

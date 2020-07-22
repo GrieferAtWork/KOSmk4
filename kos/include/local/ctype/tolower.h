@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc25c58b9 */
+/* HASH CRC-32:0xac3992a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: __ctype_tolower_loc from ctype */
 #if !defined(__local___localdep___ctype_tolower_loc_defined) && defined(__CRT_HAVE___ctype_tolower_loc)
 #define __local___localdep___ctype_tolower_loc_defined 1
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__localdep___ctype_tolower_loc,(void),__ctype_tolower_loc,())
 #endif /* !__local___localdep___ctype_tolower_loc_defined && __CRT_HAVE___ctype_tolower_loc */
 /* Dependency: isupper from ctype */

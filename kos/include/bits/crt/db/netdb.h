@@ -21,12 +21,12 @@
 #define _BITS_CRT_DB_NETDB_H 1
 
 #include <__stdinc.h>
-#include <stdint.h>
 
-__SYSDECL_BEGIN
+#include <hybrid/typecore.h>
 
-#ifndef __netent_defined
-#define __netent_defined 1
+#ifdef __CC__
+__DECL_BEGIN
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("netent")
 #pragma push_macro("n_name")
@@ -39,12 +39,14 @@ __SYSDECL_BEGIN
 #undef n_aliases
 #undef n_addrtype
 #undef n_net
+
 struct netent {
-	char    *n_name;     /* Official name of network. */
-	char   **n_aliases;  /* Alias list. */
-	int      n_addrtype; /* Net address type. */
-	uint32_t n_net;      /* Network number. */
+	char           *n_name;     /* Official name of network. */
+	char          **n_aliases;  /* Alias list. */
+	int             n_addrtype; /* Net address type. */
+	__UINT32_TYPE__ n_net;      /* Network number. */
 };
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("n_net")
 #pragma pop_macro("n_addrtype")
@@ -52,8 +54,8 @@ struct netent {
 #pragma pop_macro("n_name")
 #pragma pop_macro("netent")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !__netent_defined */
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !_BITS_CRT_DB_NETDB_H */

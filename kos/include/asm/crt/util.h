@@ -17,12 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_UTIL_H
-#define _ASM_UTIL_H 1
+#ifndef _ASM_CRT_UTIL_H
+#define _ASM_CRT_UTIL_H 1
 
 #include <__crt.h>
 
-#if defined(__KOS__) || defined(__CRT_KOS)
+#if defined(__CRT_KOS) || 1
 
 /* Options for the `dflags' argument to `opendev(3)' */
 #define __OPENDEV_PART 0x01 /* Attempt to open a raw partition during expansion. */
@@ -36,7 +36,7 @@
 #define __FPARSELN_UNESCALL \
 	(__FPARSELN_UNESCESC | __FPARSELN_UNESCCONT | __FPARSELN_UNESCCOMM | __FPARSELN_UNESCREST)
 
-#endif /* __KOS__ || __CRT_KOS */
+#endif /* __CRT_KOS */
 
 
 /* If not supported by the CRT, then it's emulated by local headers,
@@ -62,4 +62,4 @@
 #endif /* !__CRT_HAVE_fparseln */
 
 
-#endif /* !_ASM_UTIL_H */
+#endif /* !_ASM_CRT_UTIL_H */

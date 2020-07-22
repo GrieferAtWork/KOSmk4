@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7910e490 */
+/* HASH CRC-32:0xc15c951c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inet_ntoa_r_defined
 #define __local___localdep_inet_ntoa_r_defined 1
 #ifdef __CRT_HAVE_inet_ntoa_r
+__NAMESPACE_LOCAL_END
+#include <netinet/bits/in.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Re-entrant version of `inet_ntoa()' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),inet_ntoa_r,(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */

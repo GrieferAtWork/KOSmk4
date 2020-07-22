@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4c03d17 */
+/* HASH CRC-32:0xd2de29c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,6 +114,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_c16escape_defined
 #define __local___localdep_format_c16escape_defined 1
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -129,6 +132,9 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_DOS$format_wescape)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -145,6 +151,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16e
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <local/parts.wchar.format-printer/format_wescape.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -208,6 +215,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_c32escape_defined
 #define __local___localdep_format_c32escape_defined 1
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -223,6 +233,9 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_KOS$format_wescape)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -239,6 +252,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32e
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <local/parts.wchar.format-printer/format_wescape.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -279,6 +293,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_c32hexdump_defined
 #define __local___localdep_format_c32hexdump_defined 1
 #if defined(__CRT_HAVE_format_whexdump) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -290,6 +307,9 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32hexdump,(__pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif defined(__CRT_HAVE_KOS$format_whexdump)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -302,6 +322,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32h
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32hexdump,(__pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <local/parts.wchar.format-printer/format_whexdump.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print a hex dump of the given data using the provided format printer
@@ -396,6 +417,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_escape
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -414,6 +436,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_esca
 #elif defined(__CRT_HAVE_format_quote)
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -455,6 +478,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_width
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))

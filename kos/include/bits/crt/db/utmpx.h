@@ -53,8 +53,6 @@
 #define _PATH_WTMPX    _PATH_WTMP
 #endif /* __USE_GNU */
 
-__SYSDECL_BEGIN
-
 #define __UT_LINESIZE  32
 #define __UT_NAMESIZE  32
 #define __UT_HOSTSIZE  256
@@ -77,6 +75,8 @@ __SYSDECL_BEGIN
 #endif /* __USE_GNU */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 /* The structure describing the status of a terminated process.
  * This type is used in `struct utmpx' below. */
 struct __exit_status {
@@ -107,8 +107,8 @@ struct utmpx {
 	__int32_t            ut_addr_v6[4];          /* Internet address of remote host. */
 	char               __glibc_reserved[20];     /* Reserved for future use. */
 };
-#endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !_BITS_CRT_DB_UTMPX_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bfb43c3 */
+/* HASH CRC-32:0xd1c933a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__wfullpath_dbg_defined
 #define __local__wfullpath_dbg_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wfullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) {

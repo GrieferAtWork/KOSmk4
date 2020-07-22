@@ -58,9 +58,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -81,6 +80,7 @@ typedef __errno_t error_t;
 @@`PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
 @@`ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()'
 [[export_alias("__argz_create"), requires_function(malloc)]]
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>", "<hybrid/__assert.h>")]]
 error_t argz_create([[nonnull]] char *const argv[],
                     [[nonnull]] char **__restrict pargz,
@@ -119,6 +119,7 @@ error_t argz_create([[nonnull]] char *const argv[],
 @@If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
 @@The result can be destroyed using `free()'
 [[requires($has_function(malloc) && $has_function(free))]]
+[[decl_include("<bits/types.h>")]]
 [[export_alias("__argz_create_sep"), impl_include("<parts/errno.h>")]]
 error_t argz_create_sep([[nonnull]] char const *__restrict string, int sep,
                         [[nonnull]] char **__restrict pargz,
@@ -177,7 +178,7 @@ again_check_ch:
 
 @@Returns the number of strings in `ARGZ'
 @@Simply count the number of`NUL-characters within `argz...+=argz_len'
-[[ATTR_PURE, export_alias("__argz_count")]]
+[[ATTR_PURE, export_alias("__argz_count"), decl_include("<hybrid/typecore.h>")]]
 size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 	size_t result = 0;
 	if likely(argz_len) {
@@ -198,7 +199,7 @@ size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 
 @@Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
 @@to hold them all (aka: have space for at least `argz_count()' elements)
-[[export_alias(__argz_extract)]]
+[[export_alias(__argz_extract), decl_include("<hybrid/typecore.h>")]]
 void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)
 	[[([inp(argz_len)] char *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)]]
 	[[([inp(argz_len)] char const *__restrict argz, size_t argz_len, [[nonnull]] char const **__restrict argv)]]
@@ -221,7 +222,7 @@ void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len
 
 @@Make '\0' separated arg vector `ARGZ' printable by converting
 @@all the '\0's except the last into the character `SEP'
-[[export_alias("__argz_stringify")]]
+[[export_alias("__argz_stringify"), decl_include("<hybrid/typecore.h>")]]
 void argz_stringify(char *argz, size_t len, int sep) {
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
@@ -242,7 +243,7 @@ void argz_stringify(char *argz, size_t len, int sep) {
 
 @@Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN'
 [[export_alias("__argz_create_sep"), impl_include("<parts/errno.h>")]]
-[[requires_function(realloc)]]
+[[requires_function(realloc), decl_include("<bits/types.h>")]]
 error_t argz_append([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,
                     [[inp_opt(buf_len)]] char const *__restrict buf,
@@ -266,7 +267,7 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 %[insert:function(__argz_append = argz_append)]
 
 @@Append `STR' to the argz vector in `PARGZ & PARGZ_LEN'
-[[export_alias("__argz_add")]]
+[[export_alias("__argz_add"), decl_include("<bits/types.h>")]]
 [[requires_function(argz_append)]]
 error_t argz_add([[nonnull]] char **__restrict pargz,
                  [[nonnull]] size_t *__restrict pargz_len,
@@ -278,7 +279,7 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 
 @@Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN'
 [[export_alias("__argz_add_sep"), impl_include("<parts/errno.h>")]]
-[[requires_function(realloc)]]
+[[requires_function(realloc), decl_include("<bits/types.h>")]]
 error_t argz_add_sep([[nonnull]] char **__restrict pargz,
                      [[nonnull]] size_t *__restrict pargz_len,
                      [[nonnull]] char const *__restrict string,
@@ -353,7 +354,7 @@ again_check_ch:
 @@Note that `ENTRY' must be the actual pointer to one of the elements
 @@of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
 @@of the elements... (took me a while to realize this one)
-[[export_alias("__argz_add_sep")]]
+[[export_alias("__argz_add_sep"), decl_include("<hybrid/typecore.h>")]]
 void argz_delete([[nonnull]] char **__restrict pargz,
                  [[nonnull]] size_t *__restrict pargz_len,
                  [[nullable]] char *entry) {
@@ -384,7 +385,7 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 @@is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
 @@On success, `0' is returned
 [[export_alias("__argz_insert"), impl_include("<parts/errno.h>")]]
-[[requires_function(realloc, argz_add)]]
+[[requires_function(realloc, argz_add), decl_include("<bits/types.h>")]]
 error_t argz_insert([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,
                     [[nullable]] char *before,
@@ -451,7 +452,7 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 @@`PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
 @@incremented by number of replacements performed
 [[export_alias("__argz_replace"), impl_include("<parts/errno.h>")]]
-[[requires_function(realloc, free)]]
+[[requires_function(realloc, free), decl_include("<bits/types.h>")]]
 error_t argz_replace([[nonnull]] char **__restrict pargz,
                      [[nonnull]] size_t *__restrict pargz_len,
                      [[nullable]] char const *__restrict str,
@@ -551,7 +552,7 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 @@>> char *entry;
 @@>> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
 @@>>     ...;
-[[export_alias("__argz_next"), wunused, ATTR_PURE]]
+[[export_alias("__argz_next"), wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 char *argz_next([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry)
 	[[([[inp_opt(argz_len)]] char *__restrict argz, size_t argz_len, [[nullable]] char *__restrict entry): char *]]
 	[[([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry): char const *]]
@@ -572,8 +573,7 @@ char *argz_next([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_l
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

@@ -81,30 +81,32 @@
 #endif /* __unix__ */
 
 #ifdef __x86_64__
-#define __x86_64                   1
-#define __k8                       1
-#define __k8__                     1
-#define __amd64                    1
-#define __amd64__                  1
-#define __code_model_small__       1
-#define _LP64                      1
-#define __LP64__                   1
-#define __MMX__                    1
-#define __SSE2_MATH__              1
-#define __SSE2__                   1
-#define __SSE_MATH__               1
-#define __SSE__                    1
-#define __SIZEOF_LONG__            4
-#define __SIZEOF_INT128__          16
-#define __INTELLISENSE_SIZE_TYPE__ unsigned long long int
-#define __ATOMIC_HLE_ACQUIRE       65536
-#define __ATOMIC_HLE_RELEASE       131072
-#define __FXSR__                   1
+#define __x86_64                    1
+#define __k8                        1
+#define __k8__                      1
+#define __amd64                     1
+#define __amd64__                   1
+#define __code_model_small__        1
+#define _LP64                       1
+#define __LP64__                    1
+#define __MMX__                     1
+#define __SSE2_MATH__               1
+#define __SSE2__                    1
+#define __SSE_MATH__                1
+#define __SSE__                     1
+#define __SIZEOF_LONG__             4
+#define __SIZEOF_INT128__           16
+#define __INTELLISENSE_SIZE_TYPE__  unsigned long long int
+#define __INTELLISENSE_SSIZE_TYPE__ signed long long int
+#define __ATOMIC_HLE_ACQUIRE        65536
+#define __ATOMIC_HLE_RELEASE        131072
+#define __FXSR__                    1
 #elif defined(__i386__)
-#define __i386        1
-#define __i686        1
-#define __i686__      1
-#define __SIZE_TYPE__ unsigned long int /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
+#define __i386         1
+#define __i686         1
+#define __i686__       1
+#define __SIZE_TYPE__  unsigned long int /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
+#define __SSIZE_TYPE__ signed long int   /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
 #undef __SSE2_MATH__
 #undef __SSE2__
 #undef __SSE_MATH__
@@ -114,6 +116,10 @@
 #ifndef __INTELLISENSE_SIZE_TYPE__
 #define __INTELLISENSE_SIZE_TYPE__ __SIZE_TYPE__
 #endif /* !__INTELLISENSE_SIZE_TYPE__ */
+
+#ifndef __INTELLISENSE_SSIZE_TYPE__
+#define __INTELLISENSE_SSIZE_TYPE__ __SSIZE_TYPE__
+#endif /* !__INTELLISENSE_SSIZE_TYPE__ */
 
 
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */

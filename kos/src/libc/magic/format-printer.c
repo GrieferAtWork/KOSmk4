@@ -120,7 +120,7 @@ typedef __pformatungetc pformatungetc;
 @@Repeat `CH' a number of `NUM_REPETITIONS' times
 @@The usual format-printer rules apply, and this function
 @@is allowed to call `PRINTER' as often as it chooses
-[[kernel, throws, decl_include("<bits/format-printer.h>")]]
+[[kernel, throws, decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<libc/string.h>")]]
 $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
                        char ch, $size_t num_repetitions) {
@@ -204,7 +204,7 @@ err:
 @@@param: TEXTLEN: The total number of bytes to escape, starting at `text'
 [[kernel, throws, alias("format_quote")]]
 [[if(!defined(__KERNEL__)), export_as("format_quote")]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_escape([[nonnull]] pformatprinter printer, void *arg,
                        /*utf-8*/ char const *__restrict text,
                        $size_t textlen, unsigned int flags) {
@@ -515,7 +515,7 @@ err:
 @@@param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
 @@@return: 0: The given data was successfully hex-dumped
 @@@return: *: The first non-ZERO(0) return value of PRINTER
-[[kernel, throws, decl_include("<bits/format-printer.h>")]]
+[[kernel, throws, decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__alloca.h>", "<hybrid/__unaligned.h>", "<hybrid/byteorder.h>")]]
 $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
                         void const *__restrict data, $size_t size,
@@ -804,7 +804,7 @@ err:
 @@ - syslog:           Unbuffered system-log output.
 @@ - ...               There are a _lot_ more...
 [[kernel, throws, ATTR_LIBC_PRINTF(3, 0)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/parts.uchar.string.h>")]]
 [[impl_include("<libc/string.h>")]]
@@ -851,7 +851,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 }
 
 [[kernel, ATTR_LIBC_PRINTF(3, 4), throws]]
-[[decl_include("<bits/format-printer.h>"), doc_alias("format_vprintf")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>"), doc_alias("format_vprintf")]]
 $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
                        [[nonnull]] char const *__restrict format, ...) {
 	ssize_t result;
@@ -890,7 +890,7 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 @@@return: * :  The total number of successfully scanned arguments.
 @@@return: EOF: `PGETC' returned EOF the first time an attempt at reading was made
 [[throws, kernel, ATTR_LIBC_SCANF(4, 0)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
 $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
                        [[nonnull]] pformatungetc pungetc, void *arg,
@@ -906,7 +906,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 }
 
 [[throws, ATTR_LIBC_SCANF(4, 5)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 [[doc_alias("format_vscanf"), kernel]]
 $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
                       [[nonnull]] pformatungetc pungetc, void *arg,
@@ -926,7 +926,7 @@ $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
 @@Format-printer implementation for printing to a string buffer like `sprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_sprintf_printer([[nonnull]] /*char ***/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data,
                                 $size_t datalen) {
@@ -957,7 +957,7 @@ struct format_snprintf_data {
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
 @@      the sum of return values of all calls to `format_snprintf_printer()'
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
                                  [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	struct __local_format_snprintf_data {
@@ -979,7 +979,7 @@ $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ vo
 @@Returns the width (number of characters; not bytes) of the given unicode string
 [[kernel, ATTR_PURE, impl_include("<local/unicode_utf8seqlen.h>")]]
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_width(void *arg,
                       [[nonnull]] /*utf-8*/ char const *__restrict data,
                       $size_t datalen) {
@@ -1001,7 +1001,7 @@ $ssize_t format_width(void *arg,
 @@Always re-return `datalen' and ignore all other arguments
 [[ATTR_CONST, kos_export_alias("format_wwidth")]]
 [[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_length(void *arg,
                        /*utf-8*/ char const *__restrict data,
                        $size_t datalen) {
@@ -1176,7 +1176,7 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 @@This function is intended to be used as a pformatprinter-compatibile printer sink
 [[wunused, requires_function(format_aprintf_alloc)]]
 [[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
-[[decl_include("<bits/format-printer.h>")]]
+[[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	char *buf;

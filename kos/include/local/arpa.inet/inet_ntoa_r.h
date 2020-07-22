@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd7e6893 */
+/* HASH CRC-32:0xaf20f5c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_inet_ntoa_r_defined
 #define __local_inet_ntoa_r_defined 1
 #include <__crt.h>
+#include <netinet/bits/in.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined

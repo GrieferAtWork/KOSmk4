@@ -21,12 +21,16 @@
 %[default:section(".text.crt.dos.heap.debug_malloc")]
 
 %{
+
 #include <features.h>
-#include <crtdefs.h>
-#include <bits/types.h>
-#include <hybrid/typecore.h>
-#include <parts/assert.h>
+
 #include <hybrid/__assert.h>
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
+#include <parts/assert.h>
+
+#include <crtdefs.h>
 
 __SYSDECL_BEGIN
 
@@ -106,6 +110,19 @@ typedef int (__ATTR_CLRCALL *_CRT_ALLOC_HOOK_M)(int, void *, __SIZE_TYPE__, int,
 typedef void (__ATTR_CLRCALL *_CRT_DUMP_CLIENT_M)(void *, __SIZE_TYPE__);
 #endif /* _M_CEE */
 
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("pBlockHeader")
+#pragma push_macro("lCounts")
+#pragma push_macro("lSizes")
+#pragma push_macro("lHighWaterCount")
+#pragma push_macro("lTotalCount")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef pBlockHeader
+#undef lCounts
+#undef lSizes
+#undef lHighWaterCount
+#undef lTotalCount
 struct _CrtMemBlockHeader;
 typedef struct _CrtMemState {
 	struct _CrtMemBlockHeader *pBlockHeader;
@@ -114,6 +131,13 @@ typedef struct _CrtMemState {
 	__SIZE_TYPE__              lHighWaterCount;
 	__SIZE_TYPE__              lTotalCount;
 } _CrtMemState;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("lTotalCount")
+#pragma pop_macro("lHighWaterCount")
+#pragma pop_macro("lSizes")
+#pragma pop_macro("lCounts")
+#pragma pop_macro("pBlockHeader")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 
@@ -223,7 +247,8 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 %#ifdef __CRT_HAVE__crtAssertBusy
 %__LIBC __LONG32_TYPE__ _crtAssertBusy;
 %#else /* __CRT_HAVE__crtAssertBusy */
-[[crt_dos_only, guard]] __LONG32_TYPE__ *__p__crtAssertBusy();
+[[crt_dos_only, guard, decl_include("<hybrid/typecore.h>")]]
+__LONG32_TYPE__ *__p__crtAssertBusy();
 %#ifdef ____p__crtAssertBusy_defined
 %#define _crtAssertBusy  (*__p__crtAssertBusy())
 %#endif /* ____p__crtAssertBusy_defined */
@@ -232,7 +257,8 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 %#ifdef __CRT_HAVE__crtBreakAlloc
 %__LIBC __LONG32_TYPE__ _crtBreakAlloc;
 %#else /* __CRT_HAVE__crtBreakAlloc */
-[[crt_dos_only, guard]] __LONG32_TYPE__ *__p__crtBreakAlloc();
+[[crt_dos_only, guard, decl_include("<hybrid/typecore.h>")]]
+__LONG32_TYPE__ *__p__crtBreakAlloc();
 %#ifdef ____p__crtBreakAlloc_defined
 %#define _crtBreakAlloc  (*__p__crtBreakAlloc())
 %#endif /* ____p__crtBreakAlloc_defined */
@@ -241,7 +267,8 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 %#ifdef __CRT_HAVE__crtDbgFlag
 %__LIBC int _crtDbgFlag;
 %#else /* __CRT_HAVE__crtDbgFlag */
-[[crt_dos_only, guard]] int *__p__crtDbgFlag();
+[[crt_dos_only, guard]]
+int *__p__crtDbgFlag();
 %#ifdef ____p__crtDbgFlag_defined
 %#define _crtDbgFlag  (*__p__crtDbgFlag())
 %#endif /* ____p__crtDbgFlag_defined */
@@ -269,7 +296,8 @@ int _CrtSetDbgFlag(int new_flag) {
 
 [[crt_dos_only]] int _CrtSetReportMode(int report_type, int report_mode);
 [[crt_dos_only]] _HFILE _CrtSetReportFile(int report_type, _HFILE report_file);
-[[crt_dos_only]] $size_t _CrtSetDebugFillThreshold($size_t new_debug_fill_threshold);
+[[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
+$size_t _CrtSetDebugFillThreshold($size_t new_debug_fill_threshold);
 
 [[crt_dos_only, guard]]
 int _CrtDbgReport(int report_type,
@@ -279,6 +307,7 @@ int _CrtDbgReport(int report_type,
 
 /*[[export_alias("?_CrtDbgReportW@@YAHHPEBGH00ZZ")]]*/ /* __ptr64??? */
 [[guard, crt_dos_only, export_alias("?_CrtDbgReportW@@YAHHPBGH00ZZ")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int _CrtDbgReportW(int report_type,
                    __WCHAR16_TYPE__ const *filename, int line,
                    __WCHAR16_TYPE__ const *module_name,
@@ -287,11 +316,12 @@ int _CrtDbgReportW(int report_type,
 [[crt_dos_only, guard]]
 void _CrtDbgBreak();
 
-[[crt_dos_only]]
+[[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
 __LONG32_TYPE__ _CrtSetBreakAlloc(__LONG32_TYPE__ break_alloc);
 
 [[ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
 [[crt_dos_only, guard, wunused, requires_function(malloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_malloc_dbg($size_t num_bytes, int block_type,
                   char const *filename, int line) {
 	(void)block_type;
@@ -302,6 +332,7 @@ void *_malloc_dbg($size_t num_bytes, int block_type,
 
 [[guard, wunused, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 [[crt_dos_only, requires_function(calloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_calloc_dbg($size_t count, $size_t num_bytes,
                   int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -312,6 +343,7 @@ void *_calloc_dbg($size_t count, $size_t num_bytes,
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[crt_dos_only, requires_function(calloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
                    int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -322,6 +354,7 @@ void *_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2, 3))]]
 [[crt_dos_only, requires_function(recallocv)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
                     int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -332,6 +365,7 @@ void *_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[crt_dos_only, requires_function(realloc_in_place)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_expand_dbg([[nonnull]] void *ptr, $size_t num_bytes,
                   int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -348,6 +382,7 @@ void _free_dbg([[nullable]] void *ptr, int block_type) {
 
 [[guard, wunused, ATTR_PURE]]
 [[crt_dos_only, requires_function(malloc_usable_size)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
 	(void)block_type;
 	return malloc_usable_size(ptr);
@@ -355,12 +390,14 @@ $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
 
 [[guard, wunused, ATTR_PURE]]
 [[crt_dos_only, requires_function(_aligned_msize)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $size_t _aligned_msize_dbg([[nonnull]] void *ptr, $size_t min_alignment, $size_t offset) {
 	return _aligned_msize(ptr, min_alignment, offset);
 }
 
 [[guard, wunused, ATTR_MALLOC, ATTR_ALLOC_SIZE((1)), ATTR_ALLOC_ALIGN(2)]]
 [[crt_dos_only, requires_function(_aligned_malloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_aligned_malloc_dbg($size_t num_bytes, $size_t min_alignment,
                           char const *filename, int line) {
 	(void)filename;
@@ -370,6 +407,7 @@ void *_aligned_malloc_dbg($size_t num_bytes, $size_t min_alignment,
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2)), ATTR_ALLOC_ALIGN(3)]]
 [[crt_dos_only, requires_function(_aligned_realloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_aligned_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
                            $size_t min_alignment, char const *filename, int line) {
 	(void)filename;
@@ -379,6 +417,7 @@ void *_aligned_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2, 3)), ATTR_ALLOC_ALIGN(4)]]
 [[crt_dos_only, requires_function(_aligned_recalloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_aligned_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
                             $size_t min_alignment, char const *filename, int line) {
 	(void)filename;
@@ -388,6 +427,7 @@ void *_aligned_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_b
 
 [[guard, wunused, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
 [[crt_dos_only, requires_function(_aligned_offset_malloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_aligned_offset_malloc_dbg($size_t num_bytes, $size_t min_alignment, $size_t offset,
                                  char const *filename, int line) {
 	(void)filename;
@@ -397,6 +437,7 @@ void *_aligned_offset_malloc_dbg($size_t num_bytes, $size_t min_alignment, $size
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[crt_dos_only, requires_function(_aligned_offset_realloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_aligned_offset_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
                                   $size_t min_alignment, $size_t offset,
                                   char const *filename, int line) {
@@ -407,6 +448,7 @@ void *_aligned_offset_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
 
 [[guard, wunused, ATTR_ALLOC_SIZE((2, 3))]]
 [[crt_dos_only, requires_function(_aligned_offset_recalloc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 void *_aligned_offset_recalloc_dbg([[nullable]] void *ptr, $size_t count,
                                    $size_t num_bytes, $size_t min_alignment,
                                    $size_t offset, char const *filename, int line) {
@@ -430,6 +472,7 @@ char *_strdup_dbg(char const *string, int block_type, char const *filename, int 
 
 [[guard, ATTR_MALLOC, wunused]]
 [[crt_dos_only, requires_function(c16sdup)]]
+[[decl_include("<hybrid/typecore.h>")]]
 __WCHAR16_TYPE__ *_wcsdup_dbg(__WCHAR16_TYPE__ const *string,
                               int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -449,6 +492,7 @@ char *_tempnam_dbg(char const *dir_name, char const *file_prefix,
 }
 
 [[guard, wunused, crt_dos_only]]
+[[decl_include("<hybrid/typecore.h>")]]
 __WCHAR16_TYPE__ *_wtempnam_dbg(__WCHAR16_TYPE__ const *dir_name,
                                 __WCHAR16_TYPE__ const *file_prefix,
                                 int block_type, char const *filename, int line) {
@@ -463,6 +507,7 @@ __WCHAR16_TYPE__ *_wtempnam_dbg(__WCHAR16_TYPE__ const *dir_name,
 }
 
 [[guard, wunused, crt_dos_only, requires_function(_fullpath)]]
+[[decl_include("<hybrid/typecore.h>")]]
 char *_fullpath_dbg([[outp_opt(bufsize)]] char *full_path,
                     [[nonnull]] char const *path, $size_t bufsize,
                     int block_type, char const *filename, int line) {
@@ -473,6 +518,7 @@ char *_fullpath_dbg([[outp_opt(bufsize)]] char *full_path,
 }
 
 [[guard, wunused, crt_dos_only]]
+[[decl_include("<hybrid/typecore.h>")]]
 __WCHAR16_TYPE__ *_wfullpath_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *full_path,
                                  [[nonnull]] __WCHAR16_TYPE__ const *path, $size_t buflen,
                                  int block_type, char const *filename, int line) {
@@ -497,7 +543,7 @@ char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
 	return getcwd(buf, (size_t)bufsize);
 }
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[guard, wunused, crt_dos_only, requires_function(c16getcwd)]]
 __WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
                                __STDC_INT_AS_SIZE_T buflen,
@@ -520,7 +566,7 @@ char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
 	return _getdcwd(driveno, buf, bufsize);
 }
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[guard, wunused, crt_dos_only]]
 __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
                                 __STDC_INT_AS_SIZE_T buflen, int block_type,
@@ -541,6 +587,7 @@ __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE
 
 [[guard, attribute(@_Check_return_wat_@)]]
 [[crt_dos_only, requires_function(_dupenv_s)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $errno_t _dupenv_s_dbg([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
                        [[nonnull]] char const *varname,
                        int block_type, char const *filename, int line) {
@@ -551,6 +598,7 @@ $errno_t _dupenv_s_dbg([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
 }
 
 [[guard, attribute(@_Check_return_wat_@), crt_dos_only]]
+[[decl_include("<hybrid/typecore.h>")]]
 $errno_t _wdupenv_s_dbg([[nullable]] __WCHAR16_TYPE__ **pbuf, [[nullable]] $size_t *pbuflen,
                         [[nonnull]] __WCHAR16_TYPE__ const *varname,
                         int block_type, char const *filename, int line) {
@@ -578,7 +626,7 @@ void _CrtDoForAllClientObjects([[nonnull]] _PFNCRTDOFORALLCLIENTOBJECTS pfn, voi
 	(void)context;
 }
 
-[[wunused, ATTR_PURE, crt_dos_only]]
+[[wunused, ATTR_PURE, crt_dos_only, decl_include("<features.h>")]]
 int _CrtIsValidPointer(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable) {
 	COMPILER_IMPURE();
 	(void)num_bytes;
@@ -592,7 +640,7 @@ int _CrtIsValidHeapPointer(void const *heap_ptr) {
 	return heap_ptr != NULL;
 }
 
-[[crt_dos_only]]
+[[crt_dos_only, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 int _CrtIsMemoryBlock(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes,
                       [[nullable]] __LONG32_TYPE__ *prequest_number,
                       [[nullable]] char **filename, [[nullable]] int *line) {
@@ -691,7 +739,7 @@ __NAMESPACE_STD_END
 #define _RPT_BASE_W(args) (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
 #else /* ___CrtDbgReportW_defined */
 #define _ASSERT_EXPR(expr, msg) __hybrid_assertf(expr, "%ls", msg)
-#define _RPT_BASE_W(args) (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
+#define _RPT_BASE_W(args)       (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
 #define _RPT_BASE_W2(report_type, filename, line, module_name, ...) \
 	__assertion_failed_at(__NULLPTR, NULL, 0, "%ls(%d) : %ls", filename, line, module_name)
 #define _RPT_BASE_W(args) _RPT_BASE_W2 args
@@ -708,76 +756,76 @@ __NAMESPACE_STD_END
 #define _ASSERT(expr) _ASSERT_EXPR(expr, __NULLPTR)
 #endif  /* _ASSERT */
 #ifndef _ASSERTE
-#define _ASSERTE(expr)  _ASSERT_EXPR(expr, _CRT_WIDE(#expr))
+#define _ASSERTE(expr) _ASSERT_EXPR(expr, _CRT_WIDE(#expr))
 #endif  /* _ASSERTE */
 #ifndef _ASSERT_BASE
 #define _ASSERT_BASE _ASSERT_EXPR
 #endif  /* _ASSERT_BASE */
-#define _RPT0(rptno, msg) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%s", msg))
-#define _RPT1(rptno, msg, arg1) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
-#define _RPT2(rptno, msg, arg1, arg2) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
-#define _RPT3(rptno, msg, arg1, arg2, arg3) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPT4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
-#define _RPT5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
-#define _RPTF0(rptno, msg) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, "%s", msg))
-#define _RPTF1(rptno, msg, arg1) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1))
-#define _RPTF2(rptno, msg, arg1, arg2) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2))
-#define _RPTF3(rptno, msg, arg1, arg2, arg3) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPTF4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPT0(rptno, msg)                                _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%s", msg))
+#define _RPT1(rptno, msg, arg1)                          _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
+#define _RPT2(rptno, msg, arg1, arg2)                    _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
+#define _RPT3(rptno, msg, arg1, arg2, arg3)              _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPT4(rptno, msg, arg1, arg2, arg3, arg4)        _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPT5(rptno, msg, arg1, arg2, arg3, arg4, arg5)  _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
+#define _RPTF0(rptno, msg)                               _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, "%s", msg))
+#define _RPTF1(rptno, msg, arg1)                         _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1))
+#define _RPTF2(rptno, msg, arg1, arg2)                   _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2))
+#define _RPTF3(rptno, msg, arg1, arg2, arg3)             _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPTF4(rptno, msg, arg1, arg2, arg3, arg4)       _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
 #define _RPTF5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
 #ifdef __HAVE_NATIVE_RPT_BASE_W
-#define _RPTW0(rptno, msg) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, L"%s", msg))
+#define _RPTW0(rptno, msg)  _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, L"%s", msg))
 #define _RPTFW0(rptno, msg) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, L"%s", msg))
 #else /* __HAVE_NATIVE_RPT_BASE_W */
-#define _RPTW0(rptno, msg) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%ls", msg))
+#define _RPTW0(rptno, msg)  _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%ls", msg))
 #define _RPTFW0(rptno, msg) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, "%ls", msg))
 #endif /* !__HAVE_NATIVE_RPT_BASE_W */
-#define _RPTW1(rptno, msg, arg1) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
-#define _RPTW2(rptno, msg, arg1, arg2) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
-#define _RPTW3(rptno, msg, arg1, arg2, arg3) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPTW4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
-#define _RPTW5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
-#define _RPTFW1(rptno, msg, arg1) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1))
-#define _RPTFW2(rptno, msg, arg1, arg2) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2))
-#define _RPTFW3(rptno, msg, arg1, arg2, arg3) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPTFW4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPTW1(rptno, msg, arg1)                          _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
+#define _RPTW2(rptno, msg, arg1, arg2)                    _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
+#define _RPTW3(rptno, msg, arg1, arg2, arg3)              _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPTW4(rptno, msg, arg1, arg2, arg3, arg4)        _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPTW5(rptno, msg, arg1, arg2, arg3, arg4, arg5)  _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
+#define _RPTFW1(rptno, msg, arg1)                         _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1))
+#define _RPTFW2(rptno, msg, arg1, arg2)                   _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2))
+#define _RPTFW3(rptno, msg, arg1, arg2, arg3)             _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPTFW4(rptno, msg, arg1, arg2, arg3, arg4)       _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
 #define _RPTFW5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
 #ifdef _CRTDBG_MAP_ALLOC
-#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define calloc(c, s) _calloc_dbg(c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define realloc(p, s) _realloc_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _recalloc(p, c, s) _recalloc_dbg(p, c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _expand(p, s) _expand_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p) _free_dbg(p, _NORMAL_BLOCK)
-#define _msize(p) _msize_dbg(p, _NORMAL_BLOCK)
-#define _aligned_msize(p, a, o) _aligned_msize_dbg(p, a, o)
-#define _aligned_malloc(s, a) _aligned_malloc_dbg(s, a, __FILE__, __LINE__)
-#define _aligned_realloc(p, s, a) _aligned_realloc_dbg(p, s, a, __FILE__, __LINE__)
-#define _aligned_recalloc(p, c, s, a) _aligned_recalloc_dbg(p, c, s, a, __FILE__, __LINE__)
-#define _aligned_offset_malloc(s, a, o) _aligned_offset_malloc_dbg(s, a, o, __FILE__, __LINE__)
-#define _aligned_offset_realloc(p, s, a, o) _aligned_offset_realloc_dbg(p, s, a, o, __FILE__, __LINE__)
+#define malloc(s)                               _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define calloc(c, s)                            _calloc_dbg(c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define realloc(p, s)                           _realloc_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _recalloc(p, c, s)                      _recalloc_dbg(p, c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _expand(p, s)                           _expand_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)                                 _free_dbg(p, _NORMAL_BLOCK)
+#define _msize(p)                               _msize_dbg(p, _NORMAL_BLOCK)
+#define _aligned_msize(p, a, o)                 _aligned_msize_dbg(p, a, o)
+#define _aligned_malloc(s, a)                   _aligned_malloc_dbg(s, a, __FILE__, __LINE__)
+#define _aligned_realloc(p, s, a)               _aligned_realloc_dbg(p, s, a, __FILE__, __LINE__)
+#define _aligned_recalloc(p, c, s, a)           _aligned_recalloc_dbg(p, c, s, a, __FILE__, __LINE__)
+#define _aligned_offset_malloc(s, a, o)         _aligned_offset_malloc_dbg(s, a, o, __FILE__, __LINE__)
+#define _aligned_offset_realloc(p, s, a, o)     _aligned_offset_realloc_dbg(p, s, a, o, __FILE__, __LINE__)
 #define _aligned_offset_recalloc(p, c, s, a, o) _aligned_offset_recalloc_dbg(p, c, s, a, o, __FILE__, __LINE__)
-#define _aligned_free(p) _aligned_free_dbg(p)
-#define _malloca(s) _malloca_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _freea(p) _freea_dbg(p, _NORMAL_BLOCK)
-#define _strdup(s) _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wcsdup(s) _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _mbsdup(s) _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _tempnam(s1, s2) _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wtempnam(s1, s2) _wtempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _fullpath(s1, s2, le) _fullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wfullpath(s1, s2, le) _wfullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _getcwd(s, le) _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wgetcwd(s, le) _wgetcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _getdcwd(d, s, le) _getdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wgetdcwd(d, s, le) _wgetdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _dupenv_s(ps1, size, s2) _dupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wdupenv_s(ps1, size, s2) _wdupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define strdup(s) _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define wcsdup(s) _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define tempnam(s1, s2) _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define getcwd(s, le) _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif  /* _CRTDBG_MAP_ALLOC */
+#define _aligned_free(p)                        _aligned_free_dbg(p)
+#define _malloca(s)                             _malloca_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _freea(p)                               _freea_dbg(p, _NORMAL_BLOCK)
+#define _strdup(s)                              _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wcsdup(s)                              _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _mbsdup(s)                              _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _tempnam(s1, s2)                        _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wtempnam(s1, s2)                       _wtempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _fullpath(s1, s2, le)                   _fullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wfullpath(s1, s2, le)                  _wfullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _getcwd(s, le)                          _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wgetcwd(s, le)                         _wgetcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _getdcwd(d, s, le)                      _getdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wgetdcwd(d, s, le)                     _wgetdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _dupenv_s(ps1, size, s2)                _dupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wdupenv_s(ps1, size, s2)               _wdupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define strdup(s)                               _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define wcsdup(s)                               _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define tempnam(s1, s2)                         _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define getcwd(s, le)                           _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif /* _CRTDBG_MAP_ALLOC */
 
 #endif /* _DEBUG */
 

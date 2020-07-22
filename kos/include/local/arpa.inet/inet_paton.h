@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61913b35 */
+/* HASH CRC-32:0xf6200d73 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_inet_paton_defined
 #define __local_inet_paton_defined 1
 #include <__crt.h>
+#include <netinet/bits/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `inet_aton()', but update `*pcp' to point after the address

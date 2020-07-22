@@ -855,6 +855,7 @@ typedef __errno_t errno_t;
 
 [[guard, alias("_errno", "__errno"), wunused]]
 [[ATTR_CONST, section(".text.crt{|.dos}.errno_access")]]
+[[decl_include("<bits/types.h>")]]
 [[nonnull]] $errno_t *__errno_location();
 
 

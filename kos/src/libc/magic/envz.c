@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 @@Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
 @@Note that if `name' contains a `=' character, only characters leading up to this
 @@position are actually compared!
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -75,7 +75,7 @@ char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_le
 
 @@Returns a pointer to the value portion of the entry
 @@in `ENVZ' for `NAME', or `NULL' if there is none.
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -96,7 +96,7 @@ char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len,
 @@will return `NULL', although `envz_entry()' will still return an entry. This is handy
 @@because when merging with another envz, the null entry can override an
 @@entry in the other one. Such entries can be removed with `envz_strip()'
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires_function(realloc, argz_add)]]
 error_t envz_add([[nonnull]] char **__restrict penvz,
                  [[nonnull]] size_t *__restrict penvz_len,
@@ -132,7 +132,7 @@ error_t envz_add([[nonnull]] char **__restrict penvz,
 @@Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
 @@If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
 @@with the same name in `ENV', otherwise they don't
-[[requires_function(argz_append)]]
+[[requires_function(argz_append), decl_include("<hybrid/typecore.h>")]]
 error_t envz_merge([[nonnull]] char **__restrict penvz,
                    [[nonnull]] size_t *__restrict penvz_len,
                    [[nonnull]] char const *__restrict envz2,
@@ -154,6 +154,7 @@ error_t envz_merge([[nonnull]] char **__restrict penvz,
 }
 
 @@Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any
+[[decl_include("<hybrid/typecore.h>")]]
 void envz_remove([[nonnull]] char **__restrict penvz,
                  [[nonnull]] size_t *__restrict penvz_len,
                  [[nonnull]] char const *__restrict name) {
@@ -165,6 +166,7 @@ void envz_remove([[nonnull]] char **__restrict penvz,
 
 
 @@Remove entries that have no value attached
+[[decl_include("<hybrid/typecore.h>")]]
 void envz_strip([[nonnull]] char **__restrict penvz,
                 [[nonnull]] size_t *__restrict penvz_len) {
 	char *start, *ptr, *end;

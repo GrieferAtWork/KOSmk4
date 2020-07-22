@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcac1c3d */
+/* HASH CRC-32:0x77e83492 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: scanf from stdio */
 #ifndef __local___localdep_scanf_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb66cf94c */
+/* HASH CRC-32:0xf84210e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/wformat-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_wrepeat from parts.wchar.format-printer */
 #ifndef __local___localdep_format_wrepeat_defined

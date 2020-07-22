@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff2abcc */
+/* HASH CRC-32:0xceefbcca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetc from stdio */
 #ifndef __local___localdep_fgetc_defined
@@ -218,7 +219,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, _
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <asm/stdio.h>
-#include <asm/util.h>
+#include <asm/crt/util.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.

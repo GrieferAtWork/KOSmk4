@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa209007 */
+/* HASH CRC-32:0xd567d65f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,11 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -47,7 +50,7 @@ __SYSDECL_BEGIN
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
 #ifndef __size_t_defined
@@ -71,7 +74,7 @@ typedef __UINT32_TYPE__ _fsize_t;
 #endif /* _FSIZE_T_DEFINED */
 
 struct _finddata32_t;
-struct __finddata64_t; /* I guess something else already using the more obvious choice... */
+struct __finddata64_t; /* I guess something else is already using the more obvious choice... */
 struct _finddata32i64_t;
 struct _finddata64i32_t;
 

@@ -226,9 +226,9 @@ NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
 }
 /*[[[end:libc_seekdir]]]*/
 
-/*[[[head:libc_telldir,hash:CRC-32=0xc687b553]]]*/
+/*[[[head:libc_telldir,hash:CRC-32=0x6b895afa]]]*/
 /* Get the directory stream position */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) long int
+INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) longptr_t
 NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp)
 /*[[[body:libc_telldir]]]*/
 {

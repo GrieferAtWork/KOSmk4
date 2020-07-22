@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x406c69a3 */
+/* HASH CRC-32:0x65dc2e33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/crt/stdio.h>
 #include <asm/stdio.h>
-#include <asm/util.h>
+#include <asm/crt/util.h>
 /* Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
  * @param: plen:    When non-NULL, store `strlen(return)' here

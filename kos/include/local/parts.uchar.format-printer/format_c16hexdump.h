@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ade77cb */
+/* HASH CRC-32:0xcc9adf6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/uformat-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c16repeat from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16repeat_defined

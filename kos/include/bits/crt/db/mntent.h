@@ -22,9 +22,8 @@
 
 #include <__stdinc.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 /* Structure describing a mount table entry.  */
 struct mntent {
@@ -36,8 +35,7 @@ struct mntent {
 	int   mnt_passno; /* Pass number for `fsck'. */
 };
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_DB_MNTENT_H */

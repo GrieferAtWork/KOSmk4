@@ -48,9 +48,8 @@
    <http://www.gnu.org/licenses/>.  */
 
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __socklen_t_defined
 #define __socklen_t_defined 1
@@ -61,6 +60,7 @@ typedef __socklen_t socklen_t;
 
 @@Return network number part of the Internet address IN
 [[wunused, ATTR_CONST]]
+[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_netof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -75,6 +75,7 @@ $uint32_t inet_netof(struct in_addr inaddr) {
 
 @@Return the local host address part of the Internet address in IN
 [[wunused, ATTR_CONST]]
+[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_lnaof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -90,6 +91,7 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 @@Make Internet host address in network byte order by
 @@combining the network number NET with the local address HOST
 [[wunused, ATTR_CONST]]
+[[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 	struct @in_addr@ result;
@@ -118,7 +120,7 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 @@    123      (decimal)
 @@    0x123    (hex)
 @@    0123     (oct)
-[[ATTR_PURE, impl_include("<netinet/in.h>")]]
+[[ATTR_PURE, impl_include("<netinet/in.h>"), decl_include("<net/bits/types.h>")]]
 in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
@@ -137,6 +139,7 @@ in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 %#ifdef __USE_KOS
 %#define INET_NTOA_R_MAXLEN 16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
 @@Re-entrant version of `inet_ntoa()'
+[[decl_include("<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 [[nonnull]] char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -151,6 +154,7 @@ in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 
 @@This function is the same as `inet_addr()', except that
 @@the return value is in host-endian, rather than net-endian
+[[decl_include("<hybrid/typecore.h>")]]
 [[ATTR_PURE, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
@@ -176,6 +180,7 @@ $uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 @@    0123     (oct)
 @@@return: 0: Bad input format
 @@@return: 1: Success
+[[decl_include("<netinet/bits/in.h>")]]
 int inet_aton([[nonnull]] char const *__restrict cp,
               [[nonnull]] struct in_addr *__restrict inp) {
 	return inet_paton((char const **)&cp, inp, 0) && !*cp;
@@ -196,6 +201,7 @@ int inet_aton([[nonnull]] char const *__restrict cp,
 @@@return: 0: Bad input format
 @@@return: 1: Success
 [[wunused, impl_include("<hybrid/__byteswap.h>")]]
+[[decl_include("<netinet/bits/in.h>")]]
 int inet_paton([[nonnull]] char const **__restrict pcp,
                [[nonnull]] struct in_addr *__restrict inp,
                int network_addr) {
@@ -344,6 +350,7 @@ err:
 @@Format a network number NET into presentation format and place
 @@result in buffer starting at BUF with length of LEN bytes
 [[impl_include("<parts/errno.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
 char *inet_neta($uint32_t net, [[outp(len)]] char *buf, $size_t len) {
 	size_t reqlen;
 	if (net <= 0xff) {
@@ -386,12 +393,12 @@ too_small:
 
 @@Convert network number for interface type AF in buffer starting at CP
 @@to presentation format. The result will specify BITS bits of the number
-[[cp_kos]]
+[[cp_kos, decl_include("<hybrid/typecore.h>")]]
 char *inet_net_ntop(int af, void const *cp, int bits, char *buf, $size_t len);
 
 @@Convert network number for interface type AF from presentation in buffer starting
 @@at CP to network format and store result int buffer starting at BUF of size LEN
-[[cp_kos]]
+[[cp_kos, decl_include("<hybrid/typecore.h>")]]
 int inet_net_pton(int af, char const *cp, void *buf, $size_t len);
 
 @@Convert ASCII representation in hexadecimal form of the Internet address
@@ -415,15 +422,14 @@ int inet_pton(int af, char const *__restrict cp, void *__restrict buf);
 @@Convert a Internet address in binary network format for interface
 @@type AF in buffer starting at CP to presentation form and place
 @@result in buffer of length LEN starting at BUF
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 char const *inet_ntop(int af, void const *__restrict cp,
                       char *__restrict buf, socklen_t len);
 
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

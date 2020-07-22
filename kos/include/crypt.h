@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb2445b9 */
+/* HASH CRC-32:0xb024d84b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
+#ifdef __USE_GNU
+#include <bits/crt/crypt_data.h>
+#endif /* __USE_GNU */
 
 /* Derived from GLibc: /usr/include/crypt.h */
 /*
@@ -72,7 +76,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key,
 #define __encrypt_defined 1
 #ifdef __CRT_HAVE_encrypt
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, int __edflag),(__glibc_block,__edflag))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
 #else /* __CRT_HAVE_encrypt */
 #undef __encrypt_defined
 #endif /* !__CRT_HAVE_encrypt */
@@ -81,53 +85,6 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, 
 #ifdef __USE_GNU
 /* Reentrant versions of the functions above.
  * The additional argument points to a structure where the results are placed in.  */
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("keysched")
-#pragma push_macro("sb0")
-#pragma push_macro("sb1")
-#pragma push_macro("sb2")
-#pragma push_macro("sb3")
-#pragma push_macro("crypt_3_buf")
-#pragma push_macro("current_salt")
-#pragma push_macro("current_saltbits")
-#pragma push_macro("direction")
-#pragma push_macro("initialized")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef keysched
-#undef sb0
-#undef sb1
-#undef sb2
-#undef sb3
-#undef crypt_3_buf
-#undef current_salt
-#undef current_saltbits
-#undef direction
-#undef initialized
-struct crypt_data {
-	char             keysched[16 * 8];
-	char             sb0[32768];
-	char             sb1[32768];
-	char             sb2[32768];
-	char             sb3[32768];
-	/* end-of-aligment-critical-data */
-	char             crypt_3_buf[14];
-	char             current_salt[2];
-	__LONGPTR_TYPE__ current_saltbits;
-	__INT32_TYPE__   direction;
-	__INT32_TYPE__   initialized;
-};
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("initialized")
-#pragma pop_macro("direction")
-#pragma pop_macro("current_saltbits")
-#pragma pop_macro("current_salt")
-#pragma pop_macro("crypt_3_buf")
-#pragma pop_macro("sb3")
-#pragma pop_macro("sb2")
-#pragma pop_macro("sb1")
-#pragma pop_macro("sb0")
-#pragma pop_macro("keysched")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /* Encrypt at most 8 characters from KEY using salt to perturb DES */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,crypt_r,(char const *__key, char const *__salt, struct crypt_data *__restrict __data),(__key,__salt,__data))

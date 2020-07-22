@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bc70790 */
+/* HASH CRC-32:0xe1d8f877 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,12 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_kreaddirf64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)))
 #include <bits/dirent.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: kreaddirf from dirent */
 #ifndef __local___localdep_kreaddirf_defined
 #define __local___localdep_kreaddirf_defined 1
 #if defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -41,9 +39,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf,(__fd_t __fd, struct dirent *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf,(__fd,__buf,__bufsize,__mode,__flags))
 #elif defined(__CRT_HAVE_kreaddirf64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)

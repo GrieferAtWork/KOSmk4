@@ -189,6 +189,7 @@ incdir("", "../../include");
 #include <asm/crt/stdlib.h>
 #include <asm/crt/threads.h>
 #include <asm/crt/ttyent.h>
+#include <asm/crt/util.h>
 #include <asm/dirent.h>
 #include <asm/epoll.h>
 #include <asm/eventfd.h>
@@ -233,14 +234,16 @@ incdir("", "../../include");
 #include <asm/types.h>
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
-#include <asm/util.h>
 #include <asm/utsname.h>
 #include <asm/xattr.h>
 #include <assert.h>
 #include <attr/xattr.h>
 #include <bits/acct.h>
 #include <bits/cmsghdr-struct.h>
+#include <bits/crt/_diskfree_t.h>
 #include <bits/crt/confname.h>
+#include <bits/crt/crypt_data.h>
+#include <bits/crt/db/aliases.h>
 #include <bits/crt/db/group.h>
 #include <bits/crt/db/mntent.h>
 #include <bits/crt/db/netdb.h>

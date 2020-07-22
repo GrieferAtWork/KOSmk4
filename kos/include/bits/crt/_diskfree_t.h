@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xbb945150 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +17,44 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__fullpath_dbg_defined
-#define __local__fullpath_dbg_defined 1
-#include <__crt.h>
-#ifdef __CRT_HAVE__fullpath
+#ifndef _BITS_CRT__DISKFREE_T_H
+#define _BITS_CRT__DISKFREE_T_H 1
+
+#include <__stdinc.h>
+
+#ifdef __CC__
+#ifndef _DISKFREE_T_DEFINED
+#define _DISKFREE_T_DEFINED 1
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("total_clusters")
+#pragma push_macro("avail_clusters")
+#pragma push_macro("sectors_per_cluster")
+#pragma push_macro("bytes_per_sector")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef total_clusters
+#undef avail_clusters
+#undef sectors_per_cluster
+#undef bytes_per_sector
+
 #include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: _fullpath from stdlib */
-#ifndef __local___localdep__fullpath_defined
-#define __local___localdep__fullpath_defined 1
-__CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
-#endif /* !__local___localdep__fullpath_defined */
-__LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) {
-	(void)__block_type;
-	(void)__filename;
-	(void)__line;
-	return __localdep__fullpath(__full_path, __path, __bufsize);
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__fullpath_dbg_defined
-#define __local___localdep__fullpath_dbg_defined 1
-#define __localdep__fullpath_dbg __LIBC_LOCAL_NAME(_fullpath_dbg)
-#endif /* !__local___localdep__fullpath_dbg_defined */
-#else /* __CRT_HAVE__fullpath */
-#undef __local__fullpath_dbg_defined
-#endif /* !__CRT_HAVE__fullpath */
-#endif /* !__local__fullpath_dbg_defined */
+__DECL_BEGIN
+
+struct _diskfree_t {
+	__UINT32_TYPE__ total_clusters;
+	__UINT32_TYPE__ avail_clusters;
+	__UINT32_TYPE__ sectors_per_cluster;
+	__UINT32_TYPE__ bytes_per_sector;
+};
+
+__DECL_END
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("bytes_per_sector")
+#pragma pop_macro("sectors_per_cluster")
+#pragma pop_macro("avail_clusters")
+#pragma pop_macro("total_clusters")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !_DISKFREE_T_DEFINED */
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT__DISKFREE_T_H */

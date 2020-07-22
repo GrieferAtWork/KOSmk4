@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe725b446 */
+/* HASH CRC-32:0x73a958d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_c32toimax_l_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32toimax from parts.uchar.inttypes */
 #ifndef __local___localdep_c32toimax_defined

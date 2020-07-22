@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c630495 */
+/* HASH CRC-32:0x5f84711c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+
 #include <features.h>
-#include <crtdefs.h>
-#include <bits/types.h>
-#include <hybrid/typecore.h>
-#include <parts/assert.h>
+
 #include <hybrid/__assert.h>
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
+#include <parts/assert.h>
+
+#include <crtdefs.h>
 
 __SYSDECL_BEGIN
 
@@ -113,6 +117,19 @@ typedef int (__ATTR_CLRCALL *_CRT_ALLOC_HOOK_M)(int, void *, __SIZE_TYPE__, int,
 typedef void (__ATTR_CLRCALL *_CRT_DUMP_CLIENT_M)(void *, __SIZE_TYPE__);
 #endif /* _M_CEE */
 
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("pBlockHeader")
+#pragma push_macro("lCounts")
+#pragma push_macro("lSizes")
+#pragma push_macro("lHighWaterCount")
+#pragma push_macro("lTotalCount")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef pBlockHeader
+#undef lCounts
+#undef lSizes
+#undef lHighWaterCount
+#undef lTotalCount
 struct _CrtMemBlockHeader;
 typedef struct _CrtMemState {
 	struct _CrtMemBlockHeader *pBlockHeader;
@@ -121,6 +138,13 @@ typedef struct _CrtMemState {
 	__SIZE_TYPE__              lHighWaterCount;
 	__SIZE_TYPE__              lTotalCount;
 } _CrtMemState;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("lTotalCount")
+#pragma pop_macro("lHighWaterCount")
+#pragma pop_macro("lSizes")
+#pragma pop_macro("lCounts")
+#pragma pop_macro("pBlockHeader")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 
@@ -754,7 +778,7 @@ __NAMESPACE_STD_END
 #define _RPT_BASE_W(args) (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
 #else /* ___CrtDbgReportW_defined */
 #define _ASSERT_EXPR(expr, msg) __hybrid_assertf(expr, "%ls", msg)
-#define _RPT_BASE_W(args) (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
+#define _RPT_BASE_W(args)       (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
 #define _RPT_BASE_W2(report_type, filename, line, module_name, ...) \
 	__assertion_failed_at(__NULLPTR, NULL, 0, "%ls(%d) : %ls", filename, line, module_name)
 #define _RPT_BASE_W(args) _RPT_BASE_W2 args
@@ -771,76 +795,76 @@ __NAMESPACE_STD_END
 #define _ASSERT(expr) _ASSERT_EXPR(expr, __NULLPTR)
 #endif  /* _ASSERT */
 #ifndef _ASSERTE
-#define _ASSERTE(expr)  _ASSERT_EXPR(expr, _CRT_WIDE(#expr))
+#define _ASSERTE(expr) _ASSERT_EXPR(expr, _CRT_WIDE(#expr))
 #endif  /* _ASSERTE */
 #ifndef _ASSERT_BASE
 #define _ASSERT_BASE _ASSERT_EXPR
 #endif  /* _ASSERT_BASE */
-#define _RPT0(rptno, msg) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%s", msg))
-#define _RPT1(rptno, msg, arg1) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
-#define _RPT2(rptno, msg, arg1, arg2) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
-#define _RPT3(rptno, msg, arg1, arg2, arg3) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPT4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
-#define _RPT5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
-#define _RPTF0(rptno, msg) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, "%s", msg))
-#define _RPTF1(rptno, msg, arg1) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1))
-#define _RPTF2(rptno, msg, arg1, arg2) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2))
-#define _RPTF3(rptno, msg, arg1, arg2, arg3) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPTF4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPT0(rptno, msg)                                _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%s", msg))
+#define _RPT1(rptno, msg, arg1)                          _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
+#define _RPT2(rptno, msg, arg1, arg2)                    _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
+#define _RPT3(rptno, msg, arg1, arg2, arg3)              _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPT4(rptno, msg, arg1, arg2, arg3, arg4)        _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPT5(rptno, msg, arg1, arg2, arg3, arg4, arg5)  _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
+#define _RPTF0(rptno, msg)                               _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, "%s", msg))
+#define _RPTF1(rptno, msg, arg1)                         _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1))
+#define _RPTF2(rptno, msg, arg1, arg2)                   _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2))
+#define _RPTF3(rptno, msg, arg1, arg2, arg3)             _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPTF4(rptno, msg, arg1, arg2, arg3, arg4)       _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
 #define _RPTF5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
 #ifdef __HAVE_NATIVE_RPT_BASE_W
-#define _RPTW0(rptno, msg) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, L"%s", msg))
+#define _RPTW0(rptno, msg)  _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, L"%s", msg))
 #define _RPTFW0(rptno, msg) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, L"%s", msg))
 #else /* __HAVE_NATIVE_RPT_BASE_W */
-#define _RPTW0(rptno, msg) _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%ls", msg))
+#define _RPTW0(rptno, msg)  _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%ls", msg))
 #define _RPTFW0(rptno, msg) _RPT_BASE((rptno, __FILE__, __LINE__, __NULLPTR, "%ls", msg))
 #endif /* !__HAVE_NATIVE_RPT_BASE_W */
-#define _RPTW1(rptno, msg, arg1) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
-#define _RPTW2(rptno, msg, arg1, arg2) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
-#define _RPTW3(rptno, msg, arg1, arg2, arg3) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPTW4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
-#define _RPTW5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
-#define _RPTFW1(rptno, msg, arg1) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1))
-#define _RPTFW2(rptno, msg, arg1, arg2) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2))
-#define _RPTFW3(rptno, msg, arg1, arg2, arg3) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
-#define _RPTFW4(rptno, msg, arg1, arg2, arg3, arg4) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPTW1(rptno, msg, arg1)                          _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
+#define _RPTW2(rptno, msg, arg1, arg2)                    _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))
+#define _RPTW3(rptno, msg, arg1, arg2, arg3)              _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPTW4(rptno, msg, arg1, arg2, arg3, arg4)        _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4))
+#define _RPTW5(rptno, msg, arg1, arg2, arg3, arg4, arg5)  _RPT_BASE_W((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
+#define _RPTFW1(rptno, msg, arg1)                         _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1))
+#define _RPTFW2(rptno, msg, arg1, arg2)                   _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2))
+#define _RPTFW3(rptno, msg, arg1, arg2, arg3)             _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3))
+#define _RPTFW4(rptno, msg, arg1, arg2, arg3, arg4)       _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4))
 #define _RPTFW5(rptno, msg, arg1, arg2, arg3, arg4, arg5) _RPT_BASE_W((rptno, _CRT_WIDE(__FILE__), __LINE__, __NULLPTR, msg, arg1, arg2, arg3, arg4, arg5))
 #ifdef _CRTDBG_MAP_ALLOC
-#define malloc(s) _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define calloc(c, s) _calloc_dbg(c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define realloc(p, s) _realloc_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _recalloc(p, c, s) _recalloc_dbg(p, c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _expand(p, s) _expand_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define free(p) _free_dbg(p, _NORMAL_BLOCK)
-#define _msize(p) _msize_dbg(p, _NORMAL_BLOCK)
-#define _aligned_msize(p, a, o) _aligned_msize_dbg(p, a, o)
-#define _aligned_malloc(s, a) _aligned_malloc_dbg(s, a, __FILE__, __LINE__)
-#define _aligned_realloc(p, s, a) _aligned_realloc_dbg(p, s, a, __FILE__, __LINE__)
-#define _aligned_recalloc(p, c, s, a) _aligned_recalloc_dbg(p, c, s, a, __FILE__, __LINE__)
-#define _aligned_offset_malloc(s, a, o) _aligned_offset_malloc_dbg(s, a, o, __FILE__, __LINE__)
-#define _aligned_offset_realloc(p, s, a, o) _aligned_offset_realloc_dbg(p, s, a, o, __FILE__, __LINE__)
+#define malloc(s)                               _malloc_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define calloc(c, s)                            _calloc_dbg(c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define realloc(p, s)                           _realloc_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _recalloc(p, c, s)                      _recalloc_dbg(p, c, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _expand(p, s)                           _expand_dbg(p, s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)                                 _free_dbg(p, _NORMAL_BLOCK)
+#define _msize(p)                               _msize_dbg(p, _NORMAL_BLOCK)
+#define _aligned_msize(p, a, o)                 _aligned_msize_dbg(p, a, o)
+#define _aligned_malloc(s, a)                   _aligned_malloc_dbg(s, a, __FILE__, __LINE__)
+#define _aligned_realloc(p, s, a)               _aligned_realloc_dbg(p, s, a, __FILE__, __LINE__)
+#define _aligned_recalloc(p, c, s, a)           _aligned_recalloc_dbg(p, c, s, a, __FILE__, __LINE__)
+#define _aligned_offset_malloc(s, a, o)         _aligned_offset_malloc_dbg(s, a, o, __FILE__, __LINE__)
+#define _aligned_offset_realloc(p, s, a, o)     _aligned_offset_realloc_dbg(p, s, a, o, __FILE__, __LINE__)
 #define _aligned_offset_recalloc(p, c, s, a, o) _aligned_offset_recalloc_dbg(p, c, s, a, o, __FILE__, __LINE__)
-#define _aligned_free(p) _aligned_free_dbg(p)
-#define _malloca(s) _malloca_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _freea(p) _freea_dbg(p, _NORMAL_BLOCK)
-#define _strdup(s) _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wcsdup(s) _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _mbsdup(s) _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _tempnam(s1, s2) _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wtempnam(s1, s2) _wtempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _fullpath(s1, s2, le) _fullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wfullpath(s1, s2, le) _wfullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _getcwd(s, le) _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wgetcwd(s, le) _wgetcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _getdcwd(d, s, le) _getdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wgetdcwd(d, s, le) _wgetdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _dupenv_s(ps1, size, s2) _dupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define _wdupenv_s(ps1, size, s2) _wdupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define strdup(s) _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define wcsdup(s) _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define tempnam(s1, s2) _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
-#define getcwd(s, le) _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
-#endif  /* _CRTDBG_MAP_ALLOC */
+#define _aligned_free(p)                        _aligned_free_dbg(p)
+#define _malloca(s)                             _malloca_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _freea(p)                               _freea_dbg(p, _NORMAL_BLOCK)
+#define _strdup(s)                              _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wcsdup(s)                              _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _mbsdup(s)                              _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _tempnam(s1, s2)                        _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wtempnam(s1, s2)                       _wtempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _fullpath(s1, s2, le)                   _fullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wfullpath(s1, s2, le)                  _wfullpath_dbg(s1, s2, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _getcwd(s, le)                          _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wgetcwd(s, le)                         _wgetcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _getdcwd(d, s, le)                      _getdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wgetdcwd(d, s, le)                     _wgetdcwd_dbg(d, s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _dupenv_s(ps1, size, s2)                _dupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _wdupenv_s(ps1, size, s2)               _wdupenv_s_dbg(ps1, size, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define strdup(s)                               _strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define wcsdup(s)                               _wcsdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define tempnam(s1, s2)                         _tempnam_dbg(s1, s2, _NORMAL_BLOCK, __FILE__, __LINE__)
+#define getcwd(s, le)                           _getcwd_dbg(s, le, _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif /* _CRTDBG_MAP_ALLOC */
 
 #endif /* _DEBUG */
 

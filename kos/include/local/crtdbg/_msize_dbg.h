@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9cb7d3a */
+/* HASH CRC-32:0x54df3be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__msize_dbg_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: malloc_usable_size from malloc */
 #ifndef __local___localdep_malloc_usable_size_defined

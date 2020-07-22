@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd05c2bed */
+/* HASH CRC-32:0x489e165b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__expand_dbg_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: realloc_in_place from malloc */
 #ifndef __local___localdep_realloc_in_place_defined

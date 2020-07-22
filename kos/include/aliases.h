@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc5b226d */
+/* HASH CRC-32:0xed97c87b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <bits/crt/db/aliases.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/aliases.h */
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
@@ -49,33 +53,8 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("alias_name")
-#pragma push_macro("alias_members_len")
-#pragma push_macro("alias_members")
-#pragma push_macro("alias_local")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef alias_name
-#undef alias_members_len
-#undef alias_members
-#undef alias_local
-/* Structure to represent one entry of the alias data base. */
-struct aliasent {
-	char          *alias_name;
-	size_t         alias_members_len;
-	char         **alias_members;
-	__INT32_TYPE__ alias_local;
-};
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("alias_local")
-#pragma pop_macro("alias_members")
-#pragma pop_macro("alias_members_len")
-#pragma pop_macro("alias_name")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+__SYSDECL_BEGIN
 
 /* Open alias data base files */
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setaliasent,(void),())
@@ -89,8 +68,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC_KOS,getaliasent_r,(st
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
 /* Get alias entry corresponding to NAME and put it in RESULT_BUF */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_ALIASES_H */

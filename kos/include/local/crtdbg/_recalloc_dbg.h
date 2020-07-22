@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc62c6aa9 */
+/* HASH CRC-32:0xdc2d2b60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__recalloc_dbg_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: recallocv from malloc */
 #ifndef __local___localdep_recallocv_defined

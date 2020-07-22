@@ -25,9 +25,8 @@
 #include <hybrid/typecore.h>
 #include <features.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 /* Structure of the password file. */
 struct rpcent {
@@ -41,8 +40,7 @@ struct rpcent {
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 };
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_DB_RPCENT_H */
