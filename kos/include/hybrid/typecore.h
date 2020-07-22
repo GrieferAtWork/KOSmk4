@@ -77,7 +77,7 @@
 #if defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 128
 #define __INT128_C(c)  c##i128
 #define __UINT128_C(c) c##ui128
-#endif
+#endif /* _INTEGRAL_MAX_BITS >= 128 */
 #else /* _MSC_VER */
 #define __INT8_C(c)    c
 #define __UINT8_C(c)   c##u
@@ -87,30 +87,30 @@
 #elif __SIZEOF_LONG__ >= 2
 #define __INT16_C(c)   c##l
 #define __UINT16_C(c)  c##ul
-#elif __SIZEOF_LONG_LONG__ >= 2
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 2
 #define __INT16_C(c)   c##ll
 #define __UINT16_C(c)  c##ull
-#endif
+#endif /* ... */
 #if __SIZEOF_INT__ >= 4
 #define __INT32_C(c)   c
 #define __UINT32_C(c)  c##u
 #elif __SIZEOF_LONG__ >= 4
 #define __INT32_C(c)   c##l
 #define __UINT32_C(c)  c##ul
-#elif __SIZEOF_LONG_LONG__ >= 4
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 4
 #define __INT32_C(c)   c##ll
 #define __UINT32_C(c)  c##ull
-#endif
+#endif /* ... */
 #if __SIZEOF_INT__ >= 8
 #define __INT64_C(c)   c
 #define __UINT64_C(c)  c##u
 #elif __SIZEOF_LONG__ >= 8
 #define __INT64_C(c)   c##l
 #define __UINT64_C(c)  c##ul
-#elif __SIZEOF_LONG_LONG__ >= 8
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ >= 8
 #define __INT64_C(c)   c##ll
 #define __UINT64_C(c)  c##ull
-#endif
+#endif /* ... */
 #endif /* ... */
 #endif /* !__INT8_C */
 

@@ -1066,38 +1066,43 @@ void __sync_synchronize(...);
 #define __GCC_ATOMIC_LLONG_LOCK_FREE    1
 #define __GCC_ATOMIC_POINTER_LOCK_FREE  1
 
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __atomic_load_n(__T const volatile *ptr, int memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __atomic_load(__T const volatile *ptr, __T *ret, int memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __atomic_load(__T const volatile *ptr, __T volatile *ret, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, void>::__type __atomic_store_n(__T volatile *ptr, __S val, int memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __atomic_store(__T volatile *ptr, __T *val, int memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __atomic_store(__T volatile *ptr, __T volatile *val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_exchange_n(__T volatile *ptr, __S val, int memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __atomic_exchange(__T volatile *ptr, __T *val, __T *ret, int memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __atomic_exchange(__T volatile *ptr, __T volatile *val, __T volatile *ret, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __S, bool>::__type __atomic_compare_exchange_n(__T volatile *ptr, __T *expected, __S desired, bool weak, int success_memorder, int failure_memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __S, bool>::__type __atomic_compare_exchange_n(__T volatile *ptr, __T volatile *expected, __S desired, bool weak, int success_memorder, int failure_memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, bool>::__type __atomic_compare_exchange(__T volatile *ptr, __T *expected, __T *desired, bool weak, int success_memorder, int failure_memorder);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, bool>::__type __atomic_compare_exchange(__T volatile *ptr, __T volatile *expected, __T volatile *desired, bool weak, int success_memorder, int failure_memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_add_fetch(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_sub_fetch(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_and_fetch(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_xor_fetch(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_or_fetch(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_nand_fetch(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_fetch_add(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_fetch_sub(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_fetch_and(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_fetch_xor(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_fetch_or(__T volatile *ptr, __S val, int memorder);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type __atomic_fetch_nand(__T volatile *ptr, __S val, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type (__atomic_load_n)(__T const volatile *ptr, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type (__atomic_load)(__T const volatile *ptr, __T *ret, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type (__atomic_load)(__T const volatile *ptr, __T volatile *ret, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, void>::__type (__atomic_store_n)(__T volatile *ptr, __S val, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type (__atomic_store)(__T volatile *ptr, __T *val, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type (__atomic_store)(__T volatile *ptr, __T volatile *val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_exchange_n)(__T volatile *ptr, __S val, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type (__atomic_exchange)(__T volatile *ptr, __T *val, __T *ret, int memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type (__atomic_exchange)(__T volatile *ptr, __T volatile *val, __T volatile *ret, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, bool>::__type (__atomic_compare_exchange_n)(__T volatile *ptr, __T *expected, __S desired, bool weak, int success_memorder, int failure_memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, bool>::__type (__atomic_compare_exchange_n)(__T volatile *ptr, __T volatile *expected, __S desired, bool weak, int success_memorder, int failure_memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, bool>::__type (__atomic_compare_exchange)(__T volatile *ptr, __T *expected, __T *desired, bool weak, int success_memorder, int failure_memorder);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, bool>::__type (__atomic_compare_exchange)(__T volatile *ptr, __T volatile *expected, __T volatile *desired, bool weak, int success_memorder, int failure_memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_add_fetch)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_sub_fetch)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_and_fetch)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_xor_fetch)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_or_fetch)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_nand_fetch)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_fetch_add)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_fetch_sub)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_fetch_and)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_fetch_xor)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_fetch_or)(__T volatile *ptr, __S val, int memorder);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value && ::__intern::____INTELLISENSE_isarith<__S>::__value, __T>::__type (__atomic_fetch_nand)(__T volatile *ptr, __S val, int memorder);
 
 bool __atomic_test_and_set(void *ptr, int memorder);
 void __atomic_clear(bool *ptr, int memorder);
 void __atomic_thread_fence(int memorder);
 void __atomic_signal_fence(int memorder);
+#ifdef __INTELLISENSE_SIZE_TYPE__
+bool __atomic_always_lock_free(__INTELLISENSE_SIZE_TYPE__ size, void const volatile *ptr);
+bool __atomic_is_lock_free(__INTELLISENSE_SIZE_TYPE__ size, void const volatile *ptr);
+#else /* __INTELLISENSE_SIZE_TYPE__ */
 bool __atomic_always_lock_free(__SIZE_TYPE__ size, void const volatile *ptr);
 bool __atomic_is_lock_free(__SIZE_TYPE__ size, void const volatile *ptr);
+#endif /* !__INTELLISENSE_SIZE_TYPE__ */
 #endif /* !__ATOMIC_RELAXED */
 
 namespace __intern {

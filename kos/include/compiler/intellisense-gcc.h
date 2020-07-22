@@ -36,6 +36,32 @@
 /* Native GCC support in intellisense */
 #define __INTELLISENSE_GCC__ 1
 
+#define __GNUC__                           9
+#define __GNUG__                           9
+#define __GNUC_MINOR__                     1
+#define __GNUC_PATCHLEVEL__                0
+#define __GXX_ABI_VERSION                  1013
+#define __GXX_EXPERIMENTAL_CXX0X__         1
+#define __GXX_RTTI                         1
+#define __GXX_WEAK__                       1
+#define __DEPRECATED                       1
+#define __VERSION__                        "9.1.0"
+#define __STDC_UTF_16__                    1
+#define __STDC_UTF_32__                    1
+#define __STDC__                           1
+#define __GNUC_STDC_INLINE__               1
+#define __GXX_ABI_VERSION                  1013
+#define __HAVE_SPECULATION_SAFE_VALUE      1
+#define __GCC_IEC_559                      2
+#define __GCC_IEC_559_COMPLEX              2
+#define __GCC_ASM_FLAG_OUTPUTS__           1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
+
+
+
 #ifdef __KOS__
 #undef linux
 #undef __linux
@@ -45,88 +71,49 @@
 #undef _M_AMD64
 #undef _M_X64
 #undef _M_IX86
-
-#undef __GNUC__
-#undef __GNUC_MINOR__
-#undef __GNUC_PATCH__
-#define __GNUC__        9
-#define __GNUC_MINOR__  1
-#define __GNUC_PATCH__  0
+#define __unix   1
+#define __unix__ 1
 #endif /* __KOS__ */
 
-#ifndef __x86_64__ /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
-#undef __SIZE_TYPE__
-#define __SIZE_TYPE__  unsigned long int
-#endif /* !__x86_64__ */
+#ifdef __unix__
+#define __ELF__                   1
+#define __GCC_HAVE_DWARF2_CFI_ASM 1
+#endif /* __unix__ */
 
 #ifdef __x86_64__
-#if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
-static_assert(sizeof(long) == 8, "WTF Intellisense?");
-static_assert(sizeof(__INT64_TYPE__) == 8, "WTF Intellisense?");
-static_assert(sizeof(__UINT64_TYPE__) == 8, "WTF Intellisense?");
-static_assert(sizeof(__INTPTR_TYPE__) == 8, "WTF Intellisense?");
-static_assert(sizeof(__UINTPTR_TYPE__) == 8, "WTF Intellisense?");
-static_assert(sizeof(__INTMAX_TYPE__) >= 8, "WTF Intellisense?");
-static_assert(sizeof(__UINTMAX_TYPE__) >= 8, "WTF Intellisense?");
-static_assert(sizeof(__INT_LEAST64_TYPE__) >= 8, "WTF Intellisense?");
-static_assert(sizeof(__UINT_LEAST64_TYPE__) >= 8, "WTF Intellisense?");
-static_assert(sizeof(__INT_FAST16_TYPE__) == __SIZEOF_FAST16_TYPE__, "WTF Intellisense?");
-static_assert(sizeof(__INT_FAST32_TYPE__) == __SIZEOF_FAST32_TYPE__, "WTF Intellisense?");
-static_assert(sizeof(__INT_FAST64_TYPE__) == __SIZEOF_FAST64_TYPE__, "WTF Intellisense?");
-static_assert(sizeof(__UINT_FAST16_TYPE__) == __SIZEOF_FAST16_TYPE__, "WTF Intellisense?");
-static_assert(sizeof(__UINT_FAST32_TYPE__) == __SIZEOF_FAST32_TYPE__, "WTF Intellisense?");
-static_assert(sizeof(__UINT_FAST64_TYPE__) == __SIZEOF_FAST64_TYPE__, "WTF Intellisense?");
-#else
-#undef __SIZEOF_LONG__
-#define __SIZEOF_LONG__ 4
-
-#undef __SIZEOF_INT128__
-#define __SIZEOF_INT128__ 16
-
-#undef __INT64_TYPE__
-#define __INT64_TYPE__   signed long long int
-#undef __UINT64_TYPE__
-#define __UINT64_TYPE__  unsigned long long int
-
-#undef __INTPTR_TYPE__
-#define __INTPTR_TYPE__  signed long long int
-#undef __UINTPTR_TYPE__
-#define __UINTPTR_TYPE__ unsigned long long int
-
-#undef __INTMAX_TYPE__
-#define __INTMAX_TYPE__  signed long long int
-#undef __UINTMAX_TYPE__
-#define __UINTMAX_TYPE__ unsigned long long int
-
-#undef __INT_LEAST64_TYPE__
-#define __INT_LEAST64_TYPE__  signed long long int
-#undef __UINT_LEAST64_TYPE__
-#define __UINT_LEAST64_TYPE__ unsigned long long int
-
-#undef __INT_FAST16_TYPE__
-#define __INT_FAST16_TYPE__  signed long long int
-#undef __UINT_FAST16_TYPE__
-#define __UINT_FAST16_TYPE__ unsigned long long int
-
-#undef __INT_FAST32_TYPE__
-#define __INT_FAST32_TYPE__  signed long long int
-#undef __UINT_FAST32_TYPE__
-#define __UINT_FAST32_TYPE__ unsigned long long int
-
-#undef __INT_FAST64_TYPE__
-#define __INT_FAST64_TYPE__  signed long long int
-#undef __UINT_FAST64_TYPE__
-#define __UINT_FAST64_TYPE__ unsigned long long int
-
-#endif
+#define __x86_64                   1
+#define __k8                       1
+#define __k8__                     1
+#define __amd64                    1
+#define __amd64__                  1
+#define __code_model_small__       1
+#define _LP64                      1
+#define __LP64__                   1
+#define __MMX__                    1
+#define __SSE2_MATH__              1
+#define __SSE2__                   1
+#define __SSE_MATH__               1
+#define __SSE__                    1
+#define __SIZEOF_LONG__            4
+#define __SIZEOF_INT128__          16
+#define __INTELLISENSE_SIZE_TYPE__ unsigned long long int
+#define __ATOMIC_HLE_ACQUIRE       65536
+#define __ATOMIC_HLE_RELEASE       131072
+#define __FXSR__                   1
 #elif defined(__i386__)
-/* Intellisense incorrectly indicates that gcc for i386 defaults
- * to having SSE math enabled. */
+#define __i386        1
+#define __i686        1
+#define __i686__      1
+#define __SIZE_TYPE__ unsigned long int /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
 #undef __SSE2_MATH__
 #undef __SSE2__
 #undef __SSE_MATH__
 #undef __SSE__
-#endif /* __x86_64__ */
+#endif /* Arch... */
+
+#ifndef __INTELLISENSE_SIZE_TYPE__
+#define __INTELLISENSE_SIZE_TYPE__ __SIZE_TYPE__
+#endif /* !__INTELLISENSE_SIZE_TYPE__ */
 
 
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
@@ -153,9 +140,16 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #define __cplusplus 201402L
 #endif
 
-#if __cplusplus == 201402L
+#if __cplusplus >= 201402L
 #undef __cpp_deduction_guides
-#endif
+#define __cpp_constexpr               201304
+#define __cpp_digit_separators        201309
+#define __cpp_inheriting_constructors 201511
+#define __cpp_range_based_for         200907
+#define __cpp_runtime_arrays          198712
+#define __cpp_rvalue_reference        200610
+#define __cpp_static_assert           200410
+#endif /* __cplusplus == 201402L */
 
 
 namespace __intern {
@@ -442,11 +436,6 @@ template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_i
 #define __atomic_fetch_or           ::__intern::__intellisense_atomic_fetch_or
 #define __atomic_fetch_nand         ::__intern::__intellisense_atomic_fetch_nand
 
-
-#if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
-static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?");
-#elif 1
-
 #ifndef __SIZEOF_LONG_DOUBLE__
 #ifdef __i386__
 #define __SIZEOF_LONG_DOUBLE__ 12
@@ -458,6 +447,11 @@ static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?"
 #define __SIZEOF_LONG_DOUBLE__ 12
 #endif
 #endif /* !__SIZEOF_LONG_DOUBLE__ */
+
+
+#if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
+static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?");
+#elif 1
 
 class __intellisense_long_double;
 template<> struct ____INTELLISENSE_isfloat<__intellisense_long_double> { enum { __value = true }; };
@@ -491,8 +485,10 @@ public:
 	__intellisense_long_double(float) throw();
 	__intellisense_long_double(double) throw();
 	__intellisense_long_double(long double) throw();
+#ifdef __SIZEOF_INT128__
 	__intellisense_long_double(__intellisense_int128) throw();
 	__intellisense_long_double(__intellisense_uint128) throw();
+#endif /* __SIZEOF_INT128__ */
 	__intellisense_long_double &operator=(__intellisense_long_double const &) throw();
 	__intellisense_long_double &operator=(__intellisense_long_double &&) throw();
 	__intellisense_long_double &operator=(bool) throw();
@@ -511,8 +507,10 @@ public:
 	__intellisense_long_double &operator=(float) throw();
 	__intellisense_long_double &operator=(double) throw();
 	__intellisense_long_double &operator=(long double) throw();
+#ifdef __SIZEOF_INT128__
 	__intellisense_long_double &operator=(__intellisense_int128) throw();
 	__intellisense_long_double &operator=(__intellisense_uint128) throw();
+#endif /* __SIZEOF_INT128__ */
 	__intellisense_long_double operator-() const throw();
 	__intellisense_long_double operator+(__intellisense_long_double const &) const throw();
 	__intellisense_long_double operator-(__intellisense_long_double const &) const throw();
@@ -559,8 +557,10 @@ public:
 	operator float() const throw();
 	operator double() const throw();
 	operator long double() const throw();
+#ifdef __SIZEOF_INT128__
 	operator __intellisense_int128() const throw();
 	operator __intellisense_uint128() const throw();
+#endif /* __SIZEOF_INT128__ */
 #if defined(_WCHAR_T_DEFINED) || defined(__GNUC__)
 	__intellisense_long_double(char16_t) throw();
 	__intellisense_long_double(char32_t) throw();
@@ -655,8 +655,8 @@ int __builtin_fputc_unlocked(int, void *);
 int __builtin_fputs(char const *, void *);
 int __builtin_fputs_unlocked(char const *, void *);
 int __builtin_fscanf(void *, char const *, ...);
-int __builtin_fwrite(void const *, __SIZE_TYPE__, __SIZE_TYPE__, void *);
-int __builtin_fwrite_unlocked(void const *, __SIZE_TYPE__, __SIZE_TYPE__, void *);
+int __builtin_fwrite(void const *, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__, void *);
+int __builtin_fwrite_unlocked(void const *, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__, void *);
 int __builtin_printf_unlocked(char const *, ...);
 int __builtin_putchar(int);
 int __builtin_putchar_unlocked(int);
@@ -686,26 +686,26 @@ int __builtin_isxdigit(int);
 int __builtin_toascii(int);
 int __builtin_tolower(int);
 int __builtin_toupper(int);
-int __builtin_iswalnum(__WINT_TYPE__);
-int __builtin_iswalpha(__WINT_TYPE__);
-int __builtin_iswblank(__WINT_TYPE__);
-int __builtin_iswcntrl(__WINT_TYPE__);
-int __builtin_iswdigit(__WINT_TYPE__);
-int __builtin_iswgraph(__WINT_TYPE__);
-int __builtin_iswlower(__WINT_TYPE__);
-int __builtin_iswprint(__WINT_TYPE__);
-int __builtin_iswpunct(__WINT_TYPE__);
-int __builtin_iswspace(__WINT_TYPE__);
-int __builtin_iswupper(__WINT_TYPE__);
-int __builtin_iswxdigit(__WINT_TYPE__);
-int __builtin_towlower(__WINT_TYPE__);
-int __builtin_towupper(__WINT_TYPE__);
+int __builtin_iswalnum(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswalpha(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswblank(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswcntrl(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswdigit(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswgraph(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswlower(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswprint(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswpunct(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswspace(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswupper(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_iswxdigit(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_towlower(/*__WINT_TYPE__*/ unsigned int);
+int __builtin_towupper(/*__WINT_TYPE__*/ unsigned int);
 void *__builtin_aggregate_incoming_address(...);
-void *__builtin_apply(void (*)(...), void *, __SIZE_TYPE__);
+void *__builtin_apply(void (*)(...), void *, __INTELLISENSE_SIZE_TYPE__);
 void *__builtin_apply_args(...);
-void *__builtin_calloc(__SIZE_TYPE__, __SIZE_TYPE__);
-int __builtin_clzimax(__UINTMAX_TYPE__);
-int __builtin_ctzimax(__UINTMAX_TYPE__);
+void *__builtin_calloc(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
+int __builtin_clzimax(/*__UINTMAX_TYPE__*/ unsigned long long);
+int __builtin_ctzimax(/*__UINTMAX_TYPE__*/ unsigned long long);
 char *__builtin_dcgettext(char const *, char const *, int);
 char *__builtin_dgettext(char const *, char const *);
 int __builtin_execl(char const *, ...);
@@ -715,10 +715,10 @@ int __builtin_execv(char const *, char *const *);
 int __builtin_execvp(char const *, char *const *);
 int __builtin_execve(char const *, char *const *, char *const *);
 __attribute__((__noreturn__)) void __builtin_exit(int);
-int __builtin_ffsimax(__INTMAX_TYPE__);
+int __builtin_ffsimax(/*__INTMAX_TYPE__*/ long long);
 int __builtin_fork();
 char *__builtin_gettext(char const *);
-__INTMAX_TYPE__ __builtin_imaxabs(__INTMAX_TYPE__);
+/*__INTMAX_TYPE__*/ long long __builtin_imaxabs(/*__INTMAX_TYPE__*/ long long);
 int __builtin_finite(double);
 int __builtin_finitef(float);
 int __builtin_finitel(__LONGDOUBLE);
@@ -726,14 +726,14 @@ int __builtin_isinff(float);
 int __builtin_isinfl(__LONGDOUBLE);
 int __builtin_isnanf(float);
 int __builtin_isnanl(__LONGDOUBLE);
-void *__builtin_malloc(__SIZE_TYPE__);
+void *__builtin_malloc(__INTELLISENSE_SIZE_TYPE__);
 template<class __T> void *__builtin_next_arg(__T const &);
-int __builtin_parityimax(__UINTMAX_TYPE__);
-int __builtin_popcountimax(__UINTMAX_TYPE__);
+int __builtin_parityimax(/*__UINTMAX_TYPE__*/ unsigned long long);
+int __builtin_popcountimax(/*__UINTMAX_TYPE__*/ unsigned long long);
 void __builtin_return(void *);
 void *__builtin_saveregs(...);
-long int __builtin_strfmon(char *, __SIZE_TYPE__, char const *, ...);
-__SIZE_TYPE__ __builtin_strftime(char *, __SIZE_TYPE__, char const *, void const *);
+long int __builtin_strfmon(char *, __INTELLISENSE_SIZE_TYPE__, char const *, ...);
+__INTELLISENSE_SIZE_TYPE__ __builtin_strftime(char *, __INTELLISENSE_SIZE_TYPE__, char const *, void const *);
 void __builtin_update_setjmp_buf(void *);
 __attribute__((__noreturn__)) void __builtin__exit(int);
 __attribute__((__noreturn__)) void __builtin__Exit(int);
@@ -758,7 +758,7 @@ __complex__ double __builtin_cexpi(double);
 __complex__ float __builtin_cexpif(float);
 __complex__ long double __builtin_cexpil(long double);
 void __builtin_free(void *);
-void *__builtin_realloc(void *, __SIZE_TYPE__);
+void *__builtin_realloc(void *, __INTELLISENSE_SIZE_TYPE__);
 int __builtin_va_arg_pack();
 int __builtin_va_arg_pack_len();
 __attribute__((__noreturn__)) void __builtin_unwind_resume(void *);
@@ -778,18 +778,18 @@ int __builtin_iround(double);
 int __builtin_iroundf(float);
 int __builtin_iroundl(__LONGDOUBLE);
 int __builtin_clrsb(int);
-int __builtin_clrsbimax(__INTMAX_TYPE__);
+int __builtin_clrsbimax(/*__INTMAX_TYPE__*/ long long);
 int __builtin_clrsbl(long);
 int __builtin_clrsbll(long long);
 void __builtin_init_heap_trampoline(void *, void *, void *);
-void *__builtin_alloca_with_align(__SIZE_TYPE__, __SIZE_TYPE__);
-int __builtin_posix_memalign(void **, __SIZE_TYPE__, __SIZE_TYPE__);
+void *__builtin_alloca_with_align(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
+int __builtin_posix_memalign(void **, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
 void __atomic_feraiseexcept(int);
-void *__builtin_aligned_alloc(__SIZE_TYPE__, __SIZE_TYPE__);
+void *__builtin_aligned_alloc(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
 int __builtin_acc_on_device(int);
 void __builtin_init_descriptor(void *, void *, void *);
 void *__builtin_adjust_descriptor(void *);
-int __builtin_memcmp_eq(void const *, void const *, __SIZE_TYPE__);
+int __builtin_memcmp_eq(void const *, void const *, __INTELLISENSE_SIZE_TYPE__);
 int __builtin_feclearexcept(int);
 int __builtin_fegetenv(void *);
 int __builtin_fegetexceptflag(void *, int);
@@ -801,17 +801,17 @@ int __builtin_fesetexceptflag(void const *, int);
 int __builtin_fesetround(int);
 int __builtin_fetestexcept(int);
 int __builtin_feupdateenv(void const *);
-void *__builtin_alloca_with_align_and_max(__SIZE_TYPE__, __SIZE_TYPE__, __SIZE_TYPE__);
-__SIZE_TYPE__ __builtin_strnlen(char const *, __SIZE_TYPE__);
+void *__builtin_alloca_with_align_and_max(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
+__INTELLISENSE_SIZE_TYPE__ __builtin_strnlen(char const *, __INTELLISENSE_SIZE_TYPE__);
 long __builtin_expect_with_probability(long __exp, long __c, double __probability);
-int __builtin_strcmp_eq(void const *, void const *, __SIZE_TYPE__); /* Yes, that's the prototype... */
-int __builtin_strncmp_eq(void const *, void const *, __SIZE_TYPE__);
+int __builtin_strcmp_eq(void const *, void const *, __INTELLISENSE_SIZE_TYPE__); /* Yes, that's the prototype... */
+int __builtin_strncmp_eq(void const *, void const *, __INTELLISENSE_SIZE_TYPE__);
 template<class __T> __T __builtin_speculation_safe_value(__T __val, __T __failval = 0);
 void *__builtin_speculation_safe_value_ptr(void *, void * = nullptr);
-__UINT8_TYPE__ __builtin_speculation_safe_value_1(__UINT8_TYPE__, __UINT8_TYPE__ = 0);
-__UINT16_TYPE__ __builtin_speculation_safe_value_2(__UINT16_TYPE__, __UINT16_TYPE__ = 0);
-__UINT32_TYPE__ __builtin_speculation_safe_value_4(__UINT32_TYPE__, __UINT32_TYPE__ = 0);
-__UINT64_TYPE__ __builtin_speculation_safe_value_8(__UINT64_TYPE__, __UINT64_TYPE__ = 0);
+/*__UINT8_TYPE__*/ unsigned char __builtin_speculation_safe_value_1(/*__UINT8_TYPE__*/ unsigned char, /*__UINT8_TYPE__*/ unsigned char = 0);
+/*__UINT16_TYPE__*/ unsigned short __builtin_speculation_safe_value_2(/*__UINT16_TYPE__*/ unsigned short, /*__UINT16_TYPE__*/ unsigned short = 0);
+/*__UINT32_TYPE__*/ unsigned int __builtin_speculation_safe_value_4(/*__UINT32_TYPE__*/ unsigned int, /*__UINT32_TYPE__*/ unsigned int = 0);
+/*__UINT64_TYPE__*/ unsigned long long __builtin_speculation_safe_value_8(/*__UINT64_TYPE__*/ unsigned long long, /*__UINT64_TYPE__*/ unsigned long long = 0);
 void __cyg_profile_func_enter(void *, void *);
 void __cyg_profile_func_exit(void *, void *);
 #ifdef __SIZEOF_INT128__
@@ -1247,6 +1247,7 @@ __UINT128_TYPE__ __builtin_speculation_safe_value_16(__UINT128_TYPE__, __UINT128
 /* For some weird reason, intellisense defines these builtins as macros,
  * on-top of already defining them as functions... (there may be more of
  * these, but these are all the ones I've encountered thus far) */
+#ifdef __builtin_acosf
 #undef __builtin_acosf
 #undef __builtin_acoshf
 #undef __builtin_acoshl
@@ -1368,5 +1369,6 @@ __UINT128_TYPE__ __builtin_speculation_safe_value_16(__UINT128_TYPE__, __UINT128
 #undef __builtin_islessequal
 #undef __builtin_islessgreater
 #undef __builtin_isunordered
+#endif /* __builtin_acosf */
 
 #endif /* !____INTELLISENSE_STDINC_SYNTAX_GCC_H */

@@ -54,7 +54,8 @@
      defined(_WIN32_WCE) || defined(WIN32_WCE))
 #define __PE__ 1
 #elif (defined(__linux__) || defined(__linux) || defined(linux) || \
-       defined(__unix__) || defined(__unix) || defined(unix))
+       defined(__unix__) || defined(__unix) || defined(unix) ||    \
+       defined(__KOS__))
 #define __ELF__ 1
 #elif defined(__TINYC__)
 /* TCC predefines its own redirect macro when targeting ELF, meaning
