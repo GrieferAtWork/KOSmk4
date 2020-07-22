@@ -141,9 +141,9 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 		}
 		metadata_base  = page2addr(pp);
 		metadata_avail = metadata_size;
-		/* Register the phys2virt VM node. */
-		vm_node_insert(&x86_phys2virt64_node);
 	}
+	/* Register the phys2virt VM node. */
+	vm_node_insert(&x86_phys2virt64_node);
 }
 
 

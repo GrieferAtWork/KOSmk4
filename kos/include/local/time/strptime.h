@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe89b2bd6 */
+/* HASH CRC-32:0x94763b44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,50 +21,19 @@
 #ifndef __local_strptime_defined
 #define __local_strptime_defined 1
 #include <__crt.h>
-#ifndef __STRUCT_TM
-#ifdef __tm_defined
-#define __STRUCT_TM struct tm
-#else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
-__NAMESPACE_STD_BEGIN
-struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
-#ifdef __CRT_GLC
-#ifdef __USE_MISC
-	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
-	char const      *tm_zone;     /* Timezone abbreviation. */
-#else /* __USE_MISC */
-	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
-	char const      *__tm_zone;   /* Timezone abbreviation. */
-#endif /* !__USE_MISC */
-#endif /* __CRT_GLC */
-};
-__NAMESPACE_STD_END
-#endif /* !__std_tm_defined */
-#endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_strptime_l from time */
 #if !defined(__local___localdep_crt_strptime_l_defined) && defined(__CRT_HAVE_strptime_l)
 #define __local___localdep_crt_strptime_l_defined 1
 /* Similar to `strptime' but take the information from
  * the provided locale and not the global locale */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,__localdep_crt_strptime_l,(char const *__restrict __s, char const *__restrict __format, __STRUCT_TM *__restrict __tp, __locale_t __locale),strptime_l,(__s,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,__localdep_crt_strptime_l,(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp, __locale_t __locale),strptime_l,(__s,__format,__tp,__locale))
 #endif /* !__local___localdep_crt_strptime_l_defined && __CRT_HAVE_strptime_l */
 /* Parse S according to FORMAT and store binary time information in TP.
  * The return value is a pointer to the first unparsed character in S */
 __LOCAL_LIBC(strptime) __ATTR_NONNULL((1, 2, 3)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strptime))(char const *__restrict __s, char const *__restrict __format, __STRUCT_TM *__restrict __tp) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strptime))(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
 
 
 

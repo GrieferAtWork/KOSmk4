@@ -52,6 +52,7 @@ typedef size_t rsize_t;
 #include <hybrid/typecore.h>
 
 #include <asm/crt/stdio.h> /* __WEOF */
+#include <bits/crt/tm.h> /* struct tm */
 #include <bits/mbstate.h>
 #include <kos/anno.h>
 
@@ -127,35 +128,7 @@ __NAMESPACE_STD_USING(FILE)
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
-/* Define `struct tm' */
 __NAMESPACE_STD_BEGIN
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
-#ifdef __tm_defined
-__NAMESPACE_GLB_USING(tm)
-#else /* __tm_defined */
-struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
-#ifdef __CRT_GLC
-#ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
-#else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
-#endif /* !__USE_MISC */
-#endif /* __CRT_GLC */
-};
-#endif /* !__tm_defined */
-#endif /* !__std_tm_defined */
 #ifndef __std_size_t_defined
 #define __std_size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
@@ -166,16 +139,10 @@ typedef __WINT_TYPE__ wint_t;
 #endif /* !__std_wint_t_defined */
 __NAMESPACE_STD_END
 
-#ifndef __STRUCT_TM
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
-#endif /* !__STRUCT_TM */
-
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __tm_defined
 #define __tm_defined 1
-#undef __STRUCT_TM
-#define __STRUCT_TM struct tm
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #ifndef __size_t_defined
@@ -192,6 +159,7 @@ __NAMESPACE_STD_USING(wint_t)
 }
 
 %[insert:std]
+%[define_replacement(tm = "__NAMESPACE_STD_SYM tm")];
 
 
 
@@ -653,7 +621,7 @@ __STDC_INT_AS_SIZE_T fputws([[nonnull]] wchar_t const *__restrict string,
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetwc_unlocked")]]
 wint_t ungetwc(wint_t wc, [[nonnull]] FILE *stream);
 
-[[std, guard, wchar]]
+[[std, guard, wchar, decl_include("<bits/crt/tm.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.strftime")]]
 size_t wcsftime([[outp(min(return, buflen))]] wchar_t *__restrict buf, size_t buflen,
                 [[nonnull]] wchar_t const *__restrict format,
@@ -1173,12 +1141,13 @@ __STDC_INT_AS_SIZE_T fputws_unlocked([[nonnull]] wchar_t const *__restrict strin
 }
 
 
-[[wchar, decl_prefix(DEFINE_STRUCT_TM)]]
+[[wchar, decl_include("<bits/crt/tm.h>")]]
 [[dos_export_alias("_wcsftime_l"), export_alias("__wcsftime_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.format.strftime")]]
 $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
                    [[nonnull]] wchar_t const *__restrict format,
-                   [[nonnull]] __STRUCT_TM const *__restrict tp, $locale_t locale) {
+                   [[nonnull]] struct $tm const *__restrict tp,
+                   $locale_t locale) {
 	(void)locale;
 	return wcsftime(buf, maxsize, format, tp);
 }

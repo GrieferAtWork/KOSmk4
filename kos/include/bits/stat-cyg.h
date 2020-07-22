@@ -46,6 +46,7 @@
 #define _STATBUF_ST_NSEC     1
 #define _STATBUF_ST_BLKSIZE  1
 #define _STATBUF_ST_RDEV     1
+#define _STATBUF_ST_BLOCKS   1
 #endif /* !__stat_defined */
 
 #ifdef __USE_LARGEFILE64

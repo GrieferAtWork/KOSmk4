@@ -515,10 +515,10 @@ DEFINE_TEST(segfault_special_addresses) {
 	 *        triggered with %cr2=C0000000, which in turn results in VIO emulation
 	 *        being triggered as well. However, vio will then find that the access
 	 *        is actually happening at `BFFFFFFF', which causes it to not be
-	 *        dispatched through vio (since only addresses >= C0000000 are handled
-	 *        via VIO). As a result, the kernel will re-trigger the same #PF that
-	 *        originally caused the fault, and after a whole bunch of recursion,
-	 *        the kernel will end up double-faulting.
+	 *        dispatched through vio (since only addresses >= C0000000 are always
+	 *        handled via VIO). As a result, the kernel will re-trigger the same
+	 *        #PF that originally caused the fault, and after a whole bunch of
+	 *        recursion, the kernel will end up double-faulting.
 	 * Solution: In `kos/src/libviocore/arch/i386/viocore.c', all of the range-checking
 	 *           dispatch functions must handle the case where an address is accessed
 	 *           that is only partially overlapping with VIO. This should then be handled

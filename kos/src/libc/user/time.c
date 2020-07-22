@@ -82,12 +82,12 @@ NOTHROW_NCX(LIBCCALL libc_clock)(void)
 }
 /*[[[end:libc_clock]]]*/
 
-/*[[[head:libc_getdate,hash:CRC-32=0x173db77]]]*/
+/*[[[head:libc_getdate,hash:CRC-32=0x6c3d4c52]]]*/
 /* Parse the given string as a date specification and return a value
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
  * `getdate_err' is set */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) __STRUCT_TM *
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 /*[[[body:libc_getdate]]]*/
 /*AUTO*/{

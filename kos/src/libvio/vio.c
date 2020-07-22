@@ -69,7 +69,7 @@ union qword {
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define LSW 1 /* LeastSignificantWord */
 #define MSW 0 /* MosttSignificantWord */
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 
 
 /* TODO: vio_args_getstate()  (implement through use of custom hop() operations that
@@ -343,7 +343,6 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				}
 			}	break;
 
-
 			case UVIO_OPCODE_CMPXCHX: {
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 				resp.r128.ur_result = libvio_cmpxchx(&args, req.uq_addr,
@@ -401,6 +400,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				 * Respond with an empty response */
 				resp_size = sizeof(resp.r);
 			}	break;
+
 			}
 		} EXCEPT {
 			unsigned int i;

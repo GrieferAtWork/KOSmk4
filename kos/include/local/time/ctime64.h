@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd914618d */
+/* HASH CRC-32:0x83f10815 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,75 +41,13 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHRO
 #define __local___localdep_ctime64_r_defined 1
 #ifdef __CRT_HAVE_ctime64_r
 __NAMESPACE_LOCAL_END
-#ifndef __STRUCT_TM
-#ifdef __tm_defined
-#define __STRUCT_TM struct tm
-#else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
-__NAMESPACE_STD_BEGIN
-struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
-#ifdef __CRT_GLC
-#ifdef __USE_MISC
-	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
-	char const      *tm_zone;     /* Timezone abbreviation. */
-#else /* __USE_MISC */
-	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
-	char const      *__tm_zone;   /* Timezone abbreviation. */
-#endif /* !__USE_MISC */
-#endif /* __CRT_GLC */
-};
-__NAMESPACE_STD_END
-#endif /* !__std_tm_defined */
-#endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),ctime64_r,(__timer,__buf))
 #elif defined(__CRT_HAVE_ctime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
-#ifndef __STRUCT_TM
-#ifdef __tm_defined
-#define __STRUCT_TM struct tm
-#else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
-__NAMESPACE_STD_BEGIN
-struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
-#ifdef __CRT_GLC
-#ifdef __USE_MISC
-	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
-	char const      *tm_zone;     /* Timezone abbreviation. */
-#else /* __USE_MISC */
-	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
-	char const      *__tm_zone;   /* Timezone abbreviation. */
-#endif /* !__USE_MISC */
-#endif /* __CRT_GLC */
-};
-__NAMESPACE_STD_END
-#endif /* !__std_tm_defined */
-#endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))

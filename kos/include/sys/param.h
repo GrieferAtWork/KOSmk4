@@ -74,6 +74,15 @@
 #endif /* ... */
 #endif /* !MAXHOSTNAMELEN */
 
+/* MAXGETHOSTNAME: Alias for `HOST_NAME_MAX' (defined in djgpp) */
+#ifndef MAXGETHOSTNAME
+#ifdef HOST_NAME_MAX
+#define MAXGETHOSTNAME HOST_NAME_MAX
+#elif defined(__HOST_NAME_MAX) && (__HOST_NAME_MAX + 0) != -1
+#define MAXGETHOSTNAME __HOST_NAME_MAX
+#endif /* ... */
+#endif /* !MAXGETHOSTNAME */
+
 /* Max # of supplemental group IDs that may be set () */
 #if !defined(NGROUPS_MAX) && defined(__NGROUPS_MAX) && (__NGROUPS_MAX + 0) != -1
 #define NGROUPS_MAX __NGROUPS_MAX

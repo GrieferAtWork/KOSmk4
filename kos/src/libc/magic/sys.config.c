@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x1ecac07a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_CONFIG_H
-#define _SYS_CONFIG_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
+%{
 /* This one's kind-of a weird header, in that there's no real standard out there
  * that defines what should go in here... And I'm also not entirely sure if this
  * is actually a ~real~ header that is meant to be exposed in any way, shape, or
@@ -242,9 +233,9 @@
 #endif /* __KOS_SYSTEM_HEADERS__ || 1 */
 
 #undef HAVE_SYS_SIGLIST
-#if defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist) || defined(__CRT_HAVE___p_sys_siglist)
+}%[insert:pp_if(defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist) || $has_function(__p_sys_siglist))]%{
 #define HAVE_SYS_SIGLIST 1
-#endif /* __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist || __CRT_HAVE___p_sys_siglist */
+}%[insert:pp_endif]%{
 
 
 
@@ -252,49 +243,54 @@
 
 #ifdef __KOS_SYSTEM_HEADERS__
 #undef HAVE_BCMP
+}%[insert:pp_if($has_function(memcmp))]%{
 #define HAVE_BCMP 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_BCOPY
+}%[insert:pp_if($has_function(bcopy))]%{
 #define HAVE_BCOPY 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_CLOSEDIR
-#ifdef __CRT_HAVE_closedir
+}%[insert:pp_if($has_function(closedir))]%{
 #define HAVE_CLOSEDIR 1
-#endif /* __CRT_HAVE_closedir */
+}%[insert:pp_endif]%{
 
 #undef HAVE_DUP2
-#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
+}%[insert:pp_if($has_function(dup2))]%{
 #define HAVE_DUP2 1
-#endif /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */
+}%[insert:pp_endif]%{
 
 #undef HAVE_ENDGRENT
-#ifdef __CRT_HAVE_endgrent
+}%[insert:pp_if($has_function(endgrent))]%{
 #define HAVE_ENDGRENT 1
-#endif /* __CRT_HAVE_endgrent */
+}%[insert:pp_endif]%{
 
 #undef HAVE_ENDPWENT
-#ifdef __CRT_HAVE_endpwent
+}%[insert:pp_if($has_function(endpwent))]%{
 #define HAVE_ENDPWENT 1
-#endif /* __CRT_HAVE_endpwent */
+}%[insert:pp_endif]%{
 
 #undef HAVE_FNMATCH
+}%[insert:pp_if($has_function(fnmatch))]%{
 #define HAVE_FNMATCH 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_FREXP
-#include <ieee754.h>
-#if defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+}%[insert:pp_if($has_function(frexp))]%{
 #define HAVE_FREXP 1
-#endif /* __CRT_HAVE_frexp || __CRT_HAVE___frexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+}%[insert:pp_endif]%{
 
 #undef HAVE_FTIME
-#if defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)
+}%[insert:pp_if($has_function(ftime))]%{
 #define HAVE_FTIME 1
-#endif /* __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE_ftime64 */
+}%[insert:pp_endif]%{
 
 #undef HAVE_FTRUNCATE
-#if (defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
+}%[insert:pp_if($has_function(ftruncate))]%{
 #define HAVE_FTRUNCATE 1
-#endif /* (__CRT_HAVE__chsize && !__USE_FILE_OFFSET64) || (__CRT_HAVE_chsize && !__USE_FILE_OFFSET64) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */
+}%[insert:pp_endif]%{
 
 #undef HAVE_FTW
 //TODO:}%[insert:pp_if($has_function(ftw))]%{
@@ -302,165 +298,190 @@
 //TODO:}%[insert:pp_endif]%{
 
 #undef HAVE_GETCWD
-#if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
+}%[insert:pp_if($has_function(getcwd))]%{
 #define HAVE_GETCWD 1
-#endif /* __CRT_HAVE_getcwd || __CRT_HAVE__getcwd */
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETDTABLESIZE
+}%[insert:pp_if($has_function(getdtablesize))]%{
 #define HAVE_GETDTABLESIZE 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETGROUPS
-#ifdef __CRT_HAVE_getgroups
+}%[insert:pp_if($has_function(getgroups))]%{
 #define HAVE_GETGROUPS 1
-#endif /* __CRT_HAVE_getgroups */
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETHOSTNAME
-#ifdef __CRT_HAVE_gethostname
+}%[insert:pp_if($has_function(gethostname))]%{
 #define HAVE_GETHOSTNAME 1
-#endif /* __CRT_HAVE_gethostname */
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETMNTENT
-#ifdef __CRT_HAVE_getmntent
+}%[insert:pp_if($has_function(getmntent))]%{
 #define HAVE_GETMNTENT 1
-#endif /* __CRT_HAVE_getmntent */
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETPAGESIZE
-#include <asm/pagesize.h>
-#if defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE)
+}%[insert:pp_if($has_function(getpagesize))]%{
 #define HAVE_GETPAGESIZE 1
-#endif /* __CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE */
+}%[insert:pp_endif]%{
 
 #undef HAVE_GETTIMEOFDAY
-#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+}%[insert:pp_if($has_function(gettimeofday))]%{
 #define HAVE_GETTIMEOFDAY 1
-#endif /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
+}%[insert:pp_endif]%{
 
 #undef HAVE_GLOB
+}%[insert:pp_if($has_function(glob))]%{
 #define HAVE_GLOB 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_ISASCII
+}%[insert:pp_if($has_function(isascii))]%{
 #define HAVE_ISASCII 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_MEMCHR
+}%[insert:pp_if($has_function(memchr))]%{
 #define HAVE_MEMCHR 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_MEMCPY
+}%[insert:pp_if($has_function(memcpy))]%{
 #define HAVE_MEMCPY 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_MKDIR
-#if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+}%[insert:pp_if($has_function(mkdir))]%{
 #define HAVE_MKDIR 1
-#endif /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+}%[insert:pp_endif]%{
 
 #undef HAVE_MKFIFO
-#ifdef __CRT_HAVE_mkfifo
+}%[insert:pp_if($has_function(mkfifo))]%{
 #define HAVE_MKFIFO 1
-#endif /* __CRT_HAVE_mkfifo */
+}%[insert:pp_endif]%{
 
 #undef HAVE_MKTIME
+}%[insert:pp_if($has_function(mktime))]%{
 #define HAVE_MKTIME 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_POW
-#if defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+}%[insert:pp_if($has_function(pow))]%{
 #define HAVE_POW 1
-#endif /* __CRT_HAVE_pow || __CRT_HAVE___pow || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+}%[insert:pp_endif]%{
 
 #undef HAVE_PUTENV
-#if defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
+}%[insert:pp_if($has_function(putenv))]%{
 #define HAVE_PUTENV 1
-#endif /* __CRT_HAVE_putenv || __CRT_HAVE__putenv */
+}%[insert:pp_endif]%{
 
 #undef HAVE_RANDOM
+}%[insert:pp_if($has_function(random))]%{
 #define HAVE_RANDOM 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_RENAME
-#if defined(__CRT_HAVE_rename) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)))
+}%[insert:pp_if($has_function(rename))]%{
 #define HAVE_RENAME 1
-#endif /* __CRT_HAVE_rename || (__CRT_AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat)) */
+}%[insert:pp_endif]%{
 
 #undef HAVE_RMDIR
-#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || (defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+}%[insert:pp_if($has_function(rmdir))]%{
 #define HAVE_RMDIR 1
-#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || (__CRT_AT_FDCWD && __CRT_HAVE_unlinkat) */
+}%[insert:pp_endif]%{
 
 #undef HAVE_SETENV
-#include <local/environ.h>
-#if defined(__CRT_HAVE_setenv) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s))
+}%[insert:pp_if($has_function(setenv))]%{
 #define HAVE_SETENV 1
-#endif /* __CRT_HAVE_setenv || ((__CRT_HAVE_getenv || __LOCAL_environ) && __CRT_HAVE__putenv_s) */
+}%[insert:pp_endif]%{
 
 #undef HAVE_SETLINEBUF
-#if defined(__CRT_HAVE_setlinebuf) || defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
+}%[insert:pp_if($has_function(setlinebuf))]%{
 #define HAVE_SETLINEBUF 1
-#endif /* __CRT_HAVE_setlinebuf || __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
+}%[insert:pp_endif]%{
 
 #undef HAVE_SETLOCALE
-#ifdef __CRT_HAVE_setlocale
+}%[insert:pp_if($has_function(setlocale))]%{
 #define HAVE_SETLOCALE 1
-#endif /* __CRT_HAVE_setlocale */
+}%[insert:pp_endif]%{
 
 #undef HAVE_SIGACTION
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+}%[insert:pp_if($has_function(sigaction))]%{
 #define HAVE_SIGACTION 1
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+}%[insert:pp_endif]%{
 
 #undef HAVE_STPCPY
+}%[insert:pp_if($has_function(stpcpy))]%{
 #define HAVE_STPCPY 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRCASECMP
+}%[insert:pp_if($has_function(strcasecmp))]%{
 #define HAVE_STRCASECMP 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRCHR
+}%[insert:pp_if($has_function(strchr))]%{
 #define HAVE_STRCHR 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRRCHR
+}%[insert:pp_if($has_function(strrchr))]%{
 #define HAVE_STRRCHR 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRCOLL
+}%[insert:pp_if($has_function(strcoll))]%{
 #define HAVE_STRCOLL 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRDUP
-#if defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+}%[insert:pp_if($has_function(strdup))]%{
 #define HAVE_STRDUP 1
-#endif /* __CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRFTIME
+}%[insert:pp_if($has_function(strftime))]%{
 #define HAVE_STRFTIME 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_STRERROR
+}%[insert:pp_if($has_function(strerror))]%{
 #define HAVE_STRERROR 1
+}%[insert:pp_endif]%{
 
 #undef HAVE_VPRINTF
-#include <__crt.h>
-#if defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)))
+}%[insert:pp_if($has_function(vprintf))]%{
 #define HAVE_VPRINTF 1
-#endif /* __CRT_HAVE_vprintf || __CRT_HAVE_vprintf_s || __CRT_HAVE_vprintf_unlocked || (!__NO_STDSTREAMS && (__CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite)) */
+}%[insert:pp_endif]%{
 
 #undef HAVE_WAITPID
-#if defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)
+}%[insert:pp_if($has_function(waitpid))]%{
 #define HAVE_WAITPID 1
-#endif /* __CRT_HAVE_waitpid || __CRT_HAVE___waitpid */
+}%[insert:pp_endif]%{
 
 #undef GETPGRP_VOID
-#ifdef __CRT_HAVE_getpgrp
+}%[insert:pp_if($has_function(getpgrp))]%{
 #define GETPGRP_VOID 1 /* 0-argument getpgrp() version */
-#endif /* __CRT_HAVE_getpgrp */
+}%[insert:pp_endif]%{
 
 #undef MOUNTED_GETMNTENT1
-#ifdef __CRT_HAVE_getmntent
+}%[insert:pp_if($has_function(getmntent))]%{
 #define MOUNTED_GETMNTENT1 1 /* 1-argument getmntent() version */
-#endif /* __CRT_HAVE_getmntent */
+}%[insert:pp_endif]%{
 
 #undef STAT_STATFS2_BSIZE
-#if (defined(__CRT_HAVE_statfs) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE___statfs) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_statfs64) && defined(__USE_FILE_OFFSET64))
+}%[insert:pp_if($has_function(statfs))]%{
 #define STAT_STATFS2_BSIZE 1 /* Actually requires that statfs() takes 2 arguments,
                               * and that `struct statfs::f_bsize' exists! */
-#endif /* (__CRT_HAVE_statfs && !__USE_FILE_OFFSET64) || (__CRT_HAVE___statfs && !__USE_FILE_OFFSET64) || (__CRT_HAVE_statfs64 && __USE_FILE_OFFSET64) */
+}%[insert:pp_endif]%{
 
 #undef HAVE_UTIME_NULL
-#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
+}%[insert:pp_if($has_function(utime))]%{
 #define HAVE_UTIME_NULL 1 /* Second argument to utime() can be NULL for current time. */
-#endif /* __CRT_HAVE_utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
+}%[insert:pp_endif]%{
 
 
 
@@ -496,9 +517,9 @@
 
 
 #undef GETGROUPS_T
-#ifdef __CRT_HAVE_getgroups
+}%[insert:pp_if($has_function(getgroups))]%{
 #define GETGROUPS_T __gid_t /* Vector element type of `getgroups()' */
-#endif /* __CRT_HAVE_getgroups */
+}%[insert:pp_endif]%{
 
 #undef RETSIGTYPE
 #define RETSIGTYPE void /* Return type of `sighandler_t' callbacks */
@@ -590,4 +611,4 @@ __DECL_END
 #endif /* !__size_t_defined */
 #endif /* __CC__ */
 
-#endif /* !_SYS_CONFIG_H */
+}

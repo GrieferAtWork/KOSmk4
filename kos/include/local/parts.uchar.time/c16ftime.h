@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1223d5c0 */
+/* HASH CRC-32:0xd06fd511 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16ftime_defined
 #define __local_c16ftime_defined 1
 #include <__crt.h>
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16ftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16ftime))(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {

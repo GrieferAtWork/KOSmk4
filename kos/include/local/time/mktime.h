@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7431144d */
+/* HASH CRC-32:0x92f3940a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,51 +23,20 @@
 #include <__crt.h>
 #include <bits/types.h>
 #include <features.h>
-#ifndef __STRUCT_TM
-#ifdef __tm_defined
-#define __STRUCT_TM struct tm
-#else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
-__NAMESPACE_STD_BEGIN
-struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
-#ifdef __CRT_GLC
-#ifdef __USE_MISC
-	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
-	char const      *tm_zone;     /* Timezone abbreviation. */
-#else /* __USE_MISC */
-	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
-	char const      *__tm_zone;   /* Timezone abbreviation. */
-#endif /* !__USE_MISC */
-#endif /* __CRT_GLC */
-};
-__NAMESPACE_STD_END
-#endif /* !__std_tm_defined */
-#endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mktime32 from time */
 #ifndef __local___localdep_mktime32_defined
 #define __local___localdep_mktime32_defined 1
 #ifdef __CRT_HAVE_mktime
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime32)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
 #elif defined(__CRT_HAVE_timelocal)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
 #else /* ... */
 #undef __local___localdep_mktime32_defined
 #endif /* !... */
@@ -77,16 +46,16 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 #define __local___localdep_mktime64_defined 1
 #ifdef __CRT_HAVE_mktime64
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime64,(__tp))
 #elif defined(__CRT_HAVE_mktime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime64)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
 #elif defined(__CRT_HAVE_timelocal64)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/time/mktime64.h>
@@ -102,7 +71,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Return the `time_t' representation of TP and normalize TP */
 __LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time)
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(__STRUCT_TM __KOS_FIXED_CONST *__tp) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
 
 
 

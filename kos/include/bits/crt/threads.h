@@ -26,9 +26,8 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/pthreadtypesizes.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_KEY_T) __tss_t;
 typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __thrd_t;
@@ -51,8 +50,7 @@ typedef union {
 	__INT64_TYPE__ __align;
 } __cnd_t;
 
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_THREADS_H */

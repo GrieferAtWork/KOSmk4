@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x691dd3e */
+/* HASH CRC-32:0xc58a20c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1709,7 +1709,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.strftime") NONNUL
 NOTHROW_NCX(LIBDCALL libd_wcsftime_l)(char16_t *__restrict buf,
                                       size_t maxsize,
                                       char16_t const *__restrict format,
-                                      __STRUCT_TM const *__restrict tp,
+                                      struct tm const *__restrict tp,
                                       locale_t locale) {
 	(void)locale;
 	return libd_wcsftime(buf, maxsize, format, tp);
@@ -1718,7 +1718,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.format.strftime") NONNULL((1
 NOTHROW_NCX(LIBKCALL libc_wcsftime_l)(char32_t *__restrict buf,
                                       size_t maxsize,
                                       char32_t const *__restrict format,
-                                      __STRUCT_TM const *__restrict tp,
+                                      struct tm const *__restrict tp,
                                       locale_t locale) {
 	(void)locale;
 	return libc_wcsftime(buf, maxsize, format, tp);

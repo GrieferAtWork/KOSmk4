@@ -129,6 +129,7 @@
 #define _STATBUF_ST_NSEC     1
 #define _STATBUF_ST_BLKSIZE  1
 #define _STATBUF_ST_RDEV     1
+#define _STATBUF_ST_BLOCKS   1
 #if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #define _STATBUF_ST_INO32      1
 #define _STATBUF_ST_INO64      1

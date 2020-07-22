@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92193dbd */
+/* HASH CRC-32:0xe4783e2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,7 @@
 #ifndef __local_strftime_l_defined
 #define __local_strftime_l_defined 1
 #include <__crt.h>
-#ifndef __STRUCT_TM
-#ifdef __tm_defined
-#define __STRUCT_TM struct tm
-#else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
-#ifndef __std_tm_defined
-#define __std_tm_defined 1
-__NAMESPACE_STD_BEGIN
-struct tm {
-	int         tm_sec;      /* seconds [0, 61]. */
-	int         tm_min;      /* minutes [0, 59]. */
-	int         tm_hour;     /* hour [0, 23]. */
-	int         tm_mday;     /* day of month [1, 31]. */
-	int         tm_mon;      /* month of year [0, 11]. */
-	int         tm_year;     /* years since 1900. */
-	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
-	int         tm_yday;     /* day of year [0, 365]. */
-	int         tm_isdst;    /* daylight savings flag. */
-#ifdef __CRT_GLC
-#ifdef __USE_MISC
-	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
-	char const      *tm_zone;     /* Timezone abbreviation. */
-#else /* __USE_MISC */
-	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
-	char const      *__tm_zone;   /* Timezone abbreviation. */
-#endif /* !__USE_MISC */
-#endif /* __CRT_GLC */
-};
-__NAMESPACE_STD_END
-#endif /* !__std_tm_defined */
-#endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
+#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strftime from time */
 #ifndef __local___localdep_strftime_defined
@@ -61,17 +30,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__CEIREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp),strftime,{ return __builtin_strftime(__buf, __bufsize, __format, __tp); })
+__CEIREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),strftime,{ return __builtin_strftime(__buf, __bufsize, __format, __tp); })
 #elif defined(__CRT_HAVE_strftime)
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp),strftime,(__buf,__bufsize,__format,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),strftime,(__buf,__bufsize,__format,__tp))
 #elif defined(__CRT_HAVE__Strftime)
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp),_Strftime,(__buf,__bufsize,__format,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),_Strftime,(__buf,__bufsize,__format,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/time/strftime.h>
@@ -85,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
 __LOCAL_LIBC(strftime_l) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime_l))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime_l))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strftime(__buf, __bufsize, __format, __tp);
 }

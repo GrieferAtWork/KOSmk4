@@ -264,6 +264,7 @@ incdir("", "../../include");
 #include <bits/crt/semaphore.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/crt/threads.h>
+#include <bits/crt/tm.h>
 #include <bits/dirent.h>
 #include <bits/elf-types.h>
 #include <bits/elf.h>
@@ -675,6 +676,7 @@ incdir("", "../../include");
 #include <libc/core/stdlib.h>
 #include <libc/core/string.h>
 #include <libc/core/unicode.h>
+#include <libc/core/unistd.h>
 #include <libc/ctype.h>
 #include <libc/error.h>
 #include <libc/fenv.h>
@@ -684,6 +686,7 @@ incdir("", "../../include");
 #include <libc/stdlib.h>
 #include <libc/string.h>
 #include <libc/unicode.h>
+#include <libc/unistd.h>
 #include <libcmdline/api.h>
 #include <libcmdline/decode.h>
 #include <libcmdline/encode.h>
@@ -853,6 +856,7 @@ incdir("", "../../include");
 #include <linux/sysinfo.h>
 #include <linux/termios.h>
 #include <linux/types.h>
+#include <linux/unistd.h>
 #include <linux/vt.h>
 #include <locale.h>
 #include <machine/_default_types.h>

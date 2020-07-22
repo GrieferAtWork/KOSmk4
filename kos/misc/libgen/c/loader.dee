@@ -1886,7 +1886,20 @@ again_parse_default_annotation:
 		local text = self.parseAllUntilRParenAsString();
 		result.order_header.append([](fp: CWriter, escapeMode: int) {
 			fp.forceStartOfLine();
-			return fp.operator . (functionName)(text);
+			local extendedPrefixes = [];
+			local usedText = escapeText(
+				text, escapeMode, extendedPrefixes: extendedPrefixes);
+again:
+			local newExtendedPrefixes = [];
+			for (local x: extendedPrefixes) {
+				escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
+					extendedPrefixes: newExtendedPrefixes);
+			}
+			if (newExtendedPrefixes) {
+				extendedPrefixes = newExtendedPrefixes;
+				goto again;
+			}
+			return fp.operator . (functionName)(usedText);
 		});
 		self.skip(")");
 	}

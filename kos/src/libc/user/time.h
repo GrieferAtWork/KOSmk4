@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39c1d88f */
+/* HASH CRC-32:0x7741d98a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec 
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
  * `getdate_err' is set */
-INTDEF NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
+INTDEF NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
 #endif /* !__KERNEL__ */
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;
