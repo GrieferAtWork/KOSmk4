@@ -21,9 +21,12 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PROFILER_H 1
 
 #include <hybrid/compiler.h>
+
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
+#include <hybrid/typecore.h>
+
 #include <kos/kernel/paging.h>
 #define __BRANCH_PREDITION_ADDRESS_BASE     KERNEL_CORE_BASE
 #define __BRANCH_PREDITION_ADDRESS_TYPE     __UINT32_TYPE__

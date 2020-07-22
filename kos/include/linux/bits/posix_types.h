@@ -17,33 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_TYPES_H
-#define _ASM_TYPES_H 1
+#ifndef _ASM_POSIX_TYPES_H
+#define _ASM_POSIX_TYPES_H 1
 
-#include <__stdinc.h>
-
-#include <hybrid/typecore.h>
-
-#ifdef __CC__
-
-#ifndef ____s8_defined
-#define ____s8_defined 1
-__DECL_BEGIN
-typedef __INT8_TYPE__ __s8;
-typedef __UINT8_TYPE__ __u8;
-typedef __INT16_TYPE__ __s16;
-typedef __UINT16_TYPE__ __u16;
-typedef __INT32_TYPE__ __s32;
-typedef __UINT32_TYPE__ __u32;
-#ifdef __INT64_TYPE__
-typedef __INT64_TYPE__ __s64;
-#endif /* __INT64_TYPE__ */
-#ifdef __UINT64_TYPE__
-typedef __UINT64_TYPE__ __u64;
-#endif /* __UINT64_TYPE__ */
-__DECL_END
-#endif /* !____s8_defined */
-
-#endif /* __CC__ */
-
-#endif /* !_ASM_TYPES_H */
+#endif /* !_ASM_POSIX_TYPES_H */

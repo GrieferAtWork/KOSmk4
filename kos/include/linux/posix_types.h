@@ -20,19 +20,122 @@
 #ifndef _LINUX_POSIX_TYPES_H
 #define _LINUX_POSIX_TYPES_H 1
 
-#include "stddef.h"
 #include <__stdinc.h>
-#include <hybrid/typecore.h>
-#include <asm/posix_types.h>
 
-__SYSDECL_BEGIN
+#include <hybrid/typecore.h>
+
+#include <asm/select.h> /* __FD_SETSIZE */
+#include <bits/types.h>
+#include <linux/bits/posix_types.h>
+
+#include "stddef.h"
 
 /* NOTE: This stuff isn't actually used by the KOS kernel,
  *       which uses the same structures/types as userspace. */
-#undef __FD_SETSIZE
-#define __FD_SETSIZE  1024
+
+#ifndef __BITS_PER_LONG
+#include <hybrid/typecore.h>
+#if __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 4
+#define __BITS_PER_LONG 32
+#elif __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 8
+#define __BITS_PER_LONG 64
+#elif __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 2
+#define __BITS_PER_LONG 16
+#elif __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 1
+#define __BITS_PER_LONG 8
+#else /* __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == ... */
+#define __BITS_PER_LONG (__CHAR_BIT__ * __SIZEOF_POINTER__)
+#endif /* __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ != ... */
+#endif /* !__BITS_PER_LONG */
 
 #ifdef __CC__
+__DECL_BEGIN
+
+#ifndef __kernel_long_t
+#define __kernel_long_t __LONGPTR_TYPE__
+#endif /* !__kernel_long_t */
+#ifndef __kernel_ulong_t
+#define __kernel_ulong_t __ULONGPTR_TYPE__
+#endif /* !__kernel_ulong_t */
+#ifndef __kernel_ino_t
+#define __kernel_ino_t __ino64_t
+#endif /* !__kernel_ino_t */
+#ifndef __kernel_mode_t
+#define __kernel_mode_t __mode_t
+#endif /* !__kernel_mode_t */
+#ifndef __kernel_pid_t
+#define __kernel_pid_t __pid_t
+#endif /* !__kernel_pid_t */
+#ifndef __kernel_ipc_pid_t
+#define __kernel_ipc_pid_t __pid_t
+#endif /* !__kernel_ipc_pid_t */
+#ifndef __kernel_uid_t
+#define __kernel_uid_t __uid_t
+#define __kernel_gid_t __gid_t
+#endif /* !__kernel_uid_t */
+#ifndef __kernel_suseconds_t
+#define __kernel_suseconds_t __suseconds_t
+#endif /* !__kernel_suseconds_t */
+#ifndef __kernel_daddr_t
+#define __kernel_daddr_t __daddr_t
+#endif /* !__kernel_daddr_t */
+#ifndef __kernel_uid32_t
+#define __kernel_uid32_t __UINT32_TYPE__
+#endif /* !__kernel_uid32_t */
+#ifndef __kernel_gid32_t
+#define __kernel_gid32_t __UINT32_TYPE__
+#endif /* !__kernel_gid32_t */
+#ifndef __kernel_old_uid_t
+#define __kernel_old_uid_t __kernel_uid_t
+#endif /* !__kernel_old_uid_t */
+#ifndef __kernel_old_gid_t
+#define __kernel_old_gid_t __kernel_gid_t
+#endif /* !__kernel_old_gid_t */
+#ifndef __kernel_old_dev_t
+#define __kernel_old_dev_t __UINT32_TYPE__
+#endif /* !__kernel_old_dev_t */
+#ifndef __kernel_size_t
+#define __kernel_size_t __SIZE_TYPE__
+#endif /* !__kernel_size_t */
+#ifndef __kernel_ssize_t
+#define __kernel_ssize_t __SSIZE_TYPE__
+#endif /* !__kernel_ssize_t */
+#ifndef __kernel_ptrdiff_t
+#define __kernel_ptrdiff_t __PTRDIFF_TYPE__
+#endif /* !__kernel_ptrdiff_t */
+#ifndef __kernel_fsid_t
+#define __kernel_fsid_t __fsid_t
+#endif /* !__kernel_fsid_t */
+
+#ifndef __kernel_off_t
+#define __kernel_off_t __off64_t
+#endif /* !__kernel_off_t */
+#ifndef __kernel_loff_t
+#define __kernel_loff_t __loff_t
+#endif /* !__kernel_loff_t */
+#ifndef __kernel_time_t
+#define __kernel_time_t __time64_t
+#endif /* !__kernel_time_t */
+#ifndef __kernel_clock_t
+#define __kernel_clock_t __clock_t
+#endif /* !__kernel_clock_t */
+#ifndef __kernel_timer_t
+#define __kernel_timer_t __timer_t
+#endif /* !__kernel_timer_t */
+#ifndef __kernel_clockid_t
+#define __kernel_clockid_t __clockid_t
+#endif /* !__kernel_clockid_t */
+#ifndef __kernel_caddr_t
+#define __kernel_caddr_t __caddr_t
+#endif /* !__kernel_caddr_t */
+#ifndef __kernel_uid16_t
+#define __kernel_uid16_t __UINT16_TYPE__
+#endif /* !__kernel_uid16_t */
+#ifndef __kernel_gid16_t
+#define __kernel_gid16_t __UINT16_TYPE__
+#endif /* !__kernel_gid16_t */
+
+
 typedef struct {
 	__ULONGPTR_TYPE__ fds_bits[__FD_SETSIZE / (8 * sizeof(__ULONGPTR_TYPE__))];
 } __kernel_fd_set;
@@ -40,8 +143,9 @@ typedef struct {
 typedef void (*__kernel_sighandler_t)(int);
 typedef int __kernel_key_t;
 typedef int __kernel_mqd_t;
+
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_LINUX_POSIX_TYPES_H */

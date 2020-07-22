@@ -21,8 +21,11 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VM_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
 #include <hybrid/host.h>
+#include <hybrid/typecore.h>
 
 #undef CONFIG_VM_ARCH_DEFINES_MEMCPY_NOPF
 #define CONFIG_VM_ARCH_DEFINES_MEMCPY_NOPF 1

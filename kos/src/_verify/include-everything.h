@@ -178,7 +178,6 @@ incdir("", "../../include");
 #include <ar.h>
 #include <argz.h>
 #include <arpa/inet.h>
-#include <asm/bitsperlong.h>
 #include <asm/cacheline.h>
 #include <asm/crt/limits.h>
 #include <asm/crt/malloc.h>
@@ -195,8 +194,6 @@ incdir("", "../../include");
 #include <asm/eventfd.h>
 #include <asm/fcntl.h>
 #include <asm/fp_type.h>
-#include <asm/int-l64.h>
-#include <asm/int-ll64.h>
 #include <asm/intrin-arith.h>
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
@@ -209,7 +206,6 @@ incdir("", "../../include");
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
 #include <asm/poll.h>
-#include <asm/posix_types.h>
 #include <asm/ptrace.h>
 #include <asm/random.h>
 #include <asm/reboot.h>
@@ -231,7 +227,6 @@ incdir("", "../../include");
 #include <asm/termbits.h>
 #include <asm/termios.h>
 #include <asm/time.h>
-#include <asm/types.h>
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
 #include <asm/utsname.h>

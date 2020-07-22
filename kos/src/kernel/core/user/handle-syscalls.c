@@ -117,8 +117,8 @@ DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 	} EXCEPT {
 		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
 			struct exception_data *d = error_data();
-			if (d->e_pointers[0] == (__UINTPTR_TYPE__)-1)
-				d->e_pointers[0] = (__UINTPTR_TYPE__)(__INTPTR_TYPE__)oldfd;
+			if (d->e_pointers[0] == (uintptr_t)-1)
+				d->e_pointers[0] = (uintptr_t)(intptr_t)oldfd;
 		}
 		decref(hand);
 		RETHROW();

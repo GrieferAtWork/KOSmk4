@@ -24,15 +24,11 @@
 
 #ifndef __bool_true_false_are_defined
 #define __bool_true_false_are_defined 1
-#if !defined(__cplusplus) && defined(__CC__)
-#if 1
-#define bool   __BOOL
-#else
-typedef __BOOL bool;
-#endif
-#define true   1
-#define false  0
-#endif
+#ifndef __cplusplus
+#define bool  __BOOL
+#define true  1
+#define false 0
+#endif /* !__cplusplus */
 #endif /* !__bool_true_false_are_defined */
 
 #endif /* !_STDBOOL_H */

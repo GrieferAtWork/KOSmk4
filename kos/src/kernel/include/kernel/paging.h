@@ -25,6 +25,8 @@
 #include <kernel/arch/paging.h>
 #include <kernel/types.h>
 
+#include <hybrid/typecore.h>
+
 #include <asm/pagesize.h>
 #include <kos/kernel/paging.h>
 
@@ -32,19 +34,19 @@
 #define PAGESIZE __ARCH_PAGESIZE
 #elif PAGESIZE != __ARCH_PAGESIZE
 #error "Miss-configured: `PAGESIZE != __ARCH_PAGESIZE'"
-#endif
+#endif /* ... */
 
 #ifndef PAGESHIFT
 #define PAGESHIFT __ARCH_PAGESHIFT
 #elif PAGESHIFT != __ARCH_PAGESHIFT
 #error "Miss-configured: `PAGESHIFT != __ARCH_PAGESHIFT'"
-#endif
+#endif /* ... */
 
 #ifndef PAGEMASK
 #define PAGEMASK __ARCH_PAGEMASK
 #elif PAGEMASK != __ARCH_PAGEMASK
 #error "Miss-configured: `PAGEMASK != __ARCH_PAGEMASK'"
-#endif
+#endif /* ... */
 
 
 /* Check if a given `addr' or [startaddr, endaddr)
@@ -70,14 +72,14 @@
 #define ADDRRANGE_ISUSER(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_END)
 #define ADDRRANGE_ISKERN_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_END)
 #define ADDRRANGE_ISUSER_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_END)
-#else
+#else /* KERNELSPACE_...MEM */
 #define ADDR_ISKERN(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_END)
 #define ADDR_ISUSER(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
 #define ADDRRANGE_ISKERN(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(endaddr) <= KERNELSPACE_END)
 #define ADDRRANGE_ISUSER(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_END || __CCAST(__UINTPTR_TYPE__)(endaddr) <= KERNELSPACE_BASE)
 #define ADDRRANGE_ISKERN_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_END || __CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_BASE)
 #define ADDRRANGE_ISUSER_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_END)
-#endif
+#endif /* !KERNELSPACE_...MEM */
 
 
 

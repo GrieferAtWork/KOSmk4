@@ -23,6 +23,9 @@
 #include "../__stdinc.h"
 
 /* Autocomplete gcc-style compiler intrinsic predefined macros. */
+#ifndef __CHAR_BIT__
+#define __CHAR_BIT__ 8
+#endif /* !__CHAR_BIT__ */
 #ifndef __SIZEOF_CHAR__
 #define __SIZEOF_CHAR__  1
 #endif /* !__SIZEOF_CHAR__ */
@@ -1331,26 +1334,26 @@
 
 #ifndef __SSIZE_TYPE__
 #ifdef __SIZE_TYPE_IS_INT__
-#define __SSIZE_TYPE__   __ATTR_W64 signed int
+#define __SSIZE_TYPE__ __ATTR_W64 signed int
 #elif defined(__SIZE_TYPE_IS_LONG__)
-#define __SSIZE_TYPE__   __ATTR_W64 signed long
+#define __SSIZE_TYPE__ __ATTR_W64 signed long
 #elif defined(__SIZE_TYPE_IS_LLONG__)
-#define __SSIZE_TYPE__   __ATTR_W64 __LONGLONG
-#else
-#define __SSIZE_TYPE__   __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_SIZE_T__)
-#endif
+#define __SSIZE_TYPE__ __ATTR_W64 __LONGLONG
+#else /* ... */
+#define __SSIZE_TYPE__ __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_SIZE_T__)
+#endif /* !... */
 #endif /* !__SSIZE_TYPE__ */
 
 #ifndef __PTRDIFF_TYPE__
 #ifdef __PTRDIFF_TYPE_IS_INT__
-#define __SSIZE_TYPE__   __ATTR_W64 signed int
+#define __PTRDIFF_TYPE__ __ATTR_W64 signed int
 #elif defined(__PTRDIFF_TYPE_IS_LONG__)
-#define __SSIZE_TYPE__   __ATTR_W64 signed long
+#define __PTRDIFF_TYPE__ __ATTR_W64 signed long
 #elif defined(__PTRDIFF_TYPE_IS_LLONG__)
-#define __SSIZE_TYPE__   __ATTR_W64 __LONGLONG
-#else
+#define __PTRDIFF_TYPE__ __ATTR_W64 __LONGLONG
+#else /* ... */
 #define __PTRDIFF_TYPE__ __SSIZE_TYPE__
-#endif
+#endif /* !... */
 #endif /* !__PTRDIFF_TYPE__ */
 
 

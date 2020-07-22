@@ -117,19 +117,19 @@ DEFINE_PUBLIC_ALIAS(DOS$fstatat64, libc_cyg_fstatat);
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2cyg(struct __cyg_stat *__restrict dst,
                  struct __kos_stat const *__restrict src) {
-	dst->st_dev      = (__UINT32_TYPE__)src->st_dev;
-	dst->st_ino      = (__UINT64_TYPE__)src->st_ino64;
-	dst->st_mode     = (__UINT32_TYPE__)src->st_mode;
+	dst->st_dev      = (u32)src->st_dev;
+	dst->st_ino      = (u64)src->st_ino64;
+	dst->st_mode     = (u32)src->st_mode;
 	dst->st_nlink    = (__UINT16_TYPE__)src->st_nlink;
-	dst->st_uid      = (__UINT32_TYPE__)src->st_uid;
-	dst->st_gid      = (__UINT32_TYPE__)src->st_gid;
-	dst->st_rdev     = (__UINT32_TYPE__)src->st_rdev;
-	dst->st_size     = (__UINT64_TYPE__)src->st_size64;
+	dst->st_uid      = (u32)src->st_uid;
+	dst->st_gid      = (u32)src->st_gid;
+	dst->st_rdev     = (u32)src->st_rdev;
+	dst->st_size     = (u64)src->st_size64;
 	dst->st_atim     = src->st_atim64;
 	dst->st_mtim     = src->st_mtim64;
 	dst->st_ctim     = src->st_ctim64;
-	dst->st_blksize  = (__UINT32_TYPE__)src->st_blksize;
-	dst->st_blocks   = (__UINT64_TYPE__)src->st_blocks64;
+	dst->st_blksize  = (u32)src->st_blksize;
+	dst->st_blocks   = (u64)src->st_blocks64;
 	dst->st_birthtim = src->st_ctim64;
 }
 
@@ -198,16 +198,16 @@ DEFINE_INTERN_ALIAS(libc_fstatat64, libc_glc_fstatat64);
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc(struct __glc_stat *__restrict dst,
                  struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (__UINT64_TYPE__)src->st_dev;
-	dst->st_ino     = (__UINT32_TYPE__)src->st_ino32;
-	dst->st_mode    = (__UINT32_TYPE__)src->st_mode;
-	dst->st_nlink   = (__UINT32_TYPE__)src->st_nlink;
-	dst->st_uid     = (__UINT32_TYPE__)src->st_uid;
-	dst->st_gid     = (__UINT32_TYPE__)src->st_gid;
-	dst->st_rdev    = (__UINT64_TYPE__)src->st_rdev;
-	dst->st_size    = (__UINT32_TYPE__)src->st_size32;
-	dst->st_blksize = (__UINT32_TYPE__)src->st_blksize;
-	dst->st_blocks  = (__UINT32_TYPE__)src->st_blocks32;
+	dst->st_dev     = (u64)src->st_dev;
+	dst->st_ino     = (u32)src->st_ino32;
+	dst->st_mode    = (u32)src->st_mode;
+	dst->st_nlink   = (u32)src->st_nlink;
+	dst->st_uid     = (u32)src->st_uid;
+	dst->st_gid     = (u32)src->st_gid;
+	dst->st_rdev    = (u64)src->st_rdev;
+	dst->st_size    = (u32)src->st_size32;
+	dst->st_blksize = (u32)src->st_blksize;
+	dst->st_blocks  = (u32)src->st_blocks32;
 	dst->st_atim    = src->st_atim32;
 	dst->st_mtim    = src->st_mtim32;
 	dst->st_ctim    = src->st_ctim32;
@@ -216,20 +216,20 @@ convstat_kos2glc(struct __glc_stat *__restrict dst,
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (__UINT64_TYPE__)src->st_dev;
-	dst->st_ino32   = (__UINT32_TYPE__)src->st_ino32;
-	dst->st_mode    = (__UINT32_TYPE__)src->st_mode;
-	dst->st_nlink   = (__UINT32_TYPE__)src->st_nlink;
-	dst->st_uid     = (__UINT32_TYPE__)src->st_uid;
-	dst->st_gid     = (__UINT32_TYPE__)src->st_gid;
-	dst->st_rdev    = (__UINT64_TYPE__)src->st_rdev;
-	dst->st_size64  = (__UINT64_TYPE__)src->st_size64;
-	dst->st_blksize = (__UINT32_TYPE__)src->st_blksize;
-	dst->st_blocks  = (__UINT32_TYPE__)src->st_blocks32;
+	dst->st_dev     = (u64)src->st_dev;
+	dst->st_ino32   = (u32)src->st_ino32;
+	dst->st_mode    = (u32)src->st_mode;
+	dst->st_nlink   = (u32)src->st_nlink;
+	dst->st_uid     = (u32)src->st_uid;
+	dst->st_gid     = (u32)src->st_gid;
+	dst->st_rdev    = (u64)src->st_rdev;
+	dst->st_size64  = (u64)src->st_size64;
+	dst->st_blksize = (u32)src->st_blksize;
+	dst->st_blocks  = (u32)src->st_blocks32;
 	dst->st_atim    = src->st_atim32;
 	dst->st_mtim    = src->st_mtim32;
 	dst->st_ctim    = src->st_ctim32;
-	dst->st_ino64   = (__UINT64_TYPE__)src->st_ino64;
+	dst->st_ino64   = (u64)src->st_ino64;
 }
 
 INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_fstat") NONNULL((2)) int
@@ -356,30 +356,30 @@ convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (__dos_dev_t)src->st_dev;
 	dst->st_ino     = (__dos_ino_t)src->st_ino32;
-	dst->st_mode    = (__uint16_t)src->st_mode;
-	dst->st_nlink   = (__int16_t)src->st_nlink;
-	dst->st_uid     = (__int16_t)src->st_uid;
-	dst->st_gid     = (__int16_t)src->st_gid;
+	dst->st_mode    = (u16)src->st_mode;
+	dst->st_nlink   = (s16)src->st_nlink;
+	dst->st_uid     = (s16)src->st_uid;
+	dst->st_gid     = (s16)src->st_gid;
 	dst->st_rdev    = (__dos_dev_t)src->st_rdev;
-	dst->st_size32  = (__UINT32_TYPE__)src->st_size32;
-	dst->st_atime32 = (__time32_t)src->st_atim32.tv_sec;
-	dst->st_mtime32 = (__time32_t)src->st_mtim32.tv_sec;
-	dst->st_ctime32 = (__time32_t)src->st_ctim32.tv_sec;
+	dst->st_size32  = (u32)src->st_size32;
+	dst->st_atime32 = (time32_t)src->st_atim32.tv_sec;
+	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
+	dst->st_ctime32 = (time32_t)src->st_ctim32.tv_sec;
 }
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
                       struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (__dos_dev_t)src->st_dev;
 	dst->st_ino     = (__dos_ino_t)src->st_ino32;
-	dst->st_mode    = (__uint16_t)src->st_mode;
-	dst->st_nlink   = (__int16_t)src->st_nlink;
-	dst->st_uid     = (__int16_t)src->st_uid;
-	dst->st_gid     = (__int16_t)src->st_gid;
+	dst->st_mode    = (u16)src->st_mode;
+	dst->st_nlink   = (s16)src->st_nlink;
+	dst->st_uid     = (s16)src->st_uid;
+	dst->st_gid     = (s16)src->st_gid;
 	dst->st_rdev    = (__dos_dev_t)src->st_rdev;
-	dst->st_size64  = (__UINT64_TYPE__)src->st_size64;
-	dst->st_atime32 = (__time32_t)src->st_atim32.tv_sec;
-	dst->st_mtime32 = (__time32_t)src->st_mtim32.tv_sec;
-	dst->st_ctime32 = (__time32_t)src->st_ctim32.tv_sec;
+	dst->st_size64  = (u64)src->st_size64;
+	dst->st_atime32 = (time32_t)src->st_atim32.tv_sec;
+	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
+	dst->st_ctime32 = (time32_t)src->st_ctim32.tv_sec;
 }
 
 LOCAL NONNULL((1, 2)) void LIBCCALL
@@ -387,15 +387,15 @@ convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (__dos_dev_t)src->st_dev;
 	dst->st_ino     = (__dos_ino_t)src->st_ino32;
-	dst->st_mode    = (__uint16_t)src->st_mode;
-	dst->st_nlink   = (__int16_t)src->st_nlink;
-	dst->st_uid     = (__int16_t)src->st_uid;
-	dst->st_gid     = (__int16_t)src->st_gid;
+	dst->st_mode    = (u16)src->st_mode;
+	dst->st_nlink   = (s16)src->st_nlink;
+	dst->st_uid     = (s16)src->st_uid;
+	dst->st_gid     = (s16)src->st_gid;
 	dst->st_rdev    = (__dos_dev_t)src->st_rdev;
-	dst->st_size64  = (__UINT64_TYPE__)src->st_size64;
-	dst->st_atime64 = (__time64_t)src->st_atim64.tv_sec;
-	dst->st_mtime64 = (__time64_t)src->st_mtim64.tv_sec;
-	dst->st_ctime64 = (__time64_t)src->st_ctim64.tv_sec;
+	dst->st_size64  = (u64)src->st_size64;
+	dst->st_atime64 = (time64_t)src->st_atim64.tv_sec;
+	dst->st_mtime64 = (time64_t)src->st_mtim64.tv_sec;
+	dst->st_ctime64 = (time64_t)src->st_ctim64.tv_sec;
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_fstat32") NONNULL((2)) int

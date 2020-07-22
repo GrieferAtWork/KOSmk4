@@ -57,9 +57,6 @@
 #endif /* !__CHAR_UNSIGNED__ */
 #endif
 
-#ifndef __CHAR_BIT__
-#define __CHAR_BIT__ 8
-#endif /* !__CHAR_BIT__ */
 #ifndef __SCHAR_MIN__
 #define __SCHAR_MIN__ __PRIVATE_MIN_S(__SIZEOF_CHAR__)
 #endif /* !__SCHAR_MIN__ */

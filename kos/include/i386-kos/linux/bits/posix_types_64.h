@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM_POSIX_TYPES_64_H
-#define _I386_KOS_ASM_POSIX_TYPES_64_H 1
+#ifndef _I386_KOS_LINUX_BITS_POSIX_TYPES_64_H
+#define _I386_KOS_LINUX_BITS_POSIX_TYPES_64_H 1
 
 /* NOTE: Types in here are not actually used by the kernel!
  *       This header only mirrors what GLibC does for API compatibility. */
@@ -31,6 +31,4 @@
 #define __kernel_old_dev_t __UINT64_TYPE__
 #endif /* __CC__ */
 
-#include "../../asm/posix_types.h"
-
-#endif /* _I386_KOS_ASM_POSIX_TYPES_64_H */
+#endif /* _I386_KOS_LINUX_BITS_POSIX_TYPES_64_H */

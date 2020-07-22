@@ -66,9 +66,9 @@
 #define __ARCH_PAGEID_TYPE_SIZEOF 4
 #elif __ARCH_PAGEID_BITS <= 64
 #define __ARCH_PAGEID_TYPE_SIZEOF 8
-#else
+#else /* __ARCH_PAGEID_BITS <= ... */
 #error "`__ARCH_PAGEID_BITS' is too large"
-#endif
+#endif /* __ARCH_PAGEID_BITS > ... */
 #endif /* !__ARCH_PAGEID_TYPE_SIZEOF */
 
 #if !defined(__ARCH_PAGEID_TYPE) && defined(__ARCH_PAGEID_TYPE_SIZEOF)
@@ -81,7 +81,7 @@
 #define __ARCH_PAGEID_TYPE __UINT32_TYPE__
 #elif __ARCH_PAGEID_TYPE_SIZEOF == 8
 #define __ARCH_PAGEID_TYPE __UINT64_TYPE__
-#endif
+#endif /* __ARCH_PAGEID_TYPE_SIZEOF == ... */
 #endif /* !__ARCH_PAGEID_TYPE */
 
 #ifndef __ARCH_PAGEID_ENCODE

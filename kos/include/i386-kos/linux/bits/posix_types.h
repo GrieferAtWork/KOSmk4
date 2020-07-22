@@ -17,19 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM_POSIX_TYPES_X32_H
-#define _I386_KOS_ASM_POSIX_TYPES_X32_H 1
+#ifndef _I386_KOS_LINUX_BITS_POSIX_TYPES_H
+#define _I386_KOS_LINUX_BITS_POSIX_TYPES_H 1
 
-#include <hybrid/typecore.h>
+#include <hybrid/host.h>
 
-/* NOTE: Types in here are not actually used by the kernel!
- *       This header only mirrors what GLibC does for API compatibility. */
+#ifdef __i386__
+#include "posix_types_32.h"
+#elif defined(__ILP32__)
+#include "posix_types_x32.h"
+#else
+#include "posix_types_64.h"
+#endif
 
-#ifdef __CC__
-#define __kernel_long_t  __INT64_TYPE__
-#define __kernel_ulong_t __UINT64_TYPE__
-#endif /* __CC__ */
-
-#include "../../asm/posix_types.h"
-
-#endif /* _I386_KOS_ASM_POSIX_TYPES_X32_H */
+#endif /* !_I386_KOS_LINUX_BITS_POSIX_TYPES_H */

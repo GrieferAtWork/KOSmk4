@@ -51,6 +51,7 @@
 
 #include <errno.h>
 #include <int128.h>
+#include <stdint.h> /* UINT32_C */
 #include <string.h>
 
 #include <libemu86/emu86.h>

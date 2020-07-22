@@ -35,15 +35,15 @@
 
 /* ... */
 
-#if /*defined(__cplusplus) ||*/ \
-  (!defined(__LINKER__) && !defined(__ASSEMBLY__) && \
-   !defined(__ASSEMBLER__) && !defined(__assembler) && \
-   !defined(__DEEMON__))
-#define __CC__ 1    /* C Compiler. */
-#define __CCAST(T) (T)
-#else
-#define __CCAST(T)  /* Nothing */
-#endif
+#if (/*defined(__cplusplus) ||*/                          \
+     (!defined(__LINKER__) && !defined(__ASSEMBLY__) &&   \
+      !defined(__ASSEMBLER__) && !defined(__assembler) && \
+      !defined(__DEEMON__)))
+#define __CC__  1  /* C Compiler. */
+#define __CCAST    /* Nothing */
+#else /* ... */
+#define __CCAST(T) /* Nothing */
+#endif /* !... */
 
 #if !defined(__PE__) && !defined(__ELF__)
 /* Try to determine current binary format using other platform
@@ -66,11 +66,11 @@
 #else /* __REDIRECT */
 #define __PE__  1
 #endif /* !__REDIRECT */
-#else
+#else /* ... */
 #warning "Target binary format not defined. - Assuming `__ELF__'"
 #define __ELF__ 1
-#endif
-#endif
+#endif /* !... */
+#endif /* !__PE__ && !__ELF__ */
 
 #include "compiler/pp-generic.h"
 
@@ -117,9 +117,9 @@
 #define __PRIVATE_NOTHROW2(...) ()
 #define __NOTHROW(...)          (__VA_ARGS__) __PRIVATE_NOTHROW2
 #endif /* !__STDC__ */
-#else
+#else /* ... */
 #define __NOTHROW __ATTR_NOTHROW
-#endif
+#endif /* !... */
 
 /* A special variant of NOTHROW that is only applied when
  * `-fnon-call-exceptions' is disabled (NCX -- NonCallExceptions)
@@ -131,8 +131,8 @@
  * memory buffers applies for this, as the user may have defined a
  * signal handler to throw an exception upon `SIGSEGV', or the like.
  * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>) */
-#if !defined(__NO_NON_CALL_EXCEPTIONS) || \
-    (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS+0) != 0)
+#if (!defined(__NO_NON_CALL_EXCEPTIONS) || \
+     (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0))
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
 #define __NON_CALL_EXCEPTIONS 1
@@ -140,7 +140,7 @@
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_NCX /* Nothing */
 #endif /* __cplusplus */
-#else
+#else /* __NON_CALL_EXCEPTIONS */
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
 #define __NO_NON_CALL_EXCEPTIONS 1
@@ -148,7 +148,7 @@
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_NCX __CXX_NOEXCEPT
 #endif /* __cplusplus */
-#endif
+#endif /* !__NON_CALL_EXCEPTIONS */
 
 /* RPC-nothrow exceptions definition (used for functions that may only throw
  * exceptions due to the use of RPC callbacks and pthread cancellation points
@@ -183,8 +183,8 @@
 #endif /* __cplusplus */
 #endif /* __NON_CALL_EXCEPTIONS || !__NO_RPC_EXCEPTIONS */
 
-#define __untraced    /* Annotation for `if __untraced(...)' or `while __untraced(...)'
-                       * Using this macro prevents the injection of meta-data profilers
+#define __untraced    /* Annotation for `if __untraced(...)' or `while __untraced(...)' \
+                       * Using this macro prevents the injection of meta-data profilers \
                        * which would otherwise allow branches to be traced. */
 
 
@@ -208,10 +208,6 @@
 #else /* ... */
 #define __COMPILER_UNUSED(expr) (expr)
 #endif /* !... */
-
-#define __COMPILER_OFFSETAFTER(s, m) ((__SIZE_TYPE__)(&((s *)0)->m + 1))
-#define __COMPILER_CONTAINER_OF(ptr, type, member) \
-	((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
 
 #ifndef __DEFINE_PUBLIC_ALIAS
 #ifdef __COMPILER_HAVE_GCC_ASM
@@ -304,7 +300,7 @@
 #define __PUBLIC_CONST  __ATTR_DLLEXPORT
 #define __INTERN_CONST  /* Nothing */
 #endif /* !__cplusplus */
-#else
+#else /* ... */
 #if defined(__KOS__) && defined(__KERNEL__)
 #define __IMPDEF        __PUBDEF
 #elif defined(__ELF__) && defined(__WANT_NO_PLT_RELOCATIONS)
@@ -365,7 +361,7 @@
 #define __INTERN_CONST  /* nothing */
 #endif /* !__cplusplus */
 #endif /* __NO_ATTR_VISIBILITY */
-#endif
+#endif /* !... */
 
 /* COMDAT function definitions:
  * When applied to a function, an attempt will be made to ensure that multiple
@@ -642,6 +638,19 @@
 #endif /* !__cplusplus */
 #endif /* !... */
 #endif /* !__COMPILER_REDIRECT */
+
+#if defined(__SIZE_TYPE__) && defined(__UINTPTR_TYPE__)
+#define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
+#define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#elif defined(__INTELLISENSE_SIZE_TYPE__)
+/* Don't include <hybrid/typecore.h> unconditionally to keep the namespace clean (if possible) */
+#define __COMPILER_OFFSETAFTER(s, m)               ((__INTELLISENSE_SIZE_TYPE__)(&((s *)0)->m + 1))
+#define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__INTELLISENSE_SIZE_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#else /* ... */
+#include "hybrid/typecore.h"
+#define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
+#define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
+#endif /* !... */
 
 
 #endif /* !___STDINC_H */

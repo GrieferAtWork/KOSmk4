@@ -21,6 +21,7 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_EXCEPT_H 1
 
 #include <kernel/compiler.h>
+
 #include <hybrid/typecore.h>
 
 DECL_BEGIN

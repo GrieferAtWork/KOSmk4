@@ -27,6 +27,7 @@
 
 #if defined(__x86_64__) || defined(__i386__)
 #include <hybrid/atomic.h>
+#include <hybrid/typecore.h> /* __REGISTER_TYPE__ */
 
 #include <asm/intrin-arith.h>
 #include <asm/intrin-tbm.h>

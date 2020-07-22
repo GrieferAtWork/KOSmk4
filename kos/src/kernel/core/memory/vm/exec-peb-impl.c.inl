@@ -40,29 +40,29 @@ DECL_BEGIN
 #define MY_VMB_ALLOC_PEB vmb_alloc_peb64_p32
 #elif OU_POINTERSIZE == 4 && IN_POINTERSIZE == 8
 #define MY_VMB_ALLOC_PEB vmb_alloc_peb32_p64
-#else
+#else /* OU_POINTERSIZE == ... && IN_POINTERSIZE == ... */
 #error "Invalid IN/OU pointer size combination"
-#endif
+#endif /* OU_POINTERSIZE != ... || IN_POINTERSIZE != ... */
 
 #if IN_POINTERSIZE == 4
 #define IN_PTR __HYBRID_PTR32
-#define IN_UIP __UINT32_TYPE__
+#define IN_UIP uint32_t
 #elif IN_POINTERSIZE == 8
 #define IN_PTR __HYBRID_PTR64
-#define IN_UIP __UINT64_TYPE__
-#else
+#define IN_UIP uint64_t
+#else /* IN_POINTERSIZE == ... */
 #error "Invalid `IN_POINTERSIZE'"
-#endif
+#endif /* IN_POINTERSIZE != ... */
 
 #if OU_POINTERSIZE == 4
 #define OU_PTR __HYBRID_PTR32
-#define OU_UIP __UINT32_TYPE__
+#define OU_UIP uint32_t
 #elif OU_POINTERSIZE == 8
 #define OU_PTR __HYBRID_PTR64
-#define OU_UIP __UINT64_TYPE__
-#else
+#define OU_UIP uint64_t
+#else /* OU_POINTERSIZE == ... */
 #error "Invalid `OU_POINTERSIZE'"
-#endif
+#endif /* OU_POINTERSIZE == !.. */
 
 
 /* Allocate a PEB (Process Environment Block) within the given VMB,

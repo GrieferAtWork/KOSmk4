@@ -24,19 +24,22 @@
 #include "__stdinc.h"
 #ifdef __KOS_SYSTEM_HEADERS__
 #include "features.h"
+#include "hybrid/typecore.h"
 #endif /* __KOS_SYSTEM_HEADERS__ */
 
 #ifdef __CC__
-#include <stdint.h>
 #ifdef __KOS_SYSTEM_HEADERS__
 #include <bits/elf-types.h>
-#endif /* __KOS_SYSTEM_HEADERS__ */
+#ifdef __USE_GLIBC
+#include <stdint.h>
+#endif /* __USE_GLIBC */
+#else /* __KOS_SYSTEM_HEADERS__ */
+#include <stdint.h>
+#endif /* !__KOS_SYSTEM_HEADERS__ */
 #endif /* __CC__ */
 
 #ifdef __USE_KOS
 #include <bits/elf.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
 #endif /* __USE_KOS */
 
 __DECL_BEGIN
@@ -90,32 +93,72 @@ __DECL_BEGIN
 #ifndef _ELF_TYPES_DEFINED
 #define _ELF_TYPES_DEFINED 1
 /* Type for a 16-bit quantity. */
+#ifdef __UINT16_TYPE__
 typedef __UINT16_TYPE__ Elf32_Half;
 typedef __UINT16_TYPE__ Elf64_Half;
+#else /* __UINT16_TYPE__ */
+typedef uint16_t Elf32_Half;
+typedef uint16_t Elf64_Half;
+#endif /* !__UINT16_TYPE__ */
 
 /* Types for signed and unsigned 32-bit quantities. */
+#ifdef __UINT32_TYPE__
 typedef __UINT32_TYPE__ Elf32_Word;
 typedef __INT32_TYPE__  Elf32_Sword;
 typedef __UINT32_TYPE__ Elf64_Word;
 typedef __INT32_TYPE__  Elf64_Sword;
+#else /* __UINT32_TYPE__ */
+typedef uint32_t Elf32_Word;
+typedef int32_t  Elf32_Sword;
+typedef uint32_t Elf64_Word;
+typedef int32_t  Elf64_Sword;
+#endif /* !__UINT32_TYPE__ */
 
 /* Types for signed and unsigned 64-bit quantities. */
+#ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ Elf32_Xword;
 typedef __INT64_TYPE__  Elf32_Sxword;
 typedef __UINT64_TYPE__ Elf64_Xword;
 typedef __INT64_TYPE__  Elf64_Sxword;
+#else /* __UINT64_TYPE__ */
+typedef uint64_t Elf32_Xword;
+typedef int64_t  Elf32_Sxword;
+typedef uint64_t Elf64_Xword;
+typedef int64_t  Elf64_Sxword;
+#endif /* !__UINT64_TYPE__ */
 
 /* Type of addresses. */
+#ifdef __UINT32_TYPE__
 typedef __UINT32_TYPE__ Elf32_Addr;
+#else /* __UINT32_TYPE__ */
+typedef uint32_t Elf32_Addr;
+#endif /* !__UINT32_TYPE__ */
+#ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ Elf64_Addr;
+#else /* __UINT64_TYPE__ */
+typedef uint64_t Elf64_Addr;
+#endif /* !__UINT64_TYPE__ */
 
 /* Type of file offsets. */
+#ifdef __UINT32_TYPE__
 typedef __UINT32_TYPE__ Elf32_Off;
+#else /* __UINT32_TYPE__ */
+typedef uint32_t Elf32_Off;
+#endif /* !__UINT32_TYPE__ */
+#ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ Elf64_Off;
+#else /* __UINT64_TYPE__ */
+typedef uint64_t Elf64_Off;
+#endif /* !__UINT64_TYPE__ */
 
 /* Type for section indices, which are 16-bit quantities. */
+#ifdef __UINT16_TYPE__
 typedef __UINT16_TYPE__ Elf32_Section;
 typedef __UINT16_TYPE__ Elf64_Section;
+#else /* __UINT16_TYPE__ */
+typedef uint16_t Elf32_Section;
+typedef uint16_t Elf64_Section;
+#endif /* !__UINT16_TYPE__ */
 
 /* Type for version symbol information. */
 typedef Elf32_Half Elf32_Versym;
@@ -1269,20 +1312,20 @@ typedef struct elf64_vernaux /*[PREFIX(vna_)]*/ {
 #define __ALIGNOF_ELF64_AUXV     __ALIGNOF_INT64__
 #ifdef __CC__
 typedef struct elf32_auxv_t /*[NAME(elf32_auxv)][PREFIX(a_)]*/ {
-	uint32_t a_type; /* Entry type */
+	Elf32_Word a_type; /* Entry type */
 	union {
-		uint32_t a_val; /* Integer value */
-		/* We use to have pointer elements added here. We cannot do that,
+		Elf32_Word a_val; /* Integer value */
+		/* We used to have pointer elements added here. We cannot do that,
 		 * though, since it does not work when using 32-bit definitions
 		 * on 64-bit platforms and vice versa. */
 	} a_un;
 } Elf32_auxv_t;
 
 typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
-	uint64_t a_type; /* Entry type */
+	Elf64_Xword a_type; /* Entry type */
 	union {
-		uint64_t a_val; /* Integer value */
-		/* We use to have pointer elements added here. We cannot do that,
+		Elf64_Xword a_val; /* Integer value */
+		/* We used to have pointer elements added here. We cannot do that,
 		 * though, since it does not work when using 32-bit definitions
 		 * on 64-bit platforms and vice versa. */
 	} a_un;

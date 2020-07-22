@@ -47,6 +47,7 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <stdint.h> /* UINT64_C */
 #include <string.h>
 
 DECL_BEGIN

@@ -70,9 +70,9 @@
 
 #ifdef __INTELLISENSE__
 #define ASMCALL __ATTR_CDECL /* Symbolic calling convention for custom assembler functions. */
-#else
+#else /* __INTELLISENSE__ */
 #define ASMCALL /* Symbolic calling convention for custom assembler functions. */
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #define BITSOF(x) (sizeof(x)*8)
 
@@ -141,18 +141,18 @@
 
 
 #if defined(__x86_64__)
-#define FCALL   ATTR_SYSVABI
-#define KCALL   ATTR_SYSVABI
-#define VCALL   ATTR_SYSVABI
+#define FCALL ATTR_SYSVABI
+#define KCALL ATTR_SYSVABI
+#define VCALL ATTR_SYSVABI
 #elif defined(__i386__)
-#define FCALL   ATTR_FASTCALL
-#define KCALL   ATTR_STDCALL
-#define VCALL   ATTR_CDECL
-#else
-#define FCALL   /* nothing */
-#define KCALL   /* nothing */
-#define VCALL   /* nothing */
-#endif
+#define FCALL ATTR_FASTCALL
+#define KCALL ATTR_STDCALL
+#define VCALL ATTR_CDECL
+#else /* ... */
+#define FCALL /* nothing */
+#define KCALL /* nothing */
+#define VCALL /* nothing */
+#endif /* !... */
 
 
 /* Breakpoint */
@@ -161,14 +161,14 @@
 #elif defined(__INTELLISENSE__)
 FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #define BREAKPOINT        BREAKPOINT
-#else
+#else /* ... */
 #include <debugger/config.h>
 #ifndef CONFIG_NO_DEBUGGER
-#define BREAKPOINT()      ({ FUNDEF void KCALL dbg(void); dbg(); })
+#define BREAKPOINT() ({ FUNDEF void KCALL dbg(void); dbg(); })
 #else /* !CONFIG_NO_DEBUGGER */
-#define BREAKPOINT()      (void)0 /* ??? */
+#define BREAKPOINT() (void)0 /* ??? */
 #endif /* CONFIG_NO_DEBUGGER */
-#endif
+#endif /* !... */
 
 #define __COMPILER_UNIQUE_IMPL2(x, y) x##y
 #define __COMPILER_UNIQUE_IMPL(x, y) __COMPILER_UNIQUE_IMPL2(x, y)
@@ -191,7 +191,12 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
  * IS POD AND DOESN'T EVEN PROVIDE ANY CONSTRUCTORS! */
 #if __GNUC__ < 6 && !defined(__clang__)
 #undef __builtin_offsetof
+#ifdef __INTELLISENSE_SIZE_TYPE__
+#define __builtin_offsetof(s, m) ((__INTELLISENSE_SIZE_TYPE__)&((s *)0)->m)
+#else /* __INTELLISENSE_SIZE_TYPE__ */
+#include <hybrid/typecore.h>
 #define __builtin_offsetof(s, m) ((__SIZE_TYPE__)&((s *)0)->m)
+#endif /* !__INTELLISENSE_SIZE_TYPE__ */
 #endif /* __GNUC__ < 6 && !__clang__ */
 
 

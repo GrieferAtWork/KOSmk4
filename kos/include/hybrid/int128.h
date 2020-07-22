@@ -55,9 +55,9 @@
 #define __hybrid_uint128_vec32_significand(var, i) __hybrid_uint128_vec32(var)[3 - (i)]
 #define __hybrid_int128_vec64_significand(var, i)  __hybrid_int128_vec64(var)[1 - (i)]
 #define __hybrid_uint128_vec64_significand(var, i) __hybrid_uint128_vec64(var)[1 - (i)]
-#else
+#else /* __BYTE_ORDER__ == ... */
 #error "Unsupported byteorder"
-#endif
+#endif /* __BYTE_ORDER__ != ... */
 
 #define __hybrid_int128_get8(var)      ((__INT8_TYPE__)(var))
 #define __hybrid_int128_set8(var, v)   ((var) = (__INT128_TYPE__)(__INT8_TYPE__)(v))

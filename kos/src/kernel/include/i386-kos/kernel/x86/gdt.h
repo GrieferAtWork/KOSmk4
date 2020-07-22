@@ -81,7 +81,7 @@ LOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
 LOCAL void KCALL set_user_gsbase(uintptr_t value) {
 	/* We must write the KERNEL_GS_BASE MSR here, as it
 	 * currently contains the effective user-space GS-base */
-	__wrmsr(IA32_KERNEL_GS_BASE, (__UINT64_TYPE__)value);
+	__wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)value);
 }
 
 LOCAL void KCALL update_user_fsbase(void) {

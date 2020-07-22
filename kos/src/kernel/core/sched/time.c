@@ -36,6 +36,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/typecore.h>
 
 #include <kos/jiffies.h>
 #include <sys/param.h> /* HZ */

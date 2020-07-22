@@ -21,13 +21,31 @@
 #define _LINUX_TYPES_H 1
 
 #include <__stdinc.h>
-#include <asm/types.h>
+
 #include <hybrid/typecore.h>
+
 #include "posix_types.h"
 
 __DECL_BEGIN
 
 #ifdef __CC__
+
+#ifndef ____s8_defined
+#define ____s8_defined 1
+typedef __INT8_TYPE__ __s8;
+typedef __UINT8_TYPE__ __u8;
+typedef __INT16_TYPE__ __s16;
+typedef __UINT16_TYPE__ __u16;
+typedef __INT32_TYPE__ __s32;
+typedef __UINT32_TYPE__ __u32;
+#ifdef __INT64_TYPE__
+typedef __INT64_TYPE__ __s64;
+#endif /* __INT64_TYPE__ */
+#ifdef __UINT64_TYPE__
+typedef __UINT64_TYPE__ __u64;
+#endif /* __UINT64_TYPE__ */
+#endif /* !____s8_defined */
+
 #ifndef ____le8_defined
 #define ____le8_defined 1
 #ifdef __INTELLISENSE__
@@ -42,7 +60,7 @@ typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,__UINT32_TYPE_
 typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,__UINT64_TYPE__> __le64;
 typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,__UINT64_TYPE__> __be64;
 #endif /* __UINT64_TYPE__ */
-#else
+#else /* __INTELLISENSE__ */
 
 #ifndef __bitwise__
 #ifdef __CHECKER__
@@ -70,7 +88,7 @@ typedef __bitwise __UINT32_TYPE__ __be32;
 typedef __bitwise __UINT64_TYPE__ __le64;
 typedef __bitwise __UINT64_TYPE__ __be64;
 #endif /* __UINT64_TYPE__ */
-#endif
+#endif /* !__INTELLISENSE__ */
 #endif /* !____le8_defined */
 
 typedef __UINT16_TYPE__ __sum16;
