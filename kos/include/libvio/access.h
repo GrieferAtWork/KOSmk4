@@ -105,7 +105,9 @@ LIBVIO_DECL __ATTR_NONNULL((1)) __uint16_t LIBVIO_CC vio_xorw(struct vio_args *_
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint32_t LIBVIO_CC vio_xorl(struct vio_args *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic) __THROWS(...);
 #endif /* LIBVIO_WANT_PROTOTYPES */
 
-/* Copy memory to/from VIO */
+/* Copy memory to/from VIO, or exchange memory with VIO
+ * NOTE: `oldbuf' and `newbuf' may no overlap, though with the exception that they are allowed to be identical */
+typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_XCHWITHVIO)(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void *oldbuf, __USER __CHECKED void const *newbuf, __size_t num_bytes, __BOOL atomic) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO)(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYTOVIO)(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_MEMSET)(struct vio_args *__restrict args, vio_addr_t offset, int byte, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
@@ -114,6 +116,7 @@ typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO_TO_PHYS)(struct vi
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYTOVIO_FROM_PHYS)(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, __size_t num_bytes) /*__THROWS(...)*/;
 #endif /* __KERNEL__ */
 #ifdef LIBVIO_WANT_PROTOTYPES
+LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_xchwithvio(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void *oldbuf, __USER __CHECKED void const *newbuf, __size_t num_bytes, __BOOL atomic) __THROWS(E_SEGFAULT, ...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_memset(struct vio_args *__restrict args, vio_addr_t offset, int byte, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
@@ -124,39 +127,39 @@ LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio_from_phys(struct vi
 #endif /* LIBVIO_WANT_PROTOTYPES */
 
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_CMPXCHQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_CMPXCHQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic) /*__THROWS(...)*/;
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
-typedef __ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *PVIO_CMPXCHX)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, bool atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *PVIO_CMPXCHX)(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic) /*__THROWS(...)*/;
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_CMPXCH_OR_WRITEQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_CMPXCH_OR_WRITEQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic) /*__THROWS(...)*/;
 typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_READQ)(struct vio_args *__restrict args, vio_addr_t addr) /*__THROWS(...)*/;
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_WRITEQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_XCHQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t newvalue, bool atomic) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_ADDQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, bool atomic) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_SUBQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, bool atomic) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_ANDQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, bool atomic) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_ORQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, bool atomic) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_XORQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, bool atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_XCHQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t newvalue, __BOOL atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_ADDQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_SUBQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_ANDQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_ORQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *PVIO_XORQ)(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic) /*__THROWS(...)*/;
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #ifdef LIBVIO_WANT_PROTOTYPES
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_cmpxchq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_cmpxchq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic) __THROWS(...);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
-LIBVIO_DECL __ATTR_NONNULL((1)) __hybrid_uint128_t LIBVIO_CC vio_cmpxchx(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, bool atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __hybrid_uint128_t LIBVIO_CC vio_cmpxchx(struct vio_args *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic) __THROWS(...);
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_cmpxch_or_writeq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, bool atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_cmpxch_or_writeq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic) __THROWS(...);
 LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_readq(struct vio_args *__restrict args, vio_addr_t addr) __THROWS(...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_writeq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_xchq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t newvalue, bool atomic) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_addq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, bool atomic) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_subq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, bool atomic) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_andq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, bool atomic) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_orq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, bool atomic) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_xorq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, bool atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_xchq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t newvalue, __BOOL atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_addq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_subq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_andq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_orq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) __uint64_t LIBVIO_CC vio_xorq(struct vio_args *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic) __THROWS(...);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 #endif /* LIBVIO_WANT_PROTOTYPES */
 

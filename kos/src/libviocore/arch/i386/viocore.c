@@ -65,6 +65,7 @@ opt.append("-Os");
 #include <kos/types.h>
 #include <sys/syslog.h>
 
+#include <assert.h>
 #include <int128.h>
 #include <limits.h>
 #include <stdint.h>
@@ -164,24 +165,161 @@ libviocore_complete_except(struct vio_emulate_args *__restrict self,
 #define VALRDWR(addr, num_bytes) (void)0
 #endif /* !__KERNEL__ */
 
+union word16 {
+	u16 w;
+	u8 b[2];
+};
+union word32 {
+	u32 l;
+	u16 w[2];
+	u8 b[4];
+};
+union word64 {
+	u64 q;
+	u32 l[2];
+	u16 w[4];
+	u8 b[8];
+};
 
 
-#if 1
-#define CHK_VIO_ADDR(self, addr) ((addr) >= self->vea_ptrlo && (addr) <= self->vea_ptrhi)
-#define GET_VIO_ADDR(self, addr) (self->vea_addr + (size_t)((byte_t *)(addr) - (byte_t *)self->vea_ptrlo))
-#else
-#define CHK_VIO_ADDR(self, addr) ((addr) == self->vea_ptrlo)
-#define GET_VIO_ADDR(self, addr) (self->vea_addr)
-#endif
+
+#define GET_VIO_ADDR(self, addr) \
+	((self)->vea_addr + (size_t)((byte_t *)(addr) - (byte_t *)(self)->vea_ptrlo))
+
+/* Check if `addr...+=num_bytes' is entirely within the VIO address range. */
+#define IS_VIO_ADDR_FULL(self, addr, num_bytes) \
+	((addr) >= (self)->vea_ptrlo && ((byte_t *)(addr) + (num_bytes)-1) <= (byte_t *)(self)->vea_ptrhi)
+
+/* Check if `addr...+=num_bytes' is partially within the VIO address range. */
+#define IS_VIO_ADDR_PART(self, addr, num_bytes) \
+	((addr) <= (self)->vea_ptrhi && ((byte_t *)(addr) + (num_bytes)-1) >= (byte_t *)(self)->vea_ptrlo)
+
+/* Read VIO memory with a partial overlap between `addr...+=num_bytes',
+ * and the VIO address range `self->vea_ptrlo...self->vea_ptrhi' */
+PRIVATE NONNULL((1)) void CC
+libviocore_read_with_partial_overlap(struct vio_emulate_args *__restrict self,
+                                     __USER __UNCHECKED void const *addr,
+                                     size_t num_bytes, void *resbuf) {
+	assert(!IS_VIO_ADDR_FULL(self, addr, num_bytes));
+	assert(IS_VIO_ADDR_PART(self, addr, num_bytes));
+	if (addr < self->vea_ptrlo) {
+		/* Read from lower end. */
+		size_t before_vio;
+		before_vio = (size_t)((byte_t *)self->vea_ptrlo - (byte_t *)addr);
+		/*assert(before_vio < num_bytes);*/
+		VALRD(addr, before_vio);
+		resbuf = mempcpy(resbuf, addr, before_vio);
+		/* Copy the remainder from VIO memory */
+		vio_copyfromvio(&self->vea_args, self->vea_addr,
+		                resbuf, num_bytes - before_vio);
+	} else {
+		size_t within_vio;
+		void const *pafter_vio;
+		/* Read from upper end. */
+		within_vio = (size_t)((byte_t *)self->vea_ptrhi - (byte_t *)addr) + 1;
+		pafter_vio = (byte_t const *)self->vea_ptrhi + 1;
+		/*assert(within_vio < num_bytes);*/
+		VALRD(pafter_vio, num_bytes - within_vio);
+		memcpy((byte_t *)resbuf + within_vio,
+		       pafter_vio, num_bytes - within_vio);
+		/* Copy the remainder from VIO memory */
+		vio_copyfromvio(&self->vea_args, GET_VIO_ADDR(self, addr),
+		                resbuf, within_vio);
+	}
+}
+
+/* Write VIO memory with a partial overlap between `addr...+=num_bytes',
+ * and the VIO address range `self->vea_ptrlo...self->vea_ptrhi' */
+PRIVATE NONNULL((1)) void CC
+libviocore_write_with_partial_overlap(struct vio_emulate_args *__restrict self,
+                                      __USER __UNCHECKED void *addr,
+                                      size_t num_bytes, void const *srcbuf) {
+	assert(!IS_VIO_ADDR_FULL(self, addr, num_bytes));
+	assert(IS_VIO_ADDR_PART(self, addr, num_bytes));
+	if (addr < self->vea_ptrlo) {
+		/* Read from lower end. */
+		size_t before_vio;
+		before_vio = (size_t)((byte_t *)self->vea_ptrlo - (byte_t *)addr);
+		/*assert(before_vio < num_bytes);*/
+		VALWR(addr, before_vio);
+		memcpy(addr, srcbuf, before_vio);
+		/* Copy the remainder from VIO memory */
+		vio_copytovio(&self->vea_args, self->vea_addr,
+		              (byte_t *)srcbuf + before_vio,
+		              num_bytes - before_vio);
+	} else {
+		size_t within_vio;
+		void *pafter_vio;
+		/* Read from upper end. */
+		within_vio = (size_t)((byte_t *)self->vea_ptrhi - (byte_t *)addr) + 1;
+		pafter_vio = (byte_t *)self->vea_ptrhi + 1;
+		/*assert(within_vio < num_bytes);*/
+		VALRD(pafter_vio, num_bytes - within_vio);
+		memcpy(pafter_vio, (byte_t const *)srcbuf + within_vio,
+		       num_bytes - within_vio);
+		/* Copy the remainder from VIO memory */
+		vio_copytovio(&self->vea_args,
+		              GET_VIO_ADDR(self, addr),
+		              srcbuf, within_vio);
+	}
+}
+
+/* Read `VIO memory with a partial overlap between `addr...+=num_bytes',
+ * and the VIO address range `self->vea_ptrlo...self->vea_ptrhi' into
+ * `oldbuf', before copying `newbuf' into the overlap-area.
+ * NOTE: `oldbuf' and `newbuf' are not allowed to overlap, or be the same! */
+PRIVATE NONNULL((1)) void CC
+libviocore_xch_with_partial_overlap(struct vio_emulate_args *__restrict self,
+                                    __USER __UNCHECKED void *addr, size_t num_bytes,
+                                    void *__restrict oldbuf,
+                                    void const *__restrict newbuf) {
+	assert(!IS_VIO_ADDR_FULL(self, addr, num_bytes));
+	assert(IS_VIO_ADDR_PART(self, addr, num_bytes));
+	if (addr < self->vea_ptrlo) {
+		/* Read from lower end. */
+		size_t before_vio;
+		before_vio = (size_t)((byte_t *)self->vea_ptrlo - (byte_t *)addr);
+		/*assert(before_vio < num_bytes);*/
+		VALWR(addr, before_vio);
+		memcpy(oldbuf, addr, before_vio);
+		memcpy(addr, newbuf, before_vio);
+		/* Copy the remainder from VIO memory */
+		vio_xchwithvio(&self->vea_args,
+		               self->vea_addr,
+		               (byte_t *)oldbuf + before_vio,
+		               (byte_t *)newbuf + before_vio,
+		               num_bytes - before_vio,
+		               false);
+	} else {
+		size_t within_vio, after_vio;
+		void *pafter_vio;
+		/* Read from upper end. */
+		within_vio = (size_t)((byte_t *)self->vea_ptrhi - (byte_t *)addr) + 1;
+		pafter_vio = (byte_t *)self->vea_ptrhi + 1;
+		/*assert(within_vio < num_bytes);*/
+		after_vio = num_bytes - within_vio;
+		VALRD(pafter_vio, after_vio);
+		memcpy((byte_t *)oldbuf + within_vio, pafter_vio, after_vio);
+		memcpy(pafter_vio, (byte_t *)newbuf + within_vio, after_vio);
+		/* Copy the remainder from VIO memory */
+		vio_xchwithvio(&self->vea_args,
+		               GET_VIO_ADDR(self, addr),
+		               oldbuf,
+		               newbuf,
+		               within_vio,
+		               false);
+	}
+}
+
 
 
 #define EMU86_MEMREADB(addr) \
 	libviocore_readb(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u8 CC
 libviocore_readb(struct vio_emulate_args *__restrict self,
-                 __USER __CHECKED void const *addr) {
+                 __USER __UNCHECKED void const *addr) {
 	u8 result;
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_readb(&self->vea_args, GET_VIO_ADDR(self, addr));
 	else {
 		VALRD(addr, 1);
@@ -191,14 +329,17 @@ libviocore_readb(struct vio_emulate_args *__restrict self,
 	return result;
 }
 
+
 #define EMU86_MEMREADW(addr) \
 	libviocore_readw(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u16 CC
 libviocore_readw(struct vio_emulate_args *__restrict self,
-                 __USER __CHECKED void const *addr) {
+                 __USER __UNCHECKED void const *addr) {
 	u16 result;
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_readw(&self->vea_args, GET_VIO_ADDR(self, addr));
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2))
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
 	else {
 		VALRD(addr, 2);
 		result = *(u16 const *)addr;
@@ -211,10 +352,12 @@ libviocore_readw(struct vio_emulate_args *__restrict self,
 	libviocore_readl(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u32 CC
 libviocore_readl(struct vio_emulate_args *__restrict self,
-                 __USER __CHECKED void const *addr) {
+                 __USER __UNCHECKED void const *addr) {
 	u32 result;
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_readl(&self->vea_args, GET_VIO_ADDR(self, addr));
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4))
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
 	else {
 		VALRD(addr, 4);
 		result = *(u32 const *)addr;
@@ -228,10 +371,12 @@ libviocore_readl(struct vio_emulate_args *__restrict self,
 	libviocore_readq(self, (void const *)(uintptr_t)(addr))
 PRIVATE NONNULL((1)) u64 CC
 libviocore_readq(struct vio_emulate_args *__restrict self,
-                 __USER __CHECKED void const *addr) {
+                 __USER __UNCHECKED void const *addr) {
 	u64 result;
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_readq(&self->vea_args, GET_VIO_ADDR(self, addr));
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8))
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
 	else {
 		VALRD(addr, 8);
 		result = *(u64 const *)addr;
@@ -245,8 +390,8 @@ libviocore_readq(struct vio_emulate_args *__restrict self,
 	libviocore_writeb(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writeb(struct vio_emulate_args *__restrict self,
-                  __USER __CHECKED void *addr, u8 value) {
-	if likely(CHK_VIO_ADDR(self, addr))
+                  __USER __UNCHECKED void *addr, u8 value) {
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		vio_writeb(&self->vea_args, GET_VIO_ADDR(self, addr), value);
 	else {
 		VALWR(addr, 1);
@@ -259,9 +404,11 @@ libviocore_writeb(struct vio_emulate_args *__restrict self,
 	libviocore_writew(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writew(struct vio_emulate_args *__restrict self,
-                  __USER __CHECKED void *addr, u16 value) {
-	if likely(CHK_VIO_ADDR(self, addr))
+                  __USER __UNCHECKED void *addr, u16 value) {
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		vio_writew(&self->vea_args, GET_VIO_ADDR(self, addr), value);
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2))
+		libviocore_write_with_partial_overlap(self, addr, 2, &value);
 	else {
 		VALWR(addr, 2);
 		*(u16 *)addr = value;
@@ -273,9 +420,11 @@ libviocore_writew(struct vio_emulate_args *__restrict self,
 	libviocore_writel(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writel(struct vio_emulate_args *__restrict self,
-                  __USER __CHECKED void *addr, u32 value) {
-	if likely(CHK_VIO_ADDR(self, addr))
+                  __USER __UNCHECKED void *addr, u32 value) {
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		vio_writel(&self->vea_args, GET_VIO_ADDR(self, addr), value);
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4))
+		libviocore_write_with_partial_overlap(self, addr, 4, &value);
 	else {
 		VALWR(addr, 4);
 		*(u32 *)addr = value;
@@ -288,9 +437,11 @@ libviocore_writel(struct vio_emulate_args *__restrict self,
 	libviocore_writeq(self, (void *)(uintptr_t)(addr), v)
 PRIVATE NONNULL((1)) void CC
 libviocore_writeq(struct vio_emulate_args *__restrict self,
-                  __USER __CHECKED void *addr, u64 value) {
-	if likely(CHK_VIO_ADDR(self, addr))
+                  __USER __UNCHECKED void *addr, u64 value) {
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		vio_writeq(&self->vea_args, GET_VIO_ADDR(self, addr), value);
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8))
+		libviocore_write_with_partial_overlap(self, addr, 8, &value);
 	else {
 		VALWR(addr, 8);
 		*(u64 *)addr = value;
@@ -303,11 +454,11 @@ libviocore_writeq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchb(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
-                       __USER __CHECKED void *addr, u8 value,
+                       __USER __UNCHECKED void *addr, u8 value,
                        bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_xchb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -326,13 +477,17 @@ libviocore_atomic_xchb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchw(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
-                       __USER __CHECKED void *addr, u16 value,
+                       __USER __UNCHECKED void *addr, u16 value,
                        bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_xchw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_xch_with_partial_overlap(self, addr, 2, &result, &value);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u16 *)addr, value);
@@ -349,13 +504,17 @@ libviocore_atomic_xchw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchl(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
-                       __USER __CHECKED void *addr, u32 value,
+                       __USER __UNCHECKED void *addr, u32 value,
                        bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_xchl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_xch_with_partial_overlap(self, addr, 4, &result, &value);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u32 *)addr, value);
@@ -373,13 +532,17 @@ libviocore_atomic_xchl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_xchq(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
-                       __USER __CHECKED void *addr, u64 value,
+                       __USER __UNCHECKED void *addr, u64 value,
                        bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_xchq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_xch_with_partial_overlap(self, addr, 7, &result, &value);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_XCH(*(u64 *)addr, value);
@@ -397,11 +560,11 @@ libviocore_atomic_xchq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddb(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u8 value,
+                            __USER __UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_addb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -420,13 +583,20 @@ libviocore_atomic_fetchaddb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddw(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u16 value,
+                            __USER __UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_addw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		u16 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
+		newval = result + value;
+		libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u16 *)addr, value);
@@ -443,13 +613,20 @@ libviocore_atomic_fetchaddw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddl(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u32 value,
+                            __USER __UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_addl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		u32 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
+		newval = result + value;
+		libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u32 *)addr, value);
@@ -467,13 +644,20 @@ libviocore_atomic_fetchaddl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchaddq(self, (void *)(uintptr_t)(addr), addend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u64 value,
+                            __USER __UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_addq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		u64 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
+		newval = result + value;
+		libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_FETCHADD(*(u64 *)addr, value);
@@ -491,11 +675,11 @@ libviocore_atomic_fetchaddq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubb(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u8 value,
+                            __USER __UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_subb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -514,13 +698,20 @@ libviocore_atomic_fetchsubb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubw(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u16 value,
+                            __USER __UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_subw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		u16 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
+		newval = result - value;
+		libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u16 *)addr, value);
@@ -537,13 +728,20 @@ libviocore_atomic_fetchsubw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubl(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u32 value,
+                            __USER __UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_subl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		u32 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
+		newval = result - value;
+		libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u32 *)addr, value);
@@ -561,13 +759,20 @@ libviocore_atomic_fetchsubl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchsubq(self, (void *)(uintptr_t)(addr), subend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u64 value,
+                            __USER __UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_subq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		u64 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
+		newval = result - value;
+		libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_FETCHSUB(*(u64 *)addr, value);
@@ -585,11 +790,11 @@ libviocore_atomic_fetchsubq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandb(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u8 value,
+                            __USER __UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_andb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -608,13 +813,20 @@ libviocore_atomic_fetchandb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandw(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u16 value,
+                            __USER __UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_andw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		u16 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
+		newval = result & value;
+		libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u16 *)addr, value);
@@ -631,13 +843,20 @@ libviocore_atomic_fetchandw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandl(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u32 value,
+                            __USER __UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_andl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		u32 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
+		newval = result & value;
+		libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u32 *)addr, value);
@@ -655,13 +874,20 @@ libviocore_atomic_fetchandl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchandq(self, (void *)(uintptr_t)(addr), andend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u64 value,
+                            __USER __UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_andq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		u64 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
+		newval = result & value;
+		libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_FETCHAND(*(u64 *)addr, value);
@@ -679,11 +905,11 @@ libviocore_atomic_fetchandq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorb(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u8 value,
+                            __USER __UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_orb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -702,13 +928,20 @@ libviocore_atomic_fetchorb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorw(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u16 value,
+                            __USER __UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_orw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		u16 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
+		newval = result | value;
+		libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u16 *)addr, value);
@@ -725,13 +958,20 @@ libviocore_atomic_fetchorw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorl(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u32 value,
+                            __USER __UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_orl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		u32 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
+		newval = result | value;
+		libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u32 *)addr, value);
@@ -749,13 +989,20 @@ libviocore_atomic_fetchorl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchorq(self, (void *)(uintptr_t)(addr), orend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u64 value,
+                            __USER __UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_orq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		u64 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
+		newval = result | value;
+		libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_FETCHOR(*(u64 *)addr, value);
@@ -773,11 +1020,11 @@ libviocore_atomic_fetchorq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorb(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u8 value,
+                            __USER __UNCHECKED void *addr, u8 value,
                             bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_xorb(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -796,13 +1043,20 @@ libviocore_atomic_fetchxorb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorw(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u16 value,
+                            __USER __UNCHECKED void *addr, u16 value,
                             bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_xorw(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		u16 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
+		newval = result ^ value;
+		libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u16 *)addr, value);
@@ -819,13 +1073,20 @@ libviocore_atomic_fetchxorw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorl(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u32 value,
+                            __USER __UNCHECKED void *addr, u32 value,
                             bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_xorl(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		u32 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
+		newval = result ^ value;
+		libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u32 *)addr, value);
@@ -843,13 +1104,20 @@ libviocore_atomic_fetchxorl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_fetchxorq(self, (void *)(uintptr_t)(addr), xorend, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
-                            __USER __CHECKED void *addr, u64 value,
+                            __USER __UNCHECKED void *addr, u64 value,
                             bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_xorq(&self->vea_args, GET_VIO_ADDR(self, addr), value, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		u64 newval;
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
+		newval = result ^ value;
+		libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_FETCHXOR(*(u64 *)addr, value);
@@ -867,11 +1135,11 @@ libviocore_atomic_fetchxorq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u8 CC
 libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
-                          __USER __CHECKED void *addr,
+                          __USER __UNCHECKED void *addr,
                           u8 oldval, u8 newval, bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_cmpxchb(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -892,13 +1160,19 @@ libviocore_atomic_cmpxchb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchw(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u16 CC
 libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
-                          __USER __CHECKED void *addr,
+                          __USER __UNCHECKED void *addr,
                           u16 oldval, u16 newval, bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_cmpxchw(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_read_with_partial_overlap(self, addr, 2, &result);
+		if (result == oldval)
+			libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
@@ -917,13 +1191,19 @@ libviocore_atomic_cmpxchw(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchl(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u32 CC
 libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
-                          __USER __CHECKED void *addr,
+                          __USER __UNCHECKED void *addr,
                           u32 oldval, u32 newval, bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_cmpxchl(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_read_with_partial_overlap(self, addr, 4, &result);
+		if (result == oldval)
+			libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
@@ -942,13 +1222,19 @@ libviocore_atomic_cmpxchl(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchq(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
-                          __USER __CHECKED void *addr,
+                          __USER __UNCHECKED void *addr,
                           u64 oldval, u64 newval, bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_cmpxchq(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_read_with_partial_overlap(self, addr, 8, &result);
+		if (result == oldval)
+			libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
@@ -968,11 +1254,11 @@ libviocore_atomic_cmpxchq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writeb(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
-                                   __USER __CHECKED void *addr,
+                                   __USER __UNCHECKED void *addr,
                                    u8 oldval, u8 newval, bool force_atomic) {
 	u8 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 1))
 		result = vio_cmpxch_or_writeb(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
 	else {
 		VALRDWR(addr, 1);
@@ -994,13 +1280,18 @@ libviocore_atomic_cmpxch_or_writeb(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writew(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
-                                   __USER __CHECKED void *addr,
+                                   __USER __UNCHECKED void *addr,
                                    u16 oldval, u16 newval, bool force_atomic) {
 	u16 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 2))
 		result = vio_cmpxch_or_writew(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 2)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 2);
+		libviocore_write_with_partial_overlap(self, addr, 2, &newval);
+		return true;
+	} else {
 		VALRDWR(addr, 2);
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u16 *)addr, oldval, newval);
@@ -1017,13 +1308,18 @@ libviocore_atomic_cmpxch_or_writew(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writel(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) bool CC
 libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
-                                   __USER __CHECKED void *addr,
+                                   __USER __UNCHECKED void *addr,
                                    u32 oldval, u32 newval, bool force_atomic) {
 	u32 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 4))
 		result = vio_cmpxch_or_writel(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 4)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 4);
+		libviocore_write_with_partial_overlap(self, addr, 4, &newval);
+		return true;
+	} else {
 		VALRDWR(addr, 4);
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u32 *)addr, oldval, newval);
@@ -1041,13 +1337,18 @@ libviocore_atomic_cmpxch_or_writel(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxch_or_writeq(self, (void *)(uintptr_t)(addr), oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) u64 CC
 libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
-                                   __USER __CHECKED void *addr,
+                                   __USER __UNCHECKED void *addr,
                                    u64 oldval, u64 newval, bool force_atomic) {
 	u64 result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr))
+	if likely(IS_VIO_ADDR_FULL(self, addr, 8))
 		result = vio_cmpxch_or_writeq(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
-	else {
+	else if unlikely(IS_VIO_ADDR_PART(self, addr, 8)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 8);
+		libviocore_write_with_partial_overlap(self, addr, 8, &newval);
+		return true;
+	} else {
 		VALRDWR(addr, 8);
 		if (force_atomic)
 			result = ATOMIC_CMPXCH(*(u64 *)addr, oldval, newval);
@@ -1064,12 +1365,18 @@ libviocore_atomic_cmpxch_or_writeq(struct vio_emulate_args *__restrict self,
 	libviocore_atomic_cmpxchx(self, addr, oldval, newval, force_atomic)
 PRIVATE NONNULL((1)) uint128_t CC
 libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
-                          __USER __CHECKED void *addr,
+                          __USER __UNCHECKED void *addr,
                           uint128_t oldval, uint128_t newval, bool force_atomic) {
 	uint128_t result;
 	COMPILER_BARRIER();
-	if likely(CHK_VIO_ADDR(self, addr)) {
+	if likely(IS_VIO_ADDR_FULL(self, addr, 16)) {
 		result = vio_cmpxchx(&self->vea_args, GET_VIO_ADDR(self, addr), oldval, newval, force_atomic);
+	} else if unlikely(IS_VIO_ADDR_PART(self, addr, 16)) {
+		if unlikely(force_atomic)
+			THROW(E_SEGFAULT_UNALIGNED, addr, E_SEGFAULT_CONTEXT_VIO, 16);
+		libviocore_read_with_partial_overlap(self, addr, 16, &result);
+		if (uint128_eq128(result, oldval))
+			libviocore_write_with_partial_overlap(self, addr, 16, &newval);
 	} else {
 		VALRDWR(addr, 16);
 		if (force_atomic) {

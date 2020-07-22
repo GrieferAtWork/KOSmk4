@@ -596,7 +596,7 @@ myvio_readl(struct vio_args *__restrict args, vio_addr_t addr) {
 }
 
 PRIVATE struct vio_operators const myvio_ops = {
-	/* .vo_read = */ { NULL, NULL, &myvio_readl },
+	/* .vo_read = */ VIO_CALLBACK_INIT_READ(NULL, NULL, &myvio_readl, NULL),
 };
 
 int main_vio(int argc, char *argv[], char *envp[]) {

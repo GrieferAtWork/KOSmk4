@@ -959,7 +959,7 @@ _do_writex_vo_cmpxch(struct vio_operators const *__restrict ops,
 	uint128_t oldval;
 	uint128_setzero(oldval);
 	for (;;) {
-		u64 real_oldval;
+		uint128_t real_oldval;
 		real_oldval = (*ops->vo_cmpxch.f_xword)(args, addr, oldval, value, false);
 		if (int128_eq128(real_oldval, oldval))
 			break;
@@ -1497,7 +1497,107 @@ libvio_cmpxch_or_writeq(struct vio_args *__restrict args,
 
 
 
-/* Copy memory to/from VIO */
+/* Copy memory to/from VIO, or exchange memory with VIO
+ * NOTE: `oldbuf' and `newbuf' may no overlap, though with the exception that they are allowed to be identical */
+INTERN NONNULL((1)) void CC
+libvio_xchwithvio(struct vio_args *__restrict args,
+                  vio_addr_t offset,
+                  __USER __CHECKED void *oldbuf,
+                  __USER __CHECKED void const *newbuf, 
+                  size_t num_bytes, bool atomic)
+		__THROWS(E_SEGFAULT, ...) {
+	if (!num_bytes)
+		return;
+	if (offset & 1) {
+		u8 temp;
+		temp = libvio_xchb(args, offset,
+		                   *(u8 const *)newbuf,
+		                   atomic);
+		*(u8 *)oldbuf = temp;
+		oldbuf = (byte_t *)oldbuf + 1;
+		newbuf = (byte_t *)newbuf + 1;
+		--num_bytes;
+		++offset;
+	}
+	if ((offset & 2) && num_bytes >= 2) {
+		u16 temp;
+		temp = libvio_xchw(args, offset,
+		                   UNALIGNED_GET16((u16 *)oldbuf),
+		                   atomic);
+		UNALIGNED_SET16((u16 *)newbuf, temp);
+		oldbuf = (byte_t *)oldbuf + 2;
+		newbuf = (byte_t *)newbuf + 2;
+		num_bytes -= 2;
+		offset += 2;
+	}
+#ifdef LIBVIO_CONFIG_HAVE_QWORD
+	if ((offset & 4) && num_bytes >= 4) {
+		u32 temp;
+		temp = libvio_xchl(args, offset,
+		                   UNALIGNED_GET32((u32 *)oldbuf),
+		                   atomic);
+		UNALIGNED_SET32((u32 *)newbuf, temp);
+		oldbuf = (byte_t *)oldbuf + 4;
+		newbuf = (byte_t *)newbuf + 4;
+		num_bytes -= 4;
+		offset += 4;
+	}
+	while (num_bytes >= 8) {
+		u64 temp;
+		temp = libvio_xchq(args, offset,
+		                   UNALIGNED_GET64((u64 *)oldbuf),
+		                   atomic);
+		UNALIGNED_SET64((u64 *)newbuf, temp);
+		oldbuf = (byte_t *)oldbuf + 8;
+		newbuf = (byte_t *)newbuf + 8;
+		num_bytes -= 8;
+		offset += 8;
+	}
+	if (num_bytes >= 4) {
+		u32 temp;
+		temp = libvio_xchl(args, offset,
+		                   UNALIGNED_GET32((u32 *)oldbuf),
+		                   atomic);
+		UNALIGNED_SET32((u32 *)newbuf, temp);
+		oldbuf = (byte_t *)oldbuf + 4;
+		newbuf = (byte_t *)newbuf + 4;
+		num_bytes -= 4;
+		offset += 4;
+	}
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
+	while (num_bytes >= 4) {
+		u32 temp;
+		temp = libvio_xchl(args, offset,
+		                   UNALIGNED_GET32((u32 *)oldbuf),
+		                   atomic);
+		UNALIGNED_SET32((u32 *)newbuf, temp);
+		oldbuf = (byte_t *)oldbuf + 4;
+		newbuf = (byte_t *)newbuf + 4;
+		num_bytes -= 4;
+		offset += 4;
+	}
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
+	assert(num_bytes <= 3);
+	if (num_bytes >= 2) {
+		u16 temp;
+		temp = libvio_xchw(args, offset,
+		                   UNALIGNED_GET16((u16 *)oldbuf),
+		                   atomic);
+		UNALIGNED_SET16((u16 *)newbuf, temp);
+		oldbuf = (byte_t *)oldbuf + 2;
+		newbuf = (byte_t *)newbuf + 2;
+		num_bytes -= 2;
+		offset += 2;
+	}
+	if (num_bytes) {
+		u8 temp;
+		temp = libvio_xchb(args, offset,
+		                   *(u8 *)oldbuf,
+		                   atomic);
+		*(u8 *)newbuf = temp;
+	}
+}
+
 INTERN NONNULL((1)) void CC
 libvio_copyfromvio(struct vio_args *__restrict args,
                    vio_addr_t offset,
@@ -1507,18 +1607,66 @@ libvio_copyfromvio(struct vio_args *__restrict args,
 	if (!num_bytes)
 		return;
 	if (offset & 1) {
-		u8 temp = libvio_readb_aligned(args, offset);
-		*(u8 *)buf = temp;
-		buf = (byte_t *)buf + 1;
-		--num_bytes;
-		++offset;
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) && __SIZEOF_BUSINT__ >= 8
+		if (!(offset & 6) && num_bytes >= 7) {
+			/* Of a word:    WWWWWWWW
+			 * we only want:  RRRRRRR */
+			qword q;
+			q.q = libvio_readq_aligned(args, offset - 1);
+			buf = mempcpy(buf, q.b + 1, 7);
+			num_bytes -= 7;
+			offset += 7;
+		} else if (!(offset & 4) && num_bytes >= 5) {
+			/* Of a word:    WWWWWWWW
+			 * we only want:    RRRRR */
+			qword q;
+			q.q = libvio_readq_aligned(args, offset - 3);
+			buf = mempcpy(buf, q.b + 3, 5);
+			num_bytes -= 5;
+			offset += 5;
+		} else
+#endif /* LIBVIO_CONFIG_HAVE_QWORD && __SIZEOF_BUSINT__ >= 8 */
+#if __SIZEOF_BUSINT__ >= 4
+		if (!(offset & 2) && num_bytes >= 3) {
+			/* Of a word:    WWWW
+			 * we only want:  RRR */
+			dword d;
+			d.l = libvio_readl_aligned(args, offset - 1);
+			memcpy(buf, d.b + 1, 3);
+			buf = (byte_t *)buf + 3;
+			num_bytes -= 3;
+			offset += 3;
+		} else
+#endif /* __SIZEOF_BUSINT__ >= 4 */
+		{
+			u8 temp;
+			temp = libvio_readb_aligned(args, offset);
+			*(u8 *)buf = temp;
+			buf = (byte_t *)buf + 1;
+			--num_bytes;
+			++offset;
+		}
 	}
 	if ((offset & 2) && num_bytes >= 2) {
-		u16 temp = libvio_readw_aligned(args, offset);
-		UNALIGNED_SET16((u16 *)buf, temp);
-		buf = (byte_t *)buf + 2;
-		num_bytes -= 2;
-		offset += 2;
+#if defined(LIBVIO_CONFIG_HAVE_QWORD) && __SIZEOF_BUSINT__ >= 8
+		if (!(offset & 4) && num_bytes >= 6) {
+			/* Of a word:    WWWWWWWW
+			 * we only want:   RRRRRR */
+			qword q;
+			q.q = libvio_readq_aligned(args, offset - 2);
+			buf = mempcpy(buf, q.b + 2, 6);
+			num_bytes -= 6;
+			offset += 6;
+		} else
+#endif /* LIBVIO_CONFIG_HAVE_QWORD && __SIZEOF_BUSINT__ >= 8 */
+		{
+			u16 temp;
+			temp = libvio_readw_aligned(args, offset);
+			UNALIGNED_SET16((u16 *)buf, temp);
+			buf = (byte_t *)buf + 2;
+			num_bytes -= 2;
+			offset += 2;
+		}
 	}
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 	if ((offset & 4) && num_bytes >= 4) {
@@ -1536,7 +1684,20 @@ libvio_copyfromvio(struct vio_args *__restrict args,
 		offset += 8;
 	}
 	if (num_bytes >= 4) {
-		u32 temp = libvio_readl_aligned(args, offset);
+		u32 temp;
+#if __SIZEOF_BUSINT__ >= 8
+		if (num_bytes > 4 && (offset & 7) == 0) {
+			/* Optimization: Only perform a single dispatch by doing an 8-byte read! */
+			qword q;
+			q.q = libvio_readq_aligned(args, offset);
+			__builtin_assume(num_bytes == 5 ||
+			                 num_bytes == 6 ||
+			                 num_bytes == 7);
+			memcpy(buf, q.b, num_bytes);
+			return;
+		}
+#endif /* __SIZEOF_BUSINT__ >= 8 */
+		temp = libvio_readl_aligned(args, offset);
 		UNALIGNED_SET32((u32 *)buf, temp);
 		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
@@ -1553,7 +1714,17 @@ libvio_copyfromvio(struct vio_args *__restrict args,
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
-		u16 temp = libvio_readw_aligned(args, offset);
+		u16 temp;
+#if __SIZEOF_BUSINT__ >= 4
+		if (num_bytes == 3 && (offset & 3) == 0) {
+			/* Optimization: Only perform a single dispatch by doing a 4-byte read! */
+			dword d;
+			d.l = libvio_readl_aligned(args, offset);
+			memcpy(buf, d.b, 3);
+			return;
+		}
+#endif /* __SIZEOF_BUSINT__ >= 4 */
+		temp = libvio_readw_aligned(args, offset);
 		UNALIGNED_SET16((u16 *)buf, temp);
 		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
@@ -1768,6 +1939,7 @@ DEFINE_PUBLIC_ALIAS(vio_orl, libvio_orl);
 DEFINE_PUBLIC_ALIAS(vio_xorb, libvio_xorb);
 DEFINE_PUBLIC_ALIAS(vio_xorw, libvio_xorw);
 DEFINE_PUBLIC_ALIAS(vio_xorl, libvio_xorl);
+DEFINE_PUBLIC_ALIAS(vio_xchwithvio, libvio_xchwithvio);
 DEFINE_PUBLIC_ALIAS(vio_copyfromvio, libvio_copyfromvio);
 DEFINE_PUBLIC_ALIAS(vio_copytovio, libvio_copytovio);
 DEFINE_PUBLIC_ALIAS(vio_memset, libvio_memset);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ecac07a */
+/* HASH CRC-32:0xe366e1fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,6 +325,9 @@
 #endif /* __CRT_HAVE_getmntent */
 
 #undef HAVE_GETPAGESIZE
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <asm/pagesize.h>
 #if defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE)
 #define HAVE_GETPAGESIZE 1

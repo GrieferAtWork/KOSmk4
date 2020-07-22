@@ -49,6 +49,11 @@
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+}%[insert:prefix(
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
+)]%{
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
@@ -1565,6 +1570,19 @@ int setregid($gid_t rgid, $gid_t egid);
 [[ATTR_CONST, wunused, export_alias("__getpagesize")]]
 [[requires_include("<asm/pagesize.h>"), requires(defined(__ARCH_PAGESIZE))]]
 [[section(".text.crt{|.dos}.system.configuration"), decl_include("<features.h>")]]
+[[if($extended_prefix(
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
+)defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE)),
+  preferred_fast_extern_inline("getpagesize", { return __ARCH_PAGESIZE; })
+]][[if($extended_prefix(
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
+)defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE)),
+  preferred_fast_extern_inline("__getpagesize", { return __ARCH_PAGESIZE; })
+]]
 __STDC_INT_AS_SIZE_T getpagesize() {
 	return __ARCH_PAGESIZE;
 }

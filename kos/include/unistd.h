@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x299c3d4d */
+/* HASH CRC-32:0x97ea0773 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,9 @@
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <asm/pagesize.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
@@ -1699,7 +1702,15 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),(__r
 /* ... */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
-#ifdef __CRT_HAVE_getpagesize
+#if defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),{ return __ARCH_PAGESIZE; })
+#elif defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE___getpagesize)
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),__getpagesize,{ return __ARCH_PAGESIZE; })
+#elif defined(__CRT_HAVE_getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),())
