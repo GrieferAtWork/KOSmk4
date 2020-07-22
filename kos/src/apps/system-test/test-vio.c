@@ -45,6 +45,7 @@
 
 #include <libvio/vio.h>
 
+#ifdef LIBVIO_CONFIG_ENABLED
 DECL_BEGIN
 
 PRIVATE void *libvio;
@@ -255,6 +256,6 @@ DEFINE_TEST(vio) {
 
 
 DECL_END
-
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 #endif /* !GUARD_APPS_SYSTEM_TEST_TEST_VIO_C */
