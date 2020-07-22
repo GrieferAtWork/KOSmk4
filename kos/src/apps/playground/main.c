@@ -31,12 +31,12 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
-#include <kos/asm/rtm.h>
 #include <kos/debugtrap.h>
 #include <kos/except.h>
 #include <kos/fcntl.h>
 #include <kos/kernel/types.h>
 #include <kos/ksysctl.h>
+#include <kos/rtm.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
@@ -62,6 +62,7 @@
 #include <err.h>
 #include <errno.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <math.h>
 #include <pthread.h>
@@ -650,24 +651,24 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 int main_rtm(int argc, char *argv[], char *envp[]) {
 	static volatile int a, b, c;
-	syscall_slong_t error;
+	rtm_status_t status;
 	(void)argc, (void)argv, (void)envp;
 	a = 10;
 	b = 20;
 	c = 30;
-	error = sys_rtm_begin();
-	if (error == (syscall_slong_t)RTM_STARTED) {
+	status = rtm_begin();
+	if (status == RTM_STARTED) {
 		if (a < b)
 			c = b;
 		b = a * c;
 		a = b - c;
-		sys_rtm_end();
+		rtm_end();
 		printf("RTM success\n");
 		printf("\ta = %d\n", a); /* 180 */
 		printf("\tb = %d\n", b); /* 200 */
 		printf("\tc = %d\n", c); /* 20  */
 	} else {
-		printf("RTM error: %#Ix\n", error);
+		printf("RTM status: %#" PRIxN(__SIZEOF_RTM_STATUS_T__) "\n", status);
 		printf("\ta = %d\n", a); /* 10 */
 		printf("\tb = %d\n", b); /* 20 */
 		printf("\tc = %d\n", c); /* 30 */

@@ -45,6 +45,7 @@
 
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
+#include <asm/rtm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -679,7 +680,7 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
 	case SYS_rtm_begin:
 		/* Nested RTM support */
 		++self->r_nesting;
-		self->r_pax = RTM_STARTED; /* System call return value */
+		self->r_pax = _XBEGIN_STARTED; /* System call return value */
 		return X86_RTM_STATUS_CONTINUE;
 
 	case SYS_rtm_end:

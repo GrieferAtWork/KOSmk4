@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cc58e4 */
+/* HASH CRC-32:0xaf78bd1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -763,10 +763,10 @@
 #define __NRRT_fchdirat               (errno_t, __errno_t)
 #define __NRRT_kreaddirf              (ssize_t, __ssize_t)
 #define __NRRT_kreaddir               (ssize_t, __ssize_t)
-#define __NRRT_rtm_test               (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rtm_test               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRRT_rtm_abort              (errno_t, __errno_t)
 #define __NRRT_rtm_end                (errno_t, __errno_t)
-#define __NRRT_rtm_begin              (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rtm_begin              (rtm_status_t, __rtm_status_t)
 #define __NRRT_userviofd              (fd_t, __fd_t)
 #define __NRRT_process_spawnveat      (errno_t, __errno_t)
 #define __NRRT_coredump               (errno_t, __errno_t)

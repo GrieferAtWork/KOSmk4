@@ -21,10 +21,14 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VM_RTM_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
-#include <kos/asm/rtm.h>
-#include <kos/kernel/cpu-state.h>
+
+#include <hybrid/host.h>
+
+#include <asm/rtm.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 
 /* Enable RTM support in VM data structures.
  * Note however that RTM emulation is not actually implemented
@@ -57,6 +61,12 @@ struct vm_rtm_hooks_struct {
 	                   uintptr_t fallback_ip);
 };
 
+#ifdef __x86_64__
+#define vm_rtm_set_nosys(state) (void)((state)->ics_gpregs.gp_rax = RTM_NOSYS)
+#else /* __x86_64__ */
+#define vm_rtm_set_nosys(state) (void)((state)->ics_gpregs.gp_eax = RTM_NOSYS)
+#endif /* !__x86_64__ */
+
 /* Execute code pointed-to by `state' in transactional execution mode.
  * This function will operate such that `state' will be updated to
  * reflect the proper RTM execution error code within the default system
@@ -67,7 +77,7 @@ struct vm_rtm_hooks_struct {
 LOCAL ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *FCALL
 vm_rtm_execute(struct vm_rtm_hooks_struct const *__restrict hooks,
                struct icpustate *__restrict state) {
-	gpregs_setpax(&state->ics_gpregs, RTM_STARTED);
+	gpregs_setpax(&state->ics_gpregs, _XBEGIN_STARTED);
 	return (*hooks->rh_xbegin)(state, icpustate_getpc(state));
 }
 

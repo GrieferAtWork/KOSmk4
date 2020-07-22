@@ -25,12 +25,15 @@
 #include <kernel/vm/rtm.h>
 
 #ifdef ARCH_VM_HAVE_RTM
-#include <kernel/vm.h>
 #include <kernel/except.h>
 #include <kernel/syscall.h>
+#include <kernel/vm.h>
 #include <sched/rpc.h>
-#include <stddef.h>
+
+#include <kos/rtm.h>
+
 #include <errno.h>
+#include <stddef.h>
 
 #ifndef ARCH_VM_RTM_DRIVER_NAME
 #error "Arch forgot to `#define ARCH_VM_RTM_DRIVER_NAME'"
@@ -76,10 +79,11 @@ syscall_rtm_begin_rpc(void *UNUSED(arg),
 		return state;
 	}
 throw_illegal_op:
-	THROW(E_ILLEGAL_OPERATION);
+	vm_rtm_set_nosys(state);
+	return state;
 }
 
-DEFINE_SYSCALL0(syscall_slong_t, rtm_begin) {
+DEFINE_SYSCALL0(rtm_status_t, rtm_begin) {
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
 	task_schedule_user_rpc(THIS_TASK,
 	                       &syscall_rtm_begin_rpc,
@@ -88,7 +92,7 @@ DEFINE_SYSCALL0(syscall_slong_t, rtm_begin) {
 	                       TASK_USER_RPC_FINTR,
 	                       GFP_NORMAL);
 	/* Shouldn't get here... */
-	return -EOK;
+	return RTM_NOSYS;
 }
 #endif /* __ARCH_WANT_SYSCALL_RTM_BEGIN */
 
@@ -109,7 +113,7 @@ DEFINE_SYSCALL1(errno_t, rtm_abort, syscall_ulong_t, code) {
 #endif /* __ARCH_WANT_SYSCALL_RTM_ABORT */
 
 #ifdef __ARCH_WANT_SYSCALL_RTM_TEST
-DEFINE_SYSCALL0(syscall_slong_t, rtm_test) {
+DEFINE_SYSCALL0(syscall_ulong_t, rtm_test) {
 	/* No RTM operation in progress */
 	COMPILER_IMPURE();
 	return 0;

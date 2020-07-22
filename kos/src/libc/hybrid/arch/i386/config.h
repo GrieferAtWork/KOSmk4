@@ -115,8 +115,17 @@
 /* abort() */
 #define LIBC_ARCH_HAVE_ABORT 1
 
+
+#ifndef __KERNEL__
 /* void ASMCALL libc_sig_restore(void); */
 #define LIBC_ARCH_HAVE_SIG_RESTORE 1
 
+/* Arch-specific RTM optimizations do exist on x86
+ * (in the form of a dedicated instruction set) */
+#define LIBC_ARCH_HAVE_RTM_BEGIN 1
+#define LIBC_ARCH_HAVE_RTM_END   1
+#define LIBC_ARCH_HAVE_RTM_ABORT 1
+#define LIBC_ARCH_HAVE_RTM_TEST  1
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_CONFIG_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fd82954 */
+/* HASH CRC-32:0x2cc6dc6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,7 @@
 #include <kos/exec/bits/library-listdef32.h>
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/fpu-state32.h>
+#include <kos/rtm.h>
 #include <librpc/bits/syscall-info32.h>
 #include <librt/bits/mqueue.h>
 
@@ -1408,16 +1409,18 @@ __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const
 __CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_SC(rtm_abort)
-/* Abort the current transaction by having `sys_rtm_begin()'
- * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op and return `-EOK' */
+/* Abort the current transaction by having `sys_rtm_begin()' return with
+ * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK'.
+ * Otherwise, this system call does not return normally, but returns from
+ * the original `sys_rtm_begin()' */
 __CDECLARE_SC(,__errno_t,rtm_abort,(__syscall_ulong_t __code),(__code))
 #endif /* __CRT_HAVE_SC(rtm_abort) */
 #if __CRT_HAVE_SC(rtm_begin)
 /* Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
- * though any error that may happen during this will be converted into
- * an `E_ILLEGAL_OPERATION' exception.
+ * though any error that may happen during this will result in `RTM_NOSYS'
+ * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
  * system calls, or attempting to access too much system memory in general
@@ -1430,11 +1433,12 @@ __CDECLARE_SC(,__errno_t,rtm_abort,(__syscall_ulong_t __code),(__code))
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
-__CDECLARE_SC(,__syscall_slong_t,rtm_begin,(void),())
+ * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
+__CDECLARE_SC(,__rtm_status_t,rtm_begin,(void),())
 #endif /* __CRT_HAVE_SC(rtm_begin) */
 #if __CRT_HAVE_SC(rtm_end)
-/* End a transaction (s.a. `sys_rtm_end()')
+/* End a transaction
  * If the transaction was successful, return normally (by returning `-EOK').
  * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
@@ -1444,7 +1448,7 @@ __CDECLARE_SC(,__errno_t,rtm_end,(void),())
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
-__CDECLARE_SC(,__syscall_slong_t,rtm_test,(void),())
+__CDECLARE_SC(,__syscall_ulong_t,rtm_test,(void),())
 #endif /* __CRT_HAVE_SC(rtm_test) */
 #if __CRT_HAVE_SC(sched_get_priority_max)
 __CDECLARE_SC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -3222,16 +3226,18 @@ __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct cons
 __CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_XSC(rtm_abort)
-/* Abort the current transaction by having `sys_rtm_begin()'
- * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op and return `-EOK' */
+/* Abort the current transaction by having `sys_rtm_begin()' return with
+ * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK'.
+ * Otherwise, this system call does not return normally, but returns from
+ * the original `sys_rtm_begin()' */
 __CDECLARE_XSC(,__errno_t,rtm_abort,(__syscall_ulong_t __code),(__code))
 #endif /* __CRT_HAVE_XSC(rtm_abort) */
 #if __CRT_HAVE_XSC(rtm_begin)
 /* Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
- * though any error that may happen during this will be converted into
- * an `E_ILLEGAL_OPERATION' exception.
+ * though any error that may happen during this will result in `RTM_NOSYS'
+ * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
  * system calls, or attempting to access too much system memory in general
@@ -3244,11 +3250,12 @@ __CDECLARE_XSC(,__errno_t,rtm_abort,(__syscall_ulong_t __code),(__code))
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
-__CDECLARE_XSC(,__syscall_slong_t,rtm_begin,(void),())
+ * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
+__CDECLARE_XSC(,__rtm_status_t,rtm_begin,(void),())
 #endif /* __CRT_HAVE_XSC(rtm_begin) */
 #if __CRT_HAVE_XSC(rtm_end)
-/* End a transaction (s.a. `sys_rtm_end()')
+/* End a transaction
  * If the transaction was successful, return normally (by returning `-EOK').
  * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
@@ -3258,7 +3265,7 @@ __CDECLARE_XSC(,__errno_t,rtm_end,(void),())
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
-__CDECLARE_XSC(,__syscall_slong_t,rtm_test,(void),())
+__CDECLARE_XSC(,__syscall_ulong_t,rtm_test,(void),())
 #endif /* __CRT_HAVE_XSC(rtm_test) */
 #if __CRT_HAVE_XSC(sched_get_priority_max)
 __CDECLARE_XSC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))

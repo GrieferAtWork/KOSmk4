@@ -2869,6 +2869,7 @@ class LibraryFunction {
 	@@    @(this.ppCond && (functionBindings.each.ppCond || ...))
 	public property implementationPpCond: string = {
 		get(): string {
+			local ppCond = str(this.ppCond);
 			if (ppCond == "0")
 				return "0";
 			local hasUniversalBinding = false;

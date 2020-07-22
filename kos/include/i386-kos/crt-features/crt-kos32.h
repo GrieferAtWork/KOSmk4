@@ -758,6 +758,7 @@
 #define __CRT_HAVE___wctrans_l 1
 #define __CRT_HAVE___wctype_l 1
 #define __CRT_HAVE___write 1
+#define __CRT_HAVE___x86_rtm_xtest 1
 #define __CRT_HAVE___xpg_basename 1
 #define __CRT_HAVE___xpg_sigpause 1
 #define __CRT_HAVE___xpg_strerror_r 1
@@ -2915,6 +2916,10 @@
 #define __CRT_HAVE_rpmatch 1
 #define __CRT_HAVE_rresvport 1
 #define __CRT_HAVE_rresvport_af 1
+#define __CRT_HAVE_rtm_abort 1
+#define __CRT_HAVE_rtm_begin 1
+#define __CRT_HAVE_rtm_end 1
+#define __CRT_HAVE_rtm_test 1
 #define __CRT_HAVE_ruserok 1
 #define __CRT_HAVE_ruserok_af 1
 #define __CRT_HAVE_sbrk 1

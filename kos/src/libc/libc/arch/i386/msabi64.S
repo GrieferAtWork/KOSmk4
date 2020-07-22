@@ -23,8 +23,12 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
+#include <hybrid/typecore.h>
+
 #include <asm/cfi.h>
 #include <asm/instr/movzxq.h>
+#include <bits/types.h>
 #include <sys/syscall.h>
 
 

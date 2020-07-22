@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e337d9c */
+/* HASH CRC-32:0xcc8afee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -926,10 +926,10 @@
 #define __NR32RT_getrusage64             (errno_t, __errno_t)
 #define __NR32RT_fsmode                  (uint64_t, __uint64_t)
 #define __NR32RT_ioctlf                  (syscall_slong_t, __syscall_slong_t)
-#define __NR32RT_rtm_test                (syscall_slong_t, __syscall_slong_t)
+#define __NR32RT_rtm_test                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32RT_rtm_abort               (errno_t, __errno_t)
 #define __NR32RT_rtm_end                 (errno_t, __errno_t)
-#define __NR32RT_rtm_begin               (syscall_slong_t, __syscall_slong_t)
+#define __NR32RT_rtm_begin               (rtm_status_t, __rtm_status_t)
 #define __NR32RT_ftime64                 (errno_t, __errno_t)
 #define __NR32RT_utime64                 (errno_t, __errno_t)
 #define __NR32RT_userviofd               (fd_t, __fd_t)

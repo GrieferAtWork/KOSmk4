@@ -142,18 +142,14 @@
 #define __UINT8_C(c)   c
 #define __UINT16_C(c)  c
 #define __UINT32_C(c)  c
-#ifdef __UINT64_TYPE__
 #undef __INT64_C
 #undef __UINT64_C
 #define __INT64_C(c)   c
 #define __UINT64_C(c)  c
-#ifdef __UINT128_TYPE__
 #undef __INT128_C
 #undef __UINT128_C
 #define __INT128_C(c)  c
 #define __UINT128_C(c) c
-#endif /* __UINT128_TYPE__ */
-#endif /* __UINT64_TYPE__ */
 #endif /* !__CC__ */
 
 #define __PRIVATE_MIN_S1  (-__INT8_C(127)-__INT8_C(1))

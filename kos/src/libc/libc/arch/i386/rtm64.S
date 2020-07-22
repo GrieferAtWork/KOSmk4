@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x6bb53aea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,22 +18,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_ASM_RTM_H
-#define _I386_KOS_KOS_ASM_RTM_H 1
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_RTM64_S
+#define GUARD_LIBC_LIBC_ARCH_I386_RTM64_S 1
 
-#include <asm/rtm.h>
+#define __ASSEMBLER__ 1
 
-/* RTM abort reasons. */
-#define __RTM_ABORT_FAILED   _XABORT_FAILED   /* Transaction cannot be performed atomically. */
-#define __RTM_ABORT_EXPLICIT _XABORT_EXPLICIT /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
-#define __RTM_ABORT_RETRY    _XABORT_RETRY    /* The transaction may succeed if re-attempted. */
-#define __RTM_ABORT_CAPACITY _XABORT_CAPACITY /* The internal buffer to track transactions overflowed. */
-#define __RTM_ABORT_CODE_M   _XABORT_CODE_M   /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
-#define __RTM_ABORT_CODE_S   _XABORT_CODE_S   /* Shift for `RTM_ABORT_CODE_M'. */
-#define __RTM_NOSYS          _XABORT_NOSYS    /* RTM isn't supposed */
+#ifndef __INTELLISENSE__
+#include "rtm.S"
+#endif /* !__INTELLISENSE__ */
 
-/* Returned by `sys_rtm_begin()' when RTM was entered successfully. */
-#define __RTM_STARTED _XBEGIN_STARTED /* RTM was entered */
-
-
-#endif /* !_I386_KOS_KOS_ASM_RTM_H */
+#endif /* GUARD_LIBC_LIBC_ARCH_I386_RTM64_S */

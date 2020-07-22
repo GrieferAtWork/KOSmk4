@@ -35,12 +35,13 @@
 #define _XABORT_CAPACITY __UINT32_C(0x00000008) /* The internal buffer to track transactions overflowed */
 #define _XABORT_DEBUG    __UINT32_C(0x00000010) /* A #DB (%drN) or #BP (int3) was triggered */
 #define _XABORT_NESTED   __UINT32_C(0x00000020) /* A nested transaction failed */
+#define _XABORT_NOSYS    __UINT32_C(0x00ffffff) /* RTM isn't supposed */
 #define _XABORT_CODE_M   __UINT32_C(0xff000000) /* [valid_if(_XABORT_EXPLICIT)] XABORT argument */
-#define _XABORT_CODE_S   24
+#define _XABORT_CODE_S   24                     /* Shift for `_XABORT_CODE_M' */
 #define _XABORT_CODE(x)  (((x) & _XABORT_CODE_M) >> _XABORT_CODE_S)
 
 /* Returned by `__xbegin()' when RTM was entered successfully. */
-#define _XBEGIN_STARTED __UINT32_C(0xffffffff)
+#define _XBEGIN_STARTED __UINT32_C(0xffffffff) /* RTM was entered */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -52,46 +53,40 @@ __DECL_BEGIN
 #pragma GCC target("rtm")
 #endif /* ... */
 
-/* Start a transaction (s.a. `sys_rtm_begin()')
+/* Start a transaction (s.a. `rtm_begin()')
  * @return: _XBEGIN_STARTED: Transaction started.
  * @return: _XABORT_* :      Transaction failed. */
-__FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__(__xbegin)(void)
+__FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__(__xbegin)(void) {
 #if __has_builtin(__builtin_ia32_xbegin)
-{
 	return (__UINT32_TYPE__)__builtin_ia32_xbegin();
-}
 #else /* __has_builtin(__builtin_ia32_xbegin) */
-{
 	__register __UINT32_TYPE__ __result;
 	__asm__ __volatile__("xbegin 991f\n\t"
 	                     "movl $-1, %%eax\n\t" /* -1 == _XBEGIN_STARTED */
 	                     "991:"
 	                     : "=a" (__result));
 	return __result;
-}
 #endif /* !__has_builtin(__builtin_ia32_xbegin) */
+}
 
 
-/* End a transaction (s.a. `sys_rtm_end()')
+/* End a transaction (s.a. `rtm_end()')
  * If the transaction was successful, return normally.
  * If the transaction failed, `__xbegin()' returns `_XABORT_*'
  * If no transaction was in progress, trigger #GP(0) that is propagated to user-space as
  * `E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE:E_ILLEGAL_INSTRUCTION_X86_OPCODE(0x0f01, 2)' */
-__FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void)
+__FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void) {
 #if __has_builtin(__builtin_ia32_xend)
-{
 	__builtin_ia32_xend();
-}
 #else /* __has_builtin(__builtin_ia32_xend) */
-{
-	__asm__ __volatile__("xend");
-}
+	__asm__ __volatile__("xend" : : : "memory");
 #endif /* !__has_builtin(__builtin_ia32_xend) */
+}
 
 
 /* Abort the current transaction by having `__xbegin()'
  * return with `_XABORT_EXPLICIT | ((code & 0xff) << _XABORT_CODE_S)'
- * If no transaction was in progress, behave as a no-op (s.a. `sys_rtm_abort()') */
+ * If no transaction was in progress, behave as a no-op (s.a. `rtm_abort()') */
 #if __has_builtin(__builtin_ia32_xabort)
 #define __xabort(code) __builtin_ia32_xabort(code)
 #elif !defined(__NO_XBLOCK)
@@ -101,23 +96,24 @@ __FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void)
 #endif /* !... */
 
 
-/* Check if a transaction is currently in progress (s.a. `sys_rtm_test()') */
+/* Check if a transaction is currently in progress (s.a. `rtm_test()')
+ * @return: true:  Inside of RTM mode
+ * @return: false: Outside of RTM mode */
 #ifdef __KOS__ /* Always available under KOS */
 __FORCELOCAL __ATTR_ARTIFICIAL __BOOL __NOTHROW(__xtest)(void)
 #else /* __KOS__ */
 __FORCELOCAL __ATTR_ARTIFICIAL __BOOL(__xtest)(void)
 #endif /* !__KOS__ */
+{
 #if __has_builtin(__builtin_ia32_xtest)
-{
 	return __builtin_ia32_xtest();
-}
 #else /* __has_builtin(__builtin_ia32_xtest) */
-{
 	__BOOL __result;
-	__asm__ __volatile__("xtest" : "=@ccnz" (__result));
+	/* TODO: Check for `__GCC_ASM_FLAG_OUTPUTS__' */
+	__asm__ __volatile__("xtest" : "=@ccz" (__result) : : "cc");
 	return __result;
-}
 #endif /* !__has_builtin(__builtin_ia32_xtest) */
+}
 
 #if ((__has_builtin(__builtin_ia32_xbegin) || __has_builtin(__builtin_ia32_xend) ||   \
       __has_builtin(__builtin_ia32_xabort) || __has_builtin(__builtin_ia32_xtest)) && \

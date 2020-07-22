@@ -102,6 +102,7 @@
 #define cmpsP        cmpsq
 #define movsP        movsq
 #define scasP        scasq
+#define notP         notq
 
 #ifdef __KERNEL__
 #define segtls gs /* THIS_TASK */
@@ -182,6 +183,7 @@
 #define cmpsP        cmpsl
 #define movsP        movsl
 #define scasP        scasl
+#define notP         notl
 
 #ifdef __KERNEL__
 #define segtls fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */

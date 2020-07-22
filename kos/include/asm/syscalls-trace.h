@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93295c1d */
+/* HASH CRC-32:0x75c46f5e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1114,9 +1114,9 @@
 #define __NRATR0_personality            SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_personality             SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_exit                   SC_REPR_EXIT_STATUS                                     /* status */ 
-#define __NRRTR_exit                    SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_exit                    SC_REPR_SIGHANDLER_T                                    /* return */
 #define __NRATR0_exit_group             SC_REPR_EXIT_STATUS                                     /* exit_code */ 
-#define __NRRTR_exit_group              SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_exit_group              SC_REPR_SIGHANDLER_T                                    /* return */
 #define __NRATR0_waitid                 SC_REPR_IDTYPE_T                                        /* idtype */ 
 #define __NRATR1_waitid                 SC_REPR_ID_T                                            /* id */ 
 #define __NRATL1_waitid                 0                                                       /* id -> idtype */ 
@@ -1272,7 +1272,7 @@
 #define __NRATR1_rt_sigreturn           SC_REPR_STRUCT_SIGSET                                   /* restore_sigmask */ 
 #define __NRATR2_rt_sigreturn           SC_REPR_STRUCT_RPC_SYSCALL_INFO                         /* sc_info */ 
 #define __NRATR3_rt_sigreturn           SC_REPR_STRUCT_UCPUSTATE                                /* restore_cpu */ 
-#define __NRRTR_rt_sigreturn            SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_rt_sigreturn            SC_REPR_SIGHANDLER_T                                    /* return */
 #define __NRATR0_setpriority            SC_REPR_SCHED_PRIORITY_WHICH                            /* which */ 
 #define __NRATR1_setpriority            SC_REPR_ID_T                                            /* who */ 
 #define __NRATR2_setpriority            SC_REPR_SYSCALL_ULONG_T                                 /* value */ 
@@ -1313,7 +1313,7 @@
 #define __NRATR0_setfsgid               SC_REPR_GID_T                                           /* gid */ 
 #define __NRRTR_setfsgid                SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_times                  SC_REPR_POINTER                                         /* buf */ 
-#define __NRRTR_times                   SC_REPR_SIGNO_T                                         /* return */
+#define __NRRTR_times                   SC_REPR_SIGHANDLER_T                                    /* return */
 #define __NRATR0_setpgid                SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_setpgid                SC_REPR_PID_T                                           /* pgid */ 
 #define __NRRTR_setpgid                 SC_REPR_ERRNO_T                                         /* return */

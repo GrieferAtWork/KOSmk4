@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2f0b5a6 */
+/* HASH CRC-32:0xfb688200 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,6 +147,7 @@
 
 #ifdef __WANT_HAVE_SYSCALL_RETURN_REPR_TYPES
 #define HAVE_SC_REPR_ERRNO_T 1
+#define HAVE_SC_REPR_SIGHANDLER_T 1
 #define HAVE_SC_REPR_SSIZE_T 1
 #define HAVE_SC_REPR_TIME_T 1
 #endif /* __WANT_HAVE_SYSCALL_RETURN_REPR_TYPES */
@@ -275,6 +276,7 @@ __SYSCALL_REPR(SC_REPR_XATTR_FLAGS)
 
 #ifdef __WANT_SYSCALL_RETURN_REPR_TYPES
 __SYSCALL_REPR(SC_REPR_ERRNO_T)
+__SYSCALL_REPR(SC_REPR_SIGHANDLER_T)
 __SYSCALL_REPR(SC_REPR_SSIZE_T)
 __SYSCALL_REPR(SC_REPR_TIME_T)
 #endif /* __WANT_SYSCALL_RETURN_REPR_TYPES */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ced2550 */
+/* HASH CRC-32:0xdee4aa9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16104,7 +16104,7 @@ END(__x86_asm32_int80_ioctlf)
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
-/* syscall_slong_t rtm_test(void) */
+/* syscall_ulong_t rtm_test(void) */
 .section .text.x86.asm32_syscall_int80.rtm_test
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_test)
 	.cfi_startproc simple
@@ -16139,9 +16139,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_test)
 	.cfi_endproc
 END(__x86_asm32_int80_rtm_test)
 
-/* Abort the current transaction by having `sys_rtm_begin()'
- * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op and return `-EOK' */
+/* Abort the current transaction by having `sys_rtm_begin()' return with
+ * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK'.
+ * Otherwise, this system call does not return normally, but returns from
+ * the original `sys_rtm_begin()' */
 /* errno_t rtm_abort(syscall_ulong_t code) */
 .section .text.x86.asm32_syscall_int80.rtm_abort
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_abort)
@@ -16179,7 +16181,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_abort)
 	.cfi_endproc
 END(__x86_asm32_int80_rtm_abort)
 
-/* End a transaction (s.a. `sys_rtm_end()')
+/* End a transaction
  * If the transaction was successful, return normally (by returning `-EOK').
  * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
@@ -16220,8 +16222,8 @@ END(__x86_asm32_int80_rtm_end)
 
 /* Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
- * though any error that may happen during this will be converted into
- * an `E_ILLEGAL_OPERATION' exception.
+ * though any error that may happen during this will result in `RTM_NOSYS'
+ * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
  * system calls, or attempting to access too much system memory in general
@@ -16234,8 +16236,9 @@ END(__x86_asm32_int80_rtm_end)
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
-/* syscall_slong_t rtm_begin(void) */
+ * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
+/* rtm_status_t rtm_begin(void) */
 .section .text.x86.asm32_syscall_int80.rtm_begin
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_begin)
 	.cfi_startproc simple
@@ -33801,7 +33804,7 @@ END(__x86_asm32_sysenter_ioctlf)
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
-/* syscall_slong_t rtm_test(void) */
+/* syscall_ulong_t rtm_test(void) */
 .section .text.x86.asm32_syscall_sysenter.rtm_test
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_test)
 	.cfi_startproc simple
@@ -33836,9 +33839,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_test)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rtm_test)
 
-/* Abort the current transaction by having `sys_rtm_begin()'
- * return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op and return `-EOK' */
+/* Abort the current transaction by having `sys_rtm_begin()' return with
+ * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK'.
+ * Otherwise, this system call does not return normally, but returns from
+ * the original `sys_rtm_begin()' */
 /* errno_t rtm_abort(syscall_ulong_t code) */
 .section .text.x86.asm32_syscall_sysenter.rtm_abort
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_abort)
@@ -33876,7 +33881,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_abort)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rtm_abort)
 
-/* End a transaction (s.a. `sys_rtm_end()')
+/* End a transaction
  * If the transaction was successful, return normally (by returning `-EOK').
  * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
@@ -33917,8 +33922,8 @@ END(__x86_asm32_sysenter_rtm_end)
 
 /* Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
- * though any error that may happen during this will be converted into
- * an `E_ILLEGAL_OPERATION' exception.
+ * though any error that may happen during this will result in `RTM_NOSYS'
+ * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
  * system calls, or attempting to access too much system memory in general
@@ -33931,8 +33936,9 @@ END(__x86_asm32_sysenter_rtm_end)
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>') */
-/* syscall_slong_t rtm_begin(void) */
+ * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
+/* rtm_status_t rtm_begin(void) */
 .section .text.x86.asm32_syscall_sysenter.rtm_begin
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rtm_begin)
 	.cfi_startproc simple

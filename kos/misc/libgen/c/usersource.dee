@@ -258,6 +258,8 @@ discard_function_during_scan:
 			"#define " << guardName << " 1\n"
 			"\n"
 			"#include \"../api.h\"\n"
+			"/**/\n"
+			"\n"
 			"#include \"" << header.name << ".h\"\n"
 			"\n"
 			"DECL_BEGIN\n"
@@ -396,7 +398,7 @@ again_find_nextPresentFunction:
 		}
 		if (part is UserSourceFunction) {
 			local func: LibraryFunction = part.func;
-			local funcCond = ppexpr.ppParse(func.ppCond)
+			local funcCond = ppexpr.ppParse(func.implementationPpCond)
 				.optimize(asBool: true, assume: ppAssume)
 				.tostr();
 			local bindings: {LibraryFunctionBinding...} = func.functionBindings;
@@ -423,7 +425,8 @@ again_find_nextPresentFunction:
 				headFp << "#" << (isFirst ? "" : "el") << "if "
 					<< ppexpr.ppParse(b.ppCond)
 						.optimize(asBool: true, assume: ppAssume)
-						.tostr() << "\n"
+						.tostr()
+					<< "\n"
 					   "DEFINE_INTERN_ALIAS(" << func.name << ", "
 					<< str(b.functionBinding) << ");\n";
 				isFirst = false;

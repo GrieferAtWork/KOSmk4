@@ -22,17 +22,18 @@
 
 #if 0 /* Only if supported by the arch */
 /* RTM abort reasons. */
-#define RTM_ABORT_FAILED   ? /* Transaction cannot be performed atomically. */
-#define RTM_ABORT_EXPLICIT ? /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
-#define RTM_ABORT_RETRY    ? /* The transaction may succeed if re-attempted. */
-#define RTM_ABORT_CAPACITY ? /* The internal buffer to track transactions overflowed. */
-#define RTM_ABORT_CODE_M   ? /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
-#define RTM_ABORT_CODE_S   ?
-#define RTM_ABORT_CODE(x)  (((x) & RTM_ABORT_CODE_M) >> RTM_ABORT_CODE_S)
+#define __RTM_ABORT_FAILED   ? /* Transaction cannot be performed atomically. */
+#define __RTM_ABORT_EXPLICIT ? /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
+#define __RTM_ABORT_RETRY    ? /* The transaction may succeed if re-attempted. */
+#define __RTM_ABORT_CAPACITY ? /* The internal buffer to track transactions overflowed. */
+#define __RTM_ABORT_CODE_M   ? /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
+#define __RTM_ABORT_CODE_S   ? /* Shift for `RTM_ABORT_CODE_M' */
 
 /* Returned by `sys_rtm_begin()' when RTM was entered successfully. */
-#define RTM_STARTED        ?
+#define __RTM_STARTED        ? /* RTM was entered */
 #endif
 
+#include <parts/errno.h>
+#define __RTM_NOSYS (-__ENOSYS) /* RTM isn't supposed */
 
 #endif /* !_KOS_ASM_RTM_H */

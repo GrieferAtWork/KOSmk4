@@ -38,7 +38,7 @@
 	 __CCAST(__UINT32_TYPE__)(c) << 16 | \
 	 __CCAST(__UINT32_TYPE__)(b) << 8 |  \
 	 __CCAST(__UINT32_TYPE__)(a))
-#ifdef __UINT64_TYPE__
+#if defined(__UINT64_TYPE__) || !defined(__CC__)
 #define __ENCODE_INT64(a, b, c, d, e, f, g, h) \
 	(__CCAST(__UINT64_TYPE__)(h) << 56 |       \
 	 __CCAST(__UINT64_TYPE__)(g) << 48 |       \
@@ -48,7 +48,7 @@
 	 __CCAST(__UINT64_TYPE__)(c) << 16 |       \
 	 __CCAST(__UINT64_TYPE__)(b) << 8 |        \
 	 __CCAST(__UINT64_TYPE__)(a))
-#endif /* __UINT64_TYPE__ */
+#endif /* __UINT64_TYPE__ || !__CC__ */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __INT16_I8(x, i)  __CCAST(__UINT8_TYPE__)(((x) >> (8-(i)*8)) & 0xff)
 #define __INT32_I8(x, i)  __CCAST(__UINT8_TYPE__)(((x) >> (24-(i)*8)) & 0xff)

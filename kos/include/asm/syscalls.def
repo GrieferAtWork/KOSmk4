@@ -143,6 +143,8 @@
 %[typeorg(<bits/sigstack32.h>: sigstackx32, __sigstackx32, sigaltstackx32, __sigaltstackx32)]
 %[typeorg(<bits/sigstack64.h>: sigstackx64, __sigstackx64, sigaltstackx64, __sigaltstackx64)]
 %[typeorg(<bits/pollfd.h>: pollfd)]
+%[typeorg(<kos/bits/rtm.h>: __rtm_status_t)]
+%[typeorg(<kos/rtm.h>: rtm_status_t)]
 
 /* Define how specific struct names should be escaped in headers */
 %[struct_escape(sigstackx32 = __sigstackx32, sigstackx64 = __sigstackx64)]
@@ -2147,8 +2149,8 @@ userviofd:(size_t initial_size, [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK)] sysca
 
 @@Begin an RTM operation. Note that if the arch-specific RTM driver
 @@wasn't already loaded into the kernel, it will be loaded automatically,
-@@though any error that may happen during this will be converted into
-@@an `E_ILLEGAL_OPERATION' exception.
+@@though any error that may happen during this will result in `RTM_NOSYS'
+@@begin returned.
 @@Note that while an RTM operation is in progress, only a very small hand
 @@full of system calls are allowed to be used. Attempting to use arbitrary
 @@system calls, or attempting to access too much system memory in general
@@ -2161,24 +2163,27 @@ userviofd:(size_t initial_size, [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK)] sysca
 @@  - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
 @@Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
 @@@return: RTM_STARTED : RTM operation was started.
-@@@return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/asm/rtm.h>')
-rtm_begin:() -> syscall_slong_t;
+@@@return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+@@@return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>')
+rtm_begin:() -> rtm_status_t;
 
-@@End a transaction (s.a. `sys_rtm_end()')
+@@End a transaction
 @@If the transaction was successful, return normally (by returning `-EOK').
 @@If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
 @@If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown
 rtm_end:() -> errno_t;
 
-@@Abort the current transaction by having `sys_rtm_begin()'
-@@return with `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
-@@If no transaction was in progress, behave as a no-op and return `-EOK'
+@@Abort the current transaction by having `sys_rtm_begin()' return with
+@@`RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+@@If no transaction was in progress, behave as a no-op and return `-EOK'.
+@@Otherwise, this system call does not return normally, but returns from
+@@the original `sys_rtm_begin()'
 rtm_abort:(syscall_ulong_t code) -> errno_t;
 
 @@Check if a transaction is currently in progress
 @@@return: 0 : No RTM operation in progress
 @@@return: 1 : An RTM operation is currently in progress
-rtm_test:() -> syscall_slong_t;
+rtm_test:() -> syscall_ulong_t;
 
 
 

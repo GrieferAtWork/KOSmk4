@@ -737,6 +737,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				{
 #ifndef EMU86_EMULATE_XTEST_IS_ZERO
 #ifdef EMU86_EMULATE_RETURN_AFTER_XEND
+					EMU86_SETPCPTR(REAL_IP());
 					EMU86_EMULATE_RETURN_AFTER_XEND();
 #else /* EMU86_EMULATE_RETURN_AFTER_XEND */
 					goto return_unsupported_instruction_rmreg;
@@ -750,6 +751,7 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				{
 #ifndef EMU86_EMULATE_XTEST_IS_ONE
 #ifdef EMU86_EMULATE_RETURN_AFTER_INT
+					EMU86_SETPCPTR(REAL_IP());
 					EMU86_EMULATE_RETURN_AFTER_INT(0x0d); /* #GP */
 #else /* EMU86_EMULATE_RETURN_AFTER_INT */
 					goto return_unsupported_instruction_rmreg;

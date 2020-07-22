@@ -40,6 +40,9 @@ struct vm_rtm_hooks_struct {
 	(FCALL *rh_rtm_begin)(struct icpustate *__restrict state);
 };
 
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vm_rtm_set_nosys)(struct icpustate *__restrict state);
+
 /* Execute code pointed-to by `state' in transactional execution mode.
  * This function will operate such that `state' will be updated to
  * reflect the proper RTM execution error code within the default system

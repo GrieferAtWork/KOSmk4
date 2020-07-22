@@ -59,6 +59,12 @@
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
 #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
+#define __ATOMIC_RELAXED                   0
+#define __ATOMIC_CONSUME                   1
+#define __ATOMIC_ACQUIRE                   2
+#define __ATOMIC_RELEASE                   3
+#define __ATOMIC_ACQ_REL                   4
+#define __ATOMIC_SEQ_CST                   5
 
 
 

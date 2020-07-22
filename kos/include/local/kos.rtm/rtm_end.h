@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xb42a8885 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,22 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_ASM_RTM_H
-#define _I386_KOS_KOS_ASM_RTM_H 1
-
-#include <asm/rtm.h>
-
-/* RTM abort reasons. */
-#define __RTM_ABORT_FAILED   _XABORT_FAILED   /* Transaction cannot be performed atomically. */
-#define __RTM_ABORT_EXPLICIT _XABORT_EXPLICIT /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
-#define __RTM_ABORT_RETRY    _XABORT_RETRY    /* The transaction may succeed if re-attempted. */
-#define __RTM_ABORT_CAPACITY _XABORT_CAPACITY /* The internal buffer to track transactions overflowed. */
-#define __RTM_ABORT_CODE_M   _XABORT_CODE_M   /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
-#define __RTM_ABORT_CODE_S   _XABORT_CODE_S   /* Shift for `RTM_ABORT_CODE_M'. */
-#define __RTM_NOSYS          _XABORT_NOSYS    /* RTM isn't supposed */
-
-/* Returned by `sys_rtm_begin()' when RTM was entered successfully. */
-#define __RTM_STARTED _XBEGIN_STARTED /* RTM was entered */
-
-
-#endif /* !_I386_KOS_KOS_ASM_RTM_H */
+#ifndef __local_rtm_end_defined
+#define __local_rtm_end_defined 1
+#include <__crt.h>
+#include <kos/bits/rtm.h>
+#ifdef __arch_rtm_end
+__NAMESPACE_LOCAL_BEGIN
+/* End a transaction
+ * If the transaction was successful, return normally
+ * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
+ * If no transaction was in progress, the behavior is undefined */
+__LOCAL_LIBC(rtm_end) void
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rtm_end))(void) {
+	__arch_rtm_end();
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rtm_end_defined
+#define __local___localdep_rtm_end_defined 1
+#define __localdep_rtm_end __LIBC_LOCAL_NAME(rtm_end)
+#endif /* !__local___localdep_rtm_end_defined */
+#else /* __arch_rtm_end */
+#undef __local_rtm_end_defined
+#endif /* !__arch_rtm_end */
+#endif /* !__local_rtm_end_defined */

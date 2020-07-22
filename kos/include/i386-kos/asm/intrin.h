@@ -159,7 +159,7 @@ __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 #endif /* !__COMPILER_HAVE_ADDRESSIBLE_LABELS */
 __FORCELOCAL __ATTR_NORETURN void (__wrip)(void *__val) { __asm__ __volatile__("jmp *%0" : : "g" (__val)); __builtin_unreachable(); }
 
-
+/* TODO: Check for `__GCC_ASM_FLAG_OUTPUTS__' */
 __FORCELOCAL __ATTR_WUNUSED __BOOL (__verr)(__UINT16_TYPE__ __seg) { __BOOL __result; __asm__ __volatile__("verr %w1" : "=@ccz" (__result) : "g" (__seg)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __BOOL (__verw)(__UINT16_TYPE__ __seg) { __BOOL __result; __asm__ __volatile__("verw %w1" : "=@ccz" (__result) : "g" (__seg)); return __result; }
 __FORCELOCAL void (__clc)(void) { __asm__ __volatile__("clc" : : : "cc"); }
@@ -651,6 +651,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ (__rdtscp)(__UIN
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__xgetbv)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("xgetbv" : "=A" (__result) : "c" (__id)); return __result; }
 __FORCELOCAL void (__xsetbv)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { __asm__ __volatile__("xsetbv" : : "c" (__id), "A" (__val)); }
 #endif /* !__x86_64__ */
+/* TODO: Check for `__GCC_ASM_FLAG_OUTPUTS__' */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdrandw)(__UINT16_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdrand %w0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdseedw)(__UINT16_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdseed %w0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdrandl)(__UINT32_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdrand %k0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
