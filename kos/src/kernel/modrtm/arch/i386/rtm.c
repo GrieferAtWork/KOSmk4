@@ -679,6 +679,8 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
 
 	case SYS_rtm_begin:
 		/* Nested RTM support */
+		if unlikely(self->r_nesting == (uintptr_t)-1)
+			return ABORT_WITH(_XABORT_CAPACITY);
 		++self->r_nesting;
 		self->r_pax = _XBEGIN_STARTED; /* System call return value */
 		return X86_RTM_STATUS_CONTINUE;
@@ -1376,6 +1378,8 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 /* RTM instruction emulation to allow for nesting. */
 #define EMU86_EMULATE_RETURN_AFTER_XBEGIN(fallback_ip) \
 	do {                                               \
+		if unlikely(self->r_nesting == (uintptr_t)-1)  \
+			return ABORT_WITH(_XABORT_CAPACITY);       \
 		++self->r_nesting;                             \
 		return X86_RTM_STATUS_CONTINUE;                \
 	} __WHILE0
