@@ -42,8 +42,9 @@ INTERN(dl_require_global)
 	1:	.cfi_adjust_cfa_offset 4;                         \
 		popl   %ecx;                                      \
 		.cfi_adjust_cfa_offset -4;                        \
-		addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ecx; \
-		call   dl_require_global;                          \
+		addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ecx; \
+		leal   991b@GOTOFF(%ecx), %ecx;                   \
+		call   dl_require_global;                         \
 		movl   %eax, 12(%esp); /* RETURN_PC_OVERRIDE */   \
 		.cfi_rel_offset %eip, 12;                         \
 		popl_cfi_r %edx;                                  \

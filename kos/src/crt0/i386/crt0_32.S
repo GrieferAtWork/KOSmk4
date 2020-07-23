@@ -42,7 +42,7 @@ INTERN_FUNCTION(_start)
 	/* @PLT requires %ebx to be loaded, so load it now */
 	call   1f
 1:	popl   %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ebx
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
 	call   exit@PLT
 END(_start)
 

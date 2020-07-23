@@ -182,7 +182,7 @@ PRIVATE_FUNCTION(libc_hw_rtm_abort)
 	call   1f
 	.cfi_adjust_cfa_offset 4
 1:	popl_cfi %eax
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %eax
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %eax
 	leal   .Lxabort_base@GOTOFF(%eax, %ecx, 4), %eax
 	jmpl   *%eax
 END(libc_hw_rtm_abort)
@@ -216,8 +216,8 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	.cfi_remember_state
 	call   1f
 	.cfi_adjust_cfa_offset 4
-1:	popl   %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ebx
+1:	popl_cfi %ebx
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
 
 	/* Hardware RTM is supported! */
 
@@ -279,8 +279,8 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	 */
 	call   1f
 	.cfi_adjust_cfa_offset 4
-1:	popl   %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ebx
+1:	popl_cfi %ebx
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
 	leal   .Lrtm_begin_maybe_syscall@GOTOFF(%ebx), %eax
 	EXTERN(libc___i386_syscall)
 	leal   (libc___i386_syscall@GOTOFF - ((.Lrtm_begin_do_return - .Lrtm_begin_maybe_syscall)))(%ebx), %ecx

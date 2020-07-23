@@ -282,7 +282,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmovedown),
 	call   9f
 	.cfi_adjust_cfa_offset 4
 9:	popl_cfi  %edi
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 9b)), %edi
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 9b)), %edi
 #define PUSH_RELSTR(x) leal x@GOTOFF(%edi), %eax; pushl_cfi %eax
 #else /* __PIC__ || __PIE__ || __pic__ || __pie__ */
 #define PUSH_RELSTR(x) pushl_cfi $(x)
@@ -389,7 +389,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmoveup),
 	call   9f
 	.cfi_adjust_cfa_offset 4
 9:	popl_cfi  %edi
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 9b)), %edi
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 9b)), %edi
 #define PUSH_RELSTR(x) leal x@GOTOFF(%edi), %eax; pushl_cfi %eax
 #else /* __PIC__ || __PIE__ || __pic__ || __pie__ */
 #define PUSH_RELSTR(x) pushl_cfi $(x)
