@@ -125,16 +125,20 @@ DEFINE_PUBLIC_ALIAS(rtm_abort, libc_rtm_abort)
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
-INTERN_FUNCTION(libc_rtm_test)
 	.cfi_startproc
-	movl   $(SYS_rtm_test), %eax
-	clc
-	EXTERN(libc___i386_syscall)
-	jmp    libc___i386_syscall
+.Lrtm_test_redirection_target:
 	xorl   %eax, %eax
 	xtest
 	setz   %al
 	ret
+INTERN_FUNCTION(libc_rtm_test)
+	.byte 0xeb /* jmp8 1f; 1: */
+.Lrtm_test_redirection:
+	.byte 0x00
+	movl   $(SYS_rtm_test), %eax
+	clc
+	EXTERN(libc___i386_syscall)
+	jmp    libc___i386_syscall
 	.cfi_endproc
 END(libc_rtm_test)
 DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test)
@@ -228,13 +232,10 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	                      0xc3              /* ret */   \
 	       )), libc___x86_rtm_xtest@GOTOFF(%ebx)
 
-	/* TODO: rtm_test must become:
-	 *     xorl   %eax, %eax
-	 *     xtest
-	 *     setz   %al
-	 *     ret
-	 */
-
+	/* Redirect `rtm_test()' to use `xtest' */
+	movb   $((.Lrtm_test_redirection + 1) -   \
+	          .Lrtm_test_redirection_target), \
+	       .Lrtm_test_redirection@GOTOFF(%ebx)
 
 	/* Re-write the first 2 bytes at `.Lrtm_begin_maybe_xbegin'
 	 * with {0xc7, 0xf8} (which are the bytes corresponding to the `xbegin'
