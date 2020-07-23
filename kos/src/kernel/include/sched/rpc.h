@@ -116,7 +116,7 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
 #define TASK_RPC_REASON_ASYNC        0x0000 /* The RPC is being served asynchronous, following either an IPI
                                              * being served by the target CPU, or the target thread having been
                                              * preempted before, and now finding its next quantum to have begun.
-                                             * NOTE: This reason is never set when the RPC was scheduled asynchronously. */
+                                             * NOTE: This reason is never set when the RPC was scheduled synchronously. */
 #define TASK_RPC_REASON_ASYNCUSER    0x0001 /* Similar to `TASK_RPC_REASON_ASYNC', however this may still be a valid
                                              * reason for synchronous kernel-space RPCs, as the RPC is being served
                                              * while the thread (and conversely `state') points into user-space.
@@ -127,21 +127,20 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
                                              * as a result of calling `task_serve()', or was already in the process of
                                              * being blocked.
                                              * This is usually the most likely reason for a synchronous RPC being served,
-                                             * as most threads spent their time waiting for some block lock, if not waiting
-                                             * for user- or network input. */
+                                             * as most threads spent their time waiting for some lock, if not waiting for
+                                             * user- or network input. */
 #define TASK_RPC_REASON_SYSCALL      0x0003 /* This reason acts as a sort of hybrid between `TASK_RPC_REASON_ASYNCUSER'
                                              * and `TASK_RPC_REASON_SYNC', though only appearing when the RPC has been
                                              * scheduled for executing prior to the thread returning to user-space the next time.
                                              * This reason is only set if the target thread had previously been executing a
-                                             * system call which may been interrupted if the RPC was scheduled as a USER_RPC_INTERRUPT
+                                             * system call which may been interrupted if the RPC was scheduled in USER_RPC_INTERRUPT
                                              * mode, in which case the RPC executed for this reason is expected to either
                                              * throw an exception to-be propagated to user-space, or to update `state' in
                                              * a reasonable way in order to either emulate, or restart expected user-space
                                              * behavior for the interrupted system call.
-                                             * The passed CPU state here describes the state to which the the system call would
-                                             * have returned, with all registered (except for the PC register) restored to the
-                                             * values they had when the system call originally began, while unknown registers
-                                             * are filled with stub values.
+                                             * The passed CPU state here describes the state to which the system call would
+                                             * have returned, with all registers (except for the PC register) restored to the
+                                             * values they had when the system call originally began.
                                              * -> This is the type used by POSIX-Signals to interrupt system calls,
                                              *    where restartable system calls have their state altered to repeat the
                                              *    instruction used to generate the system call such that it will get
@@ -150,7 +149,8 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
                                              *          after a system call was interrupted through use of USER_RPC_INTERRUPT.
                                              *          If RPC functions are being served before returning to user-space without
                                              *          the aid of an exception, the used reason will be `TASK_RPC_REASON_ASYNCUSER'
-                                             *          instead. */
+                                             *          instead, as in this case it is assumed that the system call completed
+                                             *          successfully, while being re-directed somewhere along the way. */
 #define TASK_RPC_REASON_SHUTDOWN     0x0004 /* The RPC is being serviced because the hosting thread is currently exiting.
                                              * This reason is given in one of two cases:
                                              *  - To service any remaining synchronous RPC that is when `task_exit()' is called
