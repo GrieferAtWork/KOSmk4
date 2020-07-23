@@ -44,6 +44,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stdint.h> /* SIZE_MAX */
 
 DECL_BEGIN
 
