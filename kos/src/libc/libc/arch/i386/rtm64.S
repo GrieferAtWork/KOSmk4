@@ -22,6 +22,9 @@
 #define GUARD_LIBC_LIBC_ARCH_I386_RTM64_S 1
 #define __ASSEMBLER__ 1
 
+#include "rtm.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <hybrid/host.h>
@@ -33,13 +36,6 @@
 #include <sys/mman.h>
 
 #include <syscall.h>
-
-
-/* Enable support for hardware RTM (s.a. `CPUID_7B_RTM') */
-#undef CONFIG_SUPPORT_HARDWARE_RTM
-#if 1
-#define CONFIG_SUPPORT_HARDWARE_RTM 1
-#endif
 
 
 #ifdef CONFIG_SUPPORT_HARDWARE_RTM
@@ -239,10 +235,36 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 
 	/* Check if hardware RTM is supported */
 	pushq_cfi_r %rbx
+
+	/* Check for the `ENVIRON_HW_RTM' variable */
+#ifdef ENVIRON_HW_RTM
+	.pushsection .rodata.crt.system.rtm
+	PRIVATE_OBJECT(str_ENVIRON_HW_RTM)
+		.asciz ENVIRON_HW_RTM
+	END(str_ENVIRON_HW_RTM)
+	.popsection
+	leaq   str_ENVIRON_HW_RTM(%rip), %rdi
+	EXTERN(libc_getenv)
+	call   libc_getenv
+	testq  %rax, %rax
+	jz     1f
+	cmpb   $(0), 1(%rax)
+	jnz    1f /* strlen(%rax) != 1 */
+	movb   0(%rax), %al
+	cmpb   $('1'), %al
+	je     .Lrtm_begin_modify_supported     /* Force-enabled */
+	cmpb   $('0'), %al
+	je     .Lrtm_begin_modify_not_supported /* Force-disabled */
+1:	/* Fallthru */
+#endif /* ENVIRON_HW_RTM */
+
 	movl   $(7), %eax
 	cpuid
 	testl  $(CPUID_7B_RTM), %ebx
 	jz     .Lrtm_begin_modify_not_supported
+#ifdef ENVIRON_HW_RTM
+.Lrtm_begin_modify_supported:
+#endif /* ENVIRON_HW_RTM */
 	.cfi_remember_state
 
 	/* Hardware RTM is supported! */

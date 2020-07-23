@@ -22,6 +22,9 @@
 #define GUARD_LIBC_LIBC_ARCH_I386_RTM32_S 1
 #define __ASSEMBLER__ 1
 
+#include "rtm.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <hybrid/host.h>
@@ -31,13 +34,6 @@
 #include <asm/rtm.h>
 
 #include <syscall.h>
-
-/* Enable support for hardware RTM (s.a. `CPUID_7B_RTM') */
-#undef CONFIG_SUPPORT_HARDWARE_RTM
-#if 1
-#define CONFIG_SUPPORT_HARDWARE_RTM 1
-#endif
-
 
 #ifdef CONFIG_SUPPORT_HARDWARE_RTM
 #include <asm/cpu-cpuid.h>
@@ -205,12 +201,44 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	 *   - Hardware RTM was failed (%eax != _XBEGIN_STARTED) */
 	cmpl   $(-1), %eax
 	jne    .Lrtm_begin_do_return_or_try_again
+
 	/* Check if hardware RTM is supported */
 	pushl_cfi_r %ebx
+
+	/* Check for the `ENVIRON_HW_RTM' variable */
+#ifdef ENVIRON_HW_RTM
+	call   1f
+	.cfi_adjust_cfa_offset 4
+1:	popl_cfi %ebx
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
+	.pushsection .rodata.crt.system.rtm
+	PRIVATE_OBJECT(str_ENVIRON_HW_RTM)
+		.asciz ENVIRON_HW_RTM
+	END(str_ENVIRON_HW_RTM)
+	.popsection
+	leal   str_ENVIRON_HW_RTM(%ebx), %ebx
+	pushl_cfi %ebx
+	EXTERN(libc_getenv)
+	call   libc_getenv
+	testl  %eax, %eax
+	jz     1f
+	cmpb   $(0), 1(%eax)
+	jnz    1f /* strlen(%eax) != 1 */
+	movb   0(%eax), %al
+	cmpb   $('1'), %al
+	je     .Lrtm_begin_modify_supported     /* Force-enabled */
+	cmpb   $('0'), %al
+	je     .Lrtm_begin_modify_not_supported /* Force-disabled */
+1:	/* Fallthru */
+#endif /* ENVIRON_HW_RTM */
 	movl   $(7), %eax
 	cpuid
 	testl  $(CPUID_7B_RTM), %ebx
 	jz     .Lrtm_begin_modify_not_supported
+#ifdef ENVIRON_HW_RTM
+.Lrtm_begin_modify_supported:
+#endif /* ENVIRON_HW_RTM */
+
 	.cfi_remember_state
 	call   1f
 	.cfi_adjust_cfa_offset 4
