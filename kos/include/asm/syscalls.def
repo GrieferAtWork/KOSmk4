@@ -47,10 +47,19 @@
 %[typesize(*:[uintptr_t] = size_t)]
 %[typesize(*:[intptr_t] = uintptr_t)]
 %[typesize(*:[intptr_half_t] = uintptr_half_t)]
+%[typesize(*:[intptr_quarter_t] = uintptr_quarter_t)]
 %[typesize(*:[time32_t] = syscall_ulong_t)]
 %[typesize(*:[time64_t] = 8)]
 
-
+%[signed_types(schar, short, signed, int, long, llong)]
+%[signed_types(s8, int8_t, __INT8_TYPE__)]
+%[signed_types(s16, int16_t, __INT16_TYPE__)]
+%[signed_types(s32, int32_t, long32_t, __INT32_TYPE__, __LONG32_TYPE__)]
+%[signed_types(s64, int64_t, long64_t, __INT64_TYPE__, __LONG64_TYPE__)]
+%[signed_types(s128, int128_t, long128_t, __INT128_TYPE__, __LONG128_TYPE__)]
+%[signed_types(syscall_slong_t, intptr_t, intptr_half_t, intptr_quarter_t)]
+%[signed_types(time32_t, time64_t)]
+%[signed_types(errno_t, signo_t, oflag_t, fd_t)]
 
 /* Syscall definition syntax
  * >> sysno:name

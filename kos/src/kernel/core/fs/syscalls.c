@@ -3176,18 +3176,20 @@ done_signal_exception:
 
 /* Implementation of the execv() system call. */
 INTERN struct icpustate *KCALL
-kernel_execveat(struct icpustate *__restrict state,
-                fd_t dirfd,
+kernel_execveat(fd_t dirfd,
                 USER UNCHECKED char const *pathname,
 #ifdef __ARCH_HAVE_COMPAT
                 USER UNCHECKED void const *argv,
                 USER UNCHECKED void const *envp,
-                bool argv_is_compat,
 #else /* __ARCH_HAVE_COMPAT */
                 USER UNCHECKED char const *USER UNCHECKED const *argv,
                 USER UNCHECKED char const *USER UNCHECKED const *envp,
 #endif /* !__ARCH_HAVE_COMPAT */
-                atflag_t flags) {
+                atflag_t flags,
+#ifdef __ARCH_HAVE_COMPAT
+                bool argv_is_compat,
+#endif /* __ARCH_HAVE_COMPAT */
+                struct icpustate *__restrict state) {
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	REF struct path *containing_path;
@@ -3334,8 +3336,7 @@ syscall_execveat_rpc(void *UNUSED(arg),
                      struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
-		state = kernel_execveat(state,
-		                        (fd_t)sc_info->rsi_regs[0],
+		state = kernel_execveat((fd_t)sc_info->rsi_regs[0],
 		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
 #ifdef __ARCH_HAVE_COMPAT
 		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
@@ -3344,12 +3345,11 @@ syscall_execveat_rpc(void *UNUSED(arg),
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[2],
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[3],
 #endif /* !__ARCH_HAVE_COMPAT */
-		                        (atflag_t)sc_info->rsi_regs[4]
+		                        (atflag_t)sc_info->rsi_regs[4],
 #ifdef __ARCH_HAVE_COMPAT
-		                        ,
-		                        false
+		                        false,
 #endif /* __ARCH_HAVE_COMPAT */
-		                        );
+		                        state);
 	}
 	return state;
 }
@@ -3384,13 +3384,13 @@ compat_syscall_execveat_rpc(void *UNUSED(arg),
                             struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
-		state = kernel_execveat(state,
-		                        (fd_t)sc_info->rsi_regs[0],
+		state = kernel_execveat((fd_t)sc_info->rsi_regs[0],
 		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
 		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
 		                        (USER UNCHECKED void const *)sc_info->rsi_regs[3],
 		                        (atflag_t)sc_info->rsi_regs[4],
-		                        true);
+		                        true,
+		                        state);
 	}
 	return state;
 }
@@ -3425,8 +3425,7 @@ syscall_execve_rpc(void *UNUSED(arg),
                    struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
-		state = kernel_execveat(state,
-		                        AT_FDCWD,
+		state = kernel_execveat(AT_FDCWD,
 		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
 #ifdef __ARCH_HAVE_COMPAT
 		                        (USER UNCHECKED void const *)sc_info->rsi_regs[1],
@@ -3435,12 +3434,11 @@ syscall_execve_rpc(void *UNUSED(arg),
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[1],
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[2],
 #endif /* !__ARCH_HAVE_COMPAT */
-		                        0
+		                        0,
 #ifdef __ARCH_HAVE_COMPAT
-		                        ,
-		                        false
+		                        false,
 #endif /* __ARCH_HAVE_COMPAT */
-		                        );
+		                        state);
 	}
 	return state;
 }
@@ -3472,13 +3470,13 @@ compat_syscall_execve_rpc(void *UNUSED(arg),
                           struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
-		state = kernel_execveat(state,
-		                        AT_FDCWD,
+		state = kernel_execveat(AT_FDCWD,
 		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
 		                        (USER UNCHECKED void const *)sc_info->rsi_regs[1],
 		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
 		                        0,
-		                        true);
+		                        true,
+		                        state);
 	}
 	return state;
 }

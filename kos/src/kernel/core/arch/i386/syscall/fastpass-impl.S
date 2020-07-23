@@ -1,0 +1,540 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __INTELLISENSE__
+#define __ASSEMBLER__ 1
+#define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
+//#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
+//#define SYSCALL_FASTPASS_KIND_SYS64 1
+#endif /* __INTELLISENSE__ */
+
+
+/* NOTE:
+ *  SYSCALL_FASTPASS_KIND_SYS32_SYSENTER -- x86_syscall32_sysenter[_traced]
+ *  SYSCALL_FASTPASS_KIND_SYS32_INT80    -- x86_syscall32_int80[_traced]
+ *  SYSCALL_FASTPASS_KIND_SYS64          -- x86_syscall64_int80[_traced]
+ */
+#if (defined(SYSCALL_FASTPASS_KIND_SYS32_SYSENTER) + \
+     defined(SYSCALL_FASTPASS_KIND_SYS32_INT80) +  \
+     defined(SYSCALL_FASTPASS_KIND_SYS64)) != 1
+#error "Must #define exactly one of the above macros!"
+#endif /* ... */
+
+#undef __WANT_SYSCALL_REGISTER_COUNT
+#define __WANT_SYSCALL_REGISTER_COUNT 1
+
+#include <hybrid/compiler.h>
+
+#include <kernel/arch/syscall.h>
+#include <kernel/syscall.h>
+#include <kernel/x86/syscall-tables.h>
+
+#include <hybrid/typecore.h>
+
+#include <asm/cfi.h>
+#include <asm/instr/compat.h>
+#include <asm/instr/movzxq.h>
+#include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/paging.h>
+#include <kos/kernel/syscalls.h>
+
+#ifdef __x86_64__
+#include <asm/instr/interrupt.h>
+#endif /* __x86_64__ */
+
+/* System call numbers */
+#ifndef __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
+#define __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT 1
+#include <asm/syscalls32_d.h>
+#endif /* !__NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT */
+#ifdef __x86_64__
+#ifndef __NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT
+#define __NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT 1
+#include <asm/syscalls64_d.h>
+#endif /* !__NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT */
+#endif /* __x86_64__ */
+
+/* Headers needed by the actual fastpass implementations. */
+#include <fcntl.h> /* AT_FDCWD */
+
+
+#ifndef IS_DEFINED
+#define ARG_PLACEHOLDER_1 ,
+#define TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define TAKE_SECOND_ARG(x) TAKE_SECOND_ARG_IMPL x
+#define IS_DEFINED3(...) TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
+#define IS_DEFINED2(x) IS_DEFINED3(ARG_PLACEHOLDER_##x)
+#define IS_DEFINED(x) IS_DEFINED2(x)
+#endif /* !IS_DEFINED */
+
+
+/* Define some kind-specific macros:
+ *   - _SYSFAST_WANT(NAME, name): Expands to non-zero if `NAME' should be defined as a system call.
+ *                                Note that `NAME' must be written in upper-case!
+ *   - _SYSFAST_SECTNAME(name):   System call definition section names.
+ *                                Note that we use a unique section name for fastpass
+ *                                system calls, so-as to allow --gc-sections to delete
+ *                                the unused auto-generated system call wrappers.
+ *   - _SYSFAST_FUNCNAME(name):   Symbol name generator for the low-level system call
+ *                                entry points. - All of these are already defined as
+ *                                ATTR_WEAK, auto-generated functions.
+ *   - _SYSFAST_SYSNO(name):      The actual system call number of the system call that
+ *                                is being invoked.
+ *   - _SYSFAST_PERSO:            The CFI personality function that must be used to
+ *                                properly handle exception unwinding.
+ *   - _SYSFAST_SETALIAS(name):   Define possibly aliasing symbols for `_SYSFAST_SECTNAME(name)'
+ */
+#ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+#define _SYSFAST_SECTNAME(name) .text.x86.asm32_syscall_sysenter.fastpass_##name
+#define _SYSFAST_FUNCNAME       X86_ASMSYSCALL32_SYSENTER
+#define _SYSFAST_SYSNO(name)    __NR32_##name
+#define _SYSFAST_PERSO          x86_syscall_personality_asm32_sysenter
+#elif defined(SYSCALL_FASTPASS_KIND_SYS32_INT80)
+#define _SYSFAST_SECTNAME(name) .text.x86.asm32_syscall_int80.fastpass_##name
+#define _SYSFAST_FUNCNAME       X86_ASMSYSCALL32_INT80
+#define _SYSFAST_SYSNO(name)    __NR32_##name
+#define _SYSFAST_PERSO          x86_syscall_personality_asm32_int80
+#elif defined(SYSCALL_FASTPASS_KIND_SYS64)
+#define _SYSFAST_SECTNAME(name) .text.x86.asm64_syscall.fastpass_##name
+#define _SYSFAST_FUNCNAME       X86_ASMSYSCALL64
+#define _SYSFAST_SYSNO(name)    __NR64_##name
+#define _SYSFAST_PERSO          x86_syscall_personality_asm64_syscall
+#endif /* SYSCALL_FASTPASS_KIND_... */
+
+
+/* System call argument registers. */
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+#define _SYSFAST_R_arg1 %rdi
+#define _SYSFAST_R_arg2 %rsi
+#define _SYSFAST_R_arg3 %rdx
+#define _SYSFAST_R_arg4 %r10
+#define _SYSFAST_R_arg5 %r8
+#define _SYSFAST_R_arg6 %r9
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+#define _SYSFAST_R_arg1 %ebx
+#define _SYSFAST_R_arg2 %ecx
+#define _SYSFAST_R_arg3 %edx
+#define _SYSFAST_R_arg4 %esi
+#ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+#define _SYSFAST_R_arg5 0(%ebp)
+#define _SYSFAST_R_arg6 4(%ebp)
+#else /* SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
+#define _SYSFAST_R_arg5 %edi
+#define _SYSFAST_R_arg6 %ebp
+#endif /* !SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+
+
+/* _SYSFAST_WANT(NAME, name) = 
+ *   SYSCALL_FASTPASS_KIND_SYS64:
+ *      defined(__ARCH_WANT_SYSCALL_##NAME)
+ *   SYSCALL_FASTPASS_KIND_SYS32_INT80:
+ *      defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
+ *   SYSCALL_FASTPASS_KIND_SYS32_SYSENTER:
+ *      (defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))) &&
+ *      (__NR32RC_##name >= 5) // NOTE: Variants with register-count 0..4 are binary-compatible with int80!
+ */
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+#define _SYSFAST_WANT(NAME, name) IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME)
+#define _SYSFAST_SETALIAS(name)   /* nothing */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+#ifndef __SYSFAST_ARCH_WANT
+#ifdef __x86_64__
+#define __SYSFAST_ARCH_WANT_00     0
+#define __SYSFAST_ARCH_WANT_01     1
+#define __SYSFAST_ARCH_WANT_10     1
+#define __SYSFAST_ARCH_WANT_11     1
+#define __SYSFAST_ARCH_WANT3(a, b) __SYSFAST_ARCH_WANT_##a##b
+#define __SYSFAST_ARCH_WANT2(a, b) __SYSFAST_ARCH_WANT3(a, b)
+#define __SYSFAST_ARCH_WANT(NAME)  __SYSFAST_ARCH_WANT2(IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME), IS_DEFINED(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
+#else /* __x86_64__ */
+#define __SYSFAST_ARCH_WANT(NAME) IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME)
+#endif /* !__x86_64__ */
+/* Expand to 1 if `__NR32RC_##name in [5,6]' */
+#define __PRIVATE_SYSFAST_ARCH_ISREG_0   0
+#define __PRIVATE_SYSFAST_ARCH_ISREG_1   0
+#define __PRIVATE_SYSFAST_ARCH_ISREG_2   0
+#define __PRIVATE_SYSFAST_ARCH_ISREG_3   0
+#define __PRIVATE_SYSFAST_ARCH_ISREG_4   0
+#define __PRIVATE_SYSFAST_ARCH_ISREG_5   1
+#define __PRIVATE_SYSFAST_ARCH_ISREG_6   1
+#define __PRIVATE_SYSFAST_ARCH_ISREG2(n) __PRIVATE_SYSFAST_ARCH_ISREG_##n
+#define __PRIVATE_SYSFAST_ARCH_ISREG(n) __PRIVATE_SYSFAST_ARCH_ISREG2(n)
+#define __SYSFAST_ARCH_ISREG_56(name) __PRIVATE_SYSFAST_ARCH_ISREG(__NR32RC_##name)
+
+/* if (!c) { DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_SYSENTER(name), X86_ASMSYSCALL32_INT80(name)); } */
+#define __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT_0(name) DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_SYSENTER(name), X86_ASMSYSCALL32_INT80(name))
+#define __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT_1(name) /* nothing */
+#define __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT2(c, name) __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT_##c(name)
+#define __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT(c, name) __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT2(c, name)
+#endif /* !__SYSFAST_ARCH_WANT */
+
+#ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+#define _SYSFAST_WANT(NAME, name) __SYSFAST_ARCH_WANT(NAME)
+#define _SYSFAST_SETALIAS(name)   /* nothing */
+#else /* SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
+#define _SYSFAST_WANT(NAME, name) (__SYSFAST_ARCH_WANT(NAME) && __NR32RC_##name >= 5)
+#define _SYSFAST_SETALIAS(name)   __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT(__SYSFAST_ARCH_ISREG_56(name), name)
+#endif /* !SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+
+
+#ifndef SYSCALL_IRET
+#ifdef __x86_64__
+#define SYSCALL_IRET intr_exit_sysret
+#else /* __x86_64__ */
+#define SYSCALL_IRET X86_IRET_BUT_PREFER_SYSEXIT
+#endif /* !__x86_64__ */
+#endif /* !SYSCALL_IRET */
+
+
+#ifndef SC_BEGIN
+/* Begin/End a system call definition.
+ * Upon entry ...:
+ *   - ... a `strict irregs_user' exists as `0(%Psp)'
+ *   - ... EFLAGS.IF is enabled
+ *   - ... on x86_64, `swapgs' was called (i.e. %gs.base is loaded)
+ *   - ... %Pax has an undefined value (the original value is `_SYSFAST_SYSNO(name)')
+ */
+#define SC_BEGIN(name)                        \
+	.section _SYSFAST_SECTNAME(name);         \
+	INTERN_FUNCTION(_SYSFAST_FUNCNAME(name)); \
+		_SYSFAST_SETALIAS(name);              \
+		.cfi_startproc simple;                \
+		.cfi_personality 0, _SYSFAST_PERSO;   \
+		.cfi_lsda 0, _SYSFAST_SYSNO(name);    \
+		.cfi_iret_signal_frame;               \
+		.cfi_def_cfa %Psp, 0
+#define SC_END(name)  \
+		SYSCALL_IRET; \
+		.cfi_endproc; \
+	END(_SYSFAST_FUNCNAME(name))
+
+/* On i386 only: push/pop %ds, %es and %fs. (no-op on x86_64)
+ * NOTE: `SC386_INIT_SEGMENT_REGISTERS' will load kernel segments on i386! */
+#ifdef __x86_64__
+#define SC386_INIT_SEGMENT_REGISTERS /* nothing */
+#define SC386_PUSH_SEGMENT_REGISTERS /* nothing */
+#define SC386_POP_SEGMENT_REGISTERS  /* nothing */
+#else /* __x86_64__ */
+#define SC386_PUSH_SEGMENT_REGISTERS   \
+	pushl_cfi %ds;                     \
+	.cfi_restore_iret_ds_or_offset -4; \
+	pushl_cfi %es;                     \
+	.cfi_restore_iret_es_or_offset -8; \
+	pushl_cfi %fs;                     \
+	.cfi_restore_iret_fs_or_offset -12
+#define SC386_INIT_SEGMENT_REGISTERS       \
+	movl   $(SEGMENT_USER_DATA_RPL), %eax; \
+	movl   %eax, %ds;                      \
+	movl   %eax, %es;                      \
+	movl   $(SEGMENT_KERNEL_FSBASE), %eax; \
+	movl   %eax, %fs;                      \
+	movl   %esp, %eax
+#define SC386_POP_SEGMENT_REGISTERS \
+	popl_cfi %fs;                   \
+	.cfi_restore_iret_fs;           \
+	popl_cfi %es;                   \
+	.cfi_restore_iret_es;           \
+	popl_cfi %ds;                   \
+	.cfi_restore_iret_ds
+#endif /* !__x86_64__ */
+
+#endif /* SC_BEGIN */
+
+/* Push/pop a `struct icpustate' from `0(%Psp)'
+ * NOTES:
+ *  - SC_PUSH_ICPUSTATE:
+ *     - On i386, also includes `SC386_INIT_SEGMENT_REGISTERS'!
+ *  - SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION:
+ *     - Verifies that the sysenter argument extension vector
+ *       doesn't point into kernel-space.
+ *       Must be used when 5 or 6 registers are used by the system call.
+ */
+#ifdef __x86_64__
+#ifndef SC_PUSH_ICPUSTATE
+#define SC_PUSH_ICPUSTATE ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
+#define SC_POP_ICPUSTATE  ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+#endif /* !SC_PUSH_ICPUSTATE */
+#else /* __x86_64__ */
+#ifndef SC_PUSH_ICPUSTATE
+#define SC_PUSH_ICPUSTATE         \
+	SC386_PUSH_SEGMENT_REGISTERS; \
+	pushal_cfi_r;                 \
+	SC386_INIT_SEGMENT_REGISTERS
+#define SC_POP_ICPUSTATE \
+	popal_cfi_r;         \
+	SC386_POP_SEGMENT_REGISTERS
+#endif /* !SC_PUSH_ICPUSTATE */
+#undef SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION
+#ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+#define SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION \
+	SC386_PUSH_SEGMENT_REGISTERS;                      \
+	cmpl   $(KERNELSPACE_BASE), %ebp;                  \
+	jae    __asm32_bad_sysenter_extension;             \
+	pushal_cfi_r;                                      \
+	SC386_INIT_SEGMENT_REGISTERS
+#endif /* SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
+#endif /* !__x86_64__ */
+#ifndef SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION
+#define SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION \
+	SC_PUSH_ICPUSTATE
+#endif /* !SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION */
+
+
+
+
+
+
+
+
+/* >> errno_t execveat(fd_t dirfd,
+ * >>                  char const *filename,
+ * >>                  char const *const *argv,
+ * >>                  char const *const *envp,
+ * >>                  atflag_t flags); */
+#if _SYSFAST_WANT(EXECVEAT, execveat)
+SC_BEGIN(execveat)
+	SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION
+#ifdef __x86_64__
+	pushq_cfi %rsp               /* struct icpustate  *state */
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	xorq   %r9, %r9              /* bool argv_is_compat = false */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	movq   $(1), %r9             /* bool argv_is_compat = true */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+/*  movq   _SYSFAST_R_arg5, %r8   * atflag_t           flags    (already set correctly) */
+	movq   _SYSFAST_R_arg4, %rcx /* char const *const *envp = _SYSFAST_R_arg4(%r10) */
+/*  movq   _SYSFAST_R_arg3, %rdx  * char const *const *argv     (already set correctly) */
+/*  movq   _SYSFAST_R_arg2, %rsi  * char const        *pathname (already set correctly) */
+/*  movq   _SYSFAST_R_arg1, %rdi  * fd_t               dirfd    (already set correctly) */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	movzlq _SYSFAST_R_arg5, %r8  /* atflag_t           flags */
+	xchgl  %ecx, %esi            /* pathname / envp */
+	movzlq %esi, %rsi            /* char const        *pathname */
+	movzlq %ecx, %rcx            /* char const *const *envp */
+	movzlq %edx, %rdx            /* char const *const *argv */
+	movslq %ebx, %rdi            /* fd_t               dirfd */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+#else /* __x86_64__ */
+	pushl_cfi %esp               /* struct icpustate  *state */
+	pushl_cfi _SYSFAST_R_arg5    /* atflag_t           flags */
+	pushl_cfi _SYSFAST_R_arg4    /* char const *const *envp */
+	pushl_cfi _SYSFAST_R_arg3    /* char const *const *argv */
+	pushl_cfi _SYSFAST_R_arg2    /* char const        *pathname */
+	pushl_cfi _SYSFAST_R_arg1    /* fd_t               dirfd */
+#endif /* !__x86_64__ */
+
+	/* Call the high-level execv() handler function. */
+	EXTERN(kernel_execveat)
+	call   kernel_execveat
+
+#ifndef __x86_64__
+	.cfi_adjust_cfa_offset -24 /* STDCALL does callee-cleanup */
+#else /* !__x86_64__ */
+	addq   $(8), %rsp
+	.cfi_adjust_cfa_offset -8
+#endif /* __x86_64__ */
+
+	/* Load the new register context stack. */
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+SC_END(execveat)
+#endif /* execveat... */
+
+
+
+
+
+
+
+
+/* >> errno_t execve(char const *filename,
+ * >>                char const const *argv,
+ * >>                char const const *envp); */
+#if _SYSFAST_WANT(EXECVE, execve)
+SC_BEGIN(execve)
+	SC_PUSH_ICPUSTATE
+#ifdef __x86_64__
+	pushq_cfi %rsp               /* struct icpustate  *state */
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	xorq   %r9, %r9              /* bool argv_is_compat = false */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	movq   $(1), %r9             /* bool argv_is_compat = true */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+	xorq   %r8, %r8              /* atflag_t           flags */
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	movq   %rdx,            %rcx /* char const *const *envp */
+	movq   %rsi,            %rdx /* char const *const *argv */
+	movq   %rdi,            %rsi /* char const        *pathname */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	xchgl  %ecx, %edx
+	movzlq %ecx,            %rcx /* char const *const *envp */
+	movzlq %edx,            %rdx /* char const *const *argv */
+	movzlq %ebx,            %rsi /* char const        *pathname */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+	movq   $(AT_FDCWD),     %rdi /* fd_t               dirfd */
+#else /* __x86_64__ */
+	pushl_cfi %esp               /* struct icpustate  *state */
+	pushl_cfi $(0)               /* atflag_t           flags */
+	pushl_cfi _SYSFAST_R_arg3    /* char const *const *envp */
+	pushl_cfi _SYSFAST_R_arg2    /* char const *const *argv */
+	pushl_cfi _SYSFAST_R_arg1    /* char const        *pathname */
+	pushl_cfi $(AT_FDCWD)        /* fd_t               dirfd */
+#endif /* !__x86_64__ */
+
+	/* Call the high-level execv() handler function. */
+	EXTERN(kernel_execveat)
+	call   kernel_execveat
+
+#ifndef __x86_64__
+	.cfi_adjust_cfa_offset -24 /* STDCALL does callee-cleanup */
+#else /* !__x86_64__ */
+	addq   $(8), %rsp
+	.cfi_adjust_cfa_offset -8
+#endif /* __x86_64__ */
+
+	/* Load the new register context stack. */
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+SC_END(execve)
+#endif /* execve... */
+
+
+
+
+
+
+
+
+/* >> errno_t debugtrap(struct ucpustate const *state,
+ * >>                   struct debugtrap_reason const *reason); */
+#if _SYSFAST_WANT(DEBUGTRAP, debugtrap)
+SC_BEGIN(debugtrap)
+	SC_PUSH_ICPUSTATE
+
+	/* Call forward to `sys_debugtrap(32|64)_impl()' */
+#ifdef __x86_64__
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	movq   %rsi, %rdx   /* Arg #2 (struct debugtrap_reason const *ureason) */
+	movq   %rdi, %rsi   /* Arg #1 (struct ucpustate const *state) */
+	movq   %rsp, %rdi   /* struct icpustate *return_state */
+	EXTERN(sys_debugtrap64_impl)
+	call   sys_debugtrap64_impl
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	movzlq %ecx, %rdx   /* Arg #2 (struct debugtrap_reason const *ureason) */
+	movzlq %ebx, %rsi   /* Arg #1 (struct ucpustate const *state) */
+	movq   %rsp, %rdi   /* struct icpustate *return_state */
+	EXTERN(sys_debugtrap32_impl)
+	call   sys_debugtrap32_impl
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+#else /* __x86_64__ */
+	pushl_cfi %ecx        /* Arg #2 (struct debugtrap_reason const *ureason) */
+	movl   %ebx, %edx     /* Arg #1 (struct ucpustate const *state) */
+	leal   4(%esp), %ecx  /* struct icpustate *return_state */
+	EXTERN(sys_debugtrap32_impl)
+	call   sys_debugtrap32_impl
+	.cfi_adjust_cfa_offset -4
+#endif /* !__x86_64__ */
+
+	/* Load the new register context stack. */
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+SC_END(debugtrap)
+#endif /* debugtrap... */
+
+
+
+
+
+
+
+
+/* >> errno_t iopl(syscall_ulong_t level); */
+#if _SYSFAST_WANT(IOPL, iopl)
+SC_BEGIN(iopl)
+	SC_PUSH_ICPUSTATE
+
+	/* Call forward to `sys_iopl_impl()' */
+#if defined(__x86_64__) && !defined(SYSCALL_FASTPASS_KIND_SYS64)
+	movzlq _SYSFAST_R_arg1, %R_fcall1P /* level */
+#else /* __x86_64__ && !SYSCALL_FASTPASS_KIND_SYS64 */
+	movP   _SYSFAST_R_arg1, %R_fcall1P /* level */
+#endif /* !__x86_64__ || SYSCALL_FASTPASS_KIND_SYS64 */
+	movP   %Psp,            %R_fcall0P /* struct icpustate *state */
+	EXTERN(sys_iopl_impl)
+	call   sys_iopl_impl
+
+	/* Load the new register context stack. */
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+SC_END(iopl)
+#endif /* iopl... */
+
+
+
+
+
+
+
+
+/* >> rtm_status_t rtm_begin(void); */
+#if _SYSFAST_WANT(RTM_BEGIN, rtm_begin)
+SC_BEGIN(rtm_begin)
+	SC_PUSH_ICPUSTATE
+	movP   %Psp, %R_fcall0P
+	EXTERN(sys_rtm_begin_impl)
+	call   sys_rtm_begin_impl
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+SC_END(rtm_begin)
+#endif /* rtm_begin... */
+
+
+
+
+
+
+
+
+/* TODO: sigreturn() / rt_sigreturn() */
+/* TODO: clone() */
+/* TODO: fork() */
+/* TODO: raiseat() */
+/* TODO: coredump() */
+
+#undef _SYSFAST_R_arg1
+#undef _SYSFAST_R_arg2
+#undef _SYSFAST_R_arg3
+#undef _SYSFAST_R_arg4
+#undef _SYSFAST_R_arg5
+#undef _SYSFAST_R_arg6
+
+#undef _SYSFAST_SECTNAME
+#undef _SYSFAST_FUNCNAME
+#undef _SYSFAST_SYSNO
+#undef _SYSFAST_PERSO
+#undef _SYSFAST_SETALIAS
+#undef _SYSFAST_WANT
+
+#undef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+#undef SYSCALL_FASTPASS_KIND_SYS32_INT80
+#undef SYSCALL_FASTPASS_KIND_SYS64
+

@@ -72,7 +72,7 @@
  *     X86_ASMSYSCALL32_SYSENTER:
  *         i386:    - %esp has been loaded
  *                  - A user-space IRET tail was pushed and created
- *         x86_64:  - %esp has been loaded
+ *         x86_64:  - %rsp has been loaded
  *                  - A user-space IRET tail was pushed and created
  *                  - Compatibility-mode
  *     X86_ASMSYSCALL32_RUNC32:

@@ -379,6 +379,10 @@ DECL_END
 #ifdef __OPTIMIZE_SIZE__
 #define X86_IRET_BUT_PREFER_SYSEXIT iret
 #elif !defined(CONFIG_NO_VM86)
+/* TODO: Don't duplicate this code for every location it is used at.
+ *       Instead, have one PUBLIC label `x86_syscall_iret' that can
+ *       be jumped to with `jmp x86_syscall_iret' */
+/* TODO: Don't use `sysexit' if that one's not supposed by the host! */
 #define X86_IRET_BUT_PREFER_SYSEXIT                                           \
 	cli;                                                                      \
 	cmpl   $(SEGMENT_USER_CODE), OFFSET_IRREGS_CS(%esp);                      \

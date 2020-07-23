@@ -46,6 +46,38 @@ PUBLIC XATOMIC_WEAKLYREF(struct vm_rtm_driver_hooks)
 vm_rtm_hooks = XATOMIC_WEAKLYREF_INIT(NULL);
 
 #ifdef __ARCH_WANT_SYSCALL_RTM_BEGIN
+INTERN struct icpustate *FCALL
+sys_rtm_begin_impl(struct icpustate *__restrict state) {
+	REF struct vm_rtm_driver_hooks *hooks;
+	/* Lookup RTM hooks. */
+	hooks = vm_rtm_hooks.get();
+	if unlikely(!hooks) {
+		REF struct driver *rtm_driver;
+		/* Lazily load the RTM driver. */
+		TRY {
+			rtm_driver = driver_insmod(ARCH_VM_RTM_DRIVER_NAME);
+		} EXCEPT {
+			goto throw_illegal_op;
+		}
+		/* Check if hooks have become available now. */
+		{
+			FINALLY_DECREF_UNLIKELY(rtm_driver);
+			hooks = vm_rtm_hooks.get();
+		}
+		if unlikely(!hooks)
+			goto throw_illegal_op;
+	}
+	{
+		FINALLY_DECREF_UNLIKELY(hooks);
+		/* Perform an RTM operation for user-space. */
+		state = vm_rtm_execute(&hooks->rdh_hooks, state);
+		return state;
+	}
+throw_illegal_op:
+	vm_rtm_set_nosys(state);
+	return state;
+}
+
 PRIVATE struct icpustate *FCALL
 syscall_rtm_begin_rpc(void *UNUSED(arg),
                       struct icpustate *__restrict state,

@@ -588,7 +588,9 @@ function x86_64_formDoubleWideArgument64Ex(
 
 function x86_64_assignRegister64(
 		fp: File, sysenter: bool,
-		registerSizeValues: {int...}, format: string,
+		registerSizeValues: {int...},
+		signedRegisters: {bool...},
+		format: string,
 		clobber: string = none) {
 	if (sysenter) {
 		format = format
@@ -609,20 +611,24 @@ function x86_64_assignRegister64(
 			<< " */\n";
 	} else {
 		local regSize = 4;
+		local regSigned = "z";
 		local regI = x86_64_getRegisterIndex32(b);
 		if (regI !is none) {
 			assert regI <= #registerSizeValues;
 			regSize = registerSizeValues[regI];
+			if (signedRegisters[regI])
+				regSigned = "s";
 		}
 		switch (regSize) {
+			/* TODO: Use sign-extension if the original C-type was signed! */
 		case 1:
-			fp << "	movzbq " << x86_64Reg8NamesOfReg32.get(b, b) << ", " << a;
+			fp << "	mov" << regSigned << "bq " << x86_64Reg8NamesOfReg32.get(b, b) << ", " << a;
 			break;
 		case 2:
-			fp << "	movzwq " << x86_64Reg16NamesOfReg32.get(b, b) << ", " << a;
+			fp << "	mov" << regSigned << "wq " << x86_64Reg16NamesOfReg32.get(b, b) << ", " << a;
 			break;
 		default:
-			fp << "	movzlq " << b << ", " << a;
+			fp << "	mov" << regSigned << "lq " << b << ", " << a;
 			break;
 		}
 		fp << " /* "
@@ -650,6 +656,16 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		for (local i: [:argumentCount])
 			if (f.args[i][0].isReg64)
 				i);
+	local signedRegisters = Tuple([]{
+		for (local i: [:argumentCount]) {
+			if (i in doubleWideArguments) {
+				yield false;
+				yield false;
+				continue;
+			}
+			yield f.args[i][0].isSigned;
+		}
+	}());
 	local registerSizeValues = Tuple([]{
 		for (local i: [:argumentCount]) {
 			if (i in doubleWideArguments) {
@@ -666,8 +682,10 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		}
 	}());
 	assert #registerSizeValues == registerCount;
+#if 0 /* Not needed, because we can use 0(%ebp) during addressing, thus forcing
+       * the CPU to dereference a 32-bit pointer, rather than a 64-bit one! */
 	if (sysenter && registerCount > 4) {
-		fp << "	movzlq %ebp, %rbp\n"; /*  */
+		fp << "	movzlq %ebp, %rbp\n";
 		/* NOTE: By zero-extending the user-space EBP, we already
 		 *       ensured that %rbp doesn't point into kernel-space,
 		 *       as kernelspace on x86_64 only begins after the end
@@ -675,7 +693,8 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		/*fp << "	cmpq   $(0), %rbp\n";
 		fp << "	jl     __asm32_bad_sysenter_extension\n";*/
 	}
-#define R(...) x86_64_assignRegister64(fp, sysenter, registerSizeValues, __VA_ARGS__)
+#endif
+#define R(...) x86_64_assignRegister64(fp, sysenter, registerSizeValues, signedRegisters, __VA_ARGS__)
 	switch (registerCount) {
 	case 0:
 		assert argumentCount == 0;

@@ -156,6 +156,7 @@ function escapeSymbolName(name: string): string {
 global syscallTypeDeclarationOrigins: {string: string} = Dict();
 global syscallTypeMustPushMacro: HashSet with string = HashSet();
 global syscallTypeEscapedStructTypes: {string: string} = Dict();
+global syscallTypeSigned: {string...} = HashSet();
 
 class CType {
 	this = default;
@@ -174,9 +175,11 @@ class CType {
 	member typename: string = "void";
 	member isReg64: bool = false; /* [reg64] */
 	member isReg128: bool = false; /* [reg128] */
+
 	@@The body of the accompanying `[tostr(...)]' tag (if any)
 	@@When @none, use the default method for @typename instead
 	member tostrMethod: string = none;
+
 	property typenameBase: string = {
 		get(): string {
 			local r = typename;
@@ -185,6 +188,7 @@ class CType {
 			return r;
 		}
 	}
+
 	property escapedTypenameBase: string = {
 		get(): string {
 			local r = escapedTypename;
@@ -193,6 +197,7 @@ class CType {
 			return r;
 		}
 	}
+
 	property escapedTypename: string = {
 		get(): string {
 			if (typename.startswith("struct ")) {
@@ -224,7 +229,24 @@ class CType {
 			return typename;
 		}
 	}
-	gatherUsedEscapedStructTypes(types: HashSet with string) {
+
+	@@Returns true if @this @CType is considered to be signed
+	property isSigned: bool = {
+		get(): bool {
+			local tn = typename;
+			if (tn.strip("_") in syscallTypeSigned)
+				return true;
+			if (" signed " in tn)
+				return true;
+			if (tn.startswith("signed "))
+				return true;
+			if (tn.endswith(" signed"))
+				return true;
+			return false;
+		}
+	}
+
+	function gatherUsedEscapedStructTypes(types: HashSet with string) {
 		if (typename.startswith("struct ")) {
 			local s = 7;
 			local len = #typename;
@@ -240,7 +262,8 @@ class CType {
 			}
 		}
 	}
-	gatherTypeOriginHeaders(headers: HashSet with string) {
+
+	function gatherTypeOriginHeaders(headers: HashSet with string) {
 		if (typename.startswith("struct ")) {
 			local s = 7;
 			local len = #typename;
@@ -280,7 +303,8 @@ class CType {
 			}
 		}
 	}
-	gatherPragmaPushMacroNames(names: HashSet with string) {
+
+	function gatherPragmaPushMacroNames(names: HashSet with string) {
 		if (typename.startswith("struct ")) {
 			local s = 7;
 			local len = #typename;
@@ -1098,6 +1122,7 @@ function parseSyscallDefs(
 						currentGroup = none;
 						currentGroupPos = none;
 					}	break;
+
 					case "group": {
 						/* Define a set of function names to share identical semantics,
 						 * such that binary compatibility ~may~ be possible. */
@@ -1107,6 +1132,15 @@ function parseSyscallDefs(
 								err(i, "Function {!r} is already apart of different group {!r}"
 									.format({ x, possiblyCompatibleFunctionGroups[x] }));
 							possiblyCompatibleFunctionGroups[x] = group;
+						}
+					}	break;
+
+					case "signed_types": {
+						for (local e: directive_args.split(",")) {
+							e = e.strip();
+							if (e.startswith("\"") && e.endswith("\""))
+								e = e.decode("c-escape");
+							syscallTypeSigned.insert(e.strip("_"));
 						}
 					}	break;
 
