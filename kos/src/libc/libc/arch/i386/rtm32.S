@@ -207,19 +207,21 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 
 	/* Check for the `ENVIRON_HW_RTM' variable */
 #ifdef ENVIRON_HW_RTM
-	call   1f
-	.cfi_adjust_cfa_offset 4
-1:	popl_cfi %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
 	.pushsection .rodata.crt.system.rtm
 	PRIVATE_OBJECT(str_ENVIRON_HW_RTM)
 		.asciz ENVIRON_HW_RTM
 	END(str_ENVIRON_HW_RTM)
 	.popsection
-	leal   str_ENVIRON_HW_RTM(%ebx), %ebx
+	call   1f
+	.cfi_adjust_cfa_offset 4
+1:	popl_cfi %ebx
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
+	leal   str_ENVIRON_HW_RTM@GOTOFF(%ebx), %ebx
 	pushl_cfi %ebx
 	EXTERN(libc_getenv)
 	call   libc_getenv
+	addl   $(4), %esp
+	.cfi_adjust_cfa_offset -4
 	testl  %eax, %eax
 	jz     1f
 	cmpb   $(0), 1(%eax)
