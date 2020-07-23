@@ -65,6 +65,12 @@
 #include <bits/crt/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
+#ifdef __USE_SOLARIS
+#include <getopt.h>
+#define GF_PATH "/etc/group"
+#define PF_PATH "/etc/passwd"
+#endif /* __USE_SOLARIS */
+
 __SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN2K8
@@ -1538,7 +1544,8 @@ int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 @@Synchronize all disk operations of all mounted file systems and flush
 @@unwritten buffers down to the hardware layer, ensuring that modifications
 @@made become visible on the underlying, persistent media
-[[cp, userimpl, section(".text.crt{|.dos}.fs.modify")]] void sync() {
+[[cp, userimpl, section(".text.crt{|.dos}.fs.modify")]]
+void sync() {
 	/* NO-OP */
 }
 
@@ -1781,8 +1788,8 @@ __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 %#endif /* __USE_MISC */
 
 %
-%#if defined(__USE_MISC) || \
-%   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%#if (defined(__USE_MISC) || \
+%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 @@>> chroot(2)
 @@Change the root directory of the calling `CLONE_FS' group of threads
 @@(usually the process) to a path that was previously address by `PATH'
@@ -1793,7 +1800,7 @@ int chroot([[nonnull]] char const *__restrict path);
 %/* ... */
 [[guard, cp, wunused, section(".text.crt{|.dos}.io.tty")]]
 char *getpass([[nonnull]] char const *__restrict prompt);
-%#endif /* ... */
+%#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %
 %#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -1831,8 +1838,7 @@ int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 %#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 %
-%#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || \
-%     defined(__USE_MISC)
+%#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || defined(__USE_MISC)
 @@>> brk(2), sbrk(2)
 @@Change the program break, allowing for a rudimentary implementation of a heap.
 @@It is recommended to use the much more advanced functions found in <sys/mman.h> instead
@@ -1841,7 +1847,7 @@ int brk(void *addr);
 
 [[section(".text.crt{|.dos}.heap.utility"), export_alias("__sbrk")]]
 void *sbrk(intptr_t delta);
-%#endif
+%#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) || __USE_MISC */
 
 %
 %#if defined(__USE_POSIX199309) || defined(__USE_UNIX98)
@@ -1885,19 +1891,19 @@ void swab([[nonnull]] void const *__restrict from,
 
 %
 %
-%#if (defined(_EVERY_SOURCE) || \
+%#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 %/* ... */
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 char *ctermid(char *s);
 
 %[insert:extern(cuserid)]
-%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+%#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
 %
 %
-%#if (defined(_EVERY_SOURCE) || \
+%#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
 %     (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
 %#ifndef ____pthread_atfork_func_t_defined
 %#define ____pthread_atfork_func_t_defined 1
@@ -1905,19 +1911,19 @@ char *ctermid(char *s);
 %#endif /* !____pthread_atfork_func_t_defined */
 %
 %[insert:extern(pthread_atfork)]
-%#endif /* _EVERY_SOURCE || (__USE_UNIX98 && !__USE_XOPEN2K) */
+%#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_UNIX98 && !__USE_XOPEN2K) */
 
 
 %
 %
-%#ifdef __USE_REENTRANT
+%#if defined(__USE_REENTRANT) || defined(__USE_SOLARIS)
 @@Same as `ctermid', but return `NULL' when `S' is `NULL'
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 [[userimpl, requires($has_function(ctermid))]]
 char *ctermid_r([[nullable]] char *s) {
 	return s ? ctermid(s) : NULL;
 }
-%#endif /* __USE_REENTRANT */
+%#endif /* __USE_REENTRANT || __USE_SOLARIS */
 
 %
 %
@@ -1998,6 +2004,94 @@ void closefrom($fd_t lowfd) {
 
 %{
 #endif /* __USE_BSD */
+
+#ifdef __USE_SOLARIS
+}
+%[default:section(".text.crt{|.dos}.solaris")]
+
+%[insert:extern(fattach)]
+%[insert:extern(fdetach)]
+%[insert:extern(ioctl)]
+%[insert:extern(rexec_af)]
+%[insert:extern(rresvport_af)]
+%[insert:extern(stime)]
+%[insert:extern(tell)]
+%[insert:function(yield = thrd_yield)]
+
+// TODO: char *gettxt(char const *, char const *);
+// TODO: int issetugid(void);
+// TODO: int isaexec(char const *, char *const *, char *const *);
+// TODO: offset_t llseek($fd_t fd, offset_t offset, __STDC_INT_AS_UINT_T whence);
+
+
+@@Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+@@and referrs to a directory, then this function can be used to escape a chroot() jail.
+@@No special permissions are required to use this function, since a malicious application
+@@could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument.
+[[requires($has_function(dup2) && defined(__AT_FDROOT))]]
+[[requires_include("<asm/fcntl.h>"), impl_include("<asm/fcntl.h>")]]
+int fchroot($fd_t fd) {
+	fd_t result;
+	result = dup2(fd, __AT_FDROOT);
+	if likely(result >= 0)
+		result = 0;
+	return result;
+}
+
+@@Similar to `frealpathat(2)' (though use the later for more options)
+@@Also note that this function appears to have a weird rule (which KOS simply
+@@ignores) that is related to this function not writing more than `PATH_MAX'
+@@bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+@@is to be able to handle names of arbitrary lengths)
+@@Additionally, the online docs don't mention what happens when `buflen' is too
+@@small, so I guess I can just make up what's supposed to happen, and I say that
+@@the function will set errno=ERANGE and return -1
+@@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+@@@return: -1: Error. (s.a. `errno')
+[[requires_include("<asm/fcntl.h>")]]
+[[impl_include("<parts/errno.h>")]]
+[[requires($has_function(frealpathat) && defined(__AT_FDCWD))]]
+__STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
+                                  char *resolved, $size_t buflen) {
+	__STDC_INT_AS_SSIZE_T retval;
+	char *result;
+	result = frealpathat(__AT_FDCWD, filename, resolved, buflen, 0);
+	if unlikely(!result)
+		return -1;
+	retval = (__STDC_INT_AS_SSIZE_T)strlen(result);
+@@pp_if $has_function(free)@@
+	if unlikely(!resolved)
+		free(result);
+@@pp_endif@@
+	return retval;
+}
+
+
+@@Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)')
+[[wunused, guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("tell64", "_telli64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("tell", "_tell")]]
+[[requires_include("<asm/stdio.h>")]]
+[[requires($has_function(lseek) && defined(__SEEK_CUR))]]
+[[impl_include("<asm/stdio.h>"), export_as("_tell")]]
+$off_t tell($fd_t fd) {
+	return lseek(fd, 0, SEEK_CUR);
+}
+
+%#ifdef __USE_LARGEFILE64
+@@Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)')
+[[wunused, guard, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/stdio.h>")]]
+[[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
+[[impl_include("<asm/stdio.h>"), export_alias("_telli64")]]
+$off64_t tell64($fd_t fd) {
+	return lseek64(fd, 0, __SEEK_CUR);
+}
+%#endif /* __USE_LARGEFILE64 */
+
+
+%{
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

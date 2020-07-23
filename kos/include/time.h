@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f37a81 */
+/* HASH CRC-32:0x4e17bccd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -672,6 +672,8 @@ __LIBC __LONGPTR_TYPE__ (timezone) __ASMNAME("__timezone");
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __USE_MISC
+#ifndef __stime_defined
+#define __stime_defined 1
 #if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
@@ -682,7 +684,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *_
 #include <local/time/stime.h>
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
-#endif /* ... */
+#else /* ... */
+#undef __stime_defined
+#endif /* !... */
+#endif /* !__stime_defined */
 #if defined(__CRT_HAVE_timegm64) && defined(__USE_TIME_BITS64)
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timegm,(struct __NAMESPACE_STD_SYM tm *__tp),timegm64,(__tp))

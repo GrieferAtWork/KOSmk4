@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8855622c */
+/* HASH CRC-32:0xa0ddf01c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,12 +52,6 @@ INTDEF WUNUSED int64_t NOTHROW_NCX(LIBDCALL libd__filelengthi64)(fd_t fd);
 INTDEF WUNUSED int64_t NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED int64_t NOTHROW_NCX(LIBDCALL libd__telli64)(fd_t fd);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF WUNUSED int64_t NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_umask_s)(mode_t newmode, mode_t *oldmode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -104,12 +98,6 @@ INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBDCALL libd__filelength)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBDCALL libd__tell)(fd_t fd);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc__tell)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd__eof)(fd_t fd);

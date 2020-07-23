@@ -373,6 +373,7 @@ int thrd_join(thrd_t thr, int *res) {
 @@thread should execute next. The current thread may be selected by the
 @@scheduler to keep running
 @@s.a. `pthread_yield()'
+[[nothrow]]
 void thrd_yield() = pthread_yield;
 
 

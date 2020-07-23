@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0070474 */
+/* HASH CRC-32:0xa277458e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -311,7 +311,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_sopen_s, libd__sopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_mktemp_s, libd__mktemp_s);
 DEFINE_PUBLIC_ALIAS(DOS$_pipe, libd__pipe);
 DEFINE_PUBLIC_ALIAS(DOS$_filelengthi64, libd__filelengthi64);
-DEFINE_PUBLIC_ALIAS(DOS$_telli64, libd__telli64);
 DEFINE_PUBLIC_ALIAS(DOS$umask_s, libd_umask_s);
 DEFINE_PUBLIC_ALIAS(DOS$__lock_fhandle, libd___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(DOS$_unlock_fhandle, libd__unlock_fhandle);
@@ -322,7 +321,6 @@ DEFINE_PUBLIC_ALIAS(DOS$setmode, libd_setmode);
 DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$_filelength, libd__filelength);
-DEFINE_PUBLIC_ALIAS(DOS$_tell, libd__tell);
 DEFINE_PUBLIC_ALIAS(DOS$_eof, libd__eof);
 
 /* kos.except-handler */
@@ -2923,6 +2921,12 @@ DEFINE_PUBLIC_ALIAS(DOS$_sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$__sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$closefrom, libd_closefrom);
+DEFINE_PUBLIC_ALIAS(DOS$fchroot, libd_fchroot);
+DEFINE_PUBLIC_ALIAS(DOS$resolvepath, libd_resolvepath);
+DEFINE_PUBLIC_ALIAS(DOS$_tell, libd_tell);
+DEFINE_PUBLIC_ALIAS(DOS$tell, libd_tell);
+DEFINE_PUBLIC_ALIAS(DOS$_telli64, libd_tell64);
+DEFINE_PUBLIC_ALIAS(DOS$tell64, libd_tell64);
 
 /* util */
 DEFINE_PUBLIC_ALIAS(DOS$opendev, libd_opendev);

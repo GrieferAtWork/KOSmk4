@@ -221,7 +221,7 @@ int _pipe([[nonnull]] $fd_t pipedes[2],
 %[insert:function(_eof = eof)]
 %[insert:function(_filelength = filelength)]
 %[insert:function(_tell = tell)]
-
+%[insert:function(_telli64 = tell64)]
 
 [[impl_include("<asm/stdio.h>")]]
 [[decl_include("<bits/types.h>"), wunused]]
@@ -238,14 +238,6 @@ $int64_t _filelengthi64($fd_t fd) {
 	return result;
 }
 
-
-[[wunused, decl_include("<bits/types.h>")]]
-[[requires_include("<asm/stdio.h>")]]
-[[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
-[[impl_include("<asm/stdio.h>")]]
-$int64_t _telli64($fd_t fd) {
-	return lseek64(fd, 0, __SEEK_CUR);
-}
 
 %[default:section(".text.crt.dos.fs.basic_property")]
 
@@ -352,14 +344,7 @@ __LONG32_TYPE__ filelength($fd_t fd) {
 	return result;
 }
 
-
-[[decl_include("<bits/types.h>")]]
-[[wunused, crt_name("_tell")]]
-[[requires_function(lseek)]]
-__LONG32_TYPE__ tell($fd_t fd) {
-	return lseek(fd, 0, SEEK_CUR);
-}
-
+%[insert:extern(tell)]
 
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_eof")]]

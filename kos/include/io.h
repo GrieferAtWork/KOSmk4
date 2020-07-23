@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd567d65f */
+/* HASH CRC-32:0x8a8f663b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -756,12 +756,40 @@ __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_filelength,(__fd_t __fd
 #include <local/io/filelength.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); }
 #endif /* ... */
-#ifdef __CRT_HAVE__tell
-__CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_tell,(__fd_t __fd),(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
-#include <local/io/tell.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
-#endif /* ... */
+#if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell64,(__fd))
+#elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),_telli64,(__fd))
+#elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell,(__fd))
+#elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),(__fd))
+#else /* ... */
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#include <local/unistd/tell.h>
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
+#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#endif /* !... */
+#ifdef __CRT_HAVE_tell64
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,_telli64,(__fd_t __fd),tell64,(__fd))
+#elif defined(__CRT_HAVE__telli64)
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+__CDECLARE(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,_telli64,(__fd_t __fd),(__fd))
+#else /* ... */
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#include <local/unistd/tell64.h>
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off64_t __NOTHROW_NCX(__LIBCCALL _telli64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell64))(__fd); }
+#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#endif /* !... */
 #ifdef __CRT_HAVE__filelengthi64
 __CDECLARE(__ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW_NCX,_filelengthi64,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE__filelengthi64 */
@@ -771,15 +799,6 @@ __CDECLARE(__ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW_NCX,_filelengthi64,(__fd_t __
 __NAMESPACE_LOCAL_USING_OR_IMPL(_filelengthi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelengthi64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_filelengthi64))(__fd); })
 #endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR && __SEEK_END && __SEEK_SET */
 #endif /* !__CRT_HAVE__filelengthi64 */
-#ifdef __CRT_HAVE__telli64
-__CDECLARE(__ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW_NCX,_telli64,(__fd_t __fd),(__fd))
-#else /* __CRT_HAVE__telli64 */
-#include <asm/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
-#include <local/io/_telli64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_telli64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _telli64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_telli64))(__fd); })
-#endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
-#endif /* !__CRT_HAVE__telli64 */
 #ifdef __CRT_HAVE_umask_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,umask_s,(__mode_t __newmode, __mode_t *__oldmode),(__newmode,__oldmode))
 #elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
@@ -879,12 +898,31 @@ __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd
 #include <local/io/filelength.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(filelength, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); })
 #endif /* ... */
-#ifdef __CRT_HAVE__tell
-__CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
-#include <local/io/tell.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
-#endif /* ... */
+#ifndef __tell_defined
+#define __tell_defined 1
+#if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
+#elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
+#elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
+#else /* ... */
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#include <local/unistd/tell.h>
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
+#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#undef __tell_defined
+#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) || !__SEEK_CUR */
+#endif /* !... */
+#endif /* !__tell_defined */
 #ifdef __CRT_HAVE__eof
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,eof,(__fd_t __fd),_eof,(__fd))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)

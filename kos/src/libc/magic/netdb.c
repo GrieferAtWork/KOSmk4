@@ -566,13 +566,13 @@ int rexec(char **__restrict ahost, int rport,
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[guard, cp]]
 int rexec_af(char **__restrict ahost, int rport,
              char const *__restrict name,
              char const *__restrict pass,
              char const *__restrict cmd,
              int *__restrict fd2p,
-             sa_family_t af);
+             $sa_family_t af);
 
 @@Check whether user REMUSER on system RHOST is allowed to login as LOCUSER.
 @@If SUSER is not zero the user tries to become superuser. Return 0 if
@@ -628,8 +628,8 @@ int rresvport(int *alport);
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
-int rresvport_af(int *alport, sa_family_t af);
+[[cp, guard]]
+int rresvport_af(int *alport, $sa_family_t af);
 %#endif /* __USE_MISC */
 
 

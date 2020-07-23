@@ -230,10 +230,12 @@
  * Solaris (or more specifically: OpenSolaris) */
 #ifdef __EXTENSIONS__
 #define __USE_SOLARIS  1
-#define __MISC_VISIBLE 1
-#define __SVID_VISIBLE 1
-#define __USE_MISC     1
-#define __USE_XOPEN2K8 1
+#undef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#undef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#undef _ATFILE_SOURCE
+#define _ATFILE_SOURCE 1
 #endif /* __EXTENSIONS__ */
 
 
@@ -242,32 +244,36 @@
 #define __USE_NETBSD 1
 #endif /* _NETBSD_SOURCE */
 
-#if (defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
-    !defined(_DEFAULT_SOURCE)
+#if ((defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
+     !defined(_DEFAULT_SOURCE))
 #undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
 #endif
 
 #ifdef _GNU_SOURCE
-#undef  _ISOC95_SOURCE
+#undef _ISOC95_SOURCE
 #define _ISOC95_SOURCE 1
-#undef  _ISOC99_SOURCE
+#undef _ISOC99_SOURCE
 #define _ISOC99_SOURCE 1
-#undef  _ISOC11_SOURCE
+#undef _ISOC11_SOURCE
 #define _ISOC11_SOURCE 1
-#undef  _POSIX_SOURCE
+#undef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
-#undef  _POSIX_C_SOURCE
+#if !defined(_POSIX_C_SOURCE) || ((_POSIX_C_SOURCE + 0) < 200809L)
+#undef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
-#undef  _XOPEN_SOURCE
+#endif /* _POSIX_C_SOURCE < 200809L */
+#if !defined(_XOPEN_SOURCE) || ((_XOPEN_SOURCE + 0) < 700)
+#undef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
-#undef  _XOPEN_SOURCE_EXTENDED
+#endif /* _XOPEN_SOURCE < 200809L */
+#undef _XOPEN_SOURCE_EXTENDED
 #define _XOPEN_SOURCE_EXTENDED 1
-#undef  _LARGEFILE64_SOURCE
+#undef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE 1
-#undef  _DEFAULT_SOURCE
+#undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
-#undef  _ATFILE_SOURCE
+#undef _ATFILE_SOURCE
 #define _ATFILE_SOURCE 1
 #endif /* _GNU_SOURCE */
 
@@ -363,25 +369,25 @@
 #define __USE_POSIX 1
 #endif
 
-#if defined(_XOPEN_SOURCE) || \
-   (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 2)
+#if (defined(_XOPEN_SOURCE) || \
+     (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 2))
 #define __POSIX_VISIBLE 199209
 #define __USE_POSIX2 1
-#endif /* _POSIX_C_SOURCE >= 2 */
+#endif /* _XOPEN_SOURCE || _POSIX_C_SOURCE >= 2 */
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199309L
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 199309L
 #undef __POSIX_VISIBLE
 #define __POSIX_VISIBLE 199309
 #define __USE_POSIX199309 1
 #endif /* _POSIX_C_SOURCE >= 199309L */
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199506L
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 199506L
 #undef __POSIX_VISIBLE
 #define __POSIX_VISIBLE 199506
 #define __USE_POSIX199506 1
 #endif /* _POSIX_C_SOURCE >= 199506L */
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200112L
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 200112L
 #undef __POSIX_VISIBLE
 #define __POSIX_VISIBLE 200112
 #define __USE_XOPEN2K 1
@@ -391,7 +397,7 @@
 #define __USE_ISOC99 1
 #endif /* _POSIX_C_SOURCE >= 200112L */
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200809L
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 200809L
 #undef __POSIX_VISIBLE
 #define __POSIX_VISIBLE 200809
 #define __USE_XOPEN2K8 1
@@ -442,12 +448,12 @@
 #endif /* _LARGEFILE64_SOURCE */
 
 #ifdef _FILE_OFFSET_BITS
-#if (_FILE_OFFSET_BITS+0) == 64
+#if _FILE_OFFSET_BITS + 0 == 64
 #define __USE_FILE_OFFSET64 1
-#endif
+#endif /* _FILE_OFFSET_BITS == 64 */
 #elif defined(__USE_KOS_KERNEL)
 #define __USE_FILE_OFFSET64 1
-#endif
+#endif /* ... */
 
 #ifdef _DEFAULT_SOURCE
 #define __MISC_VISIBLE 1
@@ -472,7 +478,7 @@
 #ifdef __CRT_CYG
 #define __USE_REENTRANT 1
 #endif /* __CRT_CYG */
-#endif
+#endif /* ... */
 
 /* Enable additional utf16/32 functions in system headers. */
 #ifdef _UTF_SOURCE

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x524413ad */
+/* HASH CRC-32:0x81d9f2ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -780,25 +780,31 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,pthread_setconcurrency,(int __level),(__level)
  * This function is similar to the POSIX `sched_yield' function but
  * might be differently implemented in the case of a m-on-n thread
  * implementation */
-__CREDIRECT(,int,__NOTHROW_NCX,pthread_yield,(void),sched_yield,())
+__CREDIRECT(,int,__NOTHROW,pthread_yield,(void),sched_yield,())
 #elif defined(__CRT_HAVE_thrd_yield)
 /* Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might be differently implemented in the case of a m-on-n thread
  * implementation */
-__CREDIRECT(,int,__NOTHROW_NCX,pthread_yield,(void),thrd_yield,())
+__CREDIRECT(,int,__NOTHROW,pthread_yield,(void),thrd_yield,())
 #elif defined(__CRT_HAVE_pthread_yield)
 /* Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might be differently implemented in the case of a m-on-n thread
  * implementation */
-__CDECLARE(,int,__NOTHROW_NCX,pthread_yield,(void),())
+__CDECLARE(,int,__NOTHROW,pthread_yield,(void),())
 #elif defined(__CRT_HAVE___sched_yield)
 /* Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might be differently implemented in the case of a m-on-n thread
  * implementation */
-__CREDIRECT(,int,__NOTHROW_NCX,pthread_yield,(void),__sched_yield,())
+__CREDIRECT(,int,__NOTHROW,pthread_yield,(void),__sched_yield,())
+#elif defined(__CRT_HAVE_yield)
+/* Yield the processor to another thread or process.
+ * This function is similar to the POSIX `sched_yield' function but
+ * might be differently implemented in the case of a m-on-n thread
+ * implementation */
+__CREDIRECT(,int,__NOTHROW,pthread_yield,(void),yield,())
 #endif /* ... */
 
 /* Limit specified thread THREAD to run only on the processors represented in CPUSET */

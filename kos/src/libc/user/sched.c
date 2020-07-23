@@ -185,12 +185,12 @@ NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid)
 }
 /*[[[end:libc_sched_getscheduler]]]*/
 
-/*[[[head:libc_sched_yield,hash:CRC-32=0x87ccb48a]]]*/
+/*[[[head:libc_sched_yield,hash:CRC-32=0xa1b4f9c9]]]*/
 /* @return: 1: Another thread was executed prior to the function returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 INTERN ATTR_SECTION(".text.crt.sched.thread") int
-NOTHROW_NCX(LIBCCALL libc_sched_yield)(void)
+NOTHROW(LIBCCALL libc_sched_yield)(void)
 /*[[[body:libc_sched_yield]]]*/
 {
 	errno_t result;
@@ -277,7 +277,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x722b9c1]]]*/
+/*[[[start:exports,hash:CRC-32=0xccd61488]]]*/
 DEFINE_PUBLIC_ALIAS(unshare, libc_unshare);
 DEFINE_PUBLIC_ALIAS(sched_getcpu, libc_sched_getcpu);
 DEFINE_PUBLIC_ALIAS(setns, libc_setns);
@@ -292,6 +292,7 @@ DEFINE_PUBLIC_ALIAS(sched_getscheduler, libc_sched_getscheduler);
 DEFINE_PUBLIC_ALIAS(thrd_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(pthread_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(__sched_yield, libc_sched_yield);
+DEFINE_PUBLIC_ALIAS(yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(__sched_get_priority_max, libc_sched_get_priority_max);
 DEFINE_PUBLIC_ALIAS(sched_get_priority_max, libc_sched_get_priority_max);

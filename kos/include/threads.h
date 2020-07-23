@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85e2c88b */
+/* HASH CRC-32:0xae2d37db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -303,25 +303,31 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_join, __FORCELOCAL __ATTR_ARTIFICIAL int __
  * thread should execute next. The current thread may be selected by the
  * scheduler to keep running
  * s.a. `pthread_yield()' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,thrd_yield,(void),sched_yield,())
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),sched_yield,())
 #elif defined(__CRT_HAVE_thrd_yield)
 /* Stop current thread execution and call the scheduler to decide which
  * thread should execute next. The current thread may be selected by the
  * scheduler to keep running
  * s.a. `pthread_yield()' */
-__CDECLARE_VOID(,__NOTHROW_NCX,thrd_yield,(void),())
+__CDECLARE_VOID(,__NOTHROW,thrd_yield,(void),())
 #elif defined(__CRT_HAVE_pthread_yield)
 /* Stop current thread execution and call the scheduler to decide which
  * thread should execute next. The current thread may be selected by the
  * scheduler to keep running
  * s.a. `pthread_yield()' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,thrd_yield,(void),pthread_yield,())
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),pthread_yield,())
 #elif defined(__CRT_HAVE___sched_yield)
 /* Stop current thread execution and call the scheduler to decide which
  * thread should execute next. The current thread may be selected by the
  * scheduler to keep running
  * s.a. `pthread_yield()' */
-__CREDIRECT_VOID(,__NOTHROW_NCX,thrd_yield,(void),__sched_yield,())
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),__sched_yield,())
+#elif defined(__CRT_HAVE_yield)
+/* Stop current thread execution and call the scheduler to decide which
+ * thread should execute next. The current thread may be selected by the
+ * scheduler to keep running
+ * s.a. `pthread_yield()' */
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),yield,())
 #endif /* ... */
 
 

@@ -103,11 +103,11 @@ int putpmsg($fd_t fildes,
             __STDC_INT_AS_UINT_T flags);
 
 @@Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space
-[[cp_kos, decl_include("<bits/types.h>")]]
+[[guard, cp_kos, decl_include("<bits/types.h>")]]
 int fattach($fd_t fildes, [[nonnull]] char const *__restrict path);
 
 @@Detach a name PATH from a STREAMS-based file descriptor
-[[cp_kos]]
+[[guard, cp_kos]]
 int fdetach([[nonnull]] char const *__restrict path);
 
 

@@ -1539,6 +1539,7 @@ char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 @@@param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+@@@return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
                   char *resolved, $size_t buflen, $atflag_t flags);
@@ -1706,7 +1707,7 @@ char *ptsname($fd_t fd); /* TODO: Implement using `ptsname_r()' */
 %
 %#ifdef __USE_XOPEN2KXSI
 [[cp, wunused]]
-int posix_openpt($oflag_t oflags);
+$fd_t posix_openpt($oflag_t oflags);
 %#endif /* __USE_XOPEN2KXSI */
 
 

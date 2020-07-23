@@ -1437,7 +1437,7 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libc_frealpathat,hash:CRC-32=0xe581c981]]]*/
+/*[[[head:libc_frealpathat,hash:CRC-32=0xf1848335]]]*/
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to the symlink itself to be printed. - Otherwise, the
@@ -1449,7 +1449,8 @@ done:
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
- * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((2)) char *
 NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
                                        char const *filename,
@@ -1505,7 +1506,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 	                         filename,
 	                         buffer,
 	                         buflen,
-	                         flags);
+	                         flags | AT_READLINK_REQSIZE);
 	if (E_ISERR(result)) {
 		if (!resolved) {
 err_buffer_result_errno:
@@ -1513,6 +1514,10 @@ err_buffer_result_errno:
 		}
 		libc_seterrno(-result);
 		return NULL;
+	}
+	if unlikely((size_t)result > buflen) {
+		result = -ERANGE;
+		goto err_buffer_result_errno;
 	}
 done:
 	return buffer;
@@ -1602,8 +1607,8 @@ NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd)
 }
 /*[[[end:libc_ptsname]]]*/
 
-/*[[[head:libc_posix_openpt,hash:CRC-32=0xe65ede97]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
+/*[[[head:libc_posix_openpt,hash:CRC-32=0x9f0949e1]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED fd_t
 NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 /*[[[body:libc_posix_openpt]]]*/
 /*AUTO*/{

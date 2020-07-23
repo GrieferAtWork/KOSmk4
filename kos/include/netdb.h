@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40e444e7 */
+/* HASH CRC-32:0xddc36a05 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -452,11 +452,18 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_T
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__name,__pass,__cmd,__fd2p))
+#ifndef __rexec_af_defined
+#define __rexec_af_defined 1
+#ifdef __CRT_HAVE_rexec_af
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
+__CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
+#else /* __CRT_HAVE_rexec_af */
+#undef __rexec_af_defined
+#endif /* !__CRT_HAVE_rexec_af */
+#endif /* !__rexec_af_defined */
 /* Check whether user REMUSER on system RHOST is allowed to login as LOCUSER.
  * If SUSER is not zero the user tries to become superuser. Return 0 if
  * it is possible.
@@ -487,11 +494,18 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser,
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
+#ifndef __rresvport_af_defined
+#define __rresvport_af_defined 1
+#ifdef __CRT_HAVE_rresvport_af
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, sa_family_t __af),(__alport,__af))
+__CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af),(__alport,__af))
+#else /* __CRT_HAVE_rresvport_af */
+#undef __rresvport_af_defined
+#endif /* !__CRT_HAVE_rresvport_af */
+#endif /* !__rresvport_af_defined */
 #endif /* __USE_MISC */
 
 /* Extension from POSIX.1:2001. */

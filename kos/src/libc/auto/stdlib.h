@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1f8efbc */
+/* HASH CRC-32:0xc15aa225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -334,7 +334,8 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolv
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
- * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
@@ -363,7 +364,7 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mkdtemp)(char *templ
 INTDEF int NOTHROW_NCX(LIBDCALL libd_grantpt)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
-INTDEF WUNUSED int NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
+INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_strtol_l)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

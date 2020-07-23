@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e90531f */
+/* HASH CRC-32:0x9e291a8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -471,8 +471,6 @@
 #define __CRT_HAVE_DOS$_swscanf_l 1
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$_tell 1
-#define __CRT_HAVE_DOS$_telli64 1
 #define __CRT_HAVE_DOS$_ui64toa 1
 #define __CRT_HAVE_DOS$_ui64toa_s 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -842,6 +840,7 @@
 #define __CRT_HAVE_DOS$fchmodat 1
 #define __CRT_HAVE_DOS$fchown 1
 #define __CRT_HAVE_DOS$fchownat 1
+#define __CRT_HAVE_DOS$fchroot 1
 #define __CRT_HAVE_DOS$fclose 1
 #define __CRT_HAVE_DOS$fcntl 1
 #define __CRT_HAVE_DOS$fcvt 1
@@ -2116,6 +2115,7 @@
 #define __CRT_HAVE_DOS$remquol 1
 #define __CRT_HAVE_DOS$rename 1
 #define __CRT_HAVE_DOS$renameat 1
+#define __CRT_HAVE_DOS$resolvepath 1
 #define __CRT_HAVE_DOS$revoke 1
 #define __CRT_HAVE_DOS$rewind 1
 #define __CRT_HAVE_DOS$rewind_unlocked 1
@@ -2503,6 +2503,8 @@
 #define __CRT_HAVE_DOS$tdelete 1
 #define __CRT_HAVE_DOS$tdestroy 1
 #define __CRT_HAVE_DOS$tee 1
+#define __CRT_HAVE_DOS$tell 1
+#define __CRT_HAVE_DOS$tell64 1
 #define __CRT_HAVE_DOS$telldir 1
 #define __CRT_HAVE_DOS$tempnam 1
 #define __CRT_HAVE_DOS$tfind 1
@@ -3403,8 +3405,6 @@
 #define __CRT_HAVE__swprintf_p_l 1
 #define __CRT_HAVE__swprintf_s_l 1
 #define __CRT_HAVE__swscanf_l 1
-#define __CRT_HAVE__tell 1
-#define __CRT_HAVE__telli64 1
 #define __CRT_HAVE__tempnam_dbg 1
 #define __CRT_HAVE__ui64toa 1
 #define __CRT_HAVE__ui64toa_s 1
@@ -3793,6 +3793,7 @@
 #define __CRT_HAVE_fchmodat 1
 #define __CRT_HAVE_fchown 1
 #define __CRT_HAVE_fchownat 1
+#define __CRT_HAVE_fchroot 1
 #define __CRT_HAVE_fclose 1
 #define __CRT_HAVE_fcloseall 1
 #define __CRT_HAVE_fcntl 1
@@ -5135,6 +5136,7 @@
 #define __CRT_HAVE_remquol 1
 #define __CRT_HAVE_rename 1
 #define __CRT_HAVE_renameat 1
+#define __CRT_HAVE_resolvepath 1
 #define __CRT_HAVE_revoke 1
 #define __CRT_HAVE_rewind 1
 #define __CRT_HAVE_rewind_unlocked 1
@@ -5536,6 +5538,8 @@
 #define __CRT_HAVE_tdelete 1
 #define __CRT_HAVE_tdestroy 1
 #define __CRT_HAVE_tee 1
+#define __CRT_HAVE_tell 1
+#define __CRT_HAVE_tell64 1
 #define __CRT_HAVE_telldir 1
 #define __CRT_HAVE_tempnam 1
 #define __CRT_HAVE_tfind 1

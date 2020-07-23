@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x553dd94f */
+/* HASH CRC-32:0x4d8d3e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid);
 /* @return: 1: Another thread was executed prior to the function returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_yield)(void);
+INTDEF int NOTHROW(LIBCCALL libc_sched_yield)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset);

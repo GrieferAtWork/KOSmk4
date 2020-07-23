@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab706e1c */
+/* HASH CRC-32:0x27979b65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -299,7 +299,6 @@ DFUN(".text.crt.dos.fs.io", libd__sopen_s, libc__sopen_s, TIn(__SIZEOF_ERRNO_T__
 DFUN(".text.crt.dos.fs.utility", libd__mktemp_s, libc__mktemp_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
 DFUN(".text.crt.dos.fs.io", libd__pipe, libc__pipe, TD, 3, TP, TI32, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.utility", libd__filelengthi64, libc__filelengthi64, TI64, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.fs.utility", libd__telli64, libc__telli64, TI64, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.basic_property", libd_umask_s, libc_umask_s, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_MODE_T__), TP)
 DFUN(".text.crt.dos.fs.utility", libd___lock_fhandle, libc___lock_fhandle, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.utility", libd__unlock_fhandle, libc__unlock_fhandle, TV, 1, TIn(__SIZEOF_FD_T__))
@@ -308,7 +307,6 @@ DFUN(".text.crt.dos.fs.utility", libd__open_osfhandle, libc__open_osfhandle, TIn
 DFUN(".text.crt.dos.fs.io", libd_setmode, libc_setmode, TIn(__SIZEOF_OFLAG_T__), 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.io", libd_sopen, libc_sopen, TIn(__SIZEOF_FD_T__), 4, TP, TIn(__SIZEOF_OFLAG_T__), TD, TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.fs.utility", libd__filelength, libc__filelength, TI32, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.fs.utility", libd__tell, libc__tell, TI32, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.utility", libd__eof, libc__eof, TD, 1, TIn(__SIZEOF_FD_T__))
 
 /* kos.except-handler */
@@ -1496,7 +1494,7 @@ DFUN(".text.crt.dos.fs.utility", libd_mkdtemp, libc_mkdtemp, TP, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_grantpt, libc_grantpt, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.tty", libd_unlockpt, libc_unlockpt, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.tty", libd_ptsname, libc_ptsname, TP, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.io.tty", libd_posix_openpt, libc_posix_openpt, TD, 1, TIn(__SIZEOF_OFLAG_T__))
+DFUN(".text.crt.dos.io.tty", libd_posix_openpt, libc_posix_openpt, TIn(__SIZEOF_FD_T__), 1, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtol_l, libc_strtol_l, TL, 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoul_l, libc_strtoul_l, TL, 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoll_l, libc_strtoll_l, TLL, 4, TP, TP, TD, TP)
@@ -2382,6 +2380,10 @@ DFUN(".text.crt.dos.io.tty", libd_ctermid, libc_ctermid, TP, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
 DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.solaris", libd_fchroot, libc_fchroot, TD, 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.solaris", libd_resolvepath, libc_resolvepath, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.solaris", libd_tell, libc_tell, TIn(__SIZEOF_OFF32_T__), 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.solaris", libd_tell64, libc_tell64, TIn(__SIZEOF_OFF64_T__), 1, TIn(__SIZEOF_FD_T__))
 
 /* util */
 DFUN(".text.crt.dos.io.tty", libd_opendev, libc_opendev, TIn(__SIZEOF_FD_T__), 4, TP, TIn(__SIZEOF_OFLAG_T__), TD, TP)

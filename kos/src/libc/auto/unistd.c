@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb07362b */
+/* HASH CRC-32:0xfa82a2c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,6 +241,58 @@ INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
 NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
 	libc_fcntl(lowfd, __F_CLOSEM);
 }
+#include <asm/fcntl.h>
+/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+INTERN ATTR_SECTION(".text.crt.solaris") int
+NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
+	fd_t result;
+	result = libc_dup2(fd, __AT_FDROOT);
+	if likely(result >= 0)
+		result = 0;
+	return result;
+}
+#include <parts/errno.h>
+/* Similar to `frealpathat(2)' (though use the later for more options)
+ * Also note that this function appears to have a weird rule (which KOS simply
+ * ignores) that is related to this function not writing more than `PATH_MAX'
+ * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+ * is to be able to handle names of arbitrary lengths)
+ * Additionally, the online docs don't mention what happens when `buflen' is too
+ * small, so I guess I can just make up what's supposed to happen, and I say that
+ * the function will set errno=ERANGE and return -1
+ * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+ * @return: -1: Error. (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
+                                       char *resolved,
+                                       size_t buflen) {
+	__STDC_INT_AS_SSIZE_T retval;
+	char *result;
+	result = libc_frealpathat(__AT_FDCWD, filename, resolved, buflen, 0);
+	if unlikely(!result)
+		return -1;
+	retval = (__STDC_INT_AS_SSIZE_T)libc_strlen(result);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	if unlikely(!resolved)
+		libc_free(result);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+	return retval;
+}
+#include <asm/stdio.h>
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off_t
+NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd) {
+	return libc_lseek(fd, 0, SEEK_CUR);
+}
+#include <asm/stdio.h>
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off64_t
+NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {
+	return libc_lseek64(fd, 0, __SEEK_CUR);
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -290,6 +342,12 @@ DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
 DEFINE_PUBLIC_ALIAS(swab, libc_swab);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
+DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
+DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);
+DEFINE_PUBLIC_ALIAS(_tell, libc_tell);
+DEFINE_PUBLIC_ALIAS(tell, libc_tell);
+DEFINE_PUBLIC_ALIAS(_telli64, libc_tell64);
+DEFINE_PUBLIC_ALIAS(tell64, libc_tell64);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNISTD_C */

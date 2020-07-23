@@ -823,7 +823,7 @@ __LIBC __LONGPTR_TYPE__ (timezone) __ASMNAME("__timezone");
 int stime32([[nonnull]] $time32_t const *when);
 
 @@Set the system time to *WHEN. This call is restricted to the superuser
-[[decl_include("<bits/types.h>"), no_crt_self_import]]
+[[guard, decl_include("<bits/types.h>"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("stime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("stime")]]
 [[userimpl, requires($has_function(stime32) || $has_function("stime64"))]]

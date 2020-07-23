@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf9b1d52 */
+/* HASH CRC-32:0x5f839c61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,11 +50,6 @@ NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 	if likely(result >= 0)
 		libc_lseek64(fd, oldpos, __SEEK_SET);
 	return result;
-}
-#include <asm/stdio.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int64_t
-NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd) {
-	return libc_lseek64(fd, 0, __SEEK_CUR);
 }
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
@@ -132,10 +127,6 @@ NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd) {
 		libc_lseek(fd, oldpos, SEEK_SET);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED __LONG32_TYPE__
-NOTHROW_NCX(LIBCCALL libc__tell)(fd_t fd) {
-	return libc_lseek(fd, 0, SEEK_CUR);
-}
 #include <asm/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
@@ -158,7 +149,6 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_pipe, libc__pipe);
 DEFINE_PUBLIC_ALIAS(_filelengthi64, libc__filelengthi64);
-DEFINE_PUBLIC_ALIAS(_telli64, libc__telli64);
 DEFINE_PUBLIC_ALIAS(umask_s, libc_umask_s);
 DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
 DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);
@@ -169,7 +159,6 @@ DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
 DEFINE_PUBLIC_ALIAS(_sopen, libc_sopen);
 DEFINE_PUBLIC_ALIAS(sopen, libc_sopen);
 DEFINE_PUBLIC_ALIAS(_filelength, libc__filelength);
-DEFINE_PUBLIC_ALIAS(_tell, libc__tell);
 DEFINE_PUBLIC_ALIAS(_eof, libc__eof);
 #endif /* !__KERNEL__ */
 

@@ -1573,6 +1573,7 @@
 #define __CRT_HAVE_fchmodat 1
 #define __CRT_HAVE_fchown 1
 #define __CRT_HAVE_fchownat 1
+#define __CRT_HAVE_fchroot 1
 #define __CRT_HAVE_fclose 1
 #define __CRT_HAVE_fcloseall 1
 #define __CRT_HAVE_fcntl 1
@@ -2902,6 +2903,7 @@
 #define __CRT_HAVE_remquol 1
 #define __CRT_HAVE_rename 1
 #define __CRT_HAVE_renameat 1
+#define __CRT_HAVE_resolvepath 1
 #define __CRT_HAVE_revoke 1
 #define __CRT_HAVE_rewind 1
 #define __CRT_HAVE_rewind_unlocked 1
@@ -4205,6 +4207,8 @@
 #define __CRT_HAVE_tdelete 1
 #define __CRT_HAVE_tdestroy 1
 #define __CRT_HAVE_tee 1
+#define __CRT_HAVE_tell 1
+#define __CRT_HAVE_tell64 1
 #define __CRT_HAVE_telldir 1
 #define __CRT_HAVE_tempnam 1
 #define __CRT_HAVE_tfind 1
@@ -4580,6 +4584,7 @@
 #define __CRT_HAVE_y1 1
 #define __CRT_HAVE_y1f 1
 #define __CRT_HAVE_y1l 1
+#define __CRT_HAVE_yield 1
 #define __CRT_HAVE_yn 1
 #define __CRT_HAVE_ynf 1
 #define __CRT_HAVE_ynl 1

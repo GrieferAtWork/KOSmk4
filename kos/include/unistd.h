@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf92c7f0 */
+/* HASH CRC-32:0x31b796a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,12 @@
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #include <bits/crt/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
+
+#ifdef __USE_SOLARIS
+#include <getopt.h>
+#define GF_PATH "/etc/group"
+#define PF_PATH "/etc/passwd"
+#endif /* __USE_SOLARIS */
 
 __SYSDECL_BEGIN
 
@@ -1919,8 +1925,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__getentropy_defined */
 #endif /* __USE_MISC */
 
-#if defined(__USE_MISC) || \
-   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+#if (defined(__USE_MISC) || \
+     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
@@ -1935,7 +1941,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char
 #undef __getpass_defined
 #endif /* !__CRT_HAVE_getpass */
 #endif /* !__getpass_defined */
-#endif /* ... */
+#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
@@ -1987,8 +1993,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftruncate64, __FORCELOCAL __ATTR_ARTIFICIAL int 
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
-#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || \
-     defined(__USE_MISC)
+#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || defined(__USE_MISC)
 /* >> brk(2), sbrk(2)
  * Change the program break, allowing for a rudimentary implementation of a heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
@@ -1998,7 +2003,7 @@ __CDECLARE(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),(__delta))
 #elif defined(__CRT_HAVE___sbrk)
 __CREDIRECT(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),__sbrk,(__delta))
 #endif /* ... */
-#endif
+#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) || __USE_MISC */
 
 #if defined(__USE_POSIX199309) || defined(__USE_UNIX98)
 #ifdef __CRT_HAVE_fdatasync
@@ -2068,7 +2073,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #endif /* __USE_XOPEN */
 
 
-#if (defined(_EVERY_SOURCE) || \
+#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* ... */
 #ifndef __ctermid_defined
@@ -2089,10 +2094,10 @@ __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
 #undef __cuserid_defined
 #endif /* !__CRT_HAVE_cuserid */
 #endif /* !__cuserid_defined */
-#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
-#if (defined(_EVERY_SOURCE) || \
+#if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
      (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K)))
 #ifndef ____pthread_atfork_func_t_defined
 #define ____pthread_atfork_func_t_defined 1
@@ -2117,10 +2122,10 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare,
 #undef __pthread_atfork_defined
 #endif /* !__CRT_HAVE_pthread_atfork */
 #endif /* !__pthread_atfork_defined */
-#endif /* _EVERY_SOURCE || (__USE_UNIX98 && !__USE_XOPEN2K) */
+#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_UNIX98 && !__USE_XOPEN2K) */
 
 
-#ifdef __USE_REENTRANT
+#if defined(__USE_REENTRANT) || defined(__USE_SOLARIS)
 #ifndef __ctermid_r_defined
 #define __ctermid_r_defined 1
 #ifdef __CRT_HAVE_ctermid_r
@@ -2134,7 +2139,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
 #undef __ctermid_r_defined
 #endif /* !... */
 #endif /* !__ctermid_r_defined */
-#endif /* __USE_REENTRANT */
+#endif /* __USE_REENTRANT || __USE_SOLARIS */
 
 
 #ifdef __CRT_HAVE_sysconf
@@ -2259,6 +2264,226 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__closefrom_defined */
 #endif /* __USE_BSD */
+
+#ifdef __USE_SOLARIS
+#ifndef __fattach_defined
+#define __fattach_defined 1
+#ifdef __CRT_HAVE_fattach
+/* Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fildes, char const *__restrict __path),(__fildes,__path))
+#else /* __CRT_HAVE_fattach */
+#undef __fattach_defined
+#endif /* !__CRT_HAVE_fattach */
+#endif /* !__fattach_defined */
+#ifndef __fdetach_defined
+#define __fdetach_defined 1
+#ifdef __CRT_HAVE_fdetach
+/* Detach a name PATH from a STREAMS-based file descriptor */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
+#else /* __CRT_HAVE_fdetach */
+#undef __fdetach_defined
+#endif /* !__CRT_HAVE_fdetach */
+#endif /* !__fdetach_defined */
+#ifndef __ioctl_defined
+#define __ioctl_defined 1
+#ifdef __CRT_HAVE_ioctl
+/* Perform the I/O control operation specified by REQUEST on FD.
+ * One argument may follow; its presence and type depend on REQUEST.
+ * Return value depends on REQUEST. Usually -1 indicates error */
+__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
+#else /* __CRT_HAVE_ioctl */
+#undef __ioctl_defined
+#endif /* !__CRT_HAVE_ioctl */
+#endif /* !__ioctl_defined */
+#ifndef __rexec_af_defined
+#define __rexec_af_defined 1
+#ifdef __CRT_HAVE_rexec_af
+/* This is the equivalent function where the protocol can be selected
+ * and which therefore can be used for IPv6.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
+#else /* __CRT_HAVE_rexec_af */
+#undef __rexec_af_defined
+#endif /* !__CRT_HAVE_rexec_af */
+#endif /* !__rexec_af_defined */
+#ifndef __rresvport_af_defined
+#define __rresvport_af_defined 1
+#ifdef __CRT_HAVE_rresvport_af
+/* This is the equivalent function where the protocol can be selected
+ * and which therefore can be used for IPv6.
+ * This function is not part of POSIX and therefore no official
+ * cancellation point */
+__CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af),(__alport,__af))
+#else /* __CRT_HAVE_rresvport_af */
+#undef __rresvport_af_defined
+#endif /* !__CRT_HAVE_rresvport_af */
+#endif /* !__rresvport_af_defined */
+#ifndef __stime_defined
+#define __stime_defined 1
+#if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)
+/* Set the system time to *WHEN. This call is restricted to the superuser */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
+#elif defined(__CRT_HAVE_stime) && !defined(__USE_TIME_BITS64)
+/* Set the system time to *WHEN. This call is restricted to the superuser */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),(__when))
+#elif defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime)
+#include <local/time/stime.h>
+/* Set the system time to *WHEN. This call is restricted to the superuser */
+__NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
+#else /* ... */
+#undef __stime_defined
+#endif /* !... */
+#endif /* !__stime_defined */
+#ifndef __tell_defined
+#define __tell_defined 1
+#if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
+#elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
+#elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
+#else /* ... */
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#include <local/unistd/tell.h>
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
+#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#undef __tell_defined
+#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) || !__SEEK_CUR */
+#endif /* !... */
+#endif /* !__tell_defined */
+#ifdef __CRT_HAVE_sched_yield
+/* Stop current thread execution and call the scheduler to decide which
+ * thread should execute next. The current thread may be selected by the
+ * scheduler to keep running
+ * s.a. `pthread_yield()' */
+__CREDIRECT_VOID(,__NOTHROW,yield,(void),sched_yield,())
+#elif defined(__CRT_HAVE_thrd_yield)
+/* Stop current thread execution and call the scheduler to decide which
+ * thread should execute next. The current thread may be selected by the
+ * scheduler to keep running
+ * s.a. `pthread_yield()' */
+__CREDIRECT_VOID(,__NOTHROW,yield,(void),thrd_yield,())
+#elif defined(__CRT_HAVE_pthread_yield)
+/* Stop current thread execution and call the scheduler to decide which
+ * thread should execute next. The current thread may be selected by the
+ * scheduler to keep running
+ * s.a. `pthread_yield()' */
+__CREDIRECT_VOID(,__NOTHROW,yield,(void),pthread_yield,())
+#elif defined(__CRT_HAVE___sched_yield)
+/* Stop current thread execution and call the scheduler to decide which
+ * thread should execute next. The current thread may be selected by the
+ * scheduler to keep running
+ * s.a. `pthread_yield()' */
+__CREDIRECT_VOID(,__NOTHROW,yield,(void),__sched_yield,())
+#elif defined(__CRT_HAVE_yield)
+/* Stop current thread execution and call the scheduler to decide which
+ * thread should execute next. The current thread may be selected by the
+ * scheduler to keep running
+ * s.a. `pthread_yield()' */
+__CDECLARE_VOID(,__NOTHROW,yield,(void),())
+#endif /* ... */
+#ifdef __CRT_HAVE_fchroot
+/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+__CDECLARE(,int,__NOTHROW_NCX,fchroot,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_fchroot */
+#include <asm/fcntl.h>
+#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && defined(__AT_FDROOT)
+#include <local/unistd/fchroot.h>
+/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fchroot, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fchroot)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fchroot))(__fd); })
+#endif /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && __AT_FDROOT */
+#endif /* !__CRT_HAVE_fchroot */
+#ifdef __CRT_HAVE_resolvepath
+/* Similar to `frealpathat(2)' (though use the later for more options)
+ * Also note that this function appears to have a weird rule (which KOS simply
+ * ignores) that is related to this function not writing more than `PATH_MAX'
+ * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+ * is to be able to handle names of arbitrary lengths)
+ * Additionally, the online docs don't mention what happens when `buflen' is too
+ * small, so I guess I can just make up what's supposed to happen, and I say that
+ * the function will set errno=ERANGE and return -1
+ * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+ * @return: -1: Error. (s.a. `errno') */
+__CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,resolvepath,(char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen),(__filename,__resolved,__buflen))
+#else /* __CRT_HAVE_resolvepath */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_frealpathat) && defined(__AT_FDCWD)
+#include <local/unistd/resolvepath.h>
+/* Similar to `frealpathat(2)' (though use the later for more options)
+ * Also note that this function appears to have a weird rule (which KOS simply
+ * ignores) that is related to this function not writing more than `PATH_MAX'
+ * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+ * is to be able to handle names of arbitrary lengths)
+ * Additionally, the online docs don't mention what happens when `buflen' is too
+ * small, so I guess I can just make up what's supposed to happen, and I say that
+ * the function will set errno=ERANGE and return -1
+ * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+ * @return: -1: Error. (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(resolvepath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL resolvepath)(char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(resolvepath))(__filename, __resolved, __buflen); })
+#endif /* __CRT_HAVE_frealpathat && __AT_FDCWD */
+#endif /* !__CRT_HAVE_resolvepath */
+#ifndef __tell_defined
+#define __tell_defined 1
+#if defined(__CRT_HAVE_tell64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
+#elif defined(__CRT_HAVE__telli64) && defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
+#elif defined(__CRT_HAVE_tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE__tell) && !defined(__USE_FILE_OFFSET64)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
+#else /* ... */
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#include <local/unistd/tell.h>
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
+#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#undef __tell_defined
+#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) || !__SEEK_CUR */
+#endif /* !... */
+#endif /* !__tell_defined */
+#ifdef __USE_LARGEFILE64
+#ifndef __tell64_defined
+#define __tell64_defined 1
+#ifdef __CRT_HAVE_tell64
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+__CDECLARE(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,tell64,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE__telli64)
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+__CREDIRECT(__ATTR_WUNUSED,__off64_t,__NOTHROW_NCX,tell64,(__fd_t __fd),_telli64,(__fd))
+#else /* ... */
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
+#include <local/unistd/tell64.h>
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tell64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off64_t __NOTHROW_NCX(__LIBCCALL tell64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell64))(__fd); })
+#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
+#undef __tell64_defined
+#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) || !__SEEK_CUR */
+#endif /* !... */
+#endif /* !__tell64_defined */
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

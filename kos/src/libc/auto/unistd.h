@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x883c05bb */
+/* HASH CRC-32:0xda686c12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,6 +461,62 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_closefrom)(fd_t lowfd);
 #ifndef __KERNEL__
 /* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
+ * and referrs to a directory, then this function can be used to escape a chroot() jail.
+ * No special permissions are required to use this function, since a malicious application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Similar to `frealpathat(2)' (though use the later for more options)
+ * Also note that this function appears to have a weird rule (which KOS simply
+ * ignores) that is related to this function not writing more than `PATH_MAX'
+ * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+ * is to be able to handle names of arbitrary lengths)
+ * Additionally, the online docs don't mention what happens when `buflen' is too
+ * small, so I guess I can just make up what's supposed to happen, and I say that
+ * the function will set errno=ERANGE and return -1
+ * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+ * @return: -1: Error. (s.a. `errno') */
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_resolvepath)(char const *filename, char *resolved, size_t buflen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Similar to `frealpathat(2)' (though use the later for more options)
+ * Also note that this function appears to have a weird rule (which KOS simply
+ * ignores) that is related to this function not writing more than `PATH_MAX'
+ * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
+ * is to be able to handle names of arbitrary lengths)
+ * Additionally, the online docs don't mention what happens when `buflen' is too
+ * small, so I guess I can just make up what's supposed to happen, and I say that
+ * the function will set errno=ERANGE and return -1
+ * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
+ * @return: -1: Error. (s.a. `errno') */
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename, char *resolved, size_t buflen);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+INTDEF WUNUSED off_t NOTHROW_NCX(LIBDCALL libd_tell)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
+INTDEF WUNUSED off_t NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+INTDEF WUNUSED off64_t NOTHROW_NCX(LIBDCALL libd_tell64)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
+INTDEF WUNUSED off64_t NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd);
 #endif /* !__KERNEL__ */
 
 DECL_END

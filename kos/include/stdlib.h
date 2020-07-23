@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5478abf */
+/* HASH CRC-32:0x8ff6b878 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1740,7 +1740,8 @@ __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
- * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__dirfd,__filename,__resolved,__buflen,__flags))
 #endif /* __USE_KOS */
 
@@ -1853,7 +1854,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
 #endif /* __USE_XOPEN */
 
 #ifdef __USE_XOPEN2KXSI
-__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflags),(__oflags))
+__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflags),(__oflags))
 #endif /* __USE_XOPEN2KXSI */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_strtol_l

@@ -1570,6 +1570,7 @@
 #define __CRT_HAVE_fchmodat 1
 #define __CRT_HAVE_fchown 1
 #define __CRT_HAVE_fchownat 1
+#define __CRT_HAVE_fchroot 1
 #define __CRT_HAVE_fclose 1
 #define __CRT_HAVE_fcloseall 1
 #define __CRT_HAVE_fcntl 1
@@ -2899,6 +2900,7 @@
 #define __CRT_HAVE_remquol 1
 #define __CRT_HAVE_rename 1
 #define __CRT_HAVE_renameat 1
+#define __CRT_HAVE_resolvepath 1
 #define __CRT_HAVE_revoke 1
 #define __CRT_HAVE_rewind 1
 #define __CRT_HAVE_rewind_unlocked 1
@@ -4043,6 +4045,8 @@
 #define __CRT_HAVE_tdelete 1
 #define __CRT_HAVE_tdestroy 1
 #define __CRT_HAVE_tee 1
+#define __CRT_HAVE_tell 1
+#define __CRT_HAVE_tell64 1
 #define __CRT_HAVE_telldir 1
 #define __CRT_HAVE_tempnam 1
 #define __CRT_HAVE_tfind 1
@@ -4418,6 +4422,7 @@
 #define __CRT_HAVE_y1 1
 #define __CRT_HAVE_y1f 1
 #define __CRT_HAVE_y1l 1
+#define __CRT_HAVE_yield 1
 #define __CRT_HAVE_yn 1
 #define __CRT_HAVE_ynf 1
 #define __CRT_HAVE_ynl 1
@@ -5818,6 +5823,7 @@
 #define __CRT_HAVE_KOS$fchmodat 1
 #define __CRT_HAVE_KOS$fchown 1
 #define __CRT_HAVE_KOS$fchownat 1
+#define __CRT_HAVE_KOS$fchroot 1
 #define __CRT_HAVE_KOS$fclose 1
 #define __CRT_HAVE_KOS$fcntl 1
 #define __CRT_HAVE_KOS$fcvt 1
@@ -7055,6 +7061,7 @@
 #define __CRT_HAVE_KOS$remquol 1
 #define __CRT_HAVE_KOS$rename 1
 #define __CRT_HAVE_KOS$renameat 1
+#define __CRT_HAVE_KOS$resolvepath 1
 #define __CRT_HAVE_KOS$revoke 1
 #define __CRT_HAVE_KOS$rewind 1
 #define __CRT_HAVE_KOS$rewind_unlocked 1
@@ -7423,6 +7430,8 @@
 #define __CRT_HAVE_KOS$tdelete 1
 #define __CRT_HAVE_KOS$tdestroy 1
 #define __CRT_HAVE_KOS$tee 1
+#define __CRT_HAVE_KOS$tell 1
+#define __CRT_HAVE_KOS$tell64 1
 #define __CRT_HAVE_KOS$telldir 1
 #define __CRT_HAVE_KOS$tempnam 1
 #define __CRT_HAVE_KOS$tfind 1
@@ -9187,6 +9196,7 @@
 #define __CRT_HAVE_DOS$fchmodat 1
 #define __CRT_HAVE_DOS$fchown 1
 #define __CRT_HAVE_DOS$fchownat 1
+#define __CRT_HAVE_DOS$fchroot 1
 #define __CRT_HAVE_DOS$fclose 1
 #define __CRT_HAVE_DOS$fcntl 1
 #define __CRT_HAVE_DOS$fcvt 1
@@ -10424,6 +10434,7 @@
 #define __CRT_HAVE_DOS$remquol 1
 #define __CRT_HAVE_DOS$rename 1
 #define __CRT_HAVE_DOS$renameat 1
+#define __CRT_HAVE_DOS$resolvepath 1
 #define __CRT_HAVE_DOS$revoke 1
 #define __CRT_HAVE_DOS$rewind 1
 #define __CRT_HAVE_DOS$rewind_unlocked 1
@@ -10792,6 +10803,8 @@
 #define __CRT_HAVE_DOS$tdelete 1
 #define __CRT_HAVE_DOS$tdestroy 1
 #define __CRT_HAVE_DOS$tee 1
+#define __CRT_HAVE_DOS$tell 1
+#define __CRT_HAVE_DOS$tell64 1
 #define __CRT_HAVE_DOS$telldir 1
 #define __CRT_HAVE_DOS$tempnam 1
 #define __CRT_HAVE_DOS$tfind 1
