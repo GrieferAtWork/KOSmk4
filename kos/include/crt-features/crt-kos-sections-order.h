@@ -181,6 +181,7 @@
 	.glibc*                           # GLibc-specific stuff
 	.bsd.stringlist*                  # BSD's <stringlist.h> header
 	.bsd.*                            # Misc BSD functions
+	.solaris.*                        # Misc Solaris functions
 	.unsorted*                        # Everything else...
 
 ]]]*/

@@ -77,7 +77,7 @@ int crt_posix_memalign([[nonnull]] void **__restrict pp,
 
 %
 
-[[wunused, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
+[[guard, wunused, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
 [[ATTR_MALLOC, export_alias("aligned_alloc")]]
 [[if(__has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("aligned_alloc", { return __builtin_aligned_alloc(alignment, n_bytes); })]]

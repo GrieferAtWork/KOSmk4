@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e39bafb */
+/* HASH CRC-32:0xc5478abf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,6 +172,10 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #ifdef __USE_GNU
 #include <xlocale.h>
 #endif /* __USE_GNU */
+
+#ifdef __USE_SOLARIS
+#include <getopt.h>
+#endif /* __USE_SOLARIS */
 
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
@@ -2223,6 +2227,171 @@ __CDECLARE_VOID(,__NOTHROW_NCX,freezero,(void *__mallptr, __SIZE_TYPE__ __num_by
 __NAMESPACE_LOCAL_USING_OR_IMPL(freezero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL freezero)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(freezero))(__mallptr, __num_bytes); })
 #endif /* ... */
 #endif /* __USE_BSD */
+#ifdef __USE_SOLARIS
+#ifndef __uid_t_defined
+#define __uid_t_defined 1
+typedef __uid_t uid_t; /* User ID */
+#endif /* !__uid_t_defined */
+#ifndef __closefrom_defined
+#define __closefrom_defined 1
+#ifdef __CRT_HAVE_closefrom
+/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+__CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
+#else /* __CRT_HAVE_closefrom */
+#include <asm/fcntl.h>
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
+#include <local/unistd/closefrom.h>
+/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom))(__lowfd); })
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
+#undef __closefrom_defined
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM */
+#endif /* !__CRT_HAVE_closefrom */
+#endif /* !__closefrom_defined */
+#ifndef __dup2_defined
+#define __dup2_defined 1
+#ifdef __CRT_HAVE_dup2
+/* >> dup2(2)
+ * @return: NEWFD: Returns the new handle upon success.
+ * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+__CDECLARE(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
+#elif defined(__CRT_HAVE__dup2)
+/* >> dup2(2)
+ * @return: NEWFD: Returns the new handle upon success.
+ * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___dup2)
+/* >> dup2(2)
+ * @return: NEWFD: Returns the new handle upon success.
+ * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
+#else /* ... */
+#undef __dup2_defined
+#endif /* !... */
+#endif /* !__dup2_defined */
+#ifndef __getcwd_defined
+#define __getcwd_defined 1
+#ifdef __CRT_HAVE_getcwd
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CDECLARE(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
+#elif defined(__CRT_HAVE__getcwd)
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd,(__buf,__bufsize))
+#else /* ... */
+#undef __getcwd_defined
+#endif /* !... */
+#endif /* !__getcwd_defined */
+#ifndef __getlogin_defined
+#define __getlogin_defined 1
+#ifdef __CRT_HAVE_getlogin
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
+#else /* __CRT_HAVE_getlogin */
+#undef __getlogin_defined
+#endif /* !__CRT_HAVE_getlogin */
+#endif /* !__getlogin_defined */
+#ifndef __getpass_defined
+#define __getpass_defined 1
+#ifdef __CRT_HAVE_getpass
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
+#else /* __CRT_HAVE_getpass */
+#undef __getpass_defined
+#endif /* !__CRT_HAVE_getpass */
+#endif /* !__getpass_defined */
+#ifndef __getpw_defined
+#define __getpw_defined 1
+#ifdef __CRT_HAVE_getpw
+/* Re-construct the password-file line for the given uid in the
+ * given buffer. This knows the format that the caller will
+ * expect, but this need not be the format of the password file */
+__CDECLARE(,int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer),(__uid,__buffer))
+#elif defined(__CRT_HAVE_getpwuid)
+#include <local/pwd/getpw.h>
+/* Re-construct the password-file line for the given uid in the
+ * given buffer. This knows the format that the caller will
+ * expect, but this need not be the format of the password file */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpw, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL getpw)(__uid_t __uid, char *__buffer) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpw))(__uid, __buffer); })
+#else /* ... */
+#undef __getpw_defined
+#endif /* !... */
+#endif /* !__getpw_defined */
+#ifndef __isatty_defined
+#define __isatty_defined 1
+#ifdef __CRT_HAVE_isatty
+/* >> isatty(2)
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty
+ * Check if the given file handle `FD' refers to a TTY */
+__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE__isatty)
+/* >> isatty(2)
+ * @return: 1: Is a tty
+ * @return: 0: Not a tty
+ * Check if the given file handle `FD' refers to a TTY */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd))
+#else /* ... */
+#undef __isatty_defined
+#endif /* !... */
+#endif /* !__isatty_defined */
+#ifndef __memalign_defined
+#define __memalign_defined 1
+#if __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
+__CEIREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memalign,(size_t __alignment, size_t __n_bytes),aligned_alloc,{ return __builtin_aligned_alloc(__alignment, __n_bytes); })
+#elif defined(__CRT_HAVE_memalign)
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memalign,(size_t __alignment, size_t __n_bytes),(__alignment,__n_bytes))
+#elif defined(__CRT_HAVE_aligned_alloc)
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memalign,(size_t __alignment, size_t __n_bytes),aligned_alloc,(__alignment,__n_bytes))
+#elif defined(__CRT_HAVE_posix_memalign)
+#include <local/malloc/memalign.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(memalign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL memalign)(size_t __alignment, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __n_bytes); })
+#else /* ... */
+#undef __memalign_defined
+#endif /* !... */
+#endif /* !__memalign_defined */
+#ifndef __ttyname_defined
+#define __ttyname_defined 1
+#ifdef __CRT_HAVE_ttyname
+/* >> ttyname(3)
+ * Return the name of a TTY given its file descriptor */
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_ttyname */
+#undef __ttyname_defined
+#endif /* !__CRT_HAVE_ttyname */
+#endif /* !__ttyname_defined */
+#ifdef __CRT_HAVE_getexecname
+/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getexecname,(void),())
+#else /* __CRT_HAVE_getexecname */
+#include <local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_name
+#include <local/stdlib/getexecname.h>
+/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getexecname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getexecname))(); })
+#endif /* __LOCAL_program_invocation_name */
+#endif /* !__CRT_HAVE_getexecname */
+#ifndef ____fdwalk_func_t_defined
+#define ____fdwalk_func_t_defined 1
+typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
+#endif /* !____fdwalk_func_t_defined */
+#ifdef __CRT_HAVE_fdwalk
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+ * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+ * invocations return 0, `fdwalk()' will also return 0. */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fdwalk,(__fdwalk_func_t __func, void *__cookie),(__func,__cookie))
+#else /* __CRT_HAVE_fdwalk */
+#include <asm/fcntl.h>
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
+#include <local/stdlib/fdwalk.h>
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+ * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+ * invocations return 0, `fdwalk()' will also return 0. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fdwalk)(__fdwalk_func_t __func, void *__cookie) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdwalk))(__func, __cookie); })
+#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_NEXT */
+#endif /* !__CRT_HAVE_fdwalk */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

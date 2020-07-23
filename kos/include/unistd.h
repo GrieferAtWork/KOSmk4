@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c1805cf */
+/* HASH CRC-32:0xf92c7f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -733,9 +733,16 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
 
+#ifndef __ttyname_defined
+#define __ttyname_defined 1
+#ifdef __CRT_HAVE_ttyname
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_ttyname */
+#undef __ttyname_defined
+#endif /* !__CRT_HAVE_ttyname */
+#endif /* !__ttyname_defined */
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
@@ -749,7 +756,14 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__f
 __CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
 
 /* ... */
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
+#ifndef __getlogin_defined
+#define __getlogin_defined 1
+#ifdef __CRT_HAVE_getlogin
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
+#else /* __CRT_HAVE_getlogin */
+#undef __getlogin_defined
+#endif /* !__CRT_HAVE_getlogin */
+#endif /* !__getlogin_defined */
 
 #ifdef __CRT_HAVE_chown
 /* >> chown(2)
@@ -1913,7 +1927,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
 
 /* ... */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
+#ifndef __getpass_defined
+#define __getpass_defined 1
+#ifdef __CRT_HAVE_getpass
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
+#else /* __CRT_HAVE_getpass */
+#undef __getpass_defined
+#endif /* !__CRT_HAVE_getpass */
+#endif /* !__getpass_defined */
 #endif /* ... */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -2221,6 +2242,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 
 
 #ifdef __USE_BSD
+#ifndef __closefrom_defined
+#define __closefrom_defined 1
 #ifdef __CRT_HAVE_closefrom
 /* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
@@ -2230,8 +2253,11 @@ __CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
 #include <local/unistd/closefrom.h>
 /* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom))(__lowfd); })
-#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
+#undef __closefrom_defined
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM */
 #endif /* !__CRT_HAVE_closefrom */
+#endif /* !__closefrom_defined */
 #endif /* __USE_BSD */
 
 #endif /* __CC__ */

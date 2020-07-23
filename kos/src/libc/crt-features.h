@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x117c8edf */
+/* HASH CRC-32:0x1e90531f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -856,6 +856,7 @@
 #define __CRT_HAVE_DOS$fdopendir 1
 #define __CRT_HAVE_DOS$fdreopen 1
 #define __CRT_HAVE_DOS$fdreopen_unlocked 1
+#define __CRT_HAVE_DOS$fdwalk 1
 #define __CRT_HAVE_DOS$feclearexcept 1
 #define __CRT_HAVE_DOS$fedisableexcept 1
 #define __CRT_HAVE_DOS$feenableexcept 1
@@ -3807,6 +3808,7 @@
 #define __CRT_HAVE_fdopendir 1
 #define __CRT_HAVE_fdreopen 1
 #define __CRT_HAVE_fdreopen_unlocked 1
+#define __CRT_HAVE_fdwalk 1
 #define __CRT_HAVE_feclearexcept 1
 #define __CRT_HAVE_fedisableexcept 1
 #define __CRT_HAVE_feenableexcept 1
@@ -4155,6 +4157,7 @@
 #define __CRT_HAVE_getenv 1
 #define __CRT_HAVE_getenv_s 1
 #define __CRT_HAVE_geteuid 1
+#define __CRT_HAVE_getexecname 1
 #define __CRT_HAVE_getgid 1
 #define __CRT_HAVE_getgrent 1
 #define __CRT_HAVE_getgrent_r 1

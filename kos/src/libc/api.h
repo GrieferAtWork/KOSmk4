@@ -52,6 +52,7 @@
 #define _SVID_SOURCE        1
 #define _GNU_SOURCE         1
 #define _LARGEFILE_SOURCE   1
+#define __EXTENSIONS__      1
 
 /* Must load headers in 32-bit time/file-offset mode, so-as to prevent
  * any symbol re-directions from happening, which might otherwise screw

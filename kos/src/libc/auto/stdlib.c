@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c228aad */
+/* HASH CRC-32:0x4d7c3523 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/stdlib.h"
+#include "../user/fcntl.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
 #include "unicode.h"
@@ -962,6 +963,46 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	return libc_strtold(nptr, endptr);
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+#include <local/program_invocation_name.h>
+/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
+	return __LOCAL_program_invocation_name;
+}
+#include <asm/fcntl.h>
+#include <parts/errno.h>
+/* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+ * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+ * invocations return 0, `fdwalk()' will also return 0. */
+INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
+                                  void *cookie) {
+	int result = 0;
+#ifdef __libc_geterrno
+	errno_t saved_err;
+#endif /* __libc_geterrno */
+	fd_t fd = 0;
+	for (;;) {
+#ifdef __libc_geterrno
+		saved_err = __libc_geterrno();
+#endif /* __libc_geterrno */
+		/* fcntl(F_NEXT) returns the next valid (i.e.
+		 * currently open) FD that is >= the given FD. */
+		fd = libc_fcntl(fd, __F_NEXT);
+		if (fd < 0) {
+#ifdef __libc_geterrno
+			__libc_seterrno(saved_err);
+#endif /* __libc_geterrno */
+			break;
+		}
+		result = (*func)(cookie, fd);
+		if (result != 0)
+			break;
+		++fd;
+	}
+	return result;
+}
 #include <local/program_invocation_name.h>
 /* Alias for argv[0], as passed to main() */
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
@@ -3108,6 +3149,8 @@ DEFINE_PUBLIC_ALIAS(strtof_l, libc_strtof_l);
 DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
+DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
+DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(__p__pgmptr, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(_get_pgmptr, libc__get_pgmptr);

@@ -44,7 +44,9 @@
 %[define_type_class(__compar_fn_t      = "TP")]
 %[define_type_class(__compar_d_fn_t    = "TP")]
 
-%(auto_source)#include "../libc/globals.h"
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 
 %{
@@ -70,6 +72,10 @@
 #ifdef __USE_GNU
 #include <xlocale.h>
 #endif /* __USE_GNU */
+
+#ifdef __USE_SOLARIS
+#include <getopt.h>
+#endif /* __USE_SOLARIS */
 
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
@@ -1963,6 +1969,92 @@ void freezero(void *mallptr, $size_t num_bytes) {
 }
 
 %#endif /* __USE_BSD */
+
+%#ifdef __USE_SOLARIS
+
+%#ifndef __uid_t_defined
+%#define __uid_t_defined 1
+%typedef __uid_t uid_t; /* User ID */
+%#endif /* !__uid_t_defined */
+
+%[insert:extern(closefrom)]
+%[insert:extern(dup2)]
+%[insert:extern(getcwd)]
+%[insert:extern(getlogin)]
+%[insert:extern(getpass)]
+%[insert:extern(getpw)]
+%[insert:extern(isatty)]
+%[insert:extern(memalign)]
+%[insert:extern(ttyname)]
+
+%[default:section(".text.crt{|.dos}.solaris")]
+
+@@Returns the absolute filename of the main executable (s.a. `program_invocation_name')
+[[wunused, ATTR_CONST]]
+[[requires_include("<local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_name))]]
+[[impl_include("<local/program_invocation_name.h>")]]
+char const *getexecname() {
+	return __LOCAL_program_invocation_name;
+}
+
+%{
+#ifndef ____fdwalk_func_t_defined
+#define ____fdwalk_func_t_defined 1
+typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
+#endif /* !____fdwalk_func_t_defined */
+}
+%[define_replacement(__fdwalk_func_t = __fdwalk_func_t)]
+%[define_type_class(__fdwalk_func_t = "TP")]
+
+%[define(DEFINE_FDWALK_FUNC_T =
+@@pp_ifndef ____fdwalk_func_t_defined@@
+#define ____fdwalk_func_t_defined 1
+typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
+@@pp_endif@@
+)]
+
+
+@@Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
+@@If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+@@and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+@@invocations return 0, `fdwalk()' will also return 0.
+[[decl_prefix(DEFINE_FDWALK_FUNC_T)]]
+[[requires_include("<asm/fcntl.h>")]]
+[[requires($has_function(fcntl) && defined(__F_NEXT))]]
+[[impl_include("<asm/fcntl.h>", "<parts/errno.h>")]]
+int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
+	int result = 0;
+@@pp_ifdef __libc_geterrno@@
+	errno_t saved_err;
+@@pp_endif@@
+	fd_t fd = 0;
+	for (;;) {
+@@pp_ifdef __libc_geterrno@@
+		saved_err = __libc_geterrno();
+@@pp_endif@@
+		/* fcntl(F_NEXT) returns the next valid (i.e.
+		 * currently open) FD that is >= the given FD. */
+		fd = fcntl(fd, __F_NEXT);
+		if (fd < 0) {
+@@pp_ifdef __libc_geterrno@@
+			__libc_seterrno(saved_err);
+@@pp_endif@@
+			break;
+		}
+		result = (*func)(cookie, fd);
+		if (result != 0)
+			break;
+		++fd;
+	}
+	return result;
+}
+
+//TODO: char *getpassphrase(const char *);
+//TODO: char *lltostr(long long, char *);
+//TODO: char *ulltostr(unsigned long long, char *);
+
+%#endif /* __USE_SOLARIS */
 
 
 %{

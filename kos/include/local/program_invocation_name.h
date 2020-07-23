@@ -66,6 +66,9 @@ __LIBC char *__progname_full;
 #define __LOCAL_program_invocation_name   __progname_full
 #define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name_p
 #endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE_getexecname)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char /*const*/ *,__NOTHROW_NCX,__LOCAL_getexecname,(void),getexecname,())
+#define __LOCAL_program_invocation_name __LOCAL_getexecname()
 #else /* ... */
 #ifndef ____p__pgmptr_defined
 #define ____p__pgmptr_defined 1

@@ -226,6 +226,18 @@
 #define __BSD_VISIBLE 1
 #endif /* _BSD_SOURCE */
 
+/* Enable additional extensions present on
+ * Solaris (or more specifically: OpenSolaris) */
+#ifdef __EXTENSIONS__
+#define __USE_SOLARIS  1
+#define __MISC_VISIBLE 1
+#define __SVID_VISIBLE 1
+#define __USE_MISC     1
+#define __USE_XOPEN2K8 1
+#endif /* __EXTENSIONS__ */
+
+
+
 #ifdef _NETBSD_SOURCE
 #define __USE_NETBSD 1
 #endif /* _NETBSD_SOURCE */
@@ -596,6 +608,7 @@
 #undef __USE_ISOC_PURE
 #undef __USE_BSD
 #undef __USE_NETBSD
+#undef __USE_SOLARIS
 
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
@@ -632,6 +645,7 @@
 #define __USE_UTF 1
 #define __USE_BSD 1
 #define __USE_NETBSD 1
+#define __USE_SOLARIS 1
 #endif /* _EVERY_SOURCE */
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd93f3ca6 */
+/* HASH CRC-32:0xab706e1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1514,6 +1514,7 @@ DFUN(".text.crt.dos.fs.utility", libd_mkostemps64, libc_mkostemps64, TD, 3, TP, 
 DFUN(".text.crt.dos.heap.rare_helpers", libd_reallocf, libc_reallocf, TP, 2, TP, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_recallocarray, libc_recallocarray, TP, 4, TP, TI, TI, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_freezero, libc_freezero, TV, 2, TP, TI)
+DFUN(".text.crt.dos.solaris", libd_fdwalk, libc_fdwalk, TD, 2, TP, TP)
 DFUN(".text.crt.dos.errno", libd__set_doserrno, libc__set_doserrno, TIn(__SIZEOF_ERRNO_T__), 1, TI32)
 DFUN(".text.crt.dos.errno", libd__set_purecall_handler, libc__set_purecall_handler, TP, 1, TP)
 DFUN(".text.crt.dos.errno", libd__set_invalid_parameter_handler, libc__set_invalid_parameter_handler, TP, 1, TP)

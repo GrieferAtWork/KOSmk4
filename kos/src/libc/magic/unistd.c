@@ -612,7 +612,7 @@ $longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
 %
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
-[[cp, wunused, decl_include("<bits/types.h>")]]
+[[guard, cp, wunused, decl_include("<bits/types.h>")]]
 char *ttyname($fd_t fd);
 
 @@>> ttyname_r(3)
@@ -634,7 +634,7 @@ int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 
 %
 %/* ... */
-[[wunused]]
+[[wunused, guard]]
 char *getlogin();
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
@@ -1791,7 +1791,7 @@ int chroot([[nonnull]] char const *__restrict path);
 
 %
 %/* ... */
-[[cp, wunused, section(".text.crt{|.dos}.io.tty")]]
+[[guard, cp, wunused, section(".text.crt{|.dos}.io.tty")]]
 char *getpass([[nonnull]] char const *__restrict prompt);
 %#endif /* ... */
 
@@ -1988,7 +1988,7 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 }
 
 @@Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)')
-[[requires_include("<asm/fcntl.h>")]]
+[[guard, requires_include("<asm/fcntl.h>")]]
 [[section(".text.crt{|.dos}.bsd.io.access")]]
 [[requires($has_function(fcntl) && defined(__F_CLOSEM))]]
 void closefrom($fd_t lowfd) {
