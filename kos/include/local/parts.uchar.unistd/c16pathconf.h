@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa279827e */
+/* HASH CRC-32:0x90305049 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -100,7 +100,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

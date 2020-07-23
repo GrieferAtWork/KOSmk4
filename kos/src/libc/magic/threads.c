@@ -654,6 +654,41 @@ int tss_set(tss_t tss_id, void *val) {
 void tss_delete(tss_t tss_id) = pthread_key_delete;
 
 
+%
+%/* NOTE: On true Solaris, this function isn't actually restricted to `__EXTENSIONS__'
+% *       as it is here, however this entire header is fully standardized by STD-C, so
+% *       in the interest of enforcing a clean namespace, and the fact that I have yet
+% *       to see this function anywhere other than Solaris, restrict it to its feature
+% *       namespace. */
+%#ifdef __USE_SOLARIS
+[[decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<asm/crt/confname.h>", "<asm/crt/limits.h>")]]
+$size_t thr_min_stack() {
+@@pp_if !defined(__BUILDING_LIBC) && ($has_function(sysconf) && defined(_SC_THREAD_STACK_MIN))@@
+	__LONGPTR_TYPE__ result;
+	result = sysconf(_SC_THREAD_STACK_MIN);
+	if (result != -1)
+		return (size_t)result;
+@@pp_endif@@
+@@pp_ifdef __PTHREAD_STACK_MIN@@
+	return __PTHREAD_STACK_MIN;
+@@pp_else@@
+	return 8192;
+@@pp_endif@@
+}
+
+@@Another one of these non-restricted, but solaris-specific functions:
+@@This one returns 1 if the calling thread is the main() thread (i.e.
+@@the thread that was started by the kernel in order to execute the
+@@calling program), and 0 otherwise. Additionally, -1 is returned if
+@@the calling thread "hasn't been initialized", or if the caller wasn't
+@@created by one of the pthread- or threads-related init functions.
+@@Internally, this is the return value if the caller doesn't have a
+@@proper pthread-controller attached.
+thr_main(*) = pthread_main_np;
+%#endif /* __USE_SOLARIS */
+
+
 %{
 
 #endif /* __CC__ */

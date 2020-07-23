@@ -1415,7 +1415,7 @@ $ssize_t getline([[nonnull]] char **__restrict lineptr,
 
 
 %
-%#ifdef __USE_POSIX
+%#if defined(__USE_POSIX) || defined(__USE_REENTRANT)
 %[insert:function(getc_unlocked = fgetc_unlocked)]
 %[insert:function(putc_unlocked = fputc_unlocked)]
 
@@ -1448,14 +1448,19 @@ void funlockfile([[nonnull]] $FILE *__restrict stream);
 @@Try to acquire a lock to `STREAM'
 [[wunused, export_alias("_IO_ftrylockfile")]]
 int ftrylockfile([[nonnull]] $FILE *__restrict stream);
+%#endif /* __USE_POSIX || __USE_REENTRANT */
 
+%
+%#ifdef __USE_POSIX
 %[default:section(".text.crt{|.dos}.io.tty")]
 %[insert:extern(ctermid)]
+%#endif /* __USE_POSIX */
 
+%
 %#ifdef __USE_REENTRANT
 %[insert:extern(ctermid_r)] /* NOTE: The feature-check for `ctermid_r()' here is guessed! */
 %#endif /* __USE_REENTRANT */
-%#endif /* __USE_POSIX */
+
 
 %
 %#ifdef __USE_XOPEN
@@ -1483,7 +1488,8 @@ int pclose([[nonnull]] $FILE *stream);
 %#endif /* __USE_POSIX2 */
 
 %
-%#if defined(__USE_MISC) || defined(__USE_DOS) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%#if (defined(__USE_MISC) || defined(__USE_DOS) || \
+%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 
 %[default:section(".text.crt{|.dos}.FILE.locked.read.getc")]
 
@@ -1828,7 +1834,7 @@ $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
 
 
 %
-%#ifdef __USE_GNU
+%#if defined(__USE_GNU) || defined(__USE_SOLARIS)
 %[default:section(".text.crt{|.dos}.heap.strdup")]
 
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
@@ -1875,7 +1881,7 @@ __STDC_INT_AS_SSIZE_T asprintf([[nonnull]] char **__restrict pstr,
 	%{printf("vasprintf")}
 
 %[insert:function(__asprintf = asprintf)]
-%#endif /* __USE_GNU */
+%#endif /* __USE_GNU || __USE_SOLARIS */
 
 %{
 
@@ -2325,8 +2331,20 @@ __STDC_INT_AS_SIZE_T fscanf_unlocked([[nonnull]] $FILE *__restrict stream,
 __STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull]] char const *__restrict format, ...)
 	%{printf("vscanf_unlocked")}
 
+%#endif /* __USE_KOS */
+
+
+%
+%#ifdef __USE_SOLARIS
+
+%#if !defined(__USE_XOPEN) || defined(_EVERY_SOURCE)
+%[insert:extern(getsubopt)]
+%#endif /* !__USE_XOPEN || _EVERY_SOURCE */
+
+%#endif /* __USE_SOLARIS */
+
+
 %{
-#endif /* __USE_KOS */
 
 #endif /* __CC__ */
 
@@ -3318,9 +3336,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 %{
 
-#if defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)
+#if ((defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)) || defined(__USE_SOLARIS))
 #include <getopt.h>
-#endif /* __USE_XOPEN && !__USE_XOPEN2K && !__USE_GNU */
+#endif /* (__USE_XOPEN && !__USE_XOPEN2K && !__USE_GNU) || __USE_SOLARIS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDIO_H)

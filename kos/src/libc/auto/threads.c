@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x570e3f4d */
+/* HASH CRC-32:0x537a68f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/threads.h"
 #include "../user/pthread.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -316,6 +317,22 @@ NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
 		return thrd_success;
 	return thrd_error;
 }
+#include <asm/crt/confname.h>
+#include <asm/crt/limits.h>
+INTERN ATTR_SECTION(".text.crt.sched.threads") size_t
+NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void) {
+
+
+
+
+
+
+#ifdef __PTHREAD_STACK_MIN
+	return __PTHREAD_STACK_MIN;
+#else /* __PTHREAD_STACK_MIN */
+	return 8192;
+#endif /* !__PTHREAD_STACK_MIN */
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -339,6 +356,7 @@ DEFINE_PUBLIC_ALIAS(cnd_timedwait, libc_cnd_timedwait);
 DEFINE_PUBLIC_ALIAS(cnd_timedwait64, libc_cnd_timedwait64);
 DEFINE_PUBLIC_ALIAS(tss_create, libc_tss_create);
 DEFINE_PUBLIC_ALIAS(tss_set, libc_tss_set);
+DEFINE_PUBLIC_ALIAS(thr_min_stack, libc_thr_min_stack);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_THREADS_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87f2e05f */
+/* HASH CRC-32:0xc1ed1b34 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,6 +119,11 @@ __CREDIRECT_VOID(,__THROWING,_flushlbf,(void),_IO_flush_all_linebuffere,())
 /* Set locking status of stream FP to TYPE */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__fp, int __type),(__fp,__type))
 #endif /* __CC__ */
+
+/* Never actually needed */
+#ifndef enable_extended_FILE_stdio
+#define enable_extended_FILE_stdio(fd, act) 0
+#endif /* !enable_extended_FILE_stdio */
 
 __SYSDECL_END
 

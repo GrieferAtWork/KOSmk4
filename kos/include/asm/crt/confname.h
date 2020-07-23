@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_CONFNAME_H
-#define _BITS_CRT_CONFNAME_H 1
+#ifndef _ASM_CRT_CONFNAME_H
+#define _ASM_CRT_CONFNAME_H 1
 
 #include <__stdinc.h>
 
@@ -984,4 +984,4 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
-#endif /* !_BITS_CRT_CONFNAME_H */
+#endif /* !_ASM_CRT_CONFNAME_H */

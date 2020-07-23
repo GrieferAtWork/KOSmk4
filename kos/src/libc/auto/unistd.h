@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda686c12 */
+/* HASH CRC-32:0x4b460846 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setgid)(gid_t gid);
  * You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm */
 INTDEF unsigned int NOTHROW_NCX(LIBDCALL libd_alarm)(unsigned int seconds);
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -179,7 +179,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -348,7 +348,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, 
 INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t fd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
 /* Retrieve a system configuration string specified by `name'
- * @param: name:   One of `_CS_*' from <bits/crt/confname.h>
+ * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)
  * @return: * :    Required buffer size (including a trailing \0-character)
@@ -448,7 +448,7 @@ INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid)(char *s);
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid_r)(char *s);
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

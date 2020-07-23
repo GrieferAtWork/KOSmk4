@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x152dbb39 */
+/* HASH CRC-32:0xa11f2932 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2055,7 +2055,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getline, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* ... */
 #endif /* __USE_XOPEN2K8 */
 
-#ifdef __USE_POSIX
+#if defined(__USE_POSIX) || defined(__USE_REENTRANT)
 #ifdef __CRT_HAVE_fgetc_unlocked
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
@@ -2145,6 +2145,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(__
 /* Try to acquire a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(__FILE *__restrict __stream),_IO_ftrylockfile,(__stream))
 #endif /* ... */
+#endif /* __USE_POSIX || __USE_REENTRANT */
+
+#ifdef __USE_POSIX
 #ifndef __ctermid_defined
 #define __ctermid_defined 1
 #ifdef __CRT_HAVE_ctermid
@@ -2153,6 +2156,8 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #undef __ctermid_defined
 #endif /* !__CRT_HAVE_ctermid */
 #endif /* !__ctermid_defined */
+#endif /* __USE_POSIX */
+
 #ifdef __USE_REENTRANT
 #ifndef __ctermid_r_defined
 #define __ctermid_r_defined 1
@@ -2168,7 +2173,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
 #endif /* !... */
 #endif /* !__ctermid_r_defined */
 #endif /* __USE_REENTRANT */
-#endif /* __USE_POSIX */
 
 #ifdef __USE_XOPEN
 #ifndef __cuserid_defined
@@ -2203,7 +2207,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pclose,(__FILE *__stream),_pcl
 #endif /* ... */
 #endif /* __USE_POSIX2 */
 
-#if defined(__USE_MISC) || defined(__USE_DOS) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+#if (defined(__USE_MISC) || defined(__USE_DOS) || \
+     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 #if defined(__CRT_HAVE_getw_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Similar to `getc()', but read 2 bytes */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getw,(__FILE *__restrict __stream),getw_unlocked,(__stream))
@@ -2557,7 +2562,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(file_printer_unlocked, __FORCELOCAL __ATTR_ARTIF
 #endif /* ... */
 #endif /* __USE_KOS */
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) || defined(__USE_SOLARIS)
 #ifdef __CRT_HAVE_vasprintf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),(__pstr,__format,__args))
@@ -2592,7 +2597,7 @@ __LIBC __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 #define __asprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asprintf))
 #endif /* ... */
-#endif /* __USE_GNU */
+#endif /* __USE_GNU || __USE_SOLARIS */
 
 
 
@@ -3124,6 +3129,20 @@ __NAMESPACE_LOCAL_USING(scanf_unlocked)
 #endif /* !__cplusplus */
 #endif /* ... */
 #endif /* __USE_KOS */
+
+#ifdef __USE_SOLARIS
+#if !defined(__USE_XOPEN) || defined(_EVERY_SOURCE)
+#ifndef __getsubopt_defined
+#define __getsubopt_defined 1
+#ifdef __CRT_HAVE_getsubopt
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,getsubopt,(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep),(__optionp,__tokens,__valuep))
+#else /* __CRT_HAVE_getsubopt */
+#include <local/stdlib/getsubopt.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(getsubopt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL getsubopt)(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getsubopt))(__optionp, __tokens, __valuep); })
+#endif /* !__CRT_HAVE_getsubopt */
+#endif /* !__getsubopt_defined */
+#endif /* !__USE_XOPEN || _EVERY_SOURCE */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 
@@ -5858,9 +5877,9 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_putwc_nolock,(wchar_t 
 #endif /* __USE_DOS */
 
 
-#if defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)
+#if ((defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)) || defined(__USE_SOLARIS))
 #include <getopt.h>
-#endif /* __USE_XOPEN && !__USE_XOPEN2K && !__USE_GNU */
+#endif /* (__USE_XOPEN && !__USE_XOPEN2K && !__USE_GNU) || __USE_SOLARIS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDIO_H)

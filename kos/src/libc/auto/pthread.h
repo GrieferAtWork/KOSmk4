@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x667bf3f6 */
+/* HASH CRC-32:0x17bdcc11 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -376,6 +376,14 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_pthread_getcpuclockid)(pthread
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_atfork)(__pthread_atfork_func_t prepare, __pthread_atfork_func_t parent, __pthread_atfork_func_t child);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_set_num_processors_np)(int n);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Returns 1 if the calling thread is the main() thread (i.e. the
+ * thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned
+ * if the calling thread "hasn't been initialized", though this
+ * isn't a case that can actually happen under KOS's implementation. */
+INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_pthread_main_np)(void);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -179,6 +179,7 @@ incdir("", "../../include");
 #include <argz.h>
 #include <arpa/inet.h>
 #include <asm/cacheline.h>
+#include <asm/crt/confname.h>
 #include <asm/crt/limits.h>
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
@@ -236,7 +237,6 @@ incdir("", "../../include");
 #include <bits/acct.h>
 #include <bits/cmsghdr-struct.h>
 #include <bits/crt/_diskfree_t.h>
-#include <bits/crt/confname.h>
 #include <bits/crt/crypt_data.h>
 #include <bits/crt/db/aliases.h>
 #include <bits/crt/db/group.h>
@@ -582,6 +582,7 @@ incdir("", "../../include");
 #include <kos/bits/exception_data.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
+#include <kos/bits/rtm.h>
 #include <kos/bits/spawn-action.h>
 #include <kos/bits/spawn.h>
 #include <kos/bits/thread.h>
@@ -650,6 +651,7 @@ incdir("", "../../include");
 #include <kos/personality.h>
 #include <kos/refcnt.h>
 #include <kos/refptr.h>
+#include <kos/rtm.h>
 #include <kos/sys/ioctl.h>
 #include <kos/sys/stat.h>
 #include <kos/syscalls.h>
@@ -834,6 +836,7 @@ incdir("", "../../include");
 #include <libzlib/inflate.h>
 #include <limits.h>
 #include <link.h>
+#include <linux/bits/posix_types.h>
 #include <linux/fd.h>
 #include <linux/fs.h>
 #include <linux/futex.h>

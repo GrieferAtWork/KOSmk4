@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81d9f2ca */
+/* HASH CRC-32:0xcbf333c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1524,6 +1524,31 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n))
 #include <local/pthread/pthread_set_num_processors_np.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
 #endif /* ... */
+#ifdef __USE_BSD
+#ifdef __CRT_HAVE_pthread_main_np
+/* Returns 1 if the calling thread is the main() thread (i.e. the
+ * thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned
+ * if the calling thread "hasn't been initialized", though this
+ * isn't a case that can actually happen under KOS's implementation. */
+__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),())
+#elif defined(__CRT_HAVE_thr_main)
+/* Returns 1 if the calling thread is the main() thread (i.e. the
+ * thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned
+ * if the calling thread "hasn't been initialized", though this
+ * isn't a case that can actually happen under KOS's implementation. */
+__CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),thr_main,())
+#elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
+#include <local/pthread/pthread_main_np.h>
+/* Returns 1 if the calling thread is the main() thread (i.e. the
+ * thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned
+ * if the calling thread "hasn't been initialized", though this
+ * isn't a case that can actually happen under KOS's implementation. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
+#endif /* ... */
+#endif /* __USE_BSD */
 #endif /* __CC__ */
 
 __SYSDECL_END

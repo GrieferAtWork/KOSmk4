@@ -45,8 +45,8 @@
 
 #include <hybrid/typecore.h>
 
+#include <asm/crt/confname.h>
 #include <asm/stdio.h>
-#include <bits/crt/confname.h>
 #include <bits/posix_opt.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
@@ -604,7 +604,7 @@ int pause();
 
 %
 @@>> fpathconf(2)
-@@@param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+@@@param: NAME: One of `_PC_*' from <asm/crt/confname.h>
 @@Return a path configuration value associated with `NAME' for `FD'
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -656,7 +656,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 
 %
 @@>> pathconf(2)
-@@@param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+@@@param: NAME: One of `_PC_*' from <asm/crt/confname.h>
 @@Return a path configuration value associated with `NAME' for `PATH'
 @@return: * : The configuration limit associated with `NAME' for `PATH'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -1501,7 +1501,7 @@ int nice(int inc) {
 %#ifdef __USE_POSIX2
 
 @@Retrieve a system configuration string specified by `name'
-@@@param: name:   One of `_CS_*' from <bits/crt/confname.h>
+@@@param: name:   One of `_CS_*' from <asm/crt/confname.h>
 @@@param: buf:    Target buffer
 @@@param: buflen: Available buffer size (including a trailing \0-character)
 @@@return: * :    Required buffer size (including a trailing \0-character)
@@ -1928,7 +1928,7 @@ char *ctermid_r([[nullable]] char *s) {
 %
 %
 @@>> sysconf(2)
-@@@param: NAME: One of `_SC_*' from <bits/crt/confname.h>
+@@@param: NAME: One of `_SC_*' from <asm/crt/confname.h>
 @@Return a system configuration value `NAME'
 @@return: * : The configuration limit associated with `NAME' for `PATH'
 @@return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

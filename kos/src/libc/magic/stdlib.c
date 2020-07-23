@@ -1630,7 +1630,7 @@ char *fcvt(double val, int ndigit,
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 %[default:section(".text.crt{|.dos}.application.options")]
-[[wunused]]
+[[guard, wunused]]
 int getsubopt([[nonnull]] char **__restrict optionp,
               [[nonnull]] char *const *__restrict tokens,
               [[nonnull]] char **__restrict valuep) {

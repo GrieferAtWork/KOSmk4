@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa837efbc */
+/* HASH CRC-32:0x632d1fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/pthread.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -93,6 +94,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }
+/* Returns 1 if the calling thread is the main() thread (i.e. the
+ * thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned
+ * if the calling thread "hasn't been initialized", though this
+ * isn't a case that can actually happen under KOS's implementation. */
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST int
+NOTHROW_NCX(LIBCCALL libc_pthread_main_np)(void) {
+	return libc_gettid() == libc_getpid();
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -106,6 +116,8 @@ DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
+DEFINE_PUBLIC_ALIAS(thr_main, libc_pthread_main_np);
+DEFINE_PUBLIC_ALIAS(pthread_main_np, libc_pthread_main_np);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

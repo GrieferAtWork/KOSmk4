@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae2d37db */
+/* HASH CRC-32:0xb108e79c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -584,6 +584,52 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),pthread_key_delete,(
  * s.a. `pthread_key_delete()' */
 __CDECLARE_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),(__tss_id))
 #endif /* ... */
+
+/* NOTE: On true Solaris, this function isn't actually restricted to `__EXTENSIONS__'
+ *       as it is here, however this entire header is fully standardized by STD-C, so
+ *       in the interest of enforcing a clean namespace, and the fact that I have yet
+ *       to see this function anywhere other than Solaris, restrict it to its feature
+ *       namespace. */
+#ifdef __USE_SOLARIS
+#ifdef __CRT_HAVE_thr_min_stack
+__CDECLARE(,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
+#else /* __CRT_HAVE_thr_min_stack */
+#include <local/threads/thr_min_stack.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
+#endif /* !__CRT_HAVE_thr_min_stack */
+#ifdef __CRT_HAVE_pthread_main_np
+/* Another one of these non-restricted, but solaris-specific functions:
+ * This one returns 1 if the calling thread is the main() thread (i.e.
+ * the thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned if
+ * the calling thread "hasn't been initialized", or if the caller wasn't
+ * created by one of the pthread- or threads-related init functions.
+ * Internally, this is the return value if the caller doesn't have a
+ * proper pthread-controller attached. */
+__CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),pthread_main_np,())
+#elif defined(__CRT_HAVE_thr_main)
+/* Another one of these non-restricted, but solaris-specific functions:
+ * This one returns 1 if the calling thread is the main() thread (i.e.
+ * the thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned if
+ * the calling thread "hasn't been initialized", or if the caller wasn't
+ * created by one of the pthread- or threads-related init functions.
+ * Internally, this is the return value if the caller doesn't have a
+ * proper pthread-controller attached. */
+__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),())
+#elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
+#include <local/pthread/pthread_main_np.h>
+/* Another one of these non-restricted, but solaris-specific functions:
+ * This one returns 1 if the calling thread is the main() thread (i.e.
+ * the thread that was started by the kernel in order to execute the
+ * calling program), and 0 otherwise. Additionally, -1 is returned if
+ * the calling thread "hasn't been initialized", or if the caller wasn't
+ * created by one of the pthread- or threads-related init functions.
+ * Internally, this is the return value if the caller doesn't have a
+ * proper pthread-controller attached. */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL thr_main)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); }
+#endif /* ... */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

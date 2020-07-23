@@ -34,7 +34,7 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 
-#include <bits/crt/confname.h>
+#include <asm/crt/confname.h>
 #include <linux/magic.h>
 
 #include <assert.h>

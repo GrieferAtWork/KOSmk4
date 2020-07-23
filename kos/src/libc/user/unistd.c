@@ -2072,9 +2072,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") u8 const pc_superblock_features_
 	[_PC_2_SYMLINKS]         = FIELD_UNDEFINED, /* Custom! */
 };
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0x2a2fb4af]]]*/
+/*[[[head:libc_fpathconf,hash:CRC-32=0x258cc134]]]*/
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -2148,9 +2148,9 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 }
 /*[[[end:libc_fpathconf]]]*/
 
-/*[[[head:libc_pathconf,hash:CRC-32=0x14d6e30c]]]*/
+/*[[[head:libc_pathconf,hash:CRC-32=0xa0692a7a]]]*/
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -2181,9 +2181,9 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
 
 
 
-/*[[[head:libc_confstr,hash:CRC-32=0xff0998f1]]]*/
+/*[[[head:libc_confstr,hash:CRC-32=0x6f69d415]]]*/
 /* Retrieve a system configuration string specified by `name'
- * @param: name:   One of `_CS_*' from <bits/crt/confname.h>
+ * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)
  * @return: * :    Required buffer size (including a trailing \0-character)
@@ -2326,7 +2326,7 @@ s32 const sysconf_table[] = {
 import * from deemon;
 @@Mapping from @(SC_ID: (name, values))
 local sc_values: {int: (string, string)} = Dict();
-for (local l: File.open("../../../include/bits/crt/confname.h")) {
+for (local l: File.open("../../../include/asm/crt/confname.h")) {
 	l = l.strip();
 	local name, idval, values;
 	try {
@@ -3099,9 +3099,9 @@ STATIC_ASSERT(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
 
 
 
-/*[[[head:libc_sysconf,hash:CRC-32=0x13dbfb07]]]*/
+/*[[[head:libc_sysconf,hash:CRC-32=0xd86a6bd3]]]*/
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

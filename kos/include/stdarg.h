@@ -52,16 +52,23 @@ __NAMESPACE_STD_USING(va_list)
 #endif /* !__va_list_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
-#define va_start  __builtin_va_start
-#define __va_copy __builtin_va_copy
-#define va_end    __builtin_va_end
-#define va_arg    __builtin_va_arg
+/* void va_start(va_list &ap, T &last_named_argument); */
+#define va_start __builtin_va_start
 
-#if defined(__USE_ISOC99) || \
-   (defined(__STDC_VERSION__) && (__STDC_VERSION__+0 >= 199900L)) || \
-   (defined(__cplusplus) && (__cplusplus+0 >= 201103L))
-#define va_copy   __builtin_va_copy
-#endif
+/* void va_start(va_list &dest, va_list &src); */
+#define __va_copy __builtin_va_copy
+
+/* void va_end(va_list &ap); */
+#define va_end __builtin_va_end
+
+/* T va_arg(va_list &ap, typename T); */
+#define va_arg __builtin_va_arg
+
+#if (defined(__USE_ISOC99) || defined(__USE_SOLARIS) || defined(__USE_XOPEN2K) || \
+     (defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0 >= 199900L)) ||          \
+     (defined(__cplusplus) && (__cplusplus + 0 >= 201103L)))
+#define va_copy __builtin_va_copy
+#endif /* ... */
 #endif /* __CC__ */
 
 __SYSDECL_END

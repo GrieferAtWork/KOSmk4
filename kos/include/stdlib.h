@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ff6b878 */
+/* HASH CRC-32:0xbe4a184e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1801,12 +1801,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* !__NO_FPU */
 #endif /* ... */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
+#ifndef __getsubopt_defined
+#define __getsubopt_defined 1
 #ifdef __CRT_HAVE_getsubopt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,getsubopt,(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep),(__optionp,__tokens,__valuep))
 #else /* __CRT_HAVE_getsubopt */
 #include <local/stdlib/getsubopt.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getsubopt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL getsubopt)(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getsubopt))(__optionp, __tokens, __valuep); })
 #endif /* !__CRT_HAVE_getsubopt */
+#endif /* !__getsubopt_defined */
 #if defined(__CRT_HAVE_mkstemp64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),mkstemp64,(__template_))
 #elif defined(__CRT_HAVE_mkstemp)

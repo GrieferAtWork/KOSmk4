@@ -1839,6 +1839,19 @@ int pthread_set_num_processors_np(int n) {
 }
 
 
+%#ifdef __USE_BSD
+@@Returns 1 if the calling thread is the main() thread (i.e. the
+@@thread that was started by the kernel in order to execute the
+@@calling program), and 0 otherwise. Additionally, -1 is returned
+@@if the calling thread "hasn't been initialized", though this
+@@isn't a case that can actually happen under KOS's implementation.
+[[ATTR_CONST, export_alias("thr_main")]]
+[[requires_function(gettid, getpid)]]
+int pthread_main_np() {
+	return gettid() == getpid();
+}
+%#endif /* __USE_BSD */
+
 
 %{
 #endif /* __CC__ */

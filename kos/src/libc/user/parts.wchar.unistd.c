@@ -130,9 +130,9 @@ NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void)
 }
 /*[[[end:libd_wgetlogin]]]*/
 
-/*[[[head:libc_wpathconf,hash:CRC-32=0xe3e5d777]]]*/
+/*[[[head:libc_wpathconf,hash:CRC-32=0xf27f013b]]]*/
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -153,9 +153,9 @@ NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
 }
 /*[[[end:libc_wpathconf]]]*/
 
-/*[[[head:libd_wpathconf,hash:CRC-32=0xc084119e]]]*/
+/*[[[head:libd_wpathconf,hash:CRC-32=0x795cfdfb]]]*/
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

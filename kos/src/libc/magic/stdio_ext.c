@@ -132,6 +132,11 @@ int __fsetlocking([[nonnull]] $FILE *fp, int type);
 %{
 #endif /* __CC__ */
 
+/* Never actually needed */
+#ifndef enable_extended_FILE_stdio
+#define enable_extended_FILE_stdio(fd, act) 0
+#endif /* !enable_extended_FILE_stdio */
+
 __SYSDECL_END
 
 }

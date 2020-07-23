@@ -2708,6 +2708,7 @@
 #define __CRT_HAVE_pthread_key_create 1
 #define __CRT_HAVE_pthread_key_delete 1
 #define __CRT_HAVE_pthread_kill 1
+#define __CRT_HAVE_pthread_main_np 1
 #define __CRT_HAVE_pthread_mutex_consistent 1
 #define __CRT_HAVE_pthread_mutex_consistent_np 1
 #define __CRT_HAVE_pthread_mutex_destroy 1
@@ -4216,6 +4217,8 @@
 #define __CRT_HAVE_tgammaf 1
 #define __CRT_HAVE_tgammal 1
 #define __CRT_HAVE_tgsigqueueinfo 1
+#define __CRT_HAVE_thr_main 1
+#define __CRT_HAVE_thr_min_stack 1
 #define __CRT_HAVE_thrd_create 1
 #define __CRT_HAVE_thrd_current 1
 #define __CRT_HAVE_thrd_detach 1
