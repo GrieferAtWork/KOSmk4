@@ -79,7 +79,6 @@ SECTIONS {
 	. = ALIGN(__ARCH_PAGESIZE);
 	.xdata : {
 		ENUMERATE_SECTIONS(.xdata)
-		*(.xdata.crt.system.rtm) /* TODO: Remove me */
 	} PHDR(xdata)
 
 	. = ALIGN(__ARCH_PAGESIZE);

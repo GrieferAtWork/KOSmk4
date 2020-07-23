@@ -114,7 +114,8 @@ DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MPROTECT
 DEFINE_SYSCALL3(errno_t, mprotect,
-                void *, addr, size_t, length,
+                USER UNCHECKED void *, addr,
+                size_t, length,
                 syscall_ulong_t, prot) {
 	size_t offset;
 	offset = (uintptr_t)addr & PAGEMASK;

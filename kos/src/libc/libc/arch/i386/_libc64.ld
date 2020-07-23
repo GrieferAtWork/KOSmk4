@@ -36,7 +36,7 @@
 #else
 PHDRS {
 	text PT_LOAD;
-	xdata PT_LOAD;
+//	xdata PT_LOAD;
 	rodata PT_LOAD;
 	data PT_LOAD;
 	dynamic PT_DYNAMIC;
@@ -76,11 +76,10 @@ SECTIONS {
 		ENUMERATE_SECTIONS(.text)
 	} PHDR(text)
 
-	. = ALIGN(__ARCH_PAGESIZE);
-	.xdata : {
-		ENUMERATE_SECTIONS(.xdata)
-		*(.xdata.crt.system.rtm) /* TODO: Remove me */
-	} PHDR(xdata)
+//	. = ALIGN(__ARCH_PAGESIZE);
+//	.xdata : {
+//		ENUMERATE_SECTIONS(.xdata)
+//	} PHDR(xdata)
 
 	. = ALIGN(__ARCH_PAGESIZE);
 	.rodata : {
