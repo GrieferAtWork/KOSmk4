@@ -84,7 +84,7 @@ __ASM_L(.macro intr_exit_sysret intr_enabled=1)
 __ASM_L(.if __ASM_ARG(\intr_enabled))
 __ASM_L(	cli)
 __ASM_L(.endif)
-__ASM_L(	swapgs_if_user_iret)
+__ASM_L(	swapgs) /* sysret implies that we will return to user-space, so we can swapgs unconditionally! */
 #ifdef __OPTIMIZE_SIZE__
 __ASM_L(	iretq)
 #else /* __OPTIMIZE_SIZE__ */
