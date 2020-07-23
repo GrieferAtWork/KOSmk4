@@ -111,7 +111,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
  *       isn't part of a root-module, isn't fully mapped, was
  *       re-mapped somewhere else, or been made writable at any point. */
 #ifdef __PROT_CLEAN
-#define PROT_CLEAN 0x80
+#define PROT_CLEAN __PROT_CLEAN
 #endif /* __PROT_CLEAN */
 
 #endif /* __USE_KOS_KERNEL */

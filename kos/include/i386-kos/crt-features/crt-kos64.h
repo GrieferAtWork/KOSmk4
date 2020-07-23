@@ -1395,6 +1395,7 @@
 #define __CRT_HAVE_clone 1
 #define __CRT_HAVE_close 1
 #define __CRT_HAVE_closedir 1
+#define __CRT_HAVE_closefrom 1
 #define __CRT_HAVE_closelog 1
 #define __CRT_HAVE_cnd_broadcast 1
 #define __CRT_HAVE_cnd_destroy 1
@@ -5687,6 +5688,7 @@
 #define __CRT_HAVE_KOS$clone 1
 #define __CRT_HAVE_KOS$close 1
 #define __CRT_HAVE_KOS$closedir 1
+#define __CRT_HAVE_KOS$closefrom 1
 #define __CRT_HAVE_KOS$cnd_broadcast 1
 #define __CRT_HAVE_KOS$cnd_destroy 1
 #define __CRT_HAVE_KOS$cnd_init 1
@@ -9054,6 +9056,7 @@
 #define __CRT_HAVE_DOS$clone 1
 #define __CRT_HAVE_DOS$close 1
 #define __CRT_HAVE_DOS$closedir 1
+#define __CRT_HAVE_DOS$closefrom 1
 #define __CRT_HAVE_DOS$cnd_broadcast 1
 #define __CRT_HAVE_DOS$cnd_destroy 1
 #define __CRT_HAVE_DOS$cnd_init 1

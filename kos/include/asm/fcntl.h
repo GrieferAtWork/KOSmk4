@@ -55,7 +55,7 @@
 #define __F_SETFL_XCH      5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
 #define __F_NEXT           5164 /* return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
                                  * https://lkml.org/lkml/2012/4/1/71 */
-#define __F_CLOSEM         5165 /* close all handles >= to the one given */
+#define __F_CLOSEM         5165 /* close all handles >= to the one given (s.a. `https://www.unix.com/man-page/FreeBSD/2/closefrom/') */
 #define __F_MAXFD          5166 /* return the max open handle id (the given fd is ignored) */
 #define __F_DUP2FD         5167 /* Same as `dup2()' (the target FD is given as `(int)arg') */
 #define __F_DUP2FD_CLOEXEC 5168 /* Same as `F_DUP2FD', but set `FD_CLOEXEC'. */

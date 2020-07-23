@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97ea0773 */
+/* HASH CRC-32:0x9c1805cf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2218,6 +2218,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 	})
 #endif /* !__COMPILER_HAVE_TYPEOF */
 #endif /* __USE_GNU */
+
+
+#ifdef __USE_BSD
+#ifdef __CRT_HAVE_closefrom
+/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+__CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
+#else /* __CRT_HAVE_closefrom */
+#include <asm/fcntl.h>
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
+#include <local/unistd/closefrom.h>
+/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom))(__lowfd); })
+#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
+#endif /* !__CRT_HAVE_closefrom */
+#endif /* __USE_BSD */
 
 #endif /* __CC__ */
 

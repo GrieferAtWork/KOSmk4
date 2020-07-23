@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x682d737 */
+/* HASH CRC-32:0x117c8edf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -716,6 +716,7 @@
 #define __CRT_HAVE_DOS$clone 1
 #define __CRT_HAVE_DOS$close 1
 #define __CRT_HAVE_DOS$closedir 1
+#define __CRT_HAVE_DOS$closefrom 1
 #define __CRT_HAVE_DOS$cnd_broadcast 1
 #define __CRT_HAVE_DOS$cnd_init 1
 #define __CRT_HAVE_DOS$cnd_signal 1
@@ -3634,6 +3635,7 @@
 #define __CRT_HAVE_clone 1
 #define __CRT_HAVE_close 1
 #define __CRT_HAVE_closedir 1
+#define __CRT_HAVE_closefrom 1
 #define __CRT_HAVE_closelog 1
 #define __CRT_HAVE_cnd_broadcast 1
 #define __CRT_HAVE_cnd_init 1

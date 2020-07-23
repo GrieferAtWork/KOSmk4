@@ -1398,6 +1398,7 @@
 #define __CRT_HAVE_clone 1
 #define __CRT_HAVE_close 1
 #define __CRT_HAVE_closedir 1
+#define __CRT_HAVE_closefrom 1
 #define __CRT_HAVE_closelog 1
 #define __CRT_HAVE_cnd_broadcast 1
 #define __CRT_HAVE_cnd_destroy 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x394dab55 */
+/* HASH CRC-32:0x44052572 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2921,6 +2921,7 @@ DEFINE_PUBLIC_ALIAS(DOS$ctermid_r, libd_ctermid_r);
 DEFINE_PUBLIC_ALIAS(DOS$_sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$__sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$sysconf, libd_sysconf);
+DEFINE_PUBLIC_ALIAS(DOS$closefrom, libd_closefrom);
 
 /* util */
 DEFINE_PUBLIC_ALIAS(DOS$opendev, libd_opendev);

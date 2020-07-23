@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2d08bf5 */
+/* HASH CRC-32:0xd68626f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
  *       isn't part of a root-module, isn't fully mapped, was
  *       re-mapped somewhere else, or been made writable at any point. */
 #ifdef __PROT_CLEAN
-#define PROT_CLEAN 0x80
+#define PROT_CLEAN __PROT_CLEAN
 #endif /* __PROT_CLEAN */
 
 #endif /* __USE_KOS_KERNEL */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33df570d */
+/* HASH CRC-32:0xdb07362b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/unistd.h"
+#include "../user/fcntl.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 
@@ -235,6 +236,11 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 		((byte_t *)to)[n_bytes+1] = b;
 	}
 }
+/* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
+INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
+NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
+	libc_fcntl(lowfd, __F_CLOSEM);
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -283,6 +289,7 @@ DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
 DEFINE_PUBLIC_ALIAS(swab, libc_swab);
+DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNISTD_C */

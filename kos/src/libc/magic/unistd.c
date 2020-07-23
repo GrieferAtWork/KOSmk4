@@ -36,7 +36,9 @@
 %[define_replacement(syscall_slong_t = __syscall_slong_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 
-%(auto_source)#include "../libc/globals.h"
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 %{
 #include <features.h>
@@ -1980,6 +1982,22 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 	})
 #endif /* !__COMPILER_HAVE_TYPEOF */
 #endif /* __USE_GNU */
+
+
+#ifdef __USE_BSD
+}
+
+@@Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)')
+[[requires_include("<asm/fcntl.h>")]]
+[[section(".text.crt{|.dos}.bsd.io.access")]]
+[[requires($has_function(fcntl) && defined(__F_CLOSEM))]]
+void closefrom($fd_t lowfd) {
+	fcntl(lowfd, __F_CLOSEM);
+}
+
+
+%{
+#endif /* __USE_BSD */
 
 #endif /* __CC__ */
 
