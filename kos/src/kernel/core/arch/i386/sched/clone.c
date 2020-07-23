@@ -452,24 +452,29 @@ DEFINE_SYSCALL32_5(pid_t, clone,
 /* fork()                                                               */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FORK
+INTERN struct icpustate *FCALL
+sys_fork_impl(struct icpustate *__restrict state) {
+	pid_t child_tid;
+	child_tid = x86_task_clone(state,
+	                           SIGCHLD,
+	                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
+	                           NULL,
+	                           NULL,
+	                           get_user_gsbase(),
+	                           get_user_fsbase());
+	gpregs_setpax(&state->ics_gpregs, child_tid);
+	return state;
+}
+
 PRIVATE struct icpustate *FCALL
 task_fork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
               unsigned int reason, struct rpc_syscall_info const *UNUSED(sc_info)) {
 	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
 	       reason == TASK_RPC_REASON_SYSCALL ||
 	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if (reason != TASK_RPC_REASON_SHUTDOWN) {
-		pid_t child_tid;
-		child_tid = x86_task_clone(state,
-		                           SIGCHLD,
-		                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
-		                           NULL,
-		                           NULL,
-		                           get_user_gsbase(),
-		                           get_user_fsbase());
-		gpregs_setpax(&state->ics_gpregs, child_tid);
-	}
-	return state;
+	if (reason != TASK_RPC_REASON_SYSCALL)
+		return state;
+	return sys_fork_impl(state);
 }
 
 DEFINE_SYSCALL0(pid_t, fork) {

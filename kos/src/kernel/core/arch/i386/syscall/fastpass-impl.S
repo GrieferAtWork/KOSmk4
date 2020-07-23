@@ -530,6 +530,25 @@ SC_END(iopl)
 
 
 
+/* >> pid_t fork(void); */
+#if _SYSFAST_WANT(FORK, fork)
+SC_BEGIN(fork)
+	SC_PUSH_ICPUSTATE
+	movP   %Psp, %R_fcall0P
+	EXTERN(sys_fork_impl)
+	call   sys_fork_impl
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+SC_END(fork)
+#endif /* fork... */
+
+
+
+
+
+
+
+
 /* >> rtm_status_t rtm_begin(void); */
 #if _SYSFAST_WANT(RTM_BEGIN, rtm_begin)
 SC_BEGIN(rtm_begin)
@@ -594,7 +613,6 @@ SC_END_ALL_NOTHROW(rtm_abort)
 
 /* TODO: sigreturn() / rt_sigreturn() */
 /* TODO: clone() */
-/* TODO: fork() */
 /* TODO: raiseat() */
 /* TODO: coredump() */
 
