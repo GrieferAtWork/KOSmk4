@@ -43,7 +43,7 @@ typedef __UINT32_TYPE__ __rtm_status_t;
  *     and handle it as an alias for the `sys_rtm_end()' system call. */
 #define __arch_rtm_end() __asm__ __volatile__("xend" : : : "memory")
 
-#if defined(__GCC_ASM_FLAG_OUTPUTS__) && defined(__CRT_HAVE___x86_rtm_test)
+#if defined(__GCC_ASM_FLAG_OUTPUTS__) && defined(__CRT_HAVE___x86_rtm_xtest)
 #define __arch_rtm_test() __arch_rtm_test_impl()
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__arch_rtm_test_impl)(void) {
@@ -56,7 +56,14 @@ __NOTHROW(__arch_rtm_test_impl)(void) {
 #endif /* !__BUILDING_LIBC */
 	                     : "=@ccz" (__res)
 	                     :
-	                     : "cc");
+	                     : "cc"
+	                     /* A call to `__x86_rtm_xtest' will also clobber `%Pax'! */
+#ifdef __x86_64__
+	                     , "%rax"
+#else /* __x86_64__ */
+	                     , "%eax"
+#endif /* !__x86_64__ */
+	                     );
 	return __res;
 }
 #endif /* __GCC_ASM_FLAG_OUTPUTS__ && __CRT_HAVE___x86_rtm_test */

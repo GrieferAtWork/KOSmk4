@@ -145,17 +145,10 @@ INTERN_FUNCTION(libc___x86_rtm_xtest)
 	movq   $(SYS_rtm_test), %rax
 	clc
 	syscall
-	/* TODO: Extend the ABI behavior of `SYS_rtm_test' in the context
-	 *       of being invoked via `int80', `sysenter' or `syscall' to
-	 *       set/clear EFLAGS.ZF such that the behavior matches that
-	 *       of `xtest'
-	 * i.e. The assembly wrappers for this system call set EFLAGS.ZF
-	 *      within the associated IRET tail. */
-	/* Must transform:
-	 *    %rax == 0 -> ZF=1
-	 *    %rax != 0 -> ZF=0 */
-	notq   %rax
-	testq  %rax, %rax
+	/* NOTE: The `SYS_rtm_test' system call has some special handling in how
+	 *       it returns its result, in that in addition to setting %eax, it
+	 *       also fills in EFLAGS.ZF in the same way that the `xtest'
+	 *       instruction does! */
 	ret
 	.cfi_endproc
 END(libc___x86_rtm_xtest)

@@ -112,8 +112,7 @@ INTERN_FUNCTION(libc_rtm_abort)
 	movl   %ecx, %ebx /* code */
 	movl   $(SYS_rtm_abort), %eax
 	.byte  0xf8             /* clc */
-	EXTERN(libc___i386_syscall)
-	call   libc___i386_syscall
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -137,8 +136,8 @@ INTERN_FUNCTION(libc_rtm_test)
 	.byte 0x00
 	movl   $(SYS_rtm_test), %eax
 	clc
-	EXTERN(libc___i386_syscall)
-	jmp    libc___i386_syscall
+	int    $(0x80)
+	ret
 	.cfi_endproc
 END(libc_rtm_test)
 DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test)
@@ -152,19 +151,18 @@ INTERN_FUNCTION(libc___x86_rtm_xtest)
 	.cfi_startproc
 	movl   $(SYS_rtm_test), %eax
 	clc
-	EXTERN(libc___i386_syscall)
-	call   libc___i386_syscall
-	/* TODO: Extend the ABI behavior of `SYS_rtm_test' in the context
-	 *       of being invoked via `int80', `sysenter' or `syscall' to
-	 *       set/clear EFLAGS.ZF such that the behavior matches that
-	 *       of `xtest'
-	 * i.e. The assembly wrappers for this system call set EFLAGS.ZF
-	 *      within the associated IRET tail. */
-	/* Must transform:
-	 *    %eax == 0 -> ZF=1
-	 *    %eax != 0 -> ZF=0 */
-	notl   %eax
-	testl  %eax, %eax
+	/* Directly make use of `int80h' here, thus reducing the overhead in
+	 * in case we actually are executing in the context of an RTM operation.
+	 * In that case, by directly invoking int80, the emulator can directly
+	 * branch to the rtm-test code, without having to also emulate the contents
+	 * of the `__i386_syscall' function. (where doing so might actually cause
+	 * problems since it contains self-modifying code, which the RTM emulator
+	 * isn't designed to deal with) */
+	int    $(0x80)
+	/* NOTE: The `SYS_rtm_test' system call has some special handling in how
+	 *       it returns its result, in that in addition to setting %eax, it
+	 *       also fills in EFLAGS.ZF in the same way that the `xtest'
+	 *       instruction does! */
 	ret
 	.cfi_endproc
 END(libc___x86_rtm_xtest)

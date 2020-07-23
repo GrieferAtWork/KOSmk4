@@ -48,9 +48,12 @@
 #include <hybrid/typecore.h>
 
 #include <asm/cfi.h>
+#include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
 #include <asm/instr/movzxq.h>
 #include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
 #include <kos/kernel/syscalls.h>
 
@@ -203,6 +206,38 @@
 #endif /* !__x86_64__ */
 #endif /* !SYSCALL_IRET */
 
+
+/* Define _all_ low-level system call variants of a system
+ * call that is entirely unable to throw an exceptions.
+ * Such a system call can be defined a bit simpler, however
+ * if the implementation somehow does manage to throw an
+ * exception, then the behavior of undefined.
+ * Essentially, only stub/no-op system calls (such as `rtm_test()')
+ * fall under this category. */
+#ifndef SC_BEGIN_ALL_NOTHROW
+#ifdef __x86_64__
+#define SC_BEGIN_ALL_NOTHROW(name)                                                          \
+	.section _SYSFAST_SECTNAME(name);                                                       \
+	INTERN_FUNCTION(X86_ASMSYSCALL32_SYSENTER(name));                                       \
+		DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_INT80(name), X86_ASMSYSCALL32_SYSENTER(name)); \
+		DEFINE_INTERN_ALIAS(X86_ASMSYSCALL64(name), X86_ASMSYSCALL32_SYSENTER(name));       \
+		.cfi_startproc simple;                                                              \
+		.cfi_iret_signal_frame;                                                             \
+		.cfi_def_cfa %Psp, 0
+#else /* __x86_64__ */
+#define SC_BEGIN_ALL_NOTHROW(name)                                                          \
+	.section _SYSFAST_SECTNAME(name);                                                       \
+	INTERN_FUNCTION(X86_ASMSYSCALL32_SYSENTER(name));                                       \
+		DEFINE_INTERN_ALIAS(X86_ASMSYSCALL32_INT80(name), X86_ASMSYSCALL32_SYSENTER(name)); \
+		.cfi_startproc simple;                                                              \
+		.cfi_iret_signal_frame;                                                             \
+		.cfi_def_cfa %Psp, 0
+#endif /* !__x86_64__ */
+#define SC_END_ALL_NOTHROW(name) \
+		SYSCALL_IRET;            \
+		.cfi_endproc;            \
+	END(X86_ASMSYSCALL32_SYSENTER(name))
+#endif /* !SC_BEGIN_ALL_NOTHROW */
 
 #ifndef SC_BEGIN
 /* Begin/End a system call definition.
@@ -506,6 +541,49 @@ SC_BEGIN(rtm_begin)
 	SC_POP_ICPUSTATE
 SC_END(rtm_begin)
 #endif /* rtm_begin... */
+
+
+
+
+
+
+
+
+/* >> syscall_ulong_t rtm_test(void); */
+#if _SYSFAST_WANT(RTM_TEST, rtm_test)
+#ifndef _SC_RTM_TEST_DEFINED
+#define _SC_RTM_TEST_DEFINED 1
+SC_BEGIN_ALL_NOTHROW(rtm_test)
+	/* Special arch-specific system call behavior:
+	 *    In order to more closely match the behavior of
+	 *    the x86 `xtest' instruction (which sets ZF=1
+	 *    when outside of RTM mode), we do the same, thus
+	 *    simplifying the user-space RTM testing code.
+	 */
+	orP  $(EFLAGS_ZF), OFFSET_IRREGS_PFLAGS(%Psp)
+	/* return 0 */
+	xorP %Pax, %Pax
+SC_END_ALL_NOTHROW(rtm_test)
+#endif /* !_SC_RTM_TEST_DEFINED */
+#endif /* rtm_test... */
+
+
+
+
+
+
+
+
+/* >> errno_t rtm_abort(syscall_ulong_t code); */
+#if _SYSFAST_WANT(RTM_ABORT, rtm_abort)
+#ifndef _SC_RTM_ABORT_DEFINED
+#define _SC_RTM_ABORT_DEFINED 1
+SC_BEGIN_ALL_NOTHROW(rtm_abort)
+	/* return -EOK; */
+	xorP %Pax, %Pax
+SC_END_ALL_NOTHROW(rtm_abort)
+#endif /* !_SC_RTM_ABORT_DEFINED */
+#endif /* rtm_abort... */
 
 
 

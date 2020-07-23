@@ -43,6 +43,7 @@
 #include <sched/rpc.h>
 #include <sched/task.h>
 
+#include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
 #include <asm/rtm.h>
@@ -703,6 +704,13 @@ x86_emulate_rtm_instruction_syscall(struct rtm_machstate *__restrict self
 
 	case SYS_rtm_test:
 		self->r_pax = 1; /* System call return value */
+		/* This system call is special, in that it has 2 return values when
+		 * called in the context of an `int80', `sysenter' or `syscall' instruction.
+		 *
+		 * The non-emulated counterpart to this can be found in
+		 * `/kos/src/kernel/core/arch/i386/syscall/fastpass-impl.S'
+		 */
+		self->r_pflags &= ~EFLAGS_ZF;
 		return X86_RTM_STATUS_CONTINUE;
 
 	/* Custom system calls. */
