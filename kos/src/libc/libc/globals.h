@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifdef __CC__
 #ifndef __KERNEL__
 
-#if defined(__OPTIMIZE_SIZE__)
+#if defined(__OPTIMIZE_SIZE__) && 0 /* -Os is a per-file option, so don't do global config based on it! */
 /* Disable norel access. */
 #define GET_NOREL_GLOBAL(name)             __bind_##name
 #define DECLARE_NOREL_GLOBAL_META(T, name) DATDEF T __bind_##name ASMNAME(#name)

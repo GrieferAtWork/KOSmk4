@@ -24,31 +24,20 @@
 #include "../api.h"
 /**/
 
-#include <parts/errno.h>
-#include <parts/dos/errno.h>
+#include <hybrid/host.h>
+
 #include <parts/cyg/errno.h>
+#include <parts/dos/errno.h>
+#include <parts/errno.h>
 
 #include <elf.h>
 #include <errno.h>
 #include <signal.h>
-#include <hybrid/host.h>
 
 #include "errno.h"
+#include "tls.h"
 
 DECL_BEGIN
-
-#define LIBC_ERRNO_KIND_KOS 0
-#define LIBC_ERRNO_KIND_DOS 1
-#define LIBC_ERRNO_KIND_NT  2
-#define LIBC_ERRNO_KIND_CYG 3
-
-struct libc_errno_desc {
-	errno_t      ed_value; /* Errno value */
-	unsigned int ed_kind;  /* Errno kind (one of `LIBC_ERRNO_KIND_*') */
-};
-
-/* Per-thread variables FTW! */
-INTERN ATTR_THREAD struct libc_errno_desc libc_errno_global = { EOK, LIBC_ERRNO_KIND_KOS };
 
 #undef _errno
 #undef __errno
@@ -61,26 +50,25 @@ DEFINE_INTERN_ALIAS(libc___errno, libc_errno_p);
 DEFINE_INTERN_ALIAS(libc___errno_location, libc_errno_p);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.errno_access.__errno_location")
 NOBLOCK errno_t *NOTHROW(LIBCCALL libc_errno_p)(void) {
-	struct libc_errno_desc *result;
-	result = &libc_errno_global;
-	if unlikely(result->ed_kind != LIBC_ERRNO_KIND_KOS) {
-		if (result->ed_kind == LIBC_ERRNO_KIND_DOS)
-			result->ed_value = libd_errno_dos2kos(result->ed_value);
-		else if (result->ed_kind == LIBC_ERRNO_KIND_NT) {
-			result->ed_value = libd_errno_nt2kos(result->ed_value);
+	struct libc_tls *t = &tls;
+	if unlikely(t->t_errno_kind != LIBC_ERRNO_KIND_KOS) {
+		if (t->t_errno_kind == LIBC_ERRNO_KIND_DOS)
+			t->t_errno_value = libd_errno_dos2kos(t->t_errno_value);
+		else if (t->t_errno_kind == LIBC_ERRNO_KIND_NT) {
+			t->t_errno_value = libd_errno_nt2kos(t->t_errno_value);
 		} else {
-			result->ed_value = libd_errno_cyg2kos(result->ed_value);
+			t->t_errno_value = libd_errno_cyg2kos(t->t_errno_value);
 		}
-		result->ed_kind = LIBC_ERRNO_KIND_KOS;
+		t->t_errno_kind = LIBC_ERRNO_KIND_KOS;
 	}
-	return &result->ed_value;
+	return &t->t_errno_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_errno_fast, libc_geterrno);
 DEFINE_INTERN_ALIAS(libc___get_errno_fast, libc_geterrno);
 INTERN ATTR_SECTION(".text.crt.errno_access.geterrno")
 NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void) {
-	return libc_errno_global.ed_value;
+	return tls.t_errno_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_errno, libc_geterrno_safe);
@@ -102,10 +90,9 @@ DEFINE_PUBLIC_ALIAS(__set_errno, libc_seterrno);
 #endif /* !__i386__ || __x86_64__ */
 INTERN ATTR_SECTION(".text.crt.errno_access.seterrno")
 NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value) {
-	struct libc_errno_desc *d;
-	d = &libc_errno_global;
-	d->ed_value = value;
-	d->ed_kind  = LIBC_ERRNO_KIND_KOS;
+	struct libc_tls *t = &tls;
+	t->t_errno_value = value;
+	t->t_errno_kind  = LIBC_ERRNO_KIND_KOS;
 	return -1;
 }
 
@@ -118,19 +105,18 @@ DEFINE_PUBLIC_ALIAS(DOS$_errno, libd_errno_p);
 DEFINE_INTERN_ALIAS(libd__errno, libd_errno_p);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access._errno")
 NOBLOCK ATTR_CONST /*dos*/ errno_t *NOTHROW(LIBDCALL libd_errno_p)(void) {
-	struct libc_errno_desc *result;
-	result = &libc_errno_global;
-	if (result->ed_kind != LIBC_ERRNO_KIND_DOS) {
-		if (result->ed_kind == LIBC_ERRNO_KIND_KOS)
-			result->ed_value = libd_errno_kos2dos(result->ed_value);
-		else if (result->ed_kind == LIBC_ERRNO_KIND_NT)
-			result->ed_value = libd_errno_nt2dos(result->ed_value);
+	struct libc_tls *t = &tls;
+	if (t->t_errno_kind != LIBC_ERRNO_KIND_DOS) {
+		if (t->t_errno_kind == LIBC_ERRNO_KIND_KOS)
+			t->t_errno_value = libd_errno_kos2dos(t->t_errno_value);
+		else if (t->t_errno_kind == LIBC_ERRNO_KIND_NT)
+			t->t_errno_value = libd_errno_nt2dos(t->t_errno_value);
 		else {
-			result->ed_value = libd_errno_cyg2dos(result->ed_value);
+			t->t_errno_value = libd_errno_cyg2dos(t->t_errno_value);
 		}
-		result->ed_kind = LIBC_ERRNO_KIND_DOS;
+		t->t_errno_kind = LIBC_ERRNO_KIND_DOS;
 	}
-	return &result->ed_value;
+	return &t->t_errno_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_doserrno, libd_geterrno);
@@ -146,10 +132,9 @@ DEFINE_INTERN_ALIAS(libc__dosmaperr, libd_seterrno);
 DEFINE_INTERN_ALIAS(libc___set_doserrno, libd_seterrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_doserrno")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value) {
-	struct libc_errno_desc *d;
-	d = &libc_errno_global;
-	d->ed_value = value;
-	d->ed_kind  = LIBC_ERRNO_KIND_DOS;
+	struct libc_tls *t = &tls;
+	t->t_errno_value = value;
+	t->t_errno_kind  = LIBC_ERRNO_KIND_DOS;
 	return -1;
 }
 
@@ -157,19 +142,18 @@ DEFINE_PUBLIC_ALIAS(__doserrno, libd_nterrno_p);
 DEFINE_INTERN_ALIAS(libc___doserrno, libd_nterrno_p);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.__doserrno")
 NOBLOCK /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void) {
-	struct libc_errno_desc *result;
-	result = &libc_errno_global;
-	if (result->ed_kind != LIBC_ERRNO_KIND_NT) {
-		if (result->ed_kind == LIBC_ERRNO_KIND_KOS)
-			result->ed_value = libd_errno_kos2nt(result->ed_value);
-		else if (result->ed_kind == LIBC_ERRNO_KIND_DOS)
-			result->ed_value = libd_errno_dos2nt(result->ed_value);
+	struct libc_tls *t = &tls;
+	if (t->t_errno_kind != LIBC_ERRNO_KIND_NT) {
+		if (t->t_errno_kind == LIBC_ERRNO_KIND_KOS)
+			t->t_errno_value = libd_errno_kos2nt(t->t_errno_value);
+		else if (t->t_errno_kind == LIBC_ERRNO_KIND_DOS)
+			t->t_errno_value = libd_errno_dos2nt(t->t_errno_value);
 		else {
-			result->ed_value = libd_errno_cyg2nt(result->ed_value);
+			t->t_errno_value = libd_errno_cyg2nt(t->t_errno_value);
 		}
-		result->ed_kind = LIBC_ERRNO_KIND_NT;
+		t->t_errno_kind = LIBC_ERRNO_KIND_NT;
 	}
-	return &result->ed_value;
+	return &t->t_errno_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_nterrno, libd_getnterrno);
@@ -183,10 +167,9 @@ DEFINE_PUBLIC_ALIAS(__set_nterrno, libd_setnterrno);
 DEFINE_INTERN_ALIAS(libc___set_nterrno, libd_setnterrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_nterrno")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setnterrno)(/*nt*/ errno_t value) {
-	struct libc_errno_desc *d;
-	d = &libc_errno_global;
-	d->ed_value = value;
-	d->ed_kind  = LIBC_ERRNO_KIND_NT;
+	struct libc_tls *t = &tls;
+	t->t_errno_value = value;
+	t->t_errno_kind  = LIBC_ERRNO_KIND_NT;
 	return -1;
 }
 
@@ -200,19 +183,18 @@ DEFINE_PUBLIC_ALIAS(DOS$__errno, libd_cygerrno_p);
 DEFINE_INTERN_ALIAS(libd___errno, libd_cygerrno_p);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__errno")
 NOBLOCK ATTR_CONST /*cyg*/ errno_t *NOTHROW(LIBDCALL libd_cygerrno_p)(void) {
-	struct libc_errno_desc *result;
-	result = &libc_errno_global;
-	if (result->ed_kind != LIBC_ERRNO_KIND_CYG) {
-		if (result->ed_kind == LIBC_ERRNO_KIND_KOS)
-			result->ed_value = libd_errno_kos2cyg(result->ed_value);
-		else if (result->ed_kind == LIBC_ERRNO_KIND_DOS)
-			result->ed_value = libd_errno_dos2cyg(result->ed_value);
+	struct libc_tls *t = &tls;
+	if (t->t_errno_kind != LIBC_ERRNO_KIND_CYG) {
+		if (t->t_errno_kind == LIBC_ERRNO_KIND_KOS)
+			t->t_errno_value = libd_errno_kos2cyg(t->t_errno_value);
+		else if (t->t_errno_kind == LIBC_ERRNO_KIND_DOS)
+			t->t_errno_value = libd_errno_dos2cyg(t->t_errno_value);
 		else {
-			result->ed_value = libd_errno_nt2cyg(result->ed_value);
+			t->t_errno_value = libd_errno_nt2cyg(t->t_errno_value);
 		}
-		result->ed_kind = LIBC_ERRNO_KIND_CYG;
+		t->t_errno_kind = LIBC_ERRNO_KIND_CYG;
 	}
-	return &result->ed_value;
+	return &t->t_errno_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_cygerrno, libd_getcygerrno);
@@ -226,10 +208,9 @@ DEFINE_PUBLIC_ALIAS(__set_cygerrno, libd_setcygerrno);
 DEFINE_INTERN_ALIAS(libc___set_cygerrno, libd_setcygerrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_cygerrno")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setcygerrno)(/*cyg*/ errno_t value) {
-	struct libc_errno_desc *d;
-	d = &libc_errno_global;
-	d->ed_value = value;
-	d->ed_kind  = LIBC_ERRNO_KIND_CYG;
+	struct libc_tls *t = &tls;
+	t->t_errno_value = value;
+	t->t_errno_kind  = LIBC_ERRNO_KIND_CYG;
 	return -1;
 }
 

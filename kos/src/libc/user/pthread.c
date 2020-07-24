@@ -55,6 +55,7 @@
 #include <librpc/rpc.h>
 
 #include "../libc/dl.h"
+#include "../libc/tls.h"
 #include "pthread.h"
 #include "sched.h"
 
@@ -146,10 +147,6 @@ PRIVATE struct pthread_attr pthread_default_attr = {};
 ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.lock")
 PRIVATE DEFINE_ATOMIC_RWLOCK(pthread_default_attr_lock);
 
-/* [0..1] Pointer to the calling thread's pthread_self() field. */
-PRIVATE ATTR_THREAD __REF struct pthread *pthread_self_p = NULL;
-
-
 
 
 /* Called just before a thread exists (used to destroy() the thread's
@@ -182,7 +179,7 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
                                    __pthread_start_routine_t start) {
 	int exitcode = 0;
 	/* Set the TLS variable for `pthread_self' to `me' */
-	pthread_self_p = me;
+	tls.t_pthread = me;
 	COMPILER_BARRIER();
 	/* Apply the initial affinity mask (if given) */
 	if (me->pt_cpuset) {
@@ -345,7 +342,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN void
 (LIBCCALL libc_pthread_exit)(void *retval) THROWS(...)
 /*[[[body:libc_pthread_exit]]]*/
 {
-	__REF struct pthread *me = pthread_self_p;
+	__REF struct pthread *me = tls.t_pthread;
 	if (me) {
 		me->pt_retval = retval;
 		libc_pthread_onexit(me);
@@ -390,7 +387,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread,
 			destroy(pt);
 		return EOK;
 	}
-	if unlikely(pt == pthread_self_p)
+	if unlikely(pt == tls.t_pthread)
 		return EDEADLK;
 	return EBUSY;
 }
@@ -414,7 +411,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
 		tid = ATOMIC_READ(pt->pt_tid);
 		if (tid == 0)
 			break;
-		if unlikely(pt == pthread_self_p)
+		if unlikely(pt == tls.t_pthread)
 			return EDEADLK;
 		/* >> wait_while(pt->pt_tid == tid) */
 		result = sys_futex((uint32_t *)&pt->pt_tid,
@@ -479,7 +476,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 /*[[[body:libc_pthread_self]]]*/
 {
 	struct pthread *result;
-	result = pthread_self_p;
+	result = tls.t_pthread;
 	if unlikely(!result) {
 		result = (struct pthread *)malloc(sizeof(struct pthread));
 		if unlikely(!result) {
@@ -496,7 +493,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 		result->pt_stacksize = 0;
 		result->pt_flags     = PTHREAD_FNOSTACK;
 		COMPILER_WRITE_BARRIER();
-		pthread_self_p = result;
+		tls.t_pthread = result;
 	}
 	return (pthread_t)result;
 }

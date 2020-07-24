@@ -52,6 +52,7 @@
 
 #include "dl.h"
 #include "except.h"
+#include "tls.h"
 
 DECL_BEGIN
 
@@ -64,45 +65,33 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_code)  == OFFSET_EXCEPTION_INFO
 STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
 
 
-INTERN ATTR_THREAD struct exception_info my_exception_info = {
-	/* .ei_state = */ {},
-#if EXCEPT_BACKTRACE_SIZE != 0
-	/* .ei_trace = */ {},
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	/* .ei_flags = */ EXCEPT_FNORMAL,
-	{
-		/* .ei_code = */ E_OK
-	}
-};
-
-
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 struct exception_info *NOTHROW_NCX(LIBCCALL libc_error_info)(void) {
-	return &my_exception_info;
+	return &tls.t_except;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 struct exception_data *NOTHROW_NCX(LIBCCALL libc_error_data)(void) {
-	return &my_exception_info.ei_data;
+	return &tls.t_except.ei_data;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 error_register_state_t *NOTHROW_NCX(LIBCCALL libc_error_register_state)(void) {
-	return &my_exception_info.ei_state;
+	return &tls.t_except.ei_state;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE error_code_t
 NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
-	return my_exception_info.ei_code;
+	return tls.t_except.ei_code;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE bool
 NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
-	return my_exception_info.ei_code != E_OK;
+	return tls.t_except.ei_code != E_OK;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE error_class_t
 NOTHROW_NCX(LIBCCALL libc_error_class)(void) {
-	return ERROR_CLASS(my_exception_info.ei_code);
+	return ERROR_CLASS(tls.t_except.ei_code);
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE error_subclass_t
 NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
-	return ERROR_SUBCLASS(my_exception_info.ei_code);
+	return ERROR_SUBCLASS(tls.t_except.ei_code);
 }
 
 #undef error_info
@@ -504,7 +493,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restr
 #if EXCEPT_BACKTRACE_SIZE != 0
 	unsigned int orig_tracecount;
 	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE - 1; ++orig_tracecount) {
-		if (!my_exception_info.ei_trace[orig_tracecount])
+		if (!tls.t_except.ei_trace[orig_tracecount])
 			break;
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -563,16 +552,16 @@ search_fde:
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	/* Remember the current state PC as a new entry in the exception's traceback. */
-	if (my_exception_info.ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
+	if (tls.t_except.ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
 #if EXCEPT_BACKTRACE_SIZE > 1
 		unsigned int i;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE - 1; ++i) {
-			if (!my_exception_info.ei_trace[i])
+			if (!tls.t_except.ei_trace[i])
 				break;
 		}
-		my_exception_info.ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		tls.t_except.ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 #else
-		my_exception_info.ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		tls.t_except.ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 #endif
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -782,7 +771,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_st
 	struct _Unwind_Context context;
 	error_register_state_t oldstate, newstate;
 	void *pc;
-	/* Special case: Raise a KERNKOS exception (with information already stored in `my_exception_info') */
+	/* Special case: Raise a KERNKOS exception (with information already stored in `tls.t_except') */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
 		return libc_error_unwind(state);
 	/* Make sure that libunwind has been loaded. */

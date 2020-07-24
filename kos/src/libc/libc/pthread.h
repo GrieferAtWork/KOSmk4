@@ -40,27 +40,25 @@ DECL_BEGIN
 #define OFFSET_PTHREAD_FLAGS     (__SIZEOF_POINTER__ * 6)
 
 #ifdef __CC__
-
 struct pthread {
-	pid_t           pt_tid;       /* [const] Secondary TID (filled in by the kernel as the PTID and CTID) */
+	pid_t           pt_tid;        /* [const] Secondary TID (filled in by the kernel as the PTID and CTID) */
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
 	byte_t __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
 #endif
-	__WEAK refcnt_t pt_refcnt;    /* Reference counter for this control structure. */
-	void           *pt_retval;    /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
-	void           *pt_tls;       /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()') */
-	void           *pt_stackaddr; /* [const] Thread stack address */
-	size_t          pt_stacksize; /* [const] Thread stack size */
-	uintptr_t       pt_flags;     /* [const] Flags (Set of `PTHREAD_F*') */
-#define PTHREAD_FNORMAL    0x0000 /* Normal pthread flags. */
-#define PTHREAD_FUSERSTACK 0x0001 /* The thread's stack was provided by the user
-	                               * and should not be unmapped automatically. */
-#define PTHREAD_FNOSTACK   0x0002 /* The thread's stack area is unknown (this is the case for
-	                               * the main thread, and any thread created by `clone()'). */
-	cpu_set_t      *pt_cpuset;    /* Initial affinity cpuset. */
-	size_t          pt_cpusetsize;/* Initial affinity cpuset size. */
+	__WEAK refcnt_t pt_refcnt;     /* Reference counter for this control structure. */
+	void           *pt_retval;     /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
+	void           *pt_tls;        /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()') */
+	void           *pt_stackaddr;  /* [const] Thread stack address */
+	size_t          pt_stacksize;  /* [const] Thread stack size */
+	uintptr_t       pt_flags;      /* [const] Flags (Set of `PTHREAD_F*') */
+#define PTHREAD_FNORMAL    0x0000  /* Normal pthread flags. */
+#define PTHREAD_FUSERSTACK 0x0001  /* The thread's stack was provided by the user
+	                                * and should not be unmapped automatically. */
+#define PTHREAD_FNOSTACK   0x0002  /* The thread's stack area is unknown (this is the case for
+	                                * the main thread, and any thread created by `clone()'). */
+	cpu_set_t      *pt_cpuset;     /* Initial affinity cpuset. */
+	size_t          pt_cpusetsize; /* Initial affinity cpuset size. */
 };
-
 #endif /* __CC__ */
 
 DECL_END

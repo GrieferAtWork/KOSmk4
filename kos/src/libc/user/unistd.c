@@ -19,8 +19,6 @@
  */
 #ifndef GUARD_LIBC_USER_UNISTD_C
 #define GUARD_LIBC_USER_UNISTD_C 1
-#define _GNU_SOURCE 1
-#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -61,6 +59,7 @@
 #include "../libc/capture-varargs.h"
 #include "../libc/dl.h"
 #include "../libc/globals.h"
+#include "../libc/tls.h"
 #include "stdlib.h"
 #include "unistd.h"
 
@@ -3498,12 +3497,6 @@ NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pwriteall64]]]*/
 
-#if !defined(__OPTIMIZE_SIZE__) && \
-    !defined(__NO_ATTR_THREAD)
-#define HAVE_CACHED_TID 1
-PRIVATE ATTR_THREAD pid_t cached_tid = 0;
-#endif
-
 /*[[[head:libc_gettid,hash:CRC-32=0xccb67c13]]]*/
 /* >> gettid(2)
  * Return the TID of the calling thread
@@ -3512,21 +3505,21 @@ INTERN ATTR_SECTION(".text.crt.sched.thread") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_gettid)(void)
 /*[[[body:libc_gettid]]]*/
 {
-#ifdef HAVE_CACHED_TID
+#ifdef CONFIG_LIBC_HAVE_CACHED_TID
 	pid_t result;
 	/* Cache the TID as a thread-local variable */
-	result = cached_tid;
+	result = tls.t_tid;
 	if (!result) {
 		result = sys_gettid();
 		if unlikely(E_ISERR(result))
 			return (pid_t)libc_seterrno(-result);
-		cached_tid = result;
+		tls.t_tid = result;
 	}
 	return result;
-#else
+#else /* CONFIG_LIBC_HAVE_CACHED_TID */
 	pid_t result = sys_gettid();
 	return libc_seterrno_syserr(result);
-#endif
+#endif /* !CONFIG_LIBC_HAVE_CACHED_TID */
 }
 /*[[[end:libc_gettid]]]*/
 
