@@ -80,12 +80,16 @@ PRIVATE LLIST(struct tls_segment) static_tls_list = LLIST_INIT;
 
 /* Minimum alignment of the static TLS segment. */
 PRIVATE size_t static_tls_align = COMPILER_ALIGNOF(struct tls_segment);
+
 /* Total size of the static TLS segment (including the `struct tls_segment' descriptor)
  * NOTE: The segment base itself is then located at `p + static_tls_size - sizeof(struct tls_segment)' */
 PRIVATE size_t static_tls_size = sizeof(struct tls_segment);
 PRIVATE size_t static_tls_size_no_segment = 0;
+
 /* Initializer for the first `static_tls_size_no_segment' bytes of the static TLS segment. */
 PRIVATE void const *static_tls_init = NULL;
+
+
 
 INTERN NONNULL((1)) void CC
 DlModule_RemoveTLSExtension(DlModule *__restrict self) {
@@ -136,7 +140,7 @@ DlModule_InitStaticTLSBindings(void) {
 		iter->dm_tlsstoff = endptr;
 	}
 	static_tls_size_no_segment = (size_t)-endptr;
-	static_tls_init            = malloc(static_tls_size_no_segment);
+	static_tls_init = malloc(static_tls_size_no_segment);
 	if unlikely(!static_tls_init)
 		goto err_nomem;
 	/* Load static TLS template data */
@@ -144,7 +148,9 @@ DlModule_InitStaticTLSBindings(void) {
 		byte_t *dst;
 		if (!iter->dm_tlsmsize)
 			continue;
-		dst = (byte_t *)static_tls_init + static_tls_size_no_segment + iter->dm_tlsstoff;
+		dst = (byte_t *)static_tls_init +
+		      static_tls_size_no_segment +
+		      iter->dm_tlsstoff;
 		if (iter->dm_tlsfsize) {
 			fd_t fd = DlModule_GetFd(iter);
 			if unlikely(fd < 0)
@@ -221,17 +227,20 @@ fini_tls_extension_tables(struct dtls_extension *__restrict self) {
 	struct dtls_extension *minptr, *maxptr;
 again:
 	if (self->te_tree.a_vaddr) {
+		DlModule *mod;
 		void (*callback)(void *arg, void *base);
-		callback = ((DlModule *)self->te_tree.a_vaddr)->dm_tls_fini;
+		mod = (DlModule *)self->te_tree.a_vaddr;
+		callback = mod->dm_tls_fini;
 		if (callback) {
 			TRY {
-				(*callback)(((DlModule *)self->te_tree.a_vaddr)->dm_tls_arg, self->te_data);
+				(*callback)(mod->dm_tls_arg,
+				            self->te_data);
 			} EXCEPT {
 				decref_tls_extension_modules(self);
 				RETHROW();
 			}
 		}
-		DlModule_Decref((DlModule *)self->te_tree.a_vaddr);
+		DlModule_Decref(mod);
 	}
 	minptr = self->te_tree.a_min;
 	maxptr = self->te_tree.a_max;
@@ -282,7 +291,8 @@ libdl_dltlsallocseg(void) {
 	if unlikely(!result)
 		goto err_nomem;
 	memcpy(result, static_tls_init, static_tls_size_no_segment);
-	result          = (struct tls_segment *)((byte_t *)result + static_tls_size_no_segment);
+	result = (struct tls_segment *)((byte_t *)result +
+	                                static_tls_size_no_segment);
 	result->ts_self = result;
 	atomic_rwlock_init(&result->ts_exlock);
 	result->ts_extree = NULL;
@@ -300,17 +310,19 @@ delete_extension_tables(struct dtls_extension *__restrict self) {
 	struct dtls_extension *minptr, *maxptr;
 again:
 	if (self->te_tree.a_vaddr) {
+		DlModule *mod;
 		void (*callback)(void *arg, void *base);
-		callback = ((DlModule *)self->te_tree.a_vaddr)->dm_tls_fini;
+		mod = (DlModule *)self->te_tree.a_vaddr;
+		callback = mod->dm_tls_fini;
 		if (callback) {
 			TRY {
-				(*callback)(((DlModule *)self->te_tree.a_vaddr)->dm_tls_arg, self->te_data);
+				(*callback)(mod->dm_tls_arg, self->te_data);
 			} EXCEPT {
 				decref_tls_extension_modules(self);
 				RETHROW();
 			}
 		}
-		DlModule_Decref((DlModule *)self->te_tree.a_vaddr);
+		DlModule_Decref(mod);
 	}
 	minptr = self->te_tree.a_min;
 	maxptr = self->te_tree.a_max;
@@ -346,12 +358,14 @@ clear_extension_table(struct tls_segment *__restrict self) {
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTERN NONNULL((1)) int LIBCCALL
 libdl_dltlsfreeseg(void *ptr) {
+	struct tls_segment *seg;
 	if unlikely(!ptr)
 		goto err_badptr;
+	seg = (struct tls_segment *)ptr;
 	atomic_rwlock_write(&static_tls_lock);
-	LLIST_REMOVE((struct tls_segment *)ptr, ts_threads);
+	LLIST_REMOVE(seg, ts_threads);
 	atomic_rwlock_endwrite(&static_tls_lock);
-	clear_extension_table((struct tls_segment *)ptr);
+	clear_extension_table(seg);
 	free((byte_t *)ptr - static_tls_size_no_segment);
 	return 0;
 err_badptr:

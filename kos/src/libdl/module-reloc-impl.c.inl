@@ -62,8 +62,9 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #endif /* !APPLY_RELA */
 		byte_t *reladdr = loadaddr + rel.r_offset;
 		switch (ELFW(R_TYPE)(rel.r_info)) {
-#define LOOKUP_SYMBOL()                                                                      \
-		if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info), &value, NULL, NULL)) \
+#define LOOKUP_SYMBOL()                                                    \
+		if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info), \
+		                                    &value, NULL, NULL))           \
 			goto err
 
 #ifdef ELF_ARCH_CASE_R_NONE
@@ -106,7 +107,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_SIZE32: {
 			size_t symbol_size;
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value, &symbol_size, NULL))
+			                                    &value, &symbol_size, NULL))
 				goto err;
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(symbol_size + REL_ADDEND);
 		}	break;
@@ -117,7 +118,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		ELF_ARCH_CASE_R_SIZE64: {
 			size_t symbol_size;
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value, &symbol_size, NULL))
+			                                    &value, &symbol_size, NULL))
 				goto err;
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(symbol_size + REL_ADDEND);
 		}	break;
@@ -294,7 +295,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			DlModule *tls_module;
 			/* Negated offset in static TLS block */
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value, NULL, &tls_module))
+			                                    &value, NULL, &tls_module))
 				goto err;
 			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
 			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
@@ -322,7 +323,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			DlModule *tls_module;
 			/* Negated offset in static TLS block */
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value, NULL, &tls_module))
+			                                    &value, NULL, &tls_module))
 				goto err;
 			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
 			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
@@ -350,7 +351,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			DlModule *tls_module;
 			/* Offset in static TLS block */
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value, NULL, &tls_module))
+			                                    &value, NULL, &tls_module))
 				goto err;
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				dl_seterrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
@@ -372,7 +373,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			DlModule *tls_module;
 			/* Offset in static TLS block */
 			if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value, NULL, &tls_module))
+			                                    &value, NULL, &tls_module))
 				goto err;
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				dl_seterrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",

@@ -47,19 +47,19 @@ INTERN WUNUSED NONNULL((1)) void *LIBCCALL
 libdl_dltlsaddr(DlModule *self)
 #endif /* !FAIL_ON_ERROR */
 {
-	byte_t *result;
+	struct tls_segment *seg;
 	struct dtls_extension *extab;
 #ifndef FAIL_ON_ERROR
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_badmodule;
 #endif /* !FAIL_ON_ERROR */
-	result = (byte_t *)RD_TLS_BASE_REGISTER();
+	seg = (struct tls_segment *)RD_TLS_BASE_REGISTER();
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
-		return result + self->dm_tlsstoff;
-	atomic_rwlock_read(&((struct tls_segment *)result)->ts_exlock);
-	extab = dtls_extension_tree_locate(((struct tls_segment *)result)->ts_extree, (uintptr_t)self);
-	atomic_rwlock_endread(&((struct tls_segment *)result)->ts_exlock);
+		return (byte_t *)seg + self->dm_tlsstoff;
+	atomic_rwlock_read(&seg->ts_exlock);
+	extab = dtls_extension_tree_locate(seg->ts_extree, (uintptr_t)self);
+	atomic_rwlock_endread(&seg->ts_exlock);
 	if (extab)
 		return extab->te_data;
 	/* Lazily allocate missing extension tables.
@@ -107,7 +107,8 @@ libdl_dltlsaddr(DlModule *self)
 		               self->dm_tlsinit,
 		               self->dm_tlsfsize),
 		       0, /* .bss */
-		       self->dm_tlsmsize - self->dm_tlsfsize);
+		       self->dm_tlsmsize -
+		       self->dm_tlsfsize);
 		/* Invoke TLS initializers. */
 		if (self->dm_tls_init) {
 			TRY {
@@ -126,16 +127,16 @@ libdl_dltlsaddr(DlModule *self)
 	 *      isn't (any probably couldn't) be re-entrant in the general case...
 	 *      What do the specs say about a signal handler being the first to access some
 	 *      thread-local variable? */
-	atomic_rwlock_write(&((struct tls_segment *)result)->ts_exlock);
+	atomic_rwlock_write(&seg->ts_exlock);
 	{
 		struct dtls_extension *newtab;
-		newtab = dtls_extension_tree_locate(((struct tls_segment *)result)->ts_extree,
+		newtab = dtls_extension_tree_locate(seg->ts_extree,
 		                                    (uintptr_t)self);
 		if unlikely(newtab != NULL) {
 			/* Some other thread already allocated the TLS segment for us
 			 * XXX: Can this even happen? (I don't think it can, considering
 			 *      we're using lazy allocations) */
-			atomic_rwlock_endwrite(&((struct tls_segment *)result)->ts_exlock);
+			atomic_rwlock_endwrite(&seg->ts_exlock);
 			/* Invoke TLS finalizers. */
 			if (self->dm_tls_fini) {
 				TRY {
@@ -149,8 +150,8 @@ libdl_dltlsaddr(DlModule *self)
 			return newtab->te_data;
 		}
 	}
-	dtls_extension_tree_insert(&((struct tls_segment *)result)->ts_extree, extab);
-	atomic_rwlock_endwrite(&((struct tls_segment *)result)->ts_exlock);
+	dtls_extension_tree_insert(&seg->ts_extree, extab);
+	atomic_rwlock_endwrite(&seg->ts_exlock);
 	return extab->te_data;
 err_nomem:
 	dl_seterror_nomem();

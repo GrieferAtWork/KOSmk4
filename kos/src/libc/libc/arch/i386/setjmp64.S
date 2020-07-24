@@ -114,12 +114,13 @@ INTERN_FUNCTION(libc_sigsetjmp)
 	xorq   %rsi, %rsi                    /* sigset_t const *set */
 	movq   $(SIG_SETMASK), %rdx          /* syscall_ulong_t how */
 	movq   $(__SIZEOF_SIGSET_T__), %rcx  /* size_t sigsetsize */
+	EXTERN(libc_sys_rt_sigprocmask)
 #if defined(NDEBUG) || defined(__OPTIMIZE_SIZE__)
 	jmp    libc_sys_rt_sigprocmask /* call + ret */
-#else
+#else /* NDEBUG || __OPTIMIZE_SIZE__ */
 	call   libc_sys_rt_sigprocmask
 	ret
-#endif
+#endif /* !NDEBUG && !__OPTIMIZE_SIZE__ */
 1:	popq_cfi %rcx
 	.cfi_register %rip, %rcx
 	movq   %rcx, OFFSET_JMPBUF_RIP(%rdi)
@@ -147,6 +148,7 @@ INTERN_FUNCTION(libc_siglongjmp)
 	movq   $(SIG_SETMASK), %rdx          /* syscall_ulong_t how */
 	leaq   OFFSET_JMPBUF_SIG(%rdi), %rsi /* sigset_t *set */
 	xorq   %rdi, %rdi                    /* sigset_t *oset */
+	EXTERN(libc_sys_rt_sigprocmask)
 	call   libc_sys_rt_sigprocmask
 	popq_cfi %rsi
 	popq_cfi %rdi

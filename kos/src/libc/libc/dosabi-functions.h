@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27979b65 */
+/* HASH CRC-32:0x61af4025 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,37 +23,37 @@
 #endif /* !DFUN */
 
 #ifndef TP
-#define TP << TIn(__SIZEOF_POINTER__)
+#define TP TIn(__SIZEOF_POINTER__)
 #endif /* !TP */
 #ifndef THH
-#define THH << TIn(__SIZEOF_CHAR__)
+#define THH TIn(__SIZEOF_CHAR__)
 #endif /* !THH */
 #ifndef TH
-#define TH << TIn(__SIZEOF_SHORT__)
+#define TH TIn(__SIZEOF_SHORT__)
 #endif /* !TH */
 #ifndef TD
-#define TD << TIn(__SIZEOF_INT__)
+#define TD TIn(__SIZEOF_INT__)
 #endif /* !TD */
 #ifndef TL
-#define TL << TIn(__SIZEOF_LONG__)
+#define TL TIn(__SIZEOF_LONG__)
 #endif /* !TL */
 #ifndef TLL
-#define TLL << TIn(__SIZEOF_LONG_LONG__)
+#define TLL TIn(__SIZEOF_LONG_LONG__)
 #endif /* !TLL */
 #ifndef TI
-#define TI << TIn(__SIZEOF_SIZE_T__)
+#define TI TIn(__SIZEOF_SIZE_T__)
 #endif /* !TI */
 #ifndef TI8
-#define TI8 << TIn(1)
+#define TI8 TIn(1)
 #endif /* !TI8 */
 #ifndef TI16
-#define TI16 << TIn(2)
+#define TI16 TIn(2)
 #endif /* !TI16 */
 #ifndef TI32
-#define TI32 << TIn(4)
+#define TI32 TIn(4)
 #endif /* !TI32 */
 #ifndef TI64
-#define TI64 << TIn(8)
+#define TI64 TIn(8)
 #endif /* !TI64 */
 
 /* aliases */

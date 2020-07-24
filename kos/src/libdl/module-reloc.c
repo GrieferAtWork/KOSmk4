@@ -84,7 +84,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
                                      char const *__restrict name,
                                      uintptr_t *__restrict phash_elf,
                                      uintptr_t *__restrict phash_gnu,
-                                     ElfW(Addr) *__restrict presult,
+                                     ElfW(Addr) *__restrict paddr,
                                      size_t *psize,
                                      DlModule **pmodule,
                                      struct dl_symbol *__restrict pweak_symbol,
@@ -103,7 +103,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			                                             name,
 			                                             phash_elf,
 			                                             phash_gnu,
-			                                             presult,
+			                                             paddr,
 			                                             psize,
 			                                             pmodule,
 			                                             pweak_symbol,
@@ -126,7 +126,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			void *addr;
 			addr = dlsym_builtin(name);
 			if (addr) {
-				*presult = (ElfW(Addr))addr;
+				*paddr = (ElfW(Addr))addr;
 				if unlikely(psize)
 					*psize = builtin_symbol_size(name);
 				if unlikely(pmodule)
@@ -152,7 +152,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 				}
 			} else {
 				/* Found the real, actual symbol! */
-				*presult = (ElfW(Addr))(void *)symbol.ds_sym;
+				*paddr = (ElfW(Addr))(void *)symbol.ds_sym;
 				if unlikely(psize)
 					*psize = symbol.ds_siz;
 				if unlikely(pmodule)
@@ -176,21 +176,21 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 				}
 			} else {
 				/* Found the real, actual symbol! */
-				ElfW(Addr) result;
-				result = symbol.ds_sym->st_value;
+				ElfW(Addr) addr;
+				addr = symbol.ds_sym->st_value;
 				if (symbol.ds_sym->st_shndx != SHN_ABS)
-					result += symbol.ds_mod->dm_loadaddr;
+					addr += symbol.ds_mod->dm_loadaddr;
 				if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
 				    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA) {
 					TRY {
-						result = (*(ElfW(Addr)(*)(void))(void *)result)();
+						addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 					} EXCEPT {
 						if (pweak_symbol->ds_mod)
 							DlModule_Decref(pweak_symbol->ds_mod);
 						RETHROW();
 					}
 				}
-				*presult = result;
+				*paddr = addr;
 				if unlikely(psize)
 					*psize = symbol.ds_sym->st_size;
 				if unlikely(pmodule)
@@ -205,11 +205,11 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 3)) bool CC
 DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
-                       ElfW(Addr) *__restrict presult,
+                       ElfW(Addr) *__restrict paddr,
                        size_t *psize, DlModule **pmodule) {
 	struct dl_symbol weak_symbol;
 	ElfW(Sym) const *symbol;
-	ElfW(Addr) result;
+	ElfW(Addr) addr;
 	char const *name;
 	weak_symbol.ds_mod = NULL;
 	symbol = self->dm_elf.de_dynsym_tab + symid;
@@ -222,12 +222,12 @@ DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
 			goto search_external_symbol;
 		}
 got_local_symbol:
-		result = symbol->st_value;
+		addr = symbol->st_value;
 		if (symbol->st_shndx != SHN_ABS)
-			result += self->dm_loadaddr;
+			addr += self->dm_loadaddr;
 		if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 		    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA)
-			result = (*(ElfW(Addr)(*)(void))(void *)result)();
+			addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 		if unlikely(psize)
 			*psize = symbol->st_size;
 		if unlikely(pmodule)
@@ -257,15 +257,15 @@ again_search_globals_next:
 again_search_globals_module:
 			assert(iter != self);
 			if (iter == &dl_rtld_module) {
-				result = (ElfW(Addr))dlsym_builtin(name);
-				if (result) {
+				addr = (ElfW(Addr))dlsym_builtin(name);
+				if (addr) {
 					if (weak_symbol.ds_mod)
 						DlModule_Decref(weak_symbol.ds_mod);
 					if unlikely(psize)
 						*psize = builtin_symbol_size(name);
 					if unlikely(pmodule)
 						*pmodule = &dl_rtld_module;
-					goto done_result;
+					goto done;
 				}
 			} else if (iter->dm_ops) {
 				int error;
@@ -292,13 +292,13 @@ again_search_globals_module:
 						/* Found it! */
 						if (weak_symbol.ds_mod)
 							DlModule_Decref(weak_symbol.ds_mod);
-						result = (ElfW(Addr))symbol_addr;
+						addr = (ElfW(Addr))symbol_addr;
 						if unlikely(psize)
 							*psize = symbol_size;
 						if unlikely(pmodule)
 							*pmodule = iter;
 						DlModule_Decref(iter);
-						goto done_result;
+						goto done;
 					}
 				}
 			} else {
@@ -323,13 +323,13 @@ again_search_globals_module:
 						/* Found it! */
 						if (weak_symbol.ds_mod)
 							DlModule_Decref(weak_symbol.ds_mod);
-						result = symbol->st_value;
+						addr = symbol->st_value;
 						if (symbol->st_shndx != SHN_ABS)
-							result += iter->dm_loadaddr;
+							addr += iter->dm_loadaddr;
 						if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC ||
 						    ELFW(ST_TYPE)(symbol->st_info) == STT_KOS_IDATA) {
 							TRY {
-								result = (*(ElfW(Addr)(*)(void))(void *)result)();
+								addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 							} EXCEPT {
 								DlModule_Decref(iter);
 								RETHROW();
@@ -340,7 +340,7 @@ again_search_globals_module:
 						if unlikely(pmodule)
 							*pmodule = iter;
 						DlModule_Decref(iter);
-						goto done_result;
+						goto done;
 					}
 				}
 			}
@@ -366,7 +366,7 @@ again_search_globals_module:
 				                                             name,
 				                                             &hash_elf,
 				                                             &hash_gnu,
-				                                             presult,
+				                                             paddr,
 				                                             psize,
 				                                             pmodule,
 				                                             &weak_symbol,
@@ -383,17 +383,17 @@ again_search_globals_module:
 
 		if (weak_symbol.ds_mod) {
 			if (weak_symbol.ds_mod->dm_ops) {
-				result = (ElfW(Addr))weak_symbol.ds_sym;
+				addr = (ElfW(Addr))weak_symbol.ds_sym;
 				if unlikely(psize)
 					*psize = weak_symbol.ds_siz;
 			} else {
-				result = weak_symbol.ds_sym->st_value;
+				addr = weak_symbol.ds_sym->st_value;
 				if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-					result += weak_symbol.ds_mod->dm_loadaddr;
+					addr += weak_symbol.ds_mod->dm_loadaddr;
 				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
 				    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA) {
 					TRY {
-						result = (*(ElfW(Addr)(*)(void))(void *)result)();
+						addr = (*(ElfW(Addr)(*)(void))(void *)addr)();
 					} EXCEPT {
 						DlModule_Decref(weak_symbol.ds_mod);
 						RETHROW();
@@ -405,7 +405,7 @@ again_search_globals_module:
 			if unlikely(pmodule)
 				*pmodule = weak_symbol.ds_mod;
 			DlModule_Decref(weak_symbol.ds_mod);
-			goto done_result;
+			goto done;
 		}
 
 		/* Lastly: Check if the module itself has a valid definition,
@@ -414,20 +414,20 @@ again_search_globals_module:
 		if (symbol->st_shndx != SHN_UNDEF)
 			goto got_local_symbol;
 		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
-			result = 0;
+			addr = 0;
 			if unlikely(psize)
 				*psize = symbol->st_size; /* Return 0 instead? */
 			if unlikely(pmodule)
 				*pmodule = self;
-			goto done_result;
+			goto done;
 		}
 		/* If the symbol continues to be undefined, set an error. */
 		dl_seterrorf("Could not find symbol %q required by %q",
 		             name, self->dm_filename);
 		return false;
 	}
-done_result:
-	*presult = result;
+done:
+	*paddr = addr;
 	return true;
 }
 
@@ -465,7 +465,7 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
                            ) {
 	ElfW(Rel) *rel;
 	byte_t *reladdr;
-	ElfW(Addr) result;
+	ElfW(Addr) addr;
 #ifdef LAZY_TRACE
 	DlModule *link_module;
 #endif /* LAZY_TRACE */
@@ -532,10 +532,10 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	reladdr = (byte_t *)self->dm_loadaddr + rel->r_offset;
 	/* Resolve the symbol now. */
 #ifdef LAZY_TRACE
-	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
+	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &addr,
 	                                    NULL, &link_module))
 #else /* LAZY_TRACE */
-	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
+	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &addr,
 	                                    NULL, NULL))
 #endif /* !LAZY_TRACE */
 	{
@@ -548,15 +548,15 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 #if ELF_ARCH_USESRELA
 	/* Extend the relocation result with its addend */
 	if (self->dm_flags & RTLD_JMPRELA)
-		result += ((ElfW(Rela) *)rel)->r_addend;
+		addr += ((ElfW(Rela) *)rel)->r_addend;
 #endif /* ELF_ARCH_USESRELA */
 #ifdef LAZY_TRACE
 	syslog(LOG_DEBUG, "[rtld] Lazy resolve %q in %q (to %p from %q)\n",
 	       self->dm_elf.de_dynstr + self->dm_elf.de_dynsym_tab[ELFW(R_SYM)(rel->r_info)].st_name,
-	       self->dm_filename, result, link_module->dm_filename);
+	       self->dm_filename, addr, link_module->dm_filename);
 #endif /* LAZY_TRACE */
-	*(ElfW(Addr) *)reladdr = result;
-	return result;
+	*(ElfW(Addr) *)reladdr = addr;
+	return addr;
 }
 #endif /* ELF_ARCH_IS_R_JMP_SLOT */
 

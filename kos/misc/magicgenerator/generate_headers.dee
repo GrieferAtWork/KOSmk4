@@ -646,7 +646,7 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 	};
 	for (local name, siz: DEFAULT_TIn_TYPES) {
 		fp << "#ifndef " << name << "\n"
-			"#define " << name << " << TIn(" << siz << ")\n"
+			"#define " << name << " TIn(" << siz << ")\n"
 			"#endif /* !" << name << " */\n";
 	}
 	local cWriter = CWriter(fp, ppAssume: ppAssumeDosAbiSourceFiles);

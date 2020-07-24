@@ -63,9 +63,9 @@ elf_symhash(char const *__restrict name) {
 #define ELF_CLASSBITS 32
 #elif ELF_ARCH_CLASS == ELFCLASS64
 #define ELF_CLASSBITS 64
-#else
+#else /* ELF_ARCH_CLASS == ... */
 #define ELF_CLASSBITS (__SIZEOF_POINTER__ * 8)
-#endif
+#endif /* ELF_ARCH_CLASS != ... */
 
 
 
