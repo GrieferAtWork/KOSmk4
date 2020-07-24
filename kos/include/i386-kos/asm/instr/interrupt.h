@@ -84,7 +84,12 @@ __ASM_L(.macro intr_exit_sysret intr_enabled=1)
 __ASM_L(.if __ASM_ARG(\intr_enabled))
 __ASM_L(	cli)
 __ASM_L(.endif)
-__ASM_L(	swapgs) /* sysret implies that we will return to user-space, so we can swapgs unconditionally! */
+/* Even though we (think) we know that we're about to return to user-space, there is
+ * an exception to this rule related to `x86_rpc_user_redirection()': If some other
+ * thread has re-directed our interrupt control flow in order to service RPCs before
+ * returning to user-space, we'll once again jump to kernel-space, meaning that we
+ * must ensure that `%gs.base' matches the expected value for the target `%cs'! */
+__ASM_L(	swapgs_if_user_iret)
 #ifdef __OPTIMIZE_SIZE__
 __ASM_L(	iretq)
 #else /* __OPTIMIZE_SIZE__ */

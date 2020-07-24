@@ -349,9 +349,7 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	testq  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
-	cli
-	swapgs
-	iretq
+	intr_exit_sysret
 1:
 
 	pushq_cfi $(0)    /* Make space for ARG5 */
