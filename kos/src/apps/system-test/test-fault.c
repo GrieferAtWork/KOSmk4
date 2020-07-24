@@ -442,6 +442,19 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 		return;
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
+#ifndef __x86_64__
+		/* Special case: The access test for `0xbfffffff' behaves slightly different
+		 *               when a memory mapping exists at `0xbffff000' (which can happen
+		 *               randomly as the result of ASLR).
+		 * When this happens, the access to `0xbfffffff' will not actually fault before
+		 * then faulting for real when trying to access `0xc0000000'!
+		 * If this happens, then the error can match what is checked here. */
+		if (addr == (void *)UINT32_C(0xbfffffff)) {
+			if (error_data()->e_pointers[0] == UINT32_C(0xc0000000) &&
+			    error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_VIO)
+				return;
+		}
+#endif /* !__x86_64__ */
 		if (is_vio) {
 			/* VIO dispatching may try to access multiple surrounding bytes
 			 * in order to service the request. Because of this, fault pointer
