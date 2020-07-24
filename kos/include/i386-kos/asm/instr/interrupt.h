@@ -45,7 +45,11 @@
 #ifdef __x86_64__
 __ASM_BEGIN
 __ASM_L(.macro swapgs_if_user_iret)
+#if 1
+__ASM_L(	testb  $(3), 8(%rsp)) /* 8 == OFFSET_IRREGS64_CS */
+#else
 __ASM_L(	testq  $(3), 8(%rsp)) /* 8 == OFFSET_IRREGS64_CS */
+#endif
 __ASM_L(	jz     991f)
 __ASM_L(	swapgs)
 __ASM_L(991:)
@@ -58,7 +62,11 @@ __ASM_L(.endm)
 __ASM_L(.macro intr_enter type:req)
 __ASM_L(	swapgs_if_user_iret)
 __ASM_L(.ifc __ASM_ARG(\type),TRAP)
+#if 1
+__ASM_L(	testb  $(0x2), 17(%rsp))   /* 16 == OFFSET_IRREGS64_RFLAGS */
+#else
 __ASM_L(	testq  $(0x200), 16(%rsp)) /* 16 == OFFSET_IRREGS64_RFLAGS */
+#endif
 __ASM_L(	jz     991f)
 __ASM_L(	sti)
 __ASM_L(991:)
@@ -79,26 +87,6 @@ __ASM_L(.endif)
 __ASM_L(	swapgs_if_user_iret)
 __ASM_L(	iretq)
 __ASM_L(.endm)
-
-__ASM_L(.macro intr_exit_sysret intr_enabled=1)
-__ASM_L(.if __ASM_ARG(\intr_enabled))
-__ASM_L(	cli)
-__ASM_L(.endif)
-/* Even though we (think) we know that we're about to return to user-space, there is
- * an exception to this rule related to `x86_rpc_user_redirection()': If some other
- * thread has re-directed our interrupt control flow in order to service RPCs before
- * returning to user-space, we'll once again jump to kernel-space, meaning that we
- * must ensure that `%gs.base' matches the expected value for the target `%cs'! */
-__ASM_L(	swapgs_if_user_iret)
-#ifdef __OPTIMIZE_SIZE__
-__ASM_L(	iretq)
-#else /* __OPTIMIZE_SIZE__ */
-/* TODO: Make use of sysret if possible. */
-__ASM_L(	iretq)
-#endif /* !__OPTIMIZE_SIZE__ */
-__ASM_L(.endm)
-
-
 __ASM_END
 #endif /* __x86_64__ */
 

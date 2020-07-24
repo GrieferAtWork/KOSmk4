@@ -22,7 +22,9 @@
 #define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
+
 #include <kernel/syscall.h>
+
 #include <asm/cfi.h>
 
 
@@ -44,9 +46,9 @@ PUBLIC_FUNCTION(__i386_syscall_iret)
 	/* Disable interrupts to prevent any further IRET redirections. */
 	cli
 
-	/* sysexit requires that TARGET.%cs == SEGMENT_USER_CODE, as
+	/* sysexit requires that TARGET.%cs == SEGMENT_USER_CODE32_RPL, as
 	 * that is the effective %cs that will be loaded by `sysexit' */
-	cmpl   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS_CS(%esp)
+	cmpw   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS_CS(%esp)
 	jne    .Ldo_iret
 
 	/* When returning to vm86, we also cannot make use of `sysexit' */

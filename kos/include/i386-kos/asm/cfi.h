@@ -419,6 +419,21 @@ __ASM_L(.endif)
 __ASM_L(.endm)
 
 
+/* Encode a CFI register restore: `%dst = value' */
+__ASM_L(.macro .cfi_reg_const dst:req, value:req)
+__ASM_L(	.cfi_escape 0x16) /* DW_CFA_val_expression */
+__ASM_L(	__cfi_decode_register .cfi_escape_uleb128, __ASM_ARG(\dst))
+__ASM_L(	.pushsection .discard)
+__ASM_L(	.Lcfi_reg_offset_text_start = .)
+__ASM_L(		.uleb128 __ASM_ARG(\value))
+__ASM_L(	.Lcfi_reg_offset_text_size = 1 + (. - .Lcfi_reg_offset_text_start))
+__ASM_L(	.popsection)
+__ASM_L(	.cfi_escape_uleb128 .Lcfi_reg_offset_text_size)
+__ASM_L(	.cfi_escape 0x10) /* DW_OP_constu */
+__ASM_L(	.cfi_escape_uleb128 __ASM_ARG(\value))
+__ASM_L(.endm)
+
+
 #ifdef __x86_64__
 
 __ASM_L(.macro .cfi_restore_iret_rip)

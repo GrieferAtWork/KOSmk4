@@ -201,7 +201,26 @@
 #undef SC_IRET
 #undef SC_IRET_NOCLOBBER
 #ifdef __x86_64__
-#define SC_IRET           intr_exit_sysret
+#ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+/* We can just use `sysret' as a drop-in replacement for `sysexit', since
+ * `sysret' doesn't clobber any 32-bit registers that `sysexit' doesn't
+ * also clobber! */
+#define SC_IRET X86_IRET_BUT_PREFER_SYSRET32
+#elif defined(SYSCALL_FASTPASS_KIND_SYS32_INT80)
+/* Mustn't clobber %ecx, so always use `iret' in this case! */
+#define SC_IRET intr_exit
+#elif defined(SYSCALL_FASTPASS_KIND_SYS64)
+/* NOTE: On x86_64, 64-bit system calls can be invoked in 1 of 2 ways:
+ *       - int 80h
+ *       - syscall
+ * Documentation throughout the kernel states that both of these methods
+ * yield identical results, though one minor detail that is documented
+ * nowhere is left to use to decide upon:
+ *       `int 80h' on x86_64 is allowed to clobber %rcx and %r11
+ * By allowing for this, we can use identical return-paths for both
+ * invocation methods, by trying to make use of `sysret' in both cases. */
+#define SC_IRET X86_IRET_BUT_PREFER_SYSRET64
+#endif /* ... */
 #define SC_IRET_NOCLOBBER intr_exit
 #elif defined(SYSCALL_FASTPASS_KIND_SYS32_SYSENTER)
 #define SC_IRET           X86_IRET_BUT_PREFER_SYSEXIT

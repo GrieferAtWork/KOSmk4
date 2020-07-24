@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x211566bd */
+/* HASH CRC-32:0xbc0eb735 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_read)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_read)
 
@@ -94,7 +94,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_write)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_write)
 
@@ -124,7 +124,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_open)
 
@@ -155,7 +155,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_close)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_close)
 
@@ -185,7 +185,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_stat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_linux_stat)
 
@@ -215,7 +215,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_linux_fstat)
 
@@ -245,7 +245,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_lstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_linux_lstat)
 
@@ -275,7 +275,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_poll)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_poll)
 
@@ -305,7 +305,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lseek)
 
@@ -341,7 +341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mmap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mmap)
 
@@ -372,7 +372,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mprotect)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mprotect)
 
@@ -402,7 +402,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munmap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_munmap)
 
@@ -432,7 +432,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_brk)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_brk)
 
@@ -463,7 +463,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigaction)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigaction)
 
@@ -495,7 +495,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigprocmask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigprocmask)
 
@@ -539,7 +539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigreturn)
 
@@ -569,7 +569,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ioctl)
 
@@ -600,7 +600,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pread64)
 
@@ -631,7 +631,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pwrite64)
 
@@ -661,7 +661,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_readv)
 
@@ -691,7 +691,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_writev)
 
@@ -722,7 +722,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_access)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_access)
 
@@ -752,7 +752,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pipe)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pipe)
 
@@ -783,7 +783,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_select)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_select)
 
@@ -813,7 +813,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_yield)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_yield)
 
@@ -845,7 +845,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mremap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mremap)
 
@@ -875,7 +875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_msync)
 
@@ -905,7 +905,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mincore)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mincore)
 
@@ -935,7 +935,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_madvise)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_madvise)
 
@@ -965,7 +965,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmget)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_shmget)
 
@@ -995,7 +995,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_shmat)
 
@@ -1025,7 +1025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_shmctl)
 
@@ -1055,7 +1055,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_dup)
 
@@ -1085,7 +1085,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_dup2)
 
@@ -1115,7 +1115,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pause)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pause)
 
@@ -1145,7 +1145,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_nanosleep)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_nanosleep)
 
@@ -1176,7 +1176,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getitimer)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getitimer)
 
@@ -1206,7 +1206,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_alarm)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_alarm)
 
@@ -1237,7 +1237,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setitimer)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setitimer)
 
@@ -1267,7 +1267,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getpid)
 
@@ -1298,7 +1298,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendfile)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sendfile)
 
@@ -1336,7 +1336,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socket)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_socket)
 
@@ -1366,7 +1366,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_connect)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_connect)
 
@@ -1396,7 +1396,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_accept)
 
@@ -1429,7 +1429,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendto)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sendto)
 
@@ -1462,7 +1462,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvfrom)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_recvfrom)
 
@@ -1494,7 +1494,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sendmsg)
 
@@ -1527,7 +1527,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_recvmsg)
 
@@ -1558,7 +1558,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shutdown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_shutdown)
 
@@ -1588,7 +1588,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bind)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_bind)
 
@@ -1618,7 +1618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_listen)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_listen)
 
@@ -1648,7 +1648,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getsockname)
 
@@ -1678,7 +1678,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpeername)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getpeername)
 
@@ -1717,7 +1717,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socketpair)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_socketpair)
 
@@ -1750,7 +1750,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setsockopt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setsockopt)
 
@@ -1783,7 +1783,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockopt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getsockopt)
 
@@ -1814,7 +1814,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clone)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_clone)
 
@@ -1844,7 +1844,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fork)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fork)
 
@@ -1874,7 +1874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vfork)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_vfork)
 
@@ -1904,7 +1904,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execve)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_execve)
 
@@ -1934,7 +1934,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_exit)
 
@@ -1967,7 +1967,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_wait4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_wait4)
 
@@ -1997,7 +1997,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kill)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kill)
 
@@ -2027,7 +2027,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_uname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_uname)
 
@@ -2057,7 +2057,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semget)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_semget)
 
@@ -2087,7 +2087,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semop)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_semop)
 
@@ -2117,7 +2117,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_semctl)
 
@@ -2147,7 +2147,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmdt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_shmdt)
 
@@ -2177,7 +2177,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgget)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_msgget)
 
@@ -2207,7 +2207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgsnd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_msgsnd)
 
@@ -2237,7 +2237,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgrcv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_msgrcv)
 
@@ -2267,7 +2267,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_msgctl)
 
@@ -2297,7 +2297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fcntl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fcntl)
 
@@ -2327,7 +2327,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_flock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_flock)
 
@@ -2357,7 +2357,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fsync)
 
@@ -2387,7 +2387,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fdatasync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fdatasync)
 
@@ -2417,7 +2417,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_truncate)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_truncate)
 
@@ -2447,7 +2447,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ftruncate)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ftruncate)
 
@@ -2477,7 +2477,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdents)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getdents)
 
@@ -2507,7 +2507,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcwd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getcwd)
 
@@ -2537,7 +2537,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_chdir)
 
@@ -2567,7 +2567,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fchdir)
 
@@ -2597,7 +2597,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rename)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rename)
 
@@ -2627,7 +2627,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mkdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mkdir)
 
@@ -2657,7 +2657,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rmdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rmdir)
 
@@ -2687,7 +2687,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_creat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_creat)
 
@@ -2717,7 +2717,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_link)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_link)
 
@@ -2747,7 +2747,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_unlink)
 
@@ -2777,7 +2777,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_symlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_symlink)
 
@@ -2807,7 +2807,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_readlink)
 
@@ -2837,7 +2837,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chmod)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_chmod)
 
@@ -2867,7 +2867,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchmod)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fchmod)
 
@@ -2897,7 +2897,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_chown)
 
@@ -2927,7 +2927,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fchown)
 
@@ -2957,7 +2957,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lchown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lchown)
 
@@ -2987,7 +2987,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_umask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_umask)
 
@@ -3017,7 +3017,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_gettimeofday)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_gettimeofday)
 
@@ -3048,7 +3048,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrlimit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getrlimit)
 
@@ -3079,7 +3079,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrusage)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getrusage)
 
@@ -3109,7 +3109,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysinfo)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sysinfo)
 
@@ -3139,7 +3139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_times)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_times)
 
@@ -3170,7 +3170,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ptrace)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ptrace)
 
@@ -3200,7 +3200,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getuid)
 
@@ -3230,7 +3230,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_syslog)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_syslog)
 
@@ -3260,7 +3260,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getgid)
 
@@ -3290,7 +3290,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setuid)
 
@@ -3320,7 +3320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setgid)
 
@@ -3350,7 +3350,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_geteuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_geteuid)
 
@@ -3380,7 +3380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getegid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getegid)
 
@@ -3410,7 +3410,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setpgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setpgid)
 
@@ -3440,7 +3440,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getppid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getppid)
 
@@ -3470,7 +3470,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpgrp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getpgrp)
 
@@ -3500,7 +3500,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setsid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setsid)
 
@@ -3530,7 +3530,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setreuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setreuid)
 
@@ -3560,7 +3560,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setregid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setregid)
 
@@ -3590,7 +3590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getgroups)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getgroups)
 
@@ -3620,7 +3620,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setgroups)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setgroups)
 
@@ -3650,7 +3650,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setresuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setresuid)
 
@@ -3680,7 +3680,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getresuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getresuid)
 
@@ -3710,7 +3710,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setresgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setresgid)
 
@@ -3740,7 +3740,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getresgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getresgid)
 
@@ -3770,7 +3770,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getpgid)
 
@@ -3800,7 +3800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setfsuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setfsuid)
 
@@ -3830,7 +3830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setfsgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setfsgid)
 
@@ -3860,7 +3860,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getsid)
 
@@ -3890,7 +3890,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_capget)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_capget)
 
@@ -3920,7 +3920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_capset)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_capset)
 
@@ -3950,7 +3950,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigpending)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigpending)
 
@@ -3981,7 +3981,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigtimedwait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigtimedwait)
 
@@ -4011,7 +4011,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigqueueinfo)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigqueueinfo)
 
@@ -4041,7 +4041,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigsuspend)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigsuspend)
 
@@ -4071,7 +4071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sigaltstack)
 
@@ -4101,7 +4101,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_utime)
 
@@ -4131,7 +4131,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mknod)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mknod)
 
@@ -4161,7 +4161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_uselib)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_uselib)
 
@@ -4191,7 +4191,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_personality)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_personality)
 
@@ -4221,7 +4221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ustat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ustat)
 
@@ -4251,7 +4251,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_statfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_statfs)
 
@@ -4281,7 +4281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fstatfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fstatfs)
 
@@ -4311,7 +4311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sysfs)
 
@@ -4342,7 +4342,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpriority)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getpriority)
 
@@ -4373,7 +4373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setpriority)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setpriority)
 
@@ -4403,7 +4403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setparam)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_setparam)
 
@@ -4433,7 +4433,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getparam)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_getparam)
 
@@ -4465,7 +4465,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setscheduler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_setscheduler)
 
@@ -4495,7 +4495,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getscheduler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_getscheduler)
 
@@ -4525,7 +4525,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_get_priority_max)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_get_priority_max)
 
@@ -4555,7 +4555,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_get_priority_min)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_get_priority_min)
 
@@ -4585,7 +4585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_rr_get_interval)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_rr_get_interval)
 
@@ -4615,7 +4615,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mlock)
 
@@ -4645,7 +4645,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munlock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_munlock)
 
@@ -4676,7 +4676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlockall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mlockall)
 
@@ -4706,7 +4706,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munlockall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_munlockall)
 
@@ -4736,7 +4736,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vhangup)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_vhangup)
 
@@ -4766,7 +4766,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_modify_ldt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_modify_ldt)
 
@@ -4796,7 +4796,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pivot_root)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pivot_root)
 
@@ -4826,7 +4826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall__sysctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall__sysctl)
 
@@ -4856,7 +4856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_prctl)
 
@@ -4886,7 +4886,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_arch_prctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_arch_prctl)
 
@@ -4916,7 +4916,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_adjtimex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_adjtimex)
 
@@ -4947,7 +4947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setrlimit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setrlimit)
 
@@ -4977,7 +4977,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chroot)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_chroot)
 
@@ -5007,7 +5007,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sync)
 
@@ -5037,7 +5037,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_acct)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_acct)
 
@@ -5067,7 +5067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_settimeofday)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_settimeofday)
 
@@ -5098,7 +5098,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mount)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mount)
 
@@ -5128,7 +5128,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_umount2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_umount2)
 
@@ -5159,7 +5159,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_swapon)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_swapon)
 
@@ -5189,7 +5189,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_swapoff)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_swapoff)
 
@@ -5220,7 +5220,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_reboot)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_reboot)
 
@@ -5250,7 +5250,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sethostname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sethostname)
 
@@ -5280,7 +5280,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setdomainname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setdomainname)
 
@@ -5310,7 +5310,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_iopl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_iopl)
 
@@ -5340,7 +5340,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioperm)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ioperm)
 
@@ -5370,7 +5370,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_create_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_create_module)
 
@@ -5400,7 +5400,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_init_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_init_module)
 
@@ -5430,7 +5430,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_delete_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_delete_module)
 
@@ -5460,7 +5460,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_kernel_syms)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_get_kernel_syms)
 
@@ -5490,7 +5490,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_query_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_query_module)
 
@@ -5520,7 +5520,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_quotactl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_quotactl)
 
@@ -5550,7 +5550,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_nfsservctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_nfsservctl)
 
@@ -5580,7 +5580,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getpmsg)
 
@@ -5610,7 +5610,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_putpmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_putpmsg)
 
@@ -5640,7 +5640,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_afs_syscall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_afs_syscall)
 
@@ -5670,7 +5670,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tuxcall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_tuxcall)
 
@@ -5700,7 +5700,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_security)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_security)
 
@@ -5730,7 +5730,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_gettid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_gettid)
 
@@ -5760,7 +5760,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readahead)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_readahead)
 
@@ -5792,7 +5792,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setxattr)
 
@@ -5824,7 +5824,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lsetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lsetxattr)
 
@@ -5856,7 +5856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fsetxattr)
 
@@ -5887,7 +5887,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getxattr)
 
@@ -5918,7 +5918,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lgetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lgetxattr)
 
@@ -5949,7 +5949,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fgetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fgetxattr)
 
@@ -5979,7 +5979,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_listxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_listxattr)
 
@@ -6009,7 +6009,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_llistxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_llistxattr)
 
@@ -6039,7 +6039,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_flistxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_flistxattr)
 
@@ -6069,7 +6069,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_removexattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_removexattr)
 
@@ -6099,7 +6099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lremovexattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lremovexattr)
 
@@ -6129,7 +6129,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fremovexattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fremovexattr)
 
@@ -6159,7 +6159,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tkill)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_tkill)
 
@@ -6189,7 +6189,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_time)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_time)
 
@@ -6221,7 +6221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_futex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_futex)
 
@@ -6251,7 +6251,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setaffinity)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_setaffinity)
 
@@ -6281,7 +6281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getaffinity)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_getaffinity)
 
@@ -6311,7 +6311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_thread_area)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_set_thread_area)
 
@@ -6341,7 +6341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_setup)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_io_setup)
 
@@ -6371,7 +6371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_destroy)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_io_destroy)
 
@@ -6401,7 +6401,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_getevents)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_io_getevents)
 
@@ -6431,7 +6431,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_submit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_io_submit)
 
@@ -6461,7 +6461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_cancel)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_io_cancel)
 
@@ -6491,7 +6491,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_thread_area)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_get_thread_area)
 
@@ -6521,7 +6521,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lookup_dcookie)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lookup_dcookie)
 
@@ -6551,7 +6551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_create)
 
@@ -6583,7 +6583,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl_old)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl_old)
 
@@ -6614,7 +6614,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait_old)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_wait_old)
 
@@ -6645,7 +6645,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_remap_file_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_remap_file_pages)
 
@@ -6675,7 +6675,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdents64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getdents64)
 
@@ -6705,7 +6705,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_tid_address)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_set_tid_address)
 
@@ -6735,7 +6735,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_restart_syscall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_restart_syscall)
 
@@ -6765,7 +6765,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semtimedop)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_semtimedop)
 
@@ -6795,7 +6795,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fadvise64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fadvise64)
 
@@ -6825,7 +6825,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timer_create)
 
@@ -6857,7 +6857,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_settime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timer_settime)
 
@@ -6887,7 +6887,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_gettime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timer_gettime)
 
@@ -6917,7 +6917,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_getoverrun)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timer_getoverrun)
 
@@ -6947,7 +6947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_delete)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timer_delete)
 
@@ -6977,7 +6977,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_settime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_clock_settime)
 
@@ -7007,7 +7007,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_gettime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_clock_gettime)
 
@@ -7037,7 +7037,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_getres)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_clock_getres)
 
@@ -7068,7 +7068,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_nanosleep)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_clock_nanosleep)
 
@@ -7098,7 +7098,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit_group)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_exit_group)
 
@@ -7129,7 +7129,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_wait)
 
@@ -7161,7 +7161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl)
 
@@ -7191,7 +7191,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tgkill)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_tgkill)
 
@@ -7221,7 +7221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimes)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_utimes)
 
@@ -7251,7 +7251,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vserver)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_vserver)
 
@@ -7281,7 +7281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mbind)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mbind)
 
@@ -7311,7 +7311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_mempolicy)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_set_mempolicy)
 
@@ -7341,7 +7341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_mempolicy)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_get_mempolicy)
 
@@ -7371,7 +7371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_open)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_open)
 
@@ -7401,7 +7401,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_unlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_unlink)
 
@@ -7432,7 +7432,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedsend)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_timedsend)
 
@@ -7463,7 +7463,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedreceive)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_timedreceive)
 
@@ -7493,7 +7493,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_notify)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_notify)
 
@@ -7523,7 +7523,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_getsetattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_getsetattr)
 
@@ -7553,7 +7553,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_load)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kexec_load)
 
@@ -7586,7 +7586,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_waitid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_waitid)
 
@@ -7616,7 +7616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_add_key)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_add_key)
 
@@ -7646,7 +7646,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_request_key)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_request_key)
 
@@ -7676,7 +7676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_keyctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_keyctl)
 
@@ -7708,7 +7708,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_set)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ioprio_set)
 
@@ -7740,7 +7740,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_get)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ioprio_get)
 
@@ -7770,7 +7770,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init)
 
@@ -7800,7 +7800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_add_watch)
 
@@ -7830,7 +7830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_rm_watch)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_rm_watch)
 
@@ -7860,7 +7860,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_migrate_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_migrate_pages)
 
@@ -7891,7 +7891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_openat)
 
@@ -7921,7 +7921,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mkdirat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mkdirat)
 
@@ -7952,7 +7952,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mknodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mknodat)
 
@@ -7984,7 +7984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchownat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fchownat)
 
@@ -8014,7 +8014,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_futimesat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_futimesat)
 
@@ -8046,7 +8046,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstatat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_linux_fstatat)
 
@@ -8077,7 +8077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_unlinkat)
 
@@ -8108,7 +8108,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_renameat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_renameat)
 
@@ -8140,7 +8140,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_linkat)
 
@@ -8170,7 +8170,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_symlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_symlinkat)
 
@@ -8201,7 +8201,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_readlinkat)
 
@@ -8233,7 +8233,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchmodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fchmodat)
 
@@ -8266,7 +8266,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_faccessat)
 
@@ -8297,7 +8297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pselect6)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pselect6)
 
@@ -8328,7 +8328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ppoll)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ppoll)
 
@@ -8359,7 +8359,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unshare)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_unshare)
 
@@ -8389,7 +8389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_robust_list)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_set_robust_list)
 
@@ -8419,7 +8419,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_robust_list)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_get_robust_list)
 
@@ -8451,7 +8451,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_splice)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_splice)
 
@@ -8483,7 +8483,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tee)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_tee)
 
@@ -8515,7 +8515,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync_file_range)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sync_file_range)
 
@@ -8547,7 +8547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vmsplice)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_vmsplice)
 
@@ -8577,7 +8577,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_move_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_move_pages)
 
@@ -8609,7 +8609,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimensat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_utimensat)
 
@@ -8640,7 +8640,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_pwait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_pwait)
 
@@ -8670,7 +8670,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_signalfd)
 
@@ -8702,7 +8702,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_create)
 
@@ -8732,7 +8732,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_eventfd)
 
@@ -8764,7 +8764,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fallocate)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fallocate)
 
@@ -8799,7 +8799,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_settime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_settime)
 
@@ -8830,7 +8830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_gettime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_gettime)
 
@@ -8862,7 +8862,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_accept4)
 
@@ -8894,7 +8894,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_signalfd4)
 
@@ -8925,7 +8925,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_eventfd2)
 
@@ -8955,7 +8955,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create1)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_create1)
 
@@ -8986,7 +8986,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup3)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_dup3)
 
@@ -9016,7 +9016,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pipe2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pipe2)
 
@@ -9046,7 +9046,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init1)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init1)
 
@@ -9077,7 +9077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_preadv)
 
@@ -9108,7 +9108,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pwritev)
 
@@ -9139,7 +9139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_tgsigqueueinfo)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_tgsigqueueinfo)
 
@@ -9169,7 +9169,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_perf_event_open)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_perf_event_open)
 
@@ -9203,7 +9203,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_recvmmsg)
 
@@ -9233,7 +9233,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fanotify_init)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fanotify_init)
 
@@ -9263,7 +9263,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fanotify_mark)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fanotify_mark)
 
@@ -9295,7 +9295,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prlimit64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_prlimit64)
 
@@ -9327,7 +9327,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_name_to_handle_at)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_name_to_handle_at)
 
@@ -9357,7 +9357,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open_by_handle_at)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_open_by_handle_at)
 
@@ -9387,7 +9387,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_adjtime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_clock_adjtime)
 
@@ -9417,7 +9417,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_syncfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_syncfs)
 
@@ -9450,7 +9450,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sendmmsg)
 
@@ -9480,7 +9480,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setns)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_setns)
 
@@ -9510,7 +9510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcpu)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getcpu)
 
@@ -9542,7 +9542,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_readv)
 
@@ -9574,7 +9574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_writev)
 
@@ -9607,7 +9607,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kcmp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kcmp)
 
@@ -9637,7 +9637,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_finit_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_finit_module)
 
@@ -9667,7 +9667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_setattr)
 
@@ -9697,7 +9697,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_getattr)
 
@@ -9729,7 +9729,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_renameat2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_renameat2)
 
@@ -9759,7 +9759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_seccomp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_seccomp)
 
@@ -9790,7 +9790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrandom)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getrandom)
 
@@ -9821,7 +9821,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_memfd_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_memfd_create)
 
@@ -9851,7 +9851,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_file_load)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kexec_file_load)
 
@@ -9881,7 +9881,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bpf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_bpf)
 
@@ -9913,7 +9913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execveat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_execveat)
 
@@ -9943,7 +9943,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_userfaultfd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_userfaultfd)
 
@@ -9973,7 +9973,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_membarrier)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_membarrier)
 
@@ -10003,7 +10003,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mlock2)
 
@@ -10034,7 +10034,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pwritevf)
 
@@ -10065,7 +10065,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadvf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_preadvf)
 
@@ -10097,7 +10097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_freadlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_freadlinkat)
 
@@ -10129,7 +10129,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsymlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fsymlinkat)
 
@@ -10161,7 +10161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frenameat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_frenameat)
 
@@ -10193,7 +10193,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstatat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kfstatat)
 
@@ -10225,7 +10225,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmknodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fmknodat)
 
@@ -10257,7 +10257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fmkdirat)
 
@@ -10287,7 +10287,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ksysctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ksysctl)
 
@@ -10328,7 +10328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_maplibrary)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_maplibrary)
 
@@ -10358,7 +10358,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsmode)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fsmode)
 
@@ -10389,7 +10389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchdirat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fchdirat)
 
@@ -10422,7 +10422,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddirf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddirf)
 
@@ -10455,7 +10455,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
 
@@ -10488,7 +10488,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rtm_test)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rtm_test)
 
@@ -10523,7 +10523,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rtm_abort)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rtm_abort)
 
@@ -10557,7 +10557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rtm_end)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rtm_end)
 
@@ -10605,7 +10605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rtm_begin)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rtm_begin)
 
@@ -10648,7 +10648,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_userviofd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_userviofd)
 
@@ -10680,7 +10680,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_spawnveat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_process_spawnveat)
 
@@ -10735,7 +10735,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_coredump)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_coredump)
 
@@ -10771,7 +10771,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_raiseat)
 
@@ -10806,7 +10806,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mktty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mktty)
 
@@ -10864,7 +10864,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexlockexpr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lfutexlockexpr)
 
@@ -10922,7 +10922,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexexpr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lfutexexpr)
 
@@ -10975,7 +10975,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_lfutex)
 
@@ -11005,7 +11005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rpc_service)
 
@@ -11045,7 +11045,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_debugtrap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_debugtrap)
 
@@ -11076,7 +11076,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_library_listdef)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_set_library_listdef)
 
@@ -11107,7 +11107,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_writevf)
 
@@ -11138,7 +11138,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readvf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_readvf)
 
@@ -11169,7 +11169,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64f)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pwrite64f)
 
@@ -11200,7 +11200,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64f)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_pread64f)
 
@@ -11231,7 +11231,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctlf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_ioctlf)
 
@@ -11270,7 +11270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_set_exception_handler)
 
@@ -11313,7 +11313,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_get_exception_handler)
 
@@ -11345,7 +11345,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openpty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_openpty)
 
@@ -11386,7 +11386,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_rpc_schedule)
 
@@ -11424,7 +11424,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpathat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_frealpathat)
 
@@ -11458,7 +11458,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpath4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_frealpath4)
 
@@ -11489,7 +11489,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdrives)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_getdrives)
 
@@ -11607,7 +11607,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_detach)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_detach)
 
@@ -11638,7 +11638,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_readf)
 
@@ -11668,7 +11668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_klstat)
 
@@ -11698,7 +11698,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kfstat)
 
@@ -11728,7 +11728,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kstat)
 
@@ -11759,7 +11759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_hopf)
 
@@ -11789,7 +11789,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_hop)
 
@@ -11820,7 +11820,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_writef)
 
@@ -11859,7 +11859,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_restart_syscall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_restart_syscall)
 
@@ -11890,7 +11890,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_exit)
 
@@ -11920,7 +11920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fork)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fork)
 
@@ -11953,7 +11953,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_read)
 
@@ -11986,7 +11986,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_write)
 
@@ -12019,7 +12019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_open)
 
@@ -12051,7 +12051,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_close)
 
@@ -12090,7 +12090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitpid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_waitpid)
 
@@ -12122,7 +12122,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_creat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_creat)
 
@@ -12154,7 +12154,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_link)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_link)
 
@@ -12185,7 +12185,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_unlink)
 
@@ -12218,7 +12218,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_execve)
 
@@ -12249,7 +12249,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_chdir)
 
@@ -12280,7 +12280,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_time)
 
@@ -12313,7 +12313,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknod)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mknod)
 
@@ -12345,7 +12345,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chmod)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_chmod)
 
@@ -12378,7 +12378,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lchown)
 
@@ -12408,7 +12408,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_break)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_break)
 
@@ -12440,7 +12440,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_oldstat)
 
@@ -12473,7 +12473,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lseek)
 
@@ -12503,7 +12503,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getpid)
 
@@ -12539,7 +12539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mount)
 
@@ -12570,7 +12570,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_umount)
 
@@ -12601,7 +12601,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setuid)
 
@@ -12631,7 +12631,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getuid)
 
@@ -12662,7 +12662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_stime)
 
@@ -12697,7 +12697,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ptrace)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ptrace)
 
@@ -12728,7 +12728,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_alarm)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_alarm)
 
@@ -12760,7 +12760,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldfstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_oldfstat)
 
@@ -12790,7 +12790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pause)
 
@@ -12822,7 +12822,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utime)
 
@@ -12852,7 +12852,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_stty)
 
@@ -12882,7 +12882,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gtty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_gtty)
 
@@ -12915,7 +12915,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_access)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_access)
 
@@ -12946,7 +12946,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_nice)
 
@@ -12977,7 +12977,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ftime)
 
@@ -13007,7 +13007,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sync)
 
@@ -13039,7 +13039,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kill)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kill)
 
@@ -13071,7 +13071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rename)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rename)
 
@@ -13103,7 +13103,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mkdir)
 
@@ -13134,7 +13134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rmdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rmdir)
 
@@ -13165,7 +13165,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_dup)
 
@@ -13196,7 +13196,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pipe)
 
@@ -13227,7 +13227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_times)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_times)
 
@@ -13257,7 +13257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prof)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_prof)
 
@@ -13288,7 +13288,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_brk)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_brk)
 
@@ -13319,7 +13319,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setgid)
 
@@ -13349,7 +13349,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getgid)
 
@@ -13381,7 +13381,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signal)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_signal)
 
@@ -13411,7 +13411,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_geteuid)
 
@@ -13441,7 +13441,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getegid)
 
@@ -13472,7 +13472,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_acct)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_acct)
 
@@ -13504,7 +13504,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_umount2)
 
@@ -13534,7 +13534,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lock)
 
@@ -13567,7 +13567,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ioctl)
 
@@ -13600,7 +13600,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fcntl)
 
@@ -13630,7 +13630,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mpx)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mpx)
 
@@ -13662,7 +13662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setpgid)
 
@@ -13692,7 +13692,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ulimit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ulimit)
 
@@ -13723,7 +13723,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldolduname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_oldolduname)
 
@@ -13754,7 +13754,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_umask)
 
@@ -13785,7 +13785,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chroot)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_chroot)
 
@@ -13817,7 +13817,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ustat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ustat)
 
@@ -13849,7 +13849,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_dup2)
 
@@ -13879,7 +13879,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getppid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getppid)
 
@@ -13909,7 +13909,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgrp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getpgrp)
 
@@ -13939,7 +13939,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setsid)
 
@@ -13972,7 +13972,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sigaction)
 
@@ -14002,7 +14002,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sgetmask)
 
@@ -14033,7 +14033,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ssetmask)
 
@@ -14065,7 +14065,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setreuid)
 
@@ -14097,7 +14097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setregid)
 
@@ -14128,7 +14128,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sigsuspend)
 
@@ -14159,7 +14159,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigpending)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sigpending)
 
@@ -14191,7 +14191,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sethostname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sethostname)
 
@@ -14224,7 +14224,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setrlimit)
 
@@ -14257,7 +14257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getrlimit)
 
@@ -14290,7 +14290,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getrusage)
 
@@ -14322,7 +14322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday)
 
@@ -14354,7 +14354,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_settimeofday)
 
@@ -14386,7 +14386,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getgroups)
 
@@ -14418,7 +14418,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setgroups)
 
@@ -14454,7 +14454,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_select)
 
@@ -14486,7 +14486,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_symlink)
 
@@ -14518,7 +14518,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldlstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_oldlstat)
 
@@ -14551,7 +14551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readlink)
 
@@ -14582,7 +14582,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uselib)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_uselib)
 
@@ -14615,7 +14615,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapon)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_swapon)
 
@@ -14647,7 +14647,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_reboot)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_reboot)
 
@@ -14681,7 +14681,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readdir)
 
@@ -14723,7 +14723,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mmap)
 
@@ -14755,7 +14755,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munmap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_munmap)
 
@@ -14787,7 +14787,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_truncate)
 
@@ -14819,7 +14819,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ftruncate)
 
@@ -14851,7 +14851,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmod)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchmod)
 
@@ -14884,7 +14884,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchown)
 
@@ -14917,7 +14917,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpriority)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getpriority)
 
@@ -14951,7 +14951,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setpriority)
 
@@ -14986,7 +14986,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_profil)
 
@@ -15018,7 +15018,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_statfs)
 
@@ -15050,7 +15050,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fstatfs)
 
@@ -15083,7 +15083,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioperm)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ioperm)
 
@@ -15115,7 +15115,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketcall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_socketcall)
 
@@ -15148,7 +15148,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syslog)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_syslog)
 
@@ -15182,7 +15182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setitimer)
 
@@ -15215,7 +15215,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer)
 
@@ -15247,7 +15247,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_stat)
 
@@ -15279,7 +15279,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_lstat)
 
@@ -15311,7 +15311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_fstat)
 
@@ -15342,7 +15342,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_olduname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_olduname)
 
@@ -15373,7 +15373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_iopl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_iopl)
 
@@ -15403,7 +15403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vhangup)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_vhangup)
 
@@ -15433,7 +15433,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_idle)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_idle)
 
@@ -15464,7 +15464,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86old)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_vm86old)
 
@@ -15501,7 +15501,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_wait4)
 
@@ -15532,7 +15532,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapoff)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_swapoff)
 
@@ -15563,7 +15563,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysinfo)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sysinfo)
 
@@ -15594,7 +15594,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ipc)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ipc)
 
@@ -15625,7 +15625,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fsync)
 
@@ -15668,7 +15668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sigreturn)
 
@@ -15704,7 +15704,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clone)
 
@@ -15736,7 +15736,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setdomainname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setdomainname)
 
@@ -15767,7 +15767,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_uname)
 
@@ -15800,7 +15800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_modify_ldt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_modify_ldt)
 
@@ -15831,7 +15831,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_adjtimex)
 
@@ -15865,7 +15865,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mprotect)
 
@@ -15899,7 +15899,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sigprocmask)
 
@@ -15930,7 +15930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_create_module)
 
@@ -15961,7 +15961,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_init_module)
 
@@ -15992,7 +15992,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_delete_module)
 
@@ -16023,7 +16023,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_get_kernel_syms)
 
@@ -16054,7 +16054,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_quotactl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_quotactl)
 
@@ -16085,7 +16085,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getpgid)
 
@@ -16116,7 +16116,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchdir)
 
@@ -16147,7 +16147,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bdflush)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_bdflush)
 
@@ -16178,7 +16178,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sysfs)
 
@@ -16209,7 +16209,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_personality)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_personality)
 
@@ -16240,7 +16240,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_afs_syscall)
 
@@ -16271,7 +16271,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setfsuid)
 
@@ -16302,7 +16302,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setfsgid)
 
@@ -16340,7 +16340,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80__llseek)
 
@@ -16373,7 +16373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getdents)
 
@@ -16404,7 +16404,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80__newselect)
 
@@ -16436,7 +16436,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_flock)
 
@@ -16469,7 +16469,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_msync)
 
@@ -16502,7 +16502,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readv)
 
@@ -16535,7 +16535,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_writev)
 
@@ -16566,7 +16566,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getsid)
 
@@ -16597,7 +16597,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fdatasync)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fdatasync)
 
@@ -16628,7 +16628,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__sysctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80__sysctl)
 
@@ -16660,7 +16660,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mlock)
 
@@ -16692,7 +16692,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlock)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_munlock)
 
@@ -16724,7 +16724,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlockall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mlockall)
 
@@ -16754,7 +16754,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlockall)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_munlockall)
 
@@ -16786,7 +16786,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setparam)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_setparam)
 
@@ -16818,7 +16818,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getparam)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getparam)
 
@@ -16853,7 +16853,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setscheduler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_setscheduler)
 
@@ -16884,7 +16884,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getscheduler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getscheduler)
 
@@ -16914,7 +16914,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_yield)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_yield)
 
@@ -16945,7 +16945,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_max)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_get_priority_max)
 
@@ -16976,7 +16976,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_min)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_get_priority_min)
 
@@ -17008,7 +17008,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval)
 
@@ -17040,7 +17040,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_nanosleep)
 
@@ -17077,7 +17077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mremap)
 
@@ -17110,7 +17110,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setresuid)
 
@@ -17143,7 +17143,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getresuid)
 
@@ -17174,7 +17174,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_vm86)
 
@@ -17205,7 +17205,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_query_module)
 
@@ -17238,7 +17238,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_poll)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_poll)
 
@@ -17269,7 +17269,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nfsservctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_nfsservctl)
 
@@ -17302,7 +17302,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setresgid)
 
@@ -17335,7 +17335,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getresgid)
 
@@ -17366,7 +17366,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_prctl)
 
@@ -17409,7 +17409,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigreturn)
 
@@ -17444,7 +17444,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigaction)
 
@@ -17480,7 +17480,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigprocmask)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigprocmask)
 
@@ -17512,7 +17512,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigpending)
 
@@ -17547,7 +17547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait)
 
@@ -17580,7 +17580,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigqueueinfo)
 
@@ -17612,7 +17612,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigsuspend)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigsuspend)
 
@@ -17650,7 +17650,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pread64)
 
@@ -17688,7 +17688,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pwrite64)
 
@@ -17721,7 +17721,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_chown)
 
@@ -17753,7 +17753,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcwd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getcwd)
 
@@ -17784,7 +17784,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capget)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_capget)
 
@@ -17815,7 +17815,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
@@ -17847,7 +17847,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sigaltstack)
 
@@ -17882,7 +17882,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sendfile)
 
@@ -17913,7 +17913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getpmsg)
 
@@ -17944,7 +17944,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_putpmsg)
 
@@ -17974,7 +17974,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vfork)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_vfork)
 
@@ -18005,7 +18005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ugetrlimit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ugetrlimit)
 
@@ -18042,7 +18042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mmap2)
 
@@ -18077,7 +18077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_truncate64)
 
@@ -18112,7 +18112,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ftruncate64)
 
@@ -18144,7 +18144,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_stat64)
 
@@ -18176,7 +18176,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_lstat64)
 
@@ -18208,7 +18208,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_fstat64)
 
@@ -18241,7 +18241,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lchown32)
 
@@ -18271,7 +18271,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getuid32)
 
@@ -18301,7 +18301,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getgid32)
 
@@ -18331,7 +18331,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_geteuid32)
 
@@ -18361,7 +18361,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getegid32)
 
@@ -18393,7 +18393,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setreuid32)
 
@@ -18425,7 +18425,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setregid32)
 
@@ -18457,7 +18457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getgroups32)
 
@@ -18489,7 +18489,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setgroups32)
 
@@ -18522,7 +18522,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchown32)
 
@@ -18555,7 +18555,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setresuid32)
 
@@ -18588,7 +18588,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getresuid32)
 
@@ -18621,7 +18621,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setresgid32)
 
@@ -18654,7 +18654,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getresgid32)
 
@@ -18687,7 +18687,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_chown32)
 
@@ -18718,7 +18718,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setuid32)
 
@@ -18749,7 +18749,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setgid32)
 
@@ -18780,7 +18780,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setfsuid32)
 
@@ -18811,7 +18811,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid32)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setfsgid32)
 
@@ -18842,7 +18842,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pivot_root)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pivot_root)
 
@@ -18875,7 +18875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mincore)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mincore)
 
@@ -18908,7 +18908,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_madvise)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_madvise)
 
@@ -18941,7 +18941,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getdents64)
 
@@ -18974,7 +18974,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fcntl64)
 
@@ -19004,7 +19004,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_gettid)
 
@@ -19041,7 +19041,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readahead)
 
@@ -19078,7 +19078,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setxattr)
 
@@ -19115,7 +19115,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lsetxattr)
 
@@ -19152,7 +19152,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fsetxattr)
 
@@ -19187,7 +19187,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getxattr)
 
@@ -19222,7 +19222,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lgetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lgetxattr)
 
@@ -19257,7 +19257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fgetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fgetxattr)
 
@@ -19290,7 +19290,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_listxattr)
 
@@ -19323,7 +19323,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_llistxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_llistxattr)
 
@@ -19356,7 +19356,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flistxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_flistxattr)
 
@@ -19388,7 +19388,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_removexattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_removexattr)
 
@@ -19420,7 +19420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lremovexattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lremovexattr)
 
@@ -19452,7 +19452,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fremovexattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fremovexattr)
 
@@ -19484,7 +19484,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_tkill)
 
@@ -19519,7 +19519,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sendfile64)
 
@@ -19557,7 +19557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_futex)
 
@@ -19590,7 +19590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setaffinity)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_setaffinity)
 
@@ -19623,7 +19623,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getaffinity)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getaffinity)
 
@@ -19654,7 +19654,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_thread_area)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_set_thread_area)
 
@@ -19685,7 +19685,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_thread_area)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_get_thread_area)
 
@@ -19716,7 +19716,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_setup)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_io_setup)
 
@@ -19747,7 +19747,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_destroy)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_io_destroy)
 
@@ -19778,7 +19778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_getevents)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_io_getevents)
 
@@ -19809,7 +19809,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_submit)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_io_submit)
 
@@ -19840,7 +19840,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_cancel)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_io_cancel)
 
@@ -19871,7 +19871,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fadvise64)
 
@@ -19902,7 +19902,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit_group)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_exit_group)
 
@@ -19933,7 +19933,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lookup_dcookie)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lookup_dcookie)
 
@@ -19964,7 +19964,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_create)
 
@@ -20000,7 +20000,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_ctl)
 
@@ -20035,7 +20035,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_wait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_wait)
 
@@ -20071,7 +20071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_remap_file_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_remap_file_pages)
 
@@ -20102,7 +20102,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_tid_address)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_set_tid_address)
 
@@ -20135,7 +20135,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_create)
 
@@ -20171,7 +20171,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_settime)
 
@@ -20203,7 +20203,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_gettime)
 
@@ -20234,7 +20234,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_getoverrun)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_getoverrun)
 
@@ -20265,7 +20265,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_delete)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_delete)
 
@@ -20297,7 +20297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_settime)
 
@@ -20329,7 +20329,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_gettime)
 
@@ -20361,7 +20361,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_getres)
 
@@ -20396,7 +20396,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_nanosleep)
 
@@ -20428,7 +20428,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_statfs64)
 
@@ -20460,7 +20460,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fstatfs64)
 
@@ -20493,7 +20493,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_tgkill)
 
@@ -20525,7 +20525,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utimes)
 
@@ -20556,7 +20556,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64_64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fadvise64_64)
 
@@ -20587,7 +20587,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_vserver)
 
@@ -20618,7 +20618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mbind)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mbind)
 
@@ -20649,7 +20649,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_mempolicy)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_get_mempolicy)
 
@@ -20680,7 +20680,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_mempolicy)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_set_mempolicy)
 
@@ -20713,7 +20713,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_open)
 
@@ -20744,7 +20744,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_unlink)
 
@@ -20780,7 +20780,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedsend)
 
@@ -20816,7 +20816,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive)
 
@@ -20848,7 +20848,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_notify)
 
@@ -20881,7 +20881,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_getsetattr)
 
@@ -20912,7 +20912,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kexec_load)
 
@@ -20950,7 +20950,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_waitid)
 
@@ -20981,7 +20981,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_add_key)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_add_key)
 
@@ -21012,7 +21012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_request_key)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_request_key)
 
@@ -21043,7 +21043,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_keyctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_keyctl)
 
@@ -21078,7 +21078,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_set)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ioprio_set)
 
@@ -21112,7 +21112,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ioprio_get)
 
@@ -21143,7 +21143,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init)
 
@@ -21174,7 +21174,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_add_watch)
 
@@ -21205,7 +21205,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_rm_watch)
 
@@ -21236,7 +21236,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_migrate_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_migrate_pages)
 
@@ -21271,7 +21271,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_openat)
 
@@ -21304,7 +21304,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdirat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mkdirat)
 
@@ -21339,7 +21339,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mknodat)
 
@@ -21376,7 +21376,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchownat)
 
@@ -21409,7 +21409,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_futimesat)
 
@@ -21445,7 +21445,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linux_fstatat64)
 
@@ -21479,7 +21479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_unlinkat)
 
@@ -21514,7 +21514,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_renameat)
 
@@ -21551,7 +21551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_linkat)
 
@@ -21584,7 +21584,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_symlinkat)
 
@@ -21619,7 +21619,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readlinkat)
 
@@ -21655,7 +21655,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchmodat)
 
@@ -21692,7 +21692,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_faccessat)
 
@@ -21729,7 +21729,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pselect6)
 
@@ -21765,7 +21765,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ppoll)
 
@@ -21797,7 +21797,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unshare)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_unshare)
 
@@ -21828,7 +21828,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_robust_list)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_set_robust_list)
 
@@ -21859,7 +21859,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_robust_list)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_get_robust_list)
 
@@ -21897,7 +21897,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_splice)
 
@@ -21939,7 +21939,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sync_file_range)
 
@@ -21975,7 +21975,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_tee)
 
@@ -22011,7 +22011,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_vmsplice)
 
@@ -22042,7 +22042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_move_pages)
 
@@ -22075,7 +22075,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcpu)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getcpu)
 
@@ -22111,7 +22111,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_pwait)
 
@@ -22147,7 +22147,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utimensat)
 
@@ -22180,7 +22180,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_signalfd)
 
@@ -22214,7 +22214,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_create)
 
@@ -22245,7 +22245,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_eventfd)
 
@@ -22281,7 +22281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fallocate)
 
@@ -22320,7 +22320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_settime)
 
@@ -22353,7 +22353,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime)
 
@@ -22389,7 +22389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_signalfd4)
 
@@ -22422,7 +22422,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_eventfd2)
 
@@ -22453,7 +22453,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create1)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_create1)
 
@@ -22487,7 +22487,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup3)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_dup3)
 
@@ -22519,7 +22519,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pipe2)
 
@@ -22550,7 +22550,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init1)
 
@@ -22588,7 +22588,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_preadv)
 
@@ -22626,7 +22626,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pwritev)
 
@@ -22661,7 +22661,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_tgsigqueueinfo)
 
@@ -22692,7 +22692,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_perf_event_open)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_perf_event_open)
 
@@ -22731,7 +22731,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_recvmmsg)
 
@@ -22762,7 +22762,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_init)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fanotify_init)
 
@@ -22793,7 +22793,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_mark)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fanotify_mark)
 
@@ -22829,7 +22829,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_prlimit64)
 
@@ -22866,7 +22866,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_name_to_handle_at)
 
@@ -22899,7 +22899,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_by_handle_at)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_open_by_handle_at)
 
@@ -22930,7 +22930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_adjtime)
 
@@ -22961,7 +22961,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syncfs)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_syncfs)
 
@@ -22998,7 +22998,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sendmmsg)
 
@@ -23030,7 +23030,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setns)
 
@@ -23068,7 +23068,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_readv)
 
@@ -23106,7 +23106,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_writev)
 
@@ -23144,7 +23144,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kcmp)
 
@@ -23175,7 +23175,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_finit_module)
 
@@ -23206,7 +23206,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_setattr)
 
@@ -23237,7 +23237,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_getattr)
 
@@ -23274,7 +23274,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_renameat2)
 
@@ -23305,7 +23305,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_seccomp)
 
@@ -23339,7 +23339,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getrandom)
 
@@ -23372,7 +23372,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_memfd_create)
 
@@ -23403,7 +23403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_bpf)
 
@@ -23440,7 +23440,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_execveat)
 
@@ -23481,7 +23481,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_socket)
 
@@ -23524,7 +23524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_socketpair)
 
@@ -23557,7 +23557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bind)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_bind)
 
@@ -23590,7 +23590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_connect)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_connect)
 
@@ -23622,7 +23622,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_listen)
 
@@ -23658,7 +23658,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_accept4)
 
@@ -23696,7 +23696,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getsockopt)
 
@@ -23734,7 +23734,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setsockopt)
 
@@ -23767,7 +23767,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockname)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getsockname)
 
@@ -23800,7 +23800,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getpeername)
 
@@ -23839,7 +23839,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sendto)
 
@@ -23874,7 +23874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sendmsg)
 
@@ -23913,7 +23913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_recvfrom)
 
@@ -23949,7 +23949,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_recvmsg)
 
@@ -23982,7 +23982,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_shutdown)
 
@@ -24013,7 +24013,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_userfaultfd)
 
@@ -24044,7 +24044,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_membarrier)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_membarrier)
 
@@ -24075,7 +24075,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
@@ -24114,7 +24114,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_recvmmsg64)
 
@@ -24153,7 +24153,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pwritevf)
 
@@ -24192,7 +24192,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_preadvf)
 
@@ -24225,7 +24225,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime64)
 
@@ -24264,7 +24264,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_settime64)
 
@@ -24305,7 +24305,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fallocate64)
 
@@ -24341,7 +24341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utimensat64)
 
@@ -24377,7 +24377,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ppoll64)
 
@@ -24414,7 +24414,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pselect6_64)
 
@@ -24451,7 +24451,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_freadlinkat)
 
@@ -24487,7 +24487,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fsymlinkat)
 
@@ -24524,7 +24524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_frenameat)
 
@@ -24560,7 +24560,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kfstatat)
 
@@ -24593,7 +24593,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_futimesat64)
 
@@ -24630,7 +24630,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fmknodat)
 
@@ -24666,7 +24666,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fmkdirat)
 
@@ -24704,7 +24704,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_waitid64)
 
@@ -24740,7 +24740,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive64)
 
@@ -24776,7 +24776,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedsend64)
 
@@ -24808,7 +24808,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
 
@@ -24843,7 +24843,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_nanosleep64)
 
@@ -24875,7 +24875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_getres64)
 
@@ -24907,7 +24907,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_gettime64)
 
@@ -24939,7 +24939,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_clock_settime64)
 
@@ -24971,7 +24971,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_gettime64)
 
@@ -25007,7 +25007,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_timer_settime64)
 
@@ -25045,7 +25045,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kreaddirf)
 
@@ -25077,7 +25077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kfstat)
 
@@ -25109,7 +25109,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_klstat)
 
@@ -25141,7 +25141,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kstat)
 
@@ -25180,7 +25180,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pwrite64f)
 
@@ -25219,7 +25219,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_pread64f)
 
@@ -25254,7 +25254,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait64)
 
@@ -25286,7 +25286,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_nanosleep64)
 
@@ -25318,7 +25318,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval64)
 
@@ -25348,7 +25348,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rpc_service)
 
@@ -25380,7 +25380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ksysctl)
 
@@ -25415,7 +25415,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_writevf)
 
@@ -25450,7 +25450,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readvf)
 
@@ -25487,7 +25487,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_kreaddir)
 
@@ -25524,7 +25524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_wait4_64)
 
@@ -25557,7 +25557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer64)
 
@@ -25591,7 +25591,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_setitimer64)
 
@@ -25637,7 +25637,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_maplibrary)
 
@@ -25673,7 +25673,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_select64)
 
@@ -25705,7 +25705,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_settimeofday64)
 
@@ -25737,7 +25737,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday64)
 
@@ -25770,7 +25770,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getrusage64)
 
@@ -25806,7 +25806,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
  /* %rdx */	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fsmode)
 
@@ -25841,7 +25841,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ioctlf)
 
@@ -25874,7 +25874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_test)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rtm_test)
 
@@ -25910,7 +25910,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_abort)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rtm_abort)
 
@@ -25944,7 +25944,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_end)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rtm_end)
 
@@ -25992,7 +25992,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rtm_begin)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rtm_begin)
 
@@ -26023,7 +26023,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
 
@@ -26055,7 +26055,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
@@ -26100,7 +26100,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_userviofd)
 
@@ -26138,7 +26138,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_spawnveat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_process_spawnveat)
 
@@ -26169,7 +26169,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_stime64)
 
@@ -26230,7 +26230,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_coredump)
 
@@ -26268,7 +26268,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_raiseat)
 
@@ -26307,7 +26307,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_mktty)
 
@@ -26371,7 +26371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lfutexlockexpr)
 
@@ -26434,7 +26434,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lfutexexpr)
 
@@ -26473,7 +26473,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
  /* %rdx */	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lseek64)
 
@@ -26531,7 +26531,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_lfutex)
 
@@ -26573,7 +26573,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_debugtrap)
 
@@ -26605,7 +26605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_library_listdef)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_set_library_listdef)
 
@@ -26651,7 +26651,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_get_exception_handler)
 
@@ -26693,7 +26693,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_set_exception_handler)
 
@@ -26726,7 +26726,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
  /* %rdx */	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_time64)
 
@@ -26760,7 +26760,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fchdirat)
 
@@ -26797,7 +26797,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_openpty)
 
@@ -26842,7 +26842,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_rpc_schedule)
 
@@ -26885,7 +26885,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_frealpathat)
 
@@ -26923,7 +26923,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_frealpath4)
 
@@ -26954,7 +26954,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_getdrives)
 
@@ -27073,7 +27073,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_detach)
 
@@ -27108,7 +27108,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_writef)
 
@@ -27143,7 +27143,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_readf)
 
@@ -27178,7 +27178,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_hopf)
 
@@ -27211,7 +27211,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_hop)
 
@@ -27326,7 +27326,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mount)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mount)
 
@@ -27546,7 +27546,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_select)
 
@@ -27612,7 +27612,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mmap)
 
@@ -27745,7 +27745,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_sigreturn)
 
@@ -27781,7 +27781,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_clone)
 
@@ -27878,7 +27878,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter__llseek)
 
@@ -27984,7 +27984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mremap)
 
@@ -28054,7 +28054,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_rt_sigreturn)
 
@@ -28111,7 +28111,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pread64)
 
@@ -28149,7 +28149,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwrite64)
 
@@ -28216,7 +28216,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mmap2)
 
@@ -28346,7 +28346,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_setxattr)
 
@@ -28383,7 +28383,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_lsetxattr)
 
@@ -28420,7 +28420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsetxattr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_fsetxattr)
 
@@ -28491,7 +28491,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_futex)
 
@@ -28573,7 +28573,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_remap_file_pages)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_remap_file_pages)
 
@@ -28673,7 +28673,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedsend)
 
@@ -28709,7 +28709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedreceive)
 
@@ -28756,7 +28756,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_waitid)
 
@@ -28833,7 +28833,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchownat)
 
@@ -28884,7 +28884,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_linkat)
 
@@ -28936,7 +28936,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pselect6)
 
@@ -28972,7 +28972,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll)
 
@@ -29020,7 +29020,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_splice)
 
@@ -29062,7 +29062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_sync_file_range)
 
@@ -29112,7 +29112,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_epoll_pwait)
 
@@ -29201,7 +29201,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_preadv)
 
@@ -29239,7 +29239,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwritev)
 
@@ -29284,7 +29284,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg)
 
@@ -29331,7 +29331,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_name_to_handle_at)
 
@@ -29386,7 +29386,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_readv)
 
@@ -29424,7 +29424,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_writev)
 
@@ -29462,7 +29462,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_kcmp)
 
@@ -29508,7 +29508,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_renameat2)
 
@@ -29559,7 +29559,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_execveat)
 
@@ -29632,7 +29632,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_getsockopt)
 
@@ -29670,7 +29670,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_setsockopt)
 
@@ -29715,7 +29715,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_sendto)
 
@@ -29759,7 +29759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvfrom)
 
@@ -29817,7 +29817,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg64)
 
@@ -29856,7 +29856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwritevf)
 
@@ -29895,7 +29895,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_preadvf)
 
@@ -29947,7 +29947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_fallocate64)
 
@@ -29987,7 +29987,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll64)
 
@@ -30024,7 +30024,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pselect6_64)
 
@@ -30061,7 +30061,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_freadlinkat)
 
@@ -30102,7 +30102,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_frenameat)
 
@@ -30146,7 +30146,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_fmknodat)
 
@@ -30188,7 +30188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_waitid64)
 
@@ -30224,7 +30224,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedreceive64)
 
@@ -30260,7 +30260,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedsend64)
 
@@ -30320,7 +30320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_kreaddirf)
 
@@ -30368,7 +30368,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwrite64f)
 
@@ -30407,7 +30407,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_pread64f)
 
@@ -30492,7 +30492,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_maplibrary)
 
@@ -30528,7 +30528,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_select64)
 
@@ -30646,7 +30646,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_spawnveat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_spawnveat)
 
@@ -30710,7 +30710,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_coredump)
 
@@ -30790,7 +30790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexlockexpr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_lfutexlockexpr)
 
@@ -30853,7 +30853,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_lfutexexpr)
 
@@ -30914,7 +30914,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_lfutex)
 
@@ -31003,7 +31003,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_openpty)
 
@@ -31059,7 +31059,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	intr_exit_sysret
+	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_frealpathat)
 

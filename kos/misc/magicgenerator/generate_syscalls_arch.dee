@@ -529,7 +529,16 @@ function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, s
 		fp << "	popq_cfi_r %rdx\n";
 	}
 	fp << "	popq_cfi_r %rcx\n";
-	fp << "	intr_exit_sysret\n";
+	/* NOTE: On x86_64, 64-bit system calls can be invoked in 1 of 2 ways:
+	 *       - int 80h
+	 *       - syscall
+	 * Documentation throughout the kernel states that both of these methods
+	 * yield identical results, though one minor detail that is documented
+	 * nowhere is left to use to decide upon:
+	 *       `int 80h' on x86_64 is allowed to clobber %rcx and %r11
+	 * By allowing for this, we can use identical return-paths for both
+	 * invocation methods, by trying to make use of `sysret' in both cases. */
+	fp << "	X86_IRET_BUT_PREFER_SYSRET64\n";
 	fp << "	.cfi_endproc\n";
 	fp << "END(__x86_asm64_syscall_" << f.name << ")\n";
 }
@@ -1075,7 +1084,8 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 		fp << "	popq_cfi_r %rdx\n";
 	}
 	fp << "	popq_cfi_r %rcx\n";
-	fp << "	intr_exit_sysret\n";
+	/* _Must_ use `intr_exit' here, so-as to ensure that %ecx is preserved! */
+	fp << "	intr_exit\n";
 	fp << "	.cfi_endproc\n";
 	fp << "END(__x86_asm32_int80_" << f.name << ")\n";
 }
@@ -1122,7 +1132,10 @@ function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, 
 		fp << "	popq_cfi_r %rdx\n";
 	}
 	fp << "	popq_cfi_r %rcx\n";
-	fp << "	intr_exit_sysret\n";
+	/* We can just use `sysret' as a drop-in replacement for `sysexit', since
+	 * `sysret' doesn't clobber any 32-bit registers that `sysexit' doesn't
+	 * also clobber! */
+	fp << "	X86_IRET_BUT_PREFER_SYSRET32\n";
 	fp << "	.cfi_endproc\n";
 	fp << "END(__x86_asm32_sysenter_" << f.name << ")\n";
 }

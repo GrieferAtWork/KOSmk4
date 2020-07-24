@@ -24,13 +24,17 @@
 #include <hybrid/compiler.h>
 
 #ifndef __INTELLISENSE__
+/* 32-bit in80h has the most restrictive behavior for `SC_IRET'.
+ * As such, we _must_ define it first, such that `SC_BEGIN_ALL_NOTHROW()'
+ * system calls don't clobber registers that they are not allowed to when
+ * call from 32-bit int80h! */
+#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
+#include "fastpass-impl.S"
+
 #define SYSCALL_FASTPASS_KIND_SYS64 1
 #include "fastpass-impl.S"
 
 #define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
-#include "fastpass-impl.S"
-
-#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
 #include "fastpass-impl.S"
 #endif /* !__INTELLISENSE__ */
 

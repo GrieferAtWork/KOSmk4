@@ -349,7 +349,10 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	testq  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
-	intr_exit_sysret
+	/* We can just use `sysret' as a drop-in replacement for `sysexit', since
+	 * `sysret' doesn't clobber any 32-bit registers that `sysexit' doesn't
+	 * also clobber! */
+	X86_IRET_BUT_PREFER_SYSRET32
 1:
 
 	pushq_cfi $(0)    /* Make space for ARG5 */

@@ -364,18 +364,34 @@ DECL_END
 
 #ifdef __ASSEMBLER__
 #ifdef __x86_64__
+#include <asm/instr/interrupt.h>
 
-#ifdef __OPTIMIZE_SIZE__
-#define X86_IRET_BUT_PREFER_SYSRET iretq
-#else /* __OPTIMIZE_SIZE__ */
-#define X86_IRET_BUT_PREFER_SYSRET iretq /* TODO: Use sysret */
-#endif /* !__OPTIMIZE_SIZE__ */
+/* Do the equivalent of `intr_exit', but try to make use of `sysretl' if the register
+ * state described by the iret tail stored at `0(%rsp)' allow for this to be done.
+ * Note that if sysexit ends up being used, the following user-space registers
+ * will be clobbered (which cannot be prevented):
+ *  - %rcx      (Set to OFFSET_IRREGS_RIP(%rsp))
+ *  - %r8-%r15  (Undefined, but since these are invisible to 32-bit programs, this shouldn't matter) */
+#define X86_IRET_BUT_PREFER_SYSRET32 \
+	jmp __x86_32_syscall_iret
+
+/* Do the equivalent of `intr_exit', but try to make use of `sysretq' if the register
+ * state described by the iret tail stored at `0(%rsp)' allow for this to be done.
+ * Note that if sysexit ends up being used, the following user-space registers
+ * will be clobbered (which cannot be prevented):
+ *  - %rcx      (Set to OFFSET_IRREGS_RIP(%rsp))
+ *  - %r11      (Set to OFFSET_IRREGS_RFLAGS(%rsp)) */
+#define X86_IRET_BUT_PREFER_SYSRET64 \
+	jmp __x86_64_syscall_iret
 
 #else /* __x86_64__ */
 
-/* A fast-path implementation for returning from sysenter-like system
- * call handlers, operating identical to the invocation of `iret' at
- * the same location. */
+/* Do the equivalent of `iret', but try to make use of `sysexit' if the register
+ * state described by the iret tail stored at `0(%esp)' allow for this to be done.
+ * Note that if sysexit ends up being used, the following user-space registers
+ * will be clobbered (which cannot be prevented):
+ *  - %ecx   (Set to OFFSET_IRREGS_ESP(%esp))
+ *  - %edx   (Set to OFFSET_IRREGS_EIP(%esp)) */
 #define X86_IRET_BUT_PREFER_SYSEXIT \
 	jmp __i386_syscall_iret
 

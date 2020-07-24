@@ -199,8 +199,7 @@ PUBLIC bool KCALL arch_syscall_tracing_setenabled(bool enable, bool nx) {
 	                        enable ? (u16)(uintptr_t)x86_syscall_emulate_r_redirection_jmp
 	                               : SYSCALL_EMULATE_DONT_TRACE_WORD);
 #undef SYSCALL_EMULATE_DONT_TRACE_WORD
-	/* TODO: INVALIDATE_INSTRUCTION_CACHE(); */
-
+	__flush_instruction_cache();
 	result = syscall_tracing_enabled;
 	syscall_tracing_enabled = enable;
 
@@ -291,6 +290,21 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 		 *       end up jumping to some user-space text location when a
 		 *       32-bit program makes use of `syscall'! */
 		__wrmsr(IA32_FMASK, EFLAGS_IF);
+	} else {
+		/* Re-write `__x86_32_syscall_iret' and `__x86_64_syscall_iret' to
+		 * do the equivalent of `intr_exit', without all of the special
+		 * handling for `sysret' */
+		PRIVATE ATTR_FREERODATA byte_t const intr_exit[] = {
+			0xfa,                         /*     cli                   */
+			0xf6, 0x44, 0x24, 0x08, 0x03, /*     testb  $0x3,0x8(%rsp) */
+			0x74, 0x03,                   /*     je     1f             */
+			0x0f, 0x01, 0xf8,             /*     swapgs                */
+			0x48, 0xcf                    /* 1:  iretq                 */
+		};
+		extern byte_t __x86_32_syscall_iret[];
+		extern byte_t __x86_64_syscall_iret[];
+		memcpy(__x86_32_syscall_iret, intr_exit, sizeof(intr_exit));
+		memcpy(__x86_64_syscall_iret, intr_exit, sizeof(intr_exit));
 	}
 #endif /* __x86_64__ */
 }
