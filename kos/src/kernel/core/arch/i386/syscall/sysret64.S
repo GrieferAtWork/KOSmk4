@@ -50,7 +50,8 @@ PUBLIC_FUNCTION(__x86_32_syscall_iret)
 	cli
 
 	/* sysretl requires that TARGET.%cs == SEGMENT_USER_CODE32_RPL, as
-	 * that is the effective %cs that will be loaded by `sysret' */
+	 * that is the effective %cs that will be loaded by `sysret'
+	 * NOTE: If IRET was re-directed, then this check will fail! */
 	cmpw   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS_CS(%rsp)
 	jne    .Ldo_iret
 
@@ -96,7 +97,8 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	cli
 
 	/* sysretq requires that TARGET.%cs == SEGMENT_USER_CODE64_RPL, as
-	 * that is the effective %cs that will be loaded by `sysret' */
+	 * that is the effective %cs that will be loaded by `sysret'
+	 * NOTE: If IRET was re-directed, then this check will fail! */
 	cmpw   $(SEGMENT_USER_CODE64_RPL), OFFSET_IRREGS_CS(%rsp)
 	jne    .Ldo_iret
 

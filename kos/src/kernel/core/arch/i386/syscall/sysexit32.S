@@ -47,7 +47,8 @@ PUBLIC_FUNCTION(__i386_syscall_iret)
 	cli
 
 	/* sysexit requires that TARGET.%cs == SEGMENT_USER_CODE32_RPL, as
-	 * that is the effective %cs that will be loaded by `sysexit' */
+	 * that is the effective %cs that will be loaded by `sysexit'
+	 * NOTE: If IRET was re-directed, then this check will fail! */
 	cmpw   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS_CS(%esp)
 	jne    .Ldo_iret
 
