@@ -21,6 +21,7 @@
 #define _KOS_EXEC_LAZYBIND_H 1
 
 #include <__stdinc.h>
+
 #include <kos/exec/asm/lazybind.h>
 
 /* >> (PRIVATE|INTERN|PUBLIC)_LAZYBIND(SYMBOL name, void *getaddr(void))

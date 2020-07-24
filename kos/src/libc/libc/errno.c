@@ -85,9 +85,9 @@ NOBLOCK syscall_slong_t NOTHROW(LIBCCALL libc_seterrno_compat)(errno_t value) {
 	return libc_seterrno(value);
 }
 DEFINE_PUBLIC_ALIAS(__set_errno_f, libc_seterrno);
-#else /* __i386__ && !__x86_64__ */
+#else /* !__NO_ATTR_FASTCALL */
 DEFINE_PUBLIC_ALIAS(__set_errno, libc_seterrno);
-#endif /* !__i386__ || __x86_64__ */
+#endif /* __NO_ATTR_FASTCALL */
 INTERN ATTR_SECTION(".text.crt.errno_access.seterrno")
 NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value) {
 	struct libc_tls *t = &tls;
