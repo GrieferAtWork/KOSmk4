@@ -24,10 +24,16 @@
 #include <hybrid/compiler.h>
 
 #ifndef __INTELLISENSE__
-#define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
+#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
 #include "fastpass-impl.S"
 
-#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
+/* NOTE: Must define sysenter _after_ int80, such that `SC_BEGIN_ALL_NOTHROW()'
+ *       system calls use normal IRET for returning to user-space, so-as to
+ *       ensure that system call invocations using `int 80h' will not clobber
+ *       `%ecx' and `%edx' upon return to user-space.
+ *       Only system calls invoked via `sysenter' are allowed to clobber those
+ *       registers! */
+#define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
 #include "fastpass-impl.S"
 #endif /* !__INTELLISENSE__ */
 

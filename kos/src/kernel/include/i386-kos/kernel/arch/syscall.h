@@ -376,63 +376,9 @@ DECL_END
 /* A fast-path implementation for returning from sysenter-like system
  * call handlers, operating identical to the invocation of `iret' at
  * the same location. */
-#ifdef __OPTIMIZE_SIZE__
-#define X86_IRET_BUT_PREFER_SYSEXIT iret
-#elif !defined(CONFIG_NO_VM86)
-/* TODO: Don't duplicate this code for every location it is used at.
- *       Instead, have one PUBLIC label `x86_syscall_iret' that can
- *       be jumped to with `jmp x86_syscall_iret' */
-/* TODO: Don't use `sysexit' if that one's not supposed by the host! */
-#define X86_IRET_BUT_PREFER_SYSEXIT                                           \
-	cli;                                                                      \
-	cmpl   $(SEGMENT_USER_CODE), OFFSET_IRREGS_CS(%esp);                      \
-	jne    99f;                                                               \
-	testl  $(EFLAGS_VM), OFFSET_IRREGS_EFLAGS(%esp);                          \
-	jnz    99f;                                                               \
-	movl   OFFSET_IRREGS_ESP(%esp), %ecx;                                     \
-	movl   OFFSET_IRREGS_EIP(%esp), %edx;                                     \
-	addl   $(8), %esp;                                                        \
-	.cfi_adjust_cfa_offset - 8;                                               \
-	/* Prevent popfl from enabling interrupts to bypass a race condition      \
-	 * that could result in an interrupt attempting to re-direct user-space   \
-	 * at a time where registers it would modify were already loaded.         \
-	 * This race condition doesn't happen with IRET, because it executes      \
-	 * atomically (or rather: without interrupts). */                         \
-	andl   $(~EFLAGS_IF), (%esp);                                             \
-	popfl;                                                                    \
-	/* Enable interrupts in a way that delays its execution for 1             \
-	 * additional instruction, meaning that no interrupts can occur           \
-	 * before `sysexit' actually returns to user-space.                       \
-	 * NOTE: `popfl' doesn't have this effect, so this clutch is required. */ \
-	sti;                                                                      \
-	sysexit;                                                                  \
-	.cfi_adjust_cfa_offset 8;                                                 \
-99:	iret
-#else /* __OPTIMIZE_SIZE__ */
-#define X86_IRET_BUT_PREFER_SYSEXIT                                           \
-	cli;                                                                      \
-	cmpl   $SEGMENT_USER_CODE, OFFSET_IRREGS_CS(%esp);                        \
-	jne    99f;                                                               \
-	movl   OFFSET_IRREGS_ESP(%esp), %ecx;                                     \
-	movl   OFFSET_IRREGS_EIP(%esp), %edx;                                     \
-	addl   $(8), %esp;                                                        \
-	.cfi_adjust_cfa_offset - 8;                                               \
-	/* Prevent popfl from enabling interrupts to bypass a race condition      \
-	 * that could result in an interrupt attempting to re-direct user-space   \
-	 * at a time where registers it would modify were already loaded.         \
-	 * This race condition doesn't happen with IRET, because it executes      \
-	 * atomically (or rather: without interrupts). */                         \
-	andl   $~EFLAGS_IF, (%esp);                                               \
-	popfl;                                                                    \
-	/* Enable interrupts in a way that delays its execution for 1             \
-	 * additional instruction, meaning that no interrupts can occur           \
-	 * before `sysexit' actually returns to user-space.                       \
-	 * NOTE: `popfl' doesn't have this effect, so this clutch is required. */ \
-	sti;                                                                      \
-	sysexit;                                                                  \
-	.cfi_adjust_cfa_offset 8;                                                 \
-99:	iret
-#endif /* ... */
+#define X86_IRET_BUT_PREFER_SYSEXIT \
+	jmp __i386_syscall_iret
+
 #endif /* !__x86_64__ */
 #endif /* __ASSEMBLER__ */
 

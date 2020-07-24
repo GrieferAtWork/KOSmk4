@@ -198,13 +198,18 @@
 #endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
 
 
-#ifndef SYSCALL_IRET
+#undef SC_IRET
+#undef SC_IRET_NOCLOBBER
 #ifdef __x86_64__
-#define SYSCALL_IRET intr_exit_sysret
-#else /* __x86_64__ */
-#define SYSCALL_IRET X86_IRET_BUT_PREFER_SYSEXIT
-#endif /* !__x86_64__ */
-#endif /* !SYSCALL_IRET */
+#define SC_IRET           intr_exit_sysret
+#define SC_IRET_NOCLOBBER intr_exit
+#elif defined(SYSCALL_FASTPASS_KIND_SYS32_SYSENTER)
+#define SC_IRET           X86_IRET_BUT_PREFER_SYSEXIT
+#define SC_IRET_NOCLOBBER iret
+#else /* ... */
+#define SC_IRET           iret
+#define SC_IRET_NOCLOBBER iret
+#endif /* !... */
 
 
 /* Define _all_ low-level system call variants of a system
@@ -234,7 +239,6 @@
 		.cfi_def_cfa %Psp, 0
 #endif /* !__x86_64__ */
 #define SC_END_ALL_NOTHROW(name) \
-		SYSCALL_IRET;            \
 		.cfi_endproc;            \
 	END(X86_ASMSYSCALL32_SYSENTER(name))
 #endif /* !SC_BEGIN_ALL_NOTHROW */
@@ -257,7 +261,6 @@
 		.cfi_iret_signal_frame;               \
 		.cfi_def_cfa %Psp, 0
 #define SC_END(name)  \
-		SYSCALL_IRET; \
 		.cfi_endproc; \
 	END(_SYSFAST_FUNCNAME(name))
 
@@ -391,6 +394,10 @@ SC_BEGIN(execveat)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
+	/* Don't clobber registers, which have painstakingly
+	 * been set-up by the program loader. - _ALL_ registers
+	 * must be well defined after an exec()! */
+	SC_IRET_NOCLOBBER
 SC_END(execveat)
 #endif /* execveat... */
 
@@ -449,6 +456,10 @@ SC_BEGIN(execve)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
+	/* Don't clobber registers, which have painstakingly
+	 * been set-up by the program loader. - _ALL_ registers
+	 * must be well defined after an exec()! */
+	SC_IRET_NOCLOBBER
 SC_END(execve)
 #endif /* execve... */
 
@@ -492,6 +503,7 @@ SC_BEGIN(debugtrap)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
+	SC_IRET
 SC_END(debugtrap)
 #endif /* debugtrap... */
 
@@ -520,6 +532,7 @@ SC_BEGIN(iopl)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
+	SC_IRET
 SC_END(iopl)
 #endif /* iopl... */
 
@@ -539,6 +552,7 @@ SC_BEGIN(fork)
 	call   sys_fork_impl
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
+	SC_IRET
 SC_END(fork)
 #endif /* fork... */
 
@@ -558,6 +572,7 @@ SC_BEGIN(rtm_begin)
 	call   sys_rtm_begin_impl
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
+	SC_IRET
 SC_END(rtm_begin)
 #endif /* rtm_begin... */
 
@@ -582,6 +597,7 @@ SC_BEGIN_ALL_NOTHROW(rtm_test)
 	orP  $(EFLAGS_ZF), OFFSET_IRREGS_PFLAGS(%Psp)
 	/* return 0 */
 	xorP %Pax, %Pax
+	SC_IRET
 SC_END_ALL_NOTHROW(rtm_test)
 #endif /* !_SC_RTM_TEST_DEFINED */
 #endif /* rtm_test... */
@@ -600,6 +616,7 @@ SC_END_ALL_NOTHROW(rtm_test)
 SC_BEGIN_ALL_NOTHROW(rtm_abort)
 	/* return -EOK; */
 	xorP %Pax, %Pax
+	SC_IRET
 SC_END_ALL_NOTHROW(rtm_abort)
 #endif /* !_SC_RTM_ABORT_DEFINED */
 #endif /* rtm_abort... */

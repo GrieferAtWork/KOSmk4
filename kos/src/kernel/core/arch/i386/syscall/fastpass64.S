@@ -24,13 +24,13 @@
 #include <hybrid/compiler.h>
 
 #ifndef __INTELLISENSE__
+#define SYSCALL_FASTPASS_KIND_SYS64 1
+#include "fastpass-impl.S"
+
 #define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
 #include "fastpass-impl.S"
 
 #define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
-#include "fastpass-impl.S"
-
-#define SYSCALL_FASTPASS_KIND_SYS64 1
 #include "fastpass-impl.S"
 #endif /* !__INTELLISENSE__ */
 

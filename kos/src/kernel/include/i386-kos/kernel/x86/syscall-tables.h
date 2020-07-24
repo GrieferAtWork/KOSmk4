@@ -148,6 +148,8 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
  *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
  *    %eip:       Always set to `IN(%edi)'
  *    %esp:       Always set to `IN(%ebp)'
+ *    %ecx:       May be clobbered
+ *    %edx:       May be clobbered
  *    %eflags.CF: When cleared on entry, set on return if an exception was propagated
  *    *:          All other registers are preserved by default, though individual
  *                system calls may cause specific registers to become clobbered. */

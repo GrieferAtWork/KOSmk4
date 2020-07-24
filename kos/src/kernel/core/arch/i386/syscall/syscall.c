@@ -264,7 +264,16 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 		__wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE);
 		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_psp0);
 		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall32_sysenter);
+	} else {
+#ifndef __x86_64__
+		/* Entirely disable use of `sysexit' in `__i386_syscall_iret'
+		 * NOTE: That write-protections aren't in effect yet, so we can
+		 *       just re-write the code here! */
+		extern byte_t __i386_syscall_iret[];
+		__i386_syscall_iret[0] = 0xcf; /* iret */
+#endif /* __x86_64__ */
 	}
+
 #ifdef __x86_64__
 	if (X86_HAVE_SYSCALL) {
 		/* Must preserve the lower 32 bits of `IA32_STAR'!

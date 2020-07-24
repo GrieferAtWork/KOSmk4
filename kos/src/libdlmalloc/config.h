@@ -110,20 +110,20 @@
 #define __WANT_INLINE_SYSCALLS 1
 #include <kos/syscalls.h>
 #if __CRT_HAVE_SC(time)
-#define time(p)    sys_time(p)
+#define time(p) sys_time(p)
 #else /* time */
-#define time(p)  ((p)?(*(p)=42):42)
+#define time(p) ((p) ? (*(p) = 42) : 42)
 #endif /* !time */
 #if __CRT_HAVE_SC(sched_yield)
-#define sched_yield()  sys_sched_yield()
+#define sched_yield() sys_sched_yield()
 #else /* sched_yield */
 #define sched_yield() (void)0
 #endif /* !sched_yield */
-#define mmap(hint,size,prot,flags,fd,offset)  sys_mmap(hint,size,prot,flags,fd,offset)
-#define munmap(addr,size)                     sys_munmap(addr,size)
+#define mmap(hint, size, prot, flags, fd, offset) sys_mmap(hint, size, prot, flags, fd, offset)
+#define munmap(addr, size)                        sys_munmap(addr, size)
 #if HAVE_MREMAP
 #if __CRT_HAVE_SC(mremap)
-#define mremap(addr,osz,nsz,mv)  sys_mremap(addr,osz,nsz,mv)
+#define mremap(addr, osz, nsz, mv) sys_mremap(addr, osz, nsz, mv)
 #else /* mremap */
 #undef HAVE_MREMAP
 #define HAVE_MREMAP 0
