@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x537a68f8 */
+/* HASH CRC-32:0x5f6f69cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
 }
 #include <asm/crt/confname.h>
 #include <asm/crt/limits.h>
-INTERN ATTR_SECTION(".text.crt.sched.threads") size_t
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_CONST size_t
 NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void) {
 
 

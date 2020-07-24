@@ -661,7 +661,7 @@ void tss_delete(tss_t tss_id) = pthread_key_delete;
 % *       to see this function anywhere other than Solaris, restrict it to its feature
 % *       namespace. */
 %#ifdef __USE_SOLARIS
-[[decl_include("<hybrid/typecore.h>")]]
+[[ATTR_CONST, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/confname.h>", "<asm/crt/limits.h>")]]
 $size_t thr_min_stack() {
 @@pp_if !defined(__BUILDING_LIBC) && ($has_function(sysconf) && defined(_SC_THREAD_STACK_MIN))@@

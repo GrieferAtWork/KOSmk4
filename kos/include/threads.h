@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb108e79c */
+/* HASH CRC-32:0xd8d7f910 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,10 +592,10 @@ __CDECLARE_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),(__tss_id))
  *       namespace. */
 #ifdef __USE_SOLARIS
 #ifdef __CRT_HAVE_thr_min_stack
-__CDECLARE(,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
+__CDECLARE(__ATTR_CONST,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
 #else /* __CRT_HAVE_thr_min_stack */
 #include <local/threads/thr_min_stack.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
 #endif /* !__CRT_HAVE_thr_min_stack */
 #ifdef __CRT_HAVE_pthread_main_np
 /* Another one of these non-restricted, but solaris-specific functions:

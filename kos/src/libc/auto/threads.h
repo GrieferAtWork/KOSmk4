@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x294f6c6e */
+/* HASH CRC-32:0xaa13c6e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -254,7 +254,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_tss_set)(tss_t tss_id, void *val);
  * identified by TSS_ID for the current thread to VAL
  * s.a. `pthread_setspecific()' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id, void *val);
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void);
+INTDEF ATTR_CONST size_t NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END
