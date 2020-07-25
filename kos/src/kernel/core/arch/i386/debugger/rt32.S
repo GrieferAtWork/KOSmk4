@@ -24,8 +24,9 @@
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <asm/cpu-flags.h>
-#include <kos/kernel/cpu-state.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <libunwind/cfi.h>
 
@@ -119,7 +120,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX), %eax
 
 	/* Check if we're about to return to VM86 */
-	testl  $(EFLAGS_VM), (x86_dbg_exitstate + OFFSET_FCPUSTATE_EFLAGS)
+	ttest  mask=EFLAGS_VM, loc=(x86_dbg_exitstate + OFFSET_FCPUSTATE_EFLAGS)
 	jz     1f
 	EXTERN(thiscpu_idle_x86_kernel_psp0)
 	movl   thiscpu_idle_x86_kernel_psp0(%ebp), %esp
@@ -143,7 +144,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movw   (x86_dbg_exitstate + OFFSET_FCPUSTATE_ES), %es
 
 	/* Check if we're about to return to user-space */
-	testl  $(3), (x86_dbg_exitstate + OFFSET_FCPUSTATE_CS)
+	ttest  mask=3, loc=(x86_dbg_exitstate + OFFSET_FCPUSTATE_CS)
 	jz     1f
 	EXTERN(thiscpu_idle_x86_kernel_psp0)
 	movl   thiscpu_idle_x86_kernel_psp0(%ebp), %esp

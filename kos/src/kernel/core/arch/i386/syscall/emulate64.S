@@ -28,6 +28,7 @@
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/jccN.h>
+#include <asm/instr/ttest.h>
 #include <asm/syscalls32_d.h>
 #include <asm/syscalls64_d.h>
 #include <kos/kernel/cpu-state-asm.h>
@@ -151,7 +152,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	.cfi_adjust_cfa_offset -8
 .Lbad_sysno64:
 	/* %rax is a system call number that doesn't exist. */
-	testq  $(RPC_SYSCALL_INFO_FEXCEPT), OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx)
+	ttest  mask=RPC_SYSCALL_INFO_FEXCEPT, loc=OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx)
 	jz     .Lbad_sysno64_ENOSYS
 
 .Lthrow_unknown_systemcall:
@@ -228,7 +229,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	.cfi_adjust_cfa_offset -8
 .Lbad_sysno32:
 	/* %rax is a system call number that doesn't exist. */
-	testq  $(RPC_SYSCALL_INFO_FEXCEPT), OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx)
+	ttest  mask=RPC_SYSCALL_INFO_FEXCEPT, loc=OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx)
 	jnz    .Lthrow_unknown_systemcall /* Throw an actual `E_UNKNOWN_SYSTEMCALL' exception! */
 	/* Just return -ENOSYS (no need to go through all the hassle of throwing an exception) */
 	movq   $-ENOSYS, %rax

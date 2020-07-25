@@ -44,6 +44,7 @@
 #include <asm/instr/interrupt.h>
 #include <asm/instr/kgsbase.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -269,7 +270,7 @@ PUBLIC_FUNCTION(task_yield)
 	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 	pushfq_cfi_r                      /* ir_rflags */
-	testq  $(EFLAGS_IF), 0(%rsp)
+	ttest  mask=EFLAGS_IF, loc=0(%rsp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield
 	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
@@ -365,7 +366,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 	pushfq_cfi_r                      /* ir_rflags */
-	testq  $(EFLAGS_IF), 0(%rsp)
+	ttest  mask=EFLAGS_IF, loc=0(%rsp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield_nx
 	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
@@ -413,7 +414,7 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	pushq_cfi %rdx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 	pushfq_cfi_r                      /* ir_rflags */
-	testq  $(EFLAGS_IF), 0(%rsp)
+	ttest  mask=EFLAGS_IF, loc=0(%rsp)
 	jnz    1f
 	addq   $(24), %rsp
 	.cfi_adjust_cfa_offset -24
@@ -435,7 +436,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	pushq_cfi %rdx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 	pushfq_cfi_r                      /* ir_rflags */
-	testq  $(EFLAGS_IF), 0(%rsp)
+	ttest  mask=EFLAGS_IF, loc=0(%rsp)
 	jnz    1f
 	addq   $(24), %rsp
 	.cfi_adjust_cfa_offset -24

@@ -39,6 +39,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/instr/compat.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
@@ -455,7 +456,7 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
-	testl  $(CPUID_1D_SEP), %edx
+	ttest  mask=CPUID_1D_SEP, loc=%edx
 	jz     1f
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_FAMILY_M), %ecx
@@ -589,22 +590,22 @@ INTERN_FUNCTION(x86_smp_entry32)
 	cpuid
 
 	/* Test the LM bit. */
-	testl  $(CPUID_80000001D_LM), %edx
+	ttest  mask=CPUID_80000001D_LM, loc=%edx
 	jz     x86_smp_boot_failure_no_longmode
 
 	/* Test the PAE bit. */
-//	testl  $(CPUID_80000001D_PAE), %edx
+//	ttest  mask=CPUID_80000001D_PAE, loc=%edx
 //	jz     x86_smp_boot_failure_no_pae
 
 	/* Test the PSE bit. */
-//	testl  $(CPUID_80000001D_PSE), %edx
+//	ttest  mask=CPUID_80000001D_PSE, loc=%edx
 //	jz     x86_smp_boot_failure_no_pse
 
 	movl   $(1), %eax
 	cpuid
 
 	/* Test the MSR bit. */
-	testl  $(CPUID_1D_MSR), %edx
+	ttest  mask=CPUID_1D_MSR, loc=%edx
 	jz     x86_smp_boot_failure_no_msr
 
 	/* Configure the %CR4 register. */
@@ -615,7 +616,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	orl    $(CR4_PSE | CR4_PAE), %esp
 	movl   $(1), %eax
 	cpuid
-	testl  $(CPUID_1D_PGE), %edx /* Enable PGE if supported by the host (optional feature) */
+	ttest  mask=CPUID_1D_PGE, loc=%edx /* Enable PGE if supported by the host (optional feature) */
 	jz     1f
 	orl    $(CR4_PGE), %esp
 1:
@@ -627,10 +628,10 @@ INTERN_FUNCTION(x86_smp_entry32)
 	jnae   2f
 	movl   $(7), %eax
 	cpuid
-	testl  $(CPUID_7B_SMEP), %ebx /* Enable SMAP if supported by the host (optional feature) */
+	ttest  mask=CPUID_7B_SMEP, loc=%ebx /* Enable SMAP if supported by the host (optional feature) */
 	jz     1f
 	orl    $(CR4_SMEP), %esp
-1:	testl  $(CPUID_7B_FSGSBASE), %ebx /* Enable FSGSBASE if supported by the host (emulated if unsupported) */
+1:	ttest  mask=CPUID_7B_FSGSBASE, loc=%ebx /* Enable FSGSBASE if supported by the host (emulated if unsupported) */
 	jz     1f
 	orl    $(CR4_FSGSBASE), %esp
 1:
@@ -649,10 +650,10 @@ INTERN_FUNCTION(x86_smp_entry32)
 	 * such as the NXE bit, as well as SCE (SysCallExtensions) */
 	movl   $(0x80000001), %eax
 	cpuid
-	testl  $(CPUID_80000001D_NX), %edx
+	ttest  mask=CPUID_80000001D_NX, loc=%edx
 	jz     1f
 	orl    $(IA32_EFER_NXE), %esp
-1:	testl  $(CPUID_80000001D_SYSCALL), %edx
+1:	ttest  mask=CPUID_80000001D_SYSCALL, loc=%edx
 	jz     1f
 	orl    $(IA32_EFER_SCE), %esp
 1:	/* Save the new configuration. */
@@ -673,13 +674,13 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* Enable PAE support (if necessary for setting the page directory) */
 #ifndef CONFIG_NO_PAGING_P32
 	EXTERN(bootcpu_x86_cpuid)
-	testl  $(CPUID_1D_PAE), ((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	ttest  mask=CPUID_1D_PAE, loc=((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 #endif /* !CONFIG_NO_PAGING_P32 */
 	orl    $(CR4_PAE), %esp
 	/* Enable NX support (if necessary for setting the page directory) */
 	EXTERN(bootcpu_x86_cpuid)
-	testl  $(CPUID_80000001D_NX), ((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
+	ttest  mask=CPUID_80000001D_NX, loc=((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
 	jz     1f
 	movl   $(IA32_EFER), %ecx
 	rdmsr
@@ -687,13 +688,13 @@ INTERN_FUNCTION(x86_smp_entry32)
 	wrmsr
 	/* With PAE + NX, try to enable its effects while
 	 * in kernel-space (if supported by the CPU) */
-	testl  $(CPUID_7B_SMEP), (bootcpu_x86_cpuid + OFFSET_CPUID_7B)
+	ttest  mask=CPUID_7B_SMEP, loc=(bootcpu_x86_cpuid + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %esp
 1:
 #endif /* !CONFIG_NO_PAGING_PAE */
 	/* Enable PGE support (if necessary for setting the page directory) */
-	testl  $(CPUID_1D_PGE), ((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
+	ttest  mask=CPUID_1D_PGE, loc=((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 	orl    $(CR4_PGE), %esp
 1:	movl   %esp, %cr4
@@ -848,13 +849,13 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* Check if we've already filled in our CPUID features table. */
 	EXTERN(thiscpu_x86_cpufeatures)
-	testw  $(CPU_FEATURE_FDIDINIT), thiscpu_x86_cpufeatures(R_CPU)
+	ttest  mask=CPU_FEATURE_FDIDINIT, loc=thiscpu_x86_cpufeatures(R_CPU)
 	jz     x86_smp_init_cpuid
 .Ldone_init_cpuid:
 
 
 	/* If supported, initialize the `sysenter' instruction */
-	testl  $(CPUID_1D_SEP), (thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
+	ttest  mask=CPUID_1D_SEP, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
 	jz     .Ldone_sysenter
 
 	/* __wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE); */
@@ -901,7 +902,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* If supported, initialize the `syscall' instruction */
 #ifdef __x86_64__
-	testl  $(CPUID_80000001D_SYSCALL), (thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
+	ttest  mask=CPUID_80000001D_SYSCALL, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
 	jz     .Ldone_syscall
 
 	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32 |

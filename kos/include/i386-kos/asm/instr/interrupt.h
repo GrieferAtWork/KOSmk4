@@ -45,11 +45,7 @@
 #ifdef __x86_64__
 __ASM_BEGIN
 __ASM_L(.macro swapgs_if_user_iret)
-#if 1
 __ASM_L(	testb  $(3), 8(%rsp)) /* 8 == OFFSET_IRREGS64_CS */
-#else
-__ASM_L(	testq  $(3), 8(%rsp)) /* 8 == OFFSET_IRREGS64_CS */
-#endif
 __ASM_L(	jz     991f)
 __ASM_L(	swapgs)
 __ASM_L(991:)

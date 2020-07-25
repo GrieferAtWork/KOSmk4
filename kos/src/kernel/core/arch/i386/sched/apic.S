@@ -31,6 +31,7 @@
 
 #include <asm/instr/compat.h>
 #include <asm/instr/jccN.h>
+#include <asm/instr/ttest.h>
 #include <sys/param.h> /* HZ */
 
 #ifdef __x86_64__
@@ -176,7 +177,7 @@ BEGIN_APIC(apic86_arch_cpu_hwipi_pending_nopr)
 	EXTERN(x86_lapicbase)
 	movP   x86_lapicbase, %Pcx
 	movl   APIC_ISR(APIC_ISR_INDEX(X86_INTERRUPT_APIC_IPI))(%Pcx), %ecx
-	testl  $(APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)), %ecx
+	ttest  mask=APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI), loc=%ecx
 	setnz  %al
 	ret
 END_APIC(apic86_arch_cpu_hwipi_pending_nopr)

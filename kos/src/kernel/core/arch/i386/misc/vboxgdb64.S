@@ -27,6 +27,7 @@
 #ifdef CONFIG_VBOXGDB
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 
 #define VBOXGDB_TRAPCTL_NTRAP 0x00 /* Don't trap */
@@ -63,7 +64,7 @@ INTERN_FUNCTION(_vboxgdb_breakpoint) /* int3 */
 	je     .Lenter_steploop /* Enter the debugger step-loop */
 
 	/* Repeat the piece of code that was overwritten by the code injection */
-	testq  $(3), OFFSET_IRREGS_CS(%rsp)
+	ttest  mask=3, loc=OFFSET_IRREGS_CS(%rsp)
 	EXTERN(_x86_idt_breakpoint_after_enter)
 	jz     _x86_idt_breakpoint_after_enter
 	swapgs
@@ -85,7 +86,7 @@ PRIVATE_LABEL(.Lnormal_debugtrap):
 	.cfi_remember_state
 
 	/* Repeat the piece of code that was overwritten by the code injection */
-	testq  $(3), OFFSET_IRREGS_CS(%rsp)
+	ttest  mask=3, loc=OFFSET_IRREGS_CS(%rsp)
 	EXTERN(_x86_idt_debugtrap_after_enter)
 	jz     _x86_idt_debugtrap_after_enter
 	swapgs
@@ -95,7 +96,7 @@ PRIVATE_LABEL(.Lnormal_debugtrap):
 PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	pushq_cfi_r %rax
 	movq   %dr6, %rax
-	testq  $(DR6_BS), %rax
+	ttest  mask=DR6_BS, loc=%rax
 	jz     99f
 	andq   $(~DR6_BS), %rax
 	movq   %rax, %dr6

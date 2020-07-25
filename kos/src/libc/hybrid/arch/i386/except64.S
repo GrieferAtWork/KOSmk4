@@ -23,13 +23,15 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
+#include <asm/cpu-flags.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <kos/except.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-helpers.h>
-#include <asm/cpu-flags.h>
+#include <kos/kernel/cpu-state.h>
 
 #ifdef __KERNEL__
 #include <kernel/compiler.h>
@@ -508,7 +510,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_def_cfa_register %rsp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 	/* Check if the interrupt state points into user-space. */
-	testq  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
+	ttest  mask=3, loc=(OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rsp)
 	EXTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 

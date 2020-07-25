@@ -278,7 +278,7 @@ __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif)
-#else
+#else /* __x86_64__ */
 	__REGISTER_CASE(%eax,0)
 	__REGISTER_CASE(%ecx,1)
 	__REGISTER_CASE(%edx,2)
@@ -349,7 +349,7 @@ __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(	.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(	.endif;.endif;.endif;.endif;.endif)
-#endif
+#endif /* !__x86_64__ */
 #undef __REGISTER_CASE
 __ASM_L(.endm)
 

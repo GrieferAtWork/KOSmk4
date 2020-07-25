@@ -27,6 +27,7 @@
 
 #include <asm/cfi.h>
 #include <asm/instr/jccN.h>
+#include <asm/instr/ttest.h>
 #include <asm/unistd.h>
 #include <kos/kernel/cpu-state-asm32.h>
 #include <kos/kernel/cpu-state.h>
@@ -36,24 +37,24 @@
 #include <librpc/rpc.h>
 
 
-#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)  \
-	cmpl   $(__NR_syscall0_max), sysno_reg;                                \
-	ja     1234f;                                                          \
-	movl   sysno_reg, tempreg_l;                                           \
-	shrl   $(1), tempreg_l;                                                \
-	EXTERN(kernel_syscall0_regcnt);                                        \
-	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b; \
-	jmp    1235f;                                                          \
-1234:                                                                      \
-	leal   ((-__NR_syscall1_min) & 0xffffffff)(sysno_reg), tempreg_l;      \
-	shrl   $(1), tempreg_l;                                                \
-	EXTERN(kernel_syscall1_regcnt);                                        \
-	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
-1235:                                                                      \
-	testl  $(1), sysno_reg;                                                \
-	jz     1234f;                                                          \
-	shrb   $(4), tempreg_b;                                                \
-1234:                                                                      \
+#define TEST_DOUBLE_WIDE(sysno_reg, sysno_reg_b, tempreg_l, tempreg_b, segment_prefix)  \
+	cmpl   $(__NR_syscall0_max), sysno_reg;                                             \
+	ja     1234f;                                                                       \
+	movl   sysno_reg, tempreg_l;                                                        \
+	shrl   $(1), tempreg_l;                                                             \
+	EXTERN(kernel_syscall0_regcnt);                                                     \
+	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b;              \
+	jmp    1235f;                                                                       \
+1234:                                                                                   \
+	leal   ((-__NR_syscall1_min) & 0xffffffff)(sysno_reg), tempreg_l;                   \
+	shrl   $(1), tempreg_l;                                                             \
+	EXTERN(kernel_syscall1_regcnt);                                                     \
+	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b;              \
+1235:                                                                                   \
+	testb  $(1), sysno_reg_b;                                                           \
+	jz     1234f;                                                                       \
+	shrb   $(4), tempreg_b;                                                             \
+1234:                                                                                   \
 	testb  $(0x8), tempreg_b;
 
 
@@ -143,7 +144,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	jmpl   *x86_sysroute0_c(,%eax,4)
 .Lbad_sysno:
 	/* %eax is a system call number that doesn't exist. */
-	testl  $(RPC_SYSCALL_INFO_FEXCEPT), (4 + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%edi)
+	ttest  mask=RPC_SYSCALL_INFO_FEXCEPT, loc=(4 + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%edi)
 	jz     .Lbad_sysno_ENOSYS
 
 	/* Throw an actual `E_UNKNOWN_SYSTEMCALL' exception! */
@@ -175,7 +176,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS
 
 	/* Check if we must sign-extend the error return value. */
-	TEST_DOUBLE_WIDE(%eax, %ecx, %cl, )
+	TEST_DOUBLE_WIDE(%eax, %al, %ecx, %cl, )
 	jz     1f
 	movl   %edx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%esp)
 1:

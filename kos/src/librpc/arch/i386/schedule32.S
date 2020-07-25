@@ -17,11 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBRPC_ARCH_I386_SCHEDULE32_S
+#define GUARD_LIBRPC_ARCH_I386_SCHEDULE32_S 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
-#include <librpc/rpc.h>
+#include <asm/instr/ttest.h>
+
 #include <errno.h>
+
+#include <librpc/rpc.h>
 
 
 .section .text.__x86.get_pc_thunk.bx,"axG",@progbits,__x86.get_pc_thunk.bx,comdat
@@ -89,7 +95,7 @@ PRIVATE_FUNCTION(librpc_schedule_rpc_entry)
 	/* Invoke the user-level RPC callback */
 	call  *%eax
 	/* Check if we should restart an interrupted system call. */
-	testl  $(RPC_REASON_SYSCALL), %ebx
+	ttest  mask=RPC_REASON_SYSCALL, loc=%ebx
 	jnz    .Lrestart_system_call
 	/* Restore the interrupted register state. */
 	movl   %ebp, %esp
@@ -300,3 +306,4 @@ END(librpc_schedule)
 
 DEFINE_PUBLIC_ALIAS(rpc_schedule, librpc_schedule);
 
+#endif /* !GUARD_LIBRPC_ARCH_I386_SCHEDULE32_S */

@@ -39,6 +39,7 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/jccN.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 
 
@@ -313,7 +314,7 @@ PUBLIC_FUNCTION(task_yield)
 	popl_cfi %eax
 	.cfi_register %eip, %eax
 	pushfl_cfi_r
-	testl  $(EFLAGS_IF), (%esp)
+	ttest  mask=EFLAGS_IF, loc=(%esp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield
 	pushl_cfi_r %cs
@@ -421,7 +422,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 	popl_cfi  %eax
 	.cfi_register %eip, %eax
 	pushfl_cfi_r
-	testl  $(EFLAGS_IF), (%esp)
+	ttest  mask=EFLAGS_IF, loc=(%esp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield_nx
 	pushl_cfi_r %cs
@@ -460,7 +461,7 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	popl_cfi  %ecx
 	.cfi_register %eip, %ecx
 	pushfl_cfi_r
-	testl  $(EFLAGS_IF), (%esp)
+	ttest  mask=EFLAGS_IF, loc=(%esp)
 	jnz    1f
 	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4
@@ -477,7 +478,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	popl_cfi %ecx
 	.cfi_register %eip, %ecx
 	pushfl_cfi_r
-	testl  $(EFLAGS_IF), (%esp)
+	ttest  mask=EFLAGS_IF, loc=(%esp)
 	jnz    1f
 	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4

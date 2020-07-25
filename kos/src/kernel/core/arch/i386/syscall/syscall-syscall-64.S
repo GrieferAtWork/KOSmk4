@@ -28,6 +28,7 @@
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <asm/syscalls64_d.h>
 #include <kos/kernel/gdt.h>
 #include <librpc/rpc.h>
@@ -163,7 +164,7 @@ __ASM_L(	.cfi_escape 0x10,0x07,0x04,0x90,0x3b,0x23,(this_x86_rpc_redirection_ire
 	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
 	            RPC_SYSCALL_INFO_METHOD_INT80H_64)
 	/* Check if exceptions are enabled. */
-	testb  $(EFLAGS_CF), %r11b
+	ttest  mask=EFLAGS_CF, loc=%r11
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
 1:

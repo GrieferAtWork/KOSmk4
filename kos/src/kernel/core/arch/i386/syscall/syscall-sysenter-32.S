@@ -28,6 +28,7 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/paging.h>
@@ -164,7 +165,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
 	            RPC_SYSCALL_INFO_METHOD_SYSENTER_32)
 	/* Check if exceptions are enabled. */
-	testb  $(EFLAGS_CF), (44 + OFFSET_IRREGS_EFLAGS)(%esp)
+	ttest  mask=EFLAGS_CF, loc=(44 + OFFSET_IRREGS_EFLAGS)(%esp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%esp)
 1:
@@ -194,7 +195,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	EXTERN(kernel_syscall1_regcnt)
 	movb   kernel_syscall1_regcnt(,%ecx,1), %cl
 .Lgot_mask:
-	testl  $(1), %eax
+	testb  $(1), %al
 	jz     1f
 	shrb   $(4), %cl
 1:	andb   $(0x7), %cl
@@ -349,24 +350,24 @@ END(x86_syscall_emulate_sysenter_r)
 
 
 
-#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)  \
-	cmpl   $(__NR_syscall0_max), sysno_reg;                                \
-	ja     1234f;                                                          \
-	movl   sysno_reg, tempreg_l;                                           \
-	shrl   $(1), tempreg_l;                                                \
-	EXTERN(kernel_syscall0_regcnt);                                        \
-	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b; \
-	jmp    1235f;                                                          \
-1234:                                                                      \
-	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                       \
-	shrl   $(1), tempreg_l;                                                \
-	EXTERN(kernel_syscall1_regcnt);                                        \
-	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
-1235:                                                                      \
-	testl  $(1), sysno_reg;                                                \
-	jz     1234f;                                                          \
-	shrb   $(4), tempreg_b;                                                \
-1234:                                                                      \
+#define TEST_DOUBLE_WIDE(sysno_reg, sysno_reg_b, tempreg_l, tempreg_b, segment_prefix)  \
+	cmpl   $(__NR_syscall0_max), sysno_reg;                                             \
+	ja     1234f;                                                                       \
+	movl   sysno_reg, tempreg_l;                                                        \
+	shrl   $(1), tempreg_l;                                                             \
+	EXTERN(kernel_syscall0_regcnt);                                                     \
+	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b;              \
+	jmp    1235f;                                                                       \
+1234:                                                                                   \
+	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                                    \
+	shrl   $(1), tempreg_l;                                                             \
+	EXTERN(kernel_syscall1_regcnt);                                                     \
+	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b;              \
+1235:                                                                                   \
+	testb  $(1), sysno_reg_b;                                                           \
+	jz     1234f;                                                                       \
+	shrb   $(4), tempreg_b;                                                             \
+1234:                                                                                   \
 	testb  $(0x8), tempreg_b;
 
 
@@ -390,12 +391,12 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	.cfi_restore_iret_ds_or_offset -12
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testl  $(EFLAGS_CF), %ss:12 + OFFSET_IRREGS_EFLAGS(%esp)
+	ttest  mask=EFLAGS_CF, loc=12 + OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
 	jnz    1f
 
 	/* Check if we must sign-extend the error return value. */
 	pushl_cfi_r %ecx
-	TEST_DOUBLE_WIDE(%eax, %ecx, %cl, %ss:)
+	TEST_DOUBLE_WIDE(%eax, %al, %ecx, %cl, %ss:)
 	popl_cfi_r %ecx
 	jz     1f
 	movl   $-1, %edx
@@ -479,7 +480,7 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testl  $(EFLAGS_CF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
+	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
 	jnz    1f
 	movl   $(-ENOSYS), %eax
 	iret

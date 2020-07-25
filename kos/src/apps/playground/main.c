@@ -707,6 +707,24 @@ PRIVATE DEF defs[] = {
 	{ "yield", &main_yield },
 	{ "vio", &main_vio },
 	{ "rtm", &main_rtm },
+	/* TODO: On x86_64, add a playground that:
+	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
+	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall
+	 *   - jmp 0x00007ffffffffffe
+	 * By doing this, the syscall will return to a non-canonical address,
+	 * which is something that normally will cause sysret to #GP with
+	 * user-space registers (this is a known bug in all x86 cpus).
+	 * KOS (should) prevent this by the `testb  $(0), 0(%rcx)' that can
+	 * be found in `/kos/src/kernel/core/arch/i386/syscall/sysret64.S',
+	 * however that check hasn't been tested thus far, and it really
+	 * should get tested!
+	 * 
+	 * Additionally, add another playground that doing the same, just not
+	 * at that particular address, such that the syscall return address
+	 * isn't mapped into memory, but would still be canonical. Then check
+	 * if the kernel handles this case correctly as well (single-step the
+	 * in-kernel sysret wrapper for this)
+	 */
 	{ NULL, NULL }
 };
 

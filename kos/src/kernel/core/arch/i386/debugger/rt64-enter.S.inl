@@ -29,6 +29,7 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm64.h>
 #include <kos/kernel/cpu-state64.h>
 
@@ -180,7 +181,7 @@ L(.Lacquire_lapicid_lock):
 	/* This is where we get if some other CPU is currently inside the debugger...
 	 * At this point, either re-enable interrupts (if they were enabled before),
 	 * and always idle a bit (pause) before trying once again. */
-	testq  $(EFLAGS_IF), 0(%rsp)
+	ttest  mask=EFLAGS_IF, loc=0(%rsp)
 	jz     1f /* Not allowed to block... */
 	sti
 	/* A secondary pause is used because `sti' only enables interrupts after the next instruction.

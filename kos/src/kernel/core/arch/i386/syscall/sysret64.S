@@ -29,6 +29,7 @@
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 
 
 /************************************************************************/
@@ -119,7 +120,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 *      decided against it because it would add unnecessary overhead to
 	 *      the VM node-tree management). */
 .Lsysret64_probe_begin:
-	testb  $(0), 0(%rcx)
+	ttest  mask=0, loc=0(%rcx)
 .Lsysret64_probe_end:
 
 	/* Confirmed! We can make use of sysret! */
@@ -148,7 +149,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	/* Only handle if the `E_SEGFAULT_CONTEXT_NONCANON' flag was set.
 	 * RETHROW() the exception if that flag isn't set. */
 	EXTERN(this_exception_pointers)
-	testq  $(E_SEGFAULT_CONTEXT_NONCANON), %gs:(this_exception_pointers + 8)
+	ttest  mask=E_SEGFAULT_CONTEXT_NONCANON, loc=this_exception_pointers + 8, seg=%gs
 	jnz    .Ldo_iret
 	/* RETHROW() the exception. */
 	EXTERN(error_rethrow)

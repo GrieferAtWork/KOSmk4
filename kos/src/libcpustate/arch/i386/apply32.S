@@ -27,6 +27,7 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <libcpustate/apply.h>
@@ -166,7 +167,7 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
 	.cfi_same_value %edx
 	/* Check if we need to construct a vm86 IRET tail. */
-	testl  $(EFLAGS_VM), OFFSET_UCPUSTATE_EFLAGS(%ecx)
+	ttest  mask=EFLAGS_VM, loc=OFFSET_UCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx)
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS)(%ecx)
@@ -183,7 +184,7 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%ecx), %eax
 	movl   %eax, %ds
 	/* Check if this leads into ring that is different from ours. */
-	testl  $(3), %ss:OFFSET_UCPUSTATE_CS(%ecx)
+	ttest  mask=3, loc=OFFSET_UCPUSTATE_CS(%ecx), seg=%ss
 #ifdef __KERNEL__
 	jz     1f
 #else /* __KERNEL__ */
@@ -352,7 +353,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
 	.cfi_same_value %edx
 
-	testl  $(EFLAGS_VM), OFFSET_FCPUSTATE_EFLAGS(%ecx)
+	ttest  mask=EFLAGS_VM, loc=OFFSET_FCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	/* Return to vm86 */
 	.cfi_remember_state
@@ -392,7 +393,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movw   OFFSET_FCPUSTATE_DS(%ecx), %ax
 	movw   %ax, %ds
 	.cfi_same_value %ds
-	testl  $(3), %ss:OFFSET_FCPUSTATE_CS(%ecx)
+	ttest  mask=3, loc=OFFSET_FCPUSTATE_CS(%ecx), seg=%ss
 #ifdef __KERNEL__
 	jz     1f
 #else /* __KERNEL__ */

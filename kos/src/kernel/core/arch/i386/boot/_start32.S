@@ -31,6 +31,7 @@
 
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/gdt.h>
@@ -223,7 +224,7 @@ INTERN_FUNCTION(_start)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
-	testl  $(CPUID_1D_SEP), %edx
+	ttest  mask=CPUID_1D_SEP, loc=%edx
 	jz     1f
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_FAMILY_M), %ecx
@@ -299,7 +300,7 @@ INTERN_FUNCTION(_start)
 	/* Check for page-global support
 	 * If not supported, clear out the used GLOBAL bit */
 	EXTERN(used_pxx_page_fglobal)
-	testl  $(CPUID_1D_PGE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
+	ttest  mask=CPUID_1D_PGE, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D)
 	jnz    1f
 	movl   $(0), V2P(used_pxx_page_fglobal)
 #if !defined(CONFIG_NO_PAGING_PAE) && (PAE_PAGE_FGLOBAL > 0xffffffff)
@@ -321,7 +322,7 @@ INTERN_FUNCTION(_start)
 	EXTERN(__x86_pagedir_kernel_share)
 #ifdef HYBRID_PAGING_MODE
 	/* Check which paging mode we should enable. */
-	testl  $(CPUID_1D_PAE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
+	ttest  mask=CPUID_1D_PAE, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D)
 #if 0
 	jmp    .Linit_paging_p32
 #else
@@ -346,7 +347,7 @@ INTERN_FUNCTION(_start)
 	 * seem likely that it would also expose this functionality in the firs tof providing this
 	 * very instruction, but still though: it can't hurt to be save and disable PAE if CX8 isn't
 	 * available. */
-	testl  $(CPUID_1D_CX8), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
+	ttest  mask=CPUID_1D_CX8, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D)
 	jz     .Linit_paging_p32
 	/* TODO: Check if using PAE would even give us any form of advantage:
 	 *  - CPUID.80000008H:EAX[7:0]:
@@ -428,7 +429,7 @@ INTERN_FUNCTION(_start)
 	orl    $(CR4_PAE), %eax
 	/* With PAE we're also able to support the NX bit, so try to enable
 	 * its effects while in kernel-space (if supported by the CPU) */
-	testl  $(CPUID_7B_SMEP), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B
+	ttest  mask=CPUID_7B_SMEP, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %eax
 1:	movl   %eax, %cr4
@@ -552,7 +553,7 @@ END(__x86_paging_init_identity_mapped_text)
 
 #ifdef HYBRID_PAGING_MODE
 	/* Check which paging mode we should enable. */
-	testl  $(CPUID_1D_PAE), (bootcpu_x86_cpuid + OFFSET_CPUID_1D)
+	ttest  mask=CPUID_1D_PAE, loc=(bootcpu_x86_cpuid + OFFSET_CPUID_1D)
 	jz     .Lcleanup_paging_p32
 	/* Fallthrough to `.Lcleanup_paging_pae' */
 #endif /* HYBRID_PAGING_MODE */

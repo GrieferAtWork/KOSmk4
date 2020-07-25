@@ -30,6 +30,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
@@ -83,7 +84,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_restore_iret_ss
 	/* Enable interrupts. */
 	sti
-	
+
 	movzlq %eax, %rax
 .Ldo_prepared_sysenter:
 	cmpl   $(__NR32_syscall0_max), %eax
@@ -174,7 +175,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
 	            RPC_SYSCALL_INFO_METHOD_SYSENTER_32)
 	/* Check if exceptions are enabled. */
-	testb  $(EFLAGS_CF), (104 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	ttest  mask=EFLAGS_CF, loc=(104 + OFFSET_IRREGS_RFLAGS)(%rsp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
 1:
@@ -196,7 +197,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	EXTERN(kernel_syscall1_regcnt32)
 	movb   kernel_syscall1_regcnt32(,%rcx,1), %cl
 .Lgot_mask:
-	testl  $(1), %eax
+	testb  $(1), %al
 	jz     1f
 	shrb   $(4), %cl
 1:	andb   $(0x7), %cl
@@ -346,7 +347,7 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testq  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
+	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	/* We can just use `sysret' as a drop-in replacement for `sysexit', since

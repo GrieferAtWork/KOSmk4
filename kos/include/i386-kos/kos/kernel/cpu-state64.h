@@ -471,7 +471,7 @@ struct icpustate64 { /* i -- Interrupts */
 	 *
 	 * When an icpustate is created/exited:
 	 *     >> entry:
-	 *     >>     testq  $3, OFFSET_IRREGS_CS(%rsp)
+	 *     >>     testb  $3, OFFSET_IRREGS_CS(%rsp)
 	 *     >>     jz     1f
 	 *     >>     swapgs
 	 *     >> 1:  pushq_cfi_r <EACH_GP_REG>
@@ -480,7 +480,7 @@ struct icpustate64 { /* i -- Interrupts */
 	 *     >>
 	 *     >> exit:
 	 *     >>     popq_cfi_r <EACH_GP_REG>
-	 *     >>     testq  $3, OFFSET_IRREGS_CS(%rsp)
+	 *     >>     testb  $3, OFFSET_IRREGS_CS(%rsp)
 	 *     >>     jz     1f
 	 *     >>     cli      // Prevent interrupts after swapgs (when %gs.base already has its user-space value)
 	 *     >>     swapgs

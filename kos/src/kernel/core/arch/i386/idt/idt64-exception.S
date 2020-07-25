@@ -53,7 +53,7 @@ INTERN_LABEL(_x86_idt_breakpoint_after_enter):
 
 	/* Re-enable interrupts for certain exceptions. */
 #if IDT_CONFIG_ISTRAP(IDT_VECTOR_ID)
-	testb  $(EFLAGS_IF >> 8), (OFFSET_ICPUSTATE64_IRREGS + OFFSET_IRREGS64_RFLAGS + 1)(%rsp)
+	ttest  mask=EFLAGS_IF, loc=(OFFSET_ICPUSTATE64_IRREGS + OFFSET_IRREGS64_RFLAGS)(%rsp)
 	jz     1f
 	sti    /* Re-enable interrupts. */
 1:

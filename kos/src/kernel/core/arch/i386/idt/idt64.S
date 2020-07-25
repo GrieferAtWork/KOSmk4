@@ -30,6 +30,7 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>

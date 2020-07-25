@@ -25,9 +25,11 @@
 #include <kernel/vboxgdb.h>
 
 #ifdef CONFIG_VBOXGDB
+#include <kernel/except.h>
+
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-#include <kernel/except.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 
 #define VBOXGDB_TRAPCTL_NTRAP 0x00 /* Don't trap */
@@ -108,7 +110,7 @@ PRIVATE_LABEL(.Lnormal_debugtrap):
 PRIVATE_FUNCTION(_vboxgdb_debugtrap_chk_step)
 	pushl_cfi_r %eax
 	movl   %dr6, %eax
-	testl  $(DR6_BS), %eax
+	ttest  mask=DR6_BS, loc=%eax
 	jz     99f
 	andl   $(~DR6_BS), %eax
 	movl   %eax, %dr6

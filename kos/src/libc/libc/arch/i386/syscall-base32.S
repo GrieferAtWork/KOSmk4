@@ -25,6 +25,7 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-cpuid.h>
+#include <asm/instr/ttest.h>
 #include <sys/syscall.h>
 
 .section .text.crt.syscall.selector
@@ -37,7 +38,7 @@ INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
 	movl   $(1), %eax
 	cpuid
 	movl   16(%esp), %ebx /* Return address */
-	testl  $(CPUID_1D_SEP), %edx
+	ttest  mask=CPUID_1D_SEP, loc=%edx
 	jz    .Lnot_supported
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     goto .Lnot_supported; */

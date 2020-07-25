@@ -536,6 +536,8 @@ SC_END(debugtrap)
 /* >> errno_t iopl(syscall_ulong_t level); */
 #if _SYSFAST_WANT(IOPL, iopl)
 SC_BEGIN(iopl)
+	/* XXX: Don't need a full icpustate!
+	 *      sys_iopl_impl() only needs to set %Pflags! */
 	SC_PUSH_ICPUSTATE
 
 	/* Call forward to `sys_iopl_impl()' */

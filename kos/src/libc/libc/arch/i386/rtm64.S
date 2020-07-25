@@ -32,6 +32,7 @@
 
 #include <asm/cfi.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <asm/rtm.h>
 #include <sys/mman.h>
 
@@ -260,7 +261,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 
 	movl   $(7), %eax
 	cpuid
-	testl  $(CPUID_7B_RTM), %ebx
+	ttest  mask=CPUID_7B_RTM, loc=%ebx
 	jz     .Lrtm_begin_modify_not_supported
 #ifdef ENVIRON_HW_RTM
 .Lrtm_begin_modify_supported:

@@ -32,6 +32,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -129,7 +130,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	je     1f
 
 	/* Check if exceptions are propagated to user-space, or kernel-space */
-	testq  $(3), (OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rsp)
+	ttest  mask=3, loc=(OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rsp)
 	jnz    2f
 	/* Kernel-space target! */
 

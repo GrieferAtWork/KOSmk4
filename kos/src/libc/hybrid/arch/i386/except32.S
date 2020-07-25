@@ -23,10 +23,12 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
+#include <asm/cpu-flags.h>
+#include <asm/instr/ttest.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state.h>
-#include <asm/cpu-flags.h>
 
 #ifdef __KERNEL__
 #include <kernel/compiler.h>
@@ -486,9 +488,9 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_def_cfa_register %esp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	/* Check if the interrupt state points into user-space. */
-	testl  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
+	ttest  mask=3, loc=(OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
-	testl  $(EFLAGS_VM), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
+	ttest  mask=EFLAGS_VM, loc=(OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS)(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	/* Another special case: If the interrupt state was re-directed, then we must
 	 *                       load it immediately (and have `x86_rpc_user_redirection'

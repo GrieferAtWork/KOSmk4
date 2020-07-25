@@ -131,7 +131,7 @@ NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 
 
 INTERN pid_t KCALL
-x86_task_clone(struct icpustate const *__restrict init_state,
+x86_clone_impl(struct icpustate const *__restrict init_state,
                uintptr_t clone_flags,
                USER UNCHECKED void *child_stack,
                USER UNCHECKED pid_t *parent_tidptr,
@@ -360,7 +360,7 @@ task_clone64_rpc(void *UNUSED(arg),
 	       reason == TASK_RPC_REASON_SHUTDOWN);
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		pid_t child_tid;
-		child_tid = x86_task_clone(state,
+		child_tid = x86_clone_impl(state,
 		                           sc_info->rsi_regs[0],                         /* clone_flags */
 		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
@@ -408,7 +408,7 @@ task_clone32_rpc(void *UNUSED(arg),
 	       reason == TASK_RPC_REASON_SHUTDOWN);
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		pid_t child_tid;
-		child_tid = x86_task_clone(state,
+		child_tid = x86_clone_impl(state,
 		                           sc_info->rsi_regs[0],                         /* clone_flags */
 		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
@@ -455,7 +455,7 @@ DEFINE_SYSCALL32_5(pid_t, clone,
 INTERN struct icpustate *FCALL
 sys_fork_impl(struct icpustate *__restrict state) {
 	pid_t child_tid;
-	child_tid = x86_task_clone(state,
+	child_tid = x86_clone_impl(state,
 	                           SIGCHLD,
 	                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
 	                           NULL,

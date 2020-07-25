@@ -28,6 +28,7 @@
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/gdt.h>
 
@@ -148,7 +149,7 @@ PUBLIC_FUNCTION(x86_syscall64x64_int80_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
 	            RPC_SYSCALL_INFO_METHOD_INT80H_64)
 	/* Check if exceptions are enabled. */
-	testb  $(EFLAGS_CF), (80 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	ttest  mask=EFLAGS_CF, loc=(80 + OFFSET_IRREGS_RFLAGS)(%rsp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
 1:
@@ -189,7 +190,7 @@ PUBLIC_FUNCTION(x86_syscall64x32_int80_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
 	            RPC_SYSCALL_INFO_METHOD_INT80H_32)
 	/* Check if exceptions are enabled. */
-	testb  $(EFLAGS_CF), (96 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	ttest  mask=EFLAGS_CF, loc=(96 + OFFSET_IRREGS_RFLAGS)(%rsp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
 1:
@@ -331,7 +332,7 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	.cfi_def_cfa %rsp, 0
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testb  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
+	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	intr_exit
@@ -372,7 +373,7 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	.cfi_def_cfa %rsp, 0
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testq  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
+	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	intr_exit

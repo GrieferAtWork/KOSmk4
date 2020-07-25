@@ -33,6 +33,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/instr/interrupt.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/cpu-state64.h>
@@ -492,23 +493,23 @@ INTERN_FUNCTION(_start)
 
 
 	/* Test the LM bit. */
-	testl  $(CPUID_80000001D_LM), %edx
+	ttest  mask=CPUID_80000001D_LM, loc=%edx
 	jz     boot_failure_no_longmode
 
 	/* Test the PAE bit. */
-	testl  $(CPUID_80000001D_PAE), %edx
+	ttest  mask=CPUID_80000001D_PAE, loc=%edx
 //	jz     boot_failure_no_pae
 
 	/* Test the PSE bit. */
-	testl  $(CPUID_80000001D_PSE), %edx
+	ttest  mask=CPUID_80000001D_PSE, loc=%edx
 //	jz     boot_failure_no_pse
 
 	/* Test the CX8 bit. */
-	testl  $(CPUID_80000001D_CX8), %edx
+	ttest  mask=CPUID_80000001D_CX8, loc=%edx
 	CALL_IF_Z(boot_warning_no_cx8)
 
 	/* Test the FXSR bit. */
-	testl  $(CPUID_80000001D_FXSR), %edx
+	ttest  mask=CPUID_80000001D_FXSR, loc=%edx
 	CALL_IF_Z(boot_warning_no_fxsr)
 
 	/* Check if we can extract the brand string from cpuid */
@@ -547,35 +548,35 @@ INTERN_FUNCTION(_start)
 	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1C
 
 	/* Test the MSR bit. */
-	testl  $(CPUID_1D_MSR), %edx
+	ttest  mask=CPUID_1D_MSR, loc=%edx
 	jz     boot_failure_no_msr
 
 	/* Check for SSE support */
-	testl  $(CPUID_1D_SSE), %edx
+	ttest  mask=CPUID_1D_SSE, loc=%edx
 	CALL_IF_Z(boot_warning_no_sse)
 
 	/* Check for SSE2 support */
-	testl  $(CPUID_1D_SSE2), %edx
+	ttest  mask=CPUID_1D_SSE2, loc=%edx
 	CALL_IF_Z(boot_warning_no_sse2)
 
 	/* Check for MMX support */
-	testl  $(CPUID_1D_MMX), %edx
+	ttest  mask=CPUID_1D_MMX, loc=%edx
 	CALL_IF_Z(boot_warning_no_mmx)
 
 	/* Check for FPU support */
-	testl  $(CPUID_1D_FPU), %edx
+	ttest  mask=CPUID_1D_FPU, loc=%edx
 	CALL_IF_Z(boot_warning_no_fpu)
 
 	/* Check for TSC support */
-	testl  $(CPUID_1D_TSC), %edx
+	ttest  mask=CPUID_1D_TSC, loc=%edx
 	CALL_IF_Z(boot_warning_no_tsc)
 
 	/* Check for CMOV support */
-	testl  $(CPUID_1D_CMOV), %edx
+	ttest  mask=CPUID_1D_CMOV, loc=%edx
 	CALL_IF_Z(boot_warning_no_cmov)
 
 	/* Check for PGE support */
-	testl  $(CPUID_1D_PGE), %edx
+	ttest  mask=CPUID_1D_PGE, loc=%edx
 	jnz    1f
 	EXTERN(used_pxx_page_fglobal)
 	movl   $(0), V2P(used_pxx_page_fglobal)
@@ -586,7 +587,7 @@ INTERN_FUNCTION(_start)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
-	testl  $(CPUID_1D_SEP), %edx
+	ttest  mask=CPUID_1D_SEP, loc=%edx
 	jz     1f
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_FAMILY_M), %ecx
@@ -687,17 +688,17 @@ INTERN_FUNCTION(_start)
 	orl    $(CR4_PSE | CR4_PAE), %eax
 
 	/* Enable PGE if supported by the host (optional feature) */
-	testl  $(CPUID_1D_PGE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D
+	ttest  mask=CPUID_1D_PGE, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D)
 	jz     1f
 	orl    $(CR4_PGE), %eax
 1:
 	/* Enable SMAP if supported by the host (optional feature) */
-	testl  $(CPUID_7B_SMEP), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B
+	ttest  mask=CPUID_7B_SMEP, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %eax
 1:
 	/* Enable FSGSBASE if supported by the host (emulated if unsupported) */
-	testl  $(CPUID_7B_FSGSBASE), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B
+	ttest  mask=CPUID_7B_FSGSBASE, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_FSGSBASE), %eax
 1:
@@ -710,10 +711,10 @@ INTERN_FUNCTION(_start)
 	orl    $(IA32_EFER_LME), %eax /* LongModeEnabled */
 	/* Since we're already here, try to enable some other long-mode extensions,
 	 * such as the NXE bit, as well as SCE (SysCallExtensions) */
-	testl  $(CPUID_80000001D_NX), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D
+	ttest  mask=CPUID_80000001D_NX, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D)
 	jz     1f
 	orl    $(IA32_EFER_NXE), %eax
-1:	testl  $(CPUID_80000001D_SYSCALL), V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D
+1:	ttest  mask=CPUID_80000001D_SYSCALL, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D)
 	jz     1f
 	orl    $(IA32_EFER_SCE), %eax
 1:	wrmsr  /* Save the new configuration. */

@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 
 #include <asm/cfi.h>
+#include <asm/instr/ttest.h>
 #include <kos/kernel/gdt.h>
 
 #include <errno.h>
@@ -110,7 +111,7 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
 	            RPC_SYSCALL_INFO_METHOD_INT80H_32)
 	/* Check if exceptions are enabled. */
-	testb  $(EFLAGS_CF), (48 + OFFSET_IRREGS_EFLAGS)(%esp)
+	ttest  mask=EFLAGS_CF, loc=(48 + OFFSET_IRREGS_EFLAGS)(%esp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%esp)
 1:
@@ -219,7 +220,7 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	.cfi_def_cfa %esp, 0
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testl  $(EFLAGS_CF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
+	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
 	jnz    1f
 	movl   $(-ENOSYS), %eax
 	iret

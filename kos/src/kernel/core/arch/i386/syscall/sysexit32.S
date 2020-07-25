@@ -26,6 +26,7 @@
 #include <kernel/syscall.h>
 
 #include <asm/cfi.h>
+#include <asm/instr/ttest.h>
 
 
 /************************************************************************/
@@ -53,7 +54,7 @@ PUBLIC_FUNCTION(__i386_syscall_iret)
 	jne    .Ldo_iret
 
 	/* When returning to vm86, we also cannot make use of `sysexit' */
-	testl  $(EFLAGS_VM), OFFSET_IRREGS_EFLAGS(%esp)
+	ttest  mask=EFLAGS_VM, loc=OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    .Ldo_iret
 
 	/* Technically, we'd also have to check for EFLAGS_IF being set,
