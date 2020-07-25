@@ -63,8 +63,8 @@
 DECL_BEGIN
 
 #define WORD64(a, b) (u64)((u64)(u32)(a) | (u64)(u32)(b) << 32)
-PUBLIC struct atomic64 x86_user_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF), 0));
-PUBLIC struct atomic64 x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLAGS_IOPLMASK), 0));
+PUBLIC atomic64_t x86_user_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF), 0));
+PUBLIC atomic64_t x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLAGS_IOPLMASK), 0));
 #undef WORD64
 
 /* TODO: Kernel commandline options:

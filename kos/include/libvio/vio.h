@@ -221,16 +221,17 @@ struct vio_operators {
 	 * >> void *vio_base;
 	 * >> vio_base = mmap(NULL, 0x1000, PROT_READ | PROT_EXEC, MAP_PRIVATE, vio_fd, 0);
 	 * >>
-	 * >> kernel_function = (int(*)(int, int))((byte_t *)vio_base + 1234);
+	 * >> int (*vio_function)(int, int);
+	 * >> *(void **)&vio_function = (byte_t *)vio_base + 1234;
 	 * >>
-	 * >> // This function will invoke `vo_call(..., REGS, 1234)'
-	 * >> // REGS: (user-space register state; assuming x86)
-	 * >> //    PC: ADDROF(printf)
-	 * >> //    SP: { int: 10, int: 20 }
-	 * >> // `vo_call' can then assign the EAX register in `args' (again: assuming x86),
+	 * >> // This function will invoke `vo_call(ARGS, 1234)'
+	 * >> // vio_args_getstate(): (user-space register state; assuming i386)
+	 * >> //    eip: RETURN_ADDRESS (here: ADDR_OF(ASSIGNMENT_TO_X))
+	 * >> //    esp: [+0: (int)10, +4: (int)20]
+	 * >> // `vo_call' can then assign the EAX register in `args' (again: assuming i386),
 	 * >> // which is the value that's going to be returned to user-space and be assigned
 	 * >> // to `x', before being printed.
-	 * >> int x = (*kernel_function)(10, 20);
+	 * >> int x = (*vio_function)(10, 20);
 	 * >>
 	 * >> printf("x = %d\n", x); */
 	void (LIBVIO_CC *vo_call)(struct vio_args *__restrict args, vio_addr_t addr);

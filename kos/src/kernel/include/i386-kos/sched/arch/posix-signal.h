@@ -47,13 +47,13 @@ union x86_user_eflags_mask {
 	uint64_t uem_word;
 };
 
-DATDEF struct atomic64 x86_user_eflags_mask;
+DATDEF atomic64_t x86_user_eflags_mask;
 /* Same as `x86_user_eflags_mask', but used during exec()
  * May be set by:
  *  - Passing a `exec_eflags_mask=mask,flag' kernel commandline option
  *  - Reading/writing to/from `/proc/sys/x86/exec_eflags_mask'
  *  - Reading/writing to/from `/proc/sys/x86/keepiopl/exec' */
-DATDEF struct atomic64 x86_exec_eflags_mask;
+DATDEF atomic64_t x86_exec_eflags_mask;
 
 DECL_END
 #endif /* __CC__ */

@@ -76,7 +76,8 @@ null_pwrite(struct character_device *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 null_poll(struct character_device *__restrict UNUSED(self),
-          poll_mode_t what) {
+          poll_mode_t what)
+		THROWS(...) {
 	return what;
 }
 
@@ -190,7 +191,6 @@ port_pwrite(struct character_device *__restrict UNUSED(self),
 PRIVATE NONNULL((1, 2)) void KCALL
 port_open(struct character_device *__restrict UNUSED(self),
           struct handle *__restrict UNUSED(hand)) THROWS(...) {
-	/* XXX: Maybe just restrict on a per-port basis? */
 	require(CAP_SYS_RAWIO);
 }
 
@@ -228,7 +228,8 @@ urandom_pread(struct character_device *__restrict self,
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 urandom_poll(struct character_device *__restrict UNUSED(self),
-             poll_mode_t what) {
+             poll_mode_t what)
+		THROWS(...) {
 	return what & POLLIN;
 }
 
@@ -280,7 +281,8 @@ random_pread(struct character_device *__restrict self,
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 random_poll(struct character_device *__restrict UNUSED(self),
-            poll_mode_t what) {
+            poll_mode_t what)
+		THROWS(...) {
 	/* TODO: Wait for non-deterministic random data to become available! */
 	return what & POLLIN;
 }
@@ -295,7 +297,8 @@ kmsg_write(struct character_device *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 kmsg_poll(struct character_device *__restrict UNUSED(self),
-          poll_mode_t what) {
+          poll_mode_t what)
+		THROWS(...) {
 	return what & POLLOUT;
 }
 
@@ -357,30 +360,37 @@ port_mmap(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE u8 KCALL
-random_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+random_rdb(struct vio_args *__restrict UNUSED(args),
+           pos_t UNUSED(addr)) {
 	return krand8_nondeterministic();
 }
 
 PRIVATE u16 KCALL
-random_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+random_rdw(struct vio_args *__restrict UNUSED(args),
+           pos_t UNUSED(addr)) {
 	return krand16_nondeterministic();
 }
 
 PRIVATE u32 KCALL
-random_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+random_rdl(struct vio_args *__restrict UNUSED(args),
+           pos_t UNUSED(addr)) {
 	return krand32_nondeterministic();
 }
 
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 PRIVATE u64 KCALL
-random_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
+random_rdq(struct vio_args *__restrict UNUSED(args),
+           pos_t UNUSED(addr)) {
 	return ((u64)krand32_nondeterministic()) |
 	       ((u64)krand32_nondeterministic() << 32);
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
 PRIVATE struct vio_operators const random_vio =
-VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb, &random_rdw, &random_rdl, &random_rdq),
+VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb,
+                                          &random_rdw,
+                                          &random_rdl,
+                                          &random_rdq),
                    VIO_CALLBACK_INIT_WRITE(NULL, NULL, NULL, NULL));
 PRIVATE struct vm_datablock random_datablock = VM_DATABLOCK_INIT_VIO(&random_vio);
 

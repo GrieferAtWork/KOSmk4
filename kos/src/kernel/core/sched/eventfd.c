@@ -50,7 +50,7 @@ REF struct eventfd *KCALL eventfd_create(u64 value) THROWS(E_BADALLOC) {
 	result = (struct eventfd *)kmalloc(sizeof(struct eventfd), GFP_NORMAL);
 	result->ef_refcnt = 1;
 	sig_init(&result->ef_signal);
-	atomic64_init(&result->ef_value, value);
+	result->ef_value = value;
 	return result;
 }
 

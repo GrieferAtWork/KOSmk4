@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,80 +38,99 @@
 #include <sched/atomic64.h>
 
 #include <asm/cpu-cpuid.h>
+#include <asm/intrin.h>
 
 #include <assert.h>
+#include <string.h>
 
 DECL_BEGIN
 
-INTDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_read)(struct atomic64 *__restrict self);
-INTDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_read_r)(struct atomic64 *__restrict self);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) void NOTHROW(FCALL emulated_atomic64_write)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) void NOTHROW(FCALL emulated_atomic64_write_r)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) bool NOTHROW(FCALL emulated_atomic64_cmpxch)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) bool NOTHROW(FCALL emulated_atomic64_cmpxch_r)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_cmpxch_val)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_cmpxch_val_r)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_xch)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_xch_r)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchadd)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchadd_r)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchand)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchand_r)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchor)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchor_r)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchxor)(struct atomic64 *__restrict self, u64 value);
-INTDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL emulated_atomic64_fetchxor_r)(struct atomic64 *__restrict self, u64 value);
-
-LOCAL ATTR_FREETEXT NOBLOCK void
-NOTHROW(FCALL install_jmp)(void *redirection_addr,
-                           void const *redirection_target) {
-	byte_t *dst = (byte_t *)redirection_addr;
-	*(u8 *)(dst + 0) = 0xe9;
-	*(s32 *)(dst + 1) = ((s32)(uintptr_t)redirection_target -
-	                     (s32)(uintptr_t)(dst + 5));
-}
+extern byte_t __i386_atomic64_read[];
+extern byte_t __i386_atomic64_write[];
+extern byte_t __i386_atomic64_cmpxch[];
+extern byte_t __i386_atomic64_xch[];
+extern byte_t __i386_atomic64_fetchadd[];
+extern byte_t __i386_atomic64_fetchand[];
+extern byte_t __i386_atomic64_fetchor[];
+extern byte_t __i386_atomic64_fetchxor[];
 
 
+/* i386-specific atomic64 ABI cmpxchg8b-specific implementation. */
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_read[] = {
+	0x89, 0xc3,       /*     movl   %eax, %ebx  */
+	0x89, 0xd1,       /*     movl   %edx, %ecx  */
+	0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)   */
+	0xc3,             /*     ret                */
+};
+
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_cmpxch[] = {
+	0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)   */
+	0xc3,             /*     ret                */
+};
+
+/* also used for `__i386_atomic64_write' */
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_xch[] = {
+	0x0f, 0xc7, 0x0f, /* 1:  cmpxchg8b (%edi)   */
+	0x75, 0xfb,       /*     jne    1b          */
+	0xc3,             /*     ret                */
+};
+
+#define I386_CMPXCHG8B_FETCHxxx(lo_opcode_, hi_opcode_) \
+	{                                                   \
+		0x55,             /*     pushl  %ebp       */   \
+		0x56,             /*     pushl  %esi       */   \
+		0x89, 0xdd,       /*     movl   %ebx, %ebp */   \
+		0x89, 0xce,       /*     movl   %ecx, %esi */   \
+		0x89, 0xd8,       /*     movl   %ebx, %eax */   \
+		0x89, 0xca,       /*     movl   %ecx, %edx */   \
+		0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)  */   \
+		lo_opcode_, 0xc3, /* 1:  <lo>l  %eax, %ebx */   \
+		hi_opcode_, 0xd1, /*     <hi>l  %edx, %ecx */   \
+		0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)  */   \
+		0x75, 0x03,       /*     jne    2f         */   \
+		0x5e,             /*     popl   %esi       */   \
+		0x5d,             /*     popl   %ebp       */   \
+		0xc3,             /*     ret               */   \
+		0x89, 0xeb,       /* 2:  movl   %ebp, %ebx */   \
+		0x89, 0xf1,       /*     movl   %esi, %ecx */   \
+		0xeb, 0xee,       /*     jmp    1b         */   \
+	}
+
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_fetchadd[] = I386_CMPXCHG8B_FETCHxxx(0x01, 0x11); /* addl, adcl */
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_fetchand[] = I386_CMPXCHG8B_FETCHxxx(0x21, 0x21); /* andl, andl */
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_fetchor[]  = I386_CMPXCHG8B_FETCHxxx(0x09, 0x09); /* orl,  orl  */
+PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_fetchxor[] = I386_CMPXCHG8B_FETCHxxx(0x31, 0x31); /* xorl, xorl */
+#undef I386_CMPXCHG8B_FETCHxxx
 
 /* Initialize the atomic64 configuration */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_atomic64)(void) {
 	if (X86_HAVE_CMPXCHG8B) {
 		/* Machine has native 64-bit atomic support. */
-	} else {
-		/* Must use the 64-bit atomic emulation. */
-		install_jmp((void *)&atomic64_read, (void *)&emulated_atomic64_read);
-		install_jmp((void *)&atomic64_read_r, (void *)&emulated_atomic64_read_r);
-		install_jmp((void *)&atomic64_write, (void *)&emulated_atomic64_write);
-		install_jmp((void *)&atomic64_write_r, (void *)&emulated_atomic64_write_r);
-		install_jmp((void *)&atomic64_cmpxch, (void *)&emulated_atomic64_cmpxch);
-		install_jmp((void *)&atomic64_cmpxch_r, (void *)&emulated_atomic64_cmpxch_r);
-		install_jmp((void *)&atomic64_cmpxch_val, (void *)&emulated_atomic64_cmpxch_val);
-		install_jmp((void *)&atomic64_cmpxch_val_r, (void *)&emulated_atomic64_cmpxch_val_r);
-		install_jmp((void *)&atomic64_xch, (void *)&emulated_atomic64_xch);
-		install_jmp((void *)&atomic64_xch_r, (void *)&emulated_atomic64_xch_r);
-		install_jmp((void *)&atomic64_fetchadd, (void *)&emulated_atomic64_fetchadd);
-		install_jmp((void *)&atomic64_fetchadd_r, (void *)&emulated_atomic64_fetchadd_r);
-		install_jmp((void *)&atomic64_fetchand, (void *)&emulated_atomic64_fetchand);
-		install_jmp((void *)&atomic64_fetchand_r, (void *)&emulated_atomic64_fetchand_r);
-		install_jmp((void *)&atomic64_fetchor, (void *)&emulated_atomic64_fetchor);
-		install_jmp((void *)&atomic64_fetchor_r, (void *)&emulated_atomic64_fetchor_r);
-		install_jmp((void *)&atomic64_fetchxor, (void *)&emulated_atomic64_fetchxor);
-		install_jmp((void *)&atomic64_fetchxor_r, (void *)&emulated_atomic64_fetchxor_r);
+		memcpy(__i386_atomic64_read, __i386_cmpxchg8b_read, sizeof(__i386_cmpxchg8b_read));
+		memcpy(__i386_atomic64_write, __i386_cmpxchg8b_xch, sizeof(__i386_cmpxchg8b_xch));
+		memcpy(__i386_atomic64_cmpxch, __i386_cmpxchg8b_cmpxch, sizeof(__i386_cmpxchg8b_cmpxch));
+		memcpy(__i386_atomic64_xch, __i386_cmpxchg8b_xch, sizeof(__i386_cmpxchg8b_xch));
+		memcpy(__i386_atomic64_fetchadd, __i386_cmpxchg8b_fetchadd, sizeof(__i386_cmpxchg8b_fetchadd));
+		memcpy(__i386_atomic64_fetchand, __i386_cmpxchg8b_fetchand, sizeof(__i386_cmpxchg8b_fetchand));
+		memcpy(__i386_atomic64_fetchor, __i386_cmpxchg8b_fetchor, sizeof(__i386_cmpxchg8b_fetchor));
+		memcpy(__i386_atomic64_fetchxor, __i386_cmpxchg8b_fetchxor, sizeof(__i386_cmpxchg8b_fetchxor));
+		__flush_instruction_cache();
 	}
 
 #if !defined(NDEBUG) && 1
 	{
-		struct atomic64 a = ATOMIC64_INIT(16);
-		assertf(atomic64_read(&a) == 16, "%I64u", a.a_value);
+		atomic64_t a = ATOMIC64_INIT(16);
+		assertf(atomic64_read(&a) == 16, "%I64u", __atomic64_val(a));
 		atomic64_write(&a, 12);
-		assertf(atomic64_read(&a) == 12, "%I64u", a.a_value);
-		assertf(atomic64_cmpxch_val(&a, 12, 14) == 12, "%I64u", a.a_value);
-		assertf(atomic64_cmpxch_val(&a, 12, 14) == 14, "%I64u", a.a_value);
-		assertf(atomic64_cmpxch(&a, 14, 13) == true, "%I64u", a.a_value);
-		assertf(atomic64_cmpxch(&a, 14, 13) == false, "%I64u", a.a_value);
-		assertf(atomic64_fetchadd(&a, 7) == 13, "%I64u", a.a_value);
-		assertf(atomic64_read(&a) == 20, "%I64u", a.a_value);
+		assertf(atomic64_read(&a) == 12, "%I64u", __atomic64_val(a));
+		assertf(atomic64_cmpxch_val(&a, 12, 14) == 12, "%I64u", __atomic64_val(a));
+		assertf(atomic64_cmpxch_val(&a, 12, 14) == 14, "%I64u", __atomic64_val(a));
+		assertf(atomic64_cmpxch(&a, 14, 13) == true, "%I64u", __atomic64_val(a));
+		assertf(atomic64_cmpxch(&a, 14, 13) == false, "%I64u", __atomic64_val(a));
+		assertf(atomic64_read(&a) == 13, "%I64u", __atomic64_val(a));
+		assertf(atomic64_fetchadd(&a, 7) == 13, "%I64u", __atomic64_val(a));
+		assertf(atomic64_read(&a) == 20, "%I64u", __atomic64_val(a));
 	}
 #endif
 }

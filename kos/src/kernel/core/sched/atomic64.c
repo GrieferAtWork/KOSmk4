@@ -24,226 +24,187 @@
 #include <kernel/types.h>
 #include <sched/atomic64.h>
 
-#ifdef CONFIG_ATOMIC64_SUPPORT_DYNAMIC
-#include <stdbool.h>
+#ifndef CONFIG_ATOMIC64_SUPPORT_ALWAYS
+#ifndef ARCH_ATOMIC64_HAVE_PROTOTYPES
+#include <sched/cpu.h>
 #include <sched/task.h>
+
+#include <hybrid/sync/atomic-rwlock.h>
+
+#include <stdbool.h>
 
 DECL_BEGIN
 
-INTERN NOBLOCK ATTR_LEAF WUNUSED ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_read)(struct atomic64 *__restrict self) {
-	u64 result;
-	atomic_rwlock_read(&self->a_lock);
-	result = self->a_value;
-	atomic_rwlock_endread(&self->a_lock);
-	return result;
+#ifdef CONFIG_ATOMIC64_SUPPORT_DYNAMIC
+#define DECL       INTERN
+#define FUNC(name) emulated_##name
+#else /* CONFIG_ATOMIC64_SUPPORT_DYNAMIC */
+#define DECL       PUBLIC
+#define FUNC(name) name
+#endif /* !CONFIG_ATOMIC64_SUPPORT_DYNAMIC */
+
+
+
+#ifndef CONFIG_NO_SMP
+/* >> CONFIG_ATOMIC64_LOG2_LOCK_COUNT == log2(LOCK_COUNT) */
+#ifndef CONFIG_ATOMIC64_LOG2_LOCK_COUNT
+#define CONFIG_ATOMIC64_LOG2_LOCK_COUNT 4
+#endif /* !CONFIG_ATOMIC64_LOG2_LOCK_COUNT */
+
+PRIVATE struct atomic_rwlock locks[1 << CONFIG_ATOMIC64_LOG2_LOCK_COUNT] = {
+	ATOMIC_RWLOCK_INIT,
+};
+
+PRIVATE NOBLOCK ATTR_CONST WUNUSED struct atomic_rwlock *
+NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
+#if CONFIG_ATOMIC64_LOG2_LOCK_COUNT == 4
+	u16 index;
+	/* Only use the bottom 16 bits for indexing. */
+	index = (u16)(uintptr_t)self;
+	index = index >> 8;
+	index = index >> 4;
+#else /* CONFIG_ATOMIC64_LOG2_LOCK_COUNT == ... */
+#error "Unsupported `CONFIG_ATOMIC64_LOG2_LOCK_COUNT'"
+#endif /* CONFIG_ATOMIC64_LOG2_LOCK_COUNT != ... */
+	return &locks[index];
 }
+#endif /* !CONFIG_NO_SMP */
 
-INTERN NOBLOCK ATTR_LEAF WUNUSED ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_read_r)(struct atomic64 *__restrict self) {
-	u64 result;
-	pflag_t was = PREEMPTION_PUSHOFF();
-	atomic_rwlock_read(&self->a_lock);
-	result = self->a_value;
-	atomic_rwlock_endread(&self->a_lock);
-	PREEMPTION_POP(was);
-	return result;
-}
 
-#define atomic64_lock(self)     atomic_rwlock_write(&(self)->a_lock)
-#define atomic64_unlock(self)   atomic_rwlock_endwrite(&(self)->a_lock)
-
-#define REENTRANT_BEGIN \
-	{                   \
-		pflag_t _was = PREEMPTION_PUSHOFF();
-#define REENTRANT_END         \
+#ifdef CONFIG_NO_SMP
+#define _LOCK_EX(...) \
+	do {              \
+		pflag_t _was; \
+		_was = PREEMPTION_PUSHOFF()
+#define _UNLOCK_EX(...)       \
 		PREEMPTION_POP(_was); \
-	}
+	}	__WHILE0
+#else /* CONFIG_NO_SMP */
+#define _LOCK_EX(self, tryacquire)                          \
+	do {                                                    \
+		pflag_t _was                = PREEMPTION_PUSHOFF(); \
+		struct atomic_rwlock *_lock = lockfor(self);        \
+		while unlikely_untraced(!tryacquire(_lock))         \
+			task_pause()
+#define _UNLOCK_EX(release)   \
+		release(_lock);       \
+		PREEMPTION_POP(_was); \
+	}	__WHILE0
+#endif /* !CONFIG_NO_SMP */
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) void
-NOTHROW(FCALL emulated_atomic64_write)(struct atomic64 *__restrict self, u64 value) {
-	atomic64_lock(self);
-	self->a_value = value;
-	atomic64_unlock(self);
+#define LOCK_RD(self)                      \
+	_LOCK_EX(self, atomic_rwlock_tryread); \
+	COMPILER_READ_BARRIER()
+#define LOCK_WR(self)                       \
+	_LOCK_EX(self, atomic_rwlock_trywrite); \
+	COMPILER_WRITE_BARRIER()
+#define UNLOCK_RD()          \
+	COMPILER_READ_BARRIER(); \
+	_UNLOCK_EX(atomic_rwlock_endread)
+#define UNLOCK_WR()           \
+	COMPILER_WRITE_BARRIER(); \
+	_UNLOCK_EX(atomic_rwlock_endwrite)
+
+
+DECL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_read))(atomic64_t *__restrict self) {
+	u64 result;
+	LOCK_RD(self);
+	result = __atomic64_val(*self);
+	UNLOCK_RD();
+	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) void
-NOTHROW(FCALL emulated_atomic64_write_r)(struct atomic64 *__restrict self, u64 value) {
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	self->a_value = value;
-	atomic64_unlock(self);
-	REENTRANT_END
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) void
+NOTHROW(FCALL FUNC(atomic64_write))(atomic64_t *__restrict self,
+                                    u64 value) {
+	LOCK_WR(self);
+	__atomic64_val(*self) = value;
+	UNLOCK_WR();
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) bool
-NOTHROW(FCALL emulated_atomic64_cmpxch)(struct atomic64 *__restrict self,
-                                        u64 oldval, u64 newval) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) bool
+NOTHROW(FCALL FUNC(atomic64_cmpxch))(atomic64_t *__restrict self,
+                                     u64 oldval, u64 newval) {
 	bool result;
-	atomic64_lock(self);
-	result = self->a_value == oldval;
+	LOCK_RD(self);
+	result = __atomic64_val(*self) == oldval;
 	if (result)
-		self->a_value = newval;
-	atomic64_unlock(self);
+		__atomic64_val(*self) = newval;
+	UNLOCK_WR();
 	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) bool
-NOTHROW(FCALL emulated_atomic64_cmpxch_r)(struct atomic64 *__restrict self,
-                                          u64 oldval, u64 newval) {
-	bool result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value == oldval;
-	if (result)
-		self->a_value = newval;
-	atomic64_unlock(self);
-	REENTRANT_END
-	return result;
-}
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_cmpxch_val)(struct atomic64 *__restrict self,
-                                            u64 oldval, u64 newval) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_cmpxch_val))(atomic64_t *__restrict self,
+                                         u64 oldval, u64 newval) {
 	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
+	LOCK_RD(self);
+	result = __atomic64_val(*self);
 	if (result == oldval)
-		self->a_value = newval;
-	atomic64_unlock(self);
+		__atomic64_val(*self) = newval;
+	UNLOCK_WR();
 	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_cmpxch_val_r)(struct atomic64 *__restrict self,
-                                              u64 oldval, u64 newval) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_xch))(atomic64_t *__restrict self,
+                                  u64 value) {
 	u64 result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value;
-	if (result == oldval)
-		self->a_value = newval;
-	atomic64_unlock(self);
-	REENTRANT_END
+	LOCK_RD(self);
+	result        = __atomic64_val(*self);
+	__atomic64_val(*self) = value;
+	UNLOCK_WR();
 	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_xch)(struct atomic64 *__restrict self, u64 value) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_fetchadd))(atomic64_t *__restrict self,
+                                       u64 value) {
 	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = value;
-	atomic64_unlock(self);
+	LOCK_RD(self);
+	result        = __atomic64_val(*self);
+	__atomic64_val(*self) = result + value;
+	UNLOCK_WR();
 	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_xch_r)(struct atomic64 *__restrict self, u64 value) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_fetchand))(atomic64_t *__restrict self,
+                                       u64 value) {
 	u64 result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = value;
-	atomic64_unlock(self);
-	REENTRANT_END
+	LOCK_RD(self);
+	result        = __atomic64_val(*self);
+	__atomic64_val(*self) = result & value;
+	UNLOCK_WR();
 	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchadd)(struct atomic64 *__restrict self, u64 value) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_fetchor))(atomic64_t *__restrict self,
+                                      u64 value) {
 	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result + value;
-	atomic64_unlock(self);
+	LOCK_RD(self);
+	result        = __atomic64_val(*self);
+	__atomic64_val(*self) = result | value;
+	UNLOCK_WR();
 	return result;
 }
 
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchadd_r)(struct atomic64 *__restrict self, u64 value) {
+DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_fetchxor))(atomic64_t *__restrict self,
+                                       u64 value) {
 	u64 result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result + value;
-	atomic64_unlock(self);
-	REENTRANT_END
+	LOCK_RD(self);
+	result        = __atomic64_val(*self);
+	__atomic64_val(*self) = result ^ value;
+	UNLOCK_WR();
 	return result;
 }
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchand)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result & value;
-	atomic64_unlock(self);
-	return result;
-}
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchand_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result & value;
-	atomic64_unlock(self);
-	REENTRANT_END
-	return result;
-}
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchor)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result | value;
-	atomic64_unlock(self);
-	return result;
-}
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchor_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result | value;
-	atomic64_unlock(self);
-	REENTRANT_END
-	return result;
-}
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchxor)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result ^ value;
-	atomic64_unlock(self);
-	return result;
-}
-
-INTERN NOBLOCK ATTR_LEAF ATTR_NOINLINE NONNULL((1)) u64
-NOTHROW(FCALL emulated_atomic64_fetchxor_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result ^ value;
-	atomic64_unlock(self);
-	REENTRANT_END
-	return result;
-}
-
-
-
-
 
 DECL_END
 
-#endif /* CONFIG_ATOMIC64_SUPPORT_DYNAMIC */
+#endif /* !ARCH_ATOMIC64_HAVE_PROTOTYPES */
+#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_ATOMIC64_C */

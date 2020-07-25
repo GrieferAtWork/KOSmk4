@@ -307,7 +307,7 @@ inode_get_file_creds(struct inode *__restrict program_inode,
 
 /* Remove from the set of effective caps */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cred_turnoff_special_fsuid_caps)(struct cred *__restrict self) {
+NOTHROW(FCALL cred_turn_off_special_fsuid_caps)(struct cred *__restrict self) {
 #define CLEAR_FROM_EFFECTIVE(cap) \
 	credcap_turnoff(&self->c_cap_effective, cap);
 	FOREACH_SPECIAL_FSUID_CAPS(CLEAR_FROM_EFFECTIVE);
@@ -374,7 +374,7 @@ cred_onexec(struct inode *__restrict program_inode)
 				}
 				if (self->c_fsuid == 0 && new_euid != 0) {
 					/* Remove from the set of effective caps */
-					cred_turnoff_special_fsuid_caps(self);
+					cred_turn_off_special_fsuid_caps(self);
 				} else if (self->c_fsuid != 0 && new_euid == 0) {
 					/* Copy from permitted to effective caps */
 					cred_restore_special_fsuid_caps(self);
@@ -476,7 +476,7 @@ cred_setuid(uid_t ruid, uid_t euid,
 		}
 		if (self->c_fsuid == 0 && fsuid != 0) {
 			/* Remove from the set of effective caps */
-			cred_turnoff_special_fsuid_caps(self);
+			cred_turn_off_special_fsuid_caps(self);
 		} else if (self->c_fsuid != 0 && fsuid == 0) {
 			/* Copy from permitted to effective caps */
 			cred_restore_special_fsuid_caps(self);

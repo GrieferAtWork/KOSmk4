@@ -45,7 +45,7 @@
  */
 
 
-/* TODO: Also use `struct atomic64' for `struct fs::f_mode'
+/* TODO: Also use `atomic64_t' for `struct fs::f_mode'
  *       Then gcc can stop generating fpu-instructions to facilitate atomic reads/writes */
 
 #if (defined(CONFIG_ATOMIC64_SUPPORT_ALWAYS) + \
@@ -54,293 +54,114 @@
 #error "Invalid arch-specific atomic64 support configuration"
 #endif
 
-
-#ifndef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-#include <hybrid/sync/atomic-rwlock.h>
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-
-#ifdef CONFIG_ATOMIC64_SUPPORT_NEVER
-#include <sched/task.h> /* PREEMPTION_PUSHOFF() */
-#endif /* !CONFIG_ATOMIC64_SUPPORT_NEVER */
-
 DECL_BEGIN
 
 #ifdef __CC__
-struct atomic64 {
-	WEAK u64             a_value; /* The atomic value */
-#ifndef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-	struct atomic_rwlock a_lock;  /* Lock for `a_value'. */
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-};
 
-#ifndef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-#define atomic64_init(self, v) \
-	((self)->a_value = (v),    \
-	 atomic_rwlock_init(&(self)->a_lock))
-#define atomic64_cinit(self, v)             \
-	(__hybrid_assert((self)->a_value == 0), \
-	 (__builtin_constant_p(v) && (v) == 0)  \
-	 ? (void)0                              \
-	 : (void)((self)->a_value = (v)),       \
-	 atomic_rwlock_cinit(&(self)->a_lock))
-#define ATOMIC64_INIT(v) { v, ATOMIC_RWLOCK_INIT }
-#else /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-#define atomic64_init(self, v) \
-	((self)->a_value = (v))
-#define atomic64_cinit(self, v)             \
-	(__hybrid_assert((self)->a_value == 0), \
-	 (__builtin_constant_p(v) && (v) == 0)  \
-	 ? (void)0                              \
-	 : (void)((self)->a_value = (v)))
+#ifndef __atomic64_t_defined
+#define __atomic64_t_defined 1
+#ifdef __INTELLISENSE__
+typedef struct {
+	u64 _a_val;
+} atomic64_t;
+#define __atomic64_val(self) (self)._a_val
 #define ATOMIC64_INIT(v) { v }
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#else /* __INTELLISENSE__ */
+typedef u64 atomic64_t;
+#define __atomic64_val(self) self
+#define ATOMIC64_INIT(v) v
+#endif /* !__INTELLISENSE__ */
 
-/* NOTE: The *_r variants must (consistently) be used with some given atomic64
- *       value when that value has to be accessible from interrupt handlers,
- *       meaning that these variants are re-entrant.
- *       This is done by disabling preemption before locking the internal lock
- *       when this has to be done, thus preventing interrupts from happening
- *       while modifying the atomic value.
- *       As such, if you know that preemption is currently disabled, you may
- *       also use the non-reentrant variants, and still be guarantied that the
- *       code will end up being reentrant.
- * NOTE: The read/write functions may be used to guaranty that reads/writes
+#define atomic64_init(self, v) (void)(__atomic64_val(*(self)) = (v))
+#define atomic64_cinit(self, v)                     \
+	(__hybrid_assert(__atomic64_val(*(self)) == 0), \
+	 (__builtin_constant_p(v) && (v) == 0)          \
+	 ? (void)0                                      \
+	 : (void)(__atomic64_val(*(self)) = (v)))
+#endif /* !__atomic64_t_defined */
+
+/* NOTE: The read/write functions may be used to guaranty that reads/writes
  *       always return whole values in regards to other reads/writes to the
- *       same memory location. */
+ *       same memory location that are also made using the atomic64* APIs. */
 
-#if defined(CONFIG_ATOMIC64_SUPPORT_ALWAYS)
+#ifndef ARCH_ATOMIC64_HAVE_PROTOTYPES
+#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
 
-#define atomic64_read(self)                         __hybrid_atomic_load((self)->a_value, __ATOMIC_SEQ_CST)
-#define atomic64_write(self, value)                 __hybrid_atomic_store((self)->a_value, value, __ATOMIC_SEQ_CST)
-#define atomic64_cmpxch(self, oldval, newval)       __hybrid_atomic_cmpxch((self)->a_value, oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define atomic64_cmpxch_val(self, oldval, newval)   __hybrid_atomic_cmpxch_val((self)->a_value, oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define atomic64_xch(self, value)                   __hybrid_atomic_xch((self)->a_value, value, __ATOMIC_SEQ_CST)
-#define atomic64_fetchadd(self, value)              __hybrid_atomic_fetchadd((self)->a_value, value, __ATOMIC_SEQ_CST)
-#define atomic64_fetchand(self, value)              __hybrid_atomic_fetchand((self)->a_value, value, __ATOMIC_SEQ_CST)
-#define atomic64_fetchor(self, value)               __hybrid_atomic_fetchor((self)->a_value, value, __ATOMIC_SEQ_CST)
-#define atomic64_fetchxor(self, value)              __hybrid_atomic_fetchxor((self)->a_value, value, __ATOMIC_SEQ_CST)
-#define atomic64_read_r(self)                       atomic64_read(self)
-#define atomic64_write_r(self, value)               atomic64_write(self, value)
-#define atomic64_cmpxch_r(self, oldval, newval)     atomic64_cmpxch(self, oldval, newval)
-#define atomic64_cmpxch_val_r(self, oldval, newval) atomic64_cmpxch_val(self, oldval, newval)
-#define atomic64_xch_r(self, value)                 atomic64_xch(self, value)
-#define atomic64_fetchadd_r(self, value)            atomic64_fetchadd(self, value)
-#define atomic64_fetchand_r(self, value)            atomic64_fetchand(self, value)
-#define atomic64_fetchor_r(self, value)             atomic64_fetchor(self, value)
-#define atomic64_fetchxor_r(self, value)            atomic64_fetchxor(self, value)
+/* Atomically read a 64-bit data word from `self' */
+#define atomic64_read(self) \
+	__hybrid_atomic_load(__atomic64_val(*(self)), __ATOMIC_SEQ_CST)
 
-#elif defined(CONFIG_ATOMIC64_SUPPORT_NEVER)
+/* Atomically write a 64-bit data word to `self' */
+#define atomic64_write(self, value) \
+	__hybrid_atomic_store(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
-NOTHROW(FCALL atomic64_read)(struct atomic64 *__restrict self) {
-	u64 result;
-	atomic_rwlock_read(&self->a_lock);
-	result = self->a_value;
-	atomic_rwlock_endread(&self->a_lock);
-	return result;
-}
+/* Atomically compare-exchange a 64-bit data word from `self' */
+#define atomic64_cmpxch(self, oldval, newval) \
+	__hybrid_atomic_cmpxch(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
-NOTHROW(FCALL atomic64_read_r)(struct atomic64 *__restrict self) {
-	u64 result;
-	pflag_t was = PREEMPTION_PUSHOFF();
-	atomic_rwlock_read(&self->a_lock);
-	result = self->a_value;
-	atomic_rwlock_endread(&self->a_lock);
-	PREEMPTION_POP(was);
-	return result;
-}
+/* Atomically compare-exchange a 64-bit data word from `self' */
+#define atomic64_cmpxch_val(self, oldval, newval) \
+	__hybrid_atomic_cmpxch_val(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
-#define atomic64_lock(self)     atomic_rwlock_write(&(self)->a_lock)
-#define atomic64_unlock(self)   atomic_rwlock_endwrite(&(self)->a_lock)
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) void
-NOTHROW(FCALL atomic64_write)(struct atomic64 *__restrict self, u64 value) {
-	atomic64_lock(self);
-	self->a_value = value;
-	atomic64_unlock(self);
-}
+/* Atomically exchange a 64-bit data word from `self' */
+#define atomic64_xch(self, value) \
+	__hybrid_atomic_xch(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
-NOTHROW(FCALL atomic64_cmpxch)(struct atomic64 *__restrict self,
-                               u64 oldval, u64 newval) {
-	__BOOL result;
-	atomic64_lock(self);
-	result = self->a_value == oldval;
-	if (result)
-		self->a_value = newval;
-	atomic64_unlock(self);
-	return result;
-}
+/* Atomically fetch-and-add a 64-bit data word from `self' */
+#define atomic64_fetchadd(self, value) \
+	__hybrid_atomic_fetchadd(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_cmpxch_val)(struct atomic64 *__restrict self,
-                                   u64 oldval, u64 newval) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	if (result == oldval)
-		self->a_value = newval;
-	atomic64_unlock(self);
-	return result;
-}
+/* Atomically fetch-and-and a 64-bit data word from `self' */
+#define atomic64_fetchand(self, value) \
+	__hybrid_atomic_fetchand(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_xch)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = value;
-	atomic64_unlock(self);
-	return result;
-}
+/* Atomically fetch-and-or a 64-bit data word from `self' */
+#define atomic64_fetchor(self, value) \
+	__hybrid_atomic_fetchor(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchadd)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result + value;
-	atomic64_unlock(self);
-	return result;
-}
+/* Atomically fetch-and-xor a 64-bit data word from `self' */
+#define atomic64_fetchxor(self, value) \
+	__hybrid_atomic_fetchxor(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchand)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result & value;
-	atomic64_unlock(self);
-	return result;
-}
+#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchor)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result | value;
-	atomic64_unlock(self);
-	return result;
-}
+/* Atomically read a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
+NOTHROW(FCALL atomic64_read)(atomic64_t const *__restrict self);
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchxor)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	atomic64_lock(self);
-	result = self->a_value;
-	self->a_value = result ^ value;
-	atomic64_unlock(self);
-	return result;
-}
+/* Atomically write a 64-bit data word to `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void
+NOTHROW(FCALL atomic64_write)(atomic64_t *__restrict self, u64 value);
 
-#undef atomic64_unlock
-#undef atomic64_lock
+/* Atomically compare-exchange a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
+NOTHROW(FCALL atomic64_cmpxch)(atomic64_t *__restrict self, u64 oldval, u64 newval);
 
-#define REENTRANT_BEGIN \
-	{                   \
-		pflag_t _was = PREEMPTION_PUSHOFF();
-#define REENTRANT_END         \
-		PREEMPTION_POP(_was); \
-	}
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) void
-NOTHROW(FCALL atomic64_write_r)(struct atomic64 *__restrict self, u64 value) {
-	REENTRANT_BEGIN
-	atomic64_write(self, value);
-	REENTRANT_END
-}
+/* Atomically compare-exchange a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL atomic64_cmpxch_val)(atomic64_t *__restrict self, u64 oldval, u64 newval);
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
-NOTHROW(FCALL atomic64_cmpxch_r)(struct atomic64 *__restrict self,
-                                 u64 oldval, u64 newval) {
-	__BOOL result;
-	REENTRANT_BEGIN
-	result = atomic64_cmpxch(self, oldval, newval);
-	REENTRANT_END
-	return result;
-}
+/* Atomically exchange a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL atomic64_xch)(atomic64_t *__restrict self, u64 value);
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_cmpxch_val_r)(struct atomic64 *__restrict self,
-                                     u64 oldval, u64 newval) {
-	u64 result;
-	REENTRANT_BEGIN
-	result = atomic64_cmpxch_val(self, oldval, newval);
-	REENTRANT_END
-	return result;
-}
+/* Atomically fetch-and-add a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL atomic64_fetchadd)(atomic64_t *__restrict self, u64 value);
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_xch_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	result = atomic64_xch(self, value);
-	REENTRANT_END
-	return result;
-}
+/* Atomically fetch-and-and a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL atomic64_fetchand)(atomic64_t *__restrict self, u64 value);
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchadd_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	result = atomic64_fetchadd(self, value);
-	REENTRANT_END
-	return result;
-}
+/* Atomically fetch-and-or a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL atomic64_fetchor)(atomic64_t *__restrict self, u64 value);
 
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchand_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	result = atomic64_fetchand(self, value);
-	REENTRANT_END
-	return result;
-}
-
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchor_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	result = atomic64_fetchor(self, value);
-	REENTRANT_END
-	return result;
-}
-
-LOCAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchxor_r)(struct atomic64 *__restrict self, u64 value) {
-	u64 result;
-	REENTRANT_BEGIN
-	result = atomic64_fetchxor(self, value);
-	REENTRANT_END
-	return result;
-}
-#undef REENTRANT_BEGIN
-#undef REENTRANT_END
-
-#elif defined(CONFIG_ATOMIC64_SUPPORT_DYNAMIC)
-
-FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64 NOTHROW(FCALL atomic64_read)(struct atomic64 *__restrict self);
-FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64 NOTHROW(FCALL atomic64_read_r)(struct atomic64 *__restrict self);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void NOTHROW(FCALL atomic64_write)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void NOTHROW(FCALL atomic64_write_r)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL NOTHROW(FCALL atomic64_cmpxch)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL NOTHROW(FCALL atomic64_cmpxch_r)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_cmpxch_val)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_cmpxch_val_r)(struct atomic64 *__restrict self, u64 oldval, u64 newval);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_xch)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_xch_r)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchadd)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchadd_r)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchand)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchand_r)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchor)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchor_r)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchxor)(struct atomic64 *__restrict self, u64 value);
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64 NOTHROW(FCALL atomic64_fetchxor_r)(struct atomic64 *__restrict self, u64 value);
-
-#else
-#error "Invalid arch-specific atomic64 support configuration"
-#endif
+/* Atomically fetch-and-xor a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(FCALL atomic64_fetchxor)(atomic64_t *__restrict self, u64 value);
+#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#endif /* !ARCH_ATOMIC64_HAVE_PROTOTYPES */
 
 #endif /* __CC__ */
 
