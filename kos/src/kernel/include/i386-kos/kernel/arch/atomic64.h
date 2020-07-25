@@ -64,7 +64,7 @@ typedef u64 atomic64_t;
 
 
 /* Atomically read a 64-bit data word from `self' */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_read)(atomic64_t const *__restrict self) {
 	__register u64 __eax_edx;
 	__register u32 __ecx, __ebx;

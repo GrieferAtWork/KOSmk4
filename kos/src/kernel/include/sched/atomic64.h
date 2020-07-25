@@ -126,7 +126,7 @@ typedef u64 atomic64_t;
 #else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 
 /* Atomically read a 64-bit data word from `self' */
-FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_read)(atomic64_t const *__restrict self);
 
 /* Atomically write a 64-bit data word to `self' */
@@ -135,11 +135,13 @@ NOTHROW(FCALL atomic64_write)(atomic64_t *__restrict self, u64 value);
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
 FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
-NOTHROW(FCALL atomic64_cmpxch)(atomic64_t *__restrict self, u64 oldval, u64 newval);
+NOTHROW(FCALL atomic64_cmpxch)(atomic64_t *__restrict self,
+                               u64 oldval, u64 newval);
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
 FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_cmpxch_val)(atomic64_t *__restrict self, u64 oldval, u64 newval);
+NOTHROW(FCALL atomic64_cmpxch_val)(atomic64_t *__restrict self,
+                                   u64 oldval, u64 newval);
 
 /* Atomically exchange a 64-bit data word from `self' */
 FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64

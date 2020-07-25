@@ -106,8 +106,8 @@ NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
 	_UNLOCK_EX(atomic_rwlock_endwrite)
 
 
-DECL NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
-NOTHROW(FCALL FUNC(atomic64_read))(atomic64_t *__restrict self) {
+DECL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u64
+NOTHROW(FCALL FUNC(atomic64_read))(atomic64_t const *__restrict self) {
 	u64 result;
 	LOCK_RD(self);
 	result = __atomic64_val(*self);
