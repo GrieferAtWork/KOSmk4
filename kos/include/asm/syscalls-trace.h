@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75c46f5e */
+/* HASH CRC-32:0xf12c0f11 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1324,7 +1324,7 @@
 #define __NRRTR_setsid                  SC_REPR_PID_T                                           /* return */
 #define __NRATR0_getgroups              SC_REPR_SIZE_T                                          /* count */ 
 #define __NRATR1_getgroups              SC_REPR_POINTER                                         /* list */ 
-#define __NRRTR_getgroups               SC_REPR_ERRNO_T                                         /* return */
+#define __NRRTR_getgroups               SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_setgroups              SC_REPR_SIZE_T                                          /* count */ 
 #define __NRATR1_setgroups              SC_REPR_GID_VECTOR                                      /* groups */ 
 #define __NRATL1_setgroups              0                                                       /* groups -> count */ 

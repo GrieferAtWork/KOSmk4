@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccbedadb */
+/* HASH CRC-32:0xeb8b2e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,8 +152,7 @@ CLASS(E_NOT_EXECUTABLE, MESSAGE("The named file was not recognized as a valid ex
 	SUBCLASS(E_NOT_EXECUTABLE_TOOLARGE, MESSAGE("Executable file is too large"), NO_ERRNO, ())
 	SUBCLASS(E_NOT_EXECUTABLE_TOOSMALL, MESSAGE("Executable file is too small"), NO_ERRNO, ())
 END
-CLASS(E_INSUFFICIENT_RIGHTS, MESSAGE("Insufficient Rights"), NO_ERRNO, ())
-	SUBCLASS(E_INSUFFICIENT_RIGHTS_CTTY_STEALING, MESSAGE("Only root can steal already-assigned controlling terminals"), NO_ERRNO, ())
+CLASS(E_INSUFFICIENT_RIGHTS, MESSAGE("Insufficient Rights"), NO_ERRNO, (MEMBER(intptr_t, capability)))
 END
 CLASS(E_INVALID_CONTEXT, MESSAGE("Insufficient Context"), ERRNO(EPERM), ())
 	SUBCLASS(E_INVALID_CONTEXT_NOT_SESSION_LEADER, MESSAGE("The calling process isn\'t the session leader"), NO_ERRNO, ())

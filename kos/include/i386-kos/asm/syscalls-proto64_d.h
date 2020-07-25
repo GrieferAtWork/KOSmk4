@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6928d31f */
+/* HASH CRC-32:0x2c6af69e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -538,7 +538,7 @@
 #define __NR64RT_setsid                 (pid_t, __pid_t)
 #define __NR64RT_setreuid               (errno_t, __errno_t)
 #define __NR64RT_setregid               (errno_t, __errno_t)
-#define __NR64RT_getgroups              (errno_t, __errno_t)
+#define __NR64RT_getgroups              (ssize_t, __ssize_t)
 #define __NR64RT_setgroups              (errno_t, __errno_t)
 #define __NR64RT_setresuid              (errno_t, __errno_t)
 #define __NR64RT_getresuid              (errno_t, __errno_t)

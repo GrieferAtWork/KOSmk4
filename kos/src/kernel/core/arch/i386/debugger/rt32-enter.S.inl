@@ -78,7 +78,7 @@
 #define L(x)                         x##_dbg_enter_here
 #elif defined(DEFINE_DBG)
 #define L(x)                         x##_dbg
-#endif
+#endif /* ... */
 
 
 #ifdef DEFINE_DBG_ENTER_XCPUSTATE
@@ -289,8 +289,8 @@ L(.Lalready_active):
 	movl   %eax, %cr3
 
 	movl   %cr0, %eax
-	orl    $(CR0_PE|CR0_PG), %eax
-	andl   $~(CR0_TS|CR0_WP), %eax
+	orl    $(CR0_PE | CR0_PG), %eax
+	andl   $~(CR0_TS | CR0_WP), %eax
 	movl   %eax, %cr0
 
 	/* Load the debugger-specific GDT / IDT */

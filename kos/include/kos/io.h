@@ -24,6 +24,7 @@
 #include <features.h>
 
 #include <asm/dirent.h>
+#include <asm/fcntl.h>
 #include <asm/oflags.h>
 #include <asm/poll.h>
 #include <asm/stat.h>
@@ -56,6 +57,21 @@ typedef unsigned int fallocate_mode_t; /* TODO */
 typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !poll_mode_t_defined */
 #endif /* __CC__ */
+
+
+/* Access test flags (for use with `access(2)') */
+#if !defined(R_OK) && defined(__R_OK)
+#define R_OK __R_OK /* Test for read permission. */
+#endif /* !R_OK && __R_OK */
+#if !defined(W_OK) && defined(__W_OK)
+#define W_OK __W_OK /* Test for write permission. */
+#endif /* !W_OK && __W_OK */
+#if !defined(X_OK) && defined(__X_OK)
+#define X_OK __X_OK /* Test for execute permission. */
+#endif /* !X_OK && __X_OK */
+#if !defined(F_OK) && defined(__F_OK)
+#define F_OK __F_OK /* Test for existence. */
+#endif /* !F_OK && __F_OK */
 
 
 /* Poll flags (`poll_mode_t' / `struct pollfd')

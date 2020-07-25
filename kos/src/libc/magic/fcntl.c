@@ -1086,12 +1086,18 @@ enum __pid_type {
 
 
 #ifdef __USE_MISC
-#ifndef R_OK
-#define R_OK 4 /* Test for read permission. */
-#define W_OK 2 /* Test for write permission. */
-#define X_OK 1 /* Test for execute permission. */
-#define F_OK 0 /* Test for existence. */
-#endif /* !R_OK */
+#if !defined(R_OK) && defined(__R_OK)
+#define R_OK __R_OK /* Test for read permission. */
+#endif /* !R_OK && __R_OK */
+#if !defined(W_OK) && defined(__W_OK)
+#define W_OK __W_OK /* Test for write permission. */
+#endif /* !W_OK && __W_OK */
+#if !defined(X_OK) && defined(__X_OK)
+#define X_OK __X_OK /* Test for execute permission. */
+#endif /* !X_OK && __X_OK */
+#if !defined(F_OK) && defined(__F_OK)
+#define F_OK __F_OK /* Test for existence. */
+#endif /* !F_OK && __F_OK */
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)

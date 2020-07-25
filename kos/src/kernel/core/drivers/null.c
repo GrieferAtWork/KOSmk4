@@ -191,7 +191,7 @@ PRIVATE NONNULL((1, 2)) void KCALL
 port_open(struct character_device *__restrict UNUSED(self),
           struct handle *__restrict UNUSED(hand)) THROWS(...) {
 	/* XXX: Maybe just restrict on a per-port basis? */
-	cred_require_hwio();
+	require(CAP_SYS_RAWIO);
 }
 
 

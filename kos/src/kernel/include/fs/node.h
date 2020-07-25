@@ -1189,6 +1189,17 @@ FUNDEF NONNULL((1)) bool KCALL
 inode_tryaccess(struct inode *__restrict self, unsigned int type)
 		THROWS(E_IOERROR, ...);
 
+EXTERN_INLINE NONNULL((1)) void KCALL
+inode_access_accmode(struct inode *__restrict self, iomode_t iomode)
+		THROWS(E_FSERROR_ACCESS_DENIED, E_IOERROR, ...) {
+	unsigned int type = 0;
+	if ((iomode & IO_ACCMODE) != IO_WRONLY)
+		type |= R_OK; /* Test for read-access */
+	if ((iomode & IO_ACCMODE) != IO_RDONLY)
+		type |= W_OK; /* Test for write-access */
+	inode_access(self, type);
+}
+
 
 struct stat;
 
@@ -1233,7 +1244,8 @@ FUNDEF NONNULL((1)) void KCALL
 inode_chtime(struct inode *__restrict self,
              struct timespec const *new_atime,
              struct timespec const *new_mtime,
-             struct timespec const *new_ctime)
+             struct timespec const *new_ctime,
+             bool check_permissions DFL(true))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
 
@@ -1250,19 +1262,10 @@ inode_chtime(struct inode *__restrict self,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_WRATTR: [...] */
 FUNDEF NONNULL((1)) mode_t KCALL
 inode_chmod(struct inode *__restrict self,
-            mode_t perm_mask, mode_t perm_flag)
+            mode_t perm_mask, mode_t perm_flag,
+            bool check_permissions DFL(true))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
-#ifdef __cplusplus
-extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) mode_t KCALL
-inode_chmod(struct inode *__restrict self, mode_t new_perm)
-		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
-		       E_FSERROR_UNSUPPORTED_OPERATION, ...) {
-	return inode_chmod(self, 0, new_perm);
-}
-}
-#endif /* __cplusplus */
 
 
 /* Change the owner and group of the given file.
@@ -1275,7 +1278,8 @@ FUNDEF NONNULL((1)) void KCALL
 inode_chown(struct inode *__restrict self,
             uid_t owner, gid_t group,
             uid_t *pold_owner DFL(__NULLPTR),
-            gid_t *pold_group DFL(__NULLPTR))
+            gid_t *pold_group DFL(__NULLPTR),
+            bool check_permissions DFL(true))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
 

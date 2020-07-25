@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf78bd1e */
+/* HASH CRC-32:0x33b417fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -538,7 +538,7 @@
 #define __NRRT_setsid                 (pid_t, __pid_t)
 #define __NRRT_setreuid               (errno_t, __errno_t)
 #define __NRRT_setregid               (errno_t, __errno_t)
-#define __NRRT_getgroups              (errno_t, __errno_t)
+#define __NRRT_getgroups              (ssize_t, __ssize_t)
 #define __NRRT_setgroups              (errno_t, __errno_t)
 #define __NRRT_setresuid              (errno_t, __errno_t)
 #define __NRRT_getresuid              (errno_t, __errno_t)

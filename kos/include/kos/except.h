@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f818e9c */
+/* HASH CRC-32:0x60253b2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -581,10 +581,10 @@ __DECL_BEGIN
 
 
 
-/* Insufficient Rights */
+/* Insufficient Rights
+ * 	@@The missing capability (one of `CAP_*' from `<kos/capability.h>')
+ * 	member capability: intptr_t; */
 #define E_INSUFFICIENT_RIGHTS (0x0084)
-/* Only root can steal already-assigned controlling terminals */
-#define E_INSUFFICIENT_RIGHTS_CTTY_STEALING (E_INSUFFICIENT_RIGHTS, 0x0001)
 
 
 

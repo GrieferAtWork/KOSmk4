@@ -56,7 +56,7 @@ KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
 		cred_require_sysadmin();
 		/* Need hwio to turn one of these on! */
 		if (new_value)
-			cred_require_hwio();
+			require(CAP_SYS_RAWIO);
 		/* Change the value. */
 		if (ATOMIC_CMPXCH_WEAK(*pvalue, old_value, new_value))
 			break;

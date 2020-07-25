@@ -153,7 +153,7 @@
 
 
 #undef CONFIG_EVERYONE_IS_ROOT
-#if 0 /* TODO: Disable me */
+#if 0
 #define CONFIG_EVERYONE_IS_ROOT 1
 #endif
 
@@ -430,35 +430,22 @@ EXTERN_INLINE WUNUSED __BOOL FCALL cred_isfsgroupmember(gid_t gid) {
 #endif /* CONFIG_EVERYONE_IS_ROOT */
 
 /* Helper macros for only setting specific IDs */
-#define cred_setruid(/*uid_t*/ ruid)   cred_setuid(ruid, (uid_t)-1, (uid_t)-1, (uid_t)-1, 1)
-#define cred_seteuid(/*uid_t*/ euid)   cred_setuid((uid_t)-1, euid, (uid_t)-1, euid, 1)
-#define cred_setsuid(/*uid_t*/ suid)   cred_setuid((uid_t)-1, (uid_t)-1, suid, (uid_t)-1, 1)
-#define cred_setfsuid(/*uid_t*/ fsuid) cred_setuid((uid_t)-1, (uid_t)-1, (uid_t)-1, fsuid, 1)
-#define cred_setrgid(/*gid_t*/ rgid)   cred_setgid(rgid, (gid_t)-1, (gid_t)-1, (gid_t)-1, 1)
-#define cred_setegid(/*gid_t*/ egid)   cred_setgid((gid_t)-1, egid, (gid_t)-1, egid, 1)
-#define cred_setsgid(/*gid_t*/ sgid)   cred_setgid((gid_t)-1, (gid_t)-1, sgid, (gid_t)-1, 1)
-#define cred_setfsgid(/*gid_t*/ fsgid) cred_setgid((gid_t)-1, (gid_t)-1, (gid_t)-1, fsgid, 1)
-
+#define cred_setruid(/*uid_t*/ ruid)                                   cred_setuid(ruid, (uid_t)-1, (uid_t)-1, (uid_t)-1, 1)
+#define cred_seteuid(/*uid_t*/ euid)                                   cred_setuid((uid_t)-1, euid, (uid_t)-1, euid, 1)
+#define cred_setsuid(/*uid_t*/ suid)                                   cred_setuid((uid_t)-1, (uid_t)-1, suid, (uid_t)-1, 1)
+#define cred_setfsuid(/*uid_t*/ fsuid)                                 cred_setuid((uid_t)-1, (uid_t)-1, (uid_t)-1, fsuid, 1)
+#define cred_setrgid(/*gid_t*/ rgid)                                   cred_setgid(rgid, (gid_t)-1, (gid_t)-1, (gid_t)-1, 1)
+#define cred_setegid(/*gid_t*/ egid)                                   cred_setgid((gid_t)-1, egid, (gid_t)-1, egid, 1)
+#define cred_setsgid(/*gid_t*/ sgid)                                   cred_setgid((gid_t)-1, (gid_t)-1, sgid, (gid_t)-1, 1)
+#define cred_setfsgid(/*gid_t*/ fsgid)                                 cred_setgid((gid_t)-1, (gid_t)-1, (gid_t)-1, fsgid, 1)
+#define cred_setreuid(/*uid_t*/ ruid, /*uid_t*/ euid)                  cred_setuid(ruid, euid, (uid_t)-1, euid, 1)
+#define cred_setregid(/*gid_t*/ rgid, /*gid_t*/ egid)                  cred_setgid(rgid, egid, (gid_t)-1, egid, 1)
 #define cred_setresuid(/*uid_t*/ ruid, /*uid_t*/ euid, /*uid_t*/ suid) cred_setuid(ruid, euid, suid, euid, 1)
-#define cred_setreshid(/*gid_t*/ rgid, /*gid_t*/ egid, /*gid_t*/ sgid) cred_setgid(rgid, egid, sgid, egid, 1)
+#define cred_setresgid(/*gid_t*/ rgid, /*gid_t*/ egid, /*gid_t*/ sgid) cred_setgid(rgid, egid, sgid, egid, 1)
 
 
 /* Credential assertion (throw an error if the caller doesn't have the required credential) */
 struct vm;
-
-#define cred_has_sys_admin() 1
-#define cred_allow_ctty_stealing() cred_has_sys_admin()
-
-/* Caller can directly access hardware I/O. */
-FUNDEF void FCALL
-cred_require_hwio(void)
-		THROWS(E_INSUFFICIENT_RIGHTS);
-FUNDEF void FCALL
-cred_require_hwio_r(port_t from, port_t num)
-		THROWS(E_INSUFFICIENT_RIGHTS);
-
-/* Caller can mount/umount filesystems. */
-#define cred_require_mount() (void)0
 
 /* Caller can read from `target_vm' */
 #define cred_require_vmread(target_vm) (void)0
@@ -466,20 +453,8 @@ cred_require_hwio_r(port_t from, port_t num)
 /* Caller can write to `target_vm' */
 #define cred_require_vmwrite(target_vm) (void)0
 
-/* `CAP_SYS_RESOURCE' */
-#define cred_require_resource() (void)0
-
 /* `CAP_SYS_ADMIN' */
 #define cred_require_sysadmin() (void)0
-
-/* Caller is allowed to change DOS drive roots */
-#define cred_require_driveroot() (void)0
-
-/* Caller is allowed to trigger arbitrary debug traps */
-#define cred_require_debugtrap() (void)0
-
-/* Caller is allowed to use `MAP_UNINITIALIZED' */
-#define cred_require_mmap_uninitialized() (void)0
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
 /* TODO: Add credential checks for individual ksysctl() and hop() commands */

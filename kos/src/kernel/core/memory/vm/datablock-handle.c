@@ -364,13 +364,15 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 	}	break;
 
 	case HOP_DATABLOCK_ANONYMIZE:
-		cred_require_sysadmin();
+		/* Need write permissions. */
+		if ((mode & IO_ACCMODE) == IO_RDONLY)
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_TRUNC, mode);
 		validate_writable(arg, sizeof(int));
 		*(int *)arg = vm_datablock_anonymize(self) ? 1 : 0;
 		break;
 
 	case HOP_DATABLOCK_DEANONYMIZE:
-		cred_require_sysadmin();
+		require(CAP_DATABLOCK_DEANONYMIZE);
 		validate_writable(arg, sizeof(int));
 		*(int *)arg = vm_datablock_deanonymize(self) ? 1 : 0;
 		break;
@@ -386,14 +388,14 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->dop_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_openpart))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_openpart), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
+		require(CAP_DATABLOCK_OPEN_PART);
 		part = cmd == HOP_DATABLOCK_OPEN_PART_EXACT
 		       ? vm_paged_datablock_locatepart_exact(self,
-		                                       (vm_vpage64_t)data->dop_pageno,
-		                                       (size_t)data->dop_pages_hint)
+		                                             (vm_vpage64_t)data->dop_pageno,
+		                                             (size_t)data->dop_pages_hint)
 		       : vm_paged_datablock_locatepart(self,
-		                                 (vm_vpage64_t)data->dop_pageno,
-		                                 (size_t)data->dop_pages_hint);
+		                                       (vm_vpage64_t)data->dop_pageno,
+		                                       (size_t)data->dop_pages_hint);
 		FINALLY_DECREF_UNLIKELY(part);
 		COMPILER_WRITE_BARRIER();
 		data->dop_pageno = (u64)vm_datapart_startvpage(part);
@@ -434,7 +436,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->dof_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		if (cmd == HOP_DATABLOCK_OPEN_FUTEX_EXISTING) {
 			ftx = vm_datablock_getfutex_existing(self, (pos_t)data->dof_address);
 			if (!ftx)
@@ -451,23 +452,26 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 
 	case HOP_INODE_OPEN_SUPERBLOCK: {
 		struct handle result_handle;
-		if (!vm_datablock_isinode(self))
+		if (!vm_datablock_isinode(self)) {
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
 			      HANDLE_TYPE_DATABLOCK,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
+		}
 		result_handle.h_mode = mode;
 		result_handle.h_type = HANDLE_TYPE_DATABLOCK;
 		result_handle.h_data = ((struct inode *)self)->i_super;
+		inode_access_accmode((struct inode *)result_handle.h_data, mode);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 	}	break;
 
 	case HOP_INODE_CHMOD: {
 		size_t struct_size;
+		mode_t mask, flag;
 		struct hop_inode_chmod *data;
+		struct inode *me;
 		if (!vm_datablock_isinode(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
@@ -480,10 +484,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->icm_struct_size);
 		if (struct_size != sizeof(struct hop_inode_chmod))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_inode_chmod), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		data->icm_perm_old = inode_chmod((struct inode *)self,
-		                                 ATOMIC_READ(data->icm_perm_mask),
-		                                 ATOMIC_READ(data->icm_perm_flag));
+		me   = (struct inode *)self;
+		mask = ATOMIC_READ(data->icm_perm_mask);
+		flag = ATOMIC_READ(data->icm_perm_flag);
+		data->icm_perm_old = inode_chmod(me, mask, flag);
 	}	break;
 
 	case HOP_INODE_CHOWN: {
@@ -503,7 +507,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->ico_struct_size);
 		if (struct_size != sizeof(struct hop_inode_chown))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_inode_chown), struct_size);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		inode_chown((struct inode *)self,
 		            (uid_t)ATOMIC_READ(data->ico_newowner),
 		            (gid_t)ATOMIC_READ(data->ico_newgroup),
@@ -523,6 +526,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		REF struct inode *child_node;
 		REF struct directory_entry *child_entry;
 		struct handle temp;
+		struct directory_node *me;
 		if (!vm_datablock_isinode(self) || !INODE_ISDIR((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
@@ -530,6 +534,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
+		me = (struct directory_node *)self;
 		validate_writable(arg, sizeof(struct hop_directory_opennode));
 		data        = (struct hop_directory_opennode *)arg;
 		struct_size = ATOMIC_READ(data->don_struct_size);
@@ -545,10 +550,13 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                 HOP_DIRECTORY_OPENNODE_FNOCASE,
 		                 E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS);
 		hash = directory_entry_hash(name, namelen);
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
+		if (!capable(CAP_DAC_READ_SEARCH)) {
+			inode_loadattr(me);
+			inode_access(me, R_OK | X_OK);
+		}
 		child_node = openflags & HOP_DIRECTORY_OPENNODE_FNOCASE
-		             ? directory_getcasenode((struct directory_node *)self, name, namelen, hash, &child_entry)
-		             : directory_getnode((struct directory_node *)self, name, namelen, hash, &child_entry);
+		             ? directory_getcasenode(me, name, namelen, hash, &child_entry)
+		             : directory_getnode(me, name, namelen, hash, &child_entry);
 		if unlikely(!child_node)
 			THROW(E_FSERROR_FILE_NOT_FOUND);
 		{

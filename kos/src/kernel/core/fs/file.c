@@ -594,7 +594,6 @@ handle_file_hop(struct file *__restrict self,
 
 	case HOP_FILE_OPENNODE: {
 		struct handle temp;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		temp.h_data = self->f_node;
@@ -606,21 +605,24 @@ handle_file_hop(struct file *__restrict self,
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = mode;
 		temp.h_data = self->f_path;
+		if unlikely(!temp.h_data)
+			THROW(E_NO_SUCH_OBJECT);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_FILE_OPENDIR: {
 		struct handle temp;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dir;
+		if unlikely(!temp.h_data)
+			THROW(E_NO_SUCH_OBJECT);
+		inode_access_accmode((struct inode *)temp.h_data, mode);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_FILE_OPENDENTRY: {
 		struct handle temp;
-		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dirent;

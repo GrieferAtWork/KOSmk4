@@ -64,6 +64,11 @@ iob_maskbyte_c(byte_t *pbyte,
 	             turn_on ? 0 : bitmask);
 }
 
+LOCAL ATTR_PURE WUNUSED bool KCALL
+iob_isenabled(byte_t const *iob, u16 port) {
+	return (iob[FLOORDIV(port, 8)] & (1 << (port & 7))) != 0;
+}
+
 /* Turn permission bits for a given range on/off. */
 LOCAL void KCALL
 iob_setrange(byte_t *iob, u16 minport, u16 maxport, bool turn_on) {
@@ -117,26 +122,34 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,
 		      turn_on);
 	}
-	/* Ensure that the caller is allowed hardware port access.
-	 * This essentially enforces that:
-	 *  - Anyone is allowed to disable (or keep enabled if also so) ports
-	 *    for which they already have access (since cred_require_hwio_r()
-	 *    returns true for ports that are set to 1 within one's own IOBM)
-	 *  - In order to enable permission for ports that aren't already
-	 *    turned on, this function is identical to `cred_require_hwio()'. */
-	cred_require_hwio_r((port_t)from, (port_t)num);
-
 	/* Manipulate the IOBM of our own thread through use of the `thiscpu_x86_iob' vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	old_thread_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
 	TRY {
 		mycpu = THIS_CPU;
 		iob   = &FORCPU(mycpu, thiscpu_x86_iob[0]);
-		/* Update bits for the given range. */
-		iob_setrange(iob,
-		             (u16)from,
-		             (u16)from + num - 1,
-		             turn_on != 0);
+		/* Ensure that the caller is allowed hardware port access.
+		 * This essentially enforces that:
+		 *  - Anyone is allowed to disable ports (or keep them enabled)
+		 *  - As such, we must only throw an insufficient-rights exception
+		 *    if the calling thread doesn't have permissions to turn on
+		 *    permissions for some specific port. */
+#ifndef CONFIG_EVERYONE_IS_ROOT
+		if (turn_on && !capable(CAP_SYS_RAWIO)) {
+			u32 i, end = (u32)(u16)from + (u32)(u16)num;
+			for (i = (u32)(u16)from; i < end; ++i) {
+				if (!iob_isenabled(iob, i))
+					THROW(E_INSUFFICIENT_RIGHTS, CAP_SYS_RAWIO);
+			}
+		} else
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+		{
+			/* Update bits for the given range. */
+			iob_setrange(iob,
+			             (u16)from,
+			             (u16)from + (u16)num - 1,
+			             turn_on != 0);
+		}
 	} EXCEPT {
 		if (!(old_thread_flags & TASK_FKEEPCORE))
 			ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);

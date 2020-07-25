@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c19bd4e */
+/* HASH CRC-32:0xe8b36dbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,10 @@
 #define SYS_getrusage               __NR_getrusage               /* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 #define SYS_gettimeofday            __NR_gettimeofday            /* errno_t gettimeofday(struct timevalx32 *tv, struct timezone *tz) */
 #define SYS_settimeofday            __NR_settimeofday            /* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
-#define SYS_getgroups               __NR_getgroups               /* errno_t getgroups(size_t count, uint16_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+#define SYS_getgroups               __NR_getgroups               /* ssize_t getgroups(size_t count, uint16_t[] list) */
 #define SYS_setgroups               __NR_setgroups               /* errno_t setgroups(size_t count, uint16_t const *groups) */
 #define SYS_select                  __NR_select                  /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 #define SYS_symlink                 __NR_symlink                 /* errno_t symlink(char const *link_text, char const *target_path) */
@@ -275,7 +278,10 @@
 #define SYS_getegid32               __NR_getegid32               /* uint32_t getegid32(void) */
 #define SYS_setreuid32              __NR_setreuid32              /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 #define SYS_setregid32              __NR_setregid32              /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
-#define SYS_getgroups32             __NR_getgroups32             /* errno_t getgroups32(size_t count, uint32_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+#define SYS_getgroups32             __NR_getgroups32             /* ssize_t getgroups32(size_t count, uint32_t[] list) */
 #define SYS_setgroups32             __NR_setgroups32             /* errno_t setgroups32(size_t count, uint32_t const *groups) */
 #define SYS_fchown32                __NR_fchown32                /* errno_t fchown32(fd_t fd, uint32_t owner, uint32_t group) */
 #define SYS_setresuid32             __NR_setresuid32             /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */

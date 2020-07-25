@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1dab80d */
+/* HASH CRC-32:0x1cb8024 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -583,7 +583,7 @@
 #define __NRRT_getrusage               (errno_t, __errno_t)
 #define __NRRT_gettimeofday            (errno_t, __errno_t)
 #define __NRRT_settimeofday            (errno_t, __errno_t)
-#define __NRRT_getgroups               (errno_t, __errno_t)
+#define __NRRT_getgroups               (ssize_t, __ssize_t)
 #define __NRRT_setgroups               (errno_t, __errno_t)
 #define __NRRT_select                  (ssize_t, __ssize_t)
 #define __NRRT_symlink                 (errno_t, __errno_t)
@@ -708,7 +708,7 @@
 #define __NRRT_getegid32               (uint32_t, __uint32_t)
 #define __NRRT_setreuid32              (errno_t, __errno_t)
 #define __NRRT_setregid32              (errno_t, __errno_t)
-#define __NRRT_getgroups32             (errno_t, __errno_t)
+#define __NRRT_getgroups32             (ssize_t, __ssize_t)
 #define __NRRT_setgroups32             (errno_t, __errno_t)
 #define __NRRT_fchown32                (errno_t, __errno_t)
 #define __NRRT_setresuid32             (errno_t, __errno_t)

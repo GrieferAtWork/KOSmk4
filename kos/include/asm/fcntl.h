@@ -20,38 +20,41 @@
 #ifndef _ASM_FCNTL_H
 #define _ASM_FCNTL_H 1
 
-#include <__crt.h>
+#include <__stdinc.h>
 
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
-#define __F_DUPFD          0  /* Duplicate file descriptor. */
-#define __F_GETFD          1  /* Get file descriptor flags. */
-#define __F_SETFD          2  /* Set file descriptor flags. */
-#define __F_GETFL          3  /* Get file status flags. */
-#define __F_SETFL          4  /* Set file status flags. */
-#define __F_GETLK          5  /* Get record locking info. */
-#define __F_SETLK          6  /* Set record locking info (non-blocking). */
-#define __F_SETLKW         7  /* Set record locking info (blocking). */
-#define __F_SETOWN         8  /* Get owner (process receiving SIGIO). */
-#define __F_GETOWN         9  /* Set owner (process receiving SIGIO). */
-#define __F_SETSIG         10 /* Set number of signal to be sent. */
-#define __F_GETSIG         11 /* Get number of signal to be sent. */
-#define __F_GETLK64        12 /* Get record locking info. */
-#define __F_SETLK64        13 /* Set record locking info (non-blocking). */
-#define __F_SETLKW64       14 /* Set record locking info (blocking). */
-#define __F_SETOWN_EX      15 /* Get owner (thread receiving SIGIO). */
-#define __F_GETOWN_EX      16 /* Set owner (thread receiving SIGIO). */
-#define __F_OFD_GETLK      36
-#define __F_OFD_SETLK      37
-#define __F_OFD_SETLKW     38
-#define __F_SETLEASE       1024 /* Set a lease. */
-#define __F_GETLEASE       1025 /* Enquire what lease is active. */
-#define __F_NOTIFY         1026 /* Request notifications on a directory. */
-#define __F_DUPFD_CLOEXEC  1030 /* Duplicate file descriptor with close-on-exit set. */
-#define __F_SETPIPE_SZ     1031 /* Set pipe page size array. */
-#define __F_GETPIPE_SZ     1032 /* Get pipe page size array. */
-#endif /* ... */
+#define __R_OK 4 /* Test for read permission. */
+#define __W_OK 2 /* Test for write permission. */
+#define __X_OK 1 /* Test for execute permission. */
+#define __F_OK 0 /* Test for existence. */
 
-#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
+#if defined(__KOS__) || defined(__linux__)
+#define __F_DUPFD         0    /* Duplicate file descriptor. */
+#define __F_GETFD         1    /* Get file descriptor flags. */
+#define __F_SETFD         2    /* Set file descriptor flags. */
+#define __F_GETFL         3    /* Get file status flags. */
+#define __F_SETFL         4    /* Set file status flags. */
+#define __F_GETLK         5    /* Get record locking info. */
+#define __F_SETLK         6    /* Set record locking info (non-blocking). */
+#define __F_SETLKW        7    /* Set record locking info (blocking). */
+#define __F_SETOWN        8    /* Get owner (process receiving SIGIO). */
+#define __F_GETOWN        9    /* Set owner (process receiving SIGIO). */
+#define __F_SETSIG        10   /* Set number of signal to be sent. */
+#define __F_GETSIG        11   /* Get number of signal to be sent. */
+#define __F_GETLK64       12   /* Get record locking info. */
+#define __F_SETLK64       13   /* Set record locking info (non-blocking). */
+#define __F_SETLKW64      14   /* Set record locking info (blocking). */
+#define __F_SETOWN_EX     15   /* Get owner (thread receiving SIGIO). */
+#define __F_GETOWN_EX     16   /* Set owner (thread receiving SIGIO). */
+#define __F_OFD_GETLK     36   /* TODO: DOC */
+#define __F_OFD_SETLK     37   /* TODO: DOC */
+#define __F_OFD_SETLKW    38   /* TODO: DOC */
+#define __F_SETLEASE      1024 /* Set a lease. */
+#define __F_GETLEASE      1025 /* Enquire what lease is active. */
+#define __F_NOTIFY        1026 /* Request notifications on a directory. */
+#define __F_DUPFD_CLOEXEC 1030 /* Duplicate file descriptor with close-on-exit set. */
+#define __F_SETPIPE_SZ    1031 /* Set pipe page size array. */
+#define __F_GETPIPE_SZ    1032 /* Get pipe page size array. */
+#ifdef __KOS__
 #define __F_SETFL_XCH      5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
 #define __F_NEXT           5164 /* return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
                                  * https://lkml.org/lkml/2012/4/1/71 */
@@ -59,85 +62,17 @@
 #define __F_MAXFD          5166 /* return the max open handle id (the given fd is ignored) */
 #define __F_DUP2FD         5167 /* Same as `dup2()' (the target FD is given as `(int)arg') */
 #define __F_DUP2FD_CLOEXEC 5168 /* Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
-#endif /* __KOS_) || __CRT_KOS || __CRT_KOS_KERNEL */
+#endif /* __KOS__ */
 
-#ifndef __FD_CLOEXEC
-#define __FD_CLOEXEC 0x01 /* FLAG: Close the descriptor on `exec()'. */
-#endif /* !__FD_CLOEXEC */
 
-#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
-#define __FD_CLOFORK 0x02 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
-#endif /* ... */
-
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
-#define __F_RDLCK 0 /* Read lock. */
-#define __F_WRLCK 1 /* Write lock. */
-#define __F_UNLCK 2 /* Remove lock. */
-#define __F_EXLCK 4 /* TODO: DOC */
-#define __F_SHLCK 8 /* TODO: DOC */
-
-#define __LOCK_SH     1   /* Shared lock. */
-#define __LOCK_EX     2   /* Exclusive lock. */
-#define __LOCK_NB     4   /* Or'd with one of the above to prevent blocking. */
-#define __LOCK_UN     8   /* Remove lock. */
-#define __LOCK_ATOMIC 16  /* Atomic update.  */
-#define __LOCK_MAND   32  /* This is a mandatory flock: */
-#define __LOCK_READ   64  /* ... which allows concurrent read operations. */
-#define __LOCK_WRITE  128 /* ... which allows concurrent write operations. */
-#define __LOCK_RW     192 /* ... Which allows concurrent read & write operations. */
-
-#define __DN_ACCESS    0x00000001 /* File accessed. */
-#define __DN_MODIFY    0x00000002 /* File modified. */
-#define __DN_CREATE    0x00000004 /* File created. */
-#define __DN_DELETE    0x00000008 /* File removed. */
-#define __DN_RENAME    0x00000010 /* File renamed. */
-#define __DN_ATTRIB    0x00000020 /* File changed attributes. */
-#define __DN_MULTISHOT 0x80000000 /* Don't remove notifier. */
-
-#define __F_OWNER_TID  0 /* Kernel thread. */
-#define __F_OWNER_PID  1 /* Process. */
-#define __F_OWNER_PGRP 2 /* Process group. */
-#define __F_OWNER_GID  2 /* Alternative, obsolete name. */
-
-#define __POSIX_FADV_NORMAL     0 /* No further special treatment. */
-#define __POSIX_FADV_RANDOM     1 /* Expect random page references. */
-#define __POSIX_FADV_SEQUENTIAL 2 /* Expect sequential page references. */
-#define __POSIX_FADV_WILLNEED   3 /* Will need these pages. */
-#define __POSIX_FADV_DONTNEED   4 /* Don't need these pages. */
-#define __POSIX_FADV_NOREUSE    5 /* Data will be accessed once. */
-
-#define __SYNC_FILE_RANGE_WAIT_BEFORE 1 /* Wait upon writeout of all pages in the range before performing the write. */
-#define __SYNC_FILE_RANGE_WRITE       2 /* Initiate writeout of all those dirty pages in the range which are not presently under writeback. */
-#define __SYNC_FILE_RANGE_WAIT_AFTER  4 /* Wait upon writeout of all pages in the range after performing the write. */
-
-#define __SPLICE_F_MOVE               1 /* Move pages instead of copying. */
-#define __SPLICE_F_NONBLOCK           2 /* Don't block on the pipe splicing (but we may still block on the fd we splice from/to). */
-#define __SPLICE_F_MORE               4 /* Expect more data. */
-#define __SPLICE_F_GIFT               8 /* Pages passed in are a gift. */
-
-#define __FALLOC_FL_KEEP_SIZE         1 /* Don't extend size of file even if offset + len is greater than file size. */
-#define __FALLOC_FL_PUNCH_HOLE        2 /* Create a hole in the file. */
-#define __FALLOC_FL_COLLAPSE_RANGE    8 /* Remove a range of a file without leaving a hole. */
-#define __FALLOC_FL_ZERO_RANGE       16 /* Convert a range of a file to zeros. */
-
-#define __MAX_HANDLE_SZ 128
-#endif /* ... */
-
-#ifdef __CRT_AT_FDCWD
-/* Special value used to indicate the *at functions should use the current working directory. */
-#define __AT_FDCWD __CRT_AT_FDCWD
-#endif /* __CRT_AT_FDCWD */
-
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+/* *at function flags (s.a. `atflag_t') */
 #define __AT_SYMLINK_NOFOLLOW  0x0100 /* If the last path component is a symlink, don't follow it. */
 #define __AT_REMOVEDIR         0x0200 /* Remove directory instead of unlinking file. */
 #define __AT_EACCESS           0x0200 /* Test access permitted for effective IDs, not real IDs. */
 #define __AT_SYMLINK_FOLLOW    0x0400 /* If the last path component is a symlink, follow it. (WARNING: Only used by `linkat(2)') */
 #define __AT_NO_AUTOMOUNT      0x0800 /* Suppress terminal automount traversal. */
 #define __AT_EMPTY_PATH        0x1000 /* Allow empty relative pathname. */
-#endif /* ... */
-
-#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
+#ifdef __KOS__
 #if __KOS_VERSION__ >= 300
 #define __AT_SYMLINK_REGULAR   0x2000 /* Treat symbolic links similar to like regular files and throw an `ERROR_FS_TOO_MANY_LINKS' error during the first encounter. */
 #define __AT_CHANGE_CTIME      0x0200 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
@@ -185,28 +120,26 @@
                                        * path names that start with a leading slash.
                                        * Basically, when set: perform the system call in DOS-compatibility mode.
                                        * HINT: This flag can be specified with the `fsmode()' system call. */
+#endif /* __KOS__ */
 
 
-/* Same as `__AT_FDCWD' but sets the filesystem root
- * (using this, you can `chroot()' with 'dup2()'!) */
-#define __AT_FDROOT        (-101)
-
+/* Special values that may be used for the `dfd' argument of `*at' functions. */
+#define __AT_FDCWD  (-100) /* The current working directory. */
+#ifdef __KOS__
+#define __AT_FDROOT (-101) /* Same as `__AT_FDCWD' but sets the filesystem root
+                            * (using this, you can `chroot()' with 'dup2()'!) */
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
  * and their meaning is context-sensible. */
 #define __AT_THIS_TASK     (-180)
 #define __AT_THIS_MMAN     __AT_THIS_TASK /* DEPRECATED */
 #define __AT_THIS_STACK    __AT_THIS_TASK /* DEPRECATED */
-
 #if __KOS_VERSION__ >= 400
 #define __AT_THIS_PROCESS     (-181) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
 #define __AT_PARENT_PROCESS   (-182) /* HANDLE_TYPE_TASK (writable, Equivalent of `getppid()') */
 #define __AT_GROUP_LEADER     (-183) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpgid(0)') */
 #define __AT_SESSION_LEADER   (-184) /* HANDLE_TYPE_TASK (writable, Equivalent of `getsid(0)') */
 #endif /* __KOS_VERSION__ >= 400 */
-
-
-
 #if __KOS_VERSION__ >= 300
 /* DOS Drive root / current-working paths.
  * These are special file descriptors that can be written to using `dup2()',
@@ -275,6 +208,89 @@
 #define __AT_DOS_DRIVEMIN            'A'
 #define __AT_DOS_DRIVEMAX            'Z'
 #endif /* __KOS_VERSION__ >= 300 */
-#endif /* ... */
+#endif /* __KOS__ */
+
+
+/* File descriptor flags (s.a. `F_GETFD' and `F_SETFL') */
+#define __FD_CLOEXEC 0x01 /* FLAG: Close the descriptor on `exec()'. */
+#ifdef __KOS__
+#define __FD_CLOFORK 0x02 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
+#endif /* __KOS__ */
+
+#define __F_RDLCK 0 /* Read lock. */
+#define __F_WRLCK 1 /* Write lock. */
+#define __F_UNLCK 2 /* Remove lock. */
+#define __F_EXLCK 4 /* TODO: DOC */
+#define __F_SHLCK 8 /* TODO: DOC */
+
+
+#define __LOCK_SH     1   /* Shared lock. */
+#define __LOCK_EX     2   /* Exclusive lock. */
+#define __LOCK_NB     4   /* Or'd with one of the above to prevent blocking. */
+#define __LOCK_UN     8   /* Remove lock. */
+#define __LOCK_ATOMIC 16  /* Atomic update.  */
+#define __LOCK_MAND   32  /* This is a mandatory flock: */
+#define __LOCK_READ   64  /* ... which allows concurrent read operations. */
+#define __LOCK_WRITE  128 /* ... which allows concurrent write operations. */
+#define __LOCK_RW     192 /* ... Which allows concurrent read & write operations. */
+
+
+#define __DN_ACCESS    0x00000001 /* File accessed. */
+#define __DN_MODIFY    0x00000002 /* File modified. */
+#define __DN_CREATE    0x00000004 /* File created. */
+#define __DN_DELETE    0x00000008 /* File removed. */
+#define __DN_RENAME    0x00000010 /* File renamed. */
+#define __DN_ATTRIB    0x00000020 /* File changed attributes. */
+#define __DN_MULTISHOT 0x80000000 /* Don't remove notifier. */
+
+
+#define __F_OWNER_TID  0 /* Kernel thread. */
+#define __F_OWNER_PID  1 /* Process. */
+#define __F_OWNER_PGRP 2 /* Process group. */
+#define __F_OWNER_GID  2 /* Alternative, obsolete name. */
+
+
+#define __POSIX_FADV_NORMAL     0 /* No further special treatment. */
+#define __POSIX_FADV_RANDOM     1 /* Expect random page references. */
+#define __POSIX_FADV_SEQUENTIAL 2 /* Expect sequential page references. */
+#define __POSIX_FADV_WILLNEED   3 /* Will need these pages. */
+#define __POSIX_FADV_DONTNEED   4 /* Don't need these pages. */
+#define __POSIX_FADV_NOREUSE    5 /* Data will be accessed once. */
+
+
+#define __SYNC_FILE_RANGE_WAIT_BEFORE 1 /* Wait upon writeout of all pages in the range before performing the write. */
+#define __SYNC_FILE_RANGE_WRITE       2 /* Initiate writeout of all those dirty pages in the range which are not presently under writeback. */
+#define __SYNC_FILE_RANGE_WAIT_AFTER  4 /* Wait upon writeout of all pages in the range after performing the write. */
+
+
+#define __SPLICE_F_MOVE               1 /* Move pages instead of copying. */
+#define __SPLICE_F_NONBLOCK           2 /* Don't block on the pipe splicing (but we may still block on the fd we splice from/to). */
+#define __SPLICE_F_MORE               4 /* Expect more data. */
+#define __SPLICE_F_GIFT               8 /* Pages passed in are a gift. */
+
+
+#define __FALLOC_FL_KEEP_SIZE         1 /* Don't extend size of file even if offset + len is greater than file size. */
+#define __FALLOC_FL_PUNCH_HOLE        2 /* Create a hole in the file. */
+#define __FALLOC_FL_COLLAPSE_RANGE    8 /* Remove a range of a file without leaving a hole. */
+#define __FALLOC_FL_ZERO_RANGE       16 /* Convert a range of a file to zeros. */
+
+
+#define __MAX_HANDLE_SZ 128
+
+
+#else /* __KOS__ || __linux__ */
+#include <__crt.h>
+
+#ifdef __CRT_CYG
+/* Special values that may be used for the `dfd' argument of `*at' functions. */
+#define __AT_FDCWD (-2) /* The current working directory. */
+
+/* File descriptor flags (s.a. `F_GETFD' and `F_SETFL') */
+#define __FD_CLOEXEC 0x01 /* FLAG: Close the descriptor on `exec()'. */
+#endif /* __CRT_CYG */
+
+#endif /* !__KOS__ && !__linux__ */
+
+
 
 #endif /* !_ASM_FCNTL_H */

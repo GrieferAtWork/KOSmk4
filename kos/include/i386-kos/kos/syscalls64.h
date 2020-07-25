@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2280da44 */
+/* HASH CRC-32:0x1a5bfc71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -586,7 +586,10 @@ __CDECLARE_SC(,__uid_t,geteuid,(void),())
 __CDECLARE_SC(,__gid_t,getgid,(void),())
 #endif /* __CRT_HAVE_SC(getgid) */
 #if __CRT_HAVE_SC(getgroups)
-__CDECLARE_SC(,__errno_t,getgroups,(__size_t __count, __gid_t *__list),(__count,__list))
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+__CDECLARE_SC(,__ssize_t,getgroups,(__size_t __count, __gid_t *__list),(__count,__list))
 #endif /* __CRT_HAVE_SC(getgroups) */
 #if __CRT_HAVE_SC(getitimer)
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
@@ -2150,7 +2153,10 @@ __CDECLARE_XSC(,__uid_t,geteuid,(void),())
 __CDECLARE_XSC(,__gid_t,getgid,(void),())
 #endif /* __CRT_HAVE_XSC(getgid) */
 #if __CRT_HAVE_XSC(getgroups)
-__CDECLARE_XSC(,__errno_t,getgroups,(__size_t __count, __gid_t *__list),(__count,__list))
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+__CDECLARE_XSC(,__ssize_t,getgroups,(__size_t __count, __gid_t *__list),(__count,__list))
 #endif /* __CRT_HAVE_XSC(getgroups) */
 #if __CRT_HAVE_XSC(getitimer)
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */

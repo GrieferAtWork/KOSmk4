@@ -909,9 +909,8 @@ class E_NOT_EXECUTABLE_TOOSMALL: E_NOT_EXECUTABLE = 0x0006 {
 
 [message("Insufficient Rights")]
 class E_INSUFFICIENT_RIGHTS = 0x0084 {
-}
-[message("Only root can steal already-assigned controlling terminals")]
-class E_INSUFFICIENT_RIGHTS_CTTY_STEALING: E_INSUFFICIENT_RIGHTS = 0x0001 {
+	@@The missing capability (one of `CAP_*' from `<kos/capability.h>')
+	member capability: intptr_t;
 }
 
 %

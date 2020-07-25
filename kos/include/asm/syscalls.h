@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1db4429 */
+/* HASH CRC-32:0xcec3e529 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -217,7 +217,10 @@
 #define __NR_getpgid                0x9b  /* pid_t getpgid(pid_t pid) */
 #define __NR_getsid                 0x9c  /* pid_t getsid(pid_t pid) */
 #define __NR_setsid                 0x9d  /* pid_t setsid(void) */
-#define __NR_getgroups              0x9e  /* errno_t getgroups(size_t count, gid_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+#define __NR_getgroups              0x9e  /* ssize_t getgroups(size_t count, gid_t[] list) */
 #define __NR_setgroups              0x9f  /* errno_t setgroups(size_t count, gid_t const *groups) */
 #define __NR_uname                  0xa0  /* errno_t uname(struct utsname *name) */
 #define __NR_sethostname            0xa1  /* errno_t sethostname(char const *name, size_t len) */

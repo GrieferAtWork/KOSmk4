@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3502485 */
+/* HASH CRC-32:0xcf896cc4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1333,7 +1333,7 @@
 #define __NR32RTR_settimeofday             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getgroups               SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR1_getgroups               SC_REPR_POINTER                                                      /* list */ 
-#define __NR32RTR_getgroups                SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32RTR_getgroups                SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_setgroups               SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR1_setgroups               SC_REPR_GID_VECTOR16                                                 /* groups */ 
 #define __NR32ATL1_setgroups               0                                                                    /* groups -> count */ 
@@ -1730,7 +1730,7 @@
 #define __NR32RTR_setregid32               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getgroups32             SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR1_getgroups32             SC_REPR_POINTER                                                      /* list */ 
-#define __NR32RTR_getgroups32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32RTR_getgroups32              SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_setgroups32             SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR1_setgroups32             SC_REPR_GID_VECTOR32                                                 /* groups */ 
 #define __NR32ATL1_setgroups32             0                                                                    /* groups -> count */ 

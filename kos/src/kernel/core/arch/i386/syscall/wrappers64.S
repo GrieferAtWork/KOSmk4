@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc0eb735 */
+/* HASH CRC-32:0xc3a43439 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3564,7 +3564,10 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setregid)
 	.cfi_endproc
 END(__x86_asm64_syscall_setregid)
 
-/* errno_t getgroups(size_t count, gid_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, gid_t[] list) */
 .section .text.x86.asm64_syscall.getgroups
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getgroups)
 	.cfi_startproc simple
@@ -14358,7 +14361,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	.cfi_endproc
 END(__x86_asm32_int80_settimeofday)
 
-/* errno_t getgroups(size_t count, uint16_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, uint16_t[] list) */
 .section .text.x86.asm32_syscall_int80.getgroups
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups)
 	.cfi_startproc simple
@@ -18429,7 +18435,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
 	.cfi_endproc
 END(__x86_asm32_int80_setregid32)
 
-/* errno_t getgroups32(size_t count, uint32_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups32(size_t count, uint32_t[] list) */
 .section .text.x86.asm32_syscall_int80.getgroups32
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups32)
 	.cfi_startproc simple
@@ -27508,7 +27517,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettimeofday, __x86_asm32_int80_ge
 /* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_settimeofday, __x86_asm32_int80_settimeofday)
 
-/* errno_t getgroups(size_t count, uint16_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, uint16_t[] list) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getgroups, __x86_asm32_int80_getgroups)
 
 /* errno_t setgroups(size_t count, uint16_t const *groups) */
@@ -28256,7 +28268,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setreuid32, __x86_asm32_int80_setr
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setregid32, __x86_asm32_int80_setregid32)
 
-/* errno_t getgroups32(size_t count, uint32_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups32(size_t count, uint32_t[] list) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getgroups32, __x86_asm32_int80_getgroups32)
 
 /* errno_t setgroups32(size_t count, uint32_t const *groups) */
@@ -31908,7 +31923,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_settimeofday)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_settimeofday)
 
-/* errno_t getgroups(size_t count, uint16_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, uint16_t[] list) */
 .section .text.x86.asm32_syscall_sysrun32.getgroups
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getgroups)
 	.cfi_startproc
@@ -33284,7 +33302,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setregid32)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setregid32)
 
-/* errno_t getgroups32(size_t count, uint32_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups32(size_t count, uint32_t[] list) */
 .section .text.x86.asm32_syscall_sysrun32.getgroups32
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getgroups32)
 	.cfi_startproc

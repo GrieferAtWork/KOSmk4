@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1574d0b9 */
+/* HASH CRC-32:0x6aecdf1f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1808,7 +1808,10 @@ INTERN_FUNCTION(libc_sys_Xsettimeofday)
 END(libc_sys_Xsettimeofday)
 DEFINE_PUBLIC_ALIAS(sys_Xsettimeofday, libc_sys_Xsettimeofday)
 
-/* errno_t getgroups(size_t count, uint16_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, uint16_t[] list) */
 .section .text.crt.syscall.getgroups
 INTERN_FUNCTION(libc_sys_getgroups)
 	movl   $(0x50), %eax
@@ -1816,7 +1819,10 @@ INTERN_FUNCTION(libc_sys_getgroups)
 END(libc_sys_getgroups)
 DEFINE_PUBLIC_ALIAS(sys_getgroups, libc_sys_getgroups)
 
-/* errno_t getgroups(size_t count, uint16_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, uint16_t[] list) */
 .section .text.crt.syscall.Xgetgroups
 INTERN_FUNCTION(libc_sys_Xgetgroups)
 	movl   $(0x50), %eax
@@ -3846,7 +3852,10 @@ INTERN_FUNCTION(libc_sys_Xsetregid32)
 END(libc_sys_Xsetregid32)
 DEFINE_PUBLIC_ALIAS(sys_Xsetregid32, libc_sys_Xsetregid32)
 
-/* errno_t getgroups32(size_t count, uint32_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups32(size_t count, uint32_t[] list) */
 .section .text.crt.syscall.getgroups32
 INTERN_FUNCTION(libc_sys_getgroups32)
 	movl   $(0xcd), %eax
@@ -3854,7 +3863,10 @@ INTERN_FUNCTION(libc_sys_getgroups32)
 END(libc_sys_getgroups32)
 DEFINE_PUBLIC_ALIAS(sys_getgroups32, libc_sys_getgroups32)
 
-/* errno_t getgroups32(size_t count, uint32_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups32(size_t count, uint32_t[] list) */
 .section .text.crt.syscall.Xgetgroups32
 INTERN_FUNCTION(libc_sys_Xgetgroups32)
 	movl   $(0xcd), %eax

@@ -225,12 +225,12 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 		                                     &file_maxnumbytes,
 		                                     &datablock_fspath,
 		                                     &datablock_fsname);
-	} else if (!(flags & MAP_UNINITIALIZED)) {
+	} else if (!(flags & MAP_UNINITIALIZED) ||
+	           !capable(CAP_MMAP_UNINITIALIZED)) {
 		/* Zero-initialized, anonymous memory */
 		datablock = incref(&vm_datablock_anonymous_zero);
 	} else {
 		/* Uninitialized, anonymous memory */
-		cred_require_mmap_uninitialized();
 		datablock = incref(&vm_datablock_anonymous);
 	}
 	/* Make sure that the offset and byte counts are aligned by the pagesize. */

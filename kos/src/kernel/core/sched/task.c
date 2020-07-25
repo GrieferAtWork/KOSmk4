@@ -268,10 +268,12 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&_bootidle, this_kernel_stackpart_).dp_tree.a_vmax                = (datapage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
 #undef REL
 
-	FORTASK(&_boottask, this_fs)             = &fs_kernel;
-	FORTASK(&_bootidle, this_fs)             = &fs_kernel;
-	FORTASK(&_boottask, this_cred)           = &cred_kernel;
-	FORTASK(&_bootidle, this_cred)           = &cred_kernel;
+	FORTASK(&_boottask, this_fs) = &fs_kernel;
+	FORTASK(&_bootidle, this_fs) = &fs_kernel;
+#ifndef CONFIG_EVERYONE_IS_ROOT
+	FORTASK(&_boottask, this_cred) = &cred_kernel;
+	FORTASK(&_bootidle, this_cred) = &cred_kernel;
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
 	FORTASK(&_boottask, this_handle_manager) = &handle_manager_kernel;
 	FORTASK(&_bootidle, this_handle_manager) = &handle_manager_kernel;
 

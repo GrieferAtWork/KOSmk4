@@ -172,8 +172,10 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	thread->t_sched.s_state = state;
 	if (!FORTASK(thread, this_fs))
 		FORTASK(thread, this_fs) = incref(&fs_kernel);
+#ifndef CONFIG_EVERYONE_IS_ROOT
 	if (!FORTASK(thread, this_cred))
 		FORTASK(thread, this_cred) = incref(&cred_kernel);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
 	if (!FORTASK(thread, this_handle_manager))
 		FORTASK(thread, this_handle_manager) = incref(&handle_manager_kernel);
 	return thread;

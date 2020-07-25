@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc8afee */
+/* HASH CRC-32:0x8a099136 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -583,7 +583,7 @@
 #define __NR32RT_getrusage               (errno_t, __errno_t)
 #define __NR32RT_gettimeofday            (errno_t, __errno_t)
 #define __NR32RT_settimeofday            (errno_t, __errno_t)
-#define __NR32RT_getgroups               (errno_t, __errno_t)
+#define __NR32RT_getgroups               (ssize_t, __ssize_t)
 #define __NR32RT_setgroups               (errno_t, __errno_t)
 #define __NR32RT_select                  (ssize_t, __ssize_t)
 #define __NR32RT_symlink                 (errno_t, __errno_t)
@@ -708,7 +708,7 @@
 #define __NR32RT_getegid32               (uint32_t, __uint32_t)
 #define __NR32RT_setreuid32              (errno_t, __errno_t)
 #define __NR32RT_setregid32              (errno_t, __errno_t)
-#define __NR32RT_getgroups32             (errno_t, __errno_t)
+#define __NR32RT_getgroups32             (ssize_t, __ssize_t)
 #define __NR32RT_setgroups32             (errno_t, __errno_t)
 #define __NR32RT_fchown32                (errno_t, __errno_t)
 #define __NR32RT_setresuid32             (errno_t, __errno_t)

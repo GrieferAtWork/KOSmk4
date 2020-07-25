@@ -26,31 +26,45 @@
 
 #include <kernel/compiler.h>
 
-#include <sched/cred.h>
-#ifndef CONFIG_EVERYONE_IS_ROOT
-
 #include <fs/node.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <kernel/vm.h>
+#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/sequence/bsearch.h>
 
+#include <compat/config.h>
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <sched.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#include <asm/syscalls32_d.h>
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#include <asm/syscalls64_d.h>
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+#error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
+#endif /* __ARCH_HAVE_COMPAT */
+
 DECL_BEGIN
 
+#ifndef CONFIG_EVERYONE_IS_ROOT
 
 /* Destroy the given credentials controller. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -550,39 +564,14 @@ sort_groups_and_remove_duplicates(gid_t *__restrict vec,
 }
 
 
-/* Set the list of supplementary group ids of the calling thread. */
-PUBLIC void FCALL
-cred_setgroups(size_t ngroups,
-               USER CHECKED gid_t const *groups,
-               bool chk_rights)
+PRIVATE void FCALL
+cred_setgroups_heapvec_inherit(struct cred *__restrict self,
+                               size_t ngroups,
+                               /*inherit(always)*/ gid_t *new_groups,
+                               bool chk_rights)
 		THROWS(E_INSUFFICIENT_RIGHTS, E_SEGFAULT) {
 	size_t i;
 	gid_t *old_groups;
-	gid_t *new_groups;
-	struct cred *self = THIS_CRED;
-	if (ngroups > ATOMIC_READ(self->c_ngroups)) {
-		/* NOTE: Technically, `groups[]' may contain duplicate entries,
-		 *       such that the effective group sets are actually identical,
-		 *       however we also have to keep in mind that `ngroups' might
-		 *       be a maliciously big value that could result in the kernel
-		 *       running out of heap memory. As such, a non-malicious user
-		 *       program that wants to rely on setting the same set of groups
-		 *       as had already been set before, should also take tare to
-		 *       ensure that their list of groups doesn't contain any duplicate
-		 *       entires! */
-		if (chk_rights)
-			require(CAP_SETGID);
-	}
-	/* Allocate a new set of groups. */
-	new_groups = (gid_t *)kmalloc(ngroups * sizeof(gid_t),
-	                              GFP_NORMAL);
-	TRY {
-		/* Copy groups from user-space. */
-		memcpy(new_groups, groups, ngroups, sizeof(gid_t));
-	} EXCEPT {
-		kfree(new_groups);
-		RETHROW();
-	}
 	/* Sort the user-provided list of groups and remove duplicates. */
 	i = sort_groups_and_remove_duplicates(new_groups, ngroups);
 	assert(i <= ngroups);
@@ -638,23 +627,1053 @@ do_set_new_group:
 }
 
 
-
-
-
+/* Set the list of supplementary group ids of the calling thread. */
 PUBLIC void FCALL
-cred_require_hwio(void) THROWS(E_INSUFFICIENT_RIGHTS) {
-	/* TODO */
+cred_setgroups(size_t ngroups,
+               USER CHECKED gid_t const *groups,
+               bool chk_rights)
+		THROWS(E_INSUFFICIENT_RIGHTS, E_SEGFAULT) {
+	gid_t *new_groups;
+	struct cred *self = THIS_CRED;
+	if (ngroups > ATOMIC_READ(self->c_ngroups)) {
+		/* NOTE: Technically, `groups[]' may contain duplicate entries,
+		 *       such that the effective group sets are actually identical,
+		 *       however we also have to keep in mind that `ngroups' might
+		 *       be a maliciously big value that could result in the kernel
+		 *       running out of heap memory. As such, a non-malicious user
+		 *       program that wants to rely on setting the same set of groups
+		 *       as had already been set before, should also take tare to
+		 *       ensure that their list of groups doesn't contain any duplicate
+		 *       entires! */
+		if (chk_rights)
+			require(CAP_SETGID);
+	}
+	/* Allocate a new set of groups. */
+	new_groups = (gid_t *)kmalloc(ngroups * sizeof(gid_t),
+	                              GFP_NORMAL);
+	TRY {
+		/* Copy groups from user-space. */
+		memcpy(new_groups, groups, ngroups, sizeof(gid_t));
+	} EXCEPT {
+		kfree(new_groups);
+		RETHROW();
+	}
+	cred_setgroups_heapvec_inherit(self, ngroups, new_groups, chk_rights);
 }
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
 
-PUBLIC void FCALL
-cred_require_hwio_r(port_t from, port_t num)
-		THROWS(E_INSUFFICIENT_RIGHTS) {
-	(void)from;
-	(void)num;
-	/* TODO */
+
+#define SYSCALL_RETURN_TYPE_OF3(a, b) b
+#define SYSCALL_RETURN_TYPE_OF2(x)    SYSCALL_RETURN_TYPE_OF3 x
+#define SYSCALL_RETURN_TYPE_OF(name)  SYSCALL_RETURN_TYPE_OF2(__NRRT_##name)
+
+#define SYSCALL_ARG_TYPE_OF3(a, b)      b
+#define SYSCALL_ARG_TYPE_OF2(x)         SYSCALL_ARG_TYPE_OF3 x
+#define SYSCALL_ARG_TYPE_OF(name, argi) SYSCALL_ARG_TYPE_OF2(__NRAT##argi##_##name)
+
+#ifdef __ARCH_HAVE_COMPAT
+#define COMPAT_SYSCALL_ARG_TYPE_OF3(a, b) b
+#define COMPAT_SYSCALL_ARG_TYPE_OF2(x)    COMPAT_SYSCALL_ARG_TYPE_OF3 x
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#define COMPAT_SYSCALL_ARG_TYPE_OF(name, argi) COMPAT_SYSCALL_ARG_TYPE_OF2(__NR32AT##argi##_##name)
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#define COMPAT_SYSCALL_ARG_TYPE_OF(name, argi) COMPAT_SYSCALL_ARG_TYPE_OF2(__NR64AT##argi##_##name)
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
+#error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
+#endif /* __ARCH_HAVE_COMPAT */
+
+#define TYPEOF_DEREF(T) __typeof__(**(__typeof__(T) *)0)
+
+#ifdef CONFIG_EVERYONE_IS_ROOT
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0()        COMPILER_IMPURE();
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(a)       COMPILER_IMPURE(); (void)a;
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(a, b)    COMPILER_IMPURE(); (void)a; (void)b;
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(a, b, c) COMPILER_IMPURE(); (void)a; (void)b; (void)c;
+#else /* CONFIG_EVERYONE_IS_ROOT */
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0()        /* nothing */
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(a)       /* nothing */
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(a, b)    /* nothing */
+#define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(a, b, c) /* nothing */
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+
+
+
+
+
+
+/************************************************************************/
+/* getuid()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETUID
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getuid), getuid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getuid))cred_getruid();
 }
+#endif /* __ARCH_WANT_SYSCALL_GETUID */
+#ifdef __ARCH_WANT_SYSCALL_GETUID32
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getuid32), getuid32) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getuid32))cred_getruid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETUID32 */
+
+
+/************************************************************************/
+/* setuid()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETUID
+DEFINE_SYSCALL1(errno_t, setuid, SYSCALL_ARG_TYPE_OF(setuid, 0), uid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(uid);
+	cred_setruid((uid_t)uid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETUID */
+#ifdef __ARCH_WANT_SYSCALL_SETUID32
+DEFINE_SYSCALL1(errno_t, setuid32, SYSCALL_ARG_TYPE_OF(setuid32, 0), uid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(uid);
+	cred_setruid((uid_t)uid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETUID32 */
+
+
+/************************************************************************/
+/* getgid()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETGID
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getgid), getgid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getgid))cred_getrgid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETGID */
+#ifdef __ARCH_WANT_SYSCALL_GETGID32
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getgid32), getgid32) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getgid32))cred_getrgid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETGID32 */
+
+
+/************************************************************************/
+/* setgid()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETGID
+DEFINE_SYSCALL1(errno_t, setgid, SYSCALL_ARG_TYPE_OF(setgid, 0), gid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(gid);
+	cred_setrgid((gid_t)gid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETGID */
+#ifdef __ARCH_WANT_SYSCALL_SETGID32
+DEFINE_SYSCALL1(errno_t, setgid32, SYSCALL_ARG_TYPE_OF(setgid32, 0), gid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(gid);
+	cred_setrgid((gid_t)gid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETGID32 */
+
+
+/************************************************************************/
+/* geteuid()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETEUID
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(geteuid), geteuid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(geteuid))cred_geteuid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETEUID */
+#ifdef __ARCH_WANT_SYSCALL_GETEUID32
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(geteuid32), geteuid32) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(geteuid32))cred_geteuid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETEUID32 */
+
+
+/************************************************************************/
+/* seteuid()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETEUID
+DEFINE_SYSCALL1(errno_t, seteuid, SYSCALL_ARG_TYPE_OF(seteuid, 0), euid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(euid);
+	cred_seteuid((uid_t)euid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETEUID */
+#ifdef __ARCH_WANT_SYSCALL_SETEUID32
+DEFINE_SYSCALL1(errno_t, seteuid32, SYSCALL_ARG_TYPE_OF(seteuid32, 0), euid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(euid);
+	cred_seteuid((uid_t)euid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETEUID32 */
+
+
+/************************************************************************/
+/* getegid()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETEGID
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getegid), getegid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getegid))cred_getegid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETEGID */
+#ifdef __ARCH_WANT_SYSCALL_GETEGID32
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getegid32), getegid32) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getegid32))cred_getegid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETEGID32 */
+
+
+/************************************************************************/
+/* setegid()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETEGID
+DEFINE_SYSCALL1(errno_t, setegid, SYSCALL_ARG_TYPE_OF(setegid, 0), egid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(egid);
+	cred_setegid((gid_t)egid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETEGID */
+#ifdef __ARCH_WANT_SYSCALL_SETEGID32
+DEFINE_SYSCALL1(errno_t, setegid32, SYSCALL_ARG_TYPE_OF(setegid32, 0), egid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(egid);
+	cred_setegid((gid_t)egid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETEGID32 */
+
+
+/************************************************************************/
+/* getfsuid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETFSUID
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsuid), getfsuid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getfsuid))cred_getfsuid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETFSUID */
+#ifdef __ARCH_WANT_SYSCALL_GETFSUID32
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsuid32), getfsuid32) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getfsuid32))cred_getfsuid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETFSUID32 */
+
+
+/************************************************************************/
+/* setfsuid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETFSUID
+DEFINE_SYSCALL1(errno_t, setfsuid, SYSCALL_ARG_TYPE_OF(setfsuid, 0), fsuid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(fsuid);
+	cred_setfsuid((uid_t)fsuid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETFSUID */
+#ifdef __ARCH_WANT_SYSCALL_SETFSUID32
+DEFINE_SYSCALL1(errno_t, setfsuid32, SYSCALL_ARG_TYPE_OF(setfsuid32, 0), fsuid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(fsuid);
+	cred_setfsuid((uid_t)fsuid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETFSUID32 */
+
+
+/************************************************************************/
+/* getfsgid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETFSGID
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsgid), getfsgid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getfsgid))cred_getfsgid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETFSGID */
+#ifdef __ARCH_WANT_SYSCALL_GETFSGID32
+DEFINE_SYSCALL0(SYSCALL_RETURN_TYPE_OF(getfsgid32), getfsgid32) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0();
+	return (SYSCALL_RETURN_TYPE_OF(getfsgid32))cred_getfsgid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETFSGID32 */
+
+
+/************************************************************************/
+/* setfsgid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETFSGID
+DEFINE_SYSCALL1(errno_t, setfsgid, SYSCALL_ARG_TYPE_OF(setfsgid, 0), fsgid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(fsgid);
+	cred_setfsgid((gid_t)fsgid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETFSGID */
+#ifdef __ARCH_WANT_SYSCALL_SETFSGID32
+DEFINE_SYSCALL1(errno_t, setfsgid32, SYSCALL_ARG_TYPE_OF(setfsgid32, 0), fsgid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(fsgid);
+	cred_setfsgid((gid_t)fsgid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETFSGID32 */
+
+
+
+
+
+
+/************************************************************************/
+/* setreuid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETREUID
+DEFINE_SYSCALL2(errno_t, setreuid,
+                SYSCALL_ARG_TYPE_OF(setreuid, 0), ruid,
+                SYSCALL_ARG_TYPE_OF(setreuid, 1), euid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(ruid, euid);
+	cred_setreuid((uid_t)ruid,
+	              (uid_t)euid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETREUID */
+#ifdef __ARCH_WANT_SYSCALL_SETREUID32
+DEFINE_SYSCALL2(errno_t, setreuid32,
+                SYSCALL_ARG_TYPE_OF(setreuid32, 0), ruid,
+                SYSCALL_ARG_TYPE_OF(setreuid32, 1), euid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(ruid, euid);
+	cred_setreuid((uid_t)ruid,
+	              (uid_t)euid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETREUID32 */
+
+
+/************************************************************************/
+/* setregid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETREGID
+DEFINE_SYSCALL2(errno_t, setregid,
+                SYSCALL_ARG_TYPE_OF(setregid, 0), rgid,
+                SYSCALL_ARG_TYPE_OF(setregid, 1), egid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(rgid, egid);
+	cred_setregid((gid_t)rgid,
+	              (gid_t)egid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETREGID */
+#ifdef __ARCH_WANT_SYSCALL_SETREGID32
+DEFINE_SYSCALL2(errno_t, setregid32,
+                SYSCALL_ARG_TYPE_OF(setregid32, 0), rgid,
+                SYSCALL_ARG_TYPE_OF(setregid32, 1), egid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(rgid, egid);
+	cred_setregid((gid_t)rgid,
+	              (gid_t)egid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETREGID32 */
+
+
+/************************************************************************/
+/* setresuid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETRESUID
+DEFINE_SYSCALL3(errno_t, setresuid,
+                SYSCALL_ARG_TYPE_OF(setresuid, 0), ruid,
+                SYSCALL_ARG_TYPE_OF(setresuid, 1), euid,
+                SYSCALL_ARG_TYPE_OF(setresuid, 2), suid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(ruid, euid, suid);
+	cred_setresuid((uid_t)ruid,
+	               (uid_t)euid,
+	               (uid_t)suid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETRESUID */
+#ifdef __ARCH_WANT_SYSCALL_SETRESUID32
+DEFINE_SYSCALL3(errno_t, setresuid32,
+                SYSCALL_ARG_TYPE_OF(setresuid32, 0), ruid,
+                SYSCALL_ARG_TYPE_OF(setresuid32, 1), euid,
+                SYSCALL_ARG_TYPE_OF(setresuid32, 2), suid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(ruid, euid, suid);
+	cred_setresuid((uid_t)ruid,
+	               (uid_t)euid,
+	               (uid_t)suid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETRESUID32 */
+
+
+/************************************************************************/
+/* setresgid()                                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETRESGID
+DEFINE_SYSCALL3(errno_t, setresgid,
+                SYSCALL_ARG_TYPE_OF(setresgid, 0), rgid,
+                SYSCALL_ARG_TYPE_OF(setresgid, 1), egid,
+                SYSCALL_ARG_TYPE_OF(setresgid, 2), sgid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(rgid, egid, sgid);
+	cred_setresgid((gid_t)rgid,
+	               (gid_t)egid,
+	               (gid_t)sgid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETRESGID */
+#ifdef __ARCH_WANT_SYSCALL_SETRESGID32
+DEFINE_SYSCALL3(errno_t, setresgid32,
+                SYSCALL_ARG_TYPE_OF(setresgid32, 0), rgid,
+                SYSCALL_ARG_TYPE_OF(setresgid32, 1), egid,
+                SYSCALL_ARG_TYPE_OF(setresgid32, 2), sgid) {
+	SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(rgid, egid, sgid);
+	cred_setresgid((gid_t)rgid,
+	               (gid_t)egid,
+	               (gid_t)sgid);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETRESGID32 */
+
+
+
+
+
+
+/************************************************************************/
+/* getresuid()                                                          */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETRESUID
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresuid, 0)) getresuid_id_t;
+DEFINE_SYSCALL3(errno_t, getresuid,
+                USER UNCHECKED getresuid_id_t *, pruid,
+                USER UNCHECKED getresuid_id_t *, peuid,
+                USER UNCHECKED getresuid_id_t *, psuid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		ruid = 0,
+		euid = 0,
+		suid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	getresuid_id_t ruid, euid, suid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	ruid = (getresuid_id_t)self->c_ruid;
+	euid = (getresuid_id_t)self->c_euid;
+	suid = (getresuid_id_t)self->c_suid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (pruid) {
+		validate_writable(pruid, sizeof(*pruid));
+		*pruid = ruid;
+	}
+	if (peuid) {
+		validate_writable(peuid, sizeof(*peuid));
+		*peuid = euid;
+	}
+	if (psuid) {
+		validate_writable(psuid, sizeof(*psuid));
+		*psuid = suid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_GETRESUID */
+
+#ifdef __ARCH_WANT_SYSCALL_GETRESUID32
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresuid32, 0)) getresuid32_id_t;
+DEFINE_SYSCALL3(errno_t, getresuid32,
+                USER UNCHECKED getresuid32_id_t *, pruid,
+                USER UNCHECKED getresuid32_id_t *, peuid,
+                USER UNCHECKED getresuid32_id_t *, psuid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		ruid = 0,
+		euid = 0,
+		suid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	getresuid32_id_t ruid, euid, suid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	ruid = (getresuid32_id_t)self->c_ruid;
+	euid = (getresuid32_id_t)self->c_euid;
+	suid = (getresuid32_id_t)self->c_suid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (pruid) {
+		validate_writable(pruid, sizeof(*pruid));
+		*pruid = ruid;
+	}
+	if (peuid) {
+		validate_writable(peuid, sizeof(*peuid));
+		*peuid = euid;
+	}
+	if (psuid) {
+		validate_writable(psuid, sizeof(*psuid));
+		*psuid = suid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_GETRESUID32 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESUID
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresuid, 0)) compat_getresuid_id_t;
+DEFINE_COMPAT_SYSCALL3(errno_t, getresuid,
+                       USER UNCHECKED compat_getresuid_id_t *, pruid,
+                       USER UNCHECKED compat_getresuid_id_t *, peuid,
+                       USER UNCHECKED compat_getresuid_id_t *, psuid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		ruid = 0,
+		euid = 0,
+		suid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	compat_getresuid_id_t ruid, euid, suid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	ruid = (compat_getresuid_id_t)self->c_ruid;
+	euid = (compat_getresuid_id_t)self->c_euid;
+	suid = (compat_getresuid_id_t)self->c_suid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (pruid) {
+		validate_writable(pruid, sizeof(*pruid));
+		*pruid = ruid;
+	}
+	if (peuid) {
+		validate_writable(peuid, sizeof(*peuid));
+		*peuid = euid;
+	}
+	if (psuid) {
+		validate_writable(psuid, sizeof(*psuid));
+		*psuid = suid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETRESUID */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESUID32
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresuid32, 0)) compat_getresuid32_id_t;
+DEFINE_COMPAT_SYSCALL3(errno_t, getresuid32,
+                       USER UNCHECKED compat_getresuid32_id_t *, pruid,
+                       USER UNCHECKED compat_getresuid32_id_t *, peuid,
+                       USER UNCHECKED compat_getresuid32_id_t *, psuid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		ruid = 0,
+		euid = 0,
+		suid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	compat_getresuid32_id_t ruid, euid, suid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	ruid = (compat_getresuid32_id_t)self->c_ruid;
+	euid = (compat_getresuid32_id_t)self->c_euid;
+	suid = (compat_getresuid32_id_t)self->c_suid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (pruid) {
+		validate_writable(pruid, sizeof(*pruid));
+		*pruid = ruid;
+	}
+	if (peuid) {
+		validate_writable(peuid, sizeof(*peuid));
+		*peuid = euid;
+	}
+	if (psuid) {
+		validate_writable(psuid, sizeof(*psuid));
+		*psuid = suid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETRESUID32 */
+
+
+/************************************************************************/
+/* getresgid()                                                          */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETRESGID
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresgid, 0)) getresgid_id_t;
+DEFINE_SYSCALL3(errno_t, getresgid,
+                USER UNCHECKED getresgid_id_t *, prgid,
+                USER UNCHECKED getresgid_id_t *, pegid,
+                USER UNCHECKED getresgid_id_t *, psgid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		rgid = 0,
+		egid = 0,
+		sgid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	getresgid_id_t rgid, egid, sgid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	rgid = (getresgid_id_t)self->c_rgid;
+	egid = (getresgid_id_t)self->c_egid;
+	sgid = (getresgid_id_t)self->c_sgid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (prgid) {
+		validate_writable(prgid, sizeof(*prgid));
+		*prgid = rgid;
+	}
+	if (pegid) {
+		validate_writable(pegid, sizeof(*pegid));
+		*pegid = egid;
+	}
+	if (psgid) {
+		validate_writable(psgid, sizeof(*psgid));
+		*psgid = sgid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_GETRESGID */
+
+#ifdef __ARCH_WANT_SYSCALL_GETRESGID32
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getresgid32, 0)) getresgid32_id_t;
+DEFINE_SYSCALL3(errno_t, getresgid32,
+                USER UNCHECKED getresgid32_id_t *, prgid,
+                USER UNCHECKED getresgid32_id_t *, pegid,
+                USER UNCHECKED getresgid32_id_t *, psgid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		rgid = 0,
+		egid = 0,
+		sgid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	getresgid32_id_t rgid, egid, sgid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	rgid = (getresgid32_id_t)self->c_rgid;
+	egid = (getresgid32_id_t)self->c_egid;
+	sgid = (getresgid32_id_t)self->c_sgid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (prgid) {
+		validate_writable(prgid, sizeof(*prgid));
+		*prgid = rgid;
+	}
+	if (pegid) {
+		validate_writable(pegid, sizeof(*pegid));
+		*pegid = egid;
+	}
+	if (psgid) {
+		validate_writable(psgid, sizeof(*psgid));
+		*psgid = sgid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_GETRESGID32 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESGID
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresgid, 0)) compat_getresgid_id_t;
+DEFINE_COMPAT_SYSCALL3(errno_t, getresgid,
+                       USER UNCHECKED compat_getresgid_id_t *, prgid,
+                       USER UNCHECKED compat_getresgid_id_t *, pegid,
+                       USER UNCHECKED compat_getresgid_id_t *, psgid) {
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	enum {
+		rgid = 0,
+		egid = 0,
+		sgid = 0
+	};
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	compat_getresgid_id_t rgid, egid, sgid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	rgid = (compat_getresgid_id_t)self->c_rgid;
+	egid = (compat_getresgid_id_t)self->c_egid;
+	sgid = (compat_getresgid_id_t)self->c_sgid;
+	sync_endread(&self->c_lock);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (prgid) {
+		validate_writable(prgid, sizeof(*prgid));
+		*prgid = rgid;
+	}
+	if (pegid) {
+		validate_writable(pegid, sizeof(*pegid));
+		*pegid = egid;
+	}
+	if (psgid) {
+		validate_writable(psgid, sizeof(*psgid));
+		*psgid = sgid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETRESGID */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETRESGID32
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getresgid32, 0)) compat_getresgid32_id_t;
+DEFINE_COMPAT_SYSCALL3(errno_t, getresgid32,
+                       USER UNCHECKED compat_getresgid32_id_t *, prgid,
+                       USER UNCHECKED compat_getresgid32_id_t *, pegid,
+                       USER UNCHECKED compat_getresgid32_id_t *, psgid) {
+	compat_getresgid32_id_t rgid, egid, sgid;
+	struct cred *self = THIS_CRED;
+	sync_read(&self->c_lock);
+	rgid = (compat_getresgid32_id_t)self->c_rgid;
+	egid = (compat_getresgid32_id_t)self->c_egid;
+	sgid = (compat_getresgid32_id_t)self->c_sgid;
+	sync_endread(&self->c_lock);
+	COMPILER_WRITE_BARRIER();
+	/* Write back results to user-space. */
+	if (prgid) {
+		validate_writable(prgid, sizeof(*prgid));
+		*prgid = rgid;
+	}
+	if (pegid) {
+		validate_writable(pegid, sizeof(*pegid));
+		*pegid = egid;
+	}
+	if (psgid) {
+		validate_writable(psgid, sizeof(*psgid));
+		*psgid = sgid;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETRESGID32 */
+
+
+
+
+
+
+/************************************************************************/
+/* getgroups()                                                          */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_GETGROUPS) ||        \
+     defined(__ARCH_WANT_SYSCALL_GETGROUPS32) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_GETGROUPS) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32))
+
+#ifdef __cplusplus
+extern "C++" {
+#endif /* __cplusplus */
+
+#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifdef __cplusplus
+template<size_t sizeof_gid_t>
+FORCELOCAL void KCALL
+getgid_with_custom_size_(struct cred const *__restrict self,
+                         void *__restrict buf, size_t index)
+#define getgid_with_custom_size(self, buf, index, sizeof_gid_t) \
+	getgid_with_custom_size_<sizeof_gid_t>(self, buf, index)
+#else /* __cplusplus */
+FORCELOCAL void KCALL
+getgid_with_custom_size(struct cred const *__restrict self,
+                        void *__restrict buf, size_t index,
+                        size_t sizeof_gid_t)
+#endif /* !__cplusplus */
+{
+	if (sizeof_gid_t > sizeof(gid_t)) {
+		memset(buf, 0, sizeof_gid_t);
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		memcpy(buf, &self->c_groups[index], sizeof(gid_t));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		memcpy(buf + (sizeof_gid_t - sizeof(gid_t)),
+		       &self->c_groups[index],
+		       sizeof(gid_t));
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported byteorder"
+#endif /* __BYTE_ORDER__ != ... */
+	} else {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		memcpy(buf, &self->c_groups[index], sizeof_gid_t);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		memcpy(buf,
+		       (byte_t *)&self->c_groups[index] + (sizeof(gid_t) -
+		                                           sizeof_gid_t),
+		       sizeof_gid_t);
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported byteorder"
+#endif /* __BYTE_ORDER__ != ... */
+	}
+}
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+
+
+#ifdef __cplusplus
+template<size_t sizeof_gid_t>
+LOCAL ssize_t KCALL
+sys_getgroups_impl_(size_t count,
+                    USER UNCHECKED void *list)
+#define sys_getgroups_impl(count, list, sizeof_gid_t) \
+	sys_getgroups_impl_<sizeof_gid_t>(count, list)
+#else /* __cplusplus */
+LOCAL ssize_t KCALL
+sys_getgroups_impl(size_t count,
+                   USER UNCHECKED void *list,
+                   size_t sizeof_gid_t)
+#endif /* !__cplusplus */
+{
+#ifndef CONFIG_EVERYONE_IS_ROOT
+	byte_t tempgid[sizeof_gid_t];
+	size_t src, missing, result;
+	struct cred *self = THIS_CRED;
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	validate_writablem(list, count, sizeof_gid_t);
+#ifdef CONFIG_EVERYONE_IS_ROOT
+	return 0;
+#else /* CONFIG_EVERYONE_IS_ROOT */
+	sync_read(&self->c_lock);
+	result = self->c_ngroups;
+	/* Deal with the buffer size, as well as the -EINVAL return case. */
+	if (result > count) {
+		if (count != 0)
+			result = (size_t)-EINVAL;
+		goto done;
+	}
+	src     = 0;
+	missing = result;
+	/* Copy to user-space.
+	 * NOTE: Because we need to be holding a lock to `c_lock', this
+	 *       entire copy operation must be performed as interlocked
+	 *       with said lock. */
+continue_copy:
+	if (sizeof_gid_t == sizeof(gid_t)) {
+		size_t copy_error;
+		copy_error = memcpy_nopf(list, self->c_groups + src,
+		                         missing * sizeof_gid_t);
+		if unlikely(copy_error) {
+			size_t ok;
+			copy_error += (sizeof_gid_t - 1);
+			copy_error /= sizeof_gid_t;
+			assert(copy_error);
+			ok      = missing - copy_error;
+			missing = copy_error;
+			list = (byte_t *)list + ok * sizeof_gid_t;
+			goto copynext_without_locks;
+		}
+	} else {
+		while (missing) {
+			getgid_with_custom_size(self, tempgid, src, sizeof_gid_t);
+			if unlikely(memcpy_nopf(list, tempgid, sizeof_gid_t) != 0)
+				goto copynext_without_locks;
+			--missing;
+			list = (byte_t *)list + sizeof_gid_t;
+			++src;
+		}
+	}
+done:
+	sync_endread(&self->c_lock);
+	return (ssize_t)result;
+copynext_without_locks:
+	getgid_with_custom_size(self, tempgid, src, sizeof_gid_t);
+	sync_endread(&self->c_lock);
+	COMPILER_WRITE_BARRIER();
+	/* Copy to user-space without holding any locks. */
+	memcpy(list, tempgid, sizeof_gid_t);
+	COMPILER_WRITE_BARRIER();
+	sync_read(&self->c_lock);
+	--missing;
+	list = (byte_t *)list + sizeof_gid_t;
+	++src;
+	goto continue_copy;
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+}
+#endif /* __ARCH_WANT_SYSCALL_GETGROUPS */
+
+#ifdef __cplusplus
+} /* extern "C++" */
+#endif /* __cplusplus */
+
+#ifdef __ARCH_WANT_SYSCALL_GETGROUPS
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getgroups, 1)) getgroups_id_t;
+DEFINE_SYSCALL2(ssize_t, getgroups, size_t, count,
+                USER UNCHECKED getgroups_id_t *, list) {
+	return sys_getgroups_impl(count, list, sizeof(getgroups_id_t));
+}
+#endif /* __ARCH_WANT_SYSCALL_GETGROUPS */
+
+#ifdef __ARCH_WANT_SYSCALL_GETGROUPS32
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(getgroups32, 1)) getgroups32_id_t;
+DEFINE_SYSCALL2(ssize_t, getgroups32, size_t, count,
+                USER UNCHECKED getgroups32_id_t *, list) {
+	return sys_getgroups_impl(count, list, sizeof(getgroups32_id_t));
+}
+#endif /* __ARCH_WANT_SYSCALL_GETGROUPS32 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getgroups, 1)) compat_getgroups_id_t;
+DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups, size_t, count,
+                       USER UNCHECKED compat_getgroups_id_t *, list) {
+	return sys_getgroups_impl(count, list, sizeof(compat_getgroups_id_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(getgroups32, 1)) compat_getgroups32_id_t;
+DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups32, size_t, count,
+                       USER UNCHECKED compat_getgroups32_id_t *, list) {
+	return sys_getgroups_impl(count, list, sizeof(compat_getgroups32_id_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS32 */
+
+
+
+
+
+
+/************************************************************************/
+/* setgroups()                                                          */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_SETGROUPS) ||        \
+     defined(__ARCH_WANT_SYSCALL_SETGROUPS32) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SETGROUPS) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32))
+
+#ifdef __cplusplus
+extern "C++" {
+#endif /* __cplusplus */
+
+#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifdef __cplusplus
+template<size_t sizeof_gid_t>
+FORCELOCAL gid_t KCALL
+extractgid_with_custom_size_(void const *__restrict buf, size_t index)
+#define extractgid_with_custom_size(buf, index, sizeof_gid_t) \
+	extractgid_with_custom_size_<sizeof_gid_t>(buf, index)
+#else /* __cplusplus */
+FORCELOCAL gid_t KCALL
+extractgid_with_custom_size(void const *__restrict buf, size_t index,
+                            size_t sizeof_gid_t)
+#endif /* !__cplusplus */
+{
+	gid_t result;
+	buf = (byte_t const *)buf + index * sizeof_gid_t;
+	if (sizeof_gid_t < sizeof(gid_t)) {
+		memset(&result, 0, sizeof(result));
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		memcpy(&result, buf, sizeof_gid_t);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		memcpy((byte_t *)&result + (sizeof(gid_t) -
+		                            sizeof_gid_t),
+		       buf, sizeof_gid_t);
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported byteorder"
+#endif /* __BYTE_ORDER__ != ... */
+	} else {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		memcpy(&result, buf, sizeof(gid_t));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		memcpy(&result,
+		       buf + (sizeof_gid_t -
+		              sizeof(gid_t)),
+		       sizeof(gid_t));
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported byteorder"
+#endif /* __BYTE_ORDER__ != ... */
+	}
+	return result;
+}
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+
+#ifdef __cplusplus
+template<size_t sizeof_gid_t>
+LOCAL errno_t KCALL
+sys_setgroups_impl_(size_t count,
+                    USER UNCHECKED void const *list)
+#define sys_setgroups_impl(count, list, sizeof_gid_t) \
+	sys_setgroups_impl_<sizeof_gid_t>(count, list)
+#else /* __cplusplus */
+LOCAL errno_t KCALL
+sys_setgroups_impl(size_t count,
+                   USER UNCHECKED void const *list,
+                   size_t sizeof_gid_t)
+#endif /* !__cplusplus */
+{
+	validate_readablem(list, count, sizeof_gid_t);
+#ifndef CONFIG_EVERYONE_IS_ROOT
+	if (sizeof_gid_t == sizeof(gid_t)) {
+		cred_setgroups(count, (gid_t const *)list, true);
+	} else {
+		gid_t *new_groups;
+		struct cred *self = THIS_CRED;
+		if (count > ATOMIC_READ(self->c_ngroups))
+			require(CAP_SETGID);
+		/* Allocate a new set of groups. */
+		new_groups = (gid_t *)kmalloc(count * sizeof(gid_t),
+		                              GFP_NORMAL);
+		TRY {
+			/* Copy groups from user-space. */
+			size_t i;
+			for (i = 0; i < count; ++i) {
+				new_groups[i] = extractgid_with_custom_size(list,
+				                                            i,
+				                                            sizeof_gid_t);
+			}
+		} EXCEPT {
+			kfree(new_groups);
+			RETHROW();
+		}
+		/* Apply new groups. */
+		cred_setgroups_heapvec_inherit(self,
+		                               count,
+		                               new_groups,
+		                               true);
+	}
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETGROUPS */
+
+#ifdef __cplusplus
+} /* extern "C++" */
+#endif /* __cplusplus */
+
+#ifdef __ARCH_WANT_SYSCALL_SETGROUPS
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(setgroups, 1)) setgroups_id_t;
+DEFINE_SYSCALL2(errno_t, setgroups, size_t, count,
+                USER UNCHECKED setgroups_id_t const *, list) {
+	return sys_setgroups_impl(count, list, sizeof(setgroups_id_t));
+}
+#endif /* __ARCH_WANT_SYSCALL_SETGROUPS */
+
+#ifdef __ARCH_WANT_SYSCALL_SETGROUPS32
+typedef TYPEOF_DEREF(SYSCALL_ARG_TYPE_OF(setgroups32, 1)) setgroups32_id_t;
+DEFINE_SYSCALL2(errno_t, setgroups32, size_t, count,
+                USER UNCHECKED setgroups32_id_t const *, list) {
+	return sys_setgroups_impl(count, list, sizeof(setgroups32_id_t));
+}
+#endif /* __ARCH_WANT_SYSCALL_SETGROUPS32 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(setgroups, 1)) compat_setgroups_id_t;
+DEFINE_COMPAT_SYSCALL2(errno_t, setgroups, size_t, count,
+                       USER UNCHECKED compat_setgroups_id_t const *, list) {
+	return sys_setgroups_impl(count, list, sizeof(compat_setgroups_id_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32
+typedef TYPEOF_DEREF(COMPAT_SYSCALL_ARG_TYPE_OF(setgroups32, 1)) compat_setgroups32_id_t;
+DEFINE_COMPAT_SYSCALL2(errno_t, setgroups32, size_t, count,
+                       USER UNCHECKED compat_setgroups32_id_t const *, list) {
+	return sys_setgroups_impl(count, list, sizeof(compat_setgroups32_id_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SETGROUPS32 */
+
+
+
+
+
+
+/* TODO: __ARCH_WANT_SYSCALL_CAPGET */
+/* TODO: __ARCH_WANT_SYSCALL_CAPSET */
+
 
 DECL_END
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_CRED_C */

@@ -671,6 +671,17 @@ inode_access(struct inode *__restrict self, unsigned int type)
 		THROW(E_FSERROR_ACCESS_DENIED);
 }
 
+PUBLIC NONNULL((1)) void KCALL
+inode_access_accmode(struct inode *__restrict self, iomode_t iomode)
+		THROWS(E_FSERROR_ACCESS_DENIED, E_IOERROR, ...) {
+	unsigned int type = 0;
+	if ((iomode & IO_ACCMODE) != IO_WRONLY)
+		type |= R_OK; /* Test for read-access */
+	if ((iomode & IO_ACCMODE) != IO_RDONLY)
+		type |= W_OK; /* Test for write-access */
+	inode_access(self, type);
+}
+
 PUBLIC NONNULL((1)) bool KCALL
 inode_tryaccess(struct inode *__restrict self, unsigned int type)
 		THROWS(E_IOERROR, ...) {
@@ -884,8 +895,11 @@ inode_ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
  * @throw: E_FSERROR_READONLY: [...]
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_WRATTR: [...] */
 PUBLIC NONNULL((1)) void KCALL
-inode_chtime(struct inode *__restrict self, struct timespec const *new_atime,
-             struct timespec const *new_mtime, struct timespec const *new_ctime)
+inode_chtime(struct inode *__restrict self,
+             struct timespec const *new_atime,
+             struct timespec const *new_mtime,
+             struct timespec const *new_ctime,
+             bool check_permissions)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY, E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	struct inode_type *tp_self = self->i_type;
 	if (!tp_self->it_attr.a_saveattr)
@@ -893,6 +907,19 @@ inode_chtime(struct inode *__restrict self, struct timespec const *new_atime,
 	inode_loadattr_and_check_deleted(self);
 	{
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
+#ifndef CONFIG_EVERYONE_IS_ROOT
+		if (check_permissions) {
+			/* Permission restrictions:
+			 *  - `i_fileuid' must match the caller's fsuid, or the caller must have `CAP_FOWNER' */
+			if (self->i_fileuid != cred_getfsuid())
+				require(CAP_FOWNER);
+			/* KOS-specific: Changing a file's creation timestamp requires special capabilities. */
+			if (new_ctime != NULL)
+				require(CAP_AT_CHANGE_CTIME);
+		}
+#else /* !CONFIG_EVERYONE_IS_ROOT */
+		(void)check_permissions;
+#endif /* CONFIG_EVERYONE_IS_ROOT */
 		if (new_atime)
 			memcpy(&self->i_fileatime, new_atime, sizeof(struct timespec));
 		if (new_mtime)
@@ -918,7 +945,9 @@ inode_chtime(struct inode *__restrict self, struct timespec const *new_atime,
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_WRATTR: [...] */
 PUBLIC NONNULL((1)) mode_t KCALL
 inode_chmod(struct inode *__restrict self,
-            mode_t perm_mask, mode_t perm_flag)
+            mode_t perm_mask,
+            mode_t perm_flag,
+            bool check_permissions)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	mode_t old_mode;
@@ -930,8 +959,32 @@ inode_chmod(struct inode *__restrict self,
 	{
 		mode_t new_mode;
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
+#ifndef CONFIG_EVERYONE_IS_ROOT
+		if (check_permissions) {
+			/* Permission restrictions:
+			 *   - `i_fileuid' must match the caller's fsuid, or the caller must have `CAP_FOWNER'
+			 *   - If `i_filegid' doesn't relate to the caller, and the caller doesn't
+			 *     have `CAP_FSETID', then the `S_ISGID' bit is always turned off.
+			 * That is all. - Every user's allowed to set the SETUID bit, since they can only do this
+			 * for files they own, and in doing this, only allow programs to impersonate that user!
+			 */
+			if (self->i_fileuid != cred_getfsuid())
+				require(CAP_FOWNER);
+			if ((perm_flag & S_ISGID) || (perm_mask & S_ISGID)) {
+				/* The Set-gid bit can must be turned off (i.e. cannot be turned on/or left on)
+				 * when the caller isn't apart of the group associated with `self->i_filegid' */
+				if (!capable(CAP_FSETID) &&
+				    !cred_isfsgroupmember(self->i_filegid)) {
+					perm_mask &= ~S_ISGID;
+					perm_flag &= ~S_ISGID;
+				}
+			}
+		}
+#else /* !CONFIG_EVERYONE_IS_ROOT */
+		(void)check_permissions;
+#endif /* CONFIG_EVERYONE_IS_ROOT */
 		old_mode = self->i_filemode & 07777;
-		new_mode = (old_mode & perm_mask) | perm_flag;
+		new_mode = ((old_mode & perm_mask) | perm_flag) & 07777;
 		assert(!(new_mode & ~07777));
 		if (old_mode != new_mode) {
 			/* Set the new file mode. */
@@ -965,7 +1018,8 @@ inode_chmod(struct inode *__restrict self,
 PUBLIC NONNULL((1)) void KCALL
 inode_chown(struct inode *__restrict self,
             uid_t owner, gid_t group,
-            uid_t *pold_owner, gid_t *pold_group)
+            uid_t *pold_owner, gid_t *pold_group,
+            bool check_permissions)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	uid_t old_owner;
@@ -976,17 +1030,53 @@ inode_chown(struct inode *__restrict self,
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_WRATTR);
 	inode_loadattr_and_check_deleted(self);
 	{
+		mode_t new_mode;
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
 		old_owner = self->i_fileuid;
 		old_group = self->i_filegid;
+		/* Check for special cases: Don't actually change uid/gid */
+		if (owner == (uid_t)-1)
+			owner = old_owner;
+		if (group == (gid_t)-1)
+			group = old_group;
 		if (old_owner != owner || old_group != group) {
+#ifndef CONFIG_EVERYONE_IS_ROOT
+			if (check_permissions) {
+				/* Permission restrictions:
+				 *   - `owner' must match `old_owner', or the caller needs `CAP_CHOWN'
+				 *   - `group' must be apart of the caller's groups, or the caller needs `CAP_CHOWN'
+				 */
+				if (owner != old_owner)
+					require(CAP_CHOWN);
+				if (group != old_group && !cred_isfsgroupmember(group))
+					require(CAP_CHOWN);
+			}
+#else /* !CONFIG_EVERYONE_IS_ROOT */
+			(void)check_permissions;
+#endif /* CONFIG_EVERYONE_IS_ROOT */
+			new_mode = self->i_filemode;
+			if (new_mode & 0111) {
+				/* When changing the owner or group of an executable file,
+				 * then the S_ISUID and S_ISGID bits should be cleared.
+				 * However, `S_ISGID' is not cleared when `S_IXGRP' isn't set. */
+				mode_t mask;
+				if (new_mode & S_IXGRP) {
+					mask = ~(S_ISUID | S_ISGID);
+				} else {
+					mask = ~(S_ISUID);
+				}
+				ATOMIC_FETCHAND(self->i_filemode, mask);
+				new_mode &= mask;
+			}
 			self->i_fileuid = owner;
 			self->i_filegid = group;
 			if (tp_self->it_attr.a_maskattr) {
 				/* Mask unsupported features */
 				(*tp_self->it_attr.a_maskattr)(self);
 				/* Check if the written attributes were ok. */
-				if (self->i_fileuid != owner || self->i_filegid != group) {
+				if (self->i_fileuid != owner ||
+				    self->i_filegid != group ||
+				    self->i_filemode != new_mode) {
 					self->i_fileuid = old_owner;
 					self->i_filegid = old_group;
 					THROW(E_FSERROR_UNSUPPORTED_OPERATION,

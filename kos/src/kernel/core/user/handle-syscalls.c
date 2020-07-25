@@ -592,7 +592,7 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
 		if unlikely(!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		result = handle_write(hand, buf, bufsize);
 	} EXCEPT {
 		decref(hand);

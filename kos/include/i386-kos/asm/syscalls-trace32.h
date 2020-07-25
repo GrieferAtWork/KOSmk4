@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x444b4d5a */
+/* HASH CRC-32:0x4ce2e316 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1333,7 +1333,7 @@
 #define __NRRTR_settimeofday             SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getgroups               SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR1_getgroups               SC_REPR_POINTER                                                      /* list */ 
-#define __NRRTR_getgroups                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_getgroups                SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_setgroups               SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR1_setgroups               SC_REPR_GID_VECTOR16                                                 /* groups */ 
 #define __NRATL1_setgroups               0                                                                    /* groups -> count */ 
@@ -1730,7 +1730,7 @@
 #define __NRRTR_setregid32               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getgroups32             SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR1_getgroups32             SC_REPR_POINTER                                                      /* list */ 
-#define __NRRTR_getgroups32              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_getgroups32              SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_setgroups32             SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR1_setgroups32             SC_REPR_GID_VECTOR32                                                 /* groups */ 
 #define __NRATL1_setgroups32             0                                                                    /* groups -> count */ 

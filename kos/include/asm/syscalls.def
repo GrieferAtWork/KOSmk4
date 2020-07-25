@@ -58,7 +58,7 @@
 %[signed_types(s64, int64_t, long64_t, __INT64_TYPE__, __LONG64_TYPE__)]
 %[signed_types(s128, int128_t, long128_t, __INT128_TYPE__, __LONG128_TYPE__)]
 %[signed_types(syscall_slong_t, intptr_t, intptr_half_t, intptr_quarter_t)]
-%[signed_types(time32_t, time64_t)]
+%[signed_types(time32_t, time64_t, ssize_t)]
 %[signed_types(errno_t, signo_t, oflag_t, fd_t)]
 
 /* Syscall definition syntax
@@ -478,9 +478,12 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 %[endgroup]
 
 %[startgroup]
-[restart(must)] getgroups:(size_t count, [tostr(out:GID_VECTOR:count)] gid_t list[]) -> errno_t;
-[restart(must)] getgroups16:(size_t count, [tostr(out:GID_VECTOR16:count)] uint16_t list[]) -> errno_t;
-[restart(must)] getgroups32:(size_t count, [tostr(out:GID_VECTOR32:count)] uint32_t list[]) -> errno_t;
+@@@return: * :     [count == 0] The required number of groups
+@@@return: * :     [count != 0] The number of groups that were actually returned
+@@@throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!)
+[restart(must)] getgroups:(size_t count, [tostr(out:GID_VECTOR:count)] gid_t list[]) -> ssize_t;
+[doc_alias(getgroups)][restart(must)] getgroups32:(size_t count, [tostr(out:GID_VECTOR32:count)] uint32_t list[]) -> ssize_t;
+[doc_alias(getgroups)][restart(must)] getgroups16:(size_t count, [tostr(out:GID_VECTOR16:count)] uint16_t list[]) -> ssize_t;
 %[endgroup]
 
 %[startgroup]

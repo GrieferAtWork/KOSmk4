@@ -164,10 +164,10 @@ x86_setiopl(struct task *__restrict thread,
 	struct set_iopl_args args;
 again:
 	args.ia_new_iopl          = new_iopl;
-	args.ia_allow_iopl_change = !check_creds || cred_has_sys_admin();
+	args.ia_allow_iopl_change = !check_creds || capable(CAP_SYS_RAWIO);
 	cpu_private_function_call(thread, &cpl_setiopl_impl, &args);
 	if (!args.ia_was_set) {
-		cred_require_sysadmin();
+		require(CAP_SYS_RAWIO);
 		goto again;
 	}
 	return args.ia_old_iopl;
@@ -189,7 +189,7 @@ sys_iopl_impl(struct icpustate *__restrict state,
 	old_level = EFLAGS_GTIOPL(pflags);
 	/* Only require HWIO permissions when raising the IOPL level. */
 	if (level > old_level)
-		cred_require_hwio();
+		require(CAP_SYS_RAWIO);
 	/* Set the new PFLAGS value to reflect
 	 * the updated IOPL permissions level. */
 	pflags = (pflags & ~EFLAGS_IOPLMASK) | EFLAGS_IOPL(level);

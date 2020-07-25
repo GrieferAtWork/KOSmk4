@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf081fcd8 */
+/* HASH CRC-32:0x1b029ccc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2910,7 +2910,10 @@ INTERN_FUNCTION(libc_sys_Xsetregid)
 END(libc_sys_Xsetregid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetregid, libc_sys_Xsetregid)
 
-/* errno_t getgroups(size_t count, gid_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, gid_t[] list) */
 .section .text.crt.syscall.getgroups
 INTERN_FUNCTION(libc_sys_getgroups)
 	.cfi_startproc
@@ -2922,7 +2925,10 @@ INTERN_FUNCTION(libc_sys_getgroups)
 END(libc_sys_getgroups)
 DEFINE_PUBLIC_ALIAS(sys_getgroups, libc_sys_getgroups)
 
-/* errno_t getgroups(size_t count, gid_t[] list) */
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+/* ssize_t getgroups(size_t count, gid_t[] list) */
 .section .text.crt.syscall.Xgetgroups
 INTERN_FUNCTION(libc_sys_Xgetgroups)
 	.cfi_startproc

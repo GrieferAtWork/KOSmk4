@@ -1102,7 +1102,7 @@ DEFINE_SYSCALL2(errno_t, umount2,
 	{
 		FINALLY_DECREF_UNLIKELY(p);
 		/* Require mounting rights. */
-		cred_require_mount();
+		require(CAP_MOUNT);
 		path_umount(p);
 	}
 	return -EOK;
@@ -1158,7 +1158,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 			{
 				FINALLY_DECREF(target_path);
 				/* Require mounting rights. */
-				cred_require_mount();
+				require(CAP_MOUNT);
 				path_movemount(target_path,
 				               source_path,
 				               (mountflags & MS_REMOUNT) != 0);
@@ -1190,7 +1190,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 			{
 				FINALLY_DECREF(p);
 				/* Require mounting rights. */
-				cred_require_mount();
+				require(CAP_MOUNT);
 				/* Mount the directory from the other node. */
 				path_mount(p,
 				           node,
@@ -1228,7 +1228,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 		}
 		FINALLY_DECREF_UNLIKELY(super);
 		/* Require mounting rights. */
-		cred_require_mount();
+		require(CAP_MOUNT);
 		do {
 			old_flags = ATOMIC_READ(super->s_flags);
 			new_flags = old_flags | SUPERBLOCK_FDOATIME;
@@ -1272,7 +1272,7 @@ DEFINE_SYSCALL5(errno_t, mount,
 		                                      NULL);
 		FINALLY_DECREF_UNLIKELY(mount_location);
 		/* Require mounting rights. */
-		cred_require_mount();
+		require(CAP_MOUNT);
 		super_flags = SUPERBLOCK_FDOATIME;
 		if (mountflags & MS_NOATIME)
 			super_flags &= ~SUPERBLOCK_FDOATIME;
@@ -1610,9 +1610,7 @@ DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
 	                            NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node,
-		            07777,
-		            mode);
+		inode_chmod(node, 0, mode);
 	}
 	return -EOK;
 }
@@ -1625,9 +1623,7 @@ DEFINE_SYSCALL2(errno_t, fchmod, fd_t, fd, mode_t, mode) {
 	node = handle_get_inode((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node,
-		            07777,
-		            mode);
+		inode_chmod(node, 0, mode);
 	}
 	return -EOK;
 }
@@ -1649,9 +1645,7 @@ DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mod
 	                         NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node,
-		            07777,
-		            mode);
+		inode_chmod(node, 0, mode);
 	}
 	return -EOK;
 }

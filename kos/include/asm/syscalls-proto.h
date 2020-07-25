@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbba58bd4 */
+/* HASH CRC-32:0x592958be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -509,7 +509,7 @@
 #define __NRRT_getpgid                (pid_t, __pid_t)
 #define __NRRT_getsid                 (pid_t, __pid_t)
 #define __NRRT_setsid                 (pid_t, __pid_t)
-#define __NRRT_getgroups              (errno_t, __errno_t)
+#define __NRRT_getgroups              (ssize_t, __ssize_t)
 #define __NRRT_setgroups              (errno_t, __errno_t)
 #define __NRRT_uname                  (errno_t, __errno_t)
 #define __NRRT_sethostname            (errno_t, __errno_t)

@@ -688,10 +688,10 @@ do_TCSETA: {
 		int error;
 		error = ttybase_device_setctty(me,
 		                               true,
-		                               cred_allow_ctty_stealing() && (uintptr_t)arg != 0,
+		                               (uintptr_t)arg != 0 && capable(CAP_ALLOW_CTTY_STEALING),
 		                               false);
 		if (error == TTYBASE_DEVICE_SETCTTY_INUSE)
-			THROW(E_INSUFFICIENT_RIGHTS_CTTY_STEALING);
+			THROW(E_INSUFFICIENT_RIGHTS, CAP_ALLOW_CTTY_STEALING);
 		if (error == TTYBASE_DEVICE_SETCTTY_DIFFERENT)
 			THROW(E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED);
 		if (error == TTYBASE_DEVICE_SETCTTY_NOTLEADER)
@@ -823,7 +823,7 @@ do_TCSETX:
 	{
 		size_t value;
 		struct linebuffer *lnbuf;
-		cred_require_sysadmin();
+		require(CAP_SET_TTY_BUFFER_SIZES);
 		COMPILER_READ_BARRIER();
 #if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
 		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {

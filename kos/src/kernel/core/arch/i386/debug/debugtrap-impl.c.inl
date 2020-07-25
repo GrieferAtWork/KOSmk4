@@ -80,7 +80,7 @@ sys_debugtrap64_impl(struct icpustate *__restrict return_state,
 		case DEBUGTRAP_REASON_TEXITED:
 		case DEBUGTRAP_REASON_PEXITED: {
 			REF struct task *thread;
-			cred_require_debugtrap();
+			require(CAP_DEBUGTRAP);
 			thread = pidns_lookup_task(THIS_PIDNS, (upid_t)reason.dtr_intarg);
 			FINALLY_DECREF_UNLIKELY(thread);
 			reason.dtr_ptrarg = thread;
@@ -118,7 +118,7 @@ sys_debugtrap64_impl(struct icpustate *__restrict return_state,
 		case DEBUGTRAP_REASON_CLONE:
 		case DEBUGTRAP_REASON_SWBREAK:
 		case DEBUGTRAP_REASON_HWBREAK:
-			cred_require_debugtrap();
+			require(CAP_DEBUGTRAP);
 			reason.dtr_intarg = 0;
 			break;
 

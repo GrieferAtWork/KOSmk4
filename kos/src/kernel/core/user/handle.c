@@ -1802,7 +1802,7 @@ handle_tryclose_symolic(unsigned int fd)
 		REF struct path *oldp;
 		v = THIS_FS->f_vfs;
 		id = (fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
-		cred_require_driveroot();
+		require(CAP_MOUNT_DRIVES);
 		sync_write(&v->v_drives_lock);
 		oldp = v->v_drives[id];
 		v->v_drives[id] = NULL;
@@ -1913,7 +1913,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		REF struct path *p, *oldp;
 		struct vfs *v;
 		unsigned int id;
-		cred_require_driveroot();
+		require(CAP_MOUNT_DRIVES);
 		/* Bind DOS drives */
 		id = (dst_fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
 		p = handle_as_path_noinherit(hnd);
@@ -2266,7 +2266,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 			}
 			/* Require `CAP_SYS_RESOURCE' for very large buffers */
 			if (newsize > pipe_max_bufsize_unprivileged)
-				cred_require_resource();
+				require(CAP_EXCEED_PIPE_MAX_SIZE);
 			ATOMIC_WRITE(p->p_buffer.rb_limit, newsize);
 		} EXCEPT {
 			decref_unlikely(temp);

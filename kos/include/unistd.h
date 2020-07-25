@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb02a65b */
+/* HASH CRC-32:0x483f2ad2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,18 +116,18 @@ __SYSDECL_BEGIN
 #define STDERR_FILENO __STDERR_FILENO /* Standard error output. */
 #endif /* __STDERR_FILENO */
 
-#ifdef __F_OK
-#define F_OK __F_OK /* Test for existence. */
-#endif /* __F_OK */
-#ifdef __X_OK
-#define X_OK __X_OK /* Test for execute permission. */
-#endif /* __X_OK */
-#ifdef __W_OK
-#define W_OK __W_OK /* Test for write permission. */
-#endif /* __W_OK */
-#ifdef __R_OK
+#if !defined(R_OK) && defined(__R_OK)
 #define R_OK __R_OK /* Test for read permission. */
-#endif /* __R_OK */
+#endif /* !R_OK && __R_OK */
+#if !defined(W_OK) && defined(__W_OK)
+#define W_OK __W_OK /* Test for write permission. */
+#endif /* !W_OK && __W_OK */
+#if !defined(X_OK) && defined(__X_OK)
+#define X_OK __X_OK /* Test for execute permission. */
+#endif /* !X_OK && __X_OK */
+#if !defined(F_OK) && defined(__F_OK)
+#define F_OK __F_OK /* Test for existence. */
+#endif /* !F_OK && __F_OK */
 
 #ifndef SEEK_SET
 #ifdef __SEEK_SET

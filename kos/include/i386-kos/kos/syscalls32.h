@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cc6dc6a */
+/* HASH CRC-32:0xc7b36e01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -656,10 +656,16 @@ __CDECLARE_SC(,__uint16_t,getgid,(void),())
 __CDECLARE_SC(,__uint32_t,getgid32,(void),())
 #endif /* __CRT_HAVE_SC(getgid32) */
 #if __CRT_HAVE_SC(getgroups)
-__CDECLARE_SC(,__errno_t,getgroups,(__size_t __count, __uint16_t *__list),(__count,__list))
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+__CDECLARE_SC(,__ssize_t,getgroups,(__size_t __count, __uint16_t *__list),(__count,__list))
 #endif /* __CRT_HAVE_SC(getgroups) */
 #if __CRT_HAVE_SC(getgroups32)
-__CDECLARE_SC(,__errno_t,getgroups32,(__size_t __count, __uint32_t *__list),(__count,__list))
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+__CDECLARE_SC(,__ssize_t,getgroups32,(__size_t __count, __uint32_t *__list),(__count,__list))
 #endif /* __CRT_HAVE_SC(getgroups32) */
 #if __CRT_HAVE_SC(getitimer)
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
@@ -2482,10 +2488,16 @@ __CDECLARE_XSC(,__uint16_t,getgid,(void),())
 __CDECLARE_XSC(,__uint32_t,getgid32,(void),())
 #endif /* __CRT_HAVE_XSC(getgid32) */
 #if __CRT_HAVE_XSC(getgroups)
-__CDECLARE_XSC(,__errno_t,getgroups,(__size_t __count, __uint16_t *__list),(__count,__list))
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+__CDECLARE_XSC(,__ssize_t,getgroups,(__size_t __count, __uint16_t *__list),(__count,__list))
 #endif /* __CRT_HAVE_XSC(getgroups) */
 #if __CRT_HAVE_XSC(getgroups32)
-__CDECLARE_XSC(,__errno_t,getgroups32,(__size_t __count, __uint32_t *__list),(__count,__list))
+/* @return: * :     [count == 0] The required number of groups
+ * @return: * :     [count != 0] The number of groups that were actually returned
+ * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
+__CDECLARE_XSC(,__ssize_t,getgroups32,(__size_t __count, __uint32_t *__list),(__count,__list))
 #endif /* __CRT_HAVE_XSC(getgroups32) */
 #if __CRT_HAVE_XSC(getitimer)
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
