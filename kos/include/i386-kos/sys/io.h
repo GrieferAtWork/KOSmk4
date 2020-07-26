@@ -29,6 +29,8 @@
 
 #include <sys/perm.h>
 
+#define __SIZEOF_PORT_T__ 2
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
