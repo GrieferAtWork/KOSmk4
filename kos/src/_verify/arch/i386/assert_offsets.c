@@ -1247,13 +1247,54 @@ static_assert(alignof(struct __mcontext_linux64) == __ALIGNOF_MCONTEXT_LINUX64);
 #include <bits/mcontext-cygwin32.h>
 
 /* struct __cygwin32_uc_fpreg */
-/* ... */
+static_assert(offsetof(struct __cygwin32_uc_fpreg, exponent) == __OFFSET_CYGWIN32_UC_FPREG_EXPONENT);
+static_assert(offsetof(struct __cygwin32_uc_fpreg, significand) == __OFFSET_CYGWIN32_UC_FPREG_SIGNIFICAND);
+static_assert(sizeof(struct __cygwin32_uc_fpreg) == __SIZEOF_CYGWIN32_UC_FPREG);
+static_assert(alignof(struct __cygwin32_uc_fpreg) == __ALIGNOF_CYGWIN32_UC_FPREG);
 
 /* struct __cygwin32_fpstate */
-/* ... */
+static_assert(offsetof(struct __cygwin32_fpstate, cssel) == __OFFSET_CYGWIN32_FPSTATE_CSSEL);
+static_assert(offsetof(struct __cygwin32_fpstate, cw) == __OFFSET_CYGWIN32_FPSTATE_CW);
+static_assert(offsetof(struct __cygwin32_fpstate, dataoff) == __OFFSET_CYGWIN32_FPSTATE_DATAOFF);
+static_assert(offsetof(struct __cygwin32_fpstate, datasel) == __OFFSET_CYGWIN32_FPSTATE_DATASEL);
+static_assert(offsetof(struct __cygwin32_fpstate, ipoff) == __OFFSET_CYGWIN32_FPSTATE_IPOFF);
+static_assert(offsetof(struct __cygwin32_fpstate, nxst) == __OFFSET_CYGWIN32_FPSTATE_NXST);
+static_assert(offsetof(struct __cygwin32_fpstate, _st) == __OFFSET_CYGWIN32_FPSTATE_ST);
+static_assert(offsetof(struct __cygwin32_fpstate, sw) == __OFFSET_CYGWIN32_FPSTATE_SW);
+static_assert(offsetof(struct __cygwin32_fpstate, tag) == __OFFSET_CYGWIN32_FPSTATE_TAG);
+static_assert(sizeof(struct __cygwin32_fpstate) == __SIZEOF_CYGWIN32_FPSTATE);
+static_assert(alignof(struct __cygwin32_fpstate) == __ALIGNOF_CYGWIN32_FPSTATE);
 
 /* struct __cygwin32_mcontext */
-/* ... */
+static_assert(offsetof(struct __cygwin32_mcontext, cr2) == __OFFSET_CYGWIN32_MCONTEXT_CR2);
+static_assert(offsetof(struct __cygwin32_mcontext, cs) == __OFFSET_CYGWIN32_MCONTEXT_CS);
+static_assert(offsetof(struct __cygwin32_mcontext, ctxflags) == __OFFSET_CYGWIN32_MCONTEXT_CTXFLAGS);
+static_assert(offsetof(struct __cygwin32_mcontext, dr0) == __OFFSET_CYGWIN32_MCONTEXT_DR0);
+static_assert(offsetof(struct __cygwin32_mcontext, dr1) == __OFFSET_CYGWIN32_MCONTEXT_DR1);
+static_assert(offsetof(struct __cygwin32_mcontext, dr2) == __OFFSET_CYGWIN32_MCONTEXT_DR2);
+static_assert(offsetof(struct __cygwin32_mcontext, dr3) == __OFFSET_CYGWIN32_MCONTEXT_DR3);
+static_assert(offsetof(struct __cygwin32_mcontext, dr6) == __OFFSET_CYGWIN32_MCONTEXT_DR6);
+static_assert(offsetof(struct __cygwin32_mcontext, dr7) == __OFFSET_CYGWIN32_MCONTEXT_DR7);
+static_assert(offsetof(struct __cygwin32_mcontext, ds) == __OFFSET_CYGWIN32_MCONTEXT_DS);
+static_assert(offsetof(struct __cygwin32_mcontext, eax) == __OFFSET_CYGWIN32_MCONTEXT_EAX);
+static_assert(offsetof(struct __cygwin32_mcontext, ebp) == __OFFSET_CYGWIN32_MCONTEXT_EBP);
+static_assert(offsetof(struct __cygwin32_mcontext, ebx) == __OFFSET_CYGWIN32_MCONTEXT_EBX);
+static_assert(offsetof(struct __cygwin32_mcontext, ecx) == __OFFSET_CYGWIN32_MCONTEXT_ECX);
+static_assert(offsetof(struct __cygwin32_mcontext, edi) == __OFFSET_CYGWIN32_MCONTEXT_EDI);
+static_assert(offsetof(struct __cygwin32_mcontext, edx) == __OFFSET_CYGWIN32_MCONTEXT_EDX);
+static_assert(offsetof(struct __cygwin32_mcontext, eflags) == __OFFSET_CYGWIN32_MCONTEXT_EFLAGS);
+static_assert(offsetof(struct __cygwin32_mcontext, eip) == __OFFSET_CYGWIN32_MCONTEXT_EIP);
+static_assert(offsetof(struct __cygwin32_mcontext, es) == __OFFSET_CYGWIN32_MCONTEXT_ES);
+static_assert(offsetof(struct __cygwin32_mcontext, esi) == __OFFSET_CYGWIN32_MCONTEXT_ESI);
+static_assert(offsetof(struct __cygwin32_mcontext, esp) == __OFFSET_CYGWIN32_MCONTEXT_ESP);
+static_assert(offsetof(struct __cygwin32_mcontext, fpstate) == __OFFSET_CYGWIN32_MCONTEXT_FPSTATE);
+static_assert(offsetof(struct __cygwin32_mcontext, fs) == __OFFSET_CYGWIN32_MCONTEXT_FS);
+static_assert(offsetof(struct __cygwin32_mcontext, gs) == __OFFSET_CYGWIN32_MCONTEXT_GS);
+static_assert(offsetof(struct __cygwin32_mcontext, oldmask) == __OFFSET_CYGWIN32_MCONTEXT_OLDMASK);
+static_assert(offsetof(struct __cygwin32_mcontext, reserved) == __OFFSET_CYGWIN32_MCONTEXT_RESERVED);
+static_assert(offsetof(struct __cygwin32_mcontext, ss) == __OFFSET_CYGWIN32_MCONTEXT_SS);
+static_assert(sizeof(struct __cygwin32_mcontext) == __SIZEOF_CYGWIN32_MCONTEXT);
+static_assert(alignof(struct __cygwin32_mcontext) == __ALIGNOF_CYGWIN32_MCONTEXT);
 
 
 
@@ -1262,16 +1303,83 @@ static_assert(alignof(struct __mcontext_linux64) == __ALIGNOF_MCONTEXT_LINUX64);
 #include <bits/mcontext-cygwin64.h>
 
 /* struct __cygwin64_uc_fpxreg */
-/* ... */
+static_assert(offsetof(struct __cygwin64_uc_fpxreg, exponent) == __OFFSET_CYGWIN64_UC_FPXREG_EXPONENT);
+static_assert(offsetof(struct __cygwin64_uc_fpxreg, padding) == __OFFSET_CYGWIN64_UC_FPXREG_PADDING);
+static_assert(offsetof(struct __cygwin64_uc_fpxreg, significand) == __OFFSET_CYGWIN64_UC_FPXREG_SIGNIFICAND);
+static_assert(sizeof(struct __cygwin64_uc_fpxreg) == __SIZEOF_CYGWIN64_UC_FPXREG);
+static_assert(alignof(struct __cygwin64_uc_fpxreg) == __ALIGNOF_CYGWIN64_UC_FPXREG);
 
 /* struct __cygwin64_uc_xmmreg */
-/* ... */
+static_assert(offsetof(struct __cygwin64_uc_xmmreg, element) == __OFFSET_CYGWIN64_UC_XMMREG_ELEMENT);
+static_assert(sizeof(struct __cygwin64_uc_xmmreg) == __SIZEOF_CYGWIN64_UC_XMMREG);
+static_assert(alignof(struct __cygwin64_uc_xmmreg) == __ALIGNOF_CYGWIN64_UC_XMMREG);
 
 /* struct __cygwin64_fpstate */
-/* ... */
+static_assert(offsetof(struct __cygwin64_fpstate, cwd) == __OFFSET_CYGWIN64_FPSTATE_CWD);
+static_assert(offsetof(struct __cygwin64_fpstate, fop) == __OFFSET_CYGWIN64_FPSTATE_FOP);
+static_assert(offsetof(struct __cygwin64_fpstate, ftw) == __OFFSET_CYGWIN64_FPSTATE_FTW);
+static_assert(offsetof(struct __cygwin64_fpstate, mxcr_mask) == __OFFSET_CYGWIN64_FPSTATE_MXCR_MASK);
+static_assert(offsetof(struct __cygwin64_fpstate, mxcsr) == __OFFSET_CYGWIN64_FPSTATE_MXCSR);
+static_assert(offsetof(struct __cygwin64_fpstate, padding) == __OFFSET_CYGWIN64_FPSTATE_PADDING);
+static_assert(offsetof(struct __cygwin64_fpstate, rdp) == __OFFSET_CYGWIN64_FPSTATE_RDP);
+static_assert(offsetof(struct __cygwin64_fpstate, rip) == __OFFSET_CYGWIN64_FPSTATE_RIP);
+static_assert(offsetof(struct __cygwin64_fpstate, st) == __OFFSET_CYGWIN64_FPSTATE_ST);
+static_assert(offsetof(struct __cygwin64_fpstate, swd) == __OFFSET_CYGWIN64_FPSTATE_SWD);
+static_assert(offsetof(struct __cygwin64_fpstate, xmm) == __OFFSET_CYGWIN64_FPSTATE_XMM);
+static_assert(sizeof(struct __cygwin64_fpstate) == __SIZEOF_CYGWIN64_FPSTATE);
+static_assert(alignof(struct __cygwin64_fpstate) == __ALIGNOF_CYGWIN64_FPSTATE);
 
 /* struct __cygwin64_mcontext */
-/* ... */
+static_assert(offsetof(struct __cygwin64_mcontext, bfr) == __OFFSET_CYGWIN64_MCONTEXT_BFR);
+static_assert(offsetof(struct __cygwin64_mcontext, btr) == __OFFSET_CYGWIN64_MCONTEXT_BTR);
+static_assert(offsetof(struct __cygwin64_mcontext, cr2) == __OFFSET_CYGWIN64_MCONTEXT_CR2);
+static_assert(offsetof(struct __cygwin64_mcontext, cs) == __OFFSET_CYGWIN64_MCONTEXT_CS);
+static_assert(offsetof(struct __cygwin64_mcontext, ctxflags) == __OFFSET_CYGWIN64_MCONTEXT_CTXFLAGS);
+static_assert(offsetof(struct __cygwin64_mcontext, dbc) == __OFFSET_CYGWIN64_MCONTEXT_DBC);
+static_assert(offsetof(struct __cygwin64_mcontext, dr0) == __OFFSET_CYGWIN64_MCONTEXT_DR0);
+static_assert(offsetof(struct __cygwin64_mcontext, dr1) == __OFFSET_CYGWIN64_MCONTEXT_DR1);
+static_assert(offsetof(struct __cygwin64_mcontext, dr2) == __OFFSET_CYGWIN64_MCONTEXT_DR2);
+static_assert(offsetof(struct __cygwin64_mcontext, dr3) == __OFFSET_CYGWIN64_MCONTEXT_DR3);
+static_assert(offsetof(struct __cygwin64_mcontext, dr6) == __OFFSET_CYGWIN64_MCONTEXT_DR6);
+static_assert(offsetof(struct __cygwin64_mcontext, dr7) == __OFFSET_CYGWIN64_MCONTEXT_DR7);
+static_assert(offsetof(struct __cygwin64_mcontext, ds) == __OFFSET_CYGWIN64_MCONTEXT_DS);
+static_assert(offsetof(struct __cygwin64_mcontext, eflags) == __OFFSET_CYGWIN64_MCONTEXT_EFLAGS);
+static_assert(offsetof(struct __cygwin64_mcontext, efr) == __OFFSET_CYGWIN64_MCONTEXT_EFR);
+static_assert(offsetof(struct __cygwin64_mcontext, es) == __OFFSET_CYGWIN64_MCONTEXT_ES);
+static_assert(offsetof(struct __cygwin64_mcontext, etr) == __OFFSET_CYGWIN64_MCONTEXT_ETR);
+static_assert(offsetof(struct __cygwin64_mcontext, fpregs) == __OFFSET_CYGWIN64_MCONTEXT_FPREGS);
+static_assert(offsetof(struct __cygwin64_mcontext, fs) == __OFFSET_CYGWIN64_MCONTEXT_FS);
+static_assert(offsetof(struct __cygwin64_mcontext, gs) == __OFFSET_CYGWIN64_MCONTEXT_GS);
+static_assert(offsetof(struct __cygwin64_mcontext, mxcsr) == __OFFSET_CYGWIN64_MCONTEXT_MXCSR);
+static_assert(offsetof(struct __cygwin64_mcontext, oldmask) == __OFFSET_CYGWIN64_MCONTEXT_OLDMASK);
+static_assert(offsetof(struct __cygwin64_mcontext, p1home) == __OFFSET_CYGWIN64_MCONTEXT_P1HOME);
+static_assert(offsetof(struct __cygwin64_mcontext, p2home) == __OFFSET_CYGWIN64_MCONTEXT_P2HOME);
+static_assert(offsetof(struct __cygwin64_mcontext, p3home) == __OFFSET_CYGWIN64_MCONTEXT_P3HOME);
+static_assert(offsetof(struct __cygwin64_mcontext, p4home) == __OFFSET_CYGWIN64_MCONTEXT_P4HOME);
+static_assert(offsetof(struct __cygwin64_mcontext, p5home) == __OFFSET_CYGWIN64_MCONTEXT_P5HOME);
+static_assert(offsetof(struct __cygwin64_mcontext, p6home) == __OFFSET_CYGWIN64_MCONTEXT_P6HOME);
+static_assert(offsetof(struct __cygwin64_mcontext, r10) == __OFFSET_CYGWIN64_MCONTEXT_R10);
+static_assert(offsetof(struct __cygwin64_mcontext, r11) == __OFFSET_CYGWIN64_MCONTEXT_R11);
+static_assert(offsetof(struct __cygwin64_mcontext, r12) == __OFFSET_CYGWIN64_MCONTEXT_R12);
+static_assert(offsetof(struct __cygwin64_mcontext, r13) == __OFFSET_CYGWIN64_MCONTEXT_R13);
+static_assert(offsetof(struct __cygwin64_mcontext, r14) == __OFFSET_CYGWIN64_MCONTEXT_R14);
+static_assert(offsetof(struct __cygwin64_mcontext, r15) == __OFFSET_CYGWIN64_MCONTEXT_R15);
+static_assert(offsetof(struct __cygwin64_mcontext, r8) == __OFFSET_CYGWIN64_MCONTEXT_R8);
+static_assert(offsetof(struct __cygwin64_mcontext, r9) == __OFFSET_CYGWIN64_MCONTEXT_R9);
+static_assert(offsetof(struct __cygwin64_mcontext, rax) == __OFFSET_CYGWIN64_MCONTEXT_RAX);
+static_assert(offsetof(struct __cygwin64_mcontext, rbp) == __OFFSET_CYGWIN64_MCONTEXT_RBP);
+static_assert(offsetof(struct __cygwin64_mcontext, rbx) == __OFFSET_CYGWIN64_MCONTEXT_RBX);
+static_assert(offsetof(struct __cygwin64_mcontext, rcx) == __OFFSET_CYGWIN64_MCONTEXT_RCX);
+static_assert(offsetof(struct __cygwin64_mcontext, rdi) == __OFFSET_CYGWIN64_MCONTEXT_RDI);
+static_assert(offsetof(struct __cygwin64_mcontext, rdx) == __OFFSET_CYGWIN64_MCONTEXT_RDX);
+static_assert(offsetof(struct __cygwin64_mcontext, rip) == __OFFSET_CYGWIN64_MCONTEXT_RIP);
+static_assert(offsetof(struct __cygwin64_mcontext, rsi) == __OFFSET_CYGWIN64_MCONTEXT_RSI);
+static_assert(offsetof(struct __cygwin64_mcontext, rsp) == __OFFSET_CYGWIN64_MCONTEXT_RSP);
+static_assert(offsetof(struct __cygwin64_mcontext, ss) == __OFFSET_CYGWIN64_MCONTEXT_SS);
+static_assert(offsetof(struct __cygwin64_mcontext, vcx) == __OFFSET_CYGWIN64_MCONTEXT_VCX);
+static_assert(offsetof(struct __cygwin64_mcontext, vregs) == __OFFSET_CYGWIN64_MCONTEXT_VREGS);
+static_assert(sizeof(struct __cygwin64_mcontext) == __SIZEOF_CYGWIN64_MCONTEXT);
+static_assert(alignof(struct __cygwin64_mcontext) == __ALIGNOF_CYGWIN64_MCONTEXT);
 
 
 
@@ -1342,7 +1450,13 @@ static_assert(alignof(struct __ucontext_linux32) == __ALIGNOF_UCONTEXT_LINUX32);
 /* ... */
 
 /* struct __cygwin32_ucontext */
-/* ... */
+static_assert(offsetof(struct __cygwin32_ucontext, uc_flags) == __OFFSET_CYGWIN32_UCONTEXT_FLAGS);
+static_assert(offsetof(struct __cygwin32_ucontext, uc_link) == __OFFSET_CYGWIN32_UCONTEXT_LINK);
+static_assert(offsetof(struct __cygwin32_ucontext, uc_mcontext) == __OFFSET_CYGWIN32_UCONTEXT_MCONTEXT);
+static_assert(offsetof(struct __cygwin32_ucontext, uc_sigmask) == __OFFSET_CYGWIN32_UCONTEXT_SIGMASK);
+static_assert(offsetof(struct __cygwin32_ucontext, uc_stack) == __OFFSET_CYGWIN32_UCONTEXT_STACK);
+static_assert(sizeof(struct __cygwin32_ucontext) == __SIZEOF_CYGWIN32_UCONTEXT);
+static_assert(alignof(struct __cygwin32_ucontext) == __ALIGNOF_CYGWIN32_UCONTEXT);
 
 
 
@@ -1351,7 +1465,13 @@ static_assert(alignof(struct __ucontext_linux32) == __ALIGNOF_UCONTEXT_LINUX32);
 #include <bits/ucontext-cygwin64.h>
 
 /* struct __cygwin64_ucontext */
-/* ... */
+static_assert(offsetof(struct __cygwin64_ucontext, uc_flags) == __OFFSET_CYGWIN64_UCONTEXT_FLAGS);
+static_assert(offsetof(struct __cygwin64_ucontext, uc_link) == __OFFSET_CYGWIN64_UCONTEXT_LINK);
+static_assert(offsetof(struct __cygwin64_ucontext, uc_mcontext) == __OFFSET_CYGWIN64_UCONTEXT_MCONTEXT);
+static_assert(offsetof(struct __cygwin64_ucontext, uc_sigmask) == __OFFSET_CYGWIN64_UCONTEXT_SIGMASK);
+static_assert(offsetof(struct __cygwin64_ucontext, uc_stack) == __OFFSET_CYGWIN64_UCONTEXT_STACK);
+static_assert(sizeof(struct __cygwin64_ucontext) == __SIZEOF_CYGWIN64_UCONTEXT);
+static_assert(alignof(struct __cygwin64_ucontext) == __ALIGNOF_CYGWIN64_UCONTEXT);
 
 
 
