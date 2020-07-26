@@ -198,7 +198,7 @@ struct hop_datablock_open_futex /*[PREFIX(dof_)]*/ {
 #define __OFFSET_HOP_INODE_CHMOD_PERM_MASK   4
 #define __OFFSET_HOP_INODE_CHMOD_PERM_FLAG   8
 #define __OFFSET_HOP_INODE_CHMOD_PERM_OLD    12
-#define __SIEZOF_HOP_INODE_CHMOD             16
+#define __SIZEOF_HOP_INODE_CHMOD             16
 #ifdef __CC__
 struct hop_inode_chmod /*[PREFIX(icm_)]*/ {
 	__uint32_t            icm_struct_size; /* [== sizeof(struct hop_inode_chmod)]
@@ -219,7 +219,7 @@ struct hop_inode_chmod /*[PREFIX(icm_)]*/ {
 #define __OFFSET_HOP_INODE_CHOWN_NEWGROUP    8
 #define __OFFSET_HOP_INODE_CHOWN_OLDOWNER    12
 #define __OFFSET_HOP_INODE_CHOWN_OLDGROUP    16
-#define __SIEZOF_HOP_INODE_CHOWN             20
+#define __SIZEOF_HOP_INODE_CHOWN             20
 #ifdef __CC__
 struct hop_inode_chown /*[PREFIX(ico_)]*/ {
 	__uint32_t            ico_struct_size; /* [== sizeof(struct hop_inode_chown)]

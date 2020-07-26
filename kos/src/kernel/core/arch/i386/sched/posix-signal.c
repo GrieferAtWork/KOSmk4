@@ -45,12 +45,12 @@
 #include <asm/registers.h>
 #include <bits/siginfo-convert.h>  /* siginfo64_to_siginfo32 */
 #include <bits/siginfo-struct32.h> /* siginfo32_t */
+#include <bits/ucontext32.h>       /* __ucontextx32 */
 #include <kos/except/inval.h>
 #include <kos/kernel/cpu-state-verify.h> /* cpustate_verify_user...() */
 #include <kos/kernel/cpu-state.h>        /* icpustate */
 #include <kos/kernel/cpu-state32.h>      /* ucpustate32 */
 #include <kos/kernel/fpu-state32.h>      /* fpustate32 */
-#include <kos/kernel/ucontext32.h>       /* ucontext32_t */
 #include <sys/ucontext.h>
 
 #include <signal.h>

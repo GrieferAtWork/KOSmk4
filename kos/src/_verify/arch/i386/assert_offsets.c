@@ -96,6 +96,18 @@ local files = {
 	"../../../../include/i386-kos/bits/utimbuf64.h",
 	"../../../../include/i386-kos/bits/va_list-struct32.h",
 	"../../../../include/i386-kos/bits/va_list-struct64.h",
+	"../../../../include/i386-kos/bits/mcontext32.h",
+	"../../../../include/i386-kos/bits/mcontext64.h",
+	"../../../../include/i386-kos/bits/mcontext-linux32.h",
+	"../../../../include/i386-kos/bits/mcontext-linux64.h",
+	"../../../../include/i386-kos/bits/mcontext-cygwin32.h",
+	"../../../../include/i386-kos/bits/mcontext-cygwin64.h",
+	"../../../../include/i386-kos/bits/ucontext32.h",
+	"../../../../include/i386-kos/bits/ucontext64.h",
+	"../../../../include/i386-kos/bits/ucontext-linux32.h",
+	"../../../../include/i386-kos/bits/ucontext-linux64.h",
+	"../../../../include/i386-kos/bits/ucontext-cygwin32.h",
+	"../../../../include/i386-kos/bits/ucontext-cygwin64.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap32.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap64.h",
 	"../../../../include/i386-kos/kos/bits/exception_data32.h",
@@ -115,13 +127,9 @@ local files = {
 	"../../../../include/i386-kos/kos/kernel/fpu-sstate.h",
 	"../../../../include/i386-kos/kos/kernel/fpu-state32.h",
 	"../../../../include/i386-kos/kos/kernel/fpu-state64.h",
-	"../../../../include/i386-kos/kos/kernel/mcontext32.h",
-	"../../../../include/i386-kos/kos/kernel/mcontext64.h",
 	"../../../../include/i386-kos/kos/kernel/tss16.h",
 	"../../../../include/i386-kos/kos/kernel/tss32.h",
 	"../../../../include/i386-kos/kos/kernel/tss64.h",
-	"../../../../include/i386-kos/kos/kernel/ucontext32.h",
-	"../../../../include/i386-kos/kos/kernel/ucontext64.h",
 	"../../../../include/i386-kos/librpc/bits/rpc32.h",
 	"../../../../include/i386-kos/librpc/bits/rpc64.h",
 	"../../../../include/i386-kos/librpc/bits/syscall-info32.h",
@@ -710,11 +718,13 @@ static_assert(sizeof(struct __sigaltstackx32) == __SIZEOF_SIGALTSTACKX32);
 /* struct __sigstackx64 */
 static_assert(offsetof(struct __sigstackx64, ss_onstack) == __OFFSET_SIGSTACKX64_ONSTACK);
 static_assert(offsetof(struct __sigstackx64, ss_sp) == __OFFSET_SIGSTACKX64_SP);
+static_assert(sizeof(struct __sigstackx64) == __SIZEOF_SIGSTACKX64);
 
 /* struct __sigaltstackx64 */
 static_assert(offsetof(struct __sigaltstackx64, ss_flags) == __OFFSET_SIGALTSTACKX64_FLAGS);
 static_assert(offsetof(struct __sigaltstackx64, ss_size) == __OFFSET_SIGALTSTACKX64_SIZE);
 static_assert(offsetof(struct __sigaltstackx64, ss_sp) == __OFFSET_SIGALTSTACKX64_SP);
+static_assert(sizeof(struct __sigaltstackx64) == __SIZEOF_SIGALTSTACKX64);
 
 
 
@@ -1118,6 +1128,230 @@ static_assert(offsetof(struct x86_64_va_list_struct, vl_gp_offset) == OFFSET_X86
 static_assert(offsetof(struct x86_64_va_list_struct, vl_overflow_arg_area) == OFFSET_X86_64_VA_LIST_STRUCT_OVERFLOW_ARG_AREA);
 static_assert(offsetof(struct x86_64_va_list_struct, vl_reg_save_area) == OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA);
 static_assert(sizeof(struct x86_64_va_list_struct) == SIZEOF_X86_64_VA_LIST_STRUCT);
+
+
+
+
+
+#include <bits/mcontext32.h>
+
+/* struct _libc_fpreg */
+/* ... */
+
+/* struct _libc_fpstate */
+/* ... */
+
+/* struct __mcontextx32 */
+static_assert(offsetof(struct __mcontextx32, gregs) == __OFFSET_MCONTEXTX32_CPU);
+static_assert(offsetof(struct __mcontextx32, mc_gregs) == __OFFSET_MCONTEXTX32_CPU);
+static_assert(offsetof(struct __mcontextx32, mc_context) == __OFFSET_MCONTEXTX32_CPU);
+static_assert(offsetof(struct __mcontextx32, cr2) == __OFFSET_MCONTEXTX32_CR2);
+static_assert(offsetof(struct __mcontextx32, mc_cr2) == __OFFSET_MCONTEXTX32_CR2);
+static_assert(offsetof(struct __mcontextx32, mc_flags) == __OFFSET_MCONTEXTX32_FLAGS);
+static_assert(offsetof(struct __mcontextx32, fpregs) == __OFFSET_MCONTEXTX32_FPU);
+static_assert(offsetof(struct __mcontextx32, mc_fpu) == __OFFSET_MCONTEXTX32_FPU);
+static_assert(sizeof(struct __mcontextx32) == __SIZEOF_MCONTEXTX32);
+static_assert(alignof(struct __mcontextx32) == __ALIGNOF_MCONTEXTX32);
+
+
+
+
+
+#include <bits/mcontext64.h>
+
+/* struct __mcontextx64 */
+static_assert(offsetof(struct __mcontextx64, gregs) == __OFFSET_MCONTEXTX64_CPU);
+static_assert(offsetof(struct __mcontextx64, mc_gregs) == __OFFSET_MCONTEXTX64_CPU);
+static_assert(offsetof(struct __mcontextx64, mc_context) == __OFFSET_MCONTEXTX64_CPU);
+static_assert(offsetof(struct __mcontextx64, cr2) == __OFFSET_MCONTEXTX64_CR2);
+static_assert(offsetof(struct __mcontextx64, mc_cr2) == __OFFSET_MCONTEXTX64_CR2);
+static_assert(offsetof(struct __mcontextx64, mc_flags) == __OFFSET_MCONTEXTX64_FLAGS);
+static_assert(offsetof(struct __mcontextx64, fpregs) == __OFFSET_MCONTEXTX64_FPU);
+static_assert(offsetof(struct __mcontextx64, mc_fpu) == __OFFSET_MCONTEXTX64_FPU);
+static_assert(sizeof(struct __mcontextx64) == __SIZEOF_MCONTEXTX64);
+static_assert(alignof(struct __mcontextx64) == __ALIGNOF_MCONTEXTX64);
+
+
+
+
+
+#include <bits/mcontext-linux32.h>
+
+/* struct __libc_linux32_fpreg */
+static_assert(offsetof(struct __libc_linux32_fpreg, exponent) == __OFFSET_LIBC_LINUX32_FPREG_EXPONENT);
+static_assert(offsetof(struct __libc_linux32_fpreg, significand) == __OFFSET_LIBC_LINUX32_FPREG_SIGNIFICAND);
+static_assert(sizeof(struct __libc_linux32_fpreg) == __SIZEOF_LIBC_LINUX32_FPREG);
+
+/* struct __libc_linux32_fpstate */
+static_assert(offsetof(struct __libc_linux32_fpstate, cssel) == __OFFSET_LIBC_LINUX32_FPSTATE_CSSEL);
+static_assert(offsetof(struct __libc_linux32_fpstate, cw) == __OFFSET_LIBC_LINUX32_FPSTATE_CW);
+static_assert(offsetof(struct __libc_linux32_fpstate, dataoff) == __OFFSET_LIBC_LINUX32_FPSTATE_DATAOFF);
+static_assert(offsetof(struct __libc_linux32_fpstate, datasel) == __OFFSET_LIBC_LINUX32_FPSTATE_DATASEL);
+static_assert(offsetof(struct __libc_linux32_fpstate, ipoff) == __OFFSET_LIBC_LINUX32_FPSTATE_IPOFF);
+static_assert(offsetof(struct __libc_linux32_fpstate, _st) == __OFFSET_LIBC_LINUX32_FPSTATE_ST);
+static_assert(offsetof(struct __libc_linux32_fpstate, status) == __OFFSET_LIBC_LINUX32_FPSTATE_STATUS);
+static_assert(offsetof(struct __libc_linux32_fpstate, sw) == __OFFSET_LIBC_LINUX32_FPSTATE_SW);
+static_assert(offsetof(struct __libc_linux32_fpstate, tag) == __OFFSET_LIBC_LINUX32_FPSTATE_TAG);
+static_assert(sizeof(struct __libc_linux32_fpstate) == __SIZEOF_LIBC_LINUX32_FPSTATE);
+
+/* struct __mcontext_linux32 */
+static_assert(offsetof(struct __mcontext_linux32, cr2) == __OFFSET_MCONTEXT_LINUX32_CR2);
+static_assert(offsetof(struct __mcontext_linux32, fpregs) == __OFFSET_MCONTEXT_LINUX32_FPREGS);
+static_assert(offsetof(struct __mcontext_linux32, gregs) == __OFFSET_MCONTEXT_LINUX32_GREGS);
+static_assert(offsetof(struct __mcontext_linux32, oldmask) == __OFFSET_MCONTEXT_LINUX32_OLDMASK);
+static_assert(sizeof(struct __mcontext_linux32) == __SIZEOF_MCONTEXT_LINUX32);
+static_assert(alignof(struct __mcontext_linux32) == __ALIGNOF_MCONTEXT_LINUX32);
+
+
+
+
+
+#include <bits/mcontext-linux64.h>
+
+/* struct __libc_linux64_fpxreg */
+static_assert(offsetof(struct __libc_linux64_fpxreg, exponent) == __OFFSET_LIBC_LINUX64_FPXREG_EXPONENT);
+static_assert(offsetof(struct __libc_linux64_fpxreg, padding) == __OFFSET_LIBC_LINUX64_FPXREG_PADDING);
+static_assert(offsetof(struct __libc_linux64_fpxreg, significand) == __OFFSET_LIBC_LINUX64_FPXREG_SIGNIFICAND);
+static_assert(sizeof(struct __libc_linux64_fpxreg) == __SIZEOF_LIBC_LINUX64_FPXREG);
+
+/* struct __libc_linux64_xmmreg */
+static_assert(offsetof(struct __libc_linux64_xmmreg, element) == __OFFSET_LIBC_LINUX64_XMMREG_ELEMENT);
+static_assert(sizeof(struct __libc_linux64_xmmreg) == __SIZEOF_LIBC_LINUX64_XMMREG);
+
+/* struct __libc_linux64_fpstate */
+static_assert(offsetof(struct __libc_linux64_fpstate, cwd) == __OFFSET_LIBC_LINUX64_FPSTATE_CWD);
+static_assert(offsetof(struct __libc_linux64_fpstate, fop) == __OFFSET_LIBC_LINUX64_FPSTATE_FOP);
+static_assert(offsetof(struct __libc_linux64_fpstate, ftw) == __OFFSET_LIBC_LINUX64_FPSTATE_FTW);
+static_assert(offsetof(struct __libc_linux64_fpstate, mxcr_mask) == __OFFSET_LIBC_LINUX64_FPSTATE_MXCR_MASK);
+static_assert(offsetof(struct __libc_linux64_fpstate, mxcsr) == __OFFSET_LIBC_LINUX64_FPSTATE_MXCSR);
+static_assert(offsetof(struct __libc_linux64_fpstate, padding) == __OFFSET_LIBC_LINUX64_FPSTATE_PADDING);
+static_assert(offsetof(struct __libc_linux64_fpstate, rdp) == __OFFSET_LIBC_LINUX64_FPSTATE_RDP);
+static_assert(offsetof(struct __libc_linux64_fpstate, rip) == __OFFSET_LIBC_LINUX64_FPSTATE_RIP);
+static_assert(offsetof(struct __libc_linux64_fpstate, _st) == __OFFSET_LIBC_LINUX64_FPSTATE_ST);
+static_assert(offsetof(struct __libc_linux64_fpstate, swd) == __OFFSET_LIBC_LINUX64_FPSTATE_SWD);
+static_assert(offsetof(struct __libc_linux64_fpstate, _xmm) == __OFFSET_LIBC_LINUX64_FPSTATE_XMM);
+static_assert(sizeof(struct __libc_linux64_fpstate) == __SIZEOF_LIBC_LINUX64_FPSTATE);
+
+/* struct __mcontext_linux64 */
+static_assert(offsetof(struct __mcontext_linux64, fpregs) == __OFFSET_MCONTEXT_LINUX64_FPREGS);
+static_assert(offsetof(struct __mcontext_linux64, fs_base) == __OFFSET_MCONTEXT_LINUX64_FS_BASE);
+static_assert(offsetof(struct __mcontext_linux64, gregs) == __OFFSET_MCONTEXT_LINUX64_GREGS);
+static_assert(offsetof(struct __mcontext_linux64, gs_base) == __OFFSET_MCONTEXT_LINUX64_GS_BASE);
+static_assert(sizeof(struct __mcontext_linux64) == __SIZEOF_MCONTEXT_LINUX64);
+static_assert(alignof(struct __mcontext_linux64) == __ALIGNOF_MCONTEXT_LINUX64);
+
+
+
+
+
+#include <bits/mcontext-cygwin32.h>
+
+/* struct __cygwin32_uc_fpreg */
+/* ... */
+
+/* struct __cygwin32_fpstate */
+/* ... */
+
+/* struct __cygwin32_mcontext */
+/* ... */
+
+
+
+
+
+#include <bits/mcontext-cygwin64.h>
+
+/* struct __cygwin64_uc_fpxreg */
+/* ... */
+
+/* struct __cygwin64_uc_xmmreg */
+/* ... */
+
+/* struct __cygwin64_fpstate */
+/* ... */
+
+/* struct __cygwin64_mcontext */
+/* ... */
+
+
+
+
+
+#include <bits/ucontext32.h>
+
+/* struct __sigset_structx32 */
+/* ... */
+
+/* struct __ucontextx32 */
+static_assert(offsetof(struct __ucontextx32, uc_link) == __OFFSET_UCONTEXTX32_LINK);
+static_assert(offsetof(struct __ucontextx32, uc_mcontext) == __OFFSET_UCONTEXTX32_MCONTEXT);
+static_assert(offsetof(struct __ucontextx32, uc_sigmask) == __OFFSET_UCONTEXTX32_SIGMASK);
+static_assert(offsetof(struct __ucontextx32, uc_stack) == __OFFSET_UCONTEXTX32_STACK);
+static_assert(sizeof(struct __ucontextx32) == __SIZEOF_UCONTEXTX32);
+static_assert(alignof(struct __ucontextx32) == __ALIGNOF_UCONTEXTX32);
+
+
+
+
+
+#include <bits/ucontext64.h>
+
+/* struct __ucontextx64 */
+static_assert(offsetof(struct __ucontextx64, uc_link) == __OFFSET_UCONTEXTX64_LINK);
+static_assert(offsetof(struct __ucontextx64, uc_mcontext) == __OFFSET_UCONTEXTX64_MCONTEXT);
+static_assert(offsetof(struct __ucontextx64, uc_sigmask) == __OFFSET_UCONTEXTX64_SIGMASK);
+static_assert(offsetof(struct __ucontextx64, uc_stack) == __OFFSET_UCONTEXTX64_STACK);
+static_assert(sizeof(struct __ucontextx64) == __SIZEOF_UCONTEXTX64);
+static_assert(alignof(struct __ucontextx64) == __ALIGNOF_UCONTEXTX64);
+
+
+
+
+
+#include <bits/ucontext-linux32.h>
+
+/* struct __sigset_structx32 */
+/* ... */
+
+/* struct __ucontext_linux32 */
+static_assert(offsetof(struct __ucontext_linux32, uc_flags) == __OFFSET_UCONTEXT_LINUX32_FLAGS);
+static_assert(offsetof(struct __ucontext_linux32, __fpregs_mem) == __OFFSET_UCONTEXT_LINUX32_FPREGS);
+static_assert(offsetof(struct __ucontext_linux32, uc_link) == __OFFSET_UCONTEXT_LINUX32_LINK);
+static_assert(offsetof(struct __ucontext_linux32, uc_mcontext) == __OFFSET_UCONTEXT_LINUX32_MCONTEXT);
+static_assert(offsetof(struct __ucontext_linux32, uc_sigmask) == __OFFSET_UCONTEXT_LINUX32_SIGMASK);
+static_assert(offsetof(struct __ucontext_linux32, uc_stack) == __OFFSET_UCONTEXT_LINUX32_STACK);
+static_assert(sizeof(struct __ucontext_linux32) == __SIZEOF_UCONTEXT_LINUX32);
+static_assert(alignof(struct __ucontext_linux32) == __ALIGNOF_UCONTEXT_LINUX32);
+
+
+
+
+
+#include <bits/ucontext-linux64.h>
+
+/* struct __ucontext_linux64 */
+/* ... */
+
+
+
+
+
+#include <bits/ucontext-cygwin32.h>
+
+/* struct __sigset_structx32 */
+/* ... */
+
+/* struct __cygwin32_ucontext */
+/* ... */
+
+
+
+
+
+#include <bits/ucontext-cygwin64.h>
+
+/* struct __cygwin64_ucontext */
+/* ... */
 
 
 
@@ -1750,42 +1984,6 @@ static_assert(alignof(struct fpustate64) == ALIGNOF_FPUSTATE64);
 
 
 
-#include <kos/kernel/mcontext32.h>
-
-/* struct mcontext32 */
-static_assert(offsetof(struct mcontext32, gregs) == __OFFSET_MCONTEXT32_CPU);
-static_assert(offsetof(struct mcontext32, mc_gregs) == __OFFSET_MCONTEXT32_CPU);
-static_assert(offsetof(struct mcontext32, mc_context) == __OFFSET_MCONTEXT32_CPU);
-static_assert(offsetof(struct mcontext32, cr2) == __OFFSET_MCONTEXT32_CR2);
-static_assert(offsetof(struct mcontext32, mc_cr2) == __OFFSET_MCONTEXT32_CR2);
-static_assert(offsetof(struct mcontext32, mc_flags) == __OFFSET_MCONTEXT32_FLAGS);
-static_assert(offsetof(struct mcontext32, fpregs) == __OFFSET_MCONTEXT32_FPU);
-static_assert(offsetof(struct mcontext32, mc_fpu) == __OFFSET_MCONTEXT32_FPU);
-static_assert(sizeof(struct mcontext32) == __SIZEOF_MCONTEXT32);
-static_assert(alignof(struct mcontext32) == __ALIGNOF_MCONTEXT32);
-
-
-
-
-
-#include <kos/kernel/mcontext64.h>
-
-/* struct mcontext64 */
-static_assert(offsetof(struct mcontext64, gregs) == __OFFSET_MCONTEXT64_CPU);
-static_assert(offsetof(struct mcontext64, mc_gregs) == __OFFSET_MCONTEXT64_CPU);
-static_assert(offsetof(struct mcontext64, mc_context) == __OFFSET_MCONTEXT64_CPU);
-static_assert(offsetof(struct mcontext64, cr2) == __OFFSET_MCONTEXT64_CR2);
-static_assert(offsetof(struct mcontext64, mc_cr2) == __OFFSET_MCONTEXT64_CR2);
-static_assert(offsetof(struct mcontext64, mc_flags) == __OFFSET_MCONTEXT64_FLAGS);
-static_assert(offsetof(struct mcontext64, fpregs) == __OFFSET_MCONTEXT64_FPU);
-static_assert(offsetof(struct mcontext64, mc_fpu) == __OFFSET_MCONTEXT64_FPU);
-static_assert(sizeof(struct mcontext64) == __SIZEOF_MCONTEXT64);
-static_assert(alignof(struct mcontext64) == __ALIGNOF_MCONTEXT64);
-
-
-
-
-
 #include <kos/kernel/tss16.h>
 
 /* struct tss16 */
@@ -1871,35 +2069,6 @@ static_assert(offsetof(struct tss64, t_rsp1) == OFFSET_TSS64_RSP1);
 static_assert(offsetof(struct tss64, t_rsp2) == OFFSET_TSS64_RSP2);
 static_assert(sizeof(struct tss64) == SIZEOF_TSS64);
 static_assert(alignof(struct tss64) == ALIGNOF_TSS64);
-
-
-
-
-
-#include <kos/kernel/ucontext32.h>
-
-/* struct __sigset_structx32 */
-/* ... */
-
-/* struct ucontext32 */
-static_assert(offsetof(struct ucontext32, uc_link) == __OFFSET_UCONTEXT32_LINK);
-static_assert(offsetof(struct ucontext32, uc_mcontext) == __OFFSET_UCONTEXT32_MCONTEXT);
-static_assert(offsetof(struct ucontext32, uc_sigmask) == __OFFSET_UCONTEXT32_SIGMASK);
-static_assert(offsetof(struct ucontext32, uc_stack) == __OFFSET_UCONTEXT32_STACK);
-static_assert(sizeof(struct ucontext32) == __SIZEOF_UCONTEXT32);
-
-
-
-
-
-#include <kos/kernel/ucontext64.h>
-
-/* struct ucontext64 */
-static_assert(offsetof(struct ucontext64, uc_link) == __OFFSET_UCONTEXT64_LINK);
-static_assert(offsetof(struct ucontext64, uc_mcontext) == __OFFSET_UCONTEXT64_MCONTEXT);
-static_assert(offsetof(struct ucontext64, uc_sigmask) == __OFFSET_UCONTEXT64_SIGMASK);
-static_assert(offsetof(struct ucontext64, uc_stack) == __OFFSET_UCONTEXT64_STACK);
-static_assert(sizeof(struct ucontext64) == __SIZEOF_UCONTEXT64);
 
 
 

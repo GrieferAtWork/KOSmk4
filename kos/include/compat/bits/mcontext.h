@@ -17,15 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_KERNEL_UCONTEXT_H
-#define _I386_KOS_KOS_KERNEL_UCONTEXT_H 1
+#ifndef _COMPAT_BITS_MCONTEXT_H
+#define _COMPAT_BITS_MCONTEXT_H 1
 
-#include <hybrid/host.h>
+#include <compat/config.h>
+#ifdef __ARCH_HAVE_COMPAT
+#include <bits/mcontext.h>
+#define compat_mcontext mcontext
+#endif /* __ARCH_HAVE_COMPAT */
 
-#ifdef __x86_64__
-#include "ucontext64.h"
-#else /* __x86_64__ */
-#include "ucontext32.h"
-#endif /* !__x86_64__ */
-
-#endif /* !_I386_KOS_KOS_KERNEL_UCONTEXT_H */
+#endif /* !_COMPAT_BITS_MCONTEXT_H */

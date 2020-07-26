@@ -17,59 +17,46 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_KERNEL_UCONTEXT32_H
-#define _I386_KOS_KOS_KERNEL_UCONTEXT32_H 1
+#ifndef _SYS_UCONTEXT_H
+#define _SYS_UCONTEXT_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
-#include <hybrid/__pointer.h>
-#include <hybrid/host.h>
-
-#include <bits/sigset.h> /* struct __sigset_struct */
-#include <bits/sigstack32.h>
-#include <kos/kernel/mcontext32.h>
+#include <bits/mcontext.h> /* struct mcontext */
+#include <bits/ucontext.h> /* struct ucontext */
 
 __DECL_BEGIN
 
-#ifndef __x86_64__
-#define __OFFSET_UCONTEXT_MCONTEXT __OFFSET_UCONTEXT32_MCONTEXT
-#define __OFFSET_UCONTEXT_SIGMASK  __OFFSET_UCONTEXT32_SIGMASK
-#define __OFFSET_UCONTEXT_STACK    __OFFSET_UCONTEXT32_STACK
-#define __OFFSET_UCONTEXT_LINK     __OFFSET_UCONTEXT32_LINK
-#define __SIZEOF_UCONTEXT          __SIZEOF_UCONTEXT32
-#define ucontext32     ucontext
-#define ucontext32_t   ucontext_t
-#endif /* !__x86_64__ */
+#ifdef __MCONTEXT_NGREG
+#define NGREG __MCONTEXT_NGREG
+#endif /* __MCONTEXT_NGREG */
 
-
-#define __OFFSET_UCONTEXT32_MCONTEXT 0
-#define __OFFSET_UCONTEXT32_SIGMASK  592
-#define __OFFSET_UCONTEXT32_STACK    720
-#define __OFFSET_UCONTEXT32_LINK     732
-#define __SIZEOF_UCONTEXT32          736
+#define __SIZEOF_GREG_T__  __SIZEOF_REGISTER__
 
 #ifdef __CC__
-#ifndef ____sigsetx32_t_defined
-#define ____sigsetx32_t_defined 1
-#ifdef __x86_64__
-struct __sigset_structx32 {
-	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
-};
-#else /* __x86_64__ */
-#define __sigset_structx32 __sigset_struct
-#endif /* !__x86_64__ */
-#endif /* !____sigsetx32_t_defined */
 
-struct ucontext32; /* Userlevel context. */
-typedef struct ucontext32 {
-	mcontext32_t                      uc_mcontext;
-	struct __sigset_structx32         uc_sigmask;
-	struct __sigaltstackx32           uc_stack;
-	__HYBRID_PTR32(struct ucontext32) uc_link;
-} ucontext32_t;
+#ifndef __greg_t_defined
+#define __greg_t_defined 1
+#if defined(__KOS__) && __KOS_VERSION__ >= 300
+typedef __REGISTER_TYPE__ greg_t;
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
+typedef __SREGISTER_TYPE__ greg_t;
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
+#endif /* !__greg_t_defined */
+
+#ifndef __ucontext_t_defined
+#define __ucontext_t_defined 1
+typedef struct ucontext ucontext_t;
+#endif /* !__ucontext_t_defined */
+
+#ifndef __mcontext_t_defined
+#define __mcontext_t_defined 1
+typedef struct mcontext mcontext_t;
+#endif /* !__mcontext_t_defined */
+
 #endif /* __CC__ */
-
 
 __DECL_END
 
-#endif /* !_I386_KOS_KOS_KERNEL_UCONTEXT32_H */
+#endif /* !_SYS_UCONTEXT_H */

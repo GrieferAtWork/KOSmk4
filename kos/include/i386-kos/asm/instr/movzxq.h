@@ -21,6 +21,7 @@
 #define _I386_KOS_ASM_INSTR_MOVZXQ_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/__asm.h>
 #include <hybrid/host.h>
 

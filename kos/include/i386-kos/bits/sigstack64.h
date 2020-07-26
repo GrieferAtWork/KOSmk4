@@ -47,7 +47,7 @@ __SYSDECL_BEGIN
 #define __sigstack_defined 1
 #define __OFFSET_SIGSTACK_SP       __OFFSET_SIGSTACKX64_SP
 #define __OFFSET_SIGSTACK_ONSTACK  __OFFSET_SIGSTACKX64_ONSTACK
-#define __SIZEOF_SIGSTACK          __SIEZOF_SIGSTACKX64
+#define __SIZEOF_SIGSTACK          __SIZEOF_SIGSTACKX64
 #define __sigstackx64              sigstack
 #endif /* !__sigstack_defined */
 
@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 #define __OFFSET_SIGALTSTACK_SP    __OFFSET_SIGALTSTACKX64_SP
 #define __OFFSET_SIGALTSTACK_FLAGS __OFFSET_SIGALTSTACKX64_FLAGS
 #define __OFFSET_SIGALTSTACK_SIZE  __OFFSET_SIGALTSTACKX64_SIZE
-#define __SIZEOF_SIGALTSTACK       __SIEZOF_SIGALTSTACKX64
+#define __SIZEOF_SIGALTSTACK       __SIZEOF_SIGALTSTACKX64
 #define __sigaltstackx64           sigaltstack
 #endif /* !__sigaltstack_defined */
 
@@ -64,7 +64,7 @@ __SYSDECL_BEGIN
 
 #define __OFFSET_SIGSTACKX64_SP      0
 #define __OFFSET_SIGSTACKX64_ONSTACK 8
-#define __SIEZOF_SIGSTACKX64         16
+#define __SIZEOF_SIGSTACKX64         16
 
 #ifdef __CC__
 /* Structure describing a signal stack (obsolete). */
@@ -79,7 +79,7 @@ struct __sigstackx64 /*[NAME(sigstackx64)][PREFIX(ss_)]*/ {
 #define __OFFSET_SIGALTSTACKX64_SP    0
 #define __OFFSET_SIGALTSTACKX64_FLAGS 8
 #define __OFFSET_SIGALTSTACKX64_SIZE  16
-#define __SIEZOF_SIGALTSTACKX64       24
+#define __SIZEOF_SIGALTSTACKX64       24
 
 #ifdef __CC__
 /* Alternate, preferred interface. */

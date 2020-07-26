@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(mcontext_t = "struct mcontext")]
 %[define_replacement(ucontext_t = "struct ucontext")]
 
 %{

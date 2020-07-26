@@ -31,8 +31,8 @@
 #include <libcpustate/register.h>
 
 #ifndef __KERNEL__
-#include <kos/kernel/mcontext.h>
-#include <kos/kernel/ucontext.h>
+#include <bits/mcontext.h> /* struct mcontext */
+#include <bits/ucontext.h> /* struct ucontext */
 #endif /* !__KERNEL__ */
 
 #ifdef __x86_64__

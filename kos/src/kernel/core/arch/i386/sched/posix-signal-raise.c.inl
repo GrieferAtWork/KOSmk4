@@ -75,7 +75,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	sigset_t old_sigmask;
 	signo_t signo = ATOMIC_READ(siginfo->si_signo);
 	USER CHECKED struct NAME2(__siginfox, _struct) *user_siginfo;
-	USER CHECKED NAME2(ucontext, _t) *user_ucontext;
+	USER CHECKED struct NAME(__ucontextx) *user_ucontext;
 	USER CHECKED sigset_t *user_sigset;
 	USER CHECKED struct NAME(fpustate) *user_fpustate;
 	USER CHECKED struct NAME(rpc_syscall_info) *user_sc_info;
@@ -155,16 +155,16 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		STATIC_ASSERT(NAME2(__SIX, _KERNEL_MAX_SIZE) == sizeof(struct NAME2(__siginfox, _struct)));
 		/* Try to have the padding of `siginfo_t' overlap with `ucontextN_t' */
 #define EFFECTIVE_PADDING_SIGINFO_T (NAME2(__SIX, _USER_MAX_SIZE) - NAME2(__SIX, _KERNEL_MAX_SIZE))
-#define EFFECTIVE_SIZEOF_SIGINFO_T                                  \
-		(EFFECTIVE_PADDING_SIGINFO_T <= sizeof(NAME2(ucontext, _t)) \
-		 ? NAME2(__SIX, _KERNEL_MAX_SIZE)                           \
-		 : (NAME2(__SIX, _USER_MAX_SIZE) - sizeof(NAME2(ucontext, _t))))
+#define EFFECTIVE_SIZEOF_SIGINFO_T                                       \
+		(EFFECTIVE_PADDING_SIGINFO_T <= sizeof(struct NAME(__ucontextx)) \
+		 ? NAME2(__SIX, _KERNEL_MAX_SIZE)                                \
+		 : (NAME2(__SIX, _USER_MAX_SIZE) - sizeof(struct NAME(__ucontextx))))
 		/* Must push a full `ucontextN_t' */
-		user_ucontext = (NAME2(ucontext, _t) *)(usp - sizeof(NAME2(ucontext, _t)));
+		user_ucontext = (struct NAME(__ucontextx) *)(usp - sizeof(struct NAME(__ucontextx)));
 		validate_writable((byte_t *)user_ucontext - EFFECTIVE_SIZEOF_SIGINFO_T,
-		                  sizeof(NAME2(ucontext, _t)) + EFFECTIVE_SIZEOF_SIGINFO_T);
+		                  sizeof(struct NAME(__ucontextx)) + EFFECTIVE_SIZEOF_SIGINFO_T);
 		COMPILER_WRITE_BARRIER();
-		user_ucontext->uc_link              = (struct NAME(ucontext) *)NULL; /* Unused... */
+		user_ucontext->uc_link              = (struct NAME(__ucontextx) *)NULL; /* Unused... */
 		user_ucontext->uc_stack.ss_sp       = usp;
 		user_ucontext->uc_stack.ss_flags    = SS_ONSTACK;
 		user_ucontext->uc_stack.ss_size     = 0;
@@ -178,12 +178,12 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		}
 		if (PERTASK_GET(this_x86_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
-			NAME2(fpustate, _saveinto)(user_fpustate);
+			(NAME2(fpustate, _saveinto)(user_fpustate));
 			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
 			                                       ? __MCONTEXT_FLAG_HAVESFPU
 			                                       : __MCONTEXT_FLAG_HAVEXFPU;
 		}
-		usp -= sizeof(NAME2(ucontext, _t)) + EFFECTIVE_SIZEOF_SIGINFO_T;
+		usp -= sizeof(struct NAME(__ucontextx)) + EFFECTIVE_SIZEOF_SIGINFO_T;
 		/* Copy signal information into user-space. */
 		user_siginfo = (struct NAME2(__siginfox, _struct) *)usp;
 		NAME(siginfo_to_siginfox)(siginfo, user_siginfo);
@@ -192,7 +192,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	} else {
 		/* Only push the bare minimum */
 		user_ucontext = COMPILER_CONTAINER_OF((struct NAME(ucpustate) *)(usp - sizeof(struct NAME(ucpustate))),
-		                                      NAME2(ucontext, _t), uc_mcontext.mc_context);
+		                                      struct NAME(__ucontextx), uc_mcontext.mc_context);
 		validate_writable(user_ucontext, sizeof(struct NAME(ucpustate)));
 		COMPILER_WRITE_BARRIER();
 		usp -= sizeof(struct NAME(ucpustate));

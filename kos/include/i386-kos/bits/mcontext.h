@@ -17,15 +17,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_KERNEL_MCONTEXT_H
-#define _I386_KOS_KOS_KERNEL_MCONTEXT_H 1
+#ifndef _I386_KOS_BITS_MCONTEXT_H
+#define _I386_KOS_BITS_MCONTEXT_H 1
 
+/* File:
+ *    <i386-kos/bits/mcontext.h>
+ * 
+ * Definitions:
+ *    - struct mcontext { ... };
+ */
+
+#include <__stdinc.h>
 #include <hybrid/host.h>
 
+#if (defined(__KOS__) && (defined(__x86_64__) || __KOS_VERSION__ >= 300))
 #ifdef __x86_64__
 #include "mcontext64.h"
 #else /* __x86_64__ */
 #include "mcontext32.h"
 #endif /* !__x86_64__ */
+#elif defined(__linux__) || (!defined(__x86_64__) && defined(__KOS__) && __KOS_VERSION__ < 300)
+#ifdef __x86_64__
+#include "mcontext-linux64.h"
+#else /* __x86_64__ */
+#include "mcontext-linux32.h"
+#endif /* !__x86_64__ */
+#else /* ... */
+#include <__crt.h>
+#ifdef __CRT_CYG
+#ifdef __x86_64__
+#include "mcontext-cygwin64.h"
+#else /* __x86_64__ */
+#include "mcontext-cygwin32.h"
+#endif /* !__x86_64__ */
+#endif /* __CRT_CYG */
+#endif /* !... */
 
-#endif /* !_I386_KOS_KOS_KERNEL_MCONTEXT_H */
+#endif /* !_I386_KOS_BITS_MCONTEXT_H */
