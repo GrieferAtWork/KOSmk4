@@ -107,7 +107,13 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- `sfence`, `lfence`, `mfence`
 		- `movbe`, `sarx`, `shlx`, `shrx`, `rorx`
 		- `popcnt`, `tzcnt`, `lzcnt`, `pext`, `pdep`, `bzhi`, `andn`
+		- `xbegin`, `xend`, `xabort`, `xtest` (s.a. RTM below)
 		- ...
+	- RTM:
+		- KOS includes a driver (`modrtm`) that can be used for software-based emulation of **Restricted Transational Memory**.  
+		  This is a mechanism by which programs can implement arbitrarily complex lockless atomic operations (only limited by memory and cpu cache restrictions), with the only requirement being that all operations performed must be non-blocking.
+		- For this purpose, the `modrtm` driver will temporarily emulate user-space code in a small sandbox, from which it will collect all modifications made to memory by the user-space program, before atomically applying them all at once (in respect to other RTM operations that may modify attempt to the same memory regions)
+		- In conjunction to this, KOS also provides system calls to make use of RTM, as well as a public interface in `/kos/include/kos/rtm.h`
 	- Accounting of hardware vm86 mode (even though it's never used)
 	- Detailed exception analysis
 		- Where normally you'd only be able to see a `#UD`, KOS will analyze faulting instructions to
@@ -150,7 +156,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- Usually, it ends up being 2 zones (low memory before the bios, and high memory where the kernel gets mapped)
 - IO
 	- User-space support for `iopl()` and `ioperm()` (allowing all `65536` ports to be controlled on a per-thread basis)
-		- Note that `ioperm()` isn't implemented as it is in linux, which doesa `memcpy()` whenever a thread is preempted. Instead, KOS uses lazy page directory mappings to re-map the `TSS.IOBM` memory region when switching between different threads, and will restore the mapping once one of the io-instructions causes a `#PF`.
+		- Note that `ioperm()` isn't implemented as it is in linux, which does a `memcpy()` whenever a thread is preempted. Instead, KOS uses lazy page directory mappings to re-map the `TSS.IOBM` memory region when switching between different threads, and will restore the mapping once one of the io-instructions causes a `#PF`.
 		- This means that the overhead of using `ioperm()` is both minimal, and doesn't increase if greater-numbered ioports are used (which, once again: would be the case on linux).
 - MMU
 	- Support for
