@@ -24,7 +24,8 @@
 
 #ifdef __x86_64__
 #include <bits/mcontext32.h>
-#define compat_mcontext __mcontextx32
+#define __COMPAT_MCONTEXT_NGREG __MCONTEXTX32_NGREG
+#define compat_mcontext         __mcontextx32
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_MCONTEXT_H */

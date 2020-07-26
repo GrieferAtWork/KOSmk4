@@ -22,7 +22,7 @@
 #define _SYS_DEBUGREG_H 1
 
 #include <hybrid/host.h>
-
+#include <hybrid/typecore.h>
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/debugreg.h */
 /* Copyright (C) 2001-2016 Free Software Foundation, Inc.
@@ -54,13 +54,13 @@
  * which debugging register was responsible for the trap. The other bits
  * are either reserved or not of interest to us. */
 
-#define DR_TRAP0 (0x1) /* db0 */
-#define DR_TRAP1 (0x2) /* db1 */
-#define DR_TRAP2 (0x4) /* db2 */
-#define DR_TRAP3 (0x8) /* db3 */
+#define DR_TRAP0 0x1 /* db0 */
+#define DR_TRAP1 0x2 /* db1 */
+#define DR_TRAP2 0x4 /* db2 */
+#define DR_TRAP3 0x8 /* db3 */
 
-#define DR_STEP   (0x4000) /* single-step */
-#define DR_SWITCH (0x8000) /* task switch */
+#define DR_STEP   0x4000 /* single-step */
+#define DR_SWITCH 0x8000 /* task switch */
 
 /* Now define a bunch of things for manipulating the control register.
  * The top two bytes of the control register consist of 4 fields of 4
@@ -71,15 +71,15 @@
 #define DR_CONTROL_SHIFT 16 /* Skip this many bits in ctl register */
 #define DR_CONTROL_SIZE  4  /* 4 control bits per register */
 
-#define DR_RW_EXECUTE (0x0) /* Settings for the access types to trap on */
-#define DR_RW_WRITE   (0x1)
-#define DR_RW_READ    (0x3)
+#define DR_RW_EXECUTE 0x0 /* Settings for the access types to trap on */
+#define DR_RW_WRITE   0x1
+#define DR_RW_READ    0x3
 
-#define DR_LEN_1 (0x0) /* Settings for data length to trap on */
-#define DR_LEN_2 (0x4)
-#define DR_LEN_4 (0xC)
+#define DR_LEN_1 0x0 /* Settings for data length to trap on */
+#define DR_LEN_2 0x4
+#define DR_LEN_4 0xc
 #ifdef __x86_64__
-#define DR_LEN_8 (0x8)
+#define DR_LEN_8 0x8
 #endif /* __x86_64__ */
 
 /* The low byte to the control register determine which registers are
@@ -93,16 +93,16 @@
 #define DR_GLOBAL_ENABLE_SHIFT 1 /* Extra shift to the global enable bit */
 #define DR_ENABLE_SIZE         2 /* 2 enable bits per register */
 
-#define DR_LOCAL_ENABLE_MASK (0x55)  /* Set  local bits for all 4 regs */
-#define DR_GLOBAL_ENABLE_MASK (0xAA) /* Set global bits for all 4 regs */
+#define DR_LOCAL_ENABLE_MASK  0x55 /* Set  local bits for all 4 regs */
+#define DR_GLOBAL_ENABLE_MASK 0xaa /* Set global bits for all 4 regs */
 
 /* The second byte to the control register has a few special things. */
 #ifdef __x86_64__
-#define DR_CONTROL_RESERVED (0xFFFFFFFF0000FC00ULL) /* Reserved */
+#define DR_CONTROL_RESERVED __UINT64_C(0xffffffff0000fc00) /* Reserved */
 #else /* __x86_64__ */
-#define DR_CONTROL_RESERVED (0x00FC00U) /* Reserved */
+#define DR_CONTROL_RESERVED __UINT32_C(0x00fc00)           /* Reserved */
 #endif /* !__x86_64__ */
-#define DR_LOCAL_SLOWDOWN  (0x100) /* Local slow the pipeline */
-#define DR_GLOBAL_SLOWDOWN (0x200) /* Global slow the pipeline */
+#define DR_LOCAL_SLOWDOWN  0x100 /* Local slow the pipeline */
+#define DR_GLOBAL_SLOWDOWN 0x200 /* Global slow the pipeline */
 
 #endif /* !_I386_KOS_SYS_DEBUGREG_H */

@@ -17,16 +17,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_BITS_MCONTEXT_H
-#define _COMPAT_BITS_MCONTEXT_H 1
+#ifndef _BITS_MCONTEXT_H
+#define _BITS_MCONTEXT_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/mcontext.h>
-#ifdef __MCONTEXT_NGREG
-#define __COMPAT_MCONTEXT_NGREG __MCONTEXT_NGREG
-#endif /* __MCONTEXT_NGREG */
-#define compat_mcontext mcontext
-#endif /* __ARCH_HAVE_COMPAT */
+/* File:
+ *    <bits/mcontext.h>
+ * 
+ * Definitions:
+ *    - struct mcontext { ... };
+ *
+ */
 
-#endif /* !_COMPAT_BITS_MCONTEXT_H */
+#include <__stdinc.h>
+
+#include <hybrid/typecore.h>
+
+#ifndef __SIZEOF_MCONTEXT
+#define __SIZEOF_MCONTEXT (64 * __SIZEOF_POINTER__)
+#endif /* !__SIZEOF_MCONTEXT */
+
+#ifndef __ALIGNOF_MCONTEXT
+#define __ALIGNOF_MCONTEXT __SIZEOF_POINTER__
+#endif /* !__ALIGNOF_MCONTEXT */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct __ATTR_ALIGNED(__ALIGNOF_MCONTEXT) mcontext {
+	__BYTE_TYPE__ __m_data[__SIZEOF_MCONTEXT]; /* Register data. */
+};
+
+
+__DECL_END
+#endif /* __CC__ */
+
+
+#endif /* !_BITS_MCONTEXT_H */

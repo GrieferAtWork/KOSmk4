@@ -364,6 +364,7 @@ local files = {
 	"../../include/bits/flock-struct.h",
 	"../../include/bits/itimerspec.h",
 	"../../include/bits/itimerval.h",
+	"../../include/bits/mcontext.h",
 	"../../include/bits/mmsghdr-struct.h",
 	"../../include/bits/msghdr-struct.h",
 	"../../include/bits/pollfd.h",
@@ -375,6 +376,7 @@ local files = {
 	"../../include/bits/timeb.h",
 	"../../include/bits/timespec.h",
 	"../../include/bits/timeval.h",
+	"../../include/bits/ucontext.h",
 	"../../include/bits/ustat.h",
 	"../../include/bits/utimbuf.h",
 	"../../include/bits/utsname.h",
@@ -508,6 +510,16 @@ static_assert(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
 static_assert(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
 static_assert(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
 static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
+
+
+
+
+
+#include <bits/mcontext.h>
+
+/* struct mcontext */
+static_assert(sizeof(struct mcontext) == __SIZEOF_MCONTEXT);
+static_assert(alignof(struct mcontext) == __ALIGNOF_MCONTEXT);
 
 
 
@@ -900,6 +912,20 @@ static_assert(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
 static_assert(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
 static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
 static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
+
+
+
+
+
+#include <bits/ucontext.h>
+
+/* struct ucontext */
+static_assert(offsetof(struct ucontext, uc_link) == __OFFSET_UCONTEXT_LINK);
+static_assert(offsetof(struct ucontext, uc_mcontext) == __OFFSET_UCONTEXT_MCONTEXT);
+static_assert(offsetof(struct ucontext, uc_sigmask) == __OFFSET_UCONTEXT_SIGMASK);
+static_assert(offsetof(struct ucontext, uc_stack) == __OFFSET_UCONTEXT_STACK);
+static_assert(sizeof(struct ucontext) == __SIZEOF_UCONTEXT);
+static_assert(alignof(struct ucontext) == __ALIGNOF_UCONTEXT);
 
 
 
@@ -1489,6 +1515,7 @@ static_assert(offsetof(struct hop_inode_chmod, icm_perm_flag) == __OFFSET_HOP_IN
 static_assert(offsetof(struct hop_inode_chmod, icm_perm_mask) == __OFFSET_HOP_INODE_CHMOD_PERM_MASK);
 static_assert(offsetof(struct hop_inode_chmod, icm_perm_old) == __OFFSET_HOP_INODE_CHMOD_PERM_OLD);
 static_assert(offsetof(struct hop_inode_chmod, icm_struct_size) == __OFFSET_HOP_INODE_CHMOD_STRUCT_SIZE);
+static_assert(sizeof(struct hop_inode_chmod) == __SIZEOF_HOP_INODE_CHMOD);
 
 /* struct hop_inode_chown */
 static_assert(offsetof(struct hop_inode_chown, ico_newgroup) == __OFFSET_HOP_INODE_CHOWN_NEWGROUP);
@@ -1496,6 +1523,7 @@ static_assert(offsetof(struct hop_inode_chown, ico_newowner) == __OFFSET_HOP_INO
 static_assert(offsetof(struct hop_inode_chown, ico_oldgroup) == __OFFSET_HOP_INODE_CHOWN_OLDGROUP);
 static_assert(offsetof(struct hop_inode_chown, ico_oldowner) == __OFFSET_HOP_INODE_CHOWN_OLDOWNER);
 static_assert(offsetof(struct hop_inode_chown, ico_struct_size) == __OFFSET_HOP_INODE_CHOWN_STRUCT_SIZE);
+static_assert(sizeof(struct hop_inode_chown) == __SIZEOF_HOP_INODE_CHOWN);
 
 /* struct hop_directory_opennode */
 static_assert(offsetof(struct hop_directory_opennode, don_dent) == __OFFSET_HOP_DIRECTORY_OPENNODE_DENT);

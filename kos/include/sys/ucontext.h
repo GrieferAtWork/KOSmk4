@@ -26,8 +26,6 @@
 #include <bits/mcontext.h> /* struct mcontext */
 #include <bits/ucontext.h> /* struct ucontext */
 
-__DECL_BEGIN
-
 #ifdef __MCONTEXT_NGREG
 #define NGREG __MCONTEXT_NGREG
 #endif /* __MCONTEXT_NGREG */
@@ -35,6 +33,7 @@ __DECL_BEGIN
 #define __SIZEOF_GREG_T__  __SIZEOF_REGISTER__
 
 #ifdef __CC__
+__DECL_BEGIN
 
 #ifndef __greg_t_defined
 #define __greg_t_defined 1
@@ -55,8 +54,7 @@ typedef struct ucontext ucontext_t;
 typedef struct mcontext mcontext_t;
 #endif /* !__mcontext_t_defined */
 
-#endif /* __CC__ */
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_UCONTEXT_H */
