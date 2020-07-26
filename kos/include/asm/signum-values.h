@@ -17,16 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SIGNUM_VALUES_H
-#define _BITS_SIGNUM_VALUES_H 1
+#ifndef _ASM_SIGNUM_VALUES_H
+#define _ASM_SIGNUM_VALUES_H 1
 
 #include <__stdinc.h>
 
 /* Fake signal functions. */
-#define __SIG_ERR  (__CCAST(__sighandler_t)-1) /* Error return. */
-#define __SIG_DFL  (__CCAST(__sighandler_t)0)  /* Default action. */
-#define __SIG_IGN  (__CCAST(__sighandler_t)1)  /* Ignore signal. */
-#define __SIG_HOLD (__CCAST(__sighandler_t)2)  /* Add signal to hold mask. */
+#define __SIG_ERR  (-1) /* Error return. */
+#define __SIG_DFL  0    /* Default action. */
+#define __SIG_IGN  1    /* Ignore signal. */
+#define __SIG_HOLD 2    /* Add signal to hold mask. */
 
 /* Signals. */
 #define __SIGHUP    1         /* Hangup (POSIX). */
@@ -71,4 +71,4 @@
 #define __SIGRTMAX  64
 
 
-#endif /* !_BITS_SIGNUM_VALUES_H */
+#endif /* !_ASM_SIGNUM_VALUES_H */

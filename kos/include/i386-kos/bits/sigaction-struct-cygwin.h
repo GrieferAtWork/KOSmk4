@@ -20,11 +20,23 @@
 #ifndef _I386_KOS_BITS_SIGACTION_STRUCT_CYGWIN_H
 #define _I386_KOS_BITS_SIGACTION_STRUCT_CYGWIN_H 1
 
+/* File:
+ *    <i386-kos/bits/sigaction-struct-cygwin.h>
+ * 
+ * Definitions:
+ *    - struct __sigaction_cygwin { ... };
+ *    - typedef ... __sighandler_cygwin_t;
+ * #ifdef __CRT_CYG_PRIMARY
+ *    - typedef ... __sighandler_t;
+ *    - struct sigaction { ... };
+ * #endif
+ */
+
 #include <__crt.h>
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 #ifdef __CRT_CYG_PRIMARY
@@ -68,8 +80,8 @@ struct __sigaction_cygwin /*[NAME(sigaction_cygwin)][PREFIX(sa_)]*/ {
 	__sighandler_cygwin_t sa_handler;
 #endif /* !__USE_POSIX199309 */
 	/* XXX: Doesn't sigset_t have a different size in cygwin? */
-	__sigset_t sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t sa_flags; /* Special flags. */
+	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
+	__uint32_t             sa_flags; /* Special flags. */
 };
 #endif /* __CC__ */
 

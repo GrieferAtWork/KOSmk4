@@ -31,15 +31,7 @@
 
 
 %(auto_header,user){
-DECL_END
-#include <bits/sigaction.h>
-DECL_BEGIN
-
-#ifndef __sighandler_t_defined
-#define __sighandler_t_defined 1
-typedef __sighandler_t sighandler_t;
-#endif /* !__sighandler_t_defined */
-
+#include <signal.h>
 }
 
 
@@ -48,7 +40,7 @@ typedef __sighandler_t sighandler_t;
 #include <features.h>
 
 #include <bits/select.h>
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/time.h>
 #include <bits/timespec.h> /* struct timespec */
 #include <bits/timeval.h>  /* struct timeval */
@@ -69,7 +61,7 @@ typedef __TM_TYPE(time) time_t;
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __suseconds_t_defined

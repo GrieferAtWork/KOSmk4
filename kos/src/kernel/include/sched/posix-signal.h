@@ -32,19 +32,18 @@
 #include <hybrid/host.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/sigevent.h>
-#include <bits/siginfo-struct.h>
-#include <bits/siginfo.h>
-#include <bits/signum.h>
-#include <bits/sigset.h>
-#include <bits/waitstatus.h>
+#include <bits/siginfo-struct.h> /* struct __siginfo_struct */
+#include <bits/sigset.h>         /* struct __sigset_struct */
+#include <sys/wait.h>
 
-#include <libc/string.h>
+#include <signal.h> /* SIG* */
+
+#include <libc/string.h> /* __libc_memset() */
 
 DECL_BEGIN
 
 #ifndef NSIG
-#define NSIG    _NSIG
+#define NSIG __NSIG
 #endif /* !NSIG */
 
 #define SIGACTION_SA_NOCLDSTOP 0x00000001 /* Don't send SIGCHLD when children stop (Ignored for anything other than SIGCLD). */
@@ -78,9 +77,13 @@ DECL_BEGIN
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
+#ifndef __siginfo_t_defined
+#define __siginfo_t_defined 1
+typedef struct __siginfo_struct siginfo_t;
+#endif /* !__siginfo_t_defined */
 
 struct ucontext;
 typedef void (*user_sighandler_func_t)(signo_t signo);

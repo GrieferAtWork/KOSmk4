@@ -20,6 +20,13 @@
 #ifndef _I386_KOS_BITS_SIGINFO_STRUCT_H
 #define _I386_KOS_BITS_SIGINFO_STRUCT_H 1
 
+/* File:
+ *    <i386-kos/bits/siginfo-struct.h>
+ * 
+ * Definitions:
+ *    - struct __siginfo_struct { ... };
+ */
+
 #include <__stdinc.h>
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
 

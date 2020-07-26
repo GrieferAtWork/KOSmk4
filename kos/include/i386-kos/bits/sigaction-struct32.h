@@ -20,6 +20,18 @@
 #ifndef _I386_KOS_BITS_SIGACTION_STRUCT32_H
 #define _I386_KOS_BITS_SIGACTION_STRUCT32_H 1
 
+/* File:
+ *    <i386-kos/bits/sigaction-struct32.h>
+ * 
+ * Definitions:
+ *    - struct __sigactionx32 { ... };
+ *    - typedef ... __sighandlerx32_t;
+ * #if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
+ *    - typedef ... __sighandler_t;
+ *    - struct sigaction { ... };
+ * #endif
+ */
+
 #include <__crt.h>
 #include <__stdinc.h>
 #include <features.h>
@@ -30,7 +42,7 @@
 #include <bits/sigset.h>
 #include <bits/types.h>
 
-#if !defined(__x86_64__) && !defined(__CRT_CYG_PRIMARY)
+#if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
 #define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTIONX32_HANDLER
 #define __OFFSET_SIGACTION_SIGACTION __OFFSET_SIGACTIONX32_SIGACTION
 #define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTIONX32_MASK
@@ -43,7 +55,7 @@
 #define ____sighandler_t_defined 1
 #define __sighandlerx32_t  __sighandler_t
 #endif /* !____sighandler_t_defined */
-#endif /* !__x86_64__ && !__CRT_CYG_PRIMARY */
+#endif /* !__CRT_CYG_PRIMARY && !__x86_64__ && __i386__ */
 
 
 __SYSDECL_BEGIN
@@ -53,11 +65,11 @@ __SYSDECL_BEGIN
 typedef __HYBRID_FUNCPTR32(void,__ATTR_CDECL,__sighandlerx32_t,(int __signo));
 
 #ifdef __USE_POSIX199309
-#ifdef __x86_64__
-struct __siginfox32_struct;
-#else /* __x86_64__ */
+#if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
 struct __siginfo_struct;
-#endif /* !__x86_64__ */
+#else /* !__CRT_CYG_PRIMARY && !__x86_64__ && __i386__ */
+struct __siginfox32_struct;
+#endif /* __CRT_CYG_PRIMARY || __x86_64__ || !__i386__ */
 #ifdef __USE_KOS
 #ifdef __x86_64__
 struct ucontext32;
@@ -69,12 +81,11 @@ struct ucontext;
 #ifndef ____sigsetx32_t_defined
 #define ____sigsetx32_t_defined 1
 #ifdef __x86_64__
-typedef struct __sigset_structx32 {
+struct __sigset_structx32 {
 	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
-} __sigsetx32_t;
+};
 #else /* __x86_64__ */
 #define __sigset_structx32 __sigset_struct
-#define __sigsetx32_t      __sigset_t
 #endif /* !__x86_64__ */
 #endif /* !____sigsetx32_t_defined */
 #endif /* __CC__ */
@@ -97,24 +108,24 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx3
 		__sighandlerx32_t sa_handler;
 		/* Used if SA_SIGINFO is set. */
 #ifdef __USE_KOS
-#ifdef __x86_64__
-		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfox32_struct *__info, struct ucontext32 *__ctx));
-#else /* __x86_64__ */
+#if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
 		__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
-#endif /* !__x86_64__ */
+#else /* !__CRT_CYG_PRIMARY && !__x86_64__ && __i386__ */
+		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfox32_struct *__info, struct ucontext32 *__ctx));
+#endif /* __CRT_CYG_PRIMARY || __x86_64__ || !__i386__ */
 #else /* __USE_KOS */
-#ifdef __x86_64__
-		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfox32_struct *__info, void *__ctx));
-#else /* __x86_64__ */
+#if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
 		__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_sigaction, (int __signo, struct __siginfo_struct *__info, void *__ctx));
-#endif /* !__x86_64__ */
+#else /* !__CRT_CYG_PRIMARY && !__x86_64__ && __i386__ */
+		__HYBRID_FUNCPTR32(void, , sa_sigaction, (int __signo, struct __siginfox32_struct *__info, void *__ctx));
+#endif /* __CRT_CYG_PRIMARY || __x86_64__ || !__i386__ */
 #endif /* !__USE_KOS */
 	};
 #else /* __USE_POSIX199309 */
 	__sighandlerx32_t sa_handler;
 #endif /* !__USE_POSIX199309 */
-	__sigsetx32_t sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t    sa_flags; /* Special flags. */
+	struct __sigset_structx32 sa_mask;  /* Additional set of signals to be blocked. */
+	__uint32_t                sa_flags; /* Special flags. */
 #ifdef __x86_64__
 	__HYBRID_FUNCPTR32(void, , sa_restorer, (void)); /* Restore handler. */
 #else /* __x86_64__ */

@@ -17,13 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_MMAN_H
-#define _BITS_MMAN_H 1
+#ifndef _ASM_SIGNALFD_H
+#define _ASM_SIGNALFD_H 1
 
 #include <__stdinc.h>
 
-/* XXX: Add a few new system calls, or hop()s to allow mmap-ing of
- *      memory that will be pre-initialized to a custom value upon
- *      first access. */
+#if defined(__KOS__) || defined(__linux__)
+#define __SFD_NONBLOCK 0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
+#define __SFD_CLOEXEC  0x0080000 /* Close the file during exec() */
+#ifdef __KOS__
+#define __SFD_CLOFORK  0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#endif /* __KOS__ */
+#endif /* __KOS__ || __linux__ */
 
-#endif /* !_BITS_MMAN_H */
+#endif /* !_ASM_SIGNALFD_H */

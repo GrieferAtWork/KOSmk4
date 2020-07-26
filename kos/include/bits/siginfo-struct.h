@@ -20,6 +20,14 @@
 #ifndef _BITS_SIGINFO_STRUCT_H
 #define _BITS_SIGINFO_STRUCT_H 1
 
+/* File:
+ *    <bits/siginfo-struct.h>
+ * 
+ * Definitions:
+ *    - struct __siginfo_struct { ... };
+ *    - #define __SI_MAX_SIZE ...
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
@@ -28,13 +36,11 @@
 #include <bits/sigval.h>
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
-#define __SI_MAX_SIZE    128
+#define __SI_MAX_SIZE 128
 #if __SIZEOF_POINTER__ > 4
-#define __SI_PAD_SIZE  ((__SI_MAX_SIZE/4)-4)
+#define __SI_PAD_SIZE ((__SI_MAX_SIZE / 4) - 4)
 #else /* __SIZEOF_POINTER__ > 4 */
-#define __SI_PAD_SIZE  ((__SI_MAX_SIZE/4)-3)
+#define __SI_PAD_SIZE ((__SI_MAX_SIZE / 4) - 3)
 #endif /* __SIZEOF_POINTER__ <= 4 */
 
 #define __OFFSET_SIGINFO_SIGNO     0
@@ -64,11 +70,13 @@ __SYSDECL_BEGIN
 #define __OFFSET_SIGINFO_CALL_ADDR (4 * 4)
 #define __OFFSET_SIGINFO_SYSCALL   (4 * 4 + __SIZEOF_POINTER__)
 #define __OFFSET_SIGINFO_ARCH      (5 * 4 + __SIZEOF_POINTER__)
-#define __SIZEOF_SIGINFO            __SI_MAX_SIZE
+#define __SIZEOF_SIGINFO           __SI_MAX_SIZE
 
 
 #ifdef __CC__
-typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
+__DECL_BEGIN
+
+struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ si_signo; /* Signal number. */
 	__INT32_TYPE__ si_errno; /* If non-zero, an errno value associated with this signal, as defined in <errno.h>. */
 	__INT32_TYPE__ si_code;  /* Signal code. */
@@ -90,15 +98,15 @@ typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 			__INT32_TYPE__ si_timerid; /* Timer ID. */
 			__INT32_TYPE__ si_overrun; /* Overrun count. */
 			union {
-				sigval_t       si_value;   /* Signal value. */
+				union sigval   si_value;   /* Signal value. */
 				__INT32_TYPE__ si_int;
 				void          *si_ptr;
 			};
 		};
 		struct { /* POSIX.1b signals. */
-			__pid_t  __sig_si_pid;    /* Sending process ID. */
-			__uid_t  __sig_si_uid;    /* Real user ID of sending process. */
-			sigval_t __sig_si_sigval; /* Signal value. */
+			__pid_t      __sig_si_pid;    /* Sending process ID. */
+			__uid_t      __sig_si_uid;    /* Real user ID of sending process. */
+			union sigval __sig_si_sigval; /* Signal value. */
 		};
 		struct { /* SIGCHLD. */
 			__pid_t      __cld_si_pid;    /* Which child. */
@@ -137,19 +145,19 @@ typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 		struct { /* POSIX.1b timers. */
 			__INT32_TYPE__ si_tid;     /* Timer ID. */
 			__INT32_TYPE__ si_overrun; /* Overrun count. */
-			sigval_t       si_sigval;  /* Signal value. */
+			union sigval   si_sigval;  /* Signal value. */
 		} _timer;
 		struct { /* POSIX.1b signals. */
-			__pid_t  si_pid;    /* Sending process ID. */
-			__uid_t  si_uid;    /* Real user ID of sending process. */
-			sigval_t si_sigval; /* Signal value. */
+			__pid_t      si_pid;    /* Sending process ID. */
+			__uid_t      si_uid;    /* Real user ID of sending process. */
+			union sigval si_sigval; /* Signal value. */
 		} _rt;
 		struct { /* SIGCHLD. */
-			__pid_t           si_pid;    /* Which child. */
-			__uid_t           si_uid;    /* Real user ID of sending process. */
-			__INT32_TYPE__    si_status; /* Exit value or signal. */
-			__clock_t si_utime;
-			__clock_t si_stime;
+			__pid_t        si_pid;    /* Which child. */
+			__uid_t        si_uid;    /* Real user ID of sending process. */
+			__INT32_TYPE__ si_status; /* Exit value or signal. */
+			__clock_t      si_utime;
+			__clock_t      si_stime;
 		} _sigchld;
 		struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
 			void          *si_addr;     /* Faulting insn/memory ref. */
@@ -197,10 +205,10 @@ typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 #define si_syscall   _sifields._sigsys._syscall
 #define si_arch      _sifields._sigsys._arch
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-} siginfo_t;
+};
 
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_BITS_SIGINFO_STRUCT_H */

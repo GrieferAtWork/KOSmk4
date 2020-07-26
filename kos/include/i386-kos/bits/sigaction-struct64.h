@@ -20,16 +20,28 @@
 #ifndef _I386_KOS_BITS_SIGACTION_STRUCT64_H
 #define _I386_KOS_BITS_SIGACTION_STRUCT64_H 1
 
+/* File:
+ *    <i386-kos/bits/sigaction-struct64.h>
+ * 
+ * Definitions:
+ *    - struct __sigactionx64 { ... };
+ *    - typedef ... __sighandlerx64_t;
+ * #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
+ *    - typedef ... __sighandler_t;
+ *    - struct sigaction { ... };
+ * #endif
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
-#if defined(__x86_64__) && !defined(__CRT_CYG_PRIMARY)
+#if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
 #define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTIONX64_HANDLER
 #define __OFFSET_SIGACTION_SIGACTION __OFFSET_SIGACTIONX64_SIGACTION
 #define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTIONX64_MASK
@@ -42,7 +54,7 @@
 #define ____sighandler_t_defined 1
 #define __sighandlerx64_t __sighandler_t
 #endif /* !____sighandler_t_defined */
-#endif /* __x86_64__ && !__CRT_CYG_PRIMARY */
+#endif /* !__CRT_CYG_PRIMARY && __x86_64__ */
 
 
 __SYSDECL_BEGIN
@@ -52,11 +64,11 @@ __SYSDECL_BEGIN
 typedef __HYBRID_FUNCPTR64(void,__ATTR_SYSVABI,__sighandlerx64_t,(int __signo));
 
 #ifdef __USE_POSIX199309
-#ifdef __x86_64__
+#if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
 struct __siginfo_struct;
-#else /* __x86_64__ */
+#else /* !__CRT_CYG_PRIMARY && __x86_64__ */
 struct __siginfo64_struct;
-#endif /* !__x86_64__ */
+#endif /* __CRT_CYG_PRIMARY || !__x86_64__ */
 #ifdef __USE_KOS
 #ifdef __x86_64__
 struct ucontext;
@@ -85,25 +97,25 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx6
 		__sighandlerx64_t sa_handler;
 		/* Used if SA_SIGINFO is set. */
 #ifdef __USE_KOS
-#ifdef __x86_64__
+#if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
 		__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
-#else /* __x86_64__ */
+#else /* !__CRT_CYG_PRIMARY && __x86_64__ */
 		__HYBRID_FUNCPTR64(void, , sa_sigaction, (int __signo, struct __siginfo64_struct *__info, struct ucontext64 *__ctx));
-#endif /* !__x86_64__ */
+#endif /* __CRT_CYG_PRIMARY || !__x86_64__ */
 #else /* __USE_KOS */
-#ifdef __x86_64__
+#if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
 		__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_sigaction, (int __signo, struct __siginfo_struct *__info, void *__ctx));
-#else /* __x86_64__ */
+#else /* !__CRT_CYG_PRIMARY && __x86_64__ */
 		__HYBRID_FUNCPTR64(void, , sa_sigaction, (int __signo, struct __siginfo64_struct *__info, void *__ctx));
-#endif /* !__x86_64__ */
+#endif /* __CRT_CYG_PRIMARY || !__x86_64__ */
 #endif /* !__USE_KOS */
 	};
 #else /* __USE_POSIX199309 */
 	__sighandlerx64_t sa_handler;
 #endif /* !__USE_POSIX199309 */
-	__sigset_t sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t sa_flags; /* Special flags. */
-	__uint32_t __sa_pad; /* ... */
+	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
+	__uint32_t             sa_flags; /* Special flags. */
+	__uint32_t           __sa_pad;   /* ... */
 #ifdef __x86_64__
 	__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_restorer, (void)); /* Restore handler. */
 #else /* __x86_64__ */

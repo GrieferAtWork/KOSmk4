@@ -23,8 +23,8 @@
 #include "../api.h"
 /**/
 
-#include <bits/signum-values-dos.h>
-#include <bits/signum-values-kos.h>
+#include <asm/signum-values-dos.h>
+#include <asm/signum-values-kos.h>
 #include <parts/dos/errno.h>
 
 #include <assert.h>

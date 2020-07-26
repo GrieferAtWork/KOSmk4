@@ -17,11 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_PTHREADVALUES_H
-#define _BITS_CRT_PTHREADVALUES_H 1
+#ifndef _ASM_CRT_PTHREADVALUES_H
+#define _ASM_CRT_PTHREADVALUES_H 1
 
 #include <__stdinc.h>
-#include <hybrid/typecore.h>
 
 /* PThread constants */
 #define __PTHREAD_CREATE_JOINABLE                   0
@@ -48,8 +47,8 @@
 #define __PTHREAD_CANCEL_DISABLE                    1
 #define __PTHREAD_CANCEL_DEFERRED                   0
 #define __PTHREAD_CANCEL_ASYNCHRONOUS               1
-#define __PTHREAD_CANCELED                          (__CCAST(void *)(-1))
+#define __PTHREAD_CANCELED                          (__CCAST(void *)-1)
 #define __PTHREAD_ONCE_INIT                         0
 #define __PTHREAD_BARRIER_SERIAL_THREAD             (-1)
 
-#endif /* !_BITS_CRT_PTHREADVALUES_H */
+#endif /* !_ASM_CRT_PTHREADVALUES_H */

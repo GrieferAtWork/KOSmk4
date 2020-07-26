@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b029ccc */
+/* HASH CRC-32:0x880580a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3302,7 +3302,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigsuspend)
 END(libc_sys_Xrt_sigsuspend)
 DEFINE_PUBLIC_ALIAS(sys_Xrt_sigsuspend, libc_sys_Xrt_sigsuspend)
 
-/* errno_t sigaltstack(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
 .section .text.crt.syscall.sigaltstack
 INTERN_FUNCTION(libc_sys_sigaltstack)
 	.cfi_startproc
@@ -3314,7 +3314,7 @@ INTERN_FUNCTION(libc_sys_sigaltstack)
 END(libc_sys_sigaltstack)
 DEFINE_PUBLIC_ALIAS(sys_sigaltstack, libc_sys_sigaltstack)
 
-/* errno_t sigaltstack(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
 .section .text.crt.syscall.Xsigaltstack
 INTERN_FUNCTION(libc_sys_Xsigaltstack)
 	.cfi_startproc

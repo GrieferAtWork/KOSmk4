@@ -37,6 +37,7 @@
 #include <format-printer.h>
 #include <malloc.h>
 #include <sched.h>
+#include <signal.h> /* SIGABRT */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

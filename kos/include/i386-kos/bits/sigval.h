@@ -20,6 +20,13 @@
 #ifndef _I386_KOS_BITS_SIGVAL_H
 #define _I386_KOS_BITS_SIGVAL_H 1
 
+/* File:
+ *    <i386-kos/bits/sigval.h>
+ * 
+ * Definitions:
+ *    - union sigval { ... };
+ */
+
 #include <hybrid/host.h>
 
 #ifdef __x86_64__

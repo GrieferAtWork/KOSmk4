@@ -47,7 +47,6 @@
 #include <bits/resource.h>
 #include <bits/rusage-convert.h>
 #include <bits/rusage-struct.h>
-#include <bits/siginfo.h>
 #include <bits/timespec.h>
 #include <compat/config.h>
 #include <kos/except/inval.h>
@@ -59,15 +58,16 @@
 #include <errno.h>
 #include <limits.h>
 #include <sched.h>
+#include <signal.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/rusage-convert.h>
 #include <compat/bits/rusage-struct.h>
 #include <compat/bits/siginfo-convert.h>
-#include <compat/bits/siginfo-struct.h>
 #include <compat/bits/types.h>
 #include <compat/kos/types.h>
+#include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN

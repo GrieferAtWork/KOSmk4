@@ -20,11 +20,15 @@
 #ifndef GUARD_LIBC_LIBC_ARCH_I386_SETJMP32_S
 #define GUARD_LIBC_LIBC_ARCH_I386_SETJMP32_S 1
 #define __ASSEMBLER__ 1
+#define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
-#include <bits/sigaction.h>
+
 #include <asm/cfi.h>
+
 #include <setjmp.h>
+#include <signal.h>
 
 #undef setjmp
 #undef longjmp

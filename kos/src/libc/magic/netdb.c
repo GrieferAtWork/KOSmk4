@@ -30,9 +30,11 @@
 
 %{
 #include <features.h>
+
 #include <bits/crt/db/netdb.h>
 #include <bits/types.h>
 #include <netinet/in.h>
+
 #include <stdint.h>
 
 #ifdef __USE_MISC
@@ -40,7 +42,7 @@
 #endif /* __USE_MISC */
 
 #ifdef __USE_GNU
-#include <bits/sigevent.h>
+#include <bits/sigevent.h> /* struct sigevent */
 #include <bits/timespec.h>
 #endif /* __USE_GNU */
 
@@ -660,6 +662,12 @@ int getnameinfo(struct sockaddr const *__restrict sa, socklen_t salen,
 
 %
 %#ifdef __USE_GNU
+%#ifndef __sigevent_t_defined
+%#define __sigevent_t_defined 1
+%typedef struct sigevent sigevent_t;
+%#endif /* !__sigevent_t_defined */
+%
+
 @@Enqueue ENT requests from the LIST. If MODE is GAI_WAIT wait until all
 @@requests are handled. If WAIT is GAI_NOWAIT return immediately after
 @@queueing the requests and signal completion according to SIG.

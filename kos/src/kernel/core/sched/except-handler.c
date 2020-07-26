@@ -42,10 +42,10 @@
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/sigstack.h>
 #include <compat/kos/except-handler.h>
 #include <compat/kos/types.h>
 #include <compat/pointer.h>
+#include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN

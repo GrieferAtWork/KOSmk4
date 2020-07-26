@@ -21,9 +21,11 @@
 #define _I386_KOS_BITS_CRT_SETJMP_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
-#include <bits/sigset.h>
+
+#include <bits/sigset.h> /* struct __sigset_struct */
 
 __SYSDECL_BEGIN
 
@@ -53,7 +55,10 @@ struct __jmp_buf {
 	__UINTPTR_TYPE__ __rbx,__rbp,__r12,__r13;
 	__UINTPTR_TYPE__ __r14,__r15,__rsp,__rip;
 };
-#define __JMP_BUF_STATIC_INIT  {{0,0,0,0,0,0,0,0}}
+#define __JMP_BUF_STATIC_INIT      \
+	{                              \
+		{ 0, 0, 0, 0, 0, 0, 0, 0 } \
+	}
 #endif /* __CC__ */
 #else
 #ifdef __CC__
@@ -62,7 +67,10 @@ struct __jmp_buf {
 	__UINTPTR_TYPE__ __esi,__edi,__eip;
 	__UINTPTR_TYPE__ __padding[2];
 };
-#define __JMP_BUF_STATIC_INIT  {{0,0,0,0,0,0,0,0}}
+#define __JMP_BUF_STATIC_INIT      \
+	{                              \
+		{ 0, 0, 0, 0, 0, 0, 0, 0 } \
+	}
 #endif /* __CC__ */
 #endif
 
@@ -70,12 +78,12 @@ struct __jmp_buf {
 #ifdef __CC__
 #ifndef __KERNEL__
 struct __sigjmp_buf {
-	struct __jmp_buf __sj_buf;    /* regular jump buffer (NOTE: `__padding[0] != 0'
-	                               * is used to indicate the validity of `__sj_sig') */
+	struct __jmp_buf       __sj_buf;    /* regular jump buffer (NOTE: `__padding[0] != 0'
+	                                     * is used to indicate the validity of `__sj_sig') */
 #ifdef __x86_64__
-	__UINTPTR_TYPE__ __sj_hassig; /* non-zero if a signal set is present. */
+	__UINTPTR_TYPE__       __sj_hassig; /* non-zero if a signal set is present. */
 #endif /* __x86_64__ */
-	__sigset_t       __sj_sig;    /* Signal set to be restored before jumping (if given). */
+	struct __sigset_struct __sj_sig;    /* Signal set to be restored before jumping (if given). */
 };
 #endif /* !__KERNEL__ */
 #endif /* __CC__ */

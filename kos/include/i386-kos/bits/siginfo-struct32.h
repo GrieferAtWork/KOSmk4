@@ -20,6 +20,18 @@
 #ifndef _I386_KOS_BITS_SIGINFO32_H
 #define _I386_KOS_BITS_SIGINFO32_H 1
 
+/* File:
+ *    <i386-kos/bits/siginfo-struct32.h>
+ * 
+ * Definitions:
+ *    - struct __siginfox32_struct { ... };
+ *    - #define __SIX32_MAX_SIZE ...
+ * #if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
+ *    - struct __siginfo_struct { ... };
+ *    - #define __SI_MAX_SIZE ...
+ * #endif
+ */
+
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
 #include <__stdinc.h>
 #include <features.h> /* __USE_KOS */
@@ -32,7 +44,7 @@
 
 __DECL_BEGIN
 
-#if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__)
+#if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
 #define __SI_KERNEL_MAX_SIZE       __SIX32_KERNEL_MAX_SIZE
 #define __SI_USER_MAX_SIZE         __SIX32_USER_MAX_SIZE
 #define __SI_MAX_SIZE              __SIX32_MAX_SIZE
@@ -61,9 +73,7 @@ __DECL_BEGIN
 #define __OFFSET_SIGINFO_ARCH      __OFFSET_SIGINFOX32_ARCH
 #define __SIZEOF_SIGINFO           __SIZEOF_SIGINFOX32
 #define __siginfox32_struct        __siginfo_struct
-#define __siginfox32_t             siginfo_t
-#define __siginfo_t_defined        1
-#endif /* !__CRT_CYG_PRIMARY && !__x86_64__ */
+#endif /* !__CRT_CYG_PRIMARY && !__x86_64__ && __i386__ */
 
 
 #define __SIX32_KERNEL_MAX_SIZE 32
@@ -101,12 +111,7 @@ __DECL_BEGIN
 
 
 #ifdef __CC__
-#ifdef __USE_KOS_KERNEL
-#define siginfox32_struct __siginfox32_struct
-#define siginfox32_t      __siginfox32_t
-#endif /* __USE_KOS_KERNEL */
-
-typedef struct __siginfox32_struct /*[NAME(siginfox32)][PREFIX(si_)]*/ {
+struct __siginfox32_struct /*[NAME(siginfox32)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ si_signo; /* Signal number. */
 	__INT32_TYPE__ si_errno; /* If non-zero, an errno value associated with this signal, as defined in <errno.h>. */
 	__INT32_TYPE__ si_code;  /* Signal code. */
@@ -238,7 +243,7 @@ typedef struct __siginfox32_struct /*[NAME(siginfox32)][PREFIX(si_)]*/ {
 #define si_syscall      _sifields._sigsys._syscall
 #define si_arch         _sifields._sigsys._arch
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-} __siginfox32_t;
+};
 #endif /* __CC__ */
 
 __DECL_END

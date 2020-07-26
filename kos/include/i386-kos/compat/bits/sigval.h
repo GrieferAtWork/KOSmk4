@@ -24,8 +24,7 @@
 
 #ifdef __x86_64__
 #include <bits/sigval32.h>
-#define compat_sigval   __sigvalx32
-#define compat_sigval_t __sigvalx32_t
+#define compat_sigval __sigvalx32
 #endif /* !__x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_SIGVAL_H */

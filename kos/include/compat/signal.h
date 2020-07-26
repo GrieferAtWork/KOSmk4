@@ -24,25 +24,58 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #include <features.h>
-#include <compat/bits/types.h>
+
 #include <compat/bits/sigset.h>
-#include <compat/bits/sigaction-struct.h>
+#include <compat/bits/types.h>
 
 #ifdef __USE_POSIX199309
 #include <compat/bits/timespec.h>
 #endif /* __USE_POSIX199309 */
 
-#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
-#include <compat/bits/siginfo-struct.h>
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
+#include <compat/bits/sigstack.h>
+//#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
+//#include <compat/sys/ucontext.h>
+//#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
+#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
+
+#if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
+#include <compat/bits/sigval.h> /* union sigval */
+#endif /* __USE_POSIX199506 || __USE_UNIX98 */
+
+#ifdef __USE_POSIX
+#include <compat/bits/sigaction-struct.h>
+#endif /* __USE_POSIX */
+
+#if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
+#include <compat/bits/sigevent.h>       /* struct sigevent */
+#include <compat/bits/siginfo-struct.h> /* struct __siginfo_struct */
+#include <compat/bits/sigval.h>         /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
+
 
 #ifdef __CC__
 __DECL_BEGIN
 
+#if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
+#ifndef __compat_sigevent_t_defined
+#define __compat_sigevent_t_defined 1
+typedef struct compat_sigevent compat_sigevent_t;
+#endif /* !__compat_sigevent_t_defined */
+#ifndef __compat_siginfo_t_defined
+#define __compat_siginfo_t_defined 1
+typedef struct __compat_siginfo_struct compat_siginfo_t;
+#endif /* !__compat_siginfo_t_defined */
+#ifndef __compat_sigval_t_defined
+#define __compat_sigval_t_defined 1
+typedef union compat_sigval compat_sigval_t;
+#endif /* !__compat_sigval_t_defined */
+#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
+
 #ifdef __USE_POSIX
 #ifndef __compat_sigset_t_defined
 #define __compat_sigset_t_defined 1
-typedef __compat_sigset_t compat_sigset_t;
+typedef struct __compat_sigset_struct compat_sigset_t;
 #endif /* !__compat_sigset_t_defined */
 #endif /* __USE_POSIX */
 

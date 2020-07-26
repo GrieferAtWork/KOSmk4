@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3a43439 */
+/* HASH CRC-32:0xab084379 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4048,7 +4048,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigsuspend)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigsuspend)
 
-/* errno_t sigaltstack(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
 .section .text.x86.asm64_syscall.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	.cfi_startproc simple
@@ -13946,7 +13946,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	.cfi_endproc
 END(__x86_asm32_int80_setsid)
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_int80.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_startproc simple
@@ -17825,7 +17825,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 .section .text.x86.asm32_syscall_int80.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_startproc simple
@@ -27475,7 +27475,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpgrp, __x86_asm32_int80_getpgrp
 /* pid_t setsid(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setsid, __x86_asm32_int80_setsid)
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaction, __x86_asm32_int80_sigaction)
 
 /* syscall_ulong_t sgetmask(void) */
@@ -28177,7 +28177,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capget, __x86_asm32_int80_capget)
 /* errno_t capset(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capset, __x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaltstack, __x86_asm32_int80_sigaltstack)
 
 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
@@ -31787,7 +31787,7 @@ END(__x86_asm32_sysrun32_dup2)
 /* pid_t setsid(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_setsid, sys32_setsid); */
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_sysrun32.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaction)
 	.cfi_startproc
@@ -33123,7 +33123,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_capset)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_capset)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 .section .text.x86.asm32_syscall_sysrun32.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaltstack)
 	.cfi_startproc

@@ -26,49 +26,54 @@
 
 %{
 #include <features.h>
+
+#include <asm/wait.h>
 #include <bits/types.h>
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
+
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <bits/siginfo.h> /* We'd only need `siginfo_t' */
+#include <bits/siginfo-struct.h> /* `struct __siginfo_struct' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
-
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
-#define WCOREFLAG           __WCOREFLAG
-#define WCOREDUMP(status)   __WCOREDUMP(__WAIT_INT(status))
-#define W_EXITCODE(ret,sig) __W_EXITCODE(ret,sig)
-#define W_STOPCODE(sig)     __W_STOPCODE(sig)
+#ifdef __WCOREFLAG
+#define WCOREFLAG __WCOREFLAG
+#endif /* __WCOREFLAG */
+#ifdef __WCOREDUMP
+#define WCOREDUMP(status) __WCOREDUMP(__WAIT_INT(status))
+#endif /* __WCOREDUMP */
+#ifdef __W_EXITCODE
+#define W_EXITCODE(ret, sig) __W_EXITCODE(ret, sig)
+#endif /* __W_EXITCODE */
+#ifdef __W_STOPCODE
+#define W_STOPCODE(sig) __W_STOPCODE(sig)
+#endif /* __W_STOPCODE */
 
-#define WAIT_ANY     (-1) /* Any process. */
-#define WAIT_MYPGRP    0  /* Any process in my process group. */
+#ifdef __WAIT_ANY
+#define WAIT_ANY __WAIT_ANY /* Any process. */
+#endif /* __WAIT_ANY */
+#ifdef __WAIT_MYPGRP
+#define WAIT_MYPGRP __WAIT_MYPGRP /* Any process in my process group. */
+#endif /* __WAIT_MYPGRP */
 #endif /* __USE_MISC */
 
 
 #ifdef __CC__
 
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
+#ifndef __siginfo_t_defined
+#define __siginfo_t_defined 1
+typedef struct __siginfo_struct siginfo_t;
+#endif /* !__siginfo_t_defined */
+#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
+
 }
 
 
 @@Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);')
-[[cp, export_alias("__wait"), decl_include("<bits/types.h>", "<bits/waitmacros.h>")]]
+[[cp, export_alias("__wait"), decl_include("<bits/types.h>", "<parts/waitmacros.h>")]]
 $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 
 @@Wait for a child process:
@@ -77,7 +82,7 @@ $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 @@ - `pid == 0':  Wait for any child process whose process group ID is that of the caller
 @@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
 @@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[[decl_include("<bits/types.h>", "<features.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>", "<parts/waitmacros.h>")]]
 [[cp, export_alias("__waitpid")]]
 $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                __STDC_INT_AS_UINT_T options);
@@ -101,7 +106,7 @@ int waitid(idtype_t idtype, id_t id,
 %struct rusage;
 
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[cp, doc_alias("wait3"), ignore, nocrt, alias("wait3")]]
 $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
@@ -114,7 +119,7 @@ $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait3")]]
 [[userimpl, requires($has_function(wait3_32) || $has_function(wait3_64))]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]
 $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
              __STDC_INT_AS_UINT_T options,
@@ -137,8 +142,8 @@ $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
 %#ifdef __USE_TIME64
 %struct rusage64;
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
-[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
+[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>", "<parts/waitmacros.h>")]]
 [[doc_alias("wait3"), time64_variant_of(wait3)]]
 [[userimpl, requires_function(wait3_32)]]
 $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
@@ -158,7 +163,7 @@ $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
 %#ifdef __USE_MISC
 
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[cp, doc_alias("wait4"), ignore, nocrt, alias("wait4")]]
 $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
@@ -170,7 +175,7 @@ $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wait4_64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait4")]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]
 [[userimpl, requires($has_function(wait4_32) || $has_function(wait4_64))]]
 $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
@@ -195,7 +200,7 @@ $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 %struct rusage64;
 [[doc_alias("wait4"), time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]
 [[userimpl, requires_function(wait4_32)]]
 $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,

@@ -20,6 +20,14 @@
 #ifndef _I386_KOS_BITS_SIGSTACK_H
 #define _I386_KOS_BITS_SIGSTACK_H 1
 
+/* File:
+ *    <i386-kos/bits/sigstack.h>
+ * 
+ * Definitions:
+ *    - struct sigstack { ... };
+ *    - struct sigaltstack { ... };
+ */
+
 #include <__stdinc.h>
 #include <hybrid/host.h>
 
@@ -28,7 +36,5 @@
 #else /* __x86_64__ */
 #include "sigstack32.h"
 #endif /* __x86_64__ */
-
-#include "../../bits/sigstack.h"
 
 #endif /* !_I386_KOS_BITS_SIGSTACK_H */

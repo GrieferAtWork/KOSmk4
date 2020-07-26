@@ -74,7 +74,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	bool must_restore_sigmask;
 	sigset_t old_sigmask;
 	signo_t signo = ATOMIC_READ(siginfo->si_signo);
-	USER CHECKED NAME2(siginfox, _t) *user_siginfo;
+	USER CHECKED struct NAME2(__siginfox, _struct) *user_siginfo;
 	USER CHECKED NAME2(ucontext, _t) *user_ucontext;
 	USER CHECKED sigset_t *user_sigset;
 	USER CHECKED struct NAME(fpustate) *user_fpustate;
@@ -152,7 +152,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
 		/* In 3-argument mode, we always have to push everything... */
 		STATIC_ASSERT(NAME2(__SIX, _USER_MAX_SIZE) >= NAME2(__SIX, _KERNEL_MAX_SIZE));
-		STATIC_ASSERT(NAME2(__SIX, _KERNEL_MAX_SIZE) == sizeof(NAME2(siginfox, _t)));
+		STATIC_ASSERT(NAME2(__SIX, _KERNEL_MAX_SIZE) == sizeof(struct NAME2(__siginfox, _struct)));
 		/* Try to have the padding of `siginfo_t' overlap with `ucontextN_t' */
 #define EFFECTIVE_PADDING_SIGINFO_T (NAME2(__SIX, _USER_MAX_SIZE) - NAME2(__SIX, _KERNEL_MAX_SIZE))
 #define EFFECTIVE_SIZEOF_SIGINFO_T                                  \
@@ -185,7 +185,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		}
 		usp -= sizeof(NAME2(ucontext, _t)) + EFFECTIVE_SIZEOF_SIGINFO_T;
 		/* Copy signal information into user-space. */
-		user_siginfo = (NAME2(siginfox, _t) *)usp;
+		user_siginfo = (struct NAME2(__siginfox, _struct) *)usp;
 		NAME(siginfo_to_siginfox)(siginfo, user_siginfo);
 #undef EFFECTIVE_PADDING_SIGINFO_T
 #undef EFFECTIVE_SIZEOF_SIGINFO_T

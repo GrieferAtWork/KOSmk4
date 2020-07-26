@@ -38,7 +38,7 @@
 #ifdef __USE_KOS
 #include <hybrid/host.h>
 
-#include <bits/signum-values.h>
+#include <asm/signum-values.h> /* __SIGCHLD */
 #endif /* __USE_KOS */
 
 __SYSDECL_BEGIN

@@ -42,16 +42,17 @@
 
 %{
 #include <features.h>
-#include <endian.h>
-#include <sched.h>
-#include <time.h>
 
-#include <bits/crt/pthreadtypes.h>
-#include <bits/crt/pthreadvalues.h>
+#include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadinit.h>
+#include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
 #include <bits/wordsize.h>
 #include <kos/anno.h>
+
+#include <endian.h>
+#include <sched.h>
+#include <time.h>
 
 __SYSDECL_BEGIN
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfea37be */
+/* HASH CRC-32:0x78c03420 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,8 +26,8 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigdelset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigdelset))(struct __sigset_struct *__set, __signo_t __signo) {
-	__ULONGPTR_TYPE__ __mask = __sigmask(__signo);
-	__ULONGPTR_TYPE__ __word = __sigword(__signo);
+	__ULONGPTR_TYPE__ __mask = __sigset_mask(__signo);
+	__ULONGPTR_TYPE__ __word = __sigset_word(__signo);
 	__set->__val[__word] &= ~__mask;
 	return 0;
 }

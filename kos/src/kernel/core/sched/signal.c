@@ -44,7 +44,7 @@
 DECL_BEGIN
 
 /* Must use locked memory to prevent dependency recursion with various sub-systems */
-#define SIGNAL_GFP     GFP_LOCKED
+#define SIGNAL_GFP GFP_LOCKED
 
 
 /* FIXME: Supposedly, `connection_alloc()' (sometimes?) leaks memory. Figure out what that's about */

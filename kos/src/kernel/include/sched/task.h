@@ -30,7 +30,8 @@
 
 #include <kos/jiffies.h>
 #ifdef __cplusplus
-#include <bits/waitstatus.h>
+#include <asm/wait.h> /* `__W_EXITCODE()' */
+#include <bits/wait.h> /* `union wait' */
 #endif /* __cplusplus */
 
 DECL_BEGIN
@@ -292,7 +293,7 @@ FUNDEF __BOOL NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout DFL(_
  * WARNING: Calling this function from an IDLE task will cause
  *          the kernel to PANIC! */
 FUNDEF ATTR_NORETURN void
-NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0,0)));
+NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
 
 #ifdef __cplusplus
 #ifdef __USE_MISC

@@ -39,7 +39,7 @@
 #include <bits/types.h>
 
 #ifdef __USE_GNU
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/timespec.h>
 #endif /* __USE_GNU */
 
@@ -146,15 +146,7 @@ typedef __UINTPTR_TYPE__ nfds_t;
 }
 
 %(auto_header,user){
-DECL_END
-#include <bits/sigset.h>
-DECL_BEGIN
-
-#ifndef __sigset_t_defined
-#define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
-#endif /* !__sigset_t_defined */
-
+#include <signal.h> /* sigset_t */
 }
 
 @@@param timeout: Timeout in milliseconds (or negative for infinity)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x240436f */
+/* HASH CRC-32:0x616a7c9e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,7 @@
 
 DECL_BEGIN
 
-DECL_END
-#include <bits/sigaction.h>
 #include <pthread.h>
-DECL_BEGIN
-
-#ifndef __sighandler_t_defined
-#define __sighandler_t_defined 1
-typedef __sighandler_t sighandler_t;
-#endif /* !__sighandler_t_defined */
-
 #ifndef __KERNEL__
 INTDEF int NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo);

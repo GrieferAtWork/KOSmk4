@@ -20,6 +20,13 @@
 #ifndef _BITS_SIGNALFD_SIGINFO_H
 #define _BITS_SIGNALFD_SIGINFO_H 1
 
+/* File:
+ *    <bits/signalfd_siginfo.h>
+ * 
+ * Definitions:
+ *    - struct signalfd_siginfo { ... };
+ */
+
 #include <__stdinc.h>
 
 #include <bits/types.h>

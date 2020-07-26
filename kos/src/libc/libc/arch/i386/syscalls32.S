@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aecdf1f */
+/* HASH CRC-32:0x8280fc89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1594,7 +1594,7 @@ INTERN_FUNCTION(libc_sys_Xsetsid)
 END(libc_sys_Xsetsid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetsid, libc_sys_Xsetsid)
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 .section .text.crt.syscall.sigaction
 INTERN_FUNCTION(libc_sys_sigaction)
 	movl   $(0x43), %eax
@@ -1602,7 +1602,7 @@ INTERN_FUNCTION(libc_sys_sigaction)
 END(libc_sys_sigaction)
 DEFINE_PUBLIC_ALIAS(sys_sigaction, libc_sys_sigaction)
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 .section .text.crt.syscall.Xsigaction
 INTERN_FUNCTION(libc_sys_Xsigaction)
 	movl   $(0x43), %eax
@@ -3548,7 +3548,7 @@ INTERN_FUNCTION(libc_sys_Xcapset)
 END(libc_sys_Xcapset)
 DEFINE_PUBLIC_ALIAS(sys_Xcapset, libc_sys_Xcapset)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 .section .text.crt.syscall.sigaltstack
 INTERN_FUNCTION(libc_sys_sigaltstack)
 	movl   $(0xba), %eax
@@ -3556,7 +3556,7 @@ INTERN_FUNCTION(libc_sys_sigaltstack)
 END(libc_sys_sigaltstack)
 DEFINE_PUBLIC_ALIAS(sys_sigaltstack, libc_sys_sigaltstack)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 .section .text.crt.syscall.Xsigaltstack
 INTERN_FUNCTION(libc_sys_Xsigaltstack)
 	movl   $(0xba), %eax

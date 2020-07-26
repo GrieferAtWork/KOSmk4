@@ -34,7 +34,6 @@
 #include <features.h>
 #include <asm/mman.h>
 #include <bits/types.h>
-#include <bits/mman.h>
 
 __SYSDECL_BEGIN
 

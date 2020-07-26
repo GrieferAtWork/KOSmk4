@@ -66,8 +66,6 @@
 #define __ATOMIC_ACQ_REL                   4
 #define __ATOMIC_SEQ_CST                   5
 
-
-
 #ifdef __KOS__
 #undef linux
 #undef __linux
@@ -160,7 +158,7 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #define __cpp_range_based_for         200907
 #define __cpp_runtime_arrays          198712
 #define __cpp_rvalue_reference        200610
-#define __cpp_static_assert           200410
+#define __cpp_static_assert           201411
 #endif /* __cplusplus == 201402L */
 
 

@@ -534,7 +534,7 @@ function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, s
 	 *       - syscall
 	 * Documentation throughout the kernel states that both of these methods
 	 * yield identical results, though one minor detail that is documented
-	 * nowhere is left to use to decide upon:
+	 * nowhere else is left to use to decide upon:
 	 *       `int 80h' on x86_64 is allowed to clobber %rcx and %r11
 	 * By allowing for this, we can use identical return-paths for both
 	 * invocation methods, by trying to make use of `sysret' in both cases. */

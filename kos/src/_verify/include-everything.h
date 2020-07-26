@@ -184,6 +184,8 @@ incdir("", "../../include");
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
 #include <asm/crt/math-libc_version.h>
+#include <asm/crt/posix_spawn.h>
+#include <asm/crt/pthreadvalues.h>
 #include <asm/crt/stdio.h>
 #include <asm/crt/stdio_ext.h>
 #include <asm/crt/stdlib.h>
@@ -213,6 +215,13 @@ incdir("", "../../include");
 #include <asm/resource.h>
 #include <asm/sched.h>
 #include <asm/select.h>
+#include <asm/sigevent.h>
+#include <asm/siginfo.h>
+#include <asm/signal.h>
+#include <asm/signalfd.h>
+#include <asm/signum-values.h>
+#include <asm/sigset.h>
+#include <asm/sigstack.h>
 #include <asm/socket-families.h>
 #include <asm/socket.h>
 #include <asm/sockios.h>
@@ -231,6 +240,7 @@ incdir("", "../../include");
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
 #include <asm/utsname.h>
+#include <asm/wait.h>
 #include <asm/xattr.h>
 #include <assert.h>
 #include <attr/xattr.h>
@@ -256,9 +266,9 @@ incdir("", "../../include");
 #include <bits/crt/lconv.h>
 #include <bits/crt/locale.h>
 #include <bits/crt/math-vector.h>
+#include <bits/crt/posix_spawn.h>
 #include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
-#include <bits/crt/pthreadvalues.h>
 #include <bits/crt/semaphore.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/crt/threads.h>
@@ -282,7 +292,6 @@ incdir("", "../../include");
 #include <bits/math-constants.h>
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
-#include <bits/mman.h>
 #include <bits/mmsghdr-struct.h>
 #include <bits/msgbuf.h>
 #include <bits/msghdr-struct.h>
@@ -291,7 +300,6 @@ incdir("", "../../include");
 #include <bits/param.h>
 #include <bits/pollfd.h>
 #include <bits/posix_opt.h>
-#include <bits/posix_spawn.h>
 #include <bits/ptrace.h>
 #include <bits/resource.h>
 #include <bits/rusage-convert.h>
@@ -303,16 +311,10 @@ incdir("", "../../include");
 #include <bits/sembuf.h>
 #include <bits/shm.h>
 #include <bits/sigaction-struct.h>
-#include <bits/sigaction.h>
 #include <bits/sigcontext.h>
 #include <bits/sigevent.h>
 #include <bits/siginfo-struct.h>
-#include <bits/siginfo-values.h>
-#include <bits/siginfo.h>
-#include <bits/signalfd.h>
 #include <bits/signalfd_siginfo.h>
-#include <bits/signum-values.h>
-#include <bits/signum.h>
 #include <bits/sigset.h>
 #include <bits/sigstack.h>
 #include <bits/sigval.h>
@@ -376,13 +378,10 @@ incdir("", "../../include");
 #include <bits/types.h>
 #include <bits/typesizes.h>
 #include <bits/uformat-printer.h>
-#include <bits/uio.h>
 #include <bits/ustat.h>
 #include <bits/utimbuf.h>
 #include <bits/utsname.h>
-#include <bits/waitflags.h>
-#include <bits/waitmacros.h>
-#include <bits/waitstatus.h>
+#include <bits/wait.h>
 #include <bits/wformat-printer.h>
 #include <bits/wordsize.h>
 #include <bits/xtitypes.h>
@@ -407,6 +406,7 @@ incdir("", "../../include");
 #include <compat/bits/rusage-convert.h>
 #include <compat/bits/rusage-struct.h>
 #include <compat/bits/sigaction-struct.h>
+#include <compat/bits/sigevent.h>
 #include <compat/bits/siginfo-convert.h>
 #include <compat/bits/siginfo-struct.h>
 #include <compat/bits/sigset.h>
@@ -1024,6 +1024,7 @@ incdir("", "../../include");
 #include <parts/uchar/unistd.h>
 #include <parts/uchar/utime.h>
 #include <parts/uchar/wchar.h>
+#include <parts/waitmacros.h>
 #include <parts/wchar/format-printer.h>
 #include <parts/wchar/process.h>
 #include <parts/wchar/stdio.h>

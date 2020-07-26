@@ -25,7 +25,7 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/sigstack64.h>
 #include <kos/kernel/mcontext64.h>
 
@@ -51,7 +51,7 @@ __DECL_BEGIN
 struct ucontext64; /* Userlevel context. */
 typedef struct ucontext64 {
 	mcontext64_t                      uc_mcontext;
-	__sigset_t                        uc_sigmask;
+	struct __sigset_struct            uc_sigmask;
 	struct __sigaltstackx64           uc_stack;
 	__HYBRID_PTR64(struct ucontext64) uc_link;
 } ucontext64_t;

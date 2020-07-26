@@ -20,6 +20,18 @@
 #ifndef _I386_KOS_BITS_SIGSTACK32_H
 #define _I386_KOS_BITS_SIGSTACK32_H 1
 
+/* File:
+ *    <i386-kos/bits/sigstack32.h>
+ * 
+ * Definitions:
+ *    - struct __sigstackx32 { ... };
+ *    - struct __sigaltstackx32 { ... };
+ * #if !defined(__x86_64__) && defined(__i386__)
+ *    - struct sigstack { ... };
+ *    - struct sigaltstack { ... };
+ * #endif
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
@@ -29,7 +41,7 @@
 
 __SYSDECL_BEGIN
 
-#ifndef __x86_64__
+#if !defined(__x86_64__) && defined(__i386__)
 
 #ifndef __sigstack_defined
 #define __sigstack_defined 1
@@ -48,21 +60,7 @@ __SYSDECL_BEGIN
 #define __sigaltstackx32           sigaltstack
 #endif /* !__sigaltstack_defined */
 
-#ifndef __stack_t_defined
-#define __stack_t_defined 1
-#ifdef __CC__
-struct sigaltstack;
-typedef struct sigaltstack stack_t;
-#endif /* __CC__ */
-#endif /* !__stack_t_defined */
-
-#endif /* !__x86_64__ */
-
-#ifdef __USE_KOS_KERNEL
-#define sigstackx32    __sigstackx32
-#define sigaltstackx32 __sigaltstackx32
-#endif /* __USE_KOS_KERNEL */
-
+#endif /* !__x86_64__ && __i386__ */
 
 #define __OFFSET_SIGSTACKX32_SP      0
 #define __OFFSET_SIGSTACKX32_ONSTACK 4

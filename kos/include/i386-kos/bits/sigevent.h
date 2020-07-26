@@ -26,43 +26,12 @@
 #ifdef __CRT_CYG_PRIMARY
 #include "sigevent-cygwin.h"
 #else /* __CRT_CYG_PRIMARY */
-
 #include <hybrid/host.h>
-
 #ifdef __x86_64__
 #include "sigevent64.h"
 #else /* __x86_64__ */
 #include "sigevent32.h"
 #endif /* !__x86_64__ */
-
-__SYSDECL_BEGIN
-
-/* `sigev_notify' values. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	SIGEV_SIGNAL    = 0, /* Notify via signal. */
-	SIGEV_NONE      = 1, /* Other notification: meaningless. */
-	SIGEV_THREAD    = 2, /* Deliver via thread creation. */
-	SIGEV_THREAD_ID = 4  /* Send signal to specific thread. */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define SIGEV_SIGNAL    SIGEV_SIGNAL    /* Notify via signal. */
-#define SIGEV_NONE      SIGEV_NONE      /* Other notification: meaningless. */
-#define SIGEV_THREAD    SIGEV_THREAD    /* Deliver via thread creation. */
-#define SIGEV_THREAD_ID SIGEV_THREAD_ID /* Send signal to specific thread. */
-#else /* __COMPILER_PREFERR_ENUMS */
-#define SIGEV_SIGNAL    0 /* Notify via signal. */
-#define SIGEV_NONE      1 /* Other notification: meaningless. */
-#define SIGEV_THREAD    2 /* Deliver via thread creation. */
-#define SIGEV_THREAD_ID 4 /* Send signal to specific thread. */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-
-__SYSDECL_END
-
 #endif /* !__CRT_CYG_PRIMARY */
 
 #endif /* !_I386_KOS_BIT_SIGEVENT_H */

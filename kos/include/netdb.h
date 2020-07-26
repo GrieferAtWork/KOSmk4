@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddc36a05 */
+/* HASH CRC-32:0x79a9df49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <bits/crt/db/netdb.h>
 #include <bits/types.h>
 #include <netinet/in.h>
+
 #include <stdint.h>
 
 #ifdef __USE_MISC
@@ -39,7 +41,7 @@
 #endif /* __USE_MISC */
 
 #ifdef __USE_GNU
-#include <bits/sigevent.h>
+#include <bits/sigevent.h> /* struct sigevent */
 #include <bits/timespec.h>
 #endif /* __USE_GNU */
 
@@ -521,6 +523,11 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_GNU
+#ifndef __sigevent_t_defined
+#define __sigevent_t_defined 1
+typedef struct sigevent sigevent_t;
+#endif /* !__sigevent_t_defined */
+
 /* Enqueue ENT requests from the LIST. If MODE is GAI_WAIT wait until all
  * requests are handled. If WAIT is GAI_NOWAIT return immediately after
  * queueing the requests and signal completion according to SIG.

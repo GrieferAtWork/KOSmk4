@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfedb2451 */
+/* HASH CRC-32:0x2f175a06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,7 @@
 
 DECL_BEGIN
 
-DECL_END
-#include <bits/sigset.h>
-DECL_BEGIN
-
-#ifndef __sigset_t_defined
-#define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
-#endif /* !__sigset_t_defined */
-
+#include <signal.h> /* sigset_t */
 #ifndef __KERNEL__
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds, nfds_t nfds, int timeout);

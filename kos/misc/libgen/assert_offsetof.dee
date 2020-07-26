@@ -116,6 +116,7 @@ got_field:
 		}
 		local struct_pos = l.find("struct");
 		local isUnion = false;
+		local origLine = l;
 		if (struct_pos < 0) {
 			struct_pos = l.find("union");
 			if (struct_pos >= 0) {
@@ -125,7 +126,7 @@ got_field:
 		} else {
 			l = l[struct_pos + #"struct":].lstrip();
 		}
-		if (struct_pos >= 0) {
+		if (struct_pos >= 0 && "-" !in origLine[:struct_pos]) {
 			for (;;) {
 				local new_l = l;
 				for (local attr: { "__ATTR_PACKED", "ATTR_PACKED" })

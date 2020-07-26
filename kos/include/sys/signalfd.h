@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf14ff901 */
+/* HASH CRC-32:0x2b80559a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,10 +29,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/types.h>
-#include <bits/sigset.h>
-#include <bits/signalfd.h>
+
+#include <asm/signalfd.h>
 #include <bits/signalfd_siginfo.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/types.h>
 
 #ifdef __USE_GLIBC
 #include <stdint.h>
@@ -40,11 +41,54 @@
 
 __SYSDECL_BEGIN
 
+/* Flags for signalfd. */
+#if (defined(__SFD_NONBLOCK) || defined(__SFD_CLOEXEC) || \
+     defined(__SFD_CLOFORK))
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+#ifdef __SFD_NONBLOCK
+	SFD_NONBLOCK = __SFD_NONBLOCK, /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* __SFD_NONBLOCK */
+#ifdef __SFD_CLOEXEC
+	SFD_CLOEXEC  = __SFD_CLOEXEC,  /* Close the file during exec() */
+#endif /* __SFD_CLOEXEC */
+#ifdef __SFD_CLOFORK
+	SFD_CLOFORK  = __SFD_CLOFORK,  /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#endif /* __SFD_CLOFORK */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __SFD_NONBLOCK
+#define SFD_NONBLOCK SFD_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* __SFD_NONBLOCK */
+#ifdef __SFD_CLOEXEC
+#define SFD_CLOEXEC  SFD_CLOEXEC  /* Close the file during exec() */
+#endif /* __SFD_CLOEXEC */
+#ifdef __SFD_CLOFORK
+#define SFD_CLOFORK  SFD_CLOFORK  /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#endif /* __SFD_CLOFORK */
+#else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __SFD_NONBLOCK
+#define SFD_NONBLOCK __SFD_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* __SFD_NONBLOCK */
+#ifdef __SFD_CLOEXEC
+#define SFD_CLOEXEC  __SFD_CLOEXEC  /* Close the file during exec() */
+#endif /* __SFD_CLOEXEC */
+#ifdef __SFD_CLOFORK
+#define SFD_CLOFORK  __SFD_CLOFORK  /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#endif /* __SFD_CLOFORK */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
+#endif /* __SFD_NONBLOCK || __SFD_CLOEXEC || __SFD_CLOFORK */
+
+
 #ifdef __CC__
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 /* Request notification for delivery of signals in MASK to be performed using descriptor FD */

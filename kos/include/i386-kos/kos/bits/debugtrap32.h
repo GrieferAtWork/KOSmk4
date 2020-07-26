@@ -50,7 +50,7 @@ __DECL_BEGIN
 
 #ifdef __CC__
 struct debugtrap_reason32 /*[PREFIX(dtr_)]*/ {
-	__uint32_t dtr_signo;  /* Trap signal number (one of `SIG*' from <bits/signum.h>) */
+	__uint32_t dtr_signo;  /* Trap signal number (one of `SIG*' from <signal.h>) */
 	__uint32_t dtr_reason; /* Trap reason (one of `DEBUGTRAP_REASON_*') */
 	union {
 		__uint32_t                 dtr_intarg; /* Integer argument. */

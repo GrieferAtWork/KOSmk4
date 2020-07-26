@@ -93,7 +93,6 @@ global knownTypeClasses: {string: string} = Dict({
 	"__wctype_t"             : "TIn(__SIZEOF_WCTYPE_T__)",
 	"__WCTYPE_TYPE__"        : "TIn(__SIZEOF_WCTYPE_T__)",
 	"sig_atomic_t"           : "TIn(__SIZEOF_SIG_ATOMIC_T__)",
-	"__sig_atomic_t"         : "TIn(__SIZEOF_SIG_ATOMIC_T__)",
 	"__SIG_ATOMIC_TYPE__"    : "TIn(__SIZEOF_SIG_ATOMIC_T__)",
 	"__INTSIZE_TYPE__"       : "TI",
 	"__INTSSIZE_TYPE__"      : "TI",

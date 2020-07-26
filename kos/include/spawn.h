@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x927b676f */
+/* HASH CRC-32:0x9edd0df3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,45 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/sigset.h>
-#include <sys/types.h>
-#include <bits/types.h>
-#include <bits/posix_spawn.h>
+
+#include <asm/crt/posix_spawn.h>
+#include <bits/crt/posix_spawn.h>
 #include <bits/sched_param.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/types.h>
+#include <sys/types.h>
 
 #ifdef __USE_GLIBC
 #include <sched.h>
 #endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
+
+/* Flags to be set in the `posix_spawnattr_t'. */
+#ifdef __POSIX_SPAWN_RESETIDS
+#define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS
+#endif /* __POSIX_SPAWN_RESETIDS */
+#ifdef __POSIX_SPAWN_SETPGROUP
+#define POSIX_SPAWN_SETPGROUP __POSIX_SPAWN_SETPGROUP
+#endif /* __POSIX_SPAWN_SETPGROUP */
+#ifdef __POSIX_SPAWN_SETSIGDEF
+#define POSIX_SPAWN_SETSIGDEF __POSIX_SPAWN_SETSIGDEF
+#endif /* __POSIX_SPAWN_SETSIGDEF */
+#ifdef __POSIX_SPAWN_SETSIGMASK
+#define POSIX_SPAWN_SETSIGMASK __POSIX_SPAWN_SETSIGMASK
+#endif /* __POSIX_SPAWN_SETSIGMASK */
+#ifdef __POSIX_SPAWN_SETSCHEDPARAM
+#define POSIX_SPAWN_SETSCHEDPARAM __POSIX_SPAWN_SETSCHEDPARAM
+#endif /* __POSIX_SPAWN_SETSCHEDPARAM */
+#ifdef __POSIX_SPAWN_SETSCHEDULER
+#define POSIX_SPAWN_SETSCHEDULER __POSIX_SPAWN_SETSCHEDULER
+#endif /* __POSIX_SPAWN_SETSCHEDULER */
+#ifdef __USE_GNU
+#ifdef __POSIX_SPAWN_USEVFORK
+#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK
+#endif /* __POSIX_SPAWN_USEVFORK */
+#endif /* __USE_GNU */
+
 
 /* Comments taken from /usr/include/spawn.h of a linux machine.
  * The following is the copyright notice found in the original file. */
@@ -65,7 +93,7 @@ __SYSDECL_BEGIN
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __pid_t_defined
@@ -82,6 +110,9 @@ typedef __pid_t pid_t;
 #define __TENVP char *const ___envp[__restrict_arr]
 #endif /* ! */
 #endif /* !__TARGV */
+
+typedef struct __posix_spawnattr posix_spawnattr_t;
+typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 
 
 /* Spawn a new process executing PATH with the attributes describes in *ATTRP.

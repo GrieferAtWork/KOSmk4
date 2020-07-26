@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8b36dbd */
+/* HASH CRC-32:0x2ade0db8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@
 #define SYS_getppid                 __NR_getppid                 /* pid_t getppid(void) */
 #define SYS_getpgrp                 __NR_getpgrp                 /* pid_t getpgrp(void) */
 #define SYS_setsid                  __NR_setsid                  /* pid_t setsid(void) */
-#define SYS_sigaction               __NR_sigaction               /* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+#define SYS_sigaction               __NR_sigaction               /* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 #define SYS_sgetmask                __NR_sgetmask                /* syscall_ulong_t sgetmask(void) */
 #define SYS_ssetmask                __NR_ssetmask                /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
 #define SYS_setreuid                __NR_setreuid                /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
@@ -259,7 +259,7 @@
 #define SYS_getcwd                  __NR_getcwd                  /* ssize_t getcwd(char *buf, size_t size) */
 #define SYS_capget                  __NR_capget                  /* errno_t capget(int TODO_PROTOTYPE) */
 #define SYS_capset                  __NR_capset                  /* errno_t capset(int TODO_PROTOTYPE) */
-#define SYS_sigaltstack             __NR_sigaltstack             /* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+#define SYS_sigaltstack             __NR_sigaltstack             /* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 #define SYS_sendfile                __NR_sendfile                /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 #define SYS_getpmsg                 __NR_getpmsg                 /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define SYS_putpmsg                 __NR_putpmsg                 /* errno_t putpmsg(int TODO_PROTOTYPE) */

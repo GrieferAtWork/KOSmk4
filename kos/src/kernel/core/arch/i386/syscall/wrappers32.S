@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa276c329 */
+/* HASH CRC-32:0xf84d6bfd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2482,7 +2482,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	.cfi_endproc
 END(__x86_asm32_int80_setsid)
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_int80.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_startproc simple
@@ -6963,7 +6963,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 .section .text.x86.asm32_syscall_int80.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_startproc simple
@@ -20078,7 +20078,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsid)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setsid)
 
-/* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_sysenter.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaction)
 	.cfi_startproc simple
@@ -24577,7 +24577,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_capset)
 	.cfi_endproc
 END(__x86_asm32_sysenter_capset)
 
-/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+/* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 .section .text.x86.asm32_syscall_sysenter.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaltstack)
 	.cfi_startproc simple

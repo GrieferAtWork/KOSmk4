@@ -20,8 +20,7 @@
 #ifndef _ASM_STDLIB_H
 #define _ASM_STDLIB_H 1
 
-#include <__crt.h>
-#include <hybrid/typecore.h>
+#include <__stdinc.h>
 
 #define __EXIT_SUCCESS 0
 #define __EXIT_FAILURE 1

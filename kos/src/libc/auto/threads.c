@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f6f69cd */
+/* HASH CRC-32:0x9b670d46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 	return thrd_error;
 }
 #include <asm/crt/threads.h>
-#include <bits/crt/pthreadvalues.h>
+#include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
 /* Creates a new mutex object with type TYPE.
  * If successful the new object is pointed by MUTEX
@@ -112,8 +112,9 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
 		error = libc_pthread_mutexattr_init(&attr);
 		if (error == 0) {
 			error = libc_pthread_mutexattr_settype(&attr,
-			                                  (type & 1) ? __PTHREAD_MUTEX_RECURSIVE
-			                                             : __PTHREAD_MUTEX_TIMED);
+			                                  type == mtx_recursive
+			                                  ? __PTHREAD_MUTEX_RECURSIVE
+			                                  : __PTHREAD_MUTEX_TIMED);
 			if (error == 0)
 				error = libc_pthread_mutex_init((pthread_mutex_t *)mutex, &attr);
 			libc_pthread_mutexattr_destroy(&attr);

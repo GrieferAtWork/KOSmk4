@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x561ca28e */
+/* HASH CRC-32:0x695402f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
 #ifdef __USE_KOS
 #include <hybrid/host.h>
 
-#include <bits/signum-values.h>
+#include <asm/signum-values.h> /* __SIGCHLD */
 #endif /* __USE_KOS */
 
 __SYSDECL_BEGIN

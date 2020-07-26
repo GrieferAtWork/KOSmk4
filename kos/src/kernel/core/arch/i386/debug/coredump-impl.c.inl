@@ -73,8 +73,9 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 	void **utb_vector;
 	signo_t signo = SIGABRT;
 	validate_readable_opt(exception,
-	                      unwind_error == UNWIND_SUCCESS ? sizeof(struct NAME(exception_data))
-	                                                     : sizeof(NAME2(siginfox, _t)));
+	                      unwind_error == UNWIND_SUCCESS
+	                      ? sizeof(struct NAME(exception_data))
+	                      : sizeof(struct NAME2(__siginfox, _struct)));
 	if (!curr_state && !orig_state) {
 		icpustate_user_to_ucpustate(return_state, &curr_ustate);
 		memcpy(&orig_ustate, &curr_ustate, sizeof(struct ucpustate));
@@ -132,7 +133,8 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 		} else if (unwind_error == UNWIND_SUCCESS) {
 			/* Coredump caused by a signal. */
 			siginfo_t si;
-			NAME2(siginfox, _to_siginfo)((NAME2(siginfox, _t) *)(uintptr_t)exception, &si);
+			(NAME2(siginfox, _to_siginfo)((struct NAME2(__siginfox, _struct) *)(uintptr_t)exception,
+			                              &si));
 			COMPILER_READ_BARRIER();
 			signo = si.si_signo;
 			coredump_create(&curr_ustate,

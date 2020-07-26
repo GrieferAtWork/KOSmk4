@@ -24,17 +24,43 @@
 
 #include <bits/types.h>
 
-#ifdef __CC__
-__SYSDECL_BEGIN
+#define __OFFSET_USTAT_TFREE  0
+#if __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__
+#define __OFFSET_USTAT_TINODE __SIZEOF_INO32_T__
+#else /* __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__ */
+#define __OFFSET_USTAT_TINODE __SIZEOF_DADDR_T__
+#endif /* __SIZEOF_INO32_T__ <= __SIZEOF_DADDR_T__ */
+#define __OFFSET_USTAT_FNAME  (__OFFSET_USTAT_TINODE + __SIZEOF_INO32_T__)
+#define __OFFSET_USTAT_FPACK  (__OFFSET_USTAT_TINODE + __SIZEOF_INO32_T__ + 6)
+#if __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__
+#define __SIZEOF_USTAT (__OFFSET_USTAT_TINODE + __SIZEOF_INO32_T__ + 12 + __SIZEOF_INO32_T__ - __SIZEOF_DADDR_T__)
+#else /* __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__ */
+#define __SIZEOF_USTAT (__OFFSET_USTAT_TINODE + __SIZEOF_INO32_T__ + 12)
+#endif /* __SIZEOF_INO32_T__ <= __SIZEOF_DADDR_T__ */
 
-struct ustat {
+#if __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__
+#define __ALIGNOF_USTAT __SIZEOF_INO32_T__
+#else /* __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__ */
+#define __ALIGNOF_USTAT __SIZEOF_DADDR_T__
+#endif /* __SIZEOF_INO32_T__ <= __SIZEOF_DADDR_T__ */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct ustat /*[PREFIX(f_)]*/ {
 	__daddr_t f_tfree;    /* Number of free blocks. */
+#if __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__
+	__byte_t __f_pad[__SIZEOF_INO32_T__ - __SIZEOF_DADDR_T__]; /* Hidden padding... */
+#endif /* __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__ */
 	__ino32_t f_tinode;   /* Number of free inodes. */
 	char      f_fname[6]; /* ??? */
 	char      f_fpack[6]; /* ??? */
+#if __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__
+	__byte_t __f_pad2[__SIZEOF_INO32_T__ - __SIZEOF_DADDR_T__]; /* Hidden padding... */
+#endif /* __SIZEOF_INO32_T__ > __SIZEOF_DADDR_T__ */
 };
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 #endif /* !_BITS_USTAT_H */

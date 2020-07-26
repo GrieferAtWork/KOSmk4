@@ -20,18 +20,30 @@
 #ifndef _I386_KOS_BITS_SIGINFO_STRUCT_CYGWIN_H
 #define _I386_KOS_BITS_SIGINFO_STRUCT_CYGWIN_H 1
 
+/* File:
+ *    <i386-kos/bits/siginfo-struct-cygwin.h>
+ * 
+ * Definitions:
+ *    - struct __siginfo_cygwin_struct { ... };
+ *    - #define __SI_CYGWIN_MAX_SIZE ...
+ * #ifdef __CRT_CYG_PRIMARY
+ *    - struct __siginfo_struct { ... };
+ *    - #define __SI_MAX_SIZE ...
+ * #endif
+ */
+
 #include <__crt.h>
 #include <__stdinc.h>
 
 #include <hybrid/typecore.h>
 
-#include <bits/sigval.h>
+#include <bits/sigval.h> /* union sigval */
 #include <bits/types.h>
 
 #ifdef __CRT_CYG_PRIMARY
 #define __siginfo_cygwin_struct __siginfo_struct
-#define __siginfo_cygwin_t      siginfo_t
-#define __siginfo_t_defined     1
+#define __SI_MAX_SIZE           __SI_CYGWIN_MAX_SIZE
+#define __SI_PAD_SIZE           __SI_CYGWIN_PAD_SIZE
 #endif /* __CRT_CYG_PRIMARY */
 
 
@@ -42,8 +54,8 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #ifdef __COMPILER_HAVE_PRAGMA_PACK
-#pragma pack(push,4)
-#endif
+#pragma pack(push, 4)
+#endif /* __COMPILER_HAVE_PRAGMA_PACK */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("_sigcommune")
@@ -122,7 +134,7 @@ struct __ATTR_PACKED _sigcommune {
 #undef si_utime
 #undef si_stime
 #undef si_addr
-typedef struct __ATTR_PACKED __siginfo_cygwin_struct /*[NAME(siginfo_cygwin)][PREFIX(si_)]*/ {
+struct __ATTR_PACKED __siginfo_cygwin_struct /*[NAME(siginfo_cygwin)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ si_signo;
 	__INT32_TYPE__ si_code;
 	__pid_t        si_pid;
@@ -133,8 +145,8 @@ typedef struct __ATTR_PACKED __siginfo_cygwin_struct /*[NAME(siginfo_cygwin)][PR
 		struct _sigcommune _si_commune;
 		struct __ATTR_PACKED {
 			union __ATTR_PACKED {
-				sigval_t        si_sigval;
-				sigval_t        si_value;
+				union sigval si_sigval;
+				union sigval si_value;
 			};
 			__timer_t       si_tid;
 			__UINT32_TYPE__ si_overrun;
@@ -146,7 +158,7 @@ typedef struct __ATTR_PACKED __siginfo_cygwin_struct /*[NAME(siginfo_cygwin)][PR
 		};
 		void               *si_addr;
 	};
-} __siginfo_cygwin_t;
+};
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("si_addr")
@@ -168,7 +180,7 @@ typedef struct __ATTR_PACKED __siginfo_cygwin_struct /*[NAME(siginfo_cygwin)][PR
 
 #ifdef __COMPILER_HAVE_PRAGMA_PACK
 #pragma pack(pop)
-#endif
+#endif /* __COMPILER_HAVE_PRAGMA_PACK */
 #endif /* __CC__ */
 
 __SYSDECL_END

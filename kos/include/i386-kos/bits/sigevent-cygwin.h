@@ -20,36 +20,32 @@
 #ifndef _I386_KOS_BIT_SIGEVENT_CYGWIN_H
 #define _I386_KOS_BIT_SIGEVENT_CYGWIN_H 1
 
+/* File:
+ *    <i386-kos/bits/sigevent-cygwin.h>
+ * 
+ * Definitions:
+ *    - struct __sigevent_cygwin { ... };
+ * #ifdef __CRT_CYG_PRIMARY
+ *    - struct sigevent { ... };
+ * #endif
+ */
+
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
 #include <__stdinc.h>
 
 #include <hybrid/typecore.h> /* __INT32_TYPE__ */
 
-#include <bits/sigval.h> /* sigval_t */
-
-__SYSDECL_BEGIN
+#include <bits/sigval.h> /* union sigval */
 
 #ifdef __CRT_CYG_PRIMARY
-#define sigevent_cygwin   sigevent
-#define sigevent_cygwin_t sigevent_t
+#define __sigevent_cygwin                   sigevent
 #define __OFFSET_SIGEVENT_VALUE             __OFFSET_SIGEVENT_CYGWIN_VALUE
 #define __OFFSET_SIGEVENT_SIGNO             __OFFSET_SIGEVENT_CYGWIN_SIGNO
 #define __OFFSET_SIGEVENT_NOTIFY            __OFFSET_SIGEVENT_CYGWIN_NOTIFY
 #define __OFFSET_SIGEVENT_NOTIFY_FUNCTION   __OFFSET_SIGEVENT_CYGWIN_NOTIFY_FUNCTION
 #define __OFFSET_SIGEVENT_NOTIFY_ATTRIBUTES __OFFSET_SIGEVENT_CYGWIN_NOTIFY_ATTRIBUTES
 #define __SIZEOF_SIGEVENT                   __SIZEOF_SIGEVENT_CYGWIN
-#define SIGEV_SIGNAL      SIGEV_CYGWIN_SIGNAL
-#define SIGEV_NONE        SIGEV_CYGWIN_NONE  
-#define SIGEV_THREAD      SIGEV_CYGWIN_THREAD
 #endif /* __CRT_CYG_PRIMARY */
-
-#ifdef __CC__
-#ifndef __pthread_attr_t_defined
-#define __pthread_attr_t_defined 1
-typedef union pthread_attr_t pthread_attr_t;
-#endif /* !__pthread_attr_t_defined */
-#endif /* __CC__ */
-
 
 #define __OFFSET_SIGEVENT_CYGWIN_VALUE              0
 #define __OFFSET_SIGEVENT_CYGWIN_SIGNO              __SIZEOF_POINTER__
@@ -58,6 +54,8 @@ typedef union pthread_attr_t pthread_attr_t;
 #define __OFFSET_SIGEVENT_CYGWIN_NOTIFY_ATTRIBUTES (__SIZEOF_POINTER__*2+8)
 #define __SIZEOF_SIGEVENT_CYGWIN                   (__SIZEOF_POINTER__*3+8)
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("sigev_value")
 #pragma push_macro("sigev_signo")
@@ -70,13 +68,14 @@ typedef union pthread_attr_t pthread_attr_t;
 #undef sigev_notify
 #undef sigev_notify_function
 #undef sigev_notify_attributes
-typedef struct sigevent_cygwin /*[PREFIX(sigev_)]*/ {
-	sigval_t        sigev_value;
-	__INT32_TYPE__  sigev_signo;
-	__INT32_TYPE__  sigev_notify;
-	void          (*sigev_notify_function)(sigval_t);
-	pthread_attr_t *sigev_notify_attributes;
-} sigevent_cygwin_t;
+union __pthread_attr;
+struct __sigevent_cygwin /*[NAME(sigevent_cygwin)][PREFIX(sigev_)]*/ {
+	union sigval          sigev_value;
+	__INT32_TYPE__        sigev_signo;
+	__INT32_TYPE__        sigev_notify;
+	void                (*sigev_notify_function)(union sigval);
+	union __pthread_attr *sigev_notify_attributes;
+};
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("sigev_notify_attributes")
 #pragma pop_macro("sigev_notify_function")
@@ -84,29 +83,9 @@ typedef struct sigevent_cygwin /*[PREFIX(sigev_)]*/ {
 #pragma pop_macro("sigev_signo")
 #pragma pop_macro("sigev_value")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+__DECL_END
 #endif /* __CC__ */
 
-/* `sigev_notify' values. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	SIGEV_CYGWIN_SIGNAL    = 0, /* Notify via signal. */
-	SIGEV_CYGWIN_NONE      = 1, /* Other notification: meaningless. */
-	SIGEV_CYGWIN_THREAD    = 2, /* Deliver via thread creation. */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define SIGEV_CYGWIN_SIGNAL SIGEV_CYGWIN_SIGNAL /* Notify via signal. */
-#define SIGEV_CYGWIN_NONE   SIGEV_CYGWIN_NONE   /* Other notification: meaningless. */
-#define SIGEV_CYGWIN_THREAD SIGEV_CYGWIN_THREAD /* Deliver via thread creation. */
-#else /* __COMPILER_PREFERR_ENUMS */
-#define SIGEV_CYGWIN_SIGNAL 0 /* Notify via signal. */
-#define SIGEV_CYGWIN_NONE   1 /* Other notification: meaningless. */
-#define SIGEV_CYGWIN_THREAD 2 /* Deliver via thread creation. */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-
-__SYSDECL_END
 
 #endif /* !_I386_KOS_BIT_SIGEVENT_CYGWIN_H */

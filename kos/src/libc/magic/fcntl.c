@@ -67,9 +67,18 @@
 #include <bits/types.h>
 
 #ifdef __USE_GNU
-#include <bits/uio.h>
+#include <asm/limits.h> /* __IOV_MAX */
 #include <bits/f_owner_ex-struct.h>
 #include <bits/file_handle-struct.h>
+#include <bits/iovec-struct.h>
+
+#ifndef UIO_MAXIOV
+#if !defined(__IOV_MAX) || (__IOV_MAX == -1)
+#define UIO_MAXIOV 16
+#else /* !__IOV_MAX || __IOV_MAX == -1 */
+#define UIO_MAXIOV __IOV_MAX
+#endif /* __IOV_MAX && __IOV_MAX != -1 */
+#endif /* !UIO_MAXIOV */
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)

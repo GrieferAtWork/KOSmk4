@@ -18,5 +18,5 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __iovec_defined
-#include <bits/uio.h>
+#include <bits/iovec-struct.h>
 #endif /* !__iovec_defined */

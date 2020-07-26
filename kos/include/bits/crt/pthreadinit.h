@@ -25,8 +25,8 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
+#include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
-#include <bits/crt/pthreadvalues.h>
 
 #ifndef __PTHREAD_SPINS
 #define __PTHREAD_SPINS { 0, 0 }

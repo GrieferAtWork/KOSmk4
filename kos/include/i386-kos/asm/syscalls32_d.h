@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8842f059 */
+/* HASH CRC-32:0x778f624c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@
 #define __NR32_getppid                 0x40                   /* pid_t getppid(void) */
 #define __NR32_getpgrp                 0x41                   /* pid_t getpgrp(void) */
 #define __NR32_setsid                  0x42                   /* pid_t setsid(void) */
-#define __NR32_sigaction               0x43                   /* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+#define __NR32_sigaction               0x43                   /* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
 #define __NR32_sgetmask                0x44                   /* syscall_ulong_t sgetmask(void) */
 #define __NR32_ssetmask                0x45                   /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
 #define __NR32_setreuid                0x46                   /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
@@ -256,7 +256,7 @@
 #define __NR32_getcwd                  0xb7                   /* ssize_t getcwd(char *buf, size_t size) */
 #define __NR32_capget                  0xb8                   /* errno_t capget(int TODO_PROTOTYPE) */
 #define __NR32_capset                  0xb9                   /* errno_t capset(int TODO_PROTOTYPE) */
-#define __NR32_sigaltstack             0xba                   /* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
+#define __NR32_sigaltstack             0xba                   /* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 #define __NR32_sendfile                0xbb                   /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 #define __NR32_getpmsg                 0xbc                   /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define __NR32_putpmsg                 0xbd                   /* errno_t putpmsg(int TODO_PROTOTYPE) */

@@ -20,6 +20,13 @@
 #ifndef _BITS_SIGCONTEXT_H
 #define _BITS_SIGCONTEXT_H 1
 
+/* File:
+ *    <bits/sigcontext.h>
+ * 
+ * Definitions:
+ *    - struct sigcontext { ... };
+ */
+
 #include <__stdinc.h>
 
 #ifdef __CC__

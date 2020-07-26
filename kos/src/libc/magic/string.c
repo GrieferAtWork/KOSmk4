@@ -4700,7 +4700,7 @@ char const *strerrorname_s(int errnum) {
 }
 
 [[wunused, nothrow, ATTR_CONST, section(".text.crt{|.dos}.errno")]]
-[[userimpl, crt_dos_variant, impl_include("<bits/signum.h>"), impl_prefix(
+[[userimpl, crt_dos_variant, impl_include("<asm/signum-values.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
 #undef @sys_siglist@
@@ -4728,10 +4728,10 @@ __LIBC char const *const @sys_siglist@[@_NSIG@] __ASMNAME("_sys_siglist");
 __LIBC char const *const @_sys_siglist@[@_NSIG@];
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
-), impl_include("<bits/signum-values.h>")]]
+)]]
 char const *strsignal_s(int signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	return (unsigned int)errnum < @_NSIG@ ? @_sys_siglist@[signum] : NULL;
+	return (unsigned int)signum < @_NSIG@ ? @_sys_siglist@[signum] : NULL;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
 	char const *result;
 	switch (signum) {

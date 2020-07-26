@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa5766e8 */
+/* HASH CRC-32:0x936ab68b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 
 #include <asm/epoll.h>
 #include <bits/epoll.h>
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC
@@ -271,7 +271,7 @@ typedef int __epoll_ctl_t;
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 /* Creates an epoll instance.  Returns an fd for the new instance.

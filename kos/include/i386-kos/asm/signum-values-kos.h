@@ -17,22 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_SIGNUM_VALUES_KOS_H
-#define _I386_KOS_BITS_SIGNUM_VALUES_KOS_H 1
+#ifndef _I386_KOS_ASM_SIGNUM_VALUES_KOS_H
+#define _I386_KOS_ASM_SIGNUM_VALUES_KOS_H 1
 
 #include <__stdinc.h>
 
 /* Fake signal functions. */
-#define __KOS_SIG_ERR  (__CCAST(__sighandler_t)-1) /* Error return. */
-#define __KOS_SIG_DFL  (__CCAST(__sighandler_t)0)  /* Default action. */
-#define __KOS_SIG_IGN  (__CCAST(__sighandler_t)1)  /* Ignore signal. */
-#define __KOS_SIG_HOLD (__CCAST(__sighandler_t)2)  /* Add signal to hold mask. */
-#define __KOS_SIG_TERM (__CCAST(__sighandler_t)3)  /* Terminate the receiving process. */
-#define __KOS_SIG_EXIT (__CCAST(__sighandler_t)4)  /* Terminate the receiving thread. */
-#define __KOS_SIG_CONT (__CCAST(__sighandler_t)8)  /* Continue execution. */
-#define __KOS_SIG_STOP (__CCAST(__sighandler_t)9)  /* Suspend execution. */
-#define __KOS_SIG_CORE (__CCAST(__sighandler_t)10) /* Create a coredump and terminate. */
-#define __KOS_SIG_GET  (__CCAST(__sighandler_t)11) /* Only get the current handler (accepted by `signal(2)') */
+#define __KOS_SIG_ERR  (-1) /* Error return. */
+#define __KOS_SIG_DFL  0    /* Default action. */
+#define __KOS_SIG_IGN  1    /* Ignore signal. */
+#define __KOS_SIG_HOLD 2    /* Add signal to hold mask. */
+#define __KOS_SIG_TERM 3    /* Terminate the receiving process. */
+#define __KOS_SIG_EXIT 4    /* Terminate the receiving thread. */
+#define __KOS_SIG_CONT 8    /* Continue execution. */
+#define __KOS_SIG_STOP 9    /* Suspend execution. */
+#define __KOS_SIG_CORE 10   /* Create a coredump and terminate. */
+#define __KOS_SIG_GET  11   /* Only get the current handler (accepted by `signal(2)') */
 
 /* Signals. */
 #define __KOS_SIGHUP    1             /* Hangup (POSIX). */
@@ -76,5 +76,4 @@
 #define __KOS_SIGRTMIN  32
 #define __KOS_SIGRTMAX  64
 
-
-#endif /* !_I386_KOS_BITS_SIGNUM_VALUES_KOS_H */
+#endif /* !_I386_KOS_ASM_SIGNUM_VALUES_KOS_H */

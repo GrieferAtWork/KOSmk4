@@ -17,13 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_SIGNUM_VALUES_H
-#define _I386_KOS_BITS_SIGNUM_VALUES_H 1
+#ifndef _I386_KOS_ASM_SIGNUM_VALUES_H
+#define _I386_KOS_ASM_SIGNUM_VALUES_H 1
 
 #include <__stdinc.h>
-#include <__crt.h>
 
-#ifdef __CRT_KOS_PRIMARY
+#if defined(__KOS__) || defined(__linux__)
 #include "signum-values-kos.h"
 
 /* Fake signal functions. */
@@ -80,7 +79,9 @@
 #define __SIGRTMIN  __KOS_SIGRTMIN
 #define __SIGRTMAX  __KOS_SIGRTMAX
 
-#elif defined(__CRT_DOS_PRIMARY)
+#else /* __KOS__ || __linux__ */
+#include <__crt.h>
+#ifdef __CRT_DOS_PRIMARY
 #include "signum-values-dos.h"
 
 /* Fake signal functions. */
@@ -151,8 +152,9 @@
 #define __SIGRTMAX  __CYG_SIGRTMAX
 #define __NSIG      __CYG_NSIG      /* signal 0 implied */
 
-#else
-#include "../../bits/signum-values.h"
-#endif
+#else /* __CRT_..._PRIMARY */
+#include "../../asm/signum-values.h"
+#endif /* !__CRT_..._PRIMARY */
+#endif /* !__KOS__ && !__linux__ */
 
-#endif /* !_I386_KOS_BITS_SIGNUM_VALUES_H */
+#endif /* !_I386_KOS_ASM_SIGNUM_VALUES_H */

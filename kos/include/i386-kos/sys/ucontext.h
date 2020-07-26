@@ -23,12 +23,14 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <hybrid/typecore.h>
+
 #include <hybrid/host.h>
-#include <bits/types.h>
-#include <bits/sigset.h>
+#include <hybrid/typecore.h>
+
 #include <bits/sigcontext.h>
-#include <bits/sigstack.h>
+#include <bits/sigset.h>   /* struct __sigset_struct */
+#include <bits/sigstack.h> /* struct sigaltstack */
+#include <bits/types.h>
 
 
 #if defined(__CRT_KOS_PRIMARY) && __KOS_VERSION__ >= 400
@@ -205,10 +207,10 @@ typedef struct __ATTR_PACKED mcontext {
 
 /* Userlevel context. */
 typedef struct __ATTR_PACKED ucontext {
-	mcontext_t       uc_mcontext;
-	__sigset_t       uc_sigmask;
-	stack_t          uc_stack;
-	struct ucontext *uc_link;
+	mcontext_t             uc_mcontext;
+	struct __sigset_struct uc_sigmask;
+	struct sigaltstack     uc_stack;
+	struct ucontext       *uc_link;
 } ucontext_t;
 #endif /* __CC__ */
 
@@ -473,11 +475,11 @@ typedef struct mcontext {
 #ifdef __CC__
 /* Userlevel context. */
 typedef struct ucontext {
-	__ULONGPTR_TYPE__    uc_flags;
-	struct ucontext     *uc_link;
-	stack_t              uc_stack;
-	mcontext_t           uc_mcontext;
-	__sigset_t           uc_sigmask;
+	__ULONGPTR_TYPE__      uc_flags;
+	struct ucontext       *uc_link;
+	struct sigaltstack     uc_stack;
+	mcontext_t             uc_mcontext;
+	struct __sigset_struct uc_sigmask;
 	struct _libc_fpstate __fpregs_mem;
 } ucontext_t;
 #endif /* __CC__ */
@@ -686,11 +688,11 @@ typedef struct mcontext {
 #ifdef __CC__
 /* Userlevel context. */
 typedef struct ucontext {
-	__ULONGPTR_TYPE__    uc_flags;
-	struct ucontext     *uc_link;
-	stack_t              uc_stack;
-	mcontext_t           uc_mcontext;
-	__sigset_t           uc_sigmask;
+	__ULONGPTR_TYPE__      uc_flags;
+	struct ucontext       *uc_link;
+	struct sigaltstack     uc_stack;
+	mcontext_t             uc_mcontext;
+	struct __sigset_struct uc_sigmask;
 	struct _libc_fpstate __fpregs_mem;
 } ucontext_t;
 #endif /* __CC__ */
@@ -1100,11 +1102,11 @@ typedef struct mcontext mcontext_t;
 
 /* Userlevel context. */
 typedef __ATTR_ALIGNED(16) struct ucontext {
-	mcontext_t         uc_mcontext;
-	struct ucontext   *uc_link;
-	__sigset_t         uc_sigmask;
-	stack_t            uc_stack;
-	unsigned long int  uc_flags;
+	mcontext_t             uc_mcontext;
+	struct ucontext       *uc_link;
+	struct __sigset_struct uc_sigmask;
+	struct sigaltstack     uc_stack;
+	unsigned long int      uc_flags;
 } ucontext_t;
 #endif /* __CC__ */
 

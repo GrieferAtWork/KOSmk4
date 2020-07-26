@@ -165,7 +165,9 @@
 #define __SYSFAST_ARCH_WANT_11     1
 #define __SYSFAST_ARCH_WANT3(a, b) __SYSFAST_ARCH_WANT_##a##b
 #define __SYSFAST_ARCH_WANT2(a, b) __SYSFAST_ARCH_WANT3(a, b)
-#define __SYSFAST_ARCH_WANT(NAME)  __SYSFAST_ARCH_WANT2(IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME), IS_DEFINED(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
+#define __SYSFAST_ARCH_WANT(NAME)                                \
+	__SYSFAST_ARCH_WANT2(IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME), \
+	                     IS_DEFINED(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
 #else /* __x86_64__ */
 #define __SYSFAST_ARCH_WANT(NAME) IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME)
 #endif /* !__x86_64__ */
@@ -215,7 +217,7 @@
  *       - syscall
  * Documentation throughout the kernel states that both of these methods
  * yield identical results, though one minor detail that is documented
- * nowhere is left to use to decide upon:
+ * nowhere else is left to use to decide upon:
  *       `int 80h' on x86_64 is allowed to clobber %rcx and %r11
  * By allowing for this, we can use identical return-paths for both
  * invocation methods, by trying to make use of `sysret' in both cases. */
@@ -232,10 +234,10 @@
 
 
 /* Define _all_ low-level system call variants of a system
- * call that is entirely unable to throw an exceptions.
+ * call that is entirely unable to throw any exceptions.
  * Such a system call can be defined a bit simpler, however
  * if the implementation somehow does manage to throw an
- * exception, then the behavior of undefined.
+ * exception, then the behavior is undefined.
  * Essentially, only stub/no-op system calls (such as `rtm_test()')
  * fall under this category. */
 #ifndef SC_BEGIN_ALL_NOTHROW
@@ -265,10 +267,10 @@
 #ifndef SC_BEGIN
 /* Begin/End a system call definition.
  * Upon entry ...:
- *   - ... a `strict irregs_user' exists as `0(%Psp)'
+ *   - ... a `struct irregs_user' exists as `0(%Psp)'
  *   - ... EFLAGS.IF is enabled
- *   - ... on x86_64, `swapgs' was called (i.e. %gs.base is loaded)
- *   - ... %Pax has an undefined value (the original value is `_SYSFAST_SYSNO(name)')
+ *   - ... on x86_64, `swapgs' was called (i.e. %gs.base is loaded for kernel-space)
+ *   - ... %Pax has an undefined value (the original user-space was `_SYSFAST_SYSNO(name)')
  */
 #define SC_BEGIN(name)                        \
 	.section _SYSFAST_SECTNAME(name);         \
@@ -286,8 +288,8 @@
 /* On i386 only: push/pop %ds, %es and %fs. (no-op on x86_64)
  * NOTE: `SC386_INIT_SEGMENT_REGISTERS' will load kernel segments on i386! */
 #ifdef __x86_64__
-#define SC386_INIT_SEGMENT_REGISTERS /* nothing */
 #define SC386_PUSH_SEGMENT_REGISTERS /* nothing */
+#define SC386_INIT_SEGMENT_REGISTERS /* nothing */
 #define SC386_POP_SEGMENT_REGISTERS  /* nothing */
 #else /* __x86_64__ */
 #define SC386_PUSH_SEGMENT_REGISTERS   \
@@ -315,7 +317,7 @@
 
 #endif /* SC_BEGIN */
 
-/* Push/pop a `struct icpustate' from `0(%Psp)'
+/* Push/pop a `struct icpustate' to/from `0(%Psp)'
  * NOTES:
  *  - SC_PUSH_ICPUSTATE:
  *     - On i386, also includes `SC386_INIT_SEGMENT_REGISTERS'!

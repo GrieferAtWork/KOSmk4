@@ -30,7 +30,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/waitstatus.h>
+#include <sys/wait.h>
 
 #ifndef __INTELLISENSE__
 #include <sched/task.h>

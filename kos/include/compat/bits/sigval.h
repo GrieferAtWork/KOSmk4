@@ -23,8 +23,7 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #include <bits/sigval.h>
-#define compat_sigval   sigval
-#define compat_sigval_t sigval_t
+#define compat_sigval sigval
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_SIGVAL_H */

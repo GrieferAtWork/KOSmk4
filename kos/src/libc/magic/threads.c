@@ -387,7 +387,7 @@ void thrd_yield() = pthread_yield;
 @@If successful the new object is pointed by MUTEX
 @@s.a. `pthread_mutex_init()'
 [[decl_include("<features.h>", "<bits/crt/threads.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadvalues.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<asm/crt/pthreadvalues.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_init)]]
 int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 	int error;
@@ -398,8 +398,9 @@ int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 		error = pthread_mutexattr_init(&attr);
 		if (error == 0) {
 			error = pthread_mutexattr_settype(&attr,
-			                                  (type & 1) ? __PTHREAD_MUTEX_RECURSIVE
-			                                             : __PTHREAD_MUTEX_TIMED);
+			                                  type == mtx_recursive
+			                                  ? __PTHREAD_MUTEX_RECURSIVE
+			                                  : __PTHREAD_MUTEX_TIMED);
 			if (error == 0)
 				error = pthread_mutex_init((pthread_mutex_t *)mutex, &attr);
 			pthread_mutexattr_destroy(&attr);

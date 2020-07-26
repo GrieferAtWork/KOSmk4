@@ -24,7 +24,6 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <bits/sigset.h>
 #define __compat_sigset_struct __sigset_struct
-#define __compat_sigset_t      __sigset_t
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_SIGSET_H */

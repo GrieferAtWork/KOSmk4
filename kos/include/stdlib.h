@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe4a184e */
+/* HASH CRC-32:0xc381a6a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,7 +182,7 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 __SYSDECL_BEGIN

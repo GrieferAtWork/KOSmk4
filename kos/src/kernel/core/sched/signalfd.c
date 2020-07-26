@@ -291,8 +291,8 @@ update_signalfd(unsigned int fd,
 		sigdelset(&newmask, SIGSTOP);
 		COMPILER_BARRIER();
 		memcpy(&sfd->sf_mask, &newmask, sizeof(sigset_t));
-		/* The online documentation does not specify if a threads
-		 * currently waiting on the signalfd should wake up when
+		/* The online documentation does not specify if a thread
+		 * currently waiting on a signalfd should wake up when
 		 * the mask changes. Especially considering that doing so
 		 * would require an additional signal to be added to the
 		 * `struct signalfd' just for the purpose of listening to

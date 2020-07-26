@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89976a65 */
+/* HASH CRC-32:0x2be7d296 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,43 +29,48 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
+#include <asm/wait.h>
 #include <bits/types.h>
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
+
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <bits/siginfo.h> /* We'd only need `siginfo_t' */
+#include <bits/siginfo-struct.h> /* `struct __siginfo_struct' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
-
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
-#define WCOREFLAG           __WCOREFLAG
-#define WCOREDUMP(status)   __WCOREDUMP(__WAIT_INT(status))
-#define W_EXITCODE(ret,sig) __W_EXITCODE(ret,sig)
-#define W_STOPCODE(sig)     __W_STOPCODE(sig)
+#ifdef __WCOREFLAG
+#define WCOREFLAG __WCOREFLAG
+#endif /* __WCOREFLAG */
+#ifdef __WCOREDUMP
+#define WCOREDUMP(status) __WCOREDUMP(__WAIT_INT(status))
+#endif /* __WCOREDUMP */
+#ifdef __W_EXITCODE
+#define W_EXITCODE(ret, sig) __W_EXITCODE(ret, sig)
+#endif /* __W_EXITCODE */
+#ifdef __W_STOPCODE
+#define W_STOPCODE(sig) __W_STOPCODE(sig)
+#endif /* __W_STOPCODE */
 
-#define WAIT_ANY     (-1) /* Any process. */
-#define WAIT_MYPGRP    0  /* Any process in my process group. */
+#ifdef __WAIT_ANY
+#define WAIT_ANY __WAIT_ANY /* Any process. */
+#endif /* __WAIT_ANY */
+#ifdef __WAIT_MYPGRP
+#define WAIT_MYPGRP __WAIT_MYPGRP /* Any process in my process group. */
+#endif /* __WAIT_MYPGRP */
 #endif /* __USE_MISC */
 
 
 #ifdef __CC__
+
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
+#ifndef __siginfo_t_defined
+#define __siginfo_t_defined 1
+typedef struct __siginfo_struct siginfo_t;
+#endif /* !__siginfo_t_defined */
+#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #ifdef __CRT_HAVE_wait
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */

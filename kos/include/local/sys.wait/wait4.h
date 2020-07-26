@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14662322 */
+/* HASH CRC-32:0xdf8bb301 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ struct rusage;
 #include <bits/types.h>
 #include <features.h>
 #include <bits/rusage-struct.h>
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wait4_32 from sys.wait */
 #if !defined(__local___localdep_wait4_32_defined) && defined(__CRT_HAVE_wait4)

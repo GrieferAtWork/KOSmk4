@@ -82,7 +82,7 @@
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 __SYSDECL_BEGIN

@@ -23,6 +23,12 @@
 #include <__stdinc.h>
 #include <bits/types.h>
 
+#define __OFFSET_POLLFD_FD      0
+#define __OFFSET_POLLFD_EVENTS  __SIZEOF_FD_T__
+#define __OFFSET_POLLFD_REVENTS (__SIZEOF_FD_T__ + 2)
+#define __SIZEOF_POLLFD         (__SIZEOF_FD_T__ + 4)
+#define __ALIGNOF_POLLFD        __SIZEOF_FD_T__
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -35,7 +41,7 @@ __DECL_BEGIN
 #undef events
 #undef revents
 
-struct pollfd {
+struct pollfd /*[PREFIX()]*/ {
 	__fd_t         fd;      /* File descriptor to poll.  */
 	__INT16_TYPE__ events;  /* Types of events poller cares about (Set of 'POLL*'). */
 	__INT16_TYPE__ revents; /* Types of events that actually occurred (Set of 'POLL*'). */

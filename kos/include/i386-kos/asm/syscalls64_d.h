@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75ea6880 */
+/* HASH CRC-32:0x88f501c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -217,7 +217,7 @@
 #define __NR64_rt_sigtimedwait        0x80                           /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox64_struct *info, struct timespecx64 const *timeout, size_t sigsetsize) */
 #define __NR64_rt_sigqueueinfo        0x81                           /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 #define __NR64_rt_sigsuspend          0x82                           /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
-#define __NR64_sigaltstack            0x83                           /* errno_t sigaltstack(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) */
+#define __NR64_sigaltstack            0x83                           /* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
 #define __NR64_utime                  0x84                           /* errno_t utime(char const *filename, struct utimbufx64 const *times) */
 #define __NR64_mknod                  0x85                           /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
 #define __NR64_uselib                 0x86                           /* errno_t uselib(char const *library) */

@@ -272,14 +272,14 @@ static_assert(sizeof(struct flockx64) == __SIZEOF_FLOCKX64);
 #include <bits/itimerspec32.h>
 
 /* struct itimerspecx32 */
-static_assert(offsetof(struct itimerspecx32, it_value) == __OFFSET_ITIMERSPECX32_VALUE);
 static_assert(offsetof(struct itimerspecx32, it_interval) == __OFFSET_ITIMERSPECX32_INTERVAL);
+static_assert(offsetof(struct itimerspecx32, it_value) == __OFFSET_ITIMERSPECX32_VALUE);
 static_assert(sizeof(struct itimerspecx32) == __SIZEOF_ITIMERSPECX32);
 static_assert(alignof(struct itimerspecx32) == __ALIGNOF_ITIMERSPECX32);
 
 /* struct itimerspecx32_64 */
-static_assert(offsetof(struct itimerspecx32_64, it_value) == __OFFSET_ITIMERSPECX32_64_VALUE);
 static_assert(offsetof(struct itimerspecx32_64, it_interval) == __OFFSET_ITIMERSPECX32_64_INTERVAL);
+static_assert(offsetof(struct itimerspecx32_64, it_value) == __OFFSET_ITIMERSPECX32_64_VALUE);
 static_assert(sizeof(struct itimerspecx32_64) == __SIZEOF_ITIMERSPECX32_64);
 static_assert(alignof(struct itimerspecx32_64) == __ALIGNOF_ITIMERSPECX32_64);
 
@@ -293,8 +293,8 @@ static_assert(alignof(struct itimerspecx32_64) == __ALIGNOF_ITIMERSPECX32_64);
 #include <bits/itimerspec64.h>
 
 /* struct itimerspecx64 */
-static_assert(offsetof(struct itimerspecx64, it_value) == __OFFSET_ITIMERSPECX64_VALUE);
 static_assert(offsetof(struct itimerspecx64, it_interval) == __OFFSET_ITIMERSPECX64_INTERVAL);
+static_assert(offsetof(struct itimerspecx64, it_value) == __OFFSET_ITIMERSPECX64_VALUE);
 static_assert(sizeof(struct itimerspecx64) == __SIZEOF_ITIMERSPECX64);
 static_assert(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
 
@@ -308,14 +308,14 @@ static_assert(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
 #include <bits/itimerval32.h>
 
 /* struct itimervalx32 */
-static_assert(offsetof(struct itimervalx32, it_value) == __OFFSET_ITIMERVALX32_VALUE);
 static_assert(offsetof(struct itimervalx32, it_interval) == __OFFSET_ITIMERVALX32_INTERVAL);
+static_assert(offsetof(struct itimervalx32, it_value) == __OFFSET_ITIMERVALX32_VALUE);
 static_assert(sizeof(struct itimervalx32) == __SIZEOF_ITIMERVALX32);
 static_assert(alignof(struct itimervalx32) == __ALIGNOF_ITIMERVALX32);
 
 /* struct itimervalx32_64 */
-static_assert(offsetof(struct itimervalx32_64, it_value) == __OFFSET_ITIMERVALX32_64_VALUE);
 static_assert(offsetof(struct itimervalx32_64, it_interval) == __OFFSET_ITIMERVALX32_64_INTERVAL);
+static_assert(offsetof(struct itimervalx32_64, it_value) == __OFFSET_ITIMERVALX32_64_VALUE);
 static_assert(sizeof(struct itimervalx32_64) == __SIZEOF_ITIMERVALX32_64);
 static_assert(alignof(struct itimervalx32_64) == __ALIGNOF_ITIMERVALX32_64);
 
@@ -329,8 +329,8 @@ static_assert(alignof(struct itimervalx32_64) == __ALIGNOF_ITIMERVALX32_64);
 #include <bits/itimerval64.h>
 
 /* struct itimervalx64 */
-static_assert(offsetof(struct itimervalx64, it_value) == __OFFSET_ITIMERVALX64_VALUE);
 static_assert(offsetof(struct itimervalx64, it_interval) == __OFFSET_ITIMERVALX64_INTERVAL);
+static_assert(offsetof(struct itimervalx64, it_value) == __OFFSET_ITIMERVALX64_VALUE);
 static_assert(sizeof(struct itimervalx64) == __SIZEOF_ITIMERVALX64);
 static_assert(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
 
@@ -344,8 +344,8 @@ static_assert(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
 #include <bits/mmsghdr-struct32.h>
 
 /* struct __mmsghdrx32 */
-static_assert(offsetof(struct __mmsghdrx32, msg_len) == __OFFSET_MMSGHDRX32_LEN);
 static_assert(offsetof(struct __mmsghdrx32, msg_hdr) == __OFFSET_MMSGHDRX32_HDR);
+static_assert(offsetof(struct __mmsghdrx32, msg_len) == __OFFSET_MMSGHDRX32_LEN);
 static_assert(sizeof(struct __mmsghdrx32) == __SIZEOF_MMSGHDRX32);
 static_assert(alignof(struct __mmsghdrx32) == __ALIGNOF_MMSGHDRX32);
 
@@ -356,8 +356,8 @@ static_assert(alignof(struct __mmsghdrx32) == __ALIGNOF_MMSGHDRX32);
 #include <bits/mmsghdr-struct64.h>
 
 /* struct __mmsghdrx64 */
-static_assert(offsetof(struct __mmsghdrx64, msg_len) == __OFFSET_MMSGHDRX64_LEN);
 static_assert(offsetof(struct __mmsghdrx64, msg_hdr) == __OFFSET_MMSGHDRX64_HDR);
+static_assert(offsetof(struct __mmsghdrx64, msg_len) == __OFFSET_MMSGHDRX64_LEN);
 static_assert(sizeof(struct __mmsghdrx64) == __SIZEOF_MMSGHDRX64);
 static_assert(alignof(struct __mmsghdrx64) == __ALIGNOF_MMSGHDRX64);
 
@@ -691,8 +691,8 @@ static_assert(sizeof(struct __siginfox64_struct) == __SIZEOF_SIGINFOX64);
 #include <bits/sigstack32.h>
 
 /* struct __sigstackx32 */
-static_assert(offsetof(struct __sigstackx32, ss_sp) == __OFFSET_SIGSTACKX32_SP);
 static_assert(offsetof(struct __sigstackx32, ss_onstack) == __OFFSET_SIGSTACKX32_ONSTACK);
+static_assert(offsetof(struct __sigstackx32, ss_sp) == __OFFSET_SIGSTACKX32_SP);
 static_assert(sizeof(struct __sigstackx32) == __SIZEOF_SIGSTACKX32);
 
 /* struct __sigaltstackx32 */
@@ -708,8 +708,8 @@ static_assert(sizeof(struct __sigaltstackx32) == __SIZEOF_SIGALTSTACKX32);
 #include <bits/sigstack64.h>
 
 /* struct __sigstackx64 */
-static_assert(offsetof(struct __sigstackx64, ss_sp) == __OFFSET_SIGSTACKX64_SP);
 static_assert(offsetof(struct __sigstackx64, ss_onstack) == __OFFSET_SIGSTACKX64_ONSTACK);
+static_assert(offsetof(struct __sigstackx64, ss_sp) == __OFFSET_SIGSTACKX64_SP);
 
 /* struct __sigaltstackx64 */
 static_assert(offsetof(struct __sigaltstackx64, ss_flags) == __OFFSET_SIGALTSTACKX64_FLAGS);
@@ -987,14 +987,14 @@ static_assert(alignof(struct timebx64) == __ALIGNOF_TIMEBX64);
 #include <bits/timespec32.h>
 
 /* struct timespecx32 */
-static_assert(offsetof(struct timespecx32, tv_sec) == __OFFSET_TIMESPECX32_SEC);
 static_assert(offsetof(struct timespecx32, tv_nsec) == __OFFSET_TIMESPECX32_NSEC);
+static_assert(offsetof(struct timespecx32, tv_sec) == __OFFSET_TIMESPECX32_SEC);
 static_assert(sizeof(struct timespecx32) == __SIZEOF_TIMESPECX32);
 static_assert(alignof(struct timespecx32) == __ALIGNOF_TIMESPECX32);
 
 /* struct timespecx32_64 */
-static_assert(offsetof(struct timespecx32_64, tv_sec) == __OFFSET_TIMESPECX32_64_SEC);
 static_assert(offsetof(struct timespecx32_64, tv_nsec) == __OFFSET_TIMESPECX32_64_NSEC);
+static_assert(offsetof(struct timespecx32_64, tv_sec) == __OFFSET_TIMESPECX32_64_SEC);
 static_assert(sizeof(struct timespecx32_64) == __SIZEOF_TIMESPECX32_64);
 static_assert(alignof(struct timespecx32_64) == __ALIGNOF_TIMESPECX32_64);
 
@@ -1008,8 +1008,8 @@ static_assert(alignof(struct timespecx32_64) == __ALIGNOF_TIMESPECX32_64);
 #include <bits/timespec64.h>
 
 /* struct timespecx64 */
-static_assert(offsetof(struct timespecx64, tv_sec) == __OFFSET_TIMESPECX64_SEC);
 static_assert(offsetof(struct timespecx64, tv_nsec) == __OFFSET_TIMESPECX64_NSEC);
+static_assert(offsetof(struct timespecx64, tv_sec) == __OFFSET_TIMESPECX64_SEC);
 static_assert(sizeof(struct timespecx64) == __SIZEOF_TIMESPECX64);
 static_assert(alignof(struct timespecx64) == __ALIGNOF_TIMESPECX64);
 
@@ -1023,14 +1023,14 @@ static_assert(alignof(struct timespecx64) == __ALIGNOF_TIMESPECX64);
 #include <bits/timeval32.h>
 
 /* struct timevalx32 */
-static_assert(offsetof(struct timevalx32, tv_usec) == __OFFSET_TIMEVALX32_USEC);
 static_assert(offsetof(struct timevalx32, tv_sec) == __OFFSET_TIMEVALX32_SEC);
+static_assert(offsetof(struct timevalx32, tv_usec) == __OFFSET_TIMEVALX32_USEC);
 static_assert(sizeof(struct timevalx32) == __SIZEOF_TIMEVALX32);
 static_assert(alignof(struct timevalx32) == __ALIGNOF_TIMEVALX32);
 
 /* struct timevalx32_64 */
-static_assert(offsetof(struct timevalx32_64, tv_usec) == __OFFSET_TIMEVALX32_64_USEC);
 static_assert(offsetof(struct timevalx32_64, tv_sec) == __OFFSET_TIMEVALX32_64_SEC);
+static_assert(offsetof(struct timevalx32_64, tv_usec) == __OFFSET_TIMEVALX32_64_USEC);
 static_assert(sizeof(struct timevalx32_64) == __SIZEOF_TIMEVALX32_64);
 static_assert(alignof(struct timevalx32_64) == __ALIGNOF_TIMEVALX32_64);
 
@@ -1044,8 +1044,8 @@ static_assert(alignof(struct timevalx32_64) == __ALIGNOF_TIMEVALX32_64);
 #include <bits/timeval64.h>
 
 /* struct timevalx64 */
-static_assert(offsetof(struct timevalx64, tv_usec) == __OFFSET_TIMEVALX64_USEC);
 static_assert(offsetof(struct timevalx64, tv_sec) == __OFFSET_TIMEVALX64_SEC);
+static_assert(offsetof(struct timevalx64, tv_usec) == __OFFSET_TIMEVALX64_USEC);
 static_assert(sizeof(struct timevalx64) == __SIZEOF_TIMEVALX64);
 static_assert(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
 
@@ -1059,14 +1059,14 @@ static_assert(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
 #include <bits/utimbuf32.h>
 
 /* struct utimbufx32 */
-static_assert(offsetof(struct utimbufx32, modtime) == __OFFSET_UTIMBUFX32_MODTIME);
 static_assert(offsetof(struct utimbufx32, actime) == __OFFSET_UTIMBUFX32_ACTIME);
+static_assert(offsetof(struct utimbufx32, modtime) == __OFFSET_UTIMBUFX32_MODTIME);
 static_assert(sizeof(struct utimbufx32) == __SIZEOF_UTIMBUFX32);
 static_assert(alignof(struct utimbufx32) == __ALIGNOF_UTIMBUFX32);
 
 /* struct utimbufx32_64 */
-static_assert(offsetof(struct utimbufx32_64, modtime) == __OFFSET_UTIMBUFX32_64_MODTIME);
 static_assert(offsetof(struct utimbufx32_64, actime) == __OFFSET_UTIMBUFX32_64_ACTIME);
+static_assert(offsetof(struct utimbufx32_64, modtime) == __OFFSET_UTIMBUFX32_64_MODTIME);
 static_assert(sizeof(struct utimbufx32_64) == __SIZEOF_UTIMBUFX32_64);
 static_assert(alignof(struct utimbufx32_64) == __ALIGNOF_UTIMBUFX32_64);
 
@@ -1080,8 +1080,8 @@ static_assert(alignof(struct utimbufx32_64) == __ALIGNOF_UTIMBUFX32_64);
 #include <bits/utimbuf64.h>
 
 /* struct utimbufx64 */
-static_assert(offsetof(struct utimbufx64, modtime) == __OFFSET_UTIMBUFX64_MODTIME);
 static_assert(offsetof(struct utimbufx64, actime) == __OFFSET_UTIMBUFX64_ACTIME);
+static_assert(offsetof(struct utimbufx64, modtime) == __OFFSET_UTIMBUFX64_MODTIME);
 static_assert(sizeof(struct utimbufx64) == __SIZEOF_UTIMBUFX64);
 static_assert(alignof(struct utimbufx64) == __ALIGNOF_UTIMBUFX64);
 
@@ -1506,8 +1506,8 @@ static_assert(offsetof(struct scpustate32, scs_irregs) == OFFSET_SCPUSTATE32_IRR
 static_assert(offsetof(struct scpustate32, scs_sgregs) == OFFSET_SCPUSTATE32_SGREGS);
 
 /* struct desctab32 */
-static_assert(offsetof(struct desctab32, dt_limit) == OFFSET_DESCTAB32_LIMIT);
 static_assert(offsetof(struct desctab32, dt_base) == OFFSET_DESCTAB32_BASE);
+static_assert(offsetof(struct desctab32, dt_limit) == OFFSET_DESCTAB32_LIMIT);
 static_assert(sizeof(struct desctab32) == SIZEOF_DESCTAB32);
 
 /* struct fcpustate32 */
@@ -1579,8 +1579,8 @@ static_assert(offsetof(struct sgregs64, sg_gs) == OFFSET_SGREGS64_GS);
 static_assert(sizeof(struct sgregs64) == SIZEOF_SGREGS64);
 
 /* struct sgbase64 */
-static_assert(offsetof(struct sgbase64, sg_gsbase) == OFFSET_SGBASE64_GSBASE);
 static_assert(offsetof(struct sgbase64, sg_fsbase) == OFFSET_SGBASE64_FSBASE);
+static_assert(offsetof(struct sgbase64, sg_gsbase) == OFFSET_SGBASE64_GSBASE);
 static_assert(sizeof(struct sgbase64) == SIZEOF_SGBASE64);
 
 /* struct coregs64 */
@@ -1635,8 +1635,8 @@ static_assert(offsetof(struct kcpustate64, kcs_rip) == OFFSET_KCPUSTATE64_RIP);
 static_assert(sizeof(struct kcpustate64) == SIZEOF_KCPUSTATE64);
 
 /* struct icpustate64 */
-static_assert(offsetof(struct icpustate64, ics_irregs) == OFFSET_ICPUSTATE64_IRREGS);
 static_assert(offsetof(struct icpustate64, ics_gpregs) == OFFSET_ICPUSTATE64_GPREGSNSP);
+static_assert(offsetof(struct icpustate64, ics_irregs) == OFFSET_ICPUSTATE64_IRREGS);
 static_assert(sizeof(struct icpustate64) == SIZEOF_ICPUSTATE64);
 
 /* struct scpustate64 */
@@ -1647,8 +1647,8 @@ static_assert(offsetof(struct scpustate64, scs_sgregs) == OFFSET_SCPUSTATE64_SGR
 static_assert(sizeof(struct scpustate64) == SIZEOF_SCPUSTATE64);
 
 /* struct desctab64 */
-static_assert(offsetof(struct desctab64, dt_limit) == OFFSET_DESCTAB64_LIMIT);
 static_assert(offsetof(struct desctab64, dt_base) == OFFSET_DESCTAB64_BASE);
+static_assert(offsetof(struct desctab64, dt_limit) == OFFSET_DESCTAB64_LIMIT);
 static_assert(sizeof(struct desctab64) == SIZEOF_DESCTAB64);
 
 /* struct fcpustate64 */
@@ -1926,8 +1926,8 @@ static_assert(sizeof(struct ucontext64) == __SIZEOF_UCONTEXT64);
 #include <librpc/bits/syscall-info32.h>
 
 /* struct rpc_syscall_info32 */
-static_assert(offsetof(struct rpc_syscall_info32, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO32_SYSNO);
 static_assert(offsetof(struct rpc_syscall_info32, rsi_flags) == OFFSET_RPC_SYSCALL_INFO32_FLAGS);
+static_assert(offsetof(struct rpc_syscall_info32, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO32_SYSNO);
 static_assert(sizeof(struct rpc_syscall_info32) == SIZEOF_RPC_SYSCALL_INFO32);
 
 
@@ -1937,8 +1937,8 @@ static_assert(sizeof(struct rpc_syscall_info32) == SIZEOF_RPC_SYSCALL_INFO32);
 #include <librpc/bits/syscall-info64.h>
 
 /* struct rpc_syscall_info64 */
-static_assert(offsetof(struct rpc_syscall_info64, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO64_SYSNO);
 static_assert(offsetof(struct rpc_syscall_info64, rsi_flags) == OFFSET_RPC_SYSCALL_INFO64_FLAGS);
+static_assert(offsetof(struct rpc_syscall_info64, rsi_sysno) == OFFSET_RPC_SYSCALL_INFO64_SYSNO);
 static_assert(sizeof(struct rpc_syscall_info64) == SIZEOF_RPC_SYSCALL_INFO64);
 
 
@@ -1952,13 +1952,13 @@ static_assert(sizeof(struct rpc_syscall_info64) == SIZEOF_RPC_SYSCALL_INFO64);
 #undef sigev_notify_attributes
 #include <bits/sigevent-cygwin.h>
 
-/* struct sigevent_cygwin */
-static_assert(offsetof(struct sigevent_cygwin, sigev_notify) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY);
-static_assert(offsetof(struct sigevent_cygwin, sigev_notify_attributes) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY_ATTRIBUTES);
-static_assert(offsetof(struct sigevent_cygwin, sigev_notify_function) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY_FUNCTION);
-static_assert(offsetof(struct sigevent_cygwin, sigev_signo) == __OFFSET_SIGEVENT_CYGWIN_SIGNO);
-static_assert(offsetof(struct sigevent_cygwin, sigev_value) == __OFFSET_SIGEVENT_CYGWIN_VALUE);
-static_assert(sizeof(struct sigevent_cygwin) == __SIZEOF_SIGEVENT_CYGWIN);
+/* struct __sigevent_cygwin */
+static_assert(offsetof(struct __sigevent_cygwin, sigev_notify) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_notify_attributes) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY_ATTRIBUTES);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_notify_function) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY_FUNCTION);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_signo) == __OFFSET_SIGEVENT_CYGWIN_SIGNO);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_value) == __OFFSET_SIGEVENT_CYGWIN_VALUE);
+static_assert(sizeof(struct __sigevent_cygwin) == __SIZEOF_SIGEVENT_CYGWIN);
 
 
 
@@ -2122,8 +2122,8 @@ static_assert(offsetof(struct x86_64_va_list_reg_save_area, rsa_xmm[15]) == OFFS
 
 
 #include <bits/sigset.h>
-static_assert(sizeof(__sigset_t) == __SIZEOF_SIGSET_T__);
-static_assert(COMPILER_LENOF(((__sigset_t *)0)->__val) == _SIGSET_NWORDS);
+static_assert(sizeof(struct __sigset_struct) == __SIZEOF_SIGSET_T__);
+static_assert(COMPILER_LENOF(((struct __sigset_struct *)0)->__val) == __SIGSET_NWORDS);
 
 #include <bits/crt/semaphore.h>
 static_assert(sizeof(sem_t) == __SIZEOF_SEM_T);

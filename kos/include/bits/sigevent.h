@@ -20,15 +20,22 @@
 #ifndef _BIT_SIGEVENT_H
 #define _BIT_SIGEVENT_H 1
 
+/* File:
+ *    <bits/sigevent.h>
+ * 
+ * Definitions:
+ *    - struct sigevent { ... };
+ *    - #define __SIGEV_MAX_SIZE ...
+ *    - #define __SIGEV_PAD_SIZE ...
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
 #include <hybrid/typecore.h>
 
-#include <bits/sigval.h>
+#include <bits/sigval.h> /* union sigval */
 #include <bits/types.h>
-
-__SYSDECL_BEGIN
 
 #define __SIGEV_MAX_SIZE    64
 #if __SIZEOF_POINTER__ <= 4
@@ -38,19 +45,15 @@ __SYSDECL_BEGIN
 #endif /* __SIZEOF_POINTER__ > 4 */
 
 #ifdef __CC__
-#ifndef __pthread_attr_t_defined
-#define __pthread_attr_t_defined 1
-typedef union __pthread_attr pthread_attr_t;
-#endif /* !__pthread_attr_t_defined */
-#endif /* __CC__ */
+__DECL_BEGIN
 
-#ifdef __CC__
-typedef struct sigevent /*[PREFIX(sigev_)]*/ {
-	sigval_t       sigev_value;
+union __pthread_attr;
+struct sigevent /*[PREFIX(sigev_)]*/ {
+	union sigval   sigev_value;
 	__INT32_TYPE__ sigev_signo;
 	__INT32_TYPE__ sigev_notify;
-#if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-    defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #ifndef __USE_KOS
 	struct{
 #endif /* !__USE_KOS */
@@ -59,8 +62,8 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
 		__pid_t _tid;
 		struct {
-			void (__LIBKCALL *sigev_notify_function)(sigval_t __val); /* Function to start. */
-			pthread_attr_t   *sigev_notify_attributes;                /* Thread attributes. */
+			void (__LIBKCALL     *sigev_notify_function)(union sigval __val); /* Function to start. */
+			union __pthread_attr *sigev_notify_attributes;                    /* Thread attributes. */
 		};
 	};
 #ifndef __USE_KOS
@@ -69,8 +72,8 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
 		__pid_t _tid;
 		struct {
-			void (__LIBKCALL *_function)(sigval_t __val); /* Function to start. */
-			pthread_attr_t   *_attribute;                 /* Thread attributes. */
+			void (__LIBKCALL     *_function)(union sigval __val); /* Function to start. */
+			union __pthread_attr *_attribute;                     /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 	};
@@ -81,40 +84,17 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
 		__pid_t _tid;
 		struct {
-			void (__ATTR_CDECL *_function)(sigval_t __val); /* Function to start. */
-			pthread_attr_t *_attribute;                     /* Thread attributes. */
+			void (__ATTR_CDECL   *_function)(union sigval __val); /* Function to start. */
+			union __pthread_attr *_attribute;                     /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 #define sigev_notify_function   _sigev_un._sigev_thread._function
 #define sigev_notify_attributes _sigev_un._sigev_thread._attribute
 #endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT || !__COMPILER_HAVE_TRANSPARENT_UNION */
-} sigevent_t;
-#endif /* __CC__ */
-
-/* `sigev_notify' values. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	SIGEV_SIGNAL    = 0, /* Notify via signal. */
-	SIGEV_NONE      = 1, /* Other notification: meaningless. */
-	SIGEV_THREAD    = 2, /* Deliver via thread creation. */
-	SIGEV_THREAD_ID = 4  /* Send signal to specific thread. */
 };
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define SIGEV_SIGNAL    SIGEV_SIGNAL    /* Notify via signal. */
-#define SIGEV_NONE      SIGEV_NONE      /* Other notification: meaningless. */
-#define SIGEV_THREAD    SIGEV_THREAD    /* Deliver via thread creation. */
-#define SIGEV_THREAD_ID SIGEV_THREAD_ID /* Send signal to specific thread. */
-#else /* __COMPILER_PREFERR_ENUMS */
-#define SIGEV_SIGNAL    0 /* Notify via signal. */
-#define SIGEV_NONE      1 /* Other notification: meaningless. */
-#define SIGEV_THREAD    2 /* Deliver via thread creation. */
-#define SIGEV_THREAD_ID 4 /* Send signal to specific thread. */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_BIT_SIGEVENT_H */

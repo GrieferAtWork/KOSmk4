@@ -20,12 +20,26 @@
 #ifndef _I386_KOS_BITS_SIGINFO_CONVERT_H
 #define _I386_KOS_BITS_SIGINFO_CONVERT_H 1
 
+/* File:
+ *    <i386-kos/bits/siginfo-convert.h>
+ * 
+ * Definitions:
+ *    - void siginfox32_to_siginfox32(struct __siginfox32_struct const *self, struct __siginfox32_struct *result);
+ *    - void siginfox64_to_siginfox64(struct __siginfox64_struct const *self, struct __siginfox64_struct *result);
+ *    - void siginfox32_to_siginfox64(struct __siginfox32_struct const *self, struct __siginfox64_struct *result);
+ *    - void siginfox64_to_siginfox32(struct __siginfox64_struct const *self, struct __siginfox32_struct *result);
+ *    - void siginfox64_to_siginfo(struct __siginfox32_struct const *self, struct __siginfo_struct *result);
+ *    - void siginfox32_to_siginfo(struct __siginfox64_struct const *self, struct __siginfo_struct *result);
+ *    - void siginfo_to_siginfox32(struct __siginfo_struct const *self, struct __siginfox64_struct *result);
+ *    - void siginfo_to_siginfox64(struct __siginfo_struct const *self, struct __siginfox32_struct *result);
+ */
+
 #include <__stdinc.h>
 
 #include <hybrid/__minmax.h>
 #include <hybrid/host.h>
 
-#include <bits/signum-values.h>
+#include <asm/signum-values.h>
 
 #include <libc/string.h>
 
@@ -36,17 +50,17 @@
 __DECL_BEGIN
 
 /* Convert between 32-bit and 64-bit siginfo_t structures */
-#define siginfox32_to_siginfox32(self, result)                      \
-	__libc_memcpy(__COMPILER_REQTYPE(__siginfox32_t *, result),     \
-	              __COMPILER_REQTYPE(__siginfox32_t const *, self), \
-	              sizeof(__siginfox32_t))
-#define siginfox64_to_siginfox64(self, result)                      \
-	__libc_memcpy(__COMPILER_REQTYPE(__siginfox64_t *, result),     \
-	              __COMPILER_REQTYPE(__siginfox64_t const *, self), \
-	              sizeof(__siginfox64_t))
+#define siginfox32_to_siginfox32(self, result)                                  \
+	__libc_memcpy(__COMPILER_REQTYPE(struct __siginfox32_struct *, result),     \
+	              __COMPILER_REQTYPE(struct __siginfox32_struct const *, self), \
+	              sizeof(struct __siginfox32_struct))
+#define siginfox64_to_siginfox64(self, result)                                  \
+	__libc_memcpy(__COMPILER_REQTYPE(struct __siginfox64_struct *, result),     \
+	              __COMPILER_REQTYPE(struct __siginfox64_struct const *, self), \
+	              sizeof(struct __siginfox64_struct))
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(siginfox32_to_siginfox64)(__siginfox32_t const *__restrict __self,
-                                        __siginfox64_t *__restrict __result) {
+__NOTHROW_NCX(siginfox32_to_siginfox64)(struct __siginfox32_struct const *__restrict __self,
+                                        struct __siginfox64_struct *__restrict __result) {
 	__INT32_TYPE__ __signo;
 	__result->si_signo = __signo = __self->si_signo;
 	__result->si_errno = __self->si_errno;
@@ -91,8 +105,8 @@ __NOTHROW_NCX(siginfox32_to_siginfox64)(__siginfox32_t const *__restrict __self,
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(siginfox64_to_siginfox32)(__siginfox64_t const *__restrict __self,
-                                        __siginfox32_t *__restrict __result) {
+__NOTHROW_NCX(siginfox64_to_siginfox32)(struct __siginfox64_struct const *__restrict __self,
+                                        struct __siginfox32_struct *__restrict __result) {
 	__INT32_TYPE__ __signo;
 	__result->si_signo = __signo = __self->si_signo;
 	__result->si_errno = __self->si_errno;

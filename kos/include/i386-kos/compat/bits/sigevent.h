@@ -17,15 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_UIO_H
-#define _BITS_UIO_H 1
+#ifndef _I386_KOS_COMPAT_BITS_SIGEVENT_H
+#define _I386_KOS_COMPAT_BITS_SIGEVENT_H 1
 
-#include <__stdinc.h>
+#include <hybrid/host.h>
 
-#include <bits/iovec-struct.h>
+#ifdef __x86_64__
+#include <bits/sigevent32.h>
+#define compat_sigevent __sigeventx32
+#endif /* !__x86_64__ */
 
-#ifndef UIO_MAXIOV
-#define UIO_MAXIOV 1024
-#endif /* !UIO_MAXIOV */
-
-#endif /* !_BITS_UIO_H */
+#endif /* !_I386_KOS_COMPAT_BITS_SIGEVENT_H */

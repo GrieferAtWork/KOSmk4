@@ -20,6 +20,18 @@
 #ifndef _I386_KOS_BITS_SIGINFO64_H
 #define _I386_KOS_BITS_SIGINFO64_H 1
 
+/* File:
+ *    <i386-kos/bits/siginfo-struct64.h>
+ * 
+ * Definitions:
+ *    - struct __siginfox64_struct { ... };
+ *    - #define __SIX64_MAX_SIZE ...
+ * #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
+ *    - struct __siginfo_struct { ... };
+ *    - #define __SI_MAX_SIZE ...
+ * #endif
+ */
+
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
 #include <__stdinc.h>
 #include <features.h> /* __USE_KOS */
@@ -61,8 +73,6 @@ __SYSDECL_BEGIN
 #define __OFFSET_SIGINFO_ARCH      __OFFSET_SIGINFOX64_ARCH
 #define __SIZEOF_SIGINFO           __SIZEOF_SIGINFOX64
 #define __siginfox64_struct        __siginfo_struct
-#define __siginfox64_t             siginfo_t
-#define __siginfo_t_defined        1
 #endif /* !__CRT_CYG_PRIMARY && !__x86_64__ */
 
 
@@ -101,14 +111,9 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-#ifdef __USE_KOS_KERNEL
-#define siginfox64_struct __siginfox64_struct
-#define siginfox64_t      __siginfox64_t
-#endif /* __USE_KOS_KERNEL */
-
 typedef __ATTR_ALIGNED(4) __LONG64_TYPE__ __siginfo64_clock_t;
 
-typedef struct __siginfox64_struct /*[NAME(siginfox64)][PREFIX(si_)]*/ {
+struct __siginfox64_struct /*[NAME(siginfox64)][PREFIX(si_)]*/ {
 	__INT32_TYPE__   si_signo; /* Signal number. */
 	__INT32_TYPE__   si_errno; /* If non-zero, an errno value associated with this signal, as defined in <errno.h>. */
 	__INT32_TYPE__   si_code;  /* Signal code. */
@@ -241,7 +246,7 @@ typedef struct __siginfox64_struct /*[NAME(siginfox64)][PREFIX(si_)]*/ {
 #define si_syscall      _sifields._sigsys._syscall
 #define si_arch         _sifields._sigsys._arch
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-} __siginfox64_t;
+};
 #endif /* __CC__ */
 
 __SYSDECL_END

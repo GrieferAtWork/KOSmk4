@@ -24,7 +24,6 @@
 #ifdef __x86_64__
 #include <bits/siginfo-struct32.h>
 #define __compat_siginfo_struct __siginfox32_struct
-#define compat_siginfo_t        __siginfox32_t
 #endif /* !__x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_SIGINFO_STRUCT_H */

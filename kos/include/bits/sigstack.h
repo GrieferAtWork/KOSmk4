@@ -20,11 +20,19 @@
 #ifndef _BITS_SIGSTACK_H
 #define _BITS_SIGSTACK_H 1
 
+/* File:
+ *    <bits/sigstack.h>
+ * 
+ * Definitions:
+ *    - struct sigstack { ... };
+ *    - struct sigaltstack { ... };
+ */
+
 #include <__stdinc.h>
 
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 #ifndef __sigstack_defined
 #define __sigstack_defined 1
@@ -42,7 +50,6 @@ struct sigstack /*[PREFIX(ss_)]*/ {
 };
 #endif /* __CC__ */
 #endif /* !__sigstack_defined */
-
 
 #ifndef __sigaltstack_defined
 #define __sigaltstack_defined 1
@@ -63,44 +70,6 @@ struct sigaltstack /*[PREFIX(ss_)]*/ {
 #endif /* __CC__ */
 #endif /* !__sigaltstack_defined */
 
-
-#ifndef __stack_t_defined
-#define __stack_t_defined 1
-#ifdef __CC__
-struct sigaltstack;
-typedef struct sigaltstack stack_t;
-#endif /* __CC__ */
-#endif /* !__stack_t_defined */
-
-
-/* Possible values for `ss_flags.'. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	SS_ONSTACK = 1,
-	SS_DISABLE = 2
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define SS_ONSTACK SS_ONSTACK
-#define SS_DISABLE SS_DISABLE
-#else /* __COMPILER_PREFERR_ENUMS */
-#define SS_ONSTACK 1
-#define SS_DISABLE 2
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-
-
-#ifndef MINSIGSTKSZ
-#define MINSIGSTKSZ 2048 /* Minimum stack size for a signal handler. */
-#endif /* !MINSIGSTKSZ */
-
-#ifndef SIGSTKSZ
-#define SIGSTKSZ 8192 /* System default stack size. */
-#endif /* !SIGSTKSZ */
-
-
-__SYSDECL_END
+__DECL_END
 
 #endif /* !_BITS_SIGSTACK_H */

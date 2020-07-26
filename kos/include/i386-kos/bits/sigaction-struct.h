@@ -20,6 +20,14 @@
 #ifndef _I386_KOS_BITS_SIGACTION_STRUCT_H
 #define _I386_KOS_BITS_SIGACTION_STRUCT_H 1
 
+/* File:
+ *    <bits/sigaction-struct.h>
+ * 
+ * Definitions:
+ *    - typedef ... __sighandler_t;
+ *    - struct sigaction { ... };
+ */
+
 #include <__stdinc.h>
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
 

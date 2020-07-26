@@ -17,31 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SIGNALFD_H
-#define _BITS_SIGNALFD_H 1
+#ifndef _ASM_SIGEVENT_H
+#define _ASM_SIGEVENT_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
 
-__DECL_BEGIN
+/* `sigev_notify' values. */
+#if defined(__linux__) || defined(__KOS__)
 
-/* Flags for signalfd. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	SFD_NONBLOCK = 0x00800,
-	SFD_CLOEXEC  = 0x80000
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define SFD_NONBLOCK SFD_NONBLOCK
-#define SFD_CLOEXEC  SFD_CLOEXEC
-#else /* __COMPILER_PREFERR_ENUMS */
-#define SFD_NONBLOCK 0x00800
-#define SFD_CLOEXEC  0x80000
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
+#define __SIGEV_SIGNAL    0 /* Notify via signal. */
+#define __SIGEV_NONE      1 /* Other notification: meaningless. */
+#define __SIGEV_THREAD    2 /* Deliver via thread creation. */
+#define __SIGEV_THREAD_ID 4 /* Send signal to specific thread. */
 
-__DECL_END
+#elif defined(__CRT_CYG)
 
-#endif /* !_BITS_SIGNALFD_H */
+#define __SIGEV_SIGNAL 0 /* Notify via signal. */
+#define __SIGEV_NONE   1 /* Other notification: meaningless. */
+#define __SIGEV_THREAD 2 /* Deliver via thread creation. */
+
+#endif /* ... */
+
+
+
+#endif /* !_ASM_SIGEVENT_H */

@@ -19,12 +19,13 @@
  */
 #ifndef __sigset_t_defined
 #include <__stdinc.h>
+
 #include <bits/sigset.h>
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
 #ifdef __CC__
 __SYSDECL_BEGIN
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 __SYSDECL_END
 #endif /* __CC__ */
 #endif /* !__sigset_t_defined */

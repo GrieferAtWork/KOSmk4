@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a52b088 */
+/* HASH CRC-32:0x53bec379 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #include <features.h>
 
 #include <bits/select.h>
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/time.h>
 #include <bits/timespec.h> /* struct timespec */
 #include <bits/timeval.h>  /* struct timeval */
@@ -52,7 +52,7 @@ typedef __TM_TYPE(time) time_t;
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
-typedef __sigset_t sigset_t;
+typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
 #ifndef __suseconds_t_defined

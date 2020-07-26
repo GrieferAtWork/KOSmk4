@@ -17,17 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_SIGNUM_VALUES_CYG_H
-#define _I386_KOS_BITS_SIGNUM_VALUES_CYG_H 1
+#ifndef _I386_KOS_ASM_SIGNUM_VALUES_CYG_H
+#define _I386_KOS_ASM_SIGNUM_VALUES_CYG_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
 /* Fake signal functions. */
-#define __CYG_SIG_ERR  (__CCAST(__sighandler_t)-1) /* Error return. */
-#define __CYG_SIG_DFL  (__CCAST(__sighandler_t)0)  /* Default action. */
-#define __CYG_SIG_IGN  (__CCAST(__sighandler_t)1)  /* Ignore signal. */
-#define __CYG_SIG_HOLD (__CCAST(__sighandler_t)2)  /* Add signal to hold mask. */
+#define __CYG_SIG_ERR  (-1) /* Error return. */
+#define __CYG_SIG_DFL  0    /* Default action. */
+#define __CYG_SIG_IGN  1    /* Ignore signal. */
+#define __CYG_SIG_HOLD 2    /* Add signal to hold mask. */
 
 /* Signals. */
 #define __CYG_SIGHUP    1             /* Hangup (POSIX). */
@@ -69,9 +70,9 @@
 #if __SIZEOF_POINTER__ > 4
 #define __CYG_SIGRTMAX  64
 #define __CYG_NSIG      65      /* signal 0 implied */
-#else
+#else /* __SIZEOF_POINTER__ > 4 */
 #define __CYG_SIGRTMAX  32
 #define __CYG_NSIG      33      /* signal 0 implied */
-#endif
+#endif /* __SIZEOF_POINTER__ <= 4 */
 
-#endif /* !_I386_KOS_BITS_SIGNUM_VALUES_CYG_H */
+#endif /* !_I386_KOS_ASM_SIGNUM_VALUES_CYG_H */

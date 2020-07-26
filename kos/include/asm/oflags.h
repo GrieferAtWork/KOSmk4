@@ -59,7 +59,7 @@
 #define __DOS_O_RAW          __DOS_O_BINARY
 
 
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#if defined(__KOS__) || defined(__linux__)
 #define __O_CREAT      0x0000040 /* If missing, create a new file */
 #define __O_EXCL       0x0000080 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
                                   * exception if the file already exists. */
@@ -82,9 +82,9 @@
 #define __O_CLOEXEC    0x0080000 /* Close the file during exec() */
 #define __O_PATH       0x0200000 /* Open a path for *at system calls. */
 #define __O_TMPFILE   (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
-#endif /* ... */
+#endif /* __KOS__ || __linux__ */
 
-#if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
+#ifdef __KOS__
 #define __O_CLOFORK    0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #define __O_SYMLINK    0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
                                   * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
@@ -92,7 +92,7 @@
 #define __O_DOSPATH    0x4000000 /* Interpret '\\' as '/', and ignore casing during path resolution.
                                   * Additionally, recognize DOS mounting points, and interpret leading
                                   * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
-#endif /* ... */
+#endif /* __KOS__ */
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ab20a5d */
+/* HASH CRC-32:0xe9ca5b79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <features.h>
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
@@ -43,7 +43,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <features.h>
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'

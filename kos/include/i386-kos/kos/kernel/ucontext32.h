@@ -25,7 +25,7 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/sigstack32.h>
 #include <kos/kernel/mcontext32.h>
 
@@ -52,19 +52,18 @@ __DECL_BEGIN
 #ifndef ____sigsetx32_t_defined
 #define ____sigsetx32_t_defined 1
 #ifdef __x86_64__
-typedef struct __sigset_structx32 {
+struct __sigset_structx32 {
 	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
-} __sigsetx32_t;
+};
 #else /* __x86_64__ */
 #define __sigset_structx32 __sigset_struct
-#define __sigsetx32_t      __sigset_t
 #endif /* !__x86_64__ */
 #endif /* !____sigsetx32_t_defined */
 
 struct ucontext32; /* Userlevel context. */
 typedef struct ucontext32 {
 	mcontext32_t                      uc_mcontext;
-	__sigsetx32_t                     uc_sigmask;
+	struct __sigset_structx32         uc_sigmask;
 	struct __sigaltstackx32           uc_stack;
 	__HYBRID_PTR32(struct ucontext32) uc_link;
 } ucontext32_t;

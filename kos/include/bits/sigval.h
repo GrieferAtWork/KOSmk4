@@ -20,27 +20,33 @@
 #ifndef _BITS_SIGVAL_H
 #define _BITS_SIGVAL_H 1
 
+/* File:
+ *    <bits/sigstack.h>
+ * 
+ * Definitions:
+ *    - union sigval { ... };
+ */
+
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
-
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
 /* Type for data associated with a signal. */
 #if __SIZEOF_POINTER__ >= __SIZEOF_INT__
 #define __SIZEOF_SIGVAL __SIZEOF_POINTER__
 #else /* __SIZEOF_POINTER__ >= __SIZEOF_INT__ */
 #define __SIZEOF_SIGVAL __SIZEOF_INT__
 #endif /* __SIZEOF_POINTER__ < __SIZEOF_INT__ */
+
 #ifdef __CC__
-typedef union sigval /*[PREFIX(sival_)]*/ {
+__DECL_BEGIN
+
+union sigval /*[PREFIX(sival_)]*/ {
 	__INT32_TYPE__ sival_int;
 	void          *sival_ptr;
-} sigval_t;
-#endif /* __CC__ */
-#endif /* !__sigval_t_defined */
+};
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_BITS_SIGVAL_H */

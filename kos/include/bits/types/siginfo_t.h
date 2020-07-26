@@ -19,4 +19,12 @@
  */
 #ifndef __siginfo_t_defined
 #include <bits/siginfo-struct.h>
+#ifndef __siginfo_t_defined
+#define __siginfo_t_defined 1
+#ifdef __CC__
+__DECL_BEGIN
+typedef struct __siginfo_struct siginfo_t;
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__siginfo_t_defined */
 #endif /* !__siginfo_t_defined */

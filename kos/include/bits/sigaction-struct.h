@@ -20,10 +20,18 @@
 #ifndef _BITS_SIGACTION_STRUCT_H
 #define _BITS_SIGACTION_STRUCT_H 1
 
+/* File:
+ *    <bits/sigaction-struct.h>
+ * 
+ * Definitions:
+ *    - typedef ... __sighandler_t;
+ *    - struct sigaction { ... };
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -64,12 +72,12 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 #else /* __USE_POSIX199309 */
 	__sighandler_t sa_handler;
 #endif /* !__USE_POSIX199309 */
-	__sigset_t sa_mask;  /* Additional set of signals to be blocked. */
-	int        sa_flags; /* Special flags. */
+	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
+	int                    sa_flags; /* Special flags. */
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
-	__byte_t __sa_bad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
+	__byte_t             __sa_bad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
-	void (__LIBKCALL *sa_restorer)(void); /* Restore handler. */
+	void      (__LIBKCALL *sa_restorer)(void); /* Restore handler. */
 };
 #endif /* __CC__ */
 

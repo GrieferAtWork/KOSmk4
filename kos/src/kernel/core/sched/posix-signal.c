@@ -1308,7 +1308,7 @@ no_old_handler:
 		/* Check if the given signal set is empty. */
 		{
 			size_t i;
-			for (i = 0; i < _SIGSET_NWORDS; ++i) {
+			for (i = 0; i < COMPILER_LENOF(act->sa_mask.__val); ++i) {
 				REF struct kernel_sigmask *mask;
 				if (act->sa_mask.__val[i] == 0)
 					continue;
@@ -1564,7 +1564,7 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 			/* No need to check for mandatory masks being clear, since
 			 * this command is only able to clear masks from the get-go. */
 			/* sigandnset(&sigmask->sm_mask, &sigmask->sm_mask, set); */
-			for (i = 0; i < _SIGSET_NWORDS; ++i)
+			for (i = 0; i < COMPILER_LENOF(sigmask->sm_mask.__val); ++i)
 				sigmask->sm_mask.__val[i] &= ~set->__val[i];
 			/* Since signals (may) have just gotten unmasked, check if we're
 			 * now able to handle any of the pending signals. */

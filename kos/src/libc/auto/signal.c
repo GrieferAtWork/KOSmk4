@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d08e8d5 */
+/* HASH CRC-32:0x680dd352 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,47 +25,52 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/signal.h"
+#include "../user/string.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <bits/sigset.h>
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
-	size_t cnt;
-	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
-	while (cnt--)
-		set->__val[cnt] = 0;
+	libc_bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);
 	return 0;
 }
+#include <bits/sigset.h>
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
-	size_t cnt;
-	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
-	while (cnt--)
-		set->__val[cnt] = ~(ulongptr_t)0;
+#if __SIZEOF_POINTER__ == 8
+	libc_memsetq(set->__val, __UINT64_C(0xffffffffffffffff), COMPILER_LENOF(set->__val));
+#elif __SIZEOF_POINTER__ == 4
+	libc_memsetl(set->__val, __UINT32_C(0xffffffff), COMPILER_LENOF(set->__val));
+#elif __SIZEOF_POINTER__ == 2
+	libc_memsetw(set->__val, __UINT16_C(0xffff), COMPILER_LENOF(set->__val));
+#else /* ... */
+	libc_memset(set->__val, __UINT8_C(0xff), __SIZEOF_SIGSET_T__);
+#endif /* !... */
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
                                      signo_t signo) {
-	ulongptr_t mask = __sigmask(signo);
-	ulongptr_t word = __sigword(signo);
+	ulongptr_t mask = __sigset_mask(signo);
+	ulongptr_t word = __sigset_word(signo);
 	set->__val[word] |= mask;
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
                                      signo_t signo) {
-	ulongptr_t mask = __sigmask(signo);
-	ulongptr_t word = __sigword(signo);
+	ulongptr_t mask = __sigset_mask(signo);
+	ulongptr_t word = __sigset_word(signo);
 	set->__val[word] &= ~mask;
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
                                        signo_t signo) {
-	ulongptr_t mask = __sigmask(signo);
-	ulongptr_t word = __sigword(signo);
+	ulongptr_t mask = __sigset_mask(signo);
+	ulongptr_t word = __sigset_word(signo);
 	return (set->__val[word] & mask) != 0;
 }
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
@@ -81,7 +86,7 @@ NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
                                      sigset_t const *left,
                                      sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
 	return 0;
 }
@@ -90,7 +95,7 @@ NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
                                     sigset_t const *left,
                                     sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }

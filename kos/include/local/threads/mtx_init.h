@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2f812af */
+/* HASH CRC-32:0x5146b1b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_s
 #endif /* !__local___localdep_pthread_mutexattr_settype_defined && __CRT_HAVE_pthread_mutexattr_settype */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
-#include <bits/crt/pthreadvalues.h>
+#include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Creates a new mutex object with type TYPE.
@@ -68,8 +68,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mute
 		__error = __localdep_pthread_mutexattr_init(&__attr);
 		if (__error == 0) {
 			__error = __localdep_pthread_mutexattr_settype(&__attr,
-			                                  (__type & 1) ? __PTHREAD_MUTEX_RECURSIVE
-			                                             : __PTHREAD_MUTEX_TIMED);
+			                                  __type == __mtx_recursive
+			                                  ? __PTHREAD_MUTEX_RECURSIVE
+			                                  : __PTHREAD_MUTEX_TIMED);
 			if (__error == 0)
 				__error = __localdep_pthread_mutex_init((__pthread_mutex_t *)__mutex, &__attr);
 			__localdep_pthread_mutexattr_destroy(&__attr);

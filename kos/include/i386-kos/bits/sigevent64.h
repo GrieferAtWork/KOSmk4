@@ -20,6 +20,16 @@
 #ifndef _I386_KOS_BIT_SIGEVENT64_H
 #define _I386_KOS_BIT_SIGEVENT64_H 1
 
+/* File:
+ *    <i386-kos/bits/sigevent64.h>
+ * 
+ * Definitions:
+ *    - struct __sigeventx64 { ... };
+ * #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
+ *    - struct sigevent { ... };
+ * #endif
+ */
+
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
 #include <__stdinc.h>
 #include <features.h>
@@ -31,9 +41,7 @@
 #include <bits/sigval64.h> /* union __sigvalx64 */
 
 #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
-#define __sigevent_t_defined 1
 #define __sigeventx64                       sigevent
-#define __sigeventx64_t                     sigevent_t
 #define __SIGEV_MAX_SIZE                    __SIGEVX64_MAX_SIZE
 #define __OFFSET_SIGEVENT_VALUE             __OFFSET_SIGEVENTX64_VALUE
 #define __OFFSET_SIGEVENT_SIGNO             __OFFSET_SIGEVENTX64_SIGNO
@@ -46,14 +54,6 @@
 #endif /* !__CRT_CYG_PRIMARY && __x86_64__ */
 
 
-__SYSDECL_BEGIN
-
-#ifdef __CC__
-#ifndef __pthread_attr_t_defined
-#define __pthread_attr_t_defined 1
-typedef union pthread_attr_t pthread_attr_t;
-#endif /* !__pthread_attr_t_defined */
-#endif /* __CC__ */
 
 #ifdef __KERNEL__
 #define __SIGEVX64_MAX_SIZE 32
@@ -70,17 +70,15 @@ typedef union pthread_attr_t pthread_attr_t;
 #define __SIZEOF_SIGEVENTX64 __SIGEVX64_MAX_SIZE
 
 #ifdef __CC__
-#ifdef __USE_KOS_KERNEL
-#define sigeventx64   __sigeventx64
-#define sigeventx64_t __sigeventx64_t
-#endif /* __USE_KOS_KERNEL */
+__DECL_BEGIN
 
-typedef struct __sigeventx64 /*[NAME(sigeventx64)][PREFIX(sigev_)]*/ {
+union __pthread_attr;
+struct __sigeventx64 /*[NAME(sigeventx64)][PREFIX(sigev_)]*/ {
 	union __sigvalx64 sigev_value;  /* ... */
 	__INT32_TYPE__    sigev_signo;  /* ... */
 	__INT32_TYPE__    sigev_notify; /* ... */
-#if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-    defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
 	union {
 #endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
@@ -90,7 +88,7 @@ typedef struct __sigeventx64 /*[NAME(sigeventx64)][PREFIX(sigev_)]*/ {
 		                             * TID (pid_t) of the thread to receive the signal. */
 		struct {
 			__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sigev_notify_function,(union __sigvalx64 __val)); /* Function to start. */
-			__HYBRID_PTR64(pthread_attr_t)           sigev_notify_attributes;                          /* Thread attributes. */
+			__HYBRID_PTR64(union __pthread_attr)     sigev_notify_attributes;                          /* Thread attributes. */
 		};
 	};
 #if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
@@ -100,29 +98,30 @@ typedef struct __sigeventx64 /*[NAME(sigeventx64)][PREFIX(sigev_)]*/ {
 		                       * TID (pid_t) of the thread to receive the signal. */
 		struct {
 			__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, _function,(union __sigvalx64 __val)); /* Function to start. */
-			__HYBRID_PTR64(pthread_attr_t)           _attribute;                           /* Thread attributes. */
+			__HYBRID_PTR64(union __pthread_attr)     _attribute;                           /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 	};
 #endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
-#else
+#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT && __COMPILER_HAVE_TRANSPARENT_UNION */
 	union {
 		__UINT64_TYPE__ _data[(__SIGEVX64_MAX_SIZE / 8) - 2];
 		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                       * TID (pid_t) of the thread to receive the signal. */
 		struct {
 			__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, _function,(union __sigvalx64 __val)); /* Function to start. */
-			__HYBRID_PTR64(pthread_attr_t)           _attribute;                           /* Thread attributes. */
+			__HYBRID_PTR64(union __pthread_attr)     _attribute;                           /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 #define _sigev_data             _sigev_un._data
 #define _sigev_tid              _sigev_un._tid
 #define sigev_notify_function   _sigev_un._sigev_thread._function
 #define sigev_notify_attributes _sigev_un._sigev_thread._attribute
-#endif
-} __sigeventx64_t;
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT || !__COMPILER_HAVE_TRANSPARENT_UNION */
+};
+
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_I386_KOS_BIT_SIGEVENT64_H */

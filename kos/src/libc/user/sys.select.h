@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23a0b48f */
+/* HASH CRC-32:0x7d5904a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,7 @@
 
 DECL_BEGIN
 
-DECL_END
-#include <bits/sigaction.h>
-DECL_BEGIN
-
-#ifndef __sighandler_t_defined
-#define __sighandler_t_defined 1
-typedef __sighandler_t sighandler_t;
-#endif /* !__sighandler_t_defined */
-
+#include <signal.h>
 #ifndef __KERNEL__
 INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout);
 INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask);

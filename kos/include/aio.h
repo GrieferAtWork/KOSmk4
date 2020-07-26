@@ -29,7 +29,7 @@
 
 #include <features.h>
 
-#include <bits/sigevent.h>
+#include <bits/sigevent.h> /* struct sigevent */
 #include <bits/timespec.h>
 #include <bits/types.h>
 
@@ -66,6 +66,11 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+
+#ifndef __sigevent_t_defined
+#define __sigevent_t_defined 1
+typedef struct sigevent sigevent_t;
+#endif /* !__sigevent_t_defined */
 
 #ifdef __USE_GNU
 /* Allow user to specify optimization */

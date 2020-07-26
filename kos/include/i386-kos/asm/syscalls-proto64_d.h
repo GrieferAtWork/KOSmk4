@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c6af69e */
+/* HASH CRC-32:0xb573fe48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1088,8 +1088,8 @@
 #define __NR64AT2_rt_sigqueueinfo        (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
 #define __NR64AT0_rt_sigsuspend          (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR64AT1_rt_sigsuspend          (size_t, __size_t)
-#define __NR64AT0_sigaltstack            (struct sigaltstackx64 const *, struct __sigaltstackx64 const *)
-#define __NR64AT1_sigaltstack            (struct sigaltstackx64 *, struct __sigaltstackx64 *)
+#define __NR64AT0_sigaltstack            (struct __sigaltstackx64 const *, struct __sigaltstackx64 const *)
+#define __NR64AT1_sigaltstack            (struct __sigaltstackx64 *, struct __sigaltstackx64 *)
 #define __NR64AT0_utime                  (char const *, char const *)
 #define __NR64AT1_utime                  (struct utimbufx64 const *, struct __utimbufx64 const *)
 #define __NR64AT0_mknod                  (char const *, char const *)

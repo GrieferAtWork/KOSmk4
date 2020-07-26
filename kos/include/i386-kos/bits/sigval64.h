@@ -20,6 +20,16 @@
 #ifndef _I386_KOS_BIT_SIGVAL64_H
 #define _I386_KOS_BIT_SIGVAL64_H 1
 
+/* File:
+ *    <i386-kos/bits/sigval64.h>
+ * 
+ * Definitions:
+ *    - union __sigvalx64 { ... };
+ * #ifdef __x86_64__
+ *    - union sigval { ... };
+ * #endif
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
@@ -27,35 +37,25 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-__DECL_BEGIN
-
 #ifdef __x86_64__
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
+#define __sigvalx64      sigval
 #define __SIZEOF_SIGVAL  __SIZEOF_SIGVALX64
 #define __ALIGNOF_SIGVAL __ALIGNOF_SIGVALX64
-#define __sigval_defined 1
-#define __sigvalx64   sigval
-#define __sigvalx64_t sigval_t
-#endif /* !__sigval_t_defined */
 #endif /* __x86_64__ */
-
 
 #define __SIZEOF_SIGVALX64  8
 #define __ALIGNOF_SIGVALX64 __ALIGNOF_INT64__
 #ifdef __CC__
-#ifdef __USE_KOS_KERNEL
-#define sigvalx64   __sigvalx64
-#define sigvalx64_t __sigvalx64_t
-#endif /* __USE_KOS_KERNEL */
+__DECL_BEGIN
 
 /* Type for data associated with a signal. */
-typedef union __sigvalx64 /*[NAME(sigvalx64)][PREFIX(sival_)]*/ {
+union __sigvalx64 /*[NAME(sigvalx64)][PREFIX(sival_)]*/ {
 	__INT64_TYPE__       sival_int;
 	__HYBRID_PTR64(void) sival_ptr;
-} __sigvalx64_t;
-#endif /* __CC__ */
+};
 
 __DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_I386_KOS_BIT_SIGVAL64_H */

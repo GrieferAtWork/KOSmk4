@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46701644 */
+/* HASH CRC-32:0x584fa741 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 #include <bits/rusage-struct.h>
 #include <bits/sigaction-struct.h>
 #include <bits/siginfo-struct.h>
+#include <bits/sigstack.h>
 #include <bits/statfs.h>
 #include <bits/timespec.h>
 #include <bits/timeval.h>

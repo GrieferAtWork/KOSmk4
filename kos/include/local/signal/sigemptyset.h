@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbc5871a */
+/* HASH CRC-32:0x24ec6787 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,21 @@
 #include <__crt.h>
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: bzeroc from string */
+#ifndef __local___localdep_bzeroc_defined
+#define __local___localdep_bzeroc_defined 1
+#ifdef __CRT_HAVE_bzeroc
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
+#else /* __CRT_HAVE_bzeroc */
+__NAMESPACE_LOCAL_END
+#include <local/string/bzeroc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bzeroc __LIBC_LOCAL_NAME(bzeroc)
+#endif /* !__CRT_HAVE_bzeroc */
+#endif /* !__local___localdep_bzeroc_defined */
 __LOCAL_LIBC(sigemptyset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigemptyset))(struct __sigset_struct *__set) {
-	__SIZE_TYPE__ __cnt;
-	__cnt = sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__);
-	while (__cnt--)
-		__set->__val[__cnt] = 0;
+	__localdep_bzeroc(__set->__val, __COMPILER_LENOF(__set->__val), __SIZEOF_POINTER__);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

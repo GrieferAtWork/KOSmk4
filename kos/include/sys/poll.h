@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb415549 */
+/* HASH CRC-32:0xd427ce57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@
 #include <bits/types.h>
 
 #ifdef __USE_GNU
-#include <bits/sigset.h>
+#include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/timespec.h>
 #endif /* __USE_GNU */
 

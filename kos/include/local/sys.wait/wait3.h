@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb70ce474 */
+/* HASH CRC-32:0x4085e18f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/types.h>
 #include <features.h>
 #include <bits/rusage-struct.h>
-#include <bits/waitmacros.h>
+#include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wait3_32 from sys.wait */
 #if !defined(__local___localdep_wait3_32_defined) && defined(__CRT_HAVE_wait3)

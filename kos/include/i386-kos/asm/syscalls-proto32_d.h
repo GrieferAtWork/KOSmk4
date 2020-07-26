@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a099136 */
+/* HASH CRC-32:0x3d93ba6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1059,8 +1059,8 @@
 #define __NR32AT0_dup2                    (fd_t, __fd_t)
 #define __NR32AT1_dup2                    (fd_t, __fd_t)
 #define __NR32AT0_sigaction               (signo_t, __signo_t)
-#define __NR32AT1_sigaction               (struct sigactionx32 const *, struct __sigactionx32 const *)
-#define __NR32AT2_sigaction               (struct sigactionx32 *, struct __sigactionx32 *)
+#define __NR32AT1_sigaction               (struct __sigactionx32 const *, struct __sigactionx32 const *)
+#define __NR32AT2_sigaction               (struct __sigactionx32 *, struct __sigactionx32 *)
 #define __NR32AT0_ssetmask                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_setreuid                (uint16_t, __uint16_t)
 #define __NR32AT1_setreuid                (uint16_t, __uint16_t)
@@ -1305,8 +1305,8 @@
 #define __NR32AT1_getcwd                  (size_t, __size_t)
 #define __NR32AT0_capget                  (int, int)
 #define __NR32AT0_capset                  (int, int)
-#define __NR32AT0_sigaltstack             (struct sigaltstackx32 const *, struct __sigaltstackx32 const *)
-#define __NR32AT1_sigaltstack             (struct sigaltstackx32 *, struct __sigaltstackx32 *)
+#define __NR32AT0_sigaltstack             (struct __sigaltstackx32 const *, struct __sigaltstackx32 const *)
+#define __NR32AT1_sigaltstack             (struct __sigaltstackx32 *, struct __sigaltstackx32 *)
 #define __NR32AT0_sendfile                (fd_t, __fd_t)
 #define __NR32AT1_sendfile                (fd_t, __fd_t)
 #define __NR32AT2_sendfile                (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)

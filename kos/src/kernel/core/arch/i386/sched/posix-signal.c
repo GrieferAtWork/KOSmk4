@@ -51,6 +51,7 @@
 #include <kos/kernel/cpu-state32.h>      /* ucpustate32 */
 #include <kos/kernel/fpu-state32.h>      /* fpustate32 */
 #include <kos/kernel/ucontext32.h>       /* ucontext32_t */
+#include <sys/ucontext.h>
 
 #include <signal.h>
 #include <string.h>
@@ -537,7 +538,7 @@ DEFINE_SYSCALL64_0(void, rt_sigreturn) {
 INTERN struct icpustate *FCALL
 raiseat32_impl(struct icpustate *__restrict state,
                USER UNCHECKED struct ucpustate32 const *ust,
-               USER UNCHECKED siginfox32_t const *usi) {
+               USER UNCHECKED struct __siginfox32_struct const *usi) {
 	siginfo_t si;
 	validate_readable(usi, sizeof(*usi));
 	siginfox32_to_siginfo(usi, &si);
@@ -566,12 +567,12 @@ raiseat32_rpc(void *UNUSED(arg),
 		return state;
 	return raiseat32_impl(state,
 	                      (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[0],
-	                      (USER UNCHECKED siginfox32_t const *)sc_info->rsi_regs[1]);
+	                      (USER UNCHECKED struct __siginfox32_struct const *)sc_info->rsi_regs[1]);
 }
 
 DEFINE_SYSCALL32_2(errno_t, raiseat,
                    USER UNCHECKED struct ucpustate32 const *, state,
-                   USER UNCHECKED siginfox32_t const *, si) {
+                   USER UNCHECKED struct __siginfox32_struct const *, si) {
 	(void)state;
 	(void)si;
 	task_schedule_user_rpc(THIS_TASK,
@@ -589,7 +590,7 @@ DEFINE_SYSCALL32_2(errno_t, raiseat,
 INTERN struct icpustate *FCALL
 raiseat64_impl(struct icpustate *__restrict state,
                USER UNCHECKED struct ucpustate64 const *ust,
-               USER UNCHECKED siginfox64_t const *usi) {
+               USER UNCHECKED struct __siginfox64_struct const *usi) {
 	siginfo_t si;
 	validate_readable(usi, sizeof(*usi));
 	siginfox64_to_siginfo(usi, &si);
@@ -618,7 +619,7 @@ raiseat64_rpc(void *UNUSED(arg),
 		return state;
 	return raiseat64_impl(state,
 	                      (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_regs[0],
-	                      (USER UNCHECKED siginfox64_t const *)sc_info->rsi_regs[1]);
+	                      (USER UNCHECKED struct __siginfox64_struct const *)sc_info->rsi_regs[1]);
 }
 
 DEFINE_SYSCALL64_2(errno_t, raiseat,

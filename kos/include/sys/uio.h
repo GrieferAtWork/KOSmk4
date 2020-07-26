@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a6b894e */
+/* HASH CRC-32:0xf707356e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,20 @@
 
 #include <features.h>
 
+#include <asm/limits.h> /* __IOV_MAX */
+#include <bits/iovec-struct.h>
 #include <bits/types.h>
-#include <bits/uio.h>
 #include <sys/types.h>
 
-__SYSDECL_BEGIN
+#ifndef UIO_MAXIOV
+#if !defined(__IOV_MAX) || (__IOV_MAX == -1)
+#define UIO_MAXIOV 16
+#else /* !__IOV_MAX || __IOV_MAX == -1 */
+#define UIO_MAXIOV __IOV_MAX
+#endif /* __IOV_MAX && __IOV_MAX != -1 */
+#endif /* !UIO_MAXIOV */
 
+__SYSDECL_BEGIN
 
 #ifdef __CC__
 

@@ -35,7 +35,7 @@
 #include <kos/types.h>
 #include <sys/types.h>
 
-#include <assert.h>
+#include <assert.h> /* static_assert() */
 #include <stdalign.h>
 #include <stddef.h>
 
@@ -366,6 +366,7 @@ local files = {
 	"../../include/bits/itimerval.h",
 	"../../include/bits/mmsghdr-struct.h",
 	"../../include/bits/msghdr-struct.h",
+	"../../include/bits/pollfd.h",
 	"../../include/bits/rusage-struct.h",
 	"../../include/bits/sigaction-struct.h",
 	"../../include/bits/siginfo-struct.h",
@@ -374,7 +375,9 @@ local files = {
 	"../../include/bits/timeb.h",
 	"../../include/bits/timespec.h",
 	"../../include/bits/timeval.h",
+	"../../include/bits/ustat.h",
 	"../../include/bits/utimbuf.h",
+	"../../include/bits/utsname.h",
 	"../../include/elf.h",
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
@@ -534,6 +537,19 @@ static_assert(offsetof(struct msghdr, msg_name) == __OFFSET_MSGHDR_NAME);
 static_assert(offsetof(struct msghdr, msg_namelen) == __OFFSET_MSGHDR_NAMELEN);
 static_assert(sizeof(struct msghdr) == __SIZEOF_MSGHDR);
 static_assert(alignof(struct msghdr) == __ALIGNOF_MSGHDR);
+
+
+
+
+
+#include <bits/pollfd.h>
+
+/* struct pollfd */
+static_assert(offsetof(struct pollfd, events) == __OFFSET_POLLFD_EVENTS);
+static_assert(offsetof(struct pollfd, fd) == __OFFSET_POLLFD_FD);
+static_assert(offsetof(struct pollfd, revents) == __OFFSET_POLLFD_REVENTS);
+static_assert(sizeof(struct pollfd) == __SIZEOF_POLLFD);
+static_assert(alignof(struct pollfd) == __ALIGNOF_POLLFD);
 
 
 
@@ -889,6 +905,20 @@ static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 
 
 
+#include <bits/ustat.h>
+
+/* struct ustat */
+static_assert(offsetof(struct ustat, f_fname) == __OFFSET_USTAT_FNAME);
+static_assert(offsetof(struct ustat, f_fpack) == __OFFSET_USTAT_FPACK);
+static_assert(offsetof(struct ustat, f_tfree) == __OFFSET_USTAT_TFREE);
+static_assert(offsetof(struct ustat, f_tinode) == __OFFSET_USTAT_TINODE);
+static_assert(sizeof(struct ustat) == __SIZEOF_USTAT);
+static_assert(alignof(struct ustat) == __ALIGNOF_USTAT);
+
+
+
+
+
 #include <bits/utimbuf.h>
 
 /* struct utimbuf */
@@ -905,6 +935,22 @@ static_assert(sizeof(struct __utimbuf64) == __SIZEOF_UTIMBUF64);
 static_assert(offsetof(struct __utimbuf32, actime) == __OFFSET_UTIMBUF32_ACTIME);
 static_assert(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
 static_assert(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
+
+
+
+
+
+#include <bits/utsname.h>
+
+/* struct utsname */
+static_assert(offsetof(struct utsname, domainname) == __OFFSET_UTSNAME_DOMAINNAME);
+static_assert(offsetof(struct utsname, machine) == __OFFSET_UTSNAME_MACHINE);
+static_assert(offsetof(struct utsname, nodename) == __OFFSET_UTSNAME_NODENAME);
+static_assert(offsetof(struct utsname, release) == __OFFSET_UTSNAME_RELEASE);
+static_assert(offsetof(struct utsname, sysname) == __OFFSET_UTSNAME_SYSNAME);
+static_assert(offsetof(struct utsname, version) == __OFFSET_UTSNAME_VERSION);
+static_assert(sizeof(struct utsname) == __SIZEOF_UTSNAME);
+static_assert(alignof(struct utsname) == __ALIGNOF_UTSNAME);
 
 
 

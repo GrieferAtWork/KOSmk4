@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef __stack_t_defined
 #ifndef __sigstack_defined
 #include <bits/sigstack.h>
 #endif /* !__sigstack_defined */
+#ifndef __stack_t_defined
+#define __stack_t_defined 1
+#ifdef __CC__
+typedef struct sigaltstack stack_t;
+#endif /* __CC__ */
+#endif /* !__stack_t_defined */
+#endif /* !__stack_t_defined */

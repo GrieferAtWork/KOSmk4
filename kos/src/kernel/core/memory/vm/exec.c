@@ -49,6 +49,7 @@
 #include <elf.h>
 #include <malloca.h>
 #include <string.h>
+#include <signal.h> /* SIGTRAP */
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/exec/elf.h>
