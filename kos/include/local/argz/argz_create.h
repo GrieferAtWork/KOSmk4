@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa294c6c8 */
+/* HASH CRC-32:0xe6387269 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,9 +78,24 @@ __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_create) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	__SIZE_TYPE__ __i, ___argc, __total_len = 0;

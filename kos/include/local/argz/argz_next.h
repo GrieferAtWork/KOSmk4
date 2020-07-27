@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x987c8fdb */
+/* HASH CRC-32:0xd034e31e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,16 +37,27 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __LOCAL_LIBC(argz_next) __ATTR_PURE __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_next))(char const *__restrict __argz, __SIZE_TYPE__ __argz_len, char const *__restrict __entry) {
 	char const *__argz_end;

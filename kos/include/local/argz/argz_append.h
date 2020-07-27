@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ecb39f5 */
+/* HASH CRC-32:0x4a512ca6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,9 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_append) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len) {
 	__SIZE_TYPE__ __oldlen = *__pargz_len;

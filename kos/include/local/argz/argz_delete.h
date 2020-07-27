@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3631fdb */
+/* HASH CRC-32:0x5902146 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,9 +66,11 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __LOCAL_LIBC(argz_delete) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry) {

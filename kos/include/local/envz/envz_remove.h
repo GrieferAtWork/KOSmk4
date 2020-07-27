@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d6bdff8 */
+/* HASH CRC-32:0xc972c433 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,24 +27,30 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_delete_defined
 #define __local___localdep_argz_delete_defined 1
 #ifdef __CRT_HAVE_argz_delete
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
 #elif defined(__CRT_HAVE___argz_add_sep)
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/argz/argz_delete.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 #define __localdep_argz_delete __LIBC_LOCAL_NAME(argz_delete)
 #endif /* !... */

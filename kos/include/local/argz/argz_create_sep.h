@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ae0174f */
+/* HASH CRC-32:0x2317706f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,10 +70,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_create_sep) __ATTR_NONNULL((1, 3, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create_sep))(char const *__restrict __string, int __sep, char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	/* return string.replace(sep, "\0").replaceall("\0\0", "\0"); */

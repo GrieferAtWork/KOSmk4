@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd0045ec */
+/* HASH CRC-32:0xa9acc0db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,9 +131,13 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __LOCAL_LIBC(argz_replace) __ATTR_NONNULL((1, 2, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) {
 	__SIZE_TYPE__ __findlen, __repllen;
@@ -147,7 +151,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 	__find_offset = 0;
 	/* I have no idea what the GLibc implementation does here, and I'm not
 	 * quite sure it knows either. - At first I though that this function
-	 * was supposed to only replace entries of an ARGZ vector as a whole,
+	 * was supposed to only replace entries of an ARGZ string as a whole,
 	 * but now I believe it's just supposed to do replacement of any match
 	 * found. However, GLibc appears to be utterly afraid of using `memmem()'
 	 * for this, and instead opt's to using `argz_next()' to iterate the

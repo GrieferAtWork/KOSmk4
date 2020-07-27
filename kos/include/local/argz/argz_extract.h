@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe55f317 */
+/* HASH CRC-32:0x5178223c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,8 +37,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __LOCAL_LIBC(argz_extract) __ATTR_NONNULL((1, 3)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_extract))(char const *__restrict __argz, __SIZE_TYPE__ __argz_len, char **__restrict ___argv) {
 	__SIZE_TYPE__ __i;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x526a33c0 */
+/* HASH CRC-32:0xbde81db3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_add_defined
 #define __local___localdep_argz_add_defined 1
 #ifdef __CRT_HAVE_argz_add
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/argz/argz_add.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 #define __localdep_argz_add __LIBC_LOCAL_NAME(argz_add)
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */
@@ -99,12 +108,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __LOCAL_LIBC(argz_insert) __ATTR_NONNULL((1, 2, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__before, char const *__restrict __entry) {
 	char *__argz;

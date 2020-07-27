@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ba82d55 */
+/* HASH CRC-32:0x30ba024 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,8 +37,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __LOCAL_LIBC(argz_stringify) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_stringify))(char *__argz, __SIZE_TYPE__ __len, int __sep) {
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */

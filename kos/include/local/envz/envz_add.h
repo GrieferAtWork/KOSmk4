@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87158b18 */
+/* HASH CRC-32:0xe174564f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,19 +31,28 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/argz/argz_add.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 #define __localdep_argz_add __LIBC_LOCAL_NAME(argz_add)
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */

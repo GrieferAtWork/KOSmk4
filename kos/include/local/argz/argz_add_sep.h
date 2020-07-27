@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7450ab4b */
+/* HASH CRC-32:0xc2a08f35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_add_sep) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __string, int __sep) {
 	char *__result_string, *__dst;

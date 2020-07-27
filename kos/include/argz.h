@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb44296f0 */
+/* HASH CRC-32:0x7ec1f89b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@
 #include <features.h>
 #include <bits/types.h>
 
-/* Documentation is derived from GLibc: /usr/include/argz.h
- * Note that _ONLY_ the documentation was taken (and in places modified),
- * but the implementations were written from scratch, using GLibc's
- * implementation only as a reference (which also resulted in me discovering
- * some bugs in GLibc's version that I'm not going to report because at least
- * in my mind, these are just suuuuch _absolute_ beginner's mistakes...)
+/*
+ * Note that the KOS implementations of these functions was written entirely
+ * from scratch, only using GLibc's implementation as a reference (which also
+ * resulted in me discovering some bugs in GLibc's version that I'm not going
+ * to report because at least in my mind, these are just suuuuch _absolute_
+ * beginner's mistakes...)
  * The function's that I've fixed are:
  *  - argz_add_sep()
  *  - argz_insert()
@@ -45,23 +45,6 @@
  *                         comes across this, don't forget to include my copyright
  *                         notice when pasting ;)
  */
-/* Routines for dealing with '\0' separated arg vectors.
-   Copyright (C) 1995-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -77,656 +60,1136 @@ typedef __errno_t error_t;
 #endif /* !__error_t_defined */
 
 #ifdef __CRT_HAVE_argz_create
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_create,(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len),(___argv,__pargz,__pargz_len))
 #elif defined(__CRT_HAVE___argz_create)
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_create,(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len),__argz_create,(___argv,__pargz,__pargz_len))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/argz/argz_create.h>
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_create, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_create)(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create))(___argv, __pargz, __pargz_len); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_create
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_create,(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len),argz_create,(___argv,__pargz,__pargz_len))
 #elif defined(__CRT_HAVE___argz_create)
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_create,(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len),(___argv,__pargz,__pargz_len))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/argz/argz_create.h>
-/* Make a '\0' separated arg vector from a unix argv vector, returning it in
- * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
- * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
+/* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
+ * as is also passed to main(), and accepted by the exec() family of functions
+ * An ARGZ string is imply a string of '\0'-seperated sub-strings, where each
+ * sub-string represents one of the original strings from `ARGV'
+ * The base-pointer to this string is stored in `*PARGZ'
+ * The overall length of the ARGZ string is tracked at the offset from its base
+ * pointer, to the first byte after a trailing '\0' character that follows the
+ * last of the many sub-strings. An empty ARGZ string is thus represented as any
+ * base-pointer in conjunction with ARGZ_LEN=0. (But note that GLibc seems to
+ * suggest that certain APIs should be used under the assumption that an empty
+ * ARGZ string can also be represented with the base pointer ARGZ=NULL. This
+ * kind of behavior is _NOT_ actually supported by the API, and only implied by
+ * some (apparently) badly worded documentation of `argz_next(3)')
+ * When an ARGZ string is no longer needed, it can be destroyed by passing its
+ * base pointer (as filled in at `*PARGZ' by this function, and updated by the
+ * many other functions in this header) to `free(3)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_create)(char *const ___argv[], char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create))(___argv, __pargz, __pargz_len); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_create_sep
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),(__string,__sep,__pargz,__pargz_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),__argz_create_sep,(__string,__sep,__pargz,__pargz_len))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/argz/argz_create_sep.h>
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_create_sep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_create_sep)(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create_sep))(__string, __sep, __pargz, __pargz_len); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_create_sep
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),argz_create_sep,(__string,__sep,__pargz,__pargz_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len),(__string,__sep,__pargz,__pargz_len))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/argz/argz_create_sep.h>
-/* Make a '\0' separated arg vector from a `SEP' separated list in
- * `STRING', returning it in `PARGZ', and the total length in `PLEN'.
- * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
- * The result can be destroyed using `free()' */
+/* Create an ARGZ string from `string' by splitting that string at each
+ * occurance of `sep'. This function behaves the same as the following
+ * pseudo-code:
+ *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
+ * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
+ * are merged, such that no empty sub-strings will be present in the resulting
+ * ARGZ string.
+ * For more information on the semantics of ARGZ strings, see the
+ * documentation of `argz_create()'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_create_sep)(char const *__restrict __string, int __sep, char **__restrict __pargz, size_t *__restrict __pargz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_create_sep))(__string, __sep, __pargz, __pargz_len); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_count
-/* Returns the number of strings in `ARGZ'
+/* Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __CDECLARE(__ATTR_PURE,size_t,__NOTHROW_NCX,argz_count,(char const *__argz, size_t __argz_len),(__argz,__argz_len))
 #elif defined(__CRT_HAVE___argz_count)
-/* Returns the number of strings in `ARGZ'
+/* Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __CREDIRECT(__ATTR_PURE,size_t,__NOTHROW_NCX,argz_count,(char const *__argz, size_t __argz_len),__argz_count,(__argz,__argz_len))
 #else /* ... */
 #include <local/argz/argz_count.h>
-/* Returns the number of strings in `ARGZ'
+/* Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_count, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE size_t __NOTHROW_NCX(__LIBCCALL argz_count)(char const *__argz, size_t __argz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_count))(__argz, __argz_len); })
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_count
-/* Returns the number of strings in `ARGZ'
+/* Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __CREDIRECT(__ATTR_PURE,size_t,__NOTHROW_NCX,__argz_count,(char const *__argz, size_t __argz_len),argz_count,(__argz,__argz_len))
 #elif defined(__CRT_HAVE___argz_count)
-/* Returns the number of strings in `ARGZ'
+/* Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __CDECLARE(__ATTR_PURE,size_t,__NOTHROW_NCX,__argz_count,(char const *__argz, size_t __argz_len),(__argz,__argz_len))
 #else /* ... */
 #include <local/argz/argz_count.h>
-/* Returns the number of strings in `ARGZ'
+/* Count and return the # of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE size_t __NOTHROW_NCX(__LIBCCALL __argz_count)(char const *__argz, size_t __argz_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_count))(__argz, __argz_len); }
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_extract
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #elif defined(__CRT_HAVE___argz_extract)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #else /* ... */
 #include <local/argz/argz_extract.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_extract, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_extract
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #elif defined(__CRT_HAVE___argz_extract)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #else /* ... */
 #include <local/argz/argz_extract.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
- * to hold them all (aka: have space for at least `argz_count()' elements) */
+/* Extend pointers to individual string from `ARGZ', and sequentially write them to
+ * `ARGV', for which the caller is responsivle to provide sufficient space to hold them
+ * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_stringify
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __CDECLARE_VOID(,__NOTHROW_NCX,argz_stringify,(char *__argz, size_t __len, int __sep),(__argz,__len,__sep))
 #elif defined(__CRT_HAVE___argz_stringify)
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __CREDIRECT_VOID(,__NOTHROW_NCX,argz_stringify,(char *__argz, size_t __len, int __sep),__argz_stringify,(__argz,__len,__sep))
 #else /* ... */
 #include <local/argz/argz_stringify.h>
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_stringify, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL argz_stringify)(char *__argz, size_t __len, int __sep) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_stringify))(__argz, __len, __sep); })
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_stringify
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__argz_stringify,(char *__argz, size_t __len, int __sep),argz_stringify,(__argz,__len,__sep))
 #elif defined(__CRT_HAVE___argz_stringify)
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __CDECLARE_VOID(,__NOTHROW_NCX,__argz_stringify,(char *__argz, size_t __len, int __sep),(__argz,__len,__sep))
 #else /* ... */
 #include <local/argz/argz_stringify.h>
-/* Make '\0' separated arg vector `ARGZ' printable by converting
- * all the '\0's except the last into the character `SEP' */
+/* Convert an `ARGZ' string into a NUL-terminated c-string
+ * with a total `strlen(argz) == len - 1', by replacing all
+ * of the NUL-characters separating the individual ARGZ strings
+ * with `SEP'. */
 __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL __argz_stringify)(char *__argz, size_t __len, int __sep) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_stringify))(__argz, __len, __sep); }
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_append
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,argz_append,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len),(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,argz_append,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_append.h>
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_append, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) error_t __NOTHROW_NCX(__LIBCCALL argz_append)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_append))(__pargz, __pargz_len, __buf, __buf_len); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_append
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,__argz_append,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len),argz_append,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),error_t,__NOTHROW_NCX,__argz_append,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_append.h>
-/* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) error_t __NOTHROW_NCX(__LIBCCALL __argz_append)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __buf, size_t __buf_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_append))(__pargz, __pargz_len, __buf, __buf_len); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str),(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add.h>
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_add)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add))(__pargz, __pargz_len, __str); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str),(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add.h>
-/* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* Append `STR' (including the trailing NUL-character) to the argz string in `PARGZ...+=PARGZ_LEN'
+ * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_add)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add))(__pargz, __pargz_len, __str); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add_sep
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep),(__pargz,__pargz_len,__string,__sep))
 #elif defined(__CRT_HAVE___argz_add_sep)
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep),__argz_add_sep,(__pargz,__pargz_len,__string,__sep))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add_sep.h>
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_add_sep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL argz_add_sep)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add_sep))(__pargz, __pargz_len, __string, __sep); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_add_sep
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep),argz_add_sep,(__pargz,__pargz_len,__string,__sep))
 #elif defined(__CRT_HAVE___argz_add_sep)
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep),(__pargz,__pargz_len,__string,__sep))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_add_sep.h>
-/* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
+/* A combination of `argz_create_sep()' and `argz_append()' that will
+ * append a duplication of `string' onto `*PARGZ', whilst replacing all
+ * instances of `sep' with NUL-characters, thus turning them into the
+ * markers between seperate strings. Note however that duplicate,
+ * successive instance of `sep' are merged, such that no empty sub-
+ * strings will be present in the resulting ARGZ string.
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL __argz_add_sep)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __string, int __sep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_add_sep))(__pargz, __pargz_len, __string, __sep); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_delete
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),(__pargz,__pargz_len,__entry))
 #elif defined(__CRT_HAVE___argz_add_sep)
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
 #else /* ... */
 #include <local/argz/argz_delete.h>
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL argz_delete)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_delete))(__pargz, __pargz_len, __entry); })
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_delete
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
 #elif defined(__CRT_HAVE___argz_add_sep)
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
 #else /* ... */
 #include <local/argz/argz_delete.h>
-/* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
+/* Find the index of `ENTRY' inside of `PARGZ...+=PARGZ_LEN', and, if
+ * found, remove that entry by shifting all following elements downwards
+ * by one, as well as decrementing `*PARGZ_LEN' by one.
  * Note that `ENTRY' must be the actual pointer to one of the elements
- * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
+ * of the given `PARGZ...+=PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL __argz_delete)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_delete))(__pargz, __pargz_len, __entry); }
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_insert
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_insert,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry),(__pargz,__pargz_len,__before,__entry))
 #elif defined(__CRT_HAVE___argz_insert)
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_insert,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry),__argz_insert,(__pargz,__pargz_len,__before,__entry))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_insert.h>
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_insert, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_insert)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_insert))(__pargz, __pargz_len, __before, __entry); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_insert
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_insert,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry),argz_insert,(__pargz,__pargz_len,__before,__entry))
 #elif defined(__CRT_HAVE___argz_insert)
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_insert,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry),(__pargz,__pargz_len,__before,__entry))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/argz/argz_insert.h>
-/* Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
- * existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
- * Since `ARGZ's first entry is the same as `ARGZ', `argz_insert(ARGZ, ARGZ_LEN, ARGZ, ENTRY)'
- * will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
- * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
- * On success, `0' is returned */
+/* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
+ * Otherwise, `before' should point somewhere into the middle, or to the start
+ * of an existing argument entry, who's beginning will first be located, before
+ * this function will then allocate additional memory to insert a copy of `entry'
+ * such that the copy will appear before the entry pointed to by `before'
+ * @return: 0 :     Success
+ * @return: ENOMEM: Insufficient heap memory
+ * @return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_insert)(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__before, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_insert))(__pargz, __pargz_len, __before, __entry); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_replace
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif defined(__CRT_HAVE___argz_replace)
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),__argz_replace,(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/argz/argz_replace.h>
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_replace, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); })
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_replace
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),argz_replace,(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif defined(__CRT_HAVE___argz_replace)
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),error_t,__NOTHROW_NCX,__argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/argz/argz_replace.h>
-/* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
- * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
- * incremented by number of replacements performed */
+/* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
+ * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
+ * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)
+ * @return: 0:      Success
+ * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
+ *                  but note that the GLibc implementation of this function is completely
+ *                  unreadable and may be able to return this for other cases as well...) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) error_t __NOTHROW_NCX(__LIBCCALL __argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); }
 #endif /* ... */
 #ifdef __CRT_HAVE_argz_next
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),argz_next,(__argz,__argz_len,__entry))
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),argz_next,(__argz,__argz_len,__entry))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),(__argz,__argz_len,__entry))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #elif defined(__CRT_HAVE___argz_next)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),__argz_next,(__argz,__argz_len,__entry))
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),__argz_next,(__argz,__argz_len,__entry))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),__argz_next,(__argz,__argz_len,__entry))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #else /* ... */
 #include <local/argz/argz_next.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_next, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_next
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),argz_next,(__argz,__argz_len,__entry))
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),argz_next,(__argz,__argz_len,__entry))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),argz_next,(__argz,__argz_len,__entry))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #elif defined(__CRT_HAVE___argz_next)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char *__restrict __argz, size_t __argz_len, char *__restrict __entry),__argz_next,(__argz,__argz_len,__entry))
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),__argz_next,(__argz,__argz_len,__entry))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,__argz_next,(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry),(__argz,__argz_len,__entry))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #else /* ... */
 #include <local/argz/argz_next.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
 extern "C++" {
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char *__restrict __argz, size_t __argz_len, char *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
-/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
- * are no more. If entry is NULL, then the first entry is returned. This
- * behavior allows two convenient iteration styles:
- * >> char *entry = NULL;
- * >> while ((entry = argz_next(argz, argz_len, entry)) != NULL)
- * >>     ...;
- * or
+/* Iterate the individual strings that make up a given ARGZ vector.
+ * This function is intended to be used in one of 2 ways:
+ * >> char *my_entry = NULL;
+ * >> while ((my_entry = argz_next(argz, argz_len, my_entry)) != NULL)
+ * >>     handle_entry(my_entry);
+ * or alternatively (if you like bloat):
  * >> char *entry;
- * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
- * >>     ...; */
+ * >> for (entry = argz_len ? argz : NULL; entry != NULL;
+ * >>      entry = argz_next(argz, argz_len, entry))
+ * >>     handle_entry(my_entry);
+ * Note that GLibc documents the second usage case slightly different, and
+ * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
+ * thus assuming that an empty ARGZ string (i.e. `argz_len == 0') always has its
+ * base pointer set to `NULL' (which isn't something consistently enforced, or
+ * required by any of the other APIs, so I'd just suggest you use the first variant)
+ *
+ * Behavior:
+ *  - When entry is `NULL', `return argz_len ? argz : NULL'
+ *  - If `entry' points at, or past the end of ARGZ, return NULL
+ *  - If the successor of `entry' points at, or past the end of ARGZ, return NULL
+ *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL __argz_next)(char const *__restrict __argz, size_t __argz_len, char const *__restrict __entry) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_next))(__argz, __argz_len, __entry); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
