@@ -62,59 +62,48 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-/* Documentation taken from Glibc /usr/include/aliases.h */
-/* Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 
 }
 
 
-@@Open alias data base files
+@@Rewind/Open the internal mail alias database file (which is located in `/etc/aliases')
 [[cp_kos]]
 void setaliasent();
 
-@@Close alias data base files
+@@Close the internal mail alias database file (s.a. `setaliasent(3)')
 void endaliasent();
 
-@@Get the next entry from the alias data base
-[[cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
+@@Read the entry entry from the mail alias alias database.
+@@If the database hadn't already been opened, this function will
+@@open it the same way that a call to `setaliasent(3)' would.
+@@@return: * :   A pointer to an internal, statically allocated structure
+@@@return: NULL: [errno=<unchanged>] Database end has been reached
+@@@return: NULL: [errno=ENOENT]      Database end has been reached
+@@@return: NULL: [errno=*]           Error
+[[wunused, cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
 struct aliasent *getaliasent();
 
-@@Get the next entry from the alias data base and put it in RESULT_BUF
-[[cp_kos, decl_include("<bits/crt/db/aliases.h>", "<hybrid/typecore.h>")]]
-int getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
-                  [[nonnull]] char *__restrict buffer, size_t buflen,
-                  [[nonnull]] struct aliasent **__restrict result);
+@@Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)')
+[[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
+$errno_t getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
+                       [[nonnull]] char *__restrict buffer, size_t buflen,
+                       [[nonnull]] struct aliasent **__restrict result);
 
-@@Get alias entry corresponding to NAME
-[[cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
+@@Find a database entry associated with the given `name'
+@@@return: * :   A pointer to an internal, statically allocated structure
+@@@return: NULL: [errno=ENOENT] No entry matching `name'
+@@@return: NULL: [errno=*]      Error
+[[wunused, cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
 struct aliasent *getaliasbyname([[nonnull]] char const *name);
 
-@@Get alias entry corresponding to NAME and put it in RESULT_BUF
-[[cp_kos, decl_include("<bits/crt/db/aliases.h>", "<hybrid/typecore.h>")]]
-int getaliasbyname_r([[nonnull]] char const *__restrict name,
-                     [[nonnull]] struct aliasent *__restrict result_buf,
-                     [[nonnull]] char *__restrict buffer, size_t buflen,
-                     [[nonnull]] struct aliasent **__restrict result);
-
-
+@@Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)')
+[[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
+$errno_t getaliasbyname_r([[nonnull]] char const *__restrict name,
+                          [[nonnull]] struct aliasent *__restrict result_buf,
+                          [[nonnull]] char *__restrict buffer, size_t buflen,
+                          [[nonnull]] struct aliasent **__restrict result);
 
 %{
 

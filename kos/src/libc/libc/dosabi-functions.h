@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaa534cd */
+/* HASH CRC-32:0x8ac13e04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,9 +57,9 @@
 #endif /* !TI64 */
 
 /* aliases */
-DFUN(".text.crt.dos.database.aliases", libd_getaliasent_r, libc_getaliasent_r, TD, 4, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.aliases", libd_getaliasent_r, libc_getaliasent_r, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.database.aliases", libd_getaliasbyname, libc_getaliasbyname, TP, 1, TP)
-DFUN(".text.crt.dos.database.aliases", libd_getaliasbyname_r, libc_getaliasbyname_r, TD, 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.aliases", libd_getaliasbyname_r, libc_getaliasbyname_r, TIn(__SIZEOF_ERRNO_T__), 5, TP, TP, TP, TI, TP)
 
 /* argz */
 DFUN(".text.crt.dos.string.argz", libd_argz_create, libc_argz_create, TIn(__SIZEOF_ERRNO_T__), 3, TP, TP, TP)

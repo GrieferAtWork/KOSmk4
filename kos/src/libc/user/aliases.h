@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c5a1fa7 */
+/* HASH CRC-32:0x97dfe2e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,18 +31,27 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Open alias data base files */
+/* Rewind/Open the internal mail alias database file (which is located in `/etc/aliases') */
 INTDEF void NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void);
-/* Close alias data base files */
+/* Close the internal mail alias database file (s.a. `setaliasent(3)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_endaliasent)(void);
-/* Get the next entry from the alias data base */
-INTDEF struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void);
-/* Get the next entry from the alias data base and put it in RESULT_BUF */
-INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
-/* Get alias entry corresponding to NAME */
-INTDEF NONNULL((1)) struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name);
-/* Get alias entry corresponding to NAME and put it in RESULT_BUF */
-INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
+/* Read the entry entry from the mail alias alias database.
+ * If the database hadn't already been opened, this function will
+ * open it the same way that a call to `setaliasent(3)' would.
+ * @return: * :   A pointer to an internal, statically allocated structure
+ * @return: NULL: [errno=<unchanged>] Database end has been reached
+ * @return: NULL: [errno=ENOENT]      Database end has been reached
+ * @return: NULL: [errno=*]           Error */
+INTDEF WUNUSED struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void);
+/* Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
+INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
+/* Find a database entry associated with the given `name'
+ * @return: * :   A pointer to an internal, statically allocated structure
+ * @return: NULL: [errno=ENOENT] No entry matching `name'
+ * @return: NULL: [errno=*]      Error */
+INTDEF WUNUSED NONNULL((1)) struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name);
+/* Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
+INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
 #endif /* !__KERNEL__ */
 
 DECL_END
