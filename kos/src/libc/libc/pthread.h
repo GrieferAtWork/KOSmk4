@@ -39,6 +39,12 @@ DECL_BEGIN
 #define OFFSET_PTHREAD_STACKSIZE (__SIZEOF_POINTER__ * 5)
 #define OFFSET_PTHREAD_FLAGS     (__SIZEOF_POINTER__ * 6)
 
+#define PTHREAD_FNORMAL    0x0000 /* Normal pthread flags. */
+#define PTHREAD_FUSERSTACK 0x0001 /* The thread's stack was provided by the user
+                                   * and should not be unmapped automatically. */
+#define PTHREAD_FNOSTACK   0x0002 /* The thread's stack area is unknown (this is the case for
+                                   * the main thread, and any thread created by `clone()'). */
+
 #ifdef __CC__
 struct pthread {
 	pid_t           pt_tid;        /* [const] Secondary TID (filled in by the kernel as the PTID and CTID) */
@@ -51,11 +57,6 @@ struct pthread {
 	void           *pt_stackaddr;  /* [const] Thread stack address */
 	size_t          pt_stacksize;  /* [const] Thread stack size */
 	uintptr_t       pt_flags;      /* [const] Flags (Set of `PTHREAD_F*') */
-#define PTHREAD_FNORMAL    0x0000  /* Normal pthread flags. */
-#define PTHREAD_FUSERSTACK 0x0001  /* The thread's stack was provided by the user
-	                                * and should not be unmapped automatically. */
-#define PTHREAD_FNOSTACK   0x0002  /* The thread's stack area is unknown (this is the case for
-	                                * the main thread, and any thread created by `clone()'). */
 	cpu_set_t      *pt_cpuset;     /* Initial affinity cpuset. */
 	size_t          pt_cpusetsize; /* Initial affinity cpuset size. */
 };

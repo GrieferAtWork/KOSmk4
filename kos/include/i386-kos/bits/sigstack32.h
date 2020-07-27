@@ -87,7 +87,7 @@ struct __sigstackx32 /*[NAME(sigstackx32)][PREFIX(ss_)]*/ {
 /* Alternate, preferred interface. */
 struct __sigaltstackx32 /*[NAME(sigaltstackx32)][PREFIX(ss_)]*/ {
 	__HYBRID_PTR32(void) ss_sp;    /* Signal stack pointer. */
-	__INT32_TYPE__       ss_flags; /* Set of `SS_*' from `<bits/sigstack.h>' */
+	__INT32_TYPE__       ss_flags; /* Set of `SS_*' from `<asm/sigstack.h>' */
 	__ULONG32_TYPE__     ss_size;  /* Signal stack size (in bytes) */
 };
 #endif /* __CC__ */

@@ -127,14 +127,14 @@
 
 __DECL_BEGIN
 
-#define __MCONTEXTX64_FLAG_NORMAL    0x0000 /* Normal context flags. */
-#define __MCONTEXTX64_FLAG_HAVECR2   0x0001 /* The `mc_cr2' field contains a valid value. */
-#define __MCONTEXTX64_FLAG_HAVESFPU  0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
-                                             * When not set: The FPU hasn't been initialized yet, and a context
-                                             *               load will leave the FPU unmodified if it hasn't been
-                                             *               initialized, or will default-initialize it if it
-                                             *               had been initialized in the mean time. */
-#define __MCONTEXTX64_FLAG_HAVEXFPU  0x2000 /* The `mc_fpu' structure uses the `f_xsave' variant (otherwise, the `f_ssave' variant is used) */
+#define __MCONTEXTX64_FLAG_NORMAL   0x0000 /* Normal context flags. */
+#define __MCONTEXTX64_FLAG_HAVECR2  0x0001 /* The `mc_cr2' field contains a valid value. */
+#define __MCONTEXTX64_FLAG_HAVESFPU 0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
+                                            * When not set: The FPU hasn't been initialized yet, and a context
+                                            *               load will leave the FPU unmodified if it hasn't been
+                                            *               initialized, or will default-initialize itself if it
+                                            *               had been initialized in the mean time. */
+#define __MCONTEXTX64_FLAG_HAVEXFPU 0x2000 /* The `mc_fpu' structure uses the `f_xsave' variant (otherwise, the `f_ssave' variant is used) */
 
 
 #define __MCONTEXTX64_REGNO_GSBASE  0

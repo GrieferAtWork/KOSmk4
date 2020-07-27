@@ -225,6 +225,8 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	.cfi_adjust_cfa_offset -4
 	testl  %eax, %eax
 	jz     1f
+	cmpb   $(0), 0(%eax)
+	jz     1f /* strlen(%eax) == 1 */
 	cmpb   $(0), 1(%eax)
 	jnz    1f /* strlen(%eax) != 1 */
 	movb   0(%eax), %al

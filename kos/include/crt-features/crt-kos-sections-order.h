@@ -178,6 +178,7 @@
 	.string.argz*  .string.envz*      # <argz.h> and <envz.h>
 	.sched.pthread_ext*               # Pthread extensions
 	.system.random*                   # <sys/random.h>
+	.cpu.ucontext*                    # <ucontext.h>
 	.glibc*                           # GLibc-specific stuff
 	.bsd.stringlist*                  # BSD's <stringlist.h> header
 	.bsd.*                            # Misc BSD functions

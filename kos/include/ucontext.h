@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf14bf74 */
+/* HASH CRC-32:0xdfc7f65a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,52 +28,97 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <sys/ucontext.h>
+#include <features.h>
+
+#include <asm/crt/ucontext.h> /* `__CRT_SUPPORTS_UCONTEXT' */
+#include <sys/ucontext.h>     /* `ucontext_t' */
 
 __SYSDECL_BEGIN
 
-/* Comments taken from /usr/include/ucontext.h of a linux machine.
- * The following is the copyright notice found in the original file. */
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
 #ifdef __CC__
 
-/* Get user context and store it in variable pointed to by UCP */
+/* Save the caller's current register state into the given `UCP'
+ * Usually, this function will never fail and always return `0'.
+ * However on architectures where this function isn't implemented,
+ * it will always returns `-1' with `errno=ENOSYS'
+ * NOTE: If it is known at compile-time that this function will always
+ *       succeed, and never return with an ENOSYS error, then KOS system
+ *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
+ *       may test for, and which allows you to omit error-checks for this
+ *       function.
+ * WARNING: If the context returned by this function is loaded after the
+ *          calling function has returned, then the behavior is undefined. */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
 
-/* Set user context from information of variable pointed to by UCP */
+/* Populate the current machine register state with values from `UCP',
+ * that that this function will not return to the caller, but will instead
+ * return to the machine context that is described by `UCP'
+ * The caller must have previously initialized `UCP' by either:
+ *   - A call to `getcontext(3)'
+ *   - A call to `swapcontext(3)' where `UCP' was the `OUCP' argument
+ *   - A call to `makecontext(3)'
+ *   - By manually filling in required structure fields. Note however
+ *     that this method of initializting a `ucontext_t' is non-portable,
+ *     not only between different architectures, but also between different
+ *     C libraries, or even different versions of the same C library,
+ *     as the layout, meaning, and names of fields are never standardized.
+ * NOTE: Unless this function is not implemented by the hosting libc (in
+ *       which case `-1' is returned, and `errno' is set to `ENOSYS'), this
+ *       function will never return normally (since execution will instead
+ *       continue at the location pointed-to by `UCP')
+ * NOTE: If it is known at compile-time that this function will always
+ *       succeed, and never return with an ENOSYS error, then KOS system
+ *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
+ *       may test for, and which allows you to omit error-checks for this
+ *       function. */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
 
-/* Save current context in context variable pointed to by OUCP and set
- * context from variable pointed to by UCP */
+/* Atomically perform both a `getcontext(oucp)', as well as a `setcontext(ucp)',
+ * such that execution will continue at `ucp', but code that is hosted by that
+ * control path will be able to resume execution with the caller's control path
+ * by a call to one of `setcontext(OUCP)' or `swapcontext(..., OUCP)'
+ * The given `UCP' must be initialized the same way as is also required by
+ * `setcontext(3)', and this function will always return `0' (once execution
+ * has once again been loaded from the context described by `oucp'), unless
+ * the linked libc doesn't implement this function (in which case `swapcontext(3)'
+ * always returns `-1' with `errno' set to `ENOSYS'
+ * NOTE: If it is known at compile-time that this function will always
+ *       succeed, and never return with an ENOSYS error, then KOS system
+ *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
+ *       may test for, and which allows you to omit error-checks for this
+ *       function. */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
 
 typedef void (*__makecontext_func_t)(void);
 
 #ifdef __CRT_HAVE_makecontext
-/* Manipulate user context UCP to continue with calling functions FUNC
- * and the ARGC-1 parameters following ARGC when the context is used
- * the next time in `setcontext' or `swapcontext'.
- * We cannot say anything about the parameters FUNC takes; `void'
- * is as good as any other choice */
-__LIBC __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(ucontext_t *__ucp, __makecontext_func_t __func, int ___argc, ...) __CASMNAME_SAME("makecontext");
+/* Initialize a user-context `UCP' to perform a call to `FUNC', which
+ * should take exactly `argc' arguments of integer or pointer type (floating-
+ * point, or by-value struct-arguments cannot be accepted by `FUNC').
+ * Note that officially, arguments taken by `FUNC' must be of type `int',
+ * and you're not even allowed to pass pointer arguments. However, as far
+ * as doing so is possible for the targeted architecture, this function will
+ * also permit the use of pointer-sized arguments to-be forwarded to `FUNC'.
+ * Though if you want to be fully portable and compliant with POSIX, you should
+ * check the relation between `__SIZEOF_INT__' and `__SIZEOF_POINTER__', and
+ * use macros to pass a variable number of int-arguments that make up the
+ * different parts of a full pointer, before re-constructing the pointer
+ * argument inside of `FUNC'.
+ * Before using this function, the caller must:
+ *   - Fill in `UCP->uc_stack.ss_sp' and `UCP->uc_stack.ss_size' to
+ *     point to the stack on which `FUNC' will be executed
+ *   - Have `UCP->uc_link' point to the context that should be loaded
+ *     when `FUNC' returns normally, or set to `NULL' if the return of
+ *     `FUNC' should be handled as a call to `pthread_exit(NULL)' */
+__LIBC __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(ucontext_t *__ucp, __makecontext_func_t __func, __STDC_INT_AS_SIZE_T ___argc, ...) __CASMNAME_SAME("makecontext");
 #endif /* __CRT_HAVE_makecontext */
+
+#ifdef __CRT_SUPPORTS_UCONTEXT
+/* Tell the compiler that `setcontext()' will never return normally, though
+ * prevent any compiler warnings if the caller tries to use the function in
+ * the context of an integer expression. */
+#define setcontext(ucp) ((setcontext)(ucp), __builtin_unreachable(), 0)
+#endif /* __CRT_SUPPORTS_UCONTEXT */
 
 #endif /* __CC__ */
 

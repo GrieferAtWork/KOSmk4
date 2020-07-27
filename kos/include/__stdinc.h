@@ -42,6 +42,7 @@
 #define __CC__  1  /* C Compiler. */
 #define __CCAST    /* Nothing */
 #else /* ... */
+#undef __cplusplus
 #define __CCAST(T) /* Nothing */
 #endif /* !... */
 

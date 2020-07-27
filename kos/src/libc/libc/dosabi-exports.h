@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa277458e */
+/* HASH CRC-32:0xa7705bb8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2745,11 +2745,6 @@ DEFINE_PUBLIC_ALIAS(DOS$asctime_r, libd_asctime_r);
 
 /* ttyent */
 DEFINE_PUBLIC_ALIAS(DOS$getttynam, libd_getttynam);
-
-/* ucontext */
-DEFINE_PUBLIC_ALIAS(DOS$getcontext, libd_getcontext);
-DEFINE_PUBLIC_ALIAS(DOS$setcontext, libd_setcontext);
-DEFINE_PUBLIC_ALIAS(DOS$swapcontext, libd_swapcontext);
 
 /* ulimit */
 DEFINE_PUBLIC_ALIAS(DOS$ulimit, libd_ulimit);

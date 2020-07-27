@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x900b60e3 */
+/* HASH CRC-32:0x9895be3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1195,7 +1195,6 @@
 #define __CRT_HAVE_DOS$getaliasbyname_r 1
 #define __CRT_HAVE_DOS$getaliasent_r 1
 #define __CRT_HAVE_DOS$getauxval 1
-#define __CRT_HAVE_DOS$getcontext 1
 #define __CRT_HAVE_DOS$getcwd 1
 #define __CRT_HAVE_DOS$getdate 1
 #define __CRT_HAVE_DOS$getdate_r 1
@@ -1565,7 +1564,6 @@
 #define __CRT_HAVE_DOS$lutimes 1
 #define __CRT_HAVE_DOS$lutimes64 1
 #define __CRT_HAVE_DOS$madvise 1
-#define __CRT_HAVE_DOS$makecontext 1
 #define __CRT_HAVE_DOS$malloc 1
 #define __CRT_HAVE_DOS$malloc_trim 1
 #define __CRT_HAVE_DOS$malloc_usable_size 1
@@ -2191,7 +2189,6 @@
 #define __CRT_HAVE_DOS$set_exception_handler 1
 #define __CRT_HAVE_DOS$setbuf 1
 #define __CRT_HAVE_DOS$setbuffer 1
-#define __CRT_HAVE_DOS$setcontext 1
 #define __CRT_HAVE_DOS$setdomainname 1
 #define __CRT_HAVE_DOS$setegid 1
 #define __CRT_HAVE_DOS$setenv 1
@@ -2460,7 +2457,6 @@
 #define __CRT_HAVE_DOS$strxfrm_l 1
 #define __CRT_HAVE_DOS$stty 1
 #define __CRT_HAVE_DOS$swab 1
-#define __CRT_HAVE_DOS$swapcontext 1
 #define __CRT_HAVE_DOS$swapoff 1
 #define __CRT_HAVE_DOS$swapon 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

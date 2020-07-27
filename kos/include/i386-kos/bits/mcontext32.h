@@ -83,23 +83,23 @@
 
 #ifdef __USE_GNU
 /* Number of each register is the `gregset_t' array. */
-#define REG_GS     __MCONTEXT_REGNO_GS
-#define REG_FS     __MCONTEXT_REGNO_FS
-#define REG_ES     __MCONTEXT_REGNO_ES
-#define REG_DS     __MCONTEXT_REGNO_DS
-#define REG_EDI    __MCONTEXT_REGNO_EDI
-#define REG_ESI    __MCONTEXT_REGNO_ESI
-#define REG_EBP    __MCONTEXT_REGNO_EBP
-#define REG_ESP    __MCONTEXT_REGNO_ESP
-#define REG_EBX    __MCONTEXT_REGNO_EBX
-#define REG_EDX    __MCONTEXT_REGNO_EDX
-#define REG_ECX    __MCONTEXT_REGNO_ECX
-#define REG_EAX    __MCONTEXT_REGNO_EAX
-#define REG_EIP    __MCONTEXT_REGNO_EIP
-#define REG_CS     __MCONTEXT_REGNO_CS
-#define REG_EFL    __MCONTEXT_REGNO_EFL
-#define REG_UESP   __MCONTEXT_REGNO_ESP
-#define REG_SS     __MCONTEXT_REGNO_SS
+#define REG_GS     __MCONTEXTX32_REGNO_GS
+#define REG_FS     __MCONTEXTX32_REGNO_FS
+#define REG_ES     __MCONTEXTX32_REGNO_ES
+#define REG_DS     __MCONTEXTX32_REGNO_DS
+#define REG_EDI    __MCONTEXTX32_REGNO_EDI
+#define REG_ESI    __MCONTEXTX32_REGNO_ESI
+#define REG_EBP    __MCONTEXTX32_REGNO_EBP
+#define REG_ESP    __MCONTEXTX32_REGNO_ESP
+#define REG_EBX    __MCONTEXTX32_REGNO_EBX
+#define REG_EDX    __MCONTEXTX32_REGNO_EDX
+#define REG_ECX    __MCONTEXTX32_REGNO_ECX
+#define REG_EAX    __MCONTEXTX32_REGNO_EAX
+#define REG_EIP    __MCONTEXTX32_REGNO_EIP
+#define REG_CS     __MCONTEXTX32_REGNO_CS
+#define REG_EFL    __MCONTEXTX32_REGNO_EFL
+#define REG_UESP   __MCONTEXTX32_REGNO_ESP
+#define REG_SS     __MCONTEXTX32_REGNO_SS
 #endif /* __USE_GNU */
 
 #define __OFFSET_MCONTEXT_CPU   __OFFSET_MCONTEXTX32_CPU
@@ -116,14 +116,14 @@
 
 __DECL_BEGIN
 
-#define __MCONTEXTX32_FLAG_NORMAL    0x0000 /* Normal context flags. */
-#define __MCONTEXTX32_FLAG_HAVECR2   0x0001 /* The `mc_cr2' field contains a valid value. */
-#define __MCONTEXTX32_FLAG_HAVESFPU  0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
-                                             * When not set: The FPU hasn't been initialized yet, and a context
-                                             *               load will leave the FPU unmodified if it hasn't been
-                                             *               initialized, or will default-initialize it if it
-                                             *               had been initialized in the mean time. */
-#define __MCONTEXTX32_FLAG_HAVEXFPU  0x2000 /* The `mc_fpu' structure uses the `f_xsave' variant (otherwise, the `f_ssave' variant is used) */
+#define __MCONTEXTX32_FLAG_NORMAL   0x0000 /* Normal context flags. */
+#define __MCONTEXTX32_FLAG_HAVECR2  0x0001 /* The `mc_cr2' field contains a valid value. */
+#define __MCONTEXTX32_FLAG_HAVESFPU 0x1000 /* The `mc_fpu' structure contains valid data and must be restored.
+                                            * When not set: The FPU hasn't been initialized yet, and a context
+                                            *               load will leave the FPU unmodified if it hasn't been
+                                            *               initialized, or will default-initialize itself if it
+                                            *               had been initialized in the mean time. */
+#define __MCONTEXTX32_FLAG_HAVEXFPU 0x2000 /* The `mc_fpu' structure uses the `f_xsave' variant (otherwise, the `f_ssave' variant is used) */
 
 
 #define __MCONTEXTX32_REGNO_EDI    0  /* [P] Destination pointer */

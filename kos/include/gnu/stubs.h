@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5b428ce */
+/* HASH CRC-32:0xf5388ada */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,7 +189,6 @@
 #define __stub_getaliasbyname_r 1
 #define __stub_getaliasent 1
 #define __stub_getaliasent_r 1
-#define __stub_getcontext 1
 #define __stub_getdate 1
 #define __stub_getenv_s 1
 #define __stub_getgrent 1
@@ -348,7 +347,6 @@
 #define __stub_logwtmp 1
 #define __stub_lrand48 1
 #define __stub_lrand48_r 1
-#define __stub_makecontext 1
 #define __stub_mbsnrtowcs 1
 #define __stub_memfd_create 1
 #define __stub_mkdtemp 1
@@ -523,7 +521,6 @@
 #define __stub_semop 1
 #define __stub_semtimedop 1
 #define __stub_setaliasent 1
-#define __stub_setcontext 1
 #define __stub_setgrent 1
 #define __stub_sethostent 1
 #define __stub_setipv4sourcefilter 1
@@ -571,7 +568,6 @@
 #define __stub___strfmon_l 1
 #define __stub_strfmon_l 1
 #define __stub_stty 1
-#define __stub_swapcontext 1
 #define __stub___tan 1
 #define __stub_tan 1
 #define __stub___tanh 1
@@ -628,9 +624,6 @@
 #define __stub_DOS$_wsearchenv_s 1
 #define __stub_DOS$_wtempnam 1
 #define __stub_DOS$_wtmpnam_s 1
-#ifndef __LIBCCALL_IS_LIBDCALL
-#define __stub_DOS$makecontext 1
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 #define __stub_DOS$mbsnrtowcs 1
 #define __stub_DOS$open_wmemstream 1
 #define __stub_DOS$openat 1

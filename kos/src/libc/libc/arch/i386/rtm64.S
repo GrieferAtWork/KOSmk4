@@ -249,6 +249,8 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	call   libc_getenv
 	testq  %rax, %rax
 	jz     1f
+	cmpb   $(0), 0(%rax)
+	jz     1f /* strlen(%rax) == 0 */
 	cmpb   $(0), 1(%rax)
 	jnz    1f /* strlen(%rax) != 1 */
 	movb   0(%rax), %al

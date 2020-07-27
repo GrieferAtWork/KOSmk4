@@ -6163,7 +6163,6 @@
 #define __CRT_HAVE_KOS$getauxval 1
 #define __CRT_HAVE_KOS$getc 1
 #define __CRT_HAVE_KOS$getc_unlocked 1
-#define __CRT_HAVE_KOS$getcontext 1
 #define __CRT_HAVE_KOS$getcwd 1
 #define __CRT_HAVE_KOS$getdate 1
 #define __CRT_HAVE_KOS$getdate_r 1
@@ -6526,7 +6525,6 @@
 #define __CRT_HAVE_KOS$lutimes 1
 #define __CRT_HAVE_KOS$lutimes64 1
 #define __CRT_HAVE_KOS$madvise 1
-#define __CRT_HAVE_KOS$makecontext 1
 #define __CRT_HAVE_KOS$malloc 1
 #define __CRT_HAVE_KOS$malloc_trim 1
 #define __CRT_HAVE_KOS$malloc_usable_size 1
@@ -7140,7 +7138,6 @@
 #define __CRT_HAVE_KOS$set_exception_handler 1
 #define __CRT_HAVE_KOS$setbuf 1
 #define __CRT_HAVE_KOS$setbuffer 1
-#define __CRT_HAVE_KOS$setcontext 1
 #define __CRT_HAVE_KOS$setdomainname 1
 #define __CRT_HAVE_KOS$setegid 1
 #define __CRT_HAVE_KOS$setenv 1
@@ -7396,7 +7393,6 @@
 #define __CRT_HAVE_KOS$strxfrm_l 1
 #define __CRT_HAVE_KOS$stty 1
 #define __CRT_HAVE_KOS$swab 1
-#define __CRT_HAVE_KOS$swapcontext 1
 #define __CRT_HAVE_KOS$swapoff 1
 #define __CRT_HAVE_KOS$swapon 1
 #define __CRT_HAVE_KOS$swprintf 1
@@ -9536,7 +9532,6 @@
 #define __CRT_HAVE_DOS$getauxval 1
 #define __CRT_HAVE_DOS$getc 1
 #define __CRT_HAVE_DOS$getc_unlocked 1
-#define __CRT_HAVE_DOS$getcontext 1
 #define __CRT_HAVE_DOS$getcwd 1
 #define __CRT_HAVE_DOS$getdate 1
 #define __CRT_HAVE_DOS$getdate_r 1
@@ -9899,7 +9894,6 @@
 #define __CRT_HAVE_DOS$lutimes 1
 #define __CRT_HAVE_DOS$lutimes64 1
 #define __CRT_HAVE_DOS$madvise 1
-#define __CRT_HAVE_DOS$makecontext 1
 #define __CRT_HAVE_DOS$malloc 1
 #define __CRT_HAVE_DOS$malloc_trim 1
 #define __CRT_HAVE_DOS$malloc_usable_size 1
@@ -10513,7 +10507,6 @@
 #define __CRT_HAVE_DOS$set_exception_handler 1
 #define __CRT_HAVE_DOS$setbuf 1
 #define __CRT_HAVE_DOS$setbuffer 1
-#define __CRT_HAVE_DOS$setcontext 1
 #define __CRT_HAVE_DOS$setdomainname 1
 #define __CRT_HAVE_DOS$setegid 1
 #define __CRT_HAVE_DOS$setenv 1
@@ -10769,7 +10762,6 @@
 #define __CRT_HAVE_DOS$strxfrm_l 1
 #define __CRT_HAVE_DOS$stty 1
 #define __CRT_HAVE_DOS$swab 1
-#define __CRT_HAVE_DOS$swapcontext 1
 #define __CRT_HAVE_DOS$swapoff 1
 #define __CRT_HAVE_DOS$swapon 1
 #define __CRT_HAVE_DOS$swprintf 1

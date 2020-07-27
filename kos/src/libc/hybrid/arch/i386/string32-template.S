@@ -281,7 +281,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmovedown),
 #if defined(__PIC__) || defined(__PIE__) || defined(__pic__) || defined(__pie__)
 	call   9f
 	.cfi_adjust_cfa_offset 4
-9:	popl_cfi  %edi
+9:	popl_cfi %edi
 	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 9b)), %edi
 #define PUSH_RELSTR(x) leal x@GOTOFF(%edi), %eax; pushl_cfi %eax
 #else /* __PIC__ || __PIE__ || __pic__ || __pie__ */
@@ -388,7 +388,7 @@ INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmoveup),
 #if defined(__PIC__) || defined(__PIE__) || defined(__pic__) || defined(__pie__)
 	call   9f
 	.cfi_adjust_cfa_offset 4
-9:	popl_cfi  %edi
+9:	popl_cfi %edi
 	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 9b)), %edi
 #define PUSH_RELSTR(x) leal x@GOTOFF(%edi), %eax; pushl_cfi %eax
 #else /* __PIC__ || __PIE__ || __pic__ || __pie__ */
