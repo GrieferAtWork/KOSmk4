@@ -54,8 +54,7 @@ struct kernel_debugtraps {
 #define KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT 0x0010 /* Trap on unhandled interrupts */
 #define KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE 0x0020 /* Trap on driver initialization failure */
 #define KERNEL_DEBUGTRAP_ON_DEFAULT            \
-	(KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION | \
-	 KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT |    \
+	(KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT |    \
 	 KERNEL_DEBUGTRAP_ON_COREDUMP |            \
 	 KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT | \
 	 KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE)
@@ -76,7 +75,8 @@ kernel_debugtraps_uninstall(struct kernel_debugtraps const *__restrict handlers)
 
 /* Get the currently installed debug traps (or return `false' if none are installed) */
 FUNDEF WUNUSED NONNULL((1)) bool FCALL
-kernel_debugtraps_get(struct kernel_debugtraps *__restrict handlers) THROWS(E_WOULDBLOCK);
+kernel_debugtraps_get(struct kernel_debugtraps *__restrict handlers)
+	THROWS(E_WOULDBLOCK);
 
 /* Check if debug traps are enabled. */
 FUNDEF NOBLOCK WUNUSED bool NOTHROW(FCALL kernel_debugtrap_enabled)(void);

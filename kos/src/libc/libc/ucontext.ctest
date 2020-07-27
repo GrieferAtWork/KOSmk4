@@ -1,0 +1,104 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_UCONTEXT_CTEST
+#define GUARD_LIBC_LIBC_UCONTEXT_CTEST 1
+
+#define _KOS_SOURCE 1
+
+/**/
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <ucontext.h>
+/**/
+
+DECL_BEGIN
+
+#if 0 /* TODO */
+/* NOTE: This test program is derived from:
+ * https://www.man7.org/linux/man-pages/man3/makecontext.3.html
+ */
+
+
+PRIVATE int state = 0;
+
+PRIVATE ucontext_t uctx_main;
+PRIVATE ucontext_t uctx_func1;
+PRIVATE ucontext_t uctx_func2;
+
+PRIVATE void func1(void) {
+	++state;
+	assert(state == 5);
+	ctest_substatf("state = 5\n");
+	assert(swapcontext(&uctx_func1, &uctx_func2) == 0);
+	++state;
+	assert(state == 7);
+	ctest_substatf("state = 7\n");
+}
+
+PRIVATE void func2(void) {
+	++state;
+	assert(state == 4);
+	ctest_substatf("state = 4\n");
+	assert(swapcontext(&uctx_func2, &uctx_func1) == 0);
+	++state;
+	assert(state == 6);
+	ctest_substatf("state = 6\n");
+}
+
+DEFINE_TEST(ucontext) {
+	byte_t func1_stack[1024];
+	byte_t func2_stack[1024];
+	state = 0;
+	ctest_substatf("state = 0\n");
+	assert(getcontext(&uctx_func1) == 0);
+	++state;
+	assert(state == 1);
+	ctest_substatf("state = 1\n");
+	uctx_func1.uc_stack.ss_sp   = func1_stack;
+	uctx_func1.uc_stack.ss_size = sizeof(func1_stack);
+	uctx_func1.uc_link          = &uctx_main;
+	makecontext(&uctx_func1, func1, 0);
+
+	assert(getcontext(&uctx_func2) == 0);
+	++state;
+	assert(state == 2);
+	ctest_substatf("state = 2\n");
+	uctx_func2.uc_stack.ss_sp   = func2_stack;
+	uctx_func2.uc_stack.ss_size = sizeof(func2_stack);
+	uctx_func2.uc_link          = &uctx_func1;
+	makecontext(&uctx_func2, func2, 0);
+	++state;
+	assert(state == 3);
+	ctest_substatf("state = 3\n");
+
+	assert(swapcontext(&uctx_main, &uctx_func2) == 0);
+	++state;
+	assert(state == 8);
+	ctest_substatf("state = 8\n");
+}
+#endif
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_UCONTEXT_CTEST */

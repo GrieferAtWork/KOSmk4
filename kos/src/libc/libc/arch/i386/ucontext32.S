@@ -94,6 +94,8 @@ PRIVATE_FUNCTION(get_fpu_flags)
 	pushl_cfi %eax
 	EXTERN(libc_getenv)
 	call   libc_getenv
+	addl   $(4), %esp
+	.cfi_adjust_cfa_offset -4
 	testl  %eax, %eax
 	jz     .Lget_fpu_flags_noenv
 	cmpb   $(0), 0(%eax)
@@ -149,7 +151,9 @@ INTERN_FUNCTION(libc_getcontext)
 	.cfi_rel_offset %eip, R_(REG_EIP)
 /*	.cfi_rel_offset %eflags, R_(REG_EFL) */ /* Not needed */
 	.cfi_reg_offset %edi, 0, %esp
-	popl_cfi %eax /* %edi */
+	.cfi_reg_value %esp, 4, %esp
+	popl   %eax /* %edi */
+	.cfi_same_value %esp
 	.cfi_register %edi, %eax
 	movl   %eax, R(REG_EDI)
 	.cfi_rel_offset %edi, R_(REG_EDI)
@@ -189,20 +193,22 @@ INTERN_FUNCTION(libc_getcontext)
 	.cfi_rel_offset %esi, R_(REG_ESI) /* We're going to clobber this one, so restore during unwind! */
 
 	movl   %ebp, R(REG_EBP)
-/*	.cfi_rel_offset %ebp, R_(REG_EBP) */
+	.cfi_rel_offset %ebp, R_(REG_EBP)
 
 	movl   %esp, R(REG_ESP)
+#if REG_UESP != REG_ESP
 	movl   %esp, R(REG_UESP)
-/*	.cfi_rel_offset %esp, R_(REG_ESP) */
+#endif /* REG_UESP != REG_ESP */
+	.cfi_rel_offset %esp, R_(REG_ESP)
 
 	movl   %ebx, R(REG_EBX)
 	.cfi_rel_offset %ebx, R_(REG_EBX) /* We're going to clobber this one, so restore during unwind! */
 
 	movl   %edx, R(REG_EDX)
-/*	.cfi_rel_offset %edx, R_(REG_EDX) */
+	.cfi_rel_offset %edx, R_(REG_EDX)
 
 	movl   %ecx, R(REG_ECX)
-/*	.cfi_rel_offset %ecx, R_(REG_ECX) */
+	.cfi_rel_offset %ecx, R_(REG_ECX)
 
 	/* Fill in information about the caller's stack. */
 	EXTERN(libc_pthread_self)
@@ -314,7 +320,9 @@ INTERN_FUNCTION(libc_x86_setcontext_edi)
 	.cfi_rel_offset %eip, R_(REG_EIP)
 	.cfi_rel_offset %cs, R_(REG_CS)
 	.cfi_rel_offset %eflags, R_(REG_EFL)
+#if REG_UESP != REG_ESP
 /*	.cfi_rel_offset %uesp, R_(REG_UESP) */
+#endif /* REG_UESP != REG_ESP */
 	.cfi_rel_offset %ss, R_(REG_SS)
 	/* Load the correct value into %esp so we can use the target's
 	 * stack as temporary storage during the transition. */
@@ -414,13 +422,16 @@ INTERN_FUNCTION(libc_swapcontext)
 	pushl_cfi 4(%esp)      /* oucp */
 	call   libc_getcontext /* Generate the old-context */
 	addl   $(4), %esp
+	.cfi_adjust_cfa_offset -4
 	movl   4(%esp), %edi   /* oucp */
 	/* Override the registers that the previous call filled in incorrectly. */
 	movl   0(%esp), %eax   /* %eip */
 	movl   %eax, (__OFFSET_UCONTEXTX32_MCONTEXT + __OFFSET_MCONTEXTX32_CPU + 4 * REG_EIP)(%edi)
 	leal   4(%esp), %eax   /* return-%esp */
 	movl   %eax, (__OFFSET_UCONTEXTX32_MCONTEXT + __OFFSET_MCONTEXTX32_CPU + 4 * REG_ESP)(%edi)
+#if REG_UESP != REG_ESP
 	movl   %eax, (__OFFSET_UCONTEXTX32_MCONTEXT + __OFFSET_MCONTEXTX32_CPU + 4 * REG_UESP)(%edi)
+#endif /* REG_UESP != REG_ESP */
 
 	/* And with that, the old CPU context has been filled.
 	 * Now we just have to load the new context! */
@@ -429,6 +440,15 @@ INTERN_FUNCTION(libc_swapcontext)
 	.cfi_endproc
 END(libc_swapcontext)
 
+
+.section .text.crt.cpu.ucontext
+INTERN_FUNCTION(libc_makecontext_exit_thread)
+	/* No CFI annotation, because we don't return! */
+	pushl  $(0)
+	EXTERN(libc_pthread_exit)
+	call   libc_pthread_exit
+	hlt
+END(libc_makecontext_exit_thread)
 
 
 DEFINE_PUBLIC_ALIAS(getcontext, libc_getcontext)

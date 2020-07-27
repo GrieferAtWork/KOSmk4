@@ -26,9 +26,12 @@
 
 #include <hybrid/host.h>
 
-#include <stdlib.h>
-#include <ucontext.h>
+#include <kos/types.h>
+
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ucontext.h>
 /**/
 
 DECL_BEGIN
@@ -46,14 +49,29 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	/* TODO */
 	abort();
 #else /* __x86_64__ */
-	va_list args;
-	va_start(args, argc);
-	(void)ucp;
-	(void)func;
-	(void)argc;
-	/* TODO */
-	abort();
-	va_end(args);
+	byte_t *sp;
+	extern byte_t const libc_x86_setcontext_edi[];      /* setcontext(%edi); */
+	extern byte_t const libc_makecontext_exit_thread[]; /* pthread_exit(NULL); */
+	/* We want to achieve the following layout:
+	 *
+	 * [...]       -- Available for use by `func'
+	 * -(argc * 4) &libc_x86_setcontext_edi     (Return-handler)
+	 * -(i * 4)    Function arguments.
+	 */
+	sp = (byte_t *)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
+	sp -= argc * 4;
+	/* Copy arguments onto the target stack. */
+	sp = (byte_t *)memcpyl(sp, &argc + 1, argc);
+	sp -= 4;
+	*(u32 *)sp = (u32)libc_makecontext_exit_thread;
+	if (ucp->uc_link) {
+		*(u32 *)sp = (u32)libc_x86_setcontext_edi;
+		/* Fill in %edi, which is required by `libc_x86_setcontext_edi()' */
+		ucp->uc_mcontext.mc_context.ucs_gpregs.gp_edi = (u32)ucp->uc_link;
+	}
+	/* Assign the %eip and %esp registers. */
+	ucp->uc_mcontext.mc_context.ucs_gpregs.gp_esp = (u32)(void *)sp;
+	ucp->uc_mcontext.mc_context.ucs_eip           = (u32)(void *)func;
 #endif /* !__x86_64__ */
 }
 

@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/entry.h>
 #include <kernel/coredump.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -190,6 +191,11 @@ coredump_create(struct ucpustate const *curr_ustate,
 		curr_ustate = kernel_debugtrap_r((struct ucpustate *)curr_ustate, siginfo.si_signo);
 #endif
 	}
+
+#if 0
+	orig_ustate = dbg_enter_r((struct dbg_entry_info const *)NULL,
+	                          (struct ucpustate *)orig_ustate);
+#endif
 
 	/* TODO */
 	(void)unwind_error;

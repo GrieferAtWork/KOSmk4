@@ -28,6 +28,7 @@
 #include <system-test/ctest.h>
 
 #include <format-printer.h>
+#include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -94,6 +95,8 @@ NOTHROW_NCX(__VLIBKCALL ctest_substatf)(char const *__restrict format, ...) {
 PRIVATE void run_all_tests(void) {
 	struct testdecl *iter;
 	for (iter = __system_tests_begin; iter < __system_tests_end; ++iter) {
+		if (strcmp(iter->td_name, "ucontext"))
+			continue;
 		ctest_current_test = iter;
 		syslog(LOG_DEBUG, "[test:%s] %s:%d\n",
 		       iter->td_name,
