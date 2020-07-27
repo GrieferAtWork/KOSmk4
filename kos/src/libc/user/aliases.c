@@ -85,8 +85,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTED("getaliasent_r"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc_getaliasent_r]]]*/
 
@@ -122,8 +121,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTED("getaliasbyname_r"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc_getaliasbyname_r]]]*/
 

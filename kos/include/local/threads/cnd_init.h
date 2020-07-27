@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x815dd339 */
+/* HASH CRC-32:0xfd839bb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_init from pthread */
 #ifndef __local___localdep_pthread_cond_init_defined
 #define __local___localdep_pthread_cond_init_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Initialize condition variable COND using attributes ATTR, or use
  * the default values if later is NULL */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __cond, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__cond,__cond_attr))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __cond, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__cond,__cond_attr))
 #endif /* !__local___localdep_pthread_cond_init_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -39,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_cond_init()' */
 __LOCAL_LIBC(cnd_init) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_init))(__cnd_t *__restrict __cond) {
-	int __error;
+	__errno_t __error;
 	__error = __localdep_pthread_cond_init((__pthread_cond_t *)__cond, __NULLPTR);
 	if __likely(!__error)
 		return __thrd_success;

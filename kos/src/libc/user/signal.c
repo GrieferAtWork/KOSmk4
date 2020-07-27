@@ -204,9 +204,7 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 /*AUTO*/{
 	(void)scp;
 	CRT_UNIMPLEMENTED("sigreturn"); /* TODO */
-	libc_seterrno(ENOSYS);
-	for (;;) {
-	}
+	assert_failed("Not implemented");
 }
 /*[[[end:libc_sigreturn]]]*/
 

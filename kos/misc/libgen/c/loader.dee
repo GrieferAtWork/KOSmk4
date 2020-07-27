@@ -1443,19 +1443,23 @@ function printDefaultLibraryImplementationForPrototype(
 		if (a.name)
 			fp << "\t(void)" << a.name << ";\n";
 	}
-	fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n"
-		"\tlibc_seterrno(ENOSYS);\n";
+	fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n";
 	if (prototype.isNoreturn) {
-		fp << "\tfor (;;) {\n"
-			"\t}\n";
+		fp << "\tassert_failed(\"Not implemented\");\n";
 	} else {
 		local returnType = prototype.returnType;
-		if (returnType.isVoid) {
-			/* No return statement in void-functions */
-		} else if (returnType.isPointer) {
-			fp << "\treturn NULL;\n";
+		if (!returnType.afterName && returnType.beforeName in
+				["error_t", "errno_t", "$error_t", "$errno_t", "__errno_t"]) {
+			fp << "\treturn ENOSYS;\n";
 		} else {
-			fp << "\treturn 0;\n";
+			fp << "\tlibc_seterrno(ENOSYS);\n";
+			if (returnType.isVoid) {
+				/* No return statement in void-functions */
+			} else if (returnType.isPointer) {
+				fp << "\treturn NULL;\n";
+			} else {
+				fp << "\treturn 0;\n";
+			}
 		}
 	}
 	fp << "}";

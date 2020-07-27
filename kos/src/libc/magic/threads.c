@@ -210,14 +210,14 @@ typedef __cnd_t cnd_t;
 [[impl_include("<asm/crt/threads.h>", "<parts/errno.h>")]]
 [[requires_function(pthread_create)]]
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
-	int error;
+	$errno_t error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	error = pthread_create((pthread_t *)thr, NULL,
 	                       (__pthread_start_routine_t)(void *)func,
 	                       arg);
 	if likely(!error)
 		return thrd_success;
-@@pp_ifdef ENOMEM@@
+@@pp_if defined(thrd_nomem) && defined(ENOMEM)@@
 	if (error == ENOMEM)
 		return thrd_nomem;
 @@pp_endif@@
@@ -268,9 +268,9 @@ int thrd_sleep([[nonnull]] struct timespec const *time_point,
 	}
 	return result;
 @@pp_else@@
-	int error;
-	error = nanosleep(time_point, remaining);
-	if likely(error == 0)
+	int result;
+	result = nanosleep(time_point, remaining);
+	if likely(result == 0)
 		return 0;
 @@pp_if defined(__libc_geterrno) && defined(EINTR)@@
 	if (__libc_geterrno() == EINTR)
@@ -297,9 +297,9 @@ int crt_thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
 int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
                  [[nullable]] struct timespec64 *remaining) {
 @@pp_if $has_function(nanosleep64)@@
-	int error;
-	error = nanosleep64(time_point, remaining);
-	if likely(error == 0)
+	int result;
+	result = nanosleep64(time_point, remaining);
+	if likely(result == 0)
 		return 0;
 @@pp_if defined(__libc_geterrno) && defined(EINTR)@@
 	if (__libc_geterrno() == EINTR)
@@ -338,7 +338,7 @@ void thrd_exit(int res) {
 [[decl_include("<bits/crt/threads.h>")]]
 [[requires_function(pthread_detach)]]
 int thrd_detach(thrd_t thr) {
-	int error;
+	$errno_t error;
 	error = pthread_detach((pthread_t)thr);
 	if likely(!error)
 		return thrd_success;
@@ -352,7 +352,7 @@ int thrd_detach(thrd_t thr) {
 [[impl_include("<asm/crt/threads.h>")]]
 [[requires_function(pthread_join)]]
 int thrd_join(thrd_t thr, int *res) {
-	int error;
+	$errno_t error;
 @@pp_if __SIZEOF_POINTER__ != __SIZEOF_INT__@@
 	void *resptr;
 	error = pthread_join((pthread_t)thr, res ? &resptr : NULL);
@@ -390,7 +390,7 @@ void thrd_yield() = pthread_yield;
 [[impl_include("<asm/crt/threads.h>", "<asm/crt/pthreadvalues.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_init)]]
 int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
-	int error;
+	$errno_t error;
 	if (type == mtx_plain) {
 		error = pthread_mutex_init((pthread_mutex_t *)mutex, NULL);
 	} else {
@@ -418,7 +418,7 @@ int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_lock)]]
 int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
-	int error;
+	$errno_t error;
 	error = pthread_mutex_lock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
@@ -437,7 +437,7 @@ int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 [[requires_function(pthread_mutex_timedlock)]]
 int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
                   [[nonnull]] struct timespec const *__restrict time_point) {
-	int error;
+	$errno_t error;
 	error = pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
@@ -451,7 +451,7 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 [[requires_function(pthread_mutex_timedlock64)]]
 int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {
-	int error;
+	$errno_t error;
 	error = pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
@@ -465,13 +465,17 @@ int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
 @@it, otherwise it returns immediately
 @@s.a. `pthread_mutex_trylock()'
 [[decl_include("<bits/crt/threads.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<parts/errno.h>")]]
 [[requires_function(pthread_mutex_trylock)]]
 int mtx_trylock([[nonnull]] mtx_t *__restrict mutex) {
-	int error;
+	$errno_t error;
 	error = pthread_mutex_trylock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
+@@pp_if defined(thrd_busy) && defined(EBUSY)@@
+	if likely(error == EBUSY)
+		return thrd_busy;
+@@pp_endif@@
 	return thrd_error;
 }
 
@@ -482,7 +486,7 @@ int mtx_trylock([[nonnull]] mtx_t *__restrict mutex) {
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_mutex_unlock)]]
 int mtx_unlock([[nonnull]] mtx_t *__restrict mutex) {
-	int error;
+	$errno_t error;
 	error = pthread_mutex_unlock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
@@ -514,7 +518,7 @@ void call_once([[nonnull]] once_flag *__restrict flag,
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_cond_init)]]
 int cnd_init([[nonnull]] cnd_t *__restrict cond) {
-	int error;
+	$errno_t error;
 	error = pthread_cond_init((pthread_cond_t *)cond, NULL);
 	if likely(!error)
 		return thrd_success;
@@ -527,7 +531,7 @@ int cnd_init([[nonnull]] cnd_t *__restrict cond) {
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_cond_signal)]]
 int cnd_signal([[nonnull]] cnd_t *__restrict cond) {
-	int error;
+	$errno_t error;
 	error = pthread_cond_signal((pthread_cond_t *)cond);
 	if likely(!error)
 		return thrd_success;
@@ -540,7 +544,7 @@ int cnd_signal([[nonnull]] cnd_t *__restrict cond) {
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires($has_function(pthread_cond_broadcast))]]
 int cnd_broadcast([[nonnull]] cnd_t *__restrict cond) {
-	int error;
+	$errno_t error;
 	error = pthread_cond_broadcast((pthread_cond_t *)cond);
 	if likely(!error)
 		return thrd_success;
@@ -554,7 +558,7 @@ int cnd_broadcast([[nonnull]] cnd_t *__restrict cond) {
 [[requires_function(pthread_cond_wait)]]
 int cnd_wait([[nonnull]] cnd_t *__restrict cond,
              [[nonnull]] mtx_t *__restrict mutex) {
-	int error;
+	$errno_t error;
 	error = pthread_cond_wait((pthread_cond_t *)cond,
 	                          (pthread_mutex_t *)mutex);
 	if likely(!error)
@@ -574,7 +578,7 @@ int cnd_wait([[nonnull]] cnd_t *__restrict cond,
 int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
                   [[nonnull]] mtx_t *__restrict mutex,
                   [[nonnull]] struct timespec const *__restrict time_point) {
-	int error;
+	$errno_t error;
 	error = pthread_cond_timedwait((pthread_cond_t *)cond,
 	                               (pthread_mutex_t *)mutex,
 	                               time_point);
@@ -593,7 +597,7 @@ int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
 int cnd_timedwait64([[nonnull]] cnd_t *__restrict cond,
                     [[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {
-	int error;
+	$errno_t error;
 	error = pthread_cond_timedwait64((pthread_cond_t *)cond,
 	                                 (pthread_mutex_t *)mutex,
 	                                 time_point);
@@ -621,7 +625,7 @@ void cnd_destroy(cnd_t *cond) = pthread_cond_destroy;
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_key_create)]]
 int tss_create(tss_t *tss_id, tss_dtor_t destructor) {
-	int error;
+	$errno_t error;
 	error = pthread_key_create((pthread_key_t *)tss_id, destructor);
 	if likely(!error)
 		return thrd_success;
@@ -641,7 +645,7 @@ void *tss_get(tss_t tss_id) = pthread_getspecific;
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_setspecific)]]
 int tss_set(tss_t tss_id, void *val) {
-	int error;
+	$errno_t error;
 	error = pthread_setspecific((pthread_key_t)tss_id, val);
 	if likely(!error)
 		return thrd_success;

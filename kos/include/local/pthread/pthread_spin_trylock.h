@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e7909e6 */
+/* HASH CRC-32:0xae943138 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,12 @@
 #ifndef __local_pthread_spin_trylock_defined
 #define __local_pthread_spin_trylock_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <hybrid/__atomic.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Try to lock spinlock LOCK */
-__LOCAL_LIBC(pthread_spin_trylock) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(pthread_spin_trylock) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_trylock))(__pthread_spinlock_t *__lock) {
 	if (__hybrid_atomic_xch(*__lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;

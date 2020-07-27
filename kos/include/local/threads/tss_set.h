@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ad28a50 */
+/* HASH CRC-32:0xa75276ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_setspecific from pthread */
 #ifndef __local___localdep_pthread_setspecific_defined
 #define __local___localdep_pthread_setspecific_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Store POINTER in the thread-specific data slot identified by KEY */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #endif /* !__local___localdep_pthread_setspecific_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -39,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_setspecific()' */
 __LOCAL_LIBC(tss_set) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id, void *__val) {
-	int __error;
+	__errno_t __error;
 	__error = __localdep_pthread_setspecific((__pthread_key_t)__tss_id, __val);
 	if __likely(!__error)
 		return __thrd_success;

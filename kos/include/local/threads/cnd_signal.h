@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3e988af */
+/* HASH CRC-32:0x55791e3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_signal from pthread */
 #ifndef __local___localdep_pthread_cond_signal_defined
 #define __local___localdep_pthread_cond_signal_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Wake up one thread waiting for condition variable COND */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
 #endif /* !__local___localdep_pthread_cond_signal_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -38,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_cond_signal()' */
 __LOCAL_LIBC(cnd_signal) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __cond) {
-	int __error;
+	__errno_t __error;
 	__error = __localdep_pthread_cond_signal((__pthread_cond_t *)__cond);
 	if __likely(!__error)
 		return __thrd_success;

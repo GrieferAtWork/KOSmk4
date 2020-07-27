@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7705bb8 */
+/* HASH CRC-32:0xd90b9981 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1250,8 +1250,8 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_timedlock64, libd_pthread_mutex_timedlock6
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_unlock, libd_pthread_mutex_unlock);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_getprioceiling, libd_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_setprioceiling, libd_pthread_mutex_setprioceiling);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_consistent_np, libd_pthread_mutex_consistent);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_consistent, libd_pthread_mutex_consistent);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_mutex_consistent_np, libd_pthread_mutex_consistent_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_init, libd_pthread_mutexattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_destroy, libd_pthread_mutexattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getpshared, libd_pthread_mutexattr_getpshared);
@@ -1262,10 +1262,10 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getprotocol, libd_pthread_mutexattr_ge
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setprotocol, libd_pthread_mutexattr_setprotocol);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getprioceiling, libd_pthread_mutexattr_getprioceiling);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setprioceiling, libd_pthread_mutexattr_setprioceiling);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getrobust_np, libd_pthread_mutexattr_getrobust);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getrobust, libd_pthread_mutexattr_getrobust);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setrobust_np, libd_pthread_mutexattr_setrobust);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setrobust, libd_pthread_mutexattr_setrobust);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_getrobust_np, libd_pthread_mutexattr_getrobust_np);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_mutexattr_setrobust_np, libd_pthread_mutexattr_setrobust_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_init, libd_pthread_rwlock_init);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_destroy, libd_pthread_rwlock_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_rwlock_rdlock, libd_pthread_rwlock_rdlock);

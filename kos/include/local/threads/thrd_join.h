@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6f42e78 */
+/* HASH CRC-32:0xdc8473d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_join_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
  * is not NULL */
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
+__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -43,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_join()' */
 __LOCAL_LIBC(thrd_join) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr, int *__res) {
-	int __error;
+	__errno_t __error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *__resptr;
 	__error = __localdep_pthread_join((__pthread_t)__thr, __res ? &__resptr : __NULLPTR);

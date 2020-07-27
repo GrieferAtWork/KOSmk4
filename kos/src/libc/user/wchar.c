@@ -509,8 +509,7 @@ NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
 	(void)bufsize;
 	(void)errno_value;
 	CRT_UNIMPLEMENTED("_wcserror_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wcserror_s]]]*/
 
@@ -525,8 +524,7 @@ NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
 	(void)bufsize;
 	(void)errno_value;
 	CRT_UNIMPLEMENTED("DOS$_wcserror_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wcserror_s]]]*/
 
@@ -589,8 +587,7 @@ NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
 	(void)bufsize;
 	(void)message;
 	CRT_UNIMPLEMENTED("__wcserror_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc___wcserror_s]]]*/
 
@@ -605,8 +602,7 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
 	(void)bufsize;
 	(void)message;
 	CRT_UNIMPLEMENTED("DOS$__wcserror_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd___wcserror_s]]]*/
 
@@ -691,8 +687,7 @@ NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream,
 	(void)filename;
 	(void)mode;
 	CRT_UNIMPLEMENTED("_wfopen_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wfopen_s]]]*/
 
@@ -707,8 +702,7 @@ NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
 	(void)filename;
 	(void)mode;
 	CRT_UNIMPLEMENTED("DOS$_wfopen_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wfopen_s]]]*/
 
@@ -725,8 +719,7 @@ NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream,
 	(void)mode;
 	(void)stream;
 	CRT_UNIMPLEMENTED("_wfreopen_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wfreopen_s]]]*/
 
@@ -743,8 +736,7 @@ NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
 	(void)mode;
 	(void)stream;
 	CRT_UNIMPLEMENTED("DOS$_wfreopen_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wfreopen_s]]]*/
 
@@ -789,8 +781,7 @@ NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst,
 	(void)dst;
 	(void)wchar_count;
 	CRT_UNIMPLEMENTED("_wtmpnam_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wtmpnam_s]]]*/
 
@@ -803,8 +794,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 	(void)dst;
 	(void)wchar_count;
 	CRT_UNIMPLEMENTED("DOS$_wtmpnam_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wtmpnam_s]]]*/
 

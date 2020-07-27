@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda11e9fa */
+/* HASH CRC-32:0x99cb9cd7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@ __NAMESPACE_LOCAL_END
 #define ____pthread_destr_function_t_defined 1
 typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 #endif /* !____pthread_destr_function_t_defined */
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
@@ -39,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * associated to that key when the key is destroyed.
  * DESTR_FUNCTION is not called if the value associated is NULL when
  * the key is destroyed */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
 #endif /* !__local___localdep_pthread_key_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -50,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_key_create()' */
 __LOCAL_LIBC(tss_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id, __tss_dtor_t __destructor) {
-	int __error;
+	__errno_t __error;
 	__error = __localdep_pthread_key_create((__pthread_key_t *)__tss_id, __destructor);
 	if __likely(!__error)
 		return __thrd_success;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b670d46 */
+/* HASH CRC-32:0xd84e2bc6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,17 +40,17 @@ INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
                                        thrd_start_t func,
                                        void *arg) {
-	int error;
+	errno_t error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	error = libc_pthread_create((pthread_t *)thr, NULL,
 	                       (__pthread_start_routine_t)(void *)func,
 	                       arg);
 	if likely(!error)
 		return thrd_success;
-#ifdef ENOMEM
+#if defined(thrd_nomem) && defined(ENOMEM)
 	if (error == ENOMEM)
 		return thrd_nomem;
-#endif /* ENOMEM */
+#endif /* thrd_nomem && ENOMEM */
 	return thrd_error;
 }
 /* Terminate current thread execution, cleaning up any thread local
@@ -66,7 +66,7 @@ INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_NORETURN void
  * s.a. `pthread_detach()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr) {
-	int error;
+	errno_t error;
 	error = libc_pthread_detach((pthread_t)thr);
 	if likely(!error)
 		return thrd_success;
@@ -79,7 +79,7 @@ NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr) {
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
                                      int *res) {
-	int error;
+	errno_t error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *resptr;
 	error = libc_pthread_join((pthread_t)thr, res ? &resptr : NULL);
@@ -104,7 +104,7 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
                                     __STDC_INT_AS_UINT_T type) {
-	int error;
+	errno_t error;
 	if (type == mtx_plain) {
 		error = libc_pthread_mutex_init((pthread_mutex_t *)mutex, NULL);
 	} else {
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
  * s.a. `pthread_mutex_lock()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
-	int error;
+	errno_t error;
 	error = libc_pthread_mutex_lock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
@@ -146,7 +146,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
                                          struct timespec const *__restrict time_point) {
-	int error;
+	errno_t error;
 	error = libc_pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
@@ -164,7 +164,7 @@ DEFINE_INTERN_ALIAS(libc_mtx_timedlock64, libc_mtx_timedlock);
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
                                            struct timespec64 const *__restrict time_point) {
-	int error;
+	errno_t error;
 	error = libc_pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
@@ -173,16 +173,21 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
+#include <parts/errno.h>
 /* Try to lock the mutex pointed by MUTEX without blocking.
  * If the mutex is free the current threads takes control of
  * it, otherwise it returns immediately
  * s.a. `pthread_mutex_trylock()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
-	int error;
+	errno_t error;
 	error = libc_pthread_mutex_trylock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
+#if defined(thrd_busy) && defined(EBUSY)
+	if likely(error == EBUSY)
+		return thrd_busy;
+#endif /* thrd_busy && EBUSY */
 	return thrd_error;
 }
 #include <asm/crt/threads.h>
@@ -192,7 +197,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
  * s.a. `pthread_mutex_unlock()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
-	int error;
+	errno_t error;
 	error = libc_pthread_mutex_unlock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
@@ -204,7 +209,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
  * s.a. `pthread_cond_init()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
-	int error;
+	errno_t error;
 	error = libc_pthread_cond_init((pthread_cond_t *)cond, NULL);
 	if likely(!error)
 		return thrd_success;
@@ -216,7 +221,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
  * s.a. `pthread_cond_signal()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
-	int error;
+	errno_t error;
 	error = libc_pthread_cond_signal((pthread_cond_t *)cond);
 	if likely(!error)
 		return thrd_success;
@@ -228,7 +233,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
  * s.a. `pthread_cond_broadcast()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
-	int error;
+	errno_t error;
 	error = libc_pthread_cond_broadcast((pthread_cond_t *)cond);
 	if likely(!error)
 		return thrd_success;
@@ -241,7 +246,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
                                     mtx_t *__restrict mutex) {
-	int error;
+	errno_t error;
 	error = libc_pthread_cond_wait((pthread_cond_t *)cond,
 	                          (pthread_mutex_t *)mutex);
 	if likely(!error)
@@ -257,7 +262,7 @@ INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
                                          mtx_t *__restrict mutex,
                                          struct timespec const *__restrict time_point) {
-	int error;
+	errno_t error;
 	error = libc_pthread_cond_timedwait((pthread_cond_t *)cond,
 	                               (pthread_mutex_t *)mutex,
 	                               time_point);
@@ -279,7 +284,7 @@ INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
                                            mtx_t *__restrict mutex,
                                            struct timespec64 const *__restrict time_point) {
-	int error;
+	errno_t error;
 	error = libc_pthread_cond_timedwait64((pthread_cond_t *)cond,
 	                                 (pthread_mutex_t *)mutex,
 	                                 time_point);
@@ -298,7 +303,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
                                       tss_dtor_t destructor) {
-	int error;
+	errno_t error;
 	error = libc_pthread_key_create((pthread_key_t *)tss_id, destructor);
 	if likely(!error)
 		return thrd_success;
@@ -312,7 +317,7 @@ NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
                                    void *val) {
-	int error;
+	errno_t error;
 	error = libc_pthread_setspecific((pthread_key_t)tss_id, val);
 	if likely(!error)
 		return thrd_success;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x632d6e2c */
+/* HASH CRC-32:0xc4480f75 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #ifdef __CRT_HAVE_pthread_timedjoin_np
 #include <bits/crt/pthreadtypes.h>
 #include <bits/timespec.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_timedjoin32_np from pthread */
 #ifndef __local___localdep_pthread_timedjoin32_np_defined
@@ -31,11 +32,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
+__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #endif /* !__local___localdep_pthread_timedjoin32_np_defined */
-__LOCAL_LIBC(pthread_timedjoin64_np) int
+__LOCAL_LIBC(pthread_timedjoin64_np) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime) {
-	int __result;
+	__errno_t __result;
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__abstime32.tv_nsec = __abstime->tv_nsec;

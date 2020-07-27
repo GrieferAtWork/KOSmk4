@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff476843 */
+/* HASH CRC-32:0x7b561e62 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_create_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
+#include <bits/types.h>
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
 typedef void *(*__pthread_start_routine_t)(void *);
@@ -37,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
 #endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -47,17 +48,17 @@ __NAMESPACE_LOCAL_BEGIN
  * are passed through ARG. If successful, THR is set to new thread identifier */
 __LOCAL_LIBC(thrd_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, __thrd_start_t __func, void *__arg) {
-	int __error;
+	__errno_t __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = __localdep_pthread_create((__pthread_t *)__thr, __NULLPTR,
 	                       (__pthread_start_routine_t)(void *)__func,
 	                       __arg);
 	if __likely(!__error)
 		return __thrd_success;
-#ifdef __ENOMEM
+#if defined(__thrd_nomem) && defined(__ENOMEM)
 	if (__error == __ENOMEM)
 		return __thrd_nomem;
-#endif /* __ENOMEM */
+#endif /* __thrd_nomem && __ENOMEM */
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END

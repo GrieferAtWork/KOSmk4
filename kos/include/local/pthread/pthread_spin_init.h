@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb711f7b */
+/* HASH CRC-32:0xe2590edc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,12 @@
 #ifndef __local_pthread_spin_init_defined
 #define __local_pthread_spin_init_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes */
-__LOCAL_LIBC(pthread_spin_init) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(pthread_spin_init) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_init))(__pthread_spinlock_t *__lock, int __pshared) {
 	(void)__pshared;
 	__hybrid_atomic_store(*__lock, 0, __ATOMIC_RELAXED);

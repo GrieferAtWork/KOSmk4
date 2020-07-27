@@ -80,8 +80,7 @@ NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
 	(void)newval;
 	(void)mask;
 	CRT_UNIMPLEMENTED("_controlfp_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__controlfp_s]]]*/
 

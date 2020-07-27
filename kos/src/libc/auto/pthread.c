@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x632d1fd */
+/* HASH CRC-32:0x1ba27e0e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/pthread.h"
+#include "../user/sched.h"
 #include "../user/unistd.h"
 
 DECL_BEGIN
@@ -47,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 #include <hybrid/__atomic.h>
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
                                              int pshared) {
 	(void)pshared;
@@ -55,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
 	return 0;
 }
 /* Destroy the spinlock LOCK */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 	COMPILER_IMPURE();
 	(void)lock; /* no-op */
@@ -64,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 /* Wait until spinlock LOCK is retrieved */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 	while (libc_pthread_spin_trylock(lock) != 0)
 		__hybrid_yield();
@@ -73,7 +74,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 #include <hybrid/__atomic.h>
 #include <parts/errno.h>
 /* Try to lock spinlock LOCK */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
@@ -89,10 +90,41 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 /* Release spinlock LOCK */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
+}
+#include <bits/sched.h>
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
+	cpu_set_t cset;
+	if unlikely(libc_sched_getaffinity(0, sizeof(cset), &cset) != 0)
+		return 1;
+	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
+}
+#include <bits/sched.h>
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
+	int i, result;
+	cpu_set_t cset;
+	if (n < 1) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	__CPU_ZERO_S(sizeof(cset), &cset);
+	for (i = 0; i < n; ++i) {
+		if (!__CPU_SET_S(i, sizeof(cset), &cset))
+			break;
+	}
+	result = libc_sched_setaffinity(0, sizeof(cset), &cset);
+	if unlikely(result != 0)
+		result = __libc_geterrno_or(1);
+	return result;
 }
 /* Returns 1 if the calling thread is the main() thread (i.e. the
  * thread that was started by the kernel in order to execute the
@@ -116,6 +148,8 @@ DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
+DEFINE_PUBLIC_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
+DEFINE_PUBLIC_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);
 DEFINE_PUBLIC_ALIAS(thr_main, libc_pthread_main_np);
 DEFINE_PUBLIC_ALIAS(pthread_main_np, libc_pthread_main_np);
 #endif /* !__KERNEL__ */

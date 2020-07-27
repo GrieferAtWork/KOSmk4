@@ -48,6 +48,9 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 #else /* __x86_64__ */
 	va_list args;
 	va_start(args, argc);
+	(void)ucp;
+	(void)func;
+	(void)argc;
 	/* TODO */
 	abort();
 	va_end(args);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x483f2ad2 */
+/* HASH CRC-32:0x50b4d989 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2117,7 +2117,7 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
  * handlers are called in LIFO order (last added with PTHREAD_ATFORK,
  * first called before FORK), and the PARENT and CHILD handlers are called
  * in FIFO (first added, first called) */
-__CDECLARE(,int,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
 #else /* __CRT_HAVE_pthread_atfork */
 #undef __pthread_atfork_defined
 #endif /* !__CRT_HAVE_pthread_atfork */

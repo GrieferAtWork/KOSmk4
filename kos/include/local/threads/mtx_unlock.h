@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb73d36e */
+/* HASH CRC-32:0xde9a2dc2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_unlock from pthread */
 #ifndef __local___localdep_pthread_mutex_unlock_defined
 #define __local___localdep_pthread_mutex_unlock_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Unlock a mutex */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_unlock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -39,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_mutex_unlock()' */
 __LOCAL_LIBC(mtx_unlock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_unlock))(__mtx_t *__restrict __mutex) {
-	int __error;
+	__errno_t __error;
 	__error = __localdep_pthread_mutex_unlock((__pthread_mutex_t *)__mutex);
 	if __likely(!__error)
 		return __thrd_success;

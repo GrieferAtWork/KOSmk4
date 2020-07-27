@@ -645,8 +645,7 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 	(void)pbuflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("_dupenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__dupenv_s]]]*/
 
@@ -663,8 +662,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
 	(void)buflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("getenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc_getenv_s]]]*/
 
@@ -681,8 +679,7 @@ NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
 	(void)resultpath;
 	(void)buflen;
 	CRT_UNIMPLEMENTED("_searchenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__searchenv_s]]]*/
 
@@ -2058,8 +2055,7 @@ NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode)
 /*AUTO*/{
 	(void)mode;
 	CRT_UNIMPLEMENTED("_set_fmode"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__set_fmode]]]*/
 
@@ -2070,8 +2066,7 @@ NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode)
 /*AUTO*/{
 	(void)pmode;
 	CRT_UNIMPLEMENTED("_get_fmode"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__get_fmode]]]*/
 
@@ -2126,8 +2121,7 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *return_size,
 	(void)buflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("_wgetenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wgetenv_s]]]*/
 
@@ -2144,8 +2138,7 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
 	(void)buflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("DOS$_wgetenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wgetenv_s]]]*/
 
@@ -2160,8 +2153,7 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **pbuf,
 	(void)pbuflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("_wdupenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wdupenv_s]]]*/
 
@@ -2230,8 +2222,7 @@ NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname,
 	(void)varname;
 	(void)val;
 	CRT_UNIMPLEMENTED("DOS$_wputenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wputenv_s]]]*/
 
@@ -2244,8 +2235,7 @@ NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname,
 	(void)varname;
 	(void)val;
 	CRT_UNIMPLEMENTED("_wputenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wputenv_s]]]*/
 
@@ -2262,8 +2252,7 @@ NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file,
 	(void)resultpath;
 	(void)buflen;
 	CRT_UNIMPLEMENTED("DOS$_wsearchenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wsearchenv_s]]]*/
 
@@ -2280,8 +2269,7 @@ NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file,
 	(void)resultpath;
 	(void)buflen;
 	CRT_UNIMPLEMENTED("_wsearchenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc__wsearchenv_s]]]*/
 
@@ -2296,8 +2284,7 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 	(void)pbuflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("DOS$_wdupenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd__wdupenv_s]]]*/
 

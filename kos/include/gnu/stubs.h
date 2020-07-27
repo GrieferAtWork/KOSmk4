@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b2f6c7d */
+/* HASH CRC-32:0x78cce8ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -438,8 +438,8 @@
 #define __stub_pthread_key_create 1
 #define __stub_tss_delete 1
 #define __stub_pthread_key_delete 1
-#define __stub_pthread_mutex_consistent 1
 #define __stub_pthread_mutex_consistent_np 1
+#define __stub_pthread_mutex_consistent 1
 #define __stub_mtx_destroy 1
 #define __stub_pthread_mutex_destroy 1
 #define __stub_pthread_mutex_getprioceiling 1
@@ -454,15 +454,15 @@
 #define __stub_pthread_mutexattr_getprioceiling 1
 #define __stub_pthread_mutexattr_getprotocol 1
 #define __stub_pthread_mutexattr_getpshared 1
-#define __stub_pthread_mutexattr_getrobust 1
 #define __stub_pthread_mutexattr_getrobust_np 1
+#define __stub_pthread_mutexattr_getrobust 1
 #define __stub_pthread_mutexattr_gettype 1
 #define __stub_pthread_mutexattr_init 1
 #define __stub_pthread_mutexattr_setprioceiling 1
 #define __stub_pthread_mutexattr_setprotocol 1
 #define __stub_pthread_mutexattr_setpshared 1
-#define __stub_pthread_mutexattr_setrobust 1
 #define __stub_pthread_mutexattr_setrobust_np 1
+#define __stub_pthread_mutexattr_setrobust 1
 #define __stub_pthread_mutexattr_settype 1
 #define __stub_call_once 1
 #define __stub_pthread_once 1
@@ -486,7 +486,6 @@
 #define __stub_pthread_setcancelstate 1
 #define __stub_pthread_setcanceltype 1
 #define __stub_pthread_setspecific 1
-#define __stub_pthread_timedjoin64_np 1
 #define __stub_ptsname_r 1
 #define __stub_putgrent 1
 #define __stub_putmsg 1

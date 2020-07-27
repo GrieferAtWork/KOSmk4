@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb97bea5 */
+/* HASH CRC-32:0x721708b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,12 @@
 #define __local_pthread_set_num_processors_np_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_sched_setaffinity
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sched_setaffinity from sched */
 #ifndef __local___localdep_sched_setaffinity_defined
 #define __local___localdep_sched_setaffinity_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, __cpu_set_t const *__cpuset),sched_setaffinity,(__pid,__cpusetsize,__cpuset))
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/sched.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_set_num_processors_np) int
+__LOCAL_LIBC(pthread_set_num_processors_np) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int __n) {
 	int __i, __result;
 	__cpu_set_t __cset;

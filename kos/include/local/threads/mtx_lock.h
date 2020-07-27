@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5f23458 */
+/* HASH CRC-32:0xc2b86486 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_lock from pthread */
 #ifndef __local___localdep_pthread_mutex_lock_defined
 #define __local___localdep_pthread_mutex_lock_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Lock a mutex */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_lock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
@@ -39,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_mutex_lock()' */
 __LOCAL_LIBC(mtx_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mutex) {
-	int __error;
+	__errno_t __error;
 	__error = __localdep_pthread_mutex_lock((__pthread_mutex_t *)__mutex);
 	if __likely(!__error)
 		return __thrd_success;

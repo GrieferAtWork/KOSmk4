@@ -22,8 +22,8 @@
 
 #include <__crt.h>
 
-#define __thrd_success  0
-#define __thrd_busy     1
+#define __thrd_success  0 /* Success (s.a. `EOK') */
+#define __thrd_busy     1 /* Success (s.a. `EBUSY') */
 #define __thrd_error    2
 #define __thrd_nomem    3
 #define __thrd_timedout 4

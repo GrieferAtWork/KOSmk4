@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9895be3e */
+/* HASH CRC-32:0x4a592fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1922,7 +1922,6 @@
 #define __CRT_HAVE_DOS$pthread_key_delete 1
 #define __CRT_HAVE_DOS$pthread_kill 1
 #define __CRT_HAVE_DOS$pthread_mutex_consistent 1
-#define __CRT_HAVE_DOS$pthread_mutex_consistent_np 1
 #define __CRT_HAVE_DOS$pthread_mutex_destroy 1
 #define __CRT_HAVE_DOS$pthread_mutex_getprioceiling 1
 #define __CRT_HAVE_DOS$pthread_mutex_init 1
@@ -1937,14 +1936,12 @@
 #define __CRT_HAVE_DOS$pthread_mutexattr_getprotocol 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_getpshared 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_getrobust 1
-#define __CRT_HAVE_DOS$pthread_mutexattr_getrobust_np 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_gettype 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_init 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_setprioceiling 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_setprotocol 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_setpshared 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_setrobust 1
-#define __CRT_HAVE_DOS$pthread_mutexattr_setrobust_np 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_settype 1
 #define __CRT_HAVE_DOS$pthread_once 1
 #define __CRT_HAVE_DOS$pthread_rwlock_destroy 1
@@ -4940,7 +4937,6 @@
 #define __CRT_HAVE_pthread_kill 1
 #define __CRT_HAVE_pthread_main_np 1
 #define __CRT_HAVE_pthread_mutex_consistent 1
-#define __CRT_HAVE_pthread_mutex_consistent_np 1
 #define __CRT_HAVE_pthread_mutex_destroy 1
 #define __CRT_HAVE_pthread_mutex_getprioceiling 1
 #define __CRT_HAVE_pthread_mutex_init 1
@@ -4955,14 +4951,12 @@
 #define __CRT_HAVE_pthread_mutexattr_getprotocol 1
 #define __CRT_HAVE_pthread_mutexattr_getpshared 1
 #define __CRT_HAVE_pthread_mutexattr_getrobust 1
-#define __CRT_HAVE_pthread_mutexattr_getrobust_np 1
 #define __CRT_HAVE_pthread_mutexattr_gettype 1
 #define __CRT_HAVE_pthread_mutexattr_init 1
 #define __CRT_HAVE_pthread_mutexattr_setprioceiling 1
 #define __CRT_HAVE_pthread_mutexattr_setprotocol 1
 #define __CRT_HAVE_pthread_mutexattr_setpshared 1
 #define __CRT_HAVE_pthread_mutexattr_setrobust 1
-#define __CRT_HAVE_pthread_mutexattr_setrobust_np 1
 #define __CRT_HAVE_pthread_mutexattr_settype 1
 #define __CRT_HAVE_pthread_num_processors_np 1
 #define __CRT_HAVE_pthread_once 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10a93a37 */
+/* HASH CRC-32:0x5cb20a77 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,14 @@
 #ifndef __local_pthread_spin_lock_defined
 #define __local_pthread_spin_lock_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_spin_trylock from pthread */
 #ifndef __local___localdep_pthread_spin_trylock_defined
 #define __local___localdep_pthread_spin_trylock_defined 1
 #ifdef __CRT_HAVE_pthread_spin_trylock
 /* Try to lock spinlock LOCK */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
 #else /* __CRT_HAVE_pthread_spin_trylock */
 __NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_spin_trylock.h>
@@ -41,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/sched/__yield.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait until spinlock LOCK is retrieved */
-__LOCAL_LIBC(pthread_spin_lock) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(pthread_spin_lock) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__lock) {
 	while (__localdep_pthread_spin_trylock(__lock) != 0)
 		__hybrid_yield();
