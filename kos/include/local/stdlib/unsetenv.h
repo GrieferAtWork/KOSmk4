@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3aac96df */
+/* HASH CRC-32:0x452eb27e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unsetenv))(char const *__varname) {
 	if __unlikely(!__copy)
 		return -1;
 	__localdep_memcpyc(__copy, __varname, __namelen, sizeof(char));
-	__copy[__namelen] = '=';
+	__copy[__namelen]     = '=';
 	__copy[__namelen + 1] = '\0';
 	__result = __localdep_putenv(__copy);
 	__freea(__copy);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc15aa225 */
+/* HASH CRC-32:0x84d965e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,7 +363,16 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemp64)(char *templ
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mkdtemp)(char *template_);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_grantpt)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
+INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_strtol_l)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -408,6 +417,8 @@ INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname);
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */

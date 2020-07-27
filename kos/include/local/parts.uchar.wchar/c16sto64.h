@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d6a3914 */
+/* HASH CRC-32:0x5c307dde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,13 +65,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16sto64) __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sto64))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
 	__UINT64_TYPE__ __result;
-	__BOOL __neg = 0;
-	while (*__nptr == '-') {
-		__neg = !__neg;
+	__CHAR16_TYPE__ __sign = *__nptr;
+	if (__sign == '-') {
+		++__nptr;
+		__result = __localdep_c16stou64(__nptr, __endptr, __base);
+		return -(__INT64_TYPE__)__result;
+	} else if (__sign == '+') {
 		++__nptr;
 	}
 	__result = __localdep_c16stou64(__nptr, __endptr, __base);
-	return __neg ? -(__INT64_TYPE__)__result : (__INT64_TYPE__)__result;
+	return (__INT64_TYPE__)__result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16sto64_defined

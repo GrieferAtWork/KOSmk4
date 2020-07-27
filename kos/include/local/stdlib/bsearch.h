@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64618daa */
+/* HASH CRC-32:0xc5783e92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_bsearch_r */
 #endif /* !__local___localdep_bsearch_r_defined */
 __NAMESPACE_LOCAL_END
+#ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_compare_helper_defined 1
@@ -55,12 +56,19 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	return (void *)__localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
+	                         (int(__LIBCCALL *)(void const *, void const *, void *))(void *)__cmp,
+	                         __NULLPTR);
+#else /* __LIBCCALL_CALLER_CLEANUP */
 	return (void *)__localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	                         (void *)__cmp);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bsearch_defined

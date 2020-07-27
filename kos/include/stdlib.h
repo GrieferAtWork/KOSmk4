@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc381a6a5 */
+/* HASH CRC-32:0x200b5161 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1762,8 +1762,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __USE_XOPEN2K */
 
 
-#if defined(__USE_MISC) || \
-   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
+#if (defined(__USE_MISC) || \
+     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 #ifndef __mktemp_defined
 #define __mktemp_defined 1
 #ifdef __CRT_HAVE_mktemp
@@ -1776,11 +1776,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),
 #undef __mktemp_defined
 #endif /* !... */
 #endif /* !__mktemp_defined */
-#endif
+#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 
-#if defined(__USE_MISC) || defined(__USE_DOS) || \
-   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
+#if (defined(__USE_MISC) || defined(__USE_DOS) || \
+     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE_ecvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,ecvt,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
@@ -1799,7 +1799,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3, 4)),char *,__NOTHROW_NCX,fcvt,(dou
 __NAMESPACE_LOCAL_USING_OR_IMPL(fcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *__NOTHROW_NCX(__LIBCCALL fcvt)(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt))(__val, __ndigit, __decptr, __sign); })
 #endif /* !... */
 #endif /* !__NO_FPU */
-#endif /* ... */
+#endif /* __USE_MISC || __USE_DOS || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __getsubopt_defined
 #define __getsubopt_defined 1
@@ -1853,7 +1853,16 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,unlockpt,(__fd_t __fd),(__fd))
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
+#ifdef __CRT_HAVE_ptsname
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
+#elif defined(__CRT_HAVE_ptsname_r)
+#include <local/stdlib/ptsname.h>
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ptsname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL ptsname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ptsname))(__fd); })
+#endif /* ... */
 #endif /* __USE_XOPEN */
 
 #ifdef __USE_XOPEN2KXSI
@@ -2036,7 +2045,12 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),__secure_getenv,(__varname))
 #elif defined(__CRT_HAVE_getenv)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),getenv,(__varname))
+#elif defined(__LOCAL_environ)
+#include <local/stdlib/getenv.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL secure_getenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getenv))(__varname); }
 #endif /* ... */
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ptsname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),(__fd,__buf,__buflen))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getpt,(void),())
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer

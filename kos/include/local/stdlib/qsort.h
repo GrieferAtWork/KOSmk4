@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9dd40ba */
+/* HASH CRC-32:0x60fd9080 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_qsort_r */
 #endif /* !__local___localdep_qsort_r_defined */
 __NAMESPACE_LOCAL_END
+#ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_compare_helper_defined 1
@@ -55,12 +56,19 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort) __ATTR_NONNULL((1, 4)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(qsort))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	__localdep_qsort_r(__pbase, __item_count, __item_size,
+	        (int(__LIBCCALL *)(void const *, void const *, void *))(void *)__cmp,
+	        __NULLPTR);
+#else /* __LIBCCALL_CALLER_CLEANUP */
 	__localdep_qsort_r(__pbase, __item_count, __item_size,
 	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	        (void *)__cmp);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_qsort_defined

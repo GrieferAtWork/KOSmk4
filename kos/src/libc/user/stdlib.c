@@ -1595,17 +1595,6 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd)
 }
 /*[[[end:libc_unlockpt]]]*/
 
-/*[[[head:libc_ptsname,hash:CRC-32=0xf5496d8]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd)
-/*[[[body:libc_ptsname]]]*/
-/*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTED("ptsname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_ptsname]]]*/
 
 /*[[[head:libc_posix_openpt,hash:CRC-32=0x9f0949e1]]]*/
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED fd_t
@@ -1630,7 +1619,9 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:libc_getpt]]]*/
 
-/*[[[head:libc_ptsname_r,hash:CRC-32=0xcd858348]]]*/
+/*[[[head:libc_ptsname_r,hash:CRC-32=0xe46d5080]]]*/
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      char *buf,
@@ -2384,7 +2375,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfbac2fbf]]]*/
+/*[[[start:exports,hash:CRC-32=0xb2d7137f]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2444,7 +2435,6 @@ DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp64);
 DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
-DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
 DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);

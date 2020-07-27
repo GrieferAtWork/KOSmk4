@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b1dfc5e */
+/* HASH CRC-32:0x34790387 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gcvt))(double __val, int __ndigit, ch
 #elif __DBL_MANT_DIG__ == 56
 #define __DBL_NDIGIT_MAX 18
 #else /* ... */
-	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
+	/* ceil(M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define __DBL_NDIGIT_MAX (__DBL_MANT_DIG__ / 4)
 #endif /* !... */
 #endif /* !__DBL_NDIGIT_MAX */

@@ -219,139 +219,60 @@ typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 )]
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[impl_include("<hybrid/__minmax.h>")]]
+[[impl_include("<hybrid/__minmax.h>", "<hybrid/typecore.h>")]]
 [[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, kernel]]
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
-	/* DISCALIMER: The qsort() implementation below has been taken directly
-	 *             from glibc (`/stdlib/qsort.c'), before being re-tuned and
-	 *             formatted to best work with KOS.
-	 * >> For better source documentation, consult the original function! */
-	/* Copyright (C) 1991-2017 Free Software Foundation, Inc.
-	   This file is part of the GNU C Library.
-	   Written by Douglas C. Schmidt (schmidt@ics.uci.edu).
-
-	   The GNU C Library is free software; you can redistribute it and/or
-	   modify it under the terms of the GNU Lesser General Public
-	   License as published by the Free Software Foundation; either
-	   version 2.1 of the License, or (at your option) any later version.
-
-	   The GNU C Library is distributed in the hope that it will be useful,
-	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	   Lesser General Public License for more details.
-
-	   You should have received a copy of the GNU Lesser General Public
-	   License along with the GNU C Library; if not, see
-	   <http://www.gnu.org/licenses/>.  */
-#define SWAP(a, b, size)               \
-	do {                               \
-		size_t __size = (size);        \
-		byte_t *__a = (a), *__b = (b); \
-		do{ byte_t __tmp = *__a;       \
-			*__a++ = *__b;             \
-			*__b++ = __tmp;            \
-		} while (--__size > 0);        \
-	} __WHILE0
-#define MAX_THRESH 4
-	typedef struct { byte_t *lo, *hi; } stack_node;
-#define STACK_SIZE      (8*sizeof(size_t))
-#define PUSH(low, high)  ((void)((top->lo = (low)), (top->hi = (high)), ++top))
-#define POP(low, high)   ((void)(--top, (low = top->lo), (high = top->hi)))
-#define STACK_NOT_EMPTY (stack < top)
-	byte_t *base_ptr = (byte_t *)pbase;
-	size_t const max_thresh = MAX_THRESH * item_size;
-	if (item_count == 0)
-		return;
-	if (item_count > MAX_THRESH) {
-		byte_t *lo = base_ptr;
-		byte_t *hi = &lo[item_size * (item_count-1)];
-		stack_node stack[STACK_SIZE];
-		stack_node *top = stack;
-		PUSH(NULL, NULL);
-		while (STACK_NOT_EMPTY) {
-			byte_t *left_ptr;
-			byte_t *right_ptr;
-			byte_t *mid = lo + item_size * ((hi - lo) / item_size >> 1);
-			if ((*cmp)((void *)mid, (void *)lo, arg) < 0)
-				SWAP(mid, lo, item_size);
-			if ((*cmp)((void *)hi, (void *)mid, arg) < 0)
-				SWAP(mid, hi, item_size);
-			else
-				goto jump_over;
-			if ((*cmp) ((void *)mid, (void *)lo, arg) < 0)
-				SWAP(mid, lo, item_size);
-jump_over:
-			left_ptr  = lo+item_size;
-			right_ptr = hi-item_size;
-			do {
-				while ((*cmp)((void *)left_ptr, (void *)mid, arg) < 0)
-					left_ptr += item_size;
-				while ((*cmp)((void *)mid, (void *)right_ptr, arg) < 0)
-					right_ptr -= item_size;
-				if (left_ptr < right_ptr) {
-					SWAP(left_ptr, right_ptr, item_size);
-					if (mid == left_ptr)
-						mid = right_ptr;
-					else if (mid == right_ptr)
-						mid = left_ptr;
-					left_ptr += item_size;
-					right_ptr -= item_size;
-				} else if (left_ptr == right_ptr) {
-					left_ptr += item_size;
-					right_ptr -= item_size;
+	/* A public domain qsort() drop-in implementation. I couldn't find the original
+	 * source referenced (see the comment below), but this code is the first thing
+	 * that comes up when you search for `libc qsort public domain'.
+	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
+	 *
+	 * Note that I made some modifications, and you should see the linked source for
+	 * the original code.
+	 *
+	 * WARNING: This function's logic will break in situations where `item_count' is
+	 *          greater than or equal to:
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
+	 *
+	 * But I would argue that this isn't something that could ever feasibly happen, and
+	 * even speaking architecturally, this isn't something that _can_ happen on x86_64.
+	 * It ~could~ happen on i386, but I very much doubt that there is any justification
+	 * as to why it should.
+	 *
+	 * ================= Documented origin =================
+	 *  ssort()  --  Fast, small, qsort()-compatible Shell sort
+	 *
+	 *  by Ray Gardner,  public domain   5/90
+	 */
+	size_t total_bytes, gap;
+	total_bytes = item_size * item_count;
+	for (gap = 0; ++gap < item_count;)
+		gap *= 3;
+	while ((gap /= 3) != 0) {
+		size_t i, gap_bytes;
+		gap_bytes = item_size * gap;
+		for (i = gap_bytes; i < total_bytes; i += item_size) {
+			size_t j;
+			for (j = i - gap_bytes;; j -= gap_bytes) {
+				size_t swap_index;
+				byte_t tmp, *a, *b;
+				a = (byte_t *)pbase + j;
+				b = a + gap_bytes;
+				if ((*cmp)(a, b, arg) <= 0)
 					break;
-				}
-			} while (left_ptr <= right_ptr);
-			if ((size_t)(right_ptr-lo) <= max_thresh) {
-				if ((size_t)(hi-left_ptr) <= max_thresh)
-					POP(lo, hi);
-				else
-					lo = left_ptr;
-			} else if ((size_t)(hi-left_ptr) <= max_thresh) {
-				hi = right_ptr;
-			} else if ((right_ptr-lo) > (hi - left_ptr)) {
-				PUSH(lo, right_ptr);
-				lo = left_ptr;
-			} else {
-				PUSH(left_ptr, hi);
-				hi = right_ptr;
+				swap_index = item_size;
+				do {
+					tmp  = *a;
+					*a++ = *b;
+					*b++ = tmp;
+				} while (--swap_index);
+				if (j < gap_bytes)
+					break;
 			}
 		}
 	}
-	{
-		byte_t *const end_ptr = &base_ptr[item_size * (item_count-1)];
-		byte_t *run_ptr, *tmp_ptr = base_ptr;
-		byte_t *thresh = __hybrid_min(end_ptr, base_ptr+max_thresh);
-		for (run_ptr = tmp_ptr+item_size; run_ptr <= thresh; run_ptr += item_size) {
-			if ((*cmp) ((void *)run_ptr, (void *)tmp_ptr, arg) < 0)
-				tmp_ptr = run_ptr;
-		}
-		if (tmp_ptr != base_ptr)
-			SWAP(tmp_ptr, base_ptr, item_size);
-		run_ptr = base_ptr+item_size;
-		while ((run_ptr += item_size) <= end_ptr) {
-			tmp_ptr = run_ptr-item_size;
-			while ((*cmp)((void *)run_ptr, (void *)tmp_ptr, arg) < 0)
-				tmp_ptr -= item_size;
-			tmp_ptr += item_size;
-			if (tmp_ptr != run_ptr) {
-				byte_t *trav = run_ptr+item_size;
-				while (--trav >= run_ptr) {
-					byte_t *hi, *lo, c = *trav;
-					for (hi = lo = trav; (lo -= item_size) >= tmp_ptr; hi = lo)
-						*hi = *lo;
-					*hi = c;
-				}
-			}
-		}
-	}
-#undef STACK_NOT_EMPTY
-#undef POP
-#undef PUSH
-#undef STACK_SIZE
-#undef MAX_THRESH
-#undef SWAP
 }
 
 %#endif /* __USE_GNU */
@@ -425,6 +346,7 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER =
+@@pp_ifndef __LIBCCALL_CALLER_CLEANUP@@
 @@pp_ifndef ____invoke_compare_helper_defined@@
 @@push_namespace(local)@@
 #define ____invoke_compare_helper_defined 1
@@ -433,6 +355,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 	return (*(__compar_fn_t)__arg)(__a, __b);
 }
 @@pop_namespace@@
+@@pp_endif@@
 @@pp_endif@@
 )]
 
@@ -445,9 +368,15 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std, kernel]]
 void qsort([[nonnull]] void *pbase, size_t item_count,
            size_t item_size, [[nonnull]] __compar_fn_t cmp) {
+@@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
+	qsort_r(pbase, item_count, item_size,
+	        (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	        NULL);
+@@pp_else@@
 	qsort_r(pbase, item_count, item_size,
 	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	        (void *)cmp);
+@@pp_endif@@
 }
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
@@ -457,9 +386,15 @@ void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void const *]
 {
+@@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
+	return (void *)bsearch_r(pkey, pbase, item_count, item_size,
+	                         (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	                         NULL);
+@@pp_else@@
 	return (void *)bsearch_r(pkey, pbase, item_count, item_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	                         (void *)cmp);
+@@pp_endif@@
 }
 
 
@@ -534,8 +469,7 @@ __LONGLONG llabs(__LONGLONG x) {
  *  Honestly: I don't really understand why using the struct-prefixed name (`struct __div_struct')
  *  fixes the problem (Note that when leaving out the `struct' and only writing `__div_struct',
  *  a different error ```error: expected primary-expression before '__attribute__'``` occurs with
- *  is also incorrect in this scenario), however a work-around is a work-around, and I'm happy
- *  enough 
+ *  is also incorrect in this scenario), however a work-around is a work-around, and I'm satisfied
  *
  *  For reference, I've created a bug report for this problem here:
  *  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92438
@@ -612,15 +546,15 @@ struct __div_struct div(int numer, int denom) {
 [[requires_include("<local/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
 char *getenv([[nonnull]] char const *varname) {
-	size_t namelen;
 	char *result, **envp;
 	if unlikely(!varname)
 		return NULL;
-	namelen = strlen(varname);
 	envp = __LOCAL_environ;
 	if unlikely(!envp)
 		result = NULL;
 	else {
+		size_t namelen;
+		namelen = strlen(varname);
 		for (; (result = *envp) != NULL; ++envp) {
 			if (memcmp(result, varname, namelen * sizeof(char)) != 0 ||
 			    result[namelen] != '=')
@@ -672,9 +606,13 @@ int system([[nullable]] char const *command);
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
-[[requires_function(_Exit)]]
+[[requires_function(_Exit), impl_include("<asm/stdlib.h>")]]
 void abort() {
-	_Exit(/* EXIT_FAILURE */ 1);
+#ifdef __EXIT_FAILURE
+	_Exit(__EXIT_FAILURE);
+#else /* __EXIT_FAILURE */
+	_Exit(1);
+#endif /* !__EXIT_FAILURE */
 }
 
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
@@ -704,11 +642,9 @@ int at_quick_exit([[nonnull]] __atexit_func_t func);
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
-[[std, crtbuiltin]]
+[[std, crtbuiltin, export_alias("_exit"), alias("quick_exit", "exit")]]
 [[if(__has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS)),
-  preferred_extern_inline(_exit, { __builtin__exit(status); })]]
-[[export_alias("_exit")]]
-[[alias("quick_exit", "exit")]]
+  preferred_extern_inline("_exit", { __builtin__exit(status); })]]
 [[ATTR_NORETURN, throws, section(".text.crt{|.dos}.application.exit")]]
 void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
@@ -951,11 +887,11 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -975,11 +911,15 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -996,13 +936,16 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 $int32_t strto32([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 	u32 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = strtou32(nptr, endptr, base);
+		return -(s32)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = strtou32(nptr, endptr, base);
-	return neg ? -(s32)result : (s32)result;
+	return (s32)result;
 }
 
 %#ifdef __UINT64_TYPE__
@@ -1017,11 +960,11 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -1041,11 +984,15 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -1063,13 +1010,16 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 $int64_t strto64([[nonnull]] char const *__restrict nptr,
                  [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 	u64 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = strtou64(nptr, endptr, base);
+		return -(s64)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = strtou64(nptr, endptr, base);
-	return neg ? -(s64)result : (s64)result;
+	return (s64)result;
 }
 %#endif /* __UINT64_TYPE__ */
 
@@ -1139,7 +1089,7 @@ char *gcvt(double val, int ndigit, [[nonnull]] char *buf) {
 @@pp_elif __DBL_MANT_DIG__ == 56@@
 #define DBL_NDIGIT_MAX 18
 @@pp_else@@
-	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
+	/* ceil(M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define DBL_NDIGIT_MAX (__DBL_MANT_DIG__ / 4)
 @@pp_endif@@
 @@pp_endif@@
@@ -1218,7 +1168,7 @@ char *qgcvt(__LONGDOUBLE val, int ndigit, [[nonnull]] char *buf) {
 @@pp_elif __LDBL_MANT_DIG__ == 56@@
 #define LDBG_NDIGIT_MAX 18
 @@pp_else@@
-	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
+	/* ceil(M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define LDBG_NDIGIT_MAX (__LDBL_MANT_DIG__ / 4)
 @@pp_endif@@
 @@pp_endif@@
@@ -1351,11 +1301,13 @@ int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
 int clearenv();
 
 %[default:section(".text.crt{|.dos}.fs.utility")]
+[[wunused]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
-[[wunused]] int mkstemps([[nonnull]] char *template_, int suffixlen);
+int mkstemps([[nonnull]] char *template_, int suffixlen);
 
-[[ATTR_PURE, section(".text.crt{|.dos}.utility.locale")]]
-[[wunused]] int rpmatch([[nonnull]] char const *response) {
+[[wunused, ATTR_PURE]]
+[[section(".text.crt{|.dos}.utility.locale")]]
+int rpmatch([[nonnull]] char const *response) {
 	char c = response[0];
 	if (c == 'n' || c == 'N')
 		return 0;
@@ -1450,7 +1402,7 @@ double erand48([[nonnull]] unsigned short xsubi[3]);
 long nrand48([[nonnull]] unsigned short xsubi[3]);
 long jrand48([[nonnull]] unsigned short xsubi[3]);
 void srand48(long seedval);
-unsigned short * seed48([[nonnull]] unsigned short seed16v[3]);
+unsigned short *seed48([[nonnull]] unsigned short seed16v[3]);
 void lcong48([[nonnull]] unsigned short param[7]);
 %#endif /* __USE_MISC || __USE_XOPEN */
 
@@ -1509,6 +1461,7 @@ char *realpath([[nonnull]] char const *__restrict filename, char *resolved);
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[decl_include("<bits/types.h>")]]
 char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
@@ -1525,6 +1478,7 @@ char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[decl_include("<bits/types.h>")]]
 char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 
 @@Returns the absolute filesystem path for the specified file
@@ -1541,6 +1495,7 @@ char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 @@@param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 @@@return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[decl_include("<bits/types.h>")]]
 char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
                   char *resolved, $size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -1575,7 +1530,7 @@ int unsetenv([[nonnull]] char const *varname) {
 	if unlikely(!copy)
 		return -1;
 	memcpyc(copy, varname, namelen, sizeof(char));
-	copy[namelen] = '=';
+	copy[namelen]     = '=';
 	copy[namelen + 1] = '\0';
 	result = putenv(copy);
 	@__freea@(copy);
@@ -1585,18 +1540,18 @@ int unsetenv([[nonnull]] char const *varname) {
 
 %
 %
-%#if defined(__USE_MISC) || \
-%   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
+%#if (defined(__USE_MISC) || \
+%     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 %[default:section(".text.crt{|.dos}.fs.utility")]
 [[guard, alias("_mktemp"), export_alias("__mktemp")]]
 char *mktemp([[nonnull]] char *template_);
-%#endif
+%#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 
 %
 %
-%#if defined(__USE_MISC) || defined(__USE_DOS) || \
-%   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
+%#if (defined(__USE_MISC) || defined(__USE_DOS) || \
+%     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 %[default:section(".text.crt{|.dos}.unicode.static.convert")]
 
 %#ifndef __NO_FPU
@@ -1625,7 +1580,7 @@ char *fcvt(double val, int ndigit,
 }
 %#endif /* !__NO_FPU */
 
-%#endif /* ... */
+%#endif /* __USE_MISC || __USE_DOS || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
@@ -1697,16 +1652,27 @@ char *mkdtemp([[nonnull]] char *template_);
 %#ifdef __USE_XOPEN
 %[default:section(".text.crt{|.dos}.io.tty")]
 %[insert:extern(setkey)]
+[[decl_include("<bits/types.h>")]]
 int grantpt($fd_t fd);
+
+[[decl_include("<bits/types.h>")]]
 int unlockpt($fd_t fd);
 
-[[wunused]]
-char *ptsname($fd_t fd); /* TODO: Implement using `ptsname_r()' */
+@@Returns the name of the PTY slave (Pseudo TTY slave)
+@@associated with the master descriptor `FD'
+[[wunused, requires_function(ptsname_r)]]
+[[decl_include("<bits/types.h>")]]
+char *ptsname($fd_t fd) {
+	static char buf[64];
+	if unlikely(ptsname_r(fd, buf, sizeof(buf)))
+		return NULL;
+	return buf;
+}
 %#endif /* __USE_XOPEN */
 
 %
 %#ifdef __USE_XOPEN2KXSI
-[[cp, wunused]]
+[[cp, wunused, decl_include("<bits/types.h>")]]
 $fd_t posix_openpt($oflag_t oflags);
 %#endif /* __USE_XOPEN2KXSI */
 
@@ -1722,7 +1688,8 @@ $fd_t posix_openpt($oflag_t oflags);
 [[if(__SIZEOF_LONG__ == 8), bind_local_function(strto64_l)]]
 [[decl_include("<features.h>")]]
 long strtol_l([[nonnull]] char const *__restrict nptr,
-              char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
+              char **endptr, __STDC_INT_AS_UINT_T base,
+              $locale_t locale) {
 	(void)locale;
 	return strtol(nptr, endptr, base);
 }
@@ -1736,7 +1703,8 @@ long strtol_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_LONG__ == 8), bind_local_function(strtou64_l)]]
 [[decl_include("<features.h>")]]
 unsigned long strtoul_l([[nonnull]] char const *__restrict nptr,
-                        char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
+                        char **endptr, __STDC_INT_AS_UINT_T base,
+                        $locale_t locale) {
 	(void)locale;
 	return strtoul(nptr, endptr, base);
 }
@@ -1751,7 +1719,8 @@ unsigned long strtoul_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_LONG_LONG__ == 8), bind_local_function(strto32_l)]]
 [[decl_include("<features.h>")]]
 __LONGLONG strtoll_l([[nonnull]] char const *__restrict nptr,
-                     char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
+                     char **endptr, __STDC_INT_AS_UINT_T base,
+                     $locale_t locale) {
 	(void)locale;
 	return strtoll(nptr, endptr, base);
 }
@@ -1765,7 +1734,8 @@ __LONGLONG strtoll_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_LONG_LONG__ == 8), bind_local_function(strtou32_l)]]
 [[decl_include("<features.h>")]]
 __ULONGLONG strtoull_l([[nonnull]] char const *__restrict nptr,
-                       char **endptr, __STDC_INT_AS_UINT_T base, $locale_t locale) {
+                       char **endptr, __STDC_INT_AS_UINT_T base,
+                       $locale_t locale) {
 	(void)locale;
 	return strtoull(nptr, endptr, base);
 }
@@ -1799,11 +1769,14 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-[[section(".text.crt{|.dos}.fs.environ")]]
-[[wunused, export_alias("__secure_getenv"), alias("getenv")]]
+[[wunused, section(".text.crt{|.dos}.fs.environ")]]
+[[export_alias("__secure_getenv"), alias("getenv")]]
+[[if($extended_include_prefix("<local/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
 char *secure_getenv([[nonnull]] char const *varname);
 
-[[section(".text.crt{|.dos}.io.tty")]]
+@@Returns the name of the PTY slave (Pseudo TTY slave)
+@@associated with the master descriptor `FD'
+[[section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
 int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 
 [[cp]]

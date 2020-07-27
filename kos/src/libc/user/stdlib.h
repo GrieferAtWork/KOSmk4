@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ac58200 */
+/* HASH CRC-32:0x3509bc22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,9 +125,10 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mkstemp64)(char *templ
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_mkdtemp)(char *template_);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer

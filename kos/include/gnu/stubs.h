@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5388ada */
+/* HASH CRC-32:0x2b2f6c7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -487,7 +487,6 @@
 #define __stub_pthread_setcanceltype 1
 #define __stub_pthread_setspecific 1
 #define __stub_pthread_timedjoin64_np 1
-#define __stub_ptsname 1
 #define __stub_ptsname_r 1
 #define __stub_putgrent 1
 #define __stub_putmsg 1

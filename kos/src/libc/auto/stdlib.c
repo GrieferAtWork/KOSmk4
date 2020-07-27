@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d7c3523 */
+/* HASH CRC-32:0xcbb8c3bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,141 +35,63 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #include <hybrid/__minmax.h>
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
                         size_t item_count,
                         size_t item_size,
                         __compar_d_fn_t cmp,
                         void *arg) THROWS(...) {
-	/* DISCALIMER: The qsort() implementation below has been taken directly
-	 *             from glibc (`/stdlib/qsort.c'), before being re-tuned and
-	 *             formatted to best work with KOS.
-	 * >> For better source documentation, consult the original function! */
-	/* Copyright (C) 1991-2017 Free Software Foundation, Inc.
-	   This file is part of the GNU C Library.
-	   Written by Douglas C. Schmidt (schmidt@ics.uci.edu).
-
-	   The GNU C Library is free software; you can redistribute it and/or
-	   modify it under the terms of the GNU Lesser General Public
-	   License as published by the Free Software Foundation; either
-	   version 2.1 of the License, or (at your option) any later version.
-
-	   The GNU C Library is distributed in the hope that it will be useful,
-	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	   Lesser General Public License for more details.
-
-	   You should have received a copy of the GNU Lesser General Public
-	   License along with the GNU C Library; if not, see
-	   <http://www.gnu.org/licenses/>.  */
-#define SWAP(a, b, size)               \
-	do {                               \
-		size_t __size = (size);        \
-		byte_t *__a = (a), *__b = (b); \
-		do{ byte_t __tmp = *__a;       \
-			*__a++ = *__b;             \
-			*__b++ = __tmp;            \
-		} while (--__size > 0);        \
-	} __WHILE0
-#define MAX_THRESH 4
-	typedef struct { byte_t *lo, *hi; } stack_node;
-#define STACK_SIZE      (8*sizeof(size_t))
-#define PUSH(low, high)  ((void)((top->lo = (low)), (top->hi = (high)), ++top))
-#define POP(low, high)   ((void)(--top, (low = top->lo), (high = top->hi)))
-#define STACK_NOT_EMPTY (stack < top)
-	byte_t *base_ptr = (byte_t *)pbase;
-	size_t const max_thresh = MAX_THRESH * item_size;
-	if (item_count == 0)
-		return;
-	if (item_count > MAX_THRESH) {
-		byte_t *lo = base_ptr;
-		byte_t *hi = &lo[item_size * (item_count-1)];
-		stack_node stack[STACK_SIZE];
-		stack_node *top = stack;
-		PUSH(NULL, NULL);
-		while (STACK_NOT_EMPTY) {
-			byte_t *left_ptr;
-			byte_t *right_ptr;
-			byte_t *mid = lo + item_size * ((hi - lo) / item_size >> 1);
-			if ((*cmp)((void *)mid, (void *)lo, arg) < 0)
-				SWAP(mid, lo, item_size);
-			if ((*cmp)((void *)hi, (void *)mid, arg) < 0)
-				SWAP(mid, hi, item_size);
-			else
-				goto jump_over;
-			if ((*cmp) ((void *)mid, (void *)lo, arg) < 0)
-				SWAP(mid, lo, item_size);
-jump_over:
-			left_ptr  = lo+item_size;
-			right_ptr = hi-item_size;
-			do {
-				while ((*cmp)((void *)left_ptr, (void *)mid, arg) < 0)
-					left_ptr += item_size;
-				while ((*cmp)((void *)mid, (void *)right_ptr, arg) < 0)
-					right_ptr -= item_size;
-				if (left_ptr < right_ptr) {
-					SWAP(left_ptr, right_ptr, item_size);
-					if (mid == left_ptr)
-						mid = right_ptr;
-					else if (mid == right_ptr)
-						mid = left_ptr;
-					left_ptr += item_size;
-					right_ptr -= item_size;
-				} else if (left_ptr == right_ptr) {
-					left_ptr += item_size;
-					right_ptr -= item_size;
+	/* A public domain qsort() drop-in implementation. I couldn't find the original
+	 * source referenced (see the comment below), but this code is the first thing
+	 * that comes up when you search for `libc qsort public domain'.
+	 * https://git.busybox.net/uClibc/tree/libc/stdlib/stdlib.c#n770
+	 *
+	 * Note that I made some modifications, and you should see the linked source for
+	 * the original code.
+	 *
+	 * WARNING: This function's logic will break in situations where `item_count' is
+	 *          greater than or equal to:
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
+	 *
+	 * But I would argue that this isn't something that could ever feasibly happen, and
+	 * even speaking architecturally, this isn't something that _can_ happen on x86_64.
+	 * It ~could~ happen on i386, but I very much doubt that there is any justification
+	 * as to why it should.
+	 *
+	 * ================= Documented origin =================
+	 *  ssort()  --  Fast, small, qsort()-compatible Shell sort
+	 *
+	 *  by Ray Gardner,  public domain   5/90
+	 */
+	size_t total_bytes, gap;
+	total_bytes = item_size * item_count;
+	for (gap = 0; ++gap < item_count;)
+		gap *= 3;
+	while ((gap /= 3) != 0) {
+		size_t i, gap_bytes;
+		gap_bytes = item_size * gap;
+		for (i = gap_bytes; i < total_bytes; i += item_size) {
+			size_t j;
+			for (j = i - gap_bytes;; j -= gap_bytes) {
+				size_t swap_index;
+				byte_t tmp, *a, *b;
+				a = (byte_t *)pbase + j;
+				b = a + gap_bytes;
+				if ((*cmp)(a, b, arg) <= 0)
 					break;
-				}
-			} while (left_ptr <= right_ptr);
-			if ((size_t)(right_ptr-lo) <= max_thresh) {
-				if ((size_t)(hi-left_ptr) <= max_thresh)
-					POP(lo, hi);
-				else
-					lo = left_ptr;
-			} else if ((size_t)(hi-left_ptr) <= max_thresh) {
-				hi = right_ptr;
-			} else if ((right_ptr-lo) > (hi - left_ptr)) {
-				PUSH(lo, right_ptr);
-				lo = left_ptr;
-			} else {
-				PUSH(left_ptr, hi);
-				hi = right_ptr;
+				swap_index = item_size;
+				do {
+					tmp  = *a;
+					*a++ = *b;
+					*b++ = tmp;
+				} while (--swap_index);
+				if (j < gap_bytes)
+					break;
 			}
 		}
 	}
-	{
-		byte_t *const end_ptr = &base_ptr[item_size * (item_count-1)];
-		byte_t *run_ptr, *tmp_ptr = base_ptr;
-		byte_t *thresh = __hybrid_min(end_ptr, base_ptr+max_thresh);
-		for (run_ptr = tmp_ptr+item_size; run_ptr <= thresh; run_ptr += item_size) {
-			if ((*cmp) ((void *)run_ptr, (void *)tmp_ptr, arg) < 0)
-				tmp_ptr = run_ptr;
-		}
-		if (tmp_ptr != base_ptr)
-			SWAP(tmp_ptr, base_ptr, item_size);
-		run_ptr = base_ptr+item_size;
-		while ((run_ptr += item_size) <= end_ptr) {
-			tmp_ptr = run_ptr-item_size;
-			while ((*cmp)((void *)run_ptr, (void *)tmp_ptr, arg) < 0)
-				tmp_ptr -= item_size;
-			tmp_ptr += item_size;
-			if (tmp_ptr != run_ptr) {
-				byte_t *trav = run_ptr+item_size;
-				while (--trav >= run_ptr) {
-					byte_t *hi, *lo, c = *trav;
-					for (hi = lo = trav; (lo -= item_size) >= tmp_ptr; hi = lo)
-						*hi = *lo;
-					*hi = c;
-				}
-			}
-		}
-	}
-#undef STACK_NOT_EMPTY
-#undef POP
-#undef PUSH
-#undef STACK_SIZE
-#undef MAX_THRESH
-#undef SWAP
 }
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
@@ -218,6 +140,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 #ifdef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_USING(__invoke_compare_helper)
 #endif /* ____invoke_compare_helper_defined */
+#ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_compare_helper_defined 1
@@ -227,14 +150,21 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort)(void *pbase,
                       size_t item_count,
                       size_t item_size,
                       __compar_fn_t cmp) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	libc_qsort_r(pbase, item_count, item_size,
+	        (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	        NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
 	libc_qsort_r(pbase, item_count, item_size,
 	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	        (void *)cmp);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
@@ -243,9 +173,15 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
                         size_t item_count,
                         size_t item_size,
                         __compar_fn_t cmp) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	return (void *)libc_bsearch_r(pkey, pbase, item_count, item_size,
+	                         (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	                         NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
 	return (void *)libc_bsearch_r(pkey, pbase, item_count, item_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	                         (void *)cmp);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_labs, libc_abs);
@@ -355,9 +291,14 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
 	return libc_wcsrtombs(dst, (char32_t const **)&src, dstlen, NULL);
 }
 #ifndef LIBC_ARCH_HAVE_ABORT
+#include <asm/stdlib.h>
 INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 (LIBCCALL libc_abort)(void) THROWS(...) {
-	libc__Exit(/* EXIT_FAILURE */ 1);
+#ifdef __EXIT_FAILURE
+	libc__Exit(__EXIT_FAILURE);
+#else /* __EXIT_FAILURE */
+	libc__Exit(1);
+#endif /* !__EXIT_FAILURE */
 }
 #endif /* !LIBC_ARCH_HAVE_ABORT */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
@@ -501,11 +442,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -525,11 +466,15 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -542,13 +487,16 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
                                    char **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u32 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = libc_strtou32(nptr, endptr, base);
+		return -(s32)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libc_strtou32(nptr, endptr, base);
-	return neg ? -(s32)result : (s32)result;
+	return (s32)result;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
@@ -557,11 +505,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -581,11 +529,15 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -598,13 +550,16 @@ NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
                                    char **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u64 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = libc_strtou64(nptr, endptr, base);
+		return -(s64)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libc_strtou64(nptr, endptr, base);
-	return neg ? -(s64)result : (s64)result;
+	return (s64)result;
 }
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
@@ -652,7 +607,7 @@ NOTHROW_NCX(LIBCCALL libc_gcvt)(double val,
 #elif __DBL_MANT_DIG__ == 56
 #define DBL_NDIGIT_MAX 18
 #else /* ... */
-	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
+	/* ceil(M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define DBL_NDIGIT_MAX (__DBL_MANT_DIG__ / 4)
 #endif /* !... */
 #endif /* !DBL_NDIGIT_MAX */
@@ -716,7 +671,7 @@ NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
 #elif __LDBL_MANT_DIG__ == 56
 #define LDBG_NDIGIT_MAX 18
 #else /* ... */
-	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
+	/* ceil(M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define LDBG_NDIGIT_MAX (__LDBL_MANT_DIG__ / 4)
 #endif /* !... */
 #endif /* !LDBG_NDIGIT_MAX */
@@ -881,6 +836,15 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 	/* Not found (return the whole `name[=value]' string) */
 	*valuep = option;
 	return -1;
+}
+/* Returns the name of the PTY slave (Pseudo TTY slave)
+ * associated with the master descriptor `FD' */
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
+	static char buf[64];
+	if unlikely(libc_ptsname_r(fd, buf, sizeof(buf)))
+		return NULL;
+	return buf;
 }
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto32_l);
@@ -3128,6 +3092,7 @@ DEFINE_PUBLIC_ALIAS(ecvt, libc_ecvt);
 DEFINE_PUBLIC_ALIAS(_ecvt, libc_fcvt);
 DEFINE_PUBLIC_ALIAS(fcvt, libc_fcvt);
 DEFINE_PUBLIC_ALIAS(getsubopt, libc_getsubopt);
+DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(__strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(strtol_l, libc_strtol_l);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ba69de */
+/* HASH CRC-32:0x8460b3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: frealpathat from stdlib */
 #ifndef __local___localdep_frealpathat_defined
 #define __local___localdep_frealpathat_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to the symlink itself to be printed. - Otherwise, the

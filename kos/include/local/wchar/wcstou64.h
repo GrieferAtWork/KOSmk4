@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x133b5f57 */
+/* HASH CRC-32:0xc18c33d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__re
 	__UINT64_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {
-			++__nptr;
-			if (*__nptr == 'x' || *__nptr == 'X') {
+			__WCHAR_TYPE__ __ch = *++__nptr;
+			if (__ch == 'x' || __ch == 'X') {
 				++__nptr;
 				__base = 16;
-			} else if (*__nptr == 'b' || *__nptr == 'B') {
+			} else if (__ch == 'b' || __ch == 'B') {
 				++__nptr;
 				__base = 2;
 			} else {
@@ -52,11 +52,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__re
 		else if (__ch >= 'A' && __ch <= 'Z')
 			__temp = (__UINT64_TYPE__)10 + (__ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (__temp >= (unsigned int)__base)
 			break;
 		++__nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		__result *= (unsigned int)__base;
 		__result += __temp;
 	}

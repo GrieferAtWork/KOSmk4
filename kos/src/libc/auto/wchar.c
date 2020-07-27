@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc58a20c1 */
+/* HASH CRC-32:0xe5de2a83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1888,26 +1888,32 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u32 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char16_t sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = libd_wcstou32(nptr, endptr, base);
+		return -(s32)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libd_wcstou32(nptr, endptr, base);
-	return neg ? -(s32)result : (s32)result;
+	return (s32)result;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u32 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char32_t sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = libc_wcstou32(nptr, endptr, base);
+		return -(s32)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libc_wcstou32(nptr, endptr, base);
-	return neg ? -(s32)result : (s32)result;
+	return (s32)result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
@@ -1916,11 +1922,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char16_t ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -1940,11 +1946,15 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -1959,11 +1969,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char32_t ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -1983,11 +1993,15 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -2002,11 +2016,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char16_t ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -2026,11 +2040,15 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -2045,11 +2063,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
-			++nptr;
-			if (*nptr == 'x' || *nptr == 'X') {
+			char32_t ch = *++nptr;
+			if (ch == 'x' || ch == 'X') {
 				++nptr;
 				base = 16;
-			} else if (*nptr == 'b' || *nptr == 'B') {
+			} else if (ch == 'b' || ch == 'B') {
 				++nptr;
 				base = 2;
 			} else {
@@ -2069,11 +2087,15 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 		else if (ch >= 'A' && ch <= 'Z')
 			temp = (u64)10 + (ch - 'A');
 		else {
+			/* TODO: Support for unicode decimals, and multi-byte characters.
+			 *       But only do this if libc supports it (i.e. don't do this
+			 *       in kernel-space) */
 			break;
 		}
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
+		/* XXX: Check for overflow when we have a non-noop __libc_seterrno(ERANGE) */
 		result *= (unsigned int)base;
 		result += temp;
 	}
@@ -2086,26 +2108,32 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u64 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char16_t sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = libd_wcstou64(nptr, endptr, base);
+		return -(s64)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libd_wcstou64(nptr, endptr, base);
-	return neg ? -(s64)result : (s64)result;
+	return (s64)result;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
 	u64 result;
-	bool neg = false;
-	while (*nptr == '-') {
-		neg = !neg;
+	char32_t sign = *nptr;
+	if (sign == '-') {
+		++nptr;
+		result = libc_wcstou64(nptr, endptr, base);
+		return -(s64)result;
+	} else if (sign == '+') {
 		++nptr;
 	}
 	result = libc_wcstou64(nptr, endptr, base);
-	return neg ? -(s64)result : (s64)result;
+	return (s64)result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,

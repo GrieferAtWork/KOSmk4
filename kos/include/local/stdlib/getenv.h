@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f7999e6 */
+/* HASH CRC-32:0x7de9966 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,15 +66,15 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strlen_defined */
 __LOCAL_LIBC(getenv) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
-	__SIZE_TYPE__ __namelen;
 	char *__result, **___envp;
 	if __unlikely(!__varname)
 		return __NULLPTR;
-	__namelen = __localdep_strlen(__varname);
 	___envp = __LOCAL_environ;
 	if __unlikely(!___envp)
 		__result = __NULLPTR;
 	else {
+		__SIZE_TYPE__ __namelen;
+		__namelen = __localdep_strlen(__varname);
 		for (; (__result = *___envp) != __NULLPTR; ++___envp) {
 			if (__localdep_memcmp(__result, __varname, __namelen * sizeof(char)) != 0 ||
 			    __result[__namelen] != '=')
