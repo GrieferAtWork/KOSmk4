@@ -21,53 +21,54 @@
 %[default:section(".text.crt{|.dos}.debug")]
 
 %{
-#include <features.h>
-#include <bits/types.h>
+#include <features.h> /* __STDC_INT_AS_UINT_T */
+
+#include <bits/types.h> /* $fd_t */
 
 __SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/execinfo.h */
-/* Copyright (C) 1998-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 
 #ifdef __CC__
 }
 
-@@Store up to SIZE return address of the current program state
-@@in ARRAY and return the exact number of values stored
-[[export_alias("__backtrace")]]
-[[decl_include("<features.h>")]]
-__STDC_INT_AS_UINT_T backtrace([[nonnull]] void **array,
-                               __STDC_INT_AS_UINT_T size);
+@@Create a traceback of up to `SIZE' instruction pointers from
+@@the calling function, their caller, and so forth. On KOS, this
+@@information is constructed with the help of CFI instrumentation,
+@@and the function from `<libunwind/...>'. However, on other systems,
+@@this function is fairly dump and relies on all traversed code
+@@having been compiled with function frames enabled.
+@@@return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE')
+[[export_alias("__backtrace"), decl_include("<features.h>")]]
+__STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,
+                               __STDC_INT_AS_SIZE_T size);
 
-@@Return names of functions from the backtrace list
-@@in ARRAY in a newly malloc()ed memory block
-[[export_alias("__backtrace_symbols")]]
-[[decl_include("<features.h>")]]
+@@Return an array of exactly `size' elements that contains the
+@@names associated with program-counters from the given `ARRAY'
+@@This function is meant to be used together with `backtrace(3)'.
+@@On KOS, the names of functions are gathered with the help of
+@@functions from `<libdebuginfo/...>', meaning that many sources of
+@@function names are looked at, including `.dynsym' and `.debug_info'
+@@On other systems, this function is fairly dump and only looks at
+@@names from `.dynsym', meaning that functions not declared as `PUBLIC'
+@@would not show up.
+@@The returned pointer is a size-element long vector of strings
+@@describing the names of functions, and should be freed() using
+@@`free(3)'. Note however that you must _ONLY_ `free(return)', and
+@@not the individual strings pointed-to by that vector!
+@@@return: * :   A heap pointer to a vector of function names
+@@@return: NULL: Insufficient heap memory available
+[[export_alias("__backtrace_symbols"), decl_include("<features.h>")]]
 char **backtrace_symbols([[nonnull]] void *const *array,
-                         __STDC_INT_AS_UINT_T size);
+                         __STDC_INT_AS_SIZE_T size);
 
-@@This function is similar to backtrace_symbols()
-@@but it writes the result immediately to a file
+@@Same as `backtrace_symbols()', but rather than return a vector
+@@of symbol names, print the names directly to `fd', such that
+@@one function NAME will be written per line, with `size' lines
+@@written in total.
 [[export_alias("__backtrace_symbols_fd")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 void backtrace_symbols_fd([[nonnull]] void *const *array,
-                          __STDC_INT_AS_UINT_T size, $fd_t fd);
+                          __STDC_INT_AS_SIZE_T size,
+                          $fd_t fd);
 
 
 %{

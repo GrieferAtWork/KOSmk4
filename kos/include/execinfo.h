@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x956f4cc1 */
+/* HASH CRC-32:0xa3504ae4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,57 +28,79 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <features.h>
-#include <bits/types.h>
+#include <features.h> /* __STDC_INT_AS_UINT_T */
+
+#include <bits/types.h> /* $fd_t */
 
 __SYSDECL_BEGIN
 
-/* Documentation taken from Glibc /usr/include/execinfo.h */
-/* Copyright (C) 1998-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
 #ifdef __CC__
 #ifdef __CRT_HAVE_backtrace
-/* Store up to SIZE return address of the current program state
- * in ARRAY and return the exact number of values stored */
-__CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_UINT_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_UINT_T __size),(__array,__size))
+/* Create a traceback of up to `SIZE' instruction pointers from
+ * the calling function, their caller, and so forth. On KOS, this
+ * information is constructed with the help of CFI instrumentation,
+ * and the function from `<libunwind/...>'. However, on other systems,
+ * this function is fairly dump and relies on all traversed code
+ * having been compiled with function frames enabled.
+ * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
+__CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace)
-/* Store up to SIZE return address of the current program state
- * in ARRAY and return the exact number of values stored */
-__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_UINT_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_UINT_T __size),__backtrace,(__array,__size))
+/* Create a traceback of up to `SIZE' instruction pointers from
+ * the calling function, their caller, and so forth. On KOS, this
+ * information is constructed with the help of CFI instrumentation,
+ * and the function from `<libunwind/...>'. However, on other systems,
+ * this function is fairly dump and relies on all traversed code
+ * having been compiled with function frames enabled.
+ * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
+__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),__backtrace,(__array,__size))
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols
-/* Return names of functions from the backtrace list
- * in ARRAY in a newly malloc()ed memory block */
-__CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_UINT_T __size),(__array,__size))
+/* Return an array of exactly `size' elements that contains the
+ * names associated with program-counters from the given `ARRAY'
+ * This function is meant to be used together with `backtrace(3)'.
+ * On KOS, the names of functions are gathered with the help of
+ * functions from `<libdebuginfo/...>', meaning that many sources of
+ * function names are looked at, including `.dynsym' and `.debug_info'
+ * On other systems, this function is fairly dump and only looks at
+ * names from `.dynsym', meaning that functions not declared as `PUBLIC'
+ * would not show up.
+ * The returned pointer is a size-element long vector of strings
+ * describing the names of functions, and should be freed() using
+ * `free(3)'. Note however that you must _ONLY_ `free(return)', and
+ * not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
+__CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace_symbols)
-/* Return names of functions from the backtrace list
- * in ARRAY in a newly malloc()ed memory block */
-__CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_UINT_T __size),__backtrace_symbols,(__array,__size))
+/* Return an array of exactly `size' elements that contains the
+ * names associated with program-counters from the given `ARRAY'
+ * This function is meant to be used together with `backtrace(3)'.
+ * On KOS, the names of functions are gathered with the help of
+ * functions from `<libdebuginfo/...>', meaning that many sources of
+ * function names are looked at, including `.dynsym' and `.debug_info'
+ * On other systems, this function is fairly dump and only looks at
+ * names from `.dynsym', meaning that functions not declared as `PUBLIC'
+ * would not show up.
+ * The returned pointer is a size-element long vector of strings
+ * describing the names of functions, and should be freed() using
+ * `free(3)'. Note however that you must _ONLY_ `free(return)', and
+ * not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
+__CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),__backtrace_symbols,(__array,__size))
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols_fd
-/* This function is similar to backtrace_symbols()
- * but it writes the result immediately to a file */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_UINT_T __size, __fd_t __fd),(__array,__size,__fd))
+/* Same as `backtrace_symbols()', but rather than return a vector
+ * of symbol names, print the names directly to `fd', such that
+ * one function NAME will be written per line, with `size' lines
+ * written in total. */
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
 #elif defined(__CRT_HAVE___backtrace_symbols_fd)
-/* This function is similar to backtrace_symbols()
- * but it writes the result immediately to a file */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_UINT_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
+/* Same as `backtrace_symbols()', but rather than return a vector
+ * of symbol names, print the names directly to `fd', such that
+ * one function NAME will be written per line, with `size' lines
+ * written in total. */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
 #endif /* ... */
 #endif /* __CC__ */
 

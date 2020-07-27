@@ -132,12 +132,17 @@ bool LIBCCALL init_libdebuginfo(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_backtrace,hash:CRC-32=0x55192660]]]*/
-/* Store up to SIZE return address of the current program state
- * in ARRAY and return the exact number of values stored */
-INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) __STDC_INT_AS_UINT_T
+/*[[[head:libc_backtrace,hash:CRC-32=0xb681b400]]]*/
+/* Create a traceback of up to `SIZE' instruction pointers from
+ * the calling function, their caller, and so forth. On KOS, this
+ * information is constructed with the help of CFI instrumentation,
+ * and the function from `<libunwind/...>'. However, on other systems,
+ * this function is fairly dump and relies on all traversed code
+ * having been compiled with function frames enabled.
+ * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
+INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
-                                     __STDC_INT_AS_UINT_T size)
+                                     __STDC_INT_AS_SIZE_T size)
 /*[[[body:libc_backtrace]]]*/
 {
 	unsigned int result;
@@ -205,12 +210,25 @@ err0:
 	return 0;
 }
 
-/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x3304ceef]]]*/
-/* Return names of functions from the backtrace list
- * in ARRAY in a newly malloc()ed memory block */
+/*[[[head:libc_backtrace_symbols,hash:CRC-32=0xd6351c6f]]]*/
+/* Return an array of exactly `size' elements that contains the
+ * names associated with program-counters from the given `ARRAY'
+ * This function is meant to be used together with `backtrace(3)'.
+ * On KOS, the names of functions are gathered with the help of
+ * functions from `<libdebuginfo/...>', meaning that many sources of
+ * function names are looked at, including `.dynsym' and `.debug_info'
+ * On other systems, this function is fairly dump and only looks at
+ * names from `.dynsym', meaning that functions not declared as `PUBLIC'
+ * would not show up.
+ * The returned pointer is a size-element long vector of strings
+ * describing the names of functions, and should be freed() using
+ * `free(3)'. Note however that you must _ONLY_ `free(return)', and
+ * not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
 INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) char **
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
-                                             __STDC_INT_AS_UINT_T size)
+                                             __STDC_INT_AS_SIZE_T size)
 /*[[[body:libc_backtrace_symbols]]]*/
 {
 	char **result;
@@ -251,12 +269,14 @@ err:
 }
 /*[[[end:libc_backtrace_symbols]]]*/
 
-/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x1d1f8601]]]*/
-/* This function is similar to backtrace_symbols()
- * but it writes the result immediately to a file */
+/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x722999a8]]]*/
+/* Same as `backtrace_symbols()', but rather than return a vector
+ * of symbol names, print the names directly to `fd', such that
+ * one function NAME will be written per line, with `size' lines
+ * written in total. */
 INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
-                                                __STDC_INT_AS_UINT_T size,
+                                                __STDC_INT_AS_SIZE_T size,
                                                 fd_t fd)
 /*[[[body:libc_backtrace_symbols_fd]]]*/
 {
