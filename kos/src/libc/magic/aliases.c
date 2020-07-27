@@ -56,6 +56,7 @@
 
 %{
 #include <features.h>
+
 #include <bits/crt/db/aliases.h>
 
 #ifdef __USE_GLIBC

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e44cf37 */
+/* HASH CRC-32:0x45748ff8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,8 +26,10 @@
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make Internet host address in network byte order by
- * combining the network number NET with the local address HOST */
+/* Construct an Internet-host-address in network byte order from
+ * the combination of its network (`net'), and host (`host') number.
+ * The `net' and `host' arguments can later be re-extracted by use
+ * of `inet_netof(3)' and `inet_lnaof(3)' */
 __LOCAL_LIBC(inet_makeaddr) __ATTR_CONST __ATTR_WUNUSED struct in_addr
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) {
 	struct in_addr __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc15c951c */
+/* HASH CRC-32:0xf2a2819a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,8 +39,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_inet_ntoa_r __LIBC_LOCAL_NAME(inet_ntoa_r)
 #endif /* !__CRT_HAVE_inet_ntoa_r */
 #endif /* !__local___localdep_inet_ntoa_r_defined */
-/* Convert Internet number in IN to ASCII representation. The return
- * value is a pointer to an internal array containing the string */
+/* Return the conventional numbers-and-dots representation of a
+ * given Internet host address `inaddr'. The returned pointer is
+ * apart of a static buffer and may change in subsequence (or parallel)
+ * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 __LOCAL_LIBC(inet_ntoa) __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa))(struct in_addr __inaddr) {
 	static char __buf[16];

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6f60065 */
+/* HASH CRC-32:0xe60d9170 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Return network number part of the Internet address IN */
+/* Return the network-number-part of the Internet address `INADDR' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
@@ -47,7 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Return the local host address part of the Internet address in IN */
+/* Return the local-host-address-part of the Internet address `INADDR' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
@@ -61,8 +61,10 @@ NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
-/* Make Internet host address in network byte order by
- * combining the network number NET with the local address HOST */
+/* Construct an Internet-host-address in network byte order from
+ * the combination of its network (`net'), and host (`host') number.
+ * The `net' and `host' arguments can later be re-extracted by use
+ * of `inet_netof(3)' and `inet_lnaof(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED struct in_addr
 NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
                                          uint32_t host) {
@@ -81,8 +83,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
 	return result;
 }
 #include <netinet/in.h>
-/* Convert Internet host address from numbers-and-dots
- * notation in CP into binary data in network byte order
+/* Convert an Internet host address `CP' from its numbers-and-dots
+ * notational form into its binary representation in network byte order
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -99,8 +101,10 @@ NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 		return INADDR_NONE;
 	return addr.s_addr;
 }
-/* Convert Internet number in IN to ASCII representation. The return
- * value is a pointer to an internal array containing the string */
+/* Return the conventional numbers-and-dots representation of a
+ * given Internet host address `inaddr'. The returned pointer is
+ * apart of a static buffer and may change in subsequence (or parallel)
+ * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
 	static char buf[16];
@@ -131,8 +135,9 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 		return INADDR_NONE;
 	return addr.s_addr;
 }
-/* Convert Internet host address from numbers-and-dots notation in
- * CP into binary data and store the result in the structure INP
+/* Convert an Internet host address `CP' from its numbers-and-dots
+ * notational form into its binary representation in network byte
+ * order. The result is then stored in `*INP'
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -150,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
 	return libc_inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 #include <hybrid/__byteswap.h>
-/* Same as `inet_aton()', but update `*pcp' to point after the address
+/* Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -308,8 +313,14 @@ err:
 	return 0;
 }
 #include <parts/errno.h>
-/* Format a network number NET into presentation format and place
- * result in buffer starting at BUF with length of LEN bytes */
+/* Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
+ *     0.0.0.0      For net = 0
+ *     %u           For net <= 255
+ *     %u.%u        For net <= 65535
+ *     %u.%u.%u     For net <= 16777215
+ *     %u.%u.%u.%u  For everything else
+ * @return: buf:  Success
+ * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
 INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
                                      char *buf,

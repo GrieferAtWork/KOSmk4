@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b5108e */
+/* HASH CRC-32:0xdab902fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,8 +68,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format a network number NET into presentation format and place
- * result in buffer starting at BUF with length of LEN bytes */
+/* Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
+ *     0.0.0.0      For net = 0
+ *     %u           For net <= 255
+ *     %u.%u        For net <= 65535
+ *     %u.%u.%u     For net <= 16777215
+ *     %u.%u.%u.%u  For everything else
+ * @return: buf:  Success
+ * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
 __LOCAL_LIBC(inet_neta) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_neta))(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len) {
 	__SIZE_TYPE__ __reqlen;

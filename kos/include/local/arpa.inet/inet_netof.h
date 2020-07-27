@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20c7fc8e */
+/* HASH CRC-32:0xb29c1fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return network number part of the Internet address IN */
+/* Return the network-number-part of the Internet address `INADDR' */
 __LOCAL_LIBC(inet_netof) __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_netof))(struct in_addr __inaddr) {
 	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);

@@ -26,10 +26,8 @@
 DECL_BEGIN
 
 
-/*[[[head:libc_inet_pton,hash:CRC-32=0xe889b2c2]]]*/
-/* Convert from presentation format of an Internet number in buffer
- * starting at CP to the binary network format and store result for
- * interface type AF in buffer starting at BUF */
+/*[[[head:libc_inet_pton,hash:CRC-32=0x270161d4]]]*/
+/* TODO: Implement & document */
 INTERN ATTR_SECTION(".text.crt.net.inet") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
                                          char const *__restrict cp,
@@ -45,10 +43,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
 }
 /*[[[end:libc_inet_pton]]]*/
 
-/*[[[head:libc_inet_ntop,hash:CRC-32=0xbc87c43f]]]*/
-/* Convert a Internet address in binary network format for interface
- * type AF in buffer starting at CP to presentation form and place
- * result in buffer of length LEN starting at BUF */
+/*[[[head:libc_inet_ntop,hash:CRC-32=0x8f18137e]]]*/
+/* TODO: Implement & document */
 INTERN ATTR_SECTION(".text.crt.net.inet") char const *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
                                          void const *__restrict cp,
@@ -68,9 +64,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
 
 
 
-/*[[[head:libc_inet_net_ntop,hash:CRC-32=0x8b638e10]]]*/
-/* Convert network number for interface type AF in buffer starting at CP
- * to presentation format. The result will specify BITS bits of the number */
+/*[[[head:libc_inet_net_ntop,hash:CRC-32=0xc5599bff]]]*/
+/* TODO: Implement & document */
 INTERN ATTR_SECTION(".text.crt.net.inet") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
                                              void const *cp,
@@ -90,9 +85,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
 }
 /*[[[end:libc_inet_net_ntop]]]*/
 
-/*[[[head:libc_inet_net_pton,hash:CRC-32=0xfe918308]]]*/
-/* Convert network number for interface type AF from presentation in buffer starting
- * at CP to network format and store result int buffer starting at BUF of size LEN */
+/*[[[head:libc_inet_net_pton,hash:CRC-32=0x342923fd]]]*/
+/* TODO: Implement & document */
 INTERN ATTR_SECTION(".text.crt.net.inet") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
                                              char const *cp,
@@ -110,9 +104,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
 }
 /*[[[end:libc_inet_net_pton]]]*/
 
-/*[[[head:libc_inet_nsap_addr,hash:CRC-32=0x47e82d78]]]*/
-/* Convert ASCII representation in hexadecimal form of the Internet address
- * to binary form and place result in buffer of length LEN starting at BUF */
+/*[[[head:libc_inet_nsap_addr,hash:CRC-32=0x52e10582]]]*/
+/* TODO: Implement & document */
 INTERN ATTR_SECTION(".text.crt.net.inet") unsigned int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
                                               unsigned char *buf,
@@ -132,9 +125,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
 
 
 
-/*[[[head:libc_inet_nsap_ntoa,hash:CRC-32=0xf5ad2200]]]*/
-/* Convert internet address in binary form in LEN bytes
- * starting at CP a presentation form and place result in BUF */
+/*[[[head:libc_inet_nsap_ntoa,hash:CRC-32=0x65c7a451]]]*/
+/* TODO: Implement & document */
 INTERN ATTR_SECTION(".text.crt.net.inet") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
                                               unsigned char const *cp,

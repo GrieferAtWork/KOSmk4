@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb9e76f7 */
+/* HASH CRC-32:0xb957b53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <netinet/bits/in.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `inet_aton()', but update `*pcp' to point after the address
+/* Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_i
 __NAMESPACE_LOCAL_END
 #include <local/arpa.inet/inet_paton.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `inet_aton()', but update `*pcp' to point after the address
+/* Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)

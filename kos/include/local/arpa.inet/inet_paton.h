@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6200d73 */
+/* HASH CRC-32:0x177f59ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <netinet/bits/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `inet_aton()', but update `*pcp' to point after the address
+/* Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
  *     a.b.cd   (1.2.52)
