@@ -57,43 +57,43 @@ extern byte_t __i386_atomic64_fetchxor[];
 
 /* i386-specific atomic64 ABI cmpxchg8b-specific implementation. */
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_read[] = {
-	0x89, 0xc3,       /*     movl   %eax, %ebx  */
-	0x89, 0xd1,       /*     movl   %edx, %ecx  */
-	0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)   */
-	0xc3,             /*     ret                */
+	0x89, 0xc3,             /*     movl   %eax, %ebx  */
+	0x89, 0xd1,             /*     movl   %edx, %ecx  */
+	0xf0, 0x0f, 0xc7, 0x0f, /*     lock   cmpxchg8b (%edi)   */
+	0xc3,                   /*     ret                */
 };
 
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_cmpxch[] = {
-	0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)   */
-	0xc3,             /*     ret                */
+	0xf0, 0x0f, 0xc7, 0x0f, /*     lock   cmpxchg8b (%edi)   */
+	0xc3,                   /*     ret                */
 };
 
 /* also used for `__i386_atomic64_write' */
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_xch[] = {
-	0x0f, 0xc7, 0x0f, /* 1:  cmpxchg8b (%edi)   */
-	0x75, 0xfb,       /*     jne    1b          */
-	0xc3,             /*     ret                */
+	0xf0, 0x0f, 0xc7, 0x0f, /* 1:  lock   cmpxchg8b (%edi)   */
+	0x75, 0xfb,             /*     jne    1b          */
+	0xc3,                   /*     ret                */
 };
 
-#define I386_CMPXCHG8B_FETCHxxx(lo_opcode_, hi_opcode_) \
-	{                                                   \
-		0x55,             /*     pushl  %ebp       */   \
-		0x56,             /*     pushl  %esi       */   \
-		0x89, 0xdd,       /*     movl   %ebx, %ebp */   \
-		0x89, 0xce,       /*     movl   %ecx, %esi */   \
-		0x89, 0xd8,       /*     movl   %ebx, %eax */   \
-		0x89, 0xca,       /*     movl   %ecx, %edx */   \
-		0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)  */   \
-		lo_opcode_, 0xc3, /* 1:  <lo>l  %eax, %ebx */   \
-		hi_opcode_, 0xd1, /*     <hi>l  %edx, %ecx */   \
-		0x0f, 0xc7, 0x0f, /*     cmpxchg8b (%edi)  */   \
-		0x75, 0x03,       /*     jne    2f         */   \
-		0x5e,             /*     popl   %esi       */   \
-		0x5d,             /*     popl   %ebp       */   \
-		0xc3,             /*     ret               */   \
-		0x89, 0xeb,       /* 2:  movl   %ebp, %ebx */   \
-		0x89, 0xf1,       /*     movl   %esi, %ecx */   \
-		0xeb, 0xee,       /*     jmp    1b         */   \
+#define I386_CMPXCHG8B_FETCHxxx(lo_opcode_, hi_opcode_)           \
+	{                                                             \
+		0x55,                   /*     pushl  %ebp             */ \
+		0x56,                   /*     pushl  %esi             */ \
+		0x89, 0xdd,             /*     movl   %ebx, %ebp       */ \
+		0x89, 0xce,             /*     movl   %ecx, %esi       */ \
+		0x89, 0xd8,             /*     movl   %ebx, %eax       */ \
+		0x89, 0xca,             /*     movl   %ecx, %edx       */ \
+		0xf0, 0x0f, 0xc7, 0x0f, /*     lock   cmpxchg8b (%edi) */ \
+		lo_opcode_, 0xc3,       /* 1:  <lo>l  %eax, %ebx       */ \
+		hi_opcode_, 0xd1,       /*     <hi>l  %edx, %ecx       */ \
+		0xf0, 0x0f, 0xc7, 0x0f, /*     lock   cmpxchg8b (%edi) */ \
+		0x75, 0x03,             /*     jne    2f               */ \
+		0x5e,                   /*     popl   %esi             */ \
+		0x5d,                   /*     popl   %ebp             */ \
+		0xc3,                   /*     ret                     */ \
+		0x89, 0xeb,             /* 2:  movl   %ebp, %ebx       */ \
+		0x89, 0xf1,             /*     movl   %esi, %ecx       */ \
+		0xeb, 0xee,             /*     jmp    1b               */ \
 	}
 
 PRIVATE ATTR_FREERODATA byte_t const __i386_cmpxchg8b_fetchadd[] = I386_CMPXCHG8B_FETCHxxx(0x01, 0x11); /* addl, adcl */
