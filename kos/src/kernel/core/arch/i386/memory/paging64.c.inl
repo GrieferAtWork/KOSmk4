@@ -985,6 +985,51 @@ NOTHROW(FCALL p64_pagedir_unset_prepared)(union p64_pdir_e1 *__restrict e1_p
 	}
 }
 
+#if 1 /* XXX: This should probably be disabled... */
+#define SYNC_IDENTITY_PAGE(addr) pagedir_syncone(addr)
+#else
+#define SYNC_IDENTITY_PAGE(addr) vm_kernel_syncone(addr)
+#endif
+
+/* Called after an E1-vector was flattened into an E2-entry
+ * that now resides at `P64_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL p64_pagedir_sync_flattened_e1_vector)(unsigned int vec4,
+                                                    unsigned int vec3,
+                                                    unsigned int vec2) {
+	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, vec3, vec2, 0..511)'
+	 * didn't change, due to being flattened, the contents of our page directory identity
+	 * mapping _have_ changed:
+	 *     UNMAP(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][0..511])  (This is exactly 1 page)
+	 */
+	SYNC_IDENTITY_PAGE(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2]);
+}
+
+/* Called after an E2-vector was flattened into an E3-entry
+ * that now resides at `P64_PDIR_E3_IDENTITY[vec4][vec3]' */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL p64_pagedir_sync_flattened_e2_vector)(unsigned int vec4,
+                                                    unsigned int vec3) {
+	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, vec3, 0..511, 0..511)'
+	 * didn't change, due to being flattened, the contents of our page directory identity
+	 * mapping _have_ changed:
+	 *     UNMAP(P64_PDIR_E2_IDENTITY[vec4][vec3][0..511])  (This is exactly 1 page)
+	 */
+	SYNC_IDENTITY_PAGE(P64_PDIR_E2_IDENTITY[vec4][vec3]);
+}
+
+/* Called after an E3-vector was flattened into an E4-entry
+ * that now resides at `P64_PDIR_E4_IDENTITY[vec4]' */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL p64_pagedir_sync_flattened_e3_vector)(unsigned int vec4) {
+	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, 0..511, 0..511, 0..511)'
+	 * didn't change, due to being flattened, the contents of our page directory identity
+	 * mapping _have_ changed:
+	 *     UNMAP(P64_PDIR_E3_IDENTITY[vec4][0..511])  (This is exactly 1 page)
+	 */
+	SYNC_IDENTITY_PAGE(P64_PDIR_E3_IDENTITY[vec4]);
+}
+
 
 /* Try to flatten 512*4KiB of linear memory to a 2MiB mapping,
  * as well as 512*2MiB of linear memory to a 1GiB mapping. */
@@ -1060,8 +1105,11 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 	 * forcing us to check again further below. */
 	old_version = ATOMIC_READ(x86_pagedir_prepare_version);
 	can_flatten = p64_pagedir_can_flatten_e1_vector(e1_p, &new_e2_word, vec1_unprepare_start);
-	p64_pagedir_unset_prepared(&e1_p[vec1_unprepare_start], vec4, vec3, vec2, vec1_unprepare_start,
-	                           vec1_unprepare_start, vec1_unprepare_size);
+	p64_pagedir_unset_prepared(&e1_p[vec1_unprepare_start],
+	                           vec4, vec3, vec2,
+	                           vec1_unprepare_start,
+	                           vec1_unprepare_start,
+	                           vec1_unprepare_size);
 	if unlikely(can_flatten) {
 		pflag_t was;
 		bool must_restart;
@@ -1102,6 +1150,8 @@ again_try_exchange_e2_word:
 				return;
 			goto again_try_exchange_e2_word;
 		}
+		/* Sync if necessary. */
+		p64_pagedir_sync_flattened_e1_vector(vec4, vec3, vec2);
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector.
 		 * NOTE: No need to Shoot-down anything for this, since the new,
@@ -1128,6 +1178,8 @@ again_try_exchange_e2_word:
 		/* Replace the E3-word for the E2-vector with the new (flattened) control word. */
 		e3.p_word = ATOMIC_XCH(e3_p->p_word, new_e3_word);
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
+		/* Sync if necessary. */
+		p64_pagedir_sync_flattened_e2_vector(vec4, vec3);
 		/* Free the old E2-vector
 		 * NOTE: No need to Shoot-down anything for this, since the new,
 		 *       flattened control word has identical meaning to the old
@@ -1160,6 +1212,8 @@ again_try_exchange_e2_word:
 			}
 			e4.p_word = ATOMIC_XCH(e4_p->p_word, new_e4_word);
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
+			/* Sync if necessary. */
+			p64_pagedir_sync_flattened_e3_vector(vec4);
 			/* Free the old E3-vector
 			 * NOTE: No need to Shoot-down anything for this, since the new,
 			 *       flattened control word has identical meaning to the old
@@ -1169,6 +1223,48 @@ again_try_exchange_e2_word:
 	}
 }
 
+#ifdef NDEBUG
+#define assert_prepared(addr, num_bytes) (void)0
+#define assert_prepared_if(cond, addr, num_bytes) (void)0
+#else /* NDEBUG */
+PRIVATE NOBLOCK WUNUSED bool
+NOTHROW(FCALL p64_pagedir_isprepared)(VIRT void *addr) {
+	uintptr_t word;
+	unsigned int vec4, vec3, vec2, vec1;
+	vec4 = P64_PDIR_VEC4INDEX(addr);
+	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return false; /* Not mapped */
+	vec3 = P64_PDIR_VEC3INDEX(addr);
+	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return false; /* Not mapped */
+	if unlikely(word & P64_PAGE_F1GIB)
+		return false; /* 1GiB page */
+	vec2 = P64_PDIR_VEC2INDEX(addr);
+	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return false; /* Not mapped */
+	if unlikely(word & P64_PAGE_F2MIB)
+		return false; /* 2MiB page */
+	vec1 = P64_PDIR_VEC1INDEX(addr);
+	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
+	return word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(word);
+}
+#define assert_prepared_if(cond, addr, num_bytes) \
+	((cond) ? assert_prepared(addr, num_bytes) : (void)0)
+LOCAL NOBLOCK void
+NOTHROW(KCALL assert_prepared)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	size_t i;
+	for (i = 0; i < num_bytes; i += PAGESIZE) {
+		void *ptr = (byte_t *)addr + i;
+		assertf(p64_pagedir_isprepared(ptr),
+		        "Page at %p of range %p...%p isn't prepared",
+		        ptr, addr, (byte_t *)addr + num_bytes - 1);
+	}
+}
+#endif /* !NDEBUG */
 
 
 LOCAL NOBLOCK WUNUSED bool
@@ -1177,10 +1273,15 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v1)(unsigned int vec4,
                                                  unsigned int vec2,
                                                  unsigned int vec1_min,
                                                  unsigned int vec1_max) {
+	bool result;
 	assert(vec1_min <= vec1_max);
-	return p64_pagedir_prepare_impl_widen(vec4, vec3, vec2,
-	                                      vec1_min,
-	                                      (vec1_max - vec1_min) + 1);
+	result = p64_pagedir_prepare_impl_widen(vec4, vec3, vec2,
+	                                        vec1_min,
+	                                        (vec1_max - vec1_min) + 1);
+	assert_prepared_if(result,
+	                   P64_PDIR_VECADDR(vec4, vec3, vec2, vec1_min),
+	                   (size_t)((vec1_max - vec1_min) + 1) * PAGESIZE);
+	return result;
 }
 
 LOCAL NOBLOCK void
@@ -1261,7 +1362,10 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v2)(unsigned int vec4,
 	unsigned int vec2;
 	assert(vec2_min <= vec2_max);
 	if (vec2_min == vec2_max) {
-		p64_pagedir_unprepare_impl_flatten_v1(vec4, vec3, vec2_min, vec1_min, vec1_max);
+		p64_pagedir_unprepare_impl_flatten_v1(vec4,
+		                                      vec3,
+		                                      vec2_min,
+		                                      vec1_min, vec1_max);
 		return;
 	}
 	p64_pagedir_unprepare_impl_flatten_v1(vec4, vec3, vec2_min, vec1_min, 511);
@@ -1339,7 +1443,10 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v3)(unsigned int vec4,
 	unsigned int vec3;
 	assert(vec3_min <= vec3_max);
 	if (vec3_min == vec3_max) {
-		p64_pagedir_unprepare_impl_flatten_v2(vec4, vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
+		p64_pagedir_unprepare_impl_flatten_v2(vec4,
+		                                      vec3_min,
+		                                      vec2_min, vec2_max,
+		                                      vec1_min, vec1_max);
 		return;
 	}
 	p64_pagedir_unprepare_impl_flatten_v2(vec4, vec3_min, vec2_min, 511, vec1_min, 511);
@@ -1420,7 +1527,10 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
 	unsigned int vec4;
 	assert(vec4_min <= vec4_max);
 	if (vec4_min == vec4_max) {
-		p64_pagedir_unprepare_impl_flatten_v3(vec4_min, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
+		p64_pagedir_unprepare_impl_flatten_v3(vec4_min,
+		                                      vec3_min, vec3_max,
+		                                      vec2_min, vec2_max,
+		                                      vec1_min, vec1_max);
 		return;
 	}
 	p64_pagedir_unprepare_impl_flatten_v3(vec4_min, vec3_min, 511, vec2_min, 511, vec1_min, 511);
@@ -1428,51 +1538,6 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
 	for (vec4 = vec4_min + 1; vec4 < vec4_max; ++vec4)
 		p64_pagedir_unprepare_impl_flatten_v3(vec4, 0, 511, 0, 511, 0, 511);
 }
-
-#ifdef NDEBUG
-#define assert_prepared(addr, num_bytes) (void)0
-#define assert_prepared_if(cond, addr, num_bytes) (void)0
-#else /* NDEBUG */
-PRIVATE NOBLOCK WUNUSED bool
-NOTHROW(FCALL p64_pagedir_isprepared)(VIRT void *addr) {
-	uintptr_t word;
-	unsigned int vec4, vec3, vec2, vec1;
-	vec4 = P64_PDIR_VEC4INDEX(addr);
-	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
-	if unlikely(!(word & P64_PAGE_FPRESENT))
-		return false; /* Not mapped */
-	vec3 = P64_PDIR_VEC3INDEX(addr);
-	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
-	if unlikely(!(word & P64_PAGE_FPRESENT))
-		return false; /* Not mapped */
-	if unlikely(word & P64_PAGE_F1GIB)
-		return false; /* 1GiB page */
-	vec2 = P64_PDIR_VEC2INDEX(addr);
-	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
-	if unlikely(!(word & P64_PAGE_FPRESENT))
-		return false; /* Not mapped */
-	if unlikely(word & P64_PAGE_F2MIB)
-		return false; /* 2MiB page */
-	vec1 = P64_PDIR_VEC1INDEX(addr);
-	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
-	return word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(word);
-}
-#define assert_prepared_if(cond, addr, num_bytes) \
-	((cond) ? assert_prepared(addr, num_bytes) : (void)0)
-LOCAL NOBLOCK void
-NOTHROW(KCALL assert_prepared)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	size_t i;
-	for (i = 0; i < num_bytes; i += PAGESIZE) {
-		void *ptr = (byte_t *)addr + i;
-		assertf(p64_pagedir_isprepared(ptr),
-		        "Page at %p of range %p...%p isn't prepared",
-		        ptr, addr, (byte_t *)addr + num_bytes - 1);
-	}
-}
-#endif /* !NDEBUG */
-
-
 
 /* Prepare the page directory for a future map() operation.
  * The full cycle of a single mapping then looks like this:

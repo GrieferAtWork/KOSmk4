@@ -1015,7 +1015,7 @@ pop_connections_and_set_exception_pointers2:
 	}
 done:
 	pagedir_syncone(addr);
-	pagedir_syncall();
+	/*pagedir_syncall();*/
 	return state;
 throw_segfault:
 	if (pc == (uintptr_t)addr) {
