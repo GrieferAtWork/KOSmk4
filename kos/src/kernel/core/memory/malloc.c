@@ -81,8 +81,8 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
 #endif /* HEAP_ALIGNMENT >= (__SIZEOF_SIZE_T__ + 1) */
 
-#define mptr_get(x)  ((struct mptr *)(x)-1)
-#define mptr_user(x) ((struct mptr *)(x)+1)
+#define mptr_get(x)  ((struct mptr *)(x) - 1)
+#define mptr_user(x) ((struct mptr *)(x) + 1)
 
 
 PUBLIC ATTR_WEAK WUNUSED size_t
@@ -184,7 +184,8 @@ DECL_END
 #ifndef __INTELLISENSE__
 #define MALLOC_NX 1
 #include "malloc-impl.c.inl"
+/**/
 #include "malloc-impl.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MALLOC_C */

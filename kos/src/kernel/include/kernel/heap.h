@@ -141,7 +141,11 @@ struct heap {
 
 
 struct heapptr {
+#ifdef __INTELLISENSE__
+	     void *hp_ptr; /* [1..hp_siz] Pointer base address. */
+#else /* __INTELLISENSE__ */
 	VIRT void *hp_ptr; /* [1..hp_siz] Pointer base address. */
+#endif /* !__INTELLISENSE__ */
 	size_t     hp_siz; /* [!0] Size of the pointer. */
 };
 

@@ -45,11 +45,11 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL slab_ffree)(void *__restrict ptr,
  * In the later case, the caller should fall back to using kmalloc(), or
  * simply call the equivalent `slab_kmalloc*' function, with will do so
  * automatically. */
-#define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz)                                                    \
+#define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)                                                 \
 	FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_malloc##sz)(gfp_t flags); \
 	FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL slab_kmalloc##sz(gfp_t flags); \
 	FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL slab_kmalloc_nx##sz)(gfp_t flags);
-SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS)
+SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
 
 
@@ -65,10 +65,10 @@ FUNDEF ATTR_ERROR("Invalid slab size") void __slab_invalid_size(void);
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
-#define SLAB_CHECK_SELECT(sz)     \
+#define SLAB_CHECK_SELECT(sz, _)  \
 		if (num_bytes <= sz)      \
 			return slab_malloc##sz(flags);
-		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT)
+		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT, _)
 #undef SLAB_CHECK_SELECT
 		__slab_invalid_size();
 	}
@@ -78,10 +78,10 @@ NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL
 slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
-#define SLAB_CHECK_SELECT(sz)     \
+#define SLAB_CHECK_SELECT(sz, _)  \
 		if (num_bytes <= sz)      \
 			return slab_kmalloc##sz(flags);
-		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT)
+		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT, _)
 #undef SLAB_CHECK_SELECT
 		__slab_invalid_size();
 	}
@@ -91,10 +91,10 @@ slab_kmalloc(size_t num_bytes, gfp_t flags) {
 FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
-#define SLAB_CHECK_SELECT(sz)     \
+#define SLAB_CHECK_SELECT(sz, _)  \
 		if (num_bytes <= sz)      \
 			return slab_kmalloc_nx##sz(flags);
-		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT)
+		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT, _)
 #undef SLAB_CHECK_SELECT
 		__slab_invalid_size();
 	}

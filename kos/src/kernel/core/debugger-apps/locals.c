@@ -132,7 +132,8 @@ locals_format_printer(void *UNUSED(format_arg),
 			format = AC_COLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON);
 			break;
 
-		default: return 0;
+		default:
+			return 0;
 		}
 	}
 	return (*printer)(arg, format, strlen(format));
@@ -215,7 +216,9 @@ print_local(void *arg,
 	size_t bufsize = type->t_sizeof;
 	var_fixname(var);
 	if (arg) {
-		dbg_printf(DBGSTR(AC_WHITE("%?-s") ": "), *(size_t *)arg, var->v_name);
+		dbg_printf(DBGSTR(AC_WHITE("%?-s") ": "),
+		           *(size_t *)arg,
+		           var->v_name);
 		var->v_name = NULL;
 	}
 again:
@@ -248,10 +251,12 @@ again:
 			 * for the current source location, which happens when the compiler
 			 * decides to optimize the variable away before its scope ends. */
 			dbg_print(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_LIGHT_GRAY,
-			                          ANSITTY_CL_MAROON,
-			                          "<deleted>") "\n"));
+			                              ANSITTY_CL_MAROON,
+			                              "<deleted>")
+			                 "\n"));
 		} else {
-			dbg_printf(DBGSTR(": Unwind error #%u\n"), error);
+			dbg_printf(DBGSTR(": Unwind error #%u\n"),
+			           error);
 		}
 	}
 	return 0;
@@ -280,8 +285,8 @@ locals_maxlen(void *arg,
               di_debuginfo_variable_t *__restrict var,
               di_debuginfo_type_t *__restrict UNUSED(type),
               uintptr_t UNUSED(module_relative_pc)) {
-	size_t len;
-	size_t *pmaxlen = (size_t *)arg;
+	size_t len, *pmaxlen;
+	pmaxlen = (size_t *)arg;
 	var_fixname(var);
 	len = strlen(var->v_name);
 	if (*pmaxlen < len)

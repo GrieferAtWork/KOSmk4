@@ -38,6 +38,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/debugtrap.h>
 #include <kernel/memory.h>
 #include <kernel/panic.h>
+#include <kernel/poison-heap.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/vm.h>
@@ -86,14 +87,26 @@ NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 		pertask_init_task_connections(thread);
 }
 
-/* Some some potential system inconsistencies that may
- * otherwise cause infinite loops when an assertion gets
- * triggered (after all: there is code that can get called
- * from within an assertion handler, which in turn is able
- * to cause other assertions) */
-PRIVATE ATTR_COLDTEXT NOBLOCK void
-NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
-	struct task *mythread = THIS_TASK;
+/* Poison the kernel.
+ * This operation cannot be undone and may (under rare circumstances)
+ * itself cause the kernel to crash (due to race conditions with other
+ * CPUs). Use with caution, or better yet: Don't use at all!
+ * Additionally, this function will attempt to fix some common system
+ * integrity violations in order to allow other kernel panic code to
+ * at least somewhat function correctly. (as far as that may still be
+ * possible, given that this function is meant to be used when the
+ * kernel has become unstable) */
+PUBLIC NOBLOCK ATTR_COLD void
+NOTHROW(KCALL _kernel_poison)(void) {
+	/* Fix some potential system inconsistencies that may
+	 * otherwise cause infinite loops when an assertion gets
+	 * triggered (after all: there is code that can get called
+	 * from within an assertion handler, which in turn is able
+	 * to cause other assertions) */
+	struct task *mythread;
+	pflag_t was;
+	mythread = THIS_TASK;
+	was      = PREEMPTION_PUSHOFF();
 	fixup_uninitialized_thread(&_boottask);
 	fixup_uninitialized_thread(&_asyncwork);
 	fixup_uninitialized_thread(&_bootidle);
@@ -107,7 +120,14 @@ NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
 	COMPILER_WRITE_BARRIER();
 	__kernel_poisoned = true;
 	COMPILER_WRITE_BARRIER();
+#ifdef CONFIG_HAVE_POISON_HEAP
+	/* Redirect heap functions to use the poison heap */
+	ph_install();
+#endif /* CONFIG_HAVE_POISON_HEAP */
+	PREEMPTION_POP(was);
 }
+
+
 
 
 PRIVATE ATTR_COLDTEXT NOBLOCK bool
@@ -131,32 +151,44 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifdef LOG_STACK_REMAINDER
 	uintptr_t last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
-	fixup_potential_system_inconsistencies();
+	_kernel_poison();
 	memcpy(&state, dumpstate, sizeof(struct ucpustate));
 	memcpy(&saved_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
 	isa = instrlen_isa_from_ucpustate(&state);
-	addr2line_printf(printer, arg,
-	                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state), isa),
-	                 ucpustate_getpc(&state),
-	                 "Caused here [sp=%p]",
-	                 (void *)ucpustate_getsp(&state));
+	TRY {
+		addr2line_printf(printer, arg,
+		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state), isa),
+		                 ucpustate_getpc(&state),
+		                 "Caused here [sp=%p]",
+		                 (void *)ucpustate_getsp(&state));
+	} EXCEPT {
+		format_printf(printer, arg, "%p: Caused here\n", ucpustate_getpc(&state));
+	}
 	for (;;) {
 		struct ucpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct ucpustate));
-		error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
-		               &unwind_getreg_ucpustate, &old_state,
-		               &unwind_setreg_ucpustate, &state);
+		TRY {
+			error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
+			               &unwind_getreg_ucpustate, &old_state,
+			               &unwind_setreg_ucpustate, &state);
+		} EXCEPT {
+			error = UNWIND_SEGFAULT;
+		}
 		if (error != UNWIND_SUCCESS)
 			break;
-		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state),
-		                                                instrlen_isa_from_ucpustate(&state)),
-		                 ucpustate_getpc(&state),
-		                 "Called here [sp=%p]",
-		                 (void *)ucpustate_getsp(&state));
+		TRY {
+			addr2line_printf(printer, arg,
+			                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state),
+			                                                instrlen_isa_from_ucpustate(&state)),
+			                 ucpustate_getpc(&state),
+			                 "Called here [sp=%p]",
+			                 (void *)ucpustate_getsp(&state));
+		} EXCEPT {
+			format_printf(printer, arg, "%p: Called here\n", ucpustate_getpc(&state));
+		}
 #ifdef LOG_STACK_REMAINDER
 		last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -164,7 +196,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	if (error != UNWIND_NO_FRAME)
 		format_printf(printer, arg, "Unwind failure: %u\n", error);
 #ifdef LOG_STACK_REMAINDER
-	{
+	TRY {
 		void *minaddr, *endaddr;
 		get_stack_for(&minaddr, &endaddr, (void *)last_good_sp);
 		if (last_good_sp >= (uintptr_t)minaddr &&
@@ -195,13 +227,19 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 					format_printf(printer, arg, "Analyzing remainder of stack\n");
 					is_first = false;
 				}
-				addr2line_printf(printer, arg,
-				                 (uintptr_t)instruction_trypred(pc, isa),
-				                 (uintptr_t)pc,
-				                 "Return address from [sp=%p]",
-				                 iter);
+				TRY {
+					addr2line_printf(printer, arg,
+					                 (uintptr_t)instruction_trypred(pc, isa),
+					                 (uintptr_t)pc,
+					                 "Return address from [sp=%p]",
+					                 iter);
+				} EXCEPT {
+					format_printf(printer, arg, "%p: Return address from [sp=%p]\n",
+					              pc, iter);
+				}
 			}
 		}
+	} EXCEPT {
 	}
 #endif /* LOG_STACK_REMAINDER */
 	memcpy(&THIS_EXCEPTION_INFO, &saved_info, sizeof(struct exception_info));
@@ -239,7 +277,7 @@ panic_assert_dbg_main(void *arg) {
 INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void FCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
 	PREEMPTION_DISABLE();
-	fixup_potential_system_inconsistencies();
+	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
@@ -398,7 +436,7 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 	}
 #endif /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_DISABLE();
-	fixup_potential_system_inconsistencies();
+	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Check [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
@@ -470,7 +508,7 @@ INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
-	fixup_potential_system_inconsistencies();
+	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Stack check failure [pc=%p]\n", kcpustate_getpc(state));
 	kcpustate_to_ucpustate(state, &ustate);
@@ -492,7 +530,7 @@ INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
-	fixup_potential_system_inconsistencies();
+	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel aborted [pc=%p]\n", kcpustate_getpc(state));
 	kcpustate_to_ucpustate(state, &ustate);
@@ -547,7 +585,7 @@ PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
                         char const *format, va_list args) {
 	PREEMPTION_DISABLE();
-	fixup_potential_system_inconsistencies();
+	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel Panic [pc=%p]\n",
 	       ucpustate_getpc(state));
@@ -666,8 +704,6 @@ kernel_panic_fcpustate(struct fcpustate *__restrict state,
 	va_start(args, format);
 	kernel_vpanic_fcpustate(state, format, args);
 }
-
-
 
 DECL_END
 

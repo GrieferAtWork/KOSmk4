@@ -65,6 +65,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t *__restric
                                                   dwarf_uleb128_t index,
                                                   char **__restrict ppathname,
                                                   char **__restrict pfilename) {
+	/* TODO: Make this one an external in-library function! */
 	if (!index) {
 		*ppathname = __NULLPTR;
 		*pfilename = __NULLPTR;

@@ -111,7 +111,7 @@ typedef struct di_debuginfo_component_struct {
 #if __SIZEOF_POINTER__ >= 4
 	__uint8_t                      __dic_pad[(sizeof(void *) / 2) - 1]; /* ... */
 #endif /* __SIZEOF_POINTER__ >= 4 */
-	di_debuginfo_component_attrib_t *dic_attrib_start; /* [1..1] Pointer to the list of (attr_name,attr_form) ULEB pairs of this entry */
+	di_debuginfo_component_attrib_t *dic_attrib_start; /* [1..1] Pointer to the list of (attr_name, attr_form) ULEB pairs of this entry */
 	di_debuginfo_component_attrib_t *dic_attrib_end;   /* [1..1] End of attributes. */
 } di_debuginfo_component_t;
 
@@ -189,8 +189,8 @@ typedef struct di_debuginfo_location_struct {
  */
 #define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self)                                   \
 	for (__byte_t *_attr_reader = (__byte_t *)(self)->dup_comp.dic_attrib_start;      \
-	     /*     */ _attr_reader < (__byte_t *)(self)->dup_comp.dic_attrib_end &&      \
-	     (self)->dup_cu_info_pos < (self)->dup_cu_info_end;                           \
+	     /*    */ (_attr_reader < (__byte_t *)(self)->dup_comp.dic_attrib_end &&      \
+	               (self)->dup_cu_info_pos < (self)->dup_cu_info_end);                \
 	     debuginfo_cu_parser_skipform(self, (attr).dica_form))                        \
 		if (((attr).dica_name = dwarf_decode_uleb128((__byte_t **)&_attr_reader),     \
 		     (attr).dica_form = dwarf_decode_uleb128((__byte_t **)&_attr_reader), 0)) \
@@ -335,6 +335,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_iterator_init)(di_debuginfo_range
                                                               __uintptr_t cu_base,
                                                               __byte_t *__restrict debug_ranges_start,
                                                               __byte_t *__restrict debug_ranges_end) {
+	/* TODO: Make this one an external in-library function! */
 	self->ri_ranges   = ranges;
 	self->ri_addrsize = parser->dup_addrsize;
 	self->ri_initbase = ranges->r_startpc != (__uintptr_t)-1 ? ranges->r_startpc : cu_base;
@@ -353,6 +354,7 @@ __LOCAL __ATTR_NONNULL((1, 2, 3)) __BOOL
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_iterator_next)(di_debuginfo_ranges_iterator_t *__restrict self,
                                                               __uintptr_t *__restrict pmodule_relative_start_pc,
                                                               __uintptr_t *__restrict pmodule_relative_end_pc) {
+	/* TODO: Make this one an external in-library function! */
 	__uintptr_t range_start,range_end;
 again:
 	if (self->ri_pos >= self->ri_end) {
@@ -421,6 +423,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t c
                                                          __uintptr_t module_relative_pc,
                                                          __byte_t *__restrict debug_ranges_start,
                                                          __byte_t *__restrict debug_ranges_end) {
+	/* TODO: Make this one an external in-library function! */
 	__byte_t *iter;
 	if (DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
 		return (module_relative_pc >= self->r_startpc &&
@@ -436,24 +439,28 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t c
 	while (iter < debug_ranges_end) {
 		__uintptr_t range_start,range_end;
 		switch (parser->dup_addrsize) {
+
 		case 1:
 			range_start = *(__uint8_t *)iter;
 			iter       += 1;
 			range_end   = *(__uint8_t *)iter;
 			iter       += 1;
 			break;
+
 		case 2:
 			range_start = __hybrid_unaligned_get16((__uint16_t *)iter);
 			iter       += 2;
 			range_end   = __hybrid_unaligned_get16((__uint16_t *)iter);
 			iter       += 2;
 			break;
+
 		case 4:
 			range_start = __hybrid_unaligned_get32((__uint32_t *)iter);
 			iter       += 4;
 			range_end   = __hybrid_unaligned_get32((__uint32_t *)iter);
 			iter       += 4;
 			break;
+
 #if __SIZEOF_POINTER__ > 4
 		case 8:
 			range_start = __hybrid_unaligned_get64((__uint64_t *)iter);
@@ -462,6 +469,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t c
 			iter       += 8;
 			break;
 #endif /* __SIZEOF_POINTER__ > 4 */
+
 		default:
 			__builtin_unreachable();
 		}
@@ -492,6 +500,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_
                                                             __byte_t *__restrict debug_ranges_end,
                                                             __uintptr_t *__restrict poverlap_start,
                                                             __uintptr_t *__restrict poverlap_end) {
+	/* TODO: Make this one an external in-library function! */
 	__byte_t *iter;
 	__COMPILER_IGNORE_UNINITIALIZED(*poverlap_start);
 	__COMPILER_IGNORE_UNINITIALIZED(*poverlap_end);
@@ -511,24 +520,28 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_
 	while (iter < debug_ranges_end) {
 		__uintptr_t range_start,range_end;
 		switch (parser->dup_addrsize) {
+
 		case 1:
 			range_start = *(__uint8_t *)iter;
 			iter       += 1;
 			range_end   = *(__uint8_t *)iter;
 			iter       += 1;
 			break;
+
 		case 2:
 			range_start = __hybrid_unaligned_get16((__uint16_t *)iter);
 			iter       += 2;
 			range_end   = __hybrid_unaligned_get16((__uint16_t *)iter);
 			iter       += 2;
 			break;
+
 		case 4:
 			range_start = __hybrid_unaligned_get32((__uint32_t *)iter);
 			iter       += 4;
 			range_end   = __hybrid_unaligned_get32((__uint32_t *)iter);
 			iter       += 4;
 			break;
+
 #if __SIZEOF_POINTER__ > 4
 		case 8:
 			range_start = __hybrid_unaligned_get64((__uint64_t *)iter);
@@ -536,7 +549,8 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_
 			range_end   = __hybrid_unaligned_get64((__uint64_t *)iter);
 			iter       += 8;
 			break;
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
+
 		default:
 			__builtin_unreachable();
 		}
@@ -777,8 +791,8 @@ debuginfo_print_typename(__pformatprinter printer, void *arg,
                          void *format_arg);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
-#define DEBUGINFO_PRINT_VALUE_FNORMAL        0x0000
-#define DEBUGINFO_PRINT_VALUE_FCASTALL       0x0001 /* Include explicit type casts for all expressions */
+#define DEBUGINFO_PRINT_VALUE_FNORMAL  0x0000
+#define DEBUGINFO_PRINT_VALUE_FCASTALL 0x0001 /* Include explicit type casts for all expressions */
 
 
 typedef struct di_enum_locals_sections_struct {

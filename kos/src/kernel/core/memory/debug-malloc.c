@@ -204,7 +204,7 @@ DECL_BEGIN
  * should attempt to include in debug information of
  * allocated pointers. */
 #ifndef CONFIG_MALL_TRACEMIN
-#define CONFIG_MALL_TRACEMIN       4
+#define CONFIG_MALL_TRACEMIN 4
 #endif /* !CONFIG_MALL_TRACEMIN */
 
 #define HINT_ADDR(x, y) x
@@ -1799,8 +1799,8 @@ NOTHROW(KCALL mall_untrace_n)(void *ptr, size_t num_bytes, gfp_t flags) {
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL heap_free)(struct heap *__restrict self,
-                          VIRT void *ptr, size_t num_bytes,
-                          gfp_t flags) {
+                         VIRT void *ptr, size_t num_bytes,
+                         gfp_t flags) {
 	mall_untrace_n(ptr, num_bytes, flags | GFP_ATOMIC);
 	heap_free_untraced(self, ptr, num_bytes, flags);
 }

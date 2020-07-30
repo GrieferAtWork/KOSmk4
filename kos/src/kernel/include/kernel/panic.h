@@ -21,6 +21,7 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_PANIC_H 1
 
 #include <kernel/compiler.h>
+
 #include <debugger/config.h>
 
 DECL_BEGIN
@@ -39,6 +40,17 @@ struct fcpustate;
  * zero when the kernel may be in an inconsistent state. */
 #define kernel_poisoned() _kernel_poisoned
 DATDEF bool const _kernel_poisoned;
+
+/* Poison the kernel.
+ * This operation cannot be undone and may (under rare circumstances)
+ * itself cause the kernel to crash (due to race conditions with other
+ * CPUs). Use with caution, or better yet: Don't use at all!
+ * Additionally, this function will attempt to fix some common system
+ * integrity violations in order to allow other kernel panic code to
+ * at least somewhat function correctly. (as far as that may still be
+ * possible, given that this function is meant to be used when the
+ * kernel has become unstable) */
+FUNDEF NOBLOCK ATTR_COLD void NOTHROW(KCALL _kernel_poison)(void);
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #define ATTR_KERNEL_PANIC_NORETURN /* nothing */

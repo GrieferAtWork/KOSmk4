@@ -1230,7 +1230,10 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			             "result.hp_ptr + offset = %p\n"
 			             "offset                 = %p\n"
 			             "min_alignment          = %p\n",
-			             (uintptr_t)result.hp_ptr, (uintptr_t)result.hp_ptr + offset, (uintptr_t)offset, (uintptr_t)min_alignment);
+			             (uintptr_t)result.hp_ptr,
+			             (uintptr_t)result.hp_ptr + offset,
+			             (uintptr_t)offset,
+			             (uintptr_t)min_alignment);
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 			HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
 			heap_validate_all_pedantic();

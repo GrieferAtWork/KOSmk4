@@ -670,11 +670,11 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 	self = SLAB_GET(ptr);
 	switch (self->s_size) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_FREE(sz)                       \
+#define CASE_SLAB_FREE(sz, _)                    \
 	case sz:                                     \
 		slab_freeptr##sz(self, ptr, GFP_NORMAL); \
 		break;
-	SLAB_FOREACH_SIZE(CASE_SLAB_FREE)
+	SLAB_FOREACH_SIZE(CASE_SLAB_FREE, _)
 #undef CASE_SLAB_FREE
 #endif /* !__INTELLISENSE__ */
 	default:
@@ -695,11 +695,11 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 	self = SLAB_GET(ptr);
 	switch (self->s_size) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_FREE(sz)                  \
+#define CASE_SLAB_FREE(sz, _)               \
 	case sz:                                \
 		slab_freeptr##sz(self, ptr, flags); \
 		break;
-	SLAB_FOREACH_SIZE(CASE_SLAB_FREE)
+	SLAB_FOREACH_SIZE(CASE_SLAB_FREE, _)
 #undef CASE_SLAB_FREE
 #endif /* !__INTELLISENSE__ */
 	default:
@@ -716,10 +716,10 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 PUBLIC NOBLOCK ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_MALLOC(sz) \
-	if (num_bytes <= sz)     \
+#define CASE_SLAB_MALLOC(sz, _) \
+	if (num_bytes <= sz)        \
 		return slab_malloc##sz(flags);
-	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC)
+	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC, _)
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
@@ -733,10 +733,10 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL
 __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_MALLOC(sz) \
-	if (num_bytes <= sz)     \
+#define CASE_SLAB_MALLOC(sz, _) \
+	if (num_bytes <= sz)        \
 		return slab_kmalloc##sz(flags);
-	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC)
+	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC, _)
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
@@ -750,10 +750,10 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_MALLOC(sz) \
-	if (num_bytes <= sz)     \
+#define CASE_SLAB_MALLOC(sz, _) \
+	if (num_bytes <= sz)        \
 		return slab_kmalloc_nx##sz(flags);
-	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC)
+	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC, _)
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG

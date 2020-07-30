@@ -494,7 +494,7 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
 
 
 
-/* Read/Write the value associated a given debuginfo location descriptor.
+/* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
  * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
  *                                Optionally, this argument may be `NULL', however if this is the

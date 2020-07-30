@@ -330,9 +330,9 @@ for (local align: [4, 8, 16]) {
 		} else {
 			print "#elif KERNEL_SLAB_COUNT >=", x;
 		}
-		print "#define SLAB_FOREACH_SIZE(func)",;
+		print "#define SLAB_FOREACH_SIZE(func, _)",;
 		for (local y: [1:x + 1])
-			print " func(" + (y * align) + ")",;
+			print " func(" + (y * align) + ", _)",;
 		print;
 	}
 	print "#endif";
@@ -345,109 +345,109 @@ print "#endif";
 #if KERNEL_SLAB_COUNT >= 17
 #error Extend me
 #elif KERNEL_SLAB_COUNT >= 16
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40) func(44) func(48) func(52) func(56) func(60) func(64)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _) func(44, _) func(48, _) func(52, _) func(56, _) func(60, _) func(64, _)
 #elif KERNEL_SLAB_COUNT >= 15
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40) func(44) func(48) func(52) func(56) func(60)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _) func(44, _) func(48, _) func(52, _) func(56, _) func(60, _)
 #elif KERNEL_SLAB_COUNT >= 14
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40) func(44) func(48) func(52) func(56)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _) func(44, _) func(48, _) func(52, _) func(56, _)
 #elif KERNEL_SLAB_COUNT >= 13
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40) func(44) func(48) func(52)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _) func(44, _) func(48, _) func(52, _)
 #elif KERNEL_SLAB_COUNT >= 12
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40) func(44) func(48)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _) func(44, _) func(48, _)
 #elif KERNEL_SLAB_COUNT >= 11
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40) func(44)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _) func(44, _)
 #elif KERNEL_SLAB_COUNT >= 10
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36) func(40)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _) func(40, _)
 #elif KERNEL_SLAB_COUNT >= 9
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32) func(36)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _) func(36, _)
 #elif KERNEL_SLAB_COUNT >= 8
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28) func(32)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _) func(32, _)
 #elif KERNEL_SLAB_COUNT >= 7
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24) func(28)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _) func(28, _)
 #elif KERNEL_SLAB_COUNT >= 6
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20) func(24)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _) func(24, _)
 #elif KERNEL_SLAB_COUNT >= 5
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16) func(20)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _) func(20, _)
 #elif KERNEL_SLAB_COUNT >= 4
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12) func(16)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _) func(16, _)
 #elif KERNEL_SLAB_COUNT >= 3
-#define SLAB_FOREACH_SIZE(func) func(4) func(8) func(12)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _) func(12, _)
 #elif KERNEL_SLAB_COUNT >= 2
-#define SLAB_FOREACH_SIZE(func) func(4) func(8)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _) func(8, _)
 #else
-#define SLAB_FOREACH_SIZE(func) func(4)
+#define SLAB_FOREACH_SIZE(func, _) func(4, _)
 #endif
 #elif HEAP_ALIGNMENT == 8
 #if KERNEL_SLAB_COUNT >= 17
 #error Extend me
 #elif KERNEL_SLAB_COUNT >= 16
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80) func(88) func(96) func(104) func(112) func(120) func(128)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _) func(88, _) func(96, _) func(104, _) func(112, _) func(120, _) func(128, _)
 #elif KERNEL_SLAB_COUNT >= 15
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80) func(88) func(96) func(104) func(112) func(120)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _) func(88, _) func(96, _) func(104, _) func(112, _) func(120, _)
 #elif KERNEL_SLAB_COUNT >= 14
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80) func(88) func(96) func(104) func(112)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _) func(88, _) func(96, _) func(104, _) func(112, _)
 #elif KERNEL_SLAB_COUNT >= 13
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80) func(88) func(96) func(104)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _) func(88, _) func(96, _) func(104, _)
 #elif KERNEL_SLAB_COUNT >= 12
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80) func(88) func(96)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _) func(88, _) func(96, _)
 #elif KERNEL_SLAB_COUNT >= 11
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80) func(88)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _) func(88, _)
 #elif KERNEL_SLAB_COUNT >= 10
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72) func(80)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _) func(80, _)
 #elif KERNEL_SLAB_COUNT >= 9
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64) func(72)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _) func(72, _)
 #elif KERNEL_SLAB_COUNT >= 8
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56) func(64)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _) func(64, _)
 #elif KERNEL_SLAB_COUNT >= 7
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48) func(56)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _) func(56, _)
 #elif KERNEL_SLAB_COUNT >= 6
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40) func(48)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _) func(48, _)
 #elif KERNEL_SLAB_COUNT >= 5
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32) func(40)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _) func(40, _)
 #elif KERNEL_SLAB_COUNT >= 4
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24) func(32)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _) func(32, _)
 #elif KERNEL_SLAB_COUNT >= 3
-#define SLAB_FOREACH_SIZE(func) func(8) func(16) func(24)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _) func(24, _)
 #elif KERNEL_SLAB_COUNT >= 2
-#define SLAB_FOREACH_SIZE(func) func(8) func(16)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _) func(16, _)
 #else
-#define SLAB_FOREACH_SIZE(func) func(8)
+#define SLAB_FOREACH_SIZE(func, _) func(8, _)
 #endif
 #elif HEAP_ALIGNMENT == 16
 #if KERNEL_SLAB_COUNT >= 17
 #error Extend me
 #elif KERNEL_SLAB_COUNT >= 16
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160) func(176) func(192) func(208) func(224) func(240) func(256)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _) func(176, _) func(192, _) func(208, _) func(224, _) func(240, _) func(256, _)
 #elif KERNEL_SLAB_COUNT >= 15
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160) func(176) func(192) func(208) func(224) func(240)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _) func(176, _) func(192, _) func(208, _) func(224, _) func(240, _)
 #elif KERNEL_SLAB_COUNT >= 14
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160) func(176) func(192) func(208) func(224)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _) func(176, _) func(192, _) func(208, _) func(224, _)
 #elif KERNEL_SLAB_COUNT >= 13
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160) func(176) func(192) func(208)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _) func(176, _) func(192, _) func(208, _)
 #elif KERNEL_SLAB_COUNT >= 12
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160) func(176) func(192)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _) func(176, _) func(192, _)
 #elif KERNEL_SLAB_COUNT >= 11
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160) func(176)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _) func(176, _)
 #elif KERNEL_SLAB_COUNT >= 10
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144) func(160)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _) func(160, _)
 #elif KERNEL_SLAB_COUNT >= 9
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128) func(144)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _) func(144, _)
 #elif KERNEL_SLAB_COUNT >= 8
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112) func(128)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _) func(128, _)
 #elif KERNEL_SLAB_COUNT >= 7
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96) func(112)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _) func(112, _)
 #elif KERNEL_SLAB_COUNT >= 6
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80) func(96)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _) func(96, _)
 #elif KERNEL_SLAB_COUNT >= 5
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64) func(80)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _) func(80, _)
 #elif KERNEL_SLAB_COUNT >= 4
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48) func(64)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _) func(64, _)
 #elif KERNEL_SLAB_COUNT >= 3
-#define SLAB_FOREACH_SIZE(func) func(16) func(32) func(48)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _) func(48, _)
 #elif KERNEL_SLAB_COUNT >= 2
-#define SLAB_FOREACH_SIZE(func) func(16) func(32)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _) func(32, _)
 #else
-#define SLAB_FOREACH_SIZE(func) func(16)
+#define SLAB_FOREACH_SIZE(func, _) func(16, _)
 #endif
 #elif !defined(__DEEMON__)
 #error Unsupported alignment

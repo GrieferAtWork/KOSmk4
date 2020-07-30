@@ -402,6 +402,7 @@ typedef __uintptr_t dwarf_uleb128_t;
 /* Decode a signed/unsigned LEB128 integer and advance `*ptext' */
 __LOCAL __ATTR_NONNULL((1)) dwarf_sleb128_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128)(__byte_t **__restrict ptext) {
+	/* TODO: Make this one an external in-library function! */
 	__byte_t byte,*text = *ptext;
 	dwarf_sleb128_t result = 0;
 	unsigned int shift = 0;
@@ -421,6 +422,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128)(__byte_t **__restrict ptext)
 
 __LOCAL __ATTR_NONNULL((1)) dwarf_uleb128_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128)(__byte_t **__restrict ptext) {
+	/* TODO: Make this one an external in-library function! */
 	__byte_t byte,*text = *ptext;
 	unsigned int shift = 0;
 	dwarf_uleb128_t result = 0;
@@ -443,6 +445,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
                                                     __uintptr_t textbase,
                                                     __uintptr_t database,
                                                     __uintptr_t funcbase) {
+	/* TODO: Make this one an external in-library function! */
 	__uintptr_t result;
 	__byte_t *text = *preader;
 	/* Relative encoding formats. */
