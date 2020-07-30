@@ -96,7 +96,7 @@ NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
 	IFRD(u8 result);
 #ifndef NO_PHYS_IDENTITY
 	if (PHYS_IS_IDENTITY(addr, 1))
-		DORW_AND_RETURN(8, addr);
+		DORW_AND_RETURN(8, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = pagedir_push_mapone(tramp,
