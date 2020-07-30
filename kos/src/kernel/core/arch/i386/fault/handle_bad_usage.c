@@ -116,6 +116,8 @@ opt.append("-Os");
 #include <kernel/x86/fsgsbase.h> /* x86_fsgsbase_patch() */
 
 #include <int128.h>
+
+#include <libcpustate/apply.h> /* cpu_apply_icpustate() */
 #endif /* __x86_64__ */
 
 
@@ -1105,14 +1107,22 @@ set_noncanon_pc_exception:
 
 #undef EMU86_UNSUPPORTED_MEMACCESS_IS_NOOP
 #define EMU86_UNSUPPORTED_MEMACCESS(addr, num_bytes, reading, writing) \
-	assert_canonical_address(_state, addr, num_bytes, reading, writing)
+	assert_canonical_address(_state, (void const *)REAL_START_IP(), addr, num_bytes, reading, writing)
 PRIVATE void KCALL
 assert_canonical_address(struct icpustate *__restrict state,
+                         void const *instr_start_pc,
                          void *addr, size_t num_bytes,
                          bool reading, bool writing) {
 	assert(reading || writing);
 	if unlikely(ADDR_IS_NONCANON((byte_t *)addr) ||
 	            ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
+		/* Special handling for accesses made from `x86_nopf_check()' */
+		if (x86_nopf_check(instr_start_pc)) {
+			/* Override the return address. */
+			icpustate_setpc(state, x86_nopf_retof(instr_start_pc));
+			/* longjmp() to the custom piece of fault handling code. */
+			cpu_apply_icpustate(state);
+		}
 		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%s] [#GPF] [tid=%u]\n",
 		       addr, icpustate_getpc(state),
 		       reading && writing ? "rw" : reading ? "ro" : "wo",
@@ -1606,9 +1616,9 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 			 * There isn't any rule against drivers doing weird trickery with their
 			 * own program segments, so-long as they follow the rules that kernel
 			 * memory can only be altered while holding a lock to the kernel VM. */
-			if (pagedir_ismapped((void *)pc)) {
+			if (pagedir_ismapped(pc)) {
 				vm_phys_t pc_phys;
-				pc_phys = pagedir_translate((void *)pc);
+				pc_phys = pagedir_translate(pc);
 				/* Try to patch the instruction at `pc' */
 #ifndef NO_PHYS_IDENTITY
 				if (PHYS_IS_IDENTITY(pc_phys, 5)) {
