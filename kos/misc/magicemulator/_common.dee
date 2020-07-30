@@ -72,7 +72,7 @@ function findExecutableInPath(path: string, name: string): string | none {
 						l = l[:-2].rstrip();
 						if (l.startswith("\"") && l.endswith("\""))
 							l = l[1:-1];
-						res = l.decode("utf-8");
+						res = l.decode("utf-8", "ignore");
 					}
 					continue;
 				}
@@ -99,7 +99,7 @@ function findExecutableInPaths(paths: {string...}, name: string): string | none 
 
 function normalizeFilenameForLog(filename: string | Bytes): string {
 	if (filename !is string)
-		filename = filename.decode("utf-8");
+		filename = filename.decode("utf-8", "ignore");
 #ifdef __WINDOWS__
 	filename = fs.abspath(normalizePath(filename, false), ROOTDIR)
 		.replace("/", "\\");
@@ -368,7 +368,7 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
 #endif
 				if (data !is string) {
 					if (data is Bytes)
-						data = data.decode("utf-8");
+						data = data.decode("utf-8", "ignore");
 					else {
 						data = str(data);
 					}
