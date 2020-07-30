@@ -29,13 +29,13 @@
 
 
 #ifdef HEAP_NX
-#define IFELSE_NX(if_nx,if_x)    if_nx
-#define FUNC(x)                  x##_nx
-#define NOTHROW_NX               NOTHROW
+#define IFELSE_NX(if_nx, if_x) if_nx
+#define FUNC(x)                x##_nx
+#define NOTHROW_NX             NOTHROW
 #else /* HEAP_NX */
-#define IFELSE_NX(if_nx,if_x)    if_x
-#define FUNC(x)                  x
-#define NOTHROW_NX(x)            x
+#define IFELSE_NX(if_nx, if_x) if_x
+#define FUNC(x)                x
+#define NOTHROW_NX(x)          x
 #endif /* HEAP_NX */
 
 
@@ -1446,7 +1446,7 @@ err:
 }
 
 
-PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL
+PUBLIC WUNUSED ATTR_MALLOC IFELSE_NX(, ATTR_RETNONNULL)
 ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages, /* TODO: This function should take byte counts! */
                                              size_t alignment_in_pages,
@@ -1464,7 +1464,7 @@ NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages, /* TODO: This fun
 	return result;
 }
 
-PUBLIC WUNUSED ATTR_RETNONNULL
+PUBLIC WUNUSED IFELSE_NX(, ATTR_RETNONNULL)
 ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_base,
                                                size_t old_pages, size_t new_pages, /* TODO: This function should take byte counts! */

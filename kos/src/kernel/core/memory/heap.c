@@ -1327,8 +1327,9 @@ DECL_END
 #ifndef __INTELLISENSE__
 #define HEAP_NX 1
 #include "heap-impl.c.inl"
+/**/
 #include "heap-impl.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 DECL_BEGIN
 
