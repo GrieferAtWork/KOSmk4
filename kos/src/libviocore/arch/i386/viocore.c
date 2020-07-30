@@ -1380,15 +1380,7 @@ libviocore_atomic_cmpxchx(struct vio_emulate_args *__restrict self,
 	} else {
 		VALRDWR(addr, 16);
 		if (force_atomic) {
-			__asm__ __volatile__("cmpxchg16b %0"
-			                     : "+m" (*(uint128_t *)addr)
-			                     , "=a" (uint128_vec64(result)[0])
-			                     , "=d" (uint128_vec64(result)[1])
-			                     : "a" (uint128_vec64(oldval)[0])
-			                     , "d" (uint128_vec64(oldval)[1])
-			                     , "b" (uint128_vec64(newval)[0])
-			                     , "c" (uint128_vec64(newval)[1])
-			                     : "cc");
+			result = __lock_cmpxchg16b((uint128_t *)addr, oldval, newval);
 		} else {
 			result = *(uint128_t *)addr;
 			COMPILER_READ_BARRIER();
