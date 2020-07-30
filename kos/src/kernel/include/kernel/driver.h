@@ -25,6 +25,7 @@
 #include <debugger/config.h>
 #include <kernel/arch/driver.h>
 #include <kernel/driver-callbacks.h>
+#include <kernel/malloc-defs.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
@@ -241,7 +242,30 @@ struct driver_section {
 	                                        * NOTE: Set to `(REF struct driver_section *)-1' if the section isn't dangling. */
 	u16       DRIVER_CONST ds_sectflags;   /* [const] Section flags (Set of `DRIVER_DLSECTION_F*') */
 	u16       DRIVER_CONST ds_index;       /* [const] Index of this section. */
+#if __SIZEOF_POINTER__ > 4
+	byte_t               __ds_pad[__SIZEOF_POINTER__ - 4]; /* ... */
+#endif /* __SIZEOF_POINTER__ > 4 */
+	void                  *ds_cdata;       /* [0..ds_csize][lock(WRITE_ONCE)][owned_if(!= ds_data)]
+	                                        * Decompressed section data. (or same as `ds_data' if section isn't compressed)
+	                                        * NOTE: Set to `(void *)-1' when decompressed section data hasn't been loaded, yet.
+	                                        * NOTE: A section is compressed when `ds_flags & SHF_COMPRESSED' */
+	size_t DRIVER_CONST    ds_csize;       /* [const][lock(WRITE_ONCE)][valid_if(ds_cdata)] Decompressed section size. */
 };
+
+/* Return a pointer to the decompressed data blob for `self'.
+ * If data could not be decompressed, an `E_INVALID_ARGUMENT' exception is thrown.
+ * NOTE: The caller must ensure that raw section data of `self' has been loaded,
+ *       as in `self->ds_data != (void *)-1'!
+ * @return: * : A blob of `self->ds_csize' (after the caller) bytes of memory,
+ *              representing the section's decompressed memory contents. */
+FUNDEF ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
+driver_section_cdata(struct driver_section *__restrict self,
+                     gfp_t gfp DFL(GFP_NORMAL))
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT);
+/* @return: NULL: Failed to acquire compressed data. */
+FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self,
+                                       gfp_t gfp DFL(GFP_NORMAL));
 
 
 #define DRIVER_FLAG_NORMAL       0x0000 /* Normal (initial) driver flags. */
@@ -366,7 +390,19 @@ DATDEF struct driver_section kernel_section_bss;
 #ifdef CONFIG_HAVE_DEBUGGER
 DATDEF struct driver_section kernel_section_dbg_hooks;
 #endif /* CONFIG_HAVE_DEBUGGER */
-
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+INTDEF struct driver_section kernel_section_debug_line;
+INTDEF struct driver_section kernel_section_debug_info;
+INTDEF struct driver_section kernel_section_debug_aranges;
+INTDEF struct driver_section kernel_section_debug_abbrev;
+INTDEF struct driver_section kernel_section_debug_str;
+INTDEF struct driver_section kernel_section_debug_ranges;
+INTDEF struct driver_section kernel_section_debug_loc;
+INTDEF struct driver_section kernel_section_pertask;
+INTDEF struct driver_section kernel_section_pervm;
+INTDEF struct driver_section kernel_section_percpu;
+INTDEF struct driver_section kernel_section_shstrtab;
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_section_destroy)(struct driver_section *__restrict self);

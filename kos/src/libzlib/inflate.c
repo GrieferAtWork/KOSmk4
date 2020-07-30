@@ -23,9 +23,7 @@
 
 #include "inflate.h"
 
-#include <hybrid/align.h>
 #include <hybrid/byteorder.h>
-#include <hybrid/byteswap.h>
 #include <hybrid/wordbits.h>
 
 #include <kos/anno.h>
@@ -33,10 +31,7 @@
 #include <kos/types.h>
 
 #include <assert.h>
-#include <format-printer.h>
-#include <format-reader.h>
 #include <stddef.h>
-#include <stdint.h> /* SIZE_MAX */
 #include <string.h>
 
 #include <libzlib/inflate.h>
@@ -65,13 +60,18 @@ DECL_BEGIN
 INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libzlib_reader_init)(struct zlib_reader *__restrict self,
                                     void const *blob, size_t blob_size) {
-	self->zr_inbase  = (byte_t const *)blob;
-	self->zr_incur   = (byte_t const *)blob;
-	self->zr_inend   = (byte_t const *)blob + blob_size;
-	self->zr_state   = 0;
-	self->zr_bitcnt  = 0;
-	self->zr_offset  = 0;
-	self->zr_inblock = NULL;
+#ifndef NDEBUG
+	memset(self, 0xcc, sizeof(*self));
+#endif /* !NDEBUG */
+	self->zr_inbase = (byte_t const *)blob;
+	self->zr_incur  = (byte_t const *)blob;
+	self->zr_inend  = (byte_t const *)blob + blob_size;
+	self->zr_state  = 0;
+	self->zr_bitcnt = 0;
+	self->zr_offset = 0;
+	self->zr_window = NULL;
+	self->zr_flags  = 0;
+	self->zr_bitbuf = 0;
 }
 
 /* Finalize the given zlib reader. */
@@ -167,13 +167,13 @@ NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree) {
 PRIVATE __NOBLOCK NONNULL((1)) void
 NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
 	u16 i, code, bits, minbits, maxbits;
-	u16 next_code[MAX_BITS + 1];
+	u16 next_code[MAX_BITS + 2];
 	u16 bl_count[MAX_BITS + 1];
 	/* Count the number of codes for each bit-length */
 	memsetw(bl_count + 1, 0, MAX_BITS);
 	for (i = 0; i < tree->zr_count; ++i) {
 		u8 num_bits = tree->zt_tree[i].te_len;
-		assert(num_bits < MAX_BITS);
+		assert(num_bits <= MAX_BITS);
 		++bl_count[num_bits];
 	}
 	/* Calculate the codes for each symbol (as documented in the DEFLATE specs,
@@ -190,7 +190,7 @@ NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
 		if (len != 0) {
 			u16 rev_code;
 			code = next_code[len]++;
-			/* Reverse the bit-order of the code, to achive natural alignment. */
+			/* Reverse the bit-order of the code, to achieve natural alignment. */
 			for (rev_code = 0, bits = 0; bits < len; ++bits, code >>= 1)
 				rev_code = (rev_code << 1) | (code & 1);
 			tree->zt_tree[i].te_code = rev_code;

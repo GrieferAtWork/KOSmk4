@@ -308,7 +308,7 @@ again:
 		decref_unlikely(func_driver);
 		goto again;
 	}
-	printk(KERN_INFO "[usb] Register %s-probe (%[vinfo:%n(%p)] in driver %q)\n",
+	printk(KERN_INFO "[usb] Register %s-probe (%p in driver %q)\n",
 	       self == &probe_device ? "device" : "interface",
 	       func, func_driver->d_name);
 	decref_unlikely(func_driver);
@@ -357,7 +357,7 @@ found_index:
 		decref_unlikely(ovec);
 		goto again;
 	}
-	printk(KERN_INFO "[usb] Delete %s-probe (%[vinfo:%n(%p)] in driver %q)\n",
+	printk(KERN_INFO "[usb] Delete %s-probe (%p in driver %q)\n",
 	       self == &probe_device ? "device" : "interface",
 	       func, func_driver->d_name);
 	decref(func_driver);

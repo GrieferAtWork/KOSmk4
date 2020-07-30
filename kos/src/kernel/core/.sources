@@ -120,7 +120,9 @@ BEGIN
 		CC_FLAGS({ "-mcmodel=kernel" });
 	}
 
-//	GCC_FLAGS({ "-gz=zlib" })
+	/* Generate compressed debug sections. */
+	GCC_FLAGS({ "-gz=zlib" })
+
 	LD_FLAGS({
 		/* This flag disables alignment that
 		 * would unnecessarily bloat the kernel. */

@@ -31,25 +31,24 @@
 DECL_BEGIN
 
 #define SECTION_DESCRIPTOR_INDEX     PP_CAT2(KERNEL_SECTION_INDEX_, __LINE__)
-#define SECTION_DESCRIPTOR_NAME      PP_CAT2(kernel_section_, __LINE__)
 #define SECTION_DESCRIPTOR_SHSTRNAME PP_CAT2(ks_name_, __LINE__)
 
 
 
 /* Define globals. */
-#define SECTION(name, type, flags, start, size, entsize, link, info) /* nothing */
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) /* nothing */
 #include "kernel_sections.def"
 
 /* Define the kernel's .shstrtab section */
 struct kernel_shstrtab {
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	char SECTION_DESCRIPTOR_SHSTRNAME[sizeof(name)];
 #include "kernel_sections.def"
 	char zero;
 };
 
 INTERN_CONST ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data = {
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	/* .SECTION_DESCRIPTOR_SHSTRNAME = */ name,
 #include "kernel_sections.def"
 	/* .zero = */ 0
@@ -59,7 +58,7 @@ INTERN_CONST ATTR_COLDRODATA struct kernel_shstrtab const kernel_shstrtab_data =
 
 /* Define section indices */
 enum {
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	SECTION_DESCRIPTOR_INDEX,
 #include "kernel_sections.def"
 	KERNEL_SECTIONS_COUNT
@@ -68,7 +67,7 @@ enum {
 
 /* Define the ELF section header vector. */
 INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
-#define SECTION(name, type, flags, start, size, entsize, link, info)                          \
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info)      \
 	/* [SECTION_DESCRIPTOR_INDEX] = */ {                                                      \
 		/* .sh_name      = */ offsetof(struct kernel_shstrtab, SECTION_DESCRIPTOR_SHSTRNAME), \
 		/* .sh_type      = */ (type),                                                         \
@@ -86,23 +85,15 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 
 
 
+#if __SIZEOF_POINTER__ > 4
+#define _DRIVER_INIT_PAD { 0, },
+#else /* __SIZEOF_POINTER__ > 4 */
+#define _DRIVER_INIT_PAD /* nothing */
+#endif /* __SIZEOF_POINTER__ <= 4 */
+
 /* Define the driver section descriptors. */
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
-	PRIVATE struct driver_section SECTION_DESCRIPTOR_NAME = {        \
-		/* .ds_refcnt    = */ 2,                                     \
-		/* .ds_data      = */ (void *)(start),                       \
-		/* .ds_size      = */ (size_t)(size),                        \
-		/* .ds_entsize   = */ (size_t)(entsize),                     \
-		/* .ds_link      = */ (link),                                \
-		/* .ds_info      = */ (info),                                \
-		/* .ds_flags     = */ (flags),                               \
-		/* .ds_module    = */ &kernel_driver,                        \
-		/* .ds_dangling  = */ NULL,                                  \
-		/* .ds_sectflags = */ DRIVER_DLSECTION_FNORMAL,              \
-		/* .ds_index     = */ SECTION_DESCRIPTOR_INDEX               \
-	};
-#define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
-	PUBLIC struct driver_section export_name = {                                         \
+#define _SECTION(decl_name, name, type, flags, start, size, entsize, link, info)         \
+	struct driver_section decl_name = {                                                  \
 		/* .ds_refcnt    = */ 2,                                                         \
 		/* .ds_data      = */ (void *)(start),                                           \
 		/* .ds_size      = */ (size_t)(size),                                            \
@@ -113,17 +104,21 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 		/* .ds_module    = */ &kernel_driver,                                            \
 		/* .ds_dangling  = */ NULL,                                                      \
 		/* .ds_sectflags = */ DRIVER_DLSECTION_FNORMAL,                                  \
-		/* .ds_index     = */ SECTION_DESCRIPTOR_INDEX                                   \
+		/* .ds_index     = */ SECTION_DESCRIPTOR_INDEX,                                  \
+		_DRIVER_INIT_PAD                                                                 \
+		/* .ds_cdata     = */ (flags) & SHF_COMPRESSED ? (void *)(-1) : (void *)(start), \
+		/* .ds_csize     = */ (flags) & SHF_COMPRESSED ? 0 : (size_t)(size),             \
 	};
+#define INTERN_SECTION(intern_name, name, type, flags, start, size, entsize, link, info) \
+	INTERN _SECTION(intern_name, name, type, flags, start, size, entsize, link, info)
+#define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
+	PUBLIC _SECTION(export_name, name, type, flags, start, size, entsize, link, info)
 #include "kernel_sections.def"
 
 
 /* Define the driver sections vector. */
 INTERN_CONST struct driver_section *const kernel_sections[KERNEL_SECTIONS_COUNT] = {
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
-	/* [SECTION_DESCRIPTOR_INDEX] = */ &SECTION_DESCRIPTOR_NAME,
-#define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
-	/* [SECTION_DESCRIPTOR_INDEX] = */ &export_name,
+#define INTERN_SECTION(symbol_name, ...) /* [SECTION_DESCRIPTOR_INDEX] = */ &symbol_name,
 #include "kernel_sections.def"
 };
 

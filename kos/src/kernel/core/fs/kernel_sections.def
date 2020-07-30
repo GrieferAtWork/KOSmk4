@@ -17,13 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef SECTION
-#error "Must #define SECTION(name, type, flags, start, size, entsize, link, info) before #including this file"
-#endif /* !SECTION */
+#ifndef INTERN_SECTION
+#error "Must #define INTERN_SECTION(name, type, flags, start, size, entsize, link, info) before #including this file"
+#endif /* !INTERN_SECTION */
 
 #ifndef EXPORT_SECTION
 #define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
-	SECTION(name, type, flags, start, size, entsize, link, info)
+	INTERN_SECTION(export_name, name, type, flags, start, size, entsize, link, info)
 #endif /* !EXPORT_SECTION */
 
 #ifndef SECTION_GLOBALS_DEFINED
@@ -66,11 +66,6 @@ INTDEF byte_t __kernel_sect_dbg_hooks_size[];
 #endif /* CONFIG_HAVE_DEBUGGER */
 #endif /* !SECTION_GLOBALS_DEFINED */
 
-#if 0
-#define DEBUG_SECTION_FLAGS SHF_ALLOC | SHF_COMPRESSED
-#else
-#define DEBUG_SECTION_FLAGS SHF_ALLOC
-#endif
 EXPORT_SECTION(kernel_section_text, ".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_rodata, ".rodata", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_rodata_start, __kernel_sect_rodata_size, 0, 0, 0)
 #ifdef CONFIG_HAVE_DEBUGGER
@@ -78,22 +73,21 @@ EXPORT_SECTION(kernel_section_dbg_hooks, ".dbg.hooks", SHT_PROGBITS, SHF_ALLOC, 
 #endif /* CONFIG_HAVE_DEBUGGER */
 EXPORT_SECTION(kernel_section_gcc_except_table, ".gcc_except_table", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_gcc_except_table_start, __kernel_sect_gcc_except_table_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_eh_frame, ".eh_frame", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_eh_frame_start, __kernel_sect_eh_frame_size, 0, 0, 0)
-SECTION(".debug_line", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)
-SECTION(".debug_info", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_info_start, __kernel_debug_info_size, 0, 0, 0)
-SECTION(".debug_aranges", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_aranges_start, __kernel_debug_aranges_size, 0, 0, 0)
-SECTION(".debug_abbrev", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_abbrev_start, __kernel_debug_abbrev_size, 0, 0, 0)
-SECTION(".debug_str", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_str_start, __kernel_debug_str_size, 0, 0, 0)
-SECTION(".debug_ranges", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_ranges_start, __kernel_debug_ranges_size, 0, 0, 0)
-SECTION(".debug_loc", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_loc_start, __kernel_debug_loc_size, 0, 0, 0)
-SECTION(".pertask", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pertask_start, __kernel_pertask_size, 0, 0, 0)
-SECTION(".pervm", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pervm_start, __kernel_pervm_size, 0, 0, 0)
-SECTION(".percpu", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_percpu_start, __kernel_percpu_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_line, ".debug_line", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_info, ".debug_info", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_info_start, __kernel_debug_info_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_aranges, ".debug_aranges", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_aranges_start, __kernel_debug_aranges_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_abbrev, ".debug_abbrev", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_abbrev_start, __kernel_debug_abbrev_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_str, ".debug_str", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_str_start, __kernel_debug_str_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_ranges, ".debug_ranges", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_ranges_start, __kernel_debug_ranges_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_loc, ".debug_loc", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_loc_start, __kernel_debug_loc_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_pertask, ".pertask", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pertask_start, __kernel_pertask_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_pervm, ".pervm", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pervm_start, __kernel_pervm_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_percpu, ".percpu", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_percpu_start, __kernel_percpu_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_data, ".data", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_data_start, __kernel_sect_data_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_bss, ".bss", SHT_NOBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_bss_start, __kernel_sect_bss_size, 0, 0, 0)
-#undef DEBUG_SECTION_FLAGS
 
 /* NOTE: This section _must_ be last! */
-SECTION(".shstrtab", SHT_STRTAB, SHF_ALLOC | SHF_STRINGS, &kernel_shstrtab_data, sizeof(struct kernel_shstrtab) - 1, 0, 0, 0)
+INTERN_SECTION(kernel_section_shstrtab, ".shstrtab", SHT_STRTAB, SHF_ALLOC | SHF_STRINGS, &kernel_shstrtab_data, sizeof(struct kernel_shstrtab) - 1, 0, 0, 0)
 
-#undef SECTION
+#undef INTERN_SECTION
 #undef EXPORT_SECTION

@@ -426,7 +426,7 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 			if unlikely(!func_driver)
 				func_driver = incref(&drv_self); /* Shouldn't happen... */
 		}
-		printk(KERN_INFO "[isr] Register handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
+		printk(KERN_INFO "[isr] Register handler for vector %#Ix (%p with %p in driver %q)\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(index), real_func, real_arg, func_driver->d_name);
 		decref_unlikely(func_driver); /* Inherit on success. */
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, ignored_hisr_arg);
@@ -630,7 +630,7 @@ assign_new_state:
 		}
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
 		decref_unlikely(new_state);
-		printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
+		printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%p with %p in driver %q)\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(index), func, arg, declaring_driver->d_name);
 		decref(old_state);
 		return true;
@@ -921,7 +921,7 @@ shortcut_success:
 				declaring_driver = driver_at_address(func);
 				if unlikely(!declaring_driver)
 					declaring_driver = incref(&drv_self);
-				printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
+				printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%p with %p in driver %q)\n",
 				       (size_t)ISR_INDEX_TO_VECTOR(index), func, ob_pointer, declaring_driver->d_name);
 				decref_unlikely(declaring_driver);
 			}

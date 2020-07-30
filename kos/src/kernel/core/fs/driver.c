@@ -66,6 +66,8 @@
 #include <libcmdline/decode.h>
 #include <libcmdline/encode.h>
 #include <libunwind/eh_frame.h>
+#include <libzlib/error.h>
+#include <libzlib/inflate.h>
 
 DECL_BEGIN
 
@@ -690,6 +692,132 @@ NOTHROW(KCALL system_clearcaches)(void) {
 }
 
 
+/* Returns (void *)-1 if data hasn't been loaded, yet. */
+LOCAL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL driver_section_cdata_test)(struct driver_section *__restrict self) {
+	/* Check for simple case: Decompressed data has already been loaded. */
+	if (self->ds_cdata != (void *)-1)
+		return self->ds_cdata;
+	assertf(self->ds_data != (void *)-1, "Raw section data hasn't been loaded");
+	/* Check if the section is really compressed. Because if it isn't, then
+	 * we must set-up the `ds_cdata' field as an alias for `ds_data'! */
+	if (!(self->ds_flags & SHF_COMPRESSED)) {
+		self->ds_csize = self->ds_size;
+		COMPILER_WRITE_BARRIER();
+		self->ds_cdata = self->ds_data;
+		COMPILER_WRITE_BARRIER();
+		return self->ds_data;
+	}
+	/* Tell the caller to load decompressed data _now_. */
+	return (void *)-1;
+}
+
+/* Decompress section data.
+ * @return: * : One of `ZLIB_ERROR_*' */
+PRIVATE ATTR_NOINLINE int
+NOTHROW(KCALL decompress_section_data)(void *dst, size_t dst_size,
+                                       void const *src, size_t src_size) {
+	ssize_t error;
+	struct zlib_reader reader;
+	zlib_reader_init(&reader, src, src_size);
+	error = zlib_reader_read(&reader, dst, dst_size);
+#if 0 /* Can't be enabled at the moment */
+	if (error >= 0 && !zlib_reader_eof(&reader))
+		error = ZLIB_ERROR_BAD_LENGTH; /* More data exists after the stream... */
+#endif
+	zlib_reader_fini(&reader);
+	if unlikely(error < 0)
+		return (int)error; /* Inflate error. */
+	/* clear all trailing data that could not be read. */
+	if ((size_t)error < dst_size)
+		memset((byte_t *)dst + (size_t)error, 0, dst_size - error);
+	return ZLIB_ERROR_OK;
+}
+
+/* Return a pointer to the decompressed data blob for `self'.
+ * If data could not be decompressed, an `E_INVALID_ARGUMENT' exception is thrown.
+ * NOTE: The caller must ensure that raw section data of `self' has been loaded,
+ *       as in `self->ds_data != (void *)-1'!
+ * @return: * : A blob of `self->ds_csize' (after the caller) bytes of memory,
+ *              representing the section's decompressed memory contents. */
+PUBLIC ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
+driver_section_cdata(struct driver_section *__restrict self, gfp_t gfp)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT) {
+	void *result, *new_result;
+	ElfW(Chdr) *chdr;
+	/* Test for already-loaded data. */
+	result = driver_section_cdata_test(self);
+	if (result != (void *)-1)
+		return result;
+	/* Must load data */
+	chdr = (ElfW(Chdr) *)self->ds_data;
+	/* Verify the compressed-section header. */
+	if unlikely(self->ds_size < sizeof(*chdr))
+		THROW(E_INVALID_ARGUMENT);
+	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
+		THROW(E_INVALID_ARGUMENT);
+	/* Allocate a blob for decompressed section data. */
+	result = vpage_alloc(CEILDIV(chdr->ch_size, PAGESIZE), 1,
+	                     gfp | GFP_PREFLT);
+	if unlikely(decompress_section_data(result, chdr->ch_size, chdr + 1,
+	                                    self->ds_size - sizeof(*chdr)) != ZLIB_ERROR_OK) {
+		/* Inflate error. */
+		vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+		THROW(E_INVALID_ARGUMENT);
+	}
+	/* Save the results. */
+	ATOMIC_STORE(self->ds_csize, chdr->ch_size); /* This must be written first! */
+	/* Account for other thread that may have been performing
+	 * the inflate alongside us. */
+	new_result = ATOMIC_CMPXCH_VAL(self->ds_cdata, (void *)-1, result);
+	if likely(new_result == (void *)-1)
+		return result;
+	/* Race condition: Some other thread already did the thing! */
+	vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+	return new_result;
+}
+
+PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self, gfp_t gfp) {
+	void *result, *new_result;
+	ElfW(Chdr) *chdr;
+	/* Test for already-loaded data. */
+	result = driver_section_cdata_test(self);
+	if (result != (void *)-1)
+		return result;
+	/* Must load data */
+	chdr = (ElfW(Chdr) *)self->ds_data;
+	/* Verify the compressed-section header. */
+	if unlikely(self->ds_size < sizeof(*chdr))
+		goto err;
+	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
+		goto err;
+	/* Allocate a blob for decompressed section data. */
+	result = vpage_alloc_nx(CEILDIV(chdr->ch_size, PAGESIZE), 1,
+	                        gfp | GFP_PREFLT);
+	if unlikely(!result)
+		goto err;
+	if unlikely(decompress_section_data(result, chdr->ch_size, chdr + 1,
+	                                    self->ds_size - sizeof(*chdr)) != ZLIB_ERROR_OK) {
+		/* Inflate error. */
+		vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+		goto err;
+	}
+	/* Save the results. */
+	ATOMIC_STORE(self->ds_csize, chdr->ch_size); /* This must be written first! */
+	/* Account for other thread that may have been performing
+	 * the inflate alongside us. */
+	new_result = ATOMIC_CMPXCH_VAL(self->ds_cdata, (void *)-1, result);
+	if likely(new_result == (void *)-1)
+		return result;
+	/* Race condition: Some other thread already did the thing! */
+	vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+	return new_result;
+err:
+	return NULL;
+}
+
+
 
 
 
@@ -712,6 +840,9 @@ NOTHROW(KCALL driver_section_do_destroy_with_sections_lock_held)(struct driver_s
 			           (size_t)CEILDIV(sect_size, PAGESIZE));
 		}
 	}
+	/* Free compressed section data. */
+	if (self->ds_cdata != (void *)-1 && self->ds_cdata != self->ds_data)
+		vpage_free(self->ds_cdata, (size_t)CEILDIV(self->ds_csize, PAGESIZE));
 	kfree(self);
 }
 
@@ -836,14 +967,14 @@ INTDEF struct driver_section *const kernel_sections[];
 #define SECTION_DESCRIPTOR_SHSTRNAME PP_CAT2(ks_name_, __LINE__)
 #define SECTION_GLOBALS_DEFINED 1
 enum{
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	SECTION_DESCRIPTOR_INDEX,
 #include "kernel_sections.def"
 	KERNEL_SECTIONS_COUNT
 };
 /* Define the kernel's .shstrtab section */
 struct kernel_shstrtab {
-#define SECTION(name, type, flags, start, size, entsize, link, info) \
+#define INTERN_SECTION(symbol_name, name, type, flags, start, size, entsize, link, info) \
 	char SECTION_DESCRIPTOR_SHSTRNAME[sizeof(name)];
 #include "kernel_sections.def"
 };
@@ -2340,18 +2471,15 @@ driver_section_lock(struct driver *__restrict self,
 	assertf(self != NULL, "Invalid module handle");
 	if (flags & DRIVER_SECTION_LOCK_FINDEX) {
 		sect = driver_getshdrs(self);
-		if unlikely(!sect) {
+		if unlikely(!sect)
 			goto err;
-		}
-		if unlikely((uintptr_t)name >= self->d_shnum) {
+		if unlikely((uintptr_t)name >= self->d_shnum)
 			goto err;
-		}
 		sect += (uintptr_t)name;
 	} else {
 		sect = driver_getsection(self, name);
-		if unlikely(!sect) {
+		if unlikely(!sect)
 			goto err;
-		}
 	}
 	assert(sect >= self->d_shdr);
 	assert(sect < self->d_shdr + self->d_shnum);
@@ -2412,15 +2540,20 @@ again_read_section:
 		result->ds_refcnt  = 1;
 		result->ds_module  = incref(self);
 		result->ds_index   = index;
+		result->ds_cdata   = (void *)-1;
+		result->ds_csize   = 0;
 #ifndef NDEBUG
+#if __SIZEOF_POINTER__ > 4
+		memset(result->__ds_pad, 0xcc, sizeof(result->__ds_pad));
+#endif /* __SIZEOF_POINTER__ > 4 */
 		memset(&result->ds_dangling, 0xcc, sizeof(result->ds_dangling));
 #endif /* !NDEBUG */
 		if (sect->sh_flags & SHF_ALLOC) {
 			/* Section is already allocated in member. */
-			result->ds_data  = (void *)(self->d_loadaddr + sect->sh_addr);
+			result->ds_data      = (void *)(self->d_loadaddr + sect->sh_addr);
 			result->ds_sectflags = DRIVER_DLSECTION_FNORMAL;
 		} else {
-			result->ds_data  = (void *)-1;
+			result->ds_data      = (void *)-1;
 			result->ds_sectflags = DRIVER_DLSECTION_FOWNED;
 		}
 		TRY {
@@ -2490,9 +2623,8 @@ again_lock_sections_after_free_result:
 			decref(result);
 			RETHROW();
 		}
-		if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base)) {
+		if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base))
 			vpage_free(base, num_pages);
-		}
 	}
 	return result;
 err:

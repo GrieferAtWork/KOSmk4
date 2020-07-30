@@ -860,44 +860,61 @@ err_no_data:
 			}
 		}
 	}
-#define SECSRT(x) ((byte_t *)(x)->ds_data)
-#define SECEND(x) ((byte_t *)(x)->ds_data + (x)->ds_size)
+#ifdef __KERNEL__
+	/* Support for compressed sections. */
+#define LOAD_SECTION(sect, lv_start, lv_end)               \
+	((lv_start) = (byte_t *)driver_section_cdata_nx(sect), \
+	 (lv_end)   = (byte_t *)(lv_start) + (sect)->ds_csize)
+#else /* __KERNEL__ */
+#define LOAD_SECTION(sect, lv_start, lv_end) \
+	((lv_start) = (byte_t *)(sect)->ds_data, \
+	 (lv_end)   = (byte_t *)(sect)->ds_data + (sect)->ds_size)
+#endif /* !__KERNEL__ */
 	/* Fill in section mapping information. */
 	if (dl_sections->dl_debug_line) {
-		sections->ds_debug_line_start = SECSRT(dl_sections->dl_debug_line);
-		sections->ds_debug_line_end   = SECEND(dl_sections->dl_debug_line);
+		LOAD_SECTION(dl_sections->dl_debug_line,
+		             sections->ds_debug_line_start,
+		             sections->ds_debug_line_end);
 	}
 	if (dl_sections->dl_debug_info) {
-		sections->ds_debug_info_start = SECSRT(dl_sections->dl_debug_info);
-		sections->ds_debug_info_end   = SECEND(dl_sections->dl_debug_info);
+		LOAD_SECTION(dl_sections->dl_debug_info,
+		             sections->ds_debug_info_start,
+		             sections->ds_debug_info_end);
 	}
 	if (dl_sections->dl_debug_abbrev) {
-		sections->ds_debug_abbrev_start = SECSRT(dl_sections->dl_debug_abbrev);
-		sections->ds_debug_abbrev_end   = SECEND(dl_sections->dl_debug_abbrev);
+		LOAD_SECTION(dl_sections->dl_debug_abbrev,
+		             sections->ds_debug_abbrev_start,
+		             sections->ds_debug_abbrev_end);
 	}
 	if (dl_sections->dl_debug_aranges) {
-		sections->ds_debug_aranges_start = SECSRT(dl_sections->dl_debug_aranges);
-		sections->ds_debug_aranges_end   = SECEND(dl_sections->dl_debug_aranges);
+		LOAD_SECTION(dl_sections->dl_debug_aranges,
+		             sections->ds_debug_aranges_start,
+		             sections->ds_debug_aranges_end);
 	}
 	if (dl_sections->dl_debug_str) {
-		sections->ds_debug_str_start = SECSRT(dl_sections->dl_debug_str);
-		sections->ds_debug_str_end   = SECEND(dl_sections->dl_debug_str);
+		LOAD_SECTION(dl_sections->dl_debug_str,
+		             sections->ds_debug_str_start,
+		             sections->ds_debug_str_end);
 	}
 	if (dl_sections->dl_debug_ranges) {
-		sections->ds_debug_ranges_start = SECSRT(dl_sections->dl_debug_ranges);
-		sections->ds_debug_ranges_end   = SECEND(dl_sections->dl_debug_ranges);
+		LOAD_SECTION(dl_sections->dl_debug_ranges,
+		             sections->ds_debug_ranges_start,
+		             sections->ds_debug_ranges_end);
 	}
 	if (dl_sections->dl_symtab) {
-		sections->ds_symtab_start = SECSRT(dl_sections->dl_symtab);
-		sections->ds_symtab_end   = SECEND(dl_sections->dl_symtab);
-		sections->ds_symtab_ent   = dl_sections->dl_symtab->ds_entsize;
+		LOAD_SECTION(dl_sections->dl_symtab,
+		             sections->ds_symtab_start,
+		             sections->ds_symtab_end);
+		sections->ds_symtab_ent = dl_sections->dl_symtab->ds_entsize;
 		if (!sections->ds_symtab_ent)
 			sections->ds_symtab_ent = sizeof(ElfW(Sym));
 	}
 	if (dl_sections->dl_strtab) {
-		sections->ds_strtab_start = SECSRT(dl_sections->dl_strtab);
-		sections->ds_strtab_end   = SECEND(dl_sections->dl_strtab);
+		LOAD_SECTION(dl_sections->dl_strtab,
+		             sections->ds_strtab_start,
+		             sections->ds_strtab_end);
 	}
+#undef LOAD_SECTION
 	return DEBUG_INFO_ERROR_SUCCESS;
 }
 
