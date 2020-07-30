@@ -667,7 +667,7 @@ NOTHROW(FCALL p32_pagedir_xch_e1_word)(unsigned int vec2,
 }
 
 
-INTERN ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[16] = {
+INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[16] = {
 #define COMMON_PRESENT (P32_PAGE_FACCESSED | P32_PAGE_FDIRTY | P32_PAGE_FPRESENT)
 	[(0)]                                                                              = P32_PAGE_FPREPARED,
 	[(PAGEDIR_MAP_FEXEC)]                                                              = P32_PAGE_FPREPARED | COMMON_PRESENT,
