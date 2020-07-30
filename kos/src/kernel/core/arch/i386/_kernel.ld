@@ -202,6 +202,10 @@ SECTIONS {
 	}                                                                                      \
 	PROVIDE_HIDDEN(name##_end = ABSOLUTE(ABSOLUTE(name##_start) + ABSOLUTE(name##_size))); \
 	. += ABSOLUTE(name##_start);
+	/* TODO: Even though these sections do contain compressed debug information, the amount
+	 *       of memory within the kernel address space that LD reserves for these data blobs
+	 *       is the decompressed section size. As such, this way of integrating debug info
+	 *       still wastes a ton of runtime memory! */
 	DEFINE_DEBUG_SECTION(.debug_line, 1, __kernel_debug_line, *(.debug_line))
 	DEFINE_DEBUG_SECTION(.debug_info, 1, __kernel_debug_info, *(.debug_info))
 	DEFINE_DEBUG_SECTION(.debug_aranges, 8, __kernel_debug_aranges, *(.debug_aranges))

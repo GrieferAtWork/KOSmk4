@@ -228,8 +228,8 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *addr);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCONE */
 
 /* Translate a virtual address into its physical counterpart. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT void *addr);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT void const *addr);
 
 /* Low-level Get/Set the physical address of the currently active page directory. */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET

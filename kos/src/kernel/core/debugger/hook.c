@@ -87,7 +87,7 @@ dbg_overwrite_bytes(void const *dst,
 		do_copy  = max_copy;
 		if (do_copy > num_bytes)
 			do_copy = num_bytes;
-		phys = pagedir_translate((void *)dst);
+		phys = pagedir_translate(dst);
 		vm_copytophys(phys, src, do_copy);
 		if (do_copy >= num_bytes)
 			break;

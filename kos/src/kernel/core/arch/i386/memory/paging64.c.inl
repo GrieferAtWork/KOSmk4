@@ -417,9 +417,13 @@ NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct vm_ptram *__restrict ptr
 	if (e2_word & P64_PAGE_FPRESENT) {
 		/* Convert a 2MiB mapping into 512 * 4KiB mappings */
 		assert(e2_word & P64_PAGE_F2MIB);
+#if P64_PAGE_FPAT_2MIB != P64_PAGE_FPAT_4KIB
 		e1.p_word = e2_word & ~(P64_PAGE_F2MIB | P64_PAGE_FPAT_2MIB);
 		if (e2_word & P64_PAGE_FPAT_2MIB)
 			e1.p_word |= P64_PAGE_FPAT_4KIB;
+#else /* P64_PAGE_FPAT_2MIB != P64_PAGE_FPAT_4KIB */
+		e1.p_word = e2_word & ~(P64_PAGE_F2MIB);
+#endif /* P64_PAGE_FPAT_2MIB == P64_PAGE_FPAT_4KIB */
 		if (vec1_prepare_size == 512) {
 			unsigned int vec1;
 			assert(vec1_prepare_start == 0);
@@ -845,12 +849,14 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
 			iter.p_word += 4096;
 		}
 		e1.p_word |= flag.p_word;
+#if P64_PAGE_FPAT_4KIB != P64_PAGE_FPAT_2MIB
 		if (e1.p_word & P64_PAGE_FPAT_4KIB) {
 #if P64_PAGE_FPAT_4KIB != P64_PAGE_F2MIB
 			e1.p_word &= ~P64_PAGE_FPAT_4KIB;
 #endif /* P64_PAGE_FPAT_4KIB != P64_PAGE_F2MIB */
 			e1.p_word |= P64_PAGE_FPAT_2MIB;
 		}
+#endif /* P64_PAGE_FPAT_4KIB != P64_PAGE_FPAT_2MIB */
 		e1.p_word |= P64_PAGE_F2MIB;
 		*new_e2_word = e1.p_word;
 		return true;
@@ -1772,6 +1778,11 @@ INTERN u64 p64_pageperm_matrix[16] = {
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FEXEC)]                      = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FUSER,
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)]                     = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER | P64_PAGE_FNOEXEC,
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)] = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER,
+	/* TODO: Support for encoding the 3 different page-attribute bits:
+	 *   - P64_PAGE_FPWT
+	 *   - P64_PAGE_FPCD
+	 *   - P64_PAGE_FPAT_4KIB  (Already gets automatically converted to P64_PAGE_FPAT_2MIB/P64_PAGE_FPAT_1GIB as necessary)
+	 */
 #undef COMMON_PRESENT
 };
 
@@ -2110,7 +2121,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 
 /* Translate a virtual address into its physical counterpart. */
 INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
-NOTHROW(FCALL p64_pagedir_translate)(VIRT void *addr) {
+NOTHROW(FCALL p64_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
 	vec4 = P64_PDIR_VEC4INDEX(addr);
@@ -2356,7 +2367,12 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
 			p64_pageperm_matrix[i] &= ~P64_PAGE_FNOEXEC;
 	}
-
+	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
+		/* Disable PAT bits. */
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
+			p64_pageperm_matrix[i] &= ~(P64_PAGE_FPWT | P64_PAGE_FPCD | P64_PAGE_FPAT_4KIB);
+	}
 	/* Check if we must re-write our implementation of `pagedir_syncall()'.
 	 * Currently, it looks like this:
 	 * >> movq   $2, %rax
@@ -2404,10 +2420,12 @@ p64_convert_en_to_e1(u64 word) {
 	assert(word & P64_PAGE_FPRESENT);
 	assert(word & P64_PAGE_F2MIB);
 	word &= ~P64_PAGE_F2MIB;
+#if P64_PAGE_FPAT_4KIB != P64_PAGE_FPAT_2MIB
 	if (word & P64_PAGE_FPAT_2MIB) {
 		word &= ~P64_PAGE_FPAT_2MIB;
 		word |= P64_PAGE_FPAT_4KIB;
 	}
+#endif /* P64_PAGE_FPAT_4KIB != P64_PAGE_FPAT_2MIB */
 	return word;
 }
 
@@ -2620,44 +2638,54 @@ p64_doenum(struct p64_enumdat *__restrict data,
 		           word & P64_PAGE_FADDR_4KIB);
 		if ((num_bytes >= ((u64)1024 * 1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "TiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "TiB"),
+			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "GiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "GiB"),
+			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024)) &&
 		           (num_bytes % ((u64)1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "MiB"), (size_t)(num_bytes / ((u64)1024 * 1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "MiB"),
+			                    (size_t)(num_bytes / ((u64)1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024)) &&
 		           (num_bytes % ((u64)1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "KiB"), (size_t)(num_bytes / ((u64)1024)));
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "KiB"),
+			                    (size_t)(num_bytes / ((u64)1024)));
 		} else {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "B"), num_bytes);
+			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "B"),
+			                    num_bytes);
 		}
 #define COMMON_INDENT (9 + 3)
 		if (indent < COMMON_INDENT)
 			dbg_printf(DBGSTR("%*s"), COMMON_INDENT - indent, "");
 #undef COMMON_INDENT
 		dbg_print(DBGSTR(" ["));
-#define PUTMASK(_mask, on)                           \
-		do {                                         \
-			if (mask & _mask) {                      \
-				dbg_setcolor(oldcolor);              \
-				if (word & _mask)                    \
-					dbg_setfgcolor(ANSITTY_CL_WHITE); \
-				dbg_putc(word & _mask ? (on) : '-'); \
-			}                                        \
-		} __WHILE0
 		{
+			PRIVATE ATTR_DBGRODATA struct {
+				u64  mask;
+				char ch;
+			} const masks[] = {
+				{ P64_PAGE_FNOEXEC, 'x' },
+				{ P64_PAGE_FWRITE, 'w' },
+				{ P64_PAGE_FUSER, 'u' },
+				{ P64_PAGE_FGLOBAL, 'g' },
+				{ P64_PAGE_FACCESSED, 'a' },
+				{ P64_PAGE_FDIRTY, 'd' },
+				{ P64_PAGE_FPREPARED, 'p' },
+			};
 			dbg_color_t oldcolor;
+			unsigned int i;
 			oldcolor = dbg_getcolor();
 			word ^= P64_PAGE_FNOEXEC;
-			PUTMASK(P64_PAGE_FNOEXEC, 'x');
-			PUTMASK(P64_PAGE_FWRITE, 'w');
-			PUTMASK(P64_PAGE_FUSER, 'u');
-			PUTMASK(P64_PAGE_FGLOBAL, 'g');
-			PUTMASK(P64_PAGE_FACCESSED, 'a');
-			PUTMASK(P64_PAGE_FDIRTY, 'd');
-			PUTMASK(P64_PAGE_FPREPARED, 'p');
+			for (i = 0; i < COMPILER_LENOF(masks); ++i) {
+				if (mask & masks[i].mask) {
+					dbg_setcolor(oldcolor);
+					if (word & masks[i].mask)
+						dbg_setfgcolor(ANSITTY_CL_WHITE);
+					dbg_putc(word & masks[i].mask ? masks[i].ch : '-');
+				}
+			}
 			dbg_setcolor(oldcolor);
 		}
 #undef PUTMASK
@@ -2731,7 +2759,7 @@ PRIVATE ATTR_DBGTEXT void KCALL p64_do_ldpd(unsigned int vec4_max) {
 }
 
 PRIVATE ATTR_DBGRODATA char const lspd_str_kernel[] = "kernel";
-PRIVATE ATTR_DBGRODATA char const lspd_str_user[] = "user";
+PRIVATE ATTR_DBGRODATA char const lspd_str_user[]   = "user";
 
 DBG_AUTOCOMPLETE(lspd,
                  /*size_t*/ argc, /*char **/ argv /*[]*/,

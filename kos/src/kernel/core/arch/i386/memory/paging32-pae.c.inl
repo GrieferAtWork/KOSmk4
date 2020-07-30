@@ -1015,6 +1015,11 @@ INTERN ATTR_PAGING_READMOSTLY u64 pae_pageperm_matrix[16] = {
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FEXEC)]                      = PAE_PAGE_FPREPARED | COMMON_PRESENT | PAE_PAGE_FUSER,
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)]                     = PAE_PAGE_FPREPARED | COMMON_PRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FUSER | PAE_PAGE_FNOEXEC,
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)] = PAE_PAGE_FPREPARED | COMMON_PRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FUSER,
+	/* TODO: Support for encoding the 3 different page-attribute bits:
+	 *   - PAE_PAGE_FPWT
+	 *   - PAE_PAGE_FPCD
+	 *   - PAE_PAGE_FPAT_4KIB  (Already gets automatically converted to PAE_PAGE_FPAT_2MIB as necessary)
+	 */
 #undef COMMON_PRESENT
 };
 
@@ -1316,7 +1321,7 @@ again_read_word:
 
 /* Translate a virtual address into its physical counterpart. */
 INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
-NOTHROW(FCALL pae_pagedir_translate)(VIRT void *addr) {
+NOTHROW(FCALL pae_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);

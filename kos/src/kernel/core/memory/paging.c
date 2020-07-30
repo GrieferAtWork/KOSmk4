@@ -249,7 +249,7 @@ NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(PAGEDIR_P_SELFTYPE self) {
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_translate_p") WUNUSED PHYS vm_phys_t
 NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self,
-                                   VIRT void *virt_addr) {
+                                   VIRT void const *virt_addr) {
 	PHYS vm_phys_t result;
 	PAGEDIR_P_BEGINUSE(self) {
 		result = pagedir_translate(virt_addr);

@@ -282,12 +282,14 @@ NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[10
 			iter.p_word += 4096;
 		}
 		e1.p_word |= flag.p_word;
+#if P32_PAGE_FPAT_4KIB != P32_PAGE_FPAT_4MIB
 		if (e1.p_word & P32_PAGE_FPAT_4KIB) {
 #if P32_PAGE_FPAT_4KIB != P32_PAGE_F4MIB
 			e1.p_word &= ~P32_PAGE_FPAT_4KIB;
-#endif
+#endif /* P32_PAGE_FPAT_4KIB != P32_PAGE_F4MIB */
 			e1.p_word |= P32_PAGE_FPAT_4MIB;
 		}
+#endif /* P32_PAGE_FPAT_4KIB != P32_PAGE_FPAT_4MIB */
 		e1.p_word |= P32_PAGE_F4MIB;
 		*new_e2_word = e1.p_word;
 		return true;
@@ -665,7 +667,7 @@ NOTHROW(FCALL p32_pagedir_xch_e1_word)(unsigned int vec2,
 }
 
 
-PRIVATE u32 const p32_pageperm_matrix[16] = {
+INTERN ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[16] = {
 #define COMMON_PRESENT (P32_PAGE_FACCESSED | P32_PAGE_FDIRTY | P32_PAGE_FPRESENT)
 	[(0)]                                                                              = P32_PAGE_FPREPARED,
 	[(PAGEDIR_MAP_FEXEC)]                                                              = P32_PAGE_FPREPARED | COMMON_PRESENT,
@@ -683,6 +685,11 @@ PRIVATE u32 const p32_pageperm_matrix[16] = {
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FEXEC)]                      = P32_PAGE_FPREPARED | COMMON_PRESENT | P32_PAGE_FUSER,
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)]                     = P32_PAGE_FPREPARED | COMMON_PRESENT | P32_PAGE_FWRITE | P32_PAGE_FUSER,
 	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)] = P32_PAGE_FPREPARED | COMMON_PRESENT | P32_PAGE_FWRITE | P32_PAGE_FUSER,
+	/* TODO: Support for encoding the 3 different page-attribute bits:
+	 *   - P32_PAGE_FPWT
+	 *   - P32_PAGE_FPCD
+	 *   - P32_PAGE_FPAT_4KIB  (Already gets automatically converted to P32_PAGE_FPAT_4MIB as necessary)
+	 */
 #undef COMMON_PRESENT
 };
 
@@ -959,7 +966,7 @@ again_read_word:
 
 /* Translate a virtual address into its physical counterpart. */
 INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
-NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_translate)(VIRT void const *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -1084,7 +1091,7 @@ NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr) {
 
 INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
 NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
-                                   VIRT void *virt_addr) {
+                                   VIRT void const *virt_addr) {
 	u32 result;
 	result = self->pd_p32.p_e2[P32_PDIR_VEC2INDEX(virt_addr)].p_word;
 	if (result & P32_PAGE_F4MIB)

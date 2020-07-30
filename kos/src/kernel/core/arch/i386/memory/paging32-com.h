@@ -53,14 +53,14 @@ STATIC_ASSERT((u64)P32_PAGE_FGLOBAL == (u64)PAE_PAGE_FGLOBAL);
 INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = (u32)PAE_PAGE_FGLOBAL;
 #define USED_P32_PAGE_FGLOBAL     used_pxx_page_fglobal
 #define USED_PAE_PAGE_FGLOBAL     used_pxx_page_fglobal
-#else
+#else /* PAE_PAGE_FGLOBAL <= 0xffffffff */
 INTERN ATTR_PAGING_READMOSTLY union {
 	u64 pae;
 	u32 p32;
 } used_pxx_page_fglobal = { PAE_PAGE_FGLOBAL }; /* Cleared during init if unsupported */
 #define USED_P32_PAGE_FGLOBAL     used_pxx_page_fglobal.p32
 #define USED_PAE_PAGE_FGLOBAL     used_pxx_page_fglobal.pae
-#endif
+#endif /* PAE_PAGE_FGLOBAL > 0xffffffff */
 #elif !defined(CONFIG_NO_PAGING_P32)
 INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = P32_PAGE_FGLOBAL; /* Cleared during init if unsupported */
 #define USED_P32_PAGE_FGLOBAL     used_pxx_page_fglobal

@@ -169,7 +169,7 @@ DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 #define X86_HAVE_FSGSBASE              (bootcpu_x86_cpuid.ci_7b & CPUID_7B_FSGSBASE)
 #define X86_HAVE_CMPXCHG16B            (bootcpu_x86_cpuid.ci_1c & CPUID_1C_CX16)
 #define X86_HAVE_SYSCALL               (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_SYSCALL)
-#define X86_HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by code below!) */
+#define X86_HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by kernel code!) */
 #define X86_HAVE_4MIB_PAGES            0 /* 32-bit only feature */
 #define X86_HAVE_1GIB_PAGES            (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_PSE)
 #define X86_HAVE_PAE                   0 /* 32-bit only feature */

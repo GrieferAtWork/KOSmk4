@@ -58,6 +58,7 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/raw.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 <sys/reg.h>  (It only contains some macros, but those interact with sys/ucontext.h)
 <sys/sysctl.h>
+<sys/vlimit.h>
 <sys/vtimes.h>
 <sys/soundcard.h>
 <sys/bsdtypes.h>

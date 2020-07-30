@@ -140,7 +140,7 @@ NOTHROW(KCALL insb_nopf)(port_t port, void *buf, size_t num_bytes) {
 	return result;
 }
 
-/* @return: * : The # of bytes that could not be accessed */
+/* @return: * : The # of words that could not be accessed */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL insw_nopf)(port_t port, void *buf, size_t num_words) {
 	__register size_t result;
@@ -153,7 +153,7 @@ NOTHROW(KCALL insw_nopf)(port_t port, void *buf, size_t num_words) {
 	return result;
 }
 
-/* @return: * : The # of bytes that could not be accessed */
+/* @return: * : The # of d-words that could not be accessed */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL insl_nopf)(port_t port, void *buf, size_t num_dwords) {
 	__register size_t result;
@@ -179,7 +179,7 @@ NOTHROW(KCALL outsb_nopf)(port_t port, void const *buf, size_t num_bytes) {
 	return result;
 }
 
-/* @return: * : The # of bytes that could not be accessed */
+/* @return: * : The # of words that could not be accessed */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL outsw_nopf)(port_t port, void const *buf, size_t num_words) {
 	__register size_t result;
@@ -192,7 +192,7 @@ NOTHROW(KCALL outsw_nopf)(port_t port, void const *buf, size_t num_words) {
 	return result;
 }
 
-/* @return: * : The # of bytes that could not be accessed */
+/* @return: * : The # of d-words that could not be accessed */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL outsl_nopf)(port_t port, void const *buf, size_t num_dwords) {
 	__register size_t result;

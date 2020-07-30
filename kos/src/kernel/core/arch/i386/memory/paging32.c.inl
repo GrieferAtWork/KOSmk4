@@ -210,6 +210,8 @@ FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
 
 
 #ifndef CONFIG_NO_PAGING_P32
+INTDEF u32 p32_pageperm_matrix[16];
+
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 	if __untraced(HAVE_4MIB_PAGES) {
@@ -221,6 +223,12 @@ NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 	 *       Implementing this shouldn't be too difficult, but would require a dedicated
 	 *       function for mapping a 4MiB-aligned 40-bit physical address to a 4MiB-aligned
 	 *       virtual address. */
+	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
+		/* Disable PAT bits. */
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(p32_pageperm_matrix); ++i)
+			p32_pageperm_matrix[i] &= ~(P32_PAGE_FPWT | P32_PAGE_FPCD | P32_PAGE_FPAT_4KIB);
+	}
 }
 #endif /* !CONFIG_NO_PAGING_P32 */
 
@@ -244,6 +252,12 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 		msr  = __rdmsr(IA32_EFER);
 		msr |= IA32_EFER_NXE;
 		__wrmsr(IA32_EFER, msr);
+	}
+	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
+		/* Disable PAT bits. */
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(pae_pageperm_matrix); ++i)
+			pae_pageperm_matrix[i] &= ~(PAE_PAGE_FPWT | PAE_PAGE_FPCD | PAE_PAGE_FPAT_4KIB);
 	}
 }
 #endif /* !CONFIG_NO_PAGING_PAE */
