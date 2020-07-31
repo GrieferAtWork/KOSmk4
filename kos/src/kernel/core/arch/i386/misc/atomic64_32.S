@@ -34,7 +34,7 @@
 
 
 #ifdef CONFIG_NO_SMP
-#define LOCK() \
+#define LOCK()    \
 	pushfl_cfi_r; \
 	cli;
 #define UNLOCK() \
