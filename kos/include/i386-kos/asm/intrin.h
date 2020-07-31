@@ -697,8 +697,8 @@ __FORCELOCAL __ATTR_WUNUSED __hybrid_uint128_t
 	} __res;
 	__asm__ __volatile__("lock cmpxchg16b %0"
 	                     : "+m" (*__ptr)
-	                     , "+a" (__res.__q[0])
-	                     , "+d" (__res.__q[1])
+	                     , "=a" (__res.__q[0])
+	                     , "=d" (__res.__q[1])
 	                     : "b" (__hybrid_uint128_vec64_significand(__newval, 0))
 	                     , "c" (__hybrid_uint128_vec64_significand(__newval, 1))
 #ifdef __clang__ /* bug??? */
