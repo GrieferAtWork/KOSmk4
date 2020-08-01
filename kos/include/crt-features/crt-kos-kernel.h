@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39778941 */
+/* HASH CRC-32:0x2d323049 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,7 @@
 #define __CRT_HAVE_error_unwind 1
 #define __CRT_HAVE_format_escape 1
 #define __CRT_HAVE_format_hexdump 1
+#define __CRT_HAVE_format_length 1
 #define __CRT_HAVE_format_printf 1
 #define __CRT_HAVE_format_repeat 1
 #define __CRT_HAVE_format_scanf 1
@@ -75,6 +76,7 @@
 #define __CRT_HAVE_isspace 1
 #define __CRT_HAVE_isupper 1
 #define __CRT_HAVE_isxdigit 1
+#define __CRT_HAVE_memcasecmp 1
 #define __CRT_HAVE_memchr 1
 #define __CRT_HAVE_memchrl 1
 #define __CRT_HAVE_memchrq 1
@@ -164,14 +166,24 @@
 #define __CRT_HAVE_rawmemrlenl 1
 #define __CRT_HAVE_rawmemrlenq 1
 #define __CRT_HAVE_rawmemrlenw 1
+#define __CRT_HAVE_sigaddset 1
+#define __CRT_HAVE_sigandset 1
+#define __CRT_HAVE_sigdelset 1
+#define __CRT_HAVE_sigemptyset 1
+#define __CRT_HAVE_sigfillset 1
+#define __CRT_HAVE_sigisemptyset 1
+#define __CRT_HAVE_sigismember 1
+#define __CRT_HAVE_sigorset 1
 #define __CRT_HAVE_snprintf 1
 #define __CRT_HAVE_sprintf 1
 #define __CRT_HAVE_strchr 1
+#define __CRT_HAVE_strchrnul 1
 #define __CRT_HAVE_strcmp 1
 #define __CRT_HAVE_strend 1
 #define __CRT_HAVE_strlen 1
 #define __CRT_HAVE_strnend 1
 #define __CRT_HAVE_strnlen 1
+#define __CRT_HAVE_strrchr 1
 #define __CRT_HAVE_strto32 1
 #define __CRT_HAVE_strto64 1
 #define __CRT_HAVE_strtou32 1

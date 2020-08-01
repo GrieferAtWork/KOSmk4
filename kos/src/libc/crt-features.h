@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a592fc */
+/* HASH CRC-32:0x53e2fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3898,9 +3898,7 @@
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_format_escape 1
 #define __CRT_HAVE_format_hexdump 1
-#ifndef __KERNEL__
 #define __CRT_HAVE_format_length 1
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_format_printf 1
 #define __CRT_HAVE_format_repeat 1
 #define __CRT_HAVE_format_scanf 1
@@ -4574,7 +4572,9 @@
 #define __CRT_HAVE_mbstowcs_s 1
 #define __CRT_HAVE_mbtowc 1
 #define __CRT_HAVE_memalign 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_memcasecmp 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_memcasecmp_l 1
 #define __CRT_HAVE_memcasemem 1
 #define __CRT_HAVE_memcasemem_l 1
@@ -5276,25 +5276,35 @@
 #define __CRT_HAVE_shmget 1
 #define __CRT_HAVE_shutdown 1
 #define __CRT_HAVE_sigaction 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigaddset 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_sigaltstack 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigandset 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_sigblock 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigdelset 1
 #define __CRT_HAVE_sigemptyset 1
 #define __CRT_HAVE_sigfillset 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_siggetmask 1
 #define __CRT_HAVE_sighold 1
 #define __CRT_HAVE_sigignore 1
 #define __CRT_HAVE_siginterrupt 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigisemptyset 1
 #define __CRT_HAVE_sigismember 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_signal 1
 #define __CRT_HAVE_signalfd 1
 #define __CRT_HAVE_significand 1
 #define __CRT_HAVE_significandf 1
 #define __CRT_HAVE_significandl 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigorset 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_sigpending 1
 #define __CRT_HAVE_sigprocmask 1
 #define __CRT_HAVE_sigqueue 1
@@ -5373,9 +5383,7 @@
 #define __CRT_HAVE_strcat_s 1
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strchr 1
-#ifndef __KERNEL__
 #define __CRT_HAVE_strchrnul 1
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strcmp 1
 #ifndef __KERNEL__
 #define __CRT_HAVE_strcoll 1
@@ -5439,7 +5447,9 @@
 #define __CRT_HAVE_strpbrk 1
 #define __CRT_HAVE_strptime 1
 #define __CRT_HAVE_strptime_l 1
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strrchr 1
+#ifndef __KERNEL__
 #define __CRT_HAVE_strrchrnul 1
 #define __CRT_HAVE_strrev 1
 #define __CRT_HAVE_strroff 1

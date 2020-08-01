@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca526a5 */
+/* HASH CRC-32:0x9e753f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,33 +38,23 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd___xpg_sigpause)(signo_t signo);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_kill)(pid_t pid, signo_t signo);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigemptyset)(sigset_t *set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigfillset)(sigset_t *set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigaddset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, signo_t signo);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigdelset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, signo_t signo);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)(sigset_t const *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
@@ -74,21 +64,15 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restri
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_sigwait)(sigset_t const *__restrict set, signo_t *__restrict signo);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigisemptyset)(sigset_t const *__restrict set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *__restrict set, siginfo_t *__restrict info);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *timeout);

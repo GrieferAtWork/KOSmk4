@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe73d60f6 */
+/* HASH CRC-32:0xfe93636e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,10 +110,8 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strchr)(ch
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strrchr)(char const *__restrict haystack, int needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack, int needle);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strcmp)(char const *s1, char const *s2);
@@ -274,10 +272,8 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strchrnul)(char const *__restrict haystack, int needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack, int needle);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBDCALL libd_basename)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -1441,9 +1437,7 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_me
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')

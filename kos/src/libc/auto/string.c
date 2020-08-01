@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf30a4e7 */
+/* HASH CRC-32:0x426a2b45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,6 @@ NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
 	return NULL;
 }
 #endif /* !LIBC_ARCH_HAVE_STRCHR */
-#ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STRRCHR
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
@@ -145,7 +144,6 @@ NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack,
 	return (char *)result;
 }
 #endif /* !LIBC_ARCH_HAVE_STRRCHR */
-#endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRCMP
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
@@ -499,7 +497,6 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
 	return iter;
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
-#ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STRCHRNUL
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
@@ -512,6 +509,7 @@ NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
 	return (char *)haystack;
 }
 #endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 	char ch, *iter = (char *)filename, *result = NULL;
@@ -2896,7 +2894,6 @@ NOTHROW_NCX(LIBCCALL libc_mempatq)(void *__restrict dst,
 	return dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPATQ */
-#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
                                       void const *s2,
@@ -2910,6 +2907,7 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
 	     ((v1 = libc_tolower(v1)) == (v2 = libc_tolower(v2)))));
 	return (int)v1 - (int)v2;
 }
+#ifndef __KERNEL__
 #include <features.h>
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')
@@ -4274,9 +4272,9 @@ DEFINE_PUBLIC_ALIAS(strlen, libc_strlen);
 #ifndef LIBC_ARCH_HAVE_STRCHR
 DEFINE_PUBLIC_ALIAS(strchr, libc_strchr);
 #endif /* !LIBC_ARCH_HAVE_STRCHR */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRRCHR)
+#ifndef LIBC_ARCH_HAVE_STRRCHR
 DEFINE_PUBLIC_ALIAS(strrchr, libc_strrchr);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRRCHR */
+#endif /* !LIBC_ARCH_HAVE_STRRCHR */
 #ifndef LIBC_ARCH_HAVE_STRCMP
 DEFINE_PUBLIC_ALIAS(strcmp, libc_strcmp);
 #endif /* !LIBC_ARCH_HAVE_STRCMP */
@@ -4359,9 +4357,9 @@ DEFINE_PUBLIC_ALIAS(__rawmemchr, libc_rawmemchr);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(rawmemchr, libc_rawmemchr);
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCHRNUL)
+#ifndef LIBC_ARCH_HAVE_STRCHRNUL
 DEFINE_PUBLIC_ALIAS(strchrnul, libc_strchrnul);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCHRNUL */
+#endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(basename, libc_basename);
 DEFINE_PUBLIC_ALIAS(__strcasestr, libc_strcasestr);
@@ -4904,7 +4902,9 @@ DEFINE_PUBLIC_ALIAS(mempatq, libc_mempatq);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(memicmp, libc_memcasecmp);
 DEFINE_PUBLIC_ALIAS(_memicmp, libc_memcasecmp);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcasecmp, libc_memcasecmp);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(memcasemem, libc_memcasemem);
 DEFINE_PUBLIC_ALIAS(_memicmp_l, libc_memcasecmp_l);
 DEFINE_PUBLIC_ALIAS(memcasecmp_l, libc_memcasecmp_l);

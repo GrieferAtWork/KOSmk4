@@ -1192,14 +1192,14 @@ int sigpause($signo_t signo);
 [[decl_include("<bits/types.h>")]]
 int kill($pid_t pid, $signo_t signo);
 
-[[decl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/sigset.h>")]]
 [[impl_include("<bits/sigset.h>")]]
 int sigemptyset([[nonnull]] $sigset_t *set) {
 	bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);
 	return 0;
 }
 
-[[decl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/sigset.h>")]]
 [[impl_include("<bits/sigset.h>")]]
 int sigfillset([[nonnull]] $sigset_t *set) {
 @@pp_if __SIZEOF_POINTER__ == 8@@
@@ -1214,7 +1214,9 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 	return 0;
 }
 
-[[decl_include("<bits/types.h>", "<bits/sigset.h>"), export_alias("__sigaddset")]]
+[[kernel, alias("__sigaddset")]]
+[[if(!defined(__KERNEL__)), export_as("__sigaddset")]]
+[[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
 int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
 	ulongptr_t word = __sigset_word(signo);
@@ -1222,7 +1224,9 @@ int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	return 0;
 }
 
-[[decl_include("<bits/types.h>", "<bits/sigset.h>"), export_alias("__sigdelset")]]
+[[kernel, alias("__sigdelset")]]
+[[if(!defined(__KERNEL__)), export_as("__sigdelset")]]
+[[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
 int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
 	ulongptr_t word = __sigset_word(signo);
@@ -1230,7 +1234,8 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	return 0;
 }
 
-[[wunused, ATTR_PURE, export_alias("__sigismember")]]
+[[kernel, wunused, ATTR_PURE, alias("__sigismember")]]
+[[if(!defined(__KERNEL__)), export_as("__sigismember")]]
 [[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
 int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
@@ -1256,7 +1261,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
             [[nonnull]] $signo_t *__restrict signo);
 
 %#ifdef __USE_GNU
-[[wunused, ATTR_PURE, decl_include("<bits/sigset.h>")]]
+[[kernel, wunused, ATTR_PURE, decl_include("<bits/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
@@ -1265,7 +1270,7 @@ int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	return 1;
 }
 
-[[decl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/sigset.h>")]]
 int sigandset([[nonnull]] $sigset_t *set,
               [[nonnull]] $sigset_t const *left,
               [[nonnull]] $sigset_t const *right) {
@@ -1275,7 +1280,7 @@ int sigandset([[nonnull]] $sigset_t *set,
 	return 0;
 }
 
-[[decl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/sigset.h>")]]
 int sigorset([[nonnull]] $sigset_t *set,
              [[nonnull]] $sigset_t const *left,
              [[nonnull]] $sigset_t const *right) {

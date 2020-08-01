@@ -300,7 +300,7 @@ char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[[std, wunused, crtbuiltin, ATTR_PURE]]
+[[std, kernel, wunused, crtbuiltin, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRRCHR))]]
 char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
@@ -697,7 +697,7 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 }
 
 @@Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found.
-[[wunused, ATTR_PURE]]
+[[kernel, wunused, ATTR_PURE]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCHRNUL))]]
 [[nonnull]] char *strchrnul([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): [[nonnull]] char *]
@@ -3662,7 +3662,8 @@ mempatq([[nonnull]] void *__restrict dst,
 }
 %#endif /* __UINT64_TYPE__ */
 
-[[wunused, ATTR_PURE, export_alias("memicmp", "_memicmp")]]
+[[kernel, wunused, ATTR_PURE, alias("memicmp", "_memicmp")]]
+[[if(!defined(__KERNEL__)), export_as("memicmp", "_memicmp")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 int memcasecmp([[nonnull]] void const *s1,
                [[nonnull]] void const *s2, $size_t n_bytes) {

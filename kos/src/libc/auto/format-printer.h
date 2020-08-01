@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd54d79d */
+/* HASH CRC-32:0xe205f43c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -558,10 +558,8 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprint
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg, char const *__restrict data, size_t datalen);
-#ifndef __KERNEL__
 /* Always re-return `datalen' and ignore all other arguments */
 INTDEF ATTR_CONST ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg, char const *__restrict data, size_t datalen);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf

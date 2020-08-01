@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55e311cd */
+/* HASH CRC-32:0x4ee40c3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1939,7 +1939,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32width, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_format_wwidth)
+#elif defined(__CRT_HAVE_format_wwidth) && !defined(__KERNEL__)
 /* Always re-return `datalen' and ignore all other arguments */
 __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
@@ -1950,7 +1950,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__C16FO
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_format_wwidth)
+#elif defined(__CRT_HAVE_format_wwidth) && !defined(__KERNEL__)
 /* Always re-return `datalen' and ignore all other arguments */
 __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */

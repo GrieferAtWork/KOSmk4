@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8131e10 */
+/* HASH CRC-32:0x17e09380 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1080,7 +1080,6 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
 	}
 	return (ssize_t)result;
 }
-#ifndef __KERNEL__
 /* Always re-return `datalen' and ignore all other arguments */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
@@ -1090,6 +1089,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
 	(void)data;
 	return (ssize_t)datalen;
 }
+#ifndef __KERNEL__
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
 struct format_aprintf_data {
@@ -1239,7 +1239,9 @@ DEFINE_PUBLIC_ALIAS(format_snprintf_printer, libc_format_snprintf_printer);
 DEFINE_PUBLIC_ALIAS(format_width, libc_format_width);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(format_wwidth, libc_format_length);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(format_length, libc_format_length);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(format_aprintf_pack, libc_format_aprintf_pack);
 DEFINE_PUBLIC_ALIAS(format_aprintf_alloc, libc_format_aprintf_alloc);
 DEFINE_PUBLIC_ALIAS(format_aprintf_printer, libc_format_aprintf_printer);

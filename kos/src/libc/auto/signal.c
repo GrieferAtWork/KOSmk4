@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x680dd352 */
+/* HASH CRC-32:0x323a04d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,12 @@
 
 DECL_BEGIN
 
-#ifndef __KERNEL__
 #include <bits/sigset.h>
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
 	libc_bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);
 	return 0;
 }
-#include <bits/sigset.h>
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
 #if __SIZEOF_POINTER__ == 8
@@ -99,6 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void) {
 	return __SIGRTMIN;
@@ -111,18 +110,24 @@ NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 
 DECL_END
 
-#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(sigemptyset, libc_sigemptyset);
 DEFINE_PUBLIC_ALIAS(sigfillset, libc_sigfillset);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__sigaddset, libc_sigaddset);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigaddset, libc_sigaddset);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__sigdelset, libc_sigdelset);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigdelset, libc_sigdelset);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__sigismember, libc_sigismember);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigismember, libc_sigismember);
 DEFINE_PUBLIC_ALIAS(sigisemptyset, libc_sigisemptyset);
 DEFINE_PUBLIC_ALIAS(sigandset, libc_sigandset);
 DEFINE_PUBLIC_ALIAS(sigorset, libc_sigorset);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
 #endif /* !__KERNEL__ */

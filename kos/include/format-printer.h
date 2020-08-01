@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0b1c37 */
+/* HASH CRC-32:0x62a35a2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -708,7 +708,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_width, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __LIBC __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_length)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_length");
-#elif defined(__CRT_HAVE_format_wwidth)
+#elif defined(__CRT_HAVE_format_wwidth) && !defined(__KERNEL__)
 /* Always re-return `datalen' and ignore all other arguments */
 __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_length,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
