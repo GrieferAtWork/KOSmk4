@@ -36,7 +36,7 @@
 #include <asm/instr/movzxq.h>
 #endif /* __x86_64__ */
 
-.section .text.cold
+.section .text.x86.asmirq.x86_dbgaltcoreidt
 
 .cfi_startproc simple
 .cfi_iret_signal_frame

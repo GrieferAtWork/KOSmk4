@@ -36,7 +36,7 @@
 #include <kos/kernel/gdt.h>
 
 
-.section .text.cold
+.section .text.x86.asmirq.x86_dbgidt_pagefault
 INTERN_FUNCTION(x86_dbgidt_pagefault)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
@@ -56,7 +56,7 @@ END(x86_dbgidt_pagefault)
 
 
 
-.section .text.cold
+.section .text.x86.asmirq.x86_dbgidt_apic_ipi
 INTERN_FUNCTION(x86_dbgidt_apic_ipi)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
@@ -99,7 +99,7 @@ INTERN_FUNCTION(x86_dbgidt_apic_ipi)
 END(x86_dbgidt_apic_ipi)
 
 
-.section .text.cold
+.section .text.x86.asmirq.x86_dbgidt_specific_00h
 INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
