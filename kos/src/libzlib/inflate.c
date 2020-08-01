@@ -32,11 +32,18 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <libzlib/inflate.h>
 #include <libzlib/error.h>
+#include <libzlib/inflate.h>
 
+#ifdef __KERNEL__
+#include <kernel/malloc.h>
+#include <kernel/panic.h>
+
+#include <hybrid/atomic.h>
+#endif /* __KERNEL__ */
 #if !defined(NDEBUG) && 1
 #ifdef __KERNEL__
 #include <kernel/printk.h>
@@ -54,6 +61,55 @@
 
 DECL_BEGIN
 
+#define ZT_CACHE_BITS         10
+#define ZT_CACHE_SIZE         (1 << ZT_CACHE_BITS)
+#define ZT_CACHEENT_SIZESHIFT 9
+#define ZT_CACHEENT_SYMBMASK  511
+
+/* NOTE: This lookup table idea is derived from miniz */
+struct zlib_cache {
+	u16 c_lookup[ZT_CACHE_SIZE];
+};
+
+#ifdef __KERNEL__
+PRIVATE struct zlib_cache static_zlib_cache;
+PRIVATE bool static_zlib_cache_inuse = false;
+
+PRIVATE struct zlib_cache *CC zlib_cache_alloc(void) {
+	struct zlib_cache *result;
+	if (kernel_poisoned()) {
+		/* Try not to make use of the heap after being poisoned! */
+alloc_static:
+		if (ATOMIC_XCH(static_zlib_cache_inuse, true))
+			return NULL;
+		return &static_zlib_cache;
+	}
+	result = (struct zlib_cache *)kmalloc_nx(sizeof(struct zlib_cache),
+	                                         GFP_PREFLT);
+	if (!result)
+		goto alloc_static;
+	return result;
+}
+PRIVATE void CC zlib_cache_free(/*nullable*/ struct zlib_cache *self) {
+	if (self == &static_zlib_cache) {
+		ATOMIC_WRITE(static_zlib_cache_inuse, false);
+	} else {
+		kfree(self);
+	}
+}
+#else /* __KERNEL__ */
+PRIVATE struct zlib_cache *CC zlib_cache_alloc(void) {
+	return (struct zlib_cache *)malloc(sizeof(struct zlib_cache));
+}
+PRIVATE void CC zlib_cache_free(/*nullable*/ struct zlib_cache *self) {
+	free(self);
+}
+#endif /* !__KERNEL__ */
+
+
+
+
+
 
 
 /* Initialize a ZLIB reader, given an initial data blob. */
@@ -63,20 +119,22 @@ NOTHROW_NCX(CC libzlib_reader_init)(struct zlib_reader *__restrict self,
 #ifndef NDEBUG
 	memset(self, 0xcc, sizeof(*self));
 #endif /* !NDEBUG */
-	self->zr_inbase = (byte_t const *)blob;
-	self->zr_incur  = (byte_t const *)blob;
-	self->zr_inend  = (byte_t const *)blob + blob_size;
-	self->zr_state  = 0;
-	self->zr_bitcnt = 0;
-	self->zr_offset = 0;
-	self->zr_window = NULL;
-	self->zr_flags  = 0;
-	self->zr_bitbuf = 0;
+	self->zr_inbase      = (byte_t const *)blob;
+	self->zr_incur       = (byte_t const *)blob;
+	self->zr_inend       = (byte_t const *)blob + blob_size;
+	self->zr_state       = 0;
+	self->zr_bitcnt      = 0;
+	self->zr_offset      = 0;
+	self->zr_window      = NULL;
+	self->zr_flags       = 0;
+	self->zr_bitbuf      = 0;
+	self->zr_symbolcache = zlib_cache_alloc();
 }
 
 /* Finalize the given zlib reader. */
 INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libzlib_reader_fini)(struct zlib_reader *__restrict self) {
+	zlib_cache_free(self->zr_symbolcache);
 	/* ... */
 #ifndef NDEBUG
 	memset(self, 0xcc, sizeof(*self));
@@ -158,10 +216,23 @@ enum{ _zl_startid = __COUNTER__ };
 
 #define MAX_BITS 15 /* max # of compressed bits for any literal */
 
-PRIVATE __NOBLOCK NONNULL((1)) void
-NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree) {
-	/* TODO */
-	(void)tree;
+PRIVATE __NOBLOCK NONNULL((1, 2)) void
+NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree,
+                                          struct zlib_cache *__restrict cache) {
+	u16 i;
+	memset(cache->c_lookup, 0, sizeof(cache->c_lookup));
+	for (i = 0; i < tree->zr_count; ++i) {
+		u16 cacheent, rev_code;
+		u8 len = tree->zt_tree[i].te_len;
+		if (!len || len > ZT_CACHE_BITS)
+			continue;
+		rev_code = tree->zt_tree[i].te_code;
+		cacheent = ((u16)len << ZT_CACHEENT_SIZESHIFT) | i;
+		while (rev_code < ZT_CACHE_SIZE) {
+			cache->c_lookup[rev_code] = cacheent;
+			rev_code += (1 << len);
+		}
+	}
 }
 
 PRIVATE __NOBLOCK NONNULL((1)) void
@@ -207,7 +278,6 @@ NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
 	}
 	tree->zr_minlen = minbits;
 	tree->zr_maxlen = maxbits;
-	zlib_tree_construct_cache(tree);
 }
 
 
@@ -247,23 +317,21 @@ NOTHROW_NCX(CC zlib_tree_find_slow)(struct zlib_tree *__restrict tree,
 	return NULL;
 }
 
-#define HOFF_DECODE(result, tree)                                    \
-	do {                                                             \
-		for (self->zr_temp = (tree).zr_minlen;; ++self->zr_temp) {   \
-			struct zlib_treeent *_ent;                               \
-			REQUIREBITS(self->zr_temp);                              \
-			_ent = zlib_tree_find_slow((struct zlib_tree *)&(tree),  \
-			                           (u16)PEEKBITS(self->zr_temp), \
-			                           self->zr_temp);               \
-			if (_ent) {                                              \
-				(result) = (u16)((_ent) - (tree).zt_tree);           \
-				TAKEBITS(self->zr_temp);                             \
-				break;                                               \
-			}                                                        \
-			if (self->zr_temp >= (tree).zr_maxlen)                   \
-				YIELD_FOREVER(ZLIB_ERROR_UNKNOWN_SEQUENCE);          \
-		}                                                            \
-	} __WHILE0
+#define HOFF_DECODE_NOCACHE(result, tree)                        \
+	for (self->zr_temp = (tree).zr_minlen;; ++self->zr_temp) {   \
+		struct zlib_treeent *_ent;                               \
+		REQUIREBITS(self->zr_temp);                              \
+		_ent = zlib_tree_find_slow((struct zlib_tree *)&(tree),  \
+		                           (u16)PEEKBITS(self->zr_temp), \
+		                           self->zr_temp);               \
+		if (_ent) {                                              \
+			(result) = (u16)((_ent) - (tree).zt_tree);           \
+			TAKEBITS(self->zr_temp);                             \
+			break;                                               \
+		}                                                        \
+		if (self->zr_temp >= (tree).zr_maxlen)                   \
+			YIELD_FOREVER(ZLIB_ERROR_UNKNOWN_SEQUENCE);          \
+	}
 
 
 STATIC_ASSERT(sizeof(struct zlib_treeent) == __SIZEOF_ZLIB_TREEENT);
@@ -434,7 +502,7 @@ case 2:
 				                 self->zr_disttree.zr_count;
 				for (self->zr_index = 0; self->zr_index < self->zr_count;) {
 					u8 value, repval, repcnt;
-					HOFF_DECODE(value, self->zr_clentree);
+					HOFF_DECODE_NOCACHE(value, self->zr_clentree);
 					assert(value >= 0 && value <= 18);
 					if (value <= 15) {
 						if (self->zr_index < self->zr_symboltree.zr_count) {
@@ -496,6 +564,10 @@ case 2:
 			/* Construct the symbol and distance trees. */
 			zlib_tree_construct((struct zlib_tree *)&self->zr_symboltree);
 			zlib_tree_construct((struct zlib_tree *)&self->zr_disttree);
+			if (self->zr_symbolcache) {
+				zlib_tree_construct_cache((struct zlib_tree *)&self->zr_symboltree,
+				                          self->zr_symbolcache);
+			}
 			/* Do the actual decompressing! */
 			for (;;) {
 				u16 symbol;
@@ -526,7 +598,19 @@ case 2:
 				};
 				while (!bufsize)
 					YIELD(decompressed_bytes);
-				HOFF_DECODE(symbol, self->zr_symboltree);
+				if (self->zr_symbolcache) {
+					u16 ent;
+					REQUIREBITS(ZT_CACHE_BITS);
+					ent = self->zr_symbolcache->c_lookup[PEEKBITS(ZT_CACHE_BITS)];
+					if (!ent)
+						goto decode_symbol_nocache;
+					TAKEBITS((u8)(ent >> ZT_CACHEENT_SIZESHIFT));
+					symbol = ent & ZT_CACHEENT_SYMBMASK;
+				} else {
+decode_symbol_nocache:
+					HOFF_DECODE_NOCACHE(symbol,
+					                    self->zr_symboltree);
+				}
 				if (symbol <= 0xff) {
 					if (self->zr_window)
 						zlib_window_putc(self->zr_window, (byte_t)symbol);
@@ -560,7 +644,7 @@ case 2:
 #define SAVE_AND_LOAD                                 \
 				(/*save:*/ (self->zr_count = length), \
 				 /*load:*/ (length = self->zr_count))
-				HOFF_DECODE(symbol, self->zr_disttree);
+				HOFF_DECODE_NOCACHE(symbol, self->zr_disttree);
 #undef SAVE_AND_LOAD
 #define SAVE_AND_LOAD (, )
 				assert(symbol >= 0 && symbol <= 31);
@@ -873,22 +957,16 @@ zlib_reader_pread(struct zlib_reader *__restrict self,
 		/* Don't restore modified cache pointers. */
 		if (!(self->zr_flags & _ZLIB_READER_PFLAG_CACHECHANGED)) {
 			assert(!(saved_reader.zr_flags & _ZLIB_READER_PFLAG_CACHECHANGED));
-			assert(self->zr_symboltree.zr_cache == saved_reader.zr_symboltree.zr_cache);
-			assert(self->zr_disttree.zr_cache == saved_reader.zr_disttree.zr_cache);
-			assert(self->zr_clentree.zr_cache == saved_reader.zr_clentree.zr_cache);
+			assert(self->zr_symbolcache == saved_reader.zr_symbolcache);
 			memcpy(self, &saved_reader, sizeof(struct zlib_reader));
 		} else {
-			saved_reader.zr_symboltree.zr_cache = self->zr_symboltree.zr_cache;
-			saved_reader.zr_disttree.zr_cache   = self->zr_disttree.zr_cache;
-			saved_reader.zr_clentree.zr_cache   = self->zr_clentree.zr_cache;
+			saved_reader.zr_symbolcache = self->zr_symbolcache;
 			memcpy(self, &saved_reader, sizeof(struct zlib_reader));
 			/* Re-construct caches (if possible) */
-			if (self->zr_symboltree.zr_cache != NULL)
-				zlib_tree_construct_cache((struct zlib_tree *)&self->zr_symboltree);
-			if (self->zr_disttree.zr_cache != NULL)
-				zlib_tree_construct_cache((struct zlib_tree *)&self->zr_disttree);
-			if (self->zr_clentree.zr_cache != NULL)
-				zlib_tree_construct_cache((struct zlib_tree *)&self->zr_clentree);
+			if (self->zr_symbolcache) {
+				zlib_tree_construct_cache((struct zlib_tree *)&self->zr_symboltree,
+				                          self->zr_symbolcache);
+			}
 		}
 	}
 	return result;

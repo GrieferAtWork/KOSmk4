@@ -57,9 +57,9 @@ struct zlib_treeent {
 };
 
 
+struct zlib_cache;
 #define ZLIB_TREE_BODY(maxlen)                                                            \
 	{                                                                                     \
-		void               *zr_cache;        /* [0..1][owned] Tree translation cache (TODO). */  \
 		__uint16_t          zr_count;        /* Size of the tree. */                      \
 		__uint8_t           zr_minlen;       /* Length (in bits) of the smallest code. */ \
 		__uint8_t           zr_maxlen;       /* Length (in bits) of the largest code. */  \
@@ -120,6 +120,7 @@ struct zlib_reader {
 	struct ZLIB_TREE_BODY(288) zr_symboltree;  /* Symbol tree. (`te_len' is 0-15 each) */
 	struct ZLIB_TREE_BODY(32)  zr_disttree;    /* Distance tree. (`te_len' is 0-5 each) */
 	struct ZLIB_TREE_BODY(19)  zr_clentree;    /* Code length tree. (`te_len' is 0-7 each) */
+	struct zlib_cache         *zr_symbolcache; /* [0..1][owned] Tree translation cache for `zr_symboltree'. */
 };
 
 /* Check if the end of data stream has been reached. */
