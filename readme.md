@@ -116,7 +116,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- RTM:
 		- KOS includes a driver (`modrtm`) that can be used for software-based emulation of **Restricted Transational Memory**.  
 		  This is a mechanism by which programs can implement arbitrarily complex lockless atomic operations (only limited by memory and cpu cache restrictions), with the only requirement being that all operations performed must be non-blocking.
-		- For this purpose, the `modrtm` driver will temporarily emulate user-space code in a small sandbox, from which it will collect all modifications made to memory by the user-space program, before atomically applying them all at once (in respect to other RTM operations that may modify attempt to the same memory regions)
+		- For this purpose, the `modrtm` driver will temporarily emulate user-space code in a small sandbox, from which it will collect all modifications made to memory by the user-space program, before atomically applying them all at once (in respect to other RTM operations that may attempt to modify the same memory regions)
 		- In conjunction to this, KOS also provides system calls to make use of RTM, as well as a public interface in `/kos/include/kos/rtm.h`
 	- Accounting of hardware vm86 mode (even though it's never used)
 	- Detailed exception analysis
@@ -232,9 +232,12 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- As a KOS exception, you can also use `lcall $7, $<sysno>` instead of having to use `%eax`
 	- `sysenter`
 		- This one isn't compatible with linux's ABI
+	- `syscall`
+		- (x86_64 only) Same ABI as `int 80h`
 	- Custom mechanism: Call into ukern segment (s.a. `/kos/include/kos/ukern.h:userkern_syscall()`)
 	- System call tracing
 		- Every time a system call is invoked, its name and arguments can be logged in a human-readable format
+		- s.a. `/kos/src/kernel/modsctrace`
 - Modular kernel
 	- Allow drivers to be loaded into the kernel at runtime
 	- Drivers are ELF binaries
@@ -244,7 +247,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Just before transitioning to user-space for the first time, this section is unmapped and made available to the page frame allocator
 	- Branch profiling support
 		- Using preprocessor magic, every `if`-statement and every use of `likely` / `unlikely` within any kernel source file keeps track of which of its branches got taken what number of times
-		- Allows for easy detection of ~hot~ zones within the kernel, as well as finding `likely` / `unlikely` annotations that are just plainly wrong
+		- Allows for easy detection of *hot* zones within the kernel, as well as finding `likely` / `unlikely` annotations that are just plainly wrong
 - Drivers
 	- pci
 		- Required for detecting IDE ports
@@ -324,7 +327,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Support for lazy relocations (`R_386_JMP_SLOT`)
 		- `dlopen()`, `dlsym()`, `dlclose()`
 			- Support for `RTLD_NEXT`
-		- Various kos-specific exceptions, such as
+		- Various kos-specific extensions, such as
 			- get-module-at-address (`dlgethandle()`)
 			- get-name-of-module (`dlmodulename()`)
 			- get-file-of-module (`dlmodulefd()`)
