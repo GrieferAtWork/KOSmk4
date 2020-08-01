@@ -20,19 +20,20 @@
 #ifndef GUARD_LIBCMDLINE_ENCODE_C
 #define GUARD_LIBCMDLINE_ENCODE_C 1
 
-#include "encode.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
-#include <unicode.h>
-#include <string.h>
 #include <kos/types.h>
 
 #include <format-printer.h>
+#include <string.h>
+#include <unicode.h>
 
 #include <libcmdline/encode.h>
+
+#include "encode.h"
 
 DECL_BEGIN
 

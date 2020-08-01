@@ -27,9 +27,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-#include "symtab.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -42,6 +41,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <string.h>
 
 #include <libdebuginfo/symtab.h>
+
+#include "symtab.h"
 
 DECL_BEGIN
 
@@ -67,6 +68,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 		symtab_end -= sizeof(Elf32_Sym) - 1;
 		for (iter = (Elf32_Sym *)symtab_start;
 		     iter < (Elf32_Sym *)symtab_end; ++iter) {
+			/* FIXME: Unaligned memory access */
 			if (iter->st_shndx == SHN_UNDEF ||
 			    iter->st_shndx == SHN_ABS)
 				continue;
@@ -80,6 +82,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 		result_value = (Elf32_Addr)-1;
 		for (iter = (Elf32_Sym *)symtab_start;
 		     iter < (Elf32_Sym *)symtab_end; ++iter) {
+			/* FIXME: Unaligned memory access */
 			if (iter->st_shndx == SHN_UNDEF ||
 			    iter->st_shndx == SHN_ABS)
 				continue;
@@ -96,6 +99,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 		symtab_end -= sizeof(Elf64_Sym) - 1;
 		for (iter = (Elf64_Sym *)symtab_start;
 		     iter < (Elf64_Sym *)symtab_end; ++iter) {
+			/* FIXME: Unaligned memory access */
 			if (iter->st_shndx == SHN_UNDEF ||
 			    iter->st_shndx == SHN_ABS)
 				continue;
@@ -109,6 +113,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 		result_value = (Elf64_Addr)-1;
 		for (iter = (Elf64_Sym *)symtab_start;
 		     iter < (Elf64_Sym *)symtab_end; ++iter) {
+			/* FIXME: Unaligned memory access */
 			if (iter->st_shndx == SHN_UNDEF ||
 			    iter->st_shndx == SHN_ABS)
 				continue;

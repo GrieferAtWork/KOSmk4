@@ -49,7 +49,7 @@ DECL_BEGIN
  *       getreg_*: The contents of `buf' are undefined.
  *       setreg_*: The register was not written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
- * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
+ * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>)
  * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
 INTDEF NONNULL((1)) size_t NOTHROW_NCX(CC libcpu_getreg_gpregs)(struct gpregs const *__restrict self, unsigned int regno, void *__restrict buf, size_t buflen);
 INTDEF NONNULL((1)) size_t NOTHROW_NCX(CC libcpu_setreg_gpregs)(struct gpregs *__restrict self, unsigned int regno, void const *__restrict buf, size_t buflen);

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBINSTRLEN_ISA_H
-#define _I386_KOS_LIBINSTRLEN_ISA_H 1
+#ifndef _I386_KOS_LIBINSTRLEN_BITS_ISA_H
+#define _I386_KOS_LIBINSTRLEN_BITS_ISA_H 1
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
@@ -137,7 +137,8 @@ _instrlen_isa_getcs_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(void 
                                                                            void *__restrict __dst),
                                        void *__state) {
 	__uintptr_t __result;
-	(*__reg_getter)(__state, CFI_X86_64_UNWIND_REGISTER_CS, &__result);
+	if (!(*__reg_getter)(__state, CFI_X86_64_UNWIND_REGISTER_CS, &__result))
+		__result = SEGMENT_USER_CODE64_RPL;
 	return __result;
 }
 #else /* __x86_64__ */
@@ -157,7 +158,8 @@ _instrlen_isa_geteflags_from_unwind_getreg(__BOOL (LIBUNWIND_CC *__reg_getter)(v
                                                                                void *__restrict __dst),
                                            void *__state) {
 	__uintptr_t __result;
-	(*__reg_getter)(__state, CFI_386_UNWIND_REGISTER_EFLAGS, &__result);
+	if (!(*__reg_getter)(__state, CFI_386_UNWIND_REGISTER_EFLAGS, &__result))
+		__result = 0;
 	return __result;
 }
 #endif /* !__x86_64__ */
@@ -167,4 +169,4 @@ typedef __uint8_t instrlen_isa_t;
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_LIBINSTRLEN_ISA_H */
+#endif /* !_I386_KOS_LIBINSTRLEN_BITS_ISA_H */

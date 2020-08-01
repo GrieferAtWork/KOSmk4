@@ -21,19 +21,21 @@
 #define GUARD_LIBCMDLINE_DECODE_C 1
 #define _KOS_SOURCE 1
 
-#include "decode.h"
-
-#include <libcmdline/decode.h>
+#include "api.h"
+/**/
 
 #include <malloc.h>
 #include <stddef.h>
 #include <string.h>
 #include <unicode.h>
+
+#include <libcmdline/decode.h>
+
+#include "decode.h"
+
 #ifdef __KERNEL__
 #include <kernel/malloc.h>
 #endif /* __KERNEL__ */
-
-#include "api.h"
 
 DECL_BEGIN
 

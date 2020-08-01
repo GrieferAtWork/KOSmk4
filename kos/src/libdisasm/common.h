@@ -21,14 +21,13 @@
 #define GUARD_LIBDISASM_COMMON_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
 #include <libdisasm/disassembler.h>
-
-#define CC    LIBDISASM_CC
 
 DECL_BEGIN
 
@@ -110,7 +109,8 @@ libda_disasm_instrlen(struct disassembler *__restrict self);
 INTDEF ATTR_CONST uintptr_half_t CC
 libda_disasm_default_maxbytes(uintptr_half_t target DFL(DISASSEMBLER_TARGET_CURRENT));
 
-INTDEF NONNULL((1)) void CC libda_single_generic(struct disassembler *__restrict self);
+INTDEF NONNULL((1)) void CC
+libda_single_generic(struct disassembler *__restrict self);
 
 
 DECL_END

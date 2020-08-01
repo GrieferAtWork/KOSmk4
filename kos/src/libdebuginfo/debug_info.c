@@ -27,9 +27,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-#include "debug_info.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -47,6 +46,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/dwarf.h>
 
 #include "debug_aranges.h"
+#include "debug_info.h"
 
 #ifdef __KERNEL__
 #include <debugger/config.h>
@@ -623,9 +623,11 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *_
 	if (self->dup_comp.dic_haschildren)
 		return false;
 	reader = self->dup_cu_info_pos;
-	if (reader >= self->dup_cu_info_end || dwarf_decode_uleb128(&reader) != 0)
+	if (reader >= self->dup_cu_info_end ||
+	    dwarf_decode_uleb128(&reader) != 0)
 		return false;
-	if (reader >= self->dup_cu_info_end || dwarf_decode_uleb128(&reader) == 0)
+	if (reader >= self->dup_cu_info_end ||
+	    dwarf_decode_uleb128(&reader) == 0)
 		return false;
 	return libdi_debuginfo_cu_parser_next(self);
 }
@@ -665,9 +667,17 @@ decode_form:
 		char *result;
 		uintptr_t offset;
 		switch (self->dup_ptrsize) {
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
-		default: __builtin_unreachable();
+
+		case 4:
+			offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			break;
+
+		case 8:
+			offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			break;
+
+		default:
+			__builtin_unreachable();
 		}
 		result = (char *)self->dup_sections->cps_debug_str_start + offset;
 		if unlikely(offset >= (size_t)(self->dup_sections->cps_debug_str_end -
@@ -707,13 +717,27 @@ decode_form:
 
 	case DW_FORM_addr:
 		switch (self->dup_addrsize) {
-		case 1: *presult = *(uint8_t *)reader; break;
-		case 2: *presult = UNALIGNED_GET16((uint16_t *)reader); break;
-		case 4: *presult = UNALIGNED_GET32((uint32_t *)reader); break;
+
+		case 1:
+			*presult = *(uint8_t *)reader;
+			break;
+
+		case 2:
+			*presult = UNALIGNED_GET16((uint16_t *)reader);
+			break;
+
+		case 4:
+			*presult = UNALIGNED_GET32((uint32_t *)reader);
+			break;
+
 #if __SIZEOF_POINTER__ > 4
-		case 8: *presult = UNALIGNED_GET64((uint64_t *)reader); break;
+		case 8:
+			*presult = UNALIGNED_GET64((uint64_t *)reader);
+			break;
 #endif /* __SIZEOF_POINTER__ > 4 */
-		default: __builtin_unreachable();
+
+		default:
+			__builtin_unreachable();
 		}
 		return true;
 
@@ -737,9 +761,17 @@ decode_form:
 	switch (form) {
 	case DW_FORM_sec_offset:
 		switch (self->dup_ptrsize) {
-		case 4: *presult = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
-		case 8: *presult = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
-		default: __builtin_unreachable();
+
+		case 4:
+			*presult = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			break;
+
+		case 8:
+			*presult = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			break;
+
+		default:
+			__builtin_unreachable();
 		}
 		return true;
 
@@ -816,9 +848,17 @@ decode_form:
 
 	case DW_FORM_ref_addr:
 		switch (self->dup_ptrsize) {
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
-		default: __builtin_unreachable();
+
+		case 4:
+			offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			break;
+
+		case 8:
+			offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			break;
+
+		default:
+			__builtin_unreachable();
 		}
 		break;
 
@@ -852,7 +892,8 @@ decode_form:
 	default:
 		return false;
 	}
-	if unlikely(offset >= (size_t)(self->dup_cu_info_end - self->dup_cu_info_hdr))
+	if unlikely(offset >= (size_t)(self->dup_cu_info_end -
+	                               self->dup_cu_info_hdr))
 		ERROR(err);
 	*presult = self->dup_cu_info_hdr + offset;
 	return true;
@@ -873,9 +914,17 @@ decode_form:
 	case DW_FORM_sec_offset: {
 		uintptr_t offset;
 		switch (self->dup_ptrsize) {
-		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
-		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
-		default: __builtin_unreachable();
+
+		case 4:
+			offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			break;
+
+		case 8:
+			offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			break;
+
+		default:
+			__builtin_unreachable();
 		}
 		result->l_expr  = NULL;
 		result->l_llist = NULL;
@@ -933,35 +982,41 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 		switch (attr.dica_name) {
 
 		case DW_AT_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->cu_name))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->cu_name))
 				ERROR(err);
 			break;
 
 		case DW_AT_comp_dir:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->cu_comp_dir))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->cu_comp_dir))
 				ERROR(err);
 			break;
 
 		case DW_AT_ranges:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->cu_ranges.r_ranges_offset))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->cu_ranges.r_ranges_offset))
 				ERROR(err);
 			break;
 
 		case DW_AT_low_pc:
-			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->cu_ranges.r_startpc))
+			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form,
+			                                               &result->cu_ranges.r_startpc))
 				ERROR(err);
 			break;
 
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->cu_ranges.r_endpc)) {
-				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->cu_ranges.r_endpc))
+				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+				                                                &result->cu_ranges.r_endpc))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
 			break;
 
 		case DW_AT_stmt_list:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->cu_stmt_list))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->cu_stmt_list))
 				ERROR(err);
 			break;
 
@@ -996,50 +1051,59 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 		switch (attr.dica_name) {
 
 		case DW_AT_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->sp_name))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->sp_name))
 				ERROR(err);
 			break;
 
 		case DW_AT_linkage_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->sp_rawname))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->sp_rawname))
 				ERROR(err);
 			break;
 
 		case DW_AT_ranges:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->sp_ranges.r_ranges_offset))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->sp_ranges.r_ranges_offset))
 				ERROR(err);
 			break;
 
 		case DW_AT_low_pc:
-			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->sp_ranges.r_startpc))
+			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form,
+			                                               &result->sp_ranges.r_startpc))
 				ERROR(err);
 			break;
 
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->sp_ranges.r_endpc)) {
-				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->sp_ranges.r_endpc))
+				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+				                                                &result->sp_ranges.r_endpc))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
 			break;
 
 		case DW_AT_frame_base:
-			if unlikely(!libdi_debuginfo_cu_parser_getexpr(self, attr.dica_form, &result->sp_frame_base))
+			if unlikely(!libdi_debuginfo_cu_parser_getexpr(self, attr.dica_form,
+			                                               &result->sp_frame_base))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_file:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->sp_decl_file))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->sp_decl_file))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->sp_decl_line))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->sp_decl_line))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->sp_decl_column))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->sp_decl_column))
 				ERROR(err);
 			break;
 
@@ -1087,40 +1151,47 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debugin
 		switch (attr.dica_name) {
 
 		case DW_AT_ranges:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->is_ranges.r_ranges_offset))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->is_ranges.r_ranges_offset))
 				ERROR(err);
 			break;
 
 		case DW_AT_low_pc:
-			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->is_ranges.r_startpc))
+			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form,
+			                                               &result->is_ranges.r_startpc))
 				ERROR(err);
 			break;
 
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->is_ranges.r_endpc)) {
-				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->is_ranges.r_endpc))
+				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+				                                                &result->is_ranges.r_endpc))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
 			break;
 
 		case DW_AT_abstract_origin:
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &result->is_subprogram))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &result->is_subprogram))
 				ERROR(err);
 			break;
 
 		case DW_AT_call_column:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->is_call_column))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->is_call_column))
 				ERROR(err);
 			break;
 
 		case DW_AT_call_file:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->is_call_file))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->is_call_file))
 				ERROR(err);
 			break;
 
 		case DW_AT_call_line:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->is_call_line))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->is_call_line))
 				ERROR(err);
 			break;
 
@@ -1146,18 +1217,21 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu
 		switch (attr.dica_name) {
 
 		case DW_AT_ranges:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->lb_ranges.r_ranges_offset))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->lb_ranges.r_ranges_offset))
 				ERROR(err);
 			break;
 
 		case DW_AT_low_pc:
-			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->lb_ranges.r_startpc))
+			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form,
+			                                               &result->lb_ranges.r_startpc))
 				ERROR(err);
 			break;
 
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->lb_ranges.r_endpc)) {
-				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->lb_ranges.r_endpc))
+				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+				                                                &result->lb_ranges.r_endpc))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
@@ -1180,8 +1254,8 @@ NOTHROW_NCX(CC ao_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dup_cu_info_pos = abstract_origin;
-	return (likely(libdi_debuginfo_cu_parser_next(&pp))) &&
-	       (likely(libdi_debuginfo_cu_parser_loadattr_type(&pp, result)));
+	return likely(libdi_debuginfo_cu_parser_next(&pp)) &&
+	       likely(libdi_debuginfo_cu_parser_loadattr_type(&pp, result));
 }
 
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) void
@@ -1247,48 +1321,57 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t
 
 		case DW_AT_abstract_origin: {
 			byte_t *abstract_origin;
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &abstract_origin))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &abstract_origin))
 				ERROR(err);
 			return ao_loadattr_type(self, result, abstract_origin);
 		}	break;
 
 		case DW_AT_type:
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &result->t_type))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &result->t_type))
 				ERROR(err);
 			break;
 
 		case DW_AT_encoding:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->t_encoding))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->t_encoding))
 				ERROR(err);
 			break;
 
 		case DW_AT_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->t_name))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->t_name))
 				ERROR(err);
 			break;
 
 		case DW_AT_linkage_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->t_rawname))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->t_rawname))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_file:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->t_decl_file))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->t_decl_file))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->t_decl_line))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->t_decl_line))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->t_decl_column))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->t_decl_column))
 				ERROR(err);
 			break;
 
 		case DW_AT_byte_size:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->t_sizeof))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->t_sizeof))
 				ERROR(err);
 			break;
 
@@ -1354,50 +1437,59 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 
 		case DW_AT_abstract_origin: {
 			byte_t *abstract_origin;
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &abstract_origin))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &abstract_origin))
 				ERROR(err);
 			return ao_loadattr_member(self, result, abstract_origin);
 		}	break;
 
 		case DW_AT_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->m_name))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->m_name))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_file:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->m_decl_file))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->m_decl_file))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->m_decl_line))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->m_decl_line))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->m_decl_column))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->m_decl_column))
 				ERROR(err);
 			break;
 
 		case DW_AT_type:
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &result->m_type))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &result->m_type))
 				ERROR(err);
 			break;
 
 		case DW_AT_data_member_location:
 			/* TODO: `DW_AT_data_member_location' can also be an expression! */
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->m_offset))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->m_offset))
 				ERROR(err);
 			break;
 
 		case DW_AT_bit_offset:
 		case DW_AT_data_bit_offset:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->m_bit_offset))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->m_bit_offset))
 				ERROR(err);
 			break;
 
 		case DW_AT_bit_size:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->m_bit_size))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->m_bit_size))
 				ERROR(err);
 			break;
 
@@ -1437,43 +1529,51 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_pars
 
 		case DW_AT_abstract_origin: {
 			byte_t *abstract_origin;
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &abstract_origin))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &abstract_origin))
 				ERROR(err);
 			return ao_loadattr_variable(self, result, abstract_origin);
 		}	break;
 
 		case DW_AT_location:
-			if unlikely(!libdi_debuginfo_cu_parser_getexpr(self, attr.dica_form, &result->v_location))
+			if unlikely(!libdi_debuginfo_cu_parser_getexpr(self, attr.dica_form,
+			                                               &result->v_location))
 				ERROR(err);
 			break;
 
 		case DW_AT_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->v_name))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->v_name))
 				ERROR(err);
 			break;
 
 		case DW_AT_linkage_name:
-			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form, &result->v_rawname))
+			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
+			                                                 &result->v_rawname))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_file:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->v_decl_file))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->v_decl_file))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->v_decl_line))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->v_decl_line))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
-			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form, &result->v_decl_column))
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->v_decl_column))
 				ERROR(err);
 			break;
 
 		case DW_AT_type:
-			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form, &result->v_type))
+			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
+			                                              &result->v_type))
 				ERROR(err);
 			break;
 
@@ -1501,8 +1601,21 @@ LOCAL bool CC need_space(char a, char b) {
 	return false;
 }
 
-#define DO(x)          do{if unlikely((temp = (x)) < 0)goto err;result+=temp;}__WHILE0
-#define FORMAT(option) do{if(format_printer){if unlikely((temp = (*format_printer)(format_arg,printer,arg,option)) < 0)goto err;result+=temp;}}__WHILE0
+#define DO(x)                         \
+	do {                              \
+		if unlikely((temp = (x)) < 0) \
+			goto err;                 \
+		result += temp;               \
+	}	__WHILE0
+#define FORMAT(option)                                                 \
+	do {                                                               \
+		if (format_printer) {                                          \
+			if unlikely((temp = (*format_printer)(format_arg, printer, \
+			                                      arg, option)) < 0)   \
+				goto err;                                              \
+			result += temp;                                            \
+		}                                                              \
+	}	__WHILE0
 
 PRIVATE TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debuginfo_print_typename_and_varname(pformatprinter printer, void *arg,
@@ -1735,12 +1848,15 @@ do_prefix_type:
 							di_debuginfo_cu_parser_t parameter_pp;
 							DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &pp) {
 								switch (attr.dica_name) {
+
 								case DW_AT_type:
 									libdi_debuginfo_cu_parser_getref(&pp, attr.dica_form, &parameter_type_pointer);
 									break;
+
 								case DW_AT_name:
 									libdi_debuginfo_cu_parser_getstring(&pp, attr.dica_form, &parameter_name);
 									break;
+
 								default: break;
 								}
 							}
@@ -1992,21 +2108,52 @@ print_character(pformatprinter printer, void *arg, uint64_t value) {
 	} else {
 		switch (value) {
 			char ctrl_buf[2];
-		case '\a': ctrl_buf[1] = 'a'; goto do_ctrl;
-		case '\b': ctrl_buf[1] = 'b'; goto do_ctrl;
-		case '\f': ctrl_buf[1] = 'f'; goto do_ctrl;
-		case '\n': ctrl_buf[1] = 'n'; goto do_ctrl;
-		case '\r': ctrl_buf[1] = 'r'; goto do_ctrl;
-		case '\t': ctrl_buf[1] = 't'; goto do_ctrl;
-		case '\v': ctrl_buf[1] = 'v'; goto do_ctrl;
-		case '\033': ctrl_buf[1] = 'e'; goto do_ctrl;
-		case '\\': ctrl_buf[1] = '\\'; goto do_ctrl;
-		case '\'': ctrl_buf[1] = '\''; goto do_ctrl;
+
+		case '\a':
+			ctrl_buf[1] = 'a';
+			goto do_ctrl;
+
+		case '\b':
+			ctrl_buf[1] = 'b';
+			goto do_ctrl;
+
+		case '\f':
+			ctrl_buf[1] = 'f';
+			goto do_ctrl;
+
+		case '\n':
+			ctrl_buf[1] = 'n';
+			goto do_ctrl;
+
+		case '\r':
+			ctrl_buf[1] = 'r';
+			goto do_ctrl;
+
+		case '\t':
+			ctrl_buf[1] = 't';
+			goto do_ctrl;
+
+		case '\v':
+			ctrl_buf[1] = 'v';
+			goto do_ctrl;
+
+		case '\033':
+			ctrl_buf[1] = 'e';
+			goto do_ctrl;
+
+		case '\\':
+			ctrl_buf[1] = '\\';
+			goto do_ctrl;
+
+		case '\'':
+			ctrl_buf[1] = '\'';
+			goto do_ctrl;
+
 		case '\"':
 			ctrl_buf[1] = '\"';
 do_ctrl:
 			ctrl_buf[0] = '\\';
-			result      = (*printer)(arg, ctrl_buf, 2);
+			result = (*printer)(arg, ctrl_buf, 2);
 			break;
 
 		default:
@@ -2303,7 +2450,11 @@ got_elem_count:
 					/* Yes! -> Print this one as a string. */
 					result = 0;
 					FORMAT(DEBUGINFO_PRINT_FORMAT_STRING_PREFIX);
-					DO(inner_type.t_sizeof == 1 ? (*printer)(arg, "\"", 1) : inner_type.t_sizeof == 2 ? (*printer)(arg, "u\"", 2) : (*printer)(arg, "U\"", 2));
+					DO(inner_type.t_sizeof == 1
+					   ? (*printer)(arg, "\"", 1)
+					   : inner_type.t_sizeof == 2
+					     ? (*printer)(arg, "u\"", 2)
+					     : (*printer)(arg, "U\"", 2));
 					--elem_count;
 					for (i = 0; i < elem_count; ++i) {
 						uint32_t ch;
@@ -2371,7 +2522,9 @@ print_unknown_inner_array_type:
 						FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
 					}
 					FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
-					DO(libdi_debuginfo_do_print_unknown_data(printer, arg, (byte_t *)data + offset, inner_type.t_sizeof));
+					DO(libdi_debuginfo_do_print_unknown_data(printer, arg,
+					                                         (byte_t *)data + offset,
+					                                         inner_type.t_sizeof));
 					FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
 				}
 			}
@@ -2510,7 +2663,9 @@ print_generic_enum:
 						                                   flags);
 					} else {
 member_type_is_invalid:
-						temp = format_printf(printer, arg, "<unknown+%Iu>", member.m_offset);
+						temp = format_printf(printer, arg,
+						                     "<unknown+%Iu>",
+						                     member.m_offset);
 					}
 					if unlikely(temp < 0)
 						goto err;
@@ -2651,7 +2806,8 @@ libdi_debuginfo_print_value(pformatprinter printer, void *arg,
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
 		DO((*printer)(arg, "(", 1));
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-		DO(libdi_debuginfo_print_typename(printer, arg, parser, type, NULL, format_printer, format_arg));
+		DO(libdi_debuginfo_print_typename(printer, arg, parser, type, NULL,
+		                                  format_printer, format_arg));
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
 		DO((*printer)(arg, ")", 1));
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
@@ -2857,12 +3013,18 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 		                                       di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(sectinfo),
 		                                       &parser, &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 #if 1
-			libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, true);
+			libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser,
+			                                  module_relative_pc,
+			                                  callback, arg,
+			                                  &result, true);
 			libdi_debuginfo_cu_abbrev_fini(&abbrev);
 			goto done;
 #else
 			bool was_ok;
-			was_ok = libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, true);
+			was_ok = libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser,
+			                                           module_relative_pc,
+			                                           callback, arg,
+			                                           &result, true);
 			libdi_debuginfo_cu_abbrev_fini(&abbrev);
 			if (was_ok)
 				goto done;
@@ -2875,7 +3037,10 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 	                                          di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(sectinfo),
 	                                          &parser, &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		bool was_ok;
-		was_ok = libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, false);
+		was_ok = libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser,
+		                                           module_relative_pc,
+		                                           callback, arg,
+		                                           &result, false);
 		libdi_debuginfo_cu_abbrev_fini(&abbrev);
 		if (was_ok)
 			goto done;

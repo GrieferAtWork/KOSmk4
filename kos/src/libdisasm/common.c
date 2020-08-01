@@ -27,7 +27,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
-#include "common.h"
+#include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -43,6 +44,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/addr2line.h>
 
+#include "common.h"
 #include "x86.h"
 
 #ifndef __KERNEL__
@@ -174,9 +176,9 @@ libda_disasm_print_line_nolf(struct disassembler *__restrict self) {
 			disasm_print(self, "          ", 10);
 #elif __SIZEOF_POINTER__ == 8
 			disasm_print(self, "                  ", 18);
-#else
+#else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported __SIZEOF_POINTER__"
-#endif
+#endif /* __SIZEOF_POINTER__ != ... */
 			for (j = 0; j < self->d_maxbytes && i < instrlen; ++j, ++i)
 				disasm_printf(self, "%.2I8x ", bytes_base[i]);
 		}
@@ -339,7 +341,8 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 					TRY {
 						uintptr_t symbol_offset;
 						if (debug_sections_addr2line(&dbg_sect, &a2l_info,
-						                             (uintptr_t)symbol_addr - (uintptr_t)library_getbase(symbol_module),
+						                             (uintptr_t)symbol_addr -
+						                             (uintptr_t)library_getbase(symbol_module),
 						                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
 						                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS) {
 							library_decref(symbol_module);

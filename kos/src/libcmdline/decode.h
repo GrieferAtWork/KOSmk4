@@ -20,15 +20,16 @@
 #ifndef GUARD_LIBCMDLINE_DECODE_H
 #define GUARD_LIBCMDLINE_DECODE_H 1
 
+#include "api.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
-#include <libcmdline/decode.h>
-
 #include <format-printer.h>
 
-#include "api.h"
+#include <libcmdline/decode.h>
 
 DECL_BEGIN
 

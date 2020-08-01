@@ -181,7 +181,7 @@ NOTHROW_NCX(CC setregptrp)(uintptr_t *__restrict pvalue, unsigned int regno,
  *       getreg_*: The contents of `buf' are undefined.
  *       setreg_*: The register was not written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
- * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
+ * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>)
  * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_getreg_gpregs)(struct gpregs const *__restrict self, unsigned int regno,
@@ -191,27 +191,94 @@ NOTHROW_NCX(CC libcpu_getreg_gpregs)(struct gpregs const *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK): value = self->gp_pax; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK): value = self->gp_pcx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK): value = self->gp_pdx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK): value = self->gp_pbx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pax >> 8) : self->gp_psp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pcx >> 8) : self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pdx >> 8) : self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pbx >> 8) : self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
+		value = self->gp_pax;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
+		value = self->gp_pcx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
+		value = self->gp_pdx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
+		value = self->gp_pbx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pax >> 8)
+		        : self->gp_psp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pcx >> 8)
+		        : self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pdx >> 8)
+		        : self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pbx >> 8)
+		        : self->gp_pdi;
+		break;
+
 #ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):  value = self->gp_r8; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):  value = self->gp_r9; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK): value = self->gp_r10; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK): value = self->gp_r11; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK): value = self->gp_r12; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK): value = self->gp_r13; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK): value = self->gp_r14; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK): value = self->gp_r15; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_SPL & X86_REGISTER_IDMASK): value = self->gp_psp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK): value = self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK): value = self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK): value = self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
+		value = self->gp_r8;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
+		value = self->gp_r9;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
+		value = self->gp_r10;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
+		value = self->gp_r11;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
+		value = self->gp_r12;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
+		value = self->gp_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
+		value = self->gp_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
+		value = self->gp_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SPL & X86_REGISTER_IDMASK):
+		value = self->gp_psp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
+		value = self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
+		value = self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
+		value = self->gp_pdi;
+		break;
 #endif /* __x86_64__ */
 
 	default:
@@ -229,27 +296,94 @@ NOTHROW_NCX(CC libcpu_setreg_gpregs)(struct gpregs *__restrict self, unsigned in
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK): pvalue = &self->gp_pax; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK): pvalue = &self->gp_pcx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK): pvalue = &self->gp_pdx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK): pvalue = &self->gp_pbx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pax + 1) : (void *)&self->gp_psp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pcx + 1) : (void *)&self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pdx + 1) : (void *)&self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pbx + 1) : (void *)&self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pax;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pcx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pdx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pbx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pax + 1)
+		         : (void *)&self->gp_psp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pcx + 1)
+		         : (void *)&self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pdx + 1)
+		         : (void *)&self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pbx + 1)
+		         : (void *)&self->gp_pdi;
+		break;
+
 #ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):  pvalue = &self->gp_r8; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):  pvalue = &self->gp_r9; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK): pvalue = &self->gp_r10; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK): pvalue = &self->gp_r11; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK): pvalue = &self->gp_r12; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK): pvalue = &self->gp_r13; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK): pvalue = &self->gp_r14; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK): pvalue = &self->gp_r15; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_SPL & X86_REGISTER_IDMASK): pvalue = &self->gp_psp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK): pvalue = &self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK): pvalue = &self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK): pvalue = &self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r8;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r9;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r10;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r11;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r12;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SPL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_psp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pdi;
+		break;
 #endif /* __x86_64__ */
 
 	default:
@@ -267,10 +401,21 @@ NOTHROW_NCX(CC libcpu_getreg_sgregs)(struct sgregs const *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_SEGMENT_ES & X86_REGISTER_IDMASK): value = self->sg_es16; break;
-	case (X86_REGISTER_SEGMENT_DS & X86_REGISTER_IDMASK): value = self->sg_ds16; break;
-	case (X86_REGISTER_SEGMENT_FS & X86_REGISTER_IDMASK): value = self->sg_fs16; break;
-	case (X86_REGISTER_SEGMENT_GS & X86_REGISTER_IDMASK): value = self->sg_gs16; break;
+	case (X86_REGISTER_SEGMENT_ES & X86_REGISTER_IDMASK):
+		value = self->sg_es16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_DS & X86_REGISTER_IDMASK):
+		value = self->sg_ds16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_FS & X86_REGISTER_IDMASK):
+		value = self->sg_fs16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_GS & X86_REGISTER_IDMASK):
+		value = self->sg_gs16;
+		break;
 
 	default:
 nope:
@@ -287,10 +432,21 @@ NOTHROW_NCX(CC libcpu_setreg_sgregs)(struct sgregs *__restrict self, unsigned in
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_SEGMENT_ES & X86_REGISTER_IDMASK): pvalue = &self->sg_es; break;
-	case (X86_REGISTER_SEGMENT_DS & X86_REGISTER_IDMASK): pvalue = &self->sg_ds; break;
-	case (X86_REGISTER_SEGMENT_FS & X86_REGISTER_IDMASK): pvalue = &self->sg_fs; break;
-	case (X86_REGISTER_SEGMENT_GS & X86_REGISTER_IDMASK): pvalue = &self->sg_gs; break;
+	case (X86_REGISTER_SEGMENT_ES & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_es;
+		break;
+
+	case (X86_REGISTER_SEGMENT_DS & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_ds;
+		break;
+
+	case (X86_REGISTER_SEGMENT_FS & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_fs;
+		break;
+
+	case (X86_REGISTER_SEGMENT_GS & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_gs;
+		break;
 
 	default:
 nope:
@@ -307,10 +463,21 @@ NOTHROW_NCX(CC libcpu_getreg_coregs)(struct coregs const *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_CONTROL_CR0 & X86_REGISTER_IDMASK): value = self->co_cr0; break;
-	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK): value = (uintptr_t)self->co_cr2; break;
-	case (X86_REGISTER_CONTROL_CR3 & X86_REGISTER_IDMASK): value = self->co_cr3; break;
-	case (X86_REGISTER_CONTROL_CR4 & X86_REGISTER_IDMASK): value = self->co_cr4; break;
+	case (X86_REGISTER_CONTROL_CR0 & X86_REGISTER_IDMASK):
+		value = self->co_cr0;
+		break;
+
+	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK):
+		value = (uintptr_t)self->co_cr2;
+		break;
+
+	case (X86_REGISTER_CONTROL_CR3 & X86_REGISTER_IDMASK):
+		value = self->co_cr3;
+		break;
+
+	case (X86_REGISTER_CONTROL_CR4 & X86_REGISTER_IDMASK):
+		value = self->co_cr4;
+		break;
 
 	default:
 nope:
@@ -327,10 +494,21 @@ NOTHROW_NCX(CC libcpu_setreg_coregs)(struct coregs *__restrict self, unsigned in
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_CONTROL_CR0 & X86_REGISTER_IDMASK): pvalue = &self->co_cr0; break;
-	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->co_cr2; break;
-	case (X86_REGISTER_CONTROL_CR3 & X86_REGISTER_IDMASK): pvalue = &self->co_cr3; break;
-	case (X86_REGISTER_CONTROL_CR4 & X86_REGISTER_IDMASK): pvalue = &self->co_cr4; break;
+	case (X86_REGISTER_CONTROL_CR0 & X86_REGISTER_IDMASK):
+		pvalue = &self->co_cr0;
+		break;
+
+	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK):
+		pvalue = (uintptr_t *)&self->co_cr2;
+		break;
+
+	case (X86_REGISTER_CONTROL_CR3 & X86_REGISTER_IDMASK):
+		pvalue = &self->co_cr3;
+		break;
+
+	case (X86_REGISTER_CONTROL_CR4 & X86_REGISTER_IDMASK):
+		pvalue = &self->co_cr4;
+		break;
 
 	default:
 nope:
@@ -347,12 +525,29 @@ NOTHROW_NCX(CC libcpu_getreg_drregs)(struct drregs const *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr0; break;
-	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr1; break;
-	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr2; break;
-	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr3; break;
-	case (X86_REGISTER_DEBUG_DR6 & X86_REGISTER_IDMASK): value = self->dr_dr6; break;
-	case (X86_REGISTER_DEBUG_DR7 & X86_REGISTER_IDMASK): value = self->dr_dr7; break;
+	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK):
+		value = (uintptr_t)self->dr_dr0;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK):
+		value = (uintptr_t)self->dr_dr1;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK):
+		value = (uintptr_t)self->dr_dr2;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK):
+		value = (uintptr_t)self->dr_dr3;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR6 & X86_REGISTER_IDMASK):
+		value = self->dr_dr6;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR7 & X86_REGISTER_IDMASK):
+		value = self->dr_dr7;
+		break;
 
 	default:
 nope:
@@ -369,12 +564,29 @@ NOTHROW_NCX(CC libcpu_setreg_drregs)(struct drregs *__restrict self, unsigned in
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr0; break;
-	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr1; break;
-	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr2; break;
-	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr3; break;
-	case (X86_REGISTER_DEBUG_DR6 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr6; break;
-	case (X86_REGISTER_DEBUG_DR7 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr7; break;
+	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK):
+		pvalue = (uintptr_t *)&self->dr_dr0;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK):
+		pvalue = (uintptr_t *)&self->dr_dr1;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK):
+		pvalue = (uintptr_t *)&self->dr_dr2;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK):
+		pvalue = (uintptr_t *)&self->dr_dr3;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR6 & X86_REGISTER_IDMASK):
+		pvalue = &self->dr_dr6;
+		break;
+
+	case (X86_REGISTER_DEBUG_DR7 & X86_REGISTER_IDMASK):
+		pvalue = &self->dr_dr7;
+		break;
 
 	default:
 nope:
@@ -522,35 +734,51 @@ NOTHROW_NCX(CC libcpu_getreg_lcpustate)(struct lcpustate const *__restrict self,
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
 #ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_R15 & ~X86_REGISTER_SIZEMASK): value = self->lcs_r15; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_R14 & ~X86_REGISTER_SIZEMASK): value = self->lcs_r14; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_R13 & ~X86_REGISTER_SIZEMASK): value = self->lcs_r13; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_R12 & ~X86_REGISTER_SIZEMASK): value = self->lcs_r12; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_R15 & ~X86_REGISTER_SIZEMASK):
+		value = self->lcs_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_R14 & ~X86_REGISTER_SIZEMASK):
+		value = self->lcs_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_R13 & ~X86_REGISTER_SIZEMASK):
+		value = self->lcs_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_R12 & ~X86_REGISTER_SIZEMASK):
+		value = self->lcs_r12;
+		break;
 #else /* __x86_64__ */
 	case (X86_REGISTER_GENERAL_PURPOSE_PSI & ~X86_REGISTER_SIZEMASK):
 		if ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
 			goto nope;
 		value = self->lcs_psi;
 		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PDI & ~X86_REGISTER_SIZEMASK):
 		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
 		        ? (self->lcs_pbx >> 8)
 		        : self->lcs_pdi;
 		break;
 #endif /* !__x86_64__ */
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
 		if ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
 			goto nope;
 		value = self->lcs_psp;
 		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PBP & ~X86_REGISTER_SIZEMASK):
 		if ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
 			goto nope;
 		value = self->lcs_pbp;
 		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PBX & ~X86_REGISTER_SIZEMASK):
 		value = self->lcs_pbx;
 		break;
+
 	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
 		value = self->lcs_pip;
 		break;
@@ -569,16 +797,28 @@ NOTHROW_NCX(CC libcpu_setreg_lcpustate)(struct lcpustate *__restrict self, unsig
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
 #ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_R15 & ~X86_REGISTER_SIZEMASK): pvalue = &self->lcs_r15; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_R14 & ~X86_REGISTER_SIZEMASK): pvalue = &self->lcs_r14; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_R13 & ~X86_REGISTER_SIZEMASK): pvalue = &self->lcs_r13; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_R12 & ~X86_REGISTER_SIZEMASK): pvalue = &self->lcs_r12; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_R15 & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->lcs_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_R14 & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->lcs_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_R13 & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->lcs_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_R12 & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->lcs_r12;
+		break;
 #else /* __x86_64__ */
 	case (X86_REGISTER_GENERAL_PURPOSE_PSI & ~X86_REGISTER_SIZEMASK):
 		if ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
 			goto nope;
 		pvalue = &self->lcs_psi;
 		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PDI & ~X86_REGISTER_SIZEMASK):
 		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
 		         ? (void *)((byte_t *)&self->lcs_pbx + 1)
@@ -726,20 +966,61 @@ NOTHROW_NCX(CC libcpu_getreg_fcpustate)(struct fcpustate const *__restrict self,
 #endif /* __x86_64__ */
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): value = self->fcs_pflags; break;
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK): value = self->fcs_pip; break;
-	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_es16; break;
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_cs16; break;
-	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_ss16; break;
-	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_ds16; break;
-	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_fs16; break;
-	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_gs16; break;
-	case (X86_REGISTER_MISC_TR & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_tr16; break;
-	case (X86_REGISTER_MISC_LDT & ~X86_REGISTER_SIZEMASK): value = self->fcs_sgregs.sg_ldt16; break;
-	case (X86_REGISTER_MISC_GDT_LIMIT & ~X86_REGISTER_SIZEMASK): value = self->fcs_gdt.dt_limit; break;
-	case (X86_REGISTER_MISC_GDT_BASE & ~X86_REGISTER_SIZEMASK): value = self->fcs_gdt.dt_base; break;
-	case (X86_REGISTER_MISC_IDT_LIMIT & ~X86_REGISTER_SIZEMASK): value = self->fcs_idt.dt_limit; break;
-	case (X86_REGISTER_MISC_IDT_BASE & ~X86_REGISTER_SIZEMASK): value = self->fcs_idt.dt_base; break;
+	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_pflags;
+		break;
+
+	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_pip;
+		break;
+
+	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_es16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_cs16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_ss16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_ds16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_fs16;
+		break;
+
+	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_gs16;
+		break;
+
+	case (X86_REGISTER_MISC_TR & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_tr16;
+		break;
+
+	case (X86_REGISTER_MISC_LDT & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_sgregs.sg_ldt16;
+		break;
+
+	case (X86_REGISTER_MISC_GDT_LIMIT & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_gdt.dt_limit;
+		break;
+
+	case (X86_REGISTER_MISC_GDT_BASE & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_gdt.dt_base;
+		break;
+
+	case (X86_REGISTER_MISC_IDT_LIMIT & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_idt.dt_limit;
+		break;
+
+	case (X86_REGISTER_MISC_IDT_BASE & ~X86_REGISTER_SIZEMASK):
+		value = self->fcs_idt.dt_base;
+		break;
 
 	default:
 		goto done;
@@ -770,21 +1051,55 @@ NOTHROW_NCX(CC libcpu_setreg_fcpustate)(struct fcpustate *__restrict self, unsig
 #endif /* __x86_64__ */
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_pflags; break;
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_pip; break;
-	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_es; goto do_set_reg16;
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_cs; goto do_set_reg16;
-	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_ss; goto do_set_reg16;
-	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_ds; goto do_set_reg16;
-	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_fs; goto do_set_reg16;
-	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_gs; goto do_set_reg16;
-	case (X86_REGISTER_MISC_TR & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_tr; goto do_set_reg16;
-	case (X86_REGISTER_MISC_LDT & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_sgregs.sg_ldt;
+	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_pflags;
+		break;
+
+	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_pip;
+		break;
+
+	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_es;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_cs;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_ss;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_ds;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_fs;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_gs;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_MISC_TR & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_tr;
+		goto do_set_reg16;
+
+	case (X86_REGISTER_MISC_LDT & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_sgregs.sg_ldt;
 do_set_reg16:
 		result = setregptr16p(pvalue, regno, buf, buflen);
 		goto done;
-	case (X86_REGISTER_MISC_GDT_BASE & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_gdt.dt_base; break;
-	case (X86_REGISTER_MISC_IDT_BASE & ~X86_REGISTER_SIZEMASK): pvalue = &self->fcs_idt.dt_base; break;
+
+	case (X86_REGISTER_MISC_GDT_BASE & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_gdt.dt_base;
+		break;
+
+	case (X86_REGISTER_MISC_IDT_BASE & ~X86_REGISTER_SIZEMASK):
+		pvalue = &self->fcs_idt.dt_base;
+		break;
 
 	case (X86_REGISTER_MISC_GDT_LIMIT & ~X86_REGISTER_SIZEMASK): {
 		u16 *pvalue16;
@@ -814,15 +1129,41 @@ NOTHROW_NCX(CC libcpu_getreg_sfpuenv)(struct sfpuenv const *__restrict self, uns
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): value = self->fe_fcw; break;
-	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): value = self->fe_fsw; break;
-	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): value = self->fe_ftw; break;
-	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK): value = fpustate_ftw2ftwx(self->fe_ftw); break;
-	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): value = self->fe_fop & ((1 << 11) - 1); break;
-	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): value = self->fe_fip; break;
-	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): value = self->fe_fcs; break;
-	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): value = self->fe_fdp; break;
-	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): value = self->fe_fds; break;
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fcw;
+		break;
+
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fsw;
+		break;
+
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_ftw;
+		break;
+
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK):
+		value = fpustate_ftw2ftwx(self->fe_ftw);
+		break;
+
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fop & ((1 << 11) - 1);
+		break;
+
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fip;
+		break;
+
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fcs;
+		break;
+
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fdp;
+		break;
+
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK):
+		value = self->fe_fds;
+		break;
 
 	default:
 		return 0;
@@ -872,18 +1213,42 @@ NOTHROW_NCX(CC libcpu_setreg_sfpuenv)(struct sfpuenv *__restrict self, unsigned 
 
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): self->fe_fcw = (u16)value; break;
-	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): self->fe_fsw = (u16)value; break;
-	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): self->fe_ftw = (u16)value; break;
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK):
+		self->fe_fcw = (u16)value;
+		break;
+
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK):
+		self->fe_fsw = (u16)value;
+		break;
+
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK):
+		self->fe_ftw = (u16)value;
+		break;
+
 	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK):
 		if (value != fpustate_ftw2ftwx(self->fe_ftw))
 			goto nope;
 		break;
-	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): self->fe_fop = (u16)(value & ((1 << 11) - 1)); break;
-	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): self->fe_fip = (u32)value; break;
-	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): self->fe_fcs = (u16)value; break;
-	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): self->fe_fdp = (u32)value; break;
-	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): self->fe_fds = (u16)value; break;
+
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK):
+		self->fe_fop = (u16)(value & ((1 << 11) - 1));
+		break;
+
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK):
+		self->fe_fip = (u32)value;
+		break;
+
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK):
+		self->fe_fcs = (u16)value;
+		break;
+
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK):
+		self->fe_fdp = (u32)value;
+		break;
+
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK):
+		self->fe_fds = (u16)value;
+		break;
 
 	default:
 nope:
@@ -987,22 +1352,59 @@ NOTHROW_NCX(CC libcpu_getreg_xfpustate)(struct xfpustate const *__restrict self,
 			memcpy(buf, &self->fx_xmm[regno & X86_REGISTER_IDMASK], 16);
 		return 16;
 
-	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): value = self->fx_fcw; break;
-	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): value = self->fx_fsw; break;
-	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): value = fpustate_ftwx2ftw(self->fx_ftw, self->fx_regs); break;
-	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK): value = self->fx_ftw; break;
-	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): value = self->fx_fop & ((1 << 11) - 1); break;
-	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): value = self->fx_fip; break;
-	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): value = self->fx_fdp; break;
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fcw;
+		break;
+
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fsw;
+		break;
+
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK):
+		value = fpustate_ftwx2ftw(self->fx_ftw, self->fx_regs);
+		break;
+
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_ftw;
+		break;
+
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fop & ((1 << 11) - 1);
+		break;
+
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fip;
+		break;
+
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fdp;
+		break;
+
 #ifdef __x86_64__
-	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): value = 0; break;
-	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): value = 0; break;
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK):
+		value = 0;
+		break;
+
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK):
+		value = 0;
+		break;
 #else /* __x86_64__ */
-	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): value = self->fx_fcs; break;
-	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): value = self->fx_fds; break;
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fcs;
+		break;
+
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_fds;
+		break;
 #endif /* !__x86_64__ */
-	case (X86_REGISTER_MISC_MXCSR & ~X86_REGISTER_SIZEMASK): value = self->fx_mxcsr; break;
-	case (X86_REGISTER_MISC_MXCSR_MASK & ~X86_REGISTER_SIZEMASK): value = self->fx_mxcsr_mask; break;
+
+	case (X86_REGISTER_MISC_MXCSR & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_mxcsr;
+		break;
+
+	case (X86_REGISTER_MISC_MXCSR_MASK & ~X86_REGISTER_SIZEMASK):
+		value = self->fx_mxcsr_mask;
+		break;
 
 	default:
 		return 0;
@@ -1078,22 +1480,61 @@ NOTHROW_NCX(CC libcpu_setreg_xfpustate)(struct xfpustate *__restrict self, unsig
 	}
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): self->fx_fcw = (u16)value; break;
-	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): self->fx_fsw = (u16)value; break;
-	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): self->fx_ftw = fpustate_ftw2ftwx((u16)value); break;
-	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK): self->fx_ftw = (u8)value; break;
-	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): self->fx_fop = (u16)(value & ((1 << 11) - 1)); break;
-	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): self->fx_fip = (uintptr_t)value; break;
-	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): self->fx_fdp = (uintptr_t)value; break;
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK):
+		self->fx_fcw = (u16)value;
+		break;
+
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK):
+		self->fx_fsw = (u16)value;
+		break;
+
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK):
+		self->fx_ftw = fpustate_ftw2ftwx((u16)value);
+		break;
+
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK):
+		self->fx_ftw = (u8)value;
+		break;
+
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK):
+		self->fx_fop = (u16)(value & ((1 << 11) - 1));
+		break;
+
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK):
+		self->fx_fip = (uintptr_t)value;
+		break;
+
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK):
+		self->fx_fdp = (uintptr_t)value;
+		break;
+
 #ifdef __x86_64__
-	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): if (value != 0) goto nope; break;
-	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): if (value != 0) goto nope; break;
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK):
+		if (value != 0)
+			goto nope;
+		break;
+
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK):
+		if (value != 0)
+			goto nope;
+		break;
 #else /* __x86_64__ */
-	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): self->fx_fcs = (u16)value; break;
-	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): self->fx_fds = (u16)value; break;
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK):
+		self->fx_fcs = (u16)value;
+		break;
+
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK):
+		self->fx_fds = (u16)value;
+		break;
 #endif /* !__x86_64__ */
-	case (X86_REGISTER_MISC_MXCSR & ~X86_REGISTER_SIZEMASK): self->fx_mxcsr = (u32)value; break;
-	case (X86_REGISTER_MISC_MXCSR_MASK & ~X86_REGISTER_SIZEMASK): self->fx_mxcsr_mask = (u32)value; break;
+
+	case (X86_REGISTER_MISC_MXCSR & ~X86_REGISTER_SIZEMASK):
+		self->fx_mxcsr = (u32)value;
+		break;
+
+	case (X86_REGISTER_MISC_MXCSR_MASK & ~X86_REGISTER_SIZEMASK):
+		self->fx_mxcsr_mask = (u32)value;
+		break;
 
 	default:
 nope:
@@ -1112,30 +1553,89 @@ NOTHROW_NCX(CC libcpu_getreg_gpregsnsp)(struct gpregsnsp const *__restrict self,
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK): value = self->gp_pax; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK): value = self->gp_pcx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK): value = self->gp_pdx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK): value = self->gp_pbx; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
+		value = self->gp_pax;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
+		value = self->gp_pcx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
+		value = self->gp_pdx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
+		value = self->gp_pbx;
+		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
 		if ((regno & X86_REGISTER_SIZEMASK) != X86_REGISTER_SIZEMASK_1BYTE)
 			goto nope;
 		value = self->gp_pax >> 8;
 		break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pcx >> 8) : self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pdx >> 8) : self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK): value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (self->gp_pbx >> 8) : self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pcx >> 8)
+		        : self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pdx >> 8)
+		        : self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_pbx >> 8)
+		        : self->gp_pdi;
+		break;
+
 #ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):  value = self->gp_r8; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):  value = self->gp_r9; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK): value = self->gp_r10; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK): value = self->gp_r11; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK): value = self->gp_r12; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK): value = self->gp_r13; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK): value = self->gp_r14; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK): value = self->gp_r15; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK): value = self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK): value = self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK): value = self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
+		value = self->gp_r8;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
+		value = self->gp_r9;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
+		value = self->gp_r10;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
+		value = self->gp_r11;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
+		value = self->gp_r12;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
+		value = self->gp_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
+		value = self->gp_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
+		value = self->gp_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
+		value = self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
+		value = self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
+		value = self->gp_pdi;
+		break;
 #endif /* __x86_64__ */
 
 	default:
@@ -1153,30 +1653,90 @@ NOTHROW_NCX(CC libcpu_setreg_gpregsnsp)(struct gpregsnsp *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK): pvalue = &self->gp_pax; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK): pvalue = &self->gp_pcx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK): pvalue = &self->gp_pdx; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK): pvalue = &self->gp_pbx; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pax;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pcx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pdx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pbx;
+		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
 		if ((regno & X86_REGISTER_SIZEMASK) != X86_REGISTER_SIZEMASK_1BYTE)
 			goto nope;
 		pvalue = (void *)((byte_t *)&self->gp_pax + 1);
 		break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pcx + 1) : (void *)&self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pdx + 1) : (void *)&self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK): pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE) ? (void *)((byte_t *)&self->gp_pbx + 1) : (void *)&self->gp_pdi; break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pcx + 1)
+		         : (void *)&self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pdx + 1)
+		         : (void *)&self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_pbx + 1)
+		         : (void *)&self->gp_pdi;
+		break;
+
 #ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):  pvalue = &self->gp_r8; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):  pvalue = &self->gp_r9; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK): pvalue = &self->gp_r10; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK): pvalue = &self->gp_r11; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK): pvalue = &self->gp_r12; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK): pvalue = &self->gp_r13; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK): pvalue = &self->gp_r14; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK): pvalue = &self->gp_r15; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK): pvalue = &self->gp_pbp; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK): pvalue = &self->gp_psi; break;
-	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK): pvalue = &self->gp_pdi; break;
+	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r8;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r9;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r10;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r11;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r12;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_pdi;
+		break;
 #endif /* __x86_64__ */
 
 	default:
@@ -1194,8 +1754,13 @@ NOTHROW_NCX(CC libcpu_getreg_sgbase)(struct sgbase const *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK): value = self->sg_fsbase; break;
-	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK): value = self->sg_gsbase; break;
+	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK):
+		value = self->sg_fsbase;
+		break;
+
+	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK):
+		value = self->sg_gsbase;
+		break;
 
 	default:
 nope:
@@ -1212,8 +1777,13 @@ NOTHROW_NCX(CC libcpu_setreg_sgbase)(struct sgbase *__restrict self, unsigned in
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK): pvalue = &self->sg_fsbase; break;
-	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK): pvalue = &self->sg_gsbase; break;
+	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_fsbase;
+		break;
+
+	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_gsbase;
+		break;
 
 	default:
 nope:
@@ -1288,16 +1858,42 @@ NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__res
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK): value = irregs_getpc(self); break;
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): value = irregs_getcs(self); break;
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): value = irregs_getpflags(self); break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK): value = irregs_getsp(self); break;
-	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK): value = irregs_getss(self); break;
+	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getpc(self);
+		break;
+
+	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getcs(self);
+		break;
+
+	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getpflags(self);
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getsp(self);
+		break;
+
+	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getss(self);
+		break;
+
 #ifndef __x86_64__
-	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK): value = irregs_getds(self); break;
-	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK): value = irregs_getes(self); break;
-	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK): value = irregs_getfs(self); break;
-	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK): value = irregs_getgs(self); break;
+	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getds(self);
+		break;
+
+	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getes(self);
+		break;
+
+	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getfs(self);
+		break;
+
+	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
+		value = irregs_getgs(self);
+		break;
 #endif /* !__x86_64__ */
 
 	default:
@@ -1349,9 +1945,18 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_irregs))(LIBCPUSTATE_IRREGS_STRUCT_TYPE
 
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK): irregs_setpc(self, value); break;
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): irregs_setcs(self, value); break;
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): irregs_setpflags(self, value); break;
+	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
+		irregs_setpc(self, value);
+		break;
+
+	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
+		irregs_setcs(self, value);
+		break;
+
+	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
+		irregs_setpflags(self, value);
+		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
 #ifdef __x86_64__
 		irregs_setuserpsp(self, value);
@@ -1366,23 +1971,28 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_irregs))(LIBCPUSTATE_IRREGS_STRUCT_TYPE
 		}
 #endif /* !__x86_64__ */
 		break;
+
 	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
 		if (!irregs_trysetss(self, value))
 			goto nope;
 		break;
+
 #ifndef __x86_64__
 	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
 		if (!irregs_trysetds(self, value))
 			goto nope;
 		break;
+
 	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
 		if (!irregs_trysetes(self, value))
 			goto nope;
 		break;
+
 	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
 		if (!irregs_trysetfs(self, value))
 			goto nope;
 		break;
+
 	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
 		if (!irregs_trysetgs(self, value))
 			goto nope;
@@ -1485,9 +2095,18 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_IND
 
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK): icpustate_setpc(self, value); break;
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): icpustate_setcs(self, value); break;
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): icpustate_setpflags(self, value); break;
+	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
+		icpustate_setpc(self, value);
+		break;
+
+	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
+		icpustate_setcs(self, value);
+		break;
+
+	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
+		icpustate_setpflags(self, value);
+		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
 #ifdef __x86_64__
 		icpustate64_setrsp(self, value);
@@ -1495,20 +2114,25 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_IND
 		*pself = icpustate_setsp_p(self, value);
 #endif /* !__x86_64__ */
 		break;
+
 	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
 		if (!icpustate_trysetss(self, value))
 			goto nope;
 		break;
+
 #ifndef __x86_64__
 	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
 		icpustate_setds(self, value);
 		break;
+
 	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
 		icpustate_setes(self, value);
 		break;
+
 	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
 		icpustate_setfs(self, value);
 		break;
+
 	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
 		if (!icpustate_trysetgs(self, value))
 			goto nope;
@@ -1621,9 +2245,18 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_IND
 
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK): scpustate_setpc(self, value); break;
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): scpustate_setcs(self, value); break;
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): scpustate_setpflags(self, value); break;
+	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
+		scpustate_setpc(self, value);
+		break;
+
+	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
+		scpustate_setcs(self, value);
+		break;
+
+	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
+		scpustate_setpflags(self, value);
+		break;
+
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
 #ifdef __x86_64__
 		scpustate64_setrsp(self, value);
@@ -1631,19 +2264,24 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_IND
 		*pself = scpustate_setsp_p(self, value);
 #endif /* !__x86_64__ */
 		break;
+
 	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
 		if (!scpustate_trysetss(self, value))
 			goto nope;
 		break;
+
 	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
 		scpustate_setds(self, value);
 		break;
+
 	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
 		scpustate_setes(self, value);
 		break;
+
 	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
 		scpustate_setfs(self, value);
 		break;
+
 	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
 		scpustate_setgs(self, value);
 		break;

@@ -25,6 +25,6 @@
 
 #include <libdisasm/api.h>
 
-#define CC         LIBDISASM_CC
+#define CC LIBDISASM_CC
 
 #endif /* !GUARD_LIBDISASM_API_H */

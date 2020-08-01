@@ -55,9 +55,9 @@
 #undef TRY
 #undef EXCEPT
 #undef RETHROW
-#define TRY         try
-#define EXCEPT      catch(...)
-#define RETHROW()   throw
+#define TRY       try
+#define EXCEPT    catch (...)
+#define RETHROW() throw
 
 DECL_BEGIN
 

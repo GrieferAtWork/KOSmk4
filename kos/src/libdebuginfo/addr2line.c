@@ -27,9 +27,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-#include "addr2line.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -47,6 +46,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/dwarf.h>
 #include <libdebuginfo/symtab.h>
 
+#include "addr2line.h"
 #include "debug_aranges.h"
 #include "debug_info.h"
 #include "debug_line.h"
@@ -806,9 +806,8 @@ NOTHROW_NCX(CC libdi_debug_dllocksections)(void *dl_handle,
 	memset(sections, 0, sizeof(*sections));
 	if unlikely(!dl_handle)
 		goto err_no_data;
-	dl_sections->dl_debug_line = library_locksection((library_handle_t)dl_handle,
-	                                                 secname_debug_line,
-	                                                 LIBRARY_LOCKSECTION_FNORMAL);
+#define LOCK_SECTION(name) library_locksection((library_handle_t)dl_handle, name, LIBRARY_LOCKSECTION_FNORMAL)
+	dl_sections->dl_debug_line = LOCK_SECTION(secname_debug_line);
 	if (!dl_sections->dl_debug_line) {
 		/* No debug information sections */
 		dl_sections->dl_debug_info = NULL;
@@ -820,22 +819,22 @@ set_no_extened_debug_info:
 		dl_sections->dl_debug_ranges  = NULL;
 	} else {
 		/* Load .debug_info and .dl_debug_abbrev */
-		dl_sections->dl_debug_info = library_locksection((library_handle_t)dl_handle, secname_debug_info, LIBRARY_LOCKSECTION_FNORMAL);
+		dl_sections->dl_debug_info = LOCK_SECTION(secname_debug_info);
 		if (!dl_sections->dl_debug_info)
 			goto set_no_extened_debug_info_2;
-		dl_sections->dl_debug_abbrev = library_locksection((library_handle_t)dl_handle, secname_debug_abbrev, LIBRARY_LOCKSECTION_FNORMAL);
+		dl_sections->dl_debug_abbrev = LOCK_SECTION(secname_debug_abbrev);
 		if (!dl_sections->dl_debug_abbrev) {
 			library_unlocksection(dl_sections->dl_debug_info);
 			goto set_no_extened_debug_info;
 		}
 		/* All all of the remaining debug information sections (which are optional, though) */
-		dl_sections->dl_debug_aranges = library_locksection((library_handle_t)dl_handle, secname_debug_aranges, LIBRARY_LOCKSECTION_FNORMAL);
-		dl_sections->dl_debug_str     = library_locksection((library_handle_t)dl_handle, secname_debug_str, LIBRARY_LOCKSECTION_FNORMAL);
-		dl_sections->dl_debug_ranges  = library_locksection((library_handle_t)dl_handle, secname_debug_ranges, LIBRARY_LOCKSECTION_FNORMAL);
+		dl_sections->dl_debug_aranges = LOCK_SECTION(secname_debug_aranges);
+		dl_sections->dl_debug_str     = LOCK_SECTION(secname_debug_str);
+		dl_sections->dl_debug_ranges  = LOCK_SECTION(secname_debug_ranges);
 	}
-	dl_sections->dl_symtab = library_locksection((library_handle_t)dl_handle, secname_symtab, LIBRARY_LOCKSECTION_FNORMAL);
+	dl_sections->dl_symtab = LOCK_SECTION(secname_symtab);
 	if (dl_sections->dl_symtab) {
-		dl_sections->dl_strtab = library_locksection((library_handle_t)dl_handle, secname_strtab, LIBRARY_LOCKSECTION_FNORMAL);
+		dl_sections->dl_strtab = LOCK_SECTION(secname_strtab);
 		if unlikely(!dl_sections->dl_strtab) {
 			library_unlocksection(dl_sections->dl_symtab);
 			goto try_load_dynsym;
@@ -843,9 +842,9 @@ set_no_extened_debug_info:
 	} else {
 		dl_sections->dl_strtab = NULL;
 try_load_dynsym:
-		dl_sections->dl_symtab = library_locksection((library_handle_t)dl_handle, secname_dynsym, LIBRARY_LOCKSECTION_FNORMAL);
+		dl_sections->dl_symtab = LOCK_SECTION(secname_dynsym);
 		if (dl_sections->dl_symtab) {
-			dl_sections->dl_strtab = library_locksection((library_handle_t)dl_handle, secname_dynstr, LIBRARY_LOCKSECTION_FNORMAL);
+			dl_sections->dl_strtab = LOCK_SECTION(secname_dynstr);
 			if unlikely(!dl_sections->dl_strtab) {
 				library_unlocksection(dl_sections->dl_symtab);
 				goto handle_missing_symbol_tables;
@@ -860,6 +859,7 @@ err_no_data:
 			}
 		}
 	}
+#undef LOCK_SECTION
 #ifdef __KERNEL__
 	/* Support for compressed sections. */
 #define LOAD_SECTION(sect, lv_start, lv_end)               \
@@ -938,7 +938,7 @@ NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict 
 		library_unlocksection(dl_sections->dl_debug_line);
 #ifndef NDEBUG
 	memset(dl_sections, 0xcc, sizeof(*dl_sections));
-#endif
+#endif /* !NDEBUG */
 }
 
 DEFINE_PUBLIC_ALIAS(debug_sections_addr2line, libdi_debug_sections_addr2line);

@@ -34,6 +34,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define __LIBEMU86_STATIC 1
 
 #include "x86.h"
+/**/
 
 #include <hybrid/compiler.h>
 

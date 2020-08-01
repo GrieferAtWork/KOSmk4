@@ -25,9 +25,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_LIBDEMANGLE_DEMANGLE_C
 #define GUARD_LIBDEMANGLE_DEMANGLE_C 1
 
-#include "demangle.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -36,6 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdemangle/api.h>
 #include <libdemangle/demangle.h>
 
+#include "demangle.h"
 #include "gcc.h"
 
 DECL_BEGIN

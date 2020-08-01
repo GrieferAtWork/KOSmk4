@@ -35,13 +35,13 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Return the name of a given constant, or NULL if the constant isn't recognized.
- *  - debug_repr_DW_TAG():   Returns the `*' portion for one of `DW_TAG_*' (i.e. excluding the `DW_TAG_' prefix)
- *  - debug_repr_DW_AT():    Returns the `*' portion for one of `DW_AT_*' (i.e. excluding the `DW_AT_' prefix)
- *  - debug_repr_DW_FORM():  Returns the `*' portion for one of `DW_FORM_*' (i.e. excluding the `DW_FORM_' prefix)
- *  - debug_repr_DW_ATE():   Returns the `*' portion for one of `DW_ATE_*' (i.e. excluding the `DW_ATE_' prefix)
- *  - debug_repr_DW_OP():    Returns the `*' portion for one of `DW_OP_*' (i.e. excluding the `DW_OP_' prefix)
- *  - debug_repr_DW_CFA():   Returns the `*' portion for one of `DW_CFA_*' (i.e. excluding the `DW_CFA_' prefix)
- *  - debug_repr_DW_EH_PE(): Returns the `*' portion for one of `DW_EH_PE_*' (i.e. excluding the `DW_EH_PE_' prefix)
+ *  - debug_repr_DW_TAG():   Returns the `*' portion for one of `DW_TAG_*' (iow. excluding the `DW_TAG_' prefix)
+ *  - debug_repr_DW_AT():    Returns the `*' portion for one of `DW_AT_*' (iow. excluding the `DW_AT_' prefix)
+ *  - debug_repr_DW_FORM():  Returns the `*' portion for one of `DW_FORM_*' (iow. excluding the `DW_FORM_' prefix)
+ *  - debug_repr_DW_ATE():   Returns the `*' portion for one of `DW_ATE_*' (iow. excluding the `DW_ATE_' prefix)
+ *  - debug_repr_DW_OP():    Returns the `*' portion for one of `DW_OP_*' (iow. excluding the `DW_OP_' prefix)
+ *  - debug_repr_DW_CFA():   Returns the `*' portion for one of `DW_CFA_*' (iow. excluding the `DW_CFA_' prefix)
+ *  - debug_repr_DW_EH_PE(): Returns the `*' portion for one of `DW_EH_PE_*' (iow. excluding the `DW_EH_PE_' prefix)
  */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_TAG)(dwarf_uleb128_t value);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_AT)(dwarf_uleb128_t value);

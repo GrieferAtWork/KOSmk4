@@ -25,26 +25,37 @@
 
 #include <libdebuginfo/api.h>
 
-#define CC           LIBDEBUGINFO_CC
+#define CC LIBDEBUGINFO_CC
+
 #ifdef __KERNEL__
 #include <kernel/compiler.h>
-#define TEXTSECTION          ATTR_COLDTEXT
-#define STRINGSECTION        ATTR_COLDRODATA
-#define REPR_TEXTSECTION     ATTR_COLDTEXT
-#define REPR_STRINGSECTION   ATTR_COLDRODATA
-#define PRINT_TEXTSECTION    ATTR_COLDTEXT
-#define PRINT_STRINGSECTION  ATTR_COLDRODATA
-#else
-#define TEXTSECTION          /*ATTR_SECTION(".text")*/   /* nothing */
-#define STRINGSECTION        /*ATTR_SECTION(".rodata")*/ /* nothing */
-#define REPR_TEXTSECTION     ATTR_SECTION(".text.repr")
-#define REPR_STRINGSECTION   ATTR_SECTION(".rodata.repr")
-#define PRINT_TEXTSECTION    ATTR_SECTION(".text.print")
-#define PRINT_STRINGSECTION  ATTR_SECTION(".rodata.print")
-#endif
+#define TEXTSECTION         ATTR_COLDTEXT
+#define STRINGSECTION       ATTR_COLDRODATA
+#define REPR_TEXTSECTION    ATTR_COLDTEXT
+#define REPR_RODATASECTION  ATTR_COLDRODATA
+#define REPR_STRINGSECTION  ATTR_COLDRODATA
+#define PRINT_TEXTSECTION   ATTR_COLDTEXT
+#define PRINT_STRINGSECTION ATTR_COLDRODATA
+#else /* __KERNEL__ */
+#define TEXTSECTION         /*ATTR_SECTION(".text")*/   /* nothing */
+#define STRINGSECTION       /*ATTR_SECTION(".rodata")*/ /* nothing */
+#define REPR_TEXTSECTION    ATTR_SECTION(".text.repr")
+#define REPR_RODATASECTION  ATTR_SECTION(".rodata.repr")
+#define REPR_STRINGSECTION  ATTR_SECTION(".rodata.repr")
+#define PRINT_TEXTSECTION   ATTR_SECTION(".text.print")
+#define PRINT_STRINGSECTION ATTR_SECTION(".rodata.print")
+#endif /* !__KERNEL__ */
 
-#define REPR_STRING(s)   XBLOCK({ PRIVATE REPR_STRINGSECTION char const _repr_str[] = s; XRETURN _repr_str; })
-#define PRINT_STRING(s)  XBLOCK({ PRIVATE PRINT_STRINGSECTION char const _repr_str[] = s; XRETURN _repr_str; })
+#define REPR_STRING(s)                                         \
+	XBLOCK({                                                   \
+		PRIVATE REPR_STRINGSECTION char const _repr_str[] = s; \
+		XRETURN _repr_str;                                     \
+	})
+#define PRINT_STRING(s)                                         \
+	XBLOCK({                                                    \
+		PRIVATE PRINT_STRINGSECTION char const _repr_str[] = s; \
+		XRETURN _repr_str;                                      \
+	})
 
 
 #if !defined(NDEBUG) && 1
@@ -59,31 +70,32 @@
 #define DOTRACE(...)      (syslog(LOG_DEBUG,"%s(%d) : %s : ",__FILE__,__LINE__,__FUNCTION__),syslog(LOG_DEBUG,__VA_ARGS__))
 #define ERROR(err)      do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__FUNCTION__,#err); goto err;}__WHILE0
 #define ERRORF(err,...) do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__FUNCTION__,#err); syslog(LOG_ERR,__VA_ARGS__); goto err;}__WHILE0
-#endif
+#endif /* ... */
 #define CASE(x)         __IF0{case x: TRACE("%s\n",#x);}
-#endif
+#endif /* !NDEBUG */
+
 #ifndef CASE
 #define CASE(x)         case x:
-#endif
+#endif /* !CASE */
 #ifndef ERROR
 #define ERROR(err)      goto err
-#endif
+#endif /* !ERROR */
 #ifndef ERRORF
 #define ERRORF(err,...) goto err
-#endif
+#endif /* !ERRORF */
 
 #ifdef DOTRACE
-#define TRACE  DOTRACE
-#else
-#define DOTRACE  TRACE
-#endif
+#define TRACE DOTRACE
+#else /* DOTRACE */
+#define DOTRACE TRACE
+#endif /* !DOTRACE */
 
 #if !defined(TRACE) || 0
 #undef TRACE
-#define TRACE(...)      (void)0
+#define TRACE(...) (void)0
 #undef CASE
-#define CASE(x)         case x:
-#endif
+#define CASE(x) case x:
+#endif /* !TRACE */
 
 
 #endif /* !GUARD_LIBDEBUGINFO_API_H */

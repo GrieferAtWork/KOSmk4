@@ -27,9 +27,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-#include "debug_aranges.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -40,6 +39,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/debug_aranges.h>
 #include <libdebuginfo/dwarf.h>
+
+#include "debug_aranges.h"
 
 DECL_BEGIN
 
@@ -114,24 +115,28 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start
 		while (reader < debug_aranges_end) {
 			uintptr_t start, length;
 			switch (addrsize) {
+
 			case 1:
 				start = *(uint8_t *)reader;
 				reader += 1;
 				length = *(uint8_t *)reader;
 				reader += 1;
 				break;
+
 			case 2:
 				start = UNALIGNED_GET16((uint16_t *)reader);
 				reader += 2;
 				length = UNALIGNED_GET16((uint16_t *)reader);
 				reader += 2;
 				break;
+
 			case 4:
 				start = UNALIGNED_GET32((uint32_t *)reader);
 				reader += 4;
 				length = UNALIGNED_GET32((uint32_t *)reader);
 				reader += 4;
 				break;
+
 #if __SIZEOF_POINTER__ > 4
 			case 8:
 				start = UNALIGNED_GET64((uint64_t *)reader);
@@ -140,6 +145,7 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start
 				reader += 8;
 				break;
 #endif /* __SIZEOF_POINTER__ > 4 */
+
 			default: __builtin_unreachable();
 			}
 			if (!start && !length)

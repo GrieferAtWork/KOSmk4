@@ -26,9 +26,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define GUARD_LIBDEMANGLE_GCC_C 1
 #define _KOS_SOURCE 1
 
-#include "gcc.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -39,6 +38,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdemangle/api.h>
 #include <libdemangle/gcc.h>
+
+#include "gcc.h"
 
 DECL_BEGIN
 

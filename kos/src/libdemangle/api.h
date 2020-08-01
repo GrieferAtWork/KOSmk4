@@ -25,12 +25,7 @@
 
 #include <libdemangle/api.h>
 
-#define CC         LIBDEMANGLE_CC
-#if defined(__i386__) && !defined(__x86_64__)
-#define FASTCALL   __FCALL
-#else
-#define FASTCALL   LIBDEMANGLE_CC
-#endif
+#define CC LIBDEMANGLE_CC
 
 #if !defined(NDEBUG) && 0
 #ifdef __KERNEL__
@@ -46,28 +41,29 @@
 #define ERRORF(err,...) do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__FUNCTION__,#err); syslog(LOG_ERR,__VA_ARGS__); goto err;}__WHILE0
 #endif
 #define CASE(x)         __IF0{case x: TRACE("%s\n",#x);}
-#endif
+#endif /* !NDEBUG */
+
 #ifndef CASE
-#define CASE(x)         case x:
-#endif
+#define CASE(x) case x:
+#endif /* !CASE */
 #ifndef ERROR
-#define ERROR(err)      goto err
-#endif
+#define ERROR(err) goto err
+#endif /* !ERROR */
 #ifndef ERRORF
-#define ERRORF(err,...) goto err
-#endif
+#define ERRORF(err, ...) goto err
+#endif /* !ERRORF */
 
 #ifdef DOTRACE
-#define TRACE  DOTRACE
-#else
-#define DOTRACE  TRACE
-#endif
+#define TRACE DOTRACE
+#else /* DOTRACE */
+#define DOTRACE TRACE
+#endif /* !DOTRACE */
 
 #if !defined(TRACE) || 1
 #undef TRACE
-#define TRACE(...)      (void)0
+#define TRACE(...) (void)0
 #undef CASE
-#define CASE(x)         case x:
-#endif
+#define CASE(x) case x:
+#endif /* !TRACE */
 
 #endif /* !GUARD_LIBDEMANGLE_API_H */

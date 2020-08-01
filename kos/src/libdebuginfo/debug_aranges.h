@@ -21,6 +21,7 @@
 #define GUARD_LIBDEBUGINFO_DEBUG_ARANGES_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 

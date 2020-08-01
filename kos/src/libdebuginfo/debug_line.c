@@ -27,9 +27,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-#include "debug_line.h"
-
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -43,6 +42,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
+
+#include "debug_line.h"
 
 DECL_BEGIN
 
@@ -145,10 +146,14 @@ do_next_chunk:
 		if unlikely(!result->dlu_max_ops_per_insn)
 			result->dlu_max_ops_per_insn = 1;
 	}
-	result->dlu_default_isstmt = *(uint8_t *)reader, reader += 1;
-	result->dlu_line_base      = *(int8_t *)reader, reader += 1;
-	result->dlu_line_range     = *(uint8_t *)reader, reader += 1;
-	result->dlu_opcode_base    = *(uint8_t *)reader, reader += 1;
+	result->dlu_default_isstmt = *(uint8_t *)reader;
+	reader += 1;
+	result->dlu_line_base = *(int8_t *)reader;
+	reader += 1;
+	result->dlu_line_range = *(uint8_t *)reader;
+	reader += 1;
+	result->dlu_opcode_base = *(uint8_t *)reader;
+	reader += 1;
 	result->dlu_opcode_lengths = reader;
 	if unlikely(!result->dlu_line_range)
 		result->dlu_line_range = 1;
@@ -232,10 +237,14 @@ NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict s
 				temp *= self->dlu_min_insn_length;
 				state.address += temp;
 			} else {
-				state.address += ((state.op_index + temp) / self->dlu_max_ops_per_insn) * self->dlu_min_insn_length;
-				state.op_index = (state.op_index + temp) % self->dlu_max_ops_per_insn;
+				state.address += ((state.op_index + temp) /
+				                  self->dlu_max_ops_per_insn) *
+				                 self->dlu_min_insn_length;
+				state.op_index = (state.op_index + temp) %
+				                 self->dlu_max_ops_per_insn;
 			}
-			state.line += (intptr_t)(opcode % self->dlu_line_range) + self->dlu_line_base;
+			state.line += (intptr_t)(opcode % self->dlu_line_range) +
+			              self->dlu_line_base;
 #define TEST_MATCH()                                           \
 			{                                                  \
 				if (old_state.address <= module_relative_pc && \
@@ -359,8 +368,11 @@ found_state:
 					temp *= self->dlu_min_insn_length;
 					state.address += temp;
 				} else {
-					state.address += ((state.op_index + temp) / self->dlu_max_ops_per_insn) * self->dlu_min_insn_length;
-					state.op_index = (state.op_index + temp) % self->dlu_max_ops_per_insn;
+					state.address += ((state.op_index + temp) /
+					                  self->dlu_max_ops_per_insn) *
+					                 self->dlu_min_insn_length;
+					state.op_index = (state.op_index + temp) %
+					                 self->dlu_max_ops_per_insn;
 				}
 			}	break;
 

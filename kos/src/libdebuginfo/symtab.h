@@ -21,6 +21,7 @@
 #define GUARD_LIBDEBUGINFO_SYMTAB_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 

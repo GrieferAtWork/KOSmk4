@@ -21,6 +21,7 @@
 #define GUARD_LIBCMDLINE_ENCODE_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 

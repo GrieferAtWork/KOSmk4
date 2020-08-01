@@ -136,14 +136,14 @@
 #include <kos/types.h>
 #include <libdl/api.h>
 
-#define CC   LIBDL_CC
-#define VCC  LIBDL_VCC
+#define CC  LIBDL_CC
+#define VCC LIBDL_VCC
 
 #ifndef FCALL
 #define FCALL __FCALL
 #endif /* FCALL */
 #ifndef WEAK
-#define WEAK      /* nothing */
+#define WEAK /* nothing */
 #endif /* !WEAK */
 #define REF       /* nothing */
 #define REF_IF(x) /* nothing */

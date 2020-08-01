@@ -24,6 +24,7 @@
 #define _KOS_SOURCE 1
 
 #include "x86.h"
+/**/
 
 #include <hybrid/compiler.h>
 

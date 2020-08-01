@@ -65,7 +65,7 @@ struct scpustate;
  *       getreg_*: The contents of `buf' are undefined.
  *       setreg_*: The register was not written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
- * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
+ * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>)
  * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
 typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PGETREG_GPREGS)(struct gpregs const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
 typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_GPREGS)(struct gpregs *__restrict __self, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
