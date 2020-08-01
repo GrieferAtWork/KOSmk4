@@ -164,7 +164,7 @@ BEGIN
 	}
 
 	final local KERNEL_EXPORTS_SOURCE = "/" + config.BUILD_PATH + "/kernel-symtab.S";
-	BEGIN GROUP("kernel") { LINK, MCOPY, ELF_DIHACK,
+	BEGIN GROUP("kernel") { DILINK, MCOPY,
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
 				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
@@ -257,7 +257,19 @@ BEGIN
 			}),
 		};
 
-		options[OPT_ELF_DIHACK_PHYS2VIRT] = TARGET.KERNEL_CORE_BASE;
+		/* Bindings for compressed debug section data, and where to map them. */
+		options[DILINK_PHYS2VIRT] = TARGET.KERNEL_CORE_BASE;
+		options[DILINK_START]     = "__kernel_debug_start";
+		options[DILINK_SIZE]      = "__kernel_debug_size";
+		options[DILINK_BINDINGS]  = {
+			(".debug_line",    "__kernel_debug_line_start",    "__kernel_debug_line_size"),
+			(".debug_info",    "__kernel_debug_info_start",    "__kernel_debug_info_size"),
+			(".debug_aranges", "__kernel_debug_aranges_start", "__kernel_debug_aranges_size"),
+			(".debug_abbrev",  "__kernel_debug_abbrev_start",  "__kernel_debug_abbrev_size"),
+			(".debug_str",     "__kernel_debug_str_start",     "__kernel_debug_str_size"),
+			(".debug_ranges",  "__kernel_debug_ranges_start",  "__kernel_debug_ranges_size"),
+			(".debug_loc",     "__kernel_debug_loc_start",     "__kernel_debug_loc_size"),
+		};
 
 		LINKER_SCRIPT("arch/" + XARCH + "/_kernel.ld")
 		SET_OUTPUT("/os/kernel.bin")

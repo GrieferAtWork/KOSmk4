@@ -122,6 +122,7 @@ SECTIONS {
 		*(.text.x86.asm32_syscall_sysrun32.*)
 #endif /* __x86_64__ */
 		*(.text.x86.*)
+//		*(.text.local.*)
 		*(.text.cold .text.unlikely .text.cold.*)
 	}
 
@@ -175,9 +176,9 @@ SECTIONS {
 		DEFINE_CALLBACK_VECTOR(pervm_onexec, .rodata.callback.pervm.onexec)
 		DEFINE_CALLBACK_VECTOR(validatable_heaps, .rodata.heaps.validatable)
 
-		*(.rodata.cold .rodata.unlikely .rodata.cold.*)
+		*(.rodata.local.* .rodata.cold .rodata.unlikely .rodata.cold.*)
 	}
-#undef DEFINE_CALLBACK_VECTOR
+
 	PROVIDE_HIDDEN(__kernel_sect_rodata_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_rodata_start)));
 
 	IP_ALIGN(__SIZEOF_POINTER__);
@@ -196,42 +197,6 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_eh_frame_size = ABSOLUTE(ABSOLUTE(__kernel_eh_frame_end) - ABSOLUTE(__kernel_eh_frame_start)));
 	}
 	PROVIDE_HIDDEN(__kernel_sect_eh_frame_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_eh_frame_start)));
-
-#define DEFINE_DEBUG_SECTION(section_name, alignment, name, sections)                      \
-	PROVIDE_HIDDEN(name##_start = ABSOLUTE(ALIGN(alignment)));                             \
-	. = ABSOLUTE(0);                                                                       \
-	section_name 0 : AT(name##_start - KERNEL_CORE_BASE) {                                 \
-		KEEP(sections)                                                                     \
-		PROVIDE_HIDDEN(name##_size = ABSOLUTE(.));                                         \
-	}                                                                                      \
-	PROVIDE_HIDDEN(name##_end = ABSOLUTE(ABSOLUTE(name##_start) + ABSOLUTE(name##_size))); \
-	. += ABSOLUTE(name##_start);
-	/* TODO: Even though these sections do contain compressed debug information, the amount
-	 *       of memory within the kernel address space that LD reserves for these data blobs
-	 *       is the decompressed section size. As such, this way of integrating debug info
-	 *       still wastes a ton of runtime memory! */
-	DEFINE_DEBUG_SECTION(.debug_line, 1, __kernel_debug_line, *(.debug_line))
-	DEFINE_DEBUG_SECTION(.debug_info, 1, __kernel_debug_info, *(.debug_info))
-	DEFINE_DEBUG_SECTION(.debug_aranges, 8, __kernel_debug_aranges, *(.debug_aranges))
-	DEFINE_DEBUG_SECTION(.debug_abbrev, 1, __kernel_debug_abbrev, *(.debug_abbrev))
-	DEFINE_DEBUG_SECTION(.debug_str, 1, __kernel_debug_str, *(.debug_str))
-	DEFINE_DEBUG_SECTION(.debug_ranges, 8, __kernel_debug_ranges, *(.debug_ranges))
-	DEFINE_DEBUG_SECTION(.debug_loc, 1, __kernel_debug_loc, *(.debug_loc))
-#undef DEFINE_DEBUG_SECTION
-
-#define DEFINE_DEBUG_SECTION_WRAPPER(name)                                         \
-	PROVIDE_HIDDEN(__wrapper_##name##_start = ABSOLUTE(.));                        \
-	. = ABSOLUTE(0);                                                               \
-	.name.wrapper 0 : AT(__wrapper_##name##_start - KERNEL_CORE_BASE) { BYTE(0); } \
-	. += ABSOLUTE(__wrapper_##name##_start);
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_line)
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_info)
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_aranges)
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_abbrev)
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_str)
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_ranges)
-	DEFINE_DEBUG_SECTION_WRAPPER(debug_loc)
-#undef DEFINE_DEBUG_SECTION_WRAPPER
 
 	PEROBJECT_SECTION(.pertask, __kernel_pertask, {
 		KEEP(*(.data.pertask.head))
@@ -257,6 +222,28 @@ SECTIONS {
 /*		PROVIDE_HIDDEN(__x86_cpu_part3_pages = ABSOLUTE(1)); */
 	})
 #endif /* !CONFIG_NO_SMP */
+
+	/* Kernel debug data.
+	 * NOTE: This VM area is automatically managed by the `DILINK' link-driver,
+	 *       such that at runtime it will contain the compressed versions of all
+	 *       of the .debug_* sections. */
+	PROVIDE_HIDDEN(__kernel_debug_start = ABSOLUTE(.));
+	PROVIDE_HIDDEN(__kernel_debug_size = ABSOLUTE(1));
+	. = ABSOLUTE(0);
+	.kdebug 0 : AT(__kernel_debug_start - KERNEL_CORE_BASE) {
+		. = ABSOLUTE(__kernel_debug_size);
+	}
+	. = ABSOLUTE(__kernel_debug_start + __kernel_debug_size);
+
+	/* Also define end-symbols for linked debug sections. */
+	PROVIDE_HIDDEN(__kernel_debug_line_end = ABSOLUTE(__kernel_debug_line_start + __kernel_debug_line_size));
+	PROVIDE_HIDDEN(__kernel_debug_info_end = ABSOLUTE(__kernel_debug_info_start + __kernel_debug_info_size));
+	PROVIDE_HIDDEN(__kernel_debug_aranges_end = ABSOLUTE(__kernel_debug_aranges_start + __kernel_debug_aranges_size));
+	PROVIDE_HIDDEN(__kernel_debug_abbrev_end = ABSOLUTE(__kernel_debug_abbrev_start + __kernel_debug_abbrev_size));
+	PROVIDE_HIDDEN(__kernel_debug_str_end = ABSOLUTE(__kernel_debug_str_start + __kernel_debug_str_size));
+	PROVIDE_HIDDEN(__kernel_debug_ranges_end = ABSOLUTE(__kernel_debug_ranges_start + __kernel_debug_ranges_size));
+	PROVIDE_HIDDEN(__kernel_debug_loc_end = ABSOLUTE(__kernel_debug_loc_start + __kernel_debug_loc_size));
+
 
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_rodata_end = ABSOLUTE(.));
@@ -633,6 +620,15 @@ SECTIONS {
 #include "idt/idt.ld"
 #endif /* !CONFIG_NO_SMP */
 #endif /* !CONFIG_NO_DEBUGGER */
+
+	/* Allocate debug sections alongside each other. */
+	.debug_line 0 : { *(.debug_line) }
+	.debug_info 0 : { *(.debug_info) }
+	.debug_aranges 0 : { *(.debug_aranges) }
+	.debug_abbrev 0 : { *(.debug_abbrev) }
+	.debug_str 0 : { *(.debug_str) }
+	.debug_ranges 0 : { *(.debug_ranges) }
+	.debug_loc 0 : { *(.debug_loc) }
 
 	/DISCARD/ : {
 		*(.rel*)

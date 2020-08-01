@@ -313,7 +313,7 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 					);
 				}
 			}());
-		} catch (...) {
+		} @[interrupt] catch (...) {
 			try readelf.terminate(); catch (...);
 			throw;
 		}

@@ -450,7 +450,7 @@ final local function COMPILE_tostr(self: BoundStep): string {
 
 
 global PREPROCESS;
-final local function LINK_split(self: BoundStep): {BoundStep...} {
+final global function LINK_split(self: BoundStep): {BoundStep...} {
 	local script = self.group.options.get(OPT_LINK_SCRIPT);
 	if (script !is none) {
 		/* Generate the linker script in its own step */
@@ -467,7 +467,7 @@ final local function LINK_split(self: BoundStep): {BoundStep...} {
 	}
 	yield self;
 }
-final local function LINK_enumerate_objects(self: BoundStep): {string...} {
+final global function LINK_enumerate_objects(self: BoundStep): {string...} {
 	local config = self.toolchain.config;
 	local group = self.group;
 	local options = group.options;
@@ -475,7 +475,7 @@ final local function LINK_enumerate_objects(self: BoundStep): {string...} {
 		yield config.getObjectFilename(group, f);
 	yield group.fixFilenames(options.get(OPT_LINK_OBJECTS))...;
 }
-final local function LINK_run(self: BoundStep): string {
+final global function LINK_run(self: BoundStep): string {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -495,7 +495,7 @@ final local function LINK_run(self: BoundStep): string {
 		noStdLib: options.get(OPT_LINK_NOSTDLIB, false),
 	);
 }
-final local function LINK_getRequiredFiles(self: BoundStep): string {
+final global function LINK_getRequiredFiles(self: BoundStep): string {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -515,7 +515,7 @@ final local function LINK_getRequiredFiles(self: BoundStep): string {
 		noStdLib:  options.get(OPT_LINK_NOSTDLIB, false),
 	)...;
 }
-final local function LINK_getProducedFiles(self: BoundStep): string {
+final global function LINK_getProducedFiles(self: BoundStep): string {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_LINK_OUTPUT]);
 }

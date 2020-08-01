@@ -1,0 +1,342 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __WINDOWS__
+#define HOST_EXE(x)  x ".exe"
+#else
+#define HOST_EXE(x)  x
+#endif
+
+/* Build steps designed specifically for working with ELF files */
+import fs;
+import ipc;
+import * from deemon;
+import * from errors;
+import * from ..libmagic;
+import * from .c;
+
+#include "../../../include/elf.h"
+
+@@Physical-to-virtual memory offset
+global final DILINK_PHYS2VIRT = "DILINK.phys2virt";
+
+@@Name of the symbol that describes where debug information should start
+global final DILINK_START = "DILINK.start";
+
+@@Name of the symbol that should be defined by @DILINK to
+@@hold the total size needed to hold debug section data.
+global final DILINK_SIZE = "DILINK.size";
+
+@@List of (sectionName, sectionStartSymbol, sectionSizeSymbol)
+global final DILINK_BINDINGS = "DILINK.bindings";
+
+@@Determine the index of the program header who's starting
+@@physical address is equal to VADDR(symbolName) - offset
+function findProgramHeaderIndexWithPhysAddressEqualToSymbolPlusOffset(
+		elfBinaryFilename: string, symbolName: string, offset: int): int {
+	throw Error("TODO");
+}
+
+final local function DILINK_run(self: BoundStep): string {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local options = group.options;
+	@@Bindings for @(section_name, start_symbol, size_symbol)
+	local bindings: {(string, string, string)...} = options.get(DILINK_BINDINGS, ());
+	if (!bindings)
+		return LINK_run(self);
+	local script = options.get(OPT_LINK_SCRIPT);
+	if (script is none)
+		throw Error("DILINK with custom bindings, but no linker script!");
+	local th = Thread([]{
+		@@Our current guess on section offsets and sizes
+		local guessedSectionOffsetsAndSizes: {string: (int, int)} = Dict();
+		@@This is a cache file containing the last-correct sizes of sections in the
+		@@form of 1 entry per line, written as "<section_name>\t<section_offset>\t<section_size>\n"
+		local savedDebugSectionSizeCacheFilename = config.getBuildArtifact(group, script, ".di_sectsiz");
+		/* Guess generic values for all sections that we know nothing about */
+		for (local sectionName, none, none: bindings)
+			guessedSectionOffsetsAndSizes[sectionName] = (0, 0);
+		try {
+			with (local fp = File.open(savedDebugSectionSizeCacheFilename, "r")) {
+				for (local l: fp) {
+					local a, b, c = l.rstrip().split("\t")...;
+					if (a in guessedSectionOffsetsAndSizes)
+						guessedSectionOffsetsAndSizes[a] = (int(b), int(c));
+				}
+			}
+		} catch (e...) {
+			print repr e;
+		}
+		local linkOutput = options[OPT_LINK_OUTPUT];
+		local linkAttemptOutput = config.getBuildArtifact(group, linkOutput, ".di_attempt");
+		local diLinkStartSymbol = options[DILINK_START];
+		local diLinkSizeSymbol  = options[DILINK_SIZE];
+		local opt_objFiles     = Tuple(LINK_enumerate_objects(self));
+		local opt_language     = options.get(OPT_COMPILE_LANGUAGE);
+		local opt_linkerScript = config.getPreprocessedFilename(group, group.fixFilename(script));
+		local opt_libPath      = group.fixFilenames(options.get(OPT_LINK_LIBPATH));
+		local opt_libraries    = options.get(OPT_LINK_LIBRARIES);
+		local opt_noStdLib     = options.get(OPT_LINK_NOSTDLIB, false);
+		local guessedSectionOffsetsWereIncorrect = false;
+		for (;;) {
+			/* Do the link */
+link_again_with_new_guesses:
+			print "DILINK Sections:", repr guessedSectionOffsetsAndSizes;
+			local opt_ldFlags = List(options.get(OPT_LINK_LDFLAGS));
+			local totalDebugSize = 1;
+			for (local sectionName, startSymbolName, sizeSymbolName: bindings) {
+				local offsetAndSize = guessedSectionOffsetsAndSizes[sectionName];
+				opt_ldFlags.append("--defsym={}={}+{}".format({ /* Start */
+					startSymbolName, diLinkStartSymbol, offsetAndSize[0].hex() }));
+				opt_ldFlags.append("--defsym={}={}".format({    /* Size */
+					sizeSymbolName, offsetAndSize[1].hex() }));
+				offsetAndSize = offsetAndSize[0] + offsetAndSize[1];
+				if (totalDebugSize < offsetAndSize)
+					totalDebugSize = offsetAndSize;
+			}
+			/* Total size (== offset+size of the greatest section) */
+			opt_ldFlags.append("--defsym={}={}".format({ diLinkSizeSymbol, totalDebugSize }));
+			toolchain.createLinkerProcess(
+				step:         self,
+				exeFile:      linkAttemptOutput,
+				objFiles:     opt_objFiles,
+				ldFlags:      opt_ldFlags,
+				language:     opt_language,
+				linkerScript: opt_linkerScript,
+				libPath:      opt_libPath,
+				libraries:    opt_libraries,
+				noStdLib:     opt_noStdLib,
+			).waitfor();
+			/* Check if our guesses were correct:
+			 * >> ELF_DATA                = READ_ELF_DATA(linkAttemptOutput);
+			 * >> DATA_FOR_DEBUG_SECTIONS = ELF_DATA.SECTIONS(bindings.each[0]...);
+			 * >> diSectionsFileOffset    = DATA_FOR_DEBUG_SECTIONS.EACH.FILE_OFFSET < ...;
+			 * >> for (name: guessedSectionOffsetsAndSizes.keys) {
+			 * >>     local correctOffset = ELF_DATA.SECTION[name].FILE_OFFSET - diSectionsFileOffset;
+			 * >>     local correctSize   = ELF_DATA.SECTION[name].FILE_SIZE;
+			 * >>     assert guessedSectionOffsetsAndSizes[name][0] == correctOffset;
+			 * >>     assert guessedSectionOffsetsAndSizes[name][1] == correctSize;
+			 * >> }
+			 */
+			@@The index of the program header that should be modified.
+			@@Set to @none if unknown, and @false if ambiguous
+			local programHeaderIndexToModify: int = none;
+			@@The correct section offsets and sizes
+			local correctSectionOffsetsAndSizes: {string: (int, int)} = Dict();
+			{
+				local readelfExe = HOST_EXE(config.CROSS_PREFIX + "readelf");
+				local readelf = ipc.Process(readelfExe, { "-lSW", linkAttemptOutput });
+				local r, w = ipc.Pipe.new()...;
+				r = File.Buffer(r, "ro,c,none"); /* line-buffered */
+				readelf.stdout = w;
+				readelf.start();
+				w.close();
+				try {
+					for (;;) {
+						local l = r.readline();
+						if (!l)
+							break;
+						l = l.strip();
+						if (l.startswith("Section Headers:")) {
+							/* Load section header info */
+							r.readline(); /* Info-header (ignore) */
+							for (;;) {
+								/* [37] .shstrtab STRTAB 0000000000000000 a11922 000222 00 0 0 1 */
+								l = r.readline().strip();
+								local name, offset, size;
+								try {
+									none, name, none, none, offset, size = l
+										.scanf("[%[^\\]]] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ]")...;
+									name   = name.strip();
+									offset = int(offset.strip(), 16);
+									size   = int(size.strip(), 16);
+								} catch (...) {
+									break;
+								}
+								/* Check if we care about this section. */
+								if (name !in guessedSectionOffsetsAndSizes)
+									continue;
+								correctSectionOffsetsAndSizes[name] = (offset, size);
+							}
+						} else if (l.startswith("Program Headers:")) {
+							r.readline(); /* Info-header (ignore) */
+							local phdrIndex = 0;
+							for (;;) {
+								/* LOAD 0x001000 0xffffffff80100000 0x0000000000100000 0x3419ac 0x3419ac RWE 0x1000 */
+								l = r.readline().strip();
+								local p_memsz, p_filesz, p_vaddr;
+								try {
+									none, none, p_vaddr, none, p_filesz, p_memsz = l
+										.scanf("%[^ ] %[^ ] %[^ ] %[^ ] %[^ ] %[^ ]")...;
+									p_vaddr  = int(p_vaddr.strip().lower().lsstrip("0x"), 16);
+									p_filesz = int(p_filesz.strip().lower().lsstrip("0x"), 16);
+									p_memsz  = int(p_memsz.strip().lower().lsstrip("0x"), 16);
+								} catch (e...) {
+									break;
+								}
+								if (p_vaddr == 0 && p_memsz == totalDebugSize && p_filesz == 0) {
+									/* This is probably the one! */
+									if (programHeaderIndexToModify is none)
+										programHeaderIndexToModify = phdrIndex;
+									else {
+										/* Ambiguity! */
+										programHeaderIndexToModify = false;
+									}
+								}
+								++phdrIndex;
+							}
+						}
+					}
+				} @[interrupt] catch (...) {
+					try readelf.terminate(); catch (...);
+					throw;
+				}
+				r.close();
+				joinProcess(readelf);
+			}
+			local diSectionsFileOffset =
+				correctSectionOffsetsAndSizes.values.each[0] < ...;
+			/* Adjust the minimum file offsets to be relative to one-another */
+			for (local name: correctSectionOffsetsAndSizes.keys) {
+				local data = correctSectionOffsetsAndSizes[name];
+				data = (data[0] - diSectionsFileOffset, data[1]);
+				correctSectionOffsetsAndSizes[name] = data;
+			}
+			/* Check if we've guessed correctly! */
+			for (local name: guessedSectionOffsetsAndSizes.keys) {
+				if (name !in correctSectionOffsetsAndSizes)
+					throw Error("Section {!r} not present in final link ({!r})"
+						.format({ name, correctSectionOffsetsAndSizes }));
+			}
+			for (local name, data: guessedSectionOffsetsAndSizes) {
+				if (data != correctSectionOffsetsAndSizes[name]) {
+					/* Wrong guess */
+					guessedSectionOffsetsAndSizes = correctSectionOffsetsAndSizes;
+					guessedSectionOffsetsWereIncorrect = true;
+					goto link_again_with_new_guesses;
+				}
+			}
+			/* If the offsets were correct, then find the ELF program header
+			 * responsible for loading debug data from the ELF file.
+			 * This header can be identified as:
+			 *   - p_memsz  == totalDebugSize
+			 *   - p_filesz == 0
+			 *   - p_vaddr  == 0
+			 * And if these checks result in multiple matches, we also know
+			 * that `KERNEL_CORE_BASE + p_paddr == ADDROF(diLinkStartSymbol)'
+			 *
+			 * Once that program header is found, modify it such that:
+			 * >> phdr.p_offset = diSectionsFileOffset;
+			 * >> phdr.p_filesz = totalDebugSize;
+			 */
+			if (programHeaderIndexToModify !is int) {
+				/* Program header index was ambiguous. - Determine it the hard way! */
+				programHeaderIndexToModify =
+					findProgramHeaderIndexWithPhysAddressEqualToSymbolPlusOffset(
+						linkAttemptOutput, diLinkStartSymbol,
+						options.get(DILINK_PHYS2VIRT, 0));
+			}
+			/* Manually edit the ELF binary. */
+			with (local fp = File.open(linkAttemptOutput, "r+")) {
+				local e_ident = fp.read(EI_NIDENT);
+				local endian = e_ident[EI_DATA] == ELFDATA2LSB ? "little" : "big";
+				if (e_ident[EI_CLASS] == ELFCLASS32) {
+					fp.seek(__OFFSET_ELF32_EHDR_PHOFF);
+					local e_phoff = int.frombytes(fp.read(4), endian, false);
+					local phdrOffset = e_phoff + programHeaderIndexToModify * __SIZEOF_ELF32_PHDR;
+					fp.seek(phdrOffset + __OFFSET_ELF32_PHDR_OFFSET);
+					fp.write(diSectionsFileOffset.tobytes(4, endian, false));
+					fp.seek(phdrOffset + __OFFSET_ELF32_PHDR_FILESZ);
+					fp.write(totalDebugSize.tobytes(4, endian, false));
+				} else if (e_ident[EI_CLASS] == ELFCLASS64) {
+					fp.seek(__OFFSET_ELF64_EHDR_PHOFF);
+					local e_phoff = int.frombytes(fp.read(8), endian, false);
+					local phdrOffset = e_phoff + programHeaderIndexToModify * __SIZEOF_ELF64_PHDR;
+					fp.seek(phdrOffset + __OFFSET_ELF64_PHDR_OFFSET);
+					fp.write(diSectionsFileOffset.tobytes(8, endian, false));
+					fp.seek(phdrOffset + __OFFSET_ELF64_PHDR_FILESZ);
+					fp.write(totalDebugSize.tobytes(8, endian, false));
+				} else {
+					throw Error("Uncorected ELF class: {} in {!r}"
+						.format({ e_ident[EI_CLASS].hex(), linkAttemptOutput }));
+				}
+			}
+			break;
+		}
+		if (guessedSectionOffsetsWereIncorrect) {
+			/* Remember our last-guessed section sizes */
+			with (local fp = File.open(savedDebugSectionSizeCacheFilename, "w")) {
+				for (local sectionName, offsetAndSize: guessedSectionOffsetsAndSizes)
+					fp << sectionName << "\t"
+						<< offsetAndSize[0] << "\t"
+						<< offsetAndSize[1] << "\n";
+			}
+		}
+		/* Once we were successful, use the latest link attempt as the actual output */
+		local realLinkOutput = group.fixFilename(linkOutput);
+		try {
+			fs.unlink(realLinkOutput);
+		} catch (...) {
+		}
+		fs.rename(linkAttemptOutput, realLinkOutput);
+	});
+	th.start();
+	return { WaitableJoin(th) };
+}
+
+
+final local function DILINK_tostr(self: BoundStep): string {
+	local group = self.group;
+	return "di-Link {!r}".format({ group.fixFilename(group.options[OPT_LINK_OUTPUT]) });
+}
+
+@@DILINK
+@@Same as @(LINK from .c), but make .debug_* sections available by linking
+@@with special options to guess the final size of debug sections, and re-trying
+@@if the guess was incorrect, whilst repeating this until we've guessed correctly.
+@@For this purpose, this step must be used with @OPT_LINK_SCRIPT to assign the
+@@needed static virtual buffer area.
+global DILINK: Step = Step(
+	name: "DILINK",
+	options: {
+		DILINK_BINDINGS,
+		OPT_COMPILE_SOURCES,
+		OPT_LINK_OBJECTS,
+		OPT_LINK_LDFLAGS,
+		OPT_LINK_SCRIPT,
+		OPT_LINK_OUTPUT,
+		OPT_LINK_LIBPATH,
+		OPT_LINK_LIBRARIES,
+		OPT_LINK_NOSTDLIB,
+		/* Only for `OPT_LINK_SCRIPT' */
+		OPT_COMPILE_PPFLAGS,
+		OPT_COMPILE_LANGUAGE,
+		OPT_COMPILE_INCPATH,
+		OPT_COMPILE_MACROS
+	},
+	split: LINK_split,
+	run: DILINK_run,
+	getRequiredFiles: LINK_getRequiredFiles,
+	getProducedFiles: LINK_getProducedFiles,
+	tostr: DILINK_tostr,
+);
+
+

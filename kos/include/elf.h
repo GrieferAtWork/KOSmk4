@@ -24,11 +24,11 @@
 #include "__stdinc.h"
 #ifdef __KOS_SYSTEM_HEADERS__
 #include "features.h"
-#include "hybrid/typecore.h"
 #endif /* __KOS_SYSTEM_HEADERS__ */
 
 #ifdef __CC__
 #ifdef __KOS_SYSTEM_HEADERS__
+#include "hybrid/typecore.h"
 #include <bits/elf-types.h>
 #ifdef __USE_GLIBC
 #include <stdint.h>

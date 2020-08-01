@@ -640,6 +640,7 @@
 #endif /* !... */
 #endif /* !__COMPILER_REDIRECT */
 
+#ifdef __CC__
 #if defined(__SIZE_TYPE__) && defined(__UINTPTR_TYPE__)
 #define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
 #define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
@@ -652,6 +653,7 @@
 #define __COMPILER_OFFSETAFTER(s, m)               ((__SIZE_TYPE__)(&((s *)0)->m + 1))
 #define __COMPILER_CONTAINER_OF(ptr, type, member) ((type *)((__UINTPTR_TYPE__)(ptr) - __builtin_offsetof(type, member)))
 #endif /* !... */
+#endif /* __CC__ */
 
 
 #endif /* !___STDINC_H */
