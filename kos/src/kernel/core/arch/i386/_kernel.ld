@@ -108,7 +108,11 @@ SECTIONS {
 		*(.text.x86.syscall32.*) /* C-level implementations of system calls (for compatibility mode). */
 #endif /* __x86_64__ */
 		*(.text.x86.cisr.*)
-		*(.text.x86.asmisr.*)
+		/* Must be KEEP, or else these get deleted by --gc-sections, since
+		 * they're only referenced by this linker script, and not by actual
+		 * kernel code (we use the linker script to pre-calculate the values
+		 * to-be written to the IDT vector) */
+		KEEP(*(.text.x86.asmirq.*))
 #ifdef __x86_64__
 		*(.text.x86.asm64_syscall.*)
 #endif /* __x86_64__ */
