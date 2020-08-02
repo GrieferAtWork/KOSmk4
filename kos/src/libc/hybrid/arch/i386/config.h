@@ -112,6 +112,20 @@
 #define LIBC_ARCH_HAVE_C32SNLEN 1
 #define LIBC_ARCH_HAVE_C32SNEND 1
 
+/* Misc string/memory functions */
+#define LIBC_ARCH_HAVE_RAWMEMCHR  1
+#define LIBC_ARCH_HAVE_RAWMEMCHRW 1
+#define LIBC_ARCH_HAVE_RAWMEMCHRL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_RAWMEMCHRQ 1
+#endif /* __x86_64__ */
+#define LIBC_ARCH_HAVE_RAWMEMRCHR  1
+#define LIBC_ARCH_HAVE_RAWMEMRCHRW 1
+#define LIBC_ARCH_HAVE_RAWMEMRCHRL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_RAWMEMRCHRQ 1
+#endif /* __x86_64__ */
+
 /* abort() */
 #define LIBC_ARCH_HAVE_ABORT 1
 

@@ -21,7 +21,9 @@
 #define GUARD_LIBC_HYBRID_ARCH_I386_STRING64_S 1
 #define __ASSEMBLER__ 1
 
-#if 1
+#include <hybrid/compiler.h>
+
+#ifndef __INTELLISENSE__
 #define N 1
 #define RETURN_PCPY 1
 #include "string64-template.S"
@@ -47,6 +49,7 @@
 #define N 8
 #define RETURN_PCPY 0
 #include "string64-template.S"
+#endif /* !__INTELLISENSE__ */
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp)
@@ -62,7 +65,5 @@ DEFINE_PUBLIC_ALIAS(wmemset, libc_memsetl)
 DEFINE_PUBLIC_ALIAS(wmempcpy, libc_mempcpyl)
 DEFINE_PUBLIC_ALIAS(wmempset, libc_mempsetl)
 #endif /* !__KERNEL__ */
-
-#endif
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_STRING64_S */

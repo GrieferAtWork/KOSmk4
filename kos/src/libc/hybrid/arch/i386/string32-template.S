@@ -548,58 +548,9 @@ END(F(libc_bzero))
 DEFINE_PUBLIC_ALIAS(F(bzero), F(libc_bzero))
 
 
-
-
-/********************************************************************************/
-/* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
-/********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_memcmp))
-	.cfi_startproc
-	pushl_cfi_r %edi
-	pushl_cfi_r %esi
-	BEGIN_CLD
-	/* Compare DS:ESI (lhs) with ES:EDI (rhs) */
-	movl   12(%esp), %esi /* lhs */
-	movl   16(%esp), %edi /* rhs */
-	movl   20(%esp), %ecx /* count */
-	xorl   %eax, %eax     /* result = 0; // HINT: This also forces %eflags to an equal-state to
-	                       *             //       handle %ecx==0 (where cmps won't update %eflags) */
-	repe   I(cmps)        /* Do the actual compare */
-	/* jb -> return -1; */
-	/* ja -> return 1; */
-	/* je -> return 0; */
-	seta   %al            /* result = (result & 0xffffff00) | ((lhs > rhs) ? 1 : 0); */
-	movl   $(-1), %ecx
-	cmovb  %ecx, %eax     /* if (lhs < rhs) result = -1; */
-	END_CLD
-	popl_cfi_r %esi
-	popl_cfi_r %edi
-	RET(12)
-	.cfi_endproc
-END(F(libc_memcmp))
-DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
-
-/* TODO: memchr[b|w|l]()      (scas) */
-/* TODO: memrchr[b|w|l]()     (scas) */
-/* TODO: memxchr[b|w|l]()     (scas) */
-/* TODO: memrxchr[b|w|l]()    (scas) */
-/* TODO: memend[b|w|l]()      (scas) */
-/* TODO: memrend[b|w|l]()     (scas) */
-/* TODO: memxend[b|w|l]()     (scas) */
-/* TODO: memrxend[b|w|l]()    (scas) */
-/* TODO: memlen[b|w|l]()      (scas) */
-/* TODO: memrlen[b|w|l]()     (scas) */
-/* TODO: memxlen[b|w|l]()     (scas) */
-/* TODO: memrxlen[b|w|l]()    (scas) */
-/* TODO: rawmemchr[b|w|l]()   (scas) */
-/* TODO: rawmemrchr[b|w|l]()  (scas) */
-/* TODO: rawmemxchr[b|w|l]()  (scas) */
-/* TODO: rawmemrxchr[b|w|l]() (scas) */
-/* TODO: rawmemlen[b|w|l]()   (scas) */
-/* TODO: rawmemrlen[b|w|l]()  (scas) */
-/* TODO: rawmemxlen[b|w|l]()  (scas) */
-/* TODO: rawmemrxlen[b|w|l]() (scas) */
+#ifndef __INTELLISENSE__
+#include "string-template.S"
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -727,6 +678,7 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend), F_STRING(nend))
 #endif /* !RETURN_PCPY */
 
 
+#ifndef __INTELLISENSE__
 #undef IF_PCPY
 #undef NIF_PCPY
 #undef IFELSE_PCPY
@@ -739,4 +691,5 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend), F_STRING(nend))
 #undef BEGIN_STD
 #undef END_STD
 #undef RET
+#endif /* !__INTELLISENSE__ */
 

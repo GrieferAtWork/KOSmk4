@@ -18,8 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#define N           1
-#define RETURN_PCPY 0
+#define N             1
+#define RETURN_PCPY   0
 #define __ASSEMBLER__ 1
 #endif /* __INTELLISENSE__ */
 
@@ -537,56 +537,9 @@ END(F(libc_bzero))
 DEFINE_PUBLIC_ALIAS(F(bzero), F(libc_bzero))
 
 
-
-
-
-/********************************************************************************/
-/* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
-/********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_memcmp))
-	.cfi_startproc
-	BEGIN_CLD
-	/* lhs:       %rdi
-	 * rhs:       %rsi
-	 * num_Tword: %rdx */
-	movq   %rdx, %rcx /* count */
-	/* Compare DS:ESI (lhs) with ES:EDI (rhs) */
-	xorq   %rax, %rax /* result = 0; // HINT: This also forces %eflags into a je=1 state to
-	                   *             //       handle %ecx==0 (where cmps won't update %eflags) */
-	repe   I(cmps)    /* Do the actual compare */
-	/* jb -> return -1; */
-	/* ja -> return 1; */
-	/* je -> return 0; */
-	seta   %al         /* result = (result & 0xffffffffffffff00) | ((lhs > rhs) ? 1 : 0); */
-	movq   $(-1), %rcx
-	cmovb  %rcx, %rax  /* if (lhs < rhs) result = -1; */
-	END_CLD
-	ret
-	.cfi_endproc
-END(F(libc_memcmp))
-DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
-
-/* TODO: memchr[b|w|l]()      (scas) */
-/* TODO: memrchr[b|w|l]()     (scas) */
-/* TODO: memxchr[b|w|l]()     (scas) */
-/* TODO: memrxchr[b|w|l]()    (scas) */
-/* TODO: memend[b|w|l]()      (scas) */
-/* TODO: memrend[b|w|l]()     (scas) */
-/* TODO: memxend[b|w|l]()     (scas) */
-/* TODO: memrxend[b|w|l]()    (scas) */
-/* TODO: memlen[b|w|l]()      (scas) */
-/* TODO: memrlen[b|w|l]()     (scas) */
-/* TODO: memxlen[b|w|l]()     (scas) */
-/* TODO: memrxlen[b|w|l]()    (scas) */
-/* TODO: rawmemchr[b|w|l]()   (scas) */
-/* TODO: rawmemrchr[b|w|l]()  (scas) */
-/* TODO: rawmemxchr[b|w|l]()  (scas) */
-/* TODO: rawmemrxchr[b|w|l]() (scas) */
-/* TODO: rawmemlen[b|w|l]()   (scas) */
-/* TODO: rawmemrlen[b|w|l]()  (scas) */
-/* TODO: rawmemxlen[b|w|l]()  (scas) */
-/* TODO: rawmemrxlen[b|w|l]() (scas) */
+#ifndef __INTELLISENSE__
+#include "string-template.S"
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -645,7 +598,7 @@ INTERN_FUNCTION(F_STRING(len))
 	xorl   %eax, %eax
 	repne  I(scas)
 	subq   %rcx, %rax /* result = 0 - RCX; */
-	subq   $(2), %rax   /* result = (0 - RCX) - 2; */
+	subq   $(2), %rax /* result = (0 - RCX) - 2; */
 #if N == 2
 	popq_cfi_r %rdi
 #endif /* N == 2 */
@@ -739,6 +692,7 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend), F_STRING(nend))
 
 #endif /* !RETURN_PCPY */
 
+#ifndef __INTELLISENSE__
 #undef IF_PCPY
 #undef NIF_PCPY
 #undef IFELSE_PCPY
@@ -750,4 +704,5 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend), F_STRING(nend))
 #undef END_CLD
 #undef BEGIN_STD
 #undef END_STD
+#endif /* !__INTELLISENSE__ */
 
