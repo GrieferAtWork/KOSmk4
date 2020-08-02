@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c340b33 */
+/* HASH CRC-32:0x6ab3b9af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_rawmemxlenq_defined
 #define __local_rawmemxlenq_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: rawmemxchrq from string */
 #ifndef __local___localdep_rawmemxchrq_defined

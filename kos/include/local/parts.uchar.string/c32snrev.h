@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x318297df */
+/* HASH CRC-32:0xf148888 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32snlen_defined
 #define __local___localdep_c32snlen_defined 1
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnlen)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -49,6 +55,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrev_defined
 #define __local___localdep_memrev_defined 1
 #ifdef __CRT_HAVE_memrev
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* __CRT_HAVE_memrev */
 __NAMESPACE_LOCAL_END
@@ -61,6 +70,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrevl_defined
 #define __local___localdep_memrevl_defined 1
 #ifdef __CRT_HAVE_memrevl
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
 #else /* __CRT_HAVE_memrevl */
 __NAMESPACE_LOCAL_END
@@ -73,6 +85,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrevw_defined
 #define __local___localdep_memrevw_defined 1
 #ifdef __CRT_HAVE_memrevw
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
 #else /* __CRT_HAVE_memrevw */
 __NAMESPACE_LOCAL_END

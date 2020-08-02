@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82930a89 */
+/* HASH CRC-32:0x212e7276 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strerror_defined
 #define __local_strerror_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
@@ -59,9 +60,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strerror_s_defined
 #define __local___localdep_strerror_s_defined 1
 #ifdef __CRT_HAVE_strerror_s
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(__errno_t __errnum),strerror_s,(__errnum))
 #else /* __CRT_HAVE_strerror_s */
 __NAMESPACE_LOCAL_END
@@ -74,8 +72,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strncpy_defined
 #define __local___localdep_strncpy_defined 1
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,{ return __builtin_strncpy(__buf, __src, __buflen); })
 #elif defined(__CRT_HAVE_strncpy)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -93,9 +97,10 @@ __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(int __errnum) {
-	char *__result = __NAMESPACE_LOCAL_SYM __strerror_buf;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
+	char *__result;
 	char const *__string;
+	__result = __NAMESPACE_LOCAL_SYM __strerror_buf;
 	__string = __localdep_strerror_s(__errnum);
 	if (__string) {
 		/* Copy the descriptor text. */

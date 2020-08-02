@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde6841bf */
+/* HASH CRC-32:0xf590817b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
@@ -59,6 +62,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcslen_defined
 #define __local___localdep_wcslen_defined 1
 #ifdef __CRT_HAVE_wcslen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
 #else /* __CRT_HAVE_wcslen */
@@ -69,6 +75,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
 #endif /* !__CRT_HAVE_wcslen */
 #endif /* !__local___localdep_wcslen_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsdup))(__WCHAR_TYPE__ const *__restrict __string) {
 	__SIZE_TYPE__ __resultsize = (__localdep_wcslen(__string) + 1) * sizeof(__WCHAR_TYPE__);

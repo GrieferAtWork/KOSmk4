@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd579996e */
+/* HASH CRC-32:0xb4645f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strncoll_l_defined
 #define __local_strncoll_l_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strncoll from string */
 #ifndef __local___localdep_strncoll_defined

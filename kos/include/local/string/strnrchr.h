@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd398109 */
+/* HASH CRC-32:0xa68ba0c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strnrchr_defined
 #define __local_strnrchr_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `strrchr', but don't exceed `MAX_CHARS' characters. */
 __LOCAL_LIBC(strnrchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *

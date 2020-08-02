@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e6378e */
+/* HASH CRC-32:0x798cfd8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -621,12 +621,12 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strxfrm, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t __NOTHROW_NCX(__LIBCCALL strxfrm)(char *__dst, char const *__restrict __src, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm))(__dst, __src, __maxlen); })
 #endif /* !__CRT_HAVE_strxfrm */
 #ifdef __CRT_HAVE_strerror
-__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror,(int __errnum),(__errnum))
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror,(__errno_t __errnum),(__errnum))
 #else /* __CRT_HAVE_strerror */
 __NAMESPACE_STD_END
 #include <local/string/strerror.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror)(int __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))(__errnum); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))(__errnum); })
 #endif /* !__CRT_HAVE_strerror */
 #if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 extern "C++" {
@@ -1209,19 +1209,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifdef __USE_XOPEN2K
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_strerror_r
-__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),(__errnum,__buf,__buflen))
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen),(__errnum,__buf,__buflen))
 #elif defined(__CRT_HAVE___strerror_r)
-__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__strerror_r,(__errnum,__buf,__buflen))
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen),__strerror_r,(__errnum,__buf,__buflen))
 #else /* ... */
 #include <local/string/strerror_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL strerror_r)(int __errnum, char *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_r))(__errnum, __buf, __buflen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL strerror_r)(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_r))(__errnum, __buf, __buflen); })
 #endif /* !... */
 #else /* __USE_GNU */
 #ifdef __CRT_HAVE___xpg_strerror_r
-__CREDIRECT(__ATTR_COLD __ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__xpg_strerror_r,(__errnum,__buf,__buflen))
+__CREDIRECT(__ATTR_COLD __ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,strerror_r,(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen),__xpg_strerror_r,(__errnum,__buf,__buflen))
 #else /* __CRT_HAVE___xpg_strerror_r */
 #include <local/string/__xpg_strerror_r.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_NONNULL((2)) __errno_t __NOTHROW_NCX(__LIBCCALL strerror_r)(int __errnum, char *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errnum, __buf, __buflen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_NONNULL((2)) __errno_t __NOTHROW_NCX(__LIBCCALL strerror_r)(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errnum, __buf, __buflen); }
 #endif /* !__CRT_HAVE___xpg_strerror_r */
 #endif /* !__USE_GNU */
 #endif /* __USE_XOPEN2K */
@@ -4951,17 +4951,21 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmoveupc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmoveupc)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #endif /* !... */
 #if defined(__fast_mempmoveupc_defined) && defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CEIDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #elif defined(__fast_mempmoveupc_defined)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveupc)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
 #elif defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__dst,__src,__elem_count,__elem_size))
 #else /* ... */
 #include <local/string/mempmoveupc.h>
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveupc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveupc)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #endif /* !... */
 #if defined(__fast_memmovedownc_defined) && defined(__CRT_HAVE_memmovedownc)
@@ -5297,19 +5301,23 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec))(__dst, __src, __elem_count, __elem_size); }
 #endif /* !... */
 #if defined(__fast_mempmoveupc_defined) && defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmoveupc,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #elif defined(__fast_mempmoveupc_defined)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
 #elif defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* ... */
 } /* extern "C++" */
 #include <local/string/mempmoveupc.h>
 extern "C++" {
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
 #endif /* !... */
 #if defined(__fast_mempmovedownc_defined) && defined(__CRT_HAVE_mempmovedownc)
@@ -5950,16 +5958,16 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerror_s,(__errn
 __NAMESPACE_LOCAL_USING_OR_IMPL(strerror_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerror_s)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_s))(__errnum); })
 #endif /* !__CRT_HAVE_strerror_s */
 #ifdef __CRT_HAVE_strerrorname_s
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrorname_s,(int __errnum),(__errnum))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrorname_s,(__errno_t __errnum),(__errnum))
 #else /* __CRT_HAVE_strerrorname_s */
 #include <local/string/strerrorname_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerrorname_s)(int __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrorname_s))(__errnum); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerrorname_s)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrorname_s))(__errnum); })
 #endif /* !__CRT_HAVE_strerrorname_s */
 #ifdef __CRT_HAVE_strsignal_s
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsignal_s,(int __signum),(__signum))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsignal_s,(__signo_t __signum),(__signum))
 #else /* __CRT_HAVE_strsignal_s */
 #include <local/string/strsignal_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strsignal_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strsignal_s)(int __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal_s))(__signum); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strsignal_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strsignal_s)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal_s))(__signum); })
 #endif /* !__CRT_HAVE_strsignal_s */
 #ifdef __CRT_HAVE_vstrdupf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
@@ -6480,9 +6488,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnlen_defined
 #define __local___localdep_strnlen_defined 1
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__string, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,(__string,__maxlen))
 #else /* ... */
@@ -7704,6 +7718,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
 #ifdef __CRT_HAVE_wcsnlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(wchar_t const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #else /* __CRT_HAVE_wcsnlen */

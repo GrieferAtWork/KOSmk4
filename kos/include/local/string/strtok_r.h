@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba603551 */
+/* HASH CRC-32:0x1a7476b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,8 +40,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strspn_defined
 #define __local___localdep_strspn_defined 1
 #if __has_builtin(__builtin_strspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strspn)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strspn,(char const *__haystack, char const *__accept),strspn,{ return __builtin_strspn(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strspn)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strspn,(char const *__haystack, char const *__accept),strspn,(__haystack,__accept))
 #else /* ... */
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3c8561c */
+/* HASH CRC-32:0xb6022edb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_memsetw_defined
 #define __local_memsetw_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given word */
 __LOCAL_LIBC(memsetw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *

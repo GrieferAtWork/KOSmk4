@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53a4021f */
+/* HASH CRC-32:0xe63a6b3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_memccpy_defined
 #define __local_memccpy_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memccpy) __ATTR_LEAF __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memccpy))(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes) {

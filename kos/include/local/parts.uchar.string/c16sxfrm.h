@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x346fa22c */
+/* HASH CRC-32:0x44132d26 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16sxfrm_defined
 #define __local_c16sxfrm_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16snlen from parts.uchar.string */
 #ifndef __local___localdep_c16snlen_defined

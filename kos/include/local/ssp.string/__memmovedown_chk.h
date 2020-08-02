@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf7d2e0e */
+/* HASH CRC-32:0xbd341b6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmovedown_defined
 #define __local___localdep_memmovedown_defined 1
 #ifdef __CRT_HAVE_memmovedown
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_memmove)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5620b20d */
+/* HASH CRC-32:0xc53b203e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strnstr_defined
 #define __local_strnstr_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'

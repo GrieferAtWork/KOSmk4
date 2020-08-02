@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddec124c */
+/* HASH CRC-32:0xebab8438 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mempcpyc_defined
 #define __local_mempcpyc_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined

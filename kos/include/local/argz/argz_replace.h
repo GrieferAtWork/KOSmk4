@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9acc0db */
+/* HASH CRC-32:0xb37b5c84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmem_defined
 #define __local___localdep_memmem_defined 1
 #if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
@@ -37,6 +40,9 @@ __NAMESPACE_LOCAL_BEGIN
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__localdep_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
 #elif defined(__CRT_HAVE_memmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
@@ -63,6 +69,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
 #ifdef __CRT_HAVE_memmovedownc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
@@ -79,6 +88,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmoveupc_defined
 #define __local___localdep_memmoveupc_defined 1
 #ifdef __CRT_HAVE_memmoveupc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
@@ -95,6 +107,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
@@ -118,6 +133,9 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* __CRT_HAVE_strlen */

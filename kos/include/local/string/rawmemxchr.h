@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd37ad1e1 */
+/* HASH CRC-32:0xf95135ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_rawmemxchr_defined
 #define __local_rawmemxchr_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `rawmemchr', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemxchr) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *

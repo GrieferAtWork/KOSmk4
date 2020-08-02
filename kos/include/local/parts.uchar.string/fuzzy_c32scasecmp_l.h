@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e106f34 */
+/* HASH CRC-32:0xada0134e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <parts/malloca.h>
 #if (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fuzzy_wmemcasecmp_l) || !defined(__NO_MALLOCA)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32slen from parts.uchar.string */
 #ifndef __local___localdep_c32slen_defined

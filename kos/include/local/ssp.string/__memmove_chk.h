@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8d5ea98 */
+/* HASH CRC-32:0x7f6b6145 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmove_defined
 #define __local___localdep_memmove_defined 1
 #ifdef __CRT_HAVE_memmove
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))

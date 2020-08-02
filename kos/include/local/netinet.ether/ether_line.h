@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75ebe4ac */
+/* HASH CRC-32:0xd9d5460f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,9 +54,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */

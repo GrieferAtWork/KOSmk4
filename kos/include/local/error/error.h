@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a6c7e42 */
+/* HASH CRC-32:0xd57dfc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strerror_defined
 #define __local___localdep_strerror_defined 1
 #ifdef __CRT_HAVE_strerror
-__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(__errno_t __errnum),strerror,(__errnum))
 #else /* __CRT_HAVE_strerror */
 __NAMESPACE_LOCAL_END
 #include <local/string/strerror.h>

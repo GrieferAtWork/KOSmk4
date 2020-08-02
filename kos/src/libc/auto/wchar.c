@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5de2a83 */
+/* HASH CRC-32:0x6d52c9b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -791,6 +791,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsspn)(char32_t const *haystack,
 		++iter;
 	return (size_t)(iter - haystack);
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
                                    char16_t const *reject) {
@@ -799,6 +800,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
 		++iter;
 	return (size_t)(iter - haystack);
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack,
                                    char32_t const *reject) {
@@ -1387,6 +1389,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlen)(char32_t const *__restrict string,
 	return (size_t)(libc_wcsnend(string, maxlen) - string);
 }
 #endif /* !LIBC_ARCH_HAVE_C32SNLEN */
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string) {
 	size_t resultsize = (libd_wcslen(string) + 1) * sizeof(char16_t);
@@ -1395,6 +1398,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string) {
 		libc_memcpy(result, string, resultsize);
 	return result;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsdup)(char32_t const *__restrict string) {
 	size_t resultsize = (libc_wcslen(string) + 1) * sizeof(char32_t);
@@ -2409,6 +2413,7 @@ NOTHROW_NCX(LIBKCALL libc_wcssep)(char32_t **__restrict stringp,
 	*stringp = iter;
 	return result;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict string) {
 	size_t i, count = libd_wcslen(string);
@@ -2423,6 +2428,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict string) {
 	}
 	return string;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsfry)(char32_t *__restrict string) {
 	size_t i, count = libc_wcslen(string);

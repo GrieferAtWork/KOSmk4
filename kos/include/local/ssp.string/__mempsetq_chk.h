@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2e9432e */
+/* HASH CRC-32:0xe036bb32 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempsetq_defined
 #define __local___localdep_mempsetq_defined 1
 #ifdef __CRT_HAVE_mempsetq
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
 #else /* __CRT_HAVE_mempsetq */

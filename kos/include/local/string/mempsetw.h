@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6b8e7ad */
+/* HASH CRC-32:0xc466f7c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mempsetw_defined
 #define __local_mempsetw_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memsetw from string */
 #ifndef __local___localdep_memsetw_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6a3bd3d */
+/* HASH CRC-32:0xebe8d9b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempmove_defined
 #define __local___localdep_mempmove_defined 1
 #ifdef __CRT_HAVE_mempmove
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_mempmove */

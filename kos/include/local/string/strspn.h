@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6df57c64 */
+/* HASH CRC-32:0x6acacd96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strspn_defined
 #define __local_strspn_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strchr from string */
 #ifndef __local___localdep_strchr_defined

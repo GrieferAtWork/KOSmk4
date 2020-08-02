@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb7082c4 */
+/* HASH CRC-32:0xc24f9a00 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mempmovedownw_defined
 #define __local_mempmovedownw_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedownw from string */
 #ifndef __local___localdep_memmovedownw_defined

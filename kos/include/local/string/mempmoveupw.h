@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61395471 */
+/* HASH CRC-32:0x55c2b20 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mempmoveupw_defined
 #define __local_mempmoveupw_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveupw from string */
 #ifndef __local___localdep_memmoveupw_defined

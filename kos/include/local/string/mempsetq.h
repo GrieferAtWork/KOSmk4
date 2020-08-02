@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfedc319a */
+/* HASH CRC-32:0x6fb01f2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mempsetq_defined
 #define __local_mempsetq_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memsetq from string */
 #ifndef __local___localdep_memsetq_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x426a2b45 */
+/* HASH CRC-32:0xe3041c79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,6 +237,7 @@ NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCAT */
 #ifndef LIBC_ARCH_HAVE_STRCSPN
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
                                    char const *reject) {
@@ -303,9 +304,10 @@ __LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
-NOTHROW_NCX(LIBDCALL libd_strerror)(int errnum) {
-	char *result = __NAMESPACE_LOCAL_SYM strerror_buf;
+NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
+	char *result;
 	char const *string;
+	result = __NAMESPACE_LOCAL_SYM strerror_buf;
 	string = libc_strerror_s(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
@@ -323,9 +325,10 @@ __LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_strerror)(int errnum) {
-	char *result = __NAMESPACE_LOCAL_SYM strerror_buf;
+NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
+	char *result;
 	char const *string;
+	result = __NAMESPACE_LOCAL_SYM strerror_buf;
 	string = libc_strerror_s(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
@@ -436,6 +439,7 @@ NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict string,
 	}
 	return result;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string) {
 	size_t resultsize = (libc_strlen(string) + 1) * sizeof(char);
@@ -656,6 +660,7 @@ NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPCPY */
 #ifndef __KERNEL__
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string) {
 	size_t i, count = libc_strlen(string);
@@ -701,7 +706,7 @@ __LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
-NOTHROW_NCX(LIBDCALL libd_strerror_r)(int errnum,
+NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
                                       char *buf,
                                       size_t buflen) {
 	char const *string;
@@ -741,7 +746,7 @@ __LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
-NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum,
+NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum,
                                       char *buf,
                                       size_t buflen) {
 	char const *string;
@@ -775,7 +780,7 @@ again_unknown:
 }
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD NONNULL((2)) errno_t
-NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(int errnum,
+NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(errno_t errnum,
                                             char *buf,
                                             size_t buflen) {
 	size_t msg_len;
@@ -1862,6 +1867,7 @@ NOTHROW_NCX(LIBCCALL libc_memrxchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRXCHR */
 #ifndef LIBC_ARCH_HAVE_RAWMEMXCHR
+#include <hybrid/typecore.h>
 /* Same as `rawmemchr', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchr)(void const *__restrict haystack,
@@ -2481,7 +2487,8 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return libc_memmoveup(dst, src, elem_count * elem_size);
 }
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst,
                                        void const *src,
@@ -2727,6 +2734,7 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWN */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRCHR
+#include <hybrid/typecore.h>
 /* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchr)(void const *__restrict haystack,

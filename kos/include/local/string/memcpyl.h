@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ac4ead7 */
+/* HASH CRC-32:0xd1147cbb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_memcpyl_defined
 #define __local_memcpyl_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks. */
 __LOCAL_LIBC(memcpyl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *

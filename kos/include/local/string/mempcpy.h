@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0c62ecf */
+/* HASH CRC-32:0xecbe4bda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mempcpy_defined
 #define __local_mempcpy_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __LOCAL_LIBC(mempcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *

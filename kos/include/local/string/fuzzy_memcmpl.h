@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5a18a0 */
+/* HASH CRC-32:0x84ac77bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <parts/malloca.h>
 #ifndef __NO_MALLOCA
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined

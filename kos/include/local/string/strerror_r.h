@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28d31c78 */
+/* HASH CRC-32:0x4f2909f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,15 @@
 #ifndef __local_strerror_r_defined
 #define __local_strerror_r_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
@@ -68,9 +72,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strerror_s_defined
 #define __local___localdep_strerror_s_defined 1
 #ifdef __CRT_HAVE_strerror_s
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(__errno_t __errnum),strerror_s,(__errnum))
 #else /* __CRT_HAVE_strerror_s */
 __NAMESPACE_LOCAL_END
@@ -83,6 +84,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* __CRT_HAVE_strlen */
@@ -103,7 +107,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror_r) __ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_r))(int __errnum, char *__buf, __SIZE_TYPE__ __buflen) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_r))(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) {
 	char const *__string;
 	__string = __localdep_strerror_s(__errnum);
 	if (!__buf || !__buflen) {

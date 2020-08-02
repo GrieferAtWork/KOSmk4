@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x332024ea */
+/* HASH CRC-32:0xe2c5a277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* __CRT_HAVE_strlen */
@@ -50,6 +53,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strfry) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strfry))(char *__restrict __string) {
 	__SIZE_TYPE__ __i, __count = __localdep_strlen(__string);

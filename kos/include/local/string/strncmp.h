@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe27fa4 */
+/* HASH CRC-32:0xddacb337 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strncmp_defined
 #define __local_strncmp_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __LOCAL_LIBC(strncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int

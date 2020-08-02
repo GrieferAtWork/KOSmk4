@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4045059a */
+/* HASH CRC-32:0xf89c04ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <parts/malloca.h>
 #if defined(__CRT_HAVE_fuzzy_memcasecmp) || !defined(__NO_MALLOCA)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fuzzy_memcasecmp from string */
 #ifndef __local___localdep_fuzzy_memcasecmp_defined

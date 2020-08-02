@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c4b8255 */
+/* HASH CRC-32:0xaed38742 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,9 +90,11 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #define __libc_core_c32snend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32snend))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+#include <hybrid/typecore.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16slen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif defined(__CRT_HAVE_DOS$wcslen)
+#include <hybrid/typecore.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16slen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif __SIZEOF_WCHAR_T__ == 2
@@ -105,9 +107,11 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #define __libc_core_c16slen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16slen))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+#include <hybrid/typecore.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif defined(__CRT_HAVE_KOS$wcslen)
+#include <hybrid/typecore.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -120,9 +124,11 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #define __libc_core_c32slen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32slen))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+#include <hybrid/typecore.h>
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16snlen,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnlen)
+#include <hybrid/typecore.h>
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c16snlen,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
@@ -135,9 +141,11 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #define __libc_core_c16snlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16snlen))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+#include <hybrid/typecore.h>
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32snlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnlen)
+#include <hybrid/typecore.h>
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_c32snlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -180,9 +188,11 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 #define __libc_core_c32scmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32scmp))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+#include <hybrid/typecore.h>
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16sncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsncmp)
+#include <hybrid/typecore.h>
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c16sncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
@@ -195,9 +205,11 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 #define __libc_core_c16sncmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sncmp))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+#include <hybrid/typecore.h>
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32sncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsncmp)
+#include <hybrid/typecore.h>
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_c32sncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4

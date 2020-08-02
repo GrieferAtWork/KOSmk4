@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc34bfde6 */
+/* HASH CRC-32:0xe4a7d406 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -538,10 +538,12 @@
 #define __libc_memmoveupc __libc_core_memmoveupc
 #endif /* !__fast_memmoveupc_defined */
 #ifdef __fast_mempmoveupc_defined
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmoveupc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))
 #else /* __fast_mempmoveupc_defined */
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmoveupc __libc_core_mempmoveupc
 #endif /* !__fast_mempmoveupc_defined */
 #ifdef __fast_memmovedownc_defined

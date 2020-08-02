@@ -169,9 +169,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno") strerror_offset_t const strerror_offse
 
 
 
-/*[[[head:libc_strerrorname_s,hash:CRC-32=0xa1482a43]]]*/
+/*[[[head:libc_strerrorname_s,hash:CRC-32=0xfe8886ba]]]*/
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum)
+NOTHROW(LIBCCALL libc_strerrorname_s)(errno_t errnum)
 /*[[[body:libc_strerrorname_s]]]*/
 {
 	char const *result;
@@ -183,9 +183,9 @@ NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum)
 }
 /*[[[end:libc_strerrorname_s]]]*/
 
-/*[[[head:libd_strerrorname_s,hash:CRC-32=0x687b914f]]]*/
+/*[[[head:libd_strerrorname_s,hash:CRC-32=0x6b8637d7]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum)
+NOTHROW(LIBDCALL libd_strerrorname_s)(errno_t errnum)
 /*[[[body:libd_strerrorname_s]]]*/
 {
 	/* Special handling for a hand full of errno
@@ -251,9 +251,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno") strsignal_offset_t const strsignal_off
 };
 
 
-/*[[[head:libc_strsignal_s,hash:CRC-32=0x4ff1fbbd]]]*/
+/*[[[head:libc_strsignal_s,hash:CRC-32=0x889d7ce2]]]*/
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strsignal_s)(int signum)
+NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum)
 /*[[[body:libc_strsignal_s]]]*/
 {
 	char const *result;
@@ -276,9 +276,9 @@ libc_signo_dos2kos(int dos_signo) {
 }
 
 
-/*[[[head:libd_strsignal_s,hash:CRC-32=0x7752dcc0]]]*/
+/*[[[head:libd_strsignal_s,hash:CRC-32=0x81e20372]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strsignal_s)(int signum)
+NOTHROW(LIBDCALL libd_strsignal_s)(signo_t signum)
 /*[[[body:libd_strsignal_s]]]*/
 {
 	signum = libc_signo_dos2kos(signum);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b7edeb5 */
+/* HASH CRC-32:0x279823cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3008,6 +3008,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
 #ifdef __CRT_HAVE_wcsnlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(wchar_t const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #else /* __CRT_HAVE_wcsnlen */

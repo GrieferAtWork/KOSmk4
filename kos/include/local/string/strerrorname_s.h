@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd24d365 */
+/* HASH CRC-32:0x5478af07 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,11 @@
 #ifndef __local_strerrorname_s_defined
 #define __local_strerrorname_s_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerrorname_s) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(int __errnum) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(__errno_t __errnum) {
 	char const *__result;
 	switch (__errnum) {
 

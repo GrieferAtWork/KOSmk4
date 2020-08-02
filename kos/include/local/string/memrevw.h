@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ff32265 */
+/* HASH CRC-32:0xa25612b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_memrevw_defined
 #define __local_memrevw_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memrevw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrevw))(void *__restrict __base, __SIZE_TYPE__ __n_words) {

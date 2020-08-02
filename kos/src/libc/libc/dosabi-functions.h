@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36acc31a */
+/* HASH CRC-32:0x28ce0020 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1626,7 +1626,7 @@ DFUN(".text.crt.dos.string.memory", libd_strfry, libc_strfry, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_memfrob, libc_memfrob, TP, 2, TP, TI)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strcasecmp_l, libc_strcasecmp_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strncasecmp_l, libc_strncasecmp_l, TD, 4, TP, TP, TI, TP)
-DFUN(".text.crt.dos.errno", libd___xpg_strerror_r, libc___xpg_strerror_r, TIn(__SIZEOF_ERRNO_T__), 3, TD, TP, TI)
+DFUN(".text.crt.dos.errno", libd___xpg_strerror_r, libc___xpg_strerror_r, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_ERRNO_T__), TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strsep, libc_strsep, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_bcopy, libc_bcopy, TV, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_bzero, libc_bzero, TV, 2, TP, TI)

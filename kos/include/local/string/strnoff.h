@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac8b49f0 */
+/* HASH CRC-32:0xdd9a6fd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strnoff_defined
 #define __local_strnoff_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strnchrnul from string */
 #ifndef __local___localdep_strnchrnul_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ac6f3b9 */
+/* HASH CRC-32:0x553bf065 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_bzeroq_defined
 #define __local_bzeroq_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: bzerol from string */
 #ifndef __local___localdep_bzerol_defined

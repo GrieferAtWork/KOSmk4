@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69a3b887 */
+/* HASH CRC-32:0x66ae8bd4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcschr __LIBC_LOCAL_NAME(wcschr)
 #endif /* !__CRT_HAVE_wcschr */
 #endif /* !__local___localdep_wcschr_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcscspn) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscspn))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject) {
 	__WCHAR_TYPE__ const *__iter = __haystack;

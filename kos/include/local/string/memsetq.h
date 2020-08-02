@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba2d9952 */
+/* HASH CRC-32:0xbd937f74 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_memsetq_defined
 #define __local_memsetq_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given qword */
 __LOCAL_LIBC(memsetq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *

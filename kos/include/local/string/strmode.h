@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff274c9 */
+/* HASH CRC-32:0xce1d3674 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strmode_defined
 #define __local_strmode_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <asm/stat.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generate a file mode representation similar to what's printed by `ls -l'

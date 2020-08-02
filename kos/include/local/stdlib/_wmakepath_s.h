@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b03dec8 */
+/* HASH CRC-32:0xbacfd7ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
@@ -41,6 +44,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcslen_defined
 #define __local___localdep_wcslen_defined 1
 #ifdef __CRT_HAVE_wcslen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
 #else /* __CRT_HAVE_wcslen */

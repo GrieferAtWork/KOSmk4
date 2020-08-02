@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe93636e */
+/* HASH CRC-32:0xfd41ba11 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,8 +195,8 @@ INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_strxfrm)(char *dst, char co
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst, char const *__restrict src, size_t maxlen);
-INTDEF ATTR_COLD ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_strerror)(int errnum);
-INTDEF ATTR_COLD ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strerror)(int errnum);
+INTDEF ATTR_COLD ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum);
+INTDEF ATTR_COLD ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
@@ -343,14 +343,14 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strncasec
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
-INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_strerror_r)(int errnum, char *buf, size_t buflen);
-INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum, char *buf, size_t buflen);
+INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum, char *buf, size_t buflen);
+INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd___xpg_strerror_r)(int errnum, char *buf, size_t buflen);
+INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd___xpg_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(int errnum, char *buf, size_t buflen);
+INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strsep)(char **__restrict stringp, char const *__restrict delim);
@@ -1217,11 +1217,13 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBDCALL libd
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBDCALL libd_mempmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
