@@ -365,6 +365,8 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			assert(hinted_node->vn_vm == &vm_kernel);
 			assert(hinted_node->vn_part != NULL);
 			assert(hinted_node->vn_block != NULL);
+			assert(hinted_node->vn_fspath == NULL);
+			assert(hinted_node->vn_fsname == NULL);
 			assert(hinted_node->vn_guard == 0);
 			assert(hinted_node->vn_part->dp_srefs == hinted_node);
 			assert(hinted_node->vn_link.ln_pself == &hinted_node->vn_part->dp_srefs);
