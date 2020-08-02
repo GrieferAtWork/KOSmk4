@@ -573,6 +573,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 	struct exception_info *info;
 	uintptr_t last_pc;
 	instrlen_isa_t isa;
+	_kernel_poison();
 	last_pc = kcpustate_getpc(unwind_state);
 	isa     = instrlen_isa_from_kcpustate(unwind_state);
 	printk(KERN_RAW "\n\n\n");
@@ -618,7 +619,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 #ifdef CONFIG_HAVE_DEBUGGER
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() &&
-		(kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {
+	    (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {
 		siginfo_t si;
 		if (!error_as_signal(&info->ei_data, &si))
 			si.si_signo = SIGABRT;
