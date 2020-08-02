@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR64_S
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR64_S 1
+#define __ASSEMBLER__ 1
 
 #include <debugger/config.h>
 
@@ -34,26 +35,6 @@
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
-
-
-.section .text.x86.asmirq.x86_dbgidt_pagefault
-INTERN_FUNCTION(x86_dbgidt_pagefault)
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 8 /* Adjust for the error code. */
-	popq_cfi -(SIZEOF_GPREGSNSP + 8)(%rsp) /* ECODE */
-	intr_enter INTR
-	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-	movq   -8(%rsp), %rsi /* ECODE */
-	movq   %rsp, %rdi
-	EXTERN(x86_handle_dbg_pagefault)
-	call   x86_handle_dbg_pagefault
-	movq   %rax, %rsp
-	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
-	intr_exit
-	.cfi_endproc
-END(x86_dbgidt_pagefault)
-
 
 
 .section .text.x86.asmirq.x86_dbgidt_apic_ipi

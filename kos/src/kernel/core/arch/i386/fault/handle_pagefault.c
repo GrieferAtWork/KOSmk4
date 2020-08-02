@@ -63,6 +63,40 @@
 #include <asm/cfi.h>
 #endif /* !__x86_64__ */
 
+/* NOTE: This #PF handler is also used while in debugger mode. And here's why:
+ *
+ * Use the normal #PF handler in debugger mode.
+ *
+ * This one's kind-of a departure from the original intend that the debugger
+ * mode should be as disconnected from the rest of the system as possible.
+ * However I've been running into a couple of problems related to how the
+ * kernel heap uses lazy mappings to speed up memory allocations outside of
+ * GFP_PREFLT and GFP_LOCKED, where any piece of heap memory not allowed with
+ * one of these flags may cause the kernel to panic if accessed from within
+ * debug mode, since the debugger's old #PF handler intentionally refused
+ * to handle this kind of mapping.
+ * The design flaw in this is that many places, such as `driver_section_lock()'
+ * will make use of regular, old heap memory that falls under the category of
+ * the above, meaning that whenever the debugger was accessing debug information
+ * of dynamically loaded drivers, there was a chance that it was accessed memory
+ * that it was unable to properly initialize.
+ *
+ * I've debated how to go about fixing this design flaw, and considered adding
+ * a global variable `bool dbg_restricted_memory' that could be used to toggle
+ * which kind of #PF handler should get used. But then I'd probably had to
+ * configure it to not restrict memory by default since there are just soo
+ * many places that you wouldn't even think about needing normal #PF handling.
+ * So with that in mind, such a flag would have only ever been enabled while
+ * doing some kind of dangerous memory access while in debugger-mode. However
+ * with the current API, such memory access shouldn't be performed directly
+ * anyhow. That's what the `dbg_readmemory()' and `dbg_writememory()' functions
+ * are for.
+ * So the conclusion was that the debugger shouldn't actually be using its own
+ * #PF handling, as doing so has only ever caused problems, and would only end
+ * up causing more problems in the future.
+ */
+
+
 DECL_BEGIN
 
 #ifndef __x86_64__

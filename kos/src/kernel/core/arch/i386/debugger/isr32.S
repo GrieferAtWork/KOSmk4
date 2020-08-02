@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR32_S
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR32_S 1
+#define __ASSEMBLER__ 1
 
 #include <debugger/config.h>
 
@@ -32,43 +33,6 @@
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
-
-
-
-.section .text.x86.asmirq.x86_dbgidt_pagefault
-INTERN_FUNCTION(x86_dbgidt_pagefault)
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 4 /* Adjust for the error code. */
-	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* ECODE */
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	pushal_cfi_r
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	movl   -4(%esp), %edx /* ECODE */
-	movl   %esp, %ecx
-	EXTERN(x86_handle_dbg_pagefault)
-	call   x86_handle_dbg_pagefault
-	movl   %eax, %esp
-	popal_cfi_r
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(x86_dbgidt_pagefault)
-
 
 
 .section .text.x86.asmirq.x86_dbgidt_apic_ipi
