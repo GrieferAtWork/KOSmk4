@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe74872e */
+/* HASH CRC-32:0x8eea1782 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(index) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(index))(char const *__restrict __haystack, int __needle) {
 	for (;; ++__haystack) {
 		char __ch = *__haystack;
-		if (__ch == __needle)
+		if ((unsigned char)__ch == (unsigned char)__needle)
 			return (char *)__haystack;
 		if (!__ch)
 			break;

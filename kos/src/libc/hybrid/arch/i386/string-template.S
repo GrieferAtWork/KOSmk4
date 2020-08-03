@@ -168,7 +168,7 @@ INTERN_FUNCTION(F(libc_rawmemchr))
 	ENTER_Pdi_Nax
 	BEGIN_CLD             /* Search forward */
 	movP   $(-1), %Pcx    /* Infinite haystack size */
-	repe   I(scas)        /* Find the first match */
+	repne  I(scas)        /* Find the first match */
 	/* At this point, %Pdi points N bytes past the matching word */
 	leaP   -N(%Pdi), %Pax /* Return the pointer _to_ the matching element */
 	END_CLD
@@ -194,7 +194,7 @@ INTERN_FUNCTION(F(libc_rawmemrchr))
 	BEGIN_STD             /* Search in reverse */
 	movP   $(-1), %Pcx    /* Infinite haystack size */
 	subNP  %Pdi           /* Fix-up the start-of-search loaction */
-	repe   I(scas)        /* Find the first match */
+	repne  I(scas)        /* Find the first match */
 	/* At this point, %Pdi points N bytes before the matching word */
 	leaP   N(%Pdi), %Pax /* Return the pointer _to_ the matching element */
 	END_STD

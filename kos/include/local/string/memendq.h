@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b16622e */
+/* HASH CRC-32:0x54d47fa5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memendq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memendq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_bytes) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memendq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_bytes) {
 	__UINT64_TYPE__ *__result = (__UINT64_TYPE__ *)__haystack;
 	for (; __n_bytes--; ++__result) {
-		if __unlikely(*__result == __qword)
+		if __unlikely(*__result == __needle)
 			break;
 	}
 	return __result;

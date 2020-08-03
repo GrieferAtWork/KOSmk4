@@ -36,18 +36,18 @@
 /**/
 
 #include <hybrid/compiler.h>
+
 #include <hybrid/atomic.h>
 
 #include <kos/types.h>
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 
 #include <libemu86/emu86.h>
 
 #include "../../instrlen.h"
-
-#include <assert.h>
 
 #ifndef __KERNEL__
 #include <dlfcn.h>

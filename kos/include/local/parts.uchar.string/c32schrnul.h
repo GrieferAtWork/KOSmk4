@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafe47c7f */
+/* HASH CRC-32:0xa53c95f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32schrnul) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32schrnul))(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle) {
 	for (; *__haystack; ++__haystack) {
-		if (*__haystack == (__CHAR32_TYPE__)__needle)
+		if ((__CHAR32_TYPE__)*__haystack == (__CHAR32_TYPE__)__needle)
 			break;
 	}
 	return (__CHAR32_TYPE__ *)__haystack;

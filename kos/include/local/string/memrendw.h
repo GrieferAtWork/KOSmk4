@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x400e6a7e */
+/* HASH CRC-32:0xf7549b36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memrendw) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendw))(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendw))(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words) {
 	__UINT16_TYPE__ *__result = (__UINT16_TYPE__ *)__haystack + __n_words;
 	for (;;) {
 		--__result;
 		if __unlikely(!__n_words)
 			break;
-		if __unlikely(*__result == __word)
+		if __unlikely(*__result == __needle)
 			break;
 		--__n_words;
 	}

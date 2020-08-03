@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x684040a9 */
+/* HASH CRC-32:0x797c5c4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_memendl_defined 1
 #ifdef __CRT_HAVE_memendl
 /* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memendl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_bytes),memendl,(__haystack,__dword,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memendl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_bytes),memendl,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memendl */
 __NAMESPACE_LOCAL_END
 #include <local/string/memendl.h>
@@ -40,8 +40,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `memendl', but return the offset from `HAYSTACK', rather than the actual address.
  * Returns `HAYSTACK + N_DWORDS * 4' if the given `NEEDLE' wasn't found */
 __LOCAL_LIBC(memlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenl))(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
-	return (__SIZE_TYPE__)(__localdep_memendl(__haystack, __dword, __n_dwords) - (__UINT32_TYPE__ *)__haystack);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenl))(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords) {
+	return (__SIZE_TYPE__)(__localdep_memendl(__haystack, __needle, __n_dwords) - (__UINT32_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memlenl_defined

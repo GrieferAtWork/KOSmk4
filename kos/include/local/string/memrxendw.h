@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd3682da */
+/* HASH CRC-32:0x93b9b7e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,15 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrendw', but search for non-matching locations. */
 __LOCAL_LIBC(memrxendw) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxendw))(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxendw))(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words) {
 	__UINT16_TYPE__ *__result = (__UINT16_TYPE__ *)__haystack + __n_words;
-	while (__n_words--) {
-		if __unlikely(*--__result != __word)
+	for (;;) {
+		--__result;
+		if __unlikely(!__n_words)
 			break;
+		if __unlikely(*__result != __needle)
+			break;
+		--__n_words;
 	}
 	return __result;
 }

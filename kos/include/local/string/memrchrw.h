@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bcf1b48 */
+/* HASH CRC-32:0x8f9396bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memrchrw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrchrw))(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrchrw))(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words) {
 	__UINT16_TYPE__ *__iter = (__UINT16_TYPE__ *)__haystack + __n_words;
 	while (__n_words--) {
-		if __unlikely(*--__iter == __word)
+		if __unlikely(*--__iter == __needle)
 			return __iter;
 	}
 	return __NULLPTR;

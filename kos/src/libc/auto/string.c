@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3041c79 */
+/* HASH CRC-32:0xf05118ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -489,6 +489,7 @@ NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRCHR */
 #ifndef LIBC_ARCH_HAVE_RAWMEMCHR
+#include <hybrid/typecore.h>
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
@@ -507,7 +508,7 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED
 NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
                                      int needle) {
 	for (; *haystack; ++haystack) {
-		if (*haystack == (char)needle)
+		if ((unsigned char)*haystack == (unsigned char)needle)
 			break;
 	}
 	return (char *)haystack;
@@ -675,6 +676,7 @@ NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string) {
 	}
 	return string;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memfrob)(void *buf,
                                    size_t num_bytes) {
@@ -899,7 +901,7 @@ NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
                                  int needle) {
 	for (;; ++haystack) {
 		char ch = *haystack;
-		if (ch == needle)
+		if ((unsigned char)ch == (unsigned char)needle)
 			return (char *)haystack;
 		if (!ch)
 			break;
@@ -912,7 +914,7 @@ NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
 	char const *result = NULL;
 	for (;; ++haystack) {
 		char ch = *haystack;
-		if (ch == needle)
+		if ((unsigned char)ch == (unsigned char)needle)
 			result = haystack;
 		if (!ch)
 			break;
@@ -1284,11 +1286,11 @@ NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memchrw)(void const *__restrict haystack,
-                                   uint16_t word,
+                                   uint16_t needle,
                                    size_t n_words) {
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
-		if unlikely(*hay_iter == word)
+		if unlikely(*hay_iter == needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1298,11 +1300,11 @@ NOTHROW_NCX(LIBCCALL libc_memchrw)(void const *__restrict haystack,
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memchrl)(void const *__restrict haystack,
-                                   uint32_t dword,
+                                   uint32_t needle,
                                    size_t n_dwords) {
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
-		if unlikely(*hay_iter == dword)
+		if unlikely(*hay_iter == needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1312,11 +1314,11 @@ NOTHROW_NCX(LIBCCALL libc_memchrl)(void const *__restrict haystack,
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrw)(void const *__restrict haystack,
-                                    uint16_t word,
+                                    uint16_t needle,
                                     size_t n_words) {
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
-		if unlikely(*--iter == word)
+		if unlikely(*--iter == needle)
 			return iter;
 	}
 	return NULL;
@@ -1326,11 +1328,11 @@ NOTHROW_NCX(LIBCCALL libc_memrchrw)(void const *__restrict haystack,
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrl)(void const *__restrict haystack,
-                                    uint32_t dword,
+                                    uint32_t needle,
                                     size_t n_dwords) {
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
-		if unlikely(*--iter == dword)
+		if unlikely(*--iter == needle)
 			return iter;
 	}
 	return NULL;
@@ -1340,10 +1342,10 @@ NOTHROW_NCX(LIBCCALL libc_memrchrl)(void const *__restrict haystack,
 /* Same as `memchrw' with a search limit of `(size_t)-1 / 2' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemchrw)(void const *__restrict haystack,
-                                      uint16_t word) {
+                                      uint16_t needle) {
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter == word)
+		if unlikely(*iter == needle)
 			break;
 	}
 	return iter;
@@ -1353,10 +1355,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchrw)(void const *__restrict haystack,
 /* Same as `memchrl' with a search limit of `(size_t)-1 / 4' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemchrl)(void const *__restrict haystack,
-                                      uint32_t dword) {
+                                      uint32_t needle) {
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter == dword)
+		if unlikely(*iter == needle)
 			break;
 	}
 	return iter;
@@ -1366,10 +1368,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchrl)(void const *__restrict haystack,
 /* Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK - 2' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(void const *__restrict haystack,
-                                       uint16_t word) {
+                                       uint16_t needle) {
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
-		if unlikely(*--iter == word)
+		if unlikely(*--iter == needle)
 			break;
 	}
 	return iter;
@@ -1379,10 +1381,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(void const *__restrict haystack,
 /* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK - 4' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(void const *__restrict haystack,
-                                       uint32_t dword) {
+                                       uint32_t needle) {
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
-		if unlikely(*--iter == dword)
+		if unlikely(*--iter == needle)
 			break;
 	}
 	return iter;
@@ -1392,11 +1394,11 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(void const *__restrict haystack,
 /* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memendw)(void const *__restrict haystack,
-                                   uint16_t word,
+                                   uint16_t needle,
                                    size_t n_bytes) {
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result == word)
+		if unlikely(*result == needle)
 			break;
 	}
 	return result;
@@ -1406,11 +1408,11 @@ NOTHROW_NCX(LIBCCALL libc_memendw)(void const *__restrict haystack,
 /* Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memendl)(void const *__restrict haystack,
-                                   uint32_t dword,
+                                   uint32_t needle,
                                    size_t n_bytes) {
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result == dword)
+		if unlikely(*result == needle)
 			break;
 	}
 	return result;
@@ -1420,14 +1422,14 @@ NOTHROW_NCX(LIBCCALL libc_memendl)(void const *__restrict haystack,
 /* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrendw)(void const *__restrict haystack,
-                                    uint16_t word,
+                                    uint16_t needle,
                                     size_t n_words) {
 	u16 *result = (u16 *)haystack + n_words;
 	for (;;) {
 		--result;
 		if unlikely(!n_words)
 			break;
-		if unlikely(*result == word)
+		if unlikely(*result == needle)
 			break;
 		--n_words;
 	}
@@ -1438,14 +1440,14 @@ NOTHROW_NCX(LIBCCALL libc_memrendw)(void const *__restrict haystack,
 /* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack,
-                                    uint32_t dword,
+                                    uint32_t needle,
                                     size_t n_dwords) {
 	u32 *result = (u32 *)haystack + n_dwords;
 	for (;;) {
 		--result;
 		if unlikely(!n_dwords)
 			break;
-		if unlikely(*result == dword)
+		if unlikely(*result == needle)
 			break;
 		--n_dwords;
 	}
@@ -1457,9 +1459,9 @@ NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack,
  * Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack,
-                                   uint16_t word,
+                                   uint16_t needle,
                                    size_t n_words) {
-	return (size_t)(libc_memendw(haystack, word, n_words) - (u16 *)haystack);
+	return (size_t)(libc_memendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLENW */
 #ifndef LIBC_ARCH_HAVE_MEMLENL
@@ -1467,9 +1469,9 @@ NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack,
  * Returns `HAYSTACK + N_DWORDS * 4' if the given `NEEDLE' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack,
-                                   uint32_t dword,
+                                   uint32_t needle,
                                    size_t n_dwords) {
-	return (size_t)(libc_memendl(haystack, dword, n_dwords) - (u32 *)haystack);
+	return (size_t)(libc_memendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLENL */
 #ifndef LIBC_ARCH_HAVE_MEMRLENW
@@ -1477,9 +1479,9 @@ NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack,
  * Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenw)(void const *__restrict haystack,
-                                    uint16_t word,
+                                    uint16_t needle,
                                     size_t n_words) {
-	return (size_t)(libc_memrendw(haystack, word, n_words) - (u16 *)haystack);
+	return (size_t)(libc_memrendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLENW */
 #ifndef LIBC_ARCH_HAVE_MEMRLENL
@@ -1487,41 +1489,41 @@ NOTHROW_NCX(LIBCCALL libc_memrlenw)(void const *__restrict haystack,
  * Returns `(size_t)-1 / 4' if the given `NEEDLE' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenl)(void const *__restrict haystack,
-                                    uint32_t dword,
+                                    uint32_t needle,
                                     size_t n_dwords) {
-	return (size_t)(libc_memrendl(haystack, dword, n_dwords) - (u32 *)haystack);
+	return (size_t)(libc_memrendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLENL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLENW
 /* Same as `rawmemchrw', but return the offset from `HAYSTACK', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenw)(void const *__restrict haystack,
-                                      uint16_t word) {
-	return (size_t)(libc_rawmemchrw(haystack, word) - (u16 *)haystack);
+                                      uint16_t needle) {
+	return (size_t)(libc_rawmemchrw(haystack, needle) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLENW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLENL
 /* Same as `rawmemchrl', but return the offset from `HAYSTACK', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenl)(void const *__restrict haystack,
-                                      uint32_t dword) {
-	return (size_t)(libc_rawmemchrl(haystack, dword) - (u32 *)haystack);
+                                      uint32_t needle) {
+	return (size_t)(libc_rawmemchrl(haystack, needle) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLENL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLENW
 /* Same as `rawmemrchrw', but return the offset from `HAYSTACK', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenw)(void const *__restrict haystack,
-                                       uint16_t word) {
-	return (size_t)(libc_rawmemrchrw(haystack, word) - (u16 *)haystack);
+                                       uint16_t needle) {
+	return (size_t)(libc_rawmemrchrw(haystack, needle) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRLENW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLENL
 /* Same as `rawmemrchrl', but return the offset from `HAYSTACK', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(void const *__restrict haystack,
-                                       uint32_t dword) {
-	return (size_t)(libc_rawmemrchrl(haystack, dword) - (u32 *)haystack);
+                                       uint32_t needle) {
+	return (size_t)(libc_rawmemrchrl(haystack, needle) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRLENL */
 #ifndef LIBC_ARCH_HAVE_MEMCPYQ
@@ -1719,11 +1721,11 @@ NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1,
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memchrq)(void const *__restrict haystack,
-                                   uint64_t qword,
+                                   uint64_t needle,
                                    size_t n_qwords) {
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
-		if unlikely(*hay_iter == (u64)qword)
+		if unlikely(*hay_iter == needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1733,11 +1735,11 @@ NOTHROW_NCX(LIBCCALL libc_memchrq)(void const *__restrict haystack,
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrq)(void const *__restrict haystack,
-                                    uint64_t qword,
+                                    uint64_t needle,
                                     size_t n_qwords) {
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
-		if unlikely(*--iter == qword)
+		if unlikely(*--iter == needle)
 			return iter;
 	}
 	return NULL;
@@ -1747,10 +1749,10 @@ NOTHROW_NCX(LIBCCALL libc_memrchrq)(void const *__restrict haystack,
 /* Same as `memchrq' with a search limit of `(size_t)-1 / 8' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemchrq)(void const *__restrict haystack,
-                                      uint64_t qword) {
+                                      uint64_t needle) {
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter == qword)
+		if unlikely(*iter == needle)
 			break;
 	}
 	return iter;
@@ -1760,10 +1762,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchrq)(void const *__restrict haystack,
 /* Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK - 8' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(void const *__restrict haystack,
-                                       uint64_t qword) {
+                                       uint64_t needle) {
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
-		if unlikely(*--iter == qword)
+		if unlikely(*--iter == needle)
 			break;
 	}
 	return iter;
@@ -1773,11 +1775,11 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(void const *__restrict haystack,
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memendq)(void const *__restrict haystack,
-                                   uint64_t qword,
+                                   uint64_t needle,
                                    size_t n_bytes) {
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result == qword)
+		if unlikely(*result == needle)
 			break;
 	}
 	return result;
@@ -1787,14 +1789,14 @@ NOTHROW_NCX(LIBCCALL libc_memendq)(void const *__restrict haystack,
 /* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrendq)(void const *__restrict haystack,
-                                    uint64_t qword,
+                                    uint64_t needle,
                                     size_t n_qwords) {
 	u64 *result = (u64 *)haystack + n_qwords;
 	for (;;) {
 		--result;
 		if unlikely(!n_qwords)
 			break;
-		if unlikely(*result == qword)
+		if unlikely(*result == needle)
 			break;
 		--n_qwords;
 	}
@@ -1806,9 +1808,9 @@ NOTHROW_NCX(LIBCCALL libc_memrendq)(void const *__restrict haystack,
  * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memlenq)(void const *__restrict haystack,
-                                   uint64_t qword,
+                                   uint64_t needle,
                                    size_t n_qwords) {
-	return (size_t)(libc_memendq(haystack, qword, n_qwords) - (u64 *)haystack);
+	return (size_t)(libc_memendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMLENQ */
 #ifndef LIBC_ARCH_HAVE_MEMRLENQ
@@ -1816,25 +1818,25 @@ NOTHROW_NCX(LIBCCALL libc_memlenq)(void const *__restrict haystack,
  * Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenq)(void const *__restrict haystack,
-                                    uint64_t qword,
+                                    uint64_t needle,
                                     size_t n_qwords) {
-	return (size_t)(libc_memrendq(haystack, qword, n_qwords) - (u64 *)haystack);
+	return (size_t)(libc_memrendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRLENQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMLENQ
 /* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenq)(void const *__restrict haystack,
-                                      uint64_t qword) {
-	return (size_t)(libc_rawmemchrq(haystack, qword) - (u64 *)haystack);
+                                      uint64_t needle) {
+	return (size_t)(libc_rawmemchrq(haystack, needle) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMLENQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRLENQ
 /* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenq)(void const *__restrict haystack,
-                                       uint64_t qword) {
-	return (size_t)(libc_rawmemrchrq(haystack, qword) - (u64 *)haystack);
+                                       uint64_t needle) {
+	return (size_t)(libc_rawmemrchrq(haystack, needle) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRLENQ */
 #ifndef __KERNEL__
@@ -1881,6 +1883,7 @@ NOTHROW_NCX(LIBCCALL libc_rawmemxchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMXCHR */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRXCHR
+#include <hybrid/typecore.h>
 /* Same as `rawmemrchr', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchr)(void const *__restrict haystack,
@@ -1914,9 +1917,13 @@ NOTHROW_NCX(LIBCCALL libc_memrxend)(void const *__restrict haystack,
                                     int needle,
                                     size_t n_bytes) {
 	byte_t *result = (byte_t *)haystack + n_bytes;
-	while (n_bytes--) {
-		if unlikely(*--result != (byte_t)needle)
+	for (;;) {
+		--result;
+		if unlikely(!n_bytes)
 			break;
+		if unlikely(*result != (byte_t)needle)
+			break;
+		--n_bytes;
 	}
 	return result;
 }
@@ -1959,11 +1966,11 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrxlen)(void const *__restrict haystack,
 /* Same as `memchrw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memxchrw)(void const *__restrict haystack,
-                                    uint16_t word,
+                                    uint16_t needle,
                                     size_t n_words) {
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
-		if unlikely(*hay_iter != word)
+		if unlikely(*hay_iter != needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1973,11 +1980,11 @@ NOTHROW_NCX(LIBCCALL libc_memxchrw)(void const *__restrict haystack,
 /* Same as `memchrl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memxchrl)(void const *__restrict haystack,
-                                    uint32_t dword,
+                                    uint32_t needle,
                                     size_t n_dwords) {
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
-		if unlikely(*hay_iter != dword)
+		if unlikely(*hay_iter != needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1987,11 +1994,11 @@ NOTHROW_NCX(LIBCCALL libc_memxchrl)(void const *__restrict haystack,
 /* Same as `memrchrw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrxchrw)(void const *__restrict haystack,
-                                     uint16_t word,
+                                     uint16_t needle,
                                      size_t n_words) {
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
-		if unlikely(*--iter != word)
+		if unlikely(*--iter != needle)
 			return iter;
 	}
 	return NULL;
@@ -2001,11 +2008,11 @@ NOTHROW_NCX(LIBCCALL libc_memrxchrw)(void const *__restrict haystack,
 /* Same as `memrchrl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrxchrl)(void const *__restrict haystack,
-                                     uint32_t dword,
+                                     uint32_t needle,
                                      size_t n_dwords) {
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
-		if unlikely(*--iter != dword)
+		if unlikely(*--iter != needle)
 			return iter;
 	}
 	return NULL;
@@ -2015,10 +2022,10 @@ NOTHROW_NCX(LIBCCALL libc_memrxchrl)(void const *__restrict haystack,
 /* Same as `rawmemchrw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchrw)(void const *__restrict haystack,
-                                       uint16_t word) {
+                                       uint16_t needle) {
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter != word)
+		if unlikely(*iter != needle)
 			break;
 	}
 	return iter;
@@ -2028,10 +2035,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemxchrw)(void const *__restrict haystack,
 /* Same as `rawmemchrl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchrl)(void const *__restrict haystack,
-                                       uint32_t dword) {
+                                       uint32_t needle) {
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter != dword)
+		if unlikely(*iter != needle)
 			break;
 	}
 	return iter;
@@ -2041,10 +2048,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemxchrl)(void const *__restrict haystack,
 /* Same as `rawmemrchrw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchrw)(void const *__restrict haystack,
-                                        uint16_t word) {
+                                        uint16_t needle) {
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
-		if unlikely(*--iter != word)
+		if unlikely(*--iter != needle)
 			break;
 	}
 	return iter;
@@ -2054,10 +2061,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrxchrw)(void const *__restrict haystack,
 /* Same as `rawmemrchrl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchrl)(void const *__restrict haystack,
-                                        uint32_t dword) {
+                                        uint32_t needle) {
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
-		if unlikely(*--iter != dword)
+		if unlikely(*--iter != needle)
 			break;
 	}
 	return iter;
@@ -2067,11 +2074,11 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrxchrl)(void const *__restrict haystack,
 /* Same as `memendw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memxendw)(void const *__restrict haystack,
-                                    uint16_t word,
+                                    uint16_t needle,
                                     size_t n_bytes) {
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result != word)
+		if unlikely(*result != needle)
 			break;
 	}
 	return result;
@@ -2081,11 +2088,11 @@ NOTHROW_NCX(LIBCCALL libc_memxendw)(void const *__restrict haystack,
 /* Same as `memendl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memxendl)(void const *__restrict haystack,
-                                    uint32_t dword,
+                                    uint32_t needle,
                                     size_t n_bytes) {
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result != dword)
+		if unlikely(*result != needle)
 			break;
 	}
 	return result;
@@ -2095,12 +2102,16 @@ NOTHROW_NCX(LIBCCALL libc_memxendl)(void const *__restrict haystack,
 /* Same as `memrendw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrxendw)(void const *__restrict haystack,
-                                     uint16_t word,
+                                     uint16_t needle,
                                      size_t n_words) {
 	u16 *result = (u16 *)haystack + n_words;
-	while (n_words--) {
-		if unlikely(*--result != word)
+	for (;;) {
+		--result;
+		if unlikely(!n_words)
 			break;
+		if unlikely(*result != needle)
+			break;
+		--n_words;
 	}
 	return result;
 }
@@ -2109,12 +2120,16 @@ NOTHROW_NCX(LIBCCALL libc_memrxendw)(void const *__restrict haystack,
 /* Same as `memrendl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrxendl)(void const *__restrict haystack,
-                                     uint32_t dword,
+                                     uint32_t needle,
                                      size_t n_dwords) {
 	u32 *result = (u32 *)haystack + n_dwords;
-	while (n_dwords--) {
-		if unlikely(*--result != dword)
+	for (;;) {
+		--result;
+		if unlikely(!n_dwords)
 			break;
+		if unlikely(*result != needle)
+			break;
+		--n_dwords;
 	}
 	return result;
 }
@@ -2123,79 +2138,79 @@ NOTHROW_NCX(LIBCCALL libc_memrxendl)(void const *__restrict haystack,
 /* Same as `memlenw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memxlenw)(void const *__restrict haystack,
-                                    uint16_t word,
+                                    uint16_t needle,
                                     size_t n_words) {
-	return (size_t)(libc_memxendw(haystack, word, n_words) - (u16 *)haystack);
+	return (size_t)(libc_memxendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMXLENW */
 #ifndef LIBC_ARCH_HAVE_MEMXLENL
 /* Same as `memlenl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memxlenl)(void const *__restrict haystack,
-                                    uint32_t dword,
+                                    uint32_t needle,
                                     size_t n_dwords) {
-	return (size_t)(libc_memxendl(haystack, dword, n_dwords) - (u32 *)haystack);
+	return (size_t)(libc_memxendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMXLENL */
 #ifndef LIBC_ARCH_HAVE_MEMRXLENW
 /* Same as `memrlenw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlenw)(void const *__restrict haystack,
-                                     uint16_t word,
+                                     uint16_t needle,
                                      size_t n_words) {
-	return (size_t)(libc_memrxendw(haystack, word, n_words) - (u16 *)haystack);
+	return (size_t)(libc_memrxendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRXLENW */
 #ifndef LIBC_ARCH_HAVE_MEMRXLENL
 /* Same as `memrlenl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlenl)(void const *__restrict haystack,
-                                     uint32_t dword,
+                                     uint32_t needle,
                                      size_t n_dwords) {
-	return (size_t)(libc_memrxendl(haystack, dword, n_dwords) - (u32 *)haystack);
+	return (size_t)(libc_memrxendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRXLENL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMXLENW
 /* Same as `rawmemlenw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlenw)(void const *__restrict haystack,
-                                       uint16_t word) {
-	return (size_t)(libc_rawmemxchrw(haystack, word) - (u16 *)haystack);
+                                       uint16_t needle) {
+	return (size_t)(libc_rawmemxchrw(haystack, needle) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMXLENW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMXLENL
 /* Same as `rawmemlenl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlenl)(void const *__restrict haystack,
-                                       uint32_t dword) {
-	return (size_t)(libc_rawmemxchrl(haystack, dword) - (u32 *)haystack);
+                                       uint32_t needle) {
+	return (size_t)(libc_rawmemxchrl(haystack, needle) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMXLENL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRXLENW
 /* Same as `rawmemrlenw', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlenw)(void const *__restrict haystack,
-                                        uint16_t word) {
-	return (size_t)(libc_rawmemrxchrw(haystack, word) - (u16 *)haystack);
+                                        uint16_t needle) {
+	return (size_t)(libc_rawmemrxchrw(haystack, needle) - (u16 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRXLENW */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRXLENL
 /* Same as `rawmemrlenl', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlenl)(void const *__restrict haystack,
-                                        uint32_t dword) {
-	return (size_t)(libc_rawmemrxchrl(haystack, dword) - (u32 *)haystack);
+                                        uint32_t needle) {
+	return (size_t)(libc_rawmemrxchrl(haystack, needle) - (u32 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRXLENL */
 #ifndef LIBC_ARCH_HAVE_MEMXCHRQ
 /* Same as `memchrq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memxchrq)(void const *__restrict haystack,
-                                    uint64_t qword,
+                                    uint64_t needle,
                                     size_t n_qwords) {
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
-		if unlikely(*hay_iter != (u64)qword)
+		if unlikely(*hay_iter != needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -2205,11 +2220,11 @@ NOTHROW_NCX(LIBCCALL libc_memxchrq)(void const *__restrict haystack,
 /* Same as `memrchrq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrxchrq)(void const *__restrict haystack,
-                                     uint64_t qword,
+                                     uint64_t needle,
                                      size_t n_qwords) {
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
-		if unlikely(*--iter != qword)
+		if unlikely(*--iter != needle)
 			return iter;
 	}
 	return NULL;
@@ -2219,10 +2234,10 @@ NOTHROW_NCX(LIBCCALL libc_memrxchrq)(void const *__restrict haystack,
 /* Same as `rawmemchrq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchrq)(void const *__restrict haystack,
-                                       uint64_t qword) {
+                                       uint64_t needle) {
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter != qword)
+		if unlikely(*iter != needle)
 			break;
 	}
 	return iter;
@@ -2232,10 +2247,10 @@ NOTHROW_NCX(LIBCCALL libc_rawmemxchrq)(void const *__restrict haystack,
 /* Same as `rawmemrchrq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchrq)(void const *__restrict haystack,
-                                        uint64_t qword) {
+                                        uint64_t needle) {
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
-		if unlikely(*--iter != qword)
+		if unlikely(*--iter != needle)
 			break;
 	}
 	return iter;
@@ -2245,11 +2260,11 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrxchrq)(void const *__restrict haystack,
 /* Same as `memendq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memxendq)(void const *__restrict haystack,
-                                    uint64_t qword,
+                                    uint64_t needle,
                                     size_t n_bytes) {
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result != qword)
+		if unlikely(*result != needle)
 			break;
 	}
 	return result;
@@ -2259,12 +2274,16 @@ NOTHROW_NCX(LIBCCALL libc_memxendq)(void const *__restrict haystack,
 /* Same as `memrendq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrxendq)(void const *__restrict haystack,
-                                     uint64_t qword,
+                                     uint64_t needle,
                                      size_t n_qwords) {
 	u64 *result = (u64 *)haystack + n_qwords;
-	while (n_qwords--) {
-		if unlikely(*--result != qword)
+	for (;;) {
+		--result;
+		if unlikely(!n_qwords)
 			break;
+		if unlikely(*result != needle)
+			break;
+		--n_qwords;
 	}
 	return result;
 }
@@ -2273,34 +2292,34 @@ NOTHROW_NCX(LIBCCALL libc_memrxendq)(void const *__restrict haystack,
 /* Same as `memlenq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memxlenq)(void const *__restrict haystack,
-                                    uint64_t qword,
+                                    uint64_t needle,
                                     size_t n_qwords) {
-	return (size_t)(libc_memxendq(haystack, qword, n_qwords) - (u64 *)haystack);
+	return (size_t)(libc_memxendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMXLENQ */
 #ifndef LIBC_ARCH_HAVE_MEMRXLENQ
 /* Same as `memrlenq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlenq)(void const *__restrict haystack,
-                                     uint64_t qword,
+                                     uint64_t needle,
                                      size_t n_qwords) {
-	return (size_t)(libc_memrxendq(haystack, qword, n_qwords) - (u64 *)haystack);
+	return (size_t)(libc_memrxendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRXLENQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMXLENQ
 /* Same as `rawmemlenq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlenq)(void const *__restrict haystack,
-                                       uint64_t qword) {
-	return (size_t)(libc_rawmemxchrq(haystack, qword) - (u64 *)haystack);
+                                       uint64_t needle) {
+	return (size_t)(libc_rawmemxchrq(haystack, needle) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMXLENQ */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRXLENQ
 /* Same as `rawmemrlenq', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(void const *__restrict haystack,
-                                        uint64_t qword) {
-	return (size_t)(libc_rawmemrxchrq(haystack, qword) - (u64 *)haystack);
+                                        uint64_t needle) {
+	return (size_t)(libc_rawmemrxchrq(haystack, needle) - (u64 *)haystack);
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRXLENQ */
 #endif /* !__KERNEL__ */

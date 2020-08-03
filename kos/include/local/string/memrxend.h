@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b4de8f1 */
+/* HASH CRC-32:0x5d3a747f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memrxend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxend))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__result = (__BYTE_TYPE__ *)__haystack + __n_bytes;
-	while (__n_bytes--) {
-		if __unlikely(*--__result != (__BYTE_TYPE__)__needle)
+	for (;;) {
+		--__result;
+		if __unlikely(!__n_bytes)
 			break;
+		if __unlikely(*__result != (__BYTE_TYPE__)__needle)
+			break;
+		--__n_bytes;
 	}
 	return __result;
 }

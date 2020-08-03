@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefedf52d */
+/* HASH CRC-32:0xa6195335 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rindex))(char const *__restrict __hay
 	char const *__result = __NULLPTR;
 	for (;; ++__haystack) {
 		char __ch = *__haystack;
-		if (__ch == __needle)
+		if ((unsigned char)__ch == (unsigned char)__needle)
 			__result = __haystack;
 		if (!__ch)
 			break;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x930c1b3c */
+/* HASH CRC-32:0x130cbe82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrq', but search for non-matching locations. */
 __LOCAL_LIBC(memxchrq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_qwords) {
 	__UINT64_TYPE__ *__hay_iter = (__UINT64_TYPE__ *)__haystack;
 	for (; __n_qwords--; ++__hay_iter) {
-		if __unlikely(*__hay_iter != (__UINT64_TYPE__)__qword)
+		if __unlikely(*__hay_iter != __needle)
 			return __hay_iter;
 	}
 	return __NULLPTR;

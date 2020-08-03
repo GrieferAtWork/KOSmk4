@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x24025cc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,24 +17,64 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_memrchrq_defined
-#define __local_memrchrq_defined 1
-#include <__crt.h>
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
-__LOCAL_LIBC(memrchrq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_qwords) {
-	__UINT64_TYPE__ *__iter = (__UINT64_TYPE__ *)__haystack + __n_qwords;
-	while (__n_qwords--) {
-		if __unlikely(*--__iter == __needle)
-			return __iter;
-	}
-	return __NULLPTR;
+#ifndef GUARD_LIBC_LIBC_MEMORY_CTEST
+#define GUARD_LIBC_LIBC_MEMORY_CTEST 1
+
+#define _KOS_SOURCE 1
+
+/**/
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <string.h>
+/**/
+
+DECL_BEGIN
+
+
+/* Test the following functions
+ *  - memchr()
+ *  - memrchr()
+ *  - memend()
+ *  - memrend()
+ *  - memlen()
+ *  - memrlen()
+ *  - rawmemchr()
+ *  - rawmemrchr()
+ *  - rawmemlen()
+ *  - rawmemrlen()
+ * With all of them tested for each of the [b|w|l|q] variants.
+ */
+PRIVATE void do_test_memory(void);
+PRIVATE void do_test_memoryb(void);
+PRIVATE void do_test_memoryw(void);
+PRIVATE void do_test_memoryl(void);
+PRIVATE void do_test_memoryq(void);
+
+DEFINE_TEST(memory) {
+	do_test_memory();
+	do_test_memoryb();
+	do_test_memoryw();
+	do_test_memoryl();
+	do_test_memoryq();
 }
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_memrchrq_defined
-#define __local___localdep_memrchrq_defined 1
-#define __localdep_memrchrq __LIBC_LOCAL_NAME(memrchrq)
-#endif /* !__local___localdep_memrchrq_defined */
-#endif /* !__local_memrchrq_defined */
+
+DECL_END
+
+#ifndef __INTELLISENSE__
+#define N 0
+#include "memory.ctest.n.inl"
+#define N 1
+#include "memory.ctest.n.inl"
+#define N 2
+#include "memory.ctest.n.inl"
+#define N 4
+#include "memory.ctest.n.inl"
+#define N 8
+#include "memory.ctest.n.inl"
+#endif /* !__INTELLISENSE__ */
+
+#endif /* !GUARD_LIBC_LIBC_MEMORY_CTEST */

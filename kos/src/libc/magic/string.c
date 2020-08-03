@@ -703,6 +703,7 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 
 
 @@Same as `memchr' with a search limit of `(size_t)-1'
+[[impl_include("<hybrid/typecore.h>")]]
 [[kernel, wunused, ATTR_PURE, alias("__rawmemchr")]]
 [[if(!defined(__KERNEL__)), kos_export_as("__rawmemchr")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMCHR))]]
@@ -726,7 +727,7 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 	[([[nonnull]] char const *__restrict haystack, int needle): [[nonnull]] char const *]
 {
 	for (; *haystack; ++haystack) {
-		if (*haystack == (char)needle)
+		if ((unsigned char)*haystack == (unsigned char)needle)
 			break;
 	}
 	return (char *)haystack;
@@ -916,7 +917,7 @@ strfry:([[nonnull]] char *__restrict string) -> [[== string]] char * {
 	return string;
 }
 
-[[ATTR_LEAF]]
+[[ATTR_LEAF, impl_include("<hybrid/typecore.h>")]]
 memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [[== buf]] void * {
 	byte_t *iter = (byte_t *)buf;
 	while (num_bytes--)
@@ -1154,7 +1155,7 @@ char *index([[nonnull]] char const *__restrict haystack, int needle)
 {
 	for (;; ++haystack) {
 		char ch = *haystack;
-		if (ch == needle)
+		if ((unsigned char)ch == (unsigned char)needle)
 			return (char *)haystack;
 		if (!ch)
 			break;
@@ -1170,7 +1171,7 @@ char *rindex([[nonnull]] char const *__restrict haystack, int needle)
 	char const *result = NULL;
 	for (;; ++haystack) {
 		char ch = *haystack;
-		if (ch == needle)
+		if ((unsigned char)ch == (unsigned char)needle)
 			result = haystack;
 		if (!ch)
 			break;
@@ -1826,11 +1827,11 @@ $int32_t memcmpl([[nonnull]] /*aligned(4)*/ void const *s1,
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[wunused, ATTR_PURE, nocrt, alias("memchr"), decl_include("<hybrid/typecore.h>")]]
-[[preferred_fastbind(($uint8_t *)memchr(haystack, byte, n_bytes))]]
+[[preferred_fastbind(($uint8_t *)memchr(haystack, needle, n_bytes))]]
 [[bind_local_function("memchr")]]
-$uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *];
+$uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): $uint8_t const *];
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
@@ -1838,18 +1839,18 @@ $uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, in
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemchr")]]
 [[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemchr")]]
 [[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemchr")]]
-[[if_fast_defined(memchrw), preferred_fast_extern_inline("memchrw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
-[[if_fast_defined(memchrw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
-[[if_fast_defined(memchrw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
-[[if_fast_defined(memchrw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, word, n_words); })]]
+[[if_fast_defined(memchrw), preferred_fast_extern_inline("memchrw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
+[[if_fast_defined(memchrw), if(__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
+[[if_fast_defined(memchrw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
+[[if_fast_defined(memchrw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrw@))(haystack, needle, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRW))]]
-$uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
+$uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t const *]
 {
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
-		if unlikely(*hay_iter == word)
+		if unlikely(*hay_iter == needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1860,18 +1861,18 @@ $uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemchr")]]
 [[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemchr")]]
 [[if(!defined(__KERNEL__)), kos_export_as("wmemchr")]]
-[[if_fast_defined(memchrl), preferred_fast_extern_inline("memchrl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
-[[if_fast_defined(memchrl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
-[[if_fast_defined(memchrl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
-[[if_fast_defined(memchrl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, dword, n_dwords); })]]
+[[if_fast_defined(memchrl), preferred_fast_extern_inline("memchrl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
+[[if_fast_defined(memchrl), if(__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
+[[if_fast_defined(memchrl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemchr", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
+[[if_fast_defined(memchrl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memchrl@))(haystack, needle, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRL))]]
-$uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
+$uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
-		if unlikely(*hay_iter == dword)
+		if unlikely(*hay_iter == needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -1879,22 +1880,22 @@ $uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
 [[wunused, ATTR_PURE, nocrt, alias("memrchr"), decl_include("<hybrid/typecore.h>")]]
-[[preferred_fastbind(($uint8_t *)memrchr(haystack, byte, n_bytes))]]
+[[preferred_fastbind(($uint8_t *)memrchr(haystack, needle, n_bytes))]]
 [[bind_local_function("memrchr")]]
-$uint8_t *memrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *];
+$uint8_t *memrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): $uint8_t const *];
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHRW))]]
-$uint16_t *memrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
+$uint16_t *memrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
-		if unlikely(*--iter == word)
+		if unlikely(*--iter == needle)
 			return iter;
 	}
 	return NULL;
@@ -1903,13 +1904,13 @@ $uint16_t *memrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHRL))]]
-$uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
+$uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
-		if unlikely(*--iter == dword)
+		if unlikely(*--iter == needle)
 			return iter;
 	}
 	return NULL;
@@ -1917,21 +1918,21 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 
 @@Same as `memchrb' with a search limit of `(size_t)-1'
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[nonnull]] $uint8_t *rawmemchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
+[[nonnull]] $uint8_t *rawmemchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle): [[nonnull]] $uint8_t const *]
 	= rawmemchr;
 
 @@Same as `memchrw' with a search limit of `(size_t)-1 / 2'
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMCHRW))]]
-[[nonnull]] $uint16_t *rawmemchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *rawmemchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter == word)
+		if unlikely(*iter == needle)
 			break;
 	}
 	return iter;
@@ -1940,13 +1941,13 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Same as `memchrl' with a search limit of `(size_t)-1 / 4'
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMCHRL))]]
-[[nonnull]] $uint32_t *rawmemchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *rawmemchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter == dword)
+		if unlikely(*iter == needle)
 			break;
 	}
 	return iter;
@@ -1955,21 +1956,21 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 
 @@Same as `memrchrb' without a search limit, starting at `HAYSTACK - 1'
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[nonnull]] $uint8_t *rawmemrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
+[[nonnull]] $uint8_t *rawmemrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle): [[nonnull]] $uint8_t const *]
 	= rawmemrchr;
 
 @@Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK - 2'
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRCHRW))]]
-[[nonnull]] $uint16_t *rawmemrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *rawmemrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
-		if unlikely(*--iter == word)
+		if unlikely(*--iter == needle)
 			break;
 	}
 	return iter;
@@ -1978,13 +1979,13 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK - 4'
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRCHRL))]]
-[[nonnull]] $uint32_t *rawmemrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *rawmemrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
-		if unlikely(*--iter == dword)
+		if unlikely(*--iter == needle)
 			break;
 	}
 	return iter;
@@ -1995,20 +1996,20 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 [[wunused, ATTR_PURE, nocrt, alias("memend"), decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind(($uint8_t *)memend(haystack, byte, n_bytes))]]
 [[bind_local_function("memend")]]
-[[nonnull]] $uint8_t *memendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *];
+[[nonnull]] $uint8_t *memendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t const *];
 
 @@Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMENDW))]]
-[[nonnull]] $uint16_t *memendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *memendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_bytes): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_bytes): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result == word)
+		if unlikely(*result == needle)
 			break;
 	}
 	return result;
@@ -2017,13 +2018,13 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMENDL))]]
-[[nonnull]] $uint32_t *memendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *memendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_bytes): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_bytes): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result == dword)
+		if unlikely(*result == needle)
 			break;
 	}
 	return result;
@@ -2031,25 +2032,25 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 
 @@Same as `memrchrb', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
 [[wunused, ATTR_PURE, nocrt, alias("memrend"), decl_include("<hybrid/typecore.h>")]]
-[[preferred_fastbind(($uint8_t *)memrend(haystack, byte, n_bytes))]]
+[[preferred_fastbind(($uint8_t *)memrend(haystack, needle, n_bytes))]]
 [[bind_local_function("memrend")]]
-[[nonnull]] $uint8_t *memrendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *];
+[[nonnull]] $uint8_t *memrendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t const *];
 
 @@Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRENDW))]]
-[[nonnull]] $uint16_t *memrendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *memrendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_words): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack + n_words;
 	for (;;) {
 		--result;
 		if unlikely(!n_words)
 			break;
-		if unlikely(*result == word)
+		if unlikely(*result == needle)
 			break;
 		--n_words;
 	}
@@ -2059,16 +2060,16 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRENDL))]]
-[[nonnull]] $uint32_t *memrendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *memrendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_dwords): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack + n_dwords;
 	for (;;) {
 		--result;
 		if unlikely(!n_dwords)
 			break;
-		if unlikely(*result == dword)
+		if unlikely(*result == needle)
 			break;
 		--n_dwords;
 	}
@@ -2081,15 +2082,15 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Returns `HAYSTACK + N_DWORDS' if the given `NEEDLE' wasn't found
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 $size_t memlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
-                int byte, $size_t n_bytes) = memlen;
+                int needle, $size_t n_bytes) = memlen;
 
 @@Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLENW))]]
 $size_t memlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
-                $uint16_t word, $size_t n_words) {
-	return (size_t)(memendw(haystack, word, n_words) - (u16 *)haystack);
+                $uint16_t needle, $size_t n_words) {
+	return (size_t)(memendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memendl', but return the offset from `HAYSTACK', rather than the actual address.
@@ -2097,23 +2098,23 @@ $size_t memlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLENL))]]
 $size_t memlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
-                $uint32_t dword, $size_t n_dwords) {
-	return (size_t)(memendl(haystack, dword, n_dwords) - (u32 *)haystack);
+                $uint32_t needle, $size_t n_dwords) {
+	return (size_t)(memendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 
 @@Same as `memrendb', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1' if the given `NEEDLE' wasn't found
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 $size_t memrlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
-                 int byte, $size_t n_bytes) = memrlen;
+                 int needle, $size_t n_bytes) = memrlen;
 
 @@Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRLENW))]]
 $size_t memrlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
-                 $uint16_t word, $size_t n_words) {
-	return (size_t)(memrendw(haystack, word, n_words) - (u16 *)haystack);
+                 $uint16_t needle, $size_t n_words) {
+	return (size_t)(memrendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memrendl', but return the offset from `HAYSTACK', rather than the actual address.
@@ -2121,8 +2122,8 @@ $size_t memrlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRLENL))]]
 $size_t memrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
-                 $uint32_t dword, $size_t n_dwords) {
-	return (size_t)(memrendl(haystack, dword, n_dwords) - (u32 *)haystack);
+                 $uint32_t needle, $size_t n_dwords) {
+	return (size_t)(memrendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 
 
@@ -2135,15 +2136,15 @@ $size_t rawmemlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
 @@Same as `rawmemchrw', but return the offset from `HAYSTACK', rather than the actual address.
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMLENW))]]
-$size_t rawmemlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
-	return (size_t)(rawmemchrw(haystack, word) - (u16 *)haystack);
+$size_t rawmemlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle) {
+	return (size_t)(rawmemchrw(haystack, needle) - (u16 *)haystack);
 }
 
 @@Same as `rawmemchrl', but return the offset from `HAYSTACK', rather than the actual address.
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMLENL))]]
-$size_t rawmemlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
-	return (size_t)(rawmemchrl(haystack, dword) - (u32 *)haystack);
+$size_t rawmemlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle) {
+	return (size_t)(rawmemchrl(haystack, needle) - (u32 *)haystack);
 }
 
 
@@ -2155,15 +2156,15 @@ $size_t rawmemrlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
 @@Same as `rawmemrchrw', but return the offset from `HAYSTACK', rather than the actual address.
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRLENW))]]
-$size_t rawmemrlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
-	return (size_t)(rawmemrchrw(haystack, word) - (u16 *)haystack);
+$size_t rawmemrlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle) {
+	return (size_t)(rawmemrchrw(haystack, needle) - (u16 *)haystack);
 }
 
 @@Same as `rawmemrchrl', but return the offset from `HAYSTACK', rather than the actual address.
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRLENL))]]
-$size_t rawmemrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
-	return (size_t)(rawmemrchrl(haystack, dword) - (u32 *)haystack);
+$size_t rawmemrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle) {
+	return (size_t)(rawmemrchrl(haystack, needle) - (u32 *)haystack);
 }
 
 
@@ -2367,13 +2368,13 @@ $int64_t memcmpq([[nonnull]] /*aligned(8)*/ void const *s1,
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRQ))]]
-$uint64_t *memchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
+$uint64_t *memchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
-		if unlikely(*hay_iter == (u64)qword)
+		if unlikely(*hay_iter == needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -2382,13 +2383,13 @@ $uint64_t *memchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRCHRQ))]]
-$uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
+$uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
-		if unlikely(*--iter == qword)
+		if unlikely(*--iter == needle)
 			return iter;
 	}
 	return NULL;
@@ -2397,13 +2398,13 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 @@Same as `memchrq' with a search limit of `(size_t)-1 / 8'
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMCHRQ))]]
-[[nonnull]] $uint64_t *rawmemchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *rawmemchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter == qword)
+		if unlikely(*iter == needle)
 			break;
 	}
 	return iter;
@@ -2412,13 +2413,13 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 @@Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK - 8'
 [[kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRCHRQ))]]
-[[nonnull]] $uint64_t *rawmemrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *rawmemrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
-		if unlikely(*--iter == qword)
+		if unlikely(*--iter == needle)
 			break;
 	}
 	return iter;
@@ -2427,13 +2428,13 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 @@Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMENDQ))]]
-[[nonnull]] $uint64_t *memendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *memendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_bytes): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_bytes): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result == qword)
+		if unlikely(*result == needle)
 			break;
 	}
 	return result;
@@ -2442,16 +2443,16 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 @@Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRENDQ))]]
-[[nonnull]] $uint64_t *memrendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *memrendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_qwords): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack + n_qwords;
 	for (;;) {
 		--result;
 		if unlikely(!n_qwords)
 			break;
-		if unlikely(*result == qword)
+		if unlikely(*result == needle)
 			break;
 		--n_qwords;
 	}
@@ -2463,8 +2464,8 @@ $uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLENQ))]]
 $size_t memlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
-                $uint64_t qword, $size_t n_qwords) {
-	return (size_t)(memendq(haystack, qword, n_qwords) - (u64 *)haystack);
+                $uint64_t needle, $size_t n_qwords) {
+	return (size_t)(memendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
@@ -2472,22 +2473,22 @@ $size_t memlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRLENQ))]]
 $size_t memrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
-                 $uint64_t qword, $size_t n_qwords) {
-	return (size_t)(memrendq(haystack, qword, n_qwords) - (u64 *)haystack);
+                 $uint64_t needle, $size_t n_qwords) {
+	return (size_t)(memrendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMLENQ))]]
-$size_t rawmemlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
-	return (size_t)(rawmemchrq(haystack, qword) - (u64 *)haystack);
+$size_t rawmemlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle) {
+	return (size_t)(rawmemchrq(haystack, needle) - (u64 *)haystack);
 }
 
 @@Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address.
 [[preferred_fastbind, libc, kernel, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRLENQ))]]
-$size_t rawmemrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
-	return (size_t)(rawmemrchrq(haystack, qword) - (u64 *)haystack);
+$size_t rawmemrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle) {
+	return (size_t)(rawmemrchrq(haystack, needle) - (u64 *)haystack);
 }
 
 
@@ -2545,7 +2546,7 @@ void *memrxchr([[nonnull]] void const *__restrict haystack, int needle, $size_t 
 }
 
 @@Same as `rawmemrchr', but search for non-matching locations.
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[wunused, ATTR_PURE, impl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXCHR))]]
 [[nonnull]] void *rawmemrxchr([[nonnull]] void const *__restrict haystack, int needle)
 	[([[nonnull]] void *__restrict haystack, int needle): [[nonnull]] void *]
@@ -2582,9 +2583,13 @@ void *memrxchr([[nonnull]] void const *__restrict haystack, int needle, $size_t 
 	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void const *]
 {
 	byte_t *result = (byte_t *)haystack + n_bytes;
-	while (n_bytes--) {
-		if unlikely(*--result != (byte_t)needle)
+	for (;;) {
+		--result;
+		if unlikely(!n_bytes)
 			break;
+		if unlikely(*result != (byte_t)needle)
+			break;
+		--n_bytes;
 	}
 	return result;
 }
@@ -2623,21 +2628,21 @@ $size_t rawmemrxlen([[nonnull]] void const *__restrict haystack, int needle) {
 
 @@Same as `memchrb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-$uint8_t *memxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
+$uint8_t *memxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): $uint8_t const *]
 	= memxchr;
 
 @@Same as `memchrw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXCHRW))]]
-$uint16_t *memxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
+$uint16_t *memxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t const *]
 {
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
-		if unlikely(*hay_iter != word)
+		if unlikely(*hay_iter != needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -2646,13 +2651,13 @@ $uint16_t *memxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, 
 @@Same as `memchrl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXCHRL))]]
-$uint32_t *memxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
+$uint32_t *memxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
-		if unlikely(*hay_iter != dword)
+		if unlikely(*hay_iter != needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -2660,21 +2665,21 @@ $uint32_t *memxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 
 @@Same as `memrchrb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-$uint8_t *memrxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
+$uint8_t *memrxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): $uint8_t const *]
 	= memrxchr;
 
 @@Same as `memrchrw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXCHRW))]]
-$uint16_t *memrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
+$uint16_t *memrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words): $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
-		if unlikely(*--iter != word)
+		if unlikely(*--iter != needle)
 			return iter;
 	}
 	return NULL;
@@ -2683,13 +2688,13 @@ $uint16_t *memrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
 @@Same as `memrchrl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXCHRL))]]
-$uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
+$uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
-		if unlikely(*--iter != dword)
+		if unlikely(*--iter != needle)
 			return iter;
 	}
 	return NULL;
@@ -2697,21 +2702,21 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 
 @@Same as `rawmemchrb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[nonnull]] $uint8_t *rawmemxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
+[[nonnull]] $uint8_t *rawmemxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle): [[nonnull]] $uint8_t const *]
 	= rawmemxchr;
 
 @@Same as `rawmemchrw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMXCHRW))]]
-[[nonnull]] $uint16_t *rawmemxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *rawmemxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter != word)
+		if unlikely(*iter != needle)
 			break;
 	}
 	return iter;
@@ -2720,13 +2725,13 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 @@Same as `rawmemchrl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMXCHRL))]]
-[[nonnull]] $uint32_t *rawmemxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *rawmemxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter != dword)
+		if unlikely(*iter != needle)
 			break;
 	}
 	return iter;
@@ -2735,21 +2740,21 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 
 @@Same as `rawmemrchrb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[nonnull]] $uint8_t *rawmemrxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
+[[nonnull]] $uint8_t *rawmemrxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle): [[nonnull]] $uint8_t const *]
 	= rawmemrxchr;
 
 @@Same as `rawmemrchrw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXCHRW))]]
-[[nonnull]] $uint16_t *rawmemrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *rawmemrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
-		if unlikely(*--iter != word)
+		if unlikely(*--iter != needle)
 			break;
 	}
 	return iter;
@@ -2758,13 +2763,13 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 @@Same as `rawmemrchrl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXCHRL))]]
-[[nonnull]] $uint32_t *rawmemrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *rawmemrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
-		if unlikely(*--iter != dword)
+		if unlikely(*--iter != needle)
 			break;
 	}
 	return iter;
@@ -2773,21 +2778,21 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 
 @@Same as `memendb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[nonnull]] $uint8_t *memxendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
+[[nonnull]] $uint8_t *memxendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t const *]
 	= memxend;
 
 @@Same as `memendw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXENDW))]]
-[[nonnull]] $uint16_t *memxendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *memxendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_bytes): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_bytes): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result != word)
+		if unlikely(*result != needle)
 			break;
 	}
 	return result;
@@ -2796,13 +2801,13 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 @@Same as `memendl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXENDL))]]
-[[nonnull]] $uint32_t *memxendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *memxendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_bytes): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_bytes): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result != dword)
+		if unlikely(*result != needle)
 			break;
 	}
 	return result;
@@ -2811,22 +2816,26 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 
 @@Same as `memrendb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[nonnull]] $uint8_t *memrxendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
+[[nonnull]] $uint8_t *memrxendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] $uint8_t const *]
 	= memrxend;
 
 @@Same as `memrendw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXENDW))]]
-[[nonnull]] $uint16_t *memrxendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *memrxendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t needle, $size_t n_words): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle, $size_t n_words): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack + n_words;
-	while (n_words--) {
-		if unlikely(*--result != word)
+	for (;;) {
+		--result;
+		if unlikely(!n_words)
 			break;
+		if unlikely(*result != needle)
+			break;
+		--n_words;
 	}
 	return result;
 }
@@ -2834,14 +2843,18 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 @@Same as `memrendl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXENDL))]]
-[[nonnull]] $uint32_t *memrxendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *memrxendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t needle, $size_t n_dwords): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle, $size_t n_dwords): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack + n_dwords;
-	while (n_dwords--) {
-		if unlikely(*--result != dword)
+	for (;;) {
+		--result;
+		if unlikely(!n_dwords)
 			break;
+		if unlikely(*result != needle)
+			break;
+		--n_dwords;
 	}
 	return result;
 }
@@ -2850,58 +2863,65 @@ $uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 
 @@Same as `memlenb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-$size_t memxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) = memxlen;
+$size_t memxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                 int needle, $size_t n_bytes) = memxlen;
 
 @@Same as `memlenw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXLENW))]]
-$size_t memxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) {
-	return (size_t)(memxendw(haystack, word, n_words) - (u16 *)haystack);
+$size_t memxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
+                 $uint16_t needle, $size_t n_words) {
+	return (size_t)(memxendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memlenl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXLENL))]]
-$size_t memxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) {
-	return (size_t)(memxendl(haystack, dword, n_dwords) - (u32 *)haystack);
+$size_t memxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
+                 $uint32_t needle, $size_t n_dwords) {
+	return (size_t)(memxendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 
 @@Same as `memrlenb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-$size_t memrxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) = memrxlen;
+$size_t memrxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                  int needle, $size_t n_bytes) = memrxlen;
 
 @@Same as `memrlenw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXLENW))]]
-$size_t memrxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) {
-	return (size_t)(memrxendw(haystack, word, n_words) - (u16 *)haystack);
+$size_t memrxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
+                  $uint16_t needle, $size_t n_words) {
+	return (size_t)(memrxendw(haystack, needle, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memrlenl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXLENL))]]
-$size_t memrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) {
-	return (size_t)(memrxendl(haystack, dword, n_dwords) - (u32 *)haystack);
+$size_t memrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
+                  $uint32_t needle, $size_t n_dwords) {
+	return (size_t)(memrxendl(haystack, needle, n_dwords) - (u32 *)haystack);
 }
 
 
 
 @@Same as `rawmemlenb', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-$size_t rawmemxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) = rawmemxlen;
+$size_t rawmemxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                    int needle) = rawmemxlen;
 
 @@Same as `rawmemlenw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMXLENW))]]
-$size_t rawmemxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
-	return (size_t)(rawmemxchrw(haystack, word) - (u16 *)haystack);
+$size_t rawmemxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle) {
+	return (size_t)(rawmemxchrw(haystack, needle) - (u16 *)haystack);
 }
 
 @@Same as `rawmemlenl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMXLENL))]]
-$size_t rawmemxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
-	return (size_t)(rawmemxchrl(haystack, dword) - (u32 *)haystack);
+$size_t rawmemxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle) {
+	return (size_t)(rawmemxchrl(haystack, needle) - (u32 *)haystack);
 }
 
 
@@ -2912,15 +2932,15 @@ $size_t rawmemrxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
 @@Same as `rawmemrlenw', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXLENW))]]
-$size_t rawmemrxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
-	return (size_t)(rawmemrxchrw(haystack, word) - (u16 *)haystack);
+$size_t rawmemrxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t needle) {
+	return (size_t)(rawmemrxchrw(haystack, needle) - (u16 *)haystack);
 }
 
 @@Same as `rawmemrlenl', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXLENL))]]
-$size_t rawmemrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
-	return (size_t)(rawmemrxchrl(haystack, dword) - (u32 *)haystack);
+$size_t rawmemrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t needle) {
+	return (size_t)(rawmemrxchrl(haystack, needle) - (u32 *)haystack);
 }
 
 
@@ -2930,13 +2950,13 @@ $size_t rawmemrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
 @@Same as `memchrq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXCHRQ))]]
-$uint64_t *memxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
+$uint64_t *memxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
-		if unlikely(*hay_iter != (u64)qword)
+		if unlikely(*hay_iter != needle)
 			return hay_iter;
 	}
 	return NULL;
@@ -2945,13 +2965,13 @@ $uint64_t *memxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, 
 @@Same as `memrchrq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXCHRQ))]]
-$uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
+$uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
-		if unlikely(*--iter != qword)
+		if unlikely(*--iter != needle)
 			return iter;
 	}
 	return NULL;
@@ -2960,13 +2980,13 @@ $uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 @@Same as `rawmemchrq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMXCHRQ))]]
-[[nonnull]] $uint64_t *rawmemxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *rawmemxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
-		if unlikely(*iter != qword)
+		if unlikely(*iter != needle)
 			break;
 	}
 	return iter;
@@ -2975,13 +2995,13 @@ $uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 @@Same as `rawmemrchrq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXCHRQ))]]
-[[nonnull]] $uint64_t *rawmemrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *rawmemrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
-		if unlikely(*--iter != qword)
+		if unlikely(*--iter != needle)
 			break;
 	}
 	return iter;
@@ -2990,13 +3010,13 @@ $uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 @@Same as `memendq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXENDQ))]]
-[[nonnull]] $uint64_t *memxendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *memxendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_bytes)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_bytes): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_bytes): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
-		if unlikely(*result != qword)
+		if unlikely(*result != needle)
 			break;
 	}
 	return result;
@@ -3005,14 +3025,18 @@ $uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 @@Same as `memrendq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXENDQ))]]
-[[nonnull]] $uint64_t *memrxendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *memrxendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t needle, $size_t n_qwords): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack + n_qwords;
-	while (n_qwords--) {
-		if unlikely(*--result != qword)
+	for (;;) {
+		--result;
+		if unlikely(!n_qwords)
 			break;
+		if unlikely(*result != needle)
+			break;
+		--n_qwords;
 	}
 	return result;
 }
@@ -3020,29 +3044,29 @@ $uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 @@Same as `memlenq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMXLENQ))]]
-$size_t memxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) {
-	return (size_t)(memxendq(haystack, qword, n_qwords) - (u64 *)haystack);
+$size_t memxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords) {
+	return (size_t)(memxendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `memrlenq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRXLENQ))]]
-$size_t memrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) {
-	return (size_t)(memrxendq(haystack, qword, n_qwords) - (u64 *)haystack);
+$size_t memrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle, $size_t n_qwords) {
+	return (size_t)(memrxendq(haystack, needle, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `rawmemlenq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMXLENQ))]]
-$size_t rawmemxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
-	return (size_t)(rawmemxchrq(haystack, qword) - (u64 *)haystack);
+$size_t rawmemxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle) {
+	return (size_t)(rawmemxchrq(haystack, needle) - (u64 *)haystack);
 }
 
 @@Same as `rawmemrlenq', but search for non-matching locations.
 [[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMRXLENQ))]]
-$size_t rawmemrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
-	return (size_t)(rawmemrxchrq(haystack, qword) - (u64 *)haystack);
+$size_t rawmemrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t needle) {
+	return (size_t)(rawmemrxchrq(haystack, needle) - (u64 *)haystack);
 }
 
 %#endif /* __UINT64_TYPE__ */

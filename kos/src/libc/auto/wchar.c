@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d52c9b7 */
+/* HASH CRC-32:0x4c4d841c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1470,7 +1470,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNU
 NOTHROW_NCX(LIBDCALL libd_wcschrnul)(char16_t const *haystack,
                                      char16_t needle) {
 	for (; *haystack; ++haystack) {
-		if (*haystack == (char16_t)needle)
+		if ((char16_t)*haystack == (char16_t)needle)
 			break;
 	}
 	return (char16_t *)haystack;
@@ -1480,7 +1480,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((
 NOTHROW_NCX(LIBKCALL libc_wcschrnul)(char32_t const *haystack,
                                      char32_t needle) {
 	for (; *haystack; ++haystack) {
-		if (*haystack == (char32_t)needle)
+		if ((char32_t)*haystack == (char32_t)needle)
 			break;
 	}
 	return (char32_t *)haystack;
