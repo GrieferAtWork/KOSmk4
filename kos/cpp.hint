@@ -721,10 +721,10 @@
 #define __CRT_PRIVATE_SLNG(sizeof)  long
 #define __CRT_PRIVATE_ULNG(sizeof)  unsigned long
 
-#define DECLARE_PREALLOCATION_CACHE(decl, name, T)          T *name##_alloc(gfp_t alloc_flags); void name##_free(T *p); size_t name##_clear(void);
-#define DECLARE_PREALLOCATION_CACHE_ALLOC_NX(decl, name, T) T *name##_alloc_nx(gfp_t alloc_flags);
-#define DEFINE_PREALLOCATION_CACHE(decl, name, T, max_size)
-#define DEFINE_PREALLOCATION_CACHE_ALLOC_NX(decl, name, T)
+#define DECLARE_PREALLOCATION_CACHE(decl,name,T)          T *name##_alloc(gfp_t alloc_flags); void name##_free(T *p); size_t name##_clear(void);
+#define DECLARE_PREALLOCATION_CACHE_ALLOC_NX(decl,name,T) T *name##_alloc_nx(gfp_t alloc_flags);
+#define DEFINE_PREALLOCATION_CACHE(decl,name,T,max_size)
+#define DEFINE_PREALLOCATION_CACHE_ALLOC_NX(decl,name,T)
 
 #define __BASIC_BLOCK_DEVICE_FIELDS                                                 \
 	refcnt_t bd_refcnt; size_t bd_heapsize; struct block_device_type bd_type;       \

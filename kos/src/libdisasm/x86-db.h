@@ -5312,6 +5312,97 @@ PRIVATE struct instruction const ops_xopa[] = {
 
 
 
+/* clang-format off */
+PRIVATE struct instruction const ops_3dnow[] = {
+/*[[[begin:ops_3dnow]]]*/
+	/* 3DNow! instructions (from `https://sandpile.org/x86/opc_k3d.htm') */
+
+/*	I(0x00, IF_MODRM, "tfadds.Rx TFd,TFs1,TFs2"), */
+/*	I(0x01, IF_MODRM, "tfaddd.Rx TFd,TFs1,TFs2"), */
+/*	I(0x02, IF_MODRM, "tfsubs.Rx TFd,TFs1,TFs2"), */
+/*	I(0x03, IF_MODRM, "tfsubd.Rx TFd,TFs1,TFs2"), */
+/*	I(0x04, IF_MODRM, "tfmuls.Rx TFd,TFs1,TFs2"), */
+/*	I(0x05, IF_MODRM, "tfmuld.Rx TFd,TFs1,TFs2"), */
+/*	I(0x06, IF_MODRM, "tfdivs.Rx TFd,TFs1,TFs2"), */
+/*	I(0x07, IF_MODRM, "tfdivd.Rx TFd,TFs1,TFs2"), */
+ 
+	I(0x0c, IF_MODRM, "pi2fw\t" OP_RM64_MM OP_RMM),
+	I(0x0d, IF_MODRM, "pi2fd\t" OP_RM64_MM OP_RMM),
+
+/*	I(0x10, IF_MODRM, "tfsqrts.Rx TFd,TFs"), */
+/*	I(0x11, IF_MODRM, "tfsqrtd.Rx TFd,TFs"), */
+/*	I(0x12, IF_MODRM, "tfprems TFd,TFs1,TFs2"), */
+/*	I(0x13, IF_MODRM, "tfpremd TFd,TFs1,TFs2"), */
+/*	I(0x14, IF_MODRM, "tfcomi TFd,TFs"), */
+/*	I(0x15, IF_MODRM, "tfucomi TFd,TFs"), */
+
+	I(0x1c, IF_MODRM, "pf2iw\t" OP_RM64_MM OP_RMM),
+	I(0x1d, IF_MODRM, "pf2id\t" OP_RM64_MM OP_RMM),
+
+/*	I(0x20, IF_MODRM, "tfcmovb TFd,TFs"), */
+/*	I(0x21, IF_MODRM, "tfcmove TFd,TFs"), */
+/*	I(0x22, IF_MODRM, "tfcmovbe TFd,TFs"), */
+/*	I(0x23, IF_MODRM, "tfcmovu TFd,TFs"), */
+/*	I(0x24, IF_MODRM, "tfcmovnb TFd,TFs"), */
+/*	I(0x25, IF_MODRM, "tfcmovne TFd,TFs"), */
+/*	I(0x26, IF_MODRM, "tfcmovnbe TFd,TFs"), */
+/*	I(0x27, IF_MODRM, "tfcmovnu TFd,TFs"), */
+
+/*	I(0x30, IF_MODRM, "tfabs TFd,TFs"), */
+/*	I(0x31, IF_MODRM, "tfcpys TFd,TFs1,TFs2"), */
+/*	I(0x32, IF_MODRM, "tfcpysn TFd,TFs1,TFs2"), */
+/*	I(0x33, IF_MODRM, "tfcpyse TFd,TFs1,TFs2"), */
+
+/*	I(0x40, IF_MODRM, "tfcvt32d.Rx TFd,TFs"), */
+/*	I(0x41, IF_MODRM, "tfcvt32s.Rx TFd,TFs"), */
+/*	I(0x42, IF_MODRM, "tfcvt64d.Rx TFd,TFs"), */
+/*	I(0x43, IF_MODRM, "tfcvt64s.Rx TFd,TFs"), */
+/*	I(0x44, IF_MODRM, "tfcvtf64.Rx TFd,TFs"), */
+/*	I(0x45, IF_MODRM, "tfcvtf32.Rx TFd,TFs"), */
+/*	I(0x46, IF_MODRM, "tfcvtds.Rx TFd,TFs"), */
+
+/*	I(0x50, IF_MODRM, "tfld32 TF0...7,Md"), */
+/*	I(0x51, IF_MODRM, "tfld32 TF8...15,Md"), */
+/*	I(0x52, IF_MODRM, "tfld64 TF0...7,Mq"), */
+/*	I(0x53, IF_MODRM, "tfld64 TF8...15,Mq"), */
+/*	I(0x54, IF_MODRM, "tfst32 Md,TF0...7"), */
+/*	I(0x55, IF_MODRM, "tfst32 Md,TF8...15"), */
+/*	I(0x56, IF_MODRM, "tfst64 Mq,TF0...7"), */
+/*	I(0x57, IF_MODRM, "tfst64 Mq,TF8...15"), */
+
+	I(0x86, IF_MODRM, "pfrcpv\t" OP_RM64_MM OP_RMM),
+	I(0x87, IF_MODRM, "pfrsqrtv\t" OP_RM64_MM OP_RMM),
+	I(0x8a, IF_MODRM, "pfnacc\t" OP_RM64_MM OP_RMM),
+	I(0x8e, IF_MODRM, "pfpnacc\t" OP_RM64_MM OP_RMM),
+
+	I(0x91, IF_MODRM, "pfcmpge\t" OP_RM64_MM OP_RMM),
+	I(0x94, IF_MODRM, "pfmin\t" OP_RM64_MM OP_RMM),
+	I(0x96, IF_MODRM, "pfrcp\t" OP_RM64_MM OP_RMM),
+	I(0x97, IF_MODRM, "pfrsqrt\t" OP_RM64_MM OP_RMM),
+	I(0x9a, IF_MODRM, "pfsub\t" OP_RM64_MM OP_RMM),
+	I(0x9e, IF_MODRM, "pfadd\t" OP_RM64_MM OP_RMM),
+
+	I(0xa1, IF_MODRM, "pfcmpgt\t" OP_RM64_MM OP_RMM),
+	I(0xa4, IF_MODRM, "pfmax\t" OP_RM64_MM OP_RMM),
+	I(0xa6, IF_MODRM, "pfrcpit1\t" OP_RM64_MM OP_RMM),
+	I(0xa7, IF_MODRM, "pfrsqit1\t" OP_RM64_MM OP_RMM),
+	I(0xaa, IF_MODRM, "pfsubr\t" OP_RM64_MM OP_RMM),
+	I(0xae, IF_MODRM, "pfacc\t" OP_RM64_MM OP_RMM),
+
+	I(0xb1, IF_MODRM, "pfcmpeq\t" OP_RM64_MM OP_RMM),
+	I(0xb4, IF_MODRM, "pfmul\t" OP_RM64_MM OP_RMM),
+	I(0xb6, IF_MODRM, "pfrcpit2\t" OP_RM64_MM OP_RMM),
+	I(0xb7, IF_MODRM, "pmulhrw\t" OP_RM64_MM OP_RMM),
+	I(0xbb, IF_MODRM, "pswapd\t" OP_RM64_MM OP_RMM),
+	I(0xbf, IF_MODRM, "pavgusb\t" OP_RM64_MM OP_RMM),
+
+	I(0, 0, "")
+/*[[[end:ops_3dnow]]]*/
+};
+/* clang-format on */
+
+
+
 
 /*[[[deemon
 import * from deemon;
@@ -5398,14 +5489,15 @@ function generateOffsetTable(name: string) {
 	print;
 	return offsets;
 }
-local normal_offsets = generateOffsetTable("ops");
-generateOffsetTable("ops_0f");
+local offsets_norm = generateOffsetTable("ops");
+local offsets_0f = generateOffsetTable("ops_0f");
 generateOffsetTable("ops_0f38");
 generateOffsetTable("ops_0f3a");
 // generateOffsetTable("ops_xop8");
 // generateOffsetTable("ops_xop9");
 // generateOffsetTable("ops_xopa");
-print "#define OPS_OFFETSOF_90h", normal_offsets[0x90];
+print "#define OPS_OFFETSOF_90h   ", offsets_norm[0x90];
+print "#define OPS_0F_OFFETSOF_0fh", offsets_0f[0x0f];
 
 ]]]*/
 #define HAVE_OPS_OFFSETS 1
@@ -5492,7 +5584,8 @@ PRIVATE u8 const ops_0f3a_offsets[256] = {
 	165, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167, 167
 };
 
-#define OPS_OFFETSOF_90h 352
+#define OPS_OFFETSOF_90h    352
+#define OPS_0F_OFFETSOF_0fh 1170
 //[[[end]]]
 
 

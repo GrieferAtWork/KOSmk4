@@ -1663,6 +1663,20 @@ unknown_opcode:
 		args_start = NULL;
 		goto search_chain;
 	}
+	if (chain == ops_0f + OPS_0F_OFFETSOF_0fh && opcode == 0x0f) {
+		/* Special case: `3DNow!` instructions. */
+		args_start = (byte_t *)emu86_opcode_decode(text_start, &opcode, &op_flags);
+		self->d_pc = emu86_modrm_decode(args_start, &rm, op_flags);
+		chain      = ops_3dnow;
+		/* `3DNow!` instructions encode the opcode byte _after_ the modr/m suffix!
+		 * as such, all together, they behave more akin to a single instruction:
+		 *    I(0x0f0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx) */
+		opcode     = *self->d_pc++;
+#ifdef CONFIG_AUTOSELECT_JCC
+		whole_opcode = 0;
+#endif /* CONFIG_AUTOSELECT_JCC */
+		goto search_chain;
+	}
 print_byte:
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 	disasm_print(self, ".byte", 5);
