@@ -234,7 +234,9 @@ PRIVATE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_make_const(unwind_emulator_t *__restrict self,
                                  unwind_ste_t *__restrict ste) {
 	if (ste->s_type != UNWIND_STE_CONSTANT) {
-		if (ste->s_type == UNWIND_STE_REGISTER) {
+		/* NOTE: `UNWIND_STE_REGPOINTER' isn't technically actually allowed here! */
+		if (ste->s_type == UNWIND_STE_REGISTER ||
+		    ste->s_type == UNWIND_STE_REGPOINTER) {
 			union {
 				uintptr_t p;
 				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
@@ -433,6 +435,7 @@ copy_bits(byte_t *__restrict dst_base, unsigned int dst_bit_offset,
 	}
 }
 
+/* Do the equivalent of `WRITE_BITS(*ADDR_OF(str))' */
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
@@ -441,7 +444,9 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 	assert(UNWIND_STE_ISWRITABLE(ste->s_type));
 	if unlikely(((self->ue_piecebits + num_bits + 7) / 8) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
-	if (ste->s_type == UNWIND_STE_REGISTER) {
+	switch (ste->s_type) {
+
+	case UNWIND_STE_REGPOINTER: {
 		byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
 		if unlikely(!self->ue_regset)
 			ERROR(err_not_writable);
@@ -469,10 +474,27 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 		                                ste->s_register,
 		                                buf))
 			ERROR(err_invalid_register);
-	} else {
+	}	break;
+
+	case UNWIND_STE_CONSTANT:
+	case UNWIND_STE_REGISTER:
+	case UNWIND_STE_RW_LVALUE:
+/* 	case UNWIND_STE_RO_LVALUE: */ {
+		byte_t *lvalue;
+		lvalue = ste->s_lvalue;
+		if (ste->s_type == UNWIND_STE_REGISTER) {
+			/* Convert to l-value */
+			union {
+				uintptr_t p;
+				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+			} regval;
+			if unlikely(!(*self->ue_regget)(self->ue_regget_arg, ste->s_register, regval.buf))
+				ERRORF(err_invalid_register, "ste->s_register = %u\n", (unsigned int)ste->s_register);
+			lvalue = (byte_t *)regval.p + ste->s_regoffset;
+		}
 		/* Copy data into the l-value. */
 		TRY {
-			copy_bits(ste->s_lvalue,
+			copy_bits(lvalue,
 			          target_left_shift,
 			          self->ue_piecebuf,
 			          self->ue_piecebits,
@@ -482,6 +504,10 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 				RETHROW();
 			ERROR(err_segfault);
 		}
+	}	break;
+
+	default:
+		goto err_not_writable;
 	}
 	/* Update the number of consumed piece bits. */
 	self->ue_piecebits += num_bits;
@@ -496,6 +522,8 @@ err_not_writable:
 	return UNWIND_EMULATOR_NOT_WRITABLE;
 }
 
+
+/* Do the equivalent of `READ_BITS(*ADDR_OF(str))' */
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
                                       unwind_ste_t const *__restrict ste,
@@ -503,7 +531,6 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
                                       unsigned int target_left_shift) {
 	switch (ste->s_type) {
 
-	case UNWIND_STE_CONSTANT:
 	case UNWIND_STE_STACKVALUE: {
 		uintptr_t temp;
 		temp = ste->s_uconst;
@@ -525,7 +552,7 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
 		}
 	}	break;
 
-	case UNWIND_STE_REGISTER: {
+	case UNWIND_STE_REGPOINTER: {
 		byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
 		size_t max_bits;
 		memset(buf, 0, sizeof(buf));
@@ -563,16 +590,30 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
 		}
 	}	break;
 
+	case UNWIND_STE_CONSTANT:
+	case UNWIND_STE_REGISTER:
 	case UNWIND_STE_RO_LVALUE:
-	case UNWIND_STE_RW_LVALUE:
+	case UNWIND_STE_RW_LVALUE: {
+		byte_t *lvalue;
+		lvalue = ste->s_lvalue;
+		if (ste->s_type == UNWIND_STE_REGISTER) {
+			/* Convert to l-value */
+			union {
+				uintptr_t p;
+				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+			} regval;
+			if unlikely(!(*self->ue_regget)(self->ue_regget_arg, ste->s_register, regval.buf))
+				ERRORF(err_invalid_register, "ste->s_register = %u\n", (unsigned int)ste->s_register);
+			lvalue = (byte_t *)regval.p + ste->s_regoffset;
+		}
 		copy_bits(self->ue_piecebuf,
 		          self->ue_piecebits,
-		          ste->s_lvalue,
+		          lvalue,
 		          target_left_shift,
 		          num_bits);
 		/* Update the number of stored piece bits. */
 		self->ue_piecebits += num_bits;
-		break;
+	}	break;
 
 	default:
 		ERRORF(err_illegal_instruction, "ste->s_type = %I8u\n", ste->s_type);
@@ -643,8 +684,15 @@ again_switch_opcode:
 			if unlikely(!stacksz)
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT) {
+do_make_top_const_or_register:
+				if (TOP.s_type == UNWIND_STE_REGPOINTER) {
+					TOP.s_type = UNWIND_STE_REGISTER;
+					goto again_switch_opcode;
+				}
 do_make_top_const:
-				if (TOP.s_type == UNWIND_STE_REGISTER) {
+				/* NOTE: `UNWIND_STE_REGPOINTER' isn't technically actually allowed here! */
+				if (TOP.s_type == UNWIND_STE_REGISTER ||
+				    TOP.s_type == UNWIND_STE_REGPOINTER) {
 					union {
 						uintptr_t p;
 						byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
@@ -806,42 +854,8 @@ do_make_top_const:
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT) {
-do_make_second_const:
-				if (SECOND.s_type == UNWIND_STE_REGISTER) {
-					union {
-						uintptr_t p;
-						byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
-					} regval;
-					if unlikely(!(*self->ue_regget)(self->ue_regget_arg, SECOND.s_register, regval.buf))
-						ERROR(err_invalid_register);
-					SECOND.s_uconst = regval.p + SECOND.s_regoffset;
-				} else if (SECOND.s_type == UNWIND_STE_RW_LVALUE ||
-				           SECOND.s_type == UNWIND_STE_RO_LVALUE) {
-					if (SECOND.s_lsize >= sizeof(uintptr_t)) {
-						if unlikely(!guarded_readptr((uintptr_t *)SECOND.s_lvalue, &SECOND.s_uconst))
-							ERROR(err_segfault);
-#if __SIZEOF_POINTER__ > 4
-					} else if (self->ue_addrsize >= 4) {
-						if unlikely(!guarded_readl((uint32_t *)SECOND.s_lvalue, &SECOND.s_uconst))
-							ERROR(err_segfault);
-#endif /* __SIZEOF_POINTER__ > 4 */
-					} else if (self->ue_addrsize >= 2) {
-						if unlikely(!guarded_readw((uint16_t *)SECOND.s_lvalue, &SECOND.s_uconst))
-							ERROR(err_segfault);
-					} else {
-						if unlikely(!guarded_readb((uint8_t *)SECOND.s_lvalue, &SECOND.s_uconst))
-							ERROR(err_segfault);
-					}
-				} else if (SECOND.s_type == UNWIND_STE_STACKVALUE) {
-					SECOND.s_type = UNWIND_STE_CONSTANT;
-				} else {
-					/* Shouldn't get here... */
-					ERROR(err_illegal_instruction);
-				}
-				SECOND.s_type = UNWIND_STE_CONSTANT;
-				goto again_switch_opcode;
-			}
+			if (SECOND.s_type != UNWIND_STE_CONSTANT)
+				goto do_make_second_const;
 			SECOND.s_uconst &= TOP.s_uconst;
 			--stacksz;
 			break;
@@ -866,7 +880,7 @@ do_make_second_const:
 				goto do_make_top_const;
 			if (SECOND.s_type != UNWIND_STE_CONSTANT &&
 			    SECOND.s_type != UNWIND_STE_REGISTER)
-				goto do_make_second_const;
+				goto do_make_second_const_or_register;
 			SECOND.s_uconst -= TOP.s_uconst;
 			--stacksz;
 			break;
@@ -927,9 +941,49 @@ do_make_second_const:
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT &&
-			    SECOND.s_type != UNWIND_STE_REGISTER)
-				goto do_make_second_const;
+			if (SECOND.s_type != UNWIND_STE_CONSTANT) {
+				/* NOTE: `UNWIND_STE_REGPOINTER' isn't technically actually allowed here! */
+do_make_second_const_or_register:
+				if (SECOND.s_type == UNWIND_STE_REGPOINTER) {
+					SECOND.s_type = UNWIND_STE_REGISTER;
+					goto again_switch_opcode;
+				}
+do_make_second_const:
+				if (SECOND.s_type == UNWIND_STE_REGISTER ||
+				    SECOND.s_type == UNWIND_STE_REGPOINTER) {
+					union {
+						uintptr_t p;
+						byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+					} regval;
+					if unlikely(!(*self->ue_regget)(self->ue_regget_arg, SECOND.s_register, regval.buf))
+						ERROR(err_invalid_register);
+					SECOND.s_uconst = regval.p + SECOND.s_regoffset;
+				} else if (SECOND.s_type == UNWIND_STE_RW_LVALUE ||
+				           SECOND.s_type == UNWIND_STE_RO_LVALUE) {
+					if (SECOND.s_lsize >= sizeof(uintptr_t)) {
+						if unlikely(!guarded_readptr((uintptr_t *)SECOND.s_lvalue, &SECOND.s_uconst))
+							ERROR(err_segfault);
+#if __SIZEOF_POINTER__ > 4
+					} else if (self->ue_addrsize >= 4) {
+						if unlikely(!guarded_readl((uint32_t *)SECOND.s_lvalue, &SECOND.s_uconst))
+							ERROR(err_segfault);
+#endif /* __SIZEOF_POINTER__ > 4 */
+					} else if (self->ue_addrsize >= 2) {
+						if unlikely(!guarded_readw((uint16_t *)SECOND.s_lvalue, &SECOND.s_uconst))
+							ERROR(err_segfault);
+					} else {
+						if unlikely(!guarded_readb((uint8_t *)SECOND.s_lvalue, &SECOND.s_uconst))
+							ERROR(err_segfault);
+					}
+				} else if (SECOND.s_type == UNWIND_STE_STACKVALUE) {
+					SECOND.s_type = UNWIND_STE_CONSTANT;
+				} else {
+					/* Shouldn't get here... */
+					ERROR(err_illegal_instruction);
+				}
+				SECOND.s_type = UNWIND_STE_CONSTANT;
+				goto again_switch_opcode;
+			}
 			SECOND.s_uconst += TOP.s_uconst;
 			--stacksz;
 			break;
@@ -939,7 +993,7 @@ do_make_second_const:
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT &&
 			    TOP.s_type != UNWIND_STE_REGISTER)
-				goto do_make_top_const;
+				goto do_make_top_const_or_register;
 			TOP.s_uconst += dwarf_decode_uleb128(&pc);
 			break;
 
@@ -1122,34 +1176,22 @@ do_make_second_const:
 			break;
 
 		CASE(DW_OP_reg0 ... DW_OP_reg31)
+			/* NOTE: These opcodes push the _ADDRESS_OF_ a register (within an imaginary register map)!
+			 *       Not the actual value of the register! */
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
+			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGPOINTER;
 			self->ue_stack[stacksz].s_register  = opcode - DW_OP_reg0;
 			self->ue_stack[stacksz].s_regoffset = 0;
 			++stacksz;
 			break;
 
-		CASE(DW_OP_breg0 ... DW_OP_breg31) {
-			union {
-				uintptr_t p;
-				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
-			} regval;
-			if unlikely(stacksz >= self->ue_stackmax)
-				ERROR(err_stack_overflow);
-			if unlikely(!(*self->ue_regget)(self->ue_regget_arg,
-			                                opcode - DW_OP_breg0,
-			                                regval.buf))
-				ERROR(err_invalid_register);
-			self->ue_stack[stacksz].s_lvalue = (byte_t *)regval.p + dwarf_decode_sleb128(&pc);
-			self->ue_stack[stacksz].s_type   = UNWIND_STE_RW_LVALUE;
-			++stacksz;
-		}	break;
-
 		CASE(DW_OP_regx)
+			/* NOTE: This opcode pushes the _ADDRESS_OF_ a register (within an imaginary register map)!
+			 *       Not the actual value of the register! */
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
+			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGPOINTER;
 			self->ue_stack[stacksz].s_register  = (unwind_regno_t)dwarf_decode_uleb128(&pc);
 			self->ue_stack[stacksz].s_regoffset = 0;
 			++stacksz;
@@ -1202,20 +1244,21 @@ do_make_second_const:
 			TOP.s_sconst += dwarf_decode_sleb128(&pc);
 		}	break;
 
-		CASE(DW_OP_bregx) {
-			union {
-				uintptr_t p;
-				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
-			} regval;
-			unwind_regno_t regno;
+		CASE(DW_OP_breg0 ... DW_OP_breg31) {
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			regno = (unwind_regno_t)dwarf_decode_uleb128(&pc);
-			if unlikely(!(*self->ue_regget)(self->ue_regget_arg,
-			                                regno, regval.buf))
-				ERROR(err_invalid_register);
-			self->ue_stack[stacksz].s_lvalue = (byte_t *)regval.p + dwarf_decode_sleb128(&pc);
-			self->ue_stack[stacksz].s_type   = UNWIND_STE_RW_LVALUE;
+			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
+			self->ue_stack[stacksz].s_register  = opcode - DW_OP_breg0;
+			self->ue_stack[stacksz].s_regoffset = dwarf_decode_sleb128(&pc);
+			++stacksz;
+		}	break;
+
+		CASE(DW_OP_bregx) {
+			if unlikely(stacksz >= self->ue_stackmax)
+				ERROR(err_stack_overflow);
+			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
+			self->ue_stack[stacksz].s_register  = (unwind_regno_t)dwarf_decode_uleb128(&pc);
+			self->ue_stack[stacksz].s_regoffset = dwarf_decode_sleb128(&pc);
 			++stacksz;
 		}	break;
 
@@ -1341,7 +1384,7 @@ do_read_bit_pieces:
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT &&
 			    TOP.s_type != UNWIND_STE_REGISTER)
-				goto do_make_top_const;
+				goto do_make_top_const_or_register;
 			TOP.s_uconst += (uintptr_t)self->ue_tlsbase;
 			break;
 
@@ -1378,10 +1421,7 @@ do_read_bit_pieces:
 		CASE(DW_OP_stack_value)
 			if unlikely(stacksz < 1)
 				ERROR(err_stack_underflow);
-			/* L-Value operands are converted back into their address-form */
-			if (TOP.s_type != UNWIND_STE_RW_LVALUE &&
-			    TOP.s_type != UNWIND_STE_RO_LVALUE &&
-			    !UNWIND_STE_ISCONSTANT(TOP.s_type))
+			if (!UNWIND_STE_ISCONSTANT(TOP.s_type))
 				goto do_make_top_const;
 			TOP.s_type = UNWIND_STE_STACKVALUE;
 			break;
@@ -1983,9 +2023,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
 		result = UNWIND_SUCCESS; /* No stack-entry location. */
 	else if (result == UNWIND_SUCCESS) {
-		/* Use the last stack entry to as the missing data-piece. */
-		if (ste_top.s_type == UNWIND_STE_CONSTANT)
-			ste_top.s_type = UNWIND_STE_RW_LVALUE;
+		/* Dereference the last stack to fill in the missing data pieces. */
 		result = libuw_unwind_emulator_read_from_piece(&emulator,
 		                                               &ste_top,
 		                                               (bufsize * 8) - emulator.ue_piecebits,
@@ -2044,17 +2082,12 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
 		result = UNWIND_SUCCESS; /* No stack-entry location. */
 	else if (result == UNWIND_SUCCESS) {
-		if (ste_top.s_type == UNWIND_STE_CONSTANT)
-			ste_top.s_type = UNWIND_STE_RW_LVALUE;
-		if (!UNWIND_STE_ISWRITABLE(ste_top.s_type))
-			goto not_writable;
-		/* Use the last stack entry to as the missing data-piece. */
+		/* Dereference the last stack to fill in the missing data pieces. */
 		result = libuw_unwind_emulator_write_to_piece(&emulator,
 		                                              &ste_top,
 		                                              (bufsize * 8) - emulator.ue_piecebits,
 		                                              0);
 	} else {
-not_writable:
 		result = UNWIND_EMULATOR_NOT_WRITABLE;
 	}
 	*pnum_read_bits = emulator.ue_piecebits;

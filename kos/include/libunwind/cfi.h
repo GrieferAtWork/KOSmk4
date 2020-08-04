@@ -162,73 +162,73 @@
 #define DW_OP_lit29                 0x4d /* [+0]   PUSH(29); */
 #define DW_OP_lit30                 0x4e /* [+0]   PUSH(30); */
 #define DW_OP_lit31                 0x4f /* [+0]   PUSH(31); */
-#define DW_OP_reg0                  0x50 /* [+0]   PUSH(GET_CONTEXT_REGISTER(0)); */
-#define DW_OP_reg1                  0x51 /* [+0]   PUSH(GET_CONTEXT_REGISTER(1)); */
-#define DW_OP_reg2                  0x52 /* [+0]   PUSH(GET_CONTEXT_REGISTER(2)); */
-#define DW_OP_reg3                  0x53 /* [+0]   PUSH(GET_CONTEXT_REGISTER(3)); */
-#define DW_OP_reg4                  0x54 /* [+0]   PUSH(GET_CONTEXT_REGISTER(4)); */
-#define DW_OP_reg5                  0x55 /* [+0]   PUSH(GET_CONTEXT_REGISTER(5)); */
-#define DW_OP_reg6                  0x56 /* [+0]   PUSH(GET_CONTEXT_REGISTER(6)); */
-#define DW_OP_reg7                  0x57 /* [+0]   PUSH(GET_CONTEXT_REGISTER(7)); */
-#define DW_OP_reg8                  0x58 /* [+0]   PUSH(GET_CONTEXT_REGISTER(8)); */
-#define DW_OP_reg9                  0x59 /* [+0]   PUSH(GET_CONTEXT_REGISTER(9)); */
-#define DW_OP_reg10                 0x5a /* [+0]   PUSH(GET_CONTEXT_REGISTER(10)); */
-#define DW_OP_reg11                 0x5b /* [+0]   PUSH(GET_CONTEXT_REGISTER(11)); */
-#define DW_OP_reg12                 0x5c /* [+0]   PUSH(GET_CONTEXT_REGISTER(12)); */
-#define DW_OP_reg13                 0x5d /* [+0]   PUSH(GET_CONTEXT_REGISTER(13)); */
-#define DW_OP_reg14                 0x5e /* [+0]   PUSH(GET_CONTEXT_REGISTER(14)); */
-#define DW_OP_reg15                 0x5f /* [+0]   PUSH(GET_CONTEXT_REGISTER(15)); */
-#define DW_OP_reg16                 0x60 /* [+0]   PUSH(GET_CONTEXT_REGISTER(16)); */
-#define DW_OP_reg17                 0x61 /* [+0]   PUSH(GET_CONTEXT_REGISTER(17)); */
-#define DW_OP_reg18                 0x62 /* [+0]   PUSH(GET_CONTEXT_REGISTER(18)); */
-#define DW_OP_reg19                 0x63 /* [+0]   PUSH(GET_CONTEXT_REGISTER(19)); */
-#define DW_OP_reg20                 0x64 /* [+0]   PUSH(GET_CONTEXT_REGISTER(20)); */
-#define DW_OP_reg21                 0x65 /* [+0]   PUSH(GET_CONTEXT_REGISTER(21)); */
-#define DW_OP_reg22                 0x66 /* [+0]   PUSH(GET_CONTEXT_REGISTER(22)); */
-#define DW_OP_reg23                 0x67 /* [+0]   PUSH(GET_CONTEXT_REGISTER(23)); */
-#define DW_OP_reg24                 0x68 /* [+0]   PUSH(GET_CONTEXT_REGISTER(24)); */
-#define DW_OP_reg25                 0x69 /* [+0]   PUSH(GET_CONTEXT_REGISTER(25)); */
-#define DW_OP_reg26                 0x6a /* [+0]   PUSH(GET_CONTEXT_REGISTER(26)); */
-#define DW_OP_reg27                 0x6b /* [+0]   PUSH(GET_CONTEXT_REGISTER(27)); */
-#define DW_OP_reg28                 0x6c /* [+0]   PUSH(GET_CONTEXT_REGISTER(28)); */
-#define DW_OP_reg29                 0x6d /* [+0]   PUSH(GET_CONTEXT_REGISTER(29)); */
-#define DW_OP_reg30                 0x6e /* [+0]   PUSH(GET_CONTEXT_REGISTER(30)); */
-#define DW_OP_reg31                 0x6f /* [+0]   PUSH(GET_CONTEXT_REGISTER(31)); */
-#define DW_OP_breg0                 0x70 /* [+*]   PUSH(GET_CONTEXT_REGISTER(0) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg1                 0x71 /* [+*]   PUSH(GET_CONTEXT_REGISTER(1) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg2                 0x72 /* [+*]   PUSH(GET_CONTEXT_REGISTER(2) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg3                 0x73 /* [+*]   PUSH(GET_CONTEXT_REGISTER(3) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg4                 0x74 /* [+*]   PUSH(GET_CONTEXT_REGISTER(4) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg5                 0x75 /* [+*]   PUSH(GET_CONTEXT_REGISTER(5) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg6                 0x76 /* [+*]   PUSH(GET_CONTEXT_REGISTER(6) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg7                 0x77 /* [+*]   PUSH(GET_CONTEXT_REGISTER(7) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg8                 0x78 /* [+*]   PUSH(GET_CONTEXT_REGISTER(8) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg9                 0x79 /* [+*]   PUSH(GET_CONTEXT_REGISTER(9) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg10                0x7a /* [+*]   PUSH(GET_CONTEXT_REGISTER(10) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg11                0x7b /* [+*]   PUSH(GET_CONTEXT_REGISTER(11) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg12                0x7c /* [+*]   PUSH(GET_CONTEXT_REGISTER(12) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg13                0x7d /* [+*]   PUSH(GET_CONTEXT_REGISTER(13) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg14                0x7e /* [+*]   PUSH(GET_CONTEXT_REGISTER(14) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg15                0x7f /* [+*]   PUSH(GET_CONTEXT_REGISTER(15) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg16                0x80 /* [+*]   PUSH(GET_CONTEXT_REGISTER(16) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg17                0x81 /* [+*]   PUSH(GET_CONTEXT_REGISTER(17) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg18                0x82 /* [+*]   PUSH(GET_CONTEXT_REGISTER(18) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg19                0x83 /* [+*]   PUSH(GET_CONTEXT_REGISTER(19) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg20                0x84 /* [+*]   PUSH(GET_CONTEXT_REGISTER(20) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg21                0x85 /* [+*]   PUSH(GET_CONTEXT_REGISTER(21) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg22                0x86 /* [+*]   PUSH(GET_CONTEXT_REGISTER(22) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg23                0x87 /* [+*]   PUSH(GET_CONTEXT_REGISTER(23) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg24                0x88 /* [+*]   PUSH(GET_CONTEXT_REGISTER(24) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg25                0x89 /* [+*]   PUSH(GET_CONTEXT_REGISTER(25) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg26                0x8a /* [+*]   PUSH(GET_CONTEXT_REGISTER(26) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg27                0x8b /* [+*]   PUSH(GET_CONTEXT_REGISTER(27) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg28                0x8c /* [+*]   PUSH(GET_CONTEXT_REGISTER(28) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg29                0x8d /* [+*]   PUSH(GET_CONTEXT_REGISTER(29) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg30                0x8e /* [+*]   PUSH(GET_CONTEXT_REGISTER(30) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg31                0x8f /* [+*]   PUSH(GET_CONTEXT_REGISTER(31) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_regx                  0x90 /* [+*]   PUSH(GET_CONTEXT_REGISTER(dwarf_decode_uleb128(&pc))); */
+#define DW_OP_reg0                  0x50 /* [+0]   PUSH(GET_CONTEXT_REGADDR(0)); */
+#define DW_OP_reg1                  0x51 /* [+0]   PUSH(GET_CONTEXT_REGADDR(1)); */
+#define DW_OP_reg2                  0x52 /* [+0]   PUSH(GET_CONTEXT_REGADDR(2)); */
+#define DW_OP_reg3                  0x53 /* [+0]   PUSH(GET_CONTEXT_REGADDR(3)); */
+#define DW_OP_reg4                  0x54 /* [+0]   PUSH(GET_CONTEXT_REGADDR(4)); */
+#define DW_OP_reg5                  0x55 /* [+0]   PUSH(GET_CONTEXT_REGADDR(5)); */
+#define DW_OP_reg6                  0x56 /* [+0]   PUSH(GET_CONTEXT_REGADDR(6)); */
+#define DW_OP_reg7                  0x57 /* [+0]   PUSH(GET_CONTEXT_REGADDR(7)); */
+#define DW_OP_reg8                  0x58 /* [+0]   PUSH(GET_CONTEXT_REGADDR(8)); */
+#define DW_OP_reg9                  0x59 /* [+0]   PUSH(GET_CONTEXT_REGADDR(9)); */
+#define DW_OP_reg10                 0x5a /* [+0]   PUSH(GET_CONTEXT_REGADDR(10)); */
+#define DW_OP_reg11                 0x5b /* [+0]   PUSH(GET_CONTEXT_REGADDR(11)); */
+#define DW_OP_reg12                 0x5c /* [+0]   PUSH(GET_CONTEXT_REGADDR(12)); */
+#define DW_OP_reg13                 0x5d /* [+0]   PUSH(GET_CONTEXT_REGADDR(13)); */
+#define DW_OP_reg14                 0x5e /* [+0]   PUSH(GET_CONTEXT_REGADDR(14)); */
+#define DW_OP_reg15                 0x5f /* [+0]   PUSH(GET_CONTEXT_REGADDR(15)); */
+#define DW_OP_reg16                 0x60 /* [+0]   PUSH(GET_CONTEXT_REGADDR(16)); */
+#define DW_OP_reg17                 0x61 /* [+0]   PUSH(GET_CONTEXT_REGADDR(17)); */
+#define DW_OP_reg18                 0x62 /* [+0]   PUSH(GET_CONTEXT_REGADDR(18)); */
+#define DW_OP_reg19                 0x63 /* [+0]   PUSH(GET_CONTEXT_REGADDR(19)); */
+#define DW_OP_reg20                 0x64 /* [+0]   PUSH(GET_CONTEXT_REGADDR(20)); */
+#define DW_OP_reg21                 0x65 /* [+0]   PUSH(GET_CONTEXT_REGADDR(21)); */
+#define DW_OP_reg22                 0x66 /* [+0]   PUSH(GET_CONTEXT_REGADDR(22)); */
+#define DW_OP_reg23                 0x67 /* [+0]   PUSH(GET_CONTEXT_REGADDR(23)); */
+#define DW_OP_reg24                 0x68 /* [+0]   PUSH(GET_CONTEXT_REGADDR(24)); */
+#define DW_OP_reg25                 0x69 /* [+0]   PUSH(GET_CONTEXT_REGADDR(25)); */
+#define DW_OP_reg26                 0x6a /* [+0]   PUSH(GET_CONTEXT_REGADDR(26)); */
+#define DW_OP_reg27                 0x6b /* [+0]   PUSH(GET_CONTEXT_REGADDR(27)); */
+#define DW_OP_reg28                 0x6c /* [+0]   PUSH(GET_CONTEXT_REGADDR(28)); */
+#define DW_OP_reg29                 0x6d /* [+0]   PUSH(GET_CONTEXT_REGADDR(29)); */
+#define DW_OP_reg30                 0x6e /* [+0]   PUSH(GET_CONTEXT_REGADDR(30)); */
+#define DW_OP_reg31                 0x6f /* [+0]   PUSH(GET_CONTEXT_REGADDR(31)); */
+#define DW_OP_breg0                 0x70 /* [+*]   PUSH(GET_CONTEXT_REGVAL(0) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg1                 0x71 /* [+*]   PUSH(GET_CONTEXT_REGVAL(1) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg2                 0x72 /* [+*]   PUSH(GET_CONTEXT_REGVAL(2) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg3                 0x73 /* [+*]   PUSH(GET_CONTEXT_REGVAL(3) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg4                 0x74 /* [+*]   PUSH(GET_CONTEXT_REGVAL(4) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg5                 0x75 /* [+*]   PUSH(GET_CONTEXT_REGVAL(5) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg6                 0x76 /* [+*]   PUSH(GET_CONTEXT_REGVAL(6) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg7                 0x77 /* [+*]   PUSH(GET_CONTEXT_REGVAL(7) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg8                 0x78 /* [+*]   PUSH(GET_CONTEXT_REGVAL(8) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg9                 0x79 /* [+*]   PUSH(GET_CONTEXT_REGVAL(9) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg10                0x7a /* [+*]   PUSH(GET_CONTEXT_REGVAL(10) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg11                0x7b /* [+*]   PUSH(GET_CONTEXT_REGVAL(11) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg12                0x7c /* [+*]   PUSH(GET_CONTEXT_REGVAL(12) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg13                0x7d /* [+*]   PUSH(GET_CONTEXT_REGVAL(13) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg14                0x7e /* [+*]   PUSH(GET_CONTEXT_REGVAL(14) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg15                0x7f /* [+*]   PUSH(GET_CONTEXT_REGVAL(15) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg16                0x80 /* [+*]   PUSH(GET_CONTEXT_REGVAL(16) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg17                0x81 /* [+*]   PUSH(GET_CONTEXT_REGVAL(17) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg18                0x82 /* [+*]   PUSH(GET_CONTEXT_REGVAL(18) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg19                0x83 /* [+*]   PUSH(GET_CONTEXT_REGVAL(19) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg20                0x84 /* [+*]   PUSH(GET_CONTEXT_REGVAL(20) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg21                0x85 /* [+*]   PUSH(GET_CONTEXT_REGVAL(21) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg22                0x86 /* [+*]   PUSH(GET_CONTEXT_REGVAL(22) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg23                0x87 /* [+*]   PUSH(GET_CONTEXT_REGVAL(23) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg24                0x88 /* [+*]   PUSH(GET_CONTEXT_REGVAL(24) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg25                0x89 /* [+*]   PUSH(GET_CONTEXT_REGVAL(25) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg26                0x8a /* [+*]   PUSH(GET_CONTEXT_REGVAL(26) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg27                0x8b /* [+*]   PUSH(GET_CONTEXT_REGVAL(27) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg28                0x8c /* [+*]   PUSH(GET_CONTEXT_REGVAL(28) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg29                0x8d /* [+*]   PUSH(GET_CONTEXT_REGVAL(29) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg30                0x8e /* [+*]   PUSH(GET_CONTEXT_REGVAL(30) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg31                0x8f /* [+*]   PUSH(GET_CONTEXT_REGVAL(31) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_regx                  0x90 /* [+*]   PUSH(GET_CONTEXT_REGADDR(dwarf_decode_uleb128(&pc))); */
 #define DW_OP_fbreg                 0x91 /* [+*]   PUSH(EVAL(CURRENT_FUNCTION.DW_AT_frame_base) + dwarf_decode_sleb128(&pc)) */
-#define DW_OP_bregx                 0x92 /* [+*]   PUSH(GET_CONTEXT_REGISTER(dwarf_decode_uleb128(&pc)) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_bregx                 0x92 /* [+*]   PUSH(GET_CONTEXT_REGVAL(dwarf_decode_uleb128(&pc)) + dwarf_decode_sleb128(&pc)); */
 #define DW_OP_piece                 0x93 /* [+*]   num_bytes = dwarf_decode_uleb128(&pc); WRITE_RESULT(POP(), num_bytes * 8); // Assign TOP to `num_bytes' of the variable's value. */
 #define DW_OP_deref_size            0x94 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 *)p : n == 2 ? *(u16 *)p : n == 4 ? *(u32 *)p : n == 8 ? *(u64 *)p : UNDEFINED); */
 #define DW_OP_xderef_size           0x95 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 *)id:p : n == 2 ? *(u16 *)id:p : n == 4 ? *(u32 *)id:p : n == 8 ? *(u64 *)id:p : UNDEFINED); */
@@ -318,8 +318,9 @@
 #define UNWIND_STE_CONSTANT    0 /* Constant value */
 #define UNWIND_STE_STACKVALUE  1 /* On-stack constant value (Same as `UNWIND_STE_CONSTANT') */
 #define UNWIND_STE_REGISTER    2 /* Register value */
-#define UNWIND_STE_RW_LVALUE   3 /* Read-write l-value */
-#define UNWIND_STE_RO_LVALUE   4 /* Read-only l-value */
+#define UNWIND_STE_REGPOINTER  3 /* Pointer-to-register (value is the imaginary address of the register in the register map) */
+#define UNWIND_STE_RW_LVALUE   4 /* Read-write l-value */
+#define UNWIND_STE_RO_LVALUE   5 /* Read-only l-value */
 #define UNWIND_STE_ISCONSTANT(x) ((x) <= UNWIND_STE_STACKVALUE)
 #define UNWIND_STE_ISLVALUE(x)   ((x) >= UNWIND_STE_RW_LVALUE)
 #define UNWIND_STE_ISWRITABLE(x) ((x) == UNWIND_STE_REGISTER || (x) == UNWIND_STE_RW_LVALUE)
