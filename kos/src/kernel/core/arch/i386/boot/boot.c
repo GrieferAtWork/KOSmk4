@@ -447,9 +447,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Decompressed driver section data should be reference counted, such that (then)
 	 *       unused sections can be lazily unloaded during calls to `system_clearcache()' */
 
-	/* TODO: Figure out why libdebuginfo's local-variable enumeration
-	 *       (debugger:'l' command) no longer works */
-
 	return state;
 }
 
