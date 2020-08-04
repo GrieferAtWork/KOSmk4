@@ -494,7 +494,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 			 * however did not destroy() its own structure, or deleted its kernel tid-address.
 			 * There is a chance that the thread is still running, and that the kernel is
 			 * still going to write 0 to the TID address.
-			 * In this case, we must wait for it to do so, since we musn't destroy()
+			 * In this case, we must wait for it to do so, since we mustn't destroy()
 			 * the pthread structure before then, else the kernel might possibly write
 			 * to free'd memory. */
 			if (ATOMIC_READ(pt->pt_tid) != 0) {

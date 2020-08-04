@@ -47,7 +47,7 @@ struct ioperm_bitmap {
 	};
 };
 
-/* An empty I/O permissions map (that also musn't ever be modified) */
+/* An empty I/O permissions map (that also mustn't ever be modified) */
 DATDEF struct ioperm_bitmap ioperm_bitmap_empty;
 
 /* [0..1][lock(WRITE_ONCE)]

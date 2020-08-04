@@ -31,11 +31,11 @@
  * ATTR_PURE:
  *    - Doesn't depend on any global state
  *    - (may) dereference pointers
- *    - Only visible side-effect is return value (therefor musn't return `void')
+ *    - Only visible side-effect is return value (therefor mustn't return `void')
  *    - Example: `memcmp()'
  * ATTR_CONST:
  *    - Doesn't depend on any global state
- *    - Only visible side-effect is return value (therefor musn't return `void')
+ *    - Only visible side-effect is return value (therefor mustn't return `void')
  *    - Example: `abs()'
  *
  * Implications:

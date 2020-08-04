@@ -71,15 +71,15 @@
  * mode should be as disconnected from the rest of the system as possible.
  * However I've been running into a couple of problems related to how the
  * kernel heap uses lazy mappings to speed up memory allocations outside of
- * GFP_PREFLT and GFP_LOCKED, where any piece of heap memory not allowed with
- * one of these flags may cause the kernel to panic if accessed from within
- * debug mode, since the debugger's old #PF handler intentionally refused
- * to handle this kind of mapping.
+ * GFP_PREFLT and GFP_LOCKED, where any piece of heap memory not allocated
+ * with one of these flags may cause the kernel to panic if accessed from
+ * within debug mode, since the debugger's old #PF handler intentionally
+ * refused to handle this kind of mapping.
  * The design flaw in this is that many places, such as `driver_section_lock()'
  * will make use of regular, old heap memory that falls under the category of
  * the above, meaning that whenever the debugger was accessing debug information
- * of dynamically loaded drivers, there was a chance that it was accessed memory
- * that it was unable to properly initialize.
+ * of dynamically loaded drivers, there was a chance that it was accessing memory
+ * which it was unable to properly initialize.
  *
  * I've debated how to go about fixing this design flaw, and considered adding
  * a global variable `bool dbg_restricted_memory' that could be used to toggle

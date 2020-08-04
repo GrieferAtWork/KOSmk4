@@ -251,7 +251,7 @@ libuw_unwind_emulator_make_const(unwind_emulator_t *__restrict self,
 			} else if (self->ue_addrsize >= 4) {
 				if unlikely(!guarded_readl((uint32_t *)ste->s_lvalue, &ste->s_uconst))
 					ERROR(err_segfault);
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (self->ue_addrsize >= 2) {
 				if unlikely(!guarded_readw((uint16_t *)ste->s_lvalue, &ste->s_uconst))
 					ERROR(err_segfault);
@@ -704,10 +704,10 @@ do_make_top_const:
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t *)pc), 8)
 		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t *)pc), 8)
-#else
+#else /* ... */
 		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t *)pc + 1), 8)
 		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t *)pc + 1), 8)
-#endif
+#endif /* !... */
 #undef DEFINE_PUSH_CONSTANT
 
 		CASE(DW_OP_constu)
@@ -825,7 +825,7 @@ do_make_second_const:
 					} else if (self->ue_addrsize >= 4) {
 						if unlikely(!guarded_readl((uint32_t *)SECOND.s_lvalue, &SECOND.s_uconst))
 							ERROR(err_segfault);
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 					} else if (self->ue_addrsize >= 2) {
 						if unlikely(!guarded_readw((uint16_t *)SECOND.s_lvalue, &SECOND.s_uconst))
 							ERROR(err_segfault);
@@ -1861,7 +1861,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 				reader += addrsize;
 				range_end = UNALIGNED_GET32((uint32_t *)reader);
 				reader += addrsize;
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (addrsize >= 2) {
 				range_start = UNALIGNED_GET16((uint16_t *)reader);
 				reader += addrsize;
