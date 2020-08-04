@@ -20,9 +20,10 @@
 #ifndef GUARD_LIBCMDLINE_API_H
 #define GUARD_LIBCMDLINE_API_H 1
 
-#include <hybrid/compiler.h>
-
 #include <libcmdline/api.h>
+/**/
+
+#include <hybrid/compiler.h>
 
 #define CC LIBCMDLINE_CC
 

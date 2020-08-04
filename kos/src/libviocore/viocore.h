@@ -21,6 +21,8 @@
 #define GUARD_LIBVIOCORE_VIOCORE_H 1
 
 #include "api.h"
+/**/
+
 #include <libviocore/viocore.h>
 
 #ifdef LIBVIO_CONFIG_ENABLED

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb173181b */
+/* HASH CRC-32:0xceb67b23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_cfsetospeed_defined 1
 #include <__crt.h>
 #include <bits/termios.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cfsetospeed) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfsetospeed))(struct termios *__restrict __termios_p, __UINT32_TYPE__ __speed) {

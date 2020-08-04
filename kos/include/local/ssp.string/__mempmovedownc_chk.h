@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20810846 */
+/* HASH CRC-32:0xc52ab38e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local___mempmovedownc_chk_defined
 #define __local___mempmovedownc_chk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovedownc from string */
 #ifndef __local___localdep_mempmovedownc_defined
 #define __local___localdep_mempmovedownc_defined 1
 #ifdef __CRT_HAVE_mempmovedownc
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempmovedownc */

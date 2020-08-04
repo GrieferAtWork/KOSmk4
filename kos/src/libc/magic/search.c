@@ -244,6 +244,7 @@ typedef struct entry {
 @@Search for entry matching ITEM.key in internal hash table.
 @@If ACTION is `FIND' return found entry or signal error by returning NULL.
 @@If ACTION is `ENTER' replace existing data (if any) with ITEM.data
+[[decl_prefix(struct entry;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
 [[requires_function(hsearch_r)]]
 ENTRY *hsearch(ENTRY item, ACTION action) {
@@ -254,7 +255,7 @@ ENTRY *hsearch(ENTRY item, ACTION action) {
 
 @@Create a new hashing table which will at most contain NEL elements
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
-[[requires_function(hcreate_r)]]
+[[requires_function(hcreate_r), decl_include("<hybrid/typecore.h>")]]
 int hcreate(size_t nel) {
 	return hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
 }
@@ -281,9 +282,10 @@ struct hsearch_data {
 
 @@Reentrant versions which can handle multiple hashing tables at the same time
 [[decl_prefix(struct entry;)]]
-[[impl_include("<parts/errno.h>")]]
+[[decl_prefix(struct hsearch_data;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
+[[impl_include("<parts/errno.h>")]]
 int hsearch_r(ENTRY item, ACTION action,
               [[nonnull]] ENTRY **retval,
               [[nonnull]] struct hsearch_data *htab) {
@@ -345,6 +347,8 @@ int hsearch_r(ENTRY item, ACTION action,
 	return 0;
 }
 
+[[decl_prefix(struct hsearch_data;)]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
 [[requires_function(calloc), doc_alias("hsearch_r")]]
@@ -394,12 +398,13 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	}
 	htab->@size@   = nel;
 	htab->@filled@ = 0;
-	htab->@table@  = (struct _ENTRY *)calloc(htab->size+1, sizeof(entry_type));
+	htab->@table@  = (struct _ENTRY *)calloc(htab->@size@ + 1, sizeof(entry_type));
 	if (htab->@table@ == NULL)
 		return 0;
 	return 1;
 }
 
+[[decl_prefix(struct hsearch_data;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[doc_alias("hsearch_r"), impl_include("<parts/errno.h>")]]
 [[requires_function(free)]]
@@ -773,8 +778,16 @@ typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 }
 %[define_type_class(__action_fn_t = "TP")]
 
+%[define(DEFINE_ACTION_FN_T =
+@@pp_ifndef __ACTION_FN_T@@
+#define __ACTION_FN_T 1
+typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
+@@pp_endif@@
+)]
+
+
 @@Walk through the whole tree and call the ACTION callback for every node or leaf
-[[export_alias("__twalk"), impl_prefix(
+[[decl_prefix(DEFINE_ACTION_FN_T), export_alias("__twalk"), impl_prefix(
 @@push_namespace(local)@@
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be
@@ -808,12 +821,24 @@ void twalk([[nullable]] void const *root,
 #ifdef __USE_GNU
 /* Callback type for function to free a tree node.
  * If the keys are atomic data this function should do nothing.  */
-typedef void (*__free_fn_t) (void *__nodep);
+#ifndef ____free_fn_t_defined
+#define ____free_fn_t_defined 1
+typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
+#endif /* !____free_fn_t_defined */
 }
 %[define_type_class(__free_fn_t = "TP")]
 
+%[define(DEFINE_FREE_FN_T =
+@@pp_ifndef ____free_fn_t_defined@@
+#define ____free_fn_t_defined 1
+typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
+@@pp_endif@@
+)]
+
+
+
 @@Destroy the whole tree, call FREEFCT for each node or leaf
-[[requires_function(free)]]
+[[decl_prefix(DEFINE_FREE_FN_T), requires_function(free)]]
 void tdestroy([[nullable]] void *root,
               [[nonnull]] __free_fn_t freefct) {
 again:
@@ -840,7 +865,7 @@ again:
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE)
-[[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<features.h>")]]
+[[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 void *lfind(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar)
 	[(void const *key, [[nonnull]] void *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void *]
 	[(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void const *]
@@ -857,6 +882,7 @@ void *lfind(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __
 
 @@Perform linear search for KEY by comparing by COMPAR function
 @@in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found
+[[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
 void *lsearch(void const *key, [[nonnull]] void *base,
               [[nonnull]] size_t *nmemb,
               size_t size, [[nonnull]] __compar_fn_t compar) {

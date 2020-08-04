@@ -21,7 +21,8 @@
 #define GUARD_LIBUNWIND_EH_FRAME_C 1
 #define _KOS_SOURCE 1
 
-#include "eh_frame.h"
+#include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -32,15 +33,15 @@
 #include <kos/thread.h>
 #include <kos/types.h>
 
+#include <assert.h>
+#include <string.h>
+
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
 
-#include <assert.h>
-#include <string.h>
-
-#include "api.h"
 #include "cfi.h"
+#include "eh_frame.h"
 
 #ifndef __KERNEL__
 #include <dlfcn.h>
@@ -296,7 +297,7 @@ DECL_END
 
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 /* Alias the sigframe variants on-top of the regular ones. */

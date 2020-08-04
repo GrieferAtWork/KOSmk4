@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBCMDLINE_DECODE_C
 #define GUARD_LIBCMDLINE_DECODE_C 1
+
 #define _KOS_SOURCE 1
 
 #include "api.h"

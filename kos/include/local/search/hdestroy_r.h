@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93151fd1 */
+/* HASH CRC-32:0xa934fbf0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_hdestroy_r_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined

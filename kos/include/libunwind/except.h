@@ -56,7 +56,7 @@
  * as a handler-search phase is still performed during mode#4 exception handling.
  * For more information, see `<kos/except-handler.h>'
  */
-#define _UEC_KERNKOS    __ENCODE_INT64('K','E','R','N',  'K','O','S','\0')
+#define _UEC_KERNKOS __ENCODE_INT64('K', 'E', 'R', 'N', 'K', 'O', 'S', '\0')
 
 #ifdef __CC__
 __DECL_BEGIN

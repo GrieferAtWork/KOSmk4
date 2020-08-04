@@ -21,27 +21,28 @@
 #define _LIBUNWIND_API_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/host.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBUNWIND_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBUNWIND_CC /* nothing */
-#endif
+#endif /* !... */
 
-#if !defined(LIBUNWIND_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
+#if (!defined(LIBUNWIND_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
 #define LIBUNWIND_WANT_PROTOTYPES 1
-#endif
+#endif /* ... */
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
     defined(CONFIG_BUILDING_KERNEL_CORE)
 #define LIBUNWIND_DECL  __PUBDEF
 #elif defined(__LIBUNWIND_STATIC)
 #define LIBUNWIND_DECL  __INTDEF
-#else
+#else /* ... */
 #define LIBUNWIND_DECL  __IMPDEF
-#endif
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBUNWIND_LIBRARY_NAME "libunwind.so"

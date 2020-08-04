@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3928735e */
+/* HASH CRC-32:0x126f8ec1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
 __LOCAL_LIBC(lfind) __ATTR_NONNULL((2, 3, 5)) void *

@@ -21,7 +21,7 @@
 #define GUARD_LIBDISASM__HEXSTR_H 1
 
 #include "api.h"
-
+/**/
 
 /*[[[deemon
 for (local x: [:256]) {

@@ -19,32 +19,37 @@
  */
 #ifndef GUARD_LIBBUFFER_LINEBUFFER_C
 #define GUARD_LIBBUFFER_LINEBUFFER_C 1
+
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
 #include "api.h"
 /**/
 
-#include <kos/except.h>
 #include <hybrid/compiler.h>
+
 #include <hybrid/atomic.h>
 
-#include <libbuffer/linebuffer.h>
+#include <kos/except.h>
+
 #include <assert.h>
 #include <string.h>
+
+#include <libbuffer/linebuffer.h>
 
 #include "linebuffer.h"
 
 #ifdef __KERNEL__
-#include <kernel/vm.h>
 #include <kernel/except.h>
+#include <kernel/vm.h>
 #include <sched/signal.h>
 #define HEAP_FREE(base, size) \
 	((size) ? heap_free(&kernel_default_heap, base, size, GFP_NORMAL) : (void)0)
 #else /* __KERNEL__ */
-#include <stddef.h>
-#include <malloc.h>
 #include <kos/futexexpr.h>
+
+#include <malloc.h>
+#include <stddef.h>
 #define HEAP_FREE(base, size) free(base)
 #endif /* !__KERNEL__ */
 

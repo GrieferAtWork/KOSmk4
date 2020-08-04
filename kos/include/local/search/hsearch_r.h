@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42ce504d */
+/* HASH CRC-32:0xcd273d16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_hsearch_r_defined 1
 #include <__crt.h>
 struct entry;
+struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
@@ -58,7 +59,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
 struct _ENTRY;
@@ -75,6 +75,7 @@ typedef struct entry {
 	void *data;
 } ENTRY;
 #endif /* !__ENTRY_defined */
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int

@@ -20,10 +20,11 @@
 #ifndef GUARD_LIBCPUSTATE_API_H
 #define GUARD_LIBCPUSTATE_API_H 1
 
+#include <libcpustate/api.h>
+/**/
+
 #include <hybrid/compiler.h>
 
-#include <libcpustate/api.h>
-
-#define CC    LIBCPUSTATE_CC
+#define CC LIBCPUSTATE_CC
 
 #endif /* !GUARD_LIBCPUSTATE_API_H */

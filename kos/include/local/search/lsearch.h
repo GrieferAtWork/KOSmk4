@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2882fb9 */
+/* HASH CRC-32:0x3f6e6881 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,17 @@
 #ifndef __local_lsearch_defined
 #define __local_lsearch_defined 1
 #include <__crt.h>
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfind from search */
 #ifndef __local___localdep_lfind_defined
 #define __local___localdep_lfind_defined 1
 #ifdef __CRT_HAVE_lfind
 __NAMESPACE_LOCAL_END
-#ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
-#endif /* !____compar_fn_t_defined */
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
@@ -47,9 +48,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))

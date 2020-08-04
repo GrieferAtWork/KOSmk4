@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x472d4a1c */
+/* HASH CRC-32:0x190b2ce5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL
 INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_memalign)(size_t alignment, size_t n_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_pvalloc)(size_t n_bytes);
 INTDEF ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_valloc)(size_t n_bytes);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_memalign)(void **__restrict pp, size_t alignment, size_t n_bytes);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_memalign)(void **__restrict pp, size_t alignment, size_t n_bytes);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_malloc_trim)(size_t pad);
 INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(LIBCCALL libc_malloc_usable_size)(void *__restrict mallptr);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mallopt)(int parameter_number, int parameter_value);

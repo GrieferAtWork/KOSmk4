@@ -218,8 +218,8 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 	has_si = error_as_signal(&error, &si);
 	if (!originates_from_kernelspace) {
 		/* If the exception doesn't originate from kernel-space, such
-		 * as an E_SEGFAULT propagated by `x86_userexcept_unwind_interrupt()', then
-		 * we mustn't include whatever information is still dangling in
+		 * as an E_SEGFAULT propagated by `x86_userexcept_unwind_interrupt()',
+		 * then we mustn't include whatever information is still dangling in
 		 * the kernel's exception state descriptor (because that info will
 		 * still refer to the previous thrown exception, and not the current
 		 * one)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5f52c02 */
+/* HASH CRC-32:0x77f97c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,20 +21,15 @@
 #ifndef __local___memmovedownq_chk_defined
 #define __local___memmovedownq_chk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedownq from string */
 #ifndef __local___localdep_memmovedownq_defined
 #define __local___localdep_memmovedownq_defined 1
 #ifdef __CRT_HAVE_memmovedownq
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmovedownq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_memmoveq)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
 #else /* ... */

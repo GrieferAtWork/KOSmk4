@@ -19,8 +19,9 @@
  */
 #ifndef GUARD_LIBBUFFER_RINGBUFFER_C
 #define GUARD_LIBBUFFER_RINGBUFFER_C 1
+
 #define _USE_64BIT_TIME_T 1
-#define _KOS_SOURCE 1
+#define _KOS_SOURCE       1
 
 #include "api.h"
 /**/

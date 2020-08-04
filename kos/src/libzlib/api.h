@@ -20,10 +20,11 @@
 #ifndef GUARD_LIBZLIB_API_H
 #define GUARD_LIBZLIB_API_H 1
 
+#include <libzlib/api.h>
+/**/
+
 #include <hybrid/compiler.h>
 
-#include <libzlib/api.h>
-
-#define CC    LIBZLIB_CC
+#define CC LIBZLIB_CC
 
 #endif /* !GUARD_LIBZLIB_API_H */

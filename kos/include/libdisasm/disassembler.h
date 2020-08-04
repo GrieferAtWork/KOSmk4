@@ -58,17 +58,17 @@ enum {
 
 /* The target ID for the hosting machine. */
 #ifdef __x86_64__
-#define DISASSEMBLER_TARGET_CURRENT  DISASSEMBLER_TARGET_X86_64
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_X86_64
 #elif defined(__i386__)
-#define DISASSEMBLER_TARGET_CURRENT  DISASSEMBLER_TARGET_I386
-#else
-#define DISASSEMBLER_TARGET_CURRENT  DISASSEMBLER_TARGET_UNKNOWN
-#endif
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_I386
+#else /* ... */
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_UNKNOWN
+#endif /* !... */
 
 /* Disassembler flags. */
-#define DISASSEMBLER_FNORMAL     0x0000 /* Normal flags. */
-#define DISASSEMBLER_FNOADDR     0x0001 /* Don't prefix a line with its address. */
-#define DISASSEMBLER_FNOBYTES    0x0002 /* Don't include the raw instruction bytes in the disassembly. */
+#define DISASSEMBLER_FNORMAL  0x0000 /* Normal flags. */
+#define DISASSEMBLER_FNOADDR  0x0001 /* Don't prefix a line with its address. */
+#define DISASSEMBLER_FNOBYTES 0x0002 /* Don't include the raw instruction bytes in the disassembly. */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -91,24 +91,24 @@ typedef __ATTR_NONNULL((1)) __ssize_t
                                        void *symbol_addr);
 
 struct disassembler {
-	__byte_t              *d_pc;              /* [1..1] Next address to-be disassembled. */
-	__ptrdiff_t            d_baseoff;         /* Offset added to `d_pc' for the purpose of relative relocations. */
-	__pformatprinter       d_printer;         /* [1..1][const] The printer used to output disassembly text. */
-	void                  *d_arg;             /* [const] Argument passed to `d_printer'. */
-	__ssize_t              d_result;          /* Sum of all calls to `d_printer' (When negative, don't print anymore) */
-	diasm_symbol_printer_t d_symbol;          /* [0..1][const] An optional callback for printing symbol names.
-	                                           * When `NULL', the library will try to make use of `dladdr()' for
-	                                           * the same purpose, but will default to printing symbol operands
-	                                           * as the ordinal value of their absolute address. */
-	diasm_print_format_t   d_format;          /* [0..1][const] An optional callback for inserting format strings. */
-	__UINTPTR_HALF_TYPE__  d_target;          /* Disassembler target (One of `DISASSEMBLER_TARGET_*'). */
-	__UINTPTR_HALF_TYPE__  d_flags;           /* Disassembler flags (Set of `DISASSEMBLER_F*'). */
-	__UINTPTR_HALF_TYPE__  d_maxbytes;        /* The max number of instruction bytes to output onto a single line.
-	                                           * When ZERO(0), use a target-specific default value, but ignore this
-	                                           * option completely when the `DISASSEMBLER_FNOBYTES' flag was set,
-	                                           * in which case instruction bytes aren't printed at all. */
-	__UINTPTR_HALF_TYPE__  d_pad0;             /* ... */
-	void                  *d_pad1[4];          /* ... */
+	__byte_t              *d_pc;       /* [1..1] Next address to-be disassembled. */
+	__ptrdiff_t            d_baseoff;  /* Offset added to `d_pc' for the purpose of relative relocations. */
+	__pformatprinter       d_printer;  /* [1..1][const] The printer used to output disassembly text. */
+	void                  *d_arg;      /* [const] Argument passed to `d_printer'. */
+	__ssize_t              d_result;   /* Sum of all calls to `d_printer' (When negative, don't print anymore) */
+	diasm_symbol_printer_t d_symbol;   /* [0..1][const] An optional callback for printing symbol names.
+	                                    * When `NULL', the library will try to make use of `dladdr()' for
+	                                    * the same purpose, but will default to printing symbol operands
+	                                    * as the ordinal value of their absolute address. */
+	diasm_print_format_t   d_format;   /* [0..1][const] An optional callback for inserting format strings. */
+	__UINTPTR_HALF_TYPE__  d_target;   /* Disassembler target (One of `DISASSEMBLER_TARGET_*'). */
+	__UINTPTR_HALF_TYPE__  d_flags;    /* Disassembler flags (Set of `DISASSEMBLER_F*'). */
+	__UINTPTR_HALF_TYPE__  d_maxbytes; /* The max number of instruction bytes to output onto a single line.
+	                                    * When ZERO(0), use a target-specific default value, but ignore this
+	                                    * option completely when the `DISASSEMBLER_FNOBYTES' flag was set,
+	                                    * in which case instruction bytes aren't printed at all. */
+	__UINTPTR_HALF_TYPE__  d_pad0;      /* ... */
+	void                  *d_pad1[4];   /* ... */
 };
 
 
@@ -351,7 +351,7 @@ disasm_vprintf(struct disassembler *__restrict self,
 	}
 }
 
-#endif
+#endif /* !__INTELLISENSE__ */
 
 __DECL_END
 

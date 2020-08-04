@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbb8c3bb */
+/* HASH CRC-32:0x4cdddd02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,6 @@
 DECL_BEGIN
 
 #include "../libc/globals.h"
-#include <hybrid/__minmax.h>
-#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
                         size_t item_count,

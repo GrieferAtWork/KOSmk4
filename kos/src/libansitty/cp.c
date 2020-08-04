@@ -21,11 +21,13 @@
 #define GUARD_LIBANSITTY_CP_C 1
 
 #include "api.h"
-#include "cp.h"
+/**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
+
+#include "cp.h"
 
 DECL_BEGIN
 

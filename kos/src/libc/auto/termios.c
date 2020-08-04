@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89962cc7 */
+/* HASH CRC-32:0x563a2930 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,6 +77,7 @@ NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
 }
 #endif /* !__KERNEL__ */
 #include <sys/ttydefaults.h>
+#include <bits/posix_opt.h>
 /* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) void

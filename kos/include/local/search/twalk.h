@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1aee1d3 */
+/* HASH CRC-32:0xef18ca60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,10 @@
 #ifndef __local_twalk_defined
 #define __local_twalk_defined 1
 #include <__crt.h>
+#ifndef __ACTION_FN_T
+#define __ACTION_FN_T 1
+typedef void (__LIBKCALL *__action_fn_t)(void const *__nodep, int __value, int __level);
+#endif /* !__ACTION_FN_T */
 __NAMESPACE_LOCAL_BEGIN
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be

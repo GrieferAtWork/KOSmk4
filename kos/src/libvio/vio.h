@@ -21,6 +21,7 @@
 #define GUARD_LIBVIO_VIO_H 1
 
 #include "api.h"
+/**/
 
 #include <kos/types.h>
 

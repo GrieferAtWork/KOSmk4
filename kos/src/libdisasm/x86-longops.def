@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef LONGOP
+#define LONGOP(name, repr)
+#endif /* !LONGOP */
 
 LONGOP(LO_FUCOMPP, "fucompp\t" OP_VERBOSE_ST1 OP_VERBOSE_ST0)
 

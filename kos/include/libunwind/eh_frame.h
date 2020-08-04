@@ -21,6 +21,7 @@
 #define _LIBUNWIND_EH_FRAME_H 1
 
 #include "api.h"
+/**/
 
 #include <bits/types.h>
 
@@ -40,9 +41,9 @@
 #elif ((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xff) || \
       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xff)
 #define SIZEOF_UNWIND_ORDER_INDEX_T 2
-#else
+#else /* ... */
 #define SIZEOF_UNWIND_ORDER_INDEX_T 1
-#endif
+#endif /* !... */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -59,9 +60,9 @@ typedef __uint32_t unwind_order_index_t;
 typedef __uint16_t unwind_order_index_t;
 #elif SIZEOF_UNWIND_ORDER_INDEX_T == 1
 typedef __uint8_t unwind_order_index_t;
-#else
+#else /* SIZEOF_UNWIND_ORDER_INDEX_T == ... */
 #error "Invalid `SIZEOF_UNWIND_ORDER_INDEX_T'"
-#endif
+#endif /* SIZEOF_UNWIND_ORDER_INDEX_T != ... */
 
 #ifndef __unwind_regno_t_defined
 #define __unwind_regno_t_defined 1

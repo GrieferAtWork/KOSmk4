@@ -516,10 +516,15 @@ search_fde:
 		/* Invoke the personality function */
 		_Unwind_Reason_Code reason;
 		context.uc_state = state;
-		reason = ((_Unwind_Personality_Fn)context.uc_fde.f_persofun == &libc_gxx_personality_v0)
-		         ? libc_gxx_personality_kernexcept(&context, true)
-		         : (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1, _UA_CLEANUP_PHASE | _UA_FORCE_UNWIND, _UEC_KERNKOS,
-		                                                                libc_get_kos_unwind_exception(), &context);
+		if ((_Unwind_Personality_Fn)context.uc_fde.f_persofun == &libc_gxx_personality_v0) {
+			reason = libc_gxx_personality_kernexcept(&context, true);
+		} else {
+			reason = (*(_Unwind_Personality_Fn)context.uc_fde.f_persofun)(1,
+			                                                              _UA_CLEANUP_PHASE | _UA_FORCE_UNWIND,
+			                                                              _UEC_KERNKOS,
+			                                                              libc_get_kos_unwind_exception(),
+			                                                              &context);
+		}
 		if (reason == _URC_INSTALL_CONTEXT) {
 			uintptr_t adjustment;
 			/* Calculate the landing pad adjustment */
@@ -560,9 +565,9 @@ search_fde:
 				break;
 		}
 		tls.t_except.ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
-#else
+#else /* EXCEPT_BACKTRACE_SIZE > 1 */
 		tls.t_except.ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	/* Continue searching for handlers. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb77456db */
+/* HASH CRC-32:0xdbe5ab69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_gnu_dev_makedev_defined
 #define __local_gnu_dev_makedev_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gnu_dev_makedev) __ATTR_CONST __ATTR_WUNUSED __dev_t
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major_t __major, __minor_t __minor) {

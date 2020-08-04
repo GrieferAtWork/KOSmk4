@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8c4e31d */
+/* HASH CRC-32:0x99057bd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakesane, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __CC__ */
 
 #ifdef __USE_MISC
-#define CCEQ(val, c)   ((c) == (val) && (val) != _POSIX_VDISABLE)
+#define CCEQ(val, c) ((c) == (val) && (val) != _POSIX_VDISABLE)
 #endif /* __USE_MISC */
 
 __SYSDECL_END

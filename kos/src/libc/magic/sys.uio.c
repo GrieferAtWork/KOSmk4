@@ -57,13 +57,13 @@ typedef __SIZE_TYPE__ size_t;
 
 %
 %#ifdef __USE_GNU
-[[cp, wunused, decl_include("<bits/iovec-struct.h>")]]
+[[cp, wunused, decl_include("<bits/iovec-struct.h>", "<bits/types.h>")]]
 ssize_t process_vm_readv($pid_t pid,
                          [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
                          [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
                          $ulongptr_t flags);
 
-[[cp, decl_include("<bits/iovec-struct.h>")]]
+[[cp, decl_include("<bits/iovec-struct.h>", "<bits/types.h>")]]
 process_vm_writev:($pid_t pid,
                    [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
                    [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
@@ -71,10 +71,10 @@ process_vm_writev:($pid_t pid,
 %#endif /* __USE_GNU */
 
 %
-[[cp, wunused, decl_include("<bits/iovec-struct.h>", "<features.h>")]]
+[[cp, wunused, decl_include("<bits/iovec-struct.h>", "<features.h>", "<bits/types.h>")]]
 ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
-[[cp, decl_include("<bits/iovec-struct.h>", "<features.h>")]]
+[[cp, decl_include("<bits/iovec-struct.h>", "<features.h>", "<bits/types.h>")]]
 ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 
@@ -82,17 +82,17 @@ ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_S
 %#ifdef __USE_MISC
 
 [[cp, ignore, nocrt, alias("preadv")]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>")]]
+[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
 ssize_t preadv32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
 [[cp, ignore, nocrt, alias("pwritev")]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>")]]
+[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
 ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
 [[cp, wunused, no_crt_self_import]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>")]]
+[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadv64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadv")]]
 [[userimpl, requires($has_function(preadv32) || $has_function(preadv64))]]
@@ -106,7 +106,7 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 }
 
 [[cp, no_crt_self_import]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>")]]
+[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev64)]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev)]]
 [[userimpl, requires($has_function(pwritev32) || $has_function(pwritev64))]]
@@ -122,7 +122,7 @@ ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
 %
 %#ifdef __USE_LARGEFILE64
 [[cp, wunused, doc_alias("preadv"), off64_variant_of(preadv)]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>")]]
+[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
 [[userimpl, requires_function(preadv32)]]
 ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off64_t offset) {
@@ -130,7 +130,7 @@ ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
 }
 
 [[cp, doc_alias("pwritev"), off64_variant_of(pwritev)]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>")]]
+[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
 [[userimpl, requires_function(pwritev32)]]
 ssize_t pwritev64($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off64_t offset) {

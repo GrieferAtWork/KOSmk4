@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e6cbd5f */
+/* HASH CRC-32:0x59aa3158 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -314,7 +314,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void __NOT
 #ifdef __USE_GNU
 /* Callback type for function to free a tree node.
  * If the keys are atomic data this function should do nothing.  */
-typedef void (*__free_fn_t) (void *__nodep);
+#ifndef ____free_fn_t_defined
+#define ____free_fn_t_defined 1
+typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
+#endif /* !____free_fn_t_defined */
 #ifdef __CRT_HAVE_tdestroy
 /* Destroy the whole tree, call FREEFCT for each node or leaf */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,tdestroy,(void *__root, __free_fn_t __freefct),(__root,__freefct))

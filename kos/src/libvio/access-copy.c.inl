@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
 #error "Must #define DEFINE_IO_READ or DEFINE_IO_WRITE before #include-ing  this file"
-#endif
+#endif /* (DEFINE_IO_READ + DEFINE_IO_WRITE) != 1 */
 
 
 #ifdef DEFINE_IO_READ
@@ -44,7 +44,7 @@ INTERN NONNULL((1)) void KCALL
 libvio_copytovio_from_phys(struct vio_args *__restrict args,
                            vio_addr_t offset, vm_phys_t buf,
                            size_t num_bytes)
-#endif
+#endif /* ... */
 		__THROWS(...) {
 	bool is_first;
 	pagedir_pushval_t backup;
@@ -81,7 +81,7 @@ libvio_copytovio_from_phys(struct vio_args *__restrict args,
 			               buf & ~PAGEMASK,
 			               PAGEDIR_MAP_FREAD);
 		}
-#endif
+#endif /* ... */
 		pagedir_syncone(tramp);
 		TRY {
 			/* Copy memory. */
@@ -95,7 +95,7 @@ libvio_copytovio_from_phys(struct vio_args *__restrict args,
 			                 offset,
 			                 tramp + ((ptrdiff_t)buf & PAGEMASK),
 			                 page_bytes);
-#endif
+#endif /* ... */
 		} EXCEPT {
 			/* Try-catch is required, because VIO access may throw exceptions. */
 			pagedir_pop_mapone(tramp, backup);

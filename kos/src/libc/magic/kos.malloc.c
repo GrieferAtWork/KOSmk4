@@ -20,8 +20,10 @@
 
 %{
 #include <features.h>
-#include <malloc.h>
+
 #include <kos/anno.h>
+
+#include <malloc.h>
 
 __SYSDECL_BEGIN
 
@@ -31,15 +33,23 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt{|.dos}.except.heap.malloc")]
 
-[[throws(E_BADALLOC)]] Malloc:(size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void *;
-[[throws(E_BADALLOC)]] Calloc:(size_t count, size_t num_bytes) -> [[nonnull, malloc(count * num_bytes)]] void *;
-[[throws(E_BADALLOC)]] Realloc:(void *mallptr, size_t num_bytes) -> [[nonnull, realloc(mallptr, num_bytes)]] void *;
-[[throws(E_BADALLOC)]] Memalign:(size_t alignment, size_t num_bytes) -> [[nonnull, memalign(alignment, num_bytes)]] void *;
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+Malloc:(size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void *;
 
-[[throws(E_BADALLOC), section(".text.crt{|.dos}.except.heap.rare_helpers")]]
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+Calloc:(size_t count, size_t num_bytes) -> [[nonnull, malloc(count * num_bytes)]] void *;
+
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+Realloc:(void *mallptr, size_t num_bytes) -> [[nonnull, realloc(mallptr, num_bytes)]] void *;
+
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+Memalign:(size_t alignment, size_t num_bytes) -> [[nonnull, memalign(alignment, num_bytes)]] void *;
+
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.except.heap.rare_helpers")]]
 PValloc:(size_t num_bytes) -> [[nonnull, memalign(getpagesize(), num_bytes)]] void *;
 
-[[[throws(E_BADALLOC)]]]
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.heap.rare_helpers")]]
 [[userimpl, requires($has_function(Memalign))]]
 Valloc:(size_t num_bytes) -> [[nonnull, memalign(getpagesize(), num_bytes)]] void * {
@@ -49,7 +59,7 @@ Valloc:(size_t num_bytes) -> [[nonnull, memalign(getpagesize(), num_bytes)]] voi
 
 %
 %#ifdef __USE_KOS
-[[throws(E_BADALLOC)]]
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.heap.rare_helpers")]]
 [[userimpl, requires_function(Malloc)]]
 Memdup:([[nonnull]] void const *__restrict ptr, size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void * {
@@ -60,7 +70,7 @@ Memdup:([[nonnull]] void const *__restrict ptr, size_t num_bytes) -> [[nonnull, 
 }
 
 @@@throws: E_BADALLOC: ...
-[[throws(E_BADALLOC)]]
+[[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.heap.rare_helpers")]]
 [[userimpl, requires_function(Memdup)]]
 Memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t num_bytes) -> [[nonnull, malloc]] void * {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeeef6a4 */
+/* HASH CRC-32:0xf831f6cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_hdestroy_r_defined
 #define __local___localdep_hdestroy_r_defined 1
 #ifdef __CRT_HAVE_hdestroy_r
+__NAMESPACE_LOCAL_END
+struct hsearch_data;
+__NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_hdestroy_r,(struct hsearch_data *__htab),hdestroy_r,(__htab))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)

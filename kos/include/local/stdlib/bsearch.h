@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5783e92 */
+/* HASH CRC-32:0xdfeaf1cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: bsearch_r from stdlib */
 #ifndef __local___localdep_bsearch_r_defined

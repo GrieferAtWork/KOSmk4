@@ -178,6 +178,7 @@ incdir("", "../../include");
 #include <ar.h>
 #include <argz.h>
 #include <arpa/inet.h>
+#include <asm/asmword.h>
 #include <asm/cacheline.h>
 #include <asm/crt/confname.h>
 #include <asm/crt/limits.h>
@@ -191,6 +192,7 @@ incdir("", "../../include");
 #include <asm/crt/stdlib.h>
 #include <asm/crt/threads.h>
 #include <asm/crt/ttyent.h>
+#include <asm/crt/ucontext.h>
 #include <asm/crt/util.h>
 #include <asm/dirent.h>
 #include <asm/epoll.h>
@@ -292,6 +294,7 @@ incdir("", "../../include");
 #include <bits/math-constants.h>
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
+#include <bits/mcontext.h>
 #include <bits/mmsghdr-struct.h>
 #include <bits/msgbuf.h>
 #include <bits/msghdr-struct.h>
@@ -377,6 +380,7 @@ incdir("", "../../include");
 #include <bits/types/wint_t.h>
 #include <bits/types.h>
 #include <bits/typesizes.h>
+#include <bits/ucontext.h>
 #include <bits/uformat-printer.h>
 #include <bits/ustat.h>
 #include <bits/utimbuf.h>
@@ -401,6 +405,7 @@ incdir("", "../../include");
 #include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
 #include <compat/bits/itimerval.h>
+#include <compat/bits/mcontext.h>
 #include <compat/bits/mmsghdr-struct.h>
 #include <compat/bits/msghdr-struct.h>
 #include <compat/bits/rusage-convert.h>
@@ -420,6 +425,7 @@ incdir("", "../../include");
 #include <compat/bits/timeval.h>
 #include <compat/bits/types.h>
 #include <compat/bits/typesizes.h>
+#include <compat/bits/ucontext.h>
 #include <compat/bits/utimbuf.h>
 #include <compat/bits/va_list-struct.h>
 #include <compat/config.h>
@@ -434,6 +440,7 @@ incdir("", "../../include");
 #include <compat/kos/types.h>
 #include <compat/pointer.h>
 #include <compat/signal.h>
+#include <compat/sys/ucontext.h>
 #include <corecrt.h>
 #include <cpio.h>
 #include <crtdbg.h>
@@ -1089,6 +1096,7 @@ incdir("", "../../include");
 #include <sys/file.h>
 #include <sys/filio.h>
 #include <sys/fsuid.h>
+#include <sys/io.h>
 #include <sys/ioccom.h>
 #include <sys/ioctl.h>
 #include <sys/ipc.h>
@@ -1135,6 +1143,7 @@ incdir("", "../../include");
 #include <sys/ttychars.h>
 #include <sys/ttydefaults.h>
 #include <sys/types.h>
+#include <sys/ucontext.h>
 #include <sys/uio.h>
 #include <sys/un.h>
 #include <sys/unistd.h>

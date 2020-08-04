@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fdde9b8 */
+/* HASH CRC-32:0x25db5b1f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {

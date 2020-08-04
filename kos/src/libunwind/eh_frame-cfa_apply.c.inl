@@ -26,7 +26,7 @@
 
 #if (defined(EH_FRAME_CFA_APPLY) + defined(EH_FRAME_CFA_SIGFRAME_APPLY)) != 1
 #error "Must #define EH_FRAME_CFA_APPLY or EH_FRAME_CFA_SIGFRAME_APPLY"
-#endif
+#endif /* (EH_FRAME_CFA_APPLY + EH_FRAME_CFA_SIGFRAME_APPLY) != 1 */
 
 
 DECL_BEGIN
@@ -403,7 +403,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 		 *   - Any custom assembly function that assigns a new ESP from either another
 		 *     stack, or somewhere further up the stack must be marked as .cfi_signal_frame
 		 *   - The KOS unwind mechanism will ignore .cfi_def_cfa and .cfi_signal_frame when
-		 *     another rule exists that assign behavior to unwinding %esp
+		 *     another rule exists that assigns explicit unwinding behavior for %esp
 		 *   - GDB will _NOT_ working properly unless every function has a CFA rule defined.
 		 *     For this purpose, you can usually use `.cfi_def_cfa %esp, 0', however be warned
 		 *     that the value of this expression is used as the FRAME-ID which GDB uses to
@@ -437,7 +437,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 		 * >>     nop  // So that a return-pc directed at `MyRegisterUnwindFunction'
 		 * >>          // shows up properly in backtraced
 		 * >> PUBLIC_FUNCTION(MyRegisterUnwindFunction)
-		 * >>     
+		 * >>     ...
 		 * >>     .cfi_endproc
 		 * >> END(MyRegisterUnwindFunction)
 		 */

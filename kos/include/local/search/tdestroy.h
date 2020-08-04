@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa27068ec */
+/* HASH CRC-32:0xdc8fea61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,10 @@
 #define __local_tdestroy_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#ifndef ____free_fn_t_defined
+#define ____free_fn_t_defined 1
+typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
+#endif /* !____free_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined

@@ -24,10 +24,11 @@
 //#define EH_FRAME_FDE_EXEC_CFA_VALUE 1
 //#define EH_FRAME_FDE_EXEC_CFA_RULE 1
 //#define EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #ifdef __KERNEL__
-#include <sched/task.h>        /* get_stack_avail() */
+#include <sched/task.h> /* get_stack_avail() */
+
 #include <alloca.h>
 #else /* __KERNEL__ */
 #include <malloc.h>
@@ -42,7 +43,7 @@
      defined(EH_FRAME_FDE_EXEC_CFA_RULE) + \
      defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT)) != 1
 #error "Invalid configuration"
-#endif
+#endif /* ... */
 
 
 DECL_BEGIN
@@ -85,7 +86,7 @@ NOTHROW_NCX(CC SYM(unwind_cfa_backup_state_freechain))(SYM(unwind_cfa_backup_sta
 		base = next;
 	}
 }
-#endif
+#endif /* !__KERNEL__ */
 
 
 #if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
@@ -396,9 +397,9 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 		} else if (opcode == DW_CFA_offset) {
 			TRACE("DW_CFA_offset(%I8u)\n", operand);
 			{
-#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_RULE)
+#if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
+     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
+     defined(EH_FRAME_FDE_EXEC_CFA_RULE))
 				intptr_t value;
 				value = ((intptr_t)dwarf_decode_uleb128((byte_t **)&reader) * self->f_dataalign);
 				SET_REGISTER(operand, {
@@ -411,8 +412,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			}
 		} else if (opcode == DW_CFA_restore) {
 			TRACE("DW_CFA_restore\n");
-#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
+#if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
+     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE))
 			{
 				unwind_regno_t temp;
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
@@ -478,9 +479,9 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				reader += 4;
 				break;
 
-#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
-    defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_RULE)
+#if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
+     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
+     defined(EH_FRAME_FDE_EXEC_CFA_RULE))
 			CASE(DW_CFA_offset_extended) {
 				unwind_regno_t reg;
 				intptr_t value;
@@ -495,8 +496,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			CASE(DW_CFA_restore_extended) {
 				unwind_regno_t reg;
 				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
-#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
+#if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
+     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE))
 				{
 					unwind_regno_t temp;
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
@@ -678,8 +679,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				state_backup_free = backup;
 			}	break;
 
-#if defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_RULE)
+#if (defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT) || \
+     defined(EH_FRAME_FDE_EXEC_CFA_RULE))
 			CASE(DW_CFA_def_cfa_expression) {
 				uintptr_t expr_size;
 skip_expression:
@@ -788,9 +789,9 @@ skip_expression:
 #endif /* !EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT && !EH_FRAME_FDE_EXEC_CFA_RULE */
 
 
-#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
-    defined(EH_FRAME_FDE_EXEC_CFA_RULE)
+#if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
+     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
+     defined(EH_FRAME_FDE_EXEC_CFA_RULE))
 			CASE(DW_CFA_expression) {
 				unwind_regno_t reg;
 				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
@@ -935,6 +936,5 @@ err_illegal_instruction:
 #undef EH_FRAME_FDE_EXEC_CFA_RULE
 #undef EH_FRAME_FDE_EXEC_CFA_VALUE
 #undef EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT
-
 
 DECL_END

@@ -53,7 +53,7 @@ typedef struct @_stringlist@ {
 
 
 @@Allocates and returns a new StringList object. Upon error, `NULL' is returned
-[[wunused, decl_prefix(DEFINE_STRINGLIST)]]
+[[wunused, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(malloc, free)]]
 struct _stringlist *sl_init() {
 	struct _stringlist *result;
@@ -73,7 +73,7 @@ struct _stringlist *sl_init() {
 
 @@Append a given `NAME' to `SL'. `NAME' is considered
 @@inherited if the StringList is destroyed with `1'
-[[decl_prefix(DEFINE_STRINGLIST)]]
+[[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(realloc)]]
 int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 	if unlikely(sl->@sl_cur@ >= sl->@sl_max@) {
@@ -94,7 +94,7 @@ int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 @@Free a given string list. When `ALL' is non-zero, all contained
 @@string pointers (as previously added with `sl_add()') will also
 @@be `free(3)'ed.
-[[decl_prefix(DEFINE_STRINGLIST)]]
+[[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(free)]]
 void sl_free([[nullable]] struct _stringlist *sl, int all) {
 	if unlikely(!sl)
@@ -117,7 +117,7 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 @@pointer originally passed to `sl_add()' to insert that string).
 @@If `SL' doesn't contain an equivalent string, return `NULL' instead.
 [[decl_include("<features.h>")]]
-[[ATTR_PURE, decl_prefix(DEFINE_STRINGLIST)]]
+[[ATTR_PURE, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[nullable]] char *sl_find([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
                            [[nonnull]] char const *name) {
 	size_t i, count = sl->@sl_cur@;
@@ -134,7 +134,7 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 @@When `freeit' is non-zero, a removed string is deallocated using `free(3)'
 @@@return: 0:  Successfully removed a string equal to `name'
 @@@return: -1: No string equal to `name' was found in `sl'
-[[guard, wunused, decl_prefix(DEFINE_STRINGLIST)]]
+[[guard, wunused, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 int sl_delete([[nonnull]] struct _stringlist *sl,
               [[nonnull]] char const *name,
               int freeit) {

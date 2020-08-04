@@ -37,6 +37,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -410,18 +411,18 @@ copy_bits(byte_t *__restrict dst_base, unsigned int dst_bit_offset,
 	while (num_bits) {
 		uint8_t remaining;
 		uint8_t src_value, remaining_temp;
-		src_base += src_bit_offset / 8;
-		src_bit_offset &= 7;
-		remaining = 8 - src_bit_offset;
+		src_base += src_bit_offset / CHAR_BIT;
+		src_bit_offset %= CHAR_BIT;
+		remaining = CHAR_BIT - src_bit_offset;
 		if (remaining > num_bits)
 			remaining = num_bits;
 		src_value      = *src_base >> src_bit_offset;
 		remaining_temp = remaining;
 		while (remaining_temp) {
 			uint8_t avail;
-			dst_base += dst_bit_offset / 8;
-			dst_bit_offset &= 7;
-			avail = 8 - dst_bit_offset;
+			dst_base += dst_bit_offset / CHAR_BIT;
+			dst_bit_offset %= CHAR_BIT;
+			avail = CHAR_BIT - dst_bit_offset;
 			if (avail > remaining_temp)
 				avail = remaining_temp;
 			*dst_base &= ~(((1 << avail) - 1) << dst_bit_offset);
@@ -441,7 +442,7 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
                                      uintptr_t num_bits,
                                      unsigned int target_left_shift) {
-	if unlikely(((self->ue_piecebits + num_bits + 7) / 8) > self->ue_piecesiz)
+	if unlikely(((self->ue_piecebits + num_bits + CHAR_BIT - 1) / CHAR_BIT) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
 	switch (ste->s_type) {
 
@@ -449,11 +450,11 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 		byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
 		if unlikely(!self->ue_regset)
 			ERROR(err_not_writable);
-		if unlikely(num_bits > CFI_REGISTER_SIZE(ste->s_register) * 8)
-			num_bits = CFI_REGISTER_SIZE(ste->s_register) * 8;
+		if unlikely(num_bits > CFI_REGISTER_SIZE(ste->s_register) * CHAR_BIT)
+			num_bits = CFI_REGISTER_SIZE(ste->s_register) * CHAR_BIT;
 		/* Write to a register. */
 		if (target_left_shift == 0 &&
-		    num_bits == CFI_REGISTER_SIZE(ste->s_register) * 8) {
+		    num_bits == CFI_REGISTER_SIZE(ste->s_register) * CHAR_BIT) {
 			/* Write whole register. */
 		} else {
 			if unlikely(!(*self->ue_regget)(self->ue_regget_arg,
@@ -536,7 +537,7 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
 		temp >>= target_left_shift;
 		while (num_bits) {
 			uintptr_t part;
-			part = sizeof(temp) * 8;
+			part = sizeof(temp) * CHAR_BIT;
 			if (part > num_bits)
 				part = num_bits;
 			copy_bits(self->ue_piecebuf,
@@ -558,10 +559,10 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
 		if unlikely(!(*self->ue_regget)(self->ue_regget_arg, ste->s_register, buf))
 			ERROR(err_invalid_register);
 		UNALIGNED_SET((uintptr_t *)buf, UNALIGNED_GET((uintptr_t *)buf) + ste->s_regoffset);
-		if unlikely(target_left_shift >= (sizeof(buf) * 8)) {
+		if unlikely(target_left_shift >= (sizeof(buf) * CHAR_BIT)) {
 			max_bits = 0;
 		} else {
-			max_bits = (sizeof(buf) * 8) - target_left_shift;
+			max_bits = (sizeof(buf) * CHAR_BIT) - target_left_shift;
 			if (max_bits > num_bits)
 				max_bits = num_bits;
 		}
@@ -576,7 +577,7 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
 		while (num_bits) {
 			/* Fill out-of-bounds register data with all zeros. */
 			memset(buf, 0, sizeof(buf));
-			max_bits = sizeof(buf) * 8;
+			max_bits = sizeof(buf) * CHAR_BIT;
 			if (max_bits > num_bits)
 				max_bits = num_bits;
 			copy_bits(self->ue_piecebuf,
@@ -1272,10 +1273,10 @@ do_make_second_const:
 				if unlikely(TOP.s_type != UNWIND_STE_REGISTER &&
 				            TOP.s_type != UNWIND_STE_RW_LVALUE)
 					ERROR(err_not_writable);
-				num_bits = dwarf_decode_uleb128(&pc) * 8;
+				num_bits = dwarf_decode_uleb128(&pc) * CHAR_BIT;
 				goto do_write_bit_pieces;
 			}
-			num_bits = dwarf_decode_uleb128(&pc) * 8;
+			num_bits = dwarf_decode_uleb128(&pc) * CHAR_BIT;
 			goto do_read_bit_pieces;
 		CASE(DW_OP_bit_piece)
 			if unlikely(stacksz < 1)
@@ -1560,7 +1561,7 @@ libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
 #ifdef __KERNEL__
                                         ,
                                         size_t stack_size
-#endif
+#endif /* __KERNEL__ */
                                         ) {
 	unsigned int result;
 #ifdef __KERNEL__
@@ -1604,7 +1605,7 @@ err_no_return_value:
 #ifdef __KERNEL__
 err_badalloc:
 	return UNWIND_BADALLOC;
-#endif
+#endif /* __KERNEL__ */
 }
 
 INTERN NONNULL((1)) unsigned int CC
@@ -2075,14 +2076,15 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_module_relative_pc = module_relative_pc;
 	/* Execute the emulator. */
 	result = libuw_unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);
-	assert(emulator.ue_piecebits <= bufsize * 8);
+	assert(emulator.ue_piecebits <= bufsize * CHAR_BIT);
 	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
 		result = UNWIND_SUCCESS; /* No stack-entry location. */
 	else if (result == UNWIND_SUCCESS) {
 		/* Dereference the last stack to fill in the missing data pieces. */
 		result = libuw_unwind_emulator_read_from_piece(&emulator,
 		                                               &ste_top,
-		                                               (bufsize * 8) - emulator.ue_piecebits,
+		                                               (bufsize * CHAR_BIT) -
+		                                               emulator.ue_piecebits,
 		                                               0);
 	}
 	*pnum_written_bits = emulator.ue_piecebits;
@@ -2135,14 +2137,15 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_module_relative_pc = module_relative_pc;
 	/* Execute the emulator. */
 	result = libuw_unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);
-	assert(emulator.ue_piecebits <= bufsize * 8);
+	assert(emulator.ue_piecebits <= bufsize * CHAR_BIT);
 	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
 		result = UNWIND_SUCCESS; /* No stack-entry location. */
 	else if (result == UNWIND_SUCCESS) {
 		/* Dereference the last stack to fill in the missing data pieces. */
 		result = libuw_unwind_emulator_write_to_piece(&emulator,
 		                                              &ste_top,
-		                                              (bufsize * 8) - emulator.ue_piecebits,
+		                                              (bufsize * CHAR_BIT) -
+		                                              emulator.ue_piecebits,
 		                                              0);
 	} else {
 		result = UNWIND_EMULATOR_NOT_WRITABLE;

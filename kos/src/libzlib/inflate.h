@@ -21,6 +21,7 @@
 #define GUARD_LIBZLIB_INFLATE_H 1
 
 #include "api.h"
+/**/
 
 #include <kos/types.h>
 

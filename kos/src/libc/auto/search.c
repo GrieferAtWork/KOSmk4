@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49638e95 */
+/* HASH CRC-32:0x6e10e25e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,7 +133,6 @@ INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy)(void) {
 	libc_hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
 }
-#include <parts/errno.h>
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
 struct _ENTRY;
@@ -150,6 +149,7 @@ typedef struct entry {
 	void *data;
 } ENTRY;
 #endif /* !__ENTRY_defined */
+#include <parts/errno.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3, 4)) int
 NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
@@ -277,7 +277,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 	}
 	htab->size   = nel;
 	htab->filled = 0;
-	htab->table  = (struct _ENTRY *)libc_calloc(htab->size+1, sizeof(entry_type));
+	htab->table  = (struct _ENTRY *)libc_calloc(htab->size + 1, sizeof(entry_type));
 	if (htab->table == NULL)
 		return 0;
 	return 1;

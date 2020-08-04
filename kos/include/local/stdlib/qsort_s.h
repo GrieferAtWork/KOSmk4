@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbb17021 */
+/* HASH CRC-32:0x15c311f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_qsort_r_defined 1
 #ifdef __CRT_HAVE_qsort_r
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);

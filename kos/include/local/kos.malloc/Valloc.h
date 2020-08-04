@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4674952e */
+/* HASH CRC-32:0xa52a820f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_Memalign
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Memalign from kos.malloc */
 #ifndef __local___localdep_Memalign_defined

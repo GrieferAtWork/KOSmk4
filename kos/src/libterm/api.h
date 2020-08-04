@@ -22,16 +22,18 @@
 
 #define LIBBUFFER_WANT_PROTOTYPES 1
 
-#include <hybrid/compiler.h>
 #include <libterm/api.h>
+/**/
+
+#include <hybrid/compiler.h>
 
 #define CC LIBTERM_CC
 
 #ifdef __KERNEL__
-#define IF_NOT_KERNEL(...) /* nothing */
+#define IF_NOT_KERNEL(...)                      /* nothing */
 #define KERNEL_SELECT(if_kernel, if_not_kernel) if_kernel
 #else /* __KERNEL__ */
-#define IF_NOT_KERNEL(...) __VA_ARGS__
+#define IF_NOT_KERNEL(...)                      __VA_ARGS__
 #define KERNEL_SELECT(if_kernel, if_not_kernel) if_not_kernel
 #endif /* !__KERNEL__ */
 

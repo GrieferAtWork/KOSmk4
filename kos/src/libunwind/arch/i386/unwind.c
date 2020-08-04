@@ -23,7 +23,8 @@
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
-#include "../../unwind.h"
+#include "../../api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
@@ -45,7 +46,7 @@
 #include <libunwind/cfi.h>
 #include <libunwind/unwind.h>
 
-#include "../../api.h"
+#include "../../unwind.h"
 
 #ifdef __KERNEL__
 #include <kernel/paging.h>
@@ -115,23 +116,23 @@ INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_exclusiv
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_exclusive)(struct mcontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
 #endif /* !__KERNEL__ || __INTELLISENSE */
 
-#define MY_CS  SEGMENT_CURRENT_CODE_RPL
-#define MY_SS  SEGMENT_CURRENT_DATA_RPL
+#define MY_CS     SEGMENT_CURRENT_CODE_RPL
+#define MY_SS     SEGMENT_CURRENT_DATA_RPL
 #ifdef __x86_64__
 #define MY_FS     __rdfs()
 #define MY_DS     __rdds()
 #define MY_ES     __rdes()
-#else /* __x86_64__ */
-#ifdef __KERNEL__
-#define MY_FS   SEGMENT_KERNEL_FSBASE
-#else /* __KERNEL__ */
-#define MY_FS   __rdfs()
-#endif /* !__KERNEL__ */
-#define MY_DS   SEGMENT_USER_DATA_RPL
-#define MY_ES   SEGMENT_USER_DATA_RPL
-#endif /* !__x86_64__ */
 #define MY_FSBASE ((uintptr_t)__rdfsbase())
 #define MY_GSBASE ((uintptr_t)__rdgsbase())
+#else /* __x86_64__ */
+#ifdef __KERNEL__
+#define MY_FS     SEGMENT_KERNEL_FSBASE
+#else /* __KERNEL__ */
+#define MY_FS     __rdfs()
+#endif /* !__KERNEL__ */
+#define MY_DS     SEGMENT_USER_DATA_RPL
+#define MY_ES     SEGMENT_USER_DATA_RPL
+#endif /* !__x86_64__ */
 #define MY_TR     __str()
 #define MY_LDTR   __sldt()
 #define MY_GS     __rdgs()

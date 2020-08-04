@@ -20,14 +20,15 @@
 #ifndef GUARD_LIBVM86_EMULATOR_H
 #define GUARD_LIBVM86_EMULATOR_H 1
 
+#include "api.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
 #include <libvm86/api.h>
 #include <libvm86/emulator.h>
-
-#include "api.h"
 
 DECL_BEGIN
 

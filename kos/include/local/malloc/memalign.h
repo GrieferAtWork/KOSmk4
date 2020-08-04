@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeb19863 */
+/* HASH CRC-32:0x246d54ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_memalign_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_posix_memalign
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_posix_memalign from malloc */
 #ifndef __local___localdep_crt_posix_memalign_defined

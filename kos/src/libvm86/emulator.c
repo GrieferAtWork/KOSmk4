@@ -76,7 +76,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 			ip = base[(intno * 2) + 0];
 			cs = base[(intno * 2) + 1];
 		} EXCEPT {
-			if (!WAS_SEGFAULT_THROWN())
+			if (!was_thrown(E_SEGFAULT))
 				RETHROW();
 			return VM86_SEGFAULT;
 		}

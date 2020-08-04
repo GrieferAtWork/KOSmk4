@@ -154,8 +154,8 @@ typedef PUNWIND_SETREG_KCPUSTATE PUNWIND_SETREG_ERROR_REGISTER_STATE;
 #define UNWIND_GETREG_ERROR_REGISTER_STATE_NAME "unwind_getreg_kcpustate"
 #define UNWIND_SETREG_ERROR_REGISTER_STATE_NAME "unwind_setreg_kcpustate"
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-#define unwind_getreg_error_register_state       unwind_getreg_kcpustate
-#define unwind_setreg_error_register_state       unwind_setreg_kcpustate
+#define unwind_getreg_error_register_state unwind_getreg_kcpustate
+#define unwind_setreg_error_register_state unwind_setreg_kcpustate
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x593f5689 */
+/* HASH CRC-32:0x4d6f0f9b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_hcreate_r_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+struct hsearch_data;
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: calloc from stdlib */
 #ifndef __local___localdep_calloc_defined
@@ -104,7 +106,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 	}
 	__htab->size   = __nel;
 	__htab->filled = 0;
-	__htab->table  = (struct _ENTRY *)__localdep_calloc(__htab->__size+1, sizeof(__entry_type));
+	__htab->table  = (struct _ENTRY *)__localdep_calloc(__htab->size + 1, sizeof(__entry_type));
 	if (__htab->table == __NULLPTR)
 		return 0;
 	return 1;

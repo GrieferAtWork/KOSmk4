@@ -201,13 +201,13 @@ DL_REGISTER_CACHE(dl_clear_caches) {
 }
 #endif /* DL_REGISTER_CACHE */
 
-/* Create public exports (without weak linkage, thus overruling `libc's) */
+/* Create public exports */
 #ifndef DEFINE_DL_EXPORT_ALIAS
 #ifdef CONFIG_DLMALLOC_EXPORT_AS_INTERN
-#define DEFINE_DL_EXPORT_ALIAS  DEFINE_INTERN_ALIAS
-#else
-#define DEFINE_DL_EXPORT_ALIAS  DEFINE_PUBLIC_ALIAS
-#endif
+#define DEFINE_DL_EXPORT_ALIAS DEFINE_INTERN_ALIAS
+#else /* CONFIG_DLMALLOC_EXPORT_AS_INTERN */
+#define DEFINE_DL_EXPORT_ALIAS DEFINE_PUBLIC_ALIAS
+#endif /* !CONFIG_DLMALLOC_EXPORT_AS_INTERN */
 #endif /* !DEFINE_DL_EXPORT_ALIAS */
 
 DEFINE_DL_EXPORT_ALIAS(malloc, dlmalloc);

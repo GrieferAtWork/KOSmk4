@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9c1f450 */
+/* HASH CRC-32:0xadc8178d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_malloc_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_calloc from stdlib */
 #if !defined(__local___localdep_crt_calloc_defined) && defined(__CRT_HAVE_calloc)

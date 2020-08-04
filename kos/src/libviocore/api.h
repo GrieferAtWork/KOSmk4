@@ -19,13 +19,14 @@
  */
 #ifndef GUARD_LIBVIOCORE_API_H
 #define GUARD_LIBVIOCORE_API_H 1
-#define LIBVIO_WANT_PROTOTYPES 1
+
+#define LIBVIO_WANT_PROTOTYPES      1
 #define LIBINSTRLEN_WANT_PROTOTYPES 1
 
-#include <__stdinc.h>
-#include <hybrid/compiler.h>
-
 #include <libviocore/api.h>
+/**/
+
+#include <hybrid/compiler.h>
 
 #define CC LIBVIOCORE_CC
 

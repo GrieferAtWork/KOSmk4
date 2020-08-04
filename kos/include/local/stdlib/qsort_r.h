@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x992da54c */
+/* HASH CRC-32:0x316ccb9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,12 @@
 #ifndef __local_qsort_r_defined
 #define __local_qsort_r_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #include <kos/anno.h>
-#include <hybrid/__minmax.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {

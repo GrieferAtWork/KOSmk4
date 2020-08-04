@@ -20,12 +20,13 @@
 #ifndef GUARD_LIBUNWIND_API_H
 #define GUARD_LIBUNWIND_API_H 1
 
+#include <libunwind/api.h>
+/**/
+
 #include <__crt.h>
 #include <hybrid/compiler.h>
 
-#include <libunwind/api.h>
-
-#define CC         LIBUNWIND_CC
+#define CC LIBUNWIND_CC
 
 #if !defined(NDEBUG) && 0
 #ifdef __KERNEL__
@@ -42,6 +43,7 @@
 #endif
 #define CASE(x)         __IF0{case x: TRACE("%s\n",#x);}
 #endif
+
 #ifndef CASE
 #define CASE(x)         case x:
 #endif /* !CASE */
@@ -60,9 +62,9 @@
 
 #if !defined(TRACE) || 1
 #undef TRACE
-#define TRACE(...)      (void)0
 #undef CASE
-#define CASE(x)         case x:
-#endif
+#define TRACE(...) (void)0
+#define CASE(x)    case x:
+#endif /* !TRACE */
 
 #endif /* !GUARD_LIBUNWIND_API_H */

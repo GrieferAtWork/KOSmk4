@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23a009c9 */
+/* HASH CRC-32:0xa52c5ad6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memset_defined */
 __NAMESPACE_LOCAL_END
 #include <sys/ttydefaults.h>
+#include <bits/posix_opt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */

@@ -22,7 +22,8 @@
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1
 
-#include "vio.h"
+#include "api.h"
+/**/
 
 #ifdef LIBVIO_CONFIG_ENABLED
 #ifndef __KERNEL__
@@ -49,6 +50,7 @@
 #include <libvio/userviofd.h>
 
 #include "access.h"
+#include "vio.h"
 
 DECL_BEGIN
 

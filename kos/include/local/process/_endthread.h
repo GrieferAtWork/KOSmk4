@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fd16a73 */
+/* HASH CRC-32:0xae635e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _endthreadex from process */
 #ifndef __local___localdep__endthreadex_defined
 #define __local___localdep__endthreadex_defined 1
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__endthreadex,(__UINT32_TYPE__ __exitcode),_endthreadex,(__exitcode))
 #endif /* !__local___localdep__endthreadex_defined */
 __LOCAL_LIBC(_endthread) void

@@ -29,21 +29,21 @@ DECL_BEGIN
 #define _WRITE_METHOD_vo_write  0
 #define _WRITE_METHOD_vo_xch    1
 #define _WRITE_METHOD_vo_cmpxch 2
-#define _WRITE_METHOD3(x) _WRITE_METHOD_##x
-#define _WRITE_METHOD2(x) _WRITE_METHOD3(x)
-#define _WRITE_METHOD _WRITE_METHOD2(WRITE_METHOD)
+#define _WRITE_METHOD3(x)       _WRITE_METHOD_##x
+#define _WRITE_METHOD2(x)       _WRITE_METHOD3(x)
+#define _WRITE_METHOD           _WRITE_METHOD2(WRITE_METHOD)
 #endif /* !_WRITE_METHOD */
 
 #ifndef APPEND__METHOD
 #define _APPEND__METHOD2(x, method) x##_##method
-#define _APPEND__METHOD(x, method) _APPEND__METHOD2(x, method)
-#define APPEND__METHOD(x) _APPEND__METHOD(x, WRITE_METHOD)
+#define _APPEND__METHOD(x, method)  _APPEND__METHOD2(x, method)
+#define APPEND__METHOD(x)           _APPEND__METHOD(x, WRITE_METHOD)
 #endif /* !APPEND__METHOD */
 
 #ifndef WRITE_FUNC
 #define _WRITE_FUNC2(name, method) name##_##method
-#define _WRITE_FUNC(name, method) _WRITE_FUNC2(name, method)
-#define WRITE_FUNC(name) _WRITE_FUNC(name, WRITE_METHOD)
+#define _WRITE_FUNC(name, method)  _WRITE_FUNC2(name, method)
+#define WRITE_FUNC(name)           _WRITE_FUNC(name, WRITE_METHOD)
 #endif /* !WRITE_FUNC */
 
 #undef HAVE_QWORD
@@ -56,14 +56,14 @@ DECL_BEGIN
 #define HAVE_XWORD
 #endif /* ... */
 
-#define do_writeb  APPEND__METHOD(do_writeb)
-#define do_writew  APPEND__METHOD(do_writew)
-#define do_writel  APPEND__METHOD(do_writel)
+#define do_writeb APPEND__METHOD(do_writeb)
+#define do_writew APPEND__METHOD(do_writew)
+#define do_writel APPEND__METHOD(do_writel)
 #ifdef HAVE_QWORD
-#define do_writeq  APPEND__METHOD(do_writeq)
+#define do_writeq APPEND__METHOD(do_writeq)
 #endif /* HAVE_QWORD */
 #ifdef HAVE_XWORD
-#define do_writex  APPEND__METHOD(do_writex)
+#define do_writex APPEND__METHOD(do_writex)
 #endif /* HAVE_XWORD */
 
 
@@ -529,6 +529,7 @@ WRITE_FUNC(libvio_writel)(struct vio_operators const *__restrict ops,
 			x1.l[3] = libvio_readl_aligned(args, AX + 28);
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 			switch (addr & 15) {
+
 			case 13:
 				/* ...aaaaAAAABBBBbbbb... */
 				/* ...aaaaA....BBBbbbb... */
@@ -537,6 +538,7 @@ WRITE_FUNC(libvio_writel)(struct vio_operators const *__restrict ops,
 				x0.b[15] = x.b[2];
 				x1.b[0]  = x.b[3];
 				break;
+
 			case 14:
 				/* ...aaaaAAAABBBBbbbb... */
 				/* ...aaaaAA....BBbbbb... */
@@ -545,6 +547,7 @@ WRITE_FUNC(libvio_writel)(struct vio_operators const *__restrict ops,
 				x1.b[0]  = x.b[2];
 				x1.b[1]  = x.b[3];
 				break;
+
 			case 15:
 				/* ...aaaaAAAABBBBbbbb... */
 				/* ...aaaaAAA....Bbbbb... */
@@ -553,6 +556,7 @@ WRITE_FUNC(libvio_writel)(struct vio_operators const *__restrict ops,
 				x1.b[1]  = x.b[2];
 				x1.b[2]  = x.b[3];
 				break;
+
 			default: __builtin_unreachable();
 			}
 			do_writex(AX + 0, x0.x);
@@ -719,6 +723,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 			/* assume((addr & 7) in [1, 2, 3, 5, 6, 7]); */
 			/* assume((addr & 3) in [1, 2, 3]); */
 			switch (addr & 3) {
+
 			case 1:
 				/* ....AAAABBBBCCCC.... */
 				/* ....A........CCC.... */
@@ -730,6 +735,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				l2.l    = libvio_readl_aligned(args, addr + 7);
 				l2.b[0] = x.b[7];
 				break;
+
 			case 2:
 				/* ....AAAABBBBCCCC.... */
 				/* ....AA........CC.... */
@@ -739,6 +745,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				l2.w[0] = x.w_6;
 				l2.w[1] = libvio_readw_aligned(args, addr + 8);
 				break;
+
 			case 3:
 				/* ....AAAABBBBCCCC.... */
 				/* ....AAA........C.... */
@@ -750,6 +757,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				l2.b[2] = x.b[7];
 				l2.b[3] = libvio_readb_aligned(args, addr + 8);
 				break;
+
 			default: __builtin_unreachable();
 			}
 			do_writel(AL + 0, l0.l);
@@ -798,6 +806,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 			x1.l[3] = libvio_readl_aligned(args, AX + 28);
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 			switch (addr & 15) {
+
 			case 9:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAAB........CCCCCCCDDDDDDDD........ */
@@ -807,6 +816,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				x0.b[15] = x.b[6];
 				x1.b[0]  = x.b[7];
 				break;
+
 			case 10:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAABB........CCCCCCDDDDDDDD........ */
@@ -815,6 +825,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				x0.b[15] = x.b[5];
 				x1.w[0]  = x.w_6;
 				break;
+
 			case 11:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAABBB........CCCCCDDDDDDDD........ */
@@ -823,12 +834,14 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				x1.w[0]  = x.w_5;
 				x1.b[2]  = x.b[7];
 				break;
+
 			case 12:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAABBBB........CCCCDDDDDDDD........ */
 				x0.l_12 = x.l[0];
 				x1.l[0] = x.l[1];
 				break;
+
 			case 13:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAABBBBB........CCCDDDDDDDD........ */
@@ -837,6 +850,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				x1.l[0]  = x.l_3;
 				x1.b[4]  = x.b[7];
 				break;
+
 			case 14:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAABBBBBB........CCDDDDDDDD........ */
@@ -844,6 +858,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				x1.l[0] = x.l_2;
 				x1.w_4  = x.w_6;
 				break;
+
 			case 15:
 				/* ........AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD........ */
 				/* ........AAAAAAAABBBBBBB........CDDDDDDDD........ */
@@ -852,6 +867,7 @@ WRITE_FUNC(libvio_writeq)(struct vio_operators const *__restrict ops,
 				x1.w_4   = x.w_5;
 				x1.b[6]  = x.b[7];
 				break;
+
 			default: __builtin_unreachable();
 			}
 			do_writex(AX + 0, x0.x);

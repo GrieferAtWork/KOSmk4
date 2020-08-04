@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb537d241 */
+/* HASH CRC-32:0x7b0c14ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local___stpcpy_chk_defined
 #define __local___stpcpy_chk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: stpcpy from string */
 #ifndef __local___localdep_stpcpy_defined

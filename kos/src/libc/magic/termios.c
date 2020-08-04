@@ -52,23 +52,23 @@ typedef __pid_t pid_t;
 
 }
 
-[[wunused, ATTR_PURE, decl_include("<bits/termios.h>")]]
+[[wunused, ATTR_PURE, decl_include("<bits/termios.h>", "<bits/types.h>")]]
 speed_t cfgetospeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ospeed@;
 }
 
-[[wunused, ATTR_PURE, decl_include("<bits/termios.h>")]]
+[[wunused, ATTR_PURE, decl_include("<bits/termios.h>", "<bits/types.h>")]]
 speed_t cfgetispeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ispeed@;
 }
 
-[[decl_include("<bits/termios.h>")]]
+[[decl_include("<bits/termios.h>", "<bits/types.h>")]]
 int cfsetospeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	return 0;
 }
 
-[[decl_include("<bits/termios.h>")]]
+[[decl_include("<bits/termios.h>", "<bits/types.h>")]]
 int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ispeed@ = speed;
 	return 0;
@@ -109,7 +109,7 @@ int tcsetsid($fd_t fd, $pid_t pid);
 
 %
 %#ifdef __USE_MISC
-[[decl_include("<bits/termios.h>")]]
+[[decl_include("<bits/termios.h>", "<bits/types.h>")]]
 int cfsetspeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	termios_p->@c_ispeed@ = speed;
@@ -141,7 +141,7 @@ void cfmakeraw([[nonnull]] struct termios *__restrict termios_p) {
 @@Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
 @@Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h>
 [[kernel, decl_include("<bits/termios.h>")]]
-[[impl_include("<sys/ttydefaults.h>")]]
+[[impl_include("<sys/ttydefaults.h>", "<bits/posix_opt.h>")]]
 void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	/* Set sane values. */
 	memset(termios_p, 0, sizeof(*termios_p));
@@ -305,7 +305,7 @@ void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 #endif /* __CC__ */
 
 #ifdef __USE_MISC
-#define CCEQ(val, c)   ((c) == (val) && (val) != _POSIX_VDISABLE)
+#define CCEQ(val, c) ((c) == (val) && (val) != _POSIX_VDISABLE)
 #endif /* __USE_MISC */
 
 __SYSDECL_END

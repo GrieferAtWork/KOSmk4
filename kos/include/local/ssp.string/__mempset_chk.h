@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x581f496e */
+/* HASH CRC-32:0xd1776ccb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local___mempset_chk_defined
 #define __local___mempset_chk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempset from string */
 #ifndef __local___localdep_mempset_defined
 #define __local___localdep_mempset_defined 1
 #ifdef __CRT_HAVE_mempset
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_mempset */

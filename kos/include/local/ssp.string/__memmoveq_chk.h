@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a593232 */
+/* HASH CRC-32:0x6dd3dfa1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local___memmoveq_chk_defined
 #define __local___memmoveq_chk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveq from string */
 #ifndef __local___localdep_memmoveq_defined
 #define __local___localdep_memmoveq_defined 1
 #ifdef __CRT_HAVE_memmoveq
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
 #else /* __CRT_HAVE_memmoveq */

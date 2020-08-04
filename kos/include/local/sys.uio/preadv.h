@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x685696b */
+/* HASH CRC-32:0xc99c2104 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #if defined(__CRT_HAVE_preadv64) || defined(__CRT_HAVE_preadv)
 #include <features.h>
 #include <bits/iovec-struct.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: preadv32 from sys.uio */
 #if !defined(__local___localdep_preadv32_defined) && defined(__CRT_HAVE_preadv)

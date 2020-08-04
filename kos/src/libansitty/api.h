@@ -20,8 +20,10 @@
 #ifndef GUARD_LIBANSITTY_API_H
 #define GUARD_LIBANSITTY_API_H 1
 
-#include <hybrid/compiler.h>
 #include <libansitty/api.h>
+/**/
+
+#include <hybrid/compiler.h>
 
 #define CC LIBANSITTY_CC
 
@@ -33,14 +35,14 @@
 #define DOTRACE(...)      (printk(KERN_RAW "%s(%d) : %s : ",__FILE__,__LINE__,__FUNCTION__),printk(KERN_RAW __VA_ARGS__))
 #define ERROR(err)      do{printk(KERN_RAW "%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__FUNCTION__,#err); goto err;}__WHILE0
 #define ERRORF(err,...) do{printk(KERN_RAW "%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__FUNCTION__,#err); printk(KERN_RAW __VA_ARGS__); goto err;}__WHILE0
-#else
+#else /* __KERNEL__ */
 #include <syslog.h>
 #define DOTRACE(...)      (syslog(LOG_DEBUG,"%s(%d) : %s : ",__FILE__,__LINE__,__FUNCTION__),syslog(LOG_DEBUG,__VA_ARGS__))
 #define ERROR(err)      do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__FUNCTION__,#err); goto err;}__WHILE0
 #define ERRORF(err,...) do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__FUNCTION__,#err); syslog(LOG_ERR,__VA_ARGS__); goto err;}__WHILE0
-#endif
+#endif /* !__KERNEL__ */
 #define CASE(x)         __IF0{case x: TRACE("%s\n",#x);}
-#endif
+#endif /* !NDEBUG */
 #ifndef CASE
 #define CASE(x)         case x:
 #endif /* !CASE */
@@ -59,10 +61,10 @@
 
 #if !defined(TRACE) || 1
 #undef TRACE
-#define TRACE(...)      (void)0
 #undef CASE
-#define CASE(x)         case x:
-#endif
+#define TRACE(...) (void)0
+#define CASE(x)    case x:
+#endif /* !TRACE */
 
 
 #endif /* !GUARD_LIBANSITTY_API_H */

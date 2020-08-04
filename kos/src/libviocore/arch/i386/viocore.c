@@ -42,7 +42,7 @@ opt.append("-Os");
 #define __LIBEMU86_STATIC 1
 
 
-#include "../../viocore.h"
+#include "../../api.h"
 
 #ifdef LIBVIO_CONFIG_ENABLED
 
@@ -75,6 +75,8 @@ opt.append("-Os");
 #include <libinstrlen/instrlen.h>
 #include <libvio/access.h>
 
+#include "../../viocore.h"
+
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/printk.h>
@@ -94,10 +96,10 @@ DECL_BEGIN
 INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
 
 #ifdef __KERNEL__
-#define CS(x) icpustate_##x
+#define CS(x)  icpustate_##x
 #define _CS(x) x##_icpustate
 #else /* __KERNEL__ */
-#define CS(x) ucpustate_##x
+#define CS(x)  ucpustate_##x
 #define _CS(x) x##_ucpustate
 #endif /* !__KERNEL__ */
 

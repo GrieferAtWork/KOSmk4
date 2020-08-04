@@ -33,17 +33,17 @@ __SYSDECL_BEGIN
 
 }
 
-[[ATTR_CONST, wunused, nothrow]]
+[[ATTR_CONST, wunused, nothrow, decl_include("<bits/types.h>")]]
 $major_t gnu_dev_major($dev_t dev) {
 	return (major_t)((uintptr_t)dev >> 20);
 }
 
-[[ATTR_CONST, wunused, nothrow]]
+[[ATTR_CONST, wunused, nothrow, decl_include("<bits/types.h>")]]
 $minor_t gnu_dev_minor($dev_t dev) {
 	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
 }
 
-[[ATTR_CONST, wunused, nothrow]]
+[[ATTR_CONST, wunused, nothrow, decl_include("<bits/types.h>")]]
 $dev_t gnu_dev_makedev($major_t major, $minor_t minor) {
 	return (dev_t)major << 20 | (dev_t)minor;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28ce0020 */
+/* HASH CRC-32:0xca5cf443 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,7 +543,7 @@ DFUN(".text.crt.dos.heap.helpers", libd_realloc_in_place, libc_realloc_in_place,
 DFUN(".text.crt.dos.heap.malloc", libd_memalign, libc_memalign, TP, 2, TI, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_pvalloc, libc_pvalloc, TP, 1, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_valloc, libc_valloc, TP, 1, TI)
-DFUN(".text.crt.dos.heap.rare_helpers", libd_posix_memalign, libc_posix_memalign, TD, 3, TP, TI, TI)
+DFUN(".text.crt.dos.heap.rare_helpers", libd_posix_memalign, libc_posix_memalign, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TI)
 DFUN(".text.crt.dos.heap.utility", libd_malloc_trim, libc_malloc_trim, TD, 1, TI)
 DFUN(".text.crt.dos.heap.helpers", libd_malloc_usable_size, libc_malloc_usable_size, TI, 1, TP)
 DFUN(".text.crt.dos.heap.utility", libd_mallopt, libc_mallopt, TD, 2, TD, TD)

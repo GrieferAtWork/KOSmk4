@@ -20,10 +20,10 @@
 #ifndef GUARD_LIBDISASM_API_H
 #define GUARD_LIBDISASM_API_H 1
 
-#include <__stdinc.h>
-#include <hybrid/compiler.h>
-
 #include <libdisasm/api.h>
+/**/
+
+#include <hybrid/compiler.h>
 
 #define CC LIBDISASM_CC
 

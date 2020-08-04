@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x133ecc37 */
+/* HASH CRC-32:0x5f82949e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16stombs_defined
 #define __local_c16stombs_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16rtombs from parts.uchar.wchar */
 #ifndef __local___localdep_c16rtombs_defined

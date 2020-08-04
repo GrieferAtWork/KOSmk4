@@ -19,8 +19,8 @@
  */
 #ifndef GUARD_LIBC_API_H
 #define GUARD_LIBC_API_H 1
-#define __BUILDING_LIBC  1
 
+#define __BUILDING_LIBC   1
 #define __CRT_KOS_PRIMARY 1
 #define __CRT_KOS         1
 #ifdef __KERNEL__
@@ -60,9 +60,9 @@
  * the *64 variants of functions (e.g. `mmap64()'; `mmap()' is always the
  * 32-bit variant) */
 #undef _LARGEFILE64_SOURCE
-#undef _TIME64_SOURCE
 #define _LARGEFILE64_SOURCE 1
-#define _TIME64_SOURCE      1
+#undef _TIME64_SOURCE
+#define _TIME64_SOURCE 1
 #undef _TIME_T_BITS
 #define _TIME_T_BITS 32
 #undef _FILE_OFFSET_BITS
@@ -106,10 +106,17 @@
 #include <features.h>
 #include <hybrid/compiler.h>
 
+/* We may define a couple of functions that are annotated as deprecated.
+ * As such, prevent potential compiler warnings related to them, as we're
+ * actually supposed to use/define them. */
 #undef ATTR_DEPRECATED
 #undef ATTR_DEPRECATED_
-#define ATTR_DEPRECATED(msg) /* nothing */
-#define ATTR_DEPRECATED_     /* nothing */
+#undef __ATTR_DEPRECATED
+#undef __ATTR_DEPRECATED_
+#define ATTR_DEPRECATED(msg)   /* nothing */
+#define ATTR_DEPRECATED_       /* nothing */
+#define __ATTR_DEPRECATED(msg) /* nothing */
+#define __ATTR_DEPRECATED_     /* nothing */
 
 
 #include <hybrid/host.h>

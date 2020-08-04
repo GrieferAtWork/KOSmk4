@@ -218,8 +218,8 @@ typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 @@pp_endif@@
 )]
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[impl_include("<hybrid/__minmax.h>", "<hybrid/typecore.h>")]]
 [[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, kernel]]
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
@@ -288,7 +288,7 @@ typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 }
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, wunused]]
+[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, wunused, decl_include("<hybrid/typecore.h>")]]
 void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void const *]
@@ -365,7 +365,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std, kernel]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std, kernel, decl_include("<hybrid/typecore.h>")]]
 void qsort([[nonnull]] void *pbase, size_t item_count,
            size_t item_size, [[nonnull]] __compar_fn_t cmp) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
@@ -381,7 +381,7 @@ void qsort([[nonnull]] void *pbase, size_t item_count,
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), wunused, std, throws]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), wunused, std, throws, decl_include("<hybrid/typecore.h>")]]
 void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void const *]
@@ -542,6 +542,7 @@ struct __div_struct div(int numer, int denom) {
 %(std)#endif /* __CORRECT_ISO_CPP_MATH_H_PROTO && !__NO_FPU */
 %(std)#endif /* __cplusplus */
 
+[[impl_include("<hybrid/typecore.h>")]]
 [[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
 [[requires_include("<local/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
@@ -567,7 +568,7 @@ char *getenv([[nonnull]] char const *varname) {
 }
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")]
-[[std]]
+[[std, decl_include("<hybrid/typecore.h>")]]
 int mblen([[inp_opt(maxlen)]] char const *str, size_t maxlen) {
 	return mbrlen(str, maxlen, NULL);
 }
@@ -584,14 +585,14 @@ int wctomb(char *str, wchar_t wc) {
 	return wcrtomb(str, wc, NULL);
 }
 
-[[std, wchar]]
+[[std, wchar, decl_include("<hybrid/typecore.h>")]]
 size_t mbstowcs([[nonnull]] wchar_t *__restrict dst,
                 [[nonnull]] char const *__restrict src,
                 size_t dstlen) {
 	return mbsrtowcs(dst, (char const **)&src, dstlen, NULL);
 }
 
-[[std, wchar]]
+[[std, wchar, decl_include("<hybrid/typecore.h>")]]
 size_t wcstombs([[nonnull]] char *__restrict dst,
                 [[nonnull]] wchar_t const *__restrict src,
                 size_t dstlen) {
@@ -650,11 +651,11 @@ void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %[default:section(".text.crt{|.dos}.heap.malloc")];
-[[ignore, nocrt, alias("calloc")]]
+[[ignore, nocrt, alias("calloc"), decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_calloc(size_t count, size_t num_bytes);
 
-[[std, guard, crtbuiltin, libc]]
+[[std, guard, crtbuiltin, libc, decl_include("<hybrid/typecore.h>")]]
 [[ATTR_ALLOC_SIZE((1)), wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[userimpl, requires($has_function(crt_calloc) || $has_function(realloc) || $has_function(memalign))]]
 void *malloc(size_t num_bytes) {
@@ -667,7 +668,7 @@ void *malloc(size_t num_bytes) {
 @@pp_endif@@
 }
 
-[[guard, std, libc, crtbuiltin]]
+[[guard, std, libc, crtbuiltin, decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 [[userimpl, requires_function(malloc), impl_include("<hybrid/__overflow.h>")]]
 void *calloc(size_t count, size_t num_bytes) {
@@ -681,7 +682,7 @@ void *calloc(size_t count, size_t num_bytes) {
 	return result;
 }
 
-[[guard, std, libc, crtbuiltin]]
+[[guard, std, libc, crtbuiltin, decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 void *realloc(void *mallptr, size_t num_bytes);
 

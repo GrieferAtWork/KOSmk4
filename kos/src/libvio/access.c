@@ -27,7 +27,8 @@ opt.append("-Os");
 #define GUARD_LIBVIO_ACCESS_C 1
 #define _KOS_SOURCE 1
 
-#include "access.h"
+#include "api.h"
+/**/
 
 #ifdef LIBVIO_CONFIG_ENABLED
 #include <hybrid/unaligned.h>
@@ -36,6 +37,8 @@ opt.append("-Os");
 
 #include <assert.h>
 #include <string.h>
+
+#include "access.h"
 
 #ifdef __KERNEL__
 #include <kernel/except.h>

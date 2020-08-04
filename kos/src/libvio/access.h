@@ -21,6 +21,7 @@
 #define GUARD_LIBVIO_ACCESS_H 1
 
 #include "api.h"
+/**/
 
 #include <kos/anno.h>
 #include <kos/kernel/types.h>

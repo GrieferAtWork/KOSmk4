@@ -68,17 +68,17 @@ typedef __SIZE_TYPE__ size_t;
 @@          memory (for internal control structures) is available to complete
 @@          the operation
 [[dos_export_alias("_expand"), ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt{|.dos}.heap.helpers")]]
+[[section(".text.crt{|.dos}.heap.helpers"), decl_include("<hybrid/typecore.h>")]]
 void *realloc_in_place(void *__restrict mallptr, size_t n_bytes);
 
-[[ignore, nocrt, alias("posix_memalign")]]
+[[ignore, nocrt, alias("posix_memalign"), decl_include("<hybrid/typecore.h>")]]
 int crt_posix_memalign([[nonnull]] void **__restrict pp,
                        size_t alignment, size_t n_bytes);
 
 %
 
 [[guard, wunused, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
-[[ATTR_MALLOC, export_alias("aligned_alloc")]]
+[[ATTR_MALLOC, export_alias("aligned_alloc"), decl_include("<hybrid/typecore.h>")]]
 [[if(__has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("aligned_alloc", { return __builtin_aligned_alloc(alignment, n_bytes); })]]
 [[userimpl, requires_function(crt_posix_memalign)]]
@@ -92,20 +92,21 @@ void *memalign(size_t alignment, size_t n_bytes) {
 
 %
 [[wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1)), ATTR_MALLOC]]
-[[section(".text.crt{|.dos}.heap.rare_helpers")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), decl_include("<hybrid/typecore.h>")]]
 void *pvalloc(size_t n_bytes);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires($has_function(memalign))]]
 void *valloc($size_t n_bytes) {
 	return memalign(getpagesize(), n_bytes);
 }
 
-[[guard, crtbuiltin]]
+[[guard, crtbuiltin, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<parts/errno.h>")]]
 [[userimpl, requires_function(memalign)]]
-int posix_memalign([[nonnull]] void **__restrict pp,
-                   $size_t alignment, $size_t n_bytes) {
+$errno_t posix_memalign([[nonnull]] void **__restrict pp,
+                        $size_t alignment, $size_t n_bytes) {
 	void *result;
 	size_t d = alignment / sizeof(void *);
 	size_t r = alignment % sizeof(void *);
@@ -137,6 +138,7 @@ cfree(*) = free;
 int _heapmin();
 
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[userimpl, section(".text.crt{|.dos}.heap.utility")]]
 int malloc_trim(size_t pad) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -156,6 +158,7 @@ int malloc_trim(size_t pad) {
 }
 
 %
+[[decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_PURE, dos_export_alias("_msize")]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
@@ -174,7 +177,7 @@ int mallopt(int parameter_number, int parameter_value) {
 
 %
 %#ifdef __USE_KOS
-[[export_alias("__memdup")]]
+[[export_alias("__memdup"), decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(malloc)]]
 void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
@@ -185,7 +188,7 @@ void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 	return result;
 }
 
-[[export_alias("__memcdup")]]
+[[export_alias("__memcdup"), decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(memdup)]]
 void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) {
@@ -198,6 +201,7 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 	return memdup(ptr, n_bytes);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl]]
 [[impl_include("<hybrid/__overflow.h>"), requires_function(realloc)]]
@@ -211,8 +215,9 @@ reallocarray(void *ptr, $size_t elem_count, $size_t elem_size)
 
 [[guard]] reallocv(*) = reallocarray;
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
-[[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]
+[[userimpl, requires_function(realloc, malloc_usable_size)]]
 recalloc(void *mallptr, $size_t num_bytes)
 		-> [[realloc(mallptr, num_bytes)]] void * {
 	void *result;
@@ -227,8 +232,8 @@ recalloc(void *mallptr, $size_t num_bytes)
 }
 
 
-[[guard, export_alias(_recalloc)]]
-[[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]
+[[guard, export_alias("_recalloc"), decl_include("<hybrid/typecore.h>")]]
+[[userimpl, requires_function(realloc, malloc_usable_size)]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<hybrid/__overflow.h>")]]
 recallocv(void *mallptr, $size_t elem_count, $size_t elem_size)
 		-> [[realloc(mallptr, elem_count * elem_size)]] void * {

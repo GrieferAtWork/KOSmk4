@@ -21,7 +21,8 @@
 #define GUARD_LIBZLIB_INFLATE_C 1
 #define _KOS_SOURCE 1
 
-#include "inflate.h"
+#include "api.h"
+/**/
 
 #include <hybrid/byteorder.h>
 #include <hybrid/wordbits.h>
@@ -38,26 +39,14 @@
 #include <libzlib/error.h>
 #include <libzlib/inflate.h>
 
+#include "inflate.h"
+
 #ifdef __KERNEL__
 #include <kernel/malloc.h>
 #include <kernel/panic.h>
 
 #include <hybrid/atomic.h>
 #endif /* __KERNEL__ */
-#if !defined(NDEBUG) && 1
-#ifdef __KERNEL__
-#include <kernel/printk.h>
-#define TRACE(...) printk(KERN_TRACE __VA_ARGS__)
-#else /* __KERNEL__ */
-#include <syslog.h>
-#define TRACE(...) syslog(LOG_DEBUG, __VA_ARGS__)
-#endif /* !__KERNEL__ */
-#endif /* !NDEBUG */
-
-#ifndef TRACE
-#define TRACE(...) (void)0
-#endif /* !TRACE */
-
 
 DECL_BEGIN
 

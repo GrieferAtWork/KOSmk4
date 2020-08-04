@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7529241 */
+/* HASH CRC-32:0xdbf2b068 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <malloc.h>
+
 #include <kos/anno.h>
+
+#include <malloc.h>
 
 __SYSDECL_BEGIN
 

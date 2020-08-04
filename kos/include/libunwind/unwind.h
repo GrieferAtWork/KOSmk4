@@ -21,6 +21,7 @@
 #define _LIBUNWIND_UNWIND_H 1
 
 #include "api.h"
+/**/
 
 #include <features.h>
 
@@ -64,8 +65,8 @@ typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
 #define UNWIND_GETREG_ERROR_REGISTER_STATE_NAME "unwind_getreg_mcontext"
 #define UNWIND_SETREG_ERROR_REGISTER_STATE_NAME "unwind_setreg_mcontext"
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-#define unwind_getreg_error_register_state       unwind_getreg_mcontext
-#define unwind_setreg_error_register_state       unwind_setreg_mcontext
+#define unwind_getreg_error_register_state unwind_getreg_mcontext
+#define unwind_setreg_error_register_state unwind_setreg_mcontext
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 #endif /* !LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS */
 #endif /* !__KERNEL__ */
@@ -91,8 +92,8 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *__absolute_pc,
 /* Top-level function for unwinding the specific register state, automatically
  * locating the associated FDE entry, before using it to unwind the specified
  * register state.
- * NOTE: The given `ABSOLUTE_PC' should point _to_ the instruction that should
- *       be unwound; Not after it. - i.e. range checking is done as:
+ * NOTE: The given `ABSOLUTE_PC' should point _to_ or _into_ the instruction that
+ *       should be unwound; Not after it. - i.e. range checking is done as:
  *       `ABSOLUTE_PC >= start && ABSOLUTE_PC < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL((2, 4)) unsigned int

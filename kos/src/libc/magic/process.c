@@ -91,15 +91,40 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 
 %[default:section(".text.crt.dos.sched.thread")]
-%typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
 %{
+#ifndef ____dos_beginthread_entry_t_defined
+#define ____dos_beginthread_entry_t_defined 1
+typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
+#endif /* !____dos_beginthread_entry_t_defined */
+#ifndef ____dos_beginthreadex_entry_t_defined
+#define ____dos_beginthreadex_entry_t_defined 1
 #ifdef __NO_ATTR_STDCALL
 typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 #else /* __NO_ATTR_STDCALL */
 typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 #endif /* !__NO_ATTR_STDCALL */
+#endif /* !____dos_beginthreadex_entry_t_defined */
 }
 %
+
+%[define(DEFINE_DOS_BEGINTHREAD_ENTRY_T =
+@@pp_ifndef ____dos_beginthread_entry_t_defined@@
+#define ____dos_beginthread_entry_t_defined 1
+typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
+@@pp_endif@@
+)]
+
+%[define(DEFINE_DOS_BEGINTHREADEX_ENTRY_T =
+@@pp_ifndef ____dos_beginthreadex_entry_t_defined@@
+#define ____dos_beginthreadex_entry_t_defined 1
+#ifdef __NO_ATTR_STDCALL
+typedef __UINT32_TYPE__ (__LIBDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#else /* __NO_ATTR_STDCALL */
+typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
+#endif /* !__NO_ATTR_STDCALL */
+@@pp_endif@@
+)]
+
 
 %[define_type_class(__dos_beginthread_entry_t = "TP")]
 %[define_type_class(__dos_beginthreadex_entry_t = "TP")]
@@ -107,7 +132,12 @@ typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__ar
 %[define_replacement(__dos_beginthread_entry_t = __dos_beginthread_entry_t)]
 %[define_replacement(__dos_beginthreadex_entry_t = __dos_beginthreadex_entry_t)]
 
+[[decl_include("<hybrid/typecore.h>")]]
+[[decl_prefix(DEFINE_DOS_BEGINTHREAD_ENTRY_T)]]
 uintptr_t _beginthread(__dos_beginthread_entry_t entry, $u32 stacksz, void *arg);
+
+[[decl_include("<hybrid/typecore.h>")]]
+[[decl_prefix(DEFINE_DOS_BEGINTHREADEX_ENTRY_T)]]
 uintptr_t _beginthreadex(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry,
                          void *arg, $u32 flags, $u32 *threadaddr);
 
@@ -116,6 +146,7 @@ void _endthread() {
 	_endthreadex(0);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 void _endthreadex($u32 exitcode);
 
 %[default:section(".text.crt{|.dos}.sched.process")]

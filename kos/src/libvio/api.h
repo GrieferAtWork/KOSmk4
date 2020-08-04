@@ -20,10 +20,11 @@
 #ifndef GUARD_LIBVIO_API_H
 #define GUARD_LIBVIO_API_H 1
 
+#include <libvio/api.h>
+/**/
+
 #include <hybrid/compiler.h>
 
-#include <libvio/api.h>
-
-#define CC    LIBVIO_CC
+#define CC LIBVIO_CC
 
 #endif /* !GUARD_LIBVIO_API_H */

@@ -722,10 +722,18 @@ __SYSDECL_BEGIN
 
 #if defined(__cplusplus) && defined(_CRTDBG_MAP_ALLOC)
 __NAMESPACE_STD_BEGIN
+#ifdef ___calloc_dbg_defined
 __NAMESPACE_GLB_USING(_calloc_dbg)
+#endif /* ___calloc_dbg_defined */
+#ifdef ___free_dbg_defined
 __NAMESPACE_GLB_USING(_free_dbg)
+#endif /* ___free_dbg_defined */
+#ifdef ___malloc_dbg_defined
 __NAMESPACE_GLB_USING(_malloc_dbg)
+#endif /* ___malloc_dbg_defined */
+#ifdef ___realloc_dbg_defined
 __NAMESPACE_GLB_USING(_realloc_dbg)
+#endif /* ___realloc_dbg_defined */
 __NAMESPACE_STD_END
 #endif /* __cplusplus && _CRTDBG_MAP_ALLOC */
 
@@ -761,6 +769,7 @@ __NAMESPACE_STD_END
 #ifndef _ASSERT_BASE
 #define _ASSERT_BASE _ASSERT_EXPR
 #endif  /* _ASSERT_BASE */
+
 #define _RPT0(rptno, msg)                                _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, "%s", msg))
 #define _RPT1(rptno, msg, arg1)                          _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1))
 #define _RPT2(rptno, msg, arg1, arg2)                    _RPT_BASE((rptno, __NULLPTR, 0, __NULLPTR, msg, arg1, arg2))

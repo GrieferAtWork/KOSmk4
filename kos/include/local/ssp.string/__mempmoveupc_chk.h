@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d6b5f0 */
+/* HASH CRC-32:0x3bf5305c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local___mempmoveupc_chk_defined
 #define __local___mempmoveupc_chk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmoveupc from string */
 #ifndef __local___localdep_mempmoveupc_defined
 #define __local___localdep_mempmoveupc_defined 1
 #ifdef __CRT_HAVE_mempmoveupc
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmoveupc,(__dst,__src,__elem_count,__elem_size))
