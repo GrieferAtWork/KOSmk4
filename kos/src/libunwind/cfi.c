@@ -1450,6 +1450,20 @@ do_read_bit_pieces:
 			/* ??? */
 			break;
 
+		CASE(DW_OP_GNU_encoded_addr) {
+			uint8_t format;
+			uintptr_t value;
+			if unlikely(stacksz >= self->ue_stackmax)
+				ERROR(err_stack_overflow);
+			format = *pc++;
+			value = dwarf_decode_pointer(&pc, format,
+			                             self->ue_addrsize,
+			                             0, 0, 0);
+			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
+			self->ue_stack[stacksz].s_uconst = value;
+			++stacksz;
+		}	break;
+
 		default:
 			ERRORF(err_unknown_instruction, "opcode = %#.2I8x (%p/%p/%p/%Iu)\n%$[hex]\n",
 			       opcode, pc - 1, self->ue_pc_start, self->ue_pc_end,
@@ -1858,6 +1872,13 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 		dwarf_uleb128_t size;
 		size = dwarf_decode_uleb128((byte_t **)&unwind_pc);
 		unwind_pc += size;
+	}	break;
+
+	case DW_OP_GNU_encoded_addr: {
+		uint8_t format;
+		format = *unwind_pc++;
+		dwarf_decode_pointer((byte_t **)&unwind_pc,
+		                     format, addrsize, 0, 0, 0);
 	}	break;
 
 	default:

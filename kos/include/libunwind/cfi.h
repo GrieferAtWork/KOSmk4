@@ -252,7 +252,7 @@
 /* GNU extensions. */
 #define DW_OP_GNU_push_tls_address  0xe0 /* [+0]   PUSH(ADDRESS(sm_tlsbase)) */
 #define DW_OP_GNU_uninit            0xf0 /* [+0]   UNINIT? */
-//#define DW_OP_GNU_encoded_addr      0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
+#define DW_OP_GNU_encoded_addr      0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
 //DW_OP (DW_OP_GNU_implicit_pointer, 0xf2)
 //DW_OP (DW_OP_GNU_entry_value, 0xf3)
 //DW_OP (DW_OP_GNU_const_type, 0xf4)
