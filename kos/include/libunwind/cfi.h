@@ -314,19 +314,32 @@
 #define DW_CFA_GNU_negative_offset_extended 0x2f /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, -((signed)dwarf_decode_uleb128(&pc) * self->f_dataalign) }; */
 
 
-/* Type codes for `unwind_ste_t::s_type' */
+/* Type codes for `unwind_ste_t::s_type'
+ * Effective stack values are:
+ *   UNWIND_STE_CONSTANT:     s_uconst or s_sconst
+ *   UNWIND_STE_STACKVALUE:   s_uconst or s_sconst
+ *   UNWIND_STE_REGISTER:     REGISTER[s_register] + s_regoffset
+ *   UNWIND_STE_REGPOINTER:   &REGISTER[s_register]              // Register map address (can only be dereferenced)
+ *   UNWIND_STE_RW_LVALUE:    *(byte_t(*)[s_lsize])s_lvalue
+ *   UNWIND_STE_RO_LVALUE:    *(byte_t(*)[s_lsize])s_lvalue
+ *
+ * Effective return values (after indirection) are:
+ *   UNWIND_STE_CONSTANT:     result = *(<unspecified> *)s_uconst
+ *   UNWIND_STE_STACKVALUE:   result = s_uconst
+ *   UNWIND_STE_REGISTER:     result = *(<unspecified> *)(REGISTER[s_register] + s_regoffset)
+ *   UNWIND_STE_REGPOINTER:   result = REGISTER[s_register] + s_regoffset
+ *   UNWIND_STE_RW_LVALUE:    result = *(byte_t(*)[s_lsize])s_lvalue
+ *   UNWIND_STE_RO_LVALUE:    result = *(byte_t(*)[s_lsize])s_lvalue   // May only be read from
+ */
 #define UNWIND_STE_CONSTANT    0 /* Constant value */
 #define UNWIND_STE_STACKVALUE  1 /* On-stack constant value (Same as `UNWIND_STE_CONSTANT') */
 #define UNWIND_STE_REGISTER    2 /* Register value */
 #define UNWIND_STE_REGPOINTER  3 /* Pointer-to-register (value is the imaginary address of the register in the register map) */
 #define UNWIND_STE_RW_LVALUE   4 /* Read-write l-value */
 #define UNWIND_STE_RO_LVALUE   5 /* Read-only l-value */
-#define UNWIND_STE_ISCONSTANT(x) ((x) <= UNWIND_STE_STACKVALUE)
-#define UNWIND_STE_ISLVALUE(x)   ((x) >= UNWIND_STE_RW_LVALUE)
-#define UNWIND_STE_ISWRITABLE(x) ((x) == UNWIND_STE_REGISTER || (x) == UNWIND_STE_RW_LVALUE)
 
-/* Default value for `sm_bjmprem' */
-#define UNWIND_EMULATOR_BJMPREM_DEFAULT  0x800
+/* Default value for `ue_bjmprem' */
+#define UNWIND_EMULATOR_BJMPREM_DEFAULT 0x800
 
 #ifdef __CC__
 __DECL_BEGIN

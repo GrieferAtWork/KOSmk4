@@ -441,7 +441,6 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
                                      uintptr_t num_bits,
                                      unsigned int target_left_shift) {
-	assert(UNWIND_STE_ISWRITABLE(ste->s_type));
 	if unlikely(((self->ue_piecebits + num_bits + 7) / 8) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
 	switch (ste->s_type) {
@@ -1421,7 +1420,7 @@ do_read_bit_pieces:
 		CASE(DW_OP_stack_value)
 			if unlikely(stacksz < 1)
 				ERROR(err_stack_underflow);
-			if (!UNWIND_STE_ISCONSTANT(TOP.s_type))
+			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
 			TOP.s_type = UNWIND_STE_STACKVALUE;
 			break;
