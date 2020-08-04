@@ -63,15 +63,15 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL load_kernel_enum_locals_sections)(void) 
 	kernel_enum_locals_sections.el_debug_info_start    = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_info);
 	kernel_enum_locals_sections.el_debug_info_end      = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_info.ds_csize;
 	kernel_enum_locals_sections.el_debug_abbrev_start  = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_abbrev);
-	kernel_enum_locals_sections.el_debug_abbrev_end    = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_abbrev.ds_csize;
+	kernel_enum_locals_sections.el_debug_abbrev_end    = kernel_enum_locals_sections.el_debug_abbrev_start + kernel_section_debug_abbrev.ds_csize;
 	kernel_enum_locals_sections.el_debug_loc_start     = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_loc);
-	kernel_enum_locals_sections.el_debug_loc_end       = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_loc.ds_csize;
+	kernel_enum_locals_sections.el_debug_loc_end       = kernel_enum_locals_sections.el_debug_loc_start + kernel_section_debug_loc.ds_csize;
 	kernel_enum_locals_sections.el_debug_str_start     = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_str);
-	kernel_enum_locals_sections.el_debug_str_end       = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_str.ds_csize;
+	kernel_enum_locals_sections.el_debug_str_end       = kernel_enum_locals_sections.el_debug_str_start + kernel_section_debug_str.ds_csize;
 	kernel_enum_locals_sections.el_debug_aranges_start = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_aranges);
-	kernel_enum_locals_sections.el_debug_aranges_end   = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_aranges.ds_csize;
+	kernel_enum_locals_sections.el_debug_aranges_end   = kernel_enum_locals_sections.el_debug_aranges_start + kernel_section_debug_aranges.ds_csize;
 	kernel_enum_locals_sections.el_debug_ranges_start  = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_ranges);
-	kernel_enum_locals_sections.el_debug_ranges_end    = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_ranges.ds_csize;
+	kernel_enum_locals_sections.el_debug_ranges_end    = kernel_enum_locals_sections.el_debug_ranges_start + kernel_section_debug_ranges.ds_csize;
 }
 
 
