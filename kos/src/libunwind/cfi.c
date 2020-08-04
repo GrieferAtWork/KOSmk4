@@ -1130,14 +1130,21 @@ do_make_second_const:
 			++stacksz;
 			break;
 
-		CASE(DW_OP_breg0 ... DW_OP_breg31)
+		CASE(DW_OP_breg0 ... DW_OP_breg31) {
+			union {
+				uintptr_t p;
+				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+			} regval;
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
-			self->ue_stack[stacksz].s_register  = opcode - DW_OP_breg0;
-			self->ue_stack[stacksz].s_regoffset = dwarf_decode_sleb128(&pc);
+			if unlikely(!(*self->ue_regget)(self->ue_regget_arg,
+			                                opcode - DW_OP_breg0,
+			                                regval.buf))
+				ERROR(err_invalid_register);
+			self->ue_stack[stacksz].s_lvalue = (byte_t *)regval.p + dwarf_decode_sleb128(&pc);
+			self->ue_stack[stacksz].s_type   = UNWIND_STE_RW_LVALUE;
 			++stacksz;
-			break;
+		}	break;
 
 		CASE(DW_OP_regx)
 			if unlikely(stacksz >= self->ue_stackmax)
@@ -1195,14 +1202,22 @@ do_make_second_const:
 			TOP.s_sconst += dwarf_decode_sleb128(&pc);
 		}	break;
 
-		CASE(DW_OP_bregx)
+		CASE(DW_OP_bregx) {
+			union {
+				uintptr_t p;
+				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+			} regval;
+			unwind_regno_t regno;
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
-			self->ue_stack[stacksz].s_register  = (unwind_regno_t)dwarf_decode_uleb128(&pc);
-			self->ue_stack[stacksz].s_regoffset = dwarf_decode_sleb128(&pc);
+			regno = (unwind_regno_t)dwarf_decode_uleb128(&pc);
+			if unlikely(!(*self->ue_regget)(self->ue_regget_arg,
+			                                regno, regval.buf))
+				ERROR(err_invalid_register);
+			self->ue_stack[stacksz].s_lvalue = (byte_t *)regval.p + dwarf_decode_sleb128(&pc);
+			self->ue_stack[stacksz].s_type   = UNWIND_STE_RW_LVALUE;
 			++stacksz;
-			break;
+		}	break;
 
 		CASE(DW_OP_piece) {
 			uintptr_t num_bits;
@@ -1363,7 +1378,10 @@ do_read_bit_pieces:
 		CASE(DW_OP_stack_value)
 			if unlikely(stacksz < 1)
 				ERROR(err_stack_underflow);
-			if (!UNWIND_STE_ISCONSTANT(TOP.s_type))
+			/* L-Value operands are converted back into their address-form */
+			if (TOP.s_type != UNWIND_STE_RW_LVALUE &&
+			    TOP.s_type != UNWIND_STE_RO_LVALUE &&
+			    !UNWIND_STE_ISCONSTANT(TOP.s_type))
 				goto do_make_top_const;
 			TOP.s_type = UNWIND_STE_STACKVALUE;
 			break;
