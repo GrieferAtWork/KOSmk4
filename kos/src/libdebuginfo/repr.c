@@ -195,8 +195,7 @@ PRIVATE REPR_RODATASECTION char const repr_DW_TAG_0h[] =
 "ference_type\0template_alias\0\0\0\0atomic_type";
 
 #define GETBASE_DW_AT(result, index) \
-	(((index) <= 0x6e) ? ((result) = repr_DW_AT_0h, true) : \
-	 ((index) == 0x87) ? ((index) = 0, (result) = repr_DW_AT_87h, true) : \
+	(((index) <= 0x87) ? ((result) = repr_DW_AT_0h, true) : \
 	 ((index) >= 0x2001 && (index) <= 0x2011) ? ((index) -= 0x2001, (result) = repr_DW_AT_2001h, true) : \
 	 ((index) >= 0x2101 && (index) <= 0x2135) ? ((index) -= 0x2101, (result) = repr_DW_AT_2101h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_AT_0h[] =
@@ -216,9 +215,11 @@ PRIVATE REPR_RODATASECTION char const repr_DW_AT_0h[] =
 "cale\0decimal_scale\0small\0decimal_sign\0digit_count\0picture_string"
 "\0mutable\0threads_scaled\0explicit\0object_pointer\0endianity\0elemen"
 "tal\0pure\0recursive\0signature\0main_subprogram\0data_bit_offset\0con"
-"st_expr\0enum_class\0linkage_name";
-PRIVATE REPR_RODATASECTION char const repr_DW_AT_87h[] =
-"noreturn";
+"st_expr\0enum_class\0linkage_name\0string_length_bit_size\0string_le"
+"ngth_byte_size\0rank\0str_offsets_base\0addr_base\0rnglists_base\0\0dw"
+"o_name\0reference\0rvalue_reference\0macros\0call_all_calls\0call_all"
+"_source_calls\0call_all_tail_calls\0call_return_pc\0call_value\0call"
+"_origin\0call_parameter\0\0\0\0\0\0\0noreturn";
 PRIVATE REPR_RODATASECTION char const repr_DW_AT_2001h[] =
 "MIPS_fde\0MIPS_loop_begin\0MIPS_tail_loop_begin\0MIPS_epilog_begin\0"
 "MIPS_loop_unroll_factor\0MIPS_software_pipeline_depth\0MIPS_linkag"
@@ -252,8 +253,8 @@ PRIVATE REPR_RODATASECTION char const repr_DW_ATE_0h[] =
 "ted\0signed_fixed\0unsigned_fixed\0decimal_float\0UTF";
 
 #define GETBASE_DW_OP(result, index) \
-	(((index) <= 0x9f) ? ((result) = repr_DW_OP_0h, true) : \
-	 ((index) >= 0xe0 && (index) <= 0xf0) ? ((index) -= 0xe0, (result) = repr_DW_OP_e0h, true) : false)
+	(((index) <= 0xa9) ? ((result) = repr_DW_OP_0h, true) : \
+	 ((index) >= 0xe0 && (index) <= 0xfc) ? ((index) -= 0xe0, (result) = repr_DW_OP_e0h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_OP_0h[] =
 "\0\0\0addr\0\0\0deref\0\0const1u\0const1s\0const2u\0const2s\0const4u\0const4s"
 "\0const8u\0const8s\0constu\0consts\0dup\0drop\0over\0pick\0swap\0rot\0xdere"
@@ -270,9 +271,14 @@ PRIVATE REPR_RODATASECTION char const repr_DW_OP_0h[] =
 "26\0breg27\0breg28\0breg29\0breg30\0breg31\0regx\0fbreg\0bregx\0piece\0der"
 "ef_size\0xderef_size\0nop\0push_object_address\0call2\0call4\0call_ref"
 "\0form_tls_address\0call_frame_cfa\0bit_piece\0implicit_value\0stack_"
-"value";
+"value\0implicit_pointer\0addrx\0constx\0entry_value\0const_type\0regva"
+"l_type\0deref_type\0xderef_type\0convert\0reinterpret";
 PRIVATE REPR_RODATASECTION char const repr_DW_OP_e0h[] =
-"GNU_push_tls_address\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0GNU_uninit";
+"GNU_push_tls_address\0HP_is_value\0HP_fltconst4\0HP_fltconst8\0HP_mo"
+"d_range\0HP_unmod_range\0HP_tls\0\0\0\0\0\0\0\0\0\0GNU_uninit\0GNU_encoded_ad"
+"dr\0GNU_implicit_pointer\0GNU_entry_value\0GNU_const_type\0GNU_regva"
+"l_type\0GNU_deref_type\0GNU_convert\0PGI_omp_thread_num\0GNU_reinter"
+"pret\0GNU_parameter_ref\0GNU_addr_index\0GNU_const_index";
 
 #define GETBASE_DW_CFA(result, index) \
 	(((index) <= 0x40) ? ((result) = repr_DW_CFA_0h, true) : \

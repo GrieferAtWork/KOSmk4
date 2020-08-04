@@ -608,6 +608,7 @@ typedef struct di_debuginfo_compile_unit_struct {
 	char                 *cu_comp_dir;  /* [0..1] Path to the compiler base directory (prepended before filenames,
 	                                     * this is essentially the getcwd() of the compiler when the CU was assembled). */
 	di_debuginfo_ranges_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
+	__uintptr_t           cu_addr_base; /* Base address for `DW_OP_addrx' offsets (s.a. `DW_AT_addr_base') */
 } di_debuginfo_compile_unit_t;
 
 typedef struct di_debuginfo_subprogram_struct {
@@ -796,16 +797,22 @@ debuginfo_print_typename(__pformatprinter printer, void *arg,
 
 
 typedef struct di_enum_locals_sections_struct {
+	/*BEGIN:compat(struct unwind_emulator_sections_struct)*/
 	__byte_t *el_eh_frame_start;      /* [0..1] Starting address of the .eh_frame section. */
 	__byte_t *el_eh_frame_end;        /* [0..1] End address of the .eh_frame section. */
 	__byte_t *el_debug_info_start;    /* [0..1] Starting address of the `.debug_info' section */
 	__byte_t *el_debug_info_end;      /* [0..1] End address of the `.debug_info' section */
+	__byte_t *el_debug_addr_start;    /* [0..1] Starting address of the `.debug_addr' section */
+	__byte_t *el_debug_addr_end;      /* [0..1] End address of the `.debug_addr' section */
+	/*BEGIN:compat(struct di_debuginfo_cu_parser_sections_struct)*/
 	__byte_t *el_debug_abbrev_start;  /* [0..1] Starting address of `.debug_abbrev' */
 	__byte_t *el_debug_abbrev_end;    /* [0..1] End address of `.debug_abbrev' */
 	__byte_t *el_debug_loc_start;     /* [0..1] Starting address of `.debug_loc' */
 	__byte_t *el_debug_loc_end;       /* [0..1] End address of `.debug_loc' */
+	/*END:compat(struct unwind_emulator_sections_struct)*/
 	__byte_t *el_debug_str_start;     /* [0..1] Starting address of `.debug_str' */
 	__byte_t *el_debug_str_end;       /* [0..1] End address of `.debug_str' */
+	/*END:compat(struct di_debuginfo_cu_parser_sections_struct)*/
 	__byte_t *el_debug_aranges_start; /* [0..1] Starting address of the `.debug_aranges' section */
 	__byte_t *el_debug_aranges_end;   /* [0..1] End address of the `.debug_aranges' section */
 	__byte_t *el_debug_ranges_start;  /* [0..1] Starting address of the `.debug_ranges' section */

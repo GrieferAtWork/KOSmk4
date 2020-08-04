@@ -36,10 +36,10 @@
 
 
 #ifndef CFI_UNWIND_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_NO_COMMON_UNCOMMON_REGISTERS 1
-#define CFI_UNWIND_COMMON_REGISTER_COUNT   CFI_UNWIND_REGISTER_COUNT
-#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT 0
-#define CFI_UNWIND_COMMON_REGISTER_SP      CFI_UNWIND_REGISTER_SP
+#define CFI_UNWIND_NO_COMMON_UNCOMMON_REGISTERS      1
+#define CFI_UNWIND_COMMON_REGISTER_COUNT             CFI_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT           0
+#define CFI_UNWIND_COMMON_REGISTER_SP                CFI_UNWIND_REGISTER_SP
 #define cfi_unwind_register_dw2common(dw_regno)      (dw_regno)
 #define cfi_unwind_register_dw2uncommon(dw_regno)    0
 #define cfi_unwind_register_common2dw(com_regno)     (com_regno)
@@ -82,195 +82,216 @@
  *    .cfi_escape ...  // This code (with a size of n + (m << 8)) is only executed in KOS
  */
 
-/*      DW_OP_                      0x00  * ... */
-/*      DW_OP_                      0x01  * ... */
-/*      DW_OP_                      0x02  * ... */
-#define DW_OP_addr                  0x03 /* [+4|8] +uintptr_t constant address */
-/*      DW_OP_                      0x04  * ... */
-/*      DW_OP_                      0x05  * ... */
-#define DW_OP_deref                 0x06 /* [+0]   TOP = *(uintptr_t *)TOP; */
-/*      DW_OP_                      0x07  * ... */
-#define DW_OP_const1u               0x08 /* [+1]   PUSH(*(u8 *)pc); */
-#define DW_OP_const1s               0x09 /* [+1]   PUSH(*(s8 *)pc); */
-#define DW_OP_const2u               0x0a /* [+2]   PUSH(*(u16 *)pc); */
-#define DW_OP_const2s               0x0b /* [+2]   PUSH(*(s16 *)pc); */
-#define DW_OP_const4u               0x0c /* [+4]   PUSH(*(u32 *)pc); */
-#define DW_OP_const4s               0x0d /* [+4]   PUSH(*(s32 *)pc); */
-#define DW_OP_const8u               0x0e /* [+8]   PUSH(*(u64 *)pc); */
-#define DW_OP_const8s               0x0f /* [+8]   PUSH(*(s64 *)pc); */
-#define DW_OP_constu                0x10 /* [+*]   PUSH(dwarf_decode_uleb128(&pc)); */
-#define DW_OP_consts                0x11 /* [+*]   PUSH(dwarf_decode_sleb128(&pc)); */
-#define DW_OP_dup                   0x12 /* [+0]   PUSH(TOP); */
-#define DW_OP_drop                  0x13 /* [+0]   POP(); */
-#define DW_OP_over                  0x14 /* [+0]   PUSH(SECOND); */
-#define DW_OP_pick                  0x15 /* [+1]   PUSH(NTH(*(u8 *)pc));  // Where operand=0 is the old TOP */
-#define DW_OP_swap                  0x16 /* [+0]   TOP = XCH(SECOND, TOP); */
-#define DW_OP_rot                   0x17 /* [+0]   a = TOP; TOP = SECOND; SECOND = THIRD; THIRD = a; */
-#define DW_OP_xderef                0x18 /* [+0]   off = POP(); id = POP(); PUSH(*(uintptr_t *)id:off) */
-#define DW_OP_abs                   0x19 /* [+0]   a = POP(); PUSH(a < 0 ? -a : a); */
-#define DW_OP_and                   0x1a /* [+0]   PUSH(POP(SECOND) & POP(TOP)); */
-#define DW_OP_div                   0x1b /* [+0]   PUSH(POP(SECOND) / POP(TOP)); */
-#define DW_OP_minus                 0x1c /* [+0]   PUSH(POP(SECOND) - POP(TOP)); */
-#define DW_OP_mod                   0x1d /* [+0]   PUSH(POP(SECOND) % POP(TOP)); */
-#define DW_OP_mul                   0x1e /* [+0]   PUSH(POP(SECOND) * POP(TOP)); */
-#define DW_OP_neg                   0x1f /* [+0]   PUSH(-POP()); */
-#define DW_OP_not                   0x20 /* [+0]   PUSH(~POP()); */
-#define DW_OP_or                    0x21 /* [+0]   PUSH(POP(SECOND) | POP(TOP)); */
-#define DW_OP_plus                  0x22 /* [+0]   PUSH(POP(SECOND) + POP(TOP)); */
-#define DW_OP_plus_uconst           0x23 /* [+*]   PUSH(POP(TOP) + dwarf_decode_uleb128(&pc)); */
-#define DW_OP_shl                   0x24 /* [+0]   PUSH(POP(SECOND) << POP(TOP)); */
-#define DW_OP_shr                   0x25 /* [+0]   PUSH((unsigned)POP(SECOND) >> POP(TOP)); */
-#define DW_OP_shra                  0x26 /* [+0]   PUSH((signed)POP(SECOND) >> POP(TOP)); */
-#define DW_OP_xor                   0x27 /* [+0]   PUSH(POP(SECOND) ^ POP(TOP)); */
-#define DW_OP_bra                   0x28 /* [+2]   off = *(s16 *)pc; pc += 2; if (POP() != 0) pc += off; */
-#define DW_OP_eq                    0x29 /* [+0]   PUSH((signed)POP(SECOND) == (signed)POP(TOP)); */
-#define DW_OP_ge                    0x2a /* [+0]   PUSH((signed)POP(SECOND) >= (signed)POP(TOP)); */
-#define DW_OP_gt                    0x2b /* [+0]   PUSH((signed)POP(SECOND) >  (signed)POP(TOP)); */
-#define DW_OP_le                    0x2c /* [+0]   PUSH((signed)POP(SECOND) <= (signed)POP(TOP)); */
-#define DW_OP_lt                    0x2d /* [+0]   PUSH((signed)POP(SECOND) <  (signed)POP(TOP)); */
-#define DW_OP_ne                    0x2e /* [+0]   PUSH((signed)POP(SECOND) != (signed)POP(TOP)); */
-#define DW_OP_skip                  0x2f /* [+2]   off = *(s16 *)pc; pc += 2; pc += off; */
-#define DW_OP_lit0                  0x30 /* [+0]   PUSH(0); */
-#define DW_OP_lit1                  0x31 /* [+0]   PUSH(1); */
-#define DW_OP_lit2                  0x32 /* [+0]   PUSH(2); */
-#define DW_OP_lit3                  0x33 /* [+0]   PUSH(3); */
-#define DW_OP_lit4                  0x34 /* [+0]   PUSH(4); */
-#define DW_OP_lit5                  0x35 /* [+0]   PUSH(5); */
-#define DW_OP_lit6                  0x36 /* [+0]   PUSH(6); */
-#define DW_OP_lit7                  0x37 /* [+0]   PUSH(7); */
-#define DW_OP_lit8                  0x38 /* [+0]   PUSH(8); */
-#define DW_OP_lit9                  0x39 /* [+0]   PUSH(9); */
-#define DW_OP_lit10                 0x3a /* [+0]   PUSH(10); */
-#define DW_OP_lit11                 0x3b /* [+0]   PUSH(11); */
-#define DW_OP_lit12                 0x3c /* [+0]   PUSH(12); */
-#define DW_OP_lit13                 0x3d /* [+0]   PUSH(13); */
-#define DW_OP_lit14                 0x3e /* [+0]   PUSH(14); */
-#define DW_OP_lit15                 0x3f /* [+0]   PUSH(15); */
-#define DW_OP_lit16                 0x40 /* [+0]   PUSH(16); */
-#define DW_OP_lit17                 0x41 /* [+0]   PUSH(17); */
-#define DW_OP_lit18                 0x42 /* [+0]   PUSH(18); */
-#define DW_OP_lit19                 0x43 /* [+0]   PUSH(19); */
-#define DW_OP_lit20                 0x44 /* [+0]   PUSH(20); */
-#define DW_OP_lit21                 0x45 /* [+0]   PUSH(21); */
-#define DW_OP_lit22                 0x46 /* [+0]   PUSH(22); */
-#define DW_OP_lit23                 0x47 /* [+0]   PUSH(23); */
-#define DW_OP_lit24                 0x48 /* [+0]   PUSH(24); */
-#define DW_OP_lit25                 0x49 /* [+0]   PUSH(25); */
-#define DW_OP_lit26                 0x4a /* [+0]   PUSH(26); */
-#define DW_OP_lit27                 0x4b /* [+0]   PUSH(27); */
-#define DW_OP_lit28                 0x4c /* [+0]   PUSH(28); */
-#define DW_OP_lit29                 0x4d /* [+0]   PUSH(29); */
-#define DW_OP_lit30                 0x4e /* [+0]   PUSH(30); */
-#define DW_OP_lit31                 0x4f /* [+0]   PUSH(31); */
-#define DW_OP_reg0                  0x50 /* [+0]   PUSH(GET_CONTEXT_REGADDR(0)); */
-#define DW_OP_reg1                  0x51 /* [+0]   PUSH(GET_CONTEXT_REGADDR(1)); */
-#define DW_OP_reg2                  0x52 /* [+0]   PUSH(GET_CONTEXT_REGADDR(2)); */
-#define DW_OP_reg3                  0x53 /* [+0]   PUSH(GET_CONTEXT_REGADDR(3)); */
-#define DW_OP_reg4                  0x54 /* [+0]   PUSH(GET_CONTEXT_REGADDR(4)); */
-#define DW_OP_reg5                  0x55 /* [+0]   PUSH(GET_CONTEXT_REGADDR(5)); */
-#define DW_OP_reg6                  0x56 /* [+0]   PUSH(GET_CONTEXT_REGADDR(6)); */
-#define DW_OP_reg7                  0x57 /* [+0]   PUSH(GET_CONTEXT_REGADDR(7)); */
-#define DW_OP_reg8                  0x58 /* [+0]   PUSH(GET_CONTEXT_REGADDR(8)); */
-#define DW_OP_reg9                  0x59 /* [+0]   PUSH(GET_CONTEXT_REGADDR(9)); */
-#define DW_OP_reg10                 0x5a /* [+0]   PUSH(GET_CONTEXT_REGADDR(10)); */
-#define DW_OP_reg11                 0x5b /* [+0]   PUSH(GET_CONTEXT_REGADDR(11)); */
-#define DW_OP_reg12                 0x5c /* [+0]   PUSH(GET_CONTEXT_REGADDR(12)); */
-#define DW_OP_reg13                 0x5d /* [+0]   PUSH(GET_CONTEXT_REGADDR(13)); */
-#define DW_OP_reg14                 0x5e /* [+0]   PUSH(GET_CONTEXT_REGADDR(14)); */
-#define DW_OP_reg15                 0x5f /* [+0]   PUSH(GET_CONTEXT_REGADDR(15)); */
-#define DW_OP_reg16                 0x60 /* [+0]   PUSH(GET_CONTEXT_REGADDR(16)); */
-#define DW_OP_reg17                 0x61 /* [+0]   PUSH(GET_CONTEXT_REGADDR(17)); */
-#define DW_OP_reg18                 0x62 /* [+0]   PUSH(GET_CONTEXT_REGADDR(18)); */
-#define DW_OP_reg19                 0x63 /* [+0]   PUSH(GET_CONTEXT_REGADDR(19)); */
-#define DW_OP_reg20                 0x64 /* [+0]   PUSH(GET_CONTEXT_REGADDR(20)); */
-#define DW_OP_reg21                 0x65 /* [+0]   PUSH(GET_CONTEXT_REGADDR(21)); */
-#define DW_OP_reg22                 0x66 /* [+0]   PUSH(GET_CONTEXT_REGADDR(22)); */
-#define DW_OP_reg23                 0x67 /* [+0]   PUSH(GET_CONTEXT_REGADDR(23)); */
-#define DW_OP_reg24                 0x68 /* [+0]   PUSH(GET_CONTEXT_REGADDR(24)); */
-#define DW_OP_reg25                 0x69 /* [+0]   PUSH(GET_CONTEXT_REGADDR(25)); */
-#define DW_OP_reg26                 0x6a /* [+0]   PUSH(GET_CONTEXT_REGADDR(26)); */
-#define DW_OP_reg27                 0x6b /* [+0]   PUSH(GET_CONTEXT_REGADDR(27)); */
-#define DW_OP_reg28                 0x6c /* [+0]   PUSH(GET_CONTEXT_REGADDR(28)); */
-#define DW_OP_reg29                 0x6d /* [+0]   PUSH(GET_CONTEXT_REGADDR(29)); */
-#define DW_OP_reg30                 0x6e /* [+0]   PUSH(GET_CONTEXT_REGADDR(30)); */
-#define DW_OP_reg31                 0x6f /* [+0]   PUSH(GET_CONTEXT_REGADDR(31)); */
-#define DW_OP_breg0                 0x70 /* [+*]   PUSH(GET_CONTEXT_REGVAL(0) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg1                 0x71 /* [+*]   PUSH(GET_CONTEXT_REGVAL(1) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg2                 0x72 /* [+*]   PUSH(GET_CONTEXT_REGVAL(2) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg3                 0x73 /* [+*]   PUSH(GET_CONTEXT_REGVAL(3) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg4                 0x74 /* [+*]   PUSH(GET_CONTEXT_REGVAL(4) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg5                 0x75 /* [+*]   PUSH(GET_CONTEXT_REGVAL(5) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg6                 0x76 /* [+*]   PUSH(GET_CONTEXT_REGVAL(6) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg7                 0x77 /* [+*]   PUSH(GET_CONTEXT_REGVAL(7) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg8                 0x78 /* [+*]   PUSH(GET_CONTEXT_REGVAL(8) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg9                 0x79 /* [+*]   PUSH(GET_CONTEXT_REGVAL(9) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg10                0x7a /* [+*]   PUSH(GET_CONTEXT_REGVAL(10) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg11                0x7b /* [+*]   PUSH(GET_CONTEXT_REGVAL(11) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg12                0x7c /* [+*]   PUSH(GET_CONTEXT_REGVAL(12) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg13                0x7d /* [+*]   PUSH(GET_CONTEXT_REGVAL(13) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg14                0x7e /* [+*]   PUSH(GET_CONTEXT_REGVAL(14) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg15                0x7f /* [+*]   PUSH(GET_CONTEXT_REGVAL(15) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg16                0x80 /* [+*]   PUSH(GET_CONTEXT_REGVAL(16) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg17                0x81 /* [+*]   PUSH(GET_CONTEXT_REGVAL(17) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg18                0x82 /* [+*]   PUSH(GET_CONTEXT_REGVAL(18) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg19                0x83 /* [+*]   PUSH(GET_CONTEXT_REGVAL(19) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg20                0x84 /* [+*]   PUSH(GET_CONTEXT_REGVAL(20) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg21                0x85 /* [+*]   PUSH(GET_CONTEXT_REGVAL(21) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg22                0x86 /* [+*]   PUSH(GET_CONTEXT_REGVAL(22) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg23                0x87 /* [+*]   PUSH(GET_CONTEXT_REGVAL(23) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg24                0x88 /* [+*]   PUSH(GET_CONTEXT_REGVAL(24) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg25                0x89 /* [+*]   PUSH(GET_CONTEXT_REGVAL(25) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg26                0x8a /* [+*]   PUSH(GET_CONTEXT_REGVAL(26) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg27                0x8b /* [+*]   PUSH(GET_CONTEXT_REGVAL(27) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg28                0x8c /* [+*]   PUSH(GET_CONTEXT_REGVAL(28) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg29                0x8d /* [+*]   PUSH(GET_CONTEXT_REGVAL(29) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg30                0x8e /* [+*]   PUSH(GET_CONTEXT_REGVAL(30) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_breg31                0x8f /* [+*]   PUSH(GET_CONTEXT_REGVAL(31) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_regx                  0x90 /* [+*]   PUSH(GET_CONTEXT_REGADDR(dwarf_decode_uleb128(&pc))); */
-#define DW_OP_fbreg                 0x91 /* [+*]   PUSH(EVAL(CURRENT_FUNCTION.DW_AT_frame_base) + dwarf_decode_sleb128(&pc)) */
-#define DW_OP_bregx                 0x92 /* [+*]   PUSH(GET_CONTEXT_REGVAL(dwarf_decode_uleb128(&pc)) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_piece                 0x93 /* [+*]   num_bytes = dwarf_decode_uleb128(&pc); WRITE_RESULT(POP(), num_bytes * 8); // Assign TOP to `num_bytes' of the variable's value. */
-#define DW_OP_deref_size            0x94 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 *)p : n == 2 ? *(u16 *)p : n == 4 ? *(u32 *)p : n == 8 ? *(u64 *)p : UNDEFINED); */
-#define DW_OP_xderef_size           0x95 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 *)id:p : n == 2 ? *(u16 *)id:p : n == 4 ? *(u32 *)id:p : n == 8 ? *(u64 *)id:p : UNDEFINED); */
-#define DW_OP_nop                   0x96 /* [+0]   Do nothing */
-#define DW_OP_push_object_address   0x97 /* [+0]   Push the value of `sm_objaddr' */
-#define DW_OP_call2                 0x98 /* [+2]   Call another DW expression (the operator is a 2-byte unsigned offset from .debug_info) */
-#define DW_OP_call4                 0x99 /* [+4]   Call another DW expression (the operator is a 4-byte unsigned offset from .debug_info) */
-#define DW_OP_call_ref              0x9a /* [+*]   Call another DW expression (the operator is a dwarf_decode_uleb128 offset from .debug_info) */
-#define DW_OP_form_tls_address      0x9b /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase)) */
-#define DW_OP_call_frame_cfa        0x9c /* [+0]   PUSH(CALCULATE_CFA(GET_REGISTER(PC))) */
-#define DW_OP_bit_piece             0x9d /* [+*]   size = dwarf_decode_uleb128(&pc); offset = dwarf_decode_uleb128(&pc); WRITE_RESULT((TOP >> offset) & ((1 << size) - 1), size); */
-#define DW_OP_implicit_value        0x9e /* [+*]   size = dwarf_decode_uleb128(&pc); PUSH(LVALUE(pc, size)); pc += size; */
-#define DW_OP_stack_value           0x9f /* [+0]   TOP = TOP; // Load the value of `TOP' into a stack constant */
-/*      DW_OP_                      0xa0  * ... */
-/*      DW_OP_                      ...   * ... */
-/*      DW_OP_                      0xdf  * ... */
-#define DW_OP_lo_user               0xe0 /* First user-defined (or rather: GNU extension) opcode */
-#define DW_OP_hi_user               0xff /* Last user-defined (or rather: GNU extension) opcode */
+/*      DW_OP_                     0x00  * ... */
+/*      DW_OP_                     0x01  * ... */
+/*      DW_OP_                     0x02  * ... */
+#define DW_OP_addr                 0x03 /* [+4|8] +uintptr_t constant address */
+/*      DW_OP_                     0x04  * ... */
+/*      DW_OP_                     0x05  * ... */
+#define DW_OP_deref                0x06 /* [+0]   TOP = *(uintptr_t *)TOP; */
+/*      DW_OP_                     0x07  * ... */
+#define DW_OP_const1u              0x08 /* [+1]   PUSH(*(u8 *)pc); */
+#define DW_OP_const1s              0x09 /* [+1]   PUSH(*(s8 *)pc); */
+#define DW_OP_const2u              0x0a /* [+2]   PUSH(*(u16 *)pc); */
+#define DW_OP_const2s              0x0b /* [+2]   PUSH(*(s16 *)pc); */
+#define DW_OP_const4u              0x0c /* [+4]   PUSH(*(u32 *)pc); */
+#define DW_OP_const4s              0x0d /* [+4]   PUSH(*(s32 *)pc); */
+#define DW_OP_const8u              0x0e /* [+8]   PUSH(*(u64 *)pc); */
+#define DW_OP_const8s              0x0f /* [+8]   PUSH(*(s64 *)pc); */
+#define DW_OP_constu               0x10 /* [+*]   PUSH(dwarf_decode_uleb128(&pc)); */
+#define DW_OP_consts               0x11 /* [+*]   PUSH(dwarf_decode_sleb128(&pc)); */
+#define DW_OP_dup                  0x12 /* [+0]   PUSH(TOP); */
+#define DW_OP_drop                 0x13 /* [+0]   POP(); */
+#define DW_OP_over                 0x14 /* [+0]   PUSH(SECOND); */
+#define DW_OP_pick                 0x15 /* [+1]   PUSH(NTH(*(u8 *)pc));  // Where operand=0 is the old TOP */
+#define DW_OP_swap                 0x16 /* [+0]   TOP = XCH(SECOND, TOP); */
+#define DW_OP_rot                  0x17 /* [+0]   a = TOP; TOP = SECOND; SECOND = THIRD; THIRD = a; */
+#define DW_OP_xderef               0x18 /* [+0]   off = POP(); id = POP(); PUSH(*(uintptr_t *)id:off) */
+#define DW_OP_abs                  0x19 /* [+0]   a = POP(); PUSH(a < 0 ? -a : a); */
+#define DW_OP_and                  0x1a /* [+0]   PUSH(POP(SECOND) & POP(TOP)); */
+#define DW_OP_div                  0x1b /* [+0]   PUSH(POP(SECOND) / POP(TOP)); */
+#define DW_OP_minus                0x1c /* [+0]   PUSH(POP(SECOND) - POP(TOP)); */
+#define DW_OP_mod                  0x1d /* [+0]   PUSH(POP(SECOND) % POP(TOP)); */
+#define DW_OP_mul                  0x1e /* [+0]   PUSH(POP(SECOND) * POP(TOP)); */
+#define DW_OP_neg                  0x1f /* [+0]   PUSH(-POP()); */
+#define DW_OP_not                  0x20 /* [+0]   PUSH(~POP()); */
+#define DW_OP_or                   0x21 /* [+0]   PUSH(POP(SECOND) | POP(TOP)); */
+#define DW_OP_plus                 0x22 /* [+0]   PUSH(POP(SECOND) + POP(TOP)); */
+#define DW_OP_plus_uconst          0x23 /* [+*]   PUSH(POP(TOP) + dwarf_decode_uleb128(&pc)); */
+#define DW_OP_shl                  0x24 /* [+0]   PUSH(POP(SECOND) << POP(TOP)); */
+#define DW_OP_shr                  0x25 /* [+0]   PUSH((unsigned)POP(SECOND) >> POP(TOP)); */
+#define DW_OP_shra                 0x26 /* [+0]   PUSH((signed)POP(SECOND) >> POP(TOP)); */
+#define DW_OP_xor                  0x27 /* [+0]   PUSH(POP(SECOND) ^ POP(TOP)); */
+#define DW_OP_bra                  0x28 /* [+2]   off = *(s16 *)pc; pc += 2; if (POP() != 0) pc += off; */
+#define DW_OP_eq                   0x29 /* [+0]   PUSH((signed)POP(SECOND) == (signed)POP(TOP)); */
+#define DW_OP_ge                   0x2a /* [+0]   PUSH((signed)POP(SECOND) >= (signed)POP(TOP)); */
+#define DW_OP_gt                   0x2b /* [+0]   PUSH((signed)POP(SECOND) >  (signed)POP(TOP)); */
+#define DW_OP_le                   0x2c /* [+0]   PUSH((signed)POP(SECOND) <= (signed)POP(TOP)); */
+#define DW_OP_lt                   0x2d /* [+0]   PUSH((signed)POP(SECOND) <  (signed)POP(TOP)); */
+#define DW_OP_ne                   0x2e /* [+0]   PUSH((signed)POP(SECOND) != (signed)POP(TOP)); */
+#define DW_OP_skip                 0x2f /* [+2]   off = *(s16 *)pc; pc += 2; pc += off; */
+#define DW_OP_lit0                 0x30 /* [+0]   PUSH(0); */
+#define DW_OP_lit1                 0x31 /* [+0]   PUSH(1); */
+#define DW_OP_lit2                 0x32 /* [+0]   PUSH(2); */
+#define DW_OP_lit3                 0x33 /* [+0]   PUSH(3); */
+#define DW_OP_lit4                 0x34 /* [+0]   PUSH(4); */
+#define DW_OP_lit5                 0x35 /* [+0]   PUSH(5); */
+#define DW_OP_lit6                 0x36 /* [+0]   PUSH(6); */
+#define DW_OP_lit7                 0x37 /* [+0]   PUSH(7); */
+#define DW_OP_lit8                 0x38 /* [+0]   PUSH(8); */
+#define DW_OP_lit9                 0x39 /* [+0]   PUSH(9); */
+#define DW_OP_lit10                0x3a /* [+0]   PUSH(10); */
+#define DW_OP_lit11                0x3b /* [+0]   PUSH(11); */
+#define DW_OP_lit12                0x3c /* [+0]   PUSH(12); */
+#define DW_OP_lit13                0x3d /* [+0]   PUSH(13); */
+#define DW_OP_lit14                0x3e /* [+0]   PUSH(14); */
+#define DW_OP_lit15                0x3f /* [+0]   PUSH(15); */
+#define DW_OP_lit16                0x40 /* [+0]   PUSH(16); */
+#define DW_OP_lit17                0x41 /* [+0]   PUSH(17); */
+#define DW_OP_lit18                0x42 /* [+0]   PUSH(18); */
+#define DW_OP_lit19                0x43 /* [+0]   PUSH(19); */
+#define DW_OP_lit20                0x44 /* [+0]   PUSH(20); */
+#define DW_OP_lit21                0x45 /* [+0]   PUSH(21); */
+#define DW_OP_lit22                0x46 /* [+0]   PUSH(22); */
+#define DW_OP_lit23                0x47 /* [+0]   PUSH(23); */
+#define DW_OP_lit24                0x48 /* [+0]   PUSH(24); */
+#define DW_OP_lit25                0x49 /* [+0]   PUSH(25); */
+#define DW_OP_lit26                0x4a /* [+0]   PUSH(26); */
+#define DW_OP_lit27                0x4b /* [+0]   PUSH(27); */
+#define DW_OP_lit28                0x4c /* [+0]   PUSH(28); */
+#define DW_OP_lit29                0x4d /* [+0]   PUSH(29); */
+#define DW_OP_lit30                0x4e /* [+0]   PUSH(30); */
+#define DW_OP_lit31                0x4f /* [+0]   PUSH(31); */
+#define DW_OP_reg0                 0x50 /* [+0]   PUSH(GET_CONTEXT_REGADDR(0)); */
+#define DW_OP_reg1                 0x51 /* [+0]   PUSH(GET_CONTEXT_REGADDR(1)); */
+#define DW_OP_reg2                 0x52 /* [+0]   PUSH(GET_CONTEXT_REGADDR(2)); */
+#define DW_OP_reg3                 0x53 /* [+0]   PUSH(GET_CONTEXT_REGADDR(3)); */
+#define DW_OP_reg4                 0x54 /* [+0]   PUSH(GET_CONTEXT_REGADDR(4)); */
+#define DW_OP_reg5                 0x55 /* [+0]   PUSH(GET_CONTEXT_REGADDR(5)); */
+#define DW_OP_reg6                 0x56 /* [+0]   PUSH(GET_CONTEXT_REGADDR(6)); */
+#define DW_OP_reg7                 0x57 /* [+0]   PUSH(GET_CONTEXT_REGADDR(7)); */
+#define DW_OP_reg8                 0x58 /* [+0]   PUSH(GET_CONTEXT_REGADDR(8)); */
+#define DW_OP_reg9                 0x59 /* [+0]   PUSH(GET_CONTEXT_REGADDR(9)); */
+#define DW_OP_reg10                0x5a /* [+0]   PUSH(GET_CONTEXT_REGADDR(10)); */
+#define DW_OP_reg11                0x5b /* [+0]   PUSH(GET_CONTEXT_REGADDR(11)); */
+#define DW_OP_reg12                0x5c /* [+0]   PUSH(GET_CONTEXT_REGADDR(12)); */
+#define DW_OP_reg13                0x5d /* [+0]   PUSH(GET_CONTEXT_REGADDR(13)); */
+#define DW_OP_reg14                0x5e /* [+0]   PUSH(GET_CONTEXT_REGADDR(14)); */
+#define DW_OP_reg15                0x5f /* [+0]   PUSH(GET_CONTEXT_REGADDR(15)); */
+#define DW_OP_reg16                0x60 /* [+0]   PUSH(GET_CONTEXT_REGADDR(16)); */
+#define DW_OP_reg17                0x61 /* [+0]   PUSH(GET_CONTEXT_REGADDR(17)); */
+#define DW_OP_reg18                0x62 /* [+0]   PUSH(GET_CONTEXT_REGADDR(18)); */
+#define DW_OP_reg19                0x63 /* [+0]   PUSH(GET_CONTEXT_REGADDR(19)); */
+#define DW_OP_reg20                0x64 /* [+0]   PUSH(GET_CONTEXT_REGADDR(20)); */
+#define DW_OP_reg21                0x65 /* [+0]   PUSH(GET_CONTEXT_REGADDR(21)); */
+#define DW_OP_reg22                0x66 /* [+0]   PUSH(GET_CONTEXT_REGADDR(22)); */
+#define DW_OP_reg23                0x67 /* [+0]   PUSH(GET_CONTEXT_REGADDR(23)); */
+#define DW_OP_reg24                0x68 /* [+0]   PUSH(GET_CONTEXT_REGADDR(24)); */
+#define DW_OP_reg25                0x69 /* [+0]   PUSH(GET_CONTEXT_REGADDR(25)); */
+#define DW_OP_reg26                0x6a /* [+0]   PUSH(GET_CONTEXT_REGADDR(26)); */
+#define DW_OP_reg27                0x6b /* [+0]   PUSH(GET_CONTEXT_REGADDR(27)); */
+#define DW_OP_reg28                0x6c /* [+0]   PUSH(GET_CONTEXT_REGADDR(28)); */
+#define DW_OP_reg29                0x6d /* [+0]   PUSH(GET_CONTEXT_REGADDR(29)); */
+#define DW_OP_reg30                0x6e /* [+0]   PUSH(GET_CONTEXT_REGADDR(30)); */
+#define DW_OP_reg31                0x6f /* [+0]   PUSH(GET_CONTEXT_REGADDR(31)); */
+#define DW_OP_breg0                0x70 /* [+*]   PUSH(GET_CONTEXT_REGVAL(0) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg1                0x71 /* [+*]   PUSH(GET_CONTEXT_REGVAL(1) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg2                0x72 /* [+*]   PUSH(GET_CONTEXT_REGVAL(2) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg3                0x73 /* [+*]   PUSH(GET_CONTEXT_REGVAL(3) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg4                0x74 /* [+*]   PUSH(GET_CONTEXT_REGVAL(4) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg5                0x75 /* [+*]   PUSH(GET_CONTEXT_REGVAL(5) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg6                0x76 /* [+*]   PUSH(GET_CONTEXT_REGVAL(6) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg7                0x77 /* [+*]   PUSH(GET_CONTEXT_REGVAL(7) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg8                0x78 /* [+*]   PUSH(GET_CONTEXT_REGVAL(8) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg9                0x79 /* [+*]   PUSH(GET_CONTEXT_REGVAL(9) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg10               0x7a /* [+*]   PUSH(GET_CONTEXT_REGVAL(10) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg11               0x7b /* [+*]   PUSH(GET_CONTEXT_REGVAL(11) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg12               0x7c /* [+*]   PUSH(GET_CONTEXT_REGVAL(12) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg13               0x7d /* [+*]   PUSH(GET_CONTEXT_REGVAL(13) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg14               0x7e /* [+*]   PUSH(GET_CONTEXT_REGVAL(14) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg15               0x7f /* [+*]   PUSH(GET_CONTEXT_REGVAL(15) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg16               0x80 /* [+*]   PUSH(GET_CONTEXT_REGVAL(16) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg17               0x81 /* [+*]   PUSH(GET_CONTEXT_REGVAL(17) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg18               0x82 /* [+*]   PUSH(GET_CONTEXT_REGVAL(18) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg19               0x83 /* [+*]   PUSH(GET_CONTEXT_REGVAL(19) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg20               0x84 /* [+*]   PUSH(GET_CONTEXT_REGVAL(20) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg21               0x85 /* [+*]   PUSH(GET_CONTEXT_REGVAL(21) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg22               0x86 /* [+*]   PUSH(GET_CONTEXT_REGVAL(22) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg23               0x87 /* [+*]   PUSH(GET_CONTEXT_REGVAL(23) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg24               0x88 /* [+*]   PUSH(GET_CONTEXT_REGVAL(24) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg25               0x89 /* [+*]   PUSH(GET_CONTEXT_REGVAL(25) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg26               0x8a /* [+*]   PUSH(GET_CONTEXT_REGVAL(26) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg27               0x8b /* [+*]   PUSH(GET_CONTEXT_REGVAL(27) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg28               0x8c /* [+*]   PUSH(GET_CONTEXT_REGVAL(28) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg29               0x8d /* [+*]   PUSH(GET_CONTEXT_REGVAL(29) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg30               0x8e /* [+*]   PUSH(GET_CONTEXT_REGVAL(30) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_breg31               0x8f /* [+*]   PUSH(GET_CONTEXT_REGVAL(31) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_regx                 0x90 /* [+*]   PUSH(GET_CONTEXT_REGADDR(dwarf_decode_uleb128(&pc))); */
+#define DW_OP_fbreg                0x91 /* [+*]   PUSH(EVAL(CURRENT_FUNCTION.DW_AT_frame_base) + dwarf_decode_sleb128(&pc)) */
+#define DW_OP_bregx                0x92 /* [+*]   PUSH(GET_CONTEXT_REGVAL(dwarf_decode_uleb128(&pc)) + dwarf_decode_sleb128(&pc)); */
+#define DW_OP_piece                0x93 /* [+*]   num_bytes = dwarf_decode_uleb128(&pc); WRITE_RESULT(POP(), num_bytes * 8); // Assign TOP to `num_bytes' of the variable's value. */
+#define DW_OP_deref_size           0x94 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 *)p : n == 2 ? *(u16 *)p : n == 4 ? *(u32 *)p : n == 8 ? *(u64 *)p : UNDEFINED); */
+#define DW_OP_xderef_size          0x95 /* [+1]   n = *(u8 *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 *)id:p : n == 2 ? *(u16 *)id:p : n == 4 ? *(u32 *)id:p : n == 8 ? *(u64 *)id:p : UNDEFINED); */
+#define DW_OP_nop                  0x96 /* [+0]   Do nothing */
+#define DW_OP_push_object_address  0x97 /* [+0]   Push the value of `sm_objaddr' */
+#define DW_OP_call2                0x98 /* [+2]   Call another DW expression (the operator is a 2-byte unsigned offset from .debug_info) */
+#define DW_OP_call4                0x99 /* [+4]   Call another DW expression (the operator is a 4-byte unsigned offset from .debug_info) */
+#define DW_OP_call_ref             0x9a /* [+*]   Call another DW expression (the operator is a dwarf_decode_uleb128 offset from .debug_info) */
+#define DW_OP_form_tls_address     0x9b /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase)) */
+#define DW_OP_call_frame_cfa       0x9c /* [+0]   PUSH(CALCULATE_CFA(GET_REGISTER(PC))) */
+#define DW_OP_bit_piece            0x9d /* [+*]   size = dwarf_decode_uleb128(&pc); offset = dwarf_decode_uleb128(&pc); WRITE_RESULT((TOP >> offset) & ((1 << size) - 1), size); */
+#define DW_OP_implicit_value       0x9e /* [+*]   size = dwarf_decode_uleb128(&pc); PUSH(LVALUE(pc, size)); pc += size; */
+#define DW_OP_stack_value          0x9f /* [+0]   TOP = TOP; // Load the value of `TOP' into a stack constant */
+#define DW_OP_implicit_pointer     0xa0 /* <Not supported> */
+#define DW_OP_addrx                0xa1 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
+#define DW_OP_constx               0xa2 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
+#define DW_OP_entry_value          0xa3 /* TODO */
+#define DW_OP_const_type           0xa4 /* <Not supported> */
+#define DW_OP_regval_type          0xa5 /* <Not supported> */
+#define DW_OP_deref_type           0xa6 /* <Not supported> */
+#define DW_OP_xderef_type          0xa7 /* <Not supported> */
+#define DW_OP_convert              0xa8 /* <Not supported> */
+#define DW_OP_reinterpret          0xa9 /* <Not supported> */
+/*      DW_OP_                     0xaa  * ... */
+/*      DW_OP_                     ...   * ... */
+/*      DW_OP_                     0xdf  * ... */
+#define DW_OP_lo_user              0xe0 /* First user-defined (or rather: GNU extension) opcode */
+#define DW_OP_hi_user              0xff /* Last user-defined (or rather: GNU extension) opcode */
 
 
-/* GNU extensions. */
-#define DW_OP_GNU_push_tls_address  0xe0 /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase))   (Alias for `DW_OP_form_tls_address') */
-#define DW_OP_GNU_uninit            0xf0 /* [+0]   UNINIT? */
-#define DW_OP_GNU_encoded_addr      0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
-//DW_OP (DW_OP_GNU_implicit_pointer, 0xf2)
-//DW_OP (DW_OP_GNU_entry_value, 0xf3)
-//DW_OP (DW_OP_GNU_const_type, 0xf4)
-//DW_OP (DW_OP_GNU_regval_type, 0xf5)
-//DW_OP (DW_OP_GNU_deref_type, 0xf6)
-//DW_OP (DW_OP_GNU_convert, 0xf7)
-//DW_OP (DW_OP_GNU_reinterpret, 0xf9)
-//DW_OP (DW_OP_GNU_parameter_ref, 0xfa)
-//DW_OP (DW_OP_GNU_addr_index, 0xfb)
-//DW_OP (DW_OP_GNU_const_index, 0xfc)
-//DW_OP_DUP (DW_OP_HP_unknown, 0xe0)
-//DW_OP (DW_OP_HP_is_value, 0xe1)
-//DW_OP (DW_OP_HP_fltconst4, 0xe2)
-//DW_OP (DW_OP_HP_fltconst8, 0xe3)
-//DW_OP (DW_OP_HP_mod_range, 0xe4)
-//DW_OP (DW_OP_HP_unmod_range, 0xe5)
-//DW_OP (DW_OP_HP_tls, 0xe6)
-//DW_OP (DW_OP_PGI_omp_thread_num, 0xf8)
+/* DW Opcode extensions. */
+#define DW_OP_GNU_push_tls_address 0xe0 /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase))   (Alias for `DW_OP_form_tls_address') */
+#define DW_OP_HP_is_value          0xe1 /* <Not supported> */
+#define DW_OP_HP_fltconst4         0xe2 /* <Not supported> */
+#define DW_OP_HP_fltconst8         0xe3 /* <Not supported> */
+#define DW_OP_HP_mod_range         0xe4 /* <Not supported> */
+#define DW_OP_HP_unmod_range       0xe5 /* <Not supported> */
+#define DW_OP_HP_tls               0xe6 /* <Not supported> */
+/*      DW_OP_                     0xe7  * ... */
+/*      DW_OP_                     0xe8  * ... */
+/*      DW_OP_                     0xe9  * ... */
+/*      DW_OP_                     0xea  * ... */
+/*      DW_OP_                     0xeb  * ... */
+/*      DW_OP_                     0xec  * ... */
+/*      DW_OP_                     0xed  * ... */
+/*      DW_OP_                     0xee  * ... */
+/*      DW_OP_                     0xef  * ... */
+#define DW_OP_GNU_uninit           0xf0 /* [+0]   UNINIT? */
+#define DW_OP_GNU_encoded_addr     0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
+#define DW_OP_GNU_implicit_pointer 0xf2 /* <Not supported> */
+#define DW_OP_GNU_entry_value      0xf3 /* <Not supported> */
+#define DW_OP_GNU_const_type       0xf4 /* <Not supported> */
+#define DW_OP_GNU_regval_type      0xf5 /* <Not supported> */
+#define DW_OP_GNU_deref_type       0xf6 /* <Not supported> */
+#define DW_OP_GNU_convert          0xf7 /* <Not supported> */
+#define DW_OP_PGI_omp_thread_num   0xf8 /* <Not supported> */
+#define DW_OP_GNU_reinterpret      0xf9 /* <Not supported> */
+#define DW_OP_GNU_parameter_ref    0xfa /* <Not supported> */
+#define DW_OP_GNU_addr_index       0xfb /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc)))  (alias for `DW_OP_addrx') */
+#define DW_OP_GNU_const_index      0xfc /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc)))  (alias for `DW_OP_addrx') */
+/*      DW_OP_                     0xfd  * ... */
+/*      DW_OP_                     0xfe  * ... */
+/*      DW_OP_                     0xff  * ... */
 
 /* Call Frame Information (section 6.4.1) */
 #define DW_CFA_register_rule_undefined      0 /* Register has an undefined after unwinding */
@@ -331,12 +352,12 @@
  *   UNWIND_STE_RW_LVALUE:    result = *(byte_t(*)[s_lsize])s_lvalue
  *   UNWIND_STE_RO_LVALUE:    result = *(byte_t(*)[s_lsize])s_lvalue   // May only be read from
  */
-#define UNWIND_STE_CONSTANT    0 /* Constant value */
-#define UNWIND_STE_STACKVALUE  1 /* On-stack constant value (Same as `UNWIND_STE_CONSTANT') */
-#define UNWIND_STE_REGISTER    2 /* Register value */
-#define UNWIND_STE_REGPOINTER  3 /* Pointer-to-register (value is the imaginary address of the register in the register map) */
-#define UNWIND_STE_RW_LVALUE   4 /* Read-write l-value */
-#define UNWIND_STE_RO_LVALUE   5 /* Read-only l-value */
+#define UNWIND_STE_CONSTANT   0 /* Constant value */
+#define UNWIND_STE_STACKVALUE 1 /* On-stack constant value (Same as `UNWIND_STE_CONSTANT') */
+#define UNWIND_STE_REGISTER   2 /* Register value */
+#define UNWIND_STE_REGPOINTER 3 /* Pointer-to-register (value is the imaginary address of the register in the register map) */
+#define UNWIND_STE_RW_LVALUE  4 /* Read-write l-value */
+#define UNWIND_STE_RO_LVALUE  5 /* Read-only l-value */
 
 /* Default value for `ue_bjmprem' */
 #define UNWIND_EMULATOR_BJMPREM_DEFAULT 0x800
@@ -383,6 +404,9 @@ typedef struct unwind_emulator_sections_struct {
 	__byte_t *ues_debug_info_start;   /* [0..1][const] Starting address of the .debug_info section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
 	                                   * When set to be equal to `ues_debug_info_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
 	__byte_t *ues_debug_info_end;     /* [0..1][const] End address of the .debug_info section. */
+	__byte_t *ues_debug_addr_start;   /* [0..1][const] Starting address of the `.debug_addr' section */
+	__byte_t *ues_debug_addr_end;     /* [0..1][const] End address of the `.debug_addr' section
+	                                   * When set to be equal to `ues_debug_addr_start', consider `DW_OP_addrx' / `DW_OP_constx' as illegal instructions. */
 	__byte_t *ues_debug_abbrev_start; /* [0..1][const] Starting address of the .debug_abbrev section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
 	                                   * When set to be equal to `ues_debug_abbrev_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
 	__byte_t *ues_debug_abbrev_end;   /* [0..1][const] End address of the .debug_abbrev section. */
@@ -398,6 +422,7 @@ typedef struct di_debuginfo_location_struct {
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
+struct di_debuginfo_compile_unit_struct;
 typedef struct unwind_emulator_struct {
 	unwind_ste_t           *ue_stack;              /* [0..ue_stacksz|ALLOC(ue_stackmax)][const] Value stack for the emulator. */
 	__size_t                ue_stacksz;            /* Currently used stack size. */
@@ -431,7 +456,9 @@ typedef struct unwind_emulator_struct {
 	                                                * When set to ZERO(0), this value is calculated as-needed, using:
 	                                                *  - unwind_fde_scan(ue_eh_frame_start,ue_eh_frame_end,...)
 	                                                *  - unwind_fde_exec(...) */
-	__uintptr_t             ue_module_base;        /* [const] Module base address (used for selecting callbacks within expression lists) */
+	struct di_debuginfo_compile_unit_struct const
+	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
+	                                                * are listed in the documentation of `debuginfo_location_getvalue()') */
 	__uintptr_t             ue_module_relative_pc; /* [const] Module-relative program counter position (used for selecting callbacks within expression lists) */
 	__byte_t               *ue_tlsbase;            /* [0..1] Base to-be added to an offset in order to form a TLS address within the
 	                                                * targeted thread (or `NULL' if unknown, in which case `DW_OP_form_tls_address'
@@ -508,6 +535,7 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
 
 
 
+struct di_debuginfo_compile_unit_struct;
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
  * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
@@ -518,7 +546,10 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
  * @param: REGGET_ARG:            Register getter callback argument.
  * @param: REGSET:                Register setter callback.
  * @param: REGSET_ARG:            Register setter callback argument.
- * @param: CU_BASE:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
+ * @param: CU:                    Associated compilation unit debug info (or NULL).
+ *                                When non-NULL, the following fields may be used:
+ *                                  - CU->cu_ranges.r_startpc
+ *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
  * @param: BUF:                   Source/target buffer containing the value read from,
@@ -541,7 +572,7 @@ typedef __ATTR_NONNULL((1, 3, 7, 9)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
-                                             __uintptr_t __cu_base,
+                                             struct di_debuginfo_compile_unit_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
                                              void *__restrict __buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_written_bits,
@@ -552,7 +583,7 @@ typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
                                              unwind_setreg_t __regset, void *__regset_arg,
-                                             __uintptr_t __cu_base,
+                                             struct di_debuginfo_compile_unit_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
                                              void const *__restrict __buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_read_bits,
@@ -563,7 +594,7 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7, 9)) unsigned int LIBUNWIND_CC
 debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
-                            __uintptr_t __cu_base,
+                            struct di_debuginfo_compile_unit_struct const *__cu,
                             __uintptr_t __module_relative_pc,
                             void *__restrict __buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_written_bits,
@@ -574,7 +605,7 @@ debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
                             unwind_setreg_t __regset, void *__regset_arg,
-                            __uintptr_t __cu_base,
+                            struct di_debuginfo_compile_unit_struct const *__cu,
                             __uintptr_t __module_relative_pc,
                             void const *__restrict __buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_read_bits,

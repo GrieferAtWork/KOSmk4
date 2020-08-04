@@ -90,7 +90,10 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @param: REGGET_ARG:            Register getter callback argument.
  * @param: REGSET:                Register setter callback.
  * @param: REGSET_ARG:            Register setter callback argument.
- * @param: CU_BASE:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
+ * @param: CU:                    Associated compilation unit debug info (or NULL).
+ *                                When non-NULL, the following fields may be used:
+ *                                  - CU->cu_ranges.r_startpc
+ *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
  * @param: BUF:                   Source/target buffer containing the value read from,
@@ -113,7 +116,8 @@ INTDEF NONNULL((1, 3, 7, 9)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
-                                  uintptr_t cu_base, uintptr_t module_relative_pc,
+                                  struct di_debuginfo_compile_unit_struct const *cu,
+                                  uintptr_t module_relative_pc,
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
@@ -123,7 +127,8 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   unwind_setreg_t regset, void *regset_arg,
-                                  uintptr_t cu_base, uintptr_t module_relative_pc,
+                                  struct di_debuginfo_compile_unit_struct const *cu,
+                                  uintptr_t module_relative_pc,
                                   void const *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,

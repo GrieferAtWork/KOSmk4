@@ -25,11 +25,10 @@
 #include "api.h"
 /**/
 
-#include "cfi.h"
-
 #include <hybrid/compiler.h>
 
 #include <hybrid/byteorder.h>
+#include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/bits/thread.h>
@@ -47,6 +46,7 @@
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
 
+#include "cfi.h"
 #include "eh_frame.h"
 
 #ifndef __KERNEL__
@@ -329,7 +329,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 			ERROR(err_invalid_function_abbrev);
 		/* Select the appropriate function. */
 		self->ue_pc = libuw_debuginfo_location_select(&expr,
-		                                              self->ue_module_base,
+		                                              self->ue_cu ? self->ue_cu->cu_ranges.r_startpc : 0,
 		                                              self->ue_module_relative_pc,
 		                                              self->ue_addrsize,
 		                                              &length);
@@ -671,7 +671,7 @@ again_switch_opcode:
 			} else if (self->ue_addrsize >= 2) {
 				value = (uintptr_t)UNALIGNED_GET16((uint16_t *)pc);
 			} else {
-				value = (uintptr_t) * (uint8_t *)pc;
+				value = (uintptr_t)*(uint8_t *)pc;
 			}
 			pc += self->ue_addrsize;
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
@@ -739,7 +739,7 @@ do_make_top_const:
 			pc += size;                                           \
 			++stacksz;                                            \
 			break;
-		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t) * (uint8_t *)pc, 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)*(uint8_t *)pc, 1)
 		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t) * (int8_t *)pc, 1)
 		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16((uint16_t *)pc), 2)
 		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16((uint16_t *)pc), 2)
@@ -1204,7 +1204,7 @@ do_make_second_const:
 			if unlikely(!self->ue_framebase)
 				ERROR(err_illegal_instruction);
 			expr = libuw_debuginfo_location_select(self->ue_framebase,
-			                                       self->ue_module_base,
+			                                       self->ue_cu ? self->ue_cu->cu_ranges.r_startpc : 0,
 			                                       self->ue_module_relative_pc,
 			                                       self->ue_addrsize,
 			                                       &length);
@@ -1436,6 +1436,43 @@ do_read_bit_pieces:
 				goto do_make_top_const;
 			TOP.s_type = UNWIND_STE_STACKVALUE;
 			break;
+
+		CASE(DW_OP_addrx)
+		CASE(DW_OP_GNU_addr_index)
+		CASE(DW_OP_constx)
+		CASE(DW_OP_GNU_const_index) {
+			byte_t *debug_addr_loc, *debug_addr_end;
+			uintptr_t value;
+			if unlikely(!self->ue_sectinfo)
+				ERROR(err_illegal_instruction);
+			debug_addr_loc = self->ue_sectinfo->ues_debug_addr_start;
+			debug_addr_loc += dwarf_decode_uleb128(&pc);
+			if (self->ue_cu)
+				debug_addr_loc += self->ue_cu->cu_addr_base;
+			if (debug_addr_loc < self->ue_sectinfo->ues_debug_addr_start)
+				ERROR(err_illegal_instruction); /* Out-of-bounds */
+			if (OVERFLOW_UADD((uintptr_t)debug_addr_loc, self->ue_addrsize,
+			                  (uintptr_t *)&debug_addr_end))
+				ERROR(err_illegal_instruction); /* Out-of-bounds */
+			if (debug_addr_end > self->ue_sectinfo->ues_debug_addr_end)
+				ERROR(err_illegal_instruction); /* Out-of-bounds */
+			if unlikely(stacksz >= self->ue_stackmax)
+				ERROR(err_stack_overflow);
+			if (self->ue_addrsize >= sizeof(uintptr_t)) {
+				value = UNALIGNED_GET((uintptr_t *)debug_addr_loc);
+#if __SIZEOF_POINTER__ > 4
+			} else if (self->ue_addrsize >= 4) {
+				value = (uintptr_t)UNALIGNED_GET32((uint32_t *)debug_addr_loc);
+#endif /* __SIZEOF_POINTER__ > 4 */
+			} else if (self->ue_addrsize >= 2) {
+				value = (uintptr_t)UNALIGNED_GET16((uint16_t *)debug_addr_loc);
+			} else {
+				value = (uintptr_t)*(uint8_t *)debug_addr_loc;
+			}
+			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
+			self->ue_stack[stacksz].s_uconst = value;
+			++stacksz;
+		}	break;
 
 		CASE(DW_OP_GNU_uninit)
 			/* ??? */
@@ -1805,6 +1842,10 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_constu:
 	case DW_OP_regx:
 	case DW_OP_piece:
+	case DW_OP_addrx:
+	case DW_OP_GNU_addr_index:
+	case DW_OP_constx:
+	case DW_OP_GNU_const_index:
 		dwarf_decode_uleb128((byte_t **)&unwind_pc);
 		break;
 
@@ -1972,7 +2013,10 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @param: REGGET_ARG:            Register getter callback argument.
  * @param: REGSET:                Register setter callback.
  * @param: REGSET_ARG:            Register setter callback argument.
- * @param: CU_BASE:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
+ * @param: CU:                    Associated compilation unit debug info (or NULL).
+ *                                When non-NULL, the following fields may be used:
+ *                                  - CU->cu_ranges.r_startpc
+ *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
  * @param: BUF:                   Source/target buffer containing the value read from,
@@ -1995,7 +2039,8 @@ INTERN NONNULL((1, 3, 7, 9)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
-                                  uintptr_t cu_base, uintptr_t module_relative_pc,
+                                  struct di_debuginfo_compile_unit_struct const *cu,
+                                  uintptr_t module_relative_pc,
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
@@ -2008,7 +2053,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	memset(buf, 0, bufsize); /* Pre-initialize the buffer to all zeroes */
 	/* Select the proper function. */
 	emulator.ue_pc = libuw_debuginfo_location_select(self,
-	                                                 cu_base,
+	                                                 cu ? cu->cu_ranges.r_startpc : 0,
 	                                                 module_relative_pc,
 	                                                 addrsize,
 	                                                 &expr_length);
@@ -2026,7 +2071,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_ptrsize            = ptrsize;
 	emulator.ue_piecebuf           = (byte_t *)buf;
 	emulator.ue_piecesiz           = bufsize;
-	emulator.ue_module_base        = cu_base;
+	emulator.ue_cu                 = cu;
 	emulator.ue_module_relative_pc = module_relative_pc;
 	/* Execute the emulator. */
 	result = libuw_unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);
@@ -2052,7 +2097,8 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   unwind_setreg_t regset, void *regset_arg,
-                                  uintptr_t cu_base, uintptr_t module_relative_pc,
+                                  struct di_debuginfo_compile_unit_struct const *cu,
+                                  uintptr_t module_relative_pc,
                                   void const *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
@@ -2064,7 +2110,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	memset(&emulator, 0, sizeof(emulator));
 	/* Select the proper function. */
 	emulator.ue_pc = libuw_debuginfo_location_select(self,
-	                                                 cu_base,
+	                                                 cu ? cu->cu_ranges.r_startpc : 0,
 	                                                 module_relative_pc,
 	                                                 addrsize,
 	                                                 &expr_length);
@@ -2085,7 +2131,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_piecewrite         = 1;
 	emulator.ue_piecebuf           = (byte_t *)buf;
 	emulator.ue_piecesiz           = bufsize;
-	emulator.ue_module_base        = cu_base;
+	emulator.ue_cu                 = cu;
 	emulator.ue_module_relative_pc = module_relative_pc;
 	/* Execute the emulator. */
 	result = libuw_unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);

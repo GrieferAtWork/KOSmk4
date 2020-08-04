@@ -978,6 +978,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 	result->cu_ranges.r_ranges_offset = (uintptr_t)-1;
 	result->cu_ranges.r_startpc       = (uintptr_t)-1;
 	result->cu_ranges.r_endpc         = 0;
+	result->cu_addr_base              = 0;
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 		switch (attr.dica_name) {
 
@@ -1017,6 +1018,13 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 		case DW_AT_stmt_list:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
 			                                                &result->cu_stmt_list))
+				ERROR(err);
+			break;
+
+		case DW_AT_addr_base:
+		case DW_AT_GNU_addr_base:
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->cu_addr_base))
 				ERROR(err);
 			break;
 
