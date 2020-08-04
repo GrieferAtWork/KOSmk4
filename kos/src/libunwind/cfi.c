@@ -1377,6 +1377,7 @@ do_read_bit_pieces:
 		}	break;
 
 		CASE(DW_OP_form_tls_address)
+		CASE(DW_OP_GNU_push_tls_address)
 			if unlikely(!self->ue_tlsbase)
 				ERROR(err_illegal_instruction);
 			if unlikely(stacksz < 1)
@@ -1384,6 +1385,17 @@ do_read_bit_pieces:
 			if (TOP.s_type != UNWIND_STE_CONSTANT &&
 			    TOP.s_type != UNWIND_STE_REGISTER)
 				goto do_make_top_const_or_register;
+			if (self->ue_tlsbase == (byte_t *)-1) {
+#ifdef __KERNEL__
+				self->ue_tlsbase = (byte_t *)RD_TLS_BASE_REGISTER();
+#else /* __KERNEL__ */
+				{
+					/* Try to use the TLS-base of the associated module */
+					void *base = dltlsaddr(dlgethandle(pc));
+					self->ue_tlsbase = base ? (byte_t *)base : (byte_t *)RD_TLS_BASE_REGISTER();
+				}
+#endif /* !__KERNEL__ */
+			}
 			TOP.s_uconst += (uintptr_t)self->ue_tlsbase;
 			break;
 
@@ -1423,27 +1435,6 @@ do_read_bit_pieces:
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
 			TOP.s_type = UNWIND_STE_STACKVALUE;
-			break;
-
-		CASE(DW_OP_GNU_push_tls_address)
-			if unlikely(!self->ue_tlsbase)
-				ERROR(err_illegal_instruction);
-			if unlikely(stacksz >= self->ue_stackmax)
-				ERROR(err_stack_overflow);
-			if (self->ue_tlsbase == (byte_t *)-1) {
-#ifdef __KERNEL__
-				self->ue_tlsbase = (byte_t *)RD_TLS_BASE_REGISTER();
-#else /* __KERNEL__ */
-				{
-					/* Try to use the TLS-base of the associated module */
-					void *base = dltlsaddr(dlgethandle(pc));
-					self->ue_tlsbase = base ? (byte_t *)base : (byte_t *)RD_TLS_BASE_REGISTER();
-				}
-#endif /* !__KERNEL__ */
-			}
-			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
-			self->ue_stack[stacksz].s_uconst = (uintptr_t)self->ue_tlsbase;
-			++stacksz;
 			break;
 
 		CASE(DW_OP_GNU_uninit)

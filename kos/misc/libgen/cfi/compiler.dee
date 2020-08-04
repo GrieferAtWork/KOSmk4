@@ -473,7 +473,7 @@ global final cfa_instructions: {string: {int | (Callable, {int...})...}} = {
 
 	"stack_value": { DW_OP_stack_value },
 
-	"push_tls_address": { DW_OP_GNU_push_tls_address },
+	"GNU_push_tls_address": { DW_OP_GNU_push_tls_address },
 
 	"uninit": { DW_OP_GNU_uninit },
 };
@@ -574,6 +574,7 @@ function compileExpressionBase(arch: string, text: string): {int | Symbol | Relo
 	local backwardSymbols: {string: Symbol} = Dict();
 	function getOperandValue(operandType: int, operandText: string) {
 		switch (operandType) {
+
 		case OPERAND_NUMBER:
 		case OPERAND_NUMBER_OR_ARG:
 			if (operandText.startswith("$")) {
@@ -585,7 +586,7 @@ function compileExpressionBase(arch: string, text: string): {int | Symbol | Relo
 			if (operandText.startswith("\\") && operandType == OPERAND_NUMBER_OR_ARG)
 				return operandText;
 			break;
-			break;
+
 		case OPERAND_SYMBOL:
 			if (operandText.endswith("f")) {
 				if (operandText.isnumeric(0, #operandText - 1)) {
@@ -611,12 +612,15 @@ function compileExpressionBase(arch: string, text: string): {int | Symbol | Relo
 				return sym;
 			}
 			break;
+
 		case OPERAND_REGISTER:
 			if (operandText.startswith("%"))
 				return getRegisterId(arch, operandText[1:]);
 			break;
+
 		case OPERAND_RAW:
 			return operandText;
+
 		default:
 			break;
 		}
