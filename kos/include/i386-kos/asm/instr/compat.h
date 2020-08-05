@@ -141,6 +141,7 @@
 #define rorP         rorq
 #define rclP         rclq
 #define rcrP         rcrq
+#define jPcxz        jrcxz
 
 #ifdef __KERNEL__
 #define segtls gs /* THIS_TASK */
@@ -260,6 +261,7 @@
 #define rorP         rorl
 #define rclP         rcll
 #define rcrP         rcrl
+#define jPcxz        jecxz
 
 #ifdef __KERNEL__
 #define segtls fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */

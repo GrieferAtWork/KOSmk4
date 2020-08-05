@@ -204,8 +204,40 @@ INTERN_FUNCTION(F(libc_rawmemrchr))
 END(F(libc_rawmemrchr))
 DEFINE_PUBLIC_ALIAS(F(rawmemrchr), F(libc_rawmemrchr))
 
-/* TODO: memchr[b|w|l|q]()      (scas) */
 /* TODO: memrchr[b|w|l|q]()     (scas) */
+
+
+
+/********************************************************************************/
+/* void *LIBCCALL memchr(void const *haystack, T needle, size_t num_Tword);     */
+/********************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(F(libc_memchr))
+	.cfi_startproc
+	ENTER_Pdi_Nax_Pcx
+	jPcxz  1f             /* Special case for num_Tword==0 -> return NULL */
+	.cfi_remember_state
+	BEGIN_CLD             /* Search forward */
+	xorP   %Pdx, %Pdx     /* Force %eflags into a ZF=1 state (also: return value if not found) */
+	repne  I(scas)        /* Find the first match */
+	leaP   -N(%Pdi), %Pax /* result = %Pdi - N; */
+	cmovnzP %Pdx, %Pax    /* if (!found) result = NULL; */
+	END_CLD
+2:	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+	.cfi_restore_state
+1:	xorP   %Pax, %Pax     /* NULL */
+	jmp    2b
+	.cfi_endproc
+END(F(libc_memchr))
+DEFINE_PUBLIC_ALIAS(F(memchr), F(libc_memchr))
+#ifndef __KERNEL__
+#if N == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libc_memchrw)
+#elif N == 4
+DEFINE_PUBLIC_ALIAS(wmemchr, libc_memchrl)
+#endif /* N == ... */
+#endif /* !__KERNEL__ */
 /* TODO: memend[b|w|l|q]()      (scas) */
 /* TODO: memrend[b|w|l|q]()     (scas) */
 /* TODO: memlen[b|w|l|q]()      (scas) */
