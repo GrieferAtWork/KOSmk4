@@ -204,7 +204,6 @@ INTERN_FUNCTION(F(libc_rawmemrchr))
 END(F(libc_rawmemrchr))
 DEFINE_PUBLIC_ALIAS(F(rawmemrchr), F(libc_rawmemrchr))
 
-/* TODO: memrchr[b|w|l|q]()     (scas) */
 
 
 
@@ -238,6 +237,36 @@ DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libc_memchrw)
 DEFINE_PUBLIC_ALIAS(wmemchr, libc_memchrl)
 #endif /* N == ... */
 #endif /* !__KERNEL__ */
+
+
+
+
+/********************************************************************************/
+/* void *LIBCCALL memrchr(void const *haystack, T needle, size_t num_Tword);    */
+/********************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(F(libc_memrchr))
+	.cfi_startproc
+	ENTER_Pdi_Nax_Pcx
+	jPcxz  1f             /* Special case for num_Tword==0 -> return NULL */
+	.cfi_remember_state
+	BEGIN_STD             /* Search reverse */
+	leaP   -N(%Pdi,%Pcx,N), %Pdi /* Jump ahead to the last element to compare */
+	xorP   %Pdx, %Pdx     /* Return value if not found */
+	repne  I(scas)        /* Find the first match */
+	leaP   N(%Pdi), %Pax  /* result = %Pdi + N; */
+	cmovnzP %Pdx, %Pax    /* if (!found) result = NULL; */
+	END_STD
+2:	LEAVE_Pdi_Nax_Pcx     /* NULL */
+	RET(12)
+	.cfi_restore_state
+1:	xorP   %Pax, %Pax
+	jmp    2b
+	.cfi_endproc
+END(F(libc_memrchr))
+DEFINE_PUBLIC_ALIAS(F(memrchr), F(libc_memrchr))
+
+
 /* TODO: memend[b|w|l|q]()      (scas) */
 /* TODO: memrend[b|w|l|q]()     (scas) */
 /* TODO: memlen[b|w|l|q]()      (scas) */
