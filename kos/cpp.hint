@@ -408,8 +408,6 @@
 #define __NAMESPACE_STD_END                 }
 #define __NAMESPACE_STD_SYM                 ::std::
 #define __NAMESPACE_STD_USING(x)            using ::std::x;
-#define __NAMESPACE_STD_USING_TYPE(x)       using ::std::x;
-#define __NAMESPACE_STD_USING_OR_IMPL(x, i) using ::std::x;
 #define __NAMESPACE_GLB_USING(x)            using ::x;
 #define __NAMESPACE_GLB_USING_TYPE(x)       using ::x;
 #define __NAMESPACE_GLB_USING_OR_IMPL(x, i) using ::x;

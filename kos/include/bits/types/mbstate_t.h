@@ -20,7 +20,7 @@
 #ifndef __mbstate_t_defined
 #ifdef __std_mbstate_t_defined
 #ifdef __CC__
-__NAMESPACE_STD_USING_TYPE(mbstate_t)
+__NAMESPACE_STD_USING(mbstate_t)
 #endif /* __CC__ */
 #define __mbstate_t_defined 1
 #else /* __std_mbstate_t_defined */

@@ -29,8 +29,6 @@
 #define __NAMESPACE_STD_END                 /* nothing */
 #define __NAMESPACE_STD_SYM                 /* nothing */
 #define __NAMESPACE_STD_USING(x)            /* nothing */
-#define __NAMESPACE_STD_USING_OR_IMPL(x, i) /* nothing */
-#define __NAMESPACE_STD_USING_TYPE(x)       /* nothing */
 #define __NAMESPACE_GLB_USING(x)            /* nothing */
 #define __NAMESPACE_GLB_USING_TYPE(x)       /* nothing */
 #define __NAMESPACE_GLB_USING_OR_IMPL(x, i) /* nothing */

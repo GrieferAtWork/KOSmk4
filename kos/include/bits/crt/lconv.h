@@ -83,11 +83,6 @@ __DECL_BEGIN
 /* Structure giving information about numeric and monetary notation. */
 __NAMESPACE_STD_BEGIN
 
-#ifndef __std_lconv_defined
-#define __std_lconv_defined 1
-#ifdef __lconv_defined
-__NAMESPACE_GLB_USING(lconv)
-#else /* __lconv_defined */
 struct lconv {
 	/* Numeric (non-monetary) information. */
 	char *decimal_point;      /* Decimal point character. */
@@ -140,15 +135,10 @@ struct lconv {
 	char __int_n_sign_posn;
 #endif /* !__USE_ISOC99 */
 };
-#endif /* !__lconv_defined */
-#endif /* !__std_lconv_defined */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
-#ifndef __lconv_defined
-#define __lconv_defined 1
-__NAMESPACE_STD_USING_TYPE(lconv)
-#endif /* !__lconv_defined */
+__NAMESPACE_STD_USING(lconv)
 #endif /* !__CXX_SYSTEM_HEADER */
 
 

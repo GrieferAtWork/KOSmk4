@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33d7398b */
+/* HASH CRC-32:0x1df03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* Import all symbols into the global namespace when re-including "inttypes.h" after "cinttypes" */
 #ifndef __imaxdiv_t_defined
 #define __imaxdiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(imaxdiv_t)
+__NAMESPACE_STD_USING(imaxdiv_t)
 #endif /* !__imaxdiv_t_defined */
 __NAMESPACE_STD_USING(imaxabs)
 __NAMESPACE_STD_USING(imaxdiv)
@@ -384,7 +384,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __imaxdiv_t_defined
 #define __imaxdiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(imaxdiv_t)
+__NAMESPACE_STD_USING(imaxdiv_t)
 #endif /* !__imaxdiv_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

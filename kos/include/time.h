@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73a23a8b */
+/* HASH CRC-32:0xcc42b062 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 /* Import all symbols into the global namespace when re-including "time.h" after "ctime" */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-__NAMESPACE_STD_USING_TYPE(clock_t)
+__NAMESPACE_STD_USING(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
 #define __time_t_defined 1
-__NAMESPACE_STD_USING_TYPE(time_t)
+__NAMESPACE_STD_USING(time_t)
 #endif /* !__time_t_defined */
 #ifndef __tm_defined
 #define __tm_defined 1
@@ -178,15 +178,15 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-__NAMESPACE_STD_USING_TYPE(clock_t)
+__NAMESPACE_STD_USING(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
 #define __time_t_defined 1
-__NAMESPACE_STD_USING_TYPE(time_t)
+__NAMESPACE_STD_USING(time_t)
 #endif /* !__time_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -257,7 +257,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(time, __FORCELOCAL __ATTR_ARTIFICIAL time_t __NO
 #define __std_difftime_defined 1
 #ifdef __difftime_defined
 /* Return the difference between TIME1 and TIME0 */
-__NAMESPACE_GLB_USING(difftime)
+__NAMESPACE_GLB_USING_OR_IMPL(difftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL difftime)(time_t __time1, time_t __time0) { return (:: difftime)(__time1, __time0); })
 #elif defined(__CRT_HAVE_difftime64) && defined(__USE_TIME_BITS64)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),difftime64,(__time1,__time0))
@@ -406,7 +406,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 #ifndef __std_asctime_s_defined
 #define __std_asctime_s_defined 1
 #ifdef __asctime_s_defined
-__NAMESPACE_GLB_USING(asctime_s)
+__NAMESPACE_GLB_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL asctime_s)(char *__restrict __buf, size_t __buflen, struct tm const *__restrict __tp) { return (:: asctime_s)(__buf, __buflen, __tp); })
 #elif defined(__CRT_HAVE_asctime_s)
 __CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,asctime_s,(char *__restrict __buf, size_t __buflen, struct tm const *__restrict __tp),(__buf,__buflen,__tp))
 #else /* ... */
@@ -422,7 +422,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #define __std_timespec_get_defined 1
 #ifdef __timespec_get_defined
 /* Set TS to calendar time based in time base BASE */
-__NAMESPACE_GLB_USING(timespec_get)
+__NAMESPACE_GLB_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return (:: timespec_get)(__ts, __base); })
 #elif defined(__CRT_HAVE_timespec_get)
 /* Set TS to calendar time based in time base BASE */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))

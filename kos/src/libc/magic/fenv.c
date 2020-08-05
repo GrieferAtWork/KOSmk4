@@ -72,11 +72,11 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef ___fenv_t_defined
 #define ___fenv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(fenv_t)
+__NAMESPACE_STD_USING(fenv_t)
 #endif /* !___fenv_t_defined */
 #ifndef __fexcept_t_defined
 #define __fexcept_t_defined 1
-__NAMESPACE_STD_USING_TYPE(fexcept_t)
+__NAMESPACE_STD_USING(fexcept_t)
 #endif /* !__fexcept_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */

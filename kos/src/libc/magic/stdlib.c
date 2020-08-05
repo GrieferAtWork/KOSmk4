@@ -110,7 +110,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -169,16 +169,16 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __div_t_defined
 #define __div_t_defined 1
-__NAMESPACE_STD_USING_TYPE(div_t)
+__NAMESPACE_STD_USING(div_t)
 #endif /* !__div_t_defined */
 #ifndef __ldiv_t_defined
 #define __ldiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(ldiv_t)
+__NAMESPACE_STD_USING(ldiv_t)
 #endif /* !__ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __lldiv_t_defined
 #define __lldiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(lldiv_t)
+__NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
 }%{

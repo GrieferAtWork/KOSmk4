@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc141f */
+/* HASH CRC-32:0xc61cbd0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,16 @@
 /* Import all symbols into the global namespace when re-including "wctype.h" after "cwctype" */
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wint_t)
+__NAMESPACE_STD_USING(wint_t)
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wctype_t)
+__NAMESPACE_STD_USING(wctype_t)
 #endif /* !__wctype_t_defined */
 #if defined(__USE_ISOC99) || defined(__USE_XOPEN2K8)
 #ifndef __wctrans_t_defined
 #define __wctrans_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wctrans_t)
+__NAMESPACE_STD_USING(wctrans_t)
 #endif /* !__wctrans_t_defined */
 #endif /* __USE_ISOC99 || __USE_XOPEN2K8 */
 __NAMESPACE_STD_USING(iswalnum)
@@ -111,11 +111,11 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wint_t)
+__NAMESPACE_STD_USING(wint_t)
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wctype_t)
+__NAMESPACE_STD_USING(wctype_t)
 #endif /* !__wctype_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -144,7 +144,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __wctrans_t_defined
 #define __wctrans_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wctrans_t)
+__NAMESPACE_STD_USING(wctrans_t)
 #endif /* !__wctrans_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_ISOC99 || __USE_XOPEN2K8 */
@@ -265,7 +265,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iswxdigit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifndef __std_wctrans_defined
 #define __std_wctrans_defined 1
 #ifdef __wctrans_defined
-__NAMESPACE_GLB_USING(wctrans)
+__NAMESPACE_GLB_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) wctrans_t __NOTHROW_NCX(__LIBCCALL wctrans)(char const *__prop) { return (:: wctrans)(__prop); })
 #elif defined(__CRT_HAVE_wctrans)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),wctrans_t,__NOTHROW_NCX,wctrans,(char const *__prop),(__prop))
 #else /* ... */
@@ -278,7 +278,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifndef __std_towctrans_defined
 #define __std_towctrans_defined 1
 #ifdef __towctrans_defined
-__NAMESPACE_GLB_USING(towctrans)
+__NAMESPACE_GLB_USING_OR_IMPL(towctrans, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBCCALL towctrans)(wint_t __wc, wctrans_t __desc) { return (:: towctrans)(__wc, __desc); })
 #elif defined(__CRT_HAVE_towctrans)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,towctrans,(wint_t __wc, wctrans_t __desc),(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans)
@@ -315,7 +315,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iswctype, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __std_iswblank_defined
 #define __std_iswblank_defined 1
 #ifdef __iswblank_defined
-__NAMESPACE_GLB_USING(iswblank)
+__NAMESPACE_GLB_USING_OR_IMPL(iswblank, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswblank)(wint_t __wc) { return (:: iswblank)(__wc); })
 #elif __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswblank,(wint_t __wc),{ return __builtin_iswblank(__wc); })
 #elif defined(__CRT_HAVE_iswblank)
@@ -568,7 +568,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(towctrans_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifdef __USE_DOS
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING_TYPE(wctype_t)
+__NAMESPACE_STD_USING(wctype_t)
 #endif /* !__wctype_t_defined */
 #ifndef _WCTYPE_DEFINED
 #define _WCTYPE_DEFINED 1

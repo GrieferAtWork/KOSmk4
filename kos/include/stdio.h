@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeca72b54 */
+/* HASH CRC-32:0xfa483051 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 /* Import all symbols into the global namespace when re-including "stdio.h" after "cstdio" */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __fpos_t_defined
 #define __fpos_t_defined 1
-__NAMESPACE_STD_USING_TYPE(fpos_t)
+__NAMESPACE_STD_USING(fpos_t)
 #endif /* !__fpos_t_defined */
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING_TYPE(FILE)
+__NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #if !defined(__remove_defined) && defined(__std_remove_defined)
 #define __remove_defined 1
@@ -320,7 +320,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -352,7 +352,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __fpos_t_defined
 #define __fpos_t_defined 1
-__NAMESPACE_STD_USING_TYPE(fpos_t)
+__NAMESPACE_STD_USING(fpos_t)
 #endif /* !__fpos_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -372,7 +372,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING_TYPE(FILE)
+__NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -422,7 +422,7 @@ __NAMESPACE_STD_BEGIN
 #define __std_remove_defined 1
 #ifdef __remove_defined
 /* Remove a file or directory `FILENAME' */
-__NAMESPACE_GLB_USING(remove)
+__NAMESPACE_GLB_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL remove)(char const *__filename) { return (:: remove)(__filename); })
 #elif defined(__CRT_HAVE_remove)
 /* Remove a file or directory `FILENAME' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,remove,(char const *__filename),(__filename))
@@ -441,7 +441,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifdef __rename_defined
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
-__NAMESPACE_GLB_USING(rename)
+__NAMESPACE_GLB_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return (:: rename)(__oldname, __newname_or_path); })
 #elif defined(__CRT_HAVE_rename)
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
@@ -1012,7 +1012,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fer
  * >> } else {
  * >>     fprintf(stderr, "%s\n", strerror(errno));
  * >> } */
-__NAMESPACE_GLB_USING(perror)
+__NAMESPACE_GLB_USING_OR_IMPL(perror, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL perror)(char const *__message) { (:: perror)(__message); })
 #elif defined(__CRT_HAVE_perror)
 /* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
  * >> if (message) {
@@ -1290,7 +1290,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LI
 #ifdef __vfscanf_defined
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-__NAMESPACE_GLB_USING(vfscanf)
+__NAMESPACE_GLB_USING_OR_IMPL(vfscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL vfscanf)(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (:: vfscanf)(__stream, __format, __args); })
 #elif defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -1339,7 +1339,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vfscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifdef __vscanf_defined
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-__NAMESPACE_GLB_USING(vscanf)
+__NAMESPACE_GLB_USING_OR_IMPL(vscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__LIBCCALL vscanf)(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (:: vscanf)(__format, __args); })
 #elif __has_builtin(__builtin_vscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vscanf)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -1444,7 +1444,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #ifndef __std_gets_defined
 #define __std_gets_defined 1
 #ifdef __gets_defined
-__NAMESPACE_GLB_USING(gets)
+__NAMESPACE_GLB_USING_OR_IMPL(gets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") __ATTR_NONNULL((1)) char *(__LIBCCALL gets)(char *__restrict __buf) __THROWS(...) { return (:: gets)(__buf); })
 #elif defined(__CRT_HAVE_gets)
 __CDECLARE(__ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") __ATTR_NONNULL((1)),char *,__THROWING,gets,(char *__restrict __buf),(__buf))
 #elif defined(__CRT_HAVE__IO_gets)
@@ -1471,7 +1471,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #ifdef __vsscanf_defined
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
-__NAMESPACE_GLB_USING(vsscanf)
+__NAMESPACE_GLB_USING_OR_IMPL(vsscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vsscanf)(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) { return (:: vsscanf)(__input, __format, __args); })
 #elif __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -1578,7 +1578,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #ifdef __vsnprintf_defined
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-__NAMESPACE_GLB_USING(vsnprintf)
+__NAMESPACE_GLB_USING_OR_IMPL(vsnprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vsnprintf)(char *__restrict __buf, size_t __buflen, char const *__restrict __format, __builtin_va_list __args) { return (:: vsnprintf)(__buf, __buflen, __format, __args); })
 #elif __has_builtin(__builtin_vsnprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsnprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
@@ -1605,7 +1605,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsnprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __snprintf_defined
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-__NAMESPACE_GLB_USING(snprintf)
+__NAMESPACE_GLB_USING_OR_IMPL(snprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL snprintf)(char *__restrict __buf, size_t __buflen, char const *__restrict __format, ...) { return (:: snprintf)(__buf, __buflen, __format, __builtin_va_arg_pack()); })
 #elif __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
@@ -3205,7 +3205,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING_TYPE(FILE)
+__NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 
 

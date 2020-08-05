@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe485d608 */
+/* HASH CRC-32:0x5948b76e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -762,16 +762,16 @@ __SYSDECL_BEGIN
 #if defined(__cplusplus) && defined(_CRTDBG_MAP_ALLOC)
 __NAMESPACE_STD_BEGIN
 #ifdef ___calloc_dbg_defined
-__NAMESPACE_GLB_USING(_calloc_dbg)
+__NAMESPACE_GLB_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBDCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (::_calloc_dbg)(__count, __num_bytes, __block_type, __filename, __line); })
 #endif /* ___calloc_dbg_defined */
 #ifdef ___free_dbg_defined
-__NAMESPACE_GLB_USING(_free_dbg)
+__NAMESPACE_GLB_USING_OR_IMPL(_free_dbg, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBDCALL _free_dbg)(void *__ptr, int __block_type) { return (::_free_dbg)(__ptr, __block_type); })
 #endif /* ___free_dbg_defined */
 #ifdef ___malloc_dbg_defined
-__NAMESPACE_GLB_USING(_malloc_dbg)
+__NAMESPACE_GLB_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (::_malloc_dbg)(__num_bytes, __block_type, __filename, __line); })
 #endif /* ___malloc_dbg_defined */
 #ifdef ___realloc_dbg_defined
-__NAMESPACE_GLB_USING(_realloc_dbg)
+__NAMESPACE_GLB_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (::_realloc_dbg)(__ptr, __num_bytes, __block_type, __filename, __line); })
 #endif /* ___realloc_dbg_defined */
 __NAMESPACE_STD_END
 #endif /* __cplusplus && _CRTDBG_MAP_ALLOC */

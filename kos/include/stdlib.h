@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8815022 */
+/* HASH CRC-32:0x91eec85a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,20 +28,20 @@
 /* Import all symbols into the global namespace when re-including "stdlib.h" after "cstdlib" */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #ifndef __div_t_defined
 #define __div_t_defined 1
-__NAMESPACE_STD_USING_TYPE(div_t)
+__NAMESPACE_STD_USING(div_t)
 #endif /* !__div_t_defined */
 #ifndef __ldiv_t_defined
 #define __ldiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(ldiv_t)
+__NAMESPACE_STD_USING(ldiv_t)
 #endif /* !__ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __lldiv_t_defined
 #define __lldiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(lldiv_t)
+__NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
 __NAMESPACE_STD_USING(qsort)
@@ -209,7 +209,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -267,16 +267,16 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __div_t_defined
 #define __div_t_defined 1
-__NAMESPACE_STD_USING_TYPE(div_t)
+__NAMESPACE_STD_USING(div_t)
 #endif /* !__div_t_defined */
 #ifndef __ldiv_t_defined
 #define __ldiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(ldiv_t)
+__NAMESPACE_STD_USING(ldiv_t)
 #endif /* !__ldiv_t_defined */
 #ifdef __USE_ISOC99
 #ifndef __lldiv_t_defined
 #define __lldiv_t_defined 1
-__NAMESPACE_STD_USING_TYPE(lldiv_t)
+__NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -668,7 +668,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __std_system_defined
 #define __std_system_defined 1
 #ifdef __system_defined
-__NAMESPACE_GLB_USING(system)
+__NAMESPACE_GLB_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return (:: system)(__command); })
 #elif defined(__CRT_HAVE_system)
 __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #else /* ... */
@@ -678,7 +678,7 @@ __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #ifndef __std_abort_defined
 #define __std_abort_defined 1
 #ifdef __abort_defined
-__NAMESPACE_GLB_USING(abort)
+__NAMESPACE_GLB_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (:: abort)(); })
 #elif __has_builtin(__builtin_abort) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abort)
 __CEIDECLARE(__ATTR_NORETURN,void,__THROWING,abort,(void),{ return __builtin_abort(); })
 #elif defined(__CRT_HAVE_abort)
@@ -699,7 +699,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #ifndef __std_exit_defined
 #define __std_exit_defined 1
 #ifdef __exit_defined
-__NAMESPACE_GLB_USING(exit)
+__NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { (:: exit)(__status); })
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
 __CEIDECLARE(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ return __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
@@ -753,7 +753,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,_Exit,(int __status),exit,(__status)
 #ifndef __std_malloc_defined
 #define __std_malloc_defined 1
 #ifdef __malloc_defined
-__NAMESPACE_GLB_USING(malloc)
+__NAMESPACE_GLB_USING_OR_IMPL(malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL malloc)(size_t __num_bytes) { return (:: malloc)(__num_bytes); })
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,malloc,(size_t __num_bytes),{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
@@ -770,7 +770,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(malloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 #ifndef __std_calloc_defined
 #define __std_calloc_defined 1
 #ifdef __calloc_defined
-__NAMESPACE_GLB_USING(calloc)
+__NAMESPACE_GLB_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __count, size_t __num_bytes) { return (:: calloc)(__count, __num_bytes); })
 #elif __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __CEIDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,calloc,(size_t __count, size_t __num_bytes),{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
@@ -787,7 +787,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MA
 #ifndef __std_realloc_defined
 #define __std_realloc_defined 1
 #ifdef __realloc_defined
-__NAMESPACE_GLB_USING(realloc)
+__NAMESPACE_GLB_USING_OR_IMPL(realloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__mallptr, size_t __num_bytes) { return (:: realloc)(__mallptr, __num_bytes); })
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,realloc,(void *__mallptr, size_t __num_bytes),{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
@@ -799,7 +799,7 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),voi
 #ifndef __std_free_defined
 #define __std_free_defined 1
 #ifdef __free_defined
-__NAMESPACE_GLB_USING(free)
+__NAMESPACE_GLB_USING_OR_IMPL(free, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL free)(void *__mallptr) { (:: free)(__mallptr); })
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIDECLARE(,void,__NOTHROW_NCX,free,(void *__mallptr),{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
@@ -921,7 +921,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #ifndef __std_strtoull_defined
 #define __std_strtoull_defined 1
 #ifdef __strtoull_defined
-__NAMESPACE_GLB_USING(strtoull)
+__NAMESPACE_GLB_USING_OR_IMPL(strtoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtoull)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (:: strtoull)(__nptr, __endptr, __base); })
 #elif defined(__CRT_HAVE_strtoull)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtouq)
@@ -956,7 +956,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __std_strtoll_defined
 #define __std_strtoll_defined 1
 #ifdef __strtoll_defined
-__NAMESPACE_GLB_USING(strtoll)
+__NAMESPACE_GLB_USING_OR_IMPL(strtoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoll)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (:: strtoll)(__nptr, __endptr, __base); })
 #elif defined(__CRT_HAVE_strtoll)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq)
@@ -1013,7 +1013,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #ifndef __std_strtof_defined
 #define __std_strtof_defined 1
 #ifdef __strtof_defined
-__NAMESPACE_GLB_USING(strtof)
+__NAMESPACE_GLB_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof)(char const *__restrict __nptr, char **__endptr) { return (:: strtof)(__nptr, __endptr); })
 #elif defined(__CRT_HAVE_strtof)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
 #else /* ... */
@@ -1027,7 +1027,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #ifndef __std_strtold_defined
 #define __std_strtold_defined 1
 #ifdef __strtold_defined
-__NAMESPACE_GLB_USING(strtold)
+__NAMESPACE_GLB_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL strtold)(char const *__restrict __nptr, char **__endptr) { return (:: strtold)(__nptr, __endptr); })
 #elif defined(__CRT_HAVE_strtold)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtod) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
@@ -1046,7 +1046,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #ifndef __std_aligned_alloc_defined
 #define __std_aligned_alloc_defined 1
 #ifdef __aligned_alloc_defined
-__NAMESPACE_GLB_USING(aligned_alloc)
+__NAMESPACE_GLB_USING_OR_IMPL(aligned_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(size_t __alignment, size_t __n_bytes) { return (void *)(:: aligned_alloc)(); })
 #elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
 __CEIDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,aligned_alloc,(size_t __alignment, size_t __n_bytes),{ return __builtin_aligned_alloc(__alignment, __n_bytes); })
 #elif defined(__CRT_HAVE_memalign)

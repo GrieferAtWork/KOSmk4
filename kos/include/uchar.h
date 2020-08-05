@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe30768a0 */
+/* HASH CRC-32:0x9755d4ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@
 /* Import all symbols into the global namespace when re-including "uchar.h" after "cuchar" */
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-__NAMESPACE_STD_USING_TYPE(mbstate_t)
+__NAMESPACE_STD_USING(mbstate_t)
 #endif /* !__mbstate_t_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 __NAMESPACE_STD_USING(mbrtoc16)
 __NAMESPACE_STD_USING(mbrtoc32)
@@ -66,7 +66,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-__NAMESPACE_STD_USING_TYPE(mbstate_t)
+__NAMESPACE_STD_USING(mbstate_t)
 #endif /* !__mbstate_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -81,7 +81,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING_TYPE(size_t)
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

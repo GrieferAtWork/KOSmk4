@@ -1873,6 +1873,9 @@ class NamespaceBinding {
 		assert importName == exposedName;
 		if (doc)
 			fp.printComment(doc);
+		local callToEscapeMode = escapeMode;
+		if (callToEscapeMode == ESCAPE_MODE_PART)
+			callToEscapeMode = ESCAPE_MODE_FULL;
 		/* There are 2 ways in which we must import namespace imports:
 		 * The (simple) C++ way:
 		 * >> namespace.keyUsing(fp, exposedName);
@@ -1886,16 +1889,96 @@ class NamespaceBinding {
 			 * import in C++-mode, and don't have to do anything
 			 * in C-mode (since the symbol will have already been
 			 * imported in that case) */
-			namespace.keyUsing(fp, exposedName);
+			if (namespace === STD_NAMESPACE) {
+				/* We can always simply use keyUsing() in this case! */
+				namespace.keyUsing(fp, exposedName);
+				return;
+			}
+			local nsPrefix = namespace.prefix;
+			if (namespace === GLOBAL_NAMESPACE)
+				nsPrefix = "::";
+			if (nsPrefix)
+				cSymbolName = "({} {})".format({ nsPrefix, cSymbolName });
+			if (#conditionalPrototypes == 1 && conditionalPrototypes.first[0] == "1") {
+				namespace.keyUsingOrImpl(fp, exposedName, []{
+					local prototypes = conditionalPrototypes.first[1];
+					if (#prototypes == 1) {
+						local callToPrototype = prototypes.first;
+						if (prototype is bound)
+							callToPrototype = functionPrototype;
+						prototypes.first.cprintCallToFunction(
+							fp, escapeMode, NAMESPACE_IMPORT_DECL,
+							exposedName, cSymbolName, callToPrototype,
+							callToEscapeMode: callToEscapeMode);
+					} else {
+						fp.forceStartOfLine();
+						local oldExternLinkage = fp.externLinkage;
+						fp.externLinkage = "C++";
+						for (local p: prototypes) {
+							local callToPrototype = p;
+							if (prototype is bound)
+								callToPrototype = functionPrototype;
+							p.cprintCallToFunction(
+								fp, escapeMode, NAMESPACE_IMPORT_DECL,
+								exposedName, cSymbolName, callToPrototype,
+								callToEscapeMode: callToEscapeMode);
+							fp.forceStartOfLine();
+						}
+						fp.externLinkage = oldExternLinkage;
+					}
+				});
+			} else {
+				local cond = "!defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)";
+				if (namespace === GLOBAL_NAMESPACE || namespace === STD_NAMESPACE)
+					cond = "!defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING) || defined(__NO_NAMESPACE_STD)";
+				fp.ppIf(cond);
+				namespace.keyUsing(fp, exposedName);
+				fp.ppElse();
+				local isFirst = true;
+				for (local ppCond, prototypes: conditionalPrototypes) {
+					if (!prototypes)
+						continue;
+					if (isFirst) {
+						isFirst = false;
+						fp.ppIf(ppCond);
+					} else {
+						fp.ppElif(ppCond);
+					}
+					if (#prototypes == 1) {
+						local callToPrototype = prototypes.first;
+						if (prototype is bound)
+							callToPrototype = functionPrototype;
+						prototypes.first.cprintCallToFunction(
+							fp, escapeMode, NAMESPACE_IMPORT_DECL,
+							exposedName, cSymbolName, callToPrototype,
+							callToEscapeMode: callToEscapeMode);
+					} else {
+						fp.forceStartOfLine();
+						local oldExternLinkage = fp.externLinkage;
+						fp.externLinkage = "C++";
+						for (local p: prototypes) {
+							local callToPrototype = p;
+							if (prototype is bound)
+								callToPrototype = functionPrototype;
+							p.cprintCallToFunction(
+								fp, escapeMode, NAMESPACE_IMPORT_DECL,
+								exposedName, cSymbolName, callToPrototype,
+								callToEscapeMode: callToEscapeMode);
+							fp.forceStartOfLine();
+						}
+						fp.externLinkage = oldExternLinkage;
+					}
+				}
+				if (!isFirst)
+					fp.ppEndif();
+				fp.ppEndif();
+			}
 			return;
 		}
 		if (!conditionalPrototypes)
 			return; /* Shouldn't happen... */
 		if (namespace.prefix)
 			cSymbolName = "({} {})".format({ namespace.prefix, cSymbolName });
-		local callToEscapeMode = escapeMode;
-		if (callToEscapeMode == ESCAPE_MODE_PART)
-			callToEscapeMode = ESCAPE_MODE_FULL;
 		local isFirst = true;
 		for (local ppCond, prototypes: conditionalPrototypes) {
 			if (isFirst) {
@@ -1907,9 +1990,12 @@ class NamespaceBinding {
 			if (#prototypes == 1) {
 				/* The complicated case: Must use `keyUsingOrImpl' */
 				namespace.keyUsingOrImpl(fp, exposedName, []{
+					local callToPrototype = prototypes.first;
+					if (prototype is bound)
+						callToPrototype = functionPrototype;
 					prototypes.first.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
-						exposedName, cSymbolName, prototype,
+						exposedName, cSymbolName, callToPrototype,
 						callToEscapeMode: callToEscapeMode);
 				});
 			} else {
@@ -1927,9 +2013,12 @@ class NamespaceBinding {
 				namespace.keyUsing(fp, exposedName);
 				fp.ppElse();
 				for (local proto: prototypes) {
+					local callToPrototype = proto;
+					if (prototype is bound)
+						callToPrototype = functionPrototype;
 					proto.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
-						exposedName, cSymbolName, prototype,
+						exposedName, cSymbolName, callToPrototype,
 						callToEscapeMode: callToEscapeMode);
 					fp << "\n";
 				}

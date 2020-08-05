@@ -114,12 +114,19 @@
 #endif
 
 
-#undef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #if defined(__GNUC__) && !defined(__INTELLISENSE__)
-/* Enable work-arounds for c++ using debug information bloat:
- * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417 */
+/* Enable work-arounds for c++'s `using' causing debug information bloat:
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417
+ * NOTE: Because this work-around entails that `namespace std' is always
+ *       pre-imported into the global namespace, we only do this when
+ *       we're building for an environment that is known to be able to
+ *       deal with this. In this case: kernel-space */
+#ifdef __KERNEL__
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 1
-#endif /* __GNUC__ && !__INTELLISENSE__ */
+#endif /* __KERNEL__ */
+#else /* __GNUC__ && !__INTELLISENSE__ */
+#undef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
+#endif /* !__GNUC__ || __INTELLISENSE__ */
 
 #ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #define __CXX_USING_TYPE(ns, x) typedef ns x x;
@@ -132,8 +139,6 @@
 #define __NAMESPACE_STD_END                 /* nothing */
 #define __NAMESPACE_STD_SYM                 /* nothing */
 #define __NAMESPACE_STD_USING(x)            /* nothing */
-#define __NAMESPACE_STD_USING_OR_IMPL(x, i) /* nothing */
-#define __NAMESPACE_STD_USING_TYPE(x)       /* nothing */
 #define __NAMESPACE_GLB_USING(x)            /* nothing */
 #define __NAMESPACE_GLB_USING_OR_IMPL(x, i) /* nothing */
 #define __NAMESPACE_GLB_USING_TYPE(x)       /* nothing */
@@ -141,15 +146,17 @@
 #define __NAMESPACE_STD_BEGIN               namespace std {
 #define __NAMESPACE_STD_END                 }
 #define __NAMESPACE_STD_SYM                 ::std::
-#define __NAMESPACE_STD_USING(x)            using ::std::x;
-#define __NAMESPACE_GLB_USING(x)            using ::x;
-#define __NAMESPACE_STD_USING_TYPE(x)       __CXX_USING_TYPE(::std::, x)
-#define __NAMESPACE_GLB_USING_TYPE(x)       __CXX_USING_TYPE(::, x)
 #ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
-#define __NAMESPACE_STD_USING_OR_IMPL(x, i) i
+namespace std { }
+using namespace std; /* Overlay */
+#define __NAMESPACE_STD_USING(x)            /* nothing (already done by the overlay) */
+#define __NAMESPACE_GLB_USING(x)            using ::x;
+#define __NAMESPACE_GLB_USING_TYPE(x)       __CXX_USING_TYPE(::, x)
 #define __NAMESPACE_GLB_USING_OR_IMPL(x, i) i
 #else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
-#define __NAMESPACE_STD_USING_OR_IMPL(x, i) using ::std::x;
+#define __NAMESPACE_STD_USING(x)            using ::std::x;
+#define __NAMESPACE_GLB_USING(x)            using ::x;
+#define __NAMESPACE_GLB_USING_TYPE(x)       using ::x;
 #define __NAMESPACE_GLB_USING_OR_IMPL(x, i) using ::x;
 #endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #endif /* !__NO_NAMESPACE_STD */
@@ -163,11 +170,11 @@
 #define __DFL(expr)                         = expr
 
 #ifdef __INTELLISENSE__
-#define __register               /* nothing */
+#define __register /* nothing */
 #elif 1
-#define __register               register
+#define __register register
 #else
-#define __register               /* nothing */
+#define __register /* nothing */
 #endif
 
 #ifdef __INTELLISENSE__

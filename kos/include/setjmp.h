@@ -43,7 +43,10 @@ __NAMESPACE_STD_USING(longjmp)
 
 #include "__stdinc.h"
 #include "__crt.h"
+/**/
+
 #include <features.h>
+
 #include <bits/crt/setjmp.h>
 #include <bits/sigset.h>
 
@@ -60,35 +63,34 @@ typedef struct __jmp_buf jmp_buf[1];
 
 #ifndef __std_setjmp_defined
 #define __std_setjmp_defined 1
-#ifdef __setjmp_defined
+#if defined(__setjmp_defined) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
 __NAMESPACE_GLB_USING(setjmp)
 #elif defined(__CRT_HAVE_setjmp)
 __CDECLARE(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,setjmp,(jmp_buf __buf),(__buf))
 #elif defined(__CRT_HAVE__setjmp)
-#ifndef __NO_ASMNAME
 __CREDIRECT(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,setjmp,(jmp_buf __buf),_setjmp,(__buf))
-#else /* !__NO_ASMNAME */
-__CDECLARE(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,_setjmp,(jmp_buf __buf),(__buf))
-#define setjmp   _setjmp
-#endif /* __NO_ASMNAME */
-#else
+#else /* ... */
 #undef __std_setjmp_defined
-#endif
+#endif /* !... */
 #endif /* !__std_setjmp_defined */
 
 #ifndef __std_longjmp_defined
 #define __std_longjmp_defined 1
-#ifdef __longjmp_defined
+#if defined(__longjmp_defined) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
 __NAMESPACE_GLB_USING(longjmp)
 #elif defined(__CRT_HAVE_longjmp)
-#if defined(__CRT_HAVE___fast_longjmp) && !defined(__NO_builtin_constant_p)
+#if defined(__CRT_HAVE___fast_longjmp) && !defined(__NO_builtin_constant_p) && !defined(__NO_EXTERN_INLINE)
+#ifdef __INTELLISENSE__
+__ATTR_NORETURN void __NOTHROW_NCX(__LIBCCALL longjmp)(jmp_buf __buf, int __sig);
+#else /* __INTELLISENSE__ */
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,__fast_longjmp,(jmp_buf __buf, int __sig),(__buf,__sig))
 __CREDIRECT_VOID(__ATTR_NORETURN,__NOTHROW_NCX,__slow_longjmp,(jmp_buf __buf, int __sig),longjmp,(__buf,__sig))
-__FORCELOCAL __ATTR_NORETURN void __NOTHROW_NCX(__LIBCCALL longjmp)(jmp_buf __buf, int __sig) {
+__CEIDECLARE(__ATTR_NORETURN,void,__NOTHROW_NCX,longjmp,(jmp_buf __buf, int __sig),{
 	if (__builtin_constant_p(__sig != 0) && (__sig != 0))
 		__fast_longjmp(__buf, __sig);
 	__slow_longjmp(__buf, __sig);
-}
+})
+#endif /* !__INTELLISENSE__ */
 #else /* __CRT_HAVE___fast_longjmp */
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,longjmp,(jmp_buf __buf, int __sig),(__buf,__sig))
 #endif /* !__CRT_HAVE___fast_longjmp */
