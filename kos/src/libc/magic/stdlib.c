@@ -359,10 +359,6 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 @@pp_endif@@
 )]
 
-%(auto_source)#ifdef ____invoke_compare_helper_defined
-%(auto_source)__NAMESPACE_LOCAL_USING(__invoke_compare_helper)
-%(auto_source)#endif /* ____invoke_compare_helper_defined */
-
 [[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std, kernel, decl_include("<hybrid/typecore.h>")]]

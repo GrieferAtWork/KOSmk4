@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72c71d7c */
+/* HASH CRC-32:0xf3ec2f73 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LIBC __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warnc)(__errno_t __used_errno,
 #include <local/err/warnc.h>
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(warnc)
+__NAMESPACE_LOCAL_USING_OR_IMPL(warnc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(1, 2) void (__VLIBCCALL warnc)(__errno_t __used_errno, char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnc))(__used_errno, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define warnc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnc))
 #endif /* !__cplusplus */
@@ -85,7 +85,7 @@ __LIBC __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL errc)(int __st
 #include <local/err/errc.h>
 /* Same as `warnc()', but follow up by calling `exit(status)' */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(errc)
+__NAMESPACE_LOCAL_USING_OR_IMPL(errc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL errc)(int __status, __errno_t __used_errno, char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errc))(__status, __used_errno, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define errc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errc))
 #endif /* !__cplusplus */

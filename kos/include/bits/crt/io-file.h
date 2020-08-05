@@ -20,34 +20,35 @@
 #ifndef _BITS_CRT_IO_FILE_H
 #define _BITS_CRT_IO_FILE_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
 /* I/O buffer flags (DOS-compatible)
  * WARNING: These flags may change in the future. */
-#define __IO_FILE_IOR       0x0001 /* The current buffer was read from disk (Undefined when 'if_cnt == 0'). */
-#define __IO_FILE_IOW       0x0002 /* The current buffer has changed since being read. */
-#define __IO_FILE_IONBF     0x0004 /* ??? */
-#define __IO_FILE_IOMALLBUF 0x0008 /* The buffer was allocated internally. */
-#define __IO_FILE_IOEOF     0x0010 /* Set when the file pointed to by 'if_fd' has been exhausted. */
-#define __IO_FILE_IOERR     0x0020 /* Set when an I/O error occurred. */
-#define __IO_FILE_IONOFD    0x0040 /* The file acts as output to buffer only. - 'if_fd' is not valid.
-                                    * Under KOS this flag is used to indicate the use of file cookies; s.a. `fopencookie(3)' */
-#define __IO_FILE_IORW      0x0080 /* The file was opened for read+write permissions ('+' flag) */
-#define __IO_FILE_IOUSERBUF 0x0100 /* The buffer was given by the user. */
-#define __IO_FILE_IOLNBUF   0x0200 /* NOT ORIGINALLY DEFINED IN DOS: Use line-buffering. */
-#define __IO_FILE_IOSETVBUF 0x0400 /* ??? */
-#define __IO_FILE_IOFEOF    0x0800 /* Never used */
-#define __IO_FILE_IOFLRTN   0x1000 /* ??? */
-#define __IO_FILE_IOCTRLZ   0x2000 /* ??? */
-#define __IO_FILE_IOCOMMIT  0x4000 /* Invoke fsync() during fflush() */
-#define __IO_FILE_IOLOCKED  0x8000 /* ??? */
+#define __IO_FILE_IOR       0x00000001 /* The current buffer was read from disk (Undefined when 'if_cnt == 0'). */
+#define __IO_FILE_IOW       0x00000002 /* The current buffer has changed since being read. */
+#define __IO_FILE_IONBF     0x00000004 /* ??? */
+#define __IO_FILE_IOMALLBUF 0x00000008 /* The buffer was allocated internally. */
+#define __IO_FILE_IOEOF     0x00000010 /* Set when the file pointed to by 'if_fd' has been exhausted. */
+#define __IO_FILE_IOERR     0x00000020 /* Set when an I/O error occurred. */
+#define __IO_FILE_IONOFD    0x00000040 /* The file acts as output to buffer only. - 'if_fd' is not valid.
+                                        * Under KOS this flag is used to indicate the use of file cookies; s.a. `fopencookie(3)' */
+#define __IO_FILE_IORW      0x00000080 /* The file was opened for read+write permissions ('+' flag) */
+#define __IO_FILE_IOUSERBUF 0x00000100 /* The buffer was given by the user. */
+#define __IO_FILE_IOLNBUF   0x00000200 /* NOT ORIGINALLY DEFINED IN DOS: Use line-buffering. */
+#define __IO_FILE_IOSETVBUF 0x00000400 /* ??? */
+#define __IO_FILE_IOFEOF    0x00000800 /* Never used */
+#define __IO_FILE_IOFLRTN   0x00001000 /* ??? */
+#define __IO_FILE_IOCTRLZ   0x00002000 /* ??? */
+#define __IO_FILE_IOCOMMIT  0x00004000 /* Invoke fsync() during fflush() */
+#define __IO_FILE_IOLOCKED  0x00008000 /* ??? */
+#define __IO_FILE_IONOLOCK  0x08000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
 #define __IO_FILE_IOLNIFTYY 0x80000000 /* NOT ORIGINALLY DEFINED IN DOS: Determine 'isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
 #define __IO_FILE_IOREADING 0x40000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
 #define __IO_FILE_IOISATTY  0x20000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
 #define __IO_FILE_IONOTATTY 0x10000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */
-#define __IO_FILE_IONOLOCK  0x08000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
 
 
 #ifdef __CC__
@@ -124,7 +125,7 @@ struct __IO_FILE {
 #define __f_bufsiz   if_bufsiz
 #define __f_tmpfname if_exdata
 #else /* __BUILDING_LIBC */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_PURE
 	/* Use names that are protected by the C standard. */
 	char          *__f_ptr;
 	__INT32_TYPE__ __f_cnt;
@@ -137,7 +138,7 @@ struct __IO_FILE {
 	__INT32_TYPE__ __f_charbuf;
 	__INT32_TYPE__ __f_bufsiz;
 	char          *__f_tmpfname;
-#else /* __USE_KOS */
+#else /* __USE_KOS_PURE */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("_ptr")
 #pragma push_macro("_cnt")
@@ -147,9 +148,10 @@ struct __IO_FILE {
 #pragma push_macro("_charbuf")
 #pragma push_macro("_bufsiz")
 #pragma push_macro("_tmpfname")
-#endif
-	/* Must #undef keyboard that are not allowed by the C
-	 * standard and may collide with user-defined macros. */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+/* Must #undef keywords that are not allowed by the C
+ * standard and may collide with user-defined macros. */
 #undef _ptr
 #undef _cnt
 #undef _base
@@ -202,13 +204,13 @@ struct __IO_FILE {
 #pragma pop_macro("_base")
 #pragma pop_macro("_cnt")
 #pragma pop_macro("_ptr")
-#endif
-#endif /* !__USE_KOS */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !__USE_KOS_PURE */
 #endif /* !__BUILDING_LIBC */
 };
 #elif defined(__CRT_DOS_PRIMARY)
 struct __IO_FILE {
-#ifdef __USE_KOS
+#ifdef __USE_KOS_PURE
 	/* Use names that are protected by the C standard. */
 	char          *__f_ptr;
 	__INT32_TYPE__ __f_cnt;
@@ -221,7 +223,7 @@ struct __IO_FILE {
 	__INT32_TYPE__ __f_charbuf;
 	__INT32_TYPE__ __f_bufsiz;
 	char          *__f_tmpfname;
-#else /* __USE_KOS */
+#else /* __USE_KOS_PURE */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("_ptr")
 #pragma push_macro("_cnt")
@@ -231,10 +233,10 @@ struct __IO_FILE {
 #pragma push_macro("_charbuf")
 #pragma push_macro("_bufsiz")
 #pragma push_macro("_tmpfname")
-#endif
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-	/* Must #undef keyboard that are not allowed by the C
-	 * standard and may collide with user-defined macros. */
+/* Must #undef keywords that are not allowed by the C
+ * standard and may collide with user-defined macros. */
 #undef _ptr
 #undef _cnt
 #undef _base
@@ -287,12 +289,12 @@ struct __IO_FILE {
 #pragma pop_macro("_base")
 #pragma pop_macro("_cnt")
 #pragma pop_macro("_ptr")
-#endif
-#endif /* !__USE_KOS */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !__USE_KOS_PURE */
 };
-#else
+#else /* __CRT_... */
 struct __IO_FILE; /* Opaque */
-#endif
+#endif /* !__CRT_... */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined 1

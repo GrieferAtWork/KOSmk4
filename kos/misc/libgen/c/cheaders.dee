@@ -965,9 +965,13 @@ class FunctionPrototype {
 				continue;
 			}
 			local myArg = this.argv[argi];
-			if (explicitCastAllTypes || !myArg.ctype.implicitlyConvertibleTo(arg.ctype))
-				arg.ctype.cprintCCastPrefix(fp, callToEscapeMode);
-			escapeTextIntoFile(fp, myArg.name, escapeMode);
+			if (myArg.ctype.beforeName == "...") {
+				fp << "__builtin_va_arg_pack()";
+			} else {
+				if (explicitCastAllTypes || !myArg.ctype.implicitlyConvertibleTo(arg.ctype))
+					arg.ctype.cprintCCastPrefix(fp, callToEscapeMode);
+				escapeTextIntoFile(fp, myArg.name, escapeMode);
+			}
 		}
 		fp << "); }";
 	}
@@ -1593,7 +1597,12 @@ class LocalFunction {
 				fp.printComment(doc);
 			if (exposedName == name) {
 				fp.ppIfdef("__cplusplus");
-				LOCAL_NAMESPACE.keyUsing(fp, exposedName);
+				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
+					prototypes.first.cprintCallToFunction(
+						fp, escapeMode, NAMESPACE_IMPORT_DECL,
+						exposedName, callToLocalName, usedPrototype,
+						callToEscapeMode: callToEscapeMode);
+				});
 				fp.ppElse();
 				fp << "#define " << exposedName << " " << callToLocalName << "\n";
 				fp.ppEndif();
@@ -1914,7 +1923,7 @@ class NamespaceBinding {
 				 * >> <CallToProto...>
 				 * >> <CallToProtoN>
 				 * >> #endif */
-				fp.ppIfdef("__cplusplus");
+				fp.ppIf("defined(__cplusplus) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)");
 				namespace.keyUsing(fp, exposedName);
 				fp.ppElse();
 				for (local proto: prototypes) {

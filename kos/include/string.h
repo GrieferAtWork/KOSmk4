@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5aadf132 */
+/* HASH CRC-32:0x8184bc45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5984,7 +5984,7 @@ __LIBC __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRIN
 #include <local/string/strdupf.h>
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(strdupf)
+__NAMESPACE_LOCAL_USING_OR_IMPL(strdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) char *__NOTHROW_NCX(__VLIBCCALL strdupf)(char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdupf))(__format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define strdupf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdupf))
 #endif /* !__cplusplus */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ebf9f5e */
+/* HASH CRC-32:0x9491af55 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,11 +46,11 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
 #elif defined(__local_utf8_seqlen_defined)
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
 __NAMESPACE_LOCAL_USING(unicode_utf8seqlen)
-#else /* __cplusplus */
-#define unicode_utf8seqlen    (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_utf8seqlen))
-#endif /* !__cplusplus */
+#else /* __cplusplus && !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
+#define unicode_utf8seqlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_utf8seqlen))
+#endif /* !__cplusplus || __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #else /* ... */
 __LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seqlen[256] =
 #include "local/utf8-seqlen.h"

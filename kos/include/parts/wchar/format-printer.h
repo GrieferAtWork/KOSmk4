@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e45d68d */
+/* HASH CRC-32:0x3499bae4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -497,7 +497,7 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCA
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(format_wprintf)
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define format_wprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))
 #endif /* !__cplusplus */

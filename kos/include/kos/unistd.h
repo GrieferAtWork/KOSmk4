@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa25356b7 */
+/* HASH CRC-32:0xfdfa98c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Exe
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(Execl)
+__NAMESPACE_LOCAL_USING_OR_IMPL(Execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define Execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))
 #endif /* !__cplusplus */
@@ -88,7 +88,7 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCAL
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(Execle)
+__NAMESPACE_LOCAL_USING_OR_IMPL(Execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define Execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))
 #endif /* !__cplusplus */
@@ -104,7 +104,7 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Exe
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(Execpl)
+__NAMESPACE_LOCAL_USING_OR_IMPL(Execpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define Execpl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))
 #endif /* !__cplusplus */
@@ -122,7 +122,7 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCAL
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(Execlpe)
+__NAMESPACE_LOCAL_USING_OR_IMPL(Execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define Execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))
 #endif /* !__cplusplus */

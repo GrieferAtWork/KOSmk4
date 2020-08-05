@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62a35a2e */
+/* HASH CRC-32:0xd7412922 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -538,7 +538,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(format_printf)
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_printf)(pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_printf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define format_printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_printf))
 #endif /* !__cplusplus */
@@ -650,7 +650,7 @@ __LIBC __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__VLIBC
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(format_scanf)
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__VLIBCCALL format_scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_scanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define format_scanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_scanf))
 #endif /* !__cplusplus */

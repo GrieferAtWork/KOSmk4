@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6609640c */
+/* HASH CRC-32:0x6aebd842 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1158,7 +1158,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
 #elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/fcntl/open.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(open)
+__NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))(__filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
 #endif /* !__cplusplus */
@@ -1202,7 +1202,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(cha
 #elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <local/fcntl/open64.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(open64)
+__NAMESPACE_LOCAL_USING_OR_IMPL(open64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open64)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open64))(__filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define open64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open64))
 #endif /* !__cplusplus */
@@ -1236,7 +1236,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL opena
 #elif defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)
 #include <local/fcntl/openat.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(openat)
+__NAMESPACE_LOCAL_USING_OR_IMPL(openat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat))(__dirfd, __filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define openat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat))
 #endif /* !__cplusplus */
@@ -1254,7 +1254,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat64,(_
 #elif defined(__CRT_HAVE_openat)
 #include <local/fcntl/openat64.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(openat64)
+__NAMESPACE_LOCAL_USING_OR_IMPL(openat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat64))(__dirfd, __filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define openat64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat64))
 #endif /* !__cplusplus */

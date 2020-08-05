@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cdddd02 */
+/* HASH CRC-32:0x436cd076 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,9 +135,6 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 	return NULL;
 }
 #endif /* !__KERNEL__ */
-#ifdef ____invoke_compare_helper_defined
-__NAMESPACE_LOCAL_USING(__invoke_compare_helper)
-#endif /* ____invoke_compare_helper_defined */
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN

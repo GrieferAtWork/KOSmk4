@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47e9a6c0 */
+/* HASH CRC-32:0xfbad723f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,7 +151,7 @@ __LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex)(lfut
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(lfutex)
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex))(__uaddr, __futex_op, __val, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define lfutex (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex))
 #endif /* !__cplusplus */
@@ -231,7 +231,7 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(lfutex64)
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutex64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex64)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))(__uaddr, __futex_op, __val, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define lfutex64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))
 #endif /* !__cplusplus */
