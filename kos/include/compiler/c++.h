@@ -114,19 +114,17 @@
 #endif
 
 
+#ifndef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #if defined(__GNUC__) && !defined(__INTELLISENSE__)
 /* Enable work-arounds for c++'s `using' causing debug information bloat:
- * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417
- * NOTE: Because this work-around entails that `namespace std' is always
- *       pre-imported into the global namespace, we only do this when
- *       we're building for an environment that is known to be able to
- *       deal with this. In this case: kernel-space */
-#ifdef __KERNEL__
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417 */
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 1
-#endif /* __KERNEL__ */
 #else /* __GNUC__ && !__INTELLISENSE__ */
 #undef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #endif /* !__GNUC__ || __INTELLISENSE__ */
+#elif (__COMPILER_HAVE_BUG_BLOATY_CXX_USING + 0) == 0
+#undef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
+#endif /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 
 #ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #define __CXX_USING_TYPE(ns, x) typedef ns x x;

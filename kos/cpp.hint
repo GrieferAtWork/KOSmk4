@@ -160,6 +160,8 @@
 #define LIBZLIB_CC
 #define LIBZLIB_DECL
 
+#define __LONGLONG  long long
+#define __ULONGLONG unsigned long long
 
 #define NOTHROW(x) x
 #define __NOTHROW(x) x

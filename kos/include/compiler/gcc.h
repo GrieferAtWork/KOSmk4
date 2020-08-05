@@ -690,10 +690,22 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 
 #ifndef __LONGLONG
 #ifdef __CC__
+/* If long-long is fully supported without the need for __extension__,
+ * then simply define __[U]LONGLONG as macros, rather than typedefs,
+ * since the later seems to unconditionally create a DIE (debug-info),
+ * which would cause debug info to be bloated for _every_ source file
+ * unconditionally...
+ * Ugh... I should have never looked at what actually ends up inside
+ *        of gcc debug info. - Sooooo much unnecessary bloat! */
+#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L)
+#define __LONGLONG  long long
+#define __ULONGLONG unsigned long long
+#else /* __cplusplus || __STDC_VERSION__ > 199901L */
 __extension__ typedef long long __longlong_t;
 __extension__ typedef unsigned long long __ulonglong_t;
-#define __LONGLONG   __longlong_t
-#define __ULONGLONG  __ulonglong_t
+#define __LONGLONG  __longlong_t
+#define __ULONGLONG __ulonglong_t
+#endif /* !__cplusplus && __STDC_VERSION__ <= 199901L */
 #endif /* __CC__ */
 #endif /* !__LONGLONG */
 
