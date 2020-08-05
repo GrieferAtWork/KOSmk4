@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd90452b8 */
+/* HASH CRC-32:0xb8d228dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_width))(void *__arg, c
 	__end = (__iter = __data) + __datalen;
 	while (__iter < __end) {
 		__UINT8_TYPE__ __len;
-		__len = __LIBC_LOCAL_NAME(unicode_utf8seqlen)[(__UINT8_TYPE__)*__iter];
+		__len = __LOCAL_unicode_utf8seqlen[(__UINT8_TYPE__)*__iter];
 		if __unlikely(!__len)
 			__len = 1;
 		__iter += __len;

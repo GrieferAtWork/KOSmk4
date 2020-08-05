@@ -991,7 +991,7 @@ $ssize_t format_width(void *arg,
 	end = (iter = data) + datalen;
 	while (iter < end) {
 		u8 len;
-		len = __LIBC_LOCAL_NAME(@unicode_utf8seqlen@)[(u8)*iter];
+		len = unicode_utf8seqlen[(u8)*iter];
 		if unlikely(!len)
 			len = 1;
 		iter += len;

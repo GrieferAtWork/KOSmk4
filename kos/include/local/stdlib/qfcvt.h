@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb392c2e5 */
+/* HASH CRC-32:0x3ae2d7c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,21 +34,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_qfcvt_r __LIBC_LOCAL_NAME(qfcvt_r)
 #endif /* !__CRT_HAVE_qfcvt_r */
 #endif /* !__local___localdep_qfcvt_r_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qfcvt) __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt))(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {
-	if (__localdep_qfcvt_r(__val, __ndigit, __decptr, __sign,
-	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+
+	static char __qcvt_buffer[32];
+
+	if (__localdep_qfcvt_r(__val, __ndigit, __decptr, __sign, __qcvt_buffer, sizeof(__qcvt_buffer)))
 		return __NULLPTR;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return __qcvt_buffer;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_qfcvt_defined

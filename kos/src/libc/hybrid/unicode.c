@@ -21,6 +21,8 @@
 #define GUARD_LIBC_HYBRID_UNICODE_C 1
 
 #include "../api.h"
+/**/
+
 #include "unicode.h"
 
 DECL_BEGIN

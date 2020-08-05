@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x436cd076 */
+/* HASH CRC-32:0x7ced4179 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -717,39 +717,34 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
 	return 0;
 #endif
 }
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
+static char qcvt_buffer[32];
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
                                  int *__restrict sign) {
-	if (libc_qecvt_r(val, ndigit, decptr, sign,
-	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+
+
+
+	if (libc_qecvt_r(val, ndigit, decptr, sign,  qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
                                  int *__restrict sign) {
-	if (libc_qfcvt_r(val, ndigit, decptr, sign,
-	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+
+
+
+	if (libc_qfcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
 INTERN ATTR_SECTION(".text.crt.utility.locale") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
@@ -760,39 +755,29 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 		return 1;
 	return -1;
 }
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
                                 int ndigit,
                                 int *__restrict decptr,
                                 int *__restrict sign) {
-	if (libc_ecvt_r(val, ndigit, decptr, sign,
-	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+
+
+
+	if (libc_ecvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
                                 int ndigit,
                                 int *__restrict decptr,
                                 int *__restrict sign) {
-	if (libc_fcvt_r(val, ndigit, decptr, sign,
-	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+
+
+
+	if (libc_fcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
 INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,

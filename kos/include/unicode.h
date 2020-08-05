@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9491af55 */
+/* HASH CRC-32:0x6e5ad639 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,20 +43,15 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __utf8_seqlen_defined
+#define __utf8_seqlen_defined 1
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
-#elif defined(__local_utf8_seqlen_defined)
-#if defined(__cplusplus) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
-__NAMESPACE_LOCAL_USING(unicode_utf8seqlen)
-#else /* __cplusplus && !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
-#define unicode_utf8seqlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_utf8seqlen))
-#endif /* !__cplusplus || __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
-#else /* ... */
-__LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seqlen[256] =
-#include "local/utf8-seqlen.h"
-;
-#endif /* !... */
-#define __utf8_seqlen_defined 1
+#else /* __CRT_HAVE_unicode_utf8seqlen */
+#include <local/unicode_utf8seqlen.h>
+#define unicode_utf8seqlen __LOCAL_unicode_utf8seqlen
+#endif /* !__CRT_HAVE_unicode_utf8seqlen */
+#endif /* !__utf8_seqlen_defined */
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
 #define UNICODE_UTF8_MAXLEN   8   /* == unicode_utf8seqlen[0xff] */

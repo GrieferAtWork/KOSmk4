@@ -42,9 +42,6 @@
 /* /kos/src/libc/hybrid/except_to_posix.c */
 %[declare_kernel_export("error_as_errno", "error_as_signal")]
 
-/* /kos/src/libc/hybrid/unicode.c */
-%[declare_kernel_export("unicode_utf8seqlen")]
-
 /* Indicate that we have support for all of the different assert functions. */
 %[declare_kernel_export("__afail", "__afailf")]
 %[declare_user_export("__assert", "__assert_fail", "__assert_func")]

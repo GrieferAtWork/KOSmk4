@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa94ada8 */
+/* HASH CRC-32:0xb42c230c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext) {
 	char const *iter = *ptext;
 	result = (char32_t)(u8)*iter++;
 	if (result >= 0xc0) {
-		switch (__LIBC_LOCAL_NAME(unicode_utf8seqlen)[result]) {
+		switch (unicode_utf8seqlen[result]) {
 
 		case 0:
 		case 1:
@@ -205,7 +205,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext,
 	result = (char32_t)(u8)*iter++;
 	if (result >= 0xc0) {
 		u8 len;
-		len = __LIBC_LOCAL_NAME(unicode_utf8seqlen)[result];
+		len = unicode_utf8seqlen[result];
 		if (iter + len-1 >= text_end)
 			len = (u8)(text_end - iter)+1;
 		switch (len) {

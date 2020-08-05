@@ -1213,38 +1213,35 @@ int qfcvt_r(__LONGDOUBLE val, int ndigit,
 #endif
 }
 
-%[define(DEFINE_QCVT_BUFFER =
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
-@@pop_namespace@@
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
-)]
+%(auto_source){
+#ifndef __KERNEL__
+static char qcvt_buffer[32];
+#endif /* !__KERNEL__ */
+}
 
 
-[[impl_prefix(DEFINE_QCVT_BUFFER)]]
 [[wunused, export_alias("_ecvt")]]
 char *qecvt(__LONGDOUBLE val, int ndigit,
             [[nonnull]] int *__restrict decptr,
             [[nonnull]] int *__restrict sign) {
-	if (qecvt_r(val, ndigit, decptr, sign,
-	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+@@pp_ifndef __BUILDING_LIBC@@
+	static char qcvt_buffer[32];
+@@pp_endif@@
+	if (qecvt_r(val, ndigit, decptr, sign,  qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
 
-[[impl_prefix(DEFINE_QCVT_BUFFER)]]
 [[wunused, export_alias("_fcvt")]]
 char *qfcvt(__LONGDOUBLE val, int ndigit,
             [[nonnull]] int *__restrict decptr,
             [[nonnull]] int *__restrict sign) {
-	if (qfcvt_r(val, ndigit, decptr, sign,
-	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+@@pp_ifndef __BUILDING_LIBC@@
+	static char qcvt_buffer[32];
+@@pp_endif@@
+	if (qfcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
@@ -1552,28 +1549,28 @@ char *mktemp([[nonnull]] char *template_);
 %[default:section(".text.crt{|.dos}.unicode.static.convert")]
 
 %#ifndef __NO_FPU
-[[impl_prefix(DEFINE_QCVT_BUFFER)]]
 [[wunused, export_alias("_ecvt")]]
 char *ecvt(double val, int ndigit,
            [[nonnull]] int *__restrict decptr,
            [[nonnull]] int *__restrict sign) {
-	if (ecvt_r(val, ndigit, decptr, sign,
-	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+@@pp_ifndef __BUILDING_LIBC@@
+	static char qcvt_buffer[32];
+@@pp_endif@@
+	if (ecvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
 
-[[impl_prefix(DEFINE_QCVT_BUFFER)]]
 [[wunused, export_alias("_ecvt")]]
 char *fcvt(double val, int ndigit,
            [[nonnull]] int *__restrict decptr,
            [[nonnull]] int *__restrict sign) {
-	if (fcvt_r(val, ndigit, decptr, sign,
-	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
-	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
+@@pp_ifndef __BUILDING_LIBC@@
+	static char qcvt_buffer[32];
+@@pp_endif@@
+	if (fcvt_r(val, ndigit, decptr, sign, qcvt_buffer, sizeof(qcvt_buffer)))
 		return NULL;
-	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
+	return qcvt_buffer;
 }
 %#endif /* !__NO_FPU */
 

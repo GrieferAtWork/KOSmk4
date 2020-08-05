@@ -21,12 +21,17 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(COMPILER_ENDOF = __COMPILER_ENDOF)]
+%[define_replacement(unicode_utf8seqlen = __LOCAL_unicode_utf8seqlen)]
 %[default:section(".text.crt{|.dos}.unicode.UTF")]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
 
 %[declare_user_export("__unicode_asciiflags")]
 %[declare_user_export("__unicode_descriptor")]
 %[declare_user_export("unicode_fold")]
+
+/* /kos/src/libc/hybrid/unicode.c */
+%[declare_kernel_export("unicode_utf8seqlen")]
+
 
 %{
 #include <features.h>
@@ -44,20 +49,15 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __utf8_seqlen_defined
+#define __utf8_seqlen_defined 1
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
-#elif defined(__local_utf8_seqlen_defined)
-#if defined(__cplusplus) && !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)
-__NAMESPACE_LOCAL_USING(unicode_utf8seqlen)
-#else /* __cplusplus && !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
-#define unicode_utf8seqlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_utf8seqlen))
-#endif /* !__cplusplus || __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
-#else /* ... */
-__LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const unicode_utf8seqlen[256] =
-#include "local/utf8-seqlen.h"
-;
-#endif /* !... */
-#define __utf8_seqlen_defined 1
+#else /* __CRT_HAVE_unicode_utf8seqlen */
+#include <local/unicode_utf8seqlen.h>
+#define unicode_utf8seqlen __LOCAL_unicode_utf8seqlen
+#endif /* !__CRT_HAVE_unicode_utf8seqlen */
+#endif /* !__utf8_seqlen_defined */
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
 #define UNICODE_UTF8_MAXLEN   8   /* == unicode_utf8seqlen[0xff] */
@@ -137,7 +137,7 @@ $char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 	char const *iter = *ptext;
 	result = (char32_t)(u8)*iter++;
 	if (result >= 0xc0) {
-		switch (__LIBC_LOCAL_NAME(@unicode_utf8seqlen@)[result]) {
+		switch (unicode_utf8seqlen[result]) {
 
 		case 0:
 		case 1:
@@ -315,7 +315,7 @@ $char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext
 	result = (char32_t)(u8)*iter++;
 	if (result >= 0xc0) {
 		u8 len;
-		len = __LIBC_LOCAL_NAME(@unicode_utf8seqlen@)[result];
+		len = unicode_utf8seqlen[result];
 		if (iter + len-1 >= text_end)
 			len = (u8)(text_end - iter)+1;
 		switch (len) {
