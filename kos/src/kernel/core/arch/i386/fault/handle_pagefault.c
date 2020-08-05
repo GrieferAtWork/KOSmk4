@@ -340,6 +340,13 @@ nope:
 
 #endif /* CONFIG_NO_SMP */
 
+PRIVATE ATTR_NORETURN void FCALL
+rethrow_exception_from_pf_handler(struct icpustate *__restrict state, uintptr_t pc) {
+	pc = (uintptr_t)instruction_trysucc((void const *)pc,
+	                                    instrlen_isa_from_icpustate(state));
+	icpustate_setpc(state, pc);
+	RETHROW();
+}
 
 
 INTERN struct icpustate *FCALL
@@ -353,7 +360,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	((uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) | \
 	 (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0))
 #endif
-
 
 #if 1
 #define isuser() (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
@@ -797,9 +803,14 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							}
 							decref_unlikely(args.vea_args.va_block);
 							assert(args.vea_args.va_part == part);
-							/*decref_unlikely(args.vea_args.va_part);*/ /* Handled by outer EXCEPT */
-							/*task_popconnections(args.ma_oldcons);*/ /* Handled by outer EXCEPT */
-							RETHROW(); /* Except blocks below will already cleanup `part' and `&con' */
+							/* Directly unwind the exception, since we've got a custom return-pc set-up.
+							 * If we did a normal RETHROW() here, then the (currently correct) return PC
+							 * would get overwritten with the VIO function address. */
+							decref_unlikely(args.vea_args.va_part);
+							task_popconnections(&con);
+							if (isuser())
+								PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
+							x86_userexcept_unwind_interrupt(state);
 						}
 						assert(args.vea_args.va_part == part);
 						decref_unlikely(args.vea_args.va_block);
@@ -1034,7 +1045,7 @@ done_before_pop_connections:
 			task_popconnections(&con);
 			if (isuser())
 				PERTASK_SET(this_exception_faultaddr, (void *)pc);
-			RETHROW();
+			rethrow_exception_from_pf_handler(state, pc);
 		}
 		task_popconnections(&con);
 		__IF0 {
@@ -1080,7 +1091,7 @@ throw_segfault:
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
 					PERTASK_SET(this_exception_faultaddr, (void *)pc);
-				RETHROW();
+				rethrow_exception_from_pf_handler(state, pc);
 			}
 			goto not_a_badcall;
 		}
@@ -1115,7 +1126,7 @@ throw_segfault:
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
 					PERTASK_SET(this_exception_faultaddr, (void *)pc);
-				RETHROW();
+				rethrow_exception_from_pf_handler(state, pc);
 			}
 			/* Discard read-from-callsite_pc exception... */
 		}
