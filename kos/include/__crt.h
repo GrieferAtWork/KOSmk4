@@ -181,7 +181,11 @@
 #define __NAMESPACE_FAST_END                 }
 #define __NAMESPACE_FAST_SYM                 ::__optimized_imp::
 #define __NAMESPACE_FAST_USING(x)            using ::__optimized_imp::x;
+#ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
+#define __NAMESPACE_FAST_USING_OR_IMPL(x, i) i
+#else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __NAMESPACE_FAST_USING_OR_IMPL(x, i) using ::__optimized_imp::x;
+#endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __LIBC_FAST_NAME(x)                  x
 #else /* __cplusplus */
 #define __NAMESPACE_FAST_BEGIN               /* nothing */
@@ -198,7 +202,11 @@
 #define __NAMESPACE_LOCAL_END                 }
 #define __NAMESPACE_LOCAL_SYM                 ::__local_imp::
 #define __NAMESPACE_LOCAL_USING(x)            using ::__local_imp::x;
+#ifdef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
+#define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) i
+#else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x, i) using ::__local_imp::x;
+#endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __LIBC_LOCAL_NAME(x)                  x
 #else /* __cplusplus */
 #define __NAMESPACE_LOCAL_BEGIN               /* nothing */

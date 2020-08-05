@@ -357,7 +357,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __imaxdiv_t_defined
 #define __imaxdiv_t_defined 1
-__NAMESPACE_STD_USING(imaxdiv_t)
+__NAMESPACE_STD_USING_TYPE(imaxdiv_t)
 #endif /* !__imaxdiv_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */

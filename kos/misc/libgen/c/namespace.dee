@@ -73,18 +73,17 @@ class Namespace {
 	public operator != (other: Namespace): bool -> this !== other;
 }
 
-local function _globalNamespaceUsing(fp: File, name: string, ...) {
-	fp << "__NAMESPACE_GLB_USING(" << name << ")\n";
-}
-local function _stdNamespaceUsing(fp: File, name: string, ...) {
-	fp << "__NAMESPACE_STD_USING(" << name << ")\n";
-}
-
 @@The default, global/root namespace (the only existing namespace in C)
 global final GLOBAL_NAMESPACE: Namespace = Namespace(
 	name: "", enter: "", leave: "", prefix: "",
-	keyUsing:       _globalNamespaceUsing,
-	keyUsingOrImpl: _globalNamespaceUsing,
+	keyUsing: [](fp: File, name: string) {
+		fp << "__NAMESPACE_GLB_USING(" << name << ")\n";
+	},
+	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+		fp << "__NAMESPACE_GLB_USING_OR_IMPL(" << name << ", ";
+		impl();
+		fp << ")\n";
+	},
 	keyCSymbolName: functools.identity,
 	keyDefaultGuard: [](symbolName: string): string {
 		return "__{}_defined".format({ symbolName });
@@ -141,8 +140,14 @@ global NAMESPACES: {string: Namespace} = Dict {
 		enter:          "__NAMESPACE_STD_BEGIN\n",
 		leave:          "__NAMESPACE_STD_END\n",
 		prefix:         "__NAMESPACE_STD_SYM",
-		keyUsing:       _stdNamespaceUsing,
-		keyUsingOrImpl: _stdNamespaceUsing,
+		keyUsing:       [](fp: File, name: string) {
+			fp << "__NAMESPACE_STD_USING(" << name << ")\n";
+		},
+		keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+			fp << "__NAMESPACE_STD_USING_OR_IMPL(" << name << ", ";
+			impl();
+			fp << ")\n";
+		},
 		keyCSymbolName: functools.identity,
 		keyDefaultGuard: [](symbolName: string) {
 			return "__std_{}_defined".format({ symbolName });

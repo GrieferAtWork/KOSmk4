@@ -52,7 +52,7 @@ typedef size_t rsize_t;
 #include <hybrid/typecore.h>
 
 #include <asm/crt/stdio.h> /* __WEOF */
-#include <bits/crt/tm.h> /* struct tm */
+#include <bits/crt/tm.h>   /* struct tm */
 #include <bits/mbstate.h>
 #include <kos/anno.h>
 
@@ -95,7 +95,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-__NAMESPACE_STD_USING(mbstate_t)
+__NAMESPACE_STD_USING_TYPE(mbstate_t)
 #endif /* !__mbstate_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -114,7 +114,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -147,11 +147,11 @@ __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING(wint_t)
+__NAMESPACE_STD_USING_TYPE(wint_t)
 #endif /* !__wint_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */

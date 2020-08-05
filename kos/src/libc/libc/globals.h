@@ -118,7 +118,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 #undef __local_stdstream_defined
 #undef __stdstreams_defined

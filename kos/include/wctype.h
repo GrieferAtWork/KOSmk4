@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50af3ad0 */
+/* HASH CRC-32:0x5bc141f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,16 @@
 /* Import all symbols into the global namespace when re-including "wctype.h" after "cwctype" */
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING(wint_t)
+__NAMESPACE_STD_USING_TYPE(wint_t)
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING(wctype_t)
+__NAMESPACE_STD_USING_TYPE(wctype_t)
 #endif /* !__wctype_t_defined */
 #if defined(__USE_ISOC99) || defined(__USE_XOPEN2K8)
 #ifndef __wctrans_t_defined
 #define __wctrans_t_defined 1
-__NAMESPACE_STD_USING(wctrans_t)
+__NAMESPACE_STD_USING_TYPE(wctrans_t)
 #endif /* !__wctrans_t_defined */
 #endif /* __USE_ISOC99 || __USE_XOPEN2K8 */
 __NAMESPACE_STD_USING(iswalnum)
@@ -111,11 +111,11 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING(wint_t)
+__NAMESPACE_STD_USING_TYPE(wint_t)
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING(wctype_t)
+__NAMESPACE_STD_USING_TYPE(wctype_t)
 #endif /* !__wctype_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -144,7 +144,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __wctrans_t_defined
 #define __wctrans_t_defined 1
-__NAMESPACE_STD_USING(wctrans_t)
+__NAMESPACE_STD_USING_TYPE(wctrans_t)
 #endif /* !__wctrans_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_ISOC99 || __USE_XOPEN2K8 */
@@ -568,7 +568,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(towctrans_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifdef __USE_DOS
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING(wctype_t)
+__NAMESPACE_STD_USING_TYPE(wctype_t)
 #endif /* !__wctype_t_defined */
 #ifndef _WCTYPE_DEFINED
 #define _WCTYPE_DEFINED 1

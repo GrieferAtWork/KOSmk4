@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x279823cd */
+/* HASH CRC-32:0x935bb5f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@
 /* Import all symbols into the global namespace when re-including "wchar.h" after "cwchar" */
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-__NAMESPACE_STD_USING(mbstate_t)
+__NAMESPACE_STD_USING_TYPE(mbstate_t)
 #endif /* !__mbstate_t_defined */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K) || defined(__USE_DOS)
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K || __USE_DOS */
 #ifndef __tm_defined
@@ -42,11 +42,11 @@ __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING(wint_t)
+__NAMESPACE_STD_USING_TYPE(wint_t)
 #endif /* !__wint_t_defined */
 __NAMESPACE_STD_USING(btowc)
 __NAMESPACE_STD_USING(wctob)
@@ -270,7 +270,7 @@ __NAMESPACE_STD_USING(wmempmove)
 #include <hybrid/typecore.h>
 
 #include <asm/crt/stdio.h> /* __WEOF */
-#include <bits/crt/tm.h> /* struct tm */
+#include <bits/crt/tm.h>   /* struct tm */
 #include <bits/mbstate.h>
 #include <kos/anno.h>
 
@@ -312,7 +312,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-__NAMESPACE_STD_USING(mbstate_t)
+__NAMESPACE_STD_USING_TYPE(mbstate_t)
 #endif /* !__mbstate_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -327,7 +327,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K || __USE_DOS */
@@ -356,11 +356,11 @@ __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING(wint_t)
+__NAMESPACE_STD_USING_TYPE(wint_t)
 #endif /* !__wint_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

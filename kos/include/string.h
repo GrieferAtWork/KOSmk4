@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecc8fc1 */
+/* HASH CRC-32:0x5aadf132 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@
 /* Import all symbols into the global namespace when re-including "string.h" after "cstring" */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
 #define ____forward_size_defined 1
-__NAMESPACE_STD_USING(__forward_size)
+__NAMESPACE_STD_USING_OR_IMPL(__forward_size, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; })
 #endif /* __std___forward_size_defined && !____forward_size_defined */
 __NAMESPACE_STD_USING(memcpy)
 __NAMESPACE_STD_USING(memmove)
@@ -102,11 +102,11 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
 #define ____forward_size_defined 1
-__NAMESPACE_STD_USING(__forward_size)
+__NAMESPACE_STD_USING_OR_IMPL(__forward_size, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; })
 #endif /* __std___forward_size_defined && !____forward_size_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -7749,7 +7749,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t
 __NAMESPACE_STD_END
 #endif /* !__std___forward_size_defined */
 #ifndef __CXX_SYSTEM_HEADER
-__NAMESPACE_STD_USING(__forward_size)
+__NAMESPACE_STD_USING_OR_IMPL(__forward_size, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; })
 #endif /* !__CXX_SYSTEM_HEADER */
 #define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */

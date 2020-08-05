@@ -509,7 +509,7 @@ __FORCELOCAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(void *__x) { return _
 __NAMESPACE_STD_END
 #ifndef __forward_voidp_defined
 #define __forward_voidp_defined 1
-__NAMESPACE_STD_USING(__forward_voidp)
+__NAMESPACE_STD_USING_OR_IMPL(__forward_voidp, __FORCELOCAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(void *__x) { return __x; })
 #endif /* !__forward_voidp_defined */
 #endif /* !__std___forward_voidp_defined */
 #endif /* __cplusplus */

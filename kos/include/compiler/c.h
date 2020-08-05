@@ -18,25 +18,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-#define __DECL_BEGIN               /* nothing */
-#define __DECL_END                 /* nothing */
-#define __CXX11_CONSTEXPR          /* nothing */
-#define __CXX11_CONSTEXPR_OR_CONST const
-#define __CXX14_CONSTEXPR          /* nothing */
-#define __CXX14_CONSTEXPR_OR_CONST const
-#define __CXX_NOEXCEPT             /* nothing */
-#define __NAMESPACE_STD_BEGIN      /* nothing */
-#define __NAMESPACE_STD_END        /* nothing */
-#define __NAMESPACE_STD_SYM        /* nothing */
-#define __NAMESPACE_STD_USING(x)   /* nothing */
-#define __NAMESPACE_GLB_USING(x)   /* nothing */
-#define __NAMESPACE_INT_BEGIN      /* nothing */
-#define __NAMESPACE_INT_END        /* nothing */
-#define __NAMESPACE_INT_SYM        /* nothing */
-#define __NAMESPACE_INT_LSYM       /* nothing */
-#define __NAMESPACE_INT_USING(x)   /* nothing */
-#define __DFL(expr)                /* nothing */
-#define __register                 register
+#define __DECL_BEGIN                        /* nothing */
+#define __DECL_END                          /* nothing */
+#define __CXX11_CONSTEXPR                   /* nothing */
+#define __CXX11_CONSTEXPR_OR_CONST          const
+#define __CXX14_CONSTEXPR                   /* nothing */
+#define __CXX14_CONSTEXPR_OR_CONST          const
+#define __CXX_NOEXCEPT                      /* nothing */
+#define __NAMESPACE_STD_BEGIN               /* nothing */
+#define __NAMESPACE_STD_END                 /* nothing */
+#define __NAMESPACE_STD_SYM                 /* nothing */
+#define __NAMESPACE_STD_USING(x)            /* nothing */
+#define __NAMESPACE_STD_USING_OR_IMPL(x, i) /* nothing */
+#define __NAMESPACE_STD_USING_TYPE(x)       /* nothing */
+#define __NAMESPACE_GLB_USING(x)            /* nothing */
+#define __NAMESPACE_GLB_USING_TYPE(x)       /* nothing */
+#define __NAMESPACE_GLB_USING_OR_IMPL(x, i) /* nothing */
+#define __NAMESPACE_INT_BEGIN               /* nothing */
+#define __NAMESPACE_INT_END                 /* nothing */
+#define __NAMESPACE_INT_SYM                 /* nothing */
+#define __NAMESPACE_INT_LSYM                /* nothing */
+#define __DFL(expr)                         /* nothing */
+#define __register                          register
 
 #if 1
 #define __BOOL _Bool
@@ -45,4 +48,3 @@
 #endif
 
 #define __COMPILER_REQTYPE(T, v) (v)
-

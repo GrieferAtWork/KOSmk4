@@ -50,7 +50,7 @@ __NAMESPACE_STD_END
 }%(c,ccompat){
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-__NAMESPACE_STD_USING(mbstate_t)
+__NAMESPACE_STD_USING_TYPE(mbstate_t)
 #endif /* !__mbstate_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -67,7 +67,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */

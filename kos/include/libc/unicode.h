@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8ecf182 */
+/* HASH CRC-32:0xa8215a85 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,7 @@
 #define __LIBC_UNICODE_16TO32_MAXBUF(num_chars) (num_chars)
 #define __LIBC_UNICODE_32TO8_MAXBUF(num_chars)  ((num_chars) * 7)
 #define __LIBC_UNICODE_32TO16_MAXBUF(num_chars) ((num_chars) * 2)
+#include <hybrid/typecore.h>
 
 __DECL_BEGIN
 
@@ -107,7 +108,7 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 #define ____unicode_asciiflags_defined 1
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
-#define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
+#define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__UINT8_TYPE__)(ch)] : __unicode_descriptor(ch)->__ut_flags)
 #define __libc_unicode_asciiisupper(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FUPPER)
 #define __libc_unicode_asciiislower(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FLOWER)
 #define __libc_unicode_asciitolower(ch) (__libc_unicode_asciiisupper(ch) ? (__UINT8_TYPE__)(ch) + 0x20 : (__UINT8_TYPE__)(ch))

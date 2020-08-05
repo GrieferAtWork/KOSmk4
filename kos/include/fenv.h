@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e722fb4 */
+/* HASH CRC-32:0x63ebed13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@
 #ifndef __NO_FPU
 #ifndef ___fenv_t_defined
 #define ___fenv_t_defined 1
-__NAMESPACE_STD_USING(fenv_t)
+__NAMESPACE_STD_USING_TYPE(fenv_t)
 #endif /* !___fenv_t_defined */
 #ifndef __fexcept_t_defined
 #define __fexcept_t_defined 1
-__NAMESPACE_STD_USING(fexcept_t)
+__NAMESPACE_STD_USING_TYPE(fexcept_t)
 #endif /* !__fexcept_t_defined */
 __NAMESPACE_STD_USING(feclearexcept)
 __NAMESPACE_STD_USING(feraiseexcept)
@@ -102,11 +102,11 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef ___fenv_t_defined
 #define ___fenv_t_defined 1
-__NAMESPACE_STD_USING(fenv_t)
+__NAMESPACE_STD_USING_TYPE(fenv_t)
 #endif /* !___fenv_t_defined */
 #ifndef __fexcept_t_defined
 #define __fexcept_t_defined 1
-__NAMESPACE_STD_USING(fexcept_t)
+__NAMESPACE_STD_USING_TYPE(fexcept_t)
 #endif /* !__fexcept_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

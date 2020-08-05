@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa11f2932 */
+/* HASH CRC-32:0x4b062fa9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 /* Import all symbols into the global namespace when re-including "stdio.h" after "cstdio" */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __fpos_t_defined
 #define __fpos_t_defined 1
-__NAMESPACE_STD_USING(fpos_t)
+__NAMESPACE_STD_USING_TYPE(fpos_t)
 #endif /* !__fpos_t_defined */
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 #if !defined(__remove_defined) && defined(__std_remove_defined)
 #define __remove_defined 1
@@ -320,7 +320,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -352,7 +352,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __fpos_t_defined
 #define __fpos_t_defined 1
-__NAMESPACE_STD_USING(fpos_t)
+__NAMESPACE_STD_USING_TYPE(fpos_t)
 #endif /* !__fpos_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -372,7 +372,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -3205,7 +3205,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 
 

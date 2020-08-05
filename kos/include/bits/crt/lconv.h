@@ -147,7 +147,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __lconv_defined
 #define __lconv_defined 1
-__NAMESPACE_STD_USING(lconv)
+__NAMESPACE_STD_USING_TYPE(lconv)
 #endif /* !__lconv_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

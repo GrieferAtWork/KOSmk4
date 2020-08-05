@@ -27,15 +27,15 @@
 /* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __ptrdiff_t_defined
 #define __ptrdiff_t_defined 1
-__NAMESPACE_STD_USING(ptrdiff_t)
+__NAMESPACE_STD_USING_TYPE(ptrdiff_t)
 #endif /* !__ptrdiff_t_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __max_align_t_defined
 #define __max_align_t_defined 1
-__NAMESPACE_STD_USING(max_align_t)
+__NAMESPACE_STD_USING_TYPE(max_align_t)
 #endif /* !__max_align_t_defined */
 #undef _CXX_STDONLY_CSTDDEF
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -90,15 +90,15 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __ptrdiff_t_defined
 #define __ptrdiff_t_defined 1
-__NAMESPACE_STD_USING(ptrdiff_t)
+__NAMESPACE_STD_USING_TYPE(ptrdiff_t)
 #endif /* !__ptrdiff_t_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __max_align_t_defined
 #define __max_align_t_defined 1
-__NAMESPACE_STD_USING(max_align_t)
+__NAMESPACE_STD_USING_TYPE(max_align_t)
 #endif /* !__max_align_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

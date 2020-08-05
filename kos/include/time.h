@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e17bccd */
+/* HASH CRC-32:0x73a23a8b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 /* Import all symbols into the global namespace when re-including "time.h" after "ctime" */
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-__NAMESPACE_STD_USING(clock_t)
+__NAMESPACE_STD_USING_TYPE(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
 #define __time_t_defined 1
-__NAMESPACE_STD_USING(time_t)
+__NAMESPACE_STD_USING_TYPE(time_t)
 #endif /* !__time_t_defined */
 #ifndef __tm_defined
 #define __tm_defined 1
@@ -178,15 +178,15 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-__NAMESPACE_STD_USING(clock_t)
+__NAMESPACE_STD_USING_TYPE(clock_t)
 #endif /* !__clock_t_defined */
 #ifndef __time_t_defined
 #define __time_t_defined 1
-__NAMESPACE_STD_USING(time_t)
+__NAMESPACE_STD_USING_TYPE(time_t)
 #endif /* !__time_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

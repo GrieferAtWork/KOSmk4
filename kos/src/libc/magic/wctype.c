@@ -93,11 +93,11 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
-__NAMESPACE_STD_USING(wint_t)
+__NAMESPACE_STD_USING_TYPE(wint_t)
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-__NAMESPACE_STD_USING(wctype_t)
+__NAMESPACE_STD_USING_TYPE(wctype_t)
 #endif /* !__wctype_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -132,7 +132,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __wctrans_t_defined
 #define __wctrans_t_defined 1
-__NAMESPACE_STD_USING(wctrans_t)
+__NAMESPACE_STD_USING_TYPE(wctrans_t)
 #endif /* !__wctrans_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -402,7 +402,7 @@ $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 %#ifdef __USE_DOS
 %#ifndef __wctype_t_defined
 %#define __wctype_t_defined 1
-%__NAMESPACE_STD_USING(wctype_t)
+%__NAMESPACE_STD_USING_TYPE(wctype_t)
 %#endif /* !__wctype_t_defined */
 %#ifndef _WCTYPE_DEFINED
 %#define _WCTYPE_DEFINED 1

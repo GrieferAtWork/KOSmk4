@@ -33,6 +33,7 @@
 
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+#include <hybrid/typecore.h>
 
 #include <bits/format-printer.h>
 #include <bits/mbstate.h>
@@ -1792,7 +1793,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __b
 #define ____unicode_asciiflags_defined 1
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
-#define __unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
+#define __unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__UINT8_TYPE__)(ch)] : __unicode_descriptor(ch)->__ut_flags)
 #define __unicode_asciiisupper(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FUPPER)
 #define __unicode_asciiislower(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FLOWER)
 #define __unicode_asciitolower(ch) (__unicode_asciiisupper(ch) ? (__UINT8_TYPE__)(ch) + 0x20 : (__UINT8_TYPE__)(ch))
@@ -1883,6 +1884,7 @@ __SYSDECL_END
 }
 
 %(libc_fast){
+#include <hybrid/typecore.h>
 
 __DECL_BEGIN
 
@@ -1933,7 +1935,7 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 #define ____unicode_asciiflags_defined 1
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
-#define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
+#define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__UINT8_TYPE__)(ch)] : __unicode_descriptor(ch)->__ut_flags)
 #define __libc_unicode_asciiisupper(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FUPPER)
 #define __libc_unicode_asciiislower(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FLOWER)
 #define __libc_unicode_asciitolower(ch) (__libc_unicode_asciiisupper(ch) ? (__UINT8_TYPE__)(ch) + 0x20 : (__UINT8_TYPE__)(ch))

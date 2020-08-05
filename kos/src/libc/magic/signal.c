@@ -1037,7 +1037,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __sig_atomic_t_defined
 #define __sig_atomic_t_defined 1
-__NAMESPACE_STD_USING(sig_atomic_t)
+__NAMESPACE_STD_USING_TYPE(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -1093,7 +1093,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */

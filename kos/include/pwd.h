@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x787b3e16 */
+/* HASH CRC-32:0xfe840b5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 

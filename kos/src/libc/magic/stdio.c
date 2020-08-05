@@ -224,7 +224,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -258,7 +258,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __fpos_t_defined
 #define __fpos_t_defined 1
-__NAMESPACE_STD_USING(fpos_t)
+__NAMESPACE_STD_USING_TYPE(fpos_t)
 #endif /* !__fpos_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -280,7 +280,7 @@ __NAMESPACE_STD_END
 }%(c, ccompat){
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -2416,7 +2416,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_FILE_defined */
 #ifndef __FILE_defined
 #define __FILE_defined 1
-__NAMESPACE_STD_USING(FILE)
+__NAMESPACE_STD_USING_TYPE(FILE)
 #endif /* !__FILE_defined */
 
 }

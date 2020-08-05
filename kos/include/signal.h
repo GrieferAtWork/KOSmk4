@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbe70687 */
+/* HASH CRC-32:0xb916112d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@
 /* Import all symbols into the global namespace when re-including "signal.h" after "csignal" */
 #ifndef __sig_atomic_t_defined
 #define __sig_atomic_t_defined 1
-__NAMESPACE_STD_USING(sig_atomic_t)
+__NAMESPACE_STD_USING_TYPE(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 #ifdef __CRT_HAVE_raise
@@ -1049,7 +1049,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __sig_atomic_t_defined
 #define __sig_atomic_t_defined 1
-__NAMESPACE_STD_USING(sig_atomic_t)
+__NAMESPACE_STD_USING_TYPE(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -1101,7 +1101,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-__NAMESPACE_STD_USING(size_t)
+__NAMESPACE_STD_USING_TYPE(size_t)
 #endif /* !__size_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
