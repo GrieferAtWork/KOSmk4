@@ -447,6 +447,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Decompressed driver section data should be reference counted, such that (then)
 	 *       unused sections can be lazily unloaded during calls to `system_clearcache()' */
 
+	/* TODO: Add auto-completion to the `cpuid' debugger command.
+	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */
+
 	return state;
 }
 

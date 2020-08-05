@@ -40,22 +40,29 @@
 #define __FORMAT_ARGS     args
 #endif /* !__FORMAT_ARGS */
 
-#include <hybrid/typecore.h>
-
-#ifndef __EOF
-#ifdef EOF
-#define __EOF  EOF
-#else /* EOF */
-#define __EOF (-1)
-#endif /* !EOF */
-#endif /* !__EOF */
+#include <__stdinc.h>
 
 #include <hybrid/typecore.h>
 
+#include <asm/crt/stdio.h> /* __EOF */
+
+#ifdef __INTELLISENSE__
+#include <bits/format-printer.h>
+
+#include <libc/string.h>
+#include <libc/unicode.h>
+
+extern "C" __SSIZE_TYPE__
+format_vscanf(__pformatgetc __FORMAT_PGETC,
+              __pformatungetc __FORMAT_PUNGETC,
+              void *__FORMAT_ARG,
+              __CHAR_TYPE const *__restrict __FORMAT_FORMAT,
+              __builtin_va_list __FORMAT_ARGS)
+#endif /* __INTELLISENSE__ */
 {
-	__size_t __read_count = 0;
-	__ssize_t __result = 0;
-	__ssize_t __temp = 0; /* XXX: Unused init! */
+	__SIZE_TYPE__ __read_count = 0;
+	__SSIZE_TYPE__ __result = 0;
+	__SSIZE_TYPE__ __temp = 0; /* XXX: Unused init! */
 	__BOOL __has_temp = 0;
 	__CHAR_TYPE __ch;
 __next:
@@ -134,7 +141,7 @@ __next_mod_curr:
 			__flags |= __SCANF_FLAG_IGNORED;
 			goto __next_mod;
 		case '$':
-			__bufsize = __builtin_va_arg(__FORMAT_ARGS,__SIZE_TYPE__);
+			__bufsize = __builtin_va_arg(__FORMAT_ARGS, __SIZE_TYPE__);
 			goto __next_mod;
 		case 'h':
 			__ch = *__FORMAT_FORMAT++;
@@ -169,7 +176,7 @@ __next_mod_curr:
 			__type_size = sizeof(__SIZE_TYPE__);
 			goto __next_mod;
 		case 'L':
-			/* NOTE: Also functions as `long long' for d,i,o,u or x */
+			/* NOTE: Also functions as `long long' for d, i, o, u or x */
 			__type_size = (__SIZE_TYPE__)__ch;
 			goto __next_mod;
 		case 'I':
@@ -486,10 +493,10 @@ __done_string_terminate_eof:
 							break;
 						if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
 							break;
-						__cnt = (__SIZE_TYPE__)(__libc_unicode_writeutf8(__buf,(__CHAR32_TYPE__)__temp) - __buf);
+						__cnt = (__SIZE_TYPE__)(__libc_unicode_writeutf8(__buf, (__CHAR32_TYPE__)__temp) - __buf);
 						if (__cnt >= __bufsize) /* >=, so we always keep some space for the trailing `\0' */
 							goto __end_unget; /* Buffer too small... */
-						__libc_memcpy(__dst,__buf,__cnt);
+						__libc_memcpyc(__dst, __buf, __cnt, sizeof(char));
 						__dst += __cnt;
 						__bufsize -= __cnt;
 						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
@@ -512,7 +519,7 @@ __done_string_terminate_eof:
 			char *__dst;
 			__CHAR_TYPE const *__pattern_start;
 			__CHAR_TYPE const *__iter;
-			__CHAR32_TYPE__ __pat_ch,__pat_ch2;
+			__CHAR32_TYPE__ __pat_ch, __pat_ch2;
 			/* [OPT] bufsize = va_arg(size_t)
 			 * READ_MATCHING_CHARACTERS(maxchars: __width)
 			 * WRITE_UTF8(dst: va_arg(char *), maxbytes: bufsize) */
@@ -534,12 +541,12 @@ __done_string_terminate_eof:
 						if (!__width)
 							break;
 						for (__iter = __pattern_start; __iter < __FORMAT_FORMAT;) {
-							__pat_ch = __libc_unicode_readutf8_n((char const **)&__iter,__FORMAT_FORMAT);
+							__pat_ch = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
 							if ((__CHAR32_TYPE__)__temp == __pat_ch)
 								goto __pattern_skip_has_char;
 							if (*__iter == '-') {
 								++__iter;
-								__pat_ch2 = __libc_unicode_readutf8_n((char const **)&__iter,__FORMAT_FORMAT);
+								__pat_ch2 = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
 								if ((__CHAR32_TYPE__)__temp >= __pat_ch && (__CHAR32_TYPE__)__temp <= __pat_ch2)
 									goto __pattern_skip_has_char;
 							}
@@ -580,22 +587,22 @@ __done_pattern_terminate_eof:
 						if (!__width)
 							break;
 						for (__iter = __pattern_start; __iter < __FORMAT_FORMAT;) {
-							__pat_ch = __libc_unicode_readutf8_n((char const **)&__iter,__FORMAT_FORMAT);
+							__pat_ch = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
 							if ((__CHAR32_TYPE__)__temp == __pat_ch)
 								goto __pattern_has_char;
 							if (*__iter == '-') {
 								++__iter;
-								__pat_ch2 = __libc_unicode_readutf8_n((char const **)&__iter,__FORMAT_FORMAT);
+								__pat_ch2 = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
 								if ((__CHAR32_TYPE__)__temp >= __pat_ch && (__CHAR32_TYPE__)__temp <= __pat_ch2)
 									goto __pattern_has_char;
 							}
 						}
 						break;
 __pattern_has_char:
-						__cnt = (__SIZE_TYPE__)(__libc_unicode_writeutf8(__buf,(__CHAR32_TYPE__)__temp) - __buf);
+						__cnt = (__SIZE_TYPE__)(__libc_unicode_writeutf8(__buf, (__CHAR32_TYPE__)__temp) - __buf);
 						if (__cnt >= __bufsize) /* >=, so we always keep some space for the trailing `\0' */
 							goto __end_unget; /* Buffer too small... */
-						__libc_memcpy(__dst,__buf,__cnt);
+						__libc_memcpy(__dst, __buf, __cnt);
 						__dst += __cnt;
 						__bufsize -= __cnt;
 						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
@@ -693,13 +700,13 @@ __read_temp_for_format_c:
 			}
 			break;
 		}
-	}	break;
 #undef __SCANF_FLAG_INSIDE
 #undef __SCANF_FLAG_IGNORED
 #undef __SCANF_FLAG_ISEOF
 #undef __SCANF_FLAG_UNSIGNED
 #undef __SCANF_FLAG_INVERT
 #undef __SCANF_FLAG_SIGNED
+	}	break;
 
 	default:
 		/* Default: match characters exactly. */
@@ -719,7 +726,7 @@ __match_ch:
 __end_maybe_unget:
 	if (__has_temp) {
 __end_unget:
-		__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG,(__CHAR32_TYPE__)__temp);
+		__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, (__CHAR32_TYPE__)__temp);
 		if (__temp < 0)
 			goto __err;
 	}

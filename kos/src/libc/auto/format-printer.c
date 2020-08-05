@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17e09380 */
+/* HASH CRC-32:0x56cb2791 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -945,6 +945,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1,
                               void *arg,
                               char const *__restrict format,
                               va_list args) THROWS(...) {
+#ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
 #define __FORMAT_PGETC   pgetc
@@ -953,6 +954,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1,
 #define __FORMAT_FORMAT  format
 #define __FORMAT_ARGS    args
 #include <local/format-scanf.h>
+#endif /* !__INTELLISENSE__ */
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Generic scanf implementation

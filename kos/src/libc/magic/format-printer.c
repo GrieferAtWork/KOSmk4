@@ -895,6 +895,7 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
                        [[nonnull]] pformatungetc pungetc, void *arg,
                        [[nonnull]] char const *__restrict format, $va_list args) {
+#ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
 #define __FORMAT_PGETC   pgetc
@@ -903,6 +904,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 #define __FORMAT_FORMAT  format
 #define __FORMAT_ARGS    args
 #include <local/format-scanf.h>
+#endif /* !__INTELLISENSE__ */
 }
 
 [[throws, ATTR_LIBC_SCANF(4, 5)]]

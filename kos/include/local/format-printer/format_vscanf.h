@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77e83492 */
+/* HASH CRC-32:0xd413334b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,6 +96,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_vscanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
+#ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
 #define __FORMAT_PGETC   __pgetc
@@ -104,6 +105,7 @@ __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __
 #define __FORMAT_FORMAT  __format
 #define __FORMAT_ARGS    __args
 #include <local/format-scanf.h>
+#endif /* !__INTELLISENSE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_vscanf_defined
