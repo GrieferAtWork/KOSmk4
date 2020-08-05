@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb84040cd */
+/* HASH CRC-32:0x74be71ec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,23 +88,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
 #endif /* !__CRT_HAVE_strsignal_s */
 #endif /* !__local___localdep_strsignal_s_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __local_strsignal_buf_defined
-#define __local_strsignal_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__strsignal_buf) char __strsignal_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strsignal_buf_defined */
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strsignal) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(__signo_t __signo) {
-	char *__result = __NAMESPACE_LOCAL_SYM __strsignal_buf;
+	static char __strsignal_buf[64];
+	char *__result = __strsignal_buf;
 	char const *__string;
 	__string = __localdep_strsignal_s(__signo);
 	if (__string) {
 		/* Copy the descriptor text. */
-		__result[__COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __strsignal_buf) - 1] = '\0';
-		__localdep_strncpy(__result, __string, __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __strsignal_buf) - 1);
+		__result[__COMPILER_LENOF(__strsignal_buf) - 1] = '\0';
+		__localdep_strncpy(__result, __string, __COMPILER_LENOF(__strsignal_buf) - 1);
 	} else {
 		__localdep_sprintf(__result, "Unknown signal %d", __signo);
 	}

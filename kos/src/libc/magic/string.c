@@ -479,28 +479,19 @@ size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen)
 	return n;
 }
 
-%[define(DEFINE_STRERROR_BUF =
-@@pp_ifndef __local_strerror_buf_defined@@
-#define __local_strerror_buf_defined 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
-@@pop_namespace@@
-@@pp_endif@@
-)]
-
 [[decl_include("<bits/types.h>")]]
 [[std, wunused, ATTR_COLD, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
-[[impl_prefix(DEFINE_STRERROR_BUF)]]
 char *strerror($errno_t errnum) {
+	static char strerror_buf[64];
 	char *result;
 	char const *string;
-	result = __NAMESPACE_LOCAL_SYM strerror_buf;
+	result = strerror_buf;
 	string = strerror_s(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1] = '\0';
-		strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1);
+		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
+		strncpy(result, string, COMPILER_LENOF(strerror_buf) - 1);
 	} else {
 		sprintf(result, "Unknown error %d", errnum);
 	}
@@ -583,33 +574,24 @@ $size_t strxfrm_l(char *dst, [[nonnull]] char const *__restrict src,
 }
 
 [[ATTR_COLD, wunused, section(".text.crt{|.dos}.errno")]]
-[[requires_function(strerror)]]
 char *strerror_l(int errnum, $locale_t locale) {
 	(void)locale;
 	return strerror(errnum);
 }
 
-%[define(DEFINE_STRSIGNAL_BUF =
-@@pp_ifndef __local_strsignal_buf_defined@@
-#define __local_strsignal_buf_defined 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
-@@pop_namespace@@
-@@pp_endif@@
-)]
-
 [[decl_include("<bits/types.h>")]]
 [[std, wunused, ATTR_COLD, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.string.memory.strsignal")]]
-[[impl_prefix(DEFINE_STRSIGNAL_BUF), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
 char *strsignal($signo_t signo) {
-	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
+	static char strsignal_buf[64];
+	char *result = strsignal_buf;
 	char const *string;
 	string = strsignal_s(signo);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1] = '\0';
-		strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1);
+		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
+		strncpy(result, string, COMPILER_LENOF(strsignal_buf) - 1);
 	} else {
 		sprintf(result, "Unknown signal %d", signo);
 	}
@@ -954,36 +936,26 @@ int strncasecmp_l([[nonnull]] char const *s1,
 [[ATTR_COLD, export_alias("__strerror_r")]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
 [[impl_include("<hybrid/__assert.h>"), crt_dos_variant]]
-[[impl_prefix(DEFINE_STRERROR_BUF)]]
 char *strerror_r($errno_t errnum, [[nonnull]] char *buf, $size_t buflen) {
 	char const *string;
+	if (!buf)
+		goto fallback;
+	if (!buflen)
+		goto fallback;
 	string = strerror_s(errnum);
-	if (!buf || !buflen) {
-		buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-		buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-	}
 	if (string) {
 		/* Copy the descriptor text. */
 		size_t msg_len = strlen(string) + 1;
-		if (msg_len > buflen) {
-			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-			if unlikely(msg_len > buflen) {
-				msg_len      = buflen - 1;
-				buf[msg_len] = '\0';
-			}
-		}
+		if (msg_len > buflen)
+			goto fallback;
 		memcpyc(buf, string, msg_len, sizeof(char));
 	} else {
-again_unknown:
-		if (snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen) {
-			__hybrid_assert(buf != __NAMESPACE_LOCAL_SYM strerror_buf);
-			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-			goto again_unknown;
-		}
+		if (snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
+			goto fallback;
 	}
 	return buf;
+fallback:
+	return strerror(errnum);
 }
 
 %#else /* __USE_GNU */
@@ -6041,13 +6013,14 @@ $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) 
 %[insert:function(_strnicoll_l = strncasecoll_l)]
 
 [[cp, wunused, section(".text.crt.dos.errno")]]
-[[impl_prefix(DEFINE_STRERROR_BUF)]]
 [[requires($has_function(_strerror_s))]]
 char *_strerror(char const *message) {
-	_strerror_s(__NAMESPACE_LOCAL_SYM strerror_buf,
-	            COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf),
-	            message);
-	return __NAMESPACE_LOCAL_SYM strerror_buf;
+	static char strerror_buf[64];
+	if (_strerror_s(strerror_buf,
+	                COMPILER_LENOF(strerror_buf),
+	                message))
+		return NULL;
+	return strerror_buf;
 }
 
 [[cp, section(".text.crt.dos.errno")]]

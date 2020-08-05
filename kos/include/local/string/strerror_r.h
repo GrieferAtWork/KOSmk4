@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f2909f0 */
+/* HASH CRC-32:0xfb6eb22e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,6 +68,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_snprintf __LIBC_LOCAL_NAME(snprintf)
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
+/* Dependency: strerror from string */
+#ifndef __local___localdep_strerror_defined
+#define __local___localdep_strerror_defined 1
+#ifdef __CRT_HAVE_strerror
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(__errno_t __errnum),strerror,(__errnum))
+#else /* __CRT_HAVE_strerror */
+__NAMESPACE_LOCAL_END
+#include <local/string/strerror.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
+#endif /* !__CRT_HAVE_strerror */
+#endif /* !__local___localdep_strerror_defined */
 /* Dependency: strerror_s from string */
 #ifndef __local___localdep_strerror_s_defined
 #define __local___localdep_strerror_s_defined 1
@@ -99,43 +111,28 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
-#ifndef __local_strerror_buf_defined
-#define __local_strerror_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__strerror_buf) char __strerror_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strerror_buf_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror_r) __ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_r))(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) {
 	char const *__string;
+	if (!__buf)
+		goto __fallback;
+	if (!__buflen)
+		goto __fallback;
 	__string = __localdep_strerror_s(__errnum);
-	if (!__buf || !__buflen) {
-		__buf    = __NAMESPACE_LOCAL_SYM __strerror_buf;
-		__buflen = __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __strerror_buf);
-	}
 	if (__string) {
 		/* Copy the descriptor text. */
 		__SIZE_TYPE__ __msg_len = __localdep_strlen(__string) + 1;
-		if (__msg_len > __buflen) {
-			__buf    = __NAMESPACE_LOCAL_SYM __strerror_buf;
-			__buflen = __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __strerror_buf);
-			if __unlikely(__msg_len > __buflen) {
-				__msg_len      = __buflen - 1;
-				__buf[__msg_len] = '\0';
-			}
-		}
+		if (__msg_len > __buflen)
+			goto __fallback;
 		__localdep_memcpyc(__buf, __string, __msg_len, sizeof(char));
 	} else {
-__again_unknown:
-		if (__localdep_snprintf(__buf, __buflen, "Unknown error %d", __errnum) >= __buflen) {
-			__hybrid_assert(__buf != __NAMESPACE_LOCAL_SYM __strerror_buf);
-			__buf    = __NAMESPACE_LOCAL_SYM __strerror_buf;
-			__buflen = __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __strerror_buf);
-			goto __again_unknown;
-		}
+		if (__localdep_snprintf(__buf, __buflen, "Unknown error %d", __errnum) >= __buflen)
+			goto __fallback;
 	}
 	return __buf;
+__fallback:
+	return __localdep_strerror(__errnum);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strerror_r_defined

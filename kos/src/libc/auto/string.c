@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf05118ad */
+/* HASH CRC-32:0x66052cf7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -297,43 +297,33 @@ NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
 	return n;
 }
 #endif /* !LIBC_ARCH_HAVE_STRXFRM */
-#ifndef __local_strerror_buf_defined
-#define __local_strerror_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
+	static char strerror_buf[64];
 	char *result;
 	char const *string;
-	result = __NAMESPACE_LOCAL_SYM strerror_buf;
+	result = strerror_buf;
 	string = libc_strerror_s(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1] = '\0';
-		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1);
+		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(strerror_buf) - 1);
 	} else {
 		libc_sprintf(result, "Unknown error %d", errnum);
 	}
 	return result;
 }
-#ifndef __local_strerror_buf_defined
-#define __local_strerror_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
+	static char strerror_buf[64];
 	char *result;
 	char const *string;
-	result = __NAMESPACE_LOCAL_SYM strerror_buf;
+	result = strerror_buf;
 	string = libc_strerror_s(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1] = '\0';
-		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1);
+		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(strerror_buf) - 1);
 	} else {
 		libc_sprintf(result, "Unknown error %d", errnum);
 	}
@@ -389,41 +379,31 @@ NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
 	(void)locale;
 	return libc_strerror(errnum);
 }
-#ifndef __local_strsignal_buf_defined
-#define __local_strsignal_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strsignal_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo) {
-	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
+	static char strsignal_buf[64];
+	char *result = strsignal_buf;
 	char const *string;
 	string = libc_strsignal_s(signo);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1] = '\0';
-		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1);
+		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(strsignal_buf) - 1);
 	} else {
 		libc_sprintf(result, "Unknown signal %d", signo);
 	}
 	return result;
 }
-#ifndef __local_strsignal_buf_defined
-#define __local_strsignal_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strsignal_buf_defined */
 INTERN ATTR_SECTION(".text.crt.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
-	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
+	static char strsignal_buf[64];
+	char *result = strsignal_buf;
 	char const *string;
 	string = libc_strsignal_s(signo);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1] = '\0';
-		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1);
+		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(strsignal_buf) - 1);
 	} else {
 		libc_sprintf(result, "Unknown signal %d", signo);
 	}
@@ -701,84 +681,54 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1,
 	return libc_strncasecmp(s1, s2, maxlen);
 }
 #include <hybrid/__assert.h>
-#ifndef __local_strerror_buf_defined
-#define __local_strerror_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
 NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
                                       char *buf,
                                       size_t buflen) {
 	char const *string;
+	if (!buf)
+		goto fallback;
+	if (!buflen)
+		goto fallback;
 	string = libc_strerror_s(errnum);
-	if (!buf || !buflen) {
-		buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-		buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-	}
 	if (string) {
 		/* Copy the descriptor text. */
 		size_t msg_len = libc_strlen(string) + 1;
-		if (msg_len > buflen) {
-			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-			if unlikely(msg_len > buflen) {
-				msg_len      = buflen - 1;
-				buf[msg_len] = '\0';
-			}
-		}
+		if (msg_len > buflen)
+			goto fallback;
 		libc_memcpyc(buf, string, msg_len, sizeof(char));
 	} else {
-again_unknown:
-		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen) {
-			__hybrid_assert(buf != __NAMESPACE_LOCAL_SYM strerror_buf);
-			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-			goto again_unknown;
-		}
+		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
+			goto fallback;
 	}
 	return buf;
+fallback:
+	return libc_strerror(errnum);
 }
 #include <hybrid/__assert.h>
-#ifndef __local_strerror_buf_defined
-#define __local_strerror_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum,
                                       char *buf,
                                       size_t buflen) {
 	char const *string;
+	if (!buf)
+		goto fallback;
+	if (!buflen)
+		goto fallback;
 	string = libc_strerror_s(errnum);
-	if (!buf || !buflen) {
-		buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-		buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-	}
 	if (string) {
 		/* Copy the descriptor text. */
 		size_t msg_len = libc_strlen(string) + 1;
-		if (msg_len > buflen) {
-			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-			if unlikely(msg_len > buflen) {
-				msg_len      = buflen - 1;
-				buf[msg_len] = '\0';
-			}
-		}
+		if (msg_len > buflen)
+			goto fallback;
 		libc_memcpyc(buf, string, msg_len, sizeof(char));
 	} else {
-again_unknown:
-		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen) {
-			__hybrid_assert(buf != __NAMESPACE_LOCAL_SYM strerror_buf);
-			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
-			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
-			goto again_unknown;
-		}
+		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
+			goto fallback;
 	}
 	return buf;
+fallback:
+	return libc_strerror(errnum);
 }
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD NONNULL((2)) errno_t
@@ -3966,18 +3916,14 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
-#ifndef __local_strerror_buf_defined
-#define __local_strerror_buf_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.errno") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc__strerror)(char const *message) {
-	libc__strerror_s(__NAMESPACE_LOCAL_SYM strerror_buf,
-	            COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf),
-	            message);
-	return __NAMESPACE_LOCAL_SYM strerror_buf;
+	static char strerror_buf[64];
+	if (libc__strerror_s(strerror_buf,
+	                COMPILER_LENOF(strerror_buf),
+	                message))
+		return NULL;
+	return strerror_buf;
 }
 #include <bits/types.h>
 #include <parts/errno.h>
