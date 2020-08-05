@@ -144,7 +144,29 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	                      .Lsysret64_probe_begin,
 	                      .Lsysret64_probe_end,
 	                      .Lsysret64_probe_error)
+	EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
+	                      .Lsysret64_probe_begin2,
+	                      .Lsysret64_probe_end2,
+	                      .Lsysret64_probe_error)
+	EXCEPT_HANDLERS_CATCH(E_WOULDBLOCK,
+	                      .Lsysret64_probe_begin,
+	                      .Lsysret64_probe_end,
+	                      .Lsysret64_probe_wouldblock)
 	EXCEPT_HANDLERS_END
+.Lsysret64_probe_wouldblock:
+	/* Special case: Because the above code touched user-space memory with
+	 *               interrupts disabled, there is a chance that the system
+	 *               call return location was apart of a memory location that
+	 *               hadn't yet been loaded into memory.
+	 *               When this happens, we get here and we must handle this
+	 *               case by doing another touch with preemption enabled, and
+	 *               then try again. */
+	sti
+.Lsysret64_probe_begin2:
+	ttest  mask=0, loc=0(%rcx)
+.Lsysret64_probe_end2:
+	jmp    __x86_64_syscall_iret
+
 .Lsysret64_probe_error:
 	/* Only handle if the `E_SEGFAULT_CONTEXT_NONCANON' flag was set.
 	 * RETHROW() the exception if that flag isn't set. */
