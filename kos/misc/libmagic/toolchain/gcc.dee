@@ -27,12 +27,14 @@ import * from errors;
 @@Special set of options that is always passed when gcc or g++ is invoked
 final global OPT_GCC_OPTIONS: string = "GCC.options";
 
+@@Flags that are unrelated to implicitly linked libraries
 final local GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
 	"-fPIC", "-fpic", "-fPIE", "-fpie", "-fplt",
-	"-shared", "-static",
-	"-shared-libgcc", "-static-libgcc",
-	"-frtti", "-ffreestanding",
+	"-shared", "-static", "-shared-libgcc",
+	"-static-libgcc", "-frtti", "-ffreestanding",
 	"-pipe", "-fomit-frame-pointer",
+	"-feliminate-unused-debug-symbols",
+	"-feliminate-unused-debug-types"
 };
 
 final function isUnrelatedGCCFlag(flag: string): bool {

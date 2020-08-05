@@ -148,6 +148,8 @@ CC_FLAGS({
 
 	/* XXX: Maybe configure GCC to turn this on by default? */
 	"-fnon-call-exceptions",
+	"-feliminate-unused-debug-symbols",
+	"-feliminate-unused-debug-types",
 })
 LD_FLAGS({
 	"--no-demangle"
