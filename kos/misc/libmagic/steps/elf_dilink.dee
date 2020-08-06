@@ -96,6 +96,7 @@ final local function DILINK_run(self: BoundStep): string {
 		local opt_libraries    = options.get(OPT_LINK_LIBRARIES);
 		local opt_noStdLib     = options.get(OPT_LINK_NOSTDLIB, false);
 		local guessedSectionOffsetsWereIncorrect = false;
+		local prevTotalDebugSize = 0;
 		for (;;) {
 			/* Do the link */
 link_again_with_new_guesses:
@@ -112,6 +113,18 @@ link_again_with_new_guesses:
 				if (totalDebugSize < offsetAndSize)
 					totalDebugSize = offsetAndSize;
 			}
+			/* This prevents infinite loops when increasing the debug-section size
+			 * causes the actual debug-sections to grow to no longer fit, whilst
+			 * decreasing them causes the actual debug-sections to shrink to where
+			 * they would once again fit in a smaller area that is identical to
+			 * the older size.
+			 * By not going for the size reduction during later passes, we can
+			 * prevent this, but if the size actually shrunk during a re-build,
+			 * we're still able to optimize for a better size-potential by not
+			 * saving `totalDebugSize' in the `*.di_sectsiz' file. */
+			if (totalDebugSize < prevTotalDebugSize)
+				totalDebugSize = prevTotalDebugSize;
+			prevTotalDebugSize = totalDebugSize;
 			/* Total size (== offset+size of the greatest section) */
 			opt_ldFlags.append("--defsym={}={}".format({ diLinkSizeSymbol, totalDebugSize }));
 			toolchain.createLinkerProcess(
