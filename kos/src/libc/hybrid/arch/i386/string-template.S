@@ -359,16 +359,40 @@ BEGIN_MEMFUNC(memlen)
 	 * So that our return expression becomes:
 	 * >> return (num_Tword - %Pcx) - 1; */
 	movP   $(-1), %Pdx
-	cmovnzP %Pdx, %Pcx  /* if (!WAS_FOUND) %Pcx = -1; */
-	subP   %Pcx, %Pax  /* Subtract the value of %Pcx from our result */
-	decP   %Pax        /* fix the off-by-one error */
+	cmovnzP %Pdx, %Pcx    /* if (!WAS_FOUND) %Pcx = -1; */
+	subP   %Pcx, %Pax     /* Subtract the value of %Pcx from our result */
+	decP   %Pax           /* fix the off-by-one error */
 	END_CLD
 	LEAVE_Pdi_Nax_Pcx
 	RET(12)
 END_MEMFUNC(memlen)
 
 
-/* TODO: memrlen[b|w|l|q]()     (scas) */
+
+
+/********************************************************************************/
+/* size_t LIBCCALL memrlen(void const *haystack, T needle, size_t num_Tword);   */
+/********************************************************************************/
+BEGIN_MEMFUNC(memrlen)
+	ENTER_Pdi_Nax_Pcx
+	BEGIN_STD             /* Search reverse */
+	leaP   -N(%Pdi,%Pcx,N), %Pdi /* Jump ahead to the last element to compare */
+	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
+	repne  I(scas)        /* Find the first match */
+	/* %Pcx is the # of words not searched if a match was found.
+	 * For our purposes, the value of %Pcx is undefined if no match
+	 * was found (though in reality it's `0', though we'd need it to
+	 * be `-1' if we wanted to make use of indirect optimizations)
+	 * >> return WAS_FOUND ? %Pcx : (size_t)-1;
+	 * With `WAS_FOUND = (ZF=1)' */
+	movP   $(-1), %Pax
+	cmovzP %Pcx, %Pax     /* if (WAS_FOUND) %Pax = %Pcx; */
+	END_STD
+	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+END_MEMFUNC(memrlen)
+
+
 /* TODO: rawmemlen[b|w|l|q]()   (scas) */
 /* TODO: rawmemrlen[b|w|l|q]()  (scas) */
 
