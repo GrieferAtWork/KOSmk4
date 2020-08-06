@@ -29,6 +29,17 @@
 
 #include <asm/instr/compat.h>
 
+#ifndef BEGIN_MEMFUNC
+#define BEGIN_MEMFUNC(name)           \
+	.section .text.crt.string.memory; \
+	INTERN_FUNCTION(F(libc_##name));  \
+		.cfi_startproc
+#define END_MEMFUNC(name) \
+		.cfi_endproc;     \
+	END(F(libc_##name));  \
+	DEFINE_PUBLIC_ALIAS(F(name), F(libc_##name))
+#endif /* !BEGIN_MEMFUNC */
+
 #ifndef RET
 #define RET(n) ret
 #endif /* !RET */
@@ -40,6 +51,8 @@
 #else /* N == 1 */
 #define subNP  subP $(N),
 #endif /* N != 1 */
+
+
 
 
 /* Enter/leave a function taking N arguments that should
@@ -131,12 +144,36 @@
 
 
 
+#ifndef REQUIRE_ZF0_if_Pcxz
+/* Require that `(%Pcx = 0) ==> (PFLAGS.ZF = 0)', in that
+ * a zero-value in %Pcx requires that the ZF flag _NOT_ be
+ * set.
+ * This is a pre-requirement for `repne'-style loops where
+ * an empty haystack (%Pcx = 0) should lead to the assumption
+ * that a needle wasn't found (ZF=0), and since `repne' doesn't
+ * modify %Pflags when %Pcx = 0, the user must ensure that the
+ * case of an empty haystack is handled _before_ making use
+ * of said instruction.
+ * This macro expands to an instruction that will ensure that
+ * the above implication holds true immediatly after returning.
+ *
+ * Current implementation:
+ *   >> cmpb   $(1), %cl
+ * This will set PFLAGS.ZF = ((%Pcx & 0xff) == 1), and by filling
+ * in the case for `%Pcx = 0', we get:
+ *    PFLAGS.ZF = ((0 & 0xff) == 1)
+ *    PFLAGS.ZF = (0 == 1)
+ *    PFLAGS.ZF = 0
+ * Thus fulfilling the requirement stated above. */
+#define REQUIRE_ZF0_if_Pcxz cmpb $(1), %cl
+#endif /* !REQUIRE_ZF0_if_Pcxz */
+
+
+
 /********************************************************************************/
 /* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
 /********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_memcmp))
-	.cfi_startproc
+BEGIN_MEMFUNC(memcmp)
 	ENTER_Pdi_Psi_Pcx
 	BEGIN_CLD
 	/* Compare DS:PSI (lhs) with ES:PDI (rhs) */
@@ -152,9 +189,7 @@ INTERN_FUNCTION(F(libc_memcmp))
 	END_CLD
 	LEAVE_Pdi_Psi_Pcx
 	RET(12)
-	.cfi_endproc
-END(F(libc_memcmp))
-DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
+END_MEMFUNC(memcmp)
 
 
 
@@ -162,9 +197,7 @@ DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
 /********************************************************************************/
 /* void *LIBCCALL rawmemchr(void const *haystack, T needle);                    */
 /********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_rawmemchr))
-	.cfi_startproc
+BEGIN_MEMFUNC(rawmemchr)
 	ENTER_Pdi_Nax
 	BEGIN_CLD             /* Search forward */
 	movP   $(-1), %Pcx    /* Infinite haystack size */
@@ -174,9 +207,7 @@ INTERN_FUNCTION(F(libc_rawmemchr))
 	END_CLD
 	LEAVE_Pdi_Nax
 	RET(8)
-	.cfi_endproc
-END(F(libc_rawmemchr))
-DEFINE_PUBLIC_ALIAS(F(rawmemchr), F(libc_rawmemchr))
+END_MEMFUNC(rawmemchr)
 #if N == 1 && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(__rawmemchr, libc_rawmemchr)
 #endif /* N == 1 && !__KERNEL__ */
@@ -187,9 +218,7 @@ DEFINE_PUBLIC_ALIAS(__rawmemchr, libc_rawmemchr)
 /********************************************************************************/
 /* void *LIBCCALL rawmemrchr(void const *haystack, T needle);                   */
 /********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_rawmemrchr))
-	.cfi_startproc
+BEGIN_MEMFUNC(rawmemrchr)
 	ENTER_Pdi_Nax
 	BEGIN_STD             /* Search in reverse */
 	movP   $(-1), %Pcx    /* Infinite haystack size */
@@ -200,9 +229,7 @@ INTERN_FUNCTION(F(libc_rawmemrchr))
 	END_STD
 	LEAVE_Pdi_Nax
 	RET(8)
-	.cfi_endproc
-END(F(libc_rawmemrchr))
-DEFINE_PUBLIC_ALIAS(F(rawmemrchr), F(libc_rawmemrchr))
+END_MEMFUNC(rawmemrchr)
 
 
 
@@ -210,26 +237,18 @@ DEFINE_PUBLIC_ALIAS(F(rawmemrchr), F(libc_rawmemrchr))
 /********************************************************************************/
 /* void *LIBCCALL memchr(void const *haystack, T needle, size_t num_Tword);     */
 /********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_memchr))
-	.cfi_startproc
+BEGIN_MEMFUNC(memchr)
 	ENTER_Pdi_Nax_Pcx
-	jPcxz  1f             /* Special case for num_Tword==0 -> return NULL */
-	.cfi_remember_state
 	BEGIN_CLD             /* Search forward */
-	xorP   %Pdx, %Pdx     /* Force %eflags into a ZF=1 state (also: return value if not found) */
+	xorP   %Pdx, %Pdx     /* Return value if not found */
+	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
 	repne  I(scas)        /* Find the first match */
 	leaP   -N(%Pdi), %Pax /* result = %Pdi - N; */
 	cmovnzP %Pdx, %Pax    /* if (!found) result = NULL; */
 	END_CLD
-2:	LEAVE_Pdi_Nax_Pcx
+	LEAVE_Pdi_Nax_Pcx
 	RET(12)
-	.cfi_restore_state
-1:	xorP   %Pax, %Pax     /* NULL */
-	jmp    2b
-	.cfi_endproc
-END(F(libc_memchr))
-DEFINE_PUBLIC_ALIAS(F(memchr), F(libc_memchr))
+END_MEMFUNC(memchr)
 #ifndef __KERNEL__
 #if N == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libc_memchrw)
@@ -244,27 +263,19 @@ DEFINE_PUBLIC_ALIAS(wmemchr, libc_memchrl)
 /********************************************************************************/
 /* void *LIBCCALL memrchr(void const *haystack, T needle, size_t num_Tword);    */
 /********************************************************************************/
-.section .text.crt.string.memory
-INTERN_FUNCTION(F(libc_memrchr))
-	.cfi_startproc
+BEGIN_MEMFUNC(memrchr)
 	ENTER_Pdi_Nax_Pcx
-	jPcxz  1f             /* Special case for num_Tword==0 -> return NULL */
-	.cfi_remember_state
 	BEGIN_STD             /* Search reverse */
 	leaP   -N(%Pdi,%Pcx,N), %Pdi /* Jump ahead to the last element to compare */
 	xorP   %Pdx, %Pdx     /* Return value if not found */
+	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
 	repne  I(scas)        /* Find the first match */
 	leaP   N(%Pdi), %Pax  /* result = %Pdi + N; */
 	cmovnzP %Pdx, %Pax    /* if (!found) result = NULL; */
 	END_STD
-2:	LEAVE_Pdi_Nax_Pcx     /* NULL */
+	LEAVE_Pdi_Nax_Pcx
 	RET(12)
-	.cfi_restore_state
-1:	xorP   %Pax, %Pax
-	jmp    2b
-	.cfi_endproc
-END(F(libc_memrchr))
-DEFINE_PUBLIC_ALIAS(F(memrchr), F(libc_memrchr))
+END_MEMFUNC(memrchr)
 
 
 /* TODO: memend[b|w|l|q]()      (scas) */
