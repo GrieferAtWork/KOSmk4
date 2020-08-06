@@ -278,7 +278,29 @@ BEGIN_MEMFUNC(memrchr)
 END_MEMFUNC(memrchr)
 
 
-/* TODO: memend[b|w|l|q]()      (scas) */
+
+
+/********************************************************************************/
+/* void *LIBCCALL memend(void const *haystack, T needle, size_t num_Tword);     */
+/********************************************************************************/
+BEGIN_MEMFUNC(memend)
+	ENTER_Pdi_Nax_Pcx
+	BEGIN_CLD             /* Search forward */
+	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
+	repne  I(scas)        /* Find the first match */
+	/* if (found) {       // found (ZF=1)
+	 *     return %Pdi - N;
+	 * } else {           // not-found (ZF=0)
+	 *     return %Pdi;
+	 * } */
+	leaP   -N(%Pdi), %Pax /* result = %Pdi - N; */
+	cmovnzP %Pdi, %Pax    /* if (!found) result = %Pdi; */
+	END_CLD
+	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+END_MEMFUNC(memend)
+
+
 /* TODO: memrend[b|w|l|q]()     (scas) */
 /* TODO: memlen[b|w|l|q]()      (scas) */
 /* TODO: memrlen[b|w|l|q]()     (scas) */
