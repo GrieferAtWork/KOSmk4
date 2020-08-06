@@ -301,7 +301,25 @@ BEGIN_MEMFUNC(memend)
 END_MEMFUNC(memend)
 
 
-/* TODO: memrend[b|w|l|q]()     (scas) */
+
+
+/********************************************************************************/
+/* void *LIBCCALL memrend(void const *haystack, T needle, size_t num_Tword);    */
+/********************************************************************************/
+BEGIN_MEMFUNC(memrend)
+	ENTER_Pdi_Nax_Pcx
+	BEGIN_STD             /* Search reverse */
+	leaP   -N(%Pdi,%Pcx,N), %Pdi /* Jump ahead to the last element to compare */
+	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
+	repne  I(scas)        /* Find the first match */
+	leaP   N(%Pdi), %Pax  /* result = %Pdi + N; */
+	cmovnzP %Pdi, %Pax    /* if (!found) result = %Pdi; */
+	END_STD
+	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+END_MEMFUNC(memrend)
+
+
 /* TODO: memlen[b|w|l|q]()      (scas) */
 /* TODO: memrlen[b|w|l|q]()     (scas) */
 /* TODO: rawmemlen[b|w|l|q]()   (scas) */

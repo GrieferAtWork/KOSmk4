@@ -143,6 +143,12 @@
 #ifdef __x86_64__
 #define LIBC_ARCH_HAVE_MEMENDQ 1
 #endif /* __x86_64__ */
+#define LIBC_ARCH_HAVE_MEMREND  1
+#define LIBC_ARCH_HAVE_MEMRENDW 1
+#define LIBC_ARCH_HAVE_MEMRENDL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_MEMRENDQ 1
+#endif /* __x86_64__ */
 
 /* abort() */
 #define LIBC_ARCH_HAVE_ABORT 1
