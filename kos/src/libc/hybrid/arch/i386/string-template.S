@@ -361,8 +361,43 @@ BEGIN_MEMFUNC(rawmemrxchr)
 END_MEMFUNC(rawmemrxchr)
 
 
-/* TODO: memxchr[b|w|l|q]()     (scas) */
-/* TODO: memrxchr[b|w|l|q]()    (scas) */
+
+
+/********************************************************************************/
+/* void *LIBCCALL memxchr(void const *haystack, T needle, size_t num_Tword);    */
+/********************************************************************************/
+BEGIN_MEMFUNC(memxchr)
+	ENTER_Pdi_Nax_Pcx
+	BEGIN_CLD             /* Search forward */
+	xorP   %Pdx, %Pdx     /* Return value if not found (also forces ZF=1) */
+	repe   I(scas)        /* Find the first miss-match */
+	leaP   -N(%Pdi), %Pax /* result = %Pdi - N; */
+	cmovzP %Pdx, %Pax     /* if (!found) result = NULL; */
+	END_CLD
+	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+END_MEMFUNC(memxchr)
+
+
+
+
+/********************************************************************************/
+/* void *LIBCCALL memrxchr(void const *haystack, T needle, size_t num_Tword);   */
+/********************************************************************************/
+BEGIN_MEMFUNC(memrxchr)
+	ENTER_Pdi_Nax_Pcx
+	BEGIN_STD             /* Search reverse */
+	leaP   -N(%Pdi,%Pcx,N), %Pdi /* Jump ahead to the last element to compare */
+	xorP   %Pdx, %Pdx     /* Return value if not found (also forces ZF=1) */
+	repe   I(scas)        /* Find the first miss-match */
+	leaP   N(%Pdi), %Pax  /* result = %Pdi + N; */
+	cmovzP %Pdx, %Pax     /* if (!found) result = NULL; */
+	END_STD
+	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+END_MEMFUNC(memrxchr)
+
+
 /* TODO: memxend[b|w|l|q]()     (scas) */
 /* TODO: memrxend[b|w|l|q]()    (scas) */
 /* TODO: memxlen[b|w|l|q]()     (scas) */
