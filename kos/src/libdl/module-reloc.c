@@ -458,11 +458,11 @@ STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 INTERN WUNUSED NONNULL((1)) ElfW(Addr) ATTR_FASTCALL
 dl_bind_lazy_relocation(DlModule *__restrict self,
 #if ELF_ARCH_LAZYINDX
-                           uintptr_t jmp_rel_index
+                        uintptr_t jmp_rel_index
 #else /* ELF_ARCH_LAZYINDX */
-                           uintptr_t jmp_rel_offset
+                        uintptr_t jmp_rel_offset
 #endif /* !ELF_ARCH_LAZYINDX */
-                           ) {
+                        ) {
 	ElfW(Rel) *rel;
 	byte_t *reladdr;
 	ElfW(Addr) addr;

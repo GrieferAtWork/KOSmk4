@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad625f45 */
+/* HASH CRC-32:0xa6d87762 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: FChownAt from kos.unistd */
 #ifndef __local___localdep_FChownAt_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3e4177e */
+/* HASH CRC-32:0x9ad5792e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,31 +58,51 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef __hop_defined
+#define __hop_defined 1
 #ifdef __CRT_HAVE_hop
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __CASMNAME_SAME("hop");
-#endif /* __CRT_HAVE_hop */
+#else /* __CRT_HAVE_hop */
+#undef __hop_defined
+#endif /* !__CRT_HAVE_hop */
+#endif /* !__hop_defined */
+#ifndef __hopf_defined
+#define __hopf_defined 1
 #ifdef __CRT_HAVE_hopf
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __CASMNAME_SAME("hopf");
-#endif /* __CRT_HAVE_hopf */
+#else /* __CRT_HAVE_hopf */
+#undef __hopf_defined
+#endif /* !__CRT_HAVE_hopf */
+#endif /* !__hopf_defined */
 
 
 
 /* Exception-enabled variants */
 
+#ifndef __Hop_defined
+#define __Hop_defined 1
 #ifdef __CRT_HAVE_Hop
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t (__VLIBCCALL Hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __THROWS(...) __CASMNAME_SAME("Hop");
-#endif /* __CRT_HAVE_Hop */
+#else /* __CRT_HAVE_Hop */
+#undef __Hop_defined
+#endif /* !__CRT_HAVE_Hop */
+#endif /* !__Hop_defined */
+#ifndef __Hopf_defined
+#define __Hopf_defined 1
 #ifdef __CRT_HAVE_Hopf
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __THROWS(...) __CASMNAME_SAME("Hopf");
-#endif /* __CRT_HAVE_Hopf */
+#else /* __CRT_HAVE_Hopf */
+#undef __Hopf_defined
+#endif /* !__CRT_HAVE_Hopf */
+#endif /* !__Hopf_defined */
 
 #endif /* __CC__ */
 

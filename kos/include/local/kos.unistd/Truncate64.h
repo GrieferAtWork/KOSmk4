@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23537fde */
+/* HASH CRC-32:0x755cdd65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_Truncate
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Truncate32 from kos.unistd */
 #ifndef __local___localdep_Truncate32_defined

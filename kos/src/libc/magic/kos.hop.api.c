@@ -55,10 +55,10 @@ __SYSDECL_BEGIN
 
 @@Perform a handle operation specified by `cmd'
 @@@param: cmd: One of `HOP_<type>_<command>'
-[[vartypes(void *)]]
+[[guard, vartypes(void *), decl_include("<bits/types.h>")]]
 $syscall_slong_t hop($fd_t fd, $syscall_ulong_t cmd, ... /*, void *arg*/);
 
-[[vartypes(void *), doc_alias("hop")]]
+[[guard, vartypes(void *), doc_alias("hop"), decl_include("<bits/types.h>")]]
 $syscall_slong_t hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, void *arg*/);
 
 
@@ -69,10 +69,10 @@ $syscall_slong_t hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, vo
 %
 
 
-[[vartypes(void *), throws, doc_alias("hop")]]
+[[guard, vartypes(void *), throws, doc_alias("hop"), decl_include("<bits/types.h>")]]
 $syscall_slong_t Hop($fd_t fd, $syscall_ulong_t cmd, ... /*, void *arg*/);
 
-[[vartypes(void *), throws, doc_alias("Hop")]]
+[[guard, vartypes(void *), throws, doc_alias("Hop"), decl_include("<bits/types.h>")]]
 $syscall_slong_t Hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, void *arg*/);
 
 

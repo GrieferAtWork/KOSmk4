@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdfa98c1 */
+/* HASH CRC-32:0x247e4116 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,9 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
+#include <kos/anno.h>
+
 #include <unistd.h>
 
 __SYSDECL_BEGIN
@@ -268,7 +271,7 @@ __CDECLARE_OPT(,__fd_t,__THROWING,Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
-__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,Dup,(__fd_t __fd),(__fd))
+__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,Dup,(__fd_t __fd),(__fd))
 
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
@@ -469,10 +472,10 @@ __CDECLARE_VOID(,__THROWING,SyncFs,(__fd_t __fd),(__fd))
 #include <local/kos.unistd/SyncFs.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(SyncFs, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL SyncFs)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(SyncFs))(__fd); })
 #endif /* !__CRT_HAVE_SyncFs */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,GetResUid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,GetResGid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,SetResUid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
+__CDECLARE_VOID_OPT(,__THROWING,GetResUid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
+__CDECLARE_VOID_OPT(,__THROWING,GetResGid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
+__CDECLARE_VOID_OPT(,__THROWING,SetResUid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
+__CDECLARE_VOID_OPT(,__THROWING,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __USE_GNU */
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
      defined(__USE_MISC)

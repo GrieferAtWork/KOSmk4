@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x716742ca */
+/* HASH CRC-32:0x6e6f1a3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ INTDEF fd_t (LIBDCALL libd_Dup2)(fd_t oldfd, fd_t newfd) THROWS(...);
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_Dup)(fd_t fd);
+INTDEF WUNUSED fd_t (LIBDCALL libd_Dup)(fd_t fd) THROWS(...);
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTDEF NONNULL((1)) void (LIBDCALL libd_Chdir)(char const *path) THROWS(...);
@@ -162,10 +162,10 @@ INTDEF NONNULL((2)) size_t (LIBDCALL libd_PReadAll64)(fd_t fd, void *buf, size_t
 INTDEF NONNULL((1)) void (LIBDCALL libd_Pipe2)(fd_t pipedes[2], oflag_t flags) THROWS(...);
 INTDEF fd_t (LIBDCALL libd_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(...);
 INTDEF void (LIBDCALL libd_SyncFs)(fd_t fd) THROWS(...);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_SetResUid)(uid_t ruid, uid_t euid, uid_t suid);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid);
+INTDEF void (LIBDCALL libd_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);
+INTDEF void (LIBDCALL libd_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid) THROWS(...);
+INTDEF void (LIBDCALL libd_SetResUid)(uid_t ruid, uid_t euid, uid_t suid) THROWS(...);
+INTDEF void (LIBDCALL libd_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid) THROWS(...);
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
 INTDEF void (LIBDCALL libd_FChown)(fd_t fd, uid_t owner, gid_t group) THROWS(...);

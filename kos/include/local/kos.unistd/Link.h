@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d19b876 */
+/* HASH CRC-32:0x46fc1083 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: LinkAt from kos.unistd */
 #ifndef __local___localdep_LinkAt_defined
 #define __local___localdep_LinkAt_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 4)),__THROWING,__localdep_LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),LinkAt,(__fromfd,__from,__tofd,__to,__flags))

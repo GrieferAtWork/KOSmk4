@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc377c35c */
+/* HASH CRC-32:0x723fe549 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,7 @@ INTDEF fd_t (LIBCCALL libc_Dup2)(fd_t oldfd, fd_t newfd) THROWS(...);
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_Dup)(fd_t fd);
+INTDEF WUNUSED fd_t (LIBCCALL libc_Dup)(fd_t fd) THROWS(...);
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Chdir)(char const *path) THROWS(...);
@@ -233,10 +233,10 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) T
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(...);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...);
 INTDEF void (LIBCCALL libc_SyncFs)(fd_t fd) THROWS(...);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_SetResUid)(uid_t ruid, uid_t euid, uid_t suid);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid);
+INTDEF void (LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);
+INTDEF void (LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid) THROWS(...);
+INTDEF void (LIBCCALL libc_SetResUid)(uid_t ruid, uid_t euid, uid_t suid) THROWS(...);
+INTDEF void (LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid) THROWS(...);
 /* >> vfork(2)
  * Same as `fork(2)', but possibly suspend the calling process until the
  * child process either calls `exit(2)' or one of the many `exec(2)' functions */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f97a9b1 */
+/* HASH CRC-32:0xd8aa45d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,14 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_GetCwd
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: GetCwd from kos.unistd */
 #ifndef __local___localdep_GetCwd_defined
 #define __local___localdep_GetCwd_defined 1
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,__THROWING,__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __bufsize),GetCwd,(__buf,__bufsize))

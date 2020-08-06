@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14b12232 */
+/* HASH CRC-32:0x6f3959b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,14 @@
 #include <__crt.h>
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ReadlinkAt from kos.unistd */
 #ifndef __local___localdep_ReadlinkAt_defined
 #define __local___localdep_ReadlinkAt_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing

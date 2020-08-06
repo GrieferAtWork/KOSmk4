@@ -51,9 +51,9 @@ typedef __int64_t int64_t;
 typedef __uint8_t uint8_t;
 typedef __uint16_t uint16_t;
 typedef __uint32_t uint32_t;
-#ifdef __INT64_TYPE__
+#ifdef __UINT64_TYPE__
 typedef __uint64_t uint64_t;
-#endif /* __INT64_TYPE__ */
+#endif /* __UINT64_TYPE__ */
 #endif /* !__uint8_t_defined */
 
 #ifndef __size_t_defined
@@ -113,12 +113,12 @@ typedef __TM_TYPE(time) time_t; /* UNIX time in seconds since 01.01.1970 */
 
 #ifndef __time32_t_defined
 #define __time32_t_defined 1
-typedef __time32_t time32_t;   /* UNIX time in seconds since 01.01.1970 */
+typedef __time32_t time32_t; /* UNIX time in seconds since 01.01.1970 */
 #endif /* !__time32_t_defined */
 
 #ifndef __time64_t_defined
 #define __time64_t_defined 1
-typedef __time64_t time64_t;   /* UNIX time in seconds since 01.01.1970 */
+typedef __time64_t time64_t; /* UNIX time in seconds since 01.01.1970 */
 #endif /* !__time64_t_defined */
 
 #ifndef __dev_t_defined

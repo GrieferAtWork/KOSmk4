@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4050a75c */
+/* HASH CRC-32:0x5bfa27c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_SyncFs_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(SyncFs) void
 (__LIBCCALL __LIBC_LOCAL_NAME(SyncFs))(__fd_t __fd) __THROWS(...) {

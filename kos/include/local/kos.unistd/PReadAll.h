@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x223aa986 */
+/* HASH CRC-32:0xa2e90b45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PReadAll64) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: PReadAll32 from kos.unistd */
 #if !defined(__local___localdep_PReadAll32_defined) && defined(__CRT_HAVE_PReadAll)

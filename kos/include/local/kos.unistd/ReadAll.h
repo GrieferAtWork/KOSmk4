@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb0d2b0d */
+/* HASH CRC-32:0xa5b0cc25 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Read from kos.unistd */
 #ifndef __local___localdep_Read_defined
@@ -38,7 +39,6 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t
 #if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -46,7 +46,6 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TY
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -54,7 +53,6 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TY
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -62,7 +60,6 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TY
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -70,7 +67,6 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TY
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
