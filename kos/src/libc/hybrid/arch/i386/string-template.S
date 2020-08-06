@@ -326,14 +326,47 @@ END_MEMFUNC(memrend)
 /* TODO: rawmemrlen[b|w|l|q]()  (scas) */
 
 #ifndef __KERNEL__
+/********************************************************************************/
+/* void *LIBCCALL rawmemxchr(void const *haystack, T needle);                   */
+/********************************************************************************/
+BEGIN_MEMFUNC(rawmemxchr)
+	ENTER_Pdi_Nax
+	BEGIN_CLD             /* Search forward */
+	movP   $(-1), %Pcx    /* Infinite haystack size */
+	repe   I(scas)        /* Find the first miss-match */
+	/* At this point, %Pdi points N bytes past the non-matching word */
+	leaP   -N(%Pdi), %Pax /* Return the pointer _to_ the non-matching element */
+	END_CLD
+	LEAVE_Pdi_Nax
+	RET(8)
+END_MEMFUNC(rawmemxchr)
+
+
+
+
+/********************************************************************************/
+/* void *LIBCCALL rawmemrxchr(void const *haystack, T needle);                  */
+/********************************************************************************/
+BEGIN_MEMFUNC(rawmemrxchr)
+	ENTER_Pdi_Nax
+	BEGIN_STD             /* Search in reverse */
+	movP   $(-1), %Pcx    /* Infinite haystack size */
+	subNP  %Pdi           /* Fix-up the start-of-search loaction */
+	repe   I(scas)        /* Find the first miss-match */
+	/* At this point, %Pdi points N bytes before the non-matching word */
+	leaP   N(%Pdi), %Pax /* Return the pointer _to_ the non-matching element */
+	END_STD
+	LEAVE_Pdi_Nax
+	RET(8)
+END_MEMFUNC(rawmemrxchr)
+
+
 /* TODO: memxchr[b|w|l|q]()     (scas) */
 /* TODO: memrxchr[b|w|l|q]()    (scas) */
 /* TODO: memxend[b|w|l|q]()     (scas) */
 /* TODO: memrxend[b|w|l|q]()    (scas) */
 /* TODO: memxlen[b|w|l|q]()     (scas) */
 /* TODO: memrxlen[b|w|l|q]()    (scas) */
-/* TODO: rawmemxchr[b|w|l|q]()  (scas) */
-/* TODO: rawmemrxchr[b|w|l|q]() (scas) */
 /* TODO: rawmemxlen[b|w|l|q]()  (scas) */
 /* TODO: rawmemrxlen[b|w|l|q]() (scas) */
 #endif /* !__KERNEL__ */

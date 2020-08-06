@@ -149,6 +149,20 @@
 #ifdef __x86_64__
 #define LIBC_ARCH_HAVE_MEMRENDQ 1
 #endif /* __x86_64__ */
+#ifndef __KERNEL__
+#define LIBC_ARCH_HAVE_RAWMEMXCHR  1
+#define LIBC_ARCH_HAVE_RAWMEMXCHRW 1
+#define LIBC_ARCH_HAVE_RAWMEMXCHRL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_RAWMEMXCHRQ 1
+#endif /* __x86_64__ */
+#define LIBC_ARCH_HAVE_RAWMEMRXCHR  1
+#define LIBC_ARCH_HAVE_RAWMEMRXCHRW 1
+#define LIBC_ARCH_HAVE_RAWMEMRXCHRL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_RAWMEMRXCHRQ 1
+#endif /* __x86_64__ */
+#endif /* !__KERNEL__ */
 
 /* abort() */
 #define LIBC_ARCH_HAVE_ABORT 1
