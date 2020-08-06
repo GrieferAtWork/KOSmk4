@@ -33,9 +33,15 @@ __NAMESPACE_STD_USING(uintmax_t)
 
 #ifndef __int8_t_defined
 #define __int8_t_defined 1
+#ifdef __INT8_TYPE__
 __NAMESPACE_STD_USING(int8_t)
+#endif /* __INT8_TYPE__ */
+#ifdef __INT16_TYPE__
 __NAMESPACE_STD_USING(int16_t)
+#endif /* __INT16_TYPE__ */
+#ifdef __INT32_TYPE__
 __NAMESPACE_STD_USING(int32_t)
+#endif /* __INT32_TYPE__ */
 #ifdef __INT64_TYPE__
 __NAMESPACE_STD_USING(int64_t)
 #endif /* __INT64_TYPE__ */
@@ -43,9 +49,15 @@ __NAMESPACE_STD_USING(int64_t)
 
 #ifndef __uint8_t_defined
 #define __uint8_t_defined 1
+#ifdef __UINT8_TYPE__
 __NAMESPACE_STD_USING(uint8_t)
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
 __NAMESPACE_STD_USING(uint16_t)
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
 __NAMESPACE_STD_USING(uint32_t)
+#endif /* __UINT32_TYPE__ */
 #ifdef __UINT64_TYPE__
 __NAMESPACE_STD_USING(uint64_t)
 #endif /* __UINT64_TYPE__ */
@@ -56,11 +68,13 @@ __NAMESPACE_STD_USING(uint64_t)
 __NAMESPACE_STD_USING(int_least8_t)
 __NAMESPACE_STD_USING(int_least16_t)
 __NAMESPACE_STD_USING(int_least32_t)
-__NAMESPACE_STD_USING(int_least64_t)
 __NAMESPACE_STD_USING(uint_least8_t)
 __NAMESPACE_STD_USING(uint_least16_t)
 __NAMESPACE_STD_USING(uint_least32_t)
+#ifdef __UINT_LEAST64_TYPE__
+__NAMESPACE_STD_USING(int_least64_t)
 __NAMESPACE_STD_USING(uint_least64_t)
+#endif /* __UINT_LEAST64_TYPE__ */
 #endif /* !__int_least8_t_defined */
 
 #ifndef __int_fast8_t_defined
@@ -68,11 +82,13 @@ __NAMESPACE_STD_USING(uint_least64_t)
 __NAMESPACE_STD_USING(int_fast8_t)
 __NAMESPACE_STD_USING(int_fast16_t)
 __NAMESPACE_STD_USING(int_fast32_t)
-__NAMESPACE_STD_USING(int_fast64_t)
 __NAMESPACE_STD_USING(uint_fast8_t)
 __NAMESPACE_STD_USING(uint_fast16_t)
 __NAMESPACE_STD_USING(uint_fast32_t)
+#ifdef __UINT_FAST64_TYPE__
+__NAMESPACE_STD_USING(int_fast64_t)
 __NAMESPACE_STD_USING(uint_fast64_t)
+#endif /* __UINT_FAST64_TYPE__ */
 #endif /* !__int_fast8_t_defined */
 
 #ifndef __intptr_t_defined
@@ -90,11 +106,13 @@ __NAMESPACE_STD_USING(uintptr_t)
 #include "__stdinc.h"
 /**/
 
+#include <features.h> /* __USE_KOS */
+
 #include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
 #ifndef __std_intmax_t_defined
@@ -105,19 +123,31 @@ typedef __UINTMAX_TYPE__ uintmax_t;
 
 #ifndef __std_int8_t_defined
 #define __std_int8_t_defined 1
-typedef __INT8_TYPE__   int8_t;
-typedef __INT16_TYPE__  int16_t;
-typedef __INT32_TYPE__  int32_t;
+#ifdef __INT8_TYPE__
+typedef __INT8_TYPE__ int8_t;
+#endif /* __INT8_TYPE__ */
+#ifdef __INT16_TYPE__
+typedef __INT16_TYPE__ int16_t;
+#endif /* __INT16_TYPE__ */
+#ifdef __INT32_TYPE__
+typedef __INT32_TYPE__ int32_t;
+#endif /* __INT32_TYPE__ */
 #ifdef __INT64_TYPE__
-typedef __INT64_TYPE__  int64_t;
+typedef __INT64_TYPE__ int64_t;
 #endif /* __INT64_TYPE__ */
 #endif /* !__std_int8_t_defined */
 
 #ifndef __std_uint8_t_defined
 #define __std_uint8_t_defined 1
-typedef __UINT8_TYPE__  uint8_t;
+#ifdef __UINT8_TYPE__
+typedef __UINT8_TYPE__ uint8_t;
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
 typedef __UINT16_TYPE__ uint16_t;
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
 typedef __UINT32_TYPE__ uint32_t;
+#endif /* __UINT32_TYPE__ */
 #ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ uint64_t;
 #endif /* __UINT64_TYPE__ */
@@ -139,15 +169,15 @@ typedef __UINT_LEAST64_TYPE__ uint_least64_t;
 
 #ifndef __std_int_fast8_t_defined
 #define __std_int_fast8_t_defined 1
-typedef __INT_FAST8_TYPE__    int_fast8_t;
-typedef __INT_FAST16_TYPE__   int_fast16_t;
-typedef __INT_FAST32_TYPE__   int_fast32_t;
-typedef __UINT_FAST8_TYPE__   uint_fast8_t;
-typedef __UINT_FAST16_TYPE__  uint_fast16_t;
-typedef __UINT_FAST32_TYPE__  uint_fast32_t;
+typedef __INT_FAST8_TYPE__   int_fast8_t;
+typedef __INT_FAST16_TYPE__  int_fast16_t;
+typedef __UINT_FAST8_TYPE__  uint_fast8_t;
+typedef __UINT_FAST16_TYPE__ uint_fast16_t;
+typedef __INT_FAST32_TYPE__  int_fast32_t;
+typedef __UINT_FAST32_TYPE__ uint_fast32_t;
 #ifdef __UINT_FAST64_TYPE__
-typedef __INT_FAST64_TYPE__   int_fast64_t;
-typedef __UINT_FAST64_TYPE__  uint_fast64_t;
+typedef __INT_FAST64_TYPE__  int_fast64_t;
+typedef __UINT_FAST64_TYPE__ uint_fast64_t;
 #endif /* __UINT_FAST64_TYPE__ */
 #endif /* !__std_int_fast8_t_defined */
 
@@ -172,9 +202,15 @@ __NAMESPACE_STD_USING(uintmax_t)
 
 #ifndef __int8_t_defined
 #define __int8_t_defined 1
+#ifdef __INT8_TYPE__
 __NAMESPACE_STD_USING(int8_t)
+#endif /* __INT8_TYPE__ */
+#ifdef __INT16_TYPE__
 __NAMESPACE_STD_USING(int16_t)
+#endif /* __INT16_TYPE__ */
+#ifdef __INT32_TYPE__
 __NAMESPACE_STD_USING(int32_t)
+#endif /* __INT32_TYPE__ */
 #ifdef __INT64_TYPE__
 __NAMESPACE_STD_USING(int64_t)
 #endif /* __INT64_TYPE__ */
@@ -182,9 +218,15 @@ __NAMESPACE_STD_USING(int64_t)
 
 #ifndef __uint8_t_defined
 #define __uint8_t_defined 1
+#ifdef __UINT8_TYPE__
 __NAMESPACE_STD_USING(uint8_t)
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
 __NAMESPACE_STD_USING(uint16_t)
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
 __NAMESPACE_STD_USING(uint32_t)
+#endif /* __UINT32_TYPE__ */
 #ifdef __UINT64_TYPE__
 __NAMESPACE_STD_USING(uint64_t)
 #endif /* __UINT64_TYPE__ */
@@ -195,11 +237,13 @@ __NAMESPACE_STD_USING(uint64_t)
 __NAMESPACE_STD_USING(int_least8_t)
 __NAMESPACE_STD_USING(int_least16_t)
 __NAMESPACE_STD_USING(int_least32_t)
-__NAMESPACE_STD_USING(int_least64_t)
 __NAMESPACE_STD_USING(uint_least8_t)
 __NAMESPACE_STD_USING(uint_least16_t)
 __NAMESPACE_STD_USING(uint_least32_t)
+#ifdef __UINT_LEAST64_TYPE__
+__NAMESPACE_STD_USING(int_least64_t)
 __NAMESPACE_STD_USING(uint_least64_t)
+#endif /* __UINT_LEAST64_TYPE__ */
 #endif /* !__int_least8_t_defined */
 
 #ifndef __int_fast8_t_defined
@@ -207,11 +251,13 @@ __NAMESPACE_STD_USING(uint_least64_t)
 __NAMESPACE_STD_USING(int_fast8_t)
 __NAMESPACE_STD_USING(int_fast16_t)
 __NAMESPACE_STD_USING(int_fast32_t)
-__NAMESPACE_STD_USING(int_fast64_t)
 __NAMESPACE_STD_USING(uint_fast8_t)
 __NAMESPACE_STD_USING(uint_fast16_t)
 __NAMESPACE_STD_USING(uint_fast32_t)
+#ifdef __UINT_FAST64_TYPE__
+__NAMESPACE_STD_USING(int_fast64_t)
 __NAMESPACE_STD_USING(uint_fast64_t)
+#endif /* __UINT_FAST64_TYPE__ */
 #endif /* !__int_fast8_t_defined */
 
 #ifndef __intptr_t_defined
@@ -224,7 +270,7 @@ __NAMESPACE_STD_USING(uintptr_t)
 #endif /* !__uintptr_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 
@@ -300,6 +346,10 @@ __SYSDECL_END
 #define UINT16_C(x)  __UINT16_C(x)
 #define UINT32_C(x)  __UINT32_C(x)
 #define UINT64_C(x)  __UINT64_C(x)
+#ifdef __USE_KOS
+#define SIZE_C(x)    __SIZE_C(x)
+#define SSIZE_C(x)   __SSIZE_C(x)
+#endif /* __USE_KOS */
 #else /* __CC__ */
 #define INTMAX_C(x)  x
 #define UINTMAX_C(x) x
@@ -311,6 +361,10 @@ __SYSDECL_END
 #define UINT16_C(x)  x
 #define UINT32_C(x)  x
 #define UINT64_C(x)  x
+#ifdef __USE_KOS
+#define SIZE_C(x)    x
+#define SSIZE_C(x)   x
+#endif /* __USE_KOS */
 #endif /* !__CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER

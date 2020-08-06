@@ -62,7 +62,7 @@ meanings (and values). - Please change your code to only include one of either"
 #define _BIG_ENDIAN 1
 #elif __BYTE_ORDER__ == __ORDER_PDP_ENDIAN__
 #define _PDB_ENDIAN 1
-#endif
+#endif /* __BYTE_ORDER__ == ... */
 
 #if (!defined(_STACK_GROWS_DOWNWARD) && !defined(_STACK_GROWS_UPWARD))
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
@@ -87,7 +87,22 @@ meanings (and values). - Please change your code to only include one of either"
 
 
 #ifndef _IEEE_754
+#include <ieee754.h>
+/* Define `_IEEE_754' if all of `float', `double' (and if
+ * defined by the compiler `long double') map to types
+ * that are compatible with the `ieee[78]54' standard. */
+#if ((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||         \
+      defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||        \
+      defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)) &&  \
+     (defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||        \
+      defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||       \
+      defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && \
+     (!defined(__COMPILER_HAVE_LONGDOUBLE) ||             \
+      defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||   \
+      defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||  \
+      defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)))
 #define _IEEE_754 1
+#endif /* ... */
 #endif /* !_IEEE_754 */
 
 #if !defined(_CHAR_IS_UNSIGNED) && !defined(_CHAR_IS_SIGNED)

@@ -26,44 +26,70 @@
 #ifndef __CHAR_BIT__
 #define __CHAR_BIT__ 8
 #endif /* !__CHAR_BIT__ */
+
 #ifndef __SIZEOF_CHAR__
 #define __SIZEOF_CHAR__  1
 #endif /* !__SIZEOF_CHAR__ */
+
 #ifndef __SIZEOF_SHORT__
+#ifdef __sizeof_short
+#define __SIZEOF_SHORT__ __sizeof_short
+#elif defined(_SILP64) || defined(__SILP64__)
+#define __SIZEOF_SHORT__ 8
+#elif defined(_SILP32) || defined(__SILP32__)
+#define __SIZEOF_SHORT__ 4
+#else /* ... */
 #define __SIZEOF_SHORT__ 2
+#endif /* !... */
 #endif /* !__SIZEOF_SHORT__ */
+
 #ifndef __SIZEOF_INT__
 #ifdef __sizeof_int
-#define __SIZEOF_INT__   __sizeof_int
-#else /* __sizeof_int */
-#define __SIZEOF_INT__   4
-#endif /* !__sizeof_int */
+#define __SIZEOF_INT__ __sizeof_int
+#elif (defined(_ILP64) || defined(__ILP64__) || \
+       defined(_SILP64) || defined(__SILP64__))
+#define __SIZEOF_INT__ 8
+#else /* ... */
+#define __SIZEOF_INT__ 4
+#endif /* !... */
 #endif /* !__SIZEOF_INT__ */
+
 #ifndef __SIZEOF_LONG__
 #ifdef __sizeof_long
 #define __SIZEOF_LONG__ __sizeof_long
-#elif defined(_WIN16) || defined(WIN16) || \
-      defined(_WIN32) || defined(WIN32) || \
-      defined(_WIN64) || defined(WIN64) || \
-      defined(__WIN32__) || defined(__TOS_WIN__) || \
-      defined(_WIN32_WCE) || defined(WIN32_WCE)
-#define __SIZEOF_LONG__  4
-#else
-#define __SIZEOF_LONG__  __SIZEOF_POINTER__
-#endif
+#elif (defined(_LP32) || defined(__LP32__) || defined(_ILP32) || \
+       defined(__ILP32__) || defined(_SILP32) || defined(__SILP32__))
+#define __SIZEOF_LONG__ 4
+#elif (defined(_LP64) || defined(__LP64__) || defined(_ILP64) || \
+       defined(__ILP64__) || defined(_SILP64) || defined(__SILP64__))
+#define __SIZEOF_LONG__ 8
+#elif defined(_LLP64) || defined(__LLP64__)
+#define __SIZEOF_LONG__ 4
+#elif (defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) ||          \
+       defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
+       defined(_WIN32_WCE) || defined(WIN32_WCE))
+#define __SIZEOF_LONG__ 4
+#else /* ... */
+#define __SIZEOF_LONG__ __SIZEOF_POINTER__
+#endif /* !... */
 #endif /* !__SIZEOF_LONG__ */
+
 #ifndef __SIZEOF_LONG_LONG__
 #ifdef __COMPILER_HAVE_LONGLONG
-#define __SIZEOF_LONG_LONG__  8
+#ifdef __sizeof_long_long
+#define __SIZEOF_LONG_LONG__ __sizeof_long_long
+#else /* __sizeof_long_long */
+#define __SIZEOF_LONG_LONG__ 8
+#endif /* !__sizeof_long_long */
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* !__SIZEOF_LONG_LONG__ */
 
 #ifndef __UINT128_TYPE__
-#if (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 128) || \
-    (defined(__SIZEOF_INT128__) && __SIZEOF_INT128__ == 16)
-#define __INT128_TYPE__ signed __int128
+#if ((defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 128) || \
+     (defined(__SIZEOF_INT128__) && __SIZEOF_INT128__ == 16))
+#define __INT128_TYPE__  signed __int128
 #define __UINT128_TYPE__ unsigned __int128
-#endif
+#endif /* ... */
 #endif /* !__UINT128_TYPE__ */
 
 
@@ -185,127 +211,139 @@
 #ifndef __SIZEOF_POINTER__
 #ifdef __sizeof_ptr
 #define __SIZEOF_POINTER__ __sizeof_ptr
-#else /* __sizeof_ptr */
-#   include "host.h"
+#elif (defined(_LP32) || defined(__LP32__) || defined(_ILP32) || \
+       defined(__ILP32__) || defined(_SILP32) || defined(__SILP32__))
+#define __SIZEOF_POINTER__ 4
+#elif (defined(_LP64) || defined(__LP64__) || defined(_ILP64) ||        \
+       defined(__ILP64__) || defined(_SILP64) || defined(__SILP64__) || \
+       defined(_LLP64) || defined(__LLP64__))
+#define __SIZEOF_POINTER__ 8
+#else /* ... */
+#include "host.h"
 #if defined(__x86_64__) || defined(__aarch64__)
-#   define __SIZEOF_POINTER__ 8
+#define __SIZEOF_POINTER__ 8
 #elif defined(__i386__) || defined(__arm__)
-#   define __SIZEOF_POINTER__ 4
+#define __SIZEOF_POINTER__ 4
 #elif defined(__SIZEOF_SIZE_T__)
-#   define __SIZEOF_POINTER__ __SIZEOF_SIZE_T__
+#define __SIZEOF_POINTER__ __SIZEOF_SIZE_T__
 #elif defined(__SIZEOF_PTRDIFF_T__)
-#   define __SIZEOF_POINTER__ __SIZEOF_PTRDIFF_T__
-#else
+#define __SIZEOF_POINTER__ __SIZEOF_PTRDIFF_T__
+#else /* ... */
 #ifdef __UINTPTR_MAX__
 #if __UINTPTR_MAX__ == __PRIVATE_MAX_U4
-#   define __SIZEOF_POINTER__ 4
+#define __SIZEOF_POINTER__ 4
 #elif __UINTPTR_MAX__ == __PRIVATE_MAX_U8
-#   define __SIZEOF_POINTER__ 8
+#define __SIZEOF_POINTER__ 8
 #elif __UINTPTR_MAX__ == __PRIVATE_MAX_U2
-#   define __SIZEOF_POINTER__ 2
+#define __SIZEOF_POINTER__ 2
 #elif __UINTPTR_MAX__ == __PRIVATE_MAX_U1
-#   define __SIZEOF_POINTER__ 1
-#endif
+#define __SIZEOF_POINTER__ 1
+#endif /* __UINTPTR_MAX__ == ... */
 #endif /* __UINTPTR_MAX__ */
 #ifndef __SIZEOF_POINTER__
 #ifdef __INTPTR_MAX__
 #if __INTPTR_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_POINTER__ 4
+#define __SIZEOF_POINTER__ 4
 #elif __INTPTR_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_POINTER__ 8
+#define __SIZEOF_POINTER__ 8
 #elif __INTPTR_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_POINTER__ 2
+#define __SIZEOF_POINTER__ 2
 #elif __INTPTR_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_POINTER__ 1
-#endif
+#define __SIZEOF_POINTER__ 1
+#endif /* __INTPTR_MAX__ == ... */
 #endif /* __INTPTR_MAX__ */
 #ifndef __SIZEOF_POINTER__
-#   error "Cannot determine `__SIZEOF_POINTER__'"
+#error "Cannot determine `__SIZEOF_POINTER__'"
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* !__SIZEOF_POINTER__ */
-#endif /* ... */
-#endif /* !__sizeof_ptr */
+#endif /* !... */
+#endif /* !... */
 #endif /* !__SIZEOF_POINTER__ */
+
 #ifndef __SIZEOF_PTRDIFF_T__
 #define __SIZEOF_PTRDIFF_T__ __SIZEOF_POINTER__
 #endif /* !__SIZEOF_PTRDIFF_T__ */
+
 #ifndef __SIZEOF_SIZE_T__
 #define __SIZEOF_SIZE_T__ __SIZEOF_POINTER__
 #endif /* !__SIZEOF_SIZE_T__ */
 
 
 #if __SIZEOF_POINTER__ == 8
-#   define __INTPTR_C   __INT64_C
-#   define __UINTPTR_C  __UINT64_C
+#define __INTPTR_C  __INT64_C
+#define __UINTPTR_C __UINT64_C
 #elif __SIZEOF_POINTER__ == 4
-#   define __INTPTR_C   __INT32_C
-#   define __UINTPTR_C  __UINT32_C
+#define __INTPTR_C  __INT32_C
+#define __UINTPTR_C __UINT32_C
 #elif __SIZEOF_POINTER__ == 2
-#   define __INTPTR_C   __INT16_C
-#   define __UINTPTR_C  __UINT16_C
+#define __INTPTR_C  __INT16_C
+#define __UINTPTR_C __UINT16_C
 #elif __SIZEOF_POINTER__ == 1
-#   define __INTPTR_C   __INT8_C
-#   define __UINTPTR_C  __UINT8_C
-#else
-#   error "Unsupported sizeof(void *)"
-#endif
-/* XXX: Assume that `__SIZEOF_SIZE_T__ == __SIZEOF_POINTER__' */
-#define __SIZE_C    __UINTPTR_C
-#define __SSIZE_C   __INTPTR_C
+#define __INTPTR_C  __INT8_C
+#define __UINTPTR_C __UINT8_C
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported sizeof(void *)"
+#endif /* __SIZEOF_POINTER__ != ... */
+
+#if __SIZEOF_SIZE_T__ == __SIZEOF_POINTER__
+#define __SIZE_C  __UINTPTR_C
+#define __SSIZE_C __INTPTR_C
+#elif __SIZEOF_SIZE_T__ == 8
+#define __SIZE_C  __INT64_C
+#define __SSIZE_C __UINT64_C
+#elif __SIZEOF_SIZE_T__ == 4
+#define __SIZE_C  __INT32_C
+#define __SSIZE_C __UINT32_C
+#elif __SIZEOF_SIZE_T__ == 2
+#define __SIZE_C  __INT16_C
+#define __SSIZE_C __UINT16_C
+#elif __SIZEOF_SIZE_T__ == 1
+#define __SIZE_C  __INT8_C
+#define __SSIZE_C __UINT8_C
+#else /* __SIZEOF_SIZE_T__ == ... */
+#error "Unsupported sizeof(size_t)"
+#endif /* __SIZEOF_SIZE_T__ != ... */
 
 
-
-#ifndef __SIZEOF_INT_LEAST8_T__
-#define __SIZEOF_INT_LEAST8_T__  1
-#endif /* !__SIZEOF_INT_LEAST8_T__ */
-#ifndef __SIZEOF_INT_LEAST16_T__
-#define __SIZEOF_INT_LEAST16_T__ 2
-#endif /* !__SIZEOF_INT_LEAST16_T__ */
-#ifndef __SIZEOF_INT_LEAST32_T__
-#define __SIZEOF_INT_LEAST32_T__ 4
-#endif /* !__SIZEOF_INT_LEAST32_T__ */
-#ifndef __SIZEOF_INT_LEAST64_T__
-#define __SIZEOF_INT_LEAST64_T__ 8
-#endif /* !__SIZEOF_INT_LEAST64_T__ */
 
 #ifndef __SIZEOF_INT_FAST8_T__
 #ifdef __INT_FAST8_MAX__
 #if __INT_FAST8_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_INT_FAST8_T__   1
+#define __SIZEOF_INT_FAST8_T__ 1
 #elif __INT_FAST8_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_INT_FAST8_T__   2
+#define __SIZEOF_INT_FAST8_T__ 2
 #elif __INT_FAST8_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_INT_FAST8_T__   4
+#define __SIZEOF_INT_FAST8_T__ 4
 #elif __INT_FAST8_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_INT_FAST8_T__   8
-#endif
+#define __SIZEOF_INT_FAST8_T__ 8
+#endif /* __INT_FAST8_MAX__ == ... */
 #endif /* __INT_FAST8_MAX__ */
 #ifndef __SIZEOF_INT_FAST8_T__
 #ifdef __UINT_FAST8_MAX__
 #if __UINT_FAST8_MAX__ == __PRIVATE_MAX_U1
-#   define __SIZEOF_INT_FAST8_T__   1
+#define __SIZEOF_INT_FAST8_T__ 1
 #elif __UINT_FAST8_MAX__ == __PRIVATE_MAX_U2
-#   define __SIZEOF_INT_FAST8_T__   2
+#define __SIZEOF_INT_FAST8_T__ 2
 #elif __UINT_FAST8_MAX__ == __PRIVATE_MAX_U4
-#   define __SIZEOF_INT_FAST8_T__   4
+#define __SIZEOF_INT_FAST8_T__ 4
 #elif __UINT_FAST8_MAX__ == __PRIVATE_MAX_U8
-#   define __SIZEOF_INT_FAST8_T__   8
-#endif
+#define __SIZEOF_INT_FAST8_T__ 8
+#endif /* __UINT_FAST8_MAX__ == ... */
 #endif /* __UINT_FAST8_MAX__ */
 #ifndef __SIZEOF_INT_FAST8_T__
 #ifdef __INT_FAST8_MIN__
 #if __INT_FAST8_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_INT_FAST8_T__   1
+#define __SIZEOF_INT_FAST8_T__ 1
 #elif __INT_FAST8_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_INT_FAST8_T__   2
+#define __SIZEOF_INT_FAST8_T__ 2
 #elif __INT_FAST8_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_INT_FAST8_T__   4
+#define __SIZEOF_INT_FAST8_T__ 4
 #elif __INT_FAST8_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_INT_FAST8_T__   8
-#endif
+#define __SIZEOF_INT_FAST8_T__ 8
+#endif /* __INT_FAST8_MIN__ == ... */
 #endif /* __INT_FAST8_MIN__ */
 #ifndef __SIZEOF_INT_FAST8_T__
-#   define __SIZEOF_INT_FAST8_T__   1
+#define __SIZEOF_INT_FAST8_T__ 1
 #endif /* !__SIZEOF_INT_FAST8_T__ */
 #endif /* !__SIZEOF_INT_FAST8_T__ */
 #endif /* !__SIZEOF_INT_FAST8_T__ */
@@ -314,41 +352,46 @@
 #ifndef __SIZEOF_INT_FAST16_T__
 #ifdef __INT_FAST16_MAX__
 #if __INT_FAST16_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_INT_FAST16_T__   1
+#define __SIZEOF_INT_FAST16_T__ 1
 #elif __INT_FAST16_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_INT_FAST16_T__   2
+#define __SIZEOF_INT_FAST16_T__ 2
 #elif __INT_FAST16_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_INT_FAST16_T__   4
+#define __SIZEOF_INT_FAST16_T__ 4
 #elif __INT_FAST16_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_INT_FAST16_T__   8
-#endif
+#define __SIZEOF_INT_FAST16_T__ 8
+#endif /* __INT_FAST16_MAX__ == ... */
 #endif /* __INT_FAST16_MAX__ */
 #ifndef __SIZEOF_INT_FAST16_T__
 #ifdef __UINT_FAST16_MAX__
 #if __UINT_FAST16_MAX__ == __PRIVATE_MAX_U1
-#   define __SIZEOF_INT_FAST16_T__   1
+#define __SIZEOF_INT_FAST16_T__ 1
 #elif __UINT_FAST16_MAX__ == __PRIVATE_MAX_U2
-#   define __SIZEOF_INT_FAST16_T__   2
+#define __SIZEOF_INT_FAST16_T__ 2
 #elif __UINT_FAST16_MAX__ == __PRIVATE_MAX_U4
-#   define __SIZEOF_INT_FAST16_T__   4
+#define __SIZEOF_INT_FAST16_T__ 4
 #elif __UINT_FAST16_MAX__ == __PRIVATE_MAX_U8
-#   define __SIZEOF_INT_FAST16_T__   8
-#endif
+#define __SIZEOF_INT_FAST16_T__ 8
+#endif /* __UINT_FAST16_MAX__ == ... */
 #endif /* __UINT_FAST16_MAX__ */
 #ifndef __SIZEOF_INT_FAST16_T__
 #ifdef __INT_FAST16_MIN__
 #if __INT_FAST16_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_INT_FAST16_T__   1
+#define __SIZEOF_INT_FAST16_T__ 1
 #elif __INT_FAST16_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_INT_FAST16_T__   2
+#define __SIZEOF_INT_FAST16_T__ 2
 #elif __INT_FAST16_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_INT_FAST16_T__   4
+#define __SIZEOF_INT_FAST16_T__ 4
 #elif __INT_FAST16_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_INT_FAST16_T__   8
-#endif
+#define __SIZEOF_INT_FAST16_T__ 8
+#endif /* __INT_FAST16_MIN__ == ... */
 #endif /* __INT_FAST16_MIN__ */
 #ifndef __SIZEOF_INT_FAST16_T__
-#   define __SIZEOF_INT_FAST16_T__   1
+#include "host.h"
+#if defined(__i386__) || defined(__x86_64__)
+#define __SIZEOF_INT_FAST16_T__ 4
+#else /* __i386__ || __x86_64__ */
+#define __SIZEOF_INT_FAST16_T__ 2
+#endif /* __i386__ || __x86_64__ */
 #endif /* !__SIZEOF_INT_FAST16_T__ */
 #endif /* !__SIZEOF_INT_FAST16_T__ */
 #endif /* !__SIZEOF_INT_FAST16_T__ */
@@ -357,41 +400,41 @@
 #ifndef __SIZEOF_INT_FAST32_T__
 #ifdef __INT_FAST32_MAX__
 #if __INT_FAST32_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_INT_FAST32_T__   1
+#define __SIZEOF_INT_FAST32_T__ 1
 #elif __INT_FAST32_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_INT_FAST32_T__   2
+#define __SIZEOF_INT_FAST32_T__ 2
 #elif __INT_FAST32_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_INT_FAST32_T__   4
+#define __SIZEOF_INT_FAST32_T__ 4
 #elif __INT_FAST32_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_INT_FAST32_T__   8
-#endif
+#define __SIZEOF_INT_FAST32_T__ 8
+#endif /* __INT_FAST32_MAX__ == ... */
 #endif /* __INT_FAST32_MAX__ */
 #ifndef __SIZEOF_INT_FAST32_T__
 #ifdef __UINT_FAST32_MAX__
 #if __UINT_FAST32_MAX__ == __PRIVATE_MAX_U1
-#   define __SIZEOF_INT_FAST32_T__   1
+#define __SIZEOF_INT_FAST32_T__ 1
 #elif __UINT_FAST32_MAX__ == __PRIVATE_MAX_U2
-#   define __SIZEOF_INT_FAST32_T__   2
+#define __SIZEOF_INT_FAST32_T__ 2
 #elif __UINT_FAST32_MAX__ == __PRIVATE_MAX_U4
-#   define __SIZEOF_INT_FAST32_T__   4
+#define __SIZEOF_INT_FAST32_T__ 4
 #elif __UINT_FAST32_MAX__ == __PRIVATE_MAX_U8
-#   define __SIZEOF_INT_FAST32_T__   8
-#endif
+#define __SIZEOF_INT_FAST32_T__ 8
+#endif /* __UINT_FAST32_MAX__ == ... */
 #endif /* __UINT_FAST32_MAX__ */
 #ifndef __SIZEOF_INT_FAST32_T__
 #ifdef __INT_FAST32_MIN__
 #if __INT_FAST32_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_INT_FAST32_T__   1
+#define __SIZEOF_INT_FAST32_T__ 1
 #elif __INT_FAST32_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_INT_FAST32_T__   2
+#define __SIZEOF_INT_FAST32_T__ 2
 #elif __INT_FAST32_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_INT_FAST32_T__   4
+#define __SIZEOF_INT_FAST32_T__ 4
 #elif __INT_FAST32_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_INT_FAST32_T__   8
-#endif
+#define __SIZEOF_INT_FAST32_T__ 8
+#endif /* __INT_FAST32_MIN__ == ... */
 #endif /* __INT_FAST32_MIN__ */
 #ifndef __SIZEOF_INT_FAST32_T__
-#   define __SIZEOF_INT_FAST32_T__   1
+#define __SIZEOF_INT_FAST32_T__ 4
 #endif /* !__SIZEOF_INT_FAST32_T__ */
 #endif /* !__SIZEOF_INT_FAST32_T__ */
 #endif /* !__SIZEOF_INT_FAST32_T__ */
@@ -400,41 +443,41 @@
 #ifndef __SIZEOF_INT_FAST64_T__
 #ifdef __INT_FAST64_MAX__
 #if __INT_FAST64_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_INT_FAST64_T__   1
+#define __SIZEOF_INT_FAST64_T__ 1
 #elif __INT_FAST64_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_INT_FAST64_T__   2
+#define __SIZEOF_INT_FAST64_T__ 2
 #elif __INT_FAST64_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_INT_FAST64_T__   4
+#define __SIZEOF_INT_FAST64_T__ 4
 #elif __INT_FAST64_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_INT_FAST64_T__   8
-#endif
+#define __SIZEOF_INT_FAST64_T__ 8
+#endif /* __INT_FAST64_MAX__ == ... */
 #endif /* __INT_FAST64_MAX__ */
 #ifndef __SIZEOF_INT_FAST64_T__
 #ifdef __UINT_FAST64_MAX__
 #if __UINT_FAST64_MAX__ == __PRIVATE_MAX_U1
-#   define __SIZEOF_INT_FAST64_T__   1
+#define __SIZEOF_INT_FAST64_T__ 1
 #elif __UINT_FAST64_MAX__ == __PRIVATE_MAX_U2
-#   define __SIZEOF_INT_FAST64_T__   2
+#define __SIZEOF_INT_FAST64_T__ 2
 #elif __UINT_FAST64_MAX__ == __PRIVATE_MAX_U4
-#   define __SIZEOF_INT_FAST64_T__   4
+#define __SIZEOF_INT_FAST64_T__ 4
 #elif __UINT_FAST64_MAX__ == __PRIVATE_MAX_U8
-#   define __SIZEOF_INT_FAST64_T__   8
-#endif
+#define __SIZEOF_INT_FAST64_T__ 8
+#endif /* __UINT_FAST64_MAX__ == ... */
 #endif /* __UINT_FAST64_MAX__ */
 #ifndef __SIZEOF_INT_FAST64_T__
 #ifdef __INT_FAST64_MIN__
 #if __INT_FAST64_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_INT_FAST64_T__   1
+#define __SIZEOF_INT_FAST64_T__ 1
 #elif __INT_FAST64_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_INT_FAST64_T__   2
+#define __SIZEOF_INT_FAST64_T__ 2
 #elif __INT_FAST64_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_INT_FAST64_T__   4
+#define __SIZEOF_INT_FAST64_T__ 4
 #elif __INT_FAST64_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_INT_FAST64_T__   8
-#endif
+#define __SIZEOF_INT_FAST64_T__ 8
+#endif /* __INT_FAST64_MIN__ == ... */
 #endif /* __INT_FAST64_MIN__ */
 #ifndef __SIZEOF_INT_FAST64_T__
-#   define __SIZEOF_INT_FAST64_T__   1
+#define __SIZEOF_INT_FAST64_T__ 8
 #endif /* !__SIZEOF_INT_FAST64_T__ */
 #endif /* !__SIZEOF_INT_FAST64_T__ */
 #endif /* !__SIZEOF_INT_FAST64_T__ */
@@ -443,117 +486,105 @@
 #ifndef __SIZEOF_SIG_ATOMIC_T__
 #ifdef __SIG_ATOMIC_MAX__
 #if __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_SIG_ATOMIC_T__ 4
+#define __SIZEOF_SIG_ATOMIC_T__ 4
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_SIG_ATOMIC_T__ 8
+#define __SIZEOF_SIG_ATOMIC_T__ 8
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_SIG_ATOMIC_T__ 2
+#define __SIZEOF_SIG_ATOMIC_T__ 2
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_SIG_ATOMIC_T__ 1
+#define __SIZEOF_SIG_ATOMIC_T__ 1
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U4
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 4
+#define __SIG_ATOMIC_UNSIGNED__ 1
+#define __SIZEOF_SIG_ATOMIC_T__ 4
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U8
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 8
+#define __SIG_ATOMIC_UNSIGNED__ 1
+#define __SIZEOF_SIG_ATOMIC_T__ 8
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U2
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 2
+#define __SIG_ATOMIC_UNSIGNED__ 1
+#define __SIZEOF_SIG_ATOMIC_T__ 2
 #elif __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U1
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 1
-#endif
+#define __SIG_ATOMIC_UNSIGNED__ 1
+#define __SIZEOF_SIG_ATOMIC_T__ 1
+#endif /* __SIG_ATOMIC_MAX__ == ... */
 #endif /* __SIG_ATOMIC_MAX__ */
 #if !defined(__SIZEOF_SIG_ATOMIC_T__) && defined(__SIG_ATOMIC_MIN__)
+#undef __SIG_ATOMIC_UNSIGNED__
 #if __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_SIG_ATOMIC_T__ 4
+#define __SIZEOF_SIG_ATOMIC_T__ 4
 #elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_SIG_ATOMIC_T__ 8
+#define __SIZEOF_SIG_ATOMIC_T__ 8
 #elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_SIG_ATOMIC_T__ 2
+#define __SIZEOF_SIG_ATOMIC_T__ 2
 #elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_SIG_ATOMIC_T__ 1
+#define __SIZEOF_SIG_ATOMIC_T__ 1
 #elif __SIG_ATOMIC_MIN__ == 0
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#endif
+#define __SIG_ATOMIC_UNSIGNED__ 1
+#endif /* __SIG_ATOMIC_MIN__ == ... */
 #endif /* __SIZEOF_SIG_ATOMIC_T__ && __SIG_ATOMIC_MIN__ */
 #ifndef __SIZEOF_SIG_ATOMIC_T__
 #define __SIZEOF_SIG_ATOMIC_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_SIG_ATOMIC_T__ */
 #else /* !__SIZEOF_SIG_ATOMIC_T__ */
-#if (defined(__SIG_ATOMIC_MIN__) && (__SIG_ATOMIC_MIN__ == 0)) || \
-    (defined(__SIG_ATOMIC_MAX__) && (__SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U4 || \
-                                     __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U8 || \
-                                     __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U2 || \
-                                     __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U1))
+#if ((defined(__SIG_ATOMIC_MIN__) && (__SIG_ATOMIC_MIN__ == 0)) || \
+     (defined(__SIG_ATOMIC_MAX__) && (__SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U4 || \
+                                      __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U8 || \
+                                      __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U2 || \
+                                      __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U1)))
 #define __SIG_ATOMIC_UNSIGNED__ 1
 #endif /* ... */
 #endif /* __SIZEOF_SIG_ATOMIC_T__ */
 
 #ifndef __SIZEOF_WINT_T__
 #ifdef __WINT_MIN__
+#undef  __WINT_UNSIGNED__
 #if __WINT_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_WINT_T__ 4
+#define __SIZEOF_WINT_T__ 4
 #elif __WINT_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_WINT_T__ 2
+#define __SIZEOF_WINT_T__ 2
 #elif __WINT_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_WINT_T__ 8
+#define __SIZEOF_WINT_T__ 8
 #elif __WINT_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_WINT_T__ 1
-#elif __WINT_MIN__ == __PRIVATE_MIN_U4
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 4
-#elif __WINT_MIN__ == __PRIVATE_MIN_U2
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 2
-#elif __WINT_MIN__ == __PRIVATE_MIN_U8
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 8
-#elif __WINT_MIN__ == __PRIVATE_MIN_U1
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 1
-#endif
+#define __SIZEOF_WINT_T__ 1
+#elif __WINT_MIN__ == 0
+#define __WINT_UNSIGNED__ 1
+#endif /* __WINT_MIN__ == ... */
 #endif /* __WINT_MIN__ */
 #ifndef __SIZEOF_WINT_T__
 #ifdef __WINT_MAX__
 #if __WINT_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_WINT_T__ 4
+#define __SIZEOF_WINT_T__ 4
 #elif __WINT_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_WINT_T__ 2
+#define __SIZEOF_WINT_T__ 2
 #elif __WINT_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_WINT_T__ 8
+#define __SIZEOF_WINT_T__ 8
 #elif __WINT_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_WINT_T__ 1
+#define __SIZEOF_WINT_T__ 1
 #elif __WINT_MAX__ == __PRIVATE_MAX_U4
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 4
+#undef  __WINT_UNSIGNED__
+#define __WINT_UNSIGNED__ 1
+#define __SIZEOF_WINT_T__ 4
 #elif __WINT_MAX__ == __PRIVATE_MAX_U2
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 2
+#undef  __WINT_UNSIGNED__
+#define __WINT_UNSIGNED__ 1
+#define __SIZEOF_WINT_T__ 2
 #elif __WINT_MAX__ == __PRIVATE_MAX_U8
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 8
+#undef  __WINT_UNSIGNED__
+#define __WINT_UNSIGNED__ 1
+#define __SIZEOF_WINT_T__ 8
 #elif __WINT_MAX__ == __PRIVATE_MAX_U1
-#   undef  __WINT_UNSIGNED__
-#   define __WINT_UNSIGNED__ 1
-#   define __SIZEOF_WINT_T__ 1
+#undef  __WINT_UNSIGNED__
+#define __WINT_UNSIGNED__ 1
+#define __SIZEOF_WINT_T__ 1
 #endif
 #endif /* __WINT_MAX__ */
 #ifndef __SIZEOF_WINT_T__
 #if defined(__CYGWIN__) || defined(__CYGWIN32__) || \
     defined(__MINGW32__) || defined(WIN32) || defined(_WIN32) || \
     defined(WIN64) || defined(_WIN64)
-#   define __SIZEOF_WINT_T__ 2
-#   define __WINT_UNSIGNED__ 1
+#define __SIZEOF_WINT_T__ 2
+#define __WINT_UNSIGNED__ 1
 #else
-#   define __SIZEOF_WINT_T__ __SIZEOF_INT__
+#define __SIZEOF_WINT_T__ __SIZEOF_INT__
 #endif
 #endif /* !__SIZEOF_WINT_T__ */
 #endif /* !__SIZEOF_WINT_T__ */
@@ -564,7 +595,7 @@
                                __WINT_MAX__ == __PRIVATE_MAX_U2 || \
                                __WINT_MAX__ == __PRIVATE_MAX_U1 || \
                                __WINT_MAX__ == __PRIVATE_MAX_U8))
-#   define __WINT_UNSIGNED__ 1
+#define __WINT_UNSIGNED__ 1
 #endif /* ... */
 #endif /* !__WINT_UNSIGNED__ */
 #endif /* __SIZEOF_WINT_T__ */
@@ -572,163 +603,147 @@
 
 #ifndef __SIZEOF_WCHAR_T__
 #ifdef __WCHAR_MIN__
+#undef __WCHAR_UNSIGNED__
 #if __WCHAR_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_WCHAR_T__ 4
+#define __SIZEOF_WCHAR_T__ 4
 #elif __WCHAR_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_WCHAR_T__ 2
+#define __SIZEOF_WCHAR_T__ 2
 #elif __WCHAR_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_WCHAR_T__ 8
+#define __SIZEOF_WCHAR_T__ 8
 #elif __WCHAR_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_WCHAR_T__ 1
-#elif __WCHAR_MIN__ == __PRIVATE_MIN_U4
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 4
-#elif __WCHAR_MIN__ == __PRIVATE_MIN_U2
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 2
-#elif __WCHAR_MIN__ == __PRIVATE_MIN_U8
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 8
-#elif __WCHAR_MIN__ == __PRIVATE_MIN_U1
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 1
-#endif
+#define __SIZEOF_WCHAR_T__ 1
+#elif __WCHAR_MIN__ == 0
+#define __WCHAR_UNSIGNED__ 1
+#endif /* __WCHAR_MIN__ == ... */
 #endif /* __WCHAR_MIN__ */
 #ifndef __SIZEOF_WCHAR_T__
 #ifdef __WCHAR_MAX__
 #if __WCHAR_MAX__ == __PRIVATE_MAX_S4
-#   define __SIZEOF_WCHAR_T__ 4
+#define __SIZEOF_WCHAR_T__ 4
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_S2
-#   define __SIZEOF_WCHAR_T__ 2
+#define __SIZEOF_WCHAR_T__ 2
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_S8
-#   define __SIZEOF_WCHAR_T__ 8
+#define __SIZEOF_WCHAR_T__ 8
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_S1
-#   define __SIZEOF_WCHAR_T__ 1
+#define __SIZEOF_WCHAR_T__ 1
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_U4
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 4
+#undef  __WCHAR_UNSIGNED__
+#define __WCHAR_UNSIGNED__ 1
+#define __SIZEOF_WCHAR_T__ 4
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_U2
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 2
+#undef  __WCHAR_UNSIGNED__
+#define __WCHAR_UNSIGNED__ 1
+#define __SIZEOF_WCHAR_T__ 2
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_U8
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 8
+#undef  __WCHAR_UNSIGNED__
+#define __WCHAR_UNSIGNED__ 1
+#define __SIZEOF_WCHAR_T__ 8
 #elif __WCHAR_MAX__ == __PRIVATE_MAX_U1
-#   undef  __WCHAR_UNSIGNED__
-#   define __WCHAR_UNSIGNED__ 1
-#   define __SIZEOF_WCHAR_T__ 1
-#endif
+#undef  __WCHAR_UNSIGNED__
+#define __WCHAR_UNSIGNED__ 1
+#define __SIZEOF_WCHAR_T__ 1
+#endif /* __WCHAR_MAX__ == ... */
 #endif /* __WCHAR_MAX__ */
 #ifndef __SIZEOF_WCHAR_T__
 #if defined(__PE__)
-#   define __SIZEOF_WCHAR_T__ 2
+#define __SIZEOF_WCHAR_T__ 2
 #else /* __PE__ */
-#   define __SIZEOF_WCHAR_T__ 4
+#define __SIZEOF_WCHAR_T__ 4
 #endif /* !__PE__ */
 #endif /* !__SIZEOF_WCHAR_T__ */
 #endif /* !__SIZEOF_WCHAR_T__ */
 #else /* !__SIZEOF_WCHAR_T__ */
 #ifndef __WCHAR_UNSIGNED__
-#if (defined(__WCHAR_MIN__) && (__WCHAR_MIN__ == 0)) || \
-    (defined(__WCHAR_MAX__) && (__WCHAR_MAX__ == __PRIVATE_MAX_U4 || \
-                                __WCHAR_MAX__ == __PRIVATE_MAX_U2 || \
-                                __WCHAR_MAX__ == __PRIVATE_MAX_U1 || \
-                                __WCHAR_MAX__ == __PRIVATE_MAX_U8))
-#   define __WCHAR_UNSIGNED__ 1
+#if ((defined(__WCHAR_MIN__) && (__WCHAR_MIN__ == 0)) || \
+     (defined(__WCHAR_MAX__) && (__WCHAR_MAX__ == __PRIVATE_MAX_U4 || \
+                                 __WCHAR_MAX__ == __PRIVATE_MAX_U2 || \
+                                 __WCHAR_MAX__ == __PRIVATE_MAX_U1 || \
+                                 __WCHAR_MAX__ == __PRIVATE_MAX_U8)))
+#define __WCHAR_UNSIGNED__ 1
 #endif /* ... */
 #endif /* !__WCHAR_UNSIGNED__ */
 #endif /* __SIZEOF_WCHAR_T__ */
 
 
 #if defined(__INT8_TYPE__) && defined(__UINT8_TYPE__)
-#   define __TYPEFOR_INTIB1  __INT8_TYPE__
-#   define __TYPEFOR_UINTIB1 __UINT8_TYPE__
+#define __TYPEFOR_INTIB1  __INT8_TYPE__
+#define __TYPEFOR_UINTIB1 __UINT8_TYPE__
 #elif __SIZEOF_CHAR__ == 1
-#   define __TYPEFOR_INTIB1  signed char
-#   define __TYPEFOR_UINTIB1 unsigned char
+#define __TYPEFOR_INTIB1  signed char
+#define __TYPEFOR_UINTIB1 unsigned char
 #elif __SIZEOF_SHORT__ == 1
-#   define __TYPEFOR_INTIB1  signed short
-#   define __TYPEFOR_UINTIB1 unsigned short
+#define __TYPEFOR_INTIB1  signed short
+#define __TYPEFOR_UINTIB1 unsigned short
 #elif __SIZEOF_INT__ == 1
-#   define __TYPEFOR_INTIB1  signed int
-#   define __TYPEFOR_UINTIB1 unsigned int
+#define __TYPEFOR_INTIB1  signed int
+#define __TYPEFOR_UINTIB1 unsigned int
 #elif __SIZEOF_LONG__ == 1
-#   define __TYPEFOR_INTIB1  signed long
-#   define __TYPEFOR_UINTIB1 unsigned long
+#define __TYPEFOR_INTIB1  signed long
+#define __TYPEFOR_UINTIB1 unsigned long
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 1
-#   define __TYPEFOR_INTIB1  signed long long
-#   define __TYPEFOR_UINTIB1 unsigned long long
-#else /* ... */
-#   error "Cannot determine 1-byte integer types"
-#endif /* !... */
+#define __TYPEFOR_INTIB1  signed long long
+#define __TYPEFOR_UINTIB1 unsigned long long
+#endif /* ... == 1 */
+
 #if defined(__INT16_TYPE__) && defined(__UINT16_TYPE__)
-#   define __TYPEFOR_INTIB2  __INT16_TYPE__
-#   define __TYPEFOR_UINTIB2 __UINT16_TYPE__
+#define __TYPEFOR_INTIB2  __INT16_TYPE__
+#define __TYPEFOR_UINTIB2 __UINT16_TYPE__
 #elif __SIZEOF_SHORT__ == 2
-#   define __TYPEFOR_INTIB2  signed short
-#   define __TYPEFOR_UINTIB2 unsigned short
+#define __TYPEFOR_INTIB2  signed short
+#define __TYPEFOR_UINTIB2 unsigned short
 #elif __SIZEOF_INT__ == 2
-#   define __TYPEFOR_INTIB2  signed int
-#   define __TYPEFOR_UINTIB2 unsigned int
+#define __TYPEFOR_INTIB2  signed int
+#define __TYPEFOR_UINTIB2 unsigned int
 #elif __SIZEOF_LONG__ == 2
-#   define __TYPEFOR_INTIB2  signed long
-#   define __TYPEFOR_UINTIB2 unsigned long
+#define __TYPEFOR_INTIB2  signed long
+#define __TYPEFOR_UINTIB2 unsigned long
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 2
-#   define __TYPEFOR_INTIB2  signed long long
-#   define __TYPEFOR_UINTIB2 unsigned long long
+#define __TYPEFOR_INTIB2  signed long long
+#define __TYPEFOR_UINTIB2 unsigned long long
 #elif __SIZEOF_CHAR__ == 2
-#   define __TYPEFOR_INTIB2  signed char
-#   define __TYPEFOR_UINTIB2 unsigned char
-#else /* ... */
-#   error "Cannot determine 2-byte integer types"
-#endif /* !... */
+#define __TYPEFOR_INTIB2  signed char
+#define __TYPEFOR_UINTIB2 unsigned char
+#endif /* ... == 2 */
+
 #if defined(__INT32_TYPE__) && defined(__UINT32_TYPE__)
-#   define __TYPEFOR_INTIB4  __INT32_TYPE__
-#   define __TYPEFOR_UINTIB4 __UINT32_TYPE__
+#define __TYPEFOR_INTIB4  __INT32_TYPE__
+#define __TYPEFOR_UINTIB4 __UINT32_TYPE__
 #elif __SIZEOF_INT__ == 4
-#   define __TYPEFOR_INTIB4  signed int
-#   define __TYPEFOR_UINTIB4 unsigned int
+#define __TYPEFOR_INTIB4  signed int
+#define __TYPEFOR_UINTIB4 unsigned int
 #elif __SIZEOF_LONG__ == 4
-#   define __TYPEFOR_INTIB4  signed long
-#   define __TYPEFOR_UINTIB4 unsigned long
+#define __TYPEFOR_INTIB4  signed long
+#define __TYPEFOR_UINTIB4 unsigned long
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 4
-#   define __TYPEFOR_INTIB4  signed long long
-#   define __TYPEFOR_UINTIB4 unsigned long long
+#define __TYPEFOR_INTIB4  signed long long
+#define __TYPEFOR_UINTIB4 unsigned long long
 #elif __SIZEOF_SHORT__ == 4
-#   define __TYPEFOR_INTIB4  signed short
-#   define __TYPEFOR_UINTIB4 unsigned short
+#define __TYPEFOR_INTIB4  signed short
+#define __TYPEFOR_UINTIB4 unsigned short
 #elif __SIZEOF_CHAR__ == 4
-#   define __TYPEFOR_INTIB4  signed char
-#   define __TYPEFOR_UINTIB4 unsigned char
-#else /* ... */
-#   error "Cannot determine 4-byte integer types"
-#endif /* !... */
+#define __TYPEFOR_INTIB4  signed char
+#define __TYPEFOR_UINTIB4 unsigned char
+#endif /* ... == 4 */
+
 #if defined(__INT64_TYPE__) && defined(__UINT64_TYPE__)
-#   define __TYPEFOR_INTIB8  __INT64_TYPE__
-#   define __TYPEFOR_UINTIB8 __UINT64_TYPE__
+#define __TYPEFOR_INTIB8  __INT64_TYPE__
+#define __TYPEFOR_UINTIB8 __UINT64_TYPE__
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 8
-#   define __TYPEFOR_INTIB8  signed long long
-#   define __TYPEFOR_UINTIB8 unsigned long long
+#define __TYPEFOR_INTIB8  signed long long
+#define __TYPEFOR_UINTIB8 unsigned long long
 #elif __SIZEOF_LONG__ == 8
-#   define __TYPEFOR_INTIB8  signed long
-#   define __TYPEFOR_UINTIB8 unsigned long
+#define __TYPEFOR_INTIB8  signed long
+#define __TYPEFOR_UINTIB8 unsigned long
 #elif __SIZEOF_INT__ == 8
-#   define __TYPEFOR_INTIB8  signed int
-#   define __TYPEFOR_UINTIB8 unsigned int
+#define __TYPEFOR_INTIB8  signed int
+#define __TYPEFOR_UINTIB8 unsigned int
 #elif __SIZEOF_SHORT__ == 8
-#   define __TYPEFOR_INTIB8  signed short
-#   define __TYPEFOR_UINTIB8 unsigned short
+#define __TYPEFOR_INTIB8  signed short
+#define __TYPEFOR_UINTIB8 unsigned short
 #elif __SIZEOF_CHAR__ == 8
-#   define __TYPEFOR_INTIB8  signed char
-#   define __TYPEFOR_UINTIB8 unsigned char
-#endif
+#define __TYPEFOR_INTIB8  signed char
+#define __TYPEFOR_UINTIB8 unsigned char
+#endif /* ... == 8 */
 
 #define __PRIVATE_TYPEFOR_INTIB(n)  __TYPEFOR_INTIB##n
 #define __PRIVATE_TYPEFOR_UINTIB(n) __TYPEFOR_UINTIB##n
@@ -737,32 +752,47 @@
 
 #ifndef __CHAR8_TYPE__
 #if __SIZEOF_CHAR__ == 1
-#   define __CHAR8_TYPE__ char
-#else /* __SIZEOF_CHAR__ == 1 */
-#   define __CHAR8_TYPE__ __INT8_TYPE__
-#endif /* __SIZEOF_CHAR__ != 1 */
+#define __CHAR8_TYPE__ char
+#elif defined(__CHAR_UNSIGNED__)
+#define __CHAR8_TYPE__ __UINT8_TYPE__
+#else /* ... */
+#define __CHAR8_TYPE__ __INT8_TYPE__
+#endif /* !... */
 #endif /* !__CHAR8_TYPE__ */
+
 #ifndef __INT8_TYPE__
-#define __INT8_TYPE__   __TYPEFOR_INTIB1
+#ifdef __TYPEFOR_INTIB1
+#define __INT8_TYPE__ __TYPEFOR_INTIB1
+#endif /* __TYPEFOR_INTIB1 */
 #endif /* !__INT8_TYPE__ */
 #ifndef __INT16_TYPE__
-#define __INT16_TYPE__  __TYPEFOR_INTIB2
+#ifdef __TYPEFOR_INTIB2
+#define __INT16_TYPE__ __TYPEFOR_INTIB2
+#endif /* __TYPEFOR_INTIB2 */
 #endif /* !__INT16_TYPE__ */
 #ifndef __INT32_TYPE__
-#define __INT32_TYPE__  __TYPEFOR_INTIB4
+#ifdef __TYPEFOR_INTIB4
+#define __INT32_TYPE__ __TYPEFOR_INTIB4
+#endif /* __TYPEFOR_INTIB4 */
 #endif /* !__INT32_TYPE__ */
 #ifndef __UINT8_TYPE__
-#define __UINT8_TYPE__  __TYPEFOR_UINTIB1
+#ifdef __TYPEFOR_UINTIB1
+#define __UINT8_TYPE__ __TYPEFOR_UINTIB1
+#endif /* __TYPEFOR_UINTIB1 */
 #endif /* !__UINT8_TYPE__ */
 #ifndef __UINT16_TYPE__
+#ifdef __TYPEFOR_UINTIB2
 #define __UINT16_TYPE__ __TYPEFOR_UINTIB2
+#endif /* __TYPEFOR_UINTIB2 */
 #endif /* !__UINT16_TYPE__ */
 #ifndef __UINT32_TYPE__
+#ifdef __TYPEFOR_UINTIB4
 #define __UINT32_TYPE__ __TYPEFOR_UINTIB4
+#endif /* __TYPEFOR_UINTIB4 */
 #endif /* !__UINT32_TYPE__ */
 #ifndef __INT64_TYPE__
 #ifdef __TYPEFOR_INTIB8
-#define __INT64_TYPE__  __TYPEFOR_INTIB8
+#define __INT64_TYPE__ __TYPEFOR_INTIB8
 #endif /* __TYPEFOR_INTIB8 */
 #endif /* !__INT64_TYPE__ */
 #ifndef __UINT64_TYPE__
@@ -771,90 +801,183 @@
 #endif /* __TYPEFOR_UINTIB8 */
 #endif /* !__UINT64_TYPE__ */
 
+
+#ifndef __SIZEOF_INT_LEAST64_T__
+#ifdef __TYPEFOR_UINTIB8
+#define __SIZEOF_INT_LEAST64_T__ 8
+#endif /* __TYPEFOR_UINTIB8 */
+#endif /* !__SIZEOF_INT_LEAST64_T__ */
+
+#ifndef __SIZEOF_INT_LEAST32_T__
+#ifdef __TYPEFOR_UINTIB4
+#define __SIZEOF_INT_LEAST32_T__ 4
+#elif defined(__SIZEOF_INT_LEAST64_T__)
+#define __SIZEOF_INT_LEAST32_T__ __SIZEOF_INT_LEAST64_T__
+#endif /* ... */
+#endif /* !__SIZEOF_INT_LEAST32_T__ */
+
+#ifndef __SIZEOF_INT_LEAST16_T__
+#ifdef __TYPEFOR_UINTIB2
+#define __SIZEOF_INT_LEAST16_T__ 2
+#elif defined(__SIZEOF_INT_LEAST32_T__)
+#define __SIZEOF_INT_LEAST16_T__ __SIZEOF_INT_LEAST32_T__
+#endif /* ... */
+#endif /* !__SIZEOF_INT_LEAST16_T__ */
+
+#ifndef __SIZEOF_INT_LEAST8_T__
+#ifdef __TYPEFOR_UINTIB1
+#define __SIZEOF_INT_LEAST8_T__ 1
+#elif defined(__SIZEOF_INT_LEAST16_T__)
+#define __SIZEOF_INT_LEAST8_T__ __SIZEOF_INT_LEAST16_T__
+#endif /* ... */
+#endif /* !__SIZEOF_INT_LEAST8_T__ */
+
+
 #ifndef __INT_LEAST8_TYPE__
+#ifdef __SIZEOF_INT_LEAST8_T__
 #define __INT_LEAST8_TYPE__   __TYPEFOR_INTIB(__SIZEOF_INT_LEAST8_T__)
+#endif /* __SIZEOF_INT_LEAST8_T__ */
 #endif /* !__INT_LEAST8_TYPE__ */
 #ifndef __INT_LEAST16_TYPE__
-#define __INT_LEAST16_TYPE__  __TYPEFOR_INTIB(__SIZEOF_INT_LEAST16_T__)
+#ifdef __SIZEOF_INT_LEAST16_T__
+#define __INT_LEAST16_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_LEAST16_T__)
+#endif /* __SIZEOF_INT_LEAST16_T__ */
 #endif /* !__INT_LEAST16_TYPE__ */
 #ifndef __INT_LEAST32_TYPE__
-#define __INT_LEAST32_TYPE__  __TYPEFOR_INTIB(__SIZEOF_INT_LEAST32_T__)
+#ifdef __SIZEOF_INT_LEAST32_T__
+#define __INT_LEAST32_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_LEAST32_T__)
+#endif /* __SIZEOF_INT_LEAST32_T__ */
 #endif /* !__INT_LEAST32_TYPE__ */
 #ifndef __INT_LEAST64_TYPE__
-#define __INT_LEAST64_TYPE__  __TYPEFOR_INTIB(__SIZEOF_INT_LEAST64_T__)
+#ifdef __SIZEOF_INT_LEAST64_T__
+#define __INT_LEAST64_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_LEAST64_T__)
+#endif /* __SIZEOF_INT_LEAST64_T__ */
 #endif /* !__INT_LEAST64_TYPE__ */
 #ifndef __UINT_LEAST8_TYPE__
-#define __UINT_LEAST8_TYPE__  __TYPEFOR_UINTIB(__SIZEOF_INT_LEAST8_T__)
+#ifdef __SIZEOF_INT_LEAST8_T__
+#define __UINT_LEAST8_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_LEAST8_T__)
+#endif /* __SIZEOF_INT_LEAST8_T__ */
 #endif /* !__UINT_LEAST8_TYPE__ */
 #ifndef __UINT_LEAST16_TYPE__
+#ifdef __SIZEOF_INT_LEAST16_T__
 #define __UINT_LEAST16_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_LEAST16_T__)
+#endif /* __SIZEOF_INT_LEAST16_T__ */
 #endif /* !__UINT_LEAST16_TYPE__ */
 #ifndef __UINT_LEAST32_TYPE__
+#ifdef __SIZEOF_INT_LEAST32_T__
 #define __UINT_LEAST32_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_LEAST32_T__)
+#endif /* __SIZEOF_INT_LEAST32_T__ */
 #endif /* !__UINT_LEAST32_TYPE__ */
 #ifndef __UINT_LEAST64_TYPE__
+#ifdef __SIZEOF_INT_LEAST64_T__
 #define __UINT_LEAST64_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_LEAST64_T__)
+#endif /* __SIZEOF_INT_LEAST64_T__ */
 #endif /* !__UINT_LEAST64_TYPE__ */
 #ifndef __INT_FAST8_TYPE__
-#define __INT_FAST8_TYPE__    __TYPEFOR_INTIB(__SIZEOF_INT_FAST8_T__)
+#ifdef __SIZEOF_INT_FAST8_T__
+#define __INT_FAST8_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_FAST8_T__)
+#endif /* __SIZEOF_INT_FAST8_T__ */
 #endif /* !__INT_FAST8_TYPE__ */
 #ifndef __INT_FAST16_TYPE__
-#define __INT_FAST16_TYPE__   __TYPEFOR_INTIB(__SIZEOF_INT_FAST16_T__)
+#ifdef __SIZEOF_INT_FAST16_T__
+#define __INT_FAST16_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_FAST16_T__)
+#endif /* __SIZEOF_INT_FAST16_T__ */
 #endif /* !__INT_FAST16_TYPE__ */
 #ifndef __INT_FAST32_TYPE__
-#define __INT_FAST32_TYPE__   __TYPEFOR_INTIB(__SIZEOF_INT_FAST32_T__)
+#ifdef __SIZEOF_INT_FAST32_T__
+#define __INT_FAST32_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_FAST32_T__)
+#endif /* __SIZEOF_INT_FAST32_T__ */
 #endif /* !__INT_FAST32_TYPE__ */
 #ifndef __INT_FAST64_TYPE__
-#define __INT_FAST64_TYPE__   __TYPEFOR_INTIB(__SIZEOF_INT_FAST64_T__)
+#ifdef __SIZEOF_INT_FAST64_T__
+#define __INT_FAST64_TYPE__ __TYPEFOR_INTIB(__SIZEOF_INT_FAST64_T__)
+#endif /* __SIZEOF_INT_FAST64_T__ */
 #endif /* !__INT_FAST64_TYPE__ */
 #ifndef __UINT_FAST8_TYPE__
-#define __UINT_FAST8_TYPE__   __TYPEFOR_UINTIB(__SIZEOF_INT_FAST8_T__)
+#ifdef __SIZEOF_INT_FAST8_T__
+#define __UINT_FAST8_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_FAST8_T__)
+#endif /* __SIZEOF_INT_FAST8_T__ */
 #endif /* !__UINT_FAST8_TYPE__ */
 #ifndef __UINT_FAST16_TYPE__
-#define __UINT_FAST16_TYPE__  __TYPEFOR_UINTIB(__SIZEOF_INT_FAST16_T__)
+#ifdef __SIZEOF_INT_FAST16_T__
+#define __UINT_FAST16_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_FAST16_T__)
+#endif /* __SIZEOF_INT_FAST16_T__ */
 #endif /* !__UINT_FAST16_TYPE__ */
 #ifndef __UINT_FAST32_TYPE__
-#define __UINT_FAST32_TYPE__  __TYPEFOR_UINTIB(__SIZEOF_INT_FAST32_T__)
+#ifdef __SIZEOF_INT_FAST32_T__
+#define __UINT_FAST32_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_FAST32_T__)
+#endif /* __SIZEOF_INT_FAST32_T__ */
 #endif /* !__UINT_FAST32_TYPE__ */
 #ifndef __UINT_FAST64_TYPE__
-#define __UINT_FAST64_TYPE__  __TYPEFOR_UINTIB(__SIZEOF_INT_FAST64_T__)
+#ifdef __SIZEOF_INT_FAST64_T__
+#define __UINT_FAST64_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_INT_FAST64_T__)
+#endif /* __SIZEOF_INT_FAST64_T__ */
 #endif /* !__UINT_FAST64_TYPE__ */
 
 
 #ifndef __INTPTR_TYPE__
-#define __INTPTR_TYPE__  __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_POINTER__)
+#define __INTPTR_TYPE__ __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_POINTER__)
 #endif /* !__INTPTR_TYPE__ */
+
 #ifndef __UINTPTR_TYPE__
 #define __UINTPTR_TYPE__ __ATTR_W64 __TYPEFOR_UINTIB(__SIZEOF_POINTER__)
 #endif /* !__UINTPTR_TYPE__ */
-#ifndef __SIZE_TYPE__
-#define __SIZE_TYPE__    __ATTR_W64 __TYPEFOR_UINTIB(__SIZEOF_SIZE_T__)
-#endif /* !__SIZE_TYPE__ */
-#ifndef __INTMAX_TYPE__
-#define __INTMAX_TYPE__  __INT64_TYPE__
-#endif /* !__INTMAX_TYPE__ */
-#ifndef __UINTMAX_TYPE__
-#define __UINTMAX_TYPE__ __UINT64_TYPE__
-#endif /* !__UINTMAX_TYPE__ */
 
-#if (__SIZEOF_LONG__ == __SIZEOF_POINTER__) && \
-    (!defined(__x86_64__) || !defined(__INTELLISENSE__))
-#define __LONGPTR_TYPE__  __ATTR_W64 signed long
-#define __ULONGPTR_TYPE__ __ATTR_W64 unsigned long
-#else
-#define __LONGPTR_TYPE__  __INTPTR_TYPE__
-#define __ULONGPTR_TYPE__ __UINTPTR_TYPE__
-#endif
+#ifndef __SIZE_TYPE__
+#define __SIZE_TYPE__ __ATTR_W64 __TYPEFOR_UINTIB(__SIZEOF_SIZE_T__)
+#endif /* !__SIZE_TYPE__ */
 
 #ifndef __SIZEOF_INTMAX_T__
 #if defined(__UINT128_TYPE__) && 0
-#define __SIZEOF_INTMAX_T__   16
+#define __SIZEOF_INTMAX_T__ 16
 #elif defined(__UINT64_TYPE__)
-#define __SIZEOF_INTMAX_T__   8
-#else /* __UINT64_TYPE__ */
-#define __SIZEOF_INTMAX_T__   4
-#endif /* !__UINT64_TYPE__ */
+#define __SIZEOF_INTMAX_T__ 8
+#elif defined(__UINT32_TYPE__)
+#define __SIZEOF_INTMAX_T__ 4
+#elif defined(__UINT16_TYPE__)
+#define __SIZEOF_INTMAX_T__ 2
+#elif defined(__SIZEOF_LONG_LONG__)
+#define __SIZEOF_INTMAX_T__ __SIZEOF_LONG_LONG__
+#else /* ... */
+#define __SIZEOF_INTMAX_T__ __SIZEOF_LONG__
+#endif /* !... */
 #endif /* !__SIZEOF_INTMAX_T__ */
+
+#ifndef __UINTMAX_TYPE__
+#if __SIZEOF_INTMAX_T__ == 16
+#define __INTMAX_TYPE__  __INT128_TYPE__
+#define __UINTMAX_TYPE__ __UINT128_TYPE__
+#elif __SIZEOF_INTMAX_T__ == 8
+#define __INTMAX_TYPE__  __INT64_TYPE__
+#define __UINTMAX_TYPE__ __UINT64_TYPE__
+#elif __SIZEOF_INTMAX_T__ == 4
+#define __INTMAX_TYPE__  __INT32_TYPE__
+#define __UINTMAX_TYPE__ __UINT32_TYPE__
+#elif __SIZEOF_INTMAX_T__ == 2
+#define __INTMAX_TYPE__  __INT16_TYPE__
+#define __UINTMAX_TYPE__ __UINT16_TYPE__
+#elif __SIZEOF_INTMAX_T__ == 1
+#define __INTMAX_TYPE__  __INT8_TYPE__
+#define __UINTMAX_TYPE__ __UINT8_TYPE__
+#elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+#define __INTMAX_TYPE__  __LONGLONG
+#define __UINTMAX_TYPE__ __ULONGLONG
+#elif __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+#define __INTMAX_TYPE__  long
+#define __UINTMAX_TYPE__ long
+#else /* ... */
+#error "Unsupported __SIZEOF_INTMAX_T__"
+#endif /* !... */
+#endif /* !__UINTMAX_TYPE__ */
+
+#if ((__SIZEOF_LONG__ == __SIZEOF_POINTER__) && \
+     (!defined(__x86_64__) || !defined(__INTELLISENSE__)))
+#define __LONGPTR_TYPE__  __ATTR_W64 signed long
+#define __ULONGPTR_TYPE__ __ATTR_W64 unsigned long
+#else /* __SIZEOF_LONG__ == __SIZEOF_POINTER__ && ... */
+#define __LONGPTR_TYPE__  __INTPTR_TYPE__
+#define __ULONGPTR_TYPE__ __UINTPTR_TYPE__
+#endif /* __SIZEOF_LONG__ != __SIZEOF_POINTER__ || !... */
 
 
 /* Figure out the mapping between C types and the __[U]INTn_TYPE_ macros. */
@@ -877,13 +1000,13 @@
 #define __INT32_IS_INT__ 1
 #elif __SIZEOF_LONG__ == 4
 #define __INT32_IS_LONG__ 1
-#endif
+#endif /* ... */
 
 #if __SIZEOF_LONG__ == 8
 #define __INT64_IS_LONG__ 1
 #elif defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 8
 #define __INT64_IS_LONG_LONG__ 1
-#endif
+#endif /* ... */
 
 /* Since C defines 5 integer types (char, short, int, long, long long), which
  * usually only map to 4 types (int8, int16, int32, int64), this macro describes
@@ -892,106 +1015,106 @@
  *   - __FIFTHINT_TYPE__        (e.g. `long long')  The C type for the fifth integer
  *   - __FIFTHINT_ALIAS_TYPE__  (e.g. `long')       The alias of the fifth integer used by one of `__INTn_TYPE__'
  */
-#if !defined(__INT64_IS_LONG_LONG__) && defined(__INT64_IS_LONG__) && \
-     defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 8
-#define __SIZEOF_FIFTHINT__       8
-#define __FIFTHINT_TYPE__         signed long long int
-#define __UFIFTHINT_TYPE__        unsigned long long int
-#define __FIFTHINT_ALIAS_TYPE__   signed long int
-#define __UFIFTHINT_ALIAS_TYPE__  unsigned long int
-#elif defined(__INT64_IS_LONG_LONG__) && !defined(__INT64_IS_LONG__) && __SIZEOF_LONG__ == 8
-#define __SIZEOF_FIFTHINT__       8
-#define __FIFTHINT_TYPE__         signed long int
-#define __UFIFTHINT_TYPE__        unsigned long int
-#define __FIFTHINT_ALIAS_TYPE__   signed long long int
-#define __UFIFTHINT_ALIAS_TYPE__  unsigned long long int
-#elif !defined(__INT32_IS_LONG__) && defined(__INT32_IS_INT__) && __SIZEOF_LONG__ == 4
-#define __SIZEOF_FIFTHINT__       4
-#define __FIFTHINT_TYPE__         signed long int
-#define __UFIFTHINT_TYPE__        unsigned long int
-#define __FIFTHINT_ALIAS_TYPE__   signed int
-#define __UFIFTHINT_ALIAS_TYPE__  unsigned int
-#elif defined(__INT32_IS_LONG__) && !defined(__INT32_IS_INT__) && __SIZEOF_INT__ == 4
-#define __SIZEOF_FIFTHINT__       4
-#define __FIFTHINT_TYPE__         signed int
-#define __UFIFTHINT_TYPE__        unsigned int
-#define __FIFTHINT_ALIAS_TYPE__   signed long int
-#define __UFIFTHINT_ALIAS_TYPE__  unsigned long int
-#endif
+#if (!defined(__INT64_IS_LONG_LONG__) && defined(__INT64_IS_LONG__) && \
+     defined(__SIZEOF_LONG_LONG__) && __SIZEOF_LONG_LONG__ == 8)
+#define __SIZEOF_FIFTHINT__      8
+#define __FIFTHINT_TYPE__        signed long long int
+#define __UFIFTHINT_TYPE__       unsigned long long int
+#define __FIFTHINT_ALIAS_TYPE__  signed long int
+#define __UFIFTHINT_ALIAS_TYPE__ unsigned long int
+#elif (defined(__INT64_IS_LONG_LONG__) && !defined(__INT64_IS_LONG__) && __SIZEOF_LONG__ == 8)
+#define __SIZEOF_FIFTHINT__      8
+#define __FIFTHINT_TYPE__        signed long int
+#define __UFIFTHINT_TYPE__       unsigned long int
+#define __FIFTHINT_ALIAS_TYPE__  signed long long int
+#define __UFIFTHINT_ALIAS_TYPE__ unsigned long long int
+#elif (!defined(__INT32_IS_LONG__) && defined(__INT32_IS_INT__) && __SIZEOF_LONG__ == 4)
+#define __SIZEOF_FIFTHINT__      4
+#define __FIFTHINT_TYPE__        signed long int
+#define __UFIFTHINT_TYPE__       unsigned long int
+#define __FIFTHINT_ALIAS_TYPE__  signed int
+#define __UFIFTHINT_ALIAS_TYPE__ unsigned int
+#elif (defined(__INT32_IS_LONG__) && !defined(__INT32_IS_INT__) && __SIZEOF_INT__ == 4)
+#define __SIZEOF_FIFTHINT__      4
+#define __FIFTHINT_TYPE__        signed int
+#define __UFIFTHINT_TYPE__       unsigned int
+#define __FIFTHINT_ALIAS_TYPE__  signed long int
+#define __UFIFTHINT_ALIAS_TYPE__ unsigned long int
+#endif /* ... */
 
 
 
 #if __SIZEOF_POINTER__ <= 2
-#define __INTPTR_HALF_TYPE__   __INT8_TYPE__
-#define __UINTPTR_HALF_TYPE__  __UINT8_TYPE__
+#define __INTPTR_HALF_TYPE__  __INT8_TYPE__
+#define __UINTPTR_HALF_TYPE__ __UINT8_TYPE__
 #elif __SIZEOF_POINTER__ <= 4
 #define __INTPTR_HALF_TYPE__  __INT16_TYPE__
 #define __UINTPTR_HALF_TYPE__ __UINT16_TYPE__
-#else
+#else /* __SIZEOF_POINTER__ <= ... */
 #define __INTPTR_HALF_TYPE__  __INT32_TYPE__
 #define __UINTPTR_HALF_TYPE__ __UINT32_TYPE__
-#endif
+#endif /* __SIZEOF_POINTER__ > ... */
 
 #ifndef __BYTE_TYPE__
-#define __SBYTE_TYPE__   __TYPEFOR_INTIB1
-#define __BYTE_TYPE__    __TYPEFOR_UINTIB1
+#define __SBYTE_TYPE__ __TYPEFOR_INTIB1
+#define __BYTE_TYPE__  __TYPEFOR_UINTIB1
 #endif /* !__BYTE_TYPE__ */
 
 #ifndef __WCHAR_TYPE__
 #if defined(__native_wchar_t_defined) || defined(__cplusplus)
-#   define __WCHAR_TYPE__ wchar_t
+#define __WCHAR_TYPE__ wchar_t
 #elif defined(__WCHAR_UNSIGNED__)
-#   define __WCHAR_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_WCHAR_T__)
-#else
-#   define __WCHAR_TYPE__ __TYPEFOR_INTIB(__SIZEOF_WCHAR_T__)
-#endif
+#define __WCHAR_TYPE__ __TYPEFOR_UINTIB(__SIZEOF_WCHAR_T__)
+#else /* ... */
+#define __WCHAR_TYPE__ __TYPEFOR_INTIB(__SIZEOF_WCHAR_T__)
+#endif /* !... */
 #elif (defined(__cplusplus) &&              \
        defined(__native_wchar_t_defined) && \
        defined(__KOS_SYSTEM_HEADERS__))
 /*  g++ Seems to pre-define `__WCHAR_TYPE__' incorrectly as its integral value
  * (the same way it does in C; `#define __WCHAR_TYPE__ int'), so fix it here... */
-#   undef __WCHAR_TYPE__
-#   define __WCHAR_TYPE__ wchar_t
-#endif
+#undef __WCHAR_TYPE__
+#define __WCHAR_TYPE__ wchar_t
+#endif /* ... */
 
 #ifndef __WCHAR16_TYPE__
 #if __SIZEOF_WCHAR_T__ == 2
-#   define __WCHAR16_TYPE__ __WCHAR_TYPE__
+#define __WCHAR16_TYPE__ __WCHAR_TYPE__
 #elif defined(__WCHAR_UNSIGNED__)
-#   define __WCHAR16_TYPE__ __UINT16_TYPE__
-#else
-#   define __WCHAR16_TYPE__ __INT16_TYPE__
-#endif
+#define __WCHAR16_TYPE__ __UINT16_TYPE__
+#else /* ... */
+#define __WCHAR16_TYPE__ __INT16_TYPE__
+#endif /* !... */
 #endif /* !__WCHAR16_TYPE__ */
 
 #ifndef __WCHAR32_TYPE__
 #if __SIZEOF_WCHAR_T__ == 4
-#   define __WCHAR32_TYPE__ __WCHAR_TYPE__
+#define __WCHAR32_TYPE__ __WCHAR_TYPE__
 #elif defined(__WCHAR_UNSIGNED__)
-#   define __WCHAR32_TYPE__ __UINT32_TYPE__
-#else
-#   define __WCHAR32_TYPE__ __INT32_TYPE__
-#endif
+#define __WCHAR32_TYPE__ __UINT32_TYPE__
+#else /* ... */
+#define __WCHAR32_TYPE__ __INT32_TYPE__
+#endif /* !... */
 #endif /* !__WCHAR32_TYPE__ */
 
 #ifndef __WINT_TYPE__
 #ifdef __WINT_UNSIGNED__
-#   define __WINT_TYPE__  __TYPEFOR_UINTIB(__SIZEOF_WINT_T__)
+#define __WINT_TYPE__  __TYPEFOR_UINTIB(__SIZEOF_WINT_T__)
 #else /* __WINT_UNSIGNED__ */
-#   define __WINT_TYPE__  __TYPEFOR_INTIB(__SIZEOF_WINT_T__)
+#define __WINT_TYPE__  __TYPEFOR_INTIB(__SIZEOF_WINT_T__)
 #endif /* !__WINT_UNSIGNED__ */
 #endif /* !__WINT_TYPE__ */
 
 #ifndef __WCTYPE_TYPE__
-#if defined(__CYGWIN__) || defined(__CYGWIN32__) || \
-    defined(__MINGW32__) || defined(WIN32) || defined(_WIN32) || \
-    defined(WIN64) || defined(_WIN64)
-#   define __WCTYPE_TYPE__      __UINT16_TYPE__
-#   define __SIZEOF_WCTYPE_T__  2
-#else
-#   define __WCTYPE_TYPE__      __ULONGPTR_TYPE__
-#   define __SIZEOF_WCTYPE_T__  __SIZEOF_POINTER__
-#endif
+#if (defined(__CYGWIN__) || defined(__CYGWIN32__) || \
+     defined(__MINGW32__) || defined(WIN32) ||       \
+     defined(_WIN32) || defined(WIN64) || defined(_WIN64))
+#define __WCTYPE_TYPE__     __UINT16_TYPE__
+#define __SIZEOF_WCTYPE_T__ 2
+#else /* ... */
+#define __WCTYPE_TYPE__     __ULONGPTR_TYPE__
+#define __SIZEOF_WCTYPE_T__ __SIZEOF_POINTER__
+#endif /* !... */
 #endif /* !__WCTYPE_TYPE__ */
 
 #ifndef __CHAR16_TYPE__
@@ -1012,19 +1135,19 @@
 #endif /* !__SIZEOF_DOUBLE__ */
 
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
-#   define __INTSIZE_TYPE__  __ATTR_W64 unsigned int
-#   define __INTSSIZE_TYPE__ __ATTR_W64 signed int
+#define __INTSIZE_TYPE__  __ATTR_W64 unsigned int
+#define __INTSSIZE_TYPE__ __ATTR_W64 signed int
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
-#   define __INTSIZE_TYPE__  __SIZE_TYPE__
-#   define __INTSSIZE_TYPE__ __SSIZE_TYPE__
+#define __INTSIZE_TYPE__  __SIZE_TYPE__
+#define __INTSSIZE_TYPE__ __SSIZE_TYPE__
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 
 #if __SIZEOF_LONG__ == __SIZEOF_SIZE_T__
-#   define __LONGSIZE_TYPE__  __ATTR_W64 unsigned long int
-#   define __LONGSSIZE_TYPE__ __ATTR_W64 signed long int
+#define __LONGSIZE_TYPE__  __ATTR_W64 unsigned long int
+#define __LONGSSIZE_TYPE__ __ATTR_W64 signed long int
 #else /* __SIZEOF_LONG__ == __SIZEOF_SIZE_T__ */
-#   define __LONGSIZE_TYPE__  __SIZE_TYPE__
-#   define __LONGSSIZE_TYPE__ __SSIZE_TYPE__
+#define __LONGSIZE_TYPE__  __SIZE_TYPE__
+#define __LONGSSIZE_TYPE__ __SSIZE_TYPE__
 #endif /* __SIZEOF_LONG__ != __SIZEOF_SIZE_T__ */
 
 #if __SIZEOF_LONG__ == 4
@@ -1099,18 +1222,23 @@
 #endif /* __SIZEOF_REGISTER__ >= 2 */
 #endif /* !__ALIGNOF_INT16__ */
 
+#ifndef __ALIGNOF_INT8__
+#define __ALIGNOF_INT8__ 1
+#endif /* !__ALIGNOF_INT8__ */
+
 #ifndef __ALIGNOF_FLOAT__
 #define __ALIGNOF_FLOAT__ __SIZEOF_FLOAT__
 #endif /* !__ALIGNOF_FLOAT__ */
 
-#ifndef __ALIGNOF_DOUBLE__
-#if __SIZEOF_DOUBLE__ == 8
+#if !defined(__ALIGNOF_DOUBLE__) && defined(__SIZEOF_DOUBLE__)
+#ifdef _DOUBLE_ALIGNMENT
+#define __ALIGNOF_DOUBLE__ _DOUBLE_ALIGNMENT
+#elif __SIZEOF_DOUBLE__ == 8
 #define __ALIGNOF_DOUBLE__ __ALIGNOF_INT64__
 #else /* __SIZEOF_DOUBLE__ == 8 */
 #define __ALIGNOF_DOUBLE__ __SIZEOF_DOUBLE__
 #endif /* __SIZEOF_DOUBLE__ != 8 */
-#endif /* !__ALIGNOF_DOUBLE__ */
-
+#endif /* !__ALIGNOF_DOUBLE__ && __SIZEOF_DOUBLE__ */
 
 #ifndef __SIZEOF_LONG_DOUBLE__
 #ifdef _MSC_VER
@@ -1135,7 +1263,9 @@
 #endif /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
 
 #ifndef __ALIGNOF_LONG_DOUBLE__
-#if __ALIGNOF_INT64__ < 8
+#ifdef _LONG_DOUBLE_ALIGNMENT
+#define __ALIGNOF_LONG_DOUBLE__ _LONG_DOUBLE_ALIGNMENT
+#elif __ALIGNOF_INT64__ < 8
 #define __ALIGNOF_LONG_DOUBLE__ __ALIGNOF_INT64__
 #elif __SIZEOF_LONG_DOUBLE__ == 12
 #define __ALIGNOF_LONG_DOUBLE__ 16
@@ -1145,25 +1275,115 @@
 #endif /* !__ALIGNOF_LONG_DOUBLE__ */
 #endif /* __SIZEOF_LONG_DOUBLE__ */
 
+#if !defined(__ALIGNOF_LONG_LONG__) && defined(__SIZEOF_LONG_LONG__)
+#ifdef _LONG_LONG_ALIGNMENT
+#define __ALIGNOF_LONG_LONG__ _LONG_LONG_ALIGNMENT
+#elif __SIZEOF_LONG_LONG__ == 8
+#define __ALIGNOF_LONG_LONG__ __ALIGNOF_INT64__
+#elif __SIZEOF_LONG_LONG__ == 4
+#define __ALIGNOF_LONG_LONG__ __ALIGNOF_INT32__
+#elif __SIZEOF_LONG_LONG__ == 2
+#define __ALIGNOF_LONG_LONG__ __ALIGNOF_INT16__
+#else /* __SIZEOF_LONG_LONG__ == ... */
+#define __ALIGNOF_LONG_LONG__ __SIZEOF_LONG_LONG__
+#endif /* __SIZEOF_LONG_LONG__ != ... */
+#endif /* !__ALIGNOF_LONG_LONG__ && __SIZEOF_LONG_LONG__ */
+
+#ifndef __ALIGNOF_LONG__
+#ifdef _LONG_ALIGNMENT
+#define __ALIGNOF_LONG__ _LONG_ALIGNMENT
+#elif __SIZEOF_LONG__ == 8
+#define __ALIGNOF_LONG__ __ALIGNOF_INT64__
+#elif __SIZEOF_LONG__ == 4
+#define __ALIGNOF_LONG__ __ALIGNOF_INT32__
+#elif __SIZEOF_LONG__ == 2
+#define __ALIGNOF_LONG__ __ALIGNOF_INT16__
+#else /* __SIZEOF_LONG__ == ... */
+#define __ALIGNOF_LONG__ __SIZEOF_LONG__
+#endif /* __SIZEOF_LONG__ != ... */
+#endif /* !__ALIGNOF_LONG__ */
+
+#ifndef __ALIGNOF_INT__
+#ifdef _INT_ALIGNMENT
+#define __ALIGNOF_INT__ _INT_ALIGNMENT
+#elif __SIZEOF_INT__ == 4
+#define __ALIGNOF_INT__ __ALIGNOF_INT32__
+#elif __SIZEOF_INT__ == 2
+#define __ALIGNOF_INT__ __ALIGNOF_INT16__
+#elif __SIZEOF_INT__ == 8
+#define __ALIGNOF_INT__ __ALIGNOF_INT64__
+#else /* __SIZEOF_INT__ == ... */
+#define __ALIGNOF_INT__ __SIZEOF_INT__
+#endif /* __SIZEOF_INT__ != ... */
+#endif /* !__ALIGNOF_INT__ */
+
+#ifndef __ALIGNOF_SHORT__
+#ifdef _SHORT_ALIGNMENT
+#define __ALIGNOF_SHORT__ _SHORT_ALIGNMENT
+#elif __SIZEOF_SHORT__ == 2
+#define __ALIGNOF_SHORT__ __ALIGNOF_INT16__
+#elif __SIZEOF_SHORT__ == 4
+#define __ALIGNOF_SHORT__ __ALIGNOF_INT32__
+#elif __SIZEOF_SHORT__ == 8
+#define __ALIGNOF_SHORT__ __ALIGNOF_INT64__
+#else /* __SIZEOF_SHORT__ == ... */
+#define __ALIGNOF_SHORT__ __SIZEOF_SHORT__
+#endif /* __SIZEOF_SHORT__ != ... */
+#endif /* !__ALIGNOF_SHORT__ */
+
+#ifndef __ALIGNOF_CHAR__
+#ifdef _CHAR_ALIGNMENT
+#define __ALIGNOF_CHAR__ _CHAR_ALIGNMENT
+#else /* _CHAR_ALIGNMENT */
+#define __ALIGNOF_CHAR__ __SIZEOF_CHAR__
+#endif /* !_CHAR_ALIGNMENT */
+#endif /* !__ALIGNOF_CHAR__ */
+
+#ifndef __ALIGNOF_POINTER__
+#ifdef _POINTER_ALIGNMENT
+#define __ALIGNOF_POINTER__ _POINTER_ALIGNMENT
+#else /* _POINTER_ALIGNMENT */
+#define __ALIGNOF_POINTER__ __SIZEOF_POINTER__
+#endif /* !_POINTER_ALIGNMENT */
+#endif /* !__ALIGNOF_POINTER__ */
+
+#ifndef __ALIGNOF_WCHAR_T__
+#if __SIZEOF_WCHAR_T__ == 2
+#define __ALIGNOF_WCHAR_T__ __ALIGNOF_INT16__
+#elif __SIZEOF_WCHAR_T__ == 4
+#define __ALIGNOF_WCHAR_T__ __ALIGNOF_INT32__
+#elif __SIZEOF_WCHAR_T__ == 8
+#define __ALIGNOF_WCHAR_T__ __ALIGNOF_INT64__
+#else /* __SIZEOF_WCHAR_T__ == ... */
+#define __ALIGNOF_WCHAR_T__ __SIZEOF_WCHAR_T__
+#endif /* __SIZEOF_WCHAR_T__ != ... */
+#endif /* !__ALIGNOF_WCHAR_T__ */
+
+
+
+
 
 
 #ifndef __MAX_ALIGN_TYPE__
 #define __MAX_ALIGN_TYPE__ __LONGDOUBLE
-#ifdef __BIGGEST_ALIGNMENT__
-#   define __ALIGNOF_MAX_ALIGN_T__ __BIGGEST_ALIGNMENT__
-#   define __SIZEOF_MAX_ALIGN_T__  __BIGGEST_ALIGNMENT__
-#elif !defined(__ALIGNOF_LONG_DOUBLE__)
-#   define __ALIGNOF_MAX_ALIGN_T__ 8
-#   define __SIZEOF_MAX_ALIGN_T__  8
-#else
-#   define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_LONG_DOUBLE__
-#   define __SIZEOF_MAX_ALIGN_T__  __ALIGNOF_LONG_DOUBLE__
-#endif
+#ifdef _MAX_ALIGNMENT
+#define __ALIGNOF_MAX_ALIGN_T__ _MAX_ALIGNMENT
+#define __SIZEOF_MAX_ALIGN_T__  _MAX_ALIGNMENT
+#elif defined(__BIGGEST_ALIGNMENT__)
+#define __ALIGNOF_MAX_ALIGN_T__ __BIGGEST_ALIGNMENT__
+#define __SIZEOF_MAX_ALIGN_T__  __BIGGEST_ALIGNMENT__
+#elif defined(__ALIGNOF_LONG_DOUBLE__)
+#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_LONG_DOUBLE__
+#define __SIZEOF_MAX_ALIGN_T__  __ALIGNOF_LONG_DOUBLE__
+#else /* ... */
+#define __ALIGNOF_MAX_ALIGN_T__ 8
+#define __SIZEOF_MAX_ALIGN_T__  8
+#endif /* !... */
 #endif /* !__MAX_ALIGN_TYPE__ */
 
 
 
-#define __ALIGNOF_INTN_1 1
+#define __ALIGNOF_INTN_1 __ALIGNOF_INT8__
 #define __ALIGNOF_INTN_2 __ALIGNOF_INT16__
 #define __ALIGNOF_INTN_4 __ALIGNOF_INT32__
 #ifdef __ALIGNOF_INT64__
@@ -1198,7 +1418,7 @@
 #ifdef __INTELLISENSE__
 /* Don't #define builtin keywords with Intellisense.
  * Sometimes, Intellisense doesn't notice when those macros
- * gets deleted and will continue chugging along as though
+ * get deleted and will continue chugging along as though
  * they were still defined (leading to sporadic syntax errors
  * in arbitrary source files...) */
 

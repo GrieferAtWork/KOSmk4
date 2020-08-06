@@ -51,28 +51,55 @@ static_assert(sizeof(unsigned int) == __SIZEOF_INT__);
 static_assert(sizeof(long) == __SIZEOF_LONG__);
 static_assert(sizeof(signed long) == __SIZEOF_LONG__);
 static_assert(sizeof(unsigned long) == __SIZEOF_LONG__);
+static_assert(alignof(char) == __ALIGNOF_CHAR__);
+static_assert(alignof(signed char) == __ALIGNOF_CHAR__);
+static_assert(alignof(unsigned char) == __ALIGNOF_CHAR__);
+static_assert(alignof(short) == __ALIGNOF_SHORT__);
+static_assert(alignof(signed short) == __ALIGNOF_SHORT__);
+static_assert(alignof(unsigned short) == __ALIGNOF_SHORT__);
+static_assert(alignof(int) == __ALIGNOF_INT__);
+static_assert(alignof(signed int) == __ALIGNOF_INT__);
+static_assert(alignof(unsigned int) == __ALIGNOF_INT__);
+static_assert(alignof(long) == __ALIGNOF_LONG__);
+static_assert(alignof(signed long) == __ALIGNOF_LONG__);
+static_assert(alignof(unsigned long) == __ALIGNOF_LONG__);
+
 #ifdef __COMPILER_HAVE_LONGLONG
 static_assert(sizeof(long long) == __SIZEOF_LONG_LONG__);
 static_assert(sizeof(signed long long) == __SIZEOF_LONG_LONG__);
 static_assert(sizeof(unsigned long long) == __SIZEOF_LONG_LONG__);
+static_assert(alignof(long long) == __ALIGNOF_LONG_LONG__);
+static_assert(alignof(signed long long) == __ALIGNOF_LONG_LONG__);
+static_assert(alignof(unsigned long long) == __ALIGNOF_LONG_LONG__);
 #endif /* __COMPILER_HAVE_LONGLONG */
+
+#ifndef __NO_FPU
 static_assert(sizeof(float) == __SIZEOF_FLOAT__);
 static_assert(sizeof(double) == __SIZEOF_DOUBLE__);
+static_assert(alignof(float) == __ALIGNOF_FLOAT__);
+static_assert(alignof(double) == __ALIGNOF_DOUBLE__);
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 static_assert(sizeof(__LONGDOUBLE) == __SIZEOF_LONG_DOUBLE__);
+static_assert(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__NO_FPU */
+
 #ifdef __native_wchar_t_defined
 static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__);
+static_assert(alignof(wchar_t) == __ALIGNOF_WCHAR_T__);
 #endif /* __native_wchar_t_defined */
+
 #ifdef __native_char16_t_defined
 static_assert(sizeof(char16_t) == 2);
 static_assert(sizeof(char32_t) == 4);
+static_assert(alignof(char16_t) == __ALIGNOF_INT16__);
+static_assert(alignof(char32_t) == __ALIGNOF_INT32__);
 #endif /* __native_char16_t_defined */
 
 static_assert(sizeof(__INT8_TYPE__) == 1);
 static_assert(sizeof(__UINT8_TYPE__) == 1);
-static_assert(alignof(__INT8_TYPE__) == 1);
-static_assert(alignof(__UINT8_TYPE__) == 1);
+static_assert(alignof(__INT8_TYPE__) == __ALIGNOF_INT8__);
+static_assert(alignof(__UINT8_TYPE__) == __ALIGNOF_INT8__);
 
 static_assert(sizeof(__INT16_TYPE__) == 2);
 static_assert(sizeof(__UINT16_TYPE__) == 2);
@@ -98,11 +125,6 @@ static_assert(alignof(__INT128_TYPE__) == __ALIGNOF_INT128__);
 static_assert(alignof(__UINT128_TYPE__) == __ALIGNOF_INT128__);
 #endif /* __UINT128_TYPE__ */
 
-static_assert(alignof(float) == __ALIGNOF_FLOAT__);
-static_assert(alignof(double) == __ALIGNOF_DOUBLE__);
-#ifdef __COMPILER_HAVE_LONGDOUBLE
-static_assert(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
-#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #include <stdint.h>
 

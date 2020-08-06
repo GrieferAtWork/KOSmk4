@@ -190,6 +190,7 @@
 
 #define __P(x) x
 
+#define __ATTR_W64
 #define ATTR_NOINLINE
 #define __ATTR_NOINLINE
 #define ATTR_NORETURN

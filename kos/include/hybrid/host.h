@@ -22,49 +22,62 @@
 
 #include "../__stdinc.h"
 
-#if !defined(__x86_64__) && \
-    (defined(__amd64__) || defined(__amd64) || \
-     defined(__x86_64) || defined(_M_X64) || \
-     defined(_M_AMD64) || defined(_WIN64) || \
-     defined(WIN64))
+#if (!defined(__x86_64__) &&                    \
+     (defined(__amd64__) || defined(__amd64) || \
+      defined(__x86_64) || defined(_M_X64) ||   \
+      defined(_M_AMD64) || defined(_WIN64) ||   \
+      defined(WIN64)))
 #define __x86_64__ 1
 #endif /* x86_64... */
 
-#if !defined(__i386__) && \
-    (defined(__i386) || defined(i386) || \
-     defined(__I86__) || defined(_M_IX86) || \
-     defined(__X86__) || defined(_X86_) || \
-     defined(__THW_INTEL__) || defined(__INTEL__))
-#define __i386__   1
+#if (!defined(__i386__) &&                    \
+     (defined(__i386) || defined(i386) ||     \
+      defined(__I86__) || defined(_M_IX86) || \
+      defined(__X86__) || defined(_X86_) ||   \
+      defined(__THW_INTEL__) || defined(__INTEL__)))
+#define __i386__ 1
 #endif /* i386... */
 
 #ifdef _M_IX86
 #if !defined(__i486__) && _M_IX86 >= 400
 #define __i486__ 1
-#endif
+#endif /* !__i486__ && _M_IX86 >= 400 */
 #if !defined(__i586__) && _M_IX86 >= 500
 #define __i586__ 1
-#endif
+#endif /* !__i586__ && _M_IX86 >= 500 */
 #if !defined(__i686__) && _M_IX86 >= 600
 #define __i686__ 1
-#endif
+#endif /* !__i686__ && _M_IX86 >= 600 */
 #endif /* _M_IX86 */
 
-#if !defined(__arm__) && \
-    (defined(_M_ARM) || defined(_M_ARMT) || defined(_M_ARM_NT))
+#if (!defined(__arm__) && \
+     (defined(_M_ARM) || defined(_M_ARMT) || defined(_M_ARM_NT)))
 #define __arm__ 1
-#endif
+#endif /* __arm__... */
+
+
+#undef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+#ifdef _ALIGNMENT_REQUIRED
+#if (_ALIGNMENT_REQUIRED + 0) == 0
+#define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
+#endif /* _ALIGNMENT_REQUIRED */
+#elif defined(__i386__) || defined(__x86_64__)
+#define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
+#elif !defined(__KOS_SYSTEM_HEADERS__) && __has_include(<sys/isa_defs.h>)
+#include <sys/isa_defs.h>
+#if defined(_ALIGNMENT_REQUIRED) && (_ALIGNMENT_REQUIRED + 0) == 0
+#define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
+#endif /* _ALIGNMENT_REQUIRED */
+#endif /* ... */
 
 #undef __ARCH_STACK_GROWS_DOWNWARDS
-#undef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #if defined(__i386__) || defined(__x86_64__)
-#define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
 #elif defined(__arm__)
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
-#else
+#else /* ... */
 #define __ARCH_STACK_GROWS_DOWNWARDS 1
-#endif
+#endif /* !... */
 
 /* The native PAGE size of the hosting arch (if known to be constant)
  * Note that on some architectures, this value is not fixed, but is a
@@ -80,7 +93,7 @@
 #define __ARCH_PAGESIZE PAGE_SIZE
 #elif defined(__i386__) || defined(__x86_64__) || defined(__arm__)
 #define __ARCH_PAGESIZE 4096
-#endif
+#endif /* ... */
 #endif /* !__ARCH_PAGESIZE */
 
 
