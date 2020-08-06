@@ -142,6 +142,15 @@
 #define LEAVE_Psi_Nax_Pcx popl_cfi_r %esi
 #endif /* !__x86_64__ */
 
+/* The location of the original num_Twords argument after the
+ * caller made use of `ENTER_Pdi_Nax_Pcx' and `BEGIN_CLD' */
+#ifdef __x86_64__
+#define RM_numTwords_after_ENTER_Pdi_Nax_Pcx__BEGIN_CLD %rdx
+#else /* __x86_64__ */
+#define RM_numTwords_after_ENTER_Pdi_Nax_Pcx__BEGIN_CLD 16(%esp)
+#endif /* !__x86_64__ */
+
+
 
 
 #ifndef REQUIRE_ZF0_if_Pcxz
@@ -320,7 +329,45 @@ BEGIN_MEMFUNC(memrend)
 END_MEMFUNC(memrend)
 
 
-/* TODO: memlen[b|w|l|q]()      (scas) */
+
+
+/********************************************************************************/
+/* size_t LIBCCALL memlen(void const *haystack, T needle, size_t num_Tword);    */
+/********************************************************************************/
+BEGIN_MEMFUNC(memlen)
+	ENTER_Pdi_Nax_Pcx
+	BEGIN_CLD             /* Search forward */
+	REQUIRE_ZF0_if_Pcxz   /* Handle empty haystacks */
+	repne  I(scas)        /* Find the first match */
+	/* %Pcx is the # of words not searched if a match was found.
+	 * For our purposes, the value of %Pcx is undefined if no match
+	 * was found (though in reality it's `0', though we'd need it to
+	 * be `-1' if we wanted to make use of indirect optimizations)
+	 * >> return WAS_FOUND ? num_Tword - (%Pcx + 1) : num_Tword;
+	 * With `WAS_FOUND = (ZF=1)'
+	 *
+	 * To start out with, load the value of `num_Tword' into %Pax */
+	movP   RM_numTwords_after_ENTER_Pdi_Nax_Pcx__BEGIN_CLD, %Pax
+	/* Now refactor the return expression above:
+	 * >> return WAS_FOUND ? num_Tword - (%Pcx + 1) : num_Tword;
+	 * >> return WAS_FOUND ? (num_Tword - %Pcx) - 1 : num_Tword;
+	 * >> return WAS_FOUND ? (num_Tword - %Pcx) - 1 : (num_Tword + 1) - 1;
+	 * >> return WAS_FOUND ? (num_Tword - %Pcx) - 1 : (num_Tword - -1) - 1;
+	 * With this in mind, we now do:
+	 * >> if (!WAS_FOUND)
+	 * >>     %Pcx = -1;
+	 * So that our return expression becomes:
+	 * >> return (num_Tword - %Pcx) - 1; */
+	movP   $(-1), %Pdx
+	cmovnzP %Pdx, %Pcx  /* if (!WAS_FOUND) %Pcx = -1; */
+	subP   %Pcx, %Pax  /* Subtract the value of %Pcx from our result */
+	decP   %Pax        /* fix the off-by-one error */
+	END_CLD
+	LEAVE_Pdi_Nax_Pcx
+	RET(12)
+END_MEMFUNC(memlen)
+
+
 /* TODO: memrlen[b|w|l|q]()     (scas) */
 /* TODO: rawmemlen[b|w|l|q]()   (scas) */
 /* TODO: rawmemrlen[b|w|l|q]()  (scas) */

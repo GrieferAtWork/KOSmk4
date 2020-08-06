@@ -149,6 +149,12 @@
 #ifdef __x86_64__
 #define LIBC_ARCH_HAVE_MEMRENDQ 1
 #endif /* __x86_64__ */
+#define LIBC_ARCH_HAVE_MEMLEN  1
+#define LIBC_ARCH_HAVE_MEMLENW 1
+#define LIBC_ARCH_HAVE_MEMLENL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_MEMLENQ 1
+#endif /* __x86_64__ */
 #ifndef __KERNEL__
 #define LIBC_ARCH_HAVE_RAWMEMXCHR  1
 #define LIBC_ARCH_HAVE_RAWMEMXCHRW 1
