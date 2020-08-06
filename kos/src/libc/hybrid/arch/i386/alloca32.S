@@ -33,10 +33,8 @@ INTERN_FUNCTION(libc_alloca)
 	.cfi_startproc
 	popl_cfi %ecx            /* return address */
 	.cfi_register %eip, %ecx
-	movl   0(%esp), %eax     /* # of bytes to allocate */
-	addl   $(4 - 1), %eax
-	andl   $(~(4 - 1)), %eax /* %eax = CEIL_ALIGN(num_bytes, 4) */
-	subl   %eax, %esp        /* Allocate stack memory */
+	subl   0(%esp), %esp     /* Allocate stack memory */
+	andl   $(~(4 - 1)), %esp /* Re-align stack */
 	.cfi_same_value %esp
 	movl   %esp, %eax        /* Also re-return the new stack pointer in `%eax' */
 	jmpl   *%ecx             /* Return to caller */
