@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab59aa61 */
+/* HASH CRC-32:0xdffb0fc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_vsnprintf_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_snprintf_printer from format-printer */
 #ifndef __local___localdep_format_snprintf_printer_defined
@@ -29,7 +30,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_snprintf_printer
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
@@ -56,7 +56,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these

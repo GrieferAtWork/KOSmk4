@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74929966 */
+/* HASH CRC-32:0xe11970d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,13 @@
 #ifndef __local__scwprintf_defined
 #define __local__scwprintf_defined 1
 #include <__crt.h>
+#include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _vscwprintf from wchar */
 #ifndef __local___localdep__vscwprintf_defined
 #define __local___localdep__vscwprintf_defined 1
 #ifdef __CRT_HAVE__vscwprintf
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscwprintf,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vscwprintf,(__format,__args))
 #else /* __CRT_HAVE__vscwprintf */
 __NAMESPACE_LOCAL_END
@@ -37,9 +36,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vscwprintf __LIBC_LOCAL_NAME(_vscwprintf)
 #endif /* !__CRT_HAVE__vscwprintf */
 #endif /* !__local___localdep__vscwprintf_defined */
-__LOCAL_LIBC(_scwprintf) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(_scwprintf) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_scwprintf))(__WCHAR_TYPE__ const *__format, ...) {
-	int __result;
+	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	__result = __localdep__vscwprintf(__format, __args);

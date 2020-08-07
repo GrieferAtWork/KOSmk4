@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18f2952 */
+/* HASH CRC-32:0xc150e524 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c32spbrk_defined
 #define __local_c32spbrk_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32spbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32spbrk))(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept) {

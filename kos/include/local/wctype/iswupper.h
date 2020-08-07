@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x189cd810 */
+/* HASH CRC-32:0x92b02d29 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_iswupper_defined
 #define __local_iswupper_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: isupper from ctype */
 #ifndef __local___localdep_isupper_defined

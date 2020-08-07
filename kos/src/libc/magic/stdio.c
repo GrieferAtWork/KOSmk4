@@ -58,6 +58,7 @@
 %[define_replacement(cookie_io_functions_t = _IO_cookie_io_functions_t)]
 %[define_replacement(locale_t = __locale_t)]
 %[define_replacement(EOK      = 0)]
+%[define_replacement(rsize_t  = __SIZE_TYPE__)]
 
 /* These are defined in <local/stdstreams.h> */
 %[define_replacement(stdin  = __LOCAL_stdin)]
@@ -335,20 +336,24 @@ __LIBC __FILE *stderr;
 /* BEGIN: Declare crt-only variants of file Apis                        */
 /************************************************************************/
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, ignore, nocrt, alias("fwrite", "fwrite_s", "fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite")]]
 $size_t crt_fwrite([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
                    $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, ignore, nocrt, alias("fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite", "fwrite", "fwrite_s")]]
 $size_t crt_fwrite_unlocked([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
                             $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, ignore, wunused, nocrt, alias("fread", "fread_unlocked", "_fread_nolock", "_IO_fread")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fread_unlocked", "_fread_nolock", "_IO_fread")]]
 $size_t crt_fread([[outp(elemsize * elemcount)]] void *__restrict buf,
                   $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, ignore, wunused, nocrt, alias("fread_unlocked", "_fread_nolock", "_IO_fread", "fread")]]
 $size_t crt_fread_unlocked([[outp(elemsize * elemcount)]] void *__restrict buf,
                            $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
@@ -471,6 +476,7 @@ void setbuf([[nonnull]] FILE *__restrict stream, [[nullable]] char *buf) {
 
 @@Set the buffer and buffer-mode to-be used by the given `STREAM'
 @@@param modes: One of `_IOFBF', `_IOLBF' or `_IONBF'
+[[decl_include("<hybrid/typecore.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("setvbuf_unlocked")]]
 [[std, export_alias("_IO_setvbuf"), alias("setvbuf_unlocked")]]
 int setvbuf([[nonnull]] FILE *__restrict stream,
@@ -543,7 +549,7 @@ int putchar(int ch) {
 @@Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred.
 [[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgets_unlocked")]]
-[[alias("fgets_unlocked"), impl_include("<parts/errno.h>")]]
+[[alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<parts/errno.h>")]]
 [[requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]]
 char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
             __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] FILE *__restrict stream) {
@@ -627,6 +633,7 @@ __STDC_INT_AS_SSIZE_T puts([[nonnull]] char const *__restrict string) {
 int ungetc(int ch, [[nonnull]] FILE *__restrict stream);
 
 @@Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF'
+[[decl_include("<hybrid/typecore.h>")]]
 [[std, cp_stdio, wunused, section(".text.crt{|.dos}.FILE.locked.read.read")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fread_unlocked", "_fread_nolock", "_IO_fread")]]
 [[alias("fread_unlocked", "_fread_nolock", "_IO_fread")]]
@@ -650,6 +657,7 @@ done:
 
 
 @@Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM'
+[[decl_include("<hybrid/typecore.h>")]]
 [[std, cp_stdio, crtbuiltin, section(".text.crt{|.dos}.FILE.locked.write.write")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite")]]
 [[export_alias("fwrite_s"), userimpl, requires_function(fputc)]]
@@ -811,7 +819,7 @@ FILE *freopen([[nonnull]] char const *__restrict filename,
 
 @@Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
 @@Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()'
-[[stdio_throws, std, export_as("_IO_fgetpos")]]
+[[stdio_throws, std, export_as("_IO_fgetpos"), decl_include("<bits/types.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos64_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos_unlocked")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos64")]]
@@ -844,7 +852,7 @@ int fgetpos([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t *__restrict 
 }
 
 @@Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()'
-[[stdio_throws, std, export_as("_IO_fsetpos"), no_crt_self_import]]
+[[stdio_throws, std, export_as("_IO_fsetpos"), no_crt_self_import, decl_include("<bits/types.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos64_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos_unlocked")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos64")]]
@@ -952,7 +960,7 @@ __STDC_INT_AS_SIZE_T vfscanf([[nonnull]] FILE *__restrict stream,
                              [[nonnull]] char const *__restrict format,
                              $va_list args) {
 @@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__@@
-	return format_vscanf(*(pformatgetc)&fgetc,
+	return format_vscanf((pformatgetc)(void *)&fgetc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
@@ -1091,7 +1099,7 @@ __STDC_INT_AS_SIZE_T sprintf([[nonnull]] char *__restrict buf,
 
 @@Print a formatted string to a given in-member string buffer `BUF'
 @@Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF'
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[ATTR_LIBC_PRINTF(3, 0), std, kernel, guard]]
 [[impl_prefix(
 #ifndef ____format_snprintf_data_defined
@@ -1119,7 +1127,7 @@ __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restric
 
 @@Print a formatted string to a given in-member string buffer `BUF'
 @@Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF'
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[std, kernel, guard, crtbuiltin, ATTR_LIBC_PRINTF(3, 4)]]
 [[section(".text.crt{|.dos}.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T snprintf([[outp_opt(min(return, buflen))]] char *__restrict buf, size_t buflen,
@@ -1192,7 +1200,7 @@ char *tmpnam_r([[nonnull]] char *buf) {
 }
 
 @@Specify the location and size for the buffer to-be used by `STREAM'
-[[export_alias("_IO_setbuffer")]]
+[[decl_include("<hybrid/typecore.h>"), export_alias("_IO_setbuffer")]]
 [[requires_include("<asm/crt/stdio.h>"), impl_include("<asm/crt/stdio.h>")]]
 [[requires(defined(___IOFBF) && defined(___IONBF) && $has_function(setvbuf))]]
 [[section(".text.crt{|.dos}.FILE.locked.read.utility")]]
@@ -1226,9 +1234,10 @@ int fflush_unlocked([[nullable]] $FILE *stream) {
 }
 
 @@Same as `fread()', but performs I/O without acquiring a lock to `STREAM'
-[[cp_stdio, wunused, dos_export_alias("_fread_nolock"), export_alias("_IO_fread")]]
-[[alias("fread"), userimpl, requires_function(fgetc_unlocked)]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
+[[alias("fread"), userimpl, requires_function(fgetc_unlocked)]]
+[[cp_stdio, wunused, dos_export_alias("_fread_nolock"), export_alias("_IO_fread")]]
 $size_t fread_unlocked([[outp(min(return * elemsize, elemcount * elemsize))]] void *__restrict buf,
                        $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream) {
 	$size_t i, result = 0;
@@ -1247,9 +1256,10 @@ done:
 }
 
 @@Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM'
-[[cp_stdio, wunused, dos_export_alias("_fwrite_nolock"), export_alias("_IO_fwrite")]]
-[[alias("fwrite"), userimpl, requires_function(fgetc_unlocked)]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.write.write")]]
+[[alias("fwrite"), userimpl, requires_function(fgetc_unlocked)]]
+[[cp_stdio, wunused, dos_export_alias("_fwrite_nolock"), export_alias("_IO_fwrite")]]
 $size_t fwrite_unlocked([[inp(min(return * elemsize, elemcount * elemsize))]] void const *__restrict buf,
                         $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream) {
 	$size_t i, result = 0;
@@ -1342,11 +1352,11 @@ $fd_t fileno([[nonnull]] $FILE *__restrict stream);
 %
 %#ifdef __USE_XOPEN2K8
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
-[[wunused]]
+[[wunused, decl_include("<hybrid/typecore.h>")]]
 $FILE *fmemopen([[inoutp(len)]] void *mem, $size_t len,
                 [[nonnull]] char const *modes);
 
-[[wunused]]
+[[wunused, decl_include("<hybrid/typecore.h>")]]
 $FILE *open_memstream(char **bufloc, $size_t *sizeloc);
 
 %[default:section(".text.crt{|.dos}.FILE.locked.read.read")]
@@ -1355,6 +1365,7 @@ $FILE *open_memstream(char **bufloc, $size_t *sizeloc);
 [[cp_stdio, wunused, alias("getdelim_unlocked"), export_alias("__getdelim")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("getdelim_unlocked")]]
 [[requires_function(realloc, fgetc, ungetc)]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
                   [[nonnull]] $size_t *__restrict pcount, int delimiter,
@@ -1404,7 +1415,7 @@ $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
 
 [[cp_stdio, wunused, alias("getline_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("getline_unlocked")]]
-[[requires_function(getdelim)]]
+[[requires_function(getdelim), decl_include("<hybrid/typecore.h>")]]
 $ssize_t getline([[nonnull]] char **__restrict lineptr,
                  [[nonnull]] $size_t *__restrict pcount,
                  [[nonnull]] $FILE *__restrict stream) {
@@ -1540,8 +1551,8 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 %[default:section(".text.crt{|.dos}.FILE.unlocked.read.read")]
 
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[[decl_include("<features.h>"), impl_include("<asm/crt/stdio.h>")]]
-[[cp_stdio, alias("fgets"), wunused, impl_include("<parts/errno.h>")]]
+[[cp_stdio, alias("fgets"), wunused, decl_include("<features.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<asm/crt/stdio.h>", "<parts/errno.h>")]]
 [[requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]]
 char *fgets_unlocked([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
                      __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] $FILE *__restrict stream) {
@@ -1761,7 +1772,7 @@ $FILE *freopen64([[nonnull]] char const *__restrict filename,
 @@64-bit variant of `fgetpos'
 [[stdio_throws, off64_variant_of(fgetpos), export_alias("_IO_fgetpos64")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetpos64_unlocked")]]
-[[alias("fgetpos64_unlocked")]]
+[[alias("fgetpos64_unlocked"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(crt_ftello64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello) || $has_function(crt_ftell))]]
 int fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t *__restrict pos) {
@@ -1783,7 +1794,7 @@ int fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t *__rest
 @@64-bit variant of `fsetpos'
 [[stdio_throws, off64_variant_of(fsetpos), export_alias("_IO_fsetpos64")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fsetpos64_unlocked)]]
-[[alias("fsetpos64_unlocked"), requires_include("<asm/stdio.h>")]]
+[[alias("fsetpos64_unlocked"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(crt_fsetpos) ||
                      (defined(__SEEK_SET) && ($has_function(crt_fseeko64) ||
                                               $has_function(crt_fseeko) ||
@@ -1809,6 +1820,7 @@ int fsetpos64([[nonnull]] $FILE *__restrict stream,
 %#ifdef __USE_KOS
 %[default:section(".text.crt{|.dos}.FILE.locked.write.write")]
 @@For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/format-printer.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_printer_unlocked")]]
 [[alias("file_printer_unlocked"), userimpl, requires_function(fwrite)]]
@@ -1820,6 +1832,7 @@ $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.write.write")]
 @@Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG'
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/format-printer.h>")]]
 [[alias("file_printer"), userimpl, requires_function(fwrite_unlocked)]]
 $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
@@ -1839,6 +1852,7 @@ $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
 
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
 [[decl_include("<features.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[ATTR_LIBC_PRINTF(2, 3), wunused, impl_include("<hybrid/__assert.h>")]]
 [[requires_function(format_aprintf_pack, format_aprintf_printer, free)]]
 [[impl_prefix(
@@ -1975,7 +1989,7 @@ int flushall_unlocked() {
 [[stdio_throws, no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos64_unlocked", "fgetpos64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos_unlocked", "fgetpos")]]
-[[userimpl, requires_function(fgetpos)]]
+[[userimpl, requires_function(fgetpos), decl_include("<bits/types.h>")]]
 int fgetpos_unlocked([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] $fpos_t *__restrict pos) {
 	return fgetpos(stream, pos);
@@ -1984,7 +1998,7 @@ int fgetpos_unlocked([[nonnull]] $FILE *__restrict stream,
 [[stdio_throws, no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos64_unlocked", "fsetpos64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos_unlocked", "fsetpos")]]
-[[userimpl, requires_function(fsetpos)]]
+[[userimpl, requires_function(fsetpos), decl_include("<bits/types.h>")]]
 int fsetpos_unlocked([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] $fpos_t const *__restrict pos) {
 	return fsetpos(stream, pos);
@@ -2014,6 +2028,7 @@ int putw_unlocked(int w, [[nonnull]] $FILE *__restrict stream) {
 [[alias("setvbuf", "_IO_setvbuf")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.utility")]]
 [[userimpl, requires_function(setvbuf)]]
+[[decl_include("<hybrid/typecore.h>")]]
 int setvbuf_unlocked([[nonnull]] $FILE *__restrict stream,
                      char *__restrict buf, int modes,
                      $size_t bufsize) {
@@ -2031,6 +2046,7 @@ int ungetc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 [[requires_function(realloc, fgetc_unlocked, ungetc_unlocked)]]
 [[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
                            [[nonnull]] $size_t *__restrict pcount, int delimiter,
                            [[nonnull]] $FILE *__restrict stream) {
@@ -2050,7 +2066,7 @@ $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
 			                         new_bufsize *
 			                         sizeof(char));
 			if unlikely(!buffer)
-				return -1;
+				goto err;
 			bufsize  = new_bufsize;
 			*lineptr = buffer;
 			*pcount  = bufsize;
@@ -2075,8 +2091,11 @@ $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
 	/* NUL-Terminate the buffer. */
 	buffer[result] = '\0';
 	return result;
+err:
+	return -1;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, wunused, alias("getline")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 [[requires_function(getdelim_unlocked)]]
@@ -2198,7 +2217,7 @@ $off64_t ftello64_unlocked([[nonnull]] $FILE *__restrict stream) {
 
 [[stdio_throws, alias("fgetpos64", "_IO_fgetpos64")]]
 [[off64_variant_of(fgetpos_unlocked), section(".text.crt{|.dos}.FILE.unlocked.seek.pos")]]
-[[userimpl, requires_function(fgetpos64)]]
+[[userimpl, requires_function(fgetpos64), decl_include("<bits/types.h>")]]
 int fgetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
                        [[nonnull]] fpos64_t *__restrict pos) {
 	return fgetpos64(stream, pos);
@@ -2207,7 +2226,7 @@ int fgetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
 
 [[stdio_throws, alias("fsetpos64", "_IO_fsetpos64")]]
 [[off64_variant_of(fsetpos_unlocked), section(".text.crt{|.dos}.FILE.unlocked.seek.pos")]]
-[[userimpl, requires_function(fsetpos64)]]
+[[userimpl, requires_function(fsetpos64), decl_include("<bits/types.h>")]]
 int fsetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
                        [[nonnull]] fpos64_t const *__restrict pos) {
 	return fsetpos64(stream, pos);
@@ -2281,7 +2300,7 @@ __STDC_INT_AS_SSIZE_T printf_unlocked([[nonnull]] char const *__restrict format,
 [[cp_stdio, ATTR_LIBC_SCANF(2, 0), wunused]]
 [[alias("vfscanf", "__vfscanf", "_vfscanf", "_vfscanf_s", "_IO_vfscanf")]]
 [[requires_function(fgetc_unlocked, ungetc_unlocked)]]
-[[decl_include("<features.h>"), dependency(fgetc_unlocked)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), dependency(fgetc_unlocked)]]
 [[impl_include("<hybrid/typecore.h>"), impl_prefix(
 @@push_namespace(local)@@
 @@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__@@
@@ -2300,7 +2319,7 @@ __STDC_INT_AS_SIZE_T vfscanf_unlocked([[nonnull]] $FILE *__restrict stream,
                                       [[nonnull]] char const *__restrict format,
                                       $va_list args) {
 @@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__@@
-	return format_vscanf(*(pformatgetc)&fgetc_unlocked,
+	return format_vscanf((pformatgetc)(void *)&fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);
@@ -2535,7 +2554,7 @@ __STDC_INT_AS_SIZE_T _vsscanf_l([[nonnull]] char const *__restrict input,
 [[ignore]] _vsscanf_s_l(*) = _vsscanf_l;
 
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[ignore, export_alias("_vsnscanf_s")]]
 [[section(".text.crt.dos.unicode.static.format.scanf")]]
 [[dependency(unicode_readutf8_n, unicode_readutf8_rev)]]
@@ -2573,7 +2592,7 @@ __STDC_INT_AS_SIZE_T _vsnscanf([[inp(inputlen)]] char const *__restrict input, $
 
 [[ignore]] _vsnscanf_s(*) = _vsnscanf;
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[ignore, ATTR_LIBC_SCANF(3, 5), export_alias("_vsnscanf_s_l")]]
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
 [[requires_function(_vsnscanf)]]
@@ -2601,14 +2620,14 @@ __STDC_INT_AS_SIZE_T _fscanf_l([[nonnull]] $FILE *__restrict stream,
 	%{printf("_vfscanf_l")}
 
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.unicode.static.format.scanf")]]
 [[ATTR_LIBC_SCANF(3, 4), export_alias(_snscanf_s)]]
 __STDC_INT_AS_SIZE_T _snscanf([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
                               [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnscanf")}
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
 [[ATTR_LIBC_SCANF(3, 5), export_alias("_snscanf_s_l")]]
 __STDC_INT_AS_SIZE_T _snscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
@@ -2635,13 +2654,13 @@ __STDC_INT_AS_SIZE_T _fscanf_s_l([[nonnull]] $FILE *__restrict stream,
                                  $locale_t locale, ...)
 	%{printf("_vfscanf_s_l")}
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[ATTR_LIBC_SCANF(3, 4), no_crt_impl]]
 __STDC_INT_AS_SIZE_T _snscanf_s([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
                                 [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnscanf_s")}
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[ATTR_LIBC_SCANF(3, 5), no_crt_impl]]
 __STDC_INT_AS_SIZE_T _snscanf_s_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
                                   [[nonnull]] char const *__restrict format, $locale_t locale, ...)
@@ -2659,7 +2678,7 @@ __STDC_INT_AS_SIZE_T _vsprintf_l([[outp(return)]] char *__restrict buf,
 
 _vsprintf_s_l(*) = _vsnprintf_l;
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF_P(3, 0)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 0)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _vsprintf_p([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
                                  [[nonnull]] char const *__restrict format, $va_list args) {
@@ -2672,7 +2691,7 @@ __STDC_INT_AS_SIZE_T _vsprintf_p([[outp_opt(min(return, bufsize))]] char *__rest
 	return 0;
 }
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF_P(3, 0)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 0)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _vsprintf_p_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
                                    [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
@@ -2689,17 +2708,17 @@ __STDC_INT_AS_SIZE_T _sprintf_l([[outp(return)]] char *__restrict buf,
                                 $locale_t locale, ...)
 	%{printf("_vsprintf_l")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(3, 5)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 5)]]
 __STDC_INT_AS_SIZE_T _sprintf_s_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
                                   [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsprintf_s_l")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF_P(3, 4)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 4)]]
 __STDC_INT_AS_SIZE_T _sprintf_p([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
                                 [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsprintf_p")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF_P(3, 5)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF_P(3, 5)]]
 __STDC_INT_AS_SIZE_T _sprintf_p_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
                                   [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsprintf_p_l")}
@@ -2763,7 +2782,7 @@ __STDC_INT_AS_SIZE_T _scprintf_p_l([[nonnull]] char const *__restrict format,
 
 %
 @@WARNING: This function returns the number of written character. - Not the required buffer size!
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(3, 0)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 0)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _vsnprintf([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
                                 [[nonnull]] char const *__restrict format, $va_list args) {
@@ -2774,7 +2793,7 @@ __STDC_INT_AS_SIZE_T _vsnprintf([[outp_opt(min(return, bufsize))]] char *__restr
 	return result;
 }
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[ATTR_LIBC_PRINTF(3, 0), export_alias("_vsprintf_s_l")]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _vsnprintf_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
@@ -2786,7 +2805,7 @@ __STDC_INT_AS_SIZE_T _vsnprintf_l([[outp_opt(min(return, bufsize))]] char *__res
 _vsnprintf_c(*) = _vsnprintf;
 _vsnprintf_c_l(*) = _vsnprintf_l;
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(4, 0)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 0)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _vsnprintf_s([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf,
                                   $size_t bufsize, $size_t buflen,
@@ -2795,7 +2814,7 @@ __STDC_INT_AS_SIZE_T _vsnprintf_s([[outp_opt(min(return, bufsize, buflen))]] cha
 	return _vsnprintf(buf, bufsize, format, args);
 }
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(4, 0)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 0)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _vsnprintf_s_l([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf,
                                     $size_t bufsize, $size_t buflen,
@@ -2805,37 +2824,37 @@ __STDC_INT_AS_SIZE_T _vsnprintf_s_l([[outp_opt(min(return, bufsize, buflen))]] c
 	return _vsnprintf(buf, bufsize, format, args);
 }
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(3, 4)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 4)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _snprintf([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf,
                                $size_t bufsize, [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnprintf")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(3, 5)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 5)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _snprintf_l([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf, $size_t bufsize,
                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsnprintf_l")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(3, 4)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 4)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _snprintf_c([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf, $size_t bufsize,
                                  [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnprintf_c")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(3, 5)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(3, 5)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _snprintf_c_l([[outp_opt(min(return, buf, bufsize))]] char *__restrict buf, $size_t bufsize,
                                    [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsnprintf_c_l")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(4, 5)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 5)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _snprintf_s([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf, $size_t bufsize,
                                  $size_t buflen, [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnprintf_s")}
 
-[[decl_include("<features.h>"), ATTR_LIBC_PRINTF(4, 6)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), ATTR_LIBC_PRINTF(4, 6)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _snprintf_s_l([[outp_opt(min(return, bufsize, buflen))]] char *__restrict buf, $size_t bufsize,
                                    $size_t buflen, [[nonnull]] char const *__restrict format, $locale_t locale, ...)
@@ -2909,7 +2928,8 @@ _vfprintf_s_l(*) = _vfprintf_l;
 [[cp_stdio, ATTR_LIBC_PRINTF_P(2, 0), requires_function(fwrite)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T _vfprintf_p([[nonnull]] $FILE *__restrict stream,
-                                 [[nonnull]] char const *__restrict format, $va_list args) {
+                                 [[nonnull]] char const *__restrict format,
+                                 $va_list args) {
 	(void)stream;
 	(void)format;
 	(void)args;
@@ -2959,6 +2979,7 @@ __STDC_INT_AS_SIZE_T _fprintf_p_l([[nonnull]] $FILE *__restrict stream,
 %
 %#ifdef __USE_DOS_SLIB
 [[cp, section(".text.crt.dos.FILE.locked.access")]]
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 [[requires_function(fopen64)]]
 errno_t fopen_s([[nonnull]] $FILE **pstream,
@@ -2985,6 +3006,7 @@ errno_t fopen_s([[nonnull]] $FILE **pstream,
 }
 
 [[cp, section(".text.crt.dos.FILE.locked.access")]]
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 [[requires_function(freopen)]]
 errno_t freopen_s([[nonnull]] $FILE **pstream,
@@ -3011,6 +3033,7 @@ errno_t freopen_s([[nonnull]] $FILE **pstream,
 }
 
 [[section(".text.crt.dos.fs.utility")]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<parts/errno.h>")]]
 [[requires_function(tmpnam)]]
 errno_t tmpnam_s([[outp(bufsize)]] char *__restrict buf,
@@ -3040,6 +3063,7 @@ errno_t tmpnam_s([[outp(bufsize)]] char *__restrict buf,
 }
 
 %
+[[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.FILE.locked.utility")]]
 [[impl_include("<parts/errno.h>")]]
 [[requires_function(clearerr)]]
@@ -3055,6 +3079,7 @@ errno_t clearerr_s([[nonnull]] $FILE *__restrict stream) {
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[cp, impl_include("<parts/errno.h>")]]
 [[requires_function(tmpfile64)]]
 [[section(".text.crt.dos.FILE.locked.access")]]
@@ -3080,6 +3105,7 @@ errno_t tmpfile_s([[nonnull]] $FILE **pstream) {
 [[requires($has_function(fread))]]
 [[cp, wunused, impl_include("<parts/errno.h>", "<hybrid/__overflow.h>")]]
 [[section(".text.crt.dos.FILE.locked.read.read")]]
+[[decl_include("<hybrid/typecore.h>")]]
 $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] void *__restrict buf,
                 $size_t bufsize, $size_t elemsize, $size_t elemcount,
                 [[nonnull]] $FILE *__restrict stream) {
@@ -3103,6 +3129,7 @@ $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] 
 %[default:section(".text.crt.dos.FILE.locked.read.read")];
 [[cp, wunused, requires_include("<__crt.h>")]]
 [[impl_include("<local/stdstreams.h>", "<parts/errno.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]
 char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_t bufsize) {
 	if unlikely(!buf) {
@@ -3143,6 +3170,7 @@ __STDC_INT_AS_SIZE_T vsnprintf_s([[outp_opt(min(return, buflen, bufsize))]] char
 [[requires_include("<__crt.h>", "<parts/errno.h>")]]
 [[impl_include("<local/stdstreams.h>", "<parts/errno.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && $has_function(fprintf) && $has_function(strerror))]]
+[[decl_include("<hybrid/typecore.h>")]]
 void _wperror($wchar_t const *__restrict message) {
 	char const *enodesc;
 	enodesc = strerror(__libc_geterrno());

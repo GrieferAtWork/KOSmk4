@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x463bdf44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,36 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__scwprintf_p_defined
-#define __local__scwprintf_p_defined 1
+#ifndef _BITS_CRT_WCTYPE_H
+#define _BITS_CRT_WCTYPE_H 1
+
 #include <__crt.h>
-#include <features.h>
 #include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: _vscwprintf_p from wchar */
-#ifndef __local___localdep__vscwprintf_p_defined
-#define __local___localdep__vscwprintf_p_defined 1
-#ifdef __CRT_HAVE__vscwprintf_p
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscwprintf_p,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vscwprintf_p,(__format,__args))
-#else /* __CRT_HAVE__vscwprintf_p */
-__NAMESPACE_LOCAL_END
-#include <local/wchar/_vscwprintf_p.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep__vscwprintf_p __LIBC_LOCAL_NAME(_vscwprintf_p)
-#endif /* !__CRT_HAVE__vscwprintf_p */
-#endif /* !__local___localdep__vscwprintf_p_defined */
-__LOCAL_LIBC(_scwprintf_p) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_scwprintf_p))(__WCHAR_TYPE__ const *__format, ...) {
-	__STDC_INT_AS_SSIZE_T __result;
-	__builtin_va_list __args;
-	__builtin_va_start(__args, __format);
-	__result = __localdep__vscwprintf_p(__format, __args);
-	__builtin_va_end(__args);
-	return __result;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__scwprintf_p_defined
-#define __local___localdep__scwprintf_p_defined 1
-#define __localdep__scwprintf_p __LIBC_LOCAL_NAME(_scwprintf_p)
-#endif /* !__local___localdep__scwprintf_p_defined */
-#endif /* !__local__scwprintf_p_defined */
+
+#ifdef __CRT_DOS_PRIMARY
+#define __SIZEOF_WCTYPE_T__  2
+#define __SIZEOF_WCTRANS_T__ 2
+#else /* __CRT_DOS_PRIMARY */
+#define __SIZEOF_WCTYPE_T__  __SIZEOF_POINTER__
+#define __SIZEOF_WCTRANS_T__ __SIZEOF_POINTER__
+#endif /* !__CRT_DOS_PRIMARY */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __CRT_DOS_PRIMARY
+typedef __UINT16_TYPE__ __wctype_t;
+typedef __WCHAR16_TYPE__ __wctrans_t;
+#else /* __CRT_DOS_PRIMARY */
+typedef __ULONGPTR_TYPE__ __wctype_t;
+typedef __int32_t const *__wctrans_t;
+#endif /* !__CRT_DOS_PRIMARY */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT_WCTYPE_H */

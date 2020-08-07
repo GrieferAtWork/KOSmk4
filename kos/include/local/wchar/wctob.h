@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a2c682c */
+/* HASH CRC-32:0xde8516f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wctob_defined
 #define __local_wctob_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wctob) __ATTR_CONST __ATTR_WUNUSED int

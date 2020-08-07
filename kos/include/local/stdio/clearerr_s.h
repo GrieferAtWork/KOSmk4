@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8777b509 */
+/* HASH CRC-32:0x56a047d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_clearerr_s_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: clearerr from stdio */
 #ifndef __local___localdep_clearerr_defined

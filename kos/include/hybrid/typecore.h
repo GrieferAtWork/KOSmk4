@@ -1041,18 +1041,6 @@
 #endif /* !__WINT_UNSIGNED__ */
 #endif /* !__WINT_TYPE__ */
 
-#ifndef __WCTYPE_TYPE__
-#if (defined(__CYGWIN__) || defined(__CYGWIN32__) || \
-     defined(__MINGW32__) || defined(WIN32) ||       \
-     defined(_WIN32) || defined(WIN64) || defined(_WIN64))
-#define __WCTYPE_TYPE__     __UINT16_TYPE__
-#define __SIZEOF_WCTYPE_T__ 2
-#else /* ... */
-#define __WCTYPE_TYPE__     __ULONGPTR_TYPE__
-#define __SIZEOF_WCTYPE_T__ __SIZEOF_POINTER__
-#endif /* !... */
-#endif /* !__WCTYPE_TYPE__ */
-
 #ifndef __CHAR16_TYPE__
 #define __CHAR16_TYPE__ __UINT16_TYPE__
 #endif /* !__CHAR16_TYPE__ */

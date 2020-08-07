@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a4c5980 */
+/* HASH CRC-32:0x80602e7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,6 +56,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
 (LIBCCALL libc_putchar)(int ch) THROWS(...) {
 	return libc_fputc(ch, stdout);
 }
+#include <hybrid/typecore.h>
 #include <parts/errno.h>
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
  * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
@@ -241,7 +242,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
                         char const *__restrict format,
                         va_list args) THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return libc_format_vscanf(*(pformatgetc)&libc_fgetc,
+	return libc_format_vscanf((pformatgetc)(void *)&libc_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
@@ -632,6 +633,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 	       ? w
 	       : EOF;
 }
+#include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
 #include <parts/errno.h>
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
@@ -712,6 +714,7 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_,
 	va_end(args);
 	return result;
 }
+#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
@@ -811,7 +814,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 			                         new_bufsize *
 			                         sizeof(char));
 			if unlikely(!buffer)
-				return -1;
+				goto err;
 			bufsize  = new_bufsize;
 			*lineptr = buffer;
 			*pcount  = bufsize;
@@ -836,6 +839,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 	/* NUL-Terminate the buffer. */
 	buffer[result] = '\0';
 	return result;
+err:
+	return -1;
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 3)) ssize_t
 (LIBCCALL libc_getline_unlocked)(char **__restrict lineptr,
@@ -939,7 +944,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
                                  char const *__restrict format,
                                  va_list args) THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return libc_format_vscanf(*(pformatgetc)&libc_fgetc_unlocked,
+	return libc_format_vscanf((pformatgetc)(void *)&libc_fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);

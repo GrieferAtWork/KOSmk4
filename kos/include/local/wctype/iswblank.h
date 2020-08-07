@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46af2d62 */
+/* HASH CRC-32:0x98226230 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_iswblank_defined
 #define __local_iswblank_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: isblank from ctype */
 #ifndef __local___localdep_isblank_defined

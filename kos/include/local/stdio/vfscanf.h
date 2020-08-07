@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80c516f8 */
+/* HASH CRC-32:0x6d72178 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vfscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return __localdep_format_vscanf(*(__pformatgetc)&__localdep_fgetc,
+	return __localdep_format_vscanf((__pformatgetc)(void *)&__localdep_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc,
 	                     (void *)__stream,
 	                     __format, __args);

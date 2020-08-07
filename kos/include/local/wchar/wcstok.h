@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79eda4e0 */
+/* HASH CRC-32:0x1b5c0e62 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wcstok_defined
 #define __local_wcstok_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcscspn from wchar */
 #ifndef __local___localdep_wcscspn_defined
@@ -38,9 +39,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsspn_defined
 #define __local___localdep_wcsspn_defined 1
 #ifdef __CRT_HAVE_wcsspn
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* __CRT_HAVE_wcsspn */
 __NAMESPACE_LOCAL_END

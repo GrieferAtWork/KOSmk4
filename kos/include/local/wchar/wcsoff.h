@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaefda0d1 */
+/* HASH CRC-32:0xa4fc4685 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wcsoff_defined
 #define __local_wcsoff_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcschrnul from wchar */
 #ifndef __local___localdep_wcschrnul_defined

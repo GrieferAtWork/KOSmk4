@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac7760b9 */
+/* HASH CRC-32:0x78ea3bb1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -303,6 +303,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1

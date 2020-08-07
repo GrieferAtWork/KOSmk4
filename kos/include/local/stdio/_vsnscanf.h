@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e955f2b */
+/* HASH CRC-32:0xd6bea3cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__vsnscanf_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_vscanf from format-printer */
 #ifndef __local___localdep_format_vscanf_defined
@@ -30,7 +31,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
@@ -120,7 +120,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_unicode_readutf8_rev_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 struct __vsnscanf_data {
 	char const *__ptr;

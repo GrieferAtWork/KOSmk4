@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13151260 */
+/* HASH CRC-32:0x57c2abeb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local_wcsnrev_defined
 #define __local_wcsnrev_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memrev from string */
 #ifndef __local___localdep_memrev_defined
 #define __local___localdep_memrev_defined 1
 #ifdef __CRT_HAVE_memrev
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* __CRT_HAVE_memrev */
 __NAMESPACE_LOCAL_END
@@ -41,9 +39,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrevl_defined
 #define __local___localdep_memrevl_defined 1
 #ifdef __CRT_HAVE_memrevl
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
 #else /* __CRT_HAVE_memrevl */
 __NAMESPACE_LOCAL_END
@@ -56,9 +51,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrevw_defined
 #define __local___localdep_memrevw_defined 1
 #ifdef __CRT_HAVE_memrevw
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
 #else /* __CRT_HAVE_memrevw */
 __NAMESPACE_LOCAL_END
@@ -71,9 +63,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
 #ifdef __CRT_HAVE_wcsnlen
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #else /* __CRT_HAVE_wcsnlen */

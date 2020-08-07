@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b720769 */
+/* HASH CRC-32:0x999b78c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_btoc16_defined
 #define __local_btoc16_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(btoc16) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(btoc16))(int __ch) {

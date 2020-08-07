@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc1f8b8 */
+/* HASH CRC-32:0x90ead4c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #if (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <kos/anno.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetc_unlocked from stdio */
 #ifndef __local___localdep_fgetc_unlocked_defined
@@ -59,7 +60,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
@@ -116,7 +116,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) __SSIZE_TYPE__
@@ -135,7 +134,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vfscanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf_unlocked))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return __localdep_format_vscanf(*(__pformatgetc)&__localdep_fgetc_unlocked,
+	return __localdep_format_vscanf((__pformatgetc)(void *)&__localdep_fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc_unlocked,
 	                     (void *)__stream,
 	                     __format, __args);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc08db889 */
+/* HASH CRC-32:0x32bd45b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_fopen_s_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fopen64 from stdio */
 #ifndef __local___localdep_fopen64_defined

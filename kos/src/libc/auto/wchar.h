@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cd89134 */
+/* HASH CRC-32:0xa8efcb54 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -395,8 +395,8 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsupr)(
 INTDEF ATTR_RETNONNULL NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsupr)(char32_t *__restrict str);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscwprintf)(char16_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vscwprintf)(char32_t const *format, va_list args);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(VLIBDCALL libd__scwprintf)(char16_t const *format, ...);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(VLIBKCALL libc__scwprintf)(char32_t const *format, ...);
+INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scwprintf)(char16_t const *format, ...);
+INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__scwprintf)(char32_t const *format, ...);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscwprintf_p)(char16_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vscwprintf_p)(char32_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scwprintf_p)(char16_t const *format, ...);

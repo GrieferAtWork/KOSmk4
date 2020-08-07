@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b3a1827 */
+/* HASH CRC-32:0x43cf8e5d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #ifdef __CRT_HAVE_vfwscanf
 #include <kos/anno.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vfwscanf from wchar */
 #ifndef __local___localdep_vfwscanf_defined

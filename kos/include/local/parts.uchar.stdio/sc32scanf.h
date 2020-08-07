@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x168ea52e */
+/* HASH CRC-32:0x79855169 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_sc32scanf_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vsc32scanf from parts.uchar.stdio */
 #ifndef __local___localdep_vsc32scanf_defined

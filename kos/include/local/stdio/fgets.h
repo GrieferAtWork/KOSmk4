@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e332992 */
+/* HASH CRC-32:0x193dd99b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,6 +120,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, _
 #endif /* !... */
 #endif /* !__local___localdep_ungetc_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when

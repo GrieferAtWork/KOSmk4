@@ -22,10 +22,13 @@
 
 #include "__crt.h"
 #include "__stdinc.h"
+/**/
 
 #include <features.h>
 
 #include <hybrid/typecore.h>
+
+#include <bits/crt/wctype.h> /* __wctype_t */
 
 #include <sal.h>
 #include <vadefs.h>
@@ -329,7 +332,7 @@ typedef __WINT_TYPE__ wint_t;
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
 #define __wctype_t_defined 1
-typedef __WCTYPE_TYPE__ wctype_t;
+typedef __wctype_t wctype_t;
 #endif /* !__wctype_t_defined */
 #ifndef _VA_LIST_DEFINED
 #define _VA_LIST_DEFINED 1

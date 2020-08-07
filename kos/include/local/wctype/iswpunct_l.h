@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabd7191a */
+/* HASH CRC-32:0xcbf5695 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_iswpunct_l_defined
 #define __local_iswpunct_l_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: iswpunct from wctype */
 #ifndef __local___localdep_iswpunct_defined

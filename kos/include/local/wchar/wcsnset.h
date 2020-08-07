@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb82df024 */
+/* HASH CRC-32:0xa7d64716 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wcsnset_defined
 #define __local_wcsnset_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsnset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnset))(__WCHAR_TYPE__ *__restrict __str, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __maxlen) {

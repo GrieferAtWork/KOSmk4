@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ac6de08 */
+/* HASH CRC-32:0x46a38c93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,9 @@
 #ifndef __local_wctype_defined
 #define __local_wctype_defined 1
 #include <__crt.h>
+#include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wctype) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCTYPE_TYPE__
+__LOCAL_LIBC(wctype) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctype_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctype))(char const *__prop) {
 	/* TODO */
 	(void)__prop;

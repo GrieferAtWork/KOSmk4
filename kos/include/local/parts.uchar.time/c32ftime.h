@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47e6ca5f */
+/* HASH CRC-32:0x5d61a0e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c32ftime_defined
 #define __local_c32ftime_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32ftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__

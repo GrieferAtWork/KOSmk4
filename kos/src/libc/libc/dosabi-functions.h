@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca5cf443 */
+/* HASH CRC-32:0x3f7cf878 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2427,8 +2427,8 @@ DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_iswpunct, libc_iswpunct, T
 DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_iswspace, libc_iswspace, TD, 1, TIn(__SIZEOF_WINT_T__))
 DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_iswupper, libc_iswupper, TD, 1, TIn(__SIZEOF_WINT_T__))
 DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_iswxdigit, libc_iswxdigit, TD, 1, TIn(__SIZEOF_WINT_T__))
-DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_wctrans, libc_wctrans, TP, 1, TP)
-DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_towctrans, libc_towctrans, TIn(__SIZEOF_WINT_T__), 2, TIn(__SIZEOF_WINT_T__), TP)
+DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_wctrans, libc_wctrans, TIn(__SIZEOF_WCTRANS_T__), 1, TP)
+DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_towctrans, libc_towctrans, TIn(__SIZEOF_WINT_T__), 2, TIn(__SIZEOF_WINT_T__), TIn(__SIZEOF_WCTRANS_T__))
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_wctype, libc_wctype, TIn(__SIZEOF_WCTYPE_T__), 1, TP)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_iswctype, libc_iswctype, TD, 2, TIn(__SIZEOF_WINT_T__), TIn(__SIZEOF_WCTYPE_T__))
 DFUN(".text.crt.dos.wchar.unicode.static.ctype", libd_iswblank, libc_iswblank, TD, 1, TIn(__SIZEOF_WINT_T__))
@@ -2451,8 +2451,8 @@ DFUN(".text.crt.dos.wchar.unicode.locale.ctype", libd_iswctype_l, libc_iswctype_
 DFUN(".text.crt.dos.wchar.unicode.locale.ctype", libd_towupper_l, libc_towupper_l, TIn(__SIZEOF_WINT_T__), 2, TIn(__SIZEOF_WINT_T__), TP)
 DFUN(".text.crt.dos.wchar.unicode.locale.ctype", libd_towlower_l, libc_towlower_l, TIn(__SIZEOF_WINT_T__), 2, TIn(__SIZEOF_WINT_T__), TP)
 DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd_wctype_l, libc_wctype_l, TIn(__SIZEOF_WCTYPE_T__), 2, TP, TP)
-DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd_wctrans_l, libc_wctrans_l, TP, 2, TP, TP)
-DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd_towctrans_l, libc_towctrans_l, TIn(__SIZEOF_WINT_T__), 3, TIn(__SIZEOF_WINT_T__), TP, TP)
+DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd_wctrans_l, libc_wctrans_l, TIn(__SIZEOF_WCTRANS_T__), 2, TP, TP)
+DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd_towctrans_l, libc_towctrans_l, TIn(__SIZEOF_WINT_T__), 3, TIn(__SIZEOF_WINT_T__), TIn(__SIZEOF_WCTRANS_T__), TP)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_isleadbyte, libc_isleadbyte, TD, 1, TD)
 DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd__isleadbyte_l, libc__isleadbyte_l, TD, 2, TD, TP)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd___iswcsymf, libc___iswcsymf, TD, 1, TIn(__SIZEOF_WINT_T__))

@@ -275,6 +275,7 @@ incdir("", "../../include");
 #include <bits/crt/sys_errlist.h>
 #include <bits/crt/threads.h>
 #include <bits/crt/tm.h>
+#include <bits/crt/wctype.h>
 #include <bits/dirent.h>
 #include <bits/elf-types.h>
 #include <bits/elf.h>

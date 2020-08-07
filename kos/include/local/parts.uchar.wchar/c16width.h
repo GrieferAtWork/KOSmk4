@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62576c89 */
+/* HASH CRC-32:0x45d24b71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c16width_defined
 #define __local_c16width_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <libc/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16width) __ATTR_CONST __ATTR_WUNUSED int

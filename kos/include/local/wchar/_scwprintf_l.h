@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x409e69aa */
+/* HASH CRC-32:0xff7f8735 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__scwprintf_l_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _vscwprintf_l from wchar */
 #ifndef __local___localdep__vscwprintf_l_defined

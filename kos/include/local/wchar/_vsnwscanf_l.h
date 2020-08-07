@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe793c425 */
+/* HASH CRC-32:0x8a66eba9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__vsnwscanf_l_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _vsnwscanf from wchar */
 #ifndef __local___localdep__vsnwscanf_defined

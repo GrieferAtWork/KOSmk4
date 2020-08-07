@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46e5d13c */
+/* HASH CRC-32:0xbb1a73ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <asm/crt/stdio.h>
 #if defined(___IOFBF) && defined(___IONBF) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setvbuf from stdio */
 #ifndef __local___localdep_setvbuf_defined

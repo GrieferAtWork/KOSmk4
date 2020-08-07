@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2bc7092 */
+/* HASH CRC-32:0x23e87694 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_sc16printf_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vsc16printf from parts.uchar.stdio */
 #ifndef __local___localdep_vsc16printf_defined

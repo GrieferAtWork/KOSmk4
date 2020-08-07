@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0a9aade */
+/* HASH CRC-32:0xfea9cdec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,12 @@
 #ifndef __local_wcpcpy_defined
 #define __local_wcpcpy_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcslen from wchar */
 #ifndef __local___localdep_wcslen_defined
 #define __local___localdep_wcslen_defined 1
 #ifdef __CRT_HAVE_wcslen
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
 #else /* __CRT_HAVE_wcslen */

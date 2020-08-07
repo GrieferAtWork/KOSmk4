@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c4d841c */
+/* HASH CRC-32:0x3f3f2ea8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4023,20 +4023,20 @@ NOTHROW_NCX(LIBKCALL libc__vscwprintf)(char32_t const *format,
                                        va_list args) {
 	return libc_vswprintf(NULL, 0, format, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__scwprintf)(char16_t const *format,
                                        ...) {
-	int result;
+	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
 	result = libd__vscwprintf(format, args);
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__scwprintf)(char32_t const *format,
                                        ...) {
-	int result;
+	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
 	result = libc__vscwprintf(format, args);

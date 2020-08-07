@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39f1476f */
+/* HASH CRC-32:0xdb606091 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_wcsrchrnul_defined
 #define __local_wcsrchrnul_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(wcsrchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42758b3a */
+/* HASH CRC-32:0x640eb982 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local_towctrans_defined
 #define __local_towctrans_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
+#include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(towctrans) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towctrans))(__WINT_TYPE__ __wc, __wctrans_t __desc) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8924f8b */
+/* HASH CRC-32:0x821f03d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__iswcsym_l_defined
 #define __local__iswcsym_l_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: iswalnum_l from wctype */
 #ifndef __local___localdep_iswalnum_l_defined

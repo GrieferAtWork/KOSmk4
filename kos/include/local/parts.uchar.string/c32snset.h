@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdee36848 */
+/* HASH CRC-32:0xdeec07dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_c32snset_defined
 #define __local_c32snset_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32snset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32snset))(__CHAR32_TYPE__ *__restrict __str, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __maxlen) {

@@ -31,6 +31,8 @@
 #include <bits/types.h>
 #include <sys/syscall.h>
 
+#include <wctype.h> /* __SIZEOF_WCTRANS_T__ */
+
 
 /* Define type class IDs:
  *   - R: General purpose register argument
