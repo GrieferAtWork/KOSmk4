@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8280fc89 */
+/* HASH CRC-32:0x998732a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1722,7 +1722,7 @@ INTERN_FUNCTION(libc_sys_Xsethostname)
 END(libc_sys_Xsethostname)
 DEFINE_PUBLIC_ALIAS(sys_Xsethostname, libc_sys_Xsethostname)
 
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 .section .text.crt.syscall.setrlimit
 INTERN_FUNCTION(libc_sys_setrlimit)
@@ -1731,7 +1731,7 @@ INTERN_FUNCTION(libc_sys_setrlimit)
 END(libc_sys_setrlimit)
 DEFINE_PUBLIC_ALIAS(sys_setrlimit, libc_sys_setrlimit)
 
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 .section .text.crt.syscall.Xsetrlimit
 INTERN_FUNCTION(libc_sys_Xsetrlimit)
@@ -1740,7 +1740,7 @@ INTERN_FUNCTION(libc_sys_Xsetrlimit)
 END(libc_sys_Xsetrlimit)
 DEFINE_PUBLIC_ALIAS(sys_Xsetrlimit, libc_sys_Xsetrlimit)
 
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 .section .text.crt.syscall.getrlimit
 INTERN_FUNCTION(libc_sys_getrlimit)
@@ -1749,7 +1749,7 @@ INTERN_FUNCTION(libc_sys_getrlimit)
 END(libc_sys_getrlimit)
 DEFINE_PUBLIC_ALIAS(sys_getrlimit, libc_sys_getrlimit)
 
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 .section .text.crt.syscall.Xgetrlimit
 INTERN_FUNCTION(libc_sys_Xgetrlimit)
@@ -6032,7 +6032,7 @@ INTERN_FUNCTION(libc_sys_Xfanotify_mark)
 END(libc_sys_Xfanotify_mark)
 DEFINE_PUBLIC_ALIAS(sys_Xfanotify_mark, libc_sys_Xfanotify_mark)
 
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 .section .text.crt.syscall.prlimit64
 INTERN_FUNCTION(libc_sys_prlimit64)
@@ -6041,7 +6041,7 @@ INTERN_FUNCTION(libc_sys_prlimit64)
 END(libc_sys_prlimit64)
 DEFINE_PUBLIC_ALIAS(sys_prlimit64, libc_sys_prlimit64)
 
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 .section .text.crt.syscall.Xprlimit64
 INTERN_FUNCTION(libc_sys_Xprlimit64)

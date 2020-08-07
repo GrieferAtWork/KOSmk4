@@ -44,13 +44,13 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <bits/resource.h>
 #include <bits/rusage-convert.h>
 #include <bits/rusage-struct.h>
 #include <bits/timespec.h>
 #include <compat/config.h>
 #include <kos/except/inval.h>
 #include <sys/poll.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 

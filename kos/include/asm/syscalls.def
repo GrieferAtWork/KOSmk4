@@ -622,11 +622,11 @@ sigsuspend:([tostr(STRUCT_SIGSET)] struct __sigset_struct const *set) -> errno_t
 sigpending:(struct __sigset_struct *set) -> errno_t;
 sethostname:([tostr(STRING:len)] char const *name, size_t len) -> errno_t;
 
-@@@param: resource: One of `RLIMIT_*' from <bits/resource.h>
+@@@param: resource: One of `RLIMIT_*' from <sys/resource.h>
 setrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
            [tostr(STRUCT_RLIMIT)] struct rlimit const *rlimits) -> errno_t;
 
-@@@param: resource: One of `RLIMIT_*' from <bits/resource.h>
+@@@param: resource: One of `RLIMIT_*' from <sys/resource.h>
 getrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
            [tostr(out:STRUCT_RLIMIT)] struct rlimit *rlimits) -> errno_t;
 
@@ -1491,7 +1491,7 @@ perf_event_open:(int TODO_PROTOTYPE) -> errno_t;
 fanotify_init:(int TODO_PROTOTYPE) -> errno_t;
 fanotify_mark:(int TODO_PROTOTYPE) -> errno_t;
 
-@@@param: resource: One of `RLIMIT_*' from <bits/resource.h>
+@@@param: resource: One of `RLIMIT_*' from <sys/resource.h>
 prlimit64:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
            [tostr(STRUCT_RLIMIT64)] struct rlimit64 const *new_limit,
            [tostr(out:STRUCT_RLIMIT64)] struct rlimit64 *old_limit) -> errno_t;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcec3e529 */
+/* HASH CRC-32:0x898448af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,9 +225,9 @@
 #define __NR_uname                  0xa0  /* errno_t uname(struct utsname *name) */
 #define __NR_sethostname            0xa1  /* errno_t sethostname(char const *name, size_t len) */
 #define __NR_setdomainname          0xa2  /* errno_t setdomainname(char const *name, size_t len) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR_getrlimit              0xa3  /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR_setrlimit              0xa4  /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define __NR_getrusage              0xa5  /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
@@ -348,7 +348,7 @@
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define __NR_wait4                  0x104 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR_prlimit64              0x105 /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 #define __NR_fanotify_init          0x106 /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define __NR_fanotify_mark          0x107 /* errno_t fanotify_mark(int TODO_PROTOTYPE) */

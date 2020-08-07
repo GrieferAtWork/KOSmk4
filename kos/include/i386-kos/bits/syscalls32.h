@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ade0db8 */
+/* HASH CRC-32:0x6850f372 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,9 +109,9 @@
 #define SYS_sigsuspend              __NR_sigsuspend              /* errno_t sigsuspend(struct __sigset_struct const *set) */
 #define SYS_sigpending              __NR_sigpending              /* errno_t sigpending(struct __sigset_struct *set) */
 #define SYS_sethostname             __NR_sethostname             /* errno_t sethostname(char const *name, size_t len) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_setrlimit               __NR_setrlimit               /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_getrlimit               __NR_getrlimit               /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage               __NR_getrusage               /* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
@@ -451,7 +451,7 @@
 #define SYS_recvmmsg                __NR_recvmmsg                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 #define SYS_fanotify_init           __NR_fanotify_init           /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define SYS_fanotify_mark           __NR_fanotify_mark           /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_prlimit64               __NR_prlimit64               /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 #define SYS_name_to_handle_at       __NR_name_to_handle_at       /* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */

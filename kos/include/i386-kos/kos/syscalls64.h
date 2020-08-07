@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a5bfc71 */
+/* HASH CRC-32:0xd99a5024 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -628,7 +628,7 @@ __CDECLARE_SC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *_
 __CDECLARE_SC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_SC(getresuid) */
 #if __CRT_HAVE_SC(getrlimit)
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(getrlimit) */
 #if __CRT_HAVE_SC(getrusage)
@@ -1083,7 +1083,7 @@ __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx64 const *__iovec, 
 __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_SC(preadvf) */
 #if __CRT_HAVE_SC(prlimit64)
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
 #if __CRT_HAVE_SC(process_spawnveat)
@@ -1448,7 +1448,7 @@ __CDECLARE_SC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __su
 __CDECLARE_SC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_SC(setreuid) */
 #if __CRT_HAVE_SC(setrlimit)
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(setrlimit) */
 #if __CRT_HAVE_SC(setsid)
@@ -2195,7 +2195,7 @@ __CDECLARE_XSC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *
 __CDECLARE_XSC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_XSC(getresuid) */
 #if __CRT_HAVE_XSC(getrlimit)
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(getrlimit) */
 #if __CRT_HAVE_XSC(getrusage)
@@ -2650,7 +2650,7 @@ __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx64 const *__iovec,
 __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(preadvf) */
 #if __CRT_HAVE_XSC(prlimit64)
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
 #if __CRT_HAVE_XSC(process_spawnveat)
@@ -2998,7 +2998,7 @@ __CDECLARE_XSC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __s
 __CDECLARE_XSC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_XSC(setreuid) */
 #if __CRT_HAVE_XSC(setrlimit)
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(setrlimit) */
 #if __CRT_HAVE_XSC(setsid)

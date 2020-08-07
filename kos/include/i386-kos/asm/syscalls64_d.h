@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88f501c1 */
+/* HASH CRC-32:0x6a57f616 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,7 +178,7 @@
 #define __NR64_lchown                 0x5e                           /* errno_t lchown(char const *filename, uid_t owner, gid_t group) */
 #define __NR64_umask                  0x5f                           /* mode_t umask(mode_t mode) */
 #define __NR64_gettimeofday           0x60                           /* errno_t gettimeofday(struct timevalx64 *tv, struct timezone *tz) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR64_getrlimit              0x61                           /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define __NR64_getrusage              0x62                           /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
@@ -251,7 +251,7 @@
 #define __NR64_prctl                  0x9d                           /* errno_t prctl(int TODO_PROTOTYPE) */
 #define __NR64_arch_prctl             0x9e                           /* errno_t arch_prctl(int TODO_PROTOTYPE) */
 #define __NR64_adjtimex               0x9f                           /* errno_t adjtimex(int TODO_PROTOTYPE) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR64_setrlimit              0xa0                           /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 #define __NR64_chroot                 0xa1                           /* errno_t chroot(char const *path) */
 #define __NR64_sync                   0xa2                           /* errno_t sync(void) */
@@ -437,7 +437,7 @@
 #define __NR64_recvmmsg               0x12b                          /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 #define __NR64_fanotify_init          0x12c                          /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define __NR64_fanotify_mark          0x12d                          /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR64_prlimit64              0x12e                          /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 #define __NR64_name_to_handle_at      0x12f                          /* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */

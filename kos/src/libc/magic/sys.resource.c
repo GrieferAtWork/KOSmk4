@@ -379,6 +379,19 @@ enum __rusage_who {
 
 #ifdef __CC__
 
+/* Type for resource quantity measurement. */
+#ifndef __rlim_t_defined
+#define __rlim_t_defined 1
+typedef __FS_TYPE(rlim) rlim_t;
+#endif /* !__rlim_t_defined */
+
+#ifdef __USE_LARGEFILE64
+#ifndef __rlim64_t_defined
+#define __rlim64_t_defined 1
+typedef __rlim64_t rlim64_t;
+#endif /* !__rlim64_t_defined */
+#endif /* __USE_LARGEFILE64 */
+
 #ifndef __id_t_defined
 #define __id_t_defined
 typedef __id_t id_t;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6118ac6 */
+/* HASH CRC-32:0x886c7b51 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -228,9 +228,9 @@
 #define SYS_uname                  __NR_uname                  /* errno_t uname(struct utsname *name) */
 #define SYS_sethostname            __NR_sethostname            /* errno_t sethostname(char const *name, size_t len) */
 #define SYS_setdomainname          __NR_setdomainname          /* errno_t setdomainname(char const *name, size_t len) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_getrlimit              __NR_getrlimit              /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_setrlimit              __NR_setrlimit              /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage              __NR_getrusage              /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
@@ -351,7 +351,7 @@
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define SYS_wait4                  __NR_wait4                  /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
-/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_prlimit64              __NR_prlimit64              /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
 #define SYS_fanotify_init          __NR_fanotify_init          /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define SYS_fanotify_mark          __NR_fanotify_mark          /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
