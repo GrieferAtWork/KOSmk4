@@ -389,7 +389,6 @@ incdir("", "../../include");
 #include <bits/utsname.h>
 #include <bits/wait.h>
 #include <bits/wformat-printer.h>
-#include <bits/wordsize.h>
 #include <bits/xtitypes.h>
 #include <bitstring.h>
 #include <bsd/bitstring.h>

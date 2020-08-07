@@ -47,7 +47,6 @@
 #include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
-#include <bits/wordsize.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 

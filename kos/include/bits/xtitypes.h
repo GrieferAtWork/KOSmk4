@@ -24,6 +24,7 @@
 
 #include <hybrid/typecore.h>
 
+#define __SIZEOF_T_SCALAR_T__ 4
 #ifdef __CC__
 __DECL_BEGIN
 

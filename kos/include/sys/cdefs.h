@@ -21,6 +21,9 @@
 #define _SYS_CDEFS_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/typecore.h>
+
 #ifndef _FEATURES_H
 #include <features.h>
 #endif /* !_FEATURES_H */
@@ -106,12 +109,15 @@
 #endif /* !__cplusplus || !_GLIBCPP_USE_NAMESPACES */
 
 #if __has_builtin(__builtin_object_size)
+#ifdef __USE_FORTIFY_LEVEL
 #define __bos(ptr)  __builtin_object_size(ptr, __USE_FORTIFY_LEVEL > 1)
+#else /* __USE_FORTIFY_LEVEL */
+#define __bos(ptr)  __builtin_object_size(ptr, 0)
+#endif /* !__USE_FORTIFY_LEVEL */
 #define __bos0(ptr) __builtin_object_size(ptr, 0)
 #else /* __has_builtin(__builtin_object_size) */
-#include <hybrid/typecore.h>
-#define __bos(ptr)  (__CCAST(__SIZE_TYPE__) - 1)
-#define __bos0(ptr) (__CCAST(__SIZE_TYPE__) - 1)
+#define __bos(ptr)  (__CCAST(__SIZE_TYPE__)-1)
+#define __bos0(ptr) (__CCAST(__SIZE_TYPE__)-1)
 #endif /* !__has_builtin(__builtin_object_size) */
 
 #define __warndecl(name, msg)  extern __ATTR_WARNING(msg) void(name)(void)
@@ -209,7 +215,6 @@
 #define _Static_assert(expr, diagnostic) __STATIC_ASSERT(expr)
 #endif /* !... */
 
-#include <bits/wordsize.h>
 #if (defined(__LONG_DOUBLE_MATH_OPTIONAL) && \
      defined(__NO_LONG_DOUBLE_MATH))
 #define __LDBL_COMPAT 1
@@ -237,7 +242,6 @@
 #endif /* !__LDBL_COMPAT || !__REDIRECT */
 
 #ifdef __USE_BSD
-#include <hybrid/typecore.h>
 #ifndef __dead2
 #define __dead2 __ATTR_NORETURN
 #endif /* !__dead2 */
@@ -298,6 +302,46 @@
 #define __DEQUALIFY(type, var) ((type)(__UINTPTR_TYPE__)(void const volatile *)(var))
 #endif /* !__DEQUALIFY */
 #endif /* __USE_BSD */
+
+
+/* On GLibc, this header unconditionally #includes <bits/wordsize.h>,
+ * which defines a bunch of arch-specific configuration helpers.
+ * Since programs might therefor expect <sys/cdefs.h> to define those
+ * same macros on other platforms, emulate macros from that header
+ * here, since KOS doesn't have <bits/wordsize.h> (any more) */
+
+/* __WORDSIZE = __SIZEOF_POINTER__ * __CHAR_BIT__ */
+#if __SIZEOF_POINTER__ == 1
+#define __WORDSIZE 8
+#elif __SIZEOF_POINTER__ == 2
+#define __WORDSIZE 16
+#elif __SIZEOF_POINTER__ == 4
+#define __WORDSIZE 32
+#elif __SIZEOF_POINTER__ == 8
+#define __WORDSIZE 64
+#else /* __SIZEOF_POINTER__ == ... */
+#define __WORDSIZE (__SIZEOF_POINTER__ * 8)
+#endif /* __SIZEOF_POINTER__ != ... */
+
+/* __SYSCALL_WORDSIZE = __SIZEOF_SYSCALL_LONG_T__ * __CHAR_BIT__ */
+#include <bits/typesizes.h>
+#if __SIZEOF_SYSCALL_LONG_T__ == 1
+#define __SYSCALL_WORDSIZE 8
+#elif __SIZEOF_SYSCALL_LONG_T__ == 2
+#define __SYSCALL_WORDSIZE 16
+#elif __SIZEOF_SYSCALL_LONG_T__ == 4
+#define __SYSCALL_WORDSIZE 32
+#elif __SIZEOF_SYSCALL_LONG_T__ == 8
+#define __SYSCALL_WORDSIZE 64
+#else /* __SIZEOF_SYSCALL_LONG_T__ == ... */
+#define __SYSCALL_WORDSIZE (__SIZEOF_SYSCALL_LONG_T__ * 8)
+#endif /* __SIZEOF_SYSCALL_LONG_T__ != ... */
+
+/* defined(__WORDSIZE_TIME64_COMPAT32) = __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define __WORDSIZE_TIME64_COMPAT32 1
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+
 
 
 #endif /* !_SYS_CDEFS_H */

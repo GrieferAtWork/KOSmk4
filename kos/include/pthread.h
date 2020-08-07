@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71e01e5b */
+/* HASH CRC-32:0x31404e2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,6 @@
 #include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
-#include <bits/wordsize.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
