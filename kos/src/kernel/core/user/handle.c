@@ -361,7 +361,7 @@ check_new_alloc_linear:
 			result->hm_hashvector.hm_hashmsk = count;
 			memcpy(map,
 			       self->hm_hashvector.hm_hashvec,
-			       count + 1,
+			       (size_t)count + 1,
 			       sizeof(struct handle_hashent));
 			result->hm_hashvector.hm_hashvec = map;
 			result->hm_hashvector.hm_hashmsk = count;

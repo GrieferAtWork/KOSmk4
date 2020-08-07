@@ -25,6 +25,6 @@
 
 #include <libkeymap/api.h>
 
-#define CC         LIBKEYMAP_CC
+#define CC LIBKEYMAP_CC
 
 #endif /* !GUARD_LIBKEYMAP_API_H */

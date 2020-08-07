@@ -131,7 +131,7 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 		argv = (u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
 		TRY {
 			/* Load system call arguments. */
-			validate_readable(argv, argc * 4);
+			validate_readable(argv, (size_t)argc * 4);
 			for (i = 0; i < argc; ++i) {
 				u32 arg = ATOMIC_READ(argv[i]);
 				sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
@@ -162,7 +162,7 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 		argv = (u64 *)icpustate_getuserpsp(state);
 		TRY {
 			/* Load system call arguments. */
-			validate_readable(argv, argc * 8);
+			validate_readable(argv, (size_t)argc * 8);
 			for (i = 0; i < argc; ++i) {
 				u64 arg = ATOMIC_READ(argv[i]);
 				sc_info.rsi_regs[i] = (syscall_ulong_t)arg;

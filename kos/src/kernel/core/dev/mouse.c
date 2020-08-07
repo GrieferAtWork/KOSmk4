@@ -814,7 +814,7 @@ mouse_device_canread(struct mouse_device *__restrict self) {
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 mouse_device_poll(struct character_device *__restrict self,
-                  poll_mode_t what) {
+                  poll_mode_t what) THROWS(...) {
 	struct mouse_device *me;
 	me = (struct mouse_device *)self;
 	if (what & POLLIN) {

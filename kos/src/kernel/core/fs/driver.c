@@ -3266,7 +3266,7 @@ driver_invoke_initializer_s(uintptr_t func, struct driver *__restrict self) {
 
 PRIVATE NONNULL((1)) void KCALL
 driver_do_run_initializers(struct driver *__restrict self) THROWS(...) {
-	size_t i; uint16_t dyni;
+	size_t i, dyni;
 	uintptr_t init_func = 0;
 	uintptr_t *preinit_array_base = NULL;
 	size_t     preinit_array_size = 0;
@@ -3860,12 +3860,12 @@ done_tags_for_soname:
 			 * as well as how it performs its relocations, etc. */
 			{
 				uintptr_t soname_offset;
-				size_t dynstr_size;
+				size_t dyni, dynstr_size;
 				soname_offset = (uintptr_t)-1;
 				dynstr_size   = (size_t)-1;
-				for (i = 0; i < result->d_dyncnt; ++i) {
+				for (dyni = 0; dyni < result->d_dyncnt; ++dyni) {
 					ElfW(Dyn) tag;
-					tag = result->d_dynhdr[i];
+					tag = result->d_dynhdr[dyni];
 					switch (tag.d_tag) {
 
 					case DT_NULL:

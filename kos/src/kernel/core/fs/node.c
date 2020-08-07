@@ -3613,8 +3613,10 @@ restore_old_except:
 	superblock_nodeslock_endwrite(self);
 	decref(self);
 	/* Clear recently used INodes, thus uncaching any that were apart of `self' */
-	if (did_unmount)
+	if (did_unmount) {
+		/* FIXME: This call may throw an exception! */
 		inode_recent_clear();
+	}
 	return result;
 }
 

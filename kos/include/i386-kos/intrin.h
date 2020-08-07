@@ -35,89 +35,97 @@
 
 /* __MACHINE */
 /* __MACHINE: void *_AddressOfReturnAddress(void) */
-/* __MACHINE: unsigned char _BitScanForward(unsigned long *_Index, unsigned long Mask) */
-/* __MACHINE: unsigned char _BitScanReverse(unsigned long *_Index, unsigned long Mask) */
-#define _InterlockedAnd(Value, Mask) __lock_andl(Value, Mask)
-#define _InterlockedAnd16(Value, Mask) __lock_andw(Value, Mask)
-#define _InterlockedAnd8(Value, Mask) __lock_andw(Value, Mask)
-#define _InterlockedCompareExchange(Destination, Exchange, Comparand) __lock_cmpxchgl(Destination, Comparand, Exchange)
-#define _InterlockedCompareExchange16(Destination, Exchange, Comparand) __lock_cmpxchgw(Destination, Comparand, Exchange)
-#define _InterlockedCompareExchange64(Destination, Exchange, Comparand) __lock_cmpxchgq(Destination, Comparand, Exchange)
-#define _InterlockedCompareExchange8(Destination, Exchange, Comparand) __lock_cmpxchgb(Destination, Comparand, Exchange)
-#define _InterlockedCompareExchangePointer(Destination, Exchange, Comparand) __lock_cmpxchgp(Destination, Comparand, Exchange)
-#define _InterlockedDecrement(Addend) __lock_dec_resultl(Addend)
-#define _InterlockedDecrement16(Addend) __lock_dec_resultw(Addend)
-#define _InterlockedExchange(Target, Value) __lock_xchgl(Target, Value)
-#define _InterlockedExchange16(Target, Value) __lock_xchgw(Target, Value)
-#define _InterlockedExchange8(Target, Value) __lock_xchgb(Target, Value)
-#define _InterlockedExchangeAdd(Addend, Value) __lock_addl(Addend, Value)
-#define _InterlockedExchangeAdd16(Addend, Value) __lock_addw(Addend, Value)
-#define _InterlockedExchangeAdd8(Addend, Value) __lock_addb(Addend, Value)
-#define _InterlockedExchangePointer(Addend, Value) __lock_addp(Addend, Value)
-#define _InterlockedIncrement(Addend) __lock_inc_resultl(Addend)
-#define _InterlockedIncrement16(Addend) __lock_inc_resultw(Addend)
-#define _InterlockedOr(Value, Mask) __lock_orl(Value, Mask)
-#define _InterlockedOr16(Value, Mask) __lock_orw(Value, Mask)
-#define _InterlockedOr8(Value, Mask) __lock_orb(Value, Mask)
-#define _InterlockedXor(Value, Mask) __lock_xorl(Value, Mask)
-#define _InterlockedXor16(Value, Mask) __lock_xorw(Value, Mask)
-#define _InterlockedXor8(Value, Mask) __lock_xorb(Value, Mask)
-#define _ReadBarrier() __COMPILER_READ_BARRIER()
-#define _ReadWriteBarrier() __COMPILER_BARRIER()
-#define _WriteBarrier() __COMPILER_WRITE_BARRIER()
+/* __MACHINE: unsigned char _BitScanForward(unsigned long *_Index, unsigned long mask) */
+/* __MACHINE: unsigned char _BitScanReverse(unsigned long *_Index, unsigned long mask) */
+#define _InterlockedAnd(value, mask)                                         __lock_andl(value, mask)
+#define _InterlockedAnd16(value, mask)                                       __lock_andw(value, mask)
+#define _InterlockedAnd8(value, mask)                                        __lock_andw(value, mask)
+#define _InterlockedCompareExchange(destination, exchange, comparand)        __lock_cmpxchgl(destination, comparand, exchange)
+#define _InterlockedCompareExchange16(destination, exchange, comparand)      __lock_cmpxchgw(destination, comparand, exchange)
+#define _InterlockedCompareExchange64(destination, exchange, comparand)      __lock_cmpxchgq(destination, comparand, exchange)
+#define _InterlockedCompareExchange8(destination, exchange, comparand)       __lock_cmpxchgb(destination, comparand, exchange)
+#define _InterlockedCompareExchangePointer(destination, exchange, comparand) __lock_cmpxchgp(destination, comparand, exchange)
+#define _InterlockedDecrement(addend)                                        __lock_dec_resultl(addend)
+#define _InterlockedDecrement16(addend)                                      __lock_dec_resultw(addend)
+#define _InterlockedExchange(target, value)                                  __lock_xchgl(target, value)
+#define _InterlockedExchange16(target, value)                                __lock_xchgw(target, value)
+#define _InterlockedExchange8(target, value)                                 __lock_xchgb(target, value)
+#define _InterlockedExchangeAdd(addend, value)                               __lock_addl(addend, value)
+#define _InterlockedExchangeAdd16(addend, value)                             __lock_addw(addend, value)
+#define _InterlockedExchangeAdd8(addend, value)                              __lock_addb(addend, value)
+#define _InterlockedExchangePointer(addend, value)                           __lock_addp(addend, value)
+#define _InterlockedIncrement(addend)                                        __lock_inc_resultl(addend)
+#define _InterlockedIncrement16(addend)                                      __lock_inc_resultw(addend)
+#define _InterlockedOr(value, mask)                                          __lock_orl(value, mask)
+#define _InterlockedOr16(value, mask)                                        __lock_orw(value, mask)
+#define _InterlockedOr8(value, mask)                                         __lock_orb(value, mask)
+#define _InterlockedXor(value, mask)                                         __lock_xorl(value, mask)
+#define _InterlockedXor16(value, mask)                                       __lock_xorw(value, mask)
+#define _InterlockedXor8(value, mask)                                        __lock_xorb(value, mask)
+#define _ReadBarrier()                                                       __COMPILER_READ_BARRIER()
+#define _ReadWriteBarrier()                                                  __COMPILER_BARRIER()
+#define _WriteBarrier()                                                      __COMPILER_WRITE_BARRIER()
 #if __has_builtin(__builtin_return_address)
 #define _ReturnAddress() __builtin_return_address(0)
 #endif /* __has_builtin(__builtin_return_address) */
 /* __MACHINE: void __code_seg(const char *) */
 #define __debugbreak() __int3()
 #ifdef __COMPILER_HAVE_GCC_ASM
-#define __fastfail(Code)  __fastfail(Code)
-__FORCELOCAL __ATTR_NORETURN void (__fastfail)(unsigned int __Code) {
-	__asm__ __volatile__("int {$}0x29" : : "c" (__Code) : "memory");
+#if __has_builtin(__fastfail)
+#define __fastfail(Code)  __x86_fastfail(Code)
+__FORCELOCAL __ATTR_NORETURN void (__x86_fastfail)(unsigned int __code) {
+	__asm__ __volatile__("int {$}0x29" : : "c" (__code) : "memory");
 	__builtin_unreachable();
 }
+#else /* __has_builtin(__fastfail) */
+#define __fastfail(Code)  __fastfail(Code)
+__FORCELOCAL __ATTR_NORETURN void (__fastfail)(unsigned int __code) {
+	__asm__ __volatile__("int {$}0x29" : : "c" (__code) : "memory");
+	__builtin_unreachable();
+}
+#endif /* !__has_builtin(__fastfail) */
 #endif /* __COMPILER_HAVE_GCC_ASM */
 #define __nop() __nop()
 /* __MACHINE: unsigned char _bittest(long const *, long) */
 /* __MACHINE: unsigned char _bittestandcomplement(long *, long) */
 /* __MACHINE: unsigned char _bittestandreset(long *, long) */
 /* __MACHINE: unsigned char _bittestandset(long *, long) */
-#define _byteswap_uint64(Value) __hybrid_bswap64(Value)
-#define _byteswap_ulong(Value) __hybrid_bswap32(Value)
-#define _byteswap_ushort(Value) __hybrid_bswap16(Value)
-#define _disable() __cli()
-#define _enable() __sti()
+#define _byteswap_uint64(value) __hybrid_bswap64(value)
+#define _byteswap_ulong(value)  __hybrid_bswap32(value)
+#define _byteswap_ushort(value) __hybrid_bswap16(value)
+#define _disable()              __cli()
+#define _enable()               __sti()
 /* __MACHINE: unsigned char _interlockedbittestandreset(long volatile *, long) */
 /* __MACHINE: unsigned char _interlockedbittestandset(long volatile *, long) */
-#define _lrotl(Value, Shift) __hybrid_rol32(Value, Shift)
-#define _rotl(Value, Shift) __hybrid_rol32(Value, Shift)
-#define _rotl16(Value, Shift) __hybrid_rol16(Value, Shift)
-#define _rotl64(Value, Shift) __hybrid_rol64(Value, Shift)
-#define _rotl8(Value, Shift) __hybrid_rol8(Value, Shift)
-#define _lrotr(Value, Shift) __hybrid_rol32(Value, Shift)
-#define _rotr(Value, Shift) __hybrid_ror32(Value, Shift)
-#define _rotr16(Value, Shift) __hybrid_ror16(Value, Shift)
-#define _rotr64(Value, Shift) __hybrid_ror64(Value, Shift)
-#define _rotr8(Value, Shift) __hybrid_ror8(Value, Shift)
+#define _lrotl(value, shift)  __hybrid_rol32(value, shift)
+#define _rotl(value, shift)   __hybrid_rol32(value, shift)
+#define _rotl16(value, shift) __hybrid_rol16(value, shift)
+#define _rotl64(value, shift) __hybrid_rol64(value, shift)
+#define _rotl8(value, shift)  __hybrid_rol8(value, shift)
+#define _lrotr(value, shift)  __hybrid_rol32(value, shift)
+#define _rotr(value, shift)   __hybrid_ror32(value, shift)
+#define _rotr16(value, shift) __hybrid_ror16(value, shift)
+#define _rotr64(value, shift) __hybrid_ror64(value, shift)
+#define _rotr8(value, shift)  __hybrid_ror8(value, shift)
 /* __MACHINE: int __cdecl _setjmp(jmp_buf) */
 
 
 
 
 /* __MACHINEX86 / __MACHINEX64 */
-#define __readcr0() __rdcr0()
-#define __readcr2() __rdcr2()
-#define __readcr3() __rdcr3()
-#define __readcr4() __rdcr4()
-#define __writecr0(Value) __wrcr0(Value)
-#define __writecr3(Value) __wrcr3(Value)
-#define __writecr4(Value) __wrcr4(Value)
+#define __readcr0()       __rdcr0()
+#define __readcr2()       __rdcr2()
+#define __readcr3()       __rdcr3()
+#define __readcr4()       __rdcr4()
+#define __writecr0(value) __wrcr0(value)
+#define __writecr3(value) __wrcr3(value)
+#define __writecr4(value) __wrcr4(value)
 #ifdef __x86_64__
-#define __readcr8() __rdcr8()
-#define __writecr8(Value) __wrcr8(Value)
+#define __readcr8()       __rdcr8()
+#define __writecr8(value) __wrcr8(value)
 #endif /* __x86_64__ */
-#define __readeflags() __rdflags()
-#define __writeeflags(Value) __wrflags(Value)
+#define __readeflags()       __rdflags()
+#define __writeeflags(value) __wrflags(value)
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__readdr)(unsigned int __N) {
 	switch (__N) {
 	case 0: return (__REGISTER_TYPE__)__rddr0();
@@ -149,14 +157,14 @@ __FORCELOCAL void (__writedr)(unsigned int __N, __REGISTER_TYPE__ __Val) {
 
 /* __MACHINEX86 */
 #if defined(__i386__) && !defined(__x86_64__)
-#define __addfsbyte(Offset, Value) __addfsb(Offset, Value)
-#define __addfsdword(Offset, Value) __addfsl(Offset, Value)
-#define __addfsword(Offset, Value) __addfsw(Offset, Value)
-#define __incfsbyte(Offset) __incfsb(Offset)
-#define __incfsdword(Offset) __incfsl(Offset)
-#define __incfsword(Offset) __incfsw(Offset)
-#define __readfsbyte(Offset) __rdfsb(Offset)
-#define __readfsdword(Offset) __rdfsl(Offset)
+#define __addfsbyte(Offset, value)  __addfsb(Offset, value)
+#define __addfsdword(Offset, value) __addfsl(Offset, value)
+#define __addfsword(Offset, value)  __addfsw(Offset, value)
+#define __incfsbyte(Offset)         __incfsb(Offset)
+#define __incfsdword(Offset)        __incfsl(Offset)
+#define __incfsword(Offset)         __incfsw(Offset)
+#define __readfsbyte(Offset)        __rdfsb(Offset)
+#define __readfsdword(Offset)       __rdfsl(Offset)
 #ifdef __x86_64__
 #define __readfsqword(Offset) __rdfsq(Offset)
 #else /* __x86_64__ */
@@ -170,23 +178,23 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__readfsqword)(__ULONGPTR_TYPE__ __
 	return __Result.__Val64;
 }
 #endif /* !__x86_64__ */
-#define __readfsword(Offset) __rdfsw(Offset)
-#define __writefsbyte(Offset, Value) __wrfsb(Offset, Value)
-#define __writefsdword(Offset, Value) __wrfsl(Offset, Value)
+#define __readfsword(Offset)          __rdfsw(Offset)
+#define __writefsbyte(Offset, value)  __wrfsb(Offset, value)
+#define __writefsdword(Offset, value) __wrfsl(Offset, value)
 #ifdef __x86_64__
-#define __writefsqword(Offset, Value) __wrfsq(Offset, Value)
+#define __writefsqword(Offset, value) __wrfsq(Offset, value)
 #else /* __x86_64__ */
-__FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ __Value) {
+__FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ __value) {
 	union {
 		__UINT64_TYPE__ __Val64;
 		__UINT32_TYPE__ __Val32[2];
 	} __Data;
-	__Data.__Val64 = __Value;
+	__Data.__Val64 = __value;
 	__wrfsl(__Offset + 0, __Data.__Val32[0]);
 	__wrfsl(__Offset + 4, __Data.__Val32[1]);
 }
 #endif /* !__x86_64__ */
-#define __writefsword(Offset, Value) __wrfsw(Offset, Value)
+#define __writefsword(Offset, value) __wrfsw(Offset, value)
 /* __MACHINEX86: void _m_empty(void) */
 /* __MACHINEX86: void _m_femms(void) */
 /* __MACHINEX86: __m64 _m_from_float(float) */
@@ -314,48 +322,48 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ _
 
 /* __MACHINEX64 */
 #ifdef __x86_64__
-#define __addgsbyte(Offset, Value) __addgsb(Offset, Value)
-#define __addgsdword(Offset, Value) __addgsl(Offset, Value)
-#define __addgsword(Offset, Value) __addgsw(Offset, Value)
-#define __addgsqword(Offset, Value) __addgsq(Offset, Value)
-#define __incgsbyte(Offset) __incgsb(Offset)
-#define __incgsdword(Offset) __incgsl(Offset)
-#define __incgsword(Offset) __incgsw(Offset)
-#define __incgsqword(Offset) __incgsq(Offset)
-#define __readgsbyte(Offset) __rdgsb(Offset)
-#define __readgsdword(Offset) __rdgsl(Offset)
-#define __readgsqword(Offset) __rdgsq(Offset)
-#define __readgsword(Offset) __rdgsw(Offset)
-#define __writegsbyte(Offset, Value) __wrgsb(Offset, Value)
-#define __writegsdword(Offset, Value) __wrgsl(Offset, Value)
-#define __writegsqword(Offset, Value) __wrgsq(Offset, Value)
-#define __writegsword(Offset, Value) __wrgsw(Offset, Value)
-/* __MACHINEX64: unsigned char _BitScanForward64(unsigned long *_Index, unsigned __int64 Mask) */
-/* __MACHINEX64: unsigned char _BitScanReverse64(unsigned long *_Index, unsigned __int64 Mask) */
-/* __MACHINEX64: short _InterlockedAnd16_np(short volatile *Value, short Mask) */
-/* __MACHINEX64: __int64 _InterlockedAnd64_np(__int64 volatile *Value, __int64 Mask) */
-/* __MACHINEX64: char _InterlockedAnd8_np(char volatile *Value, char Mask) */
-/* __MACHINEX64: long _InterlockedAnd_np(long volatile *Value, long Mask) */
-/* __MACHINEX64: unsigned char _InterlockedCompareExchange128(__int64 volatile *Destination, __int64 _ExchangeHigh, __int64 _ExchangeLow, __int64 *_ComparandResult) */
-/* __MACHINEX64: unsigned char _InterlockedCompareExchange128_np(__int64 volatile *Destination, __int64 _ExchangeHigh, __int64 _ExchangeLow, __int64 *_ComparandResult) */
-/* __MACHINEX64: __int64 _InterlockedCompareExchange64_np(__int64 volatile *Destination, __int64 Exchange, __int64 Comparand) */
-/* __MACHINEX64: void *_InterlockedCompareExchangePointer_np(void *volatile *Destination, void *Exchange, void *Comparand) */
-/* __MACHINEX64: long _InterlockedCompareExchange_np(long volatile *Destination, long Exchange, long Comparand) */
-/* __MACHINEX64: short _InterlockedOr16_np(short volatile *Value, short Mask) */
-/* __MACHINEX64: __int64 _InterlockedOr64_np(__int64 volatile *Value, __int64 Mask) */
-/* __MACHINEX64: char _InterlockedOr8_np(char volatile *Value, char Mask) */
-/* __MACHINEX64: long _InterlockedOr_np(long volatile *Value, long Mask) */
-/* __MACHINEX64: short _InterlockedXor16_np(short volatile *Value, short Mask) */
-/* __MACHINEX64: __int64 _InterlockedXor64_np(__int64 volatile *Value, __int64 Mask) */
-/* __MACHINEX64: char _InterlockedXor8_np(char volatile *Value, char Mask) */
-/* __MACHINEX64: long _InterlockedXor_np(long volatile *Value, long Mask) */
+#define __addgsbyte(Offset, value)    __addgsb(Offset, value)
+#define __addgsdword(Offset, value)   __addgsl(Offset, value)
+#define __addgsword(Offset, value)    __addgsw(Offset, value)
+#define __addgsqword(Offset, value)   __addgsq(Offset, value)
+#define __incgsbyte(Offset)           __incgsb(Offset)
+#define __incgsdword(Offset)          __incgsl(Offset)
+#define __incgsword(Offset)           __incgsw(Offset)
+#define __incgsqword(Offset)          __incgsq(Offset)
+#define __readgsbyte(Offset)          __rdgsb(Offset)
+#define __readgsdword(Offset)         __rdgsl(Offset)
+#define __readgsqword(Offset)         __rdgsq(Offset)
+#define __readgsword(Offset)          __rdgsw(Offset)
+#define __writegsbyte(Offset, value)  __wrgsb(Offset, value)
+#define __writegsdword(Offset, value) __wrgsl(Offset, value)
+#define __writegsqword(Offset, value) __wrgsq(Offset, value)
+#define __writegsword(Offset, value)  __wrgsw(Offset, value)
+/* __MACHINEX64: unsigned char _BitScanForward64(unsigned long *_Index, unsigned __int64 mask) */
+/* __MACHINEX64: unsigned char _BitScanReverse64(unsigned long *_Index, unsigned __int64 mask) */
+/* __MACHINEX64: short _InterlockedAnd16_np(short volatile *value, short mask) */
+/* __MACHINEX64: __int64 _InterlockedAnd64_np(__int64 volatile *value, __int64 mask) */
+/* __MACHINEX64: char _InterlockedAnd8_np(char volatile *value, char mask) */
+/* __MACHINEX64: long _InterlockedAnd_np(long volatile *value, long mask) */
+/* __MACHINEX64: unsigned char _InterlockedCompareExchange128(__int64 volatile *destination, __int64 _ExchangeHigh, __int64 _ExchangeLow, __int64 *_ComparandResult) */
+/* __MACHINEX64: unsigned char _InterlockedCompareExchange128_np(__int64 volatile *destination, __int64 _ExchangeHigh, __int64 _ExchangeLow, __int64 *_ComparandResult) */
+/* __MACHINEX64: __int64 _InterlockedCompareExchange64_np(__int64 volatile *destination, __int64 exchange, __int64 comparand) */
+/* __MACHINEX64: void *_InterlockedCompareExchangePointer_np(void *volatile *destination, void *exchange, void *comparand) */
+/* __MACHINEX64: long _InterlockedCompareExchange_np(long volatile *destination, long exchange, long comparand) */
+/* __MACHINEX64: short _InterlockedOr16_np(short volatile *value, short mask) */
+/* __MACHINEX64: __int64 _InterlockedOr64_np(__int64 volatile *value, __int64 mask) */
+/* __MACHINEX64: char _InterlockedOr8_np(char volatile *value, char mask) */
+/* __MACHINEX64: long _InterlockedOr_np(long volatile *value, long mask) */
+/* __MACHINEX64: short _InterlockedXor16_np(short volatile *value, short mask) */
+/* __MACHINEX64: __int64 _InterlockedXor64_np(__int64 volatile *value, __int64 mask) */
+/* __MACHINEX64: char _InterlockedXor8_np(char volatile *value, char mask) */
+/* __MACHINEX64: long _InterlockedXor_np(long volatile *value, long mask) */
 /* __MACHINEX64: void __faststorefence(void) */
-#define __lzcnt64(Value) __lzcntq(Value)
+#define __lzcnt64(value)                    __lzcntq(value)
 #define __movsq(Dest, Source, NumQuadWords) __movsq(Dest, Source, NumQuadWords)
 /* __MACHINEX64: __int64 __mulh(__int64, __int64) */
-#define __popcnt64(Value) __popcntq(Value)
-/* __MACHINEX64: unsigned __int64 __shiftleft128(unsigned __int64 _LowPart, unsigned __int64 _HighPart, unsigned char _Shift) */
-/* __MACHINEX64: unsigned __int64 __shiftright128(unsigned __int64 _LowPart, unsigned __int64 _HighPart, unsigned char _Shift) */
+#define __popcnt64(value) __popcntq(value)
+/* __MACHINEX64: unsigned __int64 __shiftleft128(unsigned __int64 _LowPart, unsigned __int64 _HighPart, unsigned char _shift) */
+/* __MACHINEX64: unsigned __int64 __shiftright128(unsigned __int64 _LowPart, unsigned __int64 _HighPart, unsigned char _shift) */
 #define __stosq(Dest, QuadWord, NumQuadWords) __stosq(Dest, QuadWord, NumQuadWords)
 /* __MACHINEX64: unsigned __int64 __umulh(unsigned __int64, unsigned __int64) */
 /* __MACHINEX64: unsigned char __vmx_on(unsigned __int64 *) */
@@ -398,13 +406,13 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ _
 /* __MACHINEX64: unsigned __int64 _umul128(unsigned __int64 _Multiplier, unsigned __int64 _Multiplicand, unsigned __int64 *_HighProduct) */
 /* __MACHINEX64: unsigned char __cdecl _addcarry_u64(unsigned char, unsigned __int64, unsigned __int64, unsigned __int64 *) */
 /* __MACHINEX64: unsigned char __cdecl _subborrow_u64(unsigned char, unsigned __int64, unsigned __int64, unsigned __int64 *) */
-#define _InterlockedAnd64(Value, Mask) __lock_andq(Value, Mask)
-#define _InterlockedDecrement64(Addend) __lock_dec_resultq(Addend)
-#define _InterlockedExchange64(Target, Value) __lock_xchgq(Target, Value)
-#define _InterlockedExchangeAdd64(Addend, Value) __lock_addq(Addend, Value)
-#define _InterlockedIncrement64(Addend) __lock_inc_resultq(Addend)
-#define _InterlockedOr64(Value, Mask) __lock_orq(Value, Mask)
-#define _InterlockedXor64(Value, Mask) __lock_xorq(Value, Mask)
+#define _InterlockedAnd64(value, mask)           __lock_andq(value, mask)
+#define _InterlockedDecrement64(addend)          __lock_dec_resultq(addend)
+#define _InterlockedExchange64(target, value)    __lock_xchgq(target, value)
+#define _InterlockedExchangeAdd64(addend, value) __lock_addq(addend, value)
+#define _InterlockedIncrement64(addend)          __lock_inc_resultq(addend)
+#define _InterlockedOr64(value, mask)            __lock_orq(value, mask)
+#define _InterlockedXor64(value, mask)           __lock_xorq(value, mask)
 /* __MACHINEX64: int __cdecl _setjmpex(jmp_buf) */
 #endif /* __x86_64__ */
 
@@ -417,23 +425,23 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ _
 /* __MACHINEX86_X64: __int64 __emul(int, int) */
 /* __MACHINEX86_X64: unsigned __int64 __emulu(unsigned int, unsigned int) */
 /* __MACHINEX86_X64: unsigned int __getcallerseflags(void) */
-#define __halt() __hlt()
-#define __inbyte(Port) __inb(Port)
-#define __inbytestring(Port, Dest, NumBytes) __insb(Port, Dest, NumBytes)
-#define __indword(Port) __inl(Port)
+#define __halt()                                    __hlt()
+#define __inbyte(Port)                              __inb(Port)
+#define __inbytestring(Port, Dest, NumBytes)        __insb(Port, Dest, NumBytes)
+#define __indword(Port)                             __inl(Port)
 #define __indwordstring(Port, Dest, NumDoubleWords) __insl(Port, Dest, NumDoubleWords)
-#define __int2c() __int(0x2c)
-#define __invlpg() __invlpg()
-#define __inword(Port) __inw(Port)
-#define __inwordstring(Port, Dest, NumWords) __insw(Port, Dest, NumWords)
-#define __lidt(Data) __lidt_p(Data)
+#define __int2c()                                   __int(0x2c)
+#define __invlpg()                                  __invlpg()
+#define __inword(Port)                              __inw(Port)
+#define __inwordstring(Port, Dest, NumWords)        __insw(Port, Dest, NumWords)
+#define __lidt(Data)                                __lidt_p(Data)
 /* __MACHINEX86_X64: unsigned __int64 __ll_lshift(unsigned __int64, int) */
 /* __MACHINEX86_X64: __int64 __ll_rshift(__int64, int) */
 /* __MACHINEX86_X64: unsigned int __lzcnt(unsigned int) */
 /* __MACHINEX86_X64: unsigned short __lzcnt16(unsigned short) */
-#define __movsb(Dest, Source, NumBytes) __movsb(Dest, Source, NumBytes)
+#define __movsb(Dest, Source, NumBytes)       __movsb(Dest, Source, NumBytes)
 #define __movsd(Dest, Source, NumDoubleWords) __movsl(Dest, Source, NumDoubleWords)
-#define __movsw(Dest, Source, NumWords) __movsw(Dest, Source, NumWords)
+#define __movsw(Dest, Source, NumWords)       __movsw(Dest, Source, NumWords)
 /* __MACHINEX86_X64: void __nvreg_restore_fence(void) */
 /* __MACHINEX86_X64: void __nvreg_save_fence(void) */
 #define __outbyte(Port, Byte)                        __outb(Port, Byte)
@@ -442,17 +450,17 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ _
 #define __outdwordstring(Port, Data, NumDoubleWords) __outsl(Port, Data, NumDoubleWords)
 #define __outword(Port, Word)                        __outw(Port, Word)
 #define __outwordstring(Port, Data, NumWords)        __outsw(Port, Data, NumWords)
-#define __popcnt(Value) __popcntl(Value)
-#define __popcnt16(Value) __popcntw(Value)
-#define __rdtsc() __rdtsc()
+#define __popcnt(value)                              __popcntl(value)
+#define __popcnt16(value)                            __popcntw(value)
+#define __rdtsc()                                    __rdtsc()
 /* __MACHINEX86_X64: unsigned __int64 __rdtscp(unsigned int *) */
 #define __readmsr(Id) __rdmsr(Id)
 #define __readpmc(Id) __rdpmc(Id)
 /* __MACHINEX86_X64: unsigned long __segmentlimit(unsigned long) */
-#define __sidt(P) __sidt(P)
-#define __stosb(Dest, Byte, NumBytes) __stosb(Dest, Byte, NumBytes)
+#define __sidt(P)                                 __sidt(P)
+#define __stosb(Dest, Byte, NumBytes)             __stosb(Dest, Byte, NumBytes)
 #define __stosd(Dest, DoubleWord, NumDoubleWords) __stosl(Dest, DoubleWord, NumDoubleWords)
-#define __stosw(Dest, Word, NumWords) __stosw(Dest, Word, NumWords)
+#define __stosw(Dest, Word, NumWords)             __stosw(Dest, Word, NumWords)
 /* __MACHINEX86_X64: void __svm_clgi(void) */
 /* __MACHINEX86_X64: void __svm_invlpga(void *, int) */
 /* __MACHINEX86_X64: void __svm_skinit(int) */
@@ -873,11 +881,11 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ _
 /* __MACHINEX86_X64: __m128d _mm_xor_pd(__m128d, __m128d) */
 /* __MACHINEX86_X64: __m128 _mm_xor_ps(__m128, __m128) */
 /* __MACHINEX86_X64: __m128i _mm_xor_si128(__m128i, __m128i) */
-#define _rsm() __rsm()
+#define _rsm()      __rsm()
 #define _lgdt(Data) __lgdt_p(Data)
-#define _sgdt(P) __sgdt(P)
-#define _clac() __clac()
-#define _stac() __stac()
+#define _sgdt(P)    __sgdt(P)
+#define _clac()     __clac()
+#define _stac()     __stac()
 /* __MACHINEX86_X64: unsigned char __cdecl _addcarry_u8(unsigned char, unsigned char, unsigned char, unsigned char *) */
 /* __MACHINEX86_X64: unsigned char __cdecl _subborrow_u8(unsigned char, unsigned char, unsigned char, unsigned char *) */
 /* __MACHINEX86_X64: unsigned char __cdecl _addcarry_u16(unsigned char, unsigned short, unsigned short, unsigned short *) */

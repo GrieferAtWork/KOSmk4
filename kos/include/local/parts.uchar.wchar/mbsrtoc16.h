@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e00fb22 */
+/* HASH CRC-32:0x1f3de544 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,23 @@
 #ifndef __local_mbsrtoc16_defined
 #define __local_mbsrtoc16_defined 1
 #include <__crt.h>
+#include <bits/mbstate.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: uchar_mbrtoc16 from uchar */
 #ifndef __local___localdep_uchar_mbrtoc16_defined
 #define __local___localdep_uchar_mbrtoc16_defined 1
 #if defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$mbrtowc)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrtowc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$__mbrtowc)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_mbrtoc16) && defined(__LIBCCALL_IS_LIBDCALL)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$mbrtoc16)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END

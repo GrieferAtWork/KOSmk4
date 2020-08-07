@@ -815,7 +815,10 @@ handle_get_socket(unsigned int fd)
 
 
 
-typedef WUNUSED ATTR_RETNONNULL REF void *(FCALL *PHANDLE_AS_CB_T)(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+typedef WUNUSED ATTR_RETNONNULL REF void *
+(FCALL *PHANDLE_AS_CB_T)(REF struct handle const *__restrict self)
+		/*THROWS(E_INVALID_HANDLE_FILETYPE)*/;
+
 PRIVATE WUNUSED ATTR_RETNONNULL REF void *FCALL
 handle_as_error(REF struct handle const *__restrict UNUSED(self))
 		THROWS(E_INVALID_HANDLE_FILETYPE) {

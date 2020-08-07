@@ -461,9 +461,8 @@ again_lock_datapart:
 							new_node = (struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
 							                                        GFP_LOCKED | GFP_CALLOC |
 							                                        GFP_PREFLT | GFP_VCBASE);
-							if
-								unlikely(!new_node)
-							goto err;
+							if unlikely(!new_node)
+								goto err;
 #else /* SPLIT_NX */
 							new_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 							                                     GFP_LOCKED | GFP_CALLOC |

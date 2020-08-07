@@ -29,6 +29,7 @@ gcc_opt.append("-fexceptions");
 #define GUARD_LIBKEYMAP_EN_US_C 1
 
 #include "api.h"
+/**/
 
 #include <kos/keyboard.h>
 #include <kos/types.h>

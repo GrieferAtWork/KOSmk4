@@ -171,7 +171,9 @@
 #define __NO_ATTR_W64 1
 #define __ATTR_W64    /* Nothing */
 
-#if __has_attribute(__fastcall__)
+#ifdef __clang_tidy__
+#define __ATTR_FASTCALL /* nothing */
+#elif __has_attribute(__fastcall__)
 #define __ATTR_FASTCALL __attribute__((__fastcall__))
 #elif defined(__fastcall)
 #define __ATTR_FASTCALL __fastcall
@@ -180,7 +182,9 @@
 #define __ATTR_FASTCALL    /* Nothing */
 #endif
 
-#if __has_attribute(__stdcall__)
+#ifdef __clang_tidy__
+#define __ATTR_STDCALL /* nothing */
+#elif __has_attribute(__stdcall__)
 #define __ATTR_STDCALL __attribute__((__stdcall__))
 #elif defined(__stdcall)
 #define __ATTR_STDCALL __stdcall
@@ -189,7 +193,9 @@
 #define __ATTR_STDCALL    /* Nothing */
 #endif
 
-#if __has_attribute(__cdecl__)
+#ifdef __clang_tidy__
+#define __ATTR_CDECL /* nothing */
+#elif __has_attribute(__cdecl__)
 #define __ATTR_CDECL __attribute__((__cdecl__))
 #elif defined(__cdecl)
 #define __ATTR_CDECL __cdecl
@@ -198,7 +204,9 @@
 #define __ATTR_CDECL    /* Nothing */
 #endif
 
-#if __has_attribute(__clrcall__)
+#ifdef __clang_tidy__
+#define __ATTR_CLRCALL /* nothing */
+#elif __has_attribute(__clrcall__)
 #define __ATTR_CLRCALL __attribute__((__clrcall__))
 #elif defined(__clrcall)
 #define __ATTR_CLRCALL __clrcall
@@ -207,7 +215,9 @@
 #define __ATTR_CLRCALL    /* Nothing */
 #endif
 
-#if __has_attribute(__thiscall__)
+#ifdef __clang_tidy__
+#define __ATTR_THISCALL /* nothing */
+#elif __has_attribute(__thiscall__)
 #define __ATTR_THISCALL __attribute__((__thiscall__))
 #elif defined(__thiscall)
 #define __ATTR_THISCALL __thiscall
@@ -216,7 +226,9 @@
 #define __ATTR_THISCALL    /* Nothing */
 #endif
 
-#if __has_attribute(__ms_abi__)
+#ifdef __clang_tidy__
+#define __ATTR_MSABI /* nothing */
+#elif __has_attribute(__ms_abi__)
 #define __ATTR_MSABI __attribute__((__ms_abi__))
 #elif defined(__ms_abi)
 #define __ATTR_MSABI __ms_abi
@@ -225,7 +237,9 @@
 #define __ATTR_MSABI    /* Nothing */
 #endif
 
-#if __has_attribute(__sysv_abi__)
+#ifdef __clang_tidy__
+#define __ATTR_SYSVABI /* nothing */
+#elif __has_attribute(__sysv_abi__)
 #define __ATTR_SYSVABI __attribute__((__sysv_abi__))
 #elif defined(__sysv_abi)
 #define __ATTR_SYSVABI __sysv_abi
@@ -704,6 +718,14 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #undef __UNUSED
 #define __UNUSED(x) x __attribute__((__unused__))
+/* Disable this, so clang-tidy doesn't think that function like memcpy() cannot
+ * be made to be noexcept. - We only want warnings when calling functions marked
+ * as THROWS() being called by those marked as NOTHROW(). */
+#undef __NO_NON_CALL_EXCEPTIONS
+#define __NO_NON_CALL_EXCEPTIONS 1
+/* clang-tidy causes problems with extern-inline, so just disable it for now... */
+#undef __NO_EXTERN_INLINE
+#define __NO_EXTERN_INLINE 1
 #endif /* __clang_tidy__ */
 
 #define __STATIC_IF(x)   if(x)

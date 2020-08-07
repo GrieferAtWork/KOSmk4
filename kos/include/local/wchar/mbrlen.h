@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa42d7323 */
+/* HASH CRC-32:0xd309b021 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,19 @@
 #ifndef __local_mbrlen_defined
 #define __local_mbrlen_defined 1
 #include <__crt.h>
+#include <bits/mbstate.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mbrtowc from wchar */
 #ifndef __local___localdep_mbrtowc_defined
 #define __local___localdep_mbrtowc_defined 1
 #ifdef __CRT_HAVE_mbrtowc
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrtowc)
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_mbrtoc16) && __SIZEOF_WCHAR_T__ == 2
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_mbrtoc32) && __SIZEOF_WCHAR_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtoc32,(__pwc,__str,__maxlen,__mbs))
 #else /* ... */
 __NAMESPACE_LOCAL_END

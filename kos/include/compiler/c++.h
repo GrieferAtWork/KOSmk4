@@ -115,13 +115,13 @@
 
 
 #ifndef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
-#if defined(__GNUC__) && !defined(__INTELLISENSE__)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTELLISENSE__)
 /* Enable work-arounds for c++'s `using' causing debug information bloat:
  * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417 */
 #define __COMPILER_HAVE_BUG_BLOATY_CXX_USING 1
-#else /* __GNUC__ && !__INTELLISENSE__ */
+#else /* __GNUC__ && !__clang__ && !__INTELLISENSE__ */
 #undef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
-#endif /* !__GNUC__ || __INTELLISENSE__ */
+#endif /* !__GNUC__ || __clang__ || __INTELLISENSE__ */
 #elif (__COMPILER_HAVE_BUG_BLOATY_CXX_USING + 0) == 0
 #undef __COMPILER_HAVE_BUG_BLOATY_CXX_USING
 #endif /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */

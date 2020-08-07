@@ -302,13 +302,13 @@ static_assert(WINT_MAX          == __WINT_MAX__);
 #ifndef __DEEMON__
 #if (defined(__SIZE_TYPE_IS_INT__) + \
      defined(__SIZE_TYPE_IS_LONG__) + \
-     defined(__SIZE_TYPE_IS_LLONG__)) != 1
+     defined(__SIZE_TYPE_IS_LONG_LONG__)) != 1
 #error "Badly configured feature macro: `__SIZE_TYPE_IS_XXX__'"
 #endif
 
 #if (defined(__PTRDIFF_TYPE_IS_INT__) + \
      defined(__PTRDIFF_TYPE_IS_LONG__) + \
-     defined(__PTRDIFF_TYPE_IS_LLONG__)) != 1
+     defined(__PTRDIFF_TYPE_IS_LONG_LONG__)) != 1
 #error "Badly configured feature macro: `__PTRDIFF_TYPE_IS_XXX__'"
 #endif
 #endif /* !__DEEMON__ */
@@ -321,10 +321,10 @@ static_assert(__builtin_types_compatible_p(ssize_t, signed int));
 static_assert(__builtin_types_compatible_p(size_t, unsigned long));
 static_assert(__builtin_types_compatible_p(ssize_t, signed long));
 #endif /* __SIZE_TYPE_IS_LONG__ */
-#ifdef __SIZE_TYPE_IS_LLONG__
+#ifdef __SIZE_TYPE_IS_LONG_LONG__
 static_assert(__builtin_types_compatible_p(size_t, __ULONGLONG));
 static_assert(__builtin_types_compatible_p(ssize_t, __LONGLONG));
-#endif /* __SIZE_TYPE_IS_LLONG__ */
+#endif /* __SIZE_TYPE_IS_LONG_LONG__ */
 
 #ifdef __PTRDIFF_TYPE_IS_INT__
 static_assert(__builtin_types_compatible_p(ptrdiff_t, signed int));
@@ -332,9 +332,9 @@ static_assert(__builtin_types_compatible_p(ptrdiff_t, signed int));
 #ifdef __PTRDIFF_TYPE_IS_LONG__
 static_assert(__builtin_types_compatible_p(ptrdiff_t, signed long));
 #endif /* __PTRDIFF_TYPE_IS_LONG__ */
-#ifdef __PTRDIFF_TYPE_IS_LLONG__
+#ifdef __PTRDIFF_TYPE_IS_LONG_LONG__
 static_assert(__builtin_types_compatible_p(ptrdiff_t, __LONGLONG));
-#endif /* __PTRDIFF_TYPE_IS_LLONG__ */
+#endif /* __PTRDIFF_TYPE_IS_LONG_LONG__ */
 
 
 

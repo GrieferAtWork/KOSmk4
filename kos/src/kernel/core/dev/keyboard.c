@@ -909,7 +909,7 @@ keyboard_device_canread(struct keyboard_device *__restrict self) {
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 keyboard_device_poll(struct character_device *__restrict self,
-                     poll_mode_t what) {
+                     poll_mode_t what) THROWS(...) {
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
 	if (what & POLLIN) {

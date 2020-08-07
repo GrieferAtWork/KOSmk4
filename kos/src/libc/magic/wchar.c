@@ -249,7 +249,8 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 [[std, wchar, export_alias("__mbrtowc")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
-[[decl_include("<bits/mbstate.h>"), impl_include("<parts/errno.h>")]]
+[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<parts/errno.h>")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("mbrtoc16")]]
 [[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$mbrtoc16")]]
 [[kos_export_as("mbrtoc32")]]
@@ -280,7 +281,9 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 };
 
 
-[[std, wchar, impl_include("<parts/errno.h>")]]
+[[std, wchar]]
+[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<parts/errno.h>")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("c16rtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("c32rtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("c16rtomb")]]
@@ -334,6 +337,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 };
 
 [[std, wchar, wunused, export_alias("__mbrlen")]]
+[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
 $size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
                [[nullable]] $mbstate_t *mbs) {
 	wchar_t wc;
@@ -341,6 +345,7 @@ $size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
 };
 
 [[std, wchar]]
+[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
                  [[nonnull]] char const **__restrict psrc, size_t dstlen,
                  [[nullable]] mbstate_t *mbs) {
@@ -364,6 +369,7 @@ size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
 };
 
 [[std, wchar]]
+[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t wcsrtombs([[outp(dstlen)]] char *dst,
                  [[nonnull]] wchar_t const **__restrict psrc, size_t dstlen,
                  [[nullable]] mbstate_t *mbs) {
@@ -406,6 +412,7 @@ wcstoul(*) %{generate(str2wcs("strtoul"))}
 
 [[std, wunused, ATTR_PURE, decl_include("<bits/mbstate.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+[[decl_include("<bits/mbstate.h>")]]
 int mbsinit([[nullable]] mbstate_t const *mbs) {
 	return !mbs || __MBSTATE_ISINIT(mbs);
 }
@@ -413,6 +420,7 @@ int mbsinit([[nullable]] mbstate_t const *mbs) {
 %[define_wchar_replacement(wmemcmp = memcmpw, memcmpl)]
 
 [[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
+[[decl_include("<hybrid/typecore.h>")]]
 int wmemcmp([[inp(num_chars)]] wchar_t const *s1,
             [[inp(num_chars)]] wchar_t const *s2,
             size_t num_chars) {
@@ -716,7 +724,8 @@ int fwide([[nonnull]] FILE *fp, int mode) {
 %(std)
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(2, 3), decl_include("<features.h>")]]
+[[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(2, 3)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
 __STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
                               [[nonnull]] wchar_t const *__restrict format, ...)
@@ -906,11 +915,13 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 }
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+[[decl_include("<hybrid/typecore.h>", "<bits/mbstate.h>")]]
 $size_t mbsnrtowcs([[nullable]] wchar_t *dst,
                    [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
                    [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+[[decl_include("<hybrid/typecore.h>", "<bits/mbstate.h>")]]
 $size_t wcsnrtombs([[nullable]] char *dst,
                    [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
                    [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */

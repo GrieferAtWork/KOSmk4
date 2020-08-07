@@ -662,7 +662,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 				addr = (void *)((uintptr_t)start_addr + ADDRESS_COLUMN);
 			} else {
 				size_t offset;
-				offset     = (dbg_screen_height - 1) * hd_linesize;
+				offset     = (size_t)(dbg_screen_height - 1) * hd_linesize;
 				addr       = (byte_t *)addr - offset;
 				start_addr = (byte_t *)start_addr - offset;
 				end_addr   = (byte_t *)end_addr - offset;
@@ -674,7 +674,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 				addr = (void *)(((uintptr_t)end_addr - hd_linesize) + ADDRESS_COLUMN);
 			} else {
 				size_t offset;
-				offset     = (dbg_screen_height - 1) * hd_linesize;
+				offset     = (size_t)(dbg_screen_height - 1) * hd_linesize;
 				addr       = (byte_t *)addr + offset;
 				start_addr = (byte_t *)start_addr + offset;
 				end_addr   = (byte_t *)end_addr + offset;

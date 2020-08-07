@@ -202,7 +202,27 @@ function createClangTidyProcess(
 		ccargs.append(flag);
 	}
 	ccargs.extend({ "-MMD", "-MF", depFile });
-	ccargs.append("-D__clang_tidy__");
+	ccargs.extend({
+		/* XXX: These are work-arounds caused by the fact that I'm not
+		 *      using a cross-compiled version of clang-tidy, but instead
+		 *      some generic version of it that has been built for _WIN32.
+		 * You will probably have to adjust these if you're using a version
+		 * that was built for anything else...
+		 */
+		"-undef",
+		"-D__clang_tidy__",
+		"-D__clang__",
+		"-D__SIZEOF_LONG__=4",
+		"-D__GNUC__=9",
+		"-D__GNUC_MINOR__=1",
+	});
+	if (language == "c++") {
+		ccargs.extend({
+			"-D__cplusplus=201406L",
+			"-D__GXX_EXPERIMENTAL_CXX0X__",
+			"-D__cpp_unicode_characters=200704",
+		});
+	}
 	if (macros)
 		ccargs.extend(constructMacroDefinitions(macros));
 	if (ppFlags)

@@ -1189,6 +1189,11 @@ FUNDEF NONNULL((1)) bool KCALL
 inode_tryaccess(struct inode *__restrict self, unsigned int type)
 		THROWS(E_IOERROR, ...);
 
+#ifdef __NO_EXTERN_INLINE
+FUNDEF NONNULL((1)) void KCALL
+inode_access_accmode(struct inode *__restrict self, iomode_t iomode)
+		THROWS(E_FSERROR_ACCESS_DENIED, E_IOERROR, ...);
+#else /* __NO_EXTERN_INLINE */
 EXTERN_INLINE NONNULL((1)) void KCALL
 inode_access_accmode(struct inode *__restrict self, iomode_t iomode)
 		THROWS(E_FSERROR_ACCESS_DENIED, E_IOERROR, ...) {
@@ -1199,6 +1204,7 @@ inode_access_accmode(struct inode *__restrict self, iomode_t iomode)
 		type |= W_OK; /* Test for write-access */
 	inode_access(self, type);
 }
+#endif /* !__NO_EXTERN_INLINE */
 
 
 struct stat;

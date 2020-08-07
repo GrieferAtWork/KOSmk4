@@ -357,9 +357,15 @@ uvio_requestq(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8 */
 
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16
+#ifdef __UINT128_TYPE__
 FUNDEF NONNULL((1)) uint128_t KCALL
 uvio_requestx(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
               uint128_t arg0 DFL(0), uint128_t arg1 DFL(0)) THROWS(...);
+#else /* __UINT128_TYPE__ */
+FUNDEF NONNULL((1)) uint128_t KCALL
+uvio_requestx(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 command,
+              uint128_t arg0, uint128_t arg1) THROWS(...);
+#endif /* !__UINT128_TYPE__ */
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16 */
 
 

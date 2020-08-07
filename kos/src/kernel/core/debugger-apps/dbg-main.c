@@ -565,7 +565,7 @@ set_starts_empty_string:
 		if unlikely(cursor < cookie.cnt.acc_startslen)
 			goto done; /* shouldn't happen... */
 		if unlikely(memcmp(cmdline + cursor - cookie.cnt.acc_startslen,
-		                   cookie.cnt.acc_starts, cookie.cnt.acc_startslen))
+		                   cookie.cnt.acc_starts, cookie.cnt.acc_startslen) != 0)
 			goto done; /* Shouldn't happen... */
 		new_cursor = cursor - cookie.cnt.acc_startslen;
 		{

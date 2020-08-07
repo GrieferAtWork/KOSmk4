@@ -193,15 +193,15 @@ DBG_COMMAND(m,
 	uintptr_t count, addr;
 	unsigned int size = 1;
 	while (argc > 2 && argv[1][0] == '-') {
-		if (!strcmp(argv[1], DBGSTR("-p")))
+		if (strcmp(argv[1], DBGSTR("-p")) == 0)
 			size = sizeof(void *);
-		else if (!strcmp(argv[1], DBGSTR("-b")))
+		else if (strcmp(argv[1], DBGSTR("-b")) == 0)
 			size = 1;
-		else if (!strcmp(argv[1], DBGSTR("-w")))
+		else if (strcmp(argv[1], DBGSTR("-w")) == 0)
 			size = 2;
-		else if (!strcmp(argv[1], DBGSTR("-l")))
+		else if (strcmp(argv[1], DBGSTR("-l")) == 0)
 			size = 4;
-		else if (!strcmp(argv[1], DBGSTR("-q")))
+		else if (strcmp(argv[1], DBGSTR("-q")) == 0)
 			size = 8;
 		else
 			return DBG_STATUS_INVALID_ARGUMENTS;
@@ -214,7 +214,7 @@ DBG_COMMAND(m,
 	if (!dbg_evaladdr(argv[1], &addr))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3) {
-		if (!strcmp(argv[2], DBGSTR("page")))
+		if (strcmp(argv[2], DBGSTR("page")) == 0)
 			count = PAGESIZE - (addr & PAGEMASK);
 		else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_STATUS_INVALID_ARGUMENTS;
@@ -241,7 +241,7 @@ DBG_COMMAND(mp,
 	if (!dbg_evaladdr(argv[1], &addr))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3) {
-		if (!strcmp(argv[2], DBGSTR("page")))
+		if (strcmp(argv[2], DBGSTR("page")) == 0)
 			count = PAGESIZE - (addr & PAGEMASK);
 		else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_STATUS_INVALID_ARGUMENTS;

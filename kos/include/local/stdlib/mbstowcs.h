@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11145936 */
+/* HASH CRC-32:0x857464ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbsrtowcs_defined
 #define __local___localdep_mbsrtowcs_defined 1
 #ifdef __CRT_HAVE_mbsrtowcs
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
 #else /* __CRT_HAVE_mbsrtowcs */
 __NAMESPACE_LOCAL_END

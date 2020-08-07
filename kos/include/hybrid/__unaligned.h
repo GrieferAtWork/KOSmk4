@@ -803,7 +803,7 @@ __NOTHROW_NCX(__hybrid_unaligned_set_swap)(__UFIFTHINT_TYPE__ *__restrict __ptr,
 	__hybrid_unaligned_set_swap((__UFIFTHINT_ALIAS_TYPE__ *)__ptr, (__UFIFTHINT_ALIAS_TYPE__)__val);
 }
 #endif /* __UFIFTHINT_TYPE__ */
-}
+} /* extern "C++" */
 
 #ifdef __INTELLISENSE__
 extern "C++" { namespace __intern {

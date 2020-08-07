@@ -1141,7 +1141,7 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 	self->i_filemtime.tv_nsec = 0;
 	self->i_filectime.tv_sec  = Fat_DecodeFileDate(file->f_ctime.fc_date);
 	self->i_filectime.tv_sec += Fat_DecodeFileTime(file->f_ctime.fc_time);
-	self->i_filectime.tv_nsec = file->f_ctime.fc_sectenth * (1000000000ul / 200ul);
+	self->i_filectime.tv_nsec = (syscall_ulong_t)file->f_ctime.fc_sectenth * (1000000000ul / 200ul);
 
 	if (super->f_features & FAT_FEATURE_UGID) {
 		/* In-built user/group ID support */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c5792c0 */
+/* HASH CRC-32:0x468d8173 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbsrtoc16_defined
 #define __local___localdep_mbsrtoc16_defined 1
 #if defined(__CRT_HAVE_mbsrtowcs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$mbsrtowcs)
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END

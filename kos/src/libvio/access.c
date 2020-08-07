@@ -26,6 +26,7 @@ opt.append("-Os");
 #ifndef GUARD_LIBVIO_ACCESS_C
 #define GUARD_LIBVIO_ACCESS_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/

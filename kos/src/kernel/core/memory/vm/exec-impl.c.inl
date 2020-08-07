@@ -105,8 +105,8 @@ MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
 					page_index = PAGEID_ENCODE(phdr_vector[i].p_vaddr);
 					if (loadstart > phdr_vector[i].p_vaddr)
 						loadstart = phdr_vector[i].p_vaddr;
-					adjusted_filsize = phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);
-					adjusted_memsize = phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & PAGEMASK);
+					adjusted_filsize = (size_t)phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);
+					adjusted_memsize = (size_t)phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & PAGEMASK);
 					num_pages        = CEILDIV(adjusted_filsize, PAGESIZE);
 					num_total        = CEILDIV(adjusted_memsize, PAGESIZE);
 					bss_start        = (void *)(uintptr_t)(phdr_vector[i].p_vaddr + phdr_vector[i].p_filesz);

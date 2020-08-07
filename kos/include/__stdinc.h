@@ -387,10 +387,10 @@
  *                      If this macro is a simple alias for `__INTERN_COMDAT', then the
  *                      macro `__NO_PUBLIC_COMDAT' is defined to `1' */
 #ifndef __INTERN_COMDAT
-#ifndef __NO_ATTR_SELECTANY
-#define __INTERN_COMDAT __INTERN __ATTR_UNUSED __ATTR_SELECTANY __ATTR_VISIBILITY("hidden")
-#elif defined(__cplusplus)
+#ifdef __cplusplus
 #define __INTERN_COMDAT inline __ATTR_NOINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+#elif !defined(__NO_ATTR_SELECTANY) && 0 /* __ATTR_SELECTANY can only be used for data... */
+#define __INTERN_COMDAT extern __ATTR_UNUSED __ATTR_SELECTANY __ATTR_VISIBILITY("hidden")
 #elif !defined(__NO_ATTR_WEAK)
 #define __INTERN_COMDAT __ATTR_UNUSED __ATTR_WEAK __ATTR_VISIBILITY("hidden")
 #else /* ... */
@@ -398,10 +398,10 @@
 #endif /* !... */
 #endif /* !__INTERN_COMDAT */
 #ifndef __PUBLIC_COMDAT
-#ifndef __NO_ATTR_SELECTANY
-#define __PUBLIC_COMDAT __PUBLIC __ATTR_SELECTANY
-#elif defined(__cplusplus)
+#ifdef __cplusplus
 #define __PUBLIC_COMDAT __PUBLIC inline __ATTR_NOINLINE
+#elif !defined(__NO_ATTR_SELECTANY) && 0 /* __ATTR_SELECTANY can only be used for data... */
+#define __PUBLIC_COMDAT extern __ATTR_SELECTANY __ATTR_VISIBILITY("default")
 #elif !defined(__NO_ATTR_WEAK)
 #define __PUBLIC_COMDAT __PUBLIC __ATTR_WEAK
 #else /* ... */
@@ -468,7 +468,7 @@
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #ifdef __NO_EXTERN_INLINE
-#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          extern attr Treturn nothrow(cc name) param;
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
 #else /* __NO_EXTERN_INLINE */
 #define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERN_INLINE attr Treturn nothrow(cc name) param __VA_ARGS__
@@ -485,7 +485,7 @@
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __pragma(redefine_extname name asmname) decl attr Treturn nothrow(cc name) param;
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __pragma(redefine_extname name asmname) decl attr void nothrow(cc name) param;
 #ifdef __NO_EXTERN_INLINE
-#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          extern attr Treturn nothrow(cc name) param;
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
 #else /* __NO_EXTERN_INLINE */
 #define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERN_INLINE attr Treturn nothrow(cc name) param __VA_ARGS__
@@ -494,7 +494,7 @@
 #else /* ... */
 
 #ifdef __NO_EXTERN_INLINE
-#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          extern attr Treturn nothrow(cc name) param;
 #else /* __NO_EXTERN_INLINE */
 #define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERN_INLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #endif /* !__NO_EXTERN_INLINE */

@@ -168,6 +168,8 @@
 #define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)
 #define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)
 #endif /* !__REDIRECT_WSUPPRESS_BEGIN */
+#define EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,__VA_ARGS__)
+#define EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,__VA_ARGS__)
 
 /* Preprocessor macros */
 #define PP_PRIVATE_STR  __PP_PRIVATE_STR

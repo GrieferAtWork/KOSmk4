@@ -338,7 +338,7 @@ NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
 			pos = endptr;
 	}
 	if (pscreen_left)
-	screen_left = buf + *pscreen_left;
+		screen_left = buf + *pscreen_left;
 	if (screen_left > pos)
 		screen_left = pos;
 	onscreen = (size_t)(pos - screen_left);

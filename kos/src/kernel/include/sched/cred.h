@@ -319,10 +319,10 @@ DATDEF struct cred cred_kernel;
 
 /* Check if the calling thread has a given capability
  * `capno' (one of `CAP_*' from <kos/capability.h>) */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK ATTR_PURE __BOOL
-NOTHROW(FCALL capable)(syscall_slong_t capno) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK ATTR_PURE, __BOOL,
+          NOTHROW, FCALL, capable, (syscall_slong_t capno), {
 	return credcap_capable(&THIS_CRED->c_cap_effective, capno);
-}
+})
 
 /* Ensure that the calling thread is `capable(capno)'
  * If the calling thread isn't, throw an `E_INSUFFICIENT_RIGHTS' exception */
@@ -332,45 +332,45 @@ FUNDEF void FCALL require(syscall_slong_t capno)
 
 
 /* Get the calling thread's real user ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_getruid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, uid_t, NOTHROW, FCALL, cred_getruid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_ruid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Get the calling thread's real group ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getrgid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, gid_t, NOTHROW, FCALL, cred_getrgid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_rgid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Get the calling thread's effective user ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_geteuid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, uid_t, NOTHROW, FCALL, cred_geteuid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_euid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Get the calling thread's effective group ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getegid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, gid_t, NOTHROW, FCALL, cred_getegid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_egid, __ATOMIC_ACQUIRE);
-}
+})
 
 
 /* Get the calling thread's saved user ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_getsuid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, uid_t, NOTHROW, FCALL, cred_getsuid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_suid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Get the calling thread's saved group ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getsgid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, gid_t, NOTHROW, FCALL, cred_getsgid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_sgid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Get the calling thread's filesystem user ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK uid_t NOTHROW(FCALL cred_getfsuid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, uid_t, NOTHROW, FCALL, cred_getfsuid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_fsuid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Get the calling thread's filesystem group ID */
-EXTERN_INLINE ATTR_ARTIFICIAL NOBLOCK gid_t NOTHROW(FCALL cred_getfsgid)(void) {
+EIDECLARE(ATTR_ARTIFICIAL NOBLOCK, gid_t, NOTHROW, FCALL, cred_getfsgid, (void), {
 	return __hybrid_atomic_load(THIS_CRED->c_fsgid, __ATOMIC_ACQUIRE);
-}
+})
 
 /* Set user IDs. IDs that should not be set may be passed as `(uid_t)-1'.
  * @param: chk_rights: When true, check if the calling thread has the right to do this. */
@@ -394,7 +394,7 @@ cred_onexec(struct inode *__restrict program_inode)
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 /* Check if the calling thread is considered to be apart of the given group `gid' */
-EXTERN_INLINE WUNUSED __BOOL FCALL cred_isfsgroupmember(gid_t gid) {
+EIDECLARE(WUNUSED, __BOOL, , FCALL, cred_isfsgroupmember, (gid_t gid), {
 	size_t i;
 	__BOOL result;
 	struct cred *self = THIS_CRED;
@@ -411,7 +411,7 @@ EXTERN_INLINE WUNUSED __BOOL FCALL cred_isfsgroupmember(gid_t gid) {
 	}
 	atomic_rwlock_endread(&self->c_lock);
 	return result;
-}
+})
 #else /* !CONFIG_EVERYONE_IS_ROOT */
 #define capable(capno)                            1
 #define require(capno)                            (void)0

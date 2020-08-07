@@ -975,7 +975,7 @@ do_writethrough:
 	}
 
 	/* Extend the buf */
-	new_bufsize = self->if_bufsiz * 2;
+	new_bufsize = (size_t)self->if_bufsiz * 2;
 	if (new_bufsize < IOBUF_MIN)
 		new_bufsize = IOBUF_MIN;
 	new_buffer = file_buffer_realloc(self, new_bufsize);
@@ -1289,7 +1289,7 @@ WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned ch
 	new_buffer  = file_buffer_realloc(self, new_bufsize);
 	if unlikely(!new_buffer) {
 		inc_size    = 1;
-		new_bufsize = self->if_bufsiz + 1;
+		new_bufsize = (size_t)self->if_bufsiz + 1;
 		new_buffer  = file_buffer_realloc(self, new_bufsize);
 		if unlikely(!new_buffer)
 			goto err;

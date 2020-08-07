@@ -409,9 +409,7 @@ __NAMESPACE_STD_BEGIN
 struct __IO_FILE;
 __NAMESPACE_STD_END
 #endif /* !__FILE */
-#ifndef __LOCALE_T
 typedef void *__locale_t;
-#endif /* !__LOCALE_T */
 #endif /* ... */
 
 

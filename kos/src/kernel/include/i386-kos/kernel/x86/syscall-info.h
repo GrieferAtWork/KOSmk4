@@ -193,7 +193,7 @@ rpc_syscall_info_get32_cdecl_icpustate(struct rpc_syscall_info *__restrict self,
 		USER u32 *esp;
 		unsigned int i;
 		esp = (USER u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
-		validate_readable(esp, regcount * 4);
+		validate_readable(esp, (size_t)regcount * 4);
 		for (i = 0; i < regcount; ++i) {
 			self->rsi_regs[i] = __hybrid_atomic_load(esp[i], __ATOMIC_ACQUIRE);
 			self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);

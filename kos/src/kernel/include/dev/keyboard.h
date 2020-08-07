@@ -123,7 +123,7 @@ struct keyboard_device
 FUNDEF NONNULL((1)) size_t KCALL keyboard_device_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL keyboard_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL keyboard_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL keyboard_device_poll(struct character_device *__restrict self, poll_mode_t what);
+FUNDEF NONNULL((1)) poll_mode_t KCALL keyboard_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 /* Key-mode/character-mode read callbacks. */
 FUNDEF NONNULL((1)) size_t KCALL keyboard_device_readkeys(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) size_t KCALL keyboard_device_readchars(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);

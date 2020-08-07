@@ -406,6 +406,8 @@
 #define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)                  void name paramf;
 #define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                                 Treturn name param;
 #define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                                       void name param;
+#define EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                               Treturn name param;
+#define EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                                      Treturn name param;
 
 #define __NAMESPACE_STD_BEGIN               namespace std {
 #define __NAMESPACE_STD_END                 }

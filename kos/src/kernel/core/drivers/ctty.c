@@ -133,7 +133,8 @@ ctty_stat(struct character_device *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-ctty_poll(struct character_device *__restrict UNUSED(self), poll_mode_t what) {
+ctty_poll(struct character_device *__restrict UNUSED(self),
+          poll_mode_t what) THROWS(...) {
 	poll_mode_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);

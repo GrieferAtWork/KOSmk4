@@ -283,8 +283,8 @@ register_name(uintptr_t id) {
 }
 
 
-PRIVATE void
-NOTHROW(KCALL print_opcode)(pformatprinter printer, void *arg, uintptr_t opcode) {
+PRIVATE void KCALL
+print_opcode(pformatprinter printer, void *arg, uintptr_t opcode) {
 	uintptr_t opno = E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(opcode);
 	if (opno <= 0xff) {
 		format_printf(printer, arg, " [opcode=%#.2Ix", opno);
@@ -299,9 +299,9 @@ NOTHROW(KCALL print_opcode)(pformatprinter printer, void *arg, uintptr_t opcode)
 	(*printer)(arg, "]", 1);
 }
 
-INTERN void
-NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict data,
-                                       pformatprinter printer, void *arg) {
+INTERN void KCALL
+print_exception_desc_of(struct exception_data const *__restrict data,
+                        pformatprinter printer, void *arg) {
 	switch (data->e_class) {
 
 	case E_SEGFAULT:
@@ -387,8 +387,8 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 	}
 }
 
-PRIVATE void
-NOTHROW(KCALL print_exception_desc)(pformatprinter printer, void *arg) {
+PRIVATE void KCALL
+print_exception_desc(pformatprinter printer, void *arg) {
 	print_exception_desc_of(&THIS_EXCEPTION_DATA, printer, arg);
 }
 
@@ -397,10 +397,10 @@ indent_regdump_print_format(struct regdump_printer *__restrict self,
                             unsigned int format_option);
 
 
-PRIVATE void
-NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
-                                         pformatprinter tb_printer, void *tb_arg,
-                                         char const *reason, va_list args) {
+PRIVATE void KCALL
+print_unhandled_exception(pformatprinter printer, void *arg,
+                          pformatprinter tb_printer, void *tb_arg,
+                          char const *reason, va_list args) {
 	unsigned int i;
 	bool is_first_pointer;
 	char const *name;
