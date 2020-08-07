@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53bec379 */
+/* HASH CRC-32:0x1b161714 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,18 +30,34 @@
 
 #include <features.h>
 
-#include <bits/select.h>
+#include <hybrid/typecore.h>
+
+#include <asm/select.h> /* __FD_SETSIZE */
 #include <bits/sigset.h> /* struct __sigset_struct */
 #include <bits/time.h>
 #include <bits/timespec.h> /* struct timespec */
 #include <bits/timeval.h>  /* struct timeval */
 #include <bits/types.h>
 
+#ifndef __INTELLISENSE__
+#include <libc/string.h> /* __libc_bzero */
+#endif /* !__INTELLISENSE__ */
+
+#ifndef __FD_SETSIZE
+#define __FD_SETSIZE 1024
+#endif /* !__FD_SETSIZE */
+
 #ifdef __FD_SETSIZE
 #define FD_SETSIZE __FD_SETSIZE
 #endif /* __FD_SETSIZE */
 
 __SYSDECL_BEGIN
+
+#define __SIZEOF_FD_MASK __SIZEOF_POINTER__
+#define __SIZEOF_FD_SET  (__FD_SETSIZE / __CHAR_BIT__)
+#define __NFDBITS        (__SIZEOF_FD_MASK * __CHAR_BIT__)
+#define __FD_ELT(d)      ((d) / __NFDBITS)
+#define __FD_MASK(d)     (__CCAST(__fd_mask)1 << ((d) % __NFDBITS))
 
 #ifdef __CC__
 
@@ -60,13 +76,7 @@ typedef struct __sigset_struct sigset_t;
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 
-#define __SIZEOF_FD_MASK__ __SIZEOF_POINTER__
 typedef __intptr_t __fd_mask;
-
-#undef __NFDBITS
-#define __NFDBITS    (8 * __SIZEOF_FD_MASK__)
-#define __FD_ELT(d)  ((d) / __NFDBITS)
-#define __FD_MASK(d) ((__fd_mask)1 << ((d) % __NFDBITS))
 
 typedef struct __fd_set_struct {
 #ifdef __USE_XOPEN
@@ -83,10 +93,21 @@ typedef __fd_mask fd_mask;
 #define NFDBITS __NFDBITS
 #endif /* __USE_MISC */
 
-#define FD_SET(fd, fdsetp)   __FD_SET(fd, fdsetp)
-#define FD_CLR(fd, fdsetp)   __FD_CLR(fd, fdsetp)
-#define FD_ISSET(fd, fdsetp) __FD_ISSET(fd, fdsetp)
-#define FD_ZERO(fdsetp)      __FD_ZERO(fdsetp)
+#ifdef __INTELLISENSE__
+__ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
+__ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
+__ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
+#define FD_SET   FD_SET
+#define FD_CLR   FD_CLR
+#define FD_ISSET FD_ISSET
+#define FD_ZERO  FD_ZERO
+#else /* __INTELLISENSE__ */
+#define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(set)[__FD_ELT(d)] |= __FD_MASK(d))
+#define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(set)[__FD_ELT(d)] &= ~__FD_MASK(d))
+#define FD_ISSET(fd, fdsetp) ((__FDS_BITS(set)[__FD_ELT(d)] & __FD_MASK(d)) != 0)
+#define FD_ZERO(fdsetp)      __libc_bzero(__FDS_BITS(__arr), __SIZEOF_FD_SET)
+#endif /* !__INTELLISENSE__ */
 
 #if defined(__CRT_HAVE_select64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))

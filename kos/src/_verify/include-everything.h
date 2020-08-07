@@ -312,7 +312,6 @@ incdir("", "../../include");
 #include <bits/rusage-struct.h>
 #include <bits/sched.h>
 #include <bits/sched_param.h>
-#include <bits/select.h>
 #include <bits/sem.h>
 #include <bits/sembuf.h>
 #include <bits/shm.h>
