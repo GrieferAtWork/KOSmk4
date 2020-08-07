@@ -17,11 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_TEMRIOS_H
-#define _ASM_TEMRIOS_H 1
+#ifndef _LINUX_SOCKIOS_H
+#define _LINUX_SOCKIOS_H 1
 
-#include <asm/ioctls.h>
-#include <asm/termbits.h>
-#include <bits/ioctl-types.h>
+#include <__stdinc.h>
 
-#endif /* !_ASM_TEMRIOS_H */
+#include <asm/ioctls/socket.h>
+
+#endif /* !_LINUX_SOCKIOS_H */

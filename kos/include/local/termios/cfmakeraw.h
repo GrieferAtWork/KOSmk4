@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa12fa40d */
+/* HASH CRC-32:0x56f8c2fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_cfmakeraw_defined
 #define __local_cfmakeraw_defined 1
 #include <__crt.h>
-#include <bits/termios.h>
+#include <bits/ioctls/termios.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
  * This entails the CANON and all control characters being disabled, as well as

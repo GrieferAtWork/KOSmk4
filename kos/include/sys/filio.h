@@ -22,9 +22,6 @@
 
 #include <__stdinc.h>
 
-#include <asm/ioctls.h>
-#include <asm/sockios.h>
-
 /* This file only needs to define the following macros:
  * >> #define FIOCLEX   ...
  * >> #define FIONCLEX  ...
@@ -32,7 +29,9 @@
  * >> #define FIONBIO   ...
  * >> #define FIOASYNC  ...
  * >> #define FIOSETOWN ...
- * >> #define FIOGETOWN ...
- */
+ * >> #define FIOGETOWN ... */
+
+#include <asm/ioctls/socket.h> /* FIOSETOWN, FIOGETOWN */
+#include <asm/ioctls/tty.h>    /* FIOCLEX, FIONCLEX, FIONREAD, FIONBIO, FIOASYNC */
 
 #endif /* !_SYS_FILIO_H */

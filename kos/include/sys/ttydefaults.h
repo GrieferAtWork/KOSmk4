@@ -24,8 +24,8 @@
 
 #include <__stdinc.h>
 
-#include <bits/termios.h>   /* BRKINT, ISTRIP, ... */
-#include <bits/posix_opt.h> /* _POSIX_VDISABLE */
+#include <bits/ioctls/termios.h> /* BRKINT, ISTRIP, ... */
+#include <bits/posix_opt.h>      /* _POSIX_VDISABLE */
 
 __SYSDECL_BEGIN
 

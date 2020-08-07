@@ -21,34 +21,12 @@
 #define _LINUX_TERMIOS_H 1
 
 #include <__stdinc.h>
-#include <asm/termios.h>
+
+#include <asm/ioctls/tty.h>
+#include <bits/ioctls/termio.h>
+#include <bits/ioctls/termios.h>
+#include <bits/ioctls/termiox.h>
+#include <linux/posix_types.h>
 #include <linux/types.h>
-
-__DECL_BEGIN
-
-#define NFF 5
-
-#ifdef __CC__
-struct termiox {
-	/* Argument used by `TCGETX', `TCSETX', `TCSETXF' and `TCSETXW' */
-	__u16 x_hflag;
-	__u16 x_cflag;
-	__u16 x_rflag[NFF];
-	__u16 x_sflag;
-};
-#endif /* __CC__ */
-
-/* XXX: Where are these flags used?
- *      Are they used in by one of the fields of the struct above?
- * Here are some docs for it?
- *  - https://docs.oracle.com/cd/E86824_01/html/E54777/termiox-7i.html
- *  - https://docstore.mik.ua/manuals/hp-ux/en/B2355-60130/termiox.7.html
- */
-#define RTSXOFF 0x0001 /* RTS flow control on input */
-#define CTSXON  0x0002 /* CTS flow control on output */
-#define DTRXOFF 0x0004 /* DTR flow control on input */
-#define DSRXON  0x0008 /* DCD flow control on output */
-
-__DECL_END
 
 #endif /* !_LINUX_TERMIOS_H */

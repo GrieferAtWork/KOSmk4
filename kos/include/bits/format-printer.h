@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 #ifndef __FORMATPRINTER_CC
 #define __FORMATPRINTER_CC __LIBKCALL
@@ -53,7 +53,7 @@ typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(/*utf-32*/ __CHAR32
  * read bytes, or a negative error value to-be propagated up the call-stack. */
 typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatreader)(void *__arg, void *__restrict __buf, __SIZE_TYPE__ __num_bytes);
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 #endif /* !_BITS_FORMAT_PRINTER_H */

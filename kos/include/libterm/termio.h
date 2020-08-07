@@ -25,11 +25,10 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/format-printer.h>
+#include <bits/ioctls/termios.h> /* struct termios */
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/io.h>
-
-#include <termios.h>
 
 #include <libbuffer/linebuffer.h>
 #include <libbuffer/ringbuffer.h>

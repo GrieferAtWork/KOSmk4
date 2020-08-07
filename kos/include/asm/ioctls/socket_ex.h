@@ -17,15 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_IOCTLS_H
-#define _BITS_IOCTLS_H 1
+#ifndef _ASM_IOCTLS_SOCKET_EX_H
+#define _ASM_IOCTLS_SOCKET_EX_H 1
 
 /* DISCLAIMER: _STRONGLY_ Based on '/usr/include/i386-linux-gnu/bits/ioctls.h' */
 
 #include <__stdinc.h>
 
 #include <asm/ioctl.h>
-#include <asm/ioctls.h>
+#include <asm/ioctls/socket.h> /* Basic socket ioctls */
+#include <asm/ioctls/tty.h>    /* FIONREAD, TIOCOUTQ */
 
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -44,15 +45,21 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+#ifdef FIONREAD
+#define SIOCINQ  FIONREAD
+#endif /* FIONREAD */
+#ifdef TIOCOUTQ
+#define SIOCOUTQ TIOCOUTQ /* output queue size (not sent + not acked) */
+#endif /* TIOCOUTQ */
+
+#if defined(__KOS__) || defined(__linux__)
 /*      FIOSETOWN          _IO(0x89, 0x01)  * ... */
 /*      SIOCSPGRP          _IO(0x89, 0x02)  * ... */
 /*      FIOGETOWN          _IO(0x89, 0x03)  * ... */
 /*      SIOCGPGRP          _IO(0x89, 0x04)  * ... */
 /*      SIOCATMARK         _IO(0x89, 0x05)  * ... */
-/*      SIOCGSTAMP32       _IO(0x89, 0x06)  * [struct timeval32 *arg] Get stamp */
-/*      SIOCGSTAMP64   _IO_KOS(0x89, 0x06)  * [struct timeval64 *arg] Get stamp */
-/*      SIOCGSTAMPNS32     _IO(0x89, 0x07)  * [struct timespec32 *arg] Get stamp */
-/*      SIOCGSTAMPNS64 _IO_KOS(0x89, 0x07)  * [struct timespec64 *arg] Get stamp */
+/*      SIOCGSTAMP         _IO(0x89, 0x06)  * [struct timeval *arg] Get stamp */
+/*      SIOCGSTAMPNS       _IO(0x89, 0x07)  * [struct timespec *arg] Get stamp */
 
 /* Routing table calls. */
 #define SIOCADDRT          _IO(0x89, 0x0b) /* add routing table entry. */
@@ -101,8 +108,22 @@
 
 #define SIOCGIFTXQLEN      _IO(0x89, 0x42) /* Get the tx queue length. */
 #define SIOCSIFTXQLEN      _IO(0x89, 0x43) /* Set the tx queue length. */
+#endif /* __KOS__ || __linux__ */
+
+#ifdef __linux__
+/*      SIOCGIFDIVERT      _IO(0x89, 0x44)  * Frame diversion support */
+/*      SIOCSIFDIVERT      _IO(0x89, 0x45)  * Set frame diversion options */
+#define SIOCETHTOOL        _IO(0x89, 0x46) /* Ethtool interface */
+#define SIOCGMIIPHY        _IO(0x89, 0x47) /* Get address of MII PHY in use. */
+#define SIOCGMIIREG        _IO(0x89, 0x48) /* Read MII PHY register. */
+#define SIOCSMIIREG        _IO(0x89, 0x49) /* Write MII PHY register. */
+#define SIOCWANDEV         _IO(0x89, 0x4a) /* get/set netdev parameters */
+#define SIOCOUTQNSD        _IO(0x89, 0x4b) /* output queue size (not sent only) */
+#endif /* __linux__ */
 
 
+
+#if defined(__KOS__) || defined(__linux__)
 /* ARP cache control calls. */
 /*                         _IO(0x89, 0x50)  * obsolete call, don't re-use. */
 /*                         _IO(0x89, 0x51)  * obsolete call, don't re-use. */
@@ -123,12 +144,44 @@
 /* DLCI configuration calls */
 #define SIOCADDDLCI        _IO(0x89, 0x80) /* Create new DLCI device. */
 #define SIOCDELDLCI        _IO(0x89, 0x81) /* Delete DLCI device. */
+#endif /* __KOS__ || __linux__ */
 
+#ifdef __linux__
+#define SIOCGIFVLAN        _IO(0x89, 0x82) /* 802.1Q VLAN support */
+#define SIOCSIFVLAN        _IO(0x89, 0x83) /* Set 802.1Q VLAN options */
+#endif /* __linux__ */
+
+#ifdef __linux__
+/* bonding calls */
+#define SIOCBONDENSLAVE        _IO(0x89, 0x90) /* enslave a device to the bond */
+#define SIOCBONDRELEASE        _IO(0x89, 0x91) /* release a slave from the bond */
+#define SIOCBONDSETHWADDR      _IO(0x89, 0x92) /* set the hw addr of the bond */
+#define SIOCBONDSLAVEINFOQUERY _IO(0x89, 0x93) /* rtn info about slave state */
+#define SIOCBONDINFOQUERY      _IO(0x89, 0x94) /* rtn info about bond state */
+#define SIOCBONDCHANGEACTIVE   _IO(0x89, 0x95) /* update to a new active slave */
+#endif /* __linux__ */
+
+#ifdef __linux__
+/* bridge calls */
+#define SIOCBRADDBR        _IO(0x89, 0xa0) /* create new bridge device */
+#define SIOCBRDELBR        _IO(0x89, 0xa1) /* remove bridge device */
+#define SIOCBRADDIF        _IO(0x89, 0xa2) /* add interface to bridge */
+#define SIOCBRDELIF        _IO(0x89, 0xa3) /* remove interface from bridge */
+#endif /* __linux__ */
+
+#ifdef __linux__
+/* hardware time stamping */
+#define SIOCSHWTSTAMP      _IO(0x89, 0xb0) /* set and get config */
+#define SIOCGHWTSTAMP      _IO(0x89, 0xb1) /* get config */
+#endif /* __linux__ */
+
+
+#if defined(__KOS__) || defined(__linux__)
 /* Device private ioctl calls. */
-
-#define SIOCDEVPRIVATE     _IO(0x89, 0xf0) /* to 89FF */
+#define SIOCDEVPRIVATE     _IO(0x89, 0xf0) /* to _IO(0x89, 0xff) */
 /* These 16 ioctl calls are protocol private */
-#define SIOCPROTOPRIVATE   _IO(0x89, 0xe0) /* to 89EF */
+#define SIOCPROTOPRIVATE   _IO(0x89, 0xe0) /* to _IO(0x89, 0xef) */
+#endif /* __KOS__ || __linux__ */
 
 
-#endif /* !_BITS_IOCTLS_H */
+#endif /* !_ASM_IOCTLS_SOCKET_EX_H */

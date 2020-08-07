@@ -27,7 +27,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#if defined(__KOS__) || defined(__linux__)
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("handle_bytes")
@@ -48,7 +48,7 @@ struct file_handle {
 #pragma pop_macro("handle_bytes")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#endif /* ... */
+#endif /* __KOS__ || __linux__ */
 
 __DECL_END
 #endif /* __CC__ */

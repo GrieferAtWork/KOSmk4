@@ -23,8 +23,6 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
-
 #define __SIZEOF_ELF32_HALF__     2
 #define __SIZEOF_ELF64_HALF__     2
 #define __SIZEOF_ELF32_WORD__     4
@@ -45,6 +43,8 @@ __SYSDECL_BEGIN
 #define __SIZEOF_ELF64_VERSYM__   __SIZEOF_ELF64_HALF__
 
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifndef _ELF_TYPES_DEFINED
 #define _ELF_TYPES_DEFINED 1
 /* Type for a 16-bit quantity. */
@@ -79,8 +79,9 @@ typedef __UINT16_TYPE__ Elf64_Section;
 typedef Elf32_Half Elf32_Versym;
 typedef Elf64_Half Elf64_Versym;
 #endif /* !_ELF_TYPES_DEFINED */
+
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_BITS_ELF_TYPES_H */

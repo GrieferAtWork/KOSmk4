@@ -25,8 +25,10 @@
 %{
 #include <features.h>
 
-#include <bits/ioctl-types.h>
-#include <bits/ioctls.h>
+#include <asm/ioctl.h>
+#include <asm/ioctls/socket_ex.h>
+#include <asm/ioctls/tty.h>
+#include <bits/ioctls/termio.h>
 #include <bits/types.h>
 #include <sys/ttydefaults.h>
 

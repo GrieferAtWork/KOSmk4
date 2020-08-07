@@ -24,7 +24,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <linux/ioctl.h>
+#include <asm/ioctl.h>
 
 /* Taken from /usr/include/linux/fd.h
  * This file is needed for busybox mkfs_vfat.c, but KOS doesn't (currently) implement

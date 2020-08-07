@@ -48,7 +48,7 @@ __DECL_BEGIN
 
 typedef union epoll_data {
 	void      *ptr;
-	int        fd;
+	__fd_t     fd;
 	__uint32_t u32;
 	__uint64_t u64;
 } epoll_data_t;

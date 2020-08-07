@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_IOCTLS_H
-#define _ASM_IOCTLS_H 1
+#ifndef _ASM_IOCTLS_TTY_H
+#define _ASM_IOCTLS_TTY_H 1
 
-#include <linux/ioctl.h>
+#include <asm/ioctl.h>
 
+#if defined(__KOS__) || defined(__linux__)
 #define TCGETS              _IO('T', 0x01) /* [struct termio *arg] Get terminal attributes */
 #define TCSETS              _IO('T', 0x02) /* [struct termio const *arg] Set terminal attributes */
 #define TCSETSW             _IO('T', 0x03) /* [struct termio const *arg] Wait for all unwritten data to be transmitted, discard all unread data, then set terminal attributes */
@@ -46,10 +47,10 @@
 #define TIOCSTI             _IO('T', 0x12) /* [char const *byte] Insert the given byte in the input queue. */
 #define TIOCGWINSZ          _IO('T', 0x13) /* [struct winsize *arg] Get the window size */
 #define TIOCSWINSZ          _IO('T', 0x14) /* [struct winsize const *arg] Set the window size */
-#define TIOCMGET            _IO('T', 0x15) /* [unsigned int *argp] Get status of modem bits (set of `TIOCM_*' from <bits/ioctl-types.h>) */
-#define TIOCMBIS            _IO('T', 0x16) /* [unsigned int *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*' from <bits/ioctl-types.h>) */
-#define TIOCMBIC            _IO('T', 0x17) /* [unsigned int *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*' from <bits/ioctl-types.h>) */
-#define TIOCMSET            _IO('T', 0x18) /* [unsigned int *argp] Set modem bits (bits = *argp) (set of `TIOCM_*' from <bits/ioctl-types.h>) */
+#define TIOCMGET            _IO('T', 0x15) /* [unsigned int *argp] Get status of modem bits (set of `TIOCM_*') */
+#define TIOCMBIS            _IO('T', 0x16) /* [unsigned int *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*') */
+#define TIOCMBIC            _IO('T', 0x17) /* [unsigned int *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*') */
+#define TIOCMSET            _IO('T', 0x18) /* [unsigned int *argp] Set modem bits (bits = *argp) (set of `TIOCM_*') */
 
 #define TIOCGSOFTCAR        _IO('T', 0x19) /* [int *arg] Get the state of `termios::c_cflag::CLOCAL'. */
 #define TIOCSSOFTCAR        _IO('T', 0x1a) /* [int const *arg] Set the state of `termios::c_cflag::CLOCAL'. */
@@ -117,4 +118,19 @@
 
 #define TIOCSER_TEMT       0x01 /* Transmitter physically empty */
 
-#endif /* !_ASM_IOCTLS_H */
+/* modem lines */
+#define TIOCM_LE  0x001
+#define TIOCM_DTR 0x002
+#define TIOCM_RTS 0x004
+#define TIOCM_ST  0x008
+#define TIOCM_SR  0x010
+#define TIOCM_CTS 0x020
+#define TIOCM_CAR 0x040
+#define TIOCM_RNG 0x080
+#define TIOCM_DSR 0x100
+#define TIOCM_CD  TIOCM_CAR
+#define TIOCM_RI  TIOCM_RNG
+
+#endif /* __KOS__ || __linux__ */
+
+#endif /* !_ASM_IOCTLS_TTY_H */

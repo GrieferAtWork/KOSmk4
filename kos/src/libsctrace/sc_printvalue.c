@@ -39,9 +39,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/typecore.h>
 
 #include <asm/ioctl.h>
-#include <asm/ioctls.h>
-#include <asm/sockios.h>
-#include <bits/ioctls.h>
+#include <asm/ioctls/socket.h>
+#include <asm/ioctls/socket_ex.h>
+#include <asm/ioctls/tty.h>
 #include <bits/itimerspec.h>
 #include <bits/itimerval.h>
 #include <bits/timespec.h>
@@ -87,8 +87,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef __KERNEL__
 #include <dev/block.h>
 #include <dev/char.h>
-#include <kernel/user.h>
 #include <kernel/except.h>
+#include <kernel/user.h>
 #else /* __KERNEL__ */
 #define validate_readable(base, num_bytes)                          (void)0
 #define validate_readablem(base, num_items, item_size_in_bytes)     (void)0

@@ -17,30 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_TERMIOS_H
-#define _BITS_TERMIOS_H 1
+#ifndef _BITS_IOCTLS_TERMIOS_H
+#define _BITS_IOCTLS_TERMIOS_H 1
 
 #include <__stdinc.h>
+#include <hybrid/typecore.h>
 
-/* termios type and macro definitions.  Linux version.
-   Copyright (C) 1993-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
+#if defined(__KOS__) || defined(__linux__)
+__DECL_BEGIN
 
 #ifdef __CC__
 typedef __UINT8_TYPE__  cc_t;
@@ -280,6 +264,7 @@ struct termios2 {
 #define _IOT_termios /* Hurd ioctl type field. */ \
 	_IOT(_IOTS(cflag_t), 4, _IOTS(cc_t), NCCS, _IOTS(speed_t), 2)
 
-__SYSDECL_END
+__DECL_END
+#endif /* __KOS__ || __linux__ */
 
-#endif /* !_BITS_TERMIOS_H */
+#endif /* !_BITS_IOCTLS_TERMIOS_H */

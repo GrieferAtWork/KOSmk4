@@ -28,7 +28,7 @@
 #include <bits/format-printer.h>
 
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 #ifndef __WFORMATPRINTER_CC
 #ifdef __PE__
@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 
 typedef __SSIZE_TYPE__ (__WFORMATPRINTER_CC *__pwformatprinter)(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 #endif /* !_BITS_WFORMAT_PRINTER_H */

@@ -19,5 +19,7 @@
  */
 #ifndef _MACHINE_TERMIOS_H
 #define _MACHINE_TERMIOS_H 1
-#include <bits/termios.h>
+
+#include <bits/ioctls/termios.h>
+
 #endif /* !_MACHINE_TERMIOS_H */

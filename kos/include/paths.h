@@ -24,8 +24,6 @@
 #include <__stdinc.h>
 #include <features.h>
 
-__SYSDECL_BEGIN
-
 /*
  * Copyright (c) 1989, 1993
  * The Regents of the University of California.  All rights reserved.
@@ -112,8 +110,8 @@ __SYSDECL_BEGIN
 #define _PATH_SHADOW   "/etc/shadow"
 #define _PATH_UNIX     "/boot/vmlinux"
 #define _PATH_VARDB    "/var/lib/misc/"
-#if defined(__USE_PORTABLE) && \
-defined(__COMPILER_HAVE_PRAGMA_DEPRECATED)
+#if (defined(__USE_PORTABLE) && \
+     defined(__COMPILER_HAVE_PRAGMA_DEPRECATED))
 /* Mark non-portable GLibc paths as deprecated. */
 #pragma deprecated(_PATH_CONSOLE)
 #pragma deprecated(_PATH_DEVDB)
@@ -128,9 +126,7 @@ defined(__COMPILER_HAVE_PRAGMA_DEPRECATED)
 #pragma deprecated(_PATH_SHADOW)
 #pragma deprecated(_PATH_UNIX)
 #pragma deprecated(_PATH_VARDB)
-#endif
+#endif /* __USE_PORTABLE && __COMPILER_HAVE_PRAGMA_DEPRECATED */
 #endif /* __CRT_GLC */
-
-__SYSDECL_END
 
 #endif /* !_PATHS_H */

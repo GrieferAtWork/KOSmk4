@@ -202,7 +202,11 @@ incdir("", "../../include");
 #include <asm/intrin-arith.h>
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
-#include <asm/ioctls.h>
+#include <asm/ioctls/block.h>
+#include <asm/ioctls/block_ex.h>
+#include <asm/ioctls/socket.h>
+#include <asm/ioctls/socket_ex.h>
+#include <asm/ioctls/tty.h>
 #include <asm/limits.h>
 #include <asm/ls-syscalls.h>
 #include <asm/mman.h>
@@ -226,7 +230,6 @@ incdir("", "../../include");
 #include <asm/sigstack.h>
 #include <asm/socket-families.h>
 #include <asm/socket.h>
-#include <asm/sockios.h>
 #include <asm/stat.h>
 #include <asm/stdio.h>
 #include <asm/stdlib.h>
@@ -236,8 +239,6 @@ incdir("", "../../include");
 #include <asm/syscalls-types.h>
 #include <asm/syscalls.h>
 #include <asm/syslog.h>
-#include <asm/termbits.h>
-#include <asm/termios.h>
 #include <asm/time.h>
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
@@ -286,8 +287,9 @@ incdir("", "../../include");
 #include <bits/format-printer.h>
 #include <bits/hwcap.h>
 #include <bits/in.h>
-#include <bits/ioctl-types.h>
-#include <bits/ioctls.h>
+#include <bits/ioctls/termio.h>
+#include <bits/ioctls/termios.h>
+#include <bits/ioctls/termiox.h>
 #include <bits/iovec-struct.h>
 #include <bits/ipc.h>
 #include <bits/itimerspec.h>
@@ -339,7 +341,6 @@ incdir("", "../../include");
 #include <bits/stropts.h>
 #include <bits/syscalls.h>
 #include <bits/syslog-path.h>
-#include <bits/termios.h>
 #include <bits/time.h>
 #include <bits/timeb.h>
 #include <bits/timerfd.h>
@@ -861,6 +862,7 @@ incdir("", "../../include");
 #include <linux/param.h>
 #include <linux/pci.h>
 #include <linux/posix_types.h>
+#include <linux/sockios.h>
 #include <linux/stddef.h>
 #include <linux/sysinfo.h>
 #include <linux/termios.h>

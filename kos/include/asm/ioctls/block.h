@@ -17,35 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_WORDSIZE_H
-#define _I386_KOS_BITS_WORDSIZE_H 1
+#ifndef _ASM_IOCTLS_BLOCK_H
+#define _ASM_IOCTLS_BLOCK_H 1
 
-#include <__stdinc.h>
+#include <asm/ioctl.h>
 
-#include <hybrid/host.h>
-
-#if defined(__x86_64__) && !defined(__ILP32__)
-#define __WORDSIZE 64
-#elif defined(__x86_64__) || defined(__i386__)
-#define __WORDSIZE 32
-#else /* ... */
+#if defined(__KOS__) || defined(__linux__)
 #include <hybrid/typecore.h>
-#if __SIZEOF_POINTER__ == 1
-#define __WORDSIZE 8
-#elif __SIZEOF_POINTER__ == 2
-#define __WORDSIZE 16
-#elif __SIZEOF_POINTER__ == 4
-#define __WORDSIZE 32
-#elif __SIZEOF_POINTER__ == 8
-#define __WORDSIZE 64
-#else /* __SIZEOF_POINTER__ == ... */
-#define __WORDSIZE (__SIZEOF_POINTER__ * 8)
-#endif /* __SIZEOF_POINTER__ != ... */
-#endif /* !... */
 
-#ifdef __x86_64__
-#define __WORDSIZE_TIME64_COMPAT32 1 /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#define __SYSCALL_WORDSIZE         64
-#endif /* __x86_64__ */
+#define BLKROSET      _IO(0x12, 93)  /* [int const *arg] Set device read-only (0 = read-write) */
+#define BLKROGET      _IO(0x12, 94)  /* [int *arg] Get read-only status (0 = read_write) */
+#define BLKRRPART     _IO(0x12, 95)  /* Re-read partition table */
+#define BLKGETSIZE    _IO(0x12, 96)  /* [long *arg] Return device size/512 */
+#define BLKFLSBUF     _IO(0x12, 97)  /* Flush buffer cache */
+#define BLKRASET      _IO(0x12, 98)  /* [unsigned long const *arg] Set read ahead for block device */
+#define BLKRAGET      _IO(0x12, 99)  /* [unsigned long *arg] Get current read ahead setting */
+#define BLKFRASET     _IO(0x12, 100) /* [unsigned long const *arg] Set filesystem read-ahead. */
+#define BLKFRAGET     _IO(0x12, 101) /* [unsigned long *arg] Get filesystem read-ahead. */
+#define BLKSECTSET    _IO(0x12, 102) /* [u16 const *arg] Set max sectors per request. */
+#define BLKSECTGET    _IO(0x12, 103) /* [u16 *arg] Get max sectors per request. */
+#define BLKSSZGET     _IO(0x12, 104) /* Get block device sector size */
+#define BLKBSZGET    _IOR(0x12, 112, __SIZE_TYPE__) /* [size_t *arg] */
+#define BLKBSZSET    _IOW(0x12, 113, __SIZE_TYPE__) /* [size_t *arg] */
+#define BLKGETSIZE64 _IOR(0x12, 114, __SIZE_TYPE__) /* [u64 *arg] return device size in bytes */
+#endif /* __KOS__ || __linux__ */
 
-#endif /* !_I386_KOS_BITS_WORDSIZE_H */
+#endif /* !_ASM_IOCTLS_BLOCK_H */

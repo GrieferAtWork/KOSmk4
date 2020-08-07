@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <__stdinc.h>
 
-#include <asm/sockios.h>
+#include <asm/ioctls/socket.h>
 
 #ifndef SOL_SOCKET
 #define SOL_SOCKET 1 /* for `(get|set)sockopt':level (optname = `SO_*') */

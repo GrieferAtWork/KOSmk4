@@ -22,8 +22,9 @@
 
 %{
 #include <features.h>
+
+#include <asm/ioctls/block.h> /* BLK* (ioctls) */
 #include <asm/mount.h>
-#include <sys/ioctl.h>
 
 __SYSDECL_BEGIN
 
@@ -145,28 +146,6 @@ __SYSDECL_BEGIN
 #define MS_MGC_MSK __MS_MGC_MSK /* Magic flag number mask. */
 #endif /* __MS_MGC_MSK */
 
-/* The read-only stuff doesn't really belong here, but any other place
- * is probably as bad and I don't want to create yet another include file. */
-#ifndef BLKROSET
-#if defined(__KOS__) || defined(__linux__)
-#define BLKROSET      _IO(0x12, 93)  /* [int const *arg] Set device read-only (0 = read-write) */
-#define BLKROGET      _IO(0x12, 94)  /* [int *arg] Get read-only status (0 = read_write) */
-#define BLKRRPART     _IO(0x12, 95)  /* Re-read partition table */
-#define BLKGETSIZE    _IO(0x12, 96)  /* [long *arg] Return device size/512 */
-#define BLKFLSBUF     _IO(0x12, 97)  /* Flush buffer cache */
-#define BLKRASET      _IO(0x12, 98)  /* [unsigned long const *arg] Set read ahead for block device */
-#define BLKRAGET      _IO(0x12, 99)  /* [unsigned long *arg] Get current read ahead setting */
-#define BLKFRASET     _IO(0x12, 100) /* [unsigned long const *arg] Set filesystem read-ahead. */
-#define BLKFRAGET     _IO(0x12, 101) /* [unsigned long *arg] Get filesystem read-ahead. */
-#define BLKSECTSET    _IO(0x12, 102) /* [u16 const *arg] Set max sectors per request. */
-#define BLKSECTGET    _IO(0x12, 103) /* [u16 *arg] Get max sectors per request. */
-#define BLKSSZGET     _IO(0x12, 104) /* Get block device sector size */
-#define BLKBSZGET    _IOR(0x12, 112, size_t) /* [size_t *arg] */
-#define BLKBSZSET    _IOW(0x12, 113, size_t) /* [size_t *arg] */
-#define BLKGETSIZE64 _IOR(0x12, 114, size_t) /* [u64 *arg] return device size in bytes */
-#endif /* __KOS__ || __linux__ */
-#endif /* !BLKROSET */
-
 /* Possible value for FLAGS parameter of `umount2'. */
 #ifdef __MNT_FORCE
 #define MNT_FORCE __MNT_FORCE /* Force unmounting. */
@@ -186,7 +165,7 @@ __SYSDECL_BEGIN
 
 
 /* Mount a filesystem. */
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int mount([[nullable]] char const *special_file, [[nullable]] char const *dir,
           [[nullable]] char const *fstype, $ulongptr_t mountflags,
           [[nullable]] void const *data);

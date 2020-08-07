@@ -37,10 +37,9 @@
 #endif /* !__PTHREAD_RWLOCK_ELISION_EXTRA */
 
 #ifndef __PTHREAD_RWLOCK_INT_FLAGS_SHARED
-#include <bits/wordsize.h>
-#if __WORDSIZE == 64
+#if __SIZEOF_POINTER__ == 8
 #define __PTHREAD_RWLOCK_INT_FLAGS_SHARED 1
-#endif /* __WORDSIZE == 64 */
+#endif /* __SIZEOF_POINTER__ == 8 */
 #endif /* !__PTHREAD_RWLOCK_INT_FLAGS_SHARED */
 
 #ifdef __PTHREAD_MUTEX_HAVE_PREV

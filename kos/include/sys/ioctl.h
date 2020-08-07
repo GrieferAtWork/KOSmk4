@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b412b58 */
+/* HASH CRC-32:0xd84fdd45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,10 @@
 
 #include <features.h>
 
-#include <bits/ioctl-types.h>
-#include <bits/ioctls.h>
+#include <asm/ioctl.h>
+#include <asm/ioctls/socket_ex.h>
+#include <asm/ioctls/tty.h>
+#include <bits/ioctls/termio.h>
 #include <bits/types.h>
 #include <sys/ttydefaults.h>
 

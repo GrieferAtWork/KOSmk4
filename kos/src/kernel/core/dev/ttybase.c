@@ -36,13 +36,13 @@
 
 #include <hybrid/atomic.h>
 
-#include <asm/ioctls.h>
+#include <asm/ioctls/tty.h>
+#include <bits/ioctls/termiox.h> /* struct termiox */
 #include <compat/config.h>
 #include <compat/kos/types.h>
 #include <kos/except/inval.h>
 #include <kos/except/io.h>
 #include <kos/ioctl/tty.h>
-#include <linux/termios.h> /* struct termiox */
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */
 
@@ -51,6 +51,7 @@
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
+#include <termios.h>
 
 #include <libterm/termio.h>
 
