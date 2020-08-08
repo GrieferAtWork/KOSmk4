@@ -60,23 +60,36 @@ __SYSDECL_BEGIN
  * architecture-specific implementations will mirror. */
 
 extern __UINT8_TYPE__ __NOTHROW(inb)(__IOPORT_T __port);
-extern __UINT8_TYPE__ __NOTHROW(inb_p)(__IOPORT_T __port);
-extern void __NOTHROW(insb)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes);
-extern void __NOTHROW(outb)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-extern void __NOTHROW(outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-extern void __NOTHROW(outsb)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes);
 extern __UINT16_TYPE__ __NOTHROW(inw)(__IOPORT_T __port);
-extern __UINT16_TYPE__ __NOTHROW(inw_p)(__IOPORT_T __port);
-extern void __NOTHROW(insw)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words);
-extern void __NOTHROW(outw)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-extern void __NOTHROW(outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-extern void __NOTHROW(outsw)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words);
 extern __UINT32_TYPE__ __NOTHROW(inl)(__IOPORT_T __port);
+
+extern __UINT8_TYPE__ __NOTHROW(inb_p)(__IOPORT_T __port);
+extern __UINT16_TYPE__ __NOTHROW(inw_p)(__IOPORT_T __port);
 extern __UINT32_TYPE__ __NOTHROW(inl_p)(__IOPORT_T __port);
+
+extern void __NOTHROW(insb)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes);
+extern void __NOTHROW(insw)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words);
 extern void __NOTHROW(insl)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_dwords);
-extern void __NOTHROW(outl)(__IOPORT_T __port, __UINT32_TYPE__ __val);
-extern void __NOTHROW(outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val);
+
+extern void __NOTHROW(outsb)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes);
+extern void __NOTHROW(outsw)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words);
 extern void __NOTHROW(outsl)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_dwords);
+
+#ifdef __USE_KOS_ALTERATIONS
+extern void __NOTHROW(outb)(__IOPORT_T __port, __UINT8_TYPE__ __val);
+extern void __NOTHROW(outw)(__IOPORT_T __port, __UINT16_TYPE__ __val);
+extern void __NOTHROW(outl)(__IOPORT_T __port, __UINT32_TYPE__ __val);
+extern void __NOTHROW(outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val);
+extern void __NOTHROW(outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val);
+extern void __NOTHROW(outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val);
+#else /* __USE_KOS_ALTERATIONS */
+extern void __NOTHROW(outb)(__UINT8_TYPE__ __val, __IOPORT_T __port);
+extern void __NOTHROW(outw)(__UINT16_TYPE__ __val, __IOPORT_T __port);
+extern void __NOTHROW(outl)(__UINT32_TYPE__ __val, __IOPORT_T __port);
+extern void __NOTHROW(outb_p)(__UINT8_TYPE__ __val, __IOPORT_T __port);
+extern void __NOTHROW(outw_p)(__UINT16_TYPE__ __val, __IOPORT_T __port);
+extern void __NOTHROW(outl_p)(__UINT32_TYPE__ __val, __IOPORT_T __port);
+#endif /* !__USE_KOS_ALTERATIONS */
 
 #ifdef __USE_KOS_KERNEL
 extern void __NOTHROW(io_delay)(void);

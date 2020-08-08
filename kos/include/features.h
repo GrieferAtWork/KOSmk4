@@ -111,8 +111,8 @@
  * These include internal ABI/API details normally hidden from
  * normal user-space applications and only need to be known by
  * libc and the kernel, such as `SA_RESTORER' or `io_delay()' */
-#if defined(_KOS_KERNEL_SOURCE) || \
-   (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE))
+#if (defined(_KOS_KERNEL_SOURCE) || \
+     (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
 #define __USE_KOS_KERNEL 1
 #if !defined(_KOS_PURE_SOURCE) || (_KOS_PURE_SOURCE + 0) != 0
 #define __USE_KOS_PURE 1
@@ -137,6 +137,27 @@
 #define __USE_KOS_PURE 1
 #endif /* _KOS_PURE_SOURCE != 0 */
 #endif /* !_KOS_KERNEL_SOURCE && (!__KOS__ || !__KERNEL__ || __USE_ISOC_PURE) */
+
+/* Certain KOS extensions may alter the prototyping or invocation behavior
+ * or functions or data structures. By default, this behavior is enabled
+ * for kernel-space (when `_KOS_KERNEL_SOURCE' is also implied), but must
+ * explicitly be enabled for user-space.
+ * Alterations include:
+ *    - int sprintf() ->  size_t sprintf()
+ *    - int printf()  -> ssize_t printf()
+ *    - ...
+ *    - feof(FILE *)  -> feof(FILE const *)
+ *    - ...
+ *    - Changing `int flags'-like arguments to `unsigned int flags'
+ *    - Reversing the argument order of `outb()', `outw()', `outl()'
+ *      and their `*_p' versions, such that the port comes first.
+ * TODO: Go through all uses of __USE_KOS and replace them with this feature
+ *       test as appropriate. I'm sure there are places that alter existing
+ *       standards when KOS extensions are enabled, but we don't want that! */
+#if (defined(_KOS_ALTERATIONS_SOURCE) || \
+     (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
+#define __USE_KOS_ALTERATIONS 1
+#endif /* _KOS_ALTERATIONS_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
 
 /* `memcpy[bwlq]()' (Also implied by `_KOS_SOURCE') */
 #ifdef _STRING_BWLQ_SOURCE
@@ -698,7 +719,7 @@
 #define __STDC_UINT32_AS_SIZE_T /* nothing */
 #define __STDC_INT_AS_UINT_T    /* nothing */
 #elif defined(__INTELLISENSE__)
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #ifdef __INTELLISENSE_SSIZE_TYPE__
 #define __STDC_INT_AS_SSIZE_T   __INTELLISENSE_SSIZE_TYPE__
 #define __STDC_INT32_AS_SSIZE_T __INTELLISENSE_SSIZE_TYPE__
@@ -724,7 +745,7 @@
 #define __STDC_UINT32_AS_SIZE_T __SIZE_TYPE__
 #endif /* !__INTELLISENSE_SIZE_TYPE__ */
 #define __STDC_INT_AS_UINT_T    unsigned int
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    int
 #define __STDC_INT32_AS_SSIZE_T int
@@ -732,8 +753,8 @@
 #define __STDC_UINT_AS_SIZE_T   unsigned int
 #define __STDC_UINT32_AS_SIZE_T unsigned int
 #define __STDC_INT_AS_UINT_T    int
-#endif /* !__USE_KOS */
-#elif defined(__USE_KOS)
+#endif /* !__USE_KOS_ALTERATIONS */
+#elif defined(__USE_KOS_ALTERATIONS)
 #include "hybrid/typecore.h"
 #if __SIZEOF_SIZE_T__ <= __SIZEOF_INT__
 #define __STDC_INT_AS_SSIZE_T   __SSIZE_TYPE__
@@ -752,7 +773,7 @@
 #define __STDC_UINT_AS_SIZE_T   __STDC_INT_AS_SIZE_T
 #define __STDC_UINT32_AS_SIZE_T __STDC_INT32_AS_SIZE_T
 #define __STDC_INT_AS_UINT_T    unsigned int
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #if !defined(__INT32_TYPE__) || !defined(__UINT32_TYPE__)
 #include "hybrid/typecore.h"
 #endif /* !__INT32_TYPE__ || !__UINT32_TYPE__ */
@@ -763,14 +784,14 @@
 #define __STDC_UINT_AS_SIZE_T   unsigned int
 #define __STDC_UINT32_AS_SIZE_T __UINT32_TYPE__
 #define __STDC_INT_AS_UINT_T    int
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 
 #ifndef __KOS_FIXED_CONST
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __KOS_FIXED_CONST const
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __KOS_FIXED_CONST /* Nothing */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__KOS_FIXED_CONST */
 
 

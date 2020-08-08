@@ -265,7 +265,8 @@ INTDEF NONNULL((1, 2, 3, 4)) void KCALL
 ProcFS_OpenNode(struct superblock *__restrict self,
                 struct inode *__restrict node,
                 struct directory_node *__restrict parent_directory,
-                struct directory_entry *__restrict parent_directory_entry);
+                struct directory_entry *__restrict parent_directory_entry)
+		THROWS(E_IOERROR, E_BADALLOC, ...) ;
 
 
 /* Define printer functions used by singleton files */

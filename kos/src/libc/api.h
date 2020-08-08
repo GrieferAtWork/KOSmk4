@@ -43,17 +43,18 @@
  * locked away behind various feature macros (us being libc,
  * we obviously want access to anything we intend on defining,
  * so we make our job simple by unlocking everything) */
-#define _KOS_SOURCE         1
-#define _KOS_KERNEL_SOURCE  1
-#define _STRING_BWLQ_SOURCE 1
-#define _STRING_XCHR_SOURCE 1
-#define _CTYPE_MACRO_SOURCE 1
-#define _DOS_SOURCE         1
-#define _BSD_SOURCE         1
-#define _SVID_SOURCE        1
-#define _GNU_SOURCE         1
-#define _LARGEFILE_SOURCE   1
-#define __EXTENSIONS__      1
+#define _KOS_SOURCE             1
+#define _KOS_KERNEL_SOURCE      1
+#define _KOS_ALTERATIONS_SOURCE 1
+#define _STRING_BWLQ_SOURCE     1
+#define _STRING_XCHR_SOURCE     1
+#define _CTYPE_MACRO_SOURCE     1
+#define _DOS_SOURCE             1
+#define _BSD_SOURCE             1
+#define _SVID_SOURCE            1
+#define _GNU_SOURCE             1
+#define _LARGEFILE_SOURCE       1
+#define __EXTENSIONS__          1
 
 /* Must load headers in 32-bit time/file-offset mode, so-as to prevent
  * any symbol re-directions from happening, which might otherwise screw
