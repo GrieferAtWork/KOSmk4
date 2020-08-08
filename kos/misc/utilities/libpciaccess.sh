@@ -104,10 +104,18 @@ fi
 #     Which in combination would cause the ~real~ system include
 #     path to be added to include path, so we need to edit the file
 if ! [ -f "$PKG_CONFIG_PATH/pciaccess.pc" ]; then
-	PKG_CONFIG=$(cat "$OPTPATH/pciaccess.pc")
 	cmd mkdir -p "$PKG_CONFIG_PATH"
 	cat > "$PKG_CONFIG_PATH/pciaccess.pc" <<EOF
-${PKG_CONFIG//-I\$\{includedir\}/}
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: pciaccess
+Description: Library providing generic access to the PCI bus and devices.
+Version: $VERSION
+Cflags:
+Libs: -L${libdir} -lpciaccess
 EOF
 fi
 
