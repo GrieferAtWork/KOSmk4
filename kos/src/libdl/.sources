@@ -51,12 +51,6 @@ BEGIN
 	SET_NOSTDLIB()
 	SET_SHARED()
 
-	DEFINE({
-		"CONFIG_NO_USE_LIBDISASM" : "1",
-		"CONFIG_NO_USE_LIBDEBUGINFO" : "1",
-		"__LIBC" : "__INTDEF",
-	})
-
 	/* Pull in the actual source files for libdl/RTLD */
 	BEGIN GROUP("libs.libdl") { COMPILE };
 		SOURCE({ "arch/" + XARCH + "/*.c", "./*.c" })
@@ -92,7 +86,7 @@ BEGIN
 			"./*.c",
 			"arch/" + XARCH + "/*.c",
 			"arch/" + XARCH_ASMFILES,
-			"../libdlmalloc/*.c",
+			"../libdlmalloc/dlmalloc.c",
 		})
 	END
 

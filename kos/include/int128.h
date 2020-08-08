@@ -148,6 +148,10 @@ void int128_set(uint128_t &__var, __LONGLONG __value);
 void uint128_set(int128_t &__var, __ULONGLONG __value);
 void uint128_set(uint128_t &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 
 /* ++VAR */
 void uint128_inc(uint128_t &__var);
@@ -494,6 +498,10 @@ __ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, unsigned long
 __ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, __ULONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_eq(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool uint128_eq8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_eq8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_eq16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -524,6 +532,10 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, long __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_eq(int128_t const &__var, __LONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_eq(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool int128_eq8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_eq8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_eq16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -556,6 +568,10 @@ __ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, unsigned long
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ne(int128_t const &__var, __ULONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ne(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ne8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ne8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ne16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -586,6 +602,10 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, long __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ne(int128_t const &__var, __LONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ne(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool int128_ne8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ne8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ne16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -618,6 +638,10 @@ __ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, unsigned long
 __ATTR_WUNUSED __ATTR_PURE bool uint128_lo(int128_t const &__var, __ULONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_lo(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool uint128_lo8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_lo8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_lo16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -648,6 +672,10 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, long __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_lo(int128_t const &__var, __LONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_lo(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool int128_lo8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_lo8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_lo16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -680,6 +708,10 @@ __ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, unsigned long
 __ATTR_WUNUSED __ATTR_PURE bool uint128_le(int128_t const &__var, __ULONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_le(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool uint128_le8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_le8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_le16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -710,6 +742,10 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, long __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_le(int128_t const &__var, __LONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_le(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool int128_le8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_le8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_le16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -742,6 +778,10 @@ __ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, unsigned long
 __ATTR_WUNUSED __ATTR_PURE bool uint128_gr(int128_t const &__var, __ULONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_gr(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool uint128_gr8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_gr8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_gr16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -772,6 +812,10 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, long __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_gr(int128_t const &__var, __LONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_gr(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool int128_gr8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_gr8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_gr16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -804,6 +848,10 @@ __ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, unsigned long
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ge(int128_t const &__var, __ULONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ge(uint128_t const &__var, __ULONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ge8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ge8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool uint128_ge16(int128_t const &__var, __UINT16_TYPE__ __value);
@@ -834,6 +882,10 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, long __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ge(int128_t const &__var, __LONGLONG __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ge(uint128_t const &__var, __LONGLONG __value);
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __ATTR_WUNUSED __ATTR_PURE bool int128_ge8(int128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ge8(uint128_t const &__var, __UINT8_TYPE__ __value);
 __ATTR_WUNUSED __ATTR_PURE bool int128_ge16(int128_t const &__var, __UINT16_TYPE__ __value);

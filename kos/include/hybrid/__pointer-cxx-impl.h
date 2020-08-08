@@ -80,6 +80,10 @@ public:
 	__CXX_CLASSMEMBER explicit __hybrid_ptr(long long __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
 	__CXX_CLASSMEMBER explicit __hybrid_ptr(unsigned long long __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
 #endif /* __COMPILER_HAVE_LONGLONG */
+	/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+	/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+	/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+	/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 
 	/* Convert to integer (explicit) */
 	__CXX_CLASSMEMBER explicit operator signed char() const __CXX_NOEXCEPT { return (signed char)__m_ptr; }

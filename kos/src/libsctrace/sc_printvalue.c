@@ -115,6 +115,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
 
 
+/* TODO: Use the same trick as also used in libdebuginfo/repr.c to encode
+ *       symbolic constant names (such as those for ioctl() commands) as
+ *       efficiently as possible. */
+
+
 DECL_BEGIN
 
 #define LINUX_FUTEX_USES_TIMEOUT(futex_op)    \

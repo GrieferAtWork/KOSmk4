@@ -70,7 +70,8 @@ final local function DILINK_run(self: BoundStep): string {
 		local guessedSectionOffsetsAndSizes: {string: (int, int)} = Dict();
 		@@This is a cache file containing the last-correct sizes of sections in the
 		@@form of 1 entry per line, written as "<section_name>\t<section_offset>\t<section_size>\n"
-		local savedDebugSectionSizeCacheFilename = config.getBuildArtifact(group, script, ".di_sectsiz");
+		local savedDebugSectionSizeCacheFilename = config
+			.getBuildArtifact(group, script, ".di_sectsiz");
 		/* Guess generic values for all sections that we know nothing about */
 		for (local sectionName, none, none: bindings)
 			guessedSectionOffsetsAndSizes[sectionName] = (0, 0);
@@ -79,7 +80,7 @@ final local function DILINK_run(self: BoundStep): string {
 				for (local l: fp) {
 					local a, b, c = l.rstrip().split("\t")...;
 					if (a in guessedSectionOffsetsAndSizes)
-						guessedSectionOffsetsAndSizes[a] = (int(b), int(c));
+						guessedSectionOffsetsAndSizes[a.decode("utf-8")] = (int(b), int(c));
 				}
 			}
 		} catch (e...) {

@@ -32,9 +32,7 @@
  *   - Functions are linked as INTERN
  *   - Substitute the rest using implementations from <local/xxx/yyy.h> */
 #define __CRT_FREESTANDING 1
-#ifndef __LIBC
 #define __LIBC __INTDEF
-#endif /* !__LIBC */
 
 /* Disable some format_printf() features that we're not using. */
 #define __NO_PRINTF_FLOATING_POINT 1 /* %f, %e, %g, %F, %E, %G */

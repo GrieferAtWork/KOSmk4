@@ -49,6 +49,10 @@ template<> struct __is_integral_helper<unsigned long>: public __NAMESPACE_STD_SY
 template<> struct __is_integral_helper<__LONGLONG>: public __NAMESPACE_STD_SYM true_type {};
 template<> struct __is_integral_helper<__ULONGLONG>: public __NAMESPACE_STD_SYM true_type {};
 #endif /* __COMPILER_HAVE_LONGLONG */
+/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
+/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
 __NAMESPACE_INT_END
 __NAMESPACE_STD_BEGIN
 template<class __T> struct is_integral: public __NAMESPACE_INT_SYM __is_integral_helper<typename remove_cv<__T>::type>::type {};
