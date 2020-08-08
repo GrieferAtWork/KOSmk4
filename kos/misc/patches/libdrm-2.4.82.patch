@@ -1,0 +1,59 @@
+diff -Naur libdrm-2.4.82-orig/include/drm/drm.h libdrm-2.4.82/include/drm/drm.h
+--- libdrm-2.4.82-orig/include/drm/drm.h	2017-07-19 10:49:34.000000000 +0200
++++ libdrm-2.4.82/include/drm/drm.h	2020-08-08 17:08:49.450093300 +0200
+@@ -716,7 +716,9 @@
+ }
+ #endif
+ 
++#ifndef _DRM_MODE_H
+ #include "drm_mode.h"
++#endif /* !_DRM_MODE_H */
+ 
+ #if defined(__cplusplus)
+ extern "C" {
+diff -Naur libdrm-2.4.82-orig/include/drm/drm_mode.h libdrm-2.4.82/include/drm/drm_mode.h
+--- libdrm-2.4.82-orig/include/drm/drm_mode.h	2017-07-19 10:49:34.000000000 +0200
++++ libdrm-2.4.82/include/drm/drm_mode.h	2020-08-08 17:08:49.451089700 +0200
+@@ -27,7 +27,9 @@
+ #ifndef _DRM_MODE_H
+ #define _DRM_MODE_H
+ 
++#ifndef _DRM_H_
+ #include "drm.h"
++#endif /* !_DRM_H_ */
+ 
+ #if defined(__cplusplus)
+ extern "C" {
+diff -Naur libdrm-2.4.82-orig/include/drm/nouveau_drm.h libdrm-2.4.82/include/drm/nouveau_drm.h
+--- libdrm-2.4.82-orig/include/drm/nouveau_drm.h	2017-07-19 10:49:34.000000000 +0200
++++ libdrm-2.4.82/include/drm/nouveau_drm.h	2020-08-08 17:18:41.112207000 +0200
+@@ -52,7 +52,11 @@
+ struct drm_nouveau_grobj_alloc {
+ 	int      channel;
+ 	uint32_t handle;
++#ifdef __cplusplus
++	int      class_;
++#else /* __cplusplus */
+ 	int      class;
++#endif /* !__cplusplus */
+ };
+ 
+ struct drm_nouveau_notifierobj_alloc {
+diff -Naur libdrm-2.4.82-orig/include/drm/via_drm.h libdrm-2.4.82/include/drm/via_drm.h
+--- libdrm-2.4.82-orig/include/drm/via_drm.h	2017-07-19 10:49:34.000000000 +0200
++++ libdrm-2.4.82/include/drm/via_drm.h	2020-08-08 17:18:00.018561000 +0200
+@@ -33,7 +33,14 @@
+ #ifndef _VIA_DEFINES_
+ #define _VIA_DEFINES_
+ 
++#ifndef __has_include
++#define __NO_has_include 1
++#define __has_include(x) 0
++#endif /* !__has_include */
++
++#if __has_include("via_drmclient.h")
+ #include "via_drmclient.h"
++#endif /* __has_include("via_drmclient.h") */
+ 
+ #define VIA_NR_SAREA_CLIPRECTS		8
+ #define VIA_NR_XVMC_PORTS               10

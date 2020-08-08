@@ -1,7 +1,7 @@
-/.vs
-/bin
-/binutils
-/build
+/.vs/
+/bin/
+/binutils/
+/build/
 /kos/.vs/slnx.sqlite
 /kos/.vs/slnx.sqlite-journal
 /kos/.vs/kos
@@ -43,7 +43,7 @@ __ice__
 /kos/include/cursesw.h
 /kos/include/cursslk.h
 /kos/include/etip.h
-/kos/include/ncursesw
+/kos/include/ncursesw/
 
 # These headers are installed by `make_utility.sh ... zlib`
 /kos/include/zconf.h
@@ -56,3 +56,8 @@ __ice__
 
 # These headers are installed by `make_utility.sh ... libpciaccess`
 /kos/include/pciaccess.h
+
+# These headers are installed by `make_utility.sh ... libdrm`
+/kos/include/drm/
+/kos/include/drm.h
+

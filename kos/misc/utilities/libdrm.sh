@@ -1,3 +1,5 @@
+# NOTE: This file is currently excluded from the git via /.git/info/exclude!
+
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,35 +19,38 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: zlib
+# depends: libdrm
 
 # xorg-macros
 . "$KOS_MISC/utilities/misc/xorg-macros.sh"
 
-VERSION="0.16"
-SO_VERSION_MAJOR="0"
-SO_VERSION="$SO_VERSION_MAJOR.11.1"
-COMMIT="fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6"
+VERSION="2.4.82"
+SO_VERSION_MAJOR="2"
+SO_VERSION="$SO_VERSION_MAJOR.4.0"
 
-SRCPATH="$KOS_ROOT/binutils/src/x/libpciaccess-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/libpciaccess-$VERSION"
+SRCPATH="$KOS_ROOT/binutils/src/x/libdrm-$VERSION"
+OPTPATH="$BINUTILS_SYSROOT/opt/x/libdrm-$VERSION"
 
-# libpciaccess
-if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
+# libdrm
+if ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
 	if ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			if ! [ -f "$SRCPATH/configure.ac" ]; then
-				cmd rm -rf "$SRCPATH"
 				cmd cd "$KOS_ROOT/binutils/src/x"
-				cmd git clone "https://gitlab.freedesktop.org/xorg/lib/libpciaccess"
-				cmd mv "libpciaccess" "libpciaccess-$VERSION"
-				cmd cd "$SRCPATH"
-				cmd git checkout -f "$COMMIT"
+				cmd rm -rf "libdrm-$VERSION"
+				cmd rm -rf "libdrm-libdrm-$VERSION"
+				download_file \
+					"libdrm-$VERSION.tar.gz" \
+					"https://github.com/freedreno/libdrm/archive/libdrm-$VERSION.tar.gz"
+				cmd tar xvf "libdrm-$VERSION.tar.gz"
+				if [ -d "libdrm-libdrm-$VERSION" ]; then
+					mv "libdrm-libdrm-$VERSION" "libdrm-$VERSION"
+				fi
 			fi
 			cmd cd "$SRCPATH"
 			apply_patch \
 				"$SRCPATH" \
-				"$KOS_PATCHES/libpciaccess-$VERSION.patch"
+				"$KOS_PATCHES/libdrm-$VERSION.patch"
 			cmd aclocal
 			cmd autoreconf -i
 			cmd autoconf
@@ -60,7 +65,7 @@ if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
 			export CXX="${CROSS_PREFIX}g++"
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/x/libpciaccess-$VERSION/configure" \
+			cmd bash "../../../../src/x/libdrm-$VERSION/configure" \
 				--prefix="/" \
 				--exec-prefix="/" \
 				--bindir="/bin" \
@@ -69,8 +74,8 @@ if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
 				--sysconfdir="/etc" \
 				--sharedstatedir="/com" \
 				--localstatedir="/var" \
-				--runstatedir="/var/run" \
-				--libdir="/lib" \
+				--runstatedir="/run" \
+				--libdir="/$target_libpath" \
 				--includedir="/usr/include" \
 				--oldincludedir="/usr/include" \
 				--datarootdir="/usr/share" \
@@ -78,17 +83,15 @@ if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
 				--infodir="/usr/share/info" \
 				--localedir="/usr/share/locale" \
 				--mandir="/usr/share/man" \
-				--docdir="/usr/share/doc/libpciaccess" \
-				--htmldir="/usr/share/doc/libpciaccess" \
-				--dvidir="/usr/share/doc/libpciaccess" \
-				--pdfdir="/usr/share/doc/libpciaccess" \
-				--psdir="/usr/share/doc/libpciaccess" \
+				--docdir="/usr/share/doc/libffi" \
+				--htmldir="/usr/share/doc/libffi" \
+				--dvidir="/usr/share/doc/libffi" \
+				--pdfdir="/usr/share/doc/libffi" \
+				--psdir="/usr/share/doc/libffi" \
 				--build="$(gcc -dumpmachine)" \
 				--host="$TARGET_NAME-linux-gnu" \
-				--enable-shared \
-				--enable-linux-rom-fallback \
-				--with-gnu-ld \
-				--with-zlib
+				--disable-install-test-programs \
+				--disable-cairo-tests
 		) || exit $?
 	fi
 	cmd cd "$OPTPATH"
@@ -103,28 +106,32 @@ fi
 #     >> Cflags: -I${includedir}
 #     Which in combination would cause the ~real~ system include
 #     path to be added to include path, so we need to edit the file
-if ! [ -f "$PKG_CONFIG_PATH/pciaccess.pc" ]; then
+if ! [ -f "$PKG_CONFIG_PATH/libdrm.pc" ]; then
 	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/pciaccess.pc" <<EOF
+	cat > "$PKG_CONFIG_PATH/libdrm.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 includedir=$KOS_ROOT/kos/include
 
-Name: pciaccess
-Description: Library providing generic access to the PCI bus and devices.
+Name: libdrm
+Description: Userspace interface to kernel DRM services
 Version: $VERSION
 Cflags:
-Libs: -lpciaccess
+Libs: -ldrm
 EOF
 fi
 
 # Install libraries
-install_file /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION libpciaccess.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libpciaccess.so libpciaccess.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libpciaccess.a "$OPTPATH/src/.libs/libpciaccess.a"
+install_file /$TARGET_LIBPATH/libdrm.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libdrm.so.$SO_VERSION"
+install_symlink /$TARGET_LIBPATH/libdrm.so.$SO_VERSION libdrm.so.$SO_VERSION_MAJOR
+install_symlink /$TARGET_LIBPATH/libdrm.so libdrm.so.$SO_VERSION_MAJOR
 
 # Install headers
-install_rawfile "$KOS_ROOT/kos/include/pciaccess.h" "$SRCPATH/include/pciaccess.h"
+for f in "$SRCPATH"/include/drm/*.h; do
+	install_rawfile "$KOS_ROOT/kos/include/drm/$(basename "$f")" "$f"
+done
 
+if ! [ -f "$KOS_ROOT/kos/include/drm.h" ]; then
+	echo '#include "drm/drm.h"' > "$KOS_ROOT/kos/include/drm.h"
+fi

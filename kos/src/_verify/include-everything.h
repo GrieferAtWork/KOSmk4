@@ -55,6 +55,11 @@
  */
 
 /*[[[deemon
+#define IS_CHK_INCLUDE(x)         \
+	(x in chk_include ||          \
+	 x.startswith("ncursesw/") || \
+	 x.startswith("drm/"))
+
 local chk_include = {
 	"eti.h",
 	"etip.h",
@@ -80,6 +85,7 @@ local chk_include = {
 	"cursslk.h",
 
 	"pciaccess.h",
+	"drm.h",
 
 	"zconf.h",
 	"zlib.h",
@@ -122,12 +128,13 @@ function incdir(prefix, path) {
 			// c++ header
 		} else if (x in cxx_include) {
 			local full;
+			x = prefix + x;
 			if (".." in prefix) {
-				full = "\"" + prefix + x + "\"";
+				full = "\"" + x + "\"";
 			} else {
-				full = "<" + prefix + x + ">";
+				full = "<" + x + ">";
 			}
-			if (x in chk_include || x.startswith("ncursesw/")) {
+			if (IS_CHK_INCLUDE(x)) {
 				print("#if defined(__cpluslus) && __has_include(", full, ")");
 				print("#include ", full);
 				print("#endif /" "* __cpluslus && __has_include(", full, ") *" "/");
@@ -142,12 +149,13 @@ function incdir(prefix, path) {
 		]) {
 			if (x.endswith(".h") && !x.endswith("-impl.h")) {
 				local full;
+				x = prefix + x;
 				if (".." in prefix) {
-					full = "\"" + prefix + x + "\"";
+					full = "\"" + x + "\"";
 				} else {
-					full = "<" + prefix + x + ">";
+					full = "<" + x + ">";
 				}
-				if (x in chk_include || x.startswith("ncursesw/")) {
+				if (IS_CHK_INCLUDE(x)) {
 					print("#if __has_include(", full, ")");
 					print("#include ", full);
 					print("#endif /" "* __has_include(", full, ") *" "/");
@@ -158,11 +166,7 @@ function incdir(prefix, path) {
 		}
 	}
 }
-//print "#if 0";
-//incdir("../../include/", "../../include");
-//print "#else";
 incdir("", "../../include");
-//print "#endif";
 
 ]]]*/
 #include <ConcurrencySal.h>
@@ -475,6 +479,66 @@ incdir("", "../../include");
 #include <dirent.h>
 #include <dlfcn.h>
 #include <dos.h>
+#if __has_include(<drm/amdgpu_drm.h>)
+#include <drm/amdgpu_drm.h>
+#endif /* __has_include(<drm/amdgpu_drm.h>) */
+#if __has_include(<drm/drm.h>)
+#include <drm/drm.h>
+#endif /* __has_include(<drm/drm.h>) */
+#if __has_include(<drm/drm_fourcc.h>)
+#include <drm/drm_fourcc.h>
+#endif /* __has_include(<drm/drm_fourcc.h>) */
+#if __has_include(<drm/drm_mode.h>)
+#include <drm/drm_mode.h>
+#endif /* __has_include(<drm/drm_mode.h>) */
+#if __has_include(<drm/drm_sarea.h>)
+#include <drm/drm_sarea.h>
+#endif /* __has_include(<drm/drm_sarea.h>) */
+#if __has_include(<drm/i915_drm.h>)
+#include <drm/i915_drm.h>
+#endif /* __has_include(<drm/i915_drm.h>) */
+#if __has_include(<drm/mach64_drm.h>)
+#include <drm/mach64_drm.h>
+#endif /* __has_include(<drm/mach64_drm.h>) */
+#if __has_include(<drm/mga_drm.h>)
+#include <drm/mga_drm.h>
+#endif /* __has_include(<drm/mga_drm.h>) */
+#if __has_include(<drm/nouveau_drm.h>)
+#include <drm/nouveau_drm.h>
+#endif /* __has_include(<drm/nouveau_drm.h>) */
+#if __has_include(<drm/qxl_drm.h>)
+#include <drm/qxl_drm.h>
+#endif /* __has_include(<drm/qxl_drm.h>) */
+#if __has_include(<drm/r128_drm.h>)
+#include <drm/r128_drm.h>
+#endif /* __has_include(<drm/r128_drm.h>) */
+#if __has_include(<drm/radeon_drm.h>)
+#include <drm/radeon_drm.h>
+#endif /* __has_include(<drm/radeon_drm.h>) */
+#if __has_include(<drm/savage_drm.h>)
+#include <drm/savage_drm.h>
+#endif /* __has_include(<drm/savage_drm.h>) */
+#if __has_include(<drm/sis_drm.h>)
+#include <drm/sis_drm.h>
+#endif /* __has_include(<drm/sis_drm.h>) */
+#if __has_include(<drm/tegra_drm.h>)
+#include <drm/tegra_drm.h>
+#endif /* __has_include(<drm/tegra_drm.h>) */
+#if __has_include(<drm/vc4_drm.h>)
+#include <drm/vc4_drm.h>
+#endif /* __has_include(<drm/vc4_drm.h>) */
+#if __has_include(<drm/via_drm.h>)
+#include <drm/via_drm.h>
+#endif /* __has_include(<drm/via_drm.h>) */
+#if __has_include(<drm/virtgpu_drm.h>)
+#include <drm/virtgpu_drm.h>
+#endif /* __has_include(<drm/virtgpu_drm.h>) */
+#if __has_include(<drm/vmwgfx_drm.h>)
+#include <drm/vmwgfx_drm.h>
+#endif /* __has_include(<drm/vmwgfx_drm.h>) */
+#if __has_include(<drm.h>)
+#include <drm.h>
+#endif /* __has_include(<drm.h>) */
 #include <elf.h>
 #include <endian.h>
 #include <envz.h>
