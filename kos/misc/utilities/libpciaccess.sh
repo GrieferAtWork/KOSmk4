@@ -115,7 +115,7 @@ Name: pciaccess
 Description: Library providing generic access to the PCI bus and devices.
 Version: $VERSION
 Cflags:
-Libs: -L${libdir} -lpciaccess
+Libs: -lpciaccess
 EOF
 fi
 
