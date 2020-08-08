@@ -99,6 +99,16 @@ if ! [ -d "$TARGET_SYSROOT" ]; then
 fi
 
 
+require_program() {
+	which $1 > /dev/null 2>&1 || {
+		local error=$?
+		echo "ERROR: Required program not found '$1' -> '$error'"
+		echo "       Check if this program is installed, and make sure that it's in \$PATH"
+		exit $error
+	}
+}
+
+
 #>> mtools_makedir <DISKIMAGE> <ABSOLUTE_DISK_PATH>
 mtools_makedir() {
 	if ! "$MTOOLS" -c mmd -i "$1" -D s "::/$2" > /dev/null 2>&1; then

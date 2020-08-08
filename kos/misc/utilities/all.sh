@@ -30,15 +30,20 @@ makepart() {
 }
 
 BLACKLIST=" all "
+cmd cd "$KOS_MISC/utilities"
 
 # Build libraries first!
-for name in ncurses zlib libffi; do
+for name in ncurses zlib; do
+	BLACKLIST="$BLACKLIST $name "
+	makepart $name
+done
+for name in lib*.sh; do
+	name="${name::-3}"
 	BLACKLIST="$BLACKLIST $name "
 	makepart $name
 done
 
 # Build all of the remaining utilities
-cd "$(dirname $(readlink -f "$0"))/utilities"
 for name in *.sh; do
 	name="${name::-3}"
 	if ! [[ "$BLACKLIST" == *" $name "* ]]; then
