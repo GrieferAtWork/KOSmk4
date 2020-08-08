@@ -25,6 +25,7 @@
 
 #include <__stdinc.h>
 
+#include <asm/ioctl.h>
 #include <bits/types.h>
 
 /*
@@ -36,7 +37,7 @@
 
 /* 0x56 is 'V', to avoid collision with termios and kd */
 
-#define VT_OPENQRY 0x5600 /* find available vt */
+#define VT_OPENQRY _IO('V', 0x00) /* find available vt */
 
 #ifdef __CC__
 struct vt_mode {
@@ -47,8 +48,8 @@ struct vt_mode {
 	__int16_t frsig;  /* unused (set to 0) */
 };
 #endif /* __CC__ */
-#define VT_GETMODE 0x5601 /* get mode of active vt */
-#define VT_SETMODE 0x5602 /* set mode of active vt */
+#define VT_GETMODE _IO('V', 0x01) /* get mode of active vt */
+#define VT_SETMODE _IO('V', 0x02) /* set mode of active vt */
 #define    VT_AUTO    0x00 /* auto vt switching */
 #define    VT_PROCESS 0x01 /* process controls switching */
 #define    VT_ACKACQ  0x02 /* acknowledge switch */
@@ -63,14 +64,14 @@ struct vt_stat {
 
 /* Note: the ioctl VT_GETSTATE does not work for
  * consoles 16 and higher (since it returns a short) */
-#define VT_GETSTATE    0x5603 /* get global vt state info */
-#define VT_SENDSIG     0x5604 /* signal to send to bitmask of vts */
+#define VT_GETSTATE    _IO('V', 0x03) /* get global vt state info */
+#define VT_SENDSIG     _IO('V', 0x04) /* signal to send to bitmask of vts */
 
-#define VT_RELDISP     0x5605 /* release display */
+#define VT_RELDISP     _IO('V', 0x05) /* release display */
 
-#define VT_ACTIVATE    0x5606 /* make vt active */
-#define VT_WAITACTIVE  0x5607 /* wait for vt active */
-#define VT_DISALLOCATE 0x5608 /* free memory associated to vt */
+#define VT_ACTIVATE    _IO('V', 0x06) /* make vt active */
+#define VT_WAITACTIVE  _IO('V', 0x07) /* wait for vt active */
+#define VT_DISALLOCATE _IO('V', 0x08) /* free memory associated to vt */
 
 #ifdef __CC__
 struct vt_sizes {
@@ -79,7 +80,7 @@ struct vt_sizes {
 	__int16_t v_scrollsize; /* number of lines of scrollback */
 };
 #endif /* __CC__ */
-#define VT_RESIZE 0x5609 /* set kernel's idea of screensize */
+#define VT_RESIZE _IO('V', 0x09) /* set kernel's idea of screensize */
 
 #ifdef __CC__
 struct vt_consize {
@@ -91,10 +92,10 @@ struct vt_consize {
 	__uint16_t v_ccol; /* number of pixel columns per character */
 };
 #endif /* __CC__ */
-#define VT_RESIZEX       0x560a /* set kernel's idea of screensize + more */
-#define VT_LOCKSWITCH    0x560b /* disallow vt switching */
-#define VT_UNLOCKSWITCH  0x560c /* allow vt switching */
-#define VT_GETHIFONTMASK 0x560d /* return hi font mask */
+#define VT_RESIZEX       _IO('V', 0x0a) /* set kernel's idea of screensize + more */
+#define VT_LOCKSWITCH    _IO('V', 0x0b) /* disallow vt switching */
+#define VT_UNLOCKSWITCH  _IO('V', 0x0c) /* allow vt switching */
+#define VT_GETHIFONTMASK _IO('V', 0x0d) /* return hi font mask */
 
 #ifdef __CC__
 struct vt_event {
@@ -110,7 +111,7 @@ struct vt_event {
 };
 #endif /* __CC__ */
 
-#define VT_WAITEVENT 0x560e /* Wait for an event */
+#define VT_WAITEVENT _IO('V', 0x0e) /* Wait for an event */
 
 #ifdef __CC__
 struct vt_setactivate {
@@ -119,7 +120,7 @@ struct vt_setactivate {
 };
 #endif /* __CC__ */
 
-#define VT_SETACTIVATE 0x560f /* Activate and set the mode of a console */
+#define VT_SETACTIVATE _IO('V', 0x0f) /* Activate and set the mode of a console */
 
 
 #endif /* !_LINUX_VT_H */

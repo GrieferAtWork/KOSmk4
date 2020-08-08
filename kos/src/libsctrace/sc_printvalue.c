@@ -115,11 +115,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
 
 
-/* TODO: Use the same trick as also used in libdebuginfo/repr.c to encode
- *       symbolic constant names (such as those for ioctl() commands) as
- *       efficiently as possible. */
-
-
 DECL_BEGIN
 
 #define LINUX_FUTEX_USES_TIMEOUT(futex_op)    \
@@ -180,7 +175,7 @@ typedef uint64_t va_uint_t;
 typedef uint16_t va_uint_t;
 #elif __VA_SIZE == 1
 typedef uint8_t va_uint_t;
-#else
+#elif !defined(__DEEMON__)
 #error "Unsupported `__VA_SIZE'"
 #endif
 
@@ -923,264 +918,293 @@ err:
 }
 
 
+/* Use the same trick as also used in libdebuginfo/repr.c to encode
+ * symbolic constant names (such as those for ioctl() commands) as
+ * efficiently as possible. */
 
-PRIVATE ATTR_UNUSED struct {
-	uint16_t ic_cmd;      /* IOCTL command. */
-	char     ic_name[10]; /* IOCTL command name. */
-} const ioctl_commands[] = {
-#define IOCTL(id) { (id) & 0xffff, #id }
-	IOCTL(TCGETS),
-	IOCTL(TCSETS),
-	IOCTL(TCSETSW),
-	IOCTL(TCSETSF),
-	IOCTL(TCGETA),
-	IOCTL(TCSETA),
-	IOCTL(TCSETAW),
-	IOCTL(TCSETAF),
-	IOCTL(TCSBRK),
-	IOCTL(TCXONC),
-	IOCTL(TCFLSH),
-	IOCTL(TIOCEXCL),
-	IOCTL(TIOCNXCL),
-	IOCTL(TIOCSCTTY),
-	IOCTL(TIOCGPGRP),
-	IOCTL(TIOCSPGRP),
-	IOCTL(TIOCOUTQ),
-	IOCTL(TIOCSTI),
-	IOCTL(TIOCMGET),
-	IOCTL(TIOCMBIS),
-	IOCTL(TIOCMBIC),
-	IOCTL(TIOCMSET),
-	IOCTL(TIOCINQ),
-	IOCTL(TIOCLINUX),
-	IOCTL(TIOCCONS),
-	IOCTL(TIOCPKT),
-	IOCTL(FIONBIO),
-	IOCTL(TIOCNOTTY),
-	IOCTL(TIOCSETD),
-	IOCTL(TIOCGETD),
-	IOCTL(TCSBRKP),
-	IOCTL(TIOCSBRK),
-	IOCTL(TIOCCBRK),
-	IOCTL(TIOCGSID),
-	IOCTL(TCGETS2),
-	IOCTL(TCSETS2),
-	IOCTL(TCSETSW2),
-	IOCTL(TCSETSF2),
-	IOCTL(TIOCGPTN),
-	IOCTL(TIOCGDEV),
-	IOCTL(TCGETX),
-	IOCTL(TCSETX),
-	IOCTL(TCSETXF),
-	IOCTL(TCSETXW),
-	IOCTL(TIOCSIG),
-	IOCTL(TIOCGPKT),
-	IOCTL(TIOCGEXCL),
-	IOCTL(FIONCLEX),
-	IOCTL(FIOCLEX),
-	IOCTL(FIOASYNC),
-	IOCTL(FIOQSIZE),
-	IOCTL(FIOSETOWN),
-	IOCTL(SIOCSPGRP),
-	IOCTL(FIOGETOWN),
-	IOCTL(SIOCGPGRP),
+/*[[[deemon
+import * from deemon;
+import util;
+local ioctls = [];
+local kos_ioctls = [];
 
-	IOCTL(FDCLRPRM),
-	IOCTL(FDSETPRM),
-	IOCTL(FDDEFPRM),
-	IOCTL(FDGETPRM),
-	IOCTL(FDMSGON),
-	IOCTL(FDMSGOFF),
-	IOCTL(FDFMTBEG),
-	IOCTL(FDFMTTRK),
-	IOCTL(FDFMTEND),
-	IOCTL(FDFLUSH),
-	IOCTL(FDRESET),
-	IOCTL(FDRAWCMD),
-	IOCTL(FDTWADDLE),
-	IOCTL(FDEJECT),
-	IOCTL(BLKROSET),
-	IOCTL(BLKROGET),
-	IOCTL(BLKRRPART),
-	IOCTL(BLKFLSBUF),
-	IOCTL(BLKRASET),
-	IOCTL(BLKRAGET),
-	IOCTL(BLKFRASET),
-	IOCTL(BLKFRAGET),
-	IOCTL(BLKSSZGET),
-	IOCTL(BLKBSZGET),
-	IOCTL(BLKBSZSET),
-	IOCTL(BLKIOMIN),
-	IOCTL(BLKIOOPT),
-#ifdef FIBMAP
-	IOCTL(FIBMAP),
-#endif /* FIBMAP */
-	IOCTL(FIGETBSZ),
-	IOCTL(FIFREEZE),
-	IOCTL(FITHAW),
-	IOCTL(FITRIM),
-	IOCTL(GIO_FONT),
-	IOCTL(PIO_FONT),
-	IOCTL(GIO_FONTX),
-	IOCTL(PIO_FONTX),
-	IOCTL(GIO_CMAP),
-	IOCTL(PIO_CMAP),
-	IOCTL(KIOCSOUND),
-	IOCTL(KDMKTONE),
-	IOCTL(KDGETLED),
-	IOCTL(KDSETLED),
-	IOCTL(KDGKBTYPE),
-	IOCTL(KDADDIO),
-	IOCTL(KDDELIO),
-	IOCTL(KDENABIO),
-	IOCTL(KDDISABIO),
-	IOCTL(KDSETMODE),
-	IOCTL(KDGETMODE),
-	IOCTL(KDMAPDISP),
-	IOCTL(KDGKBMODE),
-	IOCTL(KDSKBMODE),
-	IOCTL(KDGKBMETA),
-	IOCTL(KDSKBMETA),
-	IOCTL(KDGKBLED),
-	IOCTL(KDSKBLED),
-	IOCTL(KDGKBENT),
-	IOCTL(KDSKBENT),
-	IOCTL(KDGKBSENT),
-	IOCTL(KDSKBSENT),
-	IOCTL(KDKBDREP),
-	IOCTL(KDFONTOP),
-#undef IOCTL
-};
+function decodeInt(x: string): int {
+	x = x.strip();
+	if (x.startswith("'") && x.endswith("'"))
+		return x[1:-1].ord();
+	return int(x);
+}
 
-PRIVATE ATTR_UNUSED struct {
-	uint16_t ic_cmd;      /* IOCTL command. */
-	char     ic_name[18]; /* IOCTL command name. */
-} const ioctl_commands_long[] = {
-#define IOCTL(id) { (id) & 0xffff, #id }
-	IOCTL(TIOCGWINSZ),
-	IOCTL(TIOCSWINSZ),
-	IOCTL(TIOCGSOFTCAR),
-	IOCTL(TIOCSSOFTCAR),
-	IOCTL(TIOCGSERIAL),
-	IOCTL(TIOCSSERIAL),
-	IOCTL(TIOCGRS485),
-	IOCTL(TIOCSRS485),
-	IOCTL(TIOCSPTLCK),
-	IOCTL(TIOCVHANGUP),
-	IOCTL(TIOCGPTLCK),
-	IOCTL(TIOCSERCONFIG),
-	IOCTL(TIOCSERGWILD),
-	IOCTL(TIOCSERSWILD),
-	IOCTL(TIOCGLCKTRMIOS),
-	IOCTL(TIOCSLCKTRMIOS),
-	IOCTL(TIOCSERGSTRUCT),
-	IOCTL(TIOCSERGETLSR),
-	IOCTL(TIOCSERGETMULTI),
-	IOCTL(TIOCSERSETMULTI),
-	IOCTL(TIOCMIWAIT),
-	IOCTL(TIOCGICOUNT),
-	IOCTL(FDSETEMSGTRESH),
-	IOCTL(FDSETMAXERRS),
-	IOCTL(FDGETMAXERRS),
-	IOCTL(FDGETDRVTYP),
-	IOCTL(FDSETDRVPRM),
-	IOCTL(FDGETDRVPRM),
-	IOCTL(FDGETDRVSTAT),
-	IOCTL(FDPOLLDRVSTAT),
-	IOCTL(FDGETFDCSTAT),
-	IOCTL(FDWERRORCLR),
-	IOCTL(FDWERRORGET),
-	IOCTL(BLKGETSIZE),
-	IOCTL(BLKGETSIZE64),
-	IOCTL(BLKSECTSET),
-	IOCTL(BLKSECTGET),
-	/*IOCTL(BLKTRACESETUP),*/
-	IOCTL(BLKTRACESTART),
-	IOCTL(BLKTRACESTOP),
-	IOCTL(BLKTRACETEARDOWN),
-	IOCTL(BLKDISCARD),
-	IOCTL(BLKALIGNOFF),
-	IOCTL(BLKPBSZGET),
-	IOCTL(BLKDISCARDZEROES),
-	IOCTL(BLKSECDISCARD),
-	IOCTL(BLKROTATIONAL),
-	IOCTL(BLKZEROOUT),
-	IOCTL(SIOCATMARK),
-	IOCTL(SIOCGSTAMP32),
-	IOCTL(SIOCGSTAMP64),
-	IOCTL(SIOCGSTAMPNS32),
-	IOCTL(SIOCGSTAMPNS64),
-	IOCTL(HDIO_GETGEO),
-	IOCTL(HDIO_GET_DMA),
-	IOCTL(HDIO_GET_IDENTITY),
-	IOCTL(HDIO_GET_WCACHE),
-	IOCTL(HDIO_DRIVE_RESET),
-	IOCTL(HDIO_GET_BUSSTATE),
-	IOCTL(HDIO_SET_WCACHE),
-	IOCTL(PIO_FONTRESET),
-	IOCTL(KDUNMAPDISP),
-	IOCTL(GIO_SCRNMAP),
-	IOCTL(PIO_SCRNMAP),
-	IOCTL(GIO_UNISCRNMAP),
-	IOCTL(PIO_UNISCRNMAP),
-	IOCTL(GIO_UNIMAP),
-	IOCTL(PIO_UNIMAP),
-	IOCTL(PIO_UNIMAPCLR),
-#ifdef FS_IOC_GETFLAGS
-	IOCTL(FS_IOC_GETFLAGS),
-#endif /* FS_IOC_GETFLAGS */
-#ifdef FS_IOC_SETFLAGS
-	IOCTL(FS_IOC_SETFLAGS),
-#endif /* FS_IOC_SETFLAGS */
-#ifdef FS_IOC_GETVERSION
-	IOCTL(FS_IOC_GETVERSION),
-#endif /* FS_IOC_GETVERSION */
-#ifdef FS_IOC_SETVERSION
-	IOCTL(FS_IOC_SETVERSION),
-#endif /* FS_IOC_SETVERSION */
-#ifdef FS_IOC_FIEMAP
-	IOCTL(FS_IOC_FIEMAP),
-#endif /* FS_IOC_FIEMAP */
-#ifdef FS_IOC32_GETFLAGS
-	IOCTL(FS_IOC32_GETFLAGS),
-#endif /* FS_IOC32_GETFLAGS */
-#ifdef FS_IOC32_SETFLAGS
-	IOCTL(FS_IOC32_SETFLAGS),
-#endif /* FS_IOC32_SETFLAGS */
-#ifdef FS_IOC32_GETVERSION
-	IOCTL(FS_IOC32_GETVERSION),
-#endif /* FS_IOC32_GETVERSION */
-#ifdef FS_IOC32_SETVERSION
-	IOCTL(FS_IOC32_SETVERSION),
-#endif /* FS_IOC32_SETVERSION */
-	IOCTL(KDGKBDIACR),
-	IOCTL(KDSKBDIACR),
-	IOCTL(KDGKBDIACRUC),
-	IOCTL(KDSKBDIACRUC),
-	IOCTL(KDGETKEYCODE),
-	IOCTL(KDSETKEYCODE),
-	IOCTL(KDSIGACCEPT),
-#undef IOCTL
-};
+for (local filename: [
+	"../../include/asm/ioctls/block.h",
+	"../../include/asm/ioctls/block_ex.h",
+	"../../include/asm/ioctls/socket.h",
+	"../../include/asm/ioctls/socket_ex.h",
+	"../../include/asm/ioctls/tty.h",
+	"../../include/linux/kd.h",
+	"../../include/linux/fd.h",
+	"../../include/linux/hdreg.h",
+	"../../include/linux/msdos_fs.h",
+	"../../include/linux/vt.h",
+	"../../include/kos/ioctl/clock.h",
+	"../../include/kos/ioctl/keyboard.h",
+	"../../include/kos/ioctl/mouse.h",
+	"../../include/kos/ioctl/tty.h",
+	"../../include/kos/ioctl/video.h",
+]) {
+	with (local fp = File.open(filename)) {
+		for (local l: fp) {
+			l = l.strip();
+			local macroName, macroValue;
+			try {
+				macroName, macroValue = l.scanf(" # define %[^ ] %[^]")...;
+			} catch (...) {
+				continue;
+			}
+			print File.stderr: "HERE:", repr macroName, repr macroValue;
+			local ns = ioctls;
+			for (local prefix: {
+				"_IO(", "_IOR(", "_IOW(", "_IOWR(",
+				"_IO_KOS(", "_IOR_KOS(", "_IOW_KOS(", "_IOWR_KOS(" }) {
+				if (!macroValue.startswith(prefix))
+					continue;
+				local a, b;
+				try {
+					a, b = macroValue[#prefix:].scanf(" %[^,], %[^,)] ")...;
+					a = decodeInt(a);
+					b = decodeInt(b);
+				} catch (...) {
+					continue;
+				}
+				if (a < 0 || a > 0xff || b < 0 || b > 0xff)
+					continue;
+				macroValue = a << 8 | b;
+				if ("KOS" in prefix)
+					ns = kos_ioctls;
+				break;
+			}
+			if (macroValue !is int)
+				continue;
+			if (macroValue >= #ns)
+				ns.resize(macroValue + 1);
+			ns[macroValue] = macroName;
+		}
+	}
+}
+
+#define REPR_SPLIT_THRESHOLD 24
+
+@@Split a given set of @values to prevent large holes within the data-set
+function splitValues(values: {string...}): {(int, {string...})...} {
+	local currentStart = 0;
+	local numEmptySlots = 0;
+	local count = #values;
+	while (count && !values[count - 1])
+		--count;
+	while (currentStart < count && !values[currentStart])
+		++currentStart;
+	for (local i = currentStart; i < count; ++i) {
+		if (values[i]) {
+			numEmptySlots = 0;
+			continue;
+		}
+		++numEmptySlots;
+		if (numEmptySlots >= REPR_SPLIT_THRESHOLD) {
+			yield (currentStart, values[currentStart:i - (numEmptySlots - 1)]);
+			do {
+				++i;
+			} while (i < count && !values[i]);
+			currentStart = i;
+			numEmptySlots = 0;
+		}
+	}
+	yield (currentStart, values[currentStart:]);
+}
+
+for (local values: { ioctls, kos_ioctls }) {
+	local prefix = values === ioctls ? "IOCTLS" : "KOS_IOCTLS";
+	local splitSet = List(splitValues(values));
+	print("#define GETBASE_", prefix.strip("_"), "(result, index) \\");
+	for (local i, startAndItems: util.enumerate(splitSet)) {
+		local stringName = "repr_{}_{}h"
+			.format({ prefix.strip("_"), startAndItems[0].hex()[2:] });
+		local minIndex = startAndItems[0];
+		local maxIndex = minIndex + #startAndItems[1] - 1;
+		print("\t", i ? " " : "("),;
+		if (minIndex == maxIndex) {
+			print("((index) == ", minIndex.hex(), ") ? ("),;
+		} else if (minIndex == 0) {
+			print("((index) <= ", maxIndex.hex(), ") ? ("),;
+		} else {
+			print("((index) >= ", minIndex.hex(), " && (index) <= ", maxIndex.hex(), ") ? ("),;
+		}
+		if (minIndex != 0) {
+			if (minIndex == maxIndex) {
+				print("(index) = 0, "),;
+			} else {
+				print("(index) -= ", minIndex.hex(), ", "),;
+			}
+		}
+		print("(result) = ", stringName, ", true)"),;
+		print(i == #splitSet - 1 ? " : false)" : " : \\");
+	}
+	for (local start, items: splitSet) {
+		File.Writer text;
+		for (local i, item: util.enumerate(items)) {
+			if (!item)
+				item = "";
+			if (i != #items - 1)
+				item = item + "\0";
+			text << item;
+		}
+		print("PRIVATE char const repr_",
+			prefix.strip("_"), "_", start.hex()[2:], "h[] =\n",
+			"\n".join(for (local e: text.string.segments(64)) repr(e)),
+			";");
+	}
+	print;
+}
+
+]]]*/
+#define GETBASE_IOCTLS(result, index) \
+	(((index) >= 0x1 && (index) <= 0x2) ? ((index) -= 0x1, (result) = repr_IOCTLS_1h, true) : \
+	 ((index) >= 0x204 && (index) <= 0x217) ? ((index) -= 0x204, (result) = repr_IOCTLS_204h, true) : \
+	 ((index) >= 0x241 && (index) <= 0x25a) ? ((index) -= 0x241, (result) = repr_IOCTLS_241h, true) : \
+	 ((index) == 0x290) ? ((index) = 0, (result) = repr_IOCTLS_290h, true) : \
+	 ((index) >= 0x301 && (index) <= 0x32b) ? ((index) -= 0x301, (result) = repr_IOCTLS_301h, true) : \
+	 ((index) >= 0x125d && (index) <= 0x127f) ? ((index) -= 0x125d, (result) = repr_IOCTLS_125dh, true) : \
+	 ((index) >= 0x4300 && (index) <= 0x4303) ? ((index) -= 0x4300, (result) = repr_IOCTLS_4300h, true) : \
+	 ((index) >= 0x4b2f && (index) <= 0x4b72) ? ((index) -= 0x4b2f, (result) = repr_IOCTLS_4b2fh, true) : \
+	 ((index) >= 0x4bfa && (index) <= 0x4bfb) ? ((index) -= 0x4bfa, (result) = repr_IOCTLS_4bfah, true) : \
+	 ((index) >= 0x5401 && (index) <= 0x5460) ? ((index) -= 0x5401, (result) = repr_IOCTLS_5401h, true) : \
+	 ((index) >= 0x5600 && (index) <= 0x560f) ? ((index) -= 0x5600, (result) = repr_IOCTLS_5600h, true) : \
+	 ((index) >= 0x5877 && (index) <= 0x5879) ? ((index) -= 0x5877, (result) = repr_IOCTLS_5877h, true) : \
+	 ((index) >= 0x6601 && (index) <= 0x660b) ? ((index) -= 0x6601, (result) = repr_IOCTLS_6601h, true) : \
+	 ((index) >= 0x7201 && (index) <= 0x7213) ? ((index) -= 0x7201, (result) = repr_IOCTLS_7201h, true) : \
+	 ((index) >= 0x7601 && (index) <= 0x7602) ? ((index) -= 0x7601, (result) = repr_IOCTLS_7601h, true) : \
+	 ((index) >= 0x8901 && (index) <= 0x89b1) ? ((index) -= 0x8901, (result) = repr_IOCTLS_8901h, true) : \
+	 ((index) >= 0x89e0 && (index) <= 0x89f0) ? ((index) -= 0x89e0, (result) = repr_IOCTLS_89e0h, true) : false)
+PRIVATE char const repr_IOCTLS_1h[] =
+"FIBMAP\0FIGETBSZ";
+PRIVATE char const repr_IOCTLS_204h[] =
+"FDGETPRM\0\0\0\0\0\0\0\0\0\0FDGETMAXERRS\0FDGETDRVTYP\0\0FDGETDRVPRM\0FDGETDRV"
+"STAT\0FDPOLLDRVSTAT\0\0FDGETFDCSTAT\0\0FDWERRORGET";
+PRIVATE char const repr_IOCTLS_241h[] =
+"FDCLRPRM\0FDSETPRM\0FDDEFPRM\0\0FDMSGON\0FDMSGOFF\0FDFMTBEG\0FDFMTTRK\0F"
+"DFMTEND\0FDSETEMSGTRESH\0FDFLUSH\0FDSETMAXERRS\0\0\0\0\0\0\0\0FDRESET\0\0FDWE"
+"RRORCLR\0\0FDRAWCMD\0FDTWADDLE\0FDEJECT";
+PRIVATE char const repr_IOCTLS_290h[] =
+"FDSETDRVPRM";
+PRIVATE char const repr_IOCTLS_301h[] =
+"HDIO_GETGEO\0\0\0\0\0\0\0\0\0\0HDIO_GET_DMA\0\0HDIO_GET_IDENTITY\0HDIO_GET_WC"
+"ACHE\0\0\0\0\0\0\0\0\0\0\0\0HDIO_GET_BUSSTATE\0\0HDIO_DRIVE_RESET\0\0\0\0\0\0\0\0\0\0\0\0\0"
+"\0\0HDIO_SET_WCACHE";
+PRIVATE char const repr_IOCTLS_125dh[] =
+"BLKROSET\0BLKROGET\0BLKRRPART\0BLKGETSIZE\0BLKFLSBUF\0BLKRASET\0BLKRAG"
+"ET\0BLKFRASET\0BLKFRAGET\0BLKSECTSET\0BLKSECTGET\0BLKSSZGET\0\0\0\0\0\0\0\0BL"
+"KBSZGET\0BLKBSZSET\0BLKGETSIZE64\0BLKTRACESETUP\0BLKTRACESTART\0BLKTR"
+"ACESTOP\0BLKTRACETEARDOWN\0BLKDISCARD\0BLKIOMIN\0BLKIOOPT\0BLKALIGNOF"
+"F\0BLKPBSZGET\0BLKDISCARDZEROES\0BLKSECDISCARD\0BLKROTATIONAL\0BLKZER"
+"OOUT";
+PRIVATE char const repr_IOCTLS_4300h[] =
+"CDIO_SETTIME\0\0CDIO_GETBASE\0CDIO_SETWALLCLOCK";
+PRIVATE char const repr_IOCTLS_4b2fh[] =
+"KIOCSOUND\0KDMKTONE\0KDGETLED\0KDSETLED\0KDGKBTYPE\0KDADDIO\0KDDELIO\0K"
+"DENABIO\0KDDISABIO\0\0\0KDSETMODE\0KDGETMODE\0KDMAPDISP\0KDUNMAPDISP\0\0\0"
+"GIO_SCRNMAP\0PIO_SCRNMAP\0\0\0KDGKBMODE\0KDSKBMODE\0KDGKBENT\0KDSKBENT\0"
+"KDGKBSENT\0KDSKBSENT\0KDGKBDIACR\0KDSKBDIACR\0KDGETKEYCODE\0KDSETKEYC"
+"ODE\0KDSIGACCEPT\0\0\0\0KDKBDREP\0\0\0\0\0\0\0\0\0\0\0\0\0\0GIO_FONT\0PIO_FONT\0KDGKB"
+"META\0KDSKBMETA\0KDGKBLED\0KDSKBLED\0GIO_UNIMAP\0PIO_UNIMAP\0PIO_UNIMA"
+"PCLR\0GIO_UNISCRNMAP\0PIO_UNISCRNMAP\0GIO_FONTX\0PIO_FONTX\0PIO_FONTR"
+"ESET\0\0\0GIO_CMAP\0PIO_CMAP\0KDFONTOP";
+PRIVATE char const repr_IOCTLS_4bfah[] =
+"KDGKBDIACRUC\0KDSKBDIACRUC";
+PRIVATE char const repr_IOCTLS_5401h[] =
+"TCGETS\0TCSETS\0TCSETSW\0TCSETSF\0TCGETA\0TCSETA\0TCSETAW\0TCSETAF\0TCSB"
+"RK\0TCXONC\0TCFLSH\0TIOCEXCL\0TIOCNXCL\0TIOCSCTTY\0TIOCGPGRP\0TIOCSPGRP"
+"\0TIOCOUTQ\0TIOCSTI\0TIOCGWINSZ\0TIOCSWINSZ\0TIOCMGET\0TIOCMBIS\0TIOCMB"
+"IC\0TIOCMSET\0TIOCGSOFTCAR\0TIOCSSOFTCAR\0TIOCINQ\0TIOCLINUX\0TIOCCONS"
+"\0TIOCGSERIAL\0TIOCSSERIAL\0TIOCPKT\0FIONBIO\0TIOCNOTTY\0TIOCSETD\0TIOC"
+"GETD\0TCSBRKP\0\0TIOCSBRK\0TIOCCBRK\0TIOCGSID\0TCGETS2\0TCSETS2\0TCSETSW"
+"2\0TCSETSF2\0TIOCGRS485\0TIOCSRS485\0TIOCGPTN\0TIOCSPTLCK\0TCGETX\0TCSE"
+"TX\0TCSETXF\0TCSETXW\0TIOCSIG\0TIOCVHANGUP\0TIOCGPKT\0TIOCGPTLCK\0\0\0\0\0\0"
+"\0TIOCGEXCL\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FIONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCONFI"
+"G\0TIOCSERGWILD\0TIOCSERSWILD\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOCSE"
+"RGSTRUCT\0TIOCSERGETLSR\0TIOCSERGETMULTI\0TIOCSERSETMULTI\0TIOCMIWAI"
+"T\0TIOCGICOUNT\0\0\0FIOQSIZE";
+PRIVATE char const repr_IOCTLS_5600h[] =
+"VT_OPENQRY\0VT_GETMODE\0VT_SETMODE\0VT_GETSTATE\0VT_SENDSIG\0VT_RELDI"
+"SP\0VT_ACTIVATE\0VT_WAITACTIVE\0VT_DISALLOCATE\0VT_RESIZE\0VT_RESIZEX"
+"\0VT_LOCKSWITCH\0VT_UNLOCKSWITCH\0VT_GETHIFONTMASK\0VT_WAITEVENT\0VT_"
+"SETACTIVATE";
+PRIVATE char const repr_IOCTLS_5877h[] =
+"FIFREEZE\0FITHAW\0FITRIM";
+PRIVATE char const repr_IOCTLS_6601h[] =
+"FS_IOC32_GETFLAGS\0FS_IOC32_SETFLAGS\0\0\0\0\0\0\0\0\0FS_IOC_FIEMAP";
+PRIVATE char const repr_IOCTLS_7201h[] =
+"VFAT_IOCTL_READDIR_BOTH\0VFAT_IOCTL_READDIR_SHORT\0\0\0\0\0\0\0\0\0\0\0\0\0\0FA"
+"T_IOCTL_GET_ATTRIBUTES\0FAT_IOCTL_SET_ATTRIBUTES\0\0FAT_IOCTL_GET_V"
+"OLUME_ID";
+PRIVATE char const repr_IOCTLS_7601h[] =
+"FS_IOC32_GETVERSION\0FS_IOC32_SETVERSION";
+PRIVATE char const repr_IOCTLS_8901h[] =
+"FIOSETOWN\0SIOCSPGRP\0FIOGETOWN\0SIOCGPGRP\0SIOCATMARK\0__SIOCGSTAMP3"
+"2\0__SIOCGSTAMPNS32\0\0\0\0SIOCADDRT\0SIOCDELRT\0SIOCRTMSG\0\0\0SIOCGIFNAM"
+"E\0SIOCSIFLINK\0SIOCGIFCONF\0SIOCGIFFLAGS\0SIOCSIFFLAGS\0SIOCGIFADDR\0"
+"SIOCSIFADDR\0SIOCGIFDSTADDR\0SIOCSIFDSTADDR\0SIOCGIFBRDADDR\0SIOCSIF"
+"BRDADDR\0SIOCGIFNETMASK\0SIOCSIFNETMASK\0SIOCGIFMETRIC\0SIOCSIFMETRI"
+"C\0SIOCGIFMEM\0SIOCSIFMEM\0SIOCGIFMTU\0SIOCSIFMTU\0SIOCSIFNAME\0SIOCSI"
+"FHWADDR\0SIOCGIFENCAP\0SIOCSIFENCAP\0SIOCGIFHWADDR\0\0SIOCGIFSLAVE\0\0\0"
+"\0\0\0\0SIOCSIFSLAVE\0SIOCADDMULTI\0SIOCDELMULTI\0SIOCGIFINDEX\0SIOCSIFP"
+"FLAGS\0SIOCGIFPFLAGS\0SIOCDIFADDR\0SIOCSIFHWBROADCAST\0SIOCGIFCOUNT\0"
+"\0\0\0\0\0\0\0SIOCGIFBR\0SIOCSIFBR\0SIOCGIFTXQLEN\0SIOCSIFTXQLEN\0\0\0SIOCETH"
+"TOOL\0SIOCGMIIPHY\0SIOCGMIIREG\0SIOCSMIIREG\0SIOCWANDEV\0SIOCOUTQNSD\0"
+"\0\0\0\0\0\0\0SIOCDARP\0SIOCGARP\0SIOCSARP\0\0\0\0\0\0\0\0\0\0\0SIOCDRARP\0SIOCGRARP\0"
+"SIOCSRARP\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCGIFMAP\0SIOCSIFMAP\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCA"
+"DDDLCI\0SIOCDELDLCI\0SIOCGIFVLAN\0SIOCSIFVLAN\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCBONDE"
+"NSLAVE\0SIOCBONDRELEASE\0SIOCBONDSETHWADDR\0SIOCBONDSLAVEINFOQUERY\0"
+"SIOCBONDINFOQUERY\0SIOCBONDCHANGEACTIVE\0\0\0\0\0\0\0\0\0\0\0SIOCBRADDBR\0SIO"
+"CBRDELBR\0SIOCBRADDIF\0SIOCBRDELIF\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCSHWTSTAMP\0SIOCG"
+"HWTSTAMP";
+PRIVATE char const repr_IOCTLS_89e0h[] =
+"SIOCPROTOPRIVATE\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCDEVPRIVATE";
+
+#define GETBASE_KOS_IOCTLS(result, index) \
+	(((index) >= 0x4b00 && (index) <= 0x4b0b) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
+	 ((index) >= 0x4d00 && (index) <= 0x4d07) ? ((index) -= 0x4d00, (result) = repr_KOS_IOCTLS_4d00h, true) : \
+	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
+	 ((index) >= 0x5600 && (index) <= 0x5602) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : false)
+PRIVATE char const repr_KOS_IOCTLS_4b00h[] =
+"KBDIO_SETRDKEY\0KBDIO_TRYGETCHAR\0KBDIO_GETCHAR\0KBDIO_TRYGETKEY\0KB"
+"DIO_GETKEY\0KBDIO_MASKLED\0KBDIO_RESETKEYMAP\0KBDIO_FLUSHPENDING\0KB"
+"DIO_PUTSTR\0KBDIO_PUTKEY\0KBDIO_SETDBGF12\0KBDIO_MASKMOD";
+PRIVATE char const repr_KOS_IOCTLS_4d00h[] =
+"MOUSEIO_SETABSMODE\0MOUSEIO_SETABSRECT\0MOUSEIO_PUTMOTION\0MOUSEIO_"
+"SETPOS\0MOUSEIO_PUTBUTTON\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL\0MOU"
+"SEIO_FLUSHPENDING";
+PRIVATE char const repr_KOS_IOCTLS_5400h[] =
+"TTYIO_IBUF_SETLIMIT\0TTYIO_CANON_SETLIMIT\0TTYIO_OPEND_SETLIMIT\0TT"
+"YIO_IPEND_SETLIMIT";
+PRIVATE char const repr_KOS_IOCTLS_5600h[] =
+"VIDEOIO_LISTFORMAT\0VIDEOIO_SETFORMAT\0VIDEOIO_SETPAL";
+//[[[end]]]
 
 PRIVATE ATTR_UNUSED ATTR_CONST WUNUSED char const *CC
 get_ioctl_command_name(syscall_ulong_t command) {
-	unsigned int i;
-	char const *result;
-	command &= 0xffff;
-	for (i = 0; i < COMPILER_LENOF(ioctl_commands); ++i) {
-		if (ioctl_commands[i].ic_cmd == command) {
-			result = ioctl_commands[i].ic_name;
+	char const *result = NULL;
+	if (_IOC_ISKOS(command)) {
+		command &= 0xffff;
+		if (!GETBASE_KOS_IOCTLS(result, command))
 			goto done;
-		}
-	}
-	for (i = 0; i < COMPILER_LENOF(ioctl_commands_long); ++i) {
-		if (ioctl_commands_long[i].ic_cmd == command) {
-			result = ioctl_commands_long[i].ic_name;
+	} else {
+		command &= 0xffff;
+		if (!GETBASE_IOCTLS(result, command))
 			goto done;
-		}
 	}
-	result = NULL;
+	for (; command; --command)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
 done:
 	return result;
 }
@@ -2299,9 +2323,9 @@ do_uintptr_t:
 #elif __SIZEOF_POINTER__ == 1
 #define NEED_do_format8
 		goto do_format8;
-#else /* __SIZEOF_POINTER__ == ... */
+#elif !defined(__DEEMON__)
 #error "Unsupported `__SIZEOF_POINTER__'"
-#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* ... */
 #endif /* HAVE_SC_REPR_UINTPTR_T || NEED_do_uintptr_t */
 
 #if defined(HAVE_SC_REPR_SYSCALL_SLONG_T) || defined(NEED_do_syscall_slong_t)
