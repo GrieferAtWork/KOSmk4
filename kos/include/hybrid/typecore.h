@@ -1165,18 +1165,27 @@
 #endif /* !__ALIGNOF_DOUBLE__ && __SIZEOF_DOUBLE__ */
 
 #ifndef __SIZEOF_LONG_DOUBLE__
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef _MSC_VER
 #define __SIZEOF_LONG_DOUBLE__ 8
 #elif (defined(__C67__) || defined(__i386__) || \
-       defined(__i386) || defined(i386))
+       defined(__i386) || defined(i386) ||      \
+       defined(__I86__) || defined(_M_IX86) ||  \
+       defined(__X86__) || defined(_X86_) ||    \
+       defined(__THW_INTEL__) || defined(__INTEL__))
 #define __SIZEOF_LONG_DOUBLE__ 12
-#elif defined(__X86_64__)
+#elif (defined(__X86_64__) || defined(__amd64__) || \
+       defined(__amd64) || defined(__x86_64) || \
+       defined(_M_X64) || defined(_M_AMD64) || \
+       defined(_WIN64) || defined(WIN64))
 #define __SIZEOF_LONG_DOUBLE__ 16
-#elif defined(__arm__)
+#elif (defined(__arm__) || defined(_M_ARM) || \
+       defined(_M_ARMT) || defined(_M_ARM_NT))
 #define __SIZEOF_LONG_DOUBLE__ 8
-#elif defined(__COMPILER_HAVE_LONGDOUBLE)
+#else /* ... */
 #define __SIZEOF_LONG_DOUBLE__ 8
-#endif
+#endif /* !... */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__SIZEOF_LONG_DOUBLE__ */
 
 
@@ -1191,6 +1200,8 @@
 #define __ALIGNOF_LONG_DOUBLE__ _LONG_DOUBLE_ALIGNMENT
 #elif __ALIGNOF_INT64__ < 8
 #define __ALIGNOF_LONG_DOUBLE__ __ALIGNOF_INT64__
+#elif defined(__INTELLISENSE_GCC__) && defined(__i386__)
+#define __ALIGNOF_LONG_DOUBLE__ 4
 #elif __SIZEOF_LONG_DOUBLE__ == 12
 #define __ALIGNOF_LONG_DOUBLE__ 16
 #else /* __SIZEOF_LONG_DOUBLE__ == 12 */
@@ -1346,15 +1357,21 @@
  * they were still defined (leading to sporadic syntax errors
  * in arbitrary source files...) */
 
-#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
-#define __SIZE_TYPE_IS_INT__ 1
+#ifdef __x86_64__
+#define __SIZE_TYPE_IS_LONG_LONG__    1 /* Should be `long' for elf, but isn't */
+#define __PTRDIFF_TYPE_IS_LONG_LONG__ 1
+#elif defined(__i386__)
+#define __SIZE_TYPE_IS_INT__    1 /* Should be `long' for elf, but isn't */
+#define __PTRDIFF_TYPE_IS_INT__ 1
+#elif __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+#define __SIZE_TYPE_IS_INT__    1
 #define __PTRDIFF_TYPE_IS_INT__ 1
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 #define __SIZE_TYPE_IS_LONG_LONG__ 1
-#define __PTRDIFF_TYPE_IS_LONG__ 1
+#define __PTRDIFF_TYPE_IS_LONG__   1
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 
-#define __INT8_TYPE_IS_CHAR__ 1
+#define __INT8_TYPE_IS_CHAR__   1
 #define __INT16_TYPE_IS_SHORT__ 1
 #if __SIZEOF_INT__ == 4
 #define __INT32_TYPE_IS_INT__ 1

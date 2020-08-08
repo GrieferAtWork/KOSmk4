@@ -336,7 +336,9 @@ static_assert(__builtin_types_compatible_p(ptrdiff_t, signed long));
 static_assert(__builtin_types_compatible_p(ptrdiff_t, __LONGLONG));
 #endif /* __PTRDIFF_TYPE_IS_LONG_LONG__ */
 
-
+/* Ensure that size_t and ptrdiff_t are actually what they're supposed to be. */
+static_assert(__builtin_types_compatible_p(size_t, __typeof__(sizeof(42))));
+static_assert(__builtin_types_compatible_p(ptrdiff_t, __typeof__((int *)42 - (int *)41)));
 
 
 #include <pthread.h>

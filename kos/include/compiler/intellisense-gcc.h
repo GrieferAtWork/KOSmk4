@@ -106,11 +106,11 @@
 #define __ATOMIC_HLE_RELEASE        131072
 #define __FXSR__                    1
 #elif defined(__i386__)
-#define __i386         1
-#define __i686         1
-#define __i686__       1
-#define __SIZE_TYPE__  unsigned long int /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
-#define __SSIZE_TYPE__ signed long int   /* WARNING: This breaks `operator ""s' and `operator new()' for intellisense */
+#define __i386   1
+#define __i686   1
+#define __i686__ 1
+#define __INTELLISENSE_SIZE_TYPE__  unsigned int /* Should be `long' for elf, but isn't */
+#define __INTELLISENSE_SSIZE_TYPE__ signed int
 #undef __SSE2_MATH__
 #undef __SSE2__
 #undef __SSE_MATH__
@@ -446,35 +446,35 @@ template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_i
 #define __atomic_fetch_or           ::__intern::__intellisense_atomic_fetch_or
 #define __atomic_fetch_nand         ::__intern::__intellisense_atomic_fetch_nand
 
-#ifndef __SIZEOF_LONG_DOUBLE__
+#ifndef __INTELLISENSE_SIZEOF_LONG_DOUBLE__
 #ifdef __i386__
-#define __SIZEOF_LONG_DOUBLE__ 12
+#define __INTELLISENSE_SIZEOF_LONG_DOUBLE__ 12
 #elif defined(__x86_64__)
-#define __SIZEOF_LONG_DOUBLE__ 16
+#define __INTELLISENSE_SIZEOF_LONG_DOUBLE__ 16
 #elif defined(__arm__)
-#define __SIZEOF_LONG_DOUBLE__ 8
+#define __INTELLISENSE_SIZEOF_LONG_DOUBLE__ 8
 #else
-#define __SIZEOF_LONG_DOUBLE__ 12
+#define __INTELLISENSE_SIZEOF_LONG_DOUBLE__ 12
 #endif
-#endif /* !__SIZEOF_LONG_DOUBLE__ */
+#endif /* !__INTELLISENSE_SIZEOF_LONG_DOUBLE__ */
 
 
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
-static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?");
+static_assert(sizeof(long double) == __INTELLISENSE_SIZEOF_LONG_DOUBLE__, "WTF Intellisense?");
 #elif 1
 
 class __intellisense_long_double;
 template<> struct ____INTELLISENSE_isfloat<__intellisense_long_double> { enum { __value = true }; };
 
 #define __LONGDOUBLE ::__intern::__intellisense_long_double
-#if __SIZEOF_LONG_DOUBLE__ == 12
-class __attribute__((__aligned__(16))) __intellisense_long_double
-#else /* __SIZEOF_LONG_DOUBLE__ == 12 */
-class __attribute__((__aligned__(__SIZEOF_LONG_DOUBLE__))) __intellisense_long_double
-#endif /* __SIZEOF_LONG_DOUBLE__ != 12 */
+#if __INTELLISENSE_SIZEOF_LONG_DOUBLE__ == 12
+class __attribute__((__aligned__(4))) __intellisense_long_double
+#else /* __INTELLISENSE_SIZEOF_LONG_DOUBLE__ == 12 */
+class __attribute__((__aligned__(__INTELLISENSE_SIZEOF_LONG_DOUBLE__))) __intellisense_long_double
+#endif /* __INTELLISENSE_SIZEOF_LONG_DOUBLE__ != 12 */
 {
 private:
-	unsigned char __ld_data[__SIZEOF_LONG_DOUBLE__];
+	unsigned char __ld_data[__INTELLISENSE_SIZEOF_LONG_DOUBLE__];
 public:
 	__intellisense_long_double() throw() = default;
 	__intellisense_long_double(__intellisense_long_double const &) throw() = default;
@@ -596,8 +596,8 @@ template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigne
 
 
 #else
-#undef __SIZEOF_LONG_DOUBLE__
-#define __SIZEOF_LONG_DOUBLE__ __SIZEOF_DOUBLE__
+#undef __INTELLISENSE_SIZEOF_LONG_DOUBLE__
+#define __INTELLISENSE_SIZEOF_LONG_DOUBLE__ __SIZEOF_DOUBLE__
 #endif
 
 } /* namespace __intern */

@@ -71,7 +71,8 @@ struct __sigset_structx32 {
 #endif /* !__x86_64__ */
 #endif /* !____sigsetx32_t_defined */
 
-struct __ucontextx32 /*[NAME(ucontextx32)][PREFIX(uc_)]*/ {
+
+struct __ATTR_ALIGNED(__ALIGNOF_UCONTEXTX32) __ucontextx32 /*[NAME(ucontextx32)][PREFIX(uc_)]*/ {
 	/* Userlevel context. */
 	struct __mcontextx32                 uc_mcontext;
 	struct __sigset_structx32            uc_sigmask;
