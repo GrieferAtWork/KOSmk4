@@ -1024,6 +1024,7 @@ static_assert(offsetof(struct elf32_ehdr, e_shstrndx) == __OFFSET_ELF32_EHDR_SHS
 static_assert(offsetof(struct elf32_ehdr, e_type) == __OFFSET_ELF32_EHDR_TYPE);
 static_assert(offsetof(struct elf32_ehdr, e_version) == __OFFSET_ELF32_EHDR_VERSION);
 static_assert(sizeof(struct elf32_ehdr) == __SIZEOF_ELF32_EHDR);
+static_assert(alignof(struct elf32_ehdr) == __ALIGNOF_ELF32_EHDR);
 
 /* struct elf64_ehdr */
 static_assert(offsetof(struct elf64_ehdr, e_ehsize) == __OFFSET_ELF64_EHDR_EHSIZE);
@@ -1041,6 +1042,7 @@ static_assert(offsetof(struct elf64_ehdr, e_shstrndx) == __OFFSET_ELF64_EHDR_SHS
 static_assert(offsetof(struct elf64_ehdr, e_type) == __OFFSET_ELF64_EHDR_TYPE);
 static_assert(offsetof(struct elf64_ehdr, e_version) == __OFFSET_ELF64_EHDR_VERSION);
 static_assert(sizeof(struct elf64_ehdr) == __SIZEOF_ELF64_EHDR);
+static_assert(alignof(struct elf64_ehdr) == __ALIGNOF_ELF64_EHDR);
 
 /* struct elf32_shdr */
 static_assert(offsetof(struct elf32_shdr, sh_addr) == __OFFSET_ELF32_SHDR_ADDR);
@@ -1054,6 +1056,7 @@ static_assert(offsetof(struct elf32_shdr, sh_offset) == __OFFSET_ELF32_SHDR_OFFS
 static_assert(offsetof(struct elf32_shdr, sh_size) == __OFFSET_ELF32_SHDR_SIZE);
 static_assert(offsetof(struct elf32_shdr, sh_type) == __OFFSET_ELF32_SHDR_TYPE);
 static_assert(sizeof(struct elf32_shdr) == __SIZEOF_ELF32_SHDR);
+static_assert(alignof(struct elf32_shdr) == __ALIGNOF_ELF32_SHDR);
 
 /* struct elf64_shdr */
 static_assert(offsetof(struct elf64_shdr, sh_addr) == __OFFSET_ELF64_SHDR_ADDR);
@@ -1067,6 +1070,7 @@ static_assert(offsetof(struct elf64_shdr, sh_offset) == __OFFSET_ELF64_SHDR_OFFS
 static_assert(offsetof(struct elf64_shdr, sh_size) == __OFFSET_ELF64_SHDR_SIZE);
 static_assert(offsetof(struct elf64_shdr, sh_type) == __OFFSET_ELF64_SHDR_TYPE);
 static_assert(sizeof(struct elf64_shdr) == __SIZEOF_ELF64_SHDR);
+static_assert(alignof(struct elf64_shdr) == __ALIGNOF_ELF64_SHDR);
 
 /* struct elf32_sym */
 static_assert(offsetof(struct elf32_sym, st_info) == __OFFSET_ELF32_SYM_INFO);
@@ -1076,6 +1080,7 @@ static_assert(offsetof(struct elf32_sym, st_shndx) == __OFFSET_ELF32_SYM_SHNDX);
 static_assert(offsetof(struct elf32_sym, st_size) == __OFFSET_ELF32_SYM_SIZE);
 static_assert(offsetof(struct elf32_sym, st_value) == __OFFSET_ELF32_SYM_VALUE);
 static_assert(sizeof(struct elf32_sym) == __SIZEOF_ELF32_SYM);
+static_assert(alignof(struct elf32_sym) == __ALIGNOF_ELF32_SYM);
 
 /* struct elf64_sym */
 static_assert(offsetof(struct elf64_sym, st_info) == __OFFSET_ELF64_SYM_INFO);
@@ -1085,28 +1090,45 @@ static_assert(offsetof(struct elf64_sym, st_shndx) == __OFFSET_ELF64_SYM_SHNDX);
 static_assert(offsetof(struct elf64_sym, st_size) == __OFFSET_ELF64_SYM_SIZE);
 static_assert(offsetof(struct elf64_sym, st_value) == __OFFSET_ELF64_SYM_VALUE);
 static_assert(sizeof(struct elf64_sym) == __SIZEOF_ELF64_SYM);
+static_assert(alignof(struct elf64_sym) == __ALIGNOF_ELF64_SYM);
 
 /* struct elf32_syminfo */
 static_assert(offsetof(struct elf32_syminfo, si_boundto) == __OFFSET_ELF32_SYMINFO_BOUNDTO);
 static_assert(offsetof(struct elf32_syminfo, si_flags) == __OFFSET_ELF32_SYMINFO_FLAGS);
 static_assert(sizeof(struct elf32_syminfo) == __SIZEOF_ELF32_SYMINFO);
+static_assert(alignof(struct elf32_syminfo) == __ALIGNOF_ELF32_SYMINFO);
 
 /* struct elf64_syminfo */
 static_assert(offsetof(struct elf64_syminfo, si_boundto) == __OFFSET_ELF64_SYMINFO_BOUNDTO);
 static_assert(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO_FLAGS);
 static_assert(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
+static_assert(alignof(struct elf64_syminfo) == __ALIGNOF_ELF64_SYMINFO);
 
 /* struct elf32_rel */
-/* ... */
+static_assert(offsetof(struct elf32_rel, r_info) == __OFFSET_ELF32_REL_INFO);
+static_assert(offsetof(struct elf32_rel, r_offset) == __OFFSET_ELF32_REL_OFFSET);
+static_assert(sizeof(struct elf32_rel) == __SIZEOF_ELF32_REL);
+static_assert(alignof(struct elf32_rel) == __ALIGNOF_ELF32_REL);
 
 /* struct elf64_rel */
-/* ... */
+static_assert(offsetof(struct elf64_rel, r_info) == __OFFSET_ELF64_REL_INFO);
+static_assert(offsetof(struct elf64_rel, r_offset) == __OFFSET_ELF64_REL_OFFSET);
+static_assert(sizeof(struct elf64_rel) == __SIZEOF_ELF64_REL);
+static_assert(alignof(struct elf64_rel) == __ALIGNOF_ELF64_REL);
 
 /* struct elf32_rela */
-/* ... */
+static_assert(offsetof(struct elf32_rela, r_addend) == __OFFSET_ELF32_RELA_ADDEND);
+static_assert(offsetof(struct elf32_rela, r_info) == __OFFSET_ELF32_RELA_INFO);
+static_assert(offsetof(struct elf32_rela, r_offset) == __OFFSET_ELF32_RELA_OFFSET);
+static_assert(sizeof(struct elf32_rela) == __SIZEOF_ELF32_RELA);
+static_assert(alignof(struct elf32_rela) == __ALIGNOF_ELF32_RELA);
 
 /* struct elf64_rela */
-/* ... */
+static_assert(offsetof(struct elf64_rela, r_addend) == __OFFSET_ELF64_RELA_ADDEND);
+static_assert(offsetof(struct elf64_rela, r_info) == __OFFSET_ELF64_RELA_INFO);
+static_assert(offsetof(struct elf64_rela, r_offset) == __OFFSET_ELF64_RELA_OFFSET);
+static_assert(sizeof(struct elf64_rela) == __SIZEOF_ELF64_RELA);
+static_assert(alignof(struct elf64_rela) == __ALIGNOF_ELF64_RELA);
 
 /* struct elf32_phdr */
 static_assert(offsetof(struct elf32_phdr, p_align) == __OFFSET_ELF32_PHDR_ALIGN);
@@ -1118,6 +1140,7 @@ static_assert(offsetof(struct elf32_phdr, p_paddr) == __OFFSET_ELF32_PHDR_PADDR)
 static_assert(offsetof(struct elf32_phdr, p_type) == __OFFSET_ELF32_PHDR_TYPE);
 static_assert(offsetof(struct elf32_phdr, p_vaddr) == __OFFSET_ELF32_PHDR_VADDR);
 static_assert(sizeof(struct elf32_phdr) == __SIZEOF_ELF32_PHDR);
+static_assert(alignof(struct elf32_phdr) == __ALIGNOF_ELF32_PHDR);
 
 /* struct elf64_phdr */
 static_assert(offsetof(struct elf64_phdr, p_align) == __OFFSET_ELF64_PHDR_ALIGN);
@@ -1129,6 +1152,7 @@ static_assert(offsetof(struct elf64_phdr, p_paddr) == __OFFSET_ELF64_PHDR_PADDR)
 static_assert(offsetof(struct elf64_phdr, p_type) == __OFFSET_ELF64_PHDR_TYPE);
 static_assert(offsetof(struct elf64_phdr, p_vaddr) == __OFFSET_ELF64_PHDR_VADDR);
 static_assert(sizeof(struct elf64_phdr) == __SIZEOF_ELF64_PHDR);
+static_assert(alignof(struct elf64_phdr) == __ALIGNOF_ELF64_PHDR);
 
 /* struct elf32_dyn */
 static_assert(offsetof(struct elf32_dyn, d_un.d_ptr) == __OFFSET_ELF32_DYN_PTR);
@@ -1149,12 +1173,14 @@ static_assert(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_A
 static_assert(offsetof(struct elf32_chdr, ch_size) == __OFFSET_ELF32_CHDR_SIZE);
 static_assert(offsetof(struct elf32_chdr, ch_type) == __OFFSET_ELF32_CHDR_TYPE);
 static_assert(sizeof(struct elf32_chdr) == __SIZEOF_ELF32_CHDR);
+static_assert(alignof(struct elf32_chdr) == __ALIGNOF_ELF32_CHDR);
 
 /* struct elf64_chdr */
 static_assert(offsetof(struct elf64_chdr, ch_addralign) == __OFFSET_ELF64_CHDR_ADDRALIGN);
 static_assert(offsetof(struct elf64_chdr, ch_size) == __OFFSET_ELF64_CHDR_SIZE);
 static_assert(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
 static_assert(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
+static_assert(alignof(struct elf64_chdr) == __ALIGNOF_ELF64_CHDR);
 
 /* struct elf32_verdef */
 static_assert(offsetof(struct elf32_verdef, vd_aux) == __OFFSET_ELF32_VERDEF_AUX);

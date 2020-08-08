@@ -186,6 +186,7 @@ typedef Elf64_Half Elf64_Versym;
 #define __OFFSET_ELF32_EHDR_SHNUM     48
 #define __OFFSET_ELF32_EHDR_SHSTRNDX  50
 #define __SIZEOF_ELF32_EHDR           52
+#define __ALIGNOF_ELF32_EHDR          4
 #ifdef __CC__
 typedef struct elf32_ehdr /*[PREFIX(e_)]*/ {
 	unsigned char e_ident[EI_NIDENT];     /* Magic number and other info */
@@ -220,6 +221,7 @@ typedef struct elf32_ehdr /*[PREFIX(e_)]*/ {
 #define __OFFSET_ELF64_EHDR_SHNUM     60
 #define __OFFSET_ELF64_EHDR_SHSTRNDX  62
 #define __SIZEOF_ELF64_EHDR           64
+#define __ALIGNOF_ELF64_EHDR          __ALIGNOF_INT64__
 #ifdef __CC__
 typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 	unsigned char e_ident[EI_NIDENT];     /* Magic number and other info */
@@ -412,6 +414,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define __OFFSET_ELF32_SHDR_ADDRALIGN 32
 #define __OFFSET_ELF32_SHDR_ENTSIZE   36
 #define __SIZEOF_ELF32_SHDR           40
+#define __ALIGNOF_ELF32_SHDR          4
 #ifdef __CC__
 typedef struct elf32_shdr /*[PREFIX(sh_)]*/ {
 	Elf32_Word    sh_name;                /* Section name (string tbl index) */
@@ -438,6 +441,7 @@ typedef struct elf32_shdr /*[PREFIX(sh_)]*/ {
 #define __OFFSET_ELF64_SHDR_ADDRALIGN 48
 #define __OFFSET_ELF64_SHDR_ENTSIZE   56
 #define __SIZEOF_ELF64_SHDR           64
+#define __ALIGNOF_ELF64_SHDR          __ALIGNOF_INT64__
 #ifdef __CC__
 typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 	Elf64_Word    sh_name;                /* Section name (string tbl index) */
@@ -552,6 +556,7 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define __OFFSET_ELF32_SYM_OTHER 13
 #define __OFFSET_ELF32_SYM_SHNDX 14
 #define __SIZEOF_ELF32_SYM       16
+#define __ALIGNOF_ELF32_SYM      4
 #ifdef __CC__
 typedef struct elf32_sym /*[PREFIX(st_)]*/ {
 	Elf32_Word    st_name;                /* Symbol name (string tbl index) */
@@ -570,6 +575,7 @@ typedef struct elf32_sym /*[PREFIX(st_)]*/ {
 #define __OFFSET_ELF64_SYM_VALUE 8
 #define __OFFSET_ELF64_SYM_SIZE  16
 #define __SIZEOF_ELF64_SYM       24
+#define __ALIGNOF_ELF64_SYM      __ALIGNOF_INT64__
 #ifdef __CC__
 typedef struct elf64_sym /*[PREFIX(st_)]*/ {
 	Elf64_Word    st_name;                /* Symbol name (string tbl index) */
@@ -588,6 +594,7 @@ typedef struct elf64_sym /*[PREFIX(st_)]*/ {
 #define __OFFSET_ELF32_SYMINFO_BOUNDTO 0
 #define __OFFSET_ELF32_SYMINFO_FLAGS   2
 #define __SIZEOF_ELF32_SYMINFO         4
+#define __ALIGNOF_ELF32_SYMINFO        2
 #ifdef __CC__
 typedef struct elf32_syminfo /*[PREFIX(si_)]*/ {
 	Elf32_Half si_boundto;                /* Direct bindings, symbol bound to */
@@ -598,6 +605,7 @@ typedef struct elf32_syminfo /*[PREFIX(si_)]*/ {
 #define __OFFSET_ELF64_SYMINFO_BOUNDTO 0
 #define __OFFSET_ELF64_SYMINFO_FLAGS   2
 #define __SIZEOF_ELF64_SYMINFO         4
+#define __ALIGNOF_ELF64_SYMINFO        2
 #ifdef __CC__
 typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 	Elf64_Half si_boundto;                /* Direct bindings, symbol bound to */
@@ -696,9 +704,11 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
  *                   case, then the actual symbol pointer will be filled with a
  *                   copy of the data-blob returned by resolve(), where this
  *                   copy will have previously been allocated by `ld' when it
- *                   was building 
+ *                   was linking against the declaring library.
  *         st_size:  The size of the lazily initialized data blob. This size must
  *                   match the size of the data-blob returned by `resolve()'!
+ *                   Note that this is a link-time constant that cannot be affected
+ *                   by the `resolve()' function.
  *
  */
 
@@ -723,30 +733,54 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 #define STV_PROTECTED   3               /* Not preemptible, not exported */
 
 
-#ifdef __CC__
 /* Relocation table entry without addend (in section of type SHT_REL). */
-typedef struct elf32_rel {
+#define __OFFSET_ELF32_REL_OFFSET 0
+#define __OFFSET_ELF32_REL_INFO   4
+#define __SIZEOF_ELF32_REL        8
+#define __ALIGNOF_ELF32_REL       4
+#ifdef __CC__
+typedef struct elf32_rel /*[PREFIX(r_)]*/ {
 	Elf32_Addr    r_offset;               /* Address */
 	Elf32_Word    r_info;                 /* Relocation type and symbol index */
 } Elf32_Rel;
+#endif /* __CC__ */
 
 /* I have seen two different definitions of the Elf64_Rel and
  * Elf64_Rela structures, so we'll leave them out until Novell
  * (or whoever) gets their act together. */
 /* The following, at least, is used on Sparc v9, MIPS, and Alpha. */
-typedef struct elf64_rel {
+#define __OFFSET_ELF64_REL_OFFSET 0
+#define __OFFSET_ELF64_REL_INFO   8
+#define __SIZEOF_ELF64_REL        16
+#define __ALIGNOF_ELF64_REL       __ALIGNOF_INT64__
+#ifdef __CC__
+typedef struct elf64_rel /*[PREFIX(r_)]*/ {
 	Elf64_Addr    r_offset;               /* Address */
 	Elf64_Xword   r_info;                 /* Relocation type and symbol index */
 } Elf64_Rel;
+#endif /* __CC__ */
 
 /* Relocation table entry with addend (in section of type SHT_RELA). */
-typedef struct elf32_rela {
+#define __OFFSET_ELF32_RELA_OFFSET 0
+#define __OFFSET_ELF32_RELA_INFO   4
+#define __OFFSET_ELF32_RELA_ADDEND 8
+#define __SIZEOF_ELF32_RELA        12
+#define __ALIGNOF_ELF32_RELA       4
+#ifdef __CC__
+typedef struct elf32_rela /*[PREFIX(r_)]*/ {
 	Elf32_Addr    r_offset;               /* Address */
 	Elf32_Word    r_info;                 /* Relocation type and symbol index */
 	Elf32_Sword   r_addend;               /* Addend */
 } Elf32_Rela;
+#endif /* __CC__ */
 
-typedef struct elf64_rela {
+#define __OFFSET_ELF64_RELA_OFFSET 0
+#define __OFFSET_ELF64_RELA_INFO   8
+#define __OFFSET_ELF64_RELA_ADDEND 16
+#define __SIZEOF_ELF64_RELA        24
+#define __ALIGNOF_ELF64_RELA       __ALIGNOF_INT64__
+#ifdef __CC__
+typedef struct elf64_rela /*[PREFIX(r_)]*/ {
 	Elf64_Addr    r_offset;               /* Address */
 	Elf64_Xword   r_info;                 /* Relocation type and symbol index */
 	Elf64_Sxword  r_addend;               /* Addend */
@@ -772,6 +806,7 @@ typedef struct elf64_rela {
 #define __OFFSET_ELF32_PHDR_FLAGS   24
 #define __OFFSET_ELF32_PHDR_ALIGN   28
 #define __SIZEOF_ELF32_PHDR         32
+#define __ALIGNOF_ELF32_PHDR        4
 #ifdef __CC__
 typedef struct elf32_phdr /*[PREFIX(p_)]*/ {
 	Elf32_Word    p_type;                 /* Segment type */
@@ -798,6 +833,7 @@ typedef struct elf32_phdr /*[PREFIX(p_)]*/ {
 #define __OFFSET_ELF64_PHDR_MEMSZ   40
 #define __OFFSET_ELF64_PHDR_ALIGN   48
 #define __SIZEOF_ELF64_PHDR         56
+#define __ALIGNOF_ELF64_PHDR        __ALIGNOF_INT64__
 #ifdef __CC__
 typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 	Elf64_Word    p_type;                 /* Segment type */
@@ -1108,10 +1144,12 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 #define __OFFSET_ELF32_CHDR_SIZE      4
 #define __OFFSET_ELF32_CHDR_ADDRALIGN 8
 #define __SIZEOF_ELF32_CHDR           12
+#define __ALIGNOF_ELF32_CHDR          4
 #define __OFFSET_ELF64_CHDR_TYPE      0
 #define __OFFSET_ELF64_CHDR_SIZE      8
 #define __OFFSET_ELF64_CHDR_ADDRALIGN 16
 #define __SIZEOF_ELF64_CHDR           24
+#define __ALIGNOF_ELF64_CHDR          __ALIGNOF_INT64__
 #ifdef __CC__
 typedef struct elf32_chdr /*[PREFIX(ch_)]*/ {
 	Elf32_Word    ch_type;      /* Type of compression (one of `ELFCOMPRESS_*') */
