@@ -42,12 +42,14 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
+#include <asm/ioctls/block.h>
+#include <asm/ioctls/block_ex.h>
+#include <asm/ioctls/tty.h>
 #include <bits/iovec-struct.h> /* struct iovec */
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/hop/handle.h>
 #include <kos/io.h>
-#include <linux/fs.h> /* General purpose ioctl()s */
 #include <sys/mount.h>
 #include <sys/poll.h>
 #include <sys/stat.h>

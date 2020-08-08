@@ -434,7 +434,7 @@ unknown_syscall:
 
 /* Get a description of the system call described by `sc_info' in `desc'
  * This is the main function used to access the system call description
- * database for the purpose of doing this such as printing a representation
+ * database for the purpose of doing things such as printing a representation
  * of a system call invocation.
  * @return: true:  The system call was recognized, and `desc' was filled accordingly.
  * @return: false: Unknown system call (`desc' was filled with stub-values) */
@@ -488,8 +488,8 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 				 *      Only when syscall_ulong_t is 32-bit would that translate to 64-bit
 				 *      in total. However, since KOS doesn't actually have any 128-bit
 				 *      system calls when running with a 64-bit bus width, this functionality
-				 *      is unused, though still partially implemented in case such a system
-				 *      call should ever need to be defined. */
+				 *      is unused, though still partially implemented in case such system
+				 *      calls ever need to be defined. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 				desc->sc_argv[i].sa_value.sv_u64 = (uint64_t)((uint64_t)(uintptr_t)sc_info->rsi_regs[regi] |
 				                                              (uint64_t)(uintptr_t)sc_info->rsi_regs[regi + 1] << 32);
@@ -578,8 +578,8 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 	}
 
 	return true;
-	/* Fallback: Fill in `desc' with stub-values */
 unknown_syscall:
+	/* Fallback: Fill in `desc' with stub-values */
 	desc->sc_argc = 6;
 	desc->sc_name = NULL;
 	for (i = 0; i < 6; ++i) {

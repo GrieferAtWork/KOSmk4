@@ -54,7 +54,7 @@ struct rpc_syscall_info;
 
 /* Get a description of the system call described by `sc_info' in `desc'
  * This is the main function used to access the system call description
- * database for the purpose of doing this such as printing a representation
+ * database for the purpose of doing things such as printing a representation
  * of a system call invocation.
  * @return: true:  The system call was recognized, and `desc' was filled accordingly.
  * @return: false: Unknown system call (`desc' was filled with stub-values) */
