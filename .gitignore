@@ -53,3 +53,6 @@ __ice__
 /kos/include/i386-kos/_libffi
 /kos/include/i386-kos/ffi.h
 /kos/include/i386-kos/ffitarget.h
+
+# These headers are installed by `make_utility.sh ... libpciaccess`
+/kos/include/pciaccess.h

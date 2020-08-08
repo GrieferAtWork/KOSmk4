@@ -53,6 +53,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [zlib-1.2.11](https://www.zlib.net/)
 	- [libstdc++-9.1.0](https://gcc.gnu.org/onlinedocs/libstdc++/)
 	- [libffi-3.3](https://github.com/libffi/libffi)
+	- [libpciaccess-0.16](https://cgit.freedesktop.org/xorg/lib/libpciaccess/)
 
 
 <a name="features"></a>

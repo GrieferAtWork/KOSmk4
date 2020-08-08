@@ -79,6 +79,8 @@ local chk_include = {
 	"cursesw.h",
 	"cursslk.h",
 
+	"pciaccess.h",
+
 	"zconf.h",
 	"zlib.h",
 };
@@ -1041,6 +1043,9 @@ incdir("", "../../include");
 #include <parts/wchar/unistd.h>
 #include <parts/wchar/utime.h>
 #include <paths.h>
+#if __has_include(<pciaccess.h>)
+#include <pciaccess.h>
+#endif /* __has_include(<pciaccess.h>) */
 #include <poll.h>
 #include <process.h>
 #include <pthread.h>

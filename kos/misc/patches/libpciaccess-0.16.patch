@@ -1,0 +1,63 @@
+diff -Naur libpciaccess-0.16-orig/src/Makefile.am libpciaccess-0.16/src/Makefile.am
+--- libpciaccess-0.16-orig/src/Makefile.am	2020-08-08 15:27:21.370103800 +0200
++++ libpciaccess-0.16/src/Makefile.am	2020-08-08 15:29:35.868953700 +0200
+@@ -27,8 +27,8 @@
+ lib_LTLIBRARIES = libpciaccess.la
+ 
+ if LINUX
+-OS_SUPPORT = linux_sysfs.c linux_devmem.c linux_devmem.h
+-VGA_ARBITER = common_vgaarb.c
++OS_SUPPORT = x86_pci.c x86_pci.h linux_devmem.c linux_devmem.h
++VGA_ARBITER = common_vgaarb_stub.c
+ endif
+ 
+ if FREEBSD
+diff -Naur libpciaccess-0.16-orig/src/common_init.c libpciaccess-0.16/src/common_init.c
+--- libpciaccess-0.16-orig/src/common_init.c	2020-08-08 15:27:21.372100100 +0200
++++ libpciaccess-0.16/src/common_init.c	2020-08-08 15:29:35.870914300 +0200
+@@ -67,7 +67,7 @@
+     err = pci_system_solx_devfs_create();
+ #elif defined(__GNU__)
+     err = pci_system_hurd_create();
+-#elif defined(__CYGWIN__)
++#elif defined(__CYGWIN__) || defined(__KOS__)
+     err = pci_system_x86_create();
+ #else
+ # error "Unsupported OS"
+diff -Naur libpciaccess-0.16-orig/src/pciaccess_private.h libpciaccess-0.16/src/pciaccess_private.h
+--- libpciaccess-0.16-orig/src/pciaccess_private.h	2020-08-08 15:27:21.379079600 +0200
++++ libpciaccess-0.16/src/pciaccess_private.h	2020-08-08 15:31:42.333825000 +0200
+@@ -46,6 +46,7 @@
+  * new version, so warn unconditionally.
+  */
+ #include <fcntl.h>
++#include <stddef.h>
+ 
+ #ifndef O_CLOEXEC
+ #warning O_CLOEXEC not available, please upgrade.
+diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
+--- libpciaccess-0.16-orig/src/x86_pci.c	2020-08-08 15:27:21.379079600 +0200
++++ libpciaccess-0.16/src/x86_pci.c	2020-08-08 15:29:35.871911300 +0200
+@@ -58,11 +58,11 @@
+     return errno;
+ }
+ 
+-#elif defined(__GLIBC__)
++#elif defined(__GLIBC__) || defined(__KOS__)
+ 
+ #include <sys/io.h>
+ 
+-static int
++int
+ x86_enable_io(void)
+ {
+     if (!iopl(3))
+@@ -70,7 +70,7 @@
+     return errno;
+ }
+ 
+-static int
++int
+ x86_disable_io(void)
+ {
+     if (!iopl(0))
