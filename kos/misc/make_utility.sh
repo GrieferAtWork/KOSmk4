@@ -28,6 +28,15 @@ cmd() {
 	}
 }
 
+#>> xcmd <ARGV...>
+xcmd() {
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		return $error
+	}
+}
+
 MODE_FORCE_CONF=no
 MODE_FORCE_MAKE=no
 MODE_FORCE_DISK=no

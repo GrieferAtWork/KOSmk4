@@ -61,3 +61,6 @@ __ice__
 /kos/include/drm/
 /kos/include/drm.h
 
+# These headers are installed by `make_utility.sh ... xtrans`, among others
+/kos/include/X11/
+

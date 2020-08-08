@@ -100,7 +100,7 @@ fi
 
 # Install the PKG_CONFIG file
 #     The make process above will have already created that file
-#     under "$OPTPATH/pciaccess.pc", however we don't actually want
+#     under "$OPTPATH/libdrm.pc", however we don't actually want
 #     to use that one since it contains the lines:
 #     >> includedir=/usr/include
 #     >> Cflags: -I${includedir}
