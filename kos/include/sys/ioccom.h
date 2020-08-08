@@ -21,14 +21,15 @@
 #define _SYS_IOCCOM_H 1
 
 #include <__stdinc.h>
+
 #include <asm/ioctl.h>
 
-#define	IOCPARM_MASK    _IOC_SIZEMASK
-#define	IOCPARM_LEN     _IOC_SIZE
-#define	IOCBASECMD(x)   ((x) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
-#define	IOCGROUP        _IOC_TYPE
-#define	IOCPARM_MAX     _IOC_SIZEMASK
-#define	IOC_VOID        0
-#define	IOC_DIRMASK     _IOC_DIRMASK
+#define IOCPARM_MASK  _IOC_SIZEMASK
+#define IOCPARM_LEN   _IOC_SIZE
+#define IOCBASECMD(x) ((x) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
+#define IOCGROUP      _IOC_TYPE
+#define IOCPARM_MAX   _IOC_SIZEMASK
+#define IOC_VOID      0
+#define IOC_DIRMASK   _IOC_DIRMASK
 
 #endif /* !_SYS_IOCCOM_H */

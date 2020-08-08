@@ -114,12 +114,12 @@
 #define _IOC_INOUT     ((_IOC_WRITE | _IOC_READ) << _IOC_DIRSHIFT)
 #define _IOCSIZE_MASK  (_IOC_SIZEMASK << _IOC_SIZESHIFT)
 #define _IOCSIZE_SHIFT (_IOC_SIZESHIFT)
-#ifdef __USE_KOS_KERNEL
+#if defined(__USE_KOS_KERNEL) || !defined(__USE_KOS_PURE)
 #define IOC_IN         _IOC_IN
 #define IOC_OUT        _IOC_OUT
 #define IOC_INOUT      _IOC_INOUT
 #define IOCSIZE_MASK   _IOCSIZE_MASK
 #define IOCSIZE_SHIFT  _IOCSIZE_SHIFT
-#endif /* __USE_KOS_KERNEL */
+#endif /* __USE_KOS_KERNEL || !__USE_KOS_PURE */
 
 #endif /* !_ASM_IOCTL_H */
