@@ -95,6 +95,24 @@ if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
+# Install the PKG_CONFIG file
+#     The make process above will have already created that file
+#     under "$OPTPATH/pciaccess.pc", however we don't actually want
+#     to use that one since it contains the lines:
+#     >> includedir=/usr/include
+#     >> Cflags: -I${includedir}
+#     Which in combination would cause the ~real~ system include
+#     path to be added to include path, so we need to edit the file
+if ! [ -f "$PKG_CONFIG_PATH/pciaccess.pc" ]; then
+	PKG_CONFIG=$(cat "$OPTPATH/pciaccess.pc")
+	cmd mkdir -p "$PKG_CONFIG_PATH"
+	cat > "$PKG_CONFIG_PATH/pciaccess.pc" <<EOF
+${PKG_CONFIG//-I\$\{includedir\}/}
+EOF
+fi
+
+
+
 # Install libraries
 install_file /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION"
 install_symlink /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION libpciaccess.so.$SO_VERSION_MAJOR

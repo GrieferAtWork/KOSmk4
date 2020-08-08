@@ -98,6 +98,9 @@ if ! [ -d "$TARGET_SYSROOT" ]; then
 	exit 1
 fi
 
+# This is the path where PKG_CONFIG utilities load/install their config files
+export PKG_CONFIG_PATH="$BINUTILS_SYSROOT/opt/pkg_config"
+
 
 require_program() {
 	which $1 > /dev/null 2>&1 || {
