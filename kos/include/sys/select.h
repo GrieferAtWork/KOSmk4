@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b161714 */
+/* HASH CRC-32:0x4410bb7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,10 +103,10 @@ __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 #define FD_ISSET FD_ISSET
 #define FD_ZERO  FD_ZERO
 #else /* __INTELLISENSE__ */
-#define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(set)[__FD_ELT(d)] |= __FD_MASK(d))
-#define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(set)[__FD_ELT(d)] &= ~__FD_MASK(d))
-#define FD_ISSET(fd, fdsetp) ((__FDS_BITS(set)[__FD_ELT(d)] & __FD_MASK(d)) != 0)
-#define FD_ZERO(fdsetp)      __libc_bzero(__FDS_BITS(__arr), __SIZEOF_FD_SET)
+#define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] |= __FD_MASK(fd))
+#define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] &= ~__FD_MASK(fd))
+#define FD_ISSET(fd, fdsetp) ((__FDS_BITS(fdsetp)[__FD_ELT(fd)] & __FD_MASK(fd)) != 0)
+#define FD_ZERO(fdsetp)      __libc_bzero(__FDS_BITS(fdsetp), __SIZEOF_FD_SET)
 #endif /* !__INTELLISENSE__ */
 
 #if defined(__CRT_HAVE_select64) && defined(__USE_TIME_BITS64)
