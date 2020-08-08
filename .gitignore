@@ -20,7 +20,7 @@ __ice__
 *.latest
 *.stackdump
 
-# These headers are installed by `make_utility.sh i386 ncurses`
+# These headers are installed by `make_utility.sh ... ncurses`
 /kos/include/curses.h
 /kos/include/eti.h
 /kos/include/form.h
@@ -45,6 +45,11 @@ __ice__
 /kos/include/etip.h
 /kos/include/ncursesw
 
-# These headers are installed by `make_utility.sh i386 zlib`
+# These headers are installed by `make_utility.sh ... zlib`
 /kos/include/zconf.h
 /kos/include/zlib.h
+
+# These headers are installed by `make_utility.sh [i386|x86_64] libffi`
+/kos/include/i386-kos/_libffi
+/kos/include/i386-kos/ffi.h
+/kos/include/i386-kos/ffitarget.h

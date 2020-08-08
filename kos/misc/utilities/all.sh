@@ -32,7 +32,7 @@ makepart() {
 BLACKLIST=" all "
 
 # Build libraries first!
-for name in ncurses zlib; do
+for name in ncurses zlib libffi; do
 	BLACKLIST="$BLACKLIST $name "
 	makepart $name
 done

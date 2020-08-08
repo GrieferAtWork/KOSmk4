@@ -64,7 +64,7 @@ EOF
 			--infodir="/usr/share/info" \
 			--localedir="/usr/share/locale" \
 			--mandir="/usr/share/man" \
-			--build=$(gcc -dumpmachine) \
+			--build="$(gcc -dumpmachine)" \
 			--host="$TARGET_NAME-linux-gnu" \
 			--target="$TARGET_NAME-linux-gnu" \
 			--enable-shared \
