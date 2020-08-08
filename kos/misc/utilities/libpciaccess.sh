@@ -31,8 +31,8 @@ SRCPATH="$KOS_ROOT/binutils/src/x/libpciaccess-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/x/libpciaccess-$VERSION"
 
 # libpciaccess
-if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
-	if ! [ -f "$OPTPATH/Makefile" ]; then
+if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
+	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			if ! [ -f "$SRCPATH/configure.ac" ]; then
 				cmd rm -rf "$SRCPATH"
@@ -67,10 +67,10 @@ if ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
 				--sbindir="/bin" \
 				--libexecdir="/libexec" \
 				--sysconfdir="/etc" \
-				--sharedstatedir="/com" \
+				--sharedstatedir="/usr/com" \
 				--localstatedir="/var" \
 				--runstatedir="/var/run" \
-				--libdir="/lib" \
+				--libdir="/$TARGET_LIBPATH" \
 				--includedir="/usr/include" \
 				--oldincludedir="/usr/include" \
 				--datarootdir="/usr/share" \

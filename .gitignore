@@ -54,6 +54,13 @@ __ice__
 /kos/include/i386-kos/ffi.h
 /kos/include/i386-kos/ffitarget.h
 
+# These headers are installed by `make_utility.sh ... libpng`
+/kos/include/libpng/
+/kos/include/libpng16/
+/kos/include/png.h
+/kos/include/pngconf.h
+/kos/include/pnglibconf.h
+
 # These headers are installed by `make_utility.sh ... libpciaccess`
 /kos/include/pciaccess.h
 
@@ -63,4 +70,3 @@ __ice__
 
 # These headers are installed by `make_utility.sh ... xtrans`, among others
 /kos/include/X11/
-

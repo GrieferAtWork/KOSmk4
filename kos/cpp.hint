@@ -748,3 +748,11 @@
 #define os_heap_gfpvar(var_name)    int var_name;
 
 
+#define PNG_FUNCTION(type,name,args,attributes) type name args
+#define PNG_EXPORTA(ordinal,type,name,args,attributes) type name args
+#define PNG_EXPORT(ordinal,type,name,args) type name args
+#define PNG_CALLBACK(type,name,args) type (name) args
+#define PNGARG(arglist) arglist
+
+
+

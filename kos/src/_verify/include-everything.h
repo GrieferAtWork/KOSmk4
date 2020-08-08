@@ -58,7 +58,8 @@
 #define IS_CHK_INCLUDE(x)         \
 	(x in chk_include ||          \
 	 x.startswith("ncursesw/") || \
-	 x.startswith("drm/"))
+	 x.startswith("drm/") ||      \
+	 x.startswith("libpng"))
 
 local chk_include = {
 	"eti.h",
@@ -86,6 +87,10 @@ local chk_include = {
 
 	"pciaccess.h",
 	"drm.h",
+
+	"png.h",
+	"pngconf.h",
+	"pnglibconf.h",
 
 	"zconf.h",
 	"zlib.h",
@@ -119,7 +124,7 @@ function incdir(prefix, path) {
 			if (x in [
 					"i386-kos", "c++", "local", "compiler",
 					"crt-features", "__ice__", "system-test",
-					"libdl"])
+					"libdl", "X11"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
@@ -853,6 +858,24 @@ incdir("", "../../include");
 #include <libm/significand.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
+#if __has_include(<libpng/png.h>)
+#include <libpng/png.h>
+#endif /* __has_include(<libpng/png.h>) */
+#if __has_include(<libpng/pngconf.h>)
+#include <libpng/pngconf.h>
+#endif /* __has_include(<libpng/pngconf.h>) */
+#if __has_include(<libpng/pnglibconf.h>)
+#include <libpng/pnglibconf.h>
+#endif /* __has_include(<libpng/pnglibconf.h>) */
+#if __has_include(<libpng16/png.h>)
+#include <libpng16/png.h>
+#endif /* __has_include(<libpng16/png.h>) */
+#if __has_include(<libpng16/pngconf.h>)
+#include <libpng16/pngconf.h>
+#endif /* __has_include(<libpng16/pngconf.h>) */
+#if __has_include(<libpng16/pnglibconf.h>)
+#include <libpng16/pnglibconf.h>
+#endif /* __has_include(<libpng16/pnglibconf.h>) */
 #include <libregdump/api.h>
 #include <libregdump/printer.h>
 #include <libregex/api.h>
@@ -1110,6 +1133,15 @@ incdir("", "../../include");
 #if __has_include(<pciaccess.h>)
 #include <pciaccess.h>
 #endif /* __has_include(<pciaccess.h>) */
+#if __has_include(<png.h>)
+#include <png.h>
+#endif /* __has_include(<png.h>) */
+#if __has_include(<pngconf.h>)
+#include <pngconf.h>
+#endif /* __has_include(<pngconf.h>) */
+#if __has_include(<pnglibconf.h>)
+#include <pnglibconf.h>
+#endif /* __has_include(<pnglibconf.h>) */
 #include <poll.h>
 #include <process.h>
 #include <pthread.h>

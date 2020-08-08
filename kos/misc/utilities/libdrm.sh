@@ -32,8 +32,8 @@ SRCPATH="$KOS_ROOT/binutils/src/x/libdrm-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/x/libdrm-$VERSION"
 
 # libdrm
-if ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
-	if ! [ -f "$OPTPATH/Makefile" ]; then
+if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
+	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			if ! [ -f "$SRCPATH/configure.ac" ]; then
 				cmd cd "$KOS_ROOT/binutils/src/x"
@@ -72,10 +72,10 @@ if ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
 				--sbindir="/bin" \
 				--libexecdir="/libexec" \
 				--sysconfdir="/etc" \
-				--sharedstatedir="/com" \
+				--sharedstatedir="/usr/com" \
 				--localstatedir="/var" \
 				--runstatedir="/run" \
-				--libdir="/$target_libpath" \
+				--libdir="/$TARGET_LIBPATH" \
 				--includedir="/usr/include" \
 				--oldincludedir="/usr/include" \
 				--datarootdir="/usr/share" \
@@ -83,11 +83,11 @@ if ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
 				--infodir="/usr/share/info" \
 				--localedir="/usr/share/locale" \
 				--mandir="/usr/share/man" \
-				--docdir="/usr/share/doc/libffi" \
-				--htmldir="/usr/share/doc/libffi" \
-				--dvidir="/usr/share/doc/libffi" \
-				--pdfdir="/usr/share/doc/libffi" \
-				--psdir="/usr/share/doc/libffi" \
+				--docdir="/usr/share/doc/libdrm" \
+				--htmldir="/usr/share/doc/libdrm" \
+				--dvidir="/usr/share/doc/libdrm" \
+				--pdfdir="/usr/share/doc/libdrm" \
+				--psdir="/usr/share/doc/libdrm" \
 				--build="$(gcc -dumpmachine)" \
 				--host="$TARGET_NAME-linux-gnu" \
 				--disable-install-test-programs \
