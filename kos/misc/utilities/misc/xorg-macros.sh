@@ -22,28 +22,65 @@ require_program autoreconf
 require_program autoconf
 require_program libtool
 
-SRCPATH_XORG_MACROS="$KOS_ROOT/binutils/src/x/xorg-macros"
+VERSION_XORG_MACROS="1.17"
+SRCPATH_XORG_MACROS="$KOS_ROOT/binutils/src/x/xorg-macros-$VERSION_XORG_MACROS"
+OPTPATH_XORG_MACROS="$BINUTILS_SYSROOT/opt/x/xorg-macros-$VERSION_XORG_MACROS"
 
 # xorg-macros
-if ! [ -f "$SRCPATH_XORG_MACROS/.installed" ]; then
-	if ! [ -f "$SRCPATH_XORG_MACROS/Makefile" ]; then
+if ! [ -f "$PKG_CONFIG_PATH/xorg-macros.pc" ]; then
+	if ! [ -f "$OPTPATH_XORG_MACROS/Makefile" ]; then
 		if ! [ -f "$SRCPATH_XORG_MACROS/configure" ]; then
-			if ! [ -f "$SRCPATH_XORG_MACROS/configure.ac" ]; then
-				cmd rm -rf "$SRCPATH_XORG_MACROS"
-				cmd mkdir -p "$KOS_ROOT/binutils/src/x"
-				cmd cd "$KOS_ROOT/binutils/src/x"
-				cmd git clone "https://gitlab.freedesktop.org/xorg/util/macros"
-				cmd mv "macros" "xorg-macros"
+			cmd cd "$KOS_ROOT/binutils/src/x"
+			cmd rm -rf "xorg-macros-$VERSION_XORG_MACROS"
+			cmd rm -rf "util-macros-$VERSION_XORG_MACROS"
+			if ! [ -f "xorg-macros-$VERSION_XORG_MACROS.tar.gz" ]; then
+				download_file \
+					"util-macros-$VERSION_XORG_MACROS.tar.gz" \
+					"https://www.x.org/releases/X11R7.7/src/everything/util-macros-$VERSION_XORG_MACROS.tar.gz"
+				cmd mv \
+					"util-macros-$VERSION_XORG_MACROS.tar.gz" \
+					"xorg-macros-$VERSION_XORG_MACROS.tar.gz"
 			fi
-			cmd cd "$SRCPATH_XORG_MACROS"
-			cmd autoreconf -i
-			cmd autoconf
+			cmd tar xvf "xorg-macros-$VERSION_XORG_MACROS.tar.gz"
+			cmd mv "util-macros-$VERSION_XORG_MACROS" "xorg-macros-$VERSION_XORG_MACROS"
 		fi
-		cmd cd "$SRCPATH_XORG_MACROS"
-		cmd bash configure --prefix=/usr
+		cmd rm -rf "$OPTPATH_XORG_MACROS"
+		cmd mkdir -p "$OPTPATH_XORG_MACROS"
+		cmd cd "$OPTPATH_XORG_MACROS"
+		(
+			export CC="${CROSS_PREFIX}gcc"
+			export CPP="${CROSS_PREFIX}cpp"
+			export CFLAGS="-ggdb"
+			export CXX="${CROSS_PREFIX}g++"
+			export CXXCPP="${CROSS_PREFIX}cpp"
+			export CXXFLAGS="-ggdb"
+			cmd bash "../../../../src/x/xorg-macros-$VERSION_XORG_MACROS/configure" \
+				--prefix="$BINUTILS_SYSROOT/usr" \
+				--exec-prefix="$BINUTILS_SYSROOT/usr"
+		) || exit $?
 	fi
-	cmd cd "$SRCPATH_XORG_MACROS"
-	cmd make
-	cmd make install
-	> "$SRCPATH_XORG_MACROS/.installed"
+	cmd cd "$OPTPATH_XORG_MACROS"
+	cmd make -j $MAKE_PARALLEL_COUNT
+	cmd make -j $MAKE_PARALLEL_COUNT install
+
+	# The actual macros file is:
+	#     $BINUTILS_SYSROOT/usr/share/aclocal/xorg-macros.m4
+	cat > "$PKG_CONFIG_PATH/xorg-macros.pc" <<EOF
+prefix=$BINUTILS_SYSROOT/usr
+exec_prefix=$BINUTILS_SYSROOT/usr
+includedir=$BINUTILS_SYSROOT/usr/include
+datarootdir=$BINUTILS_SYSROOT/usr/share
+datadir=$BINUTILS_SYSROOT/usr/share
+PACKAGE=util-macros
+# Used by XORG_INSTALL
+pkgdatadir=$BINUTILS_SYSROOT/usr/share/util-macros
+# docdir is kept for backwards compatibility with XORG_INSTALL from
+# util-macros 1.4
+docdir=$BINUTILS_SYSROOT/usr/share/util-macros
+
+Name: X.Org Macros
+Description: A set of autoconf project macros for X.Org modules
+Version: $VERSION_XORG_MACROS
+EOF
 fi
+
