@@ -21,6 +21,7 @@ ZLIB_VERSION_MAJOR="1"
 ZLIB_VERSION="$ZLIB_VERSION_MAJOR.2.11"
 SRCPATH="$KOS_ROOT/binutils/src/zlib-$ZLIB_VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/zlib-$ZLIB_VERSION"
+
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libz.so.$ZLIB_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
@@ -49,6 +50,26 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libz.so.$ZLIB_VERSION" ]; t
 	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
+fi
+
+# Install the PKG_CONFIG file
+if ! [ -f "$PKG_CONFIG_PATH/zlib.pc" ]; then
+	cmd mkdir -p "$PKG_CONFIG_PATH"
+	cat > "$PKG_CONFIG_PATH/zlib.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+sharedlibdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: zlib
+Description: zlib compression library
+Version: $ZLIB_VERSION
+
+Requires:
+Libs: -lz
+Cflags:
+EOF
 fi
 
 # Install libraries
