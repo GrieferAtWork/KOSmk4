@@ -60,7 +60,8 @@
 	 x.startswith("ncursesw/") || \
 	 x.startswith("drm/") ||      \
 	 x.startswith("libpng") ||    \
-	 x.startswith("openssl/"))
+	 x.startswith("openssl/") ||  \
+	 x.startswith("pixman-1/"))
 
 local chk_include = {
 	"eti.h",
@@ -99,6 +100,9 @@ local chk_include = {
 	"bzlib.h",
 
 	"ft2build.h",
+
+	"pixman.h",
+	"pixman-version.h",
 
 	"zconf.h",
 	"zlib.h",
@@ -158,7 +162,8 @@ function incdir(prefix, path) {
 			}
 		} else if (x !in [
 			"atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h",
-			"__atomic-libatomic.h", "service-lock.h"
+			"__atomic-libatomic.h", "service-lock.h",
+			"pixman-version.h"
 		]) {
 			if (x.endswith(".h") && !x.endswith("-impl.h")) {
 				local full;
@@ -1459,6 +1464,12 @@ incdir("", "../../include");
 #if __has_include(<pciaccess.h>)
 #include <pciaccess.h>
 #endif /* __has_include(<pciaccess.h>) */
+#if __has_include(<pixman-1/pixman.h>)
+#include <pixman-1/pixman.h>
+#endif /* __has_include(<pixman-1/pixman.h>) */
+#if __has_include(<pixman.h>)
+#include <pixman.h>
+#endif /* __has_include(<pixman.h>) */
 #if __has_include(<png.h>)
 #include <png.h>
 #endif /* __has_include(<png.h>) */
