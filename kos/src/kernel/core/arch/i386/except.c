@@ -837,6 +837,7 @@ err:
 
 
 
+DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
 PUBLIC unsigned int
 NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
                                     struct kcpustate *__restrict state,

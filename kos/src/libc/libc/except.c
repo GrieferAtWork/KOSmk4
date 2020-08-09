@@ -231,6 +231,7 @@ libc_get_kos_unwind_exception(void) {
  *       with its API, in that kos exceptions should show up as foreign exceptions
  *       when interfaced with the standard c++ API (which they do) */
 DEFINE_PUBLIC_WEAK_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
+DEFINE_PUBLIC_WEAK_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
 

@@ -381,6 +381,7 @@
 #define __CRT_HAVE___gamma 1
 #define __CRT_HAVE___gammaf 1
 #define __CRT_HAVE___gammal 1
+#define __CRT_HAVE___gcc_personality_v0 1
 #define __CRT_HAVE___get_cygerrno 1
 #define __CRT_HAVE___get_doserrno 1
 #define __CRT_HAVE___get_errno 1
