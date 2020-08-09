@@ -92,6 +92,9 @@ local chk_include = {
 	"pngconf.h",
 	"pnglibconf.h",
 
+	"expat.h",
+	"expat_external.h",
+
 	"zconf.h",
 	"zlib.h",
 };
@@ -557,6 +560,12 @@ incdir("", "../../include");
 #include <etip.h>
 #endif /* __cpluslus && __has_include(<etip.h>) */
 #include <execinfo.h>
+#if __has_include(<expat.h>)
+#include <expat.h>
+#endif /* __has_include(<expat.h>) */
+#if __has_include(<expat_external.h>)
+#include <expat_external.h>
+#endif /* __has_include(<expat_external.h>) */
 #include <fcntl.h>
 #include <features.h>
 #include <fenv.h>

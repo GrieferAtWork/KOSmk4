@@ -55,6 +55,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libffi-3.3](https://github.com/libffi/libffi)
 	- [libpng-1.6.35](https://github.com/glennrp/libpng)
 	- [libpciaccess-0.16](https://cgit.freedesktop.org/xorg/lib/libpciaccess/)
+	- [libexpat-2.2.9](https://github.com/libexpat/libexpat)
 
 
 <a name="features"></a>
