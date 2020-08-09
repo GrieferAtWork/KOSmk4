@@ -17,8 +17,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# NOTE: This program requires that you first run:
-#       $ make_utility.sh <TARGET> ncurses
+# depends: libncurses
 
 VERSION="0268d6df09990cbb85682b1ad947b8d602acb097"
 SRCPATH="$KOS_ROOT/binutils/src/tty-solitaire"

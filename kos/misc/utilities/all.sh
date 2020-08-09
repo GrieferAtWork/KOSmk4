@@ -33,10 +33,6 @@ BLACKLIST=" all "
 cmd cd "$KOS_MISC/utilities"
 
 # Build libraries first!
-for name in ncurses zlib; do
-	BLACKLIST="$BLACKLIST $name "
-	makepart $name
-done
 for name in lib*.sh; do
 	name="${name::-3}"
 	BLACKLIST="$BLACKLIST $name "

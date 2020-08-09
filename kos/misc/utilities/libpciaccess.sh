@@ -17,7 +17,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: zlib
+# depends: libzlib
 
 # xorg-macros
 . "$KOS_MISC/utilities/misc/xorg-macros.sh"

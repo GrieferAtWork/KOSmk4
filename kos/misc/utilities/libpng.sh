@@ -17,7 +17,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: zlib
+# depends: libzlib
 
 VERSION="1.6.35"
 SO_VERSION_MAJOR="16"
@@ -78,6 +78,24 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libpng$SO_VERSION_MAJ
 	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
+fi
+
+# Install the PKG_CONFIG file
+if ! [ -f "$PKG_CONFIG_PATH/libpng.pc" ]; then
+	cmd mkdir -p "$PKG_CONFIG_PATH"
+	cat > "$PKG_CONFIG_PATH/libpng.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include/libpng$SO_VERSION_MAJOR
+
+Name: libpng
+Description: Loads and saves PNG files
+Version: $VERSION
+Requires: zlib
+Libs: -lpng$SO_VERSION_MAJOR
+Cflags:
+EOF
 fi
 
 # Install libraries

@@ -49,8 +49,8 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [nudoku-2.0.0](https://github.com/jubalh/nudoku)
 	- [myman-0.7.1](https://sourceforge.net/projects/myman/)
 - Libraries
-	- [ncurses-6.1](https://www.gnu.org/software/ncurses/)
-	- [zlib-1.2.11](https://www.zlib.net/)
+	- [libncurses-6.1](https://www.gnu.org/software/ncurses/)
+	- [libzlib-1.2.11](https://www.zlib.net/)
 	- [libstdc++-9.1.0](https://gcc.gnu.org/onlinedocs/libstdc++/)
 	- [libffi-3.3](https://github.com/libffi/libffi)
 	- [libpng-1.6.35](https://github.com/glennrp/libpng)

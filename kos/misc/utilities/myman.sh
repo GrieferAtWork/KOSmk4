@@ -17,6 +17,8 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+# depends: libncurses
+
 if [ -z "$VERSION" ]; then VERSION="2009-10-30"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/myman-$VERSION"

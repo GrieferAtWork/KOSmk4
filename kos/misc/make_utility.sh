@@ -129,6 +129,7 @@ fi
 
 # This is the path where PKG_CONFIG utilities load/install their config files
 export PKG_CONFIG_PATH="$BINUTILS_SYSROOT/opt/pkg_config"
+export PKG_CONFIG_LIBDIR="$PKG_CONFIG_PATH"
 
 
 require_program() {
