@@ -61,6 +61,23 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libbz2.a" ]; then
 	vcmd "${CROSS_PREFIX}ar" rcs "$OPTPATH/libbz2.a" ${SOURCES//.c/.o}
 fi
 
+# Install the PKG_CONFIG file
+if ! [ -f "$PKG_CONFIG_PATH/bzip2.pc" ]; then
+	cmd mkdir -p "$PKG_CONFIG_PATH"
+	cat > "$PKG_CONFIG_PATH/bzip2.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: bzip2
+Description: The bzip2 Library
+Version: $VERSION
+Cflags:
+Libs: -lbz2
+EOF
+fi
+
 # Install libraries
 install_file /$TARGET_LIBPATH/libbz2.so "$OPTPATH/libbz2.so"
 install_file_nodisk /$TARGET_LIBPATH/libbz2.a "$OPTPATH/libbz2.a"
