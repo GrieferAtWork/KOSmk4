@@ -68,6 +68,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- [libpixman-0.40.0](http://pixman.org/)
 		- [xextproto-7.2.1](https://www.x.org/releases/X11R7.7/src/everything)
 		- [kbproto-1.0.6](https://www.x.org/releases/X11R7.7/src/everything)
+		- [inputproto-2.2](https://www.x.org/releases/X11R7.7/src/everything)
 
 
 <a name="features"></a>
