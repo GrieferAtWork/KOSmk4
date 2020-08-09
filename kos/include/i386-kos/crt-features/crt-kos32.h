@@ -967,6 +967,7 @@
 #define __CRT_HAVE__localtime64 1
 #define __CRT_HAVE__locking 1
 #define __CRT_HAVE__logb 1
+#define __CRT_HAVE__longjmp 1
 #define __CRT_HAVE__lrotl 1
 #define __CRT_HAVE__lrotr 1
 #define __CRT_HAVE__lseek 1

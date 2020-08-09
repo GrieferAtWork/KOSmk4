@@ -94,9 +94,11 @@ __CEIDECLARE(__ATTR_NORETURN,void,__NOTHROW_NCX,longjmp,(jmp_buf __buf, int __si
 #else /* __CRT_HAVE___fast_longjmp */
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,longjmp,(jmp_buf __buf, int __sig),(__buf,__sig))
 #endif /* !__CRT_HAVE___fast_longjmp */
-#else /* __CRT_HAVE_longjmp */
+#elif defined(__CRT_HAVE__longjmp)
+__CREDIRECT_VOID(__ATTR_NORETURN,__NOTHROW_NCX,longjmp,(jmp_buf __buf, int __sig),_longjmp,(__buf,__sig))
+#else /* ... */
 #undef __std_longjmp_defined
-#endif /* !__CRT_HAVE_longjmp */
+#endif /* !... */
 #endif /* !__std_longjmp_defined */
 
 __NAMESPACE_STD_END
@@ -152,6 +154,39 @@ typedef struct __jmp_buf sigjmp_buf[1];
 #endif /* __std_longjmp_defined */
 #endif /* !__CRT_HAVE__setjmpex && !__CRT_HAVE_sigsetjmp */
 #endif /* __USE_POSIX */
+
+#if defined(__USE_MISC) || defined(__USE_XOPEN)
+/* Alias for `longjmp()' */
+#ifdef __CRT_HAVE_longjmp
+#if defined(__CRT_HAVE___fast_longjmp) && !defined(__NO_builtin_constant_p) && !defined(__NO_EXTERN_INLINE)
+#ifdef __INTELLISENSE__
+__ATTR_NORETURN void __NOTHROW_NCX(__LIBCCALL _longjmp)(__NAMESPACE_STD_SYM jmp_buf __buf, int __sig);
+#else /* __INTELLISENSE__ */
+__CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,__fast_longjmp,(__NAMESPACE_STD_SYM jmp_buf __buf, int __sig),(__buf,__sig))
+__CREDIRECT_VOID(__ATTR_NORETURN,__NOTHROW_NCX,__slow_longjmp,(__NAMESPACE_STD_SYM jmp_buf __buf, int __sig),longjmp,(__buf,__sig))
+__CEIREDIRECT(__ATTR_NORETURN,void,__NOTHROW_NCX,_longjmp,(__NAMESPACE_STD_SYM jmp_buf __buf, int __sig),longjmp,{
+	if (__builtin_constant_p(__sig != 0) && (__sig != 0))
+		__fast_longjmp(__buf, __sig);
+	__slow_longjmp(__buf, __sig);
+})
+#endif /* !__INTELLISENSE__ */
+#else /* __CRT_HAVE___fast_longjmp */
+__CREDIRECT_VOID(__ATTR_NORETURN,__NOTHROW_NCX,_longjmp,(__NAMESPACE_STD_SYM jmp_buf __buf, int __sig),longjmp,(__buf,__sig))
+#endif /* !__CRT_HAVE___fast_longjmp */
+#elif defined(__CRT_HAVE__longjmp)
+__CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,_longjmp,(__NAMESPACE_STD_SYM jmp_buf __buf, int __sig),(__buf,__sig))
+#else /* __CRT_HAVE_longjmp */
+#undef __std_longjmp_defined
+#endif /* !__CRT_HAVE_longjmp */
+
+/* Alias for `setjmp()' (but is guarantied to never save the signal mask,
+ * irregardless of how the C library, or the linked program was configured) */
+#if defined(__CRT_HAVE__setjmp)
+__CDECLARE(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,_setjmp,(__NAMESPACE_STD_SYM jmp_buf __buf),(__buf))
+#elif defined(__CRT_HAVE_setjmp)
+__CREDIRECT(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,_setjmp,(__NAMESPACE_STD_SYM jmp_buf __buf),setjmp,(__buf))
+#endif /* ... */
+#endif /* __USE_MISC || __USE_XOPEN */
 
 #endif /* __CC__ */
 

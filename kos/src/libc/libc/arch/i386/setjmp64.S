@@ -90,6 +90,7 @@ INTERN_FUNCTION(libc___fast_longjmp)
 END(libc___fast_longjmp)
 END(libc_longjmp)
 DEFINE_PUBLIC_ALIAS(longjmp, libc_longjmp)
+DEFINE_PUBLIC_ALIAS(_longjmp, libc_longjmp)
 DEFINE_PUBLIC_ALIAS(__longjmp, libc_longjmp)
 DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
 
