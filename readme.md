@@ -60,6 +60,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Experimental:
 		- [libdrm-2.4.82](https://github.com/freedreno/libdrm/archive)
 		- [xtrans-1.2.7](https://www.x.org/releases/X11R7.7/src/lib)
+		- [libfontenc-1.1.1](https://www.x.org/releases/X11R7.7/src/everything)
 
 
 <a name="features"></a>

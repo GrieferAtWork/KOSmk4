@@ -1,5 +1,3 @@
-# NOTE: This file is currently excluded from the git via /.git/info/exclude!
-
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
