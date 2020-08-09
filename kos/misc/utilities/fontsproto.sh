@@ -17,41 +17,43 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-VERSION="1.2.7"
-SRCPATH="$KOS_ROOT/binutils/src/x/xtrans-$VERSION"
+VERSION="2.1.2"
+SRCPATH="$KOS_ROOT/binutils/src/x/fontsproto-$VERSION"
 
-# xtrans
+# fontsproto
 if ! [ -f "$SRCPATH/configure" ]; then
 	cmd cd "$KOS_ROOT/binutils/src/x"
-	cmd rm -rf "xtrans-$VERSION"
+	cmd rm -rf "fontsproto-$VERSION"
 	download_file \
-		"xtrans-$VERSION.tar.gz" \
-		"https://www.x.org/releases/X11R7.7/src/lib/xtrans-$VERSION.tar.gz"
-	cmd tar xvf "xtrans-$VERSION.tar.gz"
+		"fontsproto-$VERSION.tar.gz" \
+		"https://www.x.org/releases/X11R7.7/src/everything/fontsproto-$VERSION.tar.gz"
+	cmd tar xvf "fontsproto-$VERSION.tar.gz"
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/xtrans.pc" ]; then
+if ! [ -f "$PKG_CONFIG_PATH/fontsproto.pc" ]; then
 	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/xtrans.pc" <<EOF
+	cat > "$PKG_CONFIG_PATH/fontsproto.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 includedir=$KOS_ROOT/kos/include
+includex11dir=$KOS_ROOT/kos/include/X11
 
-Name: XTrans
-Description: Abstract network code for X
+Name: FontsProto
+Description: Fonts extension headers
 Version: $VERSION
-Cflags: -D_BSD_SOURCE -DHAS_FCHOWN -DHAS_STICKY_DIR_BIT
+Cflags:
 EOF
 fi
 
-DSTPATH="$KOS_ROOT/kos/include/X11/Xtrans"
-INSTALL_FILES="Xtrans.h Xtrans.c Xtransint.h Xtranslcl.c"
-INSTALL_FILES="$INSTALL_FILES Xtranssock.c Xtranstli.c"
-INSTALL_FILES="$INSTALL_FILES Xtransutil.c transport.c"
-
-# Install the header files
-for f in $INSTALL_FILES; do
-	install_rawfile "$KOS_ROOT/kos/include/X11/Xtrans/$f" "$SRCPATH/$f"
-done
+# Install headers
+install_header() {
+	install_rawfile "$KOS_ROOT/kos/include/X11/fonts/$1" "$SRCPATH/$1"
+}
+install_header "font.h"
+install_header "fontproto.h"
+install_header "fontstruct.h"
+install_header "FS.h"
+install_header "fsmasks.h"
+install_header "FSproto.h"

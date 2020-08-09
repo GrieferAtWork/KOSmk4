@@ -26,10 +26,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/Xfuncproto.h" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			cmd cd "$KOS_ROOT/binutils/src/x"
-			cmd rm -rf "xorg-server-$VERSION"
+			cmd rm -rf "xproto-$VERSION"
 			download_file \
-				"xorg-server-$VERSION.tar.gz" \
-				"https://www.x.org/releases/X11R7.7/src/lib/xproto-$VERSION.tar.gz"
+				"xproto-$VERSION.tar.gz" \
+				"https://www.x.org/releases/X11R7.7/src/everything/xproto-$VERSION.tar.gz"
 			cmd tar xvf "xproto-$VERSION.tar.gz"
 		fi
 		cmd rm -rf "$OPTPATH"
@@ -75,6 +75,23 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/Xfuncproto.h" ]; then
 	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
+fi
+
+# Install the PKG_CONFIG file
+if ! [ -f "$PKG_CONFIG_PATH/xproto.pc" ]; then
+	cmd mkdir -p "$PKG_CONFIG_PATH"
+	cat > "$PKG_CONFIG_PATH/xproto.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+includex11dir=$KOS_ROOT/kos/include/X11
+
+Name: Xproto
+Description: Xproto headers
+Version: $VERSION
+Cflags:
+EOF
 fi
 
 # Install headers
