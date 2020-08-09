@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98d8cf6a */
+/* HASH CRC-32:0xe13268ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,7 +313,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CON
 
 #ifndef __NO_XBLOCK
 #define IN6_IS_ADDR_UNSPECIFIED(a) __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0; })
-#define IN6_IS_ADDR_LOOPBACK(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == htonl(1); }))
+#define IN6_IS_ADDR_LOOPBACK(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == htonl(1); })
 #define IN6_IS_ADDR_LINKLOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfe800000)); })
 #define IN6_IS_ADDR_SITELOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfec00000)); })
 #define IN6_IS_ADDR_V4MAPPED(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == htonl(__UINT32_C(0x0000ffff)); })
@@ -323,7 +323,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CON
                                               __XRETURN __a->s6_addr32[0] == __b->s6_addr32[0] && \
                                                         __a->s6_addr32[1] == __b->s6_addr32[1] && \
                                                         __a->s6_addr32[2] == __b->s6_addr32[2] && \
-                                                        __a->s6_addr32[3] == __b->s6_addr32[3]; }))
+                                                        __a->s6_addr32[3] == __b->s6_addr32[3]; })
 #else /* !__NO_XBLOCK */
 #define IN6_IS_ADDR_UNSPECIFIED(a) (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == 0)
 #define IN6_IS_ADDR_LOOPBACK(a)    (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == htonl(1))
@@ -336,7 +336,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CON
                                    (((__uint32_t const *)(a))[2] == ((__uint32_t const *)(b))[2]) && \
                                    (((__uint32_t const *)(a))[3] == ((__uint32_t const *)(b))[3]))
 #endif /* __NO_XBLOCK */
-#define IN6_IS_ADDR_MULTICAST(a)    (((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
+#define IN6_IS_ADDR_MULTICAST(a) (((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 
 #ifdef __USE_MISC
 /* Bind socket to a privileged IP port */
