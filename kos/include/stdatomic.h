@@ -154,7 +154,7 @@ typedef enum {
 	memory_order_seq_cst = __ATOMIC_SEQ_CST
 } memory_order;
 
-#if 0 /* ??? */
+#if 1 /* ??? */
 #define __atomic_var_field(x) *(x)
 #define ATOMIC_VAR_INIT(x)     (x)
 #define __COMPILER_ATOMIC(T)  _Atomic T
@@ -274,16 +274,16 @@ typedef __COMPILER_ATOMIC(__UINTMAX_TYPE__) atomic_uintmax_t;
 	atomic_compare_exchange_strong_explicit(ptr, poldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #define atomic_compare_exchange_weak(ptr, poldval, newval) \
 	atomic_compare_exchange_weak_explicit(ptr, poldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#define atomic_fetch_add(ptr, val)               __hybrid_atomic_fetchadd(ptr, val, __ATOMIC_SEQ_CST)
-#define atomic_fetch_add_explicit(ptr, val, mo)  __hybrid_atomic_fetchadd(ptr, val, mo)
-#define atomic_fetch_sub(ptr, val)               __hybrid_atomic_fetchsub(ptr, val, __ATOMIC_SEQ_CST)
-#define atomic_fetch_sub_explicit(ptr, val, mo)  __hybrid_atomic_fetchsub(ptr, val, mo)
-#define atomic_fetch_or(ptr, val)                __hybrid_atomic_fetchor(ptr, val, __ATOMIC_SEQ_CST)
-#define atomic_fetch_or_explicit(ptr, val, mo)   __hybrid_atomic_fetchor(ptr, val, mo)
-#define atomic_fetch_xor(ptr, val)               __hybrid_atomic_fetchxor(ptr, val, __ATOMIC_SEQ_CST)
-#define atomic_fetch_xor_explicit(ptr, val, mo)  __hybrid_atomic_fetchxor(ptr, val, mo)
-#define atomic_fetch_and(ptr, val)               __hybrid_atomic_fetchand(ptr, val, __ATOMIC_SEQ_CST)
-#define atomic_fetch_and_explicit(ptr, val, mo)  __hybrid_atomic_fetchand(ptr, val, mo)
+#define atomic_fetch_add(ptr, val)               __hybrid_atomic_fetchadd(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)
+#define atomic_fetch_add_explicit(ptr, val, mo)  __hybrid_atomic_fetchadd(__atomic_var_field(ptr), val, mo)
+#define atomic_fetch_sub(ptr, val)               __hybrid_atomic_fetchsub(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)
+#define atomic_fetch_sub_explicit(ptr, val, mo)  __hybrid_atomic_fetchsub(__atomic_var_field(ptr), val, mo)
+#define atomic_fetch_or(ptr, val)                __hybrid_atomic_fetchor(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)
+#define atomic_fetch_or_explicit(ptr, val, mo)   __hybrid_atomic_fetchor(__atomic_var_field(ptr), val, mo)
+#define atomic_fetch_xor(ptr, val)               __hybrid_atomic_fetchxor(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)
+#define atomic_fetch_xor_explicit(ptr, val, mo)  __hybrid_atomic_fetchxor(__atomic_var_field(ptr), val, mo)
+#define atomic_fetch_and(ptr, val)               __hybrid_atomic_fetchand(__atomic_var_field(ptr), val, __ATOMIC_SEQ_CST)
+#define atomic_fetch_and_explicit(ptr, val, mo)  __hybrid_atomic_fetchand(__atomic_var_field(ptr), val, mo)
 
 #ifdef __USE_KOS
 #define atomic_cmpxch_explicit(ptr, oldv, newv, succ, fail)          __hybrid_atomic_cmpxch(__atomic_var_field(ptr), oldv, newv, succ, fail)
