@@ -63,6 +63,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- [libfontenc-1.1.1](https://www.x.org/releases/X11R7.7/src/everything)
 		- [xproto-7.0.23](https://www.x.org/releases/X11R7.7/src/everything)
 		- [fontsproto-2.1.2](https://www.x.org/releases/X11R7.7/src/everything)
+		- [libfreetype2-2.10.2](https://www.freetype.org/)
 
 
 <a name="features"></a>

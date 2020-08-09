@@ -98,6 +98,8 @@ local chk_include = {
 
 	"bzlib.h",
 
+	"ft2build.h",
+
 	"zconf.h",
 	"zlib.h",
 };
@@ -130,7 +132,7 @@ function incdir(prefix, path) {
 			if (x in [
 					"i386-kos", "c++", "local", "compiler",
 					"crt-features", "__ice__", "system-test",
-					"libdl", "X11"])
+					"libdl", "X11", "freetype"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
@@ -583,6 +585,9 @@ incdir("", "../../include");
 #endif /* __has_include(<form.h>) */
 #include <format-printer.h>
 #include <format-reader.h>
+#if __has_include(<ft2build.h>)
+#include <ft2build.h>
+#endif /* __has_include(<ft2build.h>) */
 #include <getopt.h>
 #include <getpagesize.h>
 #include <glob.h>

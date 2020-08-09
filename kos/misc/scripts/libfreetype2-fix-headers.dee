@@ -1,0 +1,144 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import * from deemon;
+local FT2_INCPATH = [...][1];
+local FT2_HDRFILES = HashSet();
+
+#ifdef __WINDOWS__
+if (FT2_INCPATH.startswith("/cygdrive/")) {
+	FT2_INCPATH = FT2_INCPATH[10].upper() + ":" +
+		FT2_INCPATH[11:].replace("/", "\\");
+}
+#endif
+
+function removeComments(text: string): string {
+	for (;;) {
+		local s = text.find("/*");
+		if (s < 0)
+			break;
+		local e = text.find("*/", s);
+		if (e < 0)
+			e = #text;
+		else {
+			e += 2;
+		}
+		text = text[:s] + text[e:];
+	}
+	local lcs = text.find("//");
+	if (lcs >= 0)
+		text = text[:lcs];
+	return text;
+}
+
+local incmacros: {string: string} = Dict();
+function scanFileForIncludeMacros(filename: string) {
+	with (local fp = File.open(filename, "r")) {
+		for (local l: fp) {
+			l = removeComments(l.replace("\t", " ")).strip();
+			if (!l.startswith("#"))
+				continue;
+			l = l[1:].lstrip();
+			if (!l.startswith("define "))
+				continue;
+			l = l[6:].lstrip();
+			if (" " !in l)
+				continue;
+			local macroName, none, macroValue = l.partition(" ")...;
+			macroName = macroName.strip().decode("utf-8");
+			macroValue = macroValue.strip().decode("utf-8");
+			if (!macroValue.startswith("<"))
+				continue;
+			if (!macroValue.endswith(">"))
+				continue;
+			if (macroName in incmacros) {
+				print "Warning: Duplicate macro:", repr macroName;
+				incmacros[macroName] = false;
+			} else {
+				incmacros[macroName] = macroValue;
+			}
+		}
+	}
+}
+
+function replaceIncludeMacrosInFile(filename: string) {
+	local changed = false;
+	File.Writer newfp;
+	local text;
+	with (local fp = File.open(filename, "r"))
+		text = fp.readall();
+	for (local l: text.splitlines(true)) {
+		local macname = removeComments(l.replace("\t", " ")).strip();
+		if (!macname.startswith("#"))
+			goto unchanged;
+		macname = macname[1:].lstrip();
+		if (!macname.startswith("include "))
+			goto unchanged;
+		macname = macname[7:].lstrip();
+		if (macname.issymbol()) {
+			if (macname !in incmacros) {
+				print "Warning: Unrecognized #include-macro:", repr macname;
+				goto unchanged;
+			}
+			l = "#include {}\n".format({ incmacros[macname] });
+			changed = true;
+		}
+unchanged:
+		newfp << l;
+	}
+	if (changed) {
+		print "Fixing file:", repr filename;
+		with (local fp = File.open(filename, "w"))
+			fp << newfp.string;
+	}
+}
+
+
+function scanDirectoryForIncludeMacros(path: string) {
+	for (local f: fs.dir(path)) {
+		f = fs.joinpath(path, f);
+		if (fs.stat.isdir(f)) {
+			scanDirectoryForIncludeMacros(f);
+			continue;
+		}
+		if (f.endswith(".h")) {
+			FT2_HDRFILES.insert(f);
+			scanFileForIncludeMacros(f);
+		}
+	}
+}
+
+/* Step #1: Search for #include file macros */
+scanDirectoryForIncludeMacros(FT2_INCPATH);
+
+/* Step #2: Remove entires that are ambiguous */
+again_remove_ambig:
+for (local a, b: incmacros) {
+	if (b === false) {
+		del incmacros[a];
+		goto again_remove_ambig;
+	}
+}
+
+/* Step #3: Replace include macros in #include directives */
+for (local filename: FT2_HDRFILES) {
+	replaceIncludeMacrosInFile(filename);
+}

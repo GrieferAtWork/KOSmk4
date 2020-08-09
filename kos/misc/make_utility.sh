@@ -394,8 +394,10 @@ install_path_hardcopy() {
 rundeemon() {
 	if which deemon > /dev/null 2>&1; then
 		deemon $*
+		return $?
 	else
 		"${KOS_ROOT}/binutils/deemon/deemon" $*
+		return $?
 	fi
 }
 
