@@ -51,7 +51,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/lib/.libs/libexpat.so.$SO_V
 			export CXX="${CROSS_PREFIX}g++"
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
-			# configure things that mmap isn't working without this :(
+			# configure thinks that mmap isn't working without this :(
 			cat > "$OPTPATH/config.site" <<EOF
 ac_cv_func_mmap_fixed_mapped=yes
 EOF

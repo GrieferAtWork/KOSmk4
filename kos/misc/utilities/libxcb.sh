@@ -214,7 +214,7 @@ install_library libxcb-xvmc 0 0 0
 # Install headers
 install_header() {
 	install_rawfile \
-		"$KOS_ROOT/kos/include/X11/xcb/$1" \
+		"$KOS_ROOT/kos/include/xcb/$1" \
 		"$OPTPATH/src/$1"
 }
 

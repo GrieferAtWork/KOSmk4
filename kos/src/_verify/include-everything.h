@@ -136,7 +136,7 @@ function incdir(prefix, path) {
 			if (x in [
 					"i386-kos", "c++", "local", "compiler",
 					"crt-features", "__ice__", "system-test",
-					"libdl", "X11", "freetype"])
+					"libdl", "X11", "xcb", "freetype"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
