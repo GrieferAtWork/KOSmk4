@@ -85,9 +85,9 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/pixman/.libs/libpixman-1.so
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/pixman.pc" ]; then
+if ! [ -f "$PKG_CONFIG_PATH/pixman-1.pc" ]; then
 	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/pixman.pc" <<EOF
+	cat > "$PKG_CONFIG_PATH/pixman-1.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
