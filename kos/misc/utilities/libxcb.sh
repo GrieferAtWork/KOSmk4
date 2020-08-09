@@ -218,6 +218,8 @@ install_header() {
 		"$OPTPATH/src/$1"
 }
 
+install_rawfile "$KOS_ROOT/kos/include/xcb/xcb.h" "$SRCPATH/src/xcb.h"
+install_rawfile "$KOS_ROOT/kos/include/xcb/xcbext.h" "$SRCPATH/src/xcbext.h"
 install_header "xproto.h"
 install_header "bigreq.h"
 install_header "xc_misc.h"
