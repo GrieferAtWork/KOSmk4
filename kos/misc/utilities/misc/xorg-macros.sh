@@ -55,8 +55,8 @@ if ! [ -f "$PKG_CONFIG_PATH/xorg-macros.pc" ]; then
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
 			cmd bash "../../../../src/x/xorg-macros-$VERSION_XORG_MACROS/configure" \
-				--prefix="$BINUTILS_SYSROOT/usr" \
-				--exec-prefix="$BINUTILS_SYSROOT/usr"
+				--prefix="$BINUTILS_SYSROOT/usr/local" \
+				--exec-prefix="$BINUTILS_SYSROOT/usr/local"
 		) || exit $?
 	fi
 	cmd cd "$OPTPATH_XORG_MACROS"
@@ -64,19 +64,19 @@ if ! [ -f "$PKG_CONFIG_PATH/xorg-macros.pc" ]; then
 	cmd make -j $MAKE_PARALLEL_COUNT install
 
 	# The actual macros file is:
-	#     $BINUTILS_SYSROOT/usr/share/aclocal/xorg-macros.m4
+	#     $BINUTILS_SYSROOT/usr/local/share/aclocal/xorg-macros.m4
 	cat > "$PKG_CONFIG_PATH/xorg-macros.pc" <<EOF
-prefix=$BINUTILS_SYSROOT/usr
-exec_prefix=$BINUTILS_SYSROOT/usr
-includedir=$BINUTILS_SYSROOT/usr/include
-datarootdir=$BINUTILS_SYSROOT/usr/share
-datadir=$BINUTILS_SYSROOT/usr/share
+prefix=$BINUTILS_SYSROOT/usr/local
+exec_prefix=$BINUTILS_SYSROOT/usr/local
+includedir=$KOS_ROOT/kos/include
+datarootdir=$BINUTILS_SYSROOT/usr/local/share
+datadir=$BINUTILS_SYSROOT/usr/local/share
 PACKAGE=util-macros
 # Used by XORG_INSTALL
-pkgdatadir=$BINUTILS_SYSROOT/usr/share/util-macros
+pkgdatadir=$BINUTILS_SYSROOT/usr/local/share/util-macros
 # docdir is kept for backwards compatibility with XORG_INSTALL from
 # util-macros 1.4
-docdir=$BINUTILS_SYSROOT/usr/share/util-macros
+docdir=$BINUTILS_SYSROOT/usr/local/share/util-macros
 
 Name: X.Org Macros
 Description: A set of autoconf project macros for X.Org modules
