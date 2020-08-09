@@ -1,0 +1,18 @@
+diff -Naur openssl-1.1.1g-orig/test/rsa_complex.c openssl-1.1.1g/test/rsa_complex.c
+--- openssl-1.1.1g-orig/test/rsa_complex.c	2020-04-21 14:22:39.000000000 +0200
++++ openssl-1.1.1g/test/rsa_complex.c	2020-08-09 10:30:27.422352700 +0200
+@@ -14,7 +14,13 @@
+  */
+ #if defined(__STDC_VERSION__)
+ # if __STDC_VERSION__ >= 199901L
+-#  include <complex.h>
++#  ifdef __has_include
++#   if __has_include(<complex.h>)
++#    include <complex.h>
++#   endif
++#  else
++#   include <complex.h>
++#  endif
+ # endif
+ #endif
+ #include <openssl/rsa.h>

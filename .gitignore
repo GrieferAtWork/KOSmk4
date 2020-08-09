@@ -73,5 +73,8 @@ __ice__
 /kos/include/expat_external.h
 /kos/include/i386-kos/expat_config.h
 
+# These headers are installed by `make_utility.sh ... openssl`
+/kos/include/openssl/
+
 # These headers are installed by `make_utility.sh ... xtrans`, among others
 /kos/include/X11/

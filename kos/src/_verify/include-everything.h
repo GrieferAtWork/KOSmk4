@@ -59,7 +59,8 @@
 	(x in chk_include ||          \
 	 x.startswith("ncursesw/") || \
 	 x.startswith("drm/") ||      \
-	 x.startswith("libpng"))
+	 x.startswith("libpng") ||    \
+	 x.startswith("openssl/"))
 
 local chk_include = {
 	"eti.h",
@@ -1098,6 +1099,312 @@ incdir("", "../../include");
 #include <netinet/udp.h>
 #include <netpacket/packet.h>
 #include <newlib.h>
+#if __has_include(<openssl/aes.h>)
+#include <openssl/aes.h>
+#endif /* __has_include(<openssl/aes.h>) */
+#if __has_include(<openssl/asn1.h>)
+#include <openssl/asn1.h>
+#endif /* __has_include(<openssl/asn1.h>) */
+#if __has_include(<openssl/asn1err.h>)
+#include <openssl/asn1err.h>
+#endif /* __has_include(<openssl/asn1err.h>) */
+#if __has_include(<openssl/asn1t.h>)
+#include <openssl/asn1t.h>
+#endif /* __has_include(<openssl/asn1t.h>) */
+#if __has_include(<openssl/async.h>)
+#include <openssl/async.h>
+#endif /* __has_include(<openssl/async.h>) */
+#if __has_include(<openssl/asyncerr.h>)
+#include <openssl/asyncerr.h>
+#endif /* __has_include(<openssl/asyncerr.h>) */
+#if __has_include(<openssl/bio.h>)
+#include <openssl/bio.h>
+#endif /* __has_include(<openssl/bio.h>) */
+#if __has_include(<openssl/bioerr.h>)
+#include <openssl/bioerr.h>
+#endif /* __has_include(<openssl/bioerr.h>) */
+#if __has_include(<openssl/blowfish.h>)
+#include <openssl/blowfish.h>
+#endif /* __has_include(<openssl/blowfish.h>) */
+#if __has_include(<openssl/bn.h>)
+#include <openssl/bn.h>
+#endif /* __has_include(<openssl/bn.h>) */
+#if __has_include(<openssl/bnerr.h>)
+#include <openssl/bnerr.h>
+#endif /* __has_include(<openssl/bnerr.h>) */
+#if __has_include(<openssl/buffer.h>)
+#include <openssl/buffer.h>
+#endif /* __has_include(<openssl/buffer.h>) */
+#if __has_include(<openssl/buffererr.h>)
+#include <openssl/buffererr.h>
+#endif /* __has_include(<openssl/buffererr.h>) */
+#if __has_include(<openssl/camellia.h>)
+#include <openssl/camellia.h>
+#endif /* __has_include(<openssl/camellia.h>) */
+#if __has_include(<openssl/cast.h>)
+#include <openssl/cast.h>
+#endif /* __has_include(<openssl/cast.h>) */
+#if __has_include(<openssl/cmac.h>)
+#include <openssl/cmac.h>
+#endif /* __has_include(<openssl/cmac.h>) */
+#if __has_include(<openssl/cms.h>)
+#include <openssl/cms.h>
+#endif /* __has_include(<openssl/cms.h>) */
+#if __has_include(<openssl/cmserr.h>)
+#include <openssl/cmserr.h>
+#endif /* __has_include(<openssl/cmserr.h>) */
+#if __has_include(<openssl/comp.h>)
+#include <openssl/comp.h>
+#endif /* __has_include(<openssl/comp.h>) */
+#if __has_include(<openssl/comperr.h>)
+#include <openssl/comperr.h>
+#endif /* __has_include(<openssl/comperr.h>) */
+#if __has_include(<openssl/conf.h>)
+#include <openssl/conf.h>
+#endif /* __has_include(<openssl/conf.h>) */
+#if __has_include(<openssl/conf_api.h>)
+#include <openssl/conf_api.h>
+#endif /* __has_include(<openssl/conf_api.h>) */
+#if __has_include(<openssl/conferr.h>)
+#include <openssl/conferr.h>
+#endif /* __has_include(<openssl/conferr.h>) */
+#if __has_include(<openssl/crypto.h>)
+#include <openssl/crypto.h>
+#endif /* __has_include(<openssl/crypto.h>) */
+#if __has_include(<openssl/cryptoerr.h>)
+#include <openssl/cryptoerr.h>
+#endif /* __has_include(<openssl/cryptoerr.h>) */
+#if __has_include(<openssl/ct.h>)
+#include <openssl/ct.h>
+#endif /* __has_include(<openssl/ct.h>) */
+#if __has_include(<openssl/cterr.h>)
+#include <openssl/cterr.h>
+#endif /* __has_include(<openssl/cterr.h>) */
+#if __has_include(<openssl/des.h>)
+#include <openssl/des.h>
+#endif /* __has_include(<openssl/des.h>) */
+#if __has_include(<openssl/dh.h>)
+#include <openssl/dh.h>
+#endif /* __has_include(<openssl/dh.h>) */
+#if __has_include(<openssl/dherr.h>)
+#include <openssl/dherr.h>
+#endif /* __has_include(<openssl/dherr.h>) */
+#if __has_include(<openssl/dsa.h>)
+#include <openssl/dsa.h>
+#endif /* __has_include(<openssl/dsa.h>) */
+#if __has_include(<openssl/dsaerr.h>)
+#include <openssl/dsaerr.h>
+#endif /* __has_include(<openssl/dsaerr.h>) */
+#if __has_include(<openssl/dtls1.h>)
+#include <openssl/dtls1.h>
+#endif /* __has_include(<openssl/dtls1.h>) */
+#if __has_include(<openssl/e_os2.h>)
+#include <openssl/e_os2.h>
+#endif /* __has_include(<openssl/e_os2.h>) */
+#if __has_include(<openssl/ebcdic.h>)
+#include <openssl/ebcdic.h>
+#endif /* __has_include(<openssl/ebcdic.h>) */
+#if __has_include(<openssl/ec.h>)
+#include <openssl/ec.h>
+#endif /* __has_include(<openssl/ec.h>) */
+#if __has_include(<openssl/ecdh.h>)
+#include <openssl/ecdh.h>
+#endif /* __has_include(<openssl/ecdh.h>) */
+#if __has_include(<openssl/ecdsa.h>)
+#include <openssl/ecdsa.h>
+#endif /* __has_include(<openssl/ecdsa.h>) */
+#if __has_include(<openssl/ecerr.h>)
+#include <openssl/ecerr.h>
+#endif /* __has_include(<openssl/ecerr.h>) */
+#if __has_include(<openssl/engine.h>)
+#include <openssl/engine.h>
+#endif /* __has_include(<openssl/engine.h>) */
+#if __has_include(<openssl/engineerr.h>)
+#include <openssl/engineerr.h>
+#endif /* __has_include(<openssl/engineerr.h>) */
+#if __has_include(<openssl/err.h>)
+#include <openssl/err.h>
+#endif /* __has_include(<openssl/err.h>) */
+#if __has_include(<openssl/evp.h>)
+#include <openssl/evp.h>
+#endif /* __has_include(<openssl/evp.h>) */
+#if __has_include(<openssl/evperr.h>)
+#include <openssl/evperr.h>
+#endif /* __has_include(<openssl/evperr.h>) */
+#if __has_include(<openssl/hmac.h>)
+#include <openssl/hmac.h>
+#endif /* __has_include(<openssl/hmac.h>) */
+#if __has_include(<openssl/idea.h>)
+#include <openssl/idea.h>
+#endif /* __has_include(<openssl/idea.h>) */
+#if __has_include(<openssl/kdf.h>)
+#include <openssl/kdf.h>
+#endif /* __has_include(<openssl/kdf.h>) */
+#if __has_include(<openssl/kdferr.h>)
+#include <openssl/kdferr.h>
+#endif /* __has_include(<openssl/kdferr.h>) */
+#if __has_include(<openssl/lhash.h>)
+#include <openssl/lhash.h>
+#endif /* __has_include(<openssl/lhash.h>) */
+#if __has_include(<openssl/md2.h>)
+#include <openssl/md2.h>
+#endif /* __has_include(<openssl/md2.h>) */
+#if __has_include(<openssl/md4.h>)
+#include <openssl/md4.h>
+#endif /* __has_include(<openssl/md4.h>) */
+#if __has_include(<openssl/md5.h>)
+#include <openssl/md5.h>
+#endif /* __has_include(<openssl/md5.h>) */
+#if __has_include(<openssl/mdc2.h>)
+#include <openssl/mdc2.h>
+#endif /* __has_include(<openssl/mdc2.h>) */
+#if __has_include(<openssl/modes.h>)
+#include <openssl/modes.h>
+#endif /* __has_include(<openssl/modes.h>) */
+#if __has_include(<openssl/obj_mac.h>)
+#include <openssl/obj_mac.h>
+#endif /* __has_include(<openssl/obj_mac.h>) */
+#if __has_include(<openssl/objects.h>)
+#include <openssl/objects.h>
+#endif /* __has_include(<openssl/objects.h>) */
+#if __has_include(<openssl/objectserr.h>)
+#include <openssl/objectserr.h>
+#endif /* __has_include(<openssl/objectserr.h>) */
+#if __has_include(<openssl/ocsp.h>)
+#include <openssl/ocsp.h>
+#endif /* __has_include(<openssl/ocsp.h>) */
+#if __has_include(<openssl/ocsperr.h>)
+#include <openssl/ocsperr.h>
+#endif /* __has_include(<openssl/ocsperr.h>) */
+#if __has_include(<openssl/opensslv.h>)
+#include <openssl/opensslv.h>
+#endif /* __has_include(<openssl/opensslv.h>) */
+#if __has_include(<openssl/ossl_typ.h>)
+#include <openssl/ossl_typ.h>
+#endif /* __has_include(<openssl/ossl_typ.h>) */
+#if __has_include(<openssl/pem.h>)
+#include <openssl/pem.h>
+#endif /* __has_include(<openssl/pem.h>) */
+#if __has_include(<openssl/pem2.h>)
+#include <openssl/pem2.h>
+#endif /* __has_include(<openssl/pem2.h>) */
+#if __has_include(<openssl/pemerr.h>)
+#include <openssl/pemerr.h>
+#endif /* __has_include(<openssl/pemerr.h>) */
+#if __has_include(<openssl/pkcs12.h>)
+#include <openssl/pkcs12.h>
+#endif /* __has_include(<openssl/pkcs12.h>) */
+#if __has_include(<openssl/pkcs12err.h>)
+#include <openssl/pkcs12err.h>
+#endif /* __has_include(<openssl/pkcs12err.h>) */
+#if __has_include(<openssl/pkcs7.h>)
+#include <openssl/pkcs7.h>
+#endif /* __has_include(<openssl/pkcs7.h>) */
+#if __has_include(<openssl/pkcs7err.h>)
+#include <openssl/pkcs7err.h>
+#endif /* __has_include(<openssl/pkcs7err.h>) */
+#if __has_include(<openssl/rand.h>)
+#include <openssl/rand.h>
+#endif /* __has_include(<openssl/rand.h>) */
+#if __has_include(<openssl/rand_drbg.h>)
+#include <openssl/rand_drbg.h>
+#endif /* __has_include(<openssl/rand_drbg.h>) */
+#if __has_include(<openssl/randerr.h>)
+#include <openssl/randerr.h>
+#endif /* __has_include(<openssl/randerr.h>) */
+#if __has_include(<openssl/rc2.h>)
+#include <openssl/rc2.h>
+#endif /* __has_include(<openssl/rc2.h>) */
+#if __has_include(<openssl/rc4.h>)
+#include <openssl/rc4.h>
+#endif /* __has_include(<openssl/rc4.h>) */
+#if __has_include(<openssl/rc5.h>)
+#include <openssl/rc5.h>
+#endif /* __has_include(<openssl/rc5.h>) */
+#if __has_include(<openssl/ripemd.h>)
+#include <openssl/ripemd.h>
+#endif /* __has_include(<openssl/ripemd.h>) */
+#if __has_include(<openssl/rsa.h>)
+#include <openssl/rsa.h>
+#endif /* __has_include(<openssl/rsa.h>) */
+#if __has_include(<openssl/rsaerr.h>)
+#include <openssl/rsaerr.h>
+#endif /* __has_include(<openssl/rsaerr.h>) */
+#if __has_include(<openssl/safestack.h>)
+#include <openssl/safestack.h>
+#endif /* __has_include(<openssl/safestack.h>) */
+#if __has_include(<openssl/seed.h>)
+#include <openssl/seed.h>
+#endif /* __has_include(<openssl/seed.h>) */
+#if __has_include(<openssl/sha.h>)
+#include <openssl/sha.h>
+#endif /* __has_include(<openssl/sha.h>) */
+#if __has_include(<openssl/srp.h>)
+#include <openssl/srp.h>
+#endif /* __has_include(<openssl/srp.h>) */
+#if __has_include(<openssl/srtp.h>)
+#include <openssl/srtp.h>
+#endif /* __has_include(<openssl/srtp.h>) */
+#if __has_include(<openssl/ssl.h>)
+#include <openssl/ssl.h>
+#endif /* __has_include(<openssl/ssl.h>) */
+#if __has_include(<openssl/ssl2.h>)
+#include <openssl/ssl2.h>
+#endif /* __has_include(<openssl/ssl2.h>) */
+#if __has_include(<openssl/ssl3.h>)
+#include <openssl/ssl3.h>
+#endif /* __has_include(<openssl/ssl3.h>) */
+#if __has_include(<openssl/sslerr.h>)
+#include <openssl/sslerr.h>
+#endif /* __has_include(<openssl/sslerr.h>) */
+#if __has_include(<openssl/stack.h>)
+#include <openssl/stack.h>
+#endif /* __has_include(<openssl/stack.h>) */
+#if __has_include(<openssl/store.h>)
+#include <openssl/store.h>
+#endif /* __has_include(<openssl/store.h>) */
+#if __has_include(<openssl/storeerr.h>)
+#include <openssl/storeerr.h>
+#endif /* __has_include(<openssl/storeerr.h>) */
+#if __has_include(<openssl/symhacks.h>)
+#include <openssl/symhacks.h>
+#endif /* __has_include(<openssl/symhacks.h>) */
+#if __has_include(<openssl/tls1.h>)
+#include <openssl/tls1.h>
+#endif /* __has_include(<openssl/tls1.h>) */
+#if __has_include(<openssl/ts.h>)
+#include <openssl/ts.h>
+#endif /* __has_include(<openssl/ts.h>) */
+#if __has_include(<openssl/tserr.h>)
+#include <openssl/tserr.h>
+#endif /* __has_include(<openssl/tserr.h>) */
+#if __has_include(<openssl/txt_db.h>)
+#include <openssl/txt_db.h>
+#endif /* __has_include(<openssl/txt_db.h>) */
+#if __has_include(<openssl/ui.h>)
+#include <openssl/ui.h>
+#endif /* __has_include(<openssl/ui.h>) */
+#if __has_include(<openssl/uierr.h>)
+#include <openssl/uierr.h>
+#endif /* __has_include(<openssl/uierr.h>) */
+#if __has_include(<openssl/whrlpool.h>)
+#include <openssl/whrlpool.h>
+#endif /* __has_include(<openssl/whrlpool.h>) */
+#if __has_include(<openssl/x509.h>)
+#include <openssl/x509.h>
+#endif /* __has_include(<openssl/x509.h>) */
+#if __has_include(<openssl/x509_vfy.h>)
+#include <openssl/x509_vfy.h>
+#endif /* __has_include(<openssl/x509_vfy.h>) */
+#if __has_include(<openssl/x509err.h>)
+#include <openssl/x509err.h>
+#endif /* __has_include(<openssl/x509err.h>) */
+#if __has_include(<openssl/x509v3.h>)
+#include <openssl/x509v3.h>
+#endif /* __has_include(<openssl/x509v3.h>) */
+#if __has_include(<openssl/x509v3err.h>)
+#include <openssl/x509v3err.h>
+#endif /* __has_include(<openssl/x509v3err.h>) */
 #include <optimized/error.h>
 #include <optimized/fenv.h>
 #include <optimized/ssp.string.h>
