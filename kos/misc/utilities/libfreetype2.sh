@@ -127,7 +127,7 @@ EOF
 fi
 
 # Install libraries
-install_file /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"
+install_file /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION_MAJOR "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"
 install_symlink /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION libfreetype.so.$SO_VERSION_MAJOR
 install_symlink /$TARGET_LIBPATH/libfreetype.so libfreetype.so.$SO_VERSION_MAJOR
 install_file_nodisk /$TARGET_LIBPATH/libfreetype.a "$OPTPATH/objs/.libs/libfreetype.a"
