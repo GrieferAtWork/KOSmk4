@@ -56,6 +56,10 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libpng-1.6.35](https://github.com/glennrp/libpng)
 	- [libpciaccess-0.16](https://cgit.freedesktop.org/xorg/lib/libpciaccess/)
 	- [libexpat-2.2.9](https://github.com/libexpat/libexpat)
+	- [libbzip2-1.0.8](https://sourceware.org/bzip2/index.html)
+	- Experimental:
+		- [libdrm-2.4.82](https://github.com/freedreno/libdrm/archive)
+		- [xtrans-1.2.7](https://www.x.org/releases/X11R7.7/src/lib)
 
 
 <a name="features"></a>

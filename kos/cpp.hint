@@ -753,6 +753,4 @@
 #define PNG_EXPORT(ordinal,type,name,args) type name args
 #define PNG_CALLBACK(type,name,args) type (name) args
 #define PNGARG(arglist) arglist
-
-
-
+#define BZ_API(func) func

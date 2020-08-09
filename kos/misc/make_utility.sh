@@ -37,6 +37,26 @@ xcmd() {
 	}
 }
 
+#>> vcmd <ARGV...>
+vcmd() {
+	echo "run: $*"
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		exit $error
+	}
+}
+
+#>> vxcmd <ARGV...>
+vxcmd() {
+	echo "run: $*"
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		return $error
+	}
+}
+
 MODE_FORCE_CONF=no
 MODE_FORCE_MAKE=no
 MODE_FORCE_DISK=no

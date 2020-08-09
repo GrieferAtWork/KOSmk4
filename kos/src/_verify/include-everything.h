@@ -96,6 +96,8 @@ local chk_include = {
 	"expat.h",
 	"expat_external.h",
 
+	"bzlib.h",
+
 	"zconf.h",
 	"zlib.h",
 };
@@ -415,6 +417,9 @@ incdir("", "../../include");
 #include <bsd/sys/param.h>
 #include <bsd/sys/poll.h>
 #include <byteswap.h>
+#if __has_include(<bzlib.h>)
+#include <bzlib.h>
+#endif /* __has_include(<bzlib.h>) */
 #include <compat/bits/cmsghdr-struct.h>
 #include <compat/bits/flock-struct.h>
 #include <compat/bits/iovec-struct.h>
