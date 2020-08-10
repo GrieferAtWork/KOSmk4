@@ -99,9 +99,9 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libXfont.so.$SO_V
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/libXfont.pc" ]; then
+if ! [ -f "$PKG_CONFIG_PATH/xfont.pc" ]; then
 	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/libXfont.pc" <<EOF
+	cat > "$PKG_CONFIG_PATH/xfont.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
