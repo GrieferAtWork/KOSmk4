@@ -1,0 +1,256 @@
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/common/compiler.h xorg-server-1.12.2/hw/xfree86/common/compiler.h
+--- xorg-server-1.12.2-orig/hw/xfree86/common/compiler.h	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/common/compiler.h	2020-08-10 15:57:08.463712300 +0200
+@@ -978,7 +978,7 @@
+     return xf86ReadMmio32Le((void *) ioBase, port);
+ }
+ 
+-#elif defined(__arm__) && defined(__linux__)
++#elif defined(__arm__) && (defined(__linux__) || defined(__KOS__))
+ 
+ /* for Linux on ARM, we use the LIBC inx/outx routines */
+ /* note that the appropriate setup via "ioperm" needs to be done */
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/loader/os.c xorg-server-1.12.2/hw/xfree86/loader/os.c
+--- xorg-server-1.12.2-orig/hw/xfree86/loader/os.c	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/loader/os.c	2020-08-10 15:58:38.650252600 +0200
+@@ -40,6 +40,8 @@
+ #undef OSNAME
+ #if defined(__linux__)
+ #define OSNAME "linux"
++#elif defined(__KOS__)
++#define OSNAME "kos"
+ #elif defined(__FreeBSD__)
+ #define OSNAME "freebsd"
+ #elif defined(__DragonFly__)
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/os-support/bus/Pci.h xorg-server-1.12.2/hw/xfree86/os-support/bus/Pci.h
+--- xorg-server-1.12.2-orig/hw/xfree86/os-support/bus/Pci.h	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/os-support/bus/Pci.h	2020-08-10 15:01:04.086176200 +0200
+@@ -135,7 +135,7 @@
+ #define PCI_BUS_NO_DOMAIN(bus) ((bus) & 0xffu)
+ #define PCI_TAG_NO_DOMAIN(tag) ((tag) & 0x00ffff00u)
+ 
+-#if defined(linux)
++#if defined(linux) || defined(__KOS__)
+ #define osPciInit(x) do {} while (0)
+ #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
+ 	defined(__OpenBSD__) || defined(__NetBSD__) || \
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/os-support/linux/lnx_agp.c xorg-server-1.12.2/hw/xfree86/os-support/linux/lnx_agp.c
+--- xorg-server-1.12.2-orig/hw/xfree86/os-support/linux/lnx_agp.c	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/os-support/linux/lnx_agp.c	2020-08-10 15:23:59.087882000 +0200
+@@ -17,7 +17,7 @@
+ #include "xf86_OSlib.h"
+ #include "xf86OSpriv.h"
+ 
+-#if defined(linux)
++#if defined(linux) || defined(__KOS__)
+ #include <asm/ioctl.h>
+ #include <linux/agpgart.h>
+ #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+@@ -91,7 +91,7 @@
+     }
+     xf86ReleaseGART(-1);
+ 
+-#if defined(linux)
++#if defined(linux) || defined(__KOS__)
+     /* Per Dave Jones, every effort will be made to keep the 
+      * agpgart interface backwards compatible, so allow all 
+      * future versions.
+@@ -196,7 +196,7 @@
+          * to give up access to the GART, but not to remove any
+          * allocations.
+          */
+-#if !defined(linux)
++#if !defined(linux) || defined(__KOS__)
+         if (screenNum == -1)
+ #endif
+         {
+@@ -263,7 +263,7 @@
+         return FALSE;
+     }
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__KOS__)
+     if (ioctl(gartFd, AGPIOC_DEALLOCATE, (int *) (uintptr_t) key) != 0) {
+ #else
+     if (ioctl(gartFd, AGPIOC_DEALLOCATE, &key) != 0) {
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/os-support/linux/lnx_apm.c xorg-server-1.12.2/hw/xfree86/os-support/linux/lnx_apm.c
+--- xorg-server-1.12.2-orig/hw/xfree86/os-support/linux/lnx_apm.c	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/os-support/linux/lnx_apm.c	2020-08-10 15:07:00.656376500 +0200
+@@ -146,8 +146,10 @@
+     if (!xf86acpiDisableFlag)
+         ret = lnxACPIOpen();
+ 
++#ifdef HAVE_APM
+     if (!ret)
+ #endif
++#endif
+ #ifdef HAVE_APM
+         ret = lnxAPMOpen();
+ #endif
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/os-support/linux/lnx_video.c xorg-server-1.12.2/hw/xfree86/os-support/linux/lnx_video.c
+--- xorg-server-1.12.2-orig/hw/xfree86/os-support/linux/lnx_video.c	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/os-support/linux/lnx_video.c	2020-08-10 15:31:46.631676400 +0200
+@@ -48,7 +48,9 @@
+ 
+ static Bool ExtendedEnabled = FALSE;
+ 
+-#ifdef __ia64__
++#ifdef __KOS__
++#include <sys/perm.h>
++#elif defined __ia64__
+ 
+ #include "compiler.h"
+ #include <sys/io.h>
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/os-support/xf86_OSlib.h xorg-server-1.12.2/hw/xfree86/os-support/xf86_OSlib.h
+--- xorg-server-1.12.2-orig/hw/xfree86/os-support/xf86_OSlib.h	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/os-support/xf86_OSlib.h	2020-08-10 15:30:22.929234900 +0200
+@@ -171,7 +171,7 @@
+ /**************************************************************************/
+ /* Linux or Glibc-based system                                            */
+ /**************************************************************************/
+-#if defined(__linux__) || defined(__GLIBC__)
++#if defined(__linux__) || defined(__KOS__) || defined(__GLIBC__)
+ #include <sys/ioctl.h>
+ #include <signal.h>
+ #include <stdlib.h>
+@@ -192,7 +192,7 @@
+ #include <sys/stat.h>
+ 
+ #include <sys/mman.h>
+-#ifdef __linux__
++#if defined(__linux__) || defined(__KOS__)
+ #define HAS_USL_VTS
+ #include <sys/kd.h>
+ #include <sys/vt.h>
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/parser/write.c xorg-server-1.12.2/hw/xfree86/parser/write.c
+--- xorg-server-1.12.2-orig/hw/xfree86/parser/write.c	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/parser/write.c	2020-08-10 15:32:45.899076500 +0200
+@@ -67,7 +67,7 @@
+ #include <signal.h>
+ #include <errno.h>
+ 
+-#if defined(SVR4) || defined(__linux__) || defined(CSRG_BASED)
++#if defined(SVR4) || defined(__linux__) || defined(__KOS__) || defined(CSRG_BASED)
+ #define HAS_SAVED_IDS_AND_SETEUID
+ #endif
+ #if defined(WIN32)
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/sdksyms.sh xorg-server-1.12.2/hw/xfree86/sdksyms.sh
+--- xorg-server-1.12.2-orig/hw/xfree86/sdksyms.sh	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/sdksyms.sh	2020-08-10 15:53:48.336154900 +0200
+@@ -326,29 +326,49 @@
+ export LC_ALL
+ ${CPP:-cpp} "$@" -DXorgLoader sdksyms.c > /dev/null || exit $?
+ ${CPP:-cpp} "$@" -DXorgLoader sdksyms.c | ${AWK:-awk} -v topdir=$topdir '
++# This was taken from
++# https://gitlab.freedesktop.org/xorg/xserver/-/blob/master/hw/xfree86/sdksyms.sh
++# Which is a more recent version of this script, as the original script
++# didn_t work for me.
++function basename(file) {
++    sub(".*/", "", file)
++    return file
++}
+ BEGIN {
+     sdk = 0;
+     print("/*");
+     print(" * These symbols are referenced to ensure they");
+     print(" * will be available in the X Server binary.");
+     print(" */");
+-    printf("/* topdir=%s */\n", topdir);
+     print("_X_HIDDEN void *xorg_symbols[] = {");
+ 
+     printf("sdksyms.c:") > "sdksyms.dep";
+ }
+ /^# [0-9]+ "/ {
+-    #   Process text after a include in a relative path or when the
+-    # processed file has a basename matching $top_srcdir.
+-    #   Note that indexing starts at 1; 0 means no match, and there
+-    # is a starting ".
+-    sdk = $3 !~ /^"\// || index($3, topdir) == 2;
++    # Match preprocessor linemarkers which have the form:
++    # # linenum "filename" flags
++    #
++    # Only process text for sdk exports where the linemarker filename has a
++    # relative path, or an absolute path matching $top_srcdir.
++    #
++
++    # canonicalize filename
++    if ($3 in canonicalized) {
++	c = canonicalized[$3]
++    } else {
++	cmd = "readlink -f " $3
++	cmd | getline c
++	close(cmd)
++        canonicalized[$3] = c
++    }
++    # note that index() starts at 1; 0 means no match.
++    sdk = $3 !~ /^"\// || index(c, topdir) == 1;
+ 
+     if (sdk && $3 ~ /\.h"$/) {
+ 	# remove quotes
+ 	gsub(/"/, "", $3);
+ 	line = $2;
+-	header = $3;
++	header = basename($3);
+ 	if (! headers[$3]) {
+ 	    printf(" \\\n  %s", $3) >> "sdksyms.dep";
+ 	    headers[$3] = 1;
+@@ -361,13 +381,36 @@
+     if (sdk) {
+ 	n = 3;
+ 
++        # skip line numbers GCC 5 adds before __attribute__
++        while ($n == "" || $0 ~ /^# [0-9]+ "/) {
++           getline;
++           n = 1;
++        }
++
+ 	# skip attribute, if any
+ 	while ($n ~ /^(__attribute__|__global)/ ||
+ 	    # skip modifiers, if any
+ 	    $n ~ /^\*?(unsigned|const|volatile|struct|_X_EXPORT)$/ ||
+ 	    # skip pointer
+-	    $n ~ /^[a-zA-Z0-9_]*\*$/)
++	    $n ~ /^[a-zA-Z0-9_]*\*$/) {
+ 	    n++;
++            # skip line numbers GCC 5 adds after __attribute__
++            while ($n == "" || $0 ~ /^# [0-9]+ "/) {
++               getline;
++               n = 1;
++            }
++        }
++	# hack: pid_t becomes __pid_t on NetBSD, same for uint32_t -> __uint32_t.
++	# GCC 5 inserts additional lines around this.
++        if (($1 == "__pid_t" || $1 == "__uint32_t") && NF == 1) {
++            getline;
++            n++;
++            # skip line numbers GCC 5 adds (after typedef return type?)
++            while ($n == "" || $0 ~ /^# [0-9]+ "/) {
++               getline;
++               n = 1;
++            }
++	}
+ 
+ 	# type specifier may not be set, as in
+ 	#   extern _X_EXPORT unsigned name(...)
+@@ -410,7 +453,8 @@
+ 	sub(/[^a-zA-Z0-9_].*/, "", symbol);
+ 
+ 	#print;
+-	printf("    (void *) &%-50s /* %s:%s */\n", symbol ",", header, line);
++	if (symbol != "")
++	    printf("    (void *) &%-50s /* %s:%s */\n", symbol ",", header, line);
+     }
+ }
+ 
+diff -Naur xorg-server-1.12.2-orig/os/utils.c xorg-server-1.12.2/os/utils.c
+--- xorg-server-1.12.2-orig/os/utils.c	2012-05-17 19:09:04.000000000 +0200
++++ xorg-server-1.12.2/os/utils.c	2020-08-10 15:33:01.674984600 +0200
+@@ -204,7 +204,7 @@
+ 
+ char *SeatId = NULL;
+ 
+-#if defined(SVR4) || defined(__linux__) || defined(CSRG_BASED)
++#if defined(SVR4) || defined(__linux__) || defined(__KOS__) || defined(CSRG_BASED)
+ #define HAS_SAVED_IDS_AND_SETEUID
+ #endif
+ 

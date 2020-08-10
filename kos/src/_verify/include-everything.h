@@ -136,7 +136,8 @@ function incdir(prefix, path) {
 			if (x in [
 					"i386-kos", "c++", "local", "compiler",
 					"crt-features", "__ice__", "system-test",
-					"libdl", "X11", "xcb", "freetype", "GL"])
+					"libdl", "X11", "xcb", "freetype", "GL",
+					"xorg"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
@@ -957,6 +958,7 @@ incdir("", "../../include");
 #include <libzlib/inflate.h>
 #include <limits.h>
 #include <link.h>
+#include <linux/agpgart.h>
 #include <linux/bits/posix_types.h>
 #include <linux/fd.h>
 #include <linux/fs.h>

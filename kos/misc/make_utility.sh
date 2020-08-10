@@ -271,6 +271,46 @@ install_symlink() {
 	done
 }
 
+#>> install_mkdir <ABSOLUTE_DISK_PATH>
+install_mkdir() {
+	DISPATH="${1#/}"
+	TARGET_DISPATH="$TARGET_SYSROOT/$DISPATH"
+	DIDUPDATE="no"
+	if ! [ -d "$TARGET_DISPATH" ]; then
+		echo "Installing dir ${TARGET_NAME}-kos:/$DISPATH"
+		DIDUPDATE="yes"
+		cmd mkdir -p "$TARGET_DISPATH"
+	else
+		echo "Installing dir ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+	fi
+	local OLDPWD="$(pwd)"
+	cmd cd "${KOS_ROOT}/bin"
+	local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+	cmd cd "$OLDPWD"
+	local TARGET_DISPATH_MODIFIED="$(stat -c %Y "$TARGET_DISPATH")"
+	for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
+		if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
+			local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+			if [ -f "$DISKIMAGE" ]; then
+				if [ "$DIDUPDATE" == yes ] || ! [ -d "$CONFIG_DISPATH" ]; then
+					echo "    Conf: '$CONFIG_SYSROOT'"
+					cmd mkdir -p "$CONFIG_DISPATH"
+					echo "        Disk: '$DISKIMAGE'"
+					mtools_makedir "$DISKIMAGE" "$DISPATH"
+				else
+					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+					if [ "$MODE_FORCE_DISK" == "yes" ]; then
+						echo "        Disk: '$DISKIMAGE' (forced)"
+						mtools_makedir "$DISKIMAGE" "$DISPATH"
+					fi
+				fi
+			fi
+		fi
+	done
+}
+
 #>> install_file_nodisk <ABSOLUTE_DISK_PATH> <SOURCE>
 install_file_nodisk() {
 	DISPATH="${1#/}"

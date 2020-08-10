@@ -19,5 +19,7 @@
  */
 #ifndef _SYS_VT_H
 #define _SYS_VT_H 1
+
 #include <linux/vt.h>
+
 #endif /* !_SYS_VT_H */

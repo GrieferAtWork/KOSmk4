@@ -19,5 +19,7 @@
  */
 #ifndef _SYS_KD_H
 #define _SYS_KD_H 1
+
 #include <linux/kd.h>
+
 #endif /* !_SYS_KD_H */

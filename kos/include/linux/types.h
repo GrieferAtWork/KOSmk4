@@ -97,6 +97,11 @@ typedef __UINT32_TYPE__ __wsum;
 #define __aligned_u64  __ATTR_ALIGNED(8) __u64
 #define __aligned_be64 __ATTR_ALIGNED(8) __be64
 #define __aligned_le64 __ATTR_ALIGNED(8) __le64
+
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __SIZE_TYPE__ size_t;
+#endif /* !__size_t_defined */
 #endif /* __CC__ */
 
 __DECL_END
