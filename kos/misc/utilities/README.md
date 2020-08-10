@@ -27,3 +27,4 @@ Utilities:
 - [randrproto-1.3.2](https://www.x.org/releases/X11R7.7/src/everything)
 - [renderproto-0.11.1](https://www.x.org/releases/X11R7.7/src/everything)
 - [videoproto-2.3.1](https://www.x.org/releases/X11R7.7/src/everything)
+- [compositeproto-0.4.2](https://www.x.org/releases/X11R7.7/src/everything)
