@@ -71,6 +71,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- [inputproto-2.2](https://www.x.org/releases/X11R7.7/src/everything)
 		- [libXau-1.0.7](https://www.x.org/releases/X11R7.7/src/everything)
 		- [libxcb-1.8.1](https://www.x.org/releases/X11R7.7/src/everything)
+		- [xf86bigfontproto-1.2.0](https://www.x.org/releases/X11R7.7/src/everything)
 
 
 <a name="features"></a>
