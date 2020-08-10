@@ -65,3 +65,7 @@ Add support for *_chk variants (using __builtin_object_size())
 
 <gnu/libc-version.h>
 
+
+Functions:
+	- walkcontext()
+
