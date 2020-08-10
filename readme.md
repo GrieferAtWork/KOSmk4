@@ -80,6 +80,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- [xcmiscproto-1.2.2](https://www.x.org/releases/X11R7.7/src/everything)
 		- [bigreqsproto-1.1.2](https://www.x.org/releases/X11R7.7/src/everything)
 		- [randrproto-1.3.2](https://www.x.org/releases/X11R7.7/src/everything)
+		- [renderproto-0.11.1](https://www.x.org/releases/X11R7.7/src/everything)
 
 
 <a name="features"></a>
