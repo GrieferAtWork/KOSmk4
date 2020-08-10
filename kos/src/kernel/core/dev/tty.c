@@ -47,6 +47,7 @@
 #include <errno.h>
 #include <stddef.h>
 #include <string.h>
+#include <termios.h> /* For ioctl() commands */
 
 DECL_BEGIN
 

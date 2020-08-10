@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+#include <termios.h> /* For ioctl() commands */
 
 #include <libansitty/ansitty.h>
 
