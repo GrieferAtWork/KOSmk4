@@ -1,0 +1,29 @@
+
+<a name="X-server"></a>
+## Experimental utilities for X-server support:
+
+Utilities:
+	- [libdrm-2.4.82](https://github.com/freedreno/libdrm/archive)
+	- [xtrans-1.2.7](https://www.x.org/releases/X11R7.7/src/lib)
+	- [libfontenc-1.1.1](https://www.x.org/releases/X11R7.7/src/everything)
+	- [xproto-7.0.23](https://www.x.org/releases/X11R7.7/src/everything)
+	- [fontsproto-2.1.2](https://www.x.org/releases/X11R7.7/src/everything)
+	- [libfreetype2-2.10.2](https://www.freetype.org/)
+	- [libXfont-1.4.5](https://www.x.org/releases/X11R7.7/src/everything)
+	- [libpixman-0.40.0](http://pixman.org/)
+	- [xextproto-7.2.1](https://www.x.org/releases/X11R7.7/src/everything)
+	- [kbproto-1.0.6](https://www.x.org/releases/X11R7.7/src/everything)
+	- [inputproto-2.2](https://www.x.org/releases/X11R7.7/src/everything)
+	- [libXau-1.0.7](https://www.x.org/releases/X11R7.7/src/everything)
+	- [libxcb-1.8.1](https://www.x.org/releases/X11R7.7/src/everything)
+	- [xf86bigfontproto-1.2.0](https://www.x.org/releases/X11R7.7/src/everything)
+	- [libX11-1.5.0](https://www.x.org/releases/X11R7.7/src/everything)
+	- [glproto-1.4.15](https://www.x.org/releases/X11R7.7/src/everything)
+	- [xf86driproto-2.1.1](https://www.x.org/releases/X11R7.7/src/everything)
+	- [fixesproto-5.0](https://www.x.org/releases/X11R7.7/src/everything)
+	- [damageproto-1.2.1](https://www.x.org/releases/X11R7.7/src/everything)
+	- [xcmiscproto-1.2.2](https://www.x.org/releases/X11R7.7/src/everything)
+	- [bigreqsproto-1.1.2](https://www.x.org/releases/X11R7.7/src/everything)
+	- [randrproto-1.3.2](https://www.x.org/releases/X11R7.7/src/everything)
+	- [renderproto-0.11.1](https://www.x.org/releases/X11R7.7/src/everything)
+	- [videoproto-2.3.1](https://www.x.org/releases/X11R7.7/src/everything)
