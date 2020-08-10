@@ -136,7 +136,7 @@ function incdir(prefix, path) {
 			if (x in [
 					"i386-kos", "c++", "local", "compiler",
 					"crt-features", "__ice__", "system-test",
-					"libdl", "X11", "xcb", "freetype"])
+					"libdl", "X11", "xcb", "freetype", "GL"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
@@ -1535,6 +1535,7 @@ incdir("", "../../include");
 #include <sys/file.h>
 #include <sys/filio.h>
 #include <sys/fsuid.h>
+#include <sys/inttypes.h>
 #include <sys/io.h>
 #include <sys/ioccom.h>
 #include <sys/ioctl.h>

@@ -1,0 +1,15 @@
+diff -Naur glproto-1.4.15-orig/glxint.h glproto-1.4.15/glxint.h
+--- glproto-1.4.15-orig/glxint.h	2012-01-26 15:29:06.000000000 +0100
++++ glproto-1.4.15/glxint.h	2020-08-10 11:46:24.861938100 +0200
+@@ -40,7 +40,11 @@
+ 
+ struct __GLXvisualConfigRec {
+     VisualID vid;
++#ifdef __cplusplus
++    int class_;
++#else /* __cplusplus */
+     int class;
++#endif /* !__cplusplus */
+     Bool rgba;
+     int redSize, greenSize, blueSize, alphaSize;
+     unsigned long redMask, greenMask, blueMask, alphaMask;
