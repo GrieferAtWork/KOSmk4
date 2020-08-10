@@ -30,3 +30,4 @@ Utilities:
 - [compositeproto-0.4.2](https://www.x.org/releases/X11R7.7/src/everything)
 - [recordproto-1.14.2](https://www.x.org/releases/X11R7.7/src/everything)
 - [scrnsaverproto-1.2.2](https://www.x.org/releases/X11R7.7/src/everything)
+- [resourceproto-1.2.0](https://www.x.org/releases/X11R7.7/src/everything)
