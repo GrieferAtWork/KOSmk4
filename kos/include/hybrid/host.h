@@ -24,9 +24,9 @@
 
 #if (!defined(__x86_64__) &&                    \
      (defined(__amd64__) || defined(__amd64) || \
-      defined(__x86_64) || defined(_M_X64) ||   \
-      defined(_M_AMD64) || defined(_WIN64) ||   \
-      defined(WIN64)))
+      defined(amd64) || defined(__x86_64) ||    \
+      defined(_M_X64) || defined(_M_AMD64) ||   \
+      defined(_WIN64) || defined(WIN64)))
 #define __x86_64__ 1
 #endif /* x86_64... */
 
@@ -55,6 +55,14 @@
 #define __arm__ 1
 #endif /* __arm__... */
 
+#if (!defined(__alpha__) && defined(__alpha))
+#define __alpha__ 1
+#endif /* __alpha__... */
+
+#if (!defined(__ia64__) && (defined(__ia64) || defined(ia64)))
+#define __ia64__ 1
+#endif /* __ia64__... */
+
 
 #undef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #ifdef _ALIGNMENT_REQUIRED
@@ -67,7 +75,7 @@
 #include <sys/isa_defs.h>
 #if defined(_ALIGNMENT_REQUIRED) && (_ALIGNMENT_REQUIRED + 0) == 0
 #define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
-#endif /* _ALIGNMENT_REQUIRED */
+#endif /* _ALIGNMENT_REQUIRED == 0 */
 #endif /* ... */
 
 #undef __ARCH_STACK_GROWS_DOWNWARDS

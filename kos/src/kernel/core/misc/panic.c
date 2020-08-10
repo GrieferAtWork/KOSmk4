@@ -123,6 +123,16 @@ NOTHROW(KCALL _kernel_poison)(void) {
 #ifdef CONFIG_HAVE_POISON_HEAP
 	/* Redirect heap functions to use the poison heap */
 	ph_install();
+	/* TODO: Turn system_clearcache() into a no-op.
+	 *       With the poison-heap, kfree() also becomes a no-op,
+	 *       so system_clearcache() won't actually do anything.
+	 * However, that function has an insanely large range of
+	 * call-sites, any of whom may have been compromised by the
+	 * kernel panic, so in trying to maintain system integrity
+	 * for a little while longer, it's in our test interest to
+	 * prevent any unnecessary callbacks to sub-systems that
+	 * depend on too many other sub-systems, or contain dynamic
+	 * callbacks (both of which are the case for this function) */
 #endif /* CONFIG_HAVE_POISON_HEAP */
 	PREEMPTION_POP(was);
 }

@@ -220,7 +220,10 @@
 #define __SIZEOF_POINTER__ 8
 #else /* ... */
 #include "host.h"
-#if defined(__x86_64__) || defined(__aarch64__)
+#if (defined(__x86_64__) || defined(__aarch64__) || \
+     defined(__alpha__) || defined(__ia64__) ||     \
+     defined(__sparc64__) || defined(__s390x__) ||  \
+     defined(__powerpc64__))
 #define __SIZEOF_POINTER__ 8
 #elif defined(__i386__) || defined(__arm__)
 #define __SIZEOF_POINTER__ 4
