@@ -450,6 +450,28 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Add auto-completion to the `cpuid' debugger command.
 	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */
 
+
+	/* Xorg X-Window server support roadmap.
+	 *
+	 * Current blocker(s):
+	 *
+	 *     Location:
+	 *        - xorg-server:/os/utils.c:LockServer()
+	 *     Problem:
+	 *        - The function tries to create a file /tmp/.tX0-lock
+	 *        - KOS isn't current mounting anything under /tmp/
+	 *        - Said file is meant as a lock to prevent multiple instances of X-Window
+	 *     Solution:
+	 *        - In /kos/src/kernel/core/fs/ramfs.c:
+	 *           - Fill in the missing operators/descriptors (including fs-magic) for `ramfs_type'
+	 *           - Register "ramfs" as a recognized filesystem type
+	 *        - In /kos/src/kernel/modprocfs/files/filesystems.c:
+	 *           - Optional task, but should be done sooner or later
+	 *           - Create this file to implement the file `/proc/filesystems'
+	 *             which can be used to verify that `ramfs_type' got registered
+	 *             correctly.
+	 */
+
 	return state;
 }
 
