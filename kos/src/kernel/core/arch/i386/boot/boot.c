@@ -465,11 +465,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *        - In /kos/src/kernel/core/fs/ramfs.c:
 	 *           - Fill in the missing operators/descriptors (including fs-magic) for `ramfs_type'
 	 *           - Register "ramfs" as a recognized filesystem type
-	 *        - In /kos/src/kernel/modprocfs/files/filesystems.c:
-	 *           - Optional task, but should be done sooner or later
-	 *           - Create this file to implement the file `/proc/filesystems'
-	 *             which can be used to verify that `ramfs_type' got registered
-	 *             correctly.
 	 */
 
 	return state;

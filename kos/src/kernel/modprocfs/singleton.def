@@ -93,6 +93,9 @@ MKREG_RO(kcore, 0400, ProcFS_KCore_Printer)
 ROOT_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
 MKREG_RO(cmdline, 0444, ProcFS_Cmdline_Printer)
 
+ROOT_DIRECTORY_ENTRY("filesystems", DT_REG, filesystems)
+MKREG_RO(filesystems, 0444, ProcFS_Filesystems_Printer)
+
 ROOT_DIRECTORY_ENTRY("kos", DT_DIR, kos)
 MKDIR(kos, 0555,
       F(kos, "raminfo", DT_REG, kos_raminfo) /* /proc/kos/raminfo */
