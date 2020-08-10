@@ -31,3 +31,4 @@ Utilities:
 - [recordproto-1.14.2](https://www.x.org/releases/X11R7.7/src/everything)
 - [scrnsaverproto-1.2.2](https://www.x.org/releases/X11R7.7/src/everything)
 - [resourceproto-1.2.0](https://www.x.org/releases/X11R7.7/src/everything)
+- [libxkbfile-1.0.8](https://www.x.org/releases/X11R7.7/src/everything)
