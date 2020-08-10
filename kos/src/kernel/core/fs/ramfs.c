@@ -29,6 +29,7 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/cpu.h>
 
 #include <hybrid/atomic.h>
 
@@ -97,6 +98,7 @@ ramfs_write(struct inode *__restrict UNUSED(self),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	/* no-op */
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
@@ -105,6 +107,7 @@ ramfs_pwrite(struct inode *__restrict UNUSED(self),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	/* no-op */
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
@@ -113,6 +116,7 @@ ramfs_writev(struct inode *__restrict UNUSED(self),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	/* no-op */
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
@@ -121,6 +125,7 @@ ramfs_pwritev(struct inode *__restrict UNUSED(self),
               size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
               struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	/* no-op */
 }
 
 PRIVATE NONNULL((1)) void KCALL
@@ -142,6 +147,7 @@ ramfs_readdir(struct directory_node *__restrict UNUSED(self),
 	return NULL;
 }
 
+
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_creat(struct directory_node *__restrict UNUSED(target_directory),
             struct directory_entry *__restrict target_dirent,
@@ -150,18 +156,17 @@ ramfs_creat(struct directory_node *__restrict UNUSED(target_directory),
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
-	target_dirent->de_pos         = (pos_t)(uintptr_t)target_dirent;
-	target_dirent->de_ino         = (ino_t)(uintptr_t)new_node;
-	new_node->i_fileino           = (ino_t)(uintptr_t)new_node;
-	new_node->i_type              = &ramfs_regular_type;
-	new_node->i_filemode          = S_IFREG | 0644;
-	new_node->i_filenlink         = (nlink_t)1;
-	new_node->i_fileuid           = 0;
-	new_node->i_filegid           = 0;
-	new_node->i_fileatime.tv_sec  = 0; /* TODO: Current time... */
-	new_node->i_fileatime.tv_nsec = 0;
-	new_node->i_filemtime         = new_node->i_fileatime;
-	new_node->i_filectime         = new_node->i_fileatime;
+	target_dirent->de_pos = (pos_t)(uintptr_t)target_dirent;
+	target_dirent->de_ino = (ino_t)(uintptr_t)new_node;
+	new_node->i_fileino   = (ino_t)(uintptr_t)new_node;
+	new_node->i_type      = &ramfs_regular_type;
+	new_node->i_filemode  = S_IFREG | 0644;
+	new_node->i_filenlink = (nlink_t)1;
+	new_node->i_fileuid   = 0;
+	new_node->i_filegid   = 0;
+	new_node->i_fileatime = realtime(); /* TODO: Current time... */
+	new_node->i_filemtime = new_node->i_fileatime;
+	new_node->i_filectime = new_node->i_fileatime;
 	new_node->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT);
 }
 
@@ -173,18 +178,17 @@ ramfs_mkdir(struct directory_node *__restrict UNUSED(target_directory),
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
-	target_dirent->de_pos              = (pos_t)(uintptr_t)target_dirent;
-	target_dirent->de_ino              = (ino_t)(uintptr_t)new_directory;
-	new_directory->i_fileino           = (ino_t)(uintptr_t)new_directory;
-	new_directory->i_type              = &ramfs_directory_type;
-	new_directory->i_filemode          = S_IFDIR | 0755;
-	new_directory->i_filenlink         = (nlink_t)1;
-	new_directory->i_fileuid           = 0;
-	new_directory->i_filegid           = 0;
-	new_directory->i_fileatime.tv_sec  = 0; /* TODO: Current time... */
-	new_directory->i_fileatime.tv_nsec = 0;
-	new_directory->i_filemtime         = new_directory->i_fileatime;
-	new_directory->i_filectime         = new_directory->i_fileatime;
+	target_dirent->de_pos      = (pos_t)(uintptr_t)target_dirent;
+	target_dirent->de_ino      = (ino_t)(uintptr_t)new_directory;
+	new_directory->i_fileino   = (ino_t)(uintptr_t)new_directory;
+	new_directory->i_type      = &ramfs_directory_type;
+	new_directory->i_filemode  = S_IFDIR | 0755;
+	new_directory->i_filenlink = (nlink_t)1;
+	new_directory->i_fileuid   = 0;
+	new_directory->i_filegid   = 0;
+	new_directory->i_fileatime = realtime();
+	new_directory->i_filemtime = new_directory->i_fileatime;
+	new_directory->i_filectime = new_directory->i_fileatime;
 	new_directory->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT | INODE_FDIRLOADED);
 }
 
@@ -196,18 +200,17 @@ ramfs_symlink(struct directory_node *__restrict UNUSED(target_directory),
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
-	target_dirent->de_pos          = (pos_t)(uintptr_t)target_dirent;
-	target_dirent->de_ino          = (ino_t)(uintptr_t)link_node;
-	link_node->i_fileino           = (ino_t)(uintptr_t)link_node;
-	link_node->i_type              = &ramfs_symlink_type;
-	link_node->i_filemode          = S_IFLNK | 0777;
-	link_node->i_filenlink         = (nlink_t)1;
-	link_node->i_fileuid           = 0;
-	link_node->i_filegid           = 0;
-	link_node->i_fileatime.tv_sec  = 0; /* TODO: Current time... */
-	link_node->i_fileatime.tv_nsec = 0;
-	link_node->i_filemtime         = link_node->i_fileatime;
-	link_node->i_filectime         = link_node->i_fileatime;
+	target_dirent->de_pos  = (pos_t)(uintptr_t)target_dirent;
+	target_dirent->de_ino  = (ino_t)(uintptr_t)link_node;
+	link_node->i_fileino   = (ino_t)(uintptr_t)link_node;
+	link_node->i_type      = &ramfs_symlink_type;
+	link_node->i_filemode  = S_IFLNK | 0777;
+	link_node->i_filenlink = (nlink_t)1;
+	link_node->i_fileuid   = 0;
+	link_node->i_filegid   = 0;
+	link_node->i_fileatime = realtime();
+	link_node->i_filemtime = link_node->i_fileatime;
+	link_node->i_filectime = link_node->i_fileatime;
 	link_node->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT | INODE_FLNKLOADED);
 }
 
@@ -224,13 +227,12 @@ ramfs_mknod(struct directory_node *__restrict UNUSED(target_directory),
 	device_node->i_fileino = (ino_t)(uintptr_t)device_node;
 	device_node->i_type    = &ramfs_dev_type;
 	device_node->i_filemode |= 0644;
-	device_node->i_filenlink         = (nlink_t)1;
-	device_node->i_fileuid           = 0;
-	device_node->i_filegid           = 0;
-	device_node->i_fileatime.tv_sec  = 0; /* TODO: Current time... */
-	device_node->i_fileatime.tv_nsec = 0;
-	device_node->i_filemtime         = device_node->i_fileatime;
-	device_node->i_filectime         = device_node->i_fileatime;
+	device_node->i_filenlink = (nlink_t)1;
+	device_node->i_fileuid   = 0;
+	device_node->i_filegid   = 0;
+	device_node->i_fileatime = realtime();
+	device_node->i_filemtime = device_node->i_fileatime;
+	device_node->i_filectime = device_node->i_fileatime;
 	device_node->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT);
 }
 
@@ -368,16 +370,15 @@ ramfs_open(struct superblock *__restrict self,
 	self->db_pagemask  = 0;
 	self->db_pagesize  = PAGESIZE;
 #endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
-	self->i_fileino           = (ino_t)(uintptr_t)self;
-	self->i_filesize          = 0;
-	self->i_filemode          = S_IFDIR | 0755;
-	self->i_filenlink         = (nlink_t)1;
-	self->i_fileuid           = 0;
-	self->i_filegid           = 0;
-	self->i_fileatime.tv_sec  = 0; /* TODO: Current time... */
-	self->i_fileatime.tv_nsec = 0;
-	self->i_filemtime         = self->i_fileatime;
-	self->i_filectime         = self->i_fileatime;
+	self->i_fileino   = (ino_t)(uintptr_t)self;
+	self->i_filesize  = 0;
+	self->i_filemode  = S_IFDIR | 0755;
+	self->i_filenlink = (nlink_t)1;
+	self->i_fileuid   = 0;
+	self->i_filegid   = 0;
+	self->i_fileatime = realtime();
+	self->i_filemtime = self->i_fileatime;
+	self->i_filectime = self->i_fileatime;
 	self->i_flags |= INODE_FATTRLOADED;
 }
 
@@ -397,7 +398,7 @@ ramfs_opennode(struct superblock *__restrict UNUSED(self),
 	THROW(E_FSERROR_DELETED);
 }
 
-
+/* HINT: `ramfs_type' gets registered in `kernel_initialize_devfs_driver()' */
 PUBLIC struct superblock_type ramfs_type = {
 	/* .st_driver            = */ &drv_self,
 	/* .st_name              = */ "ramfs",

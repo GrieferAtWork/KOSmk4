@@ -456,15 +456,48 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Current blocker(s):
 	 *
 	 *     Location:
-	 *        - xorg-server:/os/utils.c:LockServer()
+	 *        - xorg-server:...
 	 *     Problem:
-	 *        - The function tries to create a file /tmp/.tX0-lock
-	 *        - KOS isn't current mounting anything under /tmp/
-	 *        - Said file is meant as a lock to prevent multiple instances of X-Window
+	 *        - The server makes use of `sys_socket(domain: 00000001, type: 00000001, protocol: 00000000)'
+	 *        - That is: `domain=AF_LOCAL'
+	 *        - This results in `Translate exception 0x2:0x8[0x7b,0x1] into errno=-97'
+	 *        - That is: exception E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY:AF_LOCAL
+	 *                   errno     EAFNOSUPPORT
 	 *     Solution:
-	 *        - In /kos/src/kernel/core/fs/ramfs.c:
-	 *           - Fill in the missing operators/descriptors (including fs-magic) for `ramfs_type'
-	 *           - Register "ramfs" as a recognized filesystem type
+	 *        - For starters: implement proper libsctrace support for arguments names of sys_socket
+	 *        - Implement support for unix domain sockets (hint: `AF_UNIX=AF_LOCAL' if you're wondering about names...)
+	 *
+	 *     Current behavior:
+	 *     $ Xorg
+	 *     | _XSERVTransSocketOpenCOTSServer: Unable to open socket for local
+	 *     | _XSERVTransOpen: transport open failed for local/(none):0
+	 *     | _XSERVTransMakeAllCOTSServerListeners: failed to open listener for local
+	 *     | 
+	 *     | Fatal server error:
+	 *     | Cannot establish any listening sockets - Make sure an X server isn't already running
+	 *     | 
+	 *     | 
+	 *     | Please consult the Griefer@Work support 
+	 *     | 	 at https://github.com/GriegerAtWork/KOSmk4
+	 *     |  for help. 
+	 *     | Please also check the log file at "/var/log/Xorg.0.log" for additional information.
+	 *     | 
+	 *     | Server terminated with error (1). Closing log file.
+	 *
+	 *     $ cat /var/log/Xorg.0.log
+	 *     | [3642015.642] _XSERVTransSocketOpenCOTSServer: Unable to open socket for local
+	 *     | [3642015.701] _XSERVTransOpen: transport open failed for local/(none):0
+	 *     | [3642015.703] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for local
+	 *     | [3642015.707] 
+	 *     | Fatal server error:
+	 *     | [3642015.708] Cannot establish any listening sockets - Make sure an X server isn't already running
+	 *     | [3642015.716] 
+	 *     | Please consult the Griefer@Work support 
+	 *     | 	 at https://github.com/GrieferAtWork/KOSmk4
+	 *     |  for help. 
+	 *     | [3642015.718] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
+	 *     | [3642015.721] 
+	 *     | [3642015.737] Server terminated with error (1). Closing log file.
 	 */
 
 	return state;

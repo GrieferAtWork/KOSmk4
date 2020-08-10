@@ -127,6 +127,20 @@ done_devfs:
 	}
 done_procfs:
 
+	/* Also mount a ramfs filesystem under /tmp */
+	if (mount(NULL, "/tmp", "ramfs", 0, NULL) < 0) {
+		if (errno == ENOENT) {
+			mkdir("/tmp", 0755);
+			sync();
+			if (mount(NULL, "/tmp", "ramfs", 0, NULL) >= 0)
+				goto done_tmpfs;
+		}
+		syslog(LOG_ERR, "[init] Failed to mount ramfs: %s\n",
+		       strerror(errno));
+	}
+done_tmpfs:
+
+
 	/* Make sure there aren't any memory leaks. */
 	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 

@@ -180,6 +180,7 @@ NOTHROW(KCALL kernel_initialize_devfs_driver)(void) {
 	                                                               sizeof(REF struct directory_entry *),
 	                                                               FS_GFP | GFP_CALLOC);
 	/* Register the devfs filesystem type */
+	register_filesystem_type(&ramfs_type); /* As good-a-place as any to do this! */
 	register_filesystem_type(&devfs_type);
 	/* Register the devfs filesystem singleton */
 	fs_filesystems_lock_write();
