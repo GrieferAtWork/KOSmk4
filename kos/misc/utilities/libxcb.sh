@@ -181,7 +181,7 @@ install_library() {
 	install_file /$TARGET_LIBPATH/$1.so.$2 "$OPTPATH/src/.libs/$1.so.$2.$3.$4"
 	install_symlink /$TARGET_LIBPATH/$1.so.$2.$3.$4 $1.so.$2
 	install_symlink /$TARGET_LIBPATH/$1.so $1.so.$2
-	install_file_nodisk /$TARGET_LIBPATH/$1.a "$OPTPATH/src/.libs/libxcb.a"
+	install_file_nodisk /$TARGET_LIBPATH/$1.a "$OPTPATH/src/.libs/$1.a"
 }
 
 # Install libraries
