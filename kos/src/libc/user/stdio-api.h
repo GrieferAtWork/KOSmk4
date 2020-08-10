@@ -133,15 +133,16 @@ struct iofile_data_novtab {
 };
 #define IOFILE_DATA_NOVTAB_INIT()                    \
 	{                                                \
-		/* .io_refcnt = */ 2,                        \
 		/* .io_zero   = */ 0,                        \
+		/* .io_refcnt = */ 2,                        \
 		/* .io_lock   = */ ATOMIC_OWNER_RWLOCK_INIT, \
 		/* .io_chng   = */ NULL,                     \
 		/* .io_chsz   = */ 0,                        \
 		/* .io_lnch   = */ LLIST_INITNODE,           \
 		/* .io_link   = */ LLIST_INITNODE,           \
 		/* .io_fblk   = */ 0,                        \
-		/* .io_fpos   = */ 0                         \
+		/* .io_fpos   = */ 0,                        \
+		/* .io_mbs    = */ MBSTATE_INIT              \
 	}
 
 struct iofile_data: iofile_data_novtab {
