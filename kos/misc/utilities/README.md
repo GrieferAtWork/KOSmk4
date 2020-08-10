@@ -33,3 +33,4 @@ Utilities:
 - [resourceproto-1.2.0](https://www.x.org/releases/X11R7.7/src/everything)
 - [libxkbfile-1.0.8](https://www.x.org/releases/X11R7.7/src/everything)
 - [xf86vidmodeproto-2.3.1](https://www.x.org/releases/X11R7.7/src/everything)
+- [xf86dgaproto-2.1](https://www.x.org/releases/X11R7.7/src/everything)
