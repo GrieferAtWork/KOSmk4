@@ -77,6 +77,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- [xf86driproto-2.1.1](https://www.x.org/releases/X11R7.7/src/everything)
 		- [fixesproto-5.0](https://www.x.org/releases/X11R7.7/src/everything)
 		- [damageproto-1.2.1](https://www.x.org/releases/X11R7.7/src/everything)
+		- [xcmiscproto-1.2.2](https://www.x.org/releases/X11R7.7/src/everything)
 
 
 <a name="features"></a>
