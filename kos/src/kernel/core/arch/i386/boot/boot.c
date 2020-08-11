@@ -498,10 +498,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     | [3642015.718] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
 	 *     | [3642015.721] 
 	 *     | [3642015.737] Server terminated with error (1). Closing log file.
-	 *
-	 * TODO: Modify the Xorg server to `unlink("/var/log/Xorg.0.log.old")' if the rename(2) of
-	 *       the previous log file failed during the startup phase (no idea why it doesn't do
-	 *       this natively, but the under KOS it definitely should!)
 	 */
 
 	return state;
