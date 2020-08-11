@@ -51,7 +51,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libbz2.a" ]; then
 	vcmd "${CROSS_PREFIX}gcc" \
 		-Wl,-soname,libbz2.so \
 		-o "$OPTPATH/libbz2.so" \
-		-shared $CFLAGS $SOURCES
+		-fPIC -shared $CFLAGS $SOURCES
 	# Build the static library
 	for f in $SOURCES; do
 		vcmd "${CROSS_PREFIX}gcc" $CFLAGS -c -o "$OPTPATH/${f/.c/.o}" $f &
