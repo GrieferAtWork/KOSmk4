@@ -2308,9 +2308,10 @@ again:
 				inode_loadattr(node);
 				assert(node->i_filenlink != 0);
 				assert(node->i_super == self->i_super);
-				/* Check the file for being deleted by the calling thread. */
+				/* In order to allow for file deletion, the caller needs
+				 * write-access to the containing directory node. */
 				if (mode & DIRECTORY_REMOVE_FCHKACCESS)
-					inode_access(node, W_OK);
+					inode_access(self, W_OK);
 				if (INODE_ISDIR(node)) {
 					struct directory_node *dir;
 					if (!(mode & DIRECTORY_REMOVE_FDIRECTORY))
@@ -2630,9 +2631,13 @@ acquire_sourcedir_writelock:
 					REF struct directory_entry *existing_entry;
 					/* Check if the source node has been deleted. */
 					inode_check_deleted(source_inode);
-					/* Check the file for being deleted by the calling thread. */
-					if (mode & DIRECTORY_RENAME_FCHKACCESS)
-						inode_access(source_inode, W_OK);
+					/* In order to allow for file rename, the caller needs
+					 * write-access to the containing directory nodes. */
+					if (mode & DIRECTORY_RENAME_FCHKACCESS) {
+						inode_access(source_directory, W_OK);
+						if (source_directory != target_directory)
+							inode_access(target_directory, W_OK);
+					}
 					/* Check if the target directory already contains a file with the given name. */
 					existing_entry = directory_getentry(target_directory,
 					                                    target_entry->de_name,

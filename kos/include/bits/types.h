@@ -524,10 +524,10 @@ typedef __CRT_PRIVATE_UINT(__SIZEOF_JTIME_T__) __jtime_t;
 
 #undef  __timer_t
 #if __SIZEOF_TIMER_T__ == __SIZEOF_POINTER__
-typedef void                   *__timer_t;
-#else
+typedef void *__timer_t;
+#else /* __SIZEOF_TIMER_T__ == __SIZEOF_POINTER__ */
 typedef __CRT_PRIVATE_ULNG(__SIZEOF_TIMER_T__) __timer_t;
-#endif
+#endif /* __SIZEOF_TIMER_T__ != __SIZEOF_POINTER__ */
 #define __timer_t    __timer_t
 
 #undef  __fsword_t
@@ -562,6 +562,11 @@ typedef __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__) __fsword_t;
 #endif
 
 #endif /* __CC__ */
+
+
+#define __SIZEOF_INO_T__   __FS_SIZEOF(INO)
+#define __SIZEOF_OFF_T__   __FS_SIZEOF(OFF)
+#define __SIZEOF_POS_T__   __FS_SIZEOF(OFF)
 
 
 #define __SIZEOF_DOS_DEV_T__   4

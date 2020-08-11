@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_FS_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_FS_C 1
+#define _BSD_SOURCE 1
 #define _KOS_SOURCE 1
 #undef NDEBUG
 
@@ -32,10 +33,11 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 DECL_BEGIN
 
@@ -129,7 +131,7 @@ checkTestFiles_impl(char const *path,
 	        line);
 }
 
-PRIVATE void testPath(char const *path) {
+PRIVATE void testPath(char const *path, bool testHardLink) {
 	ssize_t temp;
 	fd_t fd;
 	fd_t dfd = open(path, O_PATH | O_CLOEXEC);
@@ -227,6 +229,80 @@ PRIVATE void testPath(char const *path) {
 	/* And after that, ensure that neither still shows up in `readdir()' */
 	checkTestFiles(path, false);
 
+	if (testHardLink) {
+		struct stat st1, st2;
+		char modestr[12];
+
+		fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
+		assertf(fd != -1, "%s", strerror(errno));
+		temp = write(fd, "HL1", 3);
+		assertf(temp == 3, "%s", strerror(errno));
+		error = close(fd);
+		assertf(error == 0, "%s", strerror(errno));
+
+		/* Take away write-permissions from the file.
+		 * This verifies that it'll still be possible to unlink()
+		 * a file that doesn't allow write access. Older versions
+		 * of the KOS kernel miss-understood the POSIX specs and
+		 * though that to delete a file, one needed write-access
+		 * to the file itself, rather than to the containing
+		 * directory.
+		 * NOTE: We only test for this kind of thing when hard-links
+		 *       are supposed to be tested, since currently all filesystems
+		 *       that are being tested support POSIX permissions exactly
+		 *       when, and only when, hard-links are also supported. */
+		error = fchmodat(dfd, "test", 0444, 0);
+		assertf(error == 0, "%s", strerror(errno));
+
+		/* Use linkat() to test hard-links. */
+		error = linkat(dfd, "test", dfd, "test2", 0);
+		assertf(error == 0, "%s", strerror(errno));
+
+		/* Pre-init the stat structures to account for padding
+		 * fields (that aren't written by the kernel) in the
+		 * memcmp() below. */
+		memset(&st1, 0xcc, sizeof(st1));
+		memset(&st2, 0xcc, sizeof(st2));
+		
+		error = fstatat(dfd, "test", &st1, 0);
+		assertf(error == 0, "%s", strerror(errno));
+		error = fstatat(dfd, "test2", &st2, 0);
+		assertf(error == 0, "%s", strerror(errno));
+
+		/* Should be the same file. */
+		assertf(memcmp(&st1, &st2, sizeof(struct stat)) == 0,
+		        "st1:\n%$[hex]\n"
+		        "st2:\n%$[hex]\n",
+		        sizeof(st1), &st1,
+		        sizeof(st2), &st2);
+
+		assertf(S_ISREG(st1.st_mode),
+		        "%q (%#" PRIxN(__SIZEOF_MODE_T__) ")",
+		        (strmode(st1.st_mode, modestr), modestr),
+		        st1.st_mode);
+		assertf((st1.st_mode & 0777) == 0444,
+		        "%q (%#" PRIxN(__SIZEOF_MODE_T__) ")",
+		        (strmode(st1.st_mode, modestr), modestr),
+		        st1.st_mode);
+		assertf(st1.st_size == 3,
+		        "st1.st_size = %#" PRIxN(__SIZEOF_POS_T__),
+		        (pos_t)st1.st_size);
+
+		/* Verify the text contents of both files */
+		assertFileText(dfd, "test", "HL1");
+		assertFileText(dfd, "test2", "HL1");
+
+		/* Verify that both files can be enumerated */
+		checkTestFiles(path, true);
+
+		/* And now to delete the files once again */
+		assertf(unlinkat(dfd, "test", 0) == 0, "%s", strerror(errno));
+		assertf(unlinkat(dfd, "test2", 0) == 0, "%s", strerror(errno));
+
+		/* And after that, ensure that neither still shows up in `readdir()' */
+		checkTestFiles(path, false);
+	}
+
 	/* Finally, close our directory handle */
 	error = close(dfd);
 	assertf(error == 0, "%s", strerror(errno));
@@ -236,12 +312,17 @@ PRIVATE void testPath(char const *path) {
 DEFINE_TEST(fs) {
 
 	ctest_substatf("path: /tmp\n");
-	testPath("/tmp");
+	testPath("/tmp", true);
 
 	if (mkdir("/var", 755) == -1)
 		assertf(errno == EEXIST, "%s", strerror(errno));
 	ctest_substatf("path: /var\n");
-	testPath("/var");
+	testPath("/var", false); /* The real hard-drive may not support hard-links (as in the case of FAT...) */
+
+	/* /dev is a slightly different filesystem type when compared to /tmp
+	 * As such, also run filesystem tests for it! */
+	ctest_substatf("path: /dev\n");
+	testPath("/dev", true);
 
 	/* Make sure the kernel doesn't crash if we try to
 	 * sync any potential modifications made above. */
