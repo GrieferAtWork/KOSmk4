@@ -92,6 +92,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libXfont.so.$SO_V
 				--enable-static \
 				--with-gnu-ld \
 				--with-bzip2
+			# TODO: This configure option list is incomplete.
+			# For example, `--enable-unix-transport' can be passed
 		) || exit $?
 	fi
 	cmd cd "$OPTPATH"

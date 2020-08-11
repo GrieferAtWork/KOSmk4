@@ -129,7 +129,7 @@
 #define RTSIG_MAX __RTSIG_MAX
 #endif /* !RTSIG_MAX && __RTSIG_MAX != -1 */
 
-/* NBBY: Alias for `CHAR_BIT' */
+/* NBBY: Alias for `CHAR_BIT' (Number_of_Bits_in_a_BYte) */
 #ifndef NBBY
 #define NBBY CHAR_BIT
 #endif /* !NBBY */

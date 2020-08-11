@@ -6,6 +6,7 @@ Add support for *_chk variants (using __builtin_object_size())
 <complex.h>
 <conio.h>
 <corecrt_wstdlib.h>
+<cthreads.h>
 <fmtmsg.h>
 <fstab.h>
 <fts.h>
