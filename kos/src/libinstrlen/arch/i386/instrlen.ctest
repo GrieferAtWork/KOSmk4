@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBINSTRLEN_ARCH_I386_INSTRLEN_CTEST
 #define GUARD_LIBINSTRLEN_ARCH_I386_INSTRLEN_CTEST 1
 #define _KOS_SOURCE 1
+#undef NDEBUG
 
 #include <hybrid/compiler.h>
 

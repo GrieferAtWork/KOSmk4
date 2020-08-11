@@ -20,6 +20,7 @@
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C 1
 #define _KOS_SOURCE 1
+#undef NDEBUG
 
 #include <hybrid/compiler.h>
 

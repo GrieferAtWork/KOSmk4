@@ -21,6 +21,7 @@
 #define GUARD_APPS_SYSTEM_TEST_TEST_IDATA_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#undef NDEBUG
 
 /* System headers are smart enough to define `sys_errlist' not as an external
  * data object, but rather as a direct invocation of its resolver function,

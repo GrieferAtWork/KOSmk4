@@ -21,6 +21,7 @@
 #define GUARD_APPS_SYSTEM_TEST_TEST_DOSABI_C 1
 #define _UTF_SOURCE 1
 #define _KOS_SOURCE 1
+#undef NDEBUG
 
 #include <hybrid/compiler.h>
 

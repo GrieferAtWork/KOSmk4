@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBKEYMAP_KEYMAP_CTEST
 #define GUARD_LIBKEYMAP_KEYMAP_CTEST 1
 #define _KOS_SOURCE 1
+#undef NDEBUG
 
 #include <hybrid/compiler.h>
 

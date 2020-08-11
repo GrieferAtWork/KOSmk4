@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_LIBC_CRT_CTEST
 #define GUARD_LIBC_LIBC_CRT_CTEST 1
 #define _KOS_SOURCE 1
+#undef NDEBUG
 
 #include <hybrid/compiler.h>
 #include <system-test/ctest.h>
