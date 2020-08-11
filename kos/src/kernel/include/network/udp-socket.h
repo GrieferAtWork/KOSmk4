@@ -51,8 +51,8 @@ struct udp_socket
 	WEAK uintptr_t              us_state;    /* UDP socket state (set of `UDP_SOCKET_STATE_*') */
 	WEAK struct in_addr         us_peerip;   /* [valid_if(UDP_SOCKET_STATE_F_HASPEER)] Peer IP */
 	WEAK be16                   us_peerport; /* [valid_if(UDP_SOCKET_STATE_F_HASPEER)] Peer port */
-	struct in_addr              us_bindip;   /* [valid_if(UDP_SOCKET_STATE_F_HASPEER)][lock(WRITE_ONCE)] Bound IP */
-	be16                        us_bindport; /* [valid_if(UDP_SOCKET_STATE_F_HASPEER)][lock(WRITE_ONCE)] Bound port */
+	struct in_addr              us_bindip;   /* [valid_if(UDP_SOCKET_STATE_F_BOUND)][lock(WRITE_ONCE)] Bound IP */
+	be16                        us_bindport; /* [valid_if(UDP_SOCKET_STATE_F_BOUND)][lock(WRITE_ONCE)] Bound port */
 };
 
 /* Socket operators for UDP sockets. */

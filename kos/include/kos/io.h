@@ -175,6 +175,9 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #if !defined(S_ISFIFO) && defined(__S_ISFIFO)
 #define S_ISFIFO(x) __S_ISFIFO(x)
 #endif /* !S_ISFIFO && __S_ISFIFO */
+#if !defined(S_ISSOCK) && defined(__S_ISSOCK)
+#define S_ISSOCK(x) __S_ISSOCK(x)
+#endif /* !S_ISSOCK && __S_ISSOCK */
 #if !defined(S_ISLNK) && defined(__S_ISLNK)
 #define S_ISLNK(x)  __S_ISLNK(x)
 #endif /* !S_ISLNK && __S_ISLNK */

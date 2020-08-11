@@ -509,8 +509,11 @@ check_result_inode_for_symlink:
 				}	break;
 	
 				//TODO:Filesystem pipes:case S_IFIFO:
-				//TODO:Filesystem pipes: These will require a new inode-subtype `struct fifo_node'
-				//                      (similar to `directory_node' or `symlink_node')
+				//TODO:Filesystem pipes:    Return a `HANDLE_TYPE_NAMED_PIPE' object
+
+				//TODO:Unix domain sockets:case S_IFSOCK:
+				//TODO:Unix domain sockets:    Read up on what kind of object this should return.
+				//TODO:Unix domain sockets:    Possibly add a `HANDLE_TYPE_*' specifically for this.
 
 				case S_IFLNK:
 					/* Symbolic  */

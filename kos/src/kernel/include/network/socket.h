@@ -157,7 +157,7 @@ ancillary_rmessage_setcontrolused(struct ancillary_rmessage const *__restrict se
 	}
 }
 
-#else /* __INTELLISENSE__ */
+#else /* ... */
 #define ancillary_message_readcmsghdr(reader, plen, plevel, ptype, msg_flags)                             \
 	(*(plen)   = *(USER CHECKED size_t const *)(reader),                                                  \
 	 *(plevel) = *(USER CHECKED u32 const *)((USER CHECKED byte_t const *)(reader) + sizeof(size_t)),     \
@@ -170,7 +170,7 @@ ancillary_rmessage_setcontrolused(struct ancillary_rmessage const *__restrict se
 	 (USER CHECKED byte_t *)(writer) + sizeof(size_t) + 8)
 #define ancillary_rmessage_setcontrolused(self, value, msg_flags) \
 	(void)(*(self)->am_controlused = (value))
-#endif /* !__INTELLISENSE__ */
+#endif /* !... */
 
 
 
@@ -498,7 +498,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct socket_connect_aio, sca_refcnt, socket_connect_
 	(MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | \
 	 MSG_EOR | MSG_MORE | MSG_NOSIGNAL)
 
-/* Mask of the message flags addend described by `sk_msgflags' for `recg()' operation */
+/* Mask of the message flags addend described by `sk_msgflags' for `recv()' operation */
 #define SOCKET_MSGFLAGS_ADDEND_RECVMASK                                  \
 	(MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK | MSG_DONTWAIT | MSG_ERRQUEUE | \
 	 MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL)
@@ -515,7 +515,7 @@ struct socket {
 	uintptr_half_t                         sk_type;       /* [const] Socket type (one of `SOCK_*'). */
 	uintptr_half_t                         sk_prot;       /* [const] Socket protocol (depends on `s_family' and `s_type'; e.g. `IPPROTO_*'). */
 	XATOMIC_REF(struct socket_connect_aio) sk_ncon;       /* [0..1] Non-blocking connect controller.
-	                                                       * This one's used for `socket_connect()' when called was a non-blocking operation.
+	                                                       * This one's used for `socket_connect()' when called as a non-blocking operation.
 	                                                       * NOTE: Socket implementation should not touch this field!
 	                                                       * HINT: `POLLOUT' is indicated when this is `NULL', or when contained AIO has completed! */
 	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
@@ -582,8 +582,8 @@ socket_isconnected(struct socket *__restrict self);
 
 /* Poll for special condition
  * The following conditions are defined:
- *    POLLIN:    `socket_recv()' or `socket_recvfrom()' if not listening,
- *               or `socket_accept()' if listening can be called.
+ *    POLLIN:    if not listening: `socket_recv()' or `socket_recvfrom()' can be called
+ *               if listening :    `socket_accept()' can be called.
  *    POLLOUT:   The socket is connected, or a previous connection request failed.
  *    POLLPRI:   Socket-specific, for tcp: out-of-band data available
  *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
@@ -647,15 +647,15 @@ socket_aconnect(struct socket *__restrict self,
 		                E_NET_UNREACHABLE, E_BUFFER_TOO_SMALL);
 
 #else /* __INTELLISENSE__ */
-#define socket_getsockname(self, addr, addr_len)  (*(self)->sk_ops->so_getsockname)(self, addr, addr_len)
-#define socket_getpeername(self, addr, addr_len)  (*(self)->sk_ops->so_getpeername)(self, addr, addr_len)
-#define socket_bind(self, addr, addr_len)         (*(self)->sk_ops->so_bind)(self, addr, addr_len)
+#define socket_getsockname(self, addr, addr_len)   (*(self)->sk_ops->so_getsockname)(self, addr, addr_len)
+#define socket_getpeername(self, addr, addr_len)   (*(self)->sk_ops->so_getpeername)(self, addr, addr_len)
+#define socket_bind(self, addr, addr_len)          (*(self)->sk_ops->so_bind)(self, addr, addr_len)
 #define socket_aconnect(self, addr, addr_len, aio) (*(self)->sk_ops->so_connect)(self, addr, addr_len, aio)
 #endif /* !__INTELLISENSE__ */
 
 /* The synchronous / non-blocking version of the async function `socket_aconnect()'.
  * When called with `IO_NONBLOCK', the connect will be done in the background through
- * use of `self->sk_ncon' (which can be waited for through use of `poll()').
+ * use of `self->sk_ncon' (which can be waited for through use of `socket_poll(POLLOUT)').
  * When `IO_NONBLOCK' isn't specified, this function simply calls its async variant
  * before waiting for the connect() to complete, canceling it if anything goes wrong.
  * @return: * : One of `SOCKET_CONNECT_*' */
@@ -677,7 +677,7 @@ socket_connect(struct socket *__restrict self,
  *       then the # of sent bytes will be returned by that function.
  *       Otherwise, the caller may assume that all data was sent, so-long
  *       as this function returns normally, and `aio' completes without
- *       and errors.
+ *       any errors.
  * @param: msg_control: When non-NULL, contains pointers to ancillary data buffer and resulting
  *                      length. Note that this function must copy the contents of this structure
  *                      if it needs to be accessed after returning. (i.e. AIO needs to use its

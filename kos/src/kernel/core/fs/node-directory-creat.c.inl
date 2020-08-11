@@ -78,7 +78,7 @@ directory_symlink(struct directory_node *__restrict target_directory,
 #define MODE_IS_NOCASE   (symlink_mode & DIRECTORY_SYMLINK_FNOCASE)
 #elif defined(DEFINE_DIRECTORY_MKNOD)
 /* Create a file / device node.
- * @assume(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode));
+ * @assume(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode) || S_ISFIFO(mode) || S_ISSOCK(mode));
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -143,7 +143,8 @@ again:
 	if unlikely(!target_directory->i_type->it_directory.d_symlink)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYMLINK);
 #elif defined(DEFINE_DIRECTORY_MKNOD)
-	assert(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode));
+	assert(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode) ||
+	       S_ISFIFO(mode) || S_ISSOCK(mode));
 	if (S_ISREG(mode)) {
 		return directory_creatfile(target_directory,
 		                           target_name,
@@ -231,19 +232,40 @@ again:
 #endif /* DEFINE_DIRECTORY_CREATFILE */
 
 			/* All right! Move ahead and construct the new, resulting INode. */
-			resptr = heap_alloc(FS_HEAP,
+#ifdef DEFINE_DIRECTORY_MKNOD
+			if (S_ISFIFO(mode)) {
+				struct fifo_node *real_result;
+				resptr = heap_alloc(FS_HEAP,
+				                    sizeof(struct fifo_node),
+				                    FS_GFP | GFP_CALLOC);
+				result      = (RETURN_NODE_TYPE *)resptr.hp_ptr;
+				real_result = (struct fifo_node *)resptr.hp_ptr;
+				real_result->f_placeholder = NULL; /* TODO */
+			} else if (S_ISSOCK(mode)) {
+				struct socket_node *real_result;
+				resptr = heap_alloc(FS_HEAP,
+				                    sizeof(struct socket_node),
+				                    FS_GFP | GFP_CALLOC);
+				result      = (RETURN_NODE_TYPE *)resptr.hp_ptr;
+				real_result = (struct socket_node *)resptr.hp_ptr;
+				real_result->s_placeholder = NULL; /* TODO */
+			} else
+#endif /* DEFINE_DIRECTORY_MKNOD */
+			{
+				resptr = heap_alloc(FS_HEAP,
 #ifdef DEFINE_DIRECTORY_CREATFILE
-			                    sizeof(struct regular_node)
+				                    sizeof(struct regular_node)
 #else /* DEFINE_DIRECTORY_CREATFILE */
-			                    sizeof(RETURN_NODE_TYPE)
+				                    sizeof(RETURN_NODE_TYPE)
 #endif /* !DEFINE_DIRECTORY_CREATFILE */
 #ifdef DEFINE_DIRECTORY_SYMLINK
-			                    + (link_text_size * sizeof(char))
+				                    + (link_text_size * sizeof(char))
 #endif /* DEFINE_DIRECTORY_SYMLINK */
-			                    ,
-			                    FS_GFP | GFP_CALLOC);
-			result = (RETURN_NODE_TYPE *)resptr.hp_ptr;
-
+				                    ,
+				                    FS_GFP | GFP_CALLOC);
+				result = (RETURN_NODE_TYPE *)resptr.hp_ptr;
+			}
+#if defined(DEFINE_DIRECTORY_SYMLINK) || defined(DEFINE_DIRECTORY_MKDIR)
 			TRY {
 #ifdef DEFINE_DIRECTORY_SYMLINK
 				memcpy(result->sl_stext, link_text, link_text_size, sizeof(char));
@@ -256,6 +278,7 @@ again:
 				heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
 				RETHROW();
 			}
+#endif /* DEFINE_DIRECTORY_SYMLINK || DEFINE_DIRECTORY_MKDIR */
 
 			/* Initialize the new INode */
 			result->db_refcnt = 1;

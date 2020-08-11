@@ -242,7 +242,7 @@ udp_sendtov(struct socket *__restrict self,
 	in  = udp_verify_sockaddr(addr, addr_len);
 	/* TODO: From what I understand, network cards should actually be
 	 *       selected based on `in->sin_addr.s_addr' (i.e. the target's
-	 *       IP address). As such, there needs to a routing table for
+	 *       IP address). As such, there needs to be a routing table for
 	 *       mapping IP addresses to NIC devices, rather than having one
 	 *       default adapter for _everything_.
 	 *       However, a way to have one particular socket be bound to

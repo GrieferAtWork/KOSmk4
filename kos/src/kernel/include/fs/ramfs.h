@@ -32,6 +32,8 @@ DECL_BEGIN
 /* Ramfs filesystem types. */
 DATDEF struct superblock_type ramfs_type;
 DATDEF struct inode_type ramfs_dev_type;
+DATDEF struct inode_type ramfs_fifo_type;
+DATDEF struct inode_type ramfs_socket_type;
 DATDEF struct inode_type ramfs_regular_type;
 DATDEF struct inode_type ramfs_directory_type;
 DATDEF struct inode_type ramfs_symlink_type;

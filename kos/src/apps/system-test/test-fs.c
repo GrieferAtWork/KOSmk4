@@ -263,7 +263,7 @@ PRIVATE void testPath(char const *path, bool testHardLink) {
 		 * memcmp() below. */
 		memset(&st1, 0xcc, sizeof(st1));
 		memset(&st2, 0xcc, sizeof(st2));
-		
+
 		error = fstatat(dfd, "test", &st1, 0);
 		assertf(error == 0, "%s", strerror(errno));
 		error = fstatat(dfd, "test2", &st2, 0);

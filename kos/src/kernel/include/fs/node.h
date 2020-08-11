@@ -138,6 +138,10 @@ struct inode_type {
 		 * >>     if (cdev->cd_type.ct_open)
 		 * >>         (*cdev->cd_type.ct_open)(cdev, &result);
 		 * >>     return result;
+		 * >> } else if (S_ISFIFO(self->i_filemode)) {
+		 * >>     THROW(E_NOT_IMPLEMENTED_TODO);
+		 * >> } else if (S_ISSOCK(self->i_filemode)) {
+		 * >>     THROW(E_NOT_IMPLEMENTED_TODO);
 		 * >> } else {
 		 * >>     if (s_ISDIR(self->i_filemode) && result_inode->i_type->it_directory.d_readdir)
 		 * >>         return { HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, ... };
@@ -506,23 +510,29 @@ struct inode_type {
 			 *    - de_fsdata (optionally, depending on filesystem implementation)
 			 *    - de_pos
 			 *    - de_ino
-			 * This function must initialize the following members of `device_node':
+			 * This function must initialize the following members of `nod':
 			 *    - i_fileino (Same as `target_dirent->de_ino')
-			 *    - i_type
+			 *    - i_type    (Note that `it_fini' must include the following calls:
+			 *                 if (S_ISFIFO(self->i_filemode)) {
+			 *                     fifo_node_fini(self);
+			 *                 } else if (S_ISSOCK(self->i_filemode)) {
+			 *                     socket_node_fini(self);
+			 *                 })
 			 *    - i_filenlink (To `>= 1')
 			 *    - i_fsdata (Optionally; pre-initialized to `NULL')
 			 * During this operation, the new directory entry should be
 			 * constructed on-disk, or scheduled for such an allocation.
 			 * NOTE: This function may also choose to set the `INODE_FCHANGED' flag
-			 *       of `device_node', in which case the caller will add the node to
+			 *       of `nod', in which case the caller will add the node to
 			 *       the set of changed nodes of the accompanying superblock, meaning
 			 *       that filesystem implementations may choose to lazily set save
 			 *       attributes of newly constructed nodes to disk once the disk
 			 *       is supposed to be synchronized.
-			 * @assume(device_node->db_refcnt == 1); (Exclusive user)
-			 * @assume(device_node->i_flags & INODE_FATTRLOADED);
-			 * @assume(device_node->i_super  == target_directory->i_super);
-			 * @assume(S_ISBLK(device_node->i_filemode) || S_ISCHR(device_node->i_filemode));
+			 * @assume(nod->db_refcnt == 1); (Exclusive user)
+			 * @assume(nod->i_flags & INODE_FATTRLOADED);
+			 * @assume(nod->i_super  == target_directory->i_super);
+			 * @assume(S_ISBLK(nod->i_filemode) ||  S_ISCHR(nod->i_filemode) ||
+			 *         S_ISFIFO(nod->i_filemode) || S_ISSOCK(nod->i_filemode));
 			 * @assume(!directory_getentry(target_directory,target_dirent...));
 			 * @assume(target_dirent->de_namelen != 0);
 			 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD:
@@ -536,7 +546,7 @@ struct inode_type {
 			NONNULL((1, 2, 3))
 			void (KCALL *d_mknod)(struct directory_node *__restrict target_directory,
 			                      struct directory_entry *__restrict target_dirent,
-			                      struct inode *__restrict device_node)
+			                      struct inode *__restrict nod)
 					THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 					       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 					       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
@@ -551,6 +561,7 @@ struct inode_type {
 			 *    - de_fsdata (optionally, depending on filesystem implementation)
 			 *    - de_pos
 			 * @assume(link_target->i_flags & INODE_FATTRLOADED);
+			 * @assume(!INODE_ISVIRT(link_target));
 			 * @assume(target_directory->i_super == link_target->i_super);
 			 * @assume(!directory_getentry(target_directory,target_dirent...));
 			 * @assume(target_dirent->de_namelen != 0);
@@ -603,6 +614,7 @@ struct inode_type {
 			 * NOTE: The invoked `d_rename' operator is always the one of `source_directory'
 			 * @assume(INODE_ISDIR(source_directory));                                 // Source is a directory
 			 * @assume(INODE_ISDIR(target_directory));                                 // Target is a directory
+			 * @assume(!INODE_ISVIRT(source_node));                                    // Affected INode is real
 			 * @assume(source_directory->i_super == target_directory->i_super);        // Same superblocks
 			 * @assume(!directory_getentry(target_directory,target_dirent...));        // The target doesn't contain an identical file
 			 * @assume(source_dirent->de_namelen != 0);                                // Non-empty source name
@@ -643,6 +655,7 @@ struct inode_type {
 			 *       data associated with the INode before it goes away.
 			 * NOTE: Upon success, this function must decrement `i_filenlink'.
 			 * @assume(containing_entry->i_filesize == 0);
+			 * @assume(!INODE_ISVIRT(node_to_unlink));      // Affected INode is real
 			 * @assume(INODE_ISDIR(containing_directory));
 			 * @assume(containing_entry->de_namelen != 0);
 			 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_UNLINK:
@@ -802,14 +815,14 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
 struct inode
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
 	: vm_datablock
-#endif
+#endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 {
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 #define __inode_as_datablock(x) (&(x)->i_datablock)
 	struct vm_datablock i_datablock;    /* The underlying data-block. */
-#else
+#else /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 #define __inode_as_datablock(x)   (x)
-#endif
+#endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 	struct inode_type  *i_type;         /* [1..1][const] INode type. */
 	REF struct superblock *i_super;     /* [1..1][const][REF_IF(!= this)] The associated superblock. */
 	struct inode_data  *i_fsdata;       /* [?..?][lock(this)] A pointer to inode-specific user-data. */
@@ -825,9 +838,9 @@ struct inode
 #ifdef __INTELLISENSE__
 	ino_t               i_fileino;      /* [const] File INode number (used to unambiguously identify an INode).
 	                                     * NOTE: This chain holds a reference to nodes with the `INODE_FPERSISTENT' flag set. */
-#else
+#else /* __INTELLISENSE__ */
 #define i_fileino       i_filetree.a_vaddr
-#endif
+#endif /* !__INTELLISENSE__ */
 	pos_t               i_filesize;     /* [lock(.)][valid_if(INODE_FATTRLOADED)] Size of the file (in bytes)
 	                                     * NOTE: Before `INODE_FATTRLOADED' is set, this field is set to ZERO(0)! */
 	mode_t              i_filemode;     /* [lock(.)][valid_if(INODE_FATTRLOADED)][const(MASK(S_IFMT))]
@@ -846,13 +859,15 @@ struct inode
 };
 
 #define INODE_ISSUPER(x) ((x)->i_super == (struct superblock *)(x)) /* Check if `x' is actually a superblock root directory node. */
-#define INODE_ISREG(x)   S_ISREG((x)->i_filemode) /* Check if `x' is a `struct regular_node' */
-#define INODE_ISDIR(x)   S_ISDIR((x)->i_filemode) /* Check if `x' is a `struct directory_node' */
-#define INODE_ISLNK(x)   S_ISLNK((x)->i_filemode) /* Check if `x' is a `struct symlink_node' */
+#define INODE_ISREG(x)   S_ISREG((x)->i_filemode)  /* Check if `x' is a `struct regular_node' */
+#define INODE_ISDIR(x)   S_ISDIR((x)->i_filemode)  /* Check if `x' is a `struct directory_node' */
+#define INODE_ISLNK(x)   S_ISLNK((x)->i_filemode)  /* Check if `x' is a `struct symlink_node' */
+#define INODE_ISFIFO(x)  S_ISFIFO((x)->i_filemode) /* Check if `x' is a `struct fifo_node' */
+#define INODE_ISSOCK(x)  S_ISSOCK((x)->i_filemode) /* Check if `x' is a `struct socket_node' */
 
 
-#if !defined(__INTELLISENSE__) || \
-    !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
+#if (!defined(__INTELLISENSE__) || \
+     !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT))
 
 /* When locking an INode, it is no longer unlikely that that Inode is devfs.
  * For this reason, re-define sync functions for INodes to explicitly get
@@ -977,18 +992,18 @@ struct module;
 struct regular_node
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
 	: inode
-#endif
+#endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 {
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 	struct inode     r_node;        /* [OVERRIDE(.i_filemode,[S_ISREF(.)])]
 	                                 * [OVERRIDE(.i_filerdev,[== 0])]
 	                                 * The underlying node. */
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 __DEFINE_SYNC_PROXY(struct regular_node,r_node)
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 
 
 
@@ -996,14 +1011,14 @@ __DEFINE_SYNC_PROXY(struct regular_node,r_node)
 struct directory_node
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
 	: inode
-#endif
+#endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 {
 	/* Directory INode (When `S_ISDIR(a_mode)' is true) */
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 	struct inode                 d_node;     /* [OVERRIDE(.i_filemode,[S_ISDIR(.)])]
 	                                          * [OVERRIDE(.i_filerdev,[== 0])]
 	                                          * The underlying node. */
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 	REF struct directory_node   *d_parent;   /* [0..1][const] Parent directory (or `NULL' for the superblock root). */
 	pos_t                        d_dirend;   /* [lock(this)] Starting address of the next directory entry which hasn't been read yet. */
 	size_t                       d_size;     /* [lock(this)] Amount of directory entries. */
@@ -1015,13 +1030,13 @@ struct directory_node
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 __DEFINE_SYNC_PROXY(struct directory_node,d_node)
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 
 
 struct symlink_node
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
 	: inode
-#endif
+#endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 {
 	/* Symbolic link INode (When `S_ISLNK(a_mode)' is true) */
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
@@ -1029,7 +1044,7 @@ struct symlink_node
 	                                * [OVERRIDE(.i_filesize,[const])]
 	                                * [OVERRIDE(.i_filerdev,[== 0])]
 	                                * The underlying node. */
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 	KERNEL /*utf-8*/ char *sl_text; /* [0..i_filesize][owned_if(!= sl_stext)]
 	                                * [valid_if(INODE_FLNKLOADED)] Symbolic link text.
 	                                * NOTE: Not required to be NUL-terminated! */
@@ -1038,7 +1053,25 @@ struct symlink_node
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 __DEFINE_SYNC_PROXY(struct symlink_node,sl_node)
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
+
+
+struct fifo_node;   /* S_ISFIFO  (define in <fs/special-node.h>) */
+struct socket_node; /* S_ISSOCK  (define in <fs/special-node.h>) */
+
+/* Mandatory finalizier that must be called by `struct inode_type::it_fini'
+ * of any INode that is `S_ISFIFO()'. This function must be called by
+ * file-system specific overrides for `struct inode_type::it_fini', and should
+ * be linked in as part of the `struct inode_type::it_directory::d_mknod'
+ * callback. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fifo_node_fini)(struct inode *__restrict self);
+
+/* Same as `fifo_node_fini()', but for `S_ISSOCK()' nodes. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL socket_node_fini)(struct inode *__restrict self);
+
+
 
 
 /* The data block type used to identify INodes. */
@@ -1785,7 +1818,7 @@ directory_symlink(struct directory_node *__restrict target_directory,
 #define DIRECTORY_MKNOD_FNOCASE    0x8000 /* Ignore casing when checking for existing files. */
 
 /* Create a file / device node.
- * @assume(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode));
+ * @assume(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode) || S_ISFIFO(mode) || S_ISSOCK(mode));
  * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]

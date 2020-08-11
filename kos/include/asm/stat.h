@@ -34,10 +34,11 @@
 #define __S_ISDIR(x)  (((x)&__S_IFMT) == __S_IFDIR)
 #define __S_ISCHR(x)  (((x)&__S_IFMT) == __S_IFCHR)
 #define __S_ISBLK(x)  (((x)&__S_IFMT) == __S_IFBLK)
+#define __S_ISDEV(x)  (((x)&0130000) == 0020000) /* __S_IFCHR|__S_IFBLK */
 #define __S_ISREG(x)  (((x)&__S_IFMT) == __S_IFREG)
 #define __S_ISFIFO(x) (((x)&__S_IFMT) == __S_IFIFO)
 #define __S_ISLNK(x)  (((x)&__S_IFMT) == __S_IFLNK)
-#define __S_ISDEV(x)  (((x)&0130000) == 0020000) /* __S_IFCHR|__S_IFBLK */
+#define __S_ISSOCK(x) (((x)&__S_IFMT) == __S_IFSOCK)
 
 #define __S_TYPEISMQ(buf)  ((buf)->st_mode - (buf)->st_mode)
 #define __S_TYPEISSEM(buf) ((buf)->st_mode - (buf)->st_mode)

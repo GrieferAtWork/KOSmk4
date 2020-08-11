@@ -99,7 +99,7 @@ enum {
 	MSG_WAITFORONE   = 0x00010000, /* Wait for at least one packet to return.*/
 	MSG_FASTOPEN     = 0x20000000, /* Send data in TCP SYN. */
 	MSG_CMSG_CLOEXEC = 0x40000000, /* Set close_on_exit for file descriptor received through SCM_RIGHTS. */
-#if defined(__KOS__) && defined(__USE_KOS)
+#if defined(__KOS__) && (defined(__USE_KOS) || defined(__USE_KOS_KERNEL))
 	MSG_CMSG_CLOFORK = 0x80000000, /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
 #endif /* __KOS__ && __USE_KOS */
 #if defined(__KOS__) && defined(__USE_KOS_KERNEL)
@@ -136,7 +136,7 @@ enum {
 #define MSG_WAITFORONE   MSG_WAITFORONE   /* Wait for at least one packet to return.*/
 #define MSG_FASTOPEN     MSG_FASTOPEN     /* Send data in TCP SYN. */
 #define MSG_CMSG_CLOEXEC MSG_CMSG_CLOEXEC /* Set close_on_exit for file descriptor received through SCM_RIGHTS. */
-#if defined(__KOS__) && defined(__USE_KOS)
+#if defined(__KOS__) && (defined(__USE_KOS) || defined(__USE_KOS_KERNEL))
 #define MSG_CMSG_CLOFORK MSG_CMSG_CLOFORK /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
 #endif /* __KOS__ && __USE_KOS */
 #if defined(__KOS__) && defined(__USE_KOS_KERNEL)
@@ -170,7 +170,7 @@ enum {
 #define MSG_WAITFORONE   0x00010000 /* Wait for at least one packet to return.*/
 #define MSG_FASTOPEN     0x20000000 /* Send data in TCP SYN. */
 #define MSG_CMSG_CLOEXEC 0x40000000 /* Set close_on_exit for file descriptor received through SCM_RIGHTS. */
-#if defined(__KOS__) && defined(__USE_KOS)
+#if defined(__KOS__) && (defined(__USE_KOS) || defined(__USE_KOS_KERNEL))
 #define MSG_CMSG_CLOFORK 0x80000000 /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
 #endif /* __KOS__ && __USE_KOS */
 #if defined(__KOS__) && defined(__USE_KOS_KERNEL)

@@ -32,7 +32,7 @@ enum {
 	E_NET_ADDRESS_IN_USE_CONTEXT_GENERIC,
 	E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT, /* Address already in use during `connect(2)' */
 	E_NET_ADDRESS_IN_USE_CONTEXT_BIND,    /* Address already in use during `bind(2)' */
-	E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN,  /* Address already in use during `listen()' (after `bind(2)') */
+	E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN,  /* Address already in use during `listen(2)' (after `bind(2)') */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -40,12 +40,12 @@ enum {
 #define E_NET_ADDRESS_IN_USE_CONTEXT_GENERIC E_NET_ADDRESS_IN_USE_CONTEXT_GENERIC
 #define E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT /* Address already in use during `connect(2)' */
 #define E_NET_ADDRESS_IN_USE_CONTEXT_BIND    E_NET_ADDRESS_IN_USE_CONTEXT_BIND    /* Address already in use during `bind(2)' */
-#define E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN  E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN  /* Address already in use during `listen()' (after `bind(2)') */
+#define E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN  E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN  /* Address already in use during `listen(2)' (after `bind(2)') */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_NET_ADDRESS_IN_USE_CONTEXT_GENERIC 0
 #define E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT 1 /* Address already in use during `connect(2)' */
 #define E_NET_ADDRESS_IN_USE_CONTEXT_BIND    2 /* Address already in use during `bind(2)' */
-#define E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN  3 /* Address already in use during `listen()' (after `bind(2)') */
+#define E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN  3 /* Address already in use during `listen(2)' (after `bind(2)') */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -53,19 +53,19 @@ enum {
 #ifdef __CC__
 enum {
 	E_NET_OPERATION_NONE,
-	E_NET_OPERATION_LISTEN, /* This type of socket does not allow listen() operations */
-	E_NET_OPERATION_ACCEPT, /* This type of socket does not allow accept() operations */
+	E_NET_OPERATION_LISTEN, /* This type of socket does not allow listen(2) operations */
+	E_NET_OPERATION_ACCEPT, /* This type of socket does not allow accept(2) operations */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define E_NET_OPERATION_NONE   E_NET_OPERATION_NONE
-#define E_NET_OPERATION_LISTEN E_NET_OPERATION_LISTEN /* This type of socket does not allow listen() operations */
-#define E_NET_OPERATION_ACCEPT E_NET_OPERATION_ACCEPT /* This type of socket does not allow accept() operations */
+#define E_NET_OPERATION_LISTEN E_NET_OPERATION_LISTEN /* This type of socket does not allow listen(2) operations */
+#define E_NET_OPERATION_ACCEPT E_NET_OPERATION_ACCEPT /* This type of socket does not allow accept(2) operations */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_NET_OPERATION_NONE   0
-#define E_NET_OPERATION_LISTEN 1 /* This type of socket does not allow listen() operations */
-#define E_NET_OPERATION_ACCEPT 2 /* This type of socket does not allow accept() operations */
+#define E_NET_OPERATION_LISTEN 1 /* This type of socket does not allow listen(2) operations */
+#define E_NET_OPERATION_ACCEPT 2 /* This type of socket does not allow accept(2) operations */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

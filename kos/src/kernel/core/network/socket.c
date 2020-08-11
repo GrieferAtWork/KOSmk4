@@ -126,8 +126,8 @@ socket_isconnected(struct socket *__restrict self) {
 
 /* Poll for special condition
  * The following conditions are defined:
- *    POLLIN:    `socket_recv()' or `socket_recvfrom()' if not listening,
- *               or `socket_accept()' if listening can be called.
+ *    POLLIN:    if not listening: `socket_recv()' or `socket_recvfrom()' can be called
+ *               if listening :    `socket_accept()' can be called.
  *    POLLOUT:   The socket is connected, or a previous connection request failed.
  *    POLLPRI:   Socket-specific, for tcp: out-of-band data available
  *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called

@@ -28,6 +28,7 @@
 #include <kos/except/inval.h>
 #include <network/socket.h>
 #include <network/udp-socket.h>
+#include <network/unix-socket.h>
 #include <sys/socket.h>
 
 DECL_BEGIN
@@ -47,6 +48,18 @@ socket_create(syscall_ulong_t family,
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
 	REF struct socket *result;
 	switch (family) {
+
+	case AF_UNIX:
+		if (type == SOCK_STREAM) {
+			if (protocol == 0 || protocol == PF_UNIX) {
+				result = unix_socket_create();
+			} else {
+				goto bad_protocol;
+			}
+		} else {
+			goto bad_type;
+		}
+		break;
 
 	case AF_INET:
 		if (type == SOCK_DGRAM) {

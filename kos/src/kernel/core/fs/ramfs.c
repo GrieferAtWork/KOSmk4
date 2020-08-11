@@ -217,23 +217,31 @@ ramfs_symlink(struct directory_node *__restrict UNUSED(target_directory),
 PRIVATE NONNULL((1, 2, 3)) void KCALL
 ramfs_mknod(struct directory_node *__restrict UNUSED(target_directory),
             struct directory_entry *__restrict target_dirent,
-            struct inode *__restrict device_node)
+            struct inode *__restrict nod)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ILLEGAL_PATH,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	target_dirent->de_pos  = (pos_t)(uintptr_t)target_dirent;
-	target_dirent->de_ino  = (ino_t)(uintptr_t)device_node;
-	device_node->i_fileino = (ino_t)(uintptr_t)device_node;
-	device_node->i_type    = &ramfs_dev_type;
-	device_node->i_filemode |= 0644;
-	device_node->i_filenlink = (nlink_t)1;
-	device_node->i_fileuid   = 0;
-	device_node->i_filegid   = 0;
-	device_node->i_fileatime = realtime();
-	device_node->i_filemtime = device_node->i_fileatime;
-	device_node->i_filectime = device_node->i_fileatime;
-	device_node->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT);
+	target_dirent->de_ino  = (ino_t)(uintptr_t)nod;
+	nod->i_fileino = (ino_t)(uintptr_t)nod;
+	if (INODE_ISSOCK(nod)) {
+		/* `struct socket_node' */
+		nod->i_type = &ramfs_socket_type;
+	} else if (INODE_ISFIFO(nod)) {
+		/* `struct fifo_node' */
+		nod->i_type = &ramfs_fifo_type;
+	} else {
+		nod->i_type = &ramfs_dev_type;
+	}
+	nod->i_filemode |= 0644;
+	nod->i_filenlink = (nlink_t)1;
+	nod->i_fileuid   = 0;
+	nod->i_filegid   = 0;
+	nod->i_fileatime = realtime();
+	nod->i_filemtime = nod->i_fileatime;
+	nod->i_filectime = nod->i_fileatime;
+	nod->i_flags |= (INODE_FATTRLOADED | INODE_FPERSISTENT);
 }
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
@@ -293,6 +301,27 @@ PUBLIC struct inode_type ramfs_dev_type = {
 		/* .a_clearcache = */ NULL
 	},
 };
+
+PUBLIC struct inode_type ramfs_fifo_type = {
+	/* .it_fini = */ &fifo_node_fini,
+	/* .it_attr = */ {
+		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
+		/* .a_saveattr   = */ &ramfs_saveattr,
+		/* .a_maskattr   = */ NULL,
+		/* .a_clearcache = */ NULL
+	},
+};
+
+PUBLIC struct inode_type ramfs_socket_type = {
+	/* .it_fini = */ &socket_node_fini,
+	/* .it_attr = */ {
+		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
+		/* .a_saveattr   = */ &ramfs_saveattr,
+		/* .a_maskattr   = */ NULL,
+		/* .a_clearcache = */ NULL
+	},
+};
+
 PUBLIC struct inode_type ramfs_regular_type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
