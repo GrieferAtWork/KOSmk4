@@ -61,7 +61,7 @@
 
 /* `si_code' values for SIGBUS signal. */
 #define __BUS_ADRALN    1 /* Invalid address alignment. */
-#define __BUS_ADRERR    2 /* Non-existant physical address. */
+#define __BUS_ADRERR    2 /* Non-existent physical address. */
 #define __BUS_OBJERR    3 /* Object specific hardware error. */
 #define __BUS_MCEERR_AR 4 /* Hardware memory error: action required. */
 #define __BUS_MCEERR_AO 5 /* Hardware memory error: action optional. */
@@ -125,7 +125,7 @@
 
 /* `si_code' values for SIGBUS signal. */
 #define __BUS_ADRALN 25 /* Invalid address alignment. */
-#define __BUS_ADRERR 26 /* Non-existant physical address. */
+#define __BUS_ADRERR 26 /* Non-existent physical address. */
 #define __BUS_OBJERR 27 /* Object specific hardware error. */
 
 /* `si_code' values for SIGCHLD signal. */

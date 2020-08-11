@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbe70687 */
+/* HASH CRC-32:0x2d377e98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -732,7 +732,7 @@ enum {
 	BUS_ADRALN    = __BUS_ADRALN,    /* Invalid address alignment. */
 #endif /* __BUS_ADRALN */
 #ifdef __BUS_ADRERR
-	BUS_ADRERR    = __BUS_ADRERR,    /* Non-existant physical address. */
+	BUS_ADRERR    = __BUS_ADRERR,    /* Non-existent physical address. */
 #endif /* __BUS_ADRERR */
 #ifdef __BUS_OBJERR
 	BUS_OBJERR    = __BUS_OBJERR,    /* Object specific hardware error. */
@@ -751,7 +751,7 @@ enum {
 #define BUS_ADRALN    BUS_ADRALN    /* Invalid address alignment. */
 #endif /* __BUS_ADRALN */
 #ifdef __BUS_ADRERR
-#define BUS_ADRERR    BUS_ADRERR    /* Non-existant physical address. */
+#define BUS_ADRERR    BUS_ADRERR    /* Non-existent physical address. */
 #endif /* __BUS_ADRERR */
 #ifdef __BUS_OBJERR
 #define BUS_OBJERR    BUS_OBJERR    /* Object specific hardware error. */
@@ -767,7 +767,7 @@ enum {
 #define BUS_ADRALN    __BUS_ADRALN    /* Invalid address alignment. */
 #endif /* __BUS_ADRALN */
 #ifdef __BUS_ADRERR
-#define BUS_ADRERR    __BUS_ADRERR    /* Non-existant physical address. */
+#define BUS_ADRERR    __BUS_ADRERR    /* Non-existent physical address. */
 #endif /* __BUS_ADRERR */
 #ifdef __BUS_OBJERR
 #define BUS_OBJERR    __BUS_OBJERR    /* Object specific hardware error. */

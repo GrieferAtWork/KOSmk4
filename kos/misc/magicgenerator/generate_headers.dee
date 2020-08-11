@@ -245,7 +245,7 @@ again_create_new:
 				goto again_create_new;
 			throw;
 		}
-		/* Create a previously non-existant file */
+		/* Create a previously non-existent file */
 		printMessage("Creating: {!r}".format({ filename }));
 		with (criticalSection) {
 			try {

@@ -140,7 +140,7 @@ PRIVATE void testPath(char const *path) {
 	unlinkat(dfd, "test2", 0);
 	checkTestFiles(path, false);
 
-	/* Create a previous non-existant file. */
+	/* Create a previous non-existent file. */
 	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
 	assertf(fd != -1, "%s", strerror(errno));
 	temp = write(fd, "F1\n", 3);
