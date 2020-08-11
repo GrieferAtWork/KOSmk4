@@ -469,35 +469,25 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *
 	 *     Current behavior:
 	 *     $ Xorg
-	 *     | _XSERVTransSocketOpenCOTSServer: Unable to open socket for local
-	 *     | _XSERVTransOpen: transport open failed for local/(none):0
-	 *     | _XSERVTransMakeAllCOTSServerListeners: failed to open listener for local
-	 *     | 
-	 *     | Fatal server error:
-	 *     | Cannot establish any listening sockets - Make sure an X server isn't already running
-	 *     | 
-	 *     | 
-	 *     | Please consult the Griefer@Work support 
-	 *     | 	 at https://github.com/GriegerAtWork/KOSmk4
-	 *     |  for help. 
-	 *     | Please also check the log file at "/var/log/Xorg.0.log" for additional information.
-	 *     | 
-	 *     | Server terminated with error (1). Closing log file.
+	 *     | ...
 	 *
 	 *     $ cat /var/log/Xorg.0.log
-	 *     | [3642015.642] _XSERVTransSocketOpenCOTSServer: Unable to open socket for local
-	 *     | [3642015.701] _XSERVTransOpen: transport open failed for local/(none):0
-	 *     | [3642015.703] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for local
-	 *     | [3642015.707] 
+	 *     | [3728957.435] _XSERVTransSocketCreateListener: failed to bind listener
+	 *     | [3728957.441] _XSERVTransSocketUNIXCreateListener: ...SocketCreateListener() failed
+	 *     | [3728957.446] _XSERVTransMakeAllCOTSServerListeners: failed to create listener for unix
+	 *     | [3728957.454] _XSERVTransPTSOpenServer: Unable to open /dev/ptmx
+	 *     | [3728957.456] _XSERVTransOpen: transport open failed for pts/(none):0
+	 *     | [3728957.458] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for pts
+	 *     | [3728957.460] 
 	 *     | Fatal server error:
-	 *     | [3642015.708] Cannot establish any listening sockets - Make sure an X server isn't already running
-	 *     | [3642015.716] 
+	 *     | [3728957.462] Cannot establish any listening sockets - Make sure an X server isn't already running
+	 *     | [3728957.465] 
 	 *     | Please consult the Griefer@Work support 
 	 *     | 	 at https://github.com/GrieferAtWork/KOSmk4
 	 *     |  for help. 
-	 *     | [3642015.718] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
-	 *     | [3642015.721] 
-	 *     | [3642015.737] Server terminated with error (1). Closing log file.
+	 *     | [3728957.467] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
+	 *     | [3728957.469] 
+	 *     | [3728957.478] Server terminated with error (1). Closing log file.
 	 */
 
 	return state;
