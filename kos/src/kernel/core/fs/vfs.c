@@ -1293,9 +1293,13 @@ again:
 	source_directory = (REF struct directory_node *)incref(source_path->p_inode);
 	sync_endread(source_path);
 	TRY {
-		sync_read(target_path);
-		target_directory = (REF struct directory_node *)incref(target_path->p_inode);
-		sync_endread(target_path);
+		if (source_path == target_path) {
+			target_directory = (REF struct directory_node *)incref(source_directory);
+		} else {
+			sync_read(target_path);
+			target_directory = (REF struct directory_node *)incref(target_path->p_inode);
+			sync_endread(target_path);
+		}
 		TRY {
 			result = directory_rename(source_directory,
 			                          source_name,

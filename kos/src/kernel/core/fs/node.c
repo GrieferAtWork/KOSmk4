@@ -62,6 +62,7 @@
 #include <sys/statvfs.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
@@ -2170,7 +2171,7 @@ NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
 #ifndef NDEBUG
 	memset(&entry->de_bypos, 0xcc, sizeof(entry->de_bypos));
 	memset(&entry->de_next, 0xcc, sizeof(entry->de_next));
-#endif
+#endif /* !NDEBUG */
 }
 
 
@@ -2668,7 +2669,9 @@ acquire_sourcedir_writelock:
 						goto after_directories_updated;
 					}
 
+					/* Inherit some basic properties from the original INode */
 					target_entry->de_type = IFTODT(source_inode->i_filemode);
+					target_entry->de_ino  = source_inode->i_fileino;
 
 					/* All right! we've got everything we need! */
 					if (source_directory->i_type->it_directory.d_rename) {
@@ -2725,6 +2728,18 @@ acquire_sourcedir_writelock:
 							assert(target_inode != NULL);
 							if (target_inode != source_inode) {
 								struct inode *delnode;
+								assertf(target_inode->i_fileino == target_entry->de_ino,
+								        "d_rename created a new INode, but didn't update the INO number "
+								        "within the associated directory entry:\n"
+								        "target_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
+								        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+								        target_inode->i_fileino, target_entry->de_ino);
+								assertf(target_inode->i_fileino != source_inode->i_fileino,
+								        "d_rename created a new INode, but that new INode has the same "
+								        "INO number as the old INode:\n"
+								        "target_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) " (created)\n"
+								        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) " (old)\n",
+								        target_inode->i_fileino, source_inode->i_fileino);
 								assert(!(ATOMIC_READ(source_inode->i_flags) & (INODE_FCHANGED | INODE_FATTRCHANGED)));
 								/* Remove the old node from the superblock's file-tree, and replace it with the new one. */
 								ATOMIC_FETCHOR(source_inode->i_flags, INODE_FDELETED);
@@ -2816,6 +2831,12 @@ acquire_sourcedir_writelock:
 								break;
 							}
 						}
+						assertf(source_inode->i_fileino == target_entry->de_ino,
+						        "Inode number of the directory entry doesn't "
+						        "match that of the INode itself (before d_link):\n"
+						        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
+						        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+						        source_inode->i_fileino, target_entry->de_ino);
 						TRY {
 							/* Invoke the LINK-operator. */
 							(*type->it_directory.d_link)(target_directory,
@@ -2824,6 +2845,16 @@ acquire_sourcedir_writelock:
 							assertf(ATOMIC_READ(source_inode->i_filenlink) >= (nlink_t)2,
 							        "There should be at least 2 links: 1 in the "
 							        "source directory, +1 in the target directory");
+							assertf(source_inode->i_fileino == target_entry->de_ino &&
+							        source_inode->i_fileino == source_entry->de_ino,
+							        "Inode number of the directory entry doesn't "
+							        "match that of the INode itself (after d_link):\n"
+							        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
+							        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
+							        "source_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+							        source_inode->i_fileino,
+							        target_entry->de_ino,
+							        source_entry->de_ino);
 							TRY {
 								/* Remove the INode from the source directory. */
 								(*type->it_directory.d_unlink)(source_directory,
@@ -2857,6 +2888,12 @@ acquire_sourcedir_writelock:
 								}
 								RETHROW();
 							}
+							assertf(source_inode->i_fileino == target_entry->de_ino,
+							        "Inode number of the directory entry doesn't "
+							        "match that of the INode itself (after d_unlink):\n"
+							        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
+							        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+							        source_inode->i_fileino, target_entry->de_ino);
 						} EXCEPT {
 							if (source_path && source_entry->de_type == DT_DIR) {
 								if (removed_path)
@@ -2899,10 +2936,8 @@ acquire_sourcedir_writelock:
 						*psource_inode = (REF struct inode *)incref(source_inode);
 
 					/* Update the source and target directories. */
-					if likely(!target_directory->i_type->it_directory.d_oneshot.o_lookup)
-						directory_addentry(target_directory, incref(target_entry));
 					if (psource_entry != &source_oneshot) {
-						*psource_entry = source_entry->de_next;
+						*psource_entry = source_entry->de_next; /* Unlink from the map */
 						assert(source_directory->d_size >= 1);
 						--source_directory->d_size;
 						/* Remove the entry from the by-position chain. */
@@ -2912,6 +2947,13 @@ acquire_sourcedir_writelock:
 							directory_rehash_smaller_nx(source_directory);
 						}
 					}
+					/* Must add the new entry _after_ removing the old one, since the act
+					 * of adding new entires may realloc() the d_map vector, which the
+					 * `psource_entry' above may point into.
+					 * So this has to happen afterwards, else we run the risk of writing to
+					 * free()'d memory in the line: `*psource_entry = source_entry->de_next;' */
+					if likely(!target_directory->i_type->it_directory.d_oneshot.o_lookup)
+						directory_addentry(target_directory, incref(target_entry));
 after_directories_updated:
 					;
 				} EXCEPT {
