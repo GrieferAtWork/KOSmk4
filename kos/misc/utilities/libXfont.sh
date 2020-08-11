@@ -90,10 +90,21 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libXfont.so.$SO_V
 				--host="$TARGET_NAME-linux-gnu" \
 				--enable-shared \
 				--enable-static \
+				--disable-devel-docs \
+				--enable-freetype \
+				--enable-builtins \
+				--enable-pcfformat \
+				--enable-bdfformat \
+				--enable-snfformat \
+				--enable-fc \
+				--enable-unix-transport \
+				--disable-tcp-transport \
+				--disable-ipv6 \
+				--disable-local-transport \
 				--with-gnu-ld \
+				--without-xmlto \
+				--without-fop \
 				--with-bzip2
-			# TODO: This configure option list is incomplete.
-			# For example, `--enable-unix-transport' can be passed
 		) || exit $?
 	fi
 	cmd cd "$OPTPATH"
