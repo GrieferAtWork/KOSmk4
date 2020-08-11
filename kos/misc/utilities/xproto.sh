@@ -76,6 +76,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/Xfuncproto.h" ]; then
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
+apply_patch "$SRCPATH" "$KOS_PATCHES/xproto-$VERSION.patch"
 
 # Install the PKG_CONFIG file
 if ! [ -f "$PKG_CONFIG_PATH/xproto.pc" ]; then
@@ -124,15 +125,3 @@ install_header "Xw32defs.h"
 install_header "XWDFile.h"
 install_header "Xwindows.h"
 install_header "Xwinsock.h"
-
-# FIXME: Xthreads.h contains `#if defined(__linux__)' that must be
-#        patched to also allow for KOS (related code uses some
-#        pthread APIs that are available under KOS just as they
-#        are on linux)
-# The following X components make use of that header:
-#  - libX11
-#  - libXau
-#  - xtrans
-#  - libXfont (through xtrans)
-#  - xorg-server (through xtrans)
-

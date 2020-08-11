@@ -1,0 +1,17 @@
+diff -Naur xproto-7.0.23-orig/Xthreads.h xproto-7.0.23/Xthreads.h
+--- xproto-7.0.23-orig/Xthreads.h	2012-03-16 07:11:44.000000000 +0100
++++ xproto-7.0.23/Xthreads.h	2020-08-11 09:53:07.369682500 +0200
+@@ -259,11 +259,11 @@
+ #       define xthread_clear_id(id) id = _X_no_thread_id
+ #       define xthread_equal(id1,id2) pthread_equal(id1, id2)
+ #      endif /* _DECTHREADS_ */
+-#      if defined(__linux__)
++#      if defined(__linux__) || defined(__KOS__)
+ #       define xthread_have_id(id) !pthread_equal(id, 0)
+ #       define xthread_clear_id(id) id = 0
+ #       define xthread_equal(id1,id2) pthread_equal(id1, id2)
+-#      endif /* linux */
++#      endif /* __linux__ || __KOS__ */
+ #      if defined(_CMA_VENDOR_) && defined(_CMA__IBM) && (_CMA_VENDOR_ == _CMA__IBM)
+ #       ifdef DEBUG		/* too much of a hack to enable normally */
+ /* see also cma__obj_set_name() */
