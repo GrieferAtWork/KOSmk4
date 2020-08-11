@@ -177,7 +177,7 @@ __SYSDECL_BEGIN
  * the final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
  * is given, in which case the link itself is opened. */
 #if !defined(O_NOFOLLOW) && defined(__O_NOFOLLOW)
-#define O_NOFOLLOW   __O_NOFOLLOW
+#define O_NOFOLLOW __O_NOFOLLOW
 #endif /* !O_NOFOLLOW && __O_NOFOLLOW */
 
 /* Close the file during exec() */
@@ -244,18 +244,23 @@ __SYSDECL_BEGIN
 #endif /* __O_NONBLOCK */
 
 #ifdef __USE_MISC
+
+/* Always append data to the end of the file */
 #ifdef __O_APPEND
-#define FAPPEND   __O_APPEND
+#define FAPPEND __O_APPEND
 #endif /* __O_APPEND */
+
 #ifdef __O_SYNC
-#define FFSYNC    __O_SYNC
+#define FFSYNC __O_SYNC /* ??? */
 #endif /* __O_SYNC */
+
 #ifdef __O_ASYNC
-#define FASYNC    __O_ASYNC
+#define FASYNC __O_ASYNC /* ??? */
 #endif /* __O_ASYNC */
+
 #ifdef __O_NONBLOCK
-#define FNONBLOCK __O_NONBLOCK
-#define FNDELAY   __O_NONBLOCK
+#define FNONBLOCK __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#define FNDELAY   __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
 #endif /* __O_NONBLOCK */
 #endif /* __USE_MISC */
 
@@ -1059,39 +1064,58 @@ enum __pid_type {
 #endif /* !__O_TMPFILE */
 
 /* For XPG all symbols from <sys/stat.h> should also be available. */
-#if !defined(S_IFMT) && (defined(__USE_XOPEN) || defined(__USE_XOPEN2K8))
-#define S_IFMT     __S_IFMT
-#define S_IFDIR    __S_IFDIR
-#define S_IFCHR    __S_IFCHR
-#define S_IFBLK    __S_IFBLK
-#define S_IFREG    __S_IFREG
-#ifdef __S_IFIFO
-#define S_IFIFO __S_IFIFO
-#endif /* __S_IFIFO */
-#ifdef __S_IFLNK
-#define S_IFLNK __S_IFLNK
-#endif /* __S_IFLNK */
-#if (defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)) && defined(__S_IFSOCK)
-#define S_IFSOCK __S_IFSOCK
-#endif /* (__USE_UNIX98 || __USE_XOPEN2K8) && __S_IFSOCK */
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
+#if !defined(S_IFMT) && defined(__S_IFMT)
+#define S_IFMT  __S_IFMT /* These bits determine file type. */
+#endif /* !S_IFMT && __S_IFMT */
+#if !defined(S_IFDIR) && defined(__S_IFDIR)
+#define S_IFDIR __S_IFDIR /* Directory. */
+#endif /* !S_IFDIR && __S_IFDIR */
+#if !defined(S_IFCHR) && defined(__S_IFCHR)
+#define S_IFCHR __S_IFCHR /* Character device. */
+#endif /* !S_IFCHR && __S_IFCHR */
+#if !defined(S_IFBLK) && defined(__S_IFBLK)
+#define S_IFBLK __S_IFBLK /* Block device. */
+#endif /* !S_IFBLK && __S_IFBLK */
+#if !defined(S_IFREG) && defined(__S_IFREG)
+#define S_IFREG __S_IFREG /* Regular file. */
+#endif /* !S_IFREG && __S_IFREG */
+#if !defined(S_IFIFO) && defined(__S_IFIFO)
+#define S_IFIFO __S_IFIFO /* FIFO. */
+#endif /* !S_IFIFO && __S_IFIFO */
+#if !defined(S_IFLNK) && defined(__S_IFLNK)
+#define S_IFLNK __S_IFLNK /* Symbolic link. */
+#endif /* !S_IFLNK && __S_IFLNK */
+#if ((defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)) && \
+     (!defined(S_IFSOCK) && defined(__S_IFSOCK)))
+#define S_IFSOCK __S_IFSOCK /* Socket. */
+#endif /* (__USE_UNIX98 || __USE_XOPEN2K8) && (!S_IFSOCK && __S_IFSOCK) */
+#if !defined(S_ISUID) && defined(__S_ISUID)
 #define S_ISUID __S_ISUID /* Set user ID on execution. */
+#endif /* !S_ISUID && __S_ISUID */
+#if !defined(S_ISGID) && defined(__S_ISGID)
 #define S_ISGID __S_ISGID /* Set group ID on execution. */
-#if defined(__USE_MISC) || defined(__USE_XOPEN)
-#define S_ISVTX __S_ISVTX
-#endif /* __USE_MISC || __USE_XOPEN */
-#define S_IRUSR  __S_IREAD  /* Read by owner. */
-#define S_IWUSR  __S_IWRITE /* Write by owner. */
-#define S_IXUSR  __S_IEXEC  /* Execute by owner. */
-#define S_IRWXU (__S_IREAD|__S_IWRITE|__S_IEXEC)
-#define S_IRGRP (S_IRUSR >> 3) /* Read by group. */
-#define S_IWGRP (S_IWUSR >> 3) /* Write by group. */
-#define S_IXGRP (S_IXUSR >> 3) /* Execute by group. */
-#define S_IRWXG (S_IRWXU >> 3)
-#define S_IROTH (S_IRGRP >> 3) /* Read by others. */
-#define S_IWOTH (S_IWGRP >> 3) /* Write by others. */
-#define S_IXOTH (S_IXGRP >> 3) /* Execute by others. */
-#define S_IRWXO (S_IRWXG >> 3)
-#endif /* !S_IFMT && (__USE_XOPEN || __USE_XOPEN2K8) */
+#endif /* !S_ISGID && __S_ISGID */
+#if ((defined(__USE_MISC) || defined(__USE_XOPEN)) && \
+     (!defined(S_ISVTX) && defined(__S_ISVTX)))
+#define S_ISVTX __S_ISVTX /* Save swapped text after use (sticky). */
+#endif /* (__USE_MISC || __USE_XOPEN) && (!S_ISVTX && __S_ISVTX) */
+
+#ifndef S_IRUSR
+#define S_IRUSR 0400 /* Read by owner. */
+#define S_IWUSR 0200 /* Write by owner. */
+#define S_IXUSR 0100 /* Execute by owner. */
+#define S_IRWXU 0700
+#define S_IRGRP 0040 /* Read by group. */
+#define S_IWGRP 0020 /* Write by group. */
+#define S_IXGRP 0010 /* Execute by group. */
+#define S_IRWXG 0070
+#define S_IROTH 0004 /* Read by others. */
+#define S_IWOTH 0002 /* Write by others. */
+#define S_IXOTH 0001 /* Execute by others. */
+#define S_IRWXO 0007
+#endif /* !S_IRWXO */
+#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 
 #ifdef __USE_MISC

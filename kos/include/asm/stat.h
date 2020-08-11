@@ -31,25 +31,18 @@
 #define __S_IFLNK  0120000 /* Symbolic link. */
 #define __S_IFSOCK 0140000 /* Socket. */
 
-#define __S_ISDIR(x)  (((x)&__S_IFMT) == __S_IFDIR)
-#define __S_ISCHR(x)  (((x)&__S_IFMT) == __S_IFCHR)
-#define __S_ISBLK(x)  (((x)&__S_IFMT) == __S_IFBLK)
-#define __S_ISDEV(x)  (((x)&0130000) == 0020000) /* __S_IFCHR|__S_IFBLK */
-#define __S_ISREG(x)  (((x)&__S_IFMT) == __S_IFREG)
-#define __S_ISFIFO(x) (((x)&__S_IFMT) == __S_IFIFO)
-#define __S_ISLNK(x)  (((x)&__S_IFMT) == __S_IFLNK)
-#define __S_ISSOCK(x) (((x)&__S_IFMT) == __S_IFSOCK)
-
-#define __S_TYPEISMQ(buf)  ((buf)->st_mode - (buf)->st_mode)
-#define __S_TYPEISSEM(buf) ((buf)->st_mode - (buf)->st_mode)
-#define __S_TYPEISSHM(buf) ((buf)->st_mode - (buf)->st_mode)
+#define __S_ISDIR(x)  (((x) & __S_IFMT) == __S_IFDIR)  /* Directory. */
+#define __S_ISCHR(x)  (((x) & __S_IFMT) == __S_IFCHR)  /* Character device. */
+#define __S_ISBLK(x)  (((x) & __S_IFMT) == __S_IFBLK)  /* Block device. */
+#define __S_ISDEV(x)  (((x) & 0130000) == 0020000)     /* __S_ISCHR(x) || __S_ISBLK(x) */
+#define __S_ISREG(x)  (((x) & __S_IFMT) == __S_IFREG)  /* Regular file. */
+#define __S_ISFIFO(x) (((x) & __S_IFMT) == __S_IFIFO)  /* FIFO. */
+#define __S_ISLNK(x)  (((x) & __S_IFMT) == __S_IFLNK)  /* Symbolic link. */
+#define __S_ISSOCK(x) (((x) & __S_IFMT) == __S_IFSOCK) /* Socket. */
 
 #define __S_ISUID  04000 /* Set user ID on execution. */
 #define __S_ISGID  02000 /* Set group ID on execution. */
 #define __S_ISVTX  01000 /* Save swapped text after use (sticky). */
-#define __S_IREAD  00400 /* Read by owner. */
-#define __S_IWRITE 00200 /* Write by owner. */
-#define __S_IEXEC  00100 /* Execute by owner. */
 
 #define __UTIME_NOW  ((1l << 30) - 1l)
 #define __UTIME_OMIT ((1l << 30) - 2l)

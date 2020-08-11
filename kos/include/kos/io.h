@@ -149,41 +149,64 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #if !defined(S_ISVTX) && defined(__S_ISVTX)
 #define S_ISVTX  __S_ISVTX  /* Save swapped text after use (sticky). */
 #endif /* !S_ISVTX && __S_ISVTX */
-#if !defined(S_IREAD) && defined(__S_IREAD)
-#define S_IREAD  __S_IREAD  /* Read by owner. */
-#endif /* !S_IREAD && __S_IREAD */
-#if !defined(S_IWRITE) && defined(__S_IWRITE)
-#define S_IWRITE __S_IWRITE /* Write by owner. */
-#endif /* !S_IWRITE && __S_IWRITE */
-#if !defined(S_IEXEC) && defined(__S_IEXEC)
-#define S_IEXEC  __S_IEXEC  /* Execute by owner. */
-#endif /* !S_IEXEC && __S_IEXEC */
+
+#ifndef S_IRUSR
+#define S_IRUSR 0400 /* Read by owner. */
+#define S_IWUSR 0200 /* Write by owner. */
+#define S_IXUSR 0100 /* Execute by owner. */
+#define S_IRWXU 0700
+#define S_IRGRP 0040 /* Read by group. */
+#define S_IWGRP 0020 /* Write by group. */
+#define S_IXGRP 0010 /* Execute by group. */
+#define S_IRWXG 0070
+#define S_IROTH 0004 /* Read by others. */
+#define S_IWOTH 0002 /* Write by others. */
+#define S_IXOTH 0001 /* Execute by others. */
+#define S_IRWXO 0007
+#endif /* !S_IRWXO */
+
+#ifndef S_IRWXUGO
+#define S_IRWXUGO 0777
+#endif /* !S_IRWXUGO */
+#ifndef S_IALLUGO
+#define S_IALLUGO 07777
+#endif /* !S_IALLUGO */
+#ifndef S_IRUGO
+#define S_IRUGO 0444
+#endif /* !S_IRUGO */
+#ifndef S_IWUGO
+#define S_IWUGO 0222
+#endif /* !S_IWUGO */
+#ifndef S_IXUGO
+#define S_IXUGO 0111
+#endif /* !S_IXUGO */
+
 
 /* File mode test macros. */
 #if !defined(S_ISDIR) && defined(__S_ISDIR)
-#define S_ISDIR(x)  __S_ISDIR(x)
+#define S_ISDIR(mode)  __S_ISDIR(mode)  /* Directory. */
 #endif /* !S_ISDIR && __S_ISDIR */
 #if !defined(S_ISCHR) && defined(__S_ISCHR)
-#define S_ISCHR(x)  __S_ISCHR(x)
+#define S_ISCHR(mode)  __S_ISCHR(mode)  /* Character device. */
 #endif /* !S_ISCHR && __S_ISCHR */
 #if !defined(S_ISBLK) && defined(__S_ISBLK)
-#define S_ISBLK(x)  __S_ISBLK(x)
+#define S_ISBLK(mode)  __S_ISBLK(mode)  /* Block device. */
 #endif /* !S_ISBLK && __S_ISBLK */
+#if !defined(S_ISDEV) && defined(__S_ISDEV)
+#define S_ISDEV(mode)  __S_ISDEV(mode) /* S_ISCHR(mode) || S_ISBLK(mode) */
+#endif /* !S_ISDEV && __S_ISDEV */
 #if !defined(S_ISREG) && defined(__S_ISREG)
-#define S_ISREG(x)  __S_ISREG(x)
+#define S_ISREG(mode)  __S_ISREG(mode)  /* Regular file. */
 #endif /* !S_ISREG && __S_ISREG */
 #if !defined(S_ISFIFO) && defined(__S_ISFIFO)
-#define S_ISFIFO(x) __S_ISFIFO(x)
+#define S_ISFIFO(mode) __S_ISFIFO(mode) /* FIFO. */
 #endif /* !S_ISFIFO && __S_ISFIFO */
-#if !defined(S_ISSOCK) && defined(__S_ISSOCK)
-#define S_ISSOCK(x) __S_ISSOCK(x)
-#endif /* !S_ISSOCK && __S_ISSOCK */
 #if !defined(S_ISLNK) && defined(__S_ISLNK)
-#define S_ISLNK(x)  __S_ISLNK(x)
+#define S_ISLNK(mode)  __S_ISLNK(mode)  /* Symbolic link. */
 #endif /* !S_ISLNK && __S_ISLNK */
-#if !defined(S_ISDEV) && defined(__S_ISDEV)
-#define S_ISDEV(x)  __S_ISDEV(x)
-#endif /* !S_ISDEV && __S_ISDEV */
+#if !defined(S_ISSOCK) && defined(__S_ISSOCK)
+#define S_ISSOCK(mode) __S_ISSOCK(mode) /* Socket. */
+#endif /* !S_ISSOCK && __S_ISSOCK */
 
 
 /* Directory entry types (`struct dirent::d_type'). */
