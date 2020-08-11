@@ -72,7 +72,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION
 				--sysconfdir="/etc" \
 				--sharedstatedir="/usr/com" \
 				--localstatedir="/var" \
-				--runstatedir="/run" \
+				--runstatedir="/var/run" \
 				--libdir="/$TARGET_LIBPATH" \
 				--includedir="/usr/include" \
 				--oldincludedir="/usr/include" \

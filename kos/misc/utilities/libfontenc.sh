@@ -63,7 +63,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libfontenc.so.$SO
 				--sysconfdir="/etc" \
 				--sharedstatedir="/usr/com" \
 				--localstatedir="/var" \
-				--runstatedir="/run" \
+				--runstatedir="/var/run" \
 				--libdir="/$TARGET_LIBPATH" \
 				--includedir="/usr/include" \
 				--oldincludedir="/usr/include" \

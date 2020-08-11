@@ -91,10 +91,13 @@ UnixSocket_Bind(struct socket *__restrict self,
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL) {
 	UnixSocket *me = (UnixSocket *)self;
+	USER CHECKED struct sockaddr_un *addr_un;
+	addr_un = (USER CHECKED struct sockaddr_un *)addr;
 	(void)me;
-	(void)addr;
+	(void)addr_un;
 	(void)addr_len;
-	/* TODO */
+	/* TODO: This function needs to eventually call `directory_mknod(S_IFSOCK)' */
+	/* NOTE: If the file `addr_un->sun_path' already exists, then we must throw an `E_NET_ADDRESS_IN_USE' */
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
