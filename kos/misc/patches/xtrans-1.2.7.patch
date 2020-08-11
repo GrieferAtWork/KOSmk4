@@ -1,0 +1,16 @@
+diff -Naur xtrans-1.2.7-orig/Xtranssock.c xtrans-1.2.7/Xtranssock.c
+--- xtrans-1.2.7-orig/Xtranssock.c	2012-03-23 04:04:35.000000000 +0100
++++ xtrans-1.2.7/Xtranssock.c	2020-08-11 17:48:05.424214300 +0200
+@@ -412,7 +412,11 @@
+ 
+     if ((ciptr->fd = socket(Sockettrans2devtab[i].family, type,
+ 	Sockettrans2devtab[i].protocol)) < 0
+-#ifndef WIN32
++#if !defined(WIN32) && !defined(__KOS__)
++       /* On KOS, sysconf(_SC_OPEN_MAX) == -1  (which posix defines as 'unlimited')
++        * So really, this code right here used to check for `fd < 0 || fd >= -1',
++        * which would obviously always result in it thinking that the socket()
++        * call failed... UGH!!! */
+ #if (defined(X11_t) && !defined(USE_POLL)) || defined(FS_t) || defined(FONT_t)
+        || ciptr->fd >= sysconf(_SC_OPEN_MAX)
+ #endif

@@ -30,6 +30,9 @@ if ! [ -f "$SRCPATH/configure" ]; then
 	cmd tar xvf "xtrans-$VERSION.tar.gz"
 fi
 
+apply_patch "$SRCPATH" "$KOS_PATCHES/xtrans-$VERSION.patch"
+
+
 # Install the PKG_CONFIG file
 if ! [ -f "$PKG_CONFIG_PATH/xtrans.pc" ]; then
 	cmd mkdir -p "$PKG_CONFIG_PATH"
