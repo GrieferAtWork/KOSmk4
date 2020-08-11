@@ -100,7 +100,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libXfont.so.$SO_V
 				--enable-unix-transport \
 				--disable-tcp-transport \
 				--disable-ipv6 \
-				--disable-local-transport \
+				--enable-local-transport \
 				--with-gnu-ld \
 				--without-xmlto \
 				--without-fop \

@@ -192,7 +192,7 @@ if ! [ -f "$OPTPATH/hw/xfree86/Xorg" ]; then
 				--enable-unix-transport `# Unix domain socket support` \
 				--disable-tcp-transport `# Not needed` \
 				--disable-ipv6 `# Not needed` \
-				--disable-local-transport \
+				--enable-local-transport \
 				--disable-secure-rpc \
 \
 				--without-doxygen \

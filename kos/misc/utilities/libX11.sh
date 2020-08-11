@@ -88,6 +88,7 @@ EOF
 				--enable-unix-transport \
 				--disable-tcp-transport \
 				--disable-ipv6 \
+				--enable-local-transport \
 				--disable-secure-rpc \
 				--disable-loadable-i18n \
 				--enable-loadable-xcursor \
@@ -96,7 +97,12 @@ EOF
 				--enable-xf86bigfont \
 				--disable-lint-library \
 				--disable-malloc0returnsnull \
-				--with-gnu-ld
+				--with-gnu-ld \
+				--without-xmlto \
+				--without-fop \
+				--with-local-transport-order=TODO \
+				--without-launchd \
+				--without-lint
 		) || exit $?
 		# TODO: --enable-composecache  (requires <langinfo.h>)
 	fi
