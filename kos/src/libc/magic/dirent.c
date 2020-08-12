@@ -354,10 +354,10 @@ typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
 [[cp, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat)), no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir64")]]
-[[decl_include("<bits/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
-int scandir([[nonnull]] char const *__restrict dir,
-            [[nonnull]] struct dirent ***__restrict namelist,
-            __scandir_selector_t selector, __scandir_cmp_t cmp) {
+[[decl_include("<features.h>", "<bits/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
+__STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
+                              [[nonnull]] struct dirent ***__restrict namelist,
+                              __scandir_selector_t selector, __scandir_cmp_t cmp) {
 	return scandirat(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
 }
 
@@ -387,10 +387,10 @@ int alphasort64([[nonnull]] struct dirent64 const **e1,
 [[cp, no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandirat")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandirat64")]]
-[[decl_include("<bits/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
-int scandirat($fd_t dirfd, [[nonnull]] char const *__restrict dir,
-              [[nonnull]] struct dirent ***__restrict namelist,
-              __scandir_selector_t selector, __scandir_cmp_t cmp);
+[[decl_include("<features.h>", "<bits/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
+__STDC_INT_AS_SSIZE_T scandirat($fd_t dirfd, [[nonnull]] char const *__restrict dir,
+                                [[nonnull]] struct dirent ***__restrict namelist,
+                                __scandir_selector_t selector, __scandir_cmp_t cmp);
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -413,21 +413,21 @@ typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const
 )]
 
 @@64-bit variant of `scandir()'
-[[cp, dirent64_variant_of(scandir), decl_include("<bits/dirent.h>")]]
+[[cp, dirent64_variant_of(scandir), decl_include("<features.h>", "<bits/dirent.h>")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat64))]]
 [[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T)]]
-int scandir64([[nonnull]] char const *__restrict dir,
-              [[nonnull]] struct dirent64 ***__restrict namelist,
-              __scandir64_selector_t selector, __scandir64_cmp_t cmp) {
+__STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
+                                [[nonnull]] struct dirent64 ***__restrict namelist,
+                                __scandir64_selector_t selector, __scandir64_cmp_t cmp) {
 	return scandirat64(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
 }
 
 @@64-bit variant of `scandirat()'
-[[cp, dirent64_variant_of(scandirat), decl_include("<bits/dirent.h>")]]
+[[cp, dirent64_variant_of(scandirat), decl_include("<features.h>", "<bits/dirent.h>")]]
 [[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T)]]
-int scandirat64($fd_t dirfd, [[nonnull]] char const *__restrict dir,
-                [[nonnull]] struct dirent64 ***__restrict namelist,
-                __scandir64_selector_t selector, __scandir64_cmp_t cmp);
+__STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restrict dir,
+                                  [[nonnull]] struct dirent64 ***__restrict namelist,
+                                  __scandir64_selector_t selector, __scandir64_cmp_t cmp);
 
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */

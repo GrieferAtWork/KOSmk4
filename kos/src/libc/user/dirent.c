@@ -23,8 +23,11 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/overflow.h>
+
 #include <kos/syscalls.h>
 
+#include <assert.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <malloc.h>
@@ -50,12 +53,14 @@ struct __dirstream {
 	                                                                *       to free this buffer. */
 };
 
-#define dirstream_init(self, fd)                            \
-	((self)->ds_fd      = fd,                               \
-	 (self)->ds_lodsize = 0,                                \
+#define dirstream_init_nofd(self)                           \
+	((self)->ds_lodsize = 0,                                \
 	 (self)->ds_bufsize = sizeof((self)->ds_sbuf),          \
 	 (self)->ds_next    = (struct dirent *)(self)->ds_sbuf, \
 	 (self)->ds_buf     = (struct dirent *)(self)->ds_sbuf)
+#define dirstream_init(self, fd) \
+	((self)->ds_fd = (fd),       \
+	 dirstream_init_nofd(self))
 #define dirstream_fini_keepfd(self)                       \
 	(((self)->ds_buf != (struct dirent *)(self)->ds_sbuf) \
 	 ? free((self)->ds_buf)                               \
@@ -355,9 +360,9 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
 /*[[[impl:libc_readdir64_r]]]*/
 DEFINE_INTERN_WEAK_ALIAS(libc_readdir64_r, libc_readdir_r);
 
-/*[[[head:libc_scandir,hash:CRC-32=0xbf8806a7]]]*/
+/*[[[head:libc_scandir,hash:CRC-32=0x8367fc23]]]*/
 /* Scan a directory `DIR' for all contained directory entries */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
                                    struct dirent ***__restrict namelist,
                                    __scandir_selector_t selector,
@@ -368,24 +373,124 @@ NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
 }
 /*[[[end:libc_scandir]]]*/
 
-/*[[[head:libc_scandirat,hash:CRC-32=0x7a72afc2]]]*/
+/*[[[head:libc_scandirat,hash:CRC-32=0x8c6bd8ad]]]*/
 /* Scan a directory `DIRFD:DIR' for all contained directory entries */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
                                      char const *__restrict dir,
                                      struct dirent ***__restrict namelist,
                                      __scandir_selector_t selector,
                                      __scandir_cmp_t cmp)
 /*[[[body:libc_scandirat]]]*/
-/*AUTO*/{
-	(void)dirfd;
-	(void)dir;
-	(void)namelist;
-	(void)selector;
-	(void)cmp;
-	CRT_UNIMPLEMENTEDF("scandirat(%" PRIxN(__SIZEOF_FD_T__) ", %q, %p, %p, %p)", dirfd, dir, namelist, selector, cmp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	DIR stream;
+	ssize_t result;
+	struct dirent **ents_list;
+	size_t ents_used, ents_size;
+	errno_t saved_errno;
+	result    = -1;
+	*namelist = NULL;
+	/* Open the named directory. */
+	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY);
+	if unlikely(stream.ds_fd < 0)
+		goto done_nostream;
+	/* Initialize the directory stream. */
+	dirstream_init_nofd(&stream);
+	/* Enumerate the directory's contents. */
+	ents_list = NULL; /* Vector of selected directories */
+	ents_used = 0;    /* # of used entries in `ent_list' */
+	ents_size = 0;    /* # of allocated entries in `ent_list' */
+	saved_errno = libc_geterrno();
+	libc_seterrno(EOK);
+	for (;;) {
+		struct dirent *ent, *ent_copy;
+		size_t ent_size;
+		ent = libc_readdir(&stream);
+		if (!ent) {
+			/* Check if this is an error, or if it's EOF */
+			if (libc_geterrno() != EOK)
+				goto err; /* It's an error! */
+			/* Its EOF */
+			break;
+		}
+		/* Check with the filter-function if we should use this entry. */
+		if (selector) {
+			if ((*selector)(ent) == 0)
+				continue; /* Don't include this one. */
+		}
+		/* Make sure `ent_list' has sufficient space for another entry. */
+		if (ents_used >= ents_size) {
+			struct dirent **new_ents_list;
+			size_t new_alloc;
+			if (OVERFLOW_UMUL(ents_size, 2, &new_alloc))
+				new_alloc = (size_t)-1;
+			if (!new_alloc)
+				new_alloc = 16;
+			new_ents_list = (struct dirent **)realloc(ents_list,
+			                                          new_alloc,
+			                                          sizeof(struct dirent *));
+			if unlikely(!new_ents_list) {
+				new_alloc = ents_used + 1;
+				new_ents_list = (struct dirent **)realloc(ents_list,
+				                                          new_alloc,
+				                                          sizeof(struct dirent *));
+				if unlikely(!new_ents_list)
+					goto err;
+			}
+			ents_list = new_ents_list;
+			ents_size = new_alloc;
+		}
+		/* Append a copy of `ent' to `ent_list' */
+		ent_size = offsetof(struct dirent, d_name) +
+		           (ent->d_namlen + 1) * sizeof(char);
+		ent_copy = (struct dirent *)malloc(ent_size);
+		if unlikely(!ent_copy)
+			goto err;
+		ent_copy = (struct dirent *)memcpy(ent_copy, ent, ent_size);
+		/* Actually append the entry copy. */
+		ents_list[ents_used++] = ent_copy;
+	}
+	libc_seterrno(saved_errno);
+	result = (ssize_t)ents_used;
+	if (!ents_list) {
+		/* Don't return a NULL-pointer on success! */
+		assert(ents_used == 0);
+#ifdef __MALLOC_ZERO_IS_NONNULL
+		ents_list = (struct dirent **)malloc(0);
+#else /* __MALLOC_ZERO_IS_NONNULL */
+		ents_list = (struct dirent **)malloc(1);
+#endif /* !__MALLOC_ZERO_IS_NONNULL */
+		if unlikely(!ents_list)
+			result = -1;
+	} else if (ents_size > ents_used) {
+		/* Try to reclaim unused memory. */
+		struct dirent **new_ents_list;
+		new_ents_list = (struct dirent **)realloc(ents_list,
+		                                          ents_used,
+		                                          sizeof(struct dirent *));
+		if likely(new_ents_list)
+			ents_list = new_ents_list;
+	}
+	/* Finally, we must qsort() the list as a whole. */
+	if (cmp) {
+		qsort(ents_list, ents_used,
+		      sizeof(struct dirent *),
+		      (__compar_fn_t)cmp);
+	}
+done:
+	*namelist = ents_list; /* Inherit */
+	dirstream_fini(&stream);
+done_nostream:
+	return result;
+err:
+	/* Free already-allocated dirent copies, as well as the dirent list. */
+	while (ents_used) {
+		--ents_used;
+		free(ents_list[ents_used]);
+	}
+	free(ents_list);
+	ents_list = NULL; /* Write-back a NULL-pointer on error */
+	goto done;
 }
 /*[[[end:libc_scandirat]]]*/
 

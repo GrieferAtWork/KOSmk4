@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x417da9fb */
+/* HASH CRC-32:0xc8ecacd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_scandir64_defined 1
 #include <__crt.h>
 #if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
+#include <features.h>
 #include <bits/dirent.h>
 #ifndef ____scandir64_selector_t_defined
 #define ____scandir64_selector_t_defined 1
@@ -34,16 +35,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_scandirat64_defined 1
 #ifdef __CRT_HAVE_scandirat64
 /* 64-bit variant of `scandirat()' */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)
 /* 64-bit variant of `scandirat()' */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
 #else /* ... */
 #undef __local___localdep_scandirat64_defined
 #endif /* !... */
 #endif /* !__local___localdep_scandirat64_defined */
 /* 64-bit variant of `scandir()' */
-__LOCAL_LIBC(scandir64) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(scandir64) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir64))(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp) {
 	return __localdep_scandirat64(__CRT_AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }

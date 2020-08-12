@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78cce8ed */
+/* HASH CRC-32:0xe2dd38f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -511,7 +511,6 @@
 #define __stub_rresvport_af 1
 #define __stub_ruserok 1
 #define __stub_ruserok_af 1
-#define __stub_scandirat 1
 #define __stub_seed48 1
 #define __stub_seed48_r 1
 #define __stub_semctl 1
