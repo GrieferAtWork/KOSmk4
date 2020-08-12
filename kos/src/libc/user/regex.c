@@ -323,7 +323,7 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
                                    regmatch_t pmatch[__restrict_arr],
                                    int eflags)
 /*[[[body:libc_regexec]]]*/
-/*AUTO*/{
+{
 	(void)preg;
 	(void)string;
 	(void)nmatch;
@@ -331,7 +331,9 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
 	(void)eflags;
 	CRT_UNIMPLEMENTEDF("regexec(%p, %q, %Ix, %p, %x)", preg, string, nmatch, pmatch, eflags); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	/* FIXME: Implement this function proper.
+	 *        Current, it returning -1 is a work-around for the Xorg server. */
+	return -1;
 }
 /*[[[end:libc_regexec]]]*/
 

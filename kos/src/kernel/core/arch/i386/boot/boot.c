@@ -453,41 +453,156 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Xorg X-Window server support roadmap.
 	 *
-	 * Current blocker(s):
+	 * TODO:
+	 *     - Implement proper libsctrace support for arguments names of sys_socket
+	 *     - Finish implementing support for unix domain sockets
+	 *     - Properly implement libc's regex functions
 	 *
-	 *     Location:
-	 *        - xorg-server:...
-	 *     Problem:
-	 *        - The server makes use of `sys_socket(domain: 00000001, type: 00000001, protocol: 00000000)'
-	 *        - That is: `domain=AF_LOCAL'
-	 *        - This results in `Translate exception 0x2:0x8[0x7b,0x1] into errno=-97'
-	 *        - That is: exception E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY:AF_LOCAL
-	 *                   errno     EAFNOSUPPORT
-	 *     Solution:
-	 *        - For starters: implement proper libsctrace support for arguments names of sys_socket
-	 *        - Implement support for unix domain sockets (hint: `AF_UNIX=AF_LOCAL' if you're wondering about names...)
-	 *
-	 *     Current behavior:
+	 * Current behavior:
 	 *     $ Xorg
 	 *     | ...
 	 *
 	 *     $ cat /var/log/Xorg.0.log
-	 *     | [3728957.435] _XSERVTransSocketCreateListener: failed to bind listener
-	 *     | [3728957.441] _XSERVTransSocketUNIXCreateListener: ...SocketCreateListener() failed
-	 *     | [3728957.446] _XSERVTransMakeAllCOTSServerListeners: failed to create listener for unix
-	 *     | [3728957.454] _XSERVTransPTSOpenServer: Unable to open /dev/ptmx
-	 *     | [3728957.456] _XSERVTransOpen: transport open failed for pts/(none):0
-	 *     | [3728957.458] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for pts
-	 *     | [3728957.460] 
+	 *     | [3807291.277] _XSERVTransPTSOpenServer: Unable to open /dev/ptmx
+	 *     | [3807291.281] _XSERVTransOpen: transport open failed for pts/(none):0
+	 *     | [3807291.283] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for pts
+	 *     | [3807291.342] 
+	 *     | X.Org X Server 1.12.2
+	 *     | Release Date: 2012-05-29
+	 *     | [3807291.344] X Protocol Version 11, Revision 0
+	 *     | [3807291.345] Build Operating System: KOS Griefer@Work
+	 *     | [3807291.348] Current Operating System: KOS (none) KOS Mk4 - yakal 4.0.0 i386
+	 *     | [3807291.351]  
+	 *     | [3807291.353] Current version of pixman: 0.40.0
+	 *     | [3807291.355] 	Before reporting problems, check https://github.com/GrieferAtWork/KOSmk4
+	 *     | 	to make sure that you have the latest version.
+	 *     | [3807291.356] Markers: (--) probed, (**) from config file, (==) default setting,
+	 *     | 	(++) from command line, (!!) notice, (II) informational,
+	 *     | 	(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
+	 *     | [3807291.363] (==) Log file: "/var/log/Xorg.0.log", Time: Wed Aug 12 13:49:18 2020
+	 *     | [3807291.380] (II) Loader magic: 082337E0
+	 *     | [3807291.382] (II) Module ABI versions:
+	 *     | [3807291.383] 	X.Org ANSI C Emulation: 0.4
+	 *     | [3807291.385] 	X.Org Video Driver: 12.0
+	 *     | [3807291.386] 	X.Org XInput driver : 16.0
+	 *     | [3807291.388] 	X.Org Server Extension : 6.0
+	 *     | [3807291.401] (==) Using default built-in configuration (21 lines)
+	 *     | [3807291.403] (==) --- Start of built-in configuration ---
+	 *     | [3807291.405] 	Section "Device"
+	 *     | [3807291.406] 		Identifier	"Builtin Default vesa Device 0"
+	 *     | [3807291.408] 		Driver	"vesa"
+	 *     | [3807291.409] 	EndSection
+	 *     | [3807291.410] 	Section "Screen"
+	 *     | [3807291.412] 		Identifier	"Builtin Default vesa Screen 0"
+	 *     | [3807291.414] 		Device	"Builtin Default vesa Device 0"
+	 *     | [3807291.415] 	EndSection
+	 *     | [3807291.417] 	Section "Device"
+	 *     | [3807291.418] 		Identifier	"Builtin Default fbdev Device 0"
+	 *     | [3807291.419] 		Driver	"fbdev"
+	 *     | [3807291.421] 	EndSection
+	 *     | [3807291.422] 	Section "Screen"
+	 *     | [3807291.424] 		Identifier	"Builtin Default fbdev Screen 0"
+	 *     | [3807291.425] 		Device	"Builtin Default fbdev Device 0"
+	 *     | [3807291.427] 	EndSection
+	 *     | [3807291.428] 	Section "ServerLayout"
+	 *     | [3807291.429] 		Identifier	"Builtin Default Layout"
+	 *     | [3807291.431] 		Screen	"Builtin Default vesa Screen 0"
+	 *     | [3807291.432] 		Screen	"Builtin Default fbdev Screen 0"
+	 *     | [3807291.435] 	EndSection
+	 *     | [3807291.436] (==) --- End of built-in configuration ---
+	 *     | [3807291.443] (==) ServerLayout "Builtin Default Layout"
+	 *     | [3807291.446] (**) |-->Screen "Builtin Default vesa Screen 0" (0)
+	 *     | [3807291.447] (**) |   |-->Monitor "<default monitor>"
+	 *     | [3807291.454] (**) |   |-->Device "Builtin Default vesa Device 0"
+	 *     | [3807291.455] (==) No monitor specified for screen "Builtin Default vesa Screen 0".
+	 *     | 	Using a default monitor configuration.
+	 *     | [3807291.457] (**) |-->Screen "Builtin Default fbdev Screen 0" (1)
+	 *     | [3807291.459] (**) |   |-->Monitor "<default monitor>"
+	 *     | [3807291.462] (**) |   |-->Device "Builtin Default fbdev Device 0"
+	 *     | [3807291.463] (==) No monitor specified for screen "Builtin Default fbdev Screen 0".
+	 *     | 	Using a default monitor configuration.
+	 *     | [3807291.466] (==) Disabling SIGIO handlers for input devices
+	 *     | [3807291.467] (==) Not automatically adding devices
+	 *     | [3807291.468] (==) Not automatically enabling devices
+	 *     | [3807291.472] (WW) The directory "/usr/share/fonts/X11/misc/" does not exist.
+	 *     | [3807291.473] 	Entry deleted from font path.
+	 *     | [3807291.475] (WW) The directory "/usr/share/fonts/X11/ttf/" does not exist.
+	 *     | [3807291.477] 	Entry deleted from font path.
+	 *     | [3807291.479] (WW) The directory "/usr/share/fonts/X11/otf/" does not exist.
+	 *     | [3807291.480] 	Entry deleted from font path.
+	 *     | [3807291.482] (WW) The directory "/usr/share/fonts/X11/Type1/" does not exist.
+	 *     | [3807291.484] 	Entry deleted from font path.
+	 *     | [3807291.486] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
+	 *     | [3807291.487] 	Entry deleted from font path.
+	 *     | [3807291.489] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
+	 *     | [3807291.490] 	Entry deleted from font path.
+	 *     | [3807291.493] (==) FontPath set to:
+	 *     | 	
+	 *     | [3807291.495] (==) ModulePath set to "/lib/xorg/modules"
+	 *     | [3807291.496] (==) |-->Input Device "<default pointer>"
+	 *     | [3807291.498] (==) |-->Input Device "<default keyboard>"
+	 *     | [3807291.500] (==) The core pointer device wasn't specified explicitly in the layout.
+	 *     | 	Using the default mouse configuration.
+	 *     | [3807291.502] (==) The core keyboard device wasn't specified explicitly in the layout.
+	 *     | 	Using the default keyboard configuration.
+	 *     | [3807291.504] (II) LoadModule: "extmod"
+	 *     | [3807291.527] (II) Loading /lib/xorg/modules/extensions/libextmod.so
+	 *     | [3807291.535] (II) Module extmod: vendor="X.Org Foundation"
+	 *     | [3807291.536] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3807291.538] 	Module class: X.Org Server Extension
+	 *     | [3807291.539] 	ABI class: X.Org Server Extension, version 6.0
+	 *     | [3807291.541] (II) Loading extension MIT-SCREEN-SAVER
+	 *     | [3807291.543] (II) Loading extension XFree86-VidModeExtension
+	 *     | [3807291.545] (II) Loading extension XFree86-DGA
+	 *     | [3807291.546] (II) Loading extension DPMS
+	 *     | [3807291.548] (II) Loading extension XVideo
+	 *     | [3807291.549] (II) Loading extension XVideo-MotionCompensation
+	 *     | [3807291.552] (II) Loading extension X-Resource
+	 *     | [3807291.553] (II) LoadModule: "dbe"
+	 *     | [3807291.559] (II) Loading /lib/xorg/modules/extensions/libdbe.so
+	 *     | [3807291.564] (II) Module dbe: vendor="X.Org Foundation"
+	 *     | [3807291.566] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3807291.567] 	Module class: X.Org Server Extension
+	 *     | [3807291.569] 	ABI class: X.Org Server Extension, version 6.0
+	 *     | [3807291.571] (II) Loading extension DOUBLE-BUFFER
+	 *     | [3807291.572] (II) LoadModule: "record"
+	 *     | [3807291.580] (II) Loading /lib/xorg/modules/extensions/librecord.so
+	 *     | [3807291.588] (II) Module record: vendor="X.Org Foundation"
+	 *     | [3807291.589] 	compiled for 1.12.2, module version = 1.13.0
+	 *     | [3807291.591] 	Module class: X.Org Server Extension
+	 *     | [3807291.593] 	ABI class: X.Org Server Extension, version 6.0
+	 *     | [3807291.594] (II) Loading extension RECORD
+	 *     | [3807291.596] (II) LoadModule: "vesa"
+	 *     | [3807291.636] (WW) Warning, couldn't open module vesa
+	 *     | [3807291.637] (II) UnloadModule: "vesa"
+	 *     | [3807291.639] (II) Unloading vesa
+	 *     | [3807291.640] (EE) Failed to load module "vesa" (module does not exist, 0)
+	 *     | [3807291.644] (II) LoadModule: "fbdev"
+	 *     | [3807291.682] (WW) Warning, couldn't open module fbdev
+	 *     | [3807291.683] (II) UnloadModule: "fbdev"
+	 *     | [3807291.685] (II) Unloading fbdev
+	 *     | [3807291.686] (EE) Failed to load module "fbdev" (module does not exist, 0)
+	 *     | [3807291.688] (II) LoadModule: "mouse"
+	 *     | [3807291.723] (WW) Warning, couldn't open module mouse
+	 *     | [3807291.724] (II) UnloadModule: "mouse"
+	 *     | [3807291.725] (II) Unloading mouse
+	 *     | [3807291.726] (EE) Failed to load module "mouse" (module does not exist, 0)
+	 *     | [3807291.728] (II) LoadModule: "kbd"
+	 *     | [3807291.761] (WW) Warning, couldn't open module kbd
+	 *     | [3807291.764] (II) UnloadModule: "kbd"
+	 *     | [3807291.765] (II) Unloading kbd
+	 *     | [3807291.766] (EE) Failed to load module "kbd" (module does not exist, 0)
+	 *     | [3807291.768] (EE) No drivers available.
+	 *     | [3807291.769] 
 	 *     | Fatal server error:
-	 *     | [3728957.462] Cannot establish any listening sockets - Make sure an X server isn't already running
-	 *     | [3728957.465] 
+	 *     | [3807291.771] no screens found
+	 *     | [3807291.776] 
 	 *     | Please consult the Griefer@Work support 
 	 *     | 	 at https://github.com/GrieferAtWork/KOSmk4
 	 *     |  for help. 
-	 *     | [3728957.467] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
-	 *     | [3728957.469] 
-	 *     | [3728957.478] Server terminated with error (1). Closing log file.
+	 *     | [3807291.779] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
+	 *     | [3807291.781] 
+	 *     | [3807291.790] Server terminated with error (1). Closing log file.
 	 */
 
 	return state;
