@@ -2621,8 +2621,8 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 
 	self->f_uid  = 0;
 	self->f_gid  = 0;
-	self->f_mode = 0555; /* Read/Execute permissions for everyone. */
-	self->i_filemode |= 0555;
+	self->f_mode = 0755; /* Read/Execute permissions for everyone. */
+	self->i_filemode |= 0755;
 
 	/* Setup operators */
 	if (self->f_type == FAT32) {

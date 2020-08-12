@@ -946,14 +946,20 @@ linux_keyboard_setmode(struct keyboard_device *__restrict self,
 LOCAL unsigned int KCALL
 linux_keyboard_getmeta(struct keyboard_device *__restrict self) {
 	(void)self;
-	return K_METABIT;
+	return K_ESCPREFIX;
 }
 
 LOCAL void KCALL
 linux_keyboard_setmeta(struct keyboard_device *__restrict self,
                        unsigned int mode) {
 	(void)self;
-	if (mode != K_METABIT) {
+	/* TODO: This should configure if pressing ALT will:
+	 *   K_METABIT:    Or' the produced character with 0x80
+	 *   K_ESCPREFIX:  Prefix the produced character with \e
+	 * On KOS, this is done in `ansitty_translate_misc()'
+	 * (s.a. the call to said function further up in this file)
+	 */
+	if (mode != K_ESCPREFIX) {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
 		      mode);
