@@ -248,7 +248,7 @@ again:
 				                    FS_GFP | GFP_CALLOC);
 				result      = (RETURN_NODE_TYPE *)resptr.hp_ptr;
 				real_result = (struct socket_node *)resptr.hp_ptr;
-				real_result->s_placeholder = NULL; /* TODO */
+				unix_server_init(&real_result->s_server);
 			} else
 #endif /* DEFINE_DIRECTORY_MKNOD */
 			{

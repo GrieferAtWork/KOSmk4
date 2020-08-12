@@ -52,9 +52,9 @@ DECL_BEGIN
  *   │
  *   │                                      ┌────────────> [struct device]
  *   │                                      │              >> // [0..1][lock(ATOMIC)] Chain of scheduled AIO operations
- *   │                                      │              >> WEAK struct aio_handle *d_aio_current;
- *   │                                      │              >> // [0..1][clear(ON_CANCEL)] The current AIO operation
  *   │                                      │              >> WEAK struct aio_handle *d_aio_pending;
+ *   │                                      │              >> // [0..1][clear(ON_CANCEL)] The current AIO operation
+ *   │                                      │              >> WEAK struct aio_handle *d_aio_current;
  *   │                                      │              >> // Signal broadcast when new AIO becomes available
  *   │                                      │              >> struct sig              d_aio_avail;
  *   │                                      │       ┌────> APPEND(ent):

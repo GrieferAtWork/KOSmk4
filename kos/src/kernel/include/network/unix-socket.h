@@ -22,20 +22,12 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/nic.h>
 #include <kernel/types.h>
+#include <sched/signal.h>
 
-#include <network/udp.h>
 #include <network/socket.h>
-#include <netinet/in.h>
 
 DECL_BEGIN
-
-#define UDP_SOCKET_STATE_NORMAL    0x0000
-#define UDP_SOCKET_STATE_F_BINDING 0x0001 /* [lock(WRITE_ONCE)] The socket is currently being bound */
-#define UDP_SOCKET_STATE_F_BOUND   0x0002 /* [lock(WRITE_ONCE)] The socket has been bound to a port.
-                                           * When not set during the first send, this is automatically allocated. */
-#define UDP_SOCKET_STATE_F_HASPEER 0x0004 /* [lock(WRITE_ONCE)] The socket has been given a peer address. */
 
 #ifdef __CC__
 
@@ -55,6 +47,70 @@ struct path;
 struct directory_entry;
 struct socket_node;
 
+#define UNIX_CLIENT_STATUS_PENDING  0 /* Client is pending to be accept(2)-ed
+                                       * May transition to:
+                                       *  - UNIX_CLIENT_STATUS_ACCEPTED
+                                       *  - UNIX_CLIENT_STATUS_REFUSED */
+#define UNIX_CLIENT_STATUS_ACCEPTED 1 /* Client has been accepted
+                                       * May transition to:
+                                       *  - UNIX_CLIENT_STATUS_CLOSED */
+#define UNIX_CLIENT_STATUS_REFUSED  2 /* Client was refused */
+#define UNIX_CLIENT_STATUS_CLOSED   3 /* Connection was closed */
+
+struct unix_client {
+	WEAK refcnt_t           uc_refcnt;     /* Reference counter. */
+	REF struct unix_client *uc_next;       /* [lock(ATOMIC)][owner(struct unix_server)]
+	                                        * Next client in the chain of clients to-be accepted. */
+	syscall_ulong_t         uc_status;     /* [lock(ATOMIC)] Client status (one of `UNIX_CLIENT_STATUS_*') */
+	struct sig              uc_status_sig; /* Signal broadcast when `uc_status' changes. */
+	/* TODO: full-duplex packet-buffer for messages send to/from the server.
+	 *       Note that we need special buffers for this, as file descriptors
+	 *       must be received in the same order as the associated data-stream.
+	 * This behavior is documented under `Ancillary messages' in `man 7 unix':
+	 * https://www.man7.org/linux/man-pages/man7/unix.7.html */
+};
+
+#define unix_client_close_buffers(self) (void)0 /* TODO: Close buffers */
+
+
+
+/* Destroy a given Unix domain socket client descriptor. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct unix_client, uc_refcnt, unix_client_destroy)
+
+
+
+struct unix_server {
+	/* HINT: This structure is in-lined in `struct socket_node' INode objects! */
+	syscall_ulong_t         us_max_backlog; /* [lock(READ(ATOMIC), WRITE(PRIVATE(SERVER)))]
+	                                         * The max # of clients that may be in-queue as
+	                                         * pending sockets to-be accept(2)-ed
+	                                         * When this field is ZERO(0), that means that
+	                                         * the server isn't listening at the moment. */
+#define UNIX_SERVER_ACCEPTME_SHUTDOWN ((REF struct unix_client *)-1)
+	REF struct unix_client *us_acceptme;    /* [lock(ATOMIC)] Chain of clients that want to
+	                                         * be accept(2)-ed. When the server shuts down, this
+	                                         * field is set to `UNIX_SERVER_ACCEPTME_SHUTDOWN',
+	                                         * which cannot be reverted, and means that the server
+	                                         * will never again accept new connections. Prior to
+	                                         * the server's first call to listen(2), `us_max_backlog'
+	                                         * will have been set to `0' */
+	struct sig              us_acceptme_sig;/* Signal broadcast when new clients are added to `us_acceptme' */
+};
+
+/* Initialize the given Unix domain server */
+#define unix_server_init(self)           \
+	((self)->us_max_backlog = 0,         \
+	 (self)->us_acceptme    = __NULLPTR, \
+	 sig_init(&(self)->us_acceptme_sig))
+
+/* Finalize the given Unix domain server */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL unix_server_fini)(struct unix_server *__restrict self);
+
+
+
 struct unix_socket
 #ifdef __cplusplus
     : socket
@@ -64,33 +120,22 @@ struct unix_socket
 	struct socket               us_sock;     /* The underlying socket. */
 #endif /* !__cplusplus */
 	REF struct socket_node     *us_node;     /* [0..1][valid_if(!= -1)][lock(WRITE_ONCE)]
-	                                          * The bound `struct socket_node' S_IFSOCK-inode object.
-	                                          * To prevent the need of an additional lock, binding of this
-	                                          * field, alongside the `us_nodepath' and `us_nodename' fields
-	                                          * happens as:
-	                                          * >> PREEMPTION_DISABLE();
-	                                          * >> if (!ATOMIC_CMPXCH(us_node, NULL, -1))
-	                                          * >>     goto handle_socket_is_already_bound;
-	                                          * >> ATOMIC_WRITE(us_nodepath, bound_path);
-	                                          * >> ATOMIC_WRITE(us_nodename, bound_name);
-	                                          * >> // Write `us_node' last, so that all other bind-related
-	                                          * >> // fields are already valid when this one becomes filled.
-	                                          * >> // As such, other code can simply check this field to see
-	                                          * >> // if the socket has been bound!
-	                                          * >> ATOMIC_WRITE(us_node, bound_node);
-	                                          * >> PREEMPTION_ENABLE();
-	                                          * 
-	                                          * Meaning that:
+	                                          * The bound `struct socket_node' S_IFSOCK-inode object:
 	                                          *   - us_node == NULL: Socket is unbound
-	                                          *   - us_node == -1:   Socket is currently being bound
-	                                          *                      To wait for binding to complete, any thread can
-	                                          *                      simply do `while (still_binding) task_pause();',
-	                                          *                      as this state really can only happen in an SMP
-	                                          *                      context.
-	                                          *   - else:            Socket is bound
-	                                          */
-	REF struct path            *us_nodepath; /* [?..1][valid_if(us_node != -1)][lock(WRITE_ONCE)] */
-	REF struct directory_entry *us_nodename; /* [?..1][valid_if(us_node != -1)][lock(WRITE_ONCE)] */
+	                                          *   - us_node == -1:   Socket is currently being bound.
+	                                          *                      Note that becoming bound might take a
+	                                          *                      while in the case of this not being the
+	                                          *                      server socket: If this is a client, then
+	                                          *                      the socket only becomes bound once the
+	                                          *                      server accept(2)'s the client!
+	                                          *   - else:            Socket is bound/connected */
+	REF struct path            *us_nodepath; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
+	REF struct directory_entry *us_nodename; /* [?..1][valid_if(us_node)][lock(WRITE_ONCE)] */
+	REF struct unix_client     *us_client;   /* [0..1][valid_if(us_node)][lock(WRITE_ONCE)]
+	                                          * Set during bind(==NULL) and connect(!= NULL)
+	                                          * When non-NULL, this is a connected client socket.
+	                                          * Otherwise, if `us_node' is valid, this is a bound
+	                                          * server socket. */
 };
 
 /* Socket operators for UNIX sockets. */

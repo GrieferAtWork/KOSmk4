@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
+#include <fs/special-node.h>
 
 DECL_BEGIN
 
@@ -46,8 +47,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_node_fini)(struct inode *__restrict self) {
 	struct socket_node *me;
 	me = (struct socket_node *)self;
-	/* TODO */
-	(void)me;
+	unix_server_fini(&me->s_server);
 }
 
 

@@ -24,6 +24,8 @@
 
 #include <fs/node.h>
 
+#include <network/unix-socket.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -35,7 +37,7 @@ struct fifo_node /* S_ISFIFO */
 {
 	/* Fi-fo pipe file (virtual-only; non-persistent file) */
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-	struct inode f_node; /* [OVERRIDE(.i_filemode,[S_ISLNK(.)])]
+	struct inode f_node; /* [OVERRIDE(.i_filemode,[S_ISFIFO(.)])]
 	                      * [OVERRIDE(.i_filesize,[const])]
 	                      * [OVERRIDE(.i_filerdev,[== 0])]
 	                      * The underlying node. */
@@ -77,16 +79,12 @@ struct socket_node /* S_ISSOCK */
 	 *       objects as part of `bind(2)' with `struct sockaddr_un'
 	 * s.a. <network/unix-socket.h>:struct unix_socket */
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-	struct inode s_node; /* [OVERRIDE(.i_filemode,[S_ISLNK(.)])]
-	                      * [OVERRIDE(.i_filesize,[const])]
-	                      * [OVERRIDE(.i_filerdev,[== 0])]
-	                      * The underlying node. */
+	struct inode       s_node; /* [OVERRIDE(.i_filemode,[S_ISSOCK(.)])]
+	                            * [OVERRIDE(.i_filesize,[const])]
+	                            * [OVERRIDE(.i_filerdev,[== 0])]
+	                            * The underlying node. */
 #endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
-	/* TODO: All of the data buffers needed for unix domain sockets.
-	 *       That means the read/write/packet buffers, as well as
-	 *       special containers for unread ancillary data, such as
-	 *       shared descriptors, or credentials. */
-	void *s_placeholder; /* TODO */
+	struct unix_server s_server; /* Unix domain socket server descriptor. */
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)

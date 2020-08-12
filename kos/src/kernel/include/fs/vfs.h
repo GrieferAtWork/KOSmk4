@@ -819,6 +819,7 @@ struct fs {
 	                                              * NOTE: All bits not masked by `0777' _MUST_ always be ZERO(0)! */
 	WEAK u32             f_lnkmax;               /* The max number of symbolic links allowed during resolution of a path.
 	                                              * This field defaults to `SYMLOOP_MAX'. */
+	/* TODO: Get rid of these 2. - Use uid/gid from cred instead! */
 	uid_t                f_fsuid;                /* Filesystem user ID */
 	gid_t                f_fsgid;                /* Filesystem group ID */
 	union ATTR_PACKED {

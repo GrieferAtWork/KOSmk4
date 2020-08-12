@@ -901,8 +901,8 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_job_destroy)(async_job_t self) {
 	struct async_job *me;
 	me = self - 1;
-	if (me->aj_ops->aj_fini)
-		(*me->aj_ops->aj_fini)(self);
+	if (me->aj_ops->jc_fini)
+		(*me->aj_ops->jc_fini)(self);
 	decref_unlikely(me->aj_ops->jc_driver);
 	kfree(me);
 }
@@ -1059,6 +1059,8 @@ PRIVATE struct aio_handle_type const async_job_aio_noretsize = {
  *       - `jc_poll()' returned with an exception
  *       - `jc_work()' returned with an exception
  *       - `jc_time()' returned with an exception
+ * Note also that when `aio' is given, it will be initialize to inherit a reference
+ * to `self', meaning that `decref(async_job_start(job, aio))' is a valid use case!
  * @return: * : Always re-returns `self' */
 PUBLIC NOBLOCK NONNULL((1)) REF async_job_t
 NOTHROW(FCALL async_job_start)(async_job_t self,

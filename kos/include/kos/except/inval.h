@@ -157,6 +157,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT,                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
 	E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT,                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
 	E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING,               /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND,                   /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `listen(2)' on a socket without first calling `bind(2)'. */
 	E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED,             /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
 	E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED,          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
 	E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED,                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
@@ -308,6 +309,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND                   E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND                   /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `listen(2)' on a socket without first calling `bind(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
@@ -456,25 +458,26 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         111 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         112 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
 #define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               113 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             114 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          115 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 116 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 117 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          118 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
-#define E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 119 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
-#define E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          120 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
-#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       121 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
-#define E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        122 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  123 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    124 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
-#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                125 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
-#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 126 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of socket flags passed to `sys_accept()' is not masked by `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-#define E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     127 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     128 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       129 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
-#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    130 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
-#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 131 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
-#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    132 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND                   114 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `listen(2)' on a socket without first calling `bind(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             115 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          116 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 117 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 118 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          119 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 120 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          121 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       122 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        123 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  124 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    125 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                126 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
+#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS                 127 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of socket flags passed to `sys_accept()' is not masked by `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS                     128 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_send()', `sys_sendto()', `sys_sendmsg()' or `sys_sendmmsg()' is not masked by `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS                     129 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of message flags passed to `sys_recv()', `sys_recvfrom()', `sys_recvmsg()' or `sys_recvmmsg()' is not masked by `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW                       130 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `how' passed to `sys_shutdown()' isn't one of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    131 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
+#define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 132 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    133 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
