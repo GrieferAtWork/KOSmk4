@@ -618,8 +618,10 @@ again:
 		/* It _is_ already being used... */
 		sync_endwrite(self);
 		partnode_pair_vector_fini_and_unlock_parts(&parts);
-		if (system_clearcaches_s(&version))
-			goto again;
+		if (self == &vm_kernel) {
+			if (system_clearcaches_s(&version))
+				goto again;
+		}
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		      num_bytes);
 	}
@@ -762,8 +764,10 @@ again_lock_vm:
 	if unlikely(result == VM_GETFREE_ERROR) {
 		/* It _is_ already being used... */
 		sync_endwrite(self);
-		if (system_clearcaches_s(&version))
-			goto again_lock_vm;
+		if (self == &vm_kernel) {
+			if (system_clearcaches_s(&version))
+				goto again_lock_vm;
+		}
 		kfree(node);
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		      num_bytes);
@@ -1040,15 +1044,17 @@ again_create_sr:
 		                                                       prot);
 		/* Figure out where the mapping should go. */
 		result = vm_paged_getfree(effective_vm,
-		                    hint,
-		                    num_pages,
-		                    min_alignment_in_pages,
-		                    getfree_mode);
+		                          hint,
+		                          num_pages,
+		                          min_alignment_in_pages,
+		                          getfree_mode);
 		if unlikely(result == VM_PAGED_GETFREE_ERROR) {
 			sync_endwrite(effective_vm);
 			vm_map_subrange_descriptors_fini_and_unlock_parts(&sr);
-			if (system_clearcaches_s(&version))
-				goto again_create_sr;
+			if (effective_vm == &vm_kernel) {
+				if (system_clearcaches_s(&version))
+					goto again_create_sr;
+			}
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 			      num_pages);
 		}
