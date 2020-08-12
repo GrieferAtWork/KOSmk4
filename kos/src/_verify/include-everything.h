@@ -89,6 +89,8 @@ local chk_include = {
 
 	"pciaccess.h",
 	"drm.h",
+	"xf86drm.h",
+	"xf86drmMode.h",
 
 	"png.h",
 	"pngconf.h",
@@ -1638,6 +1640,12 @@ incdir("", "../../include");
 #include <wait.h>
 #include <wchar.h>
 #include <wctype.h>
+#if __has_include(<xf86drm.h>)
+#include <xf86drm.h>
+#endif /* __has_include(<xf86drm.h>) */
+#if __has_include(<xf86drmMode.h>)
+#include <xf86drmMode.h>
+#endif /* __has_include(<xf86drmMode.h>) */
 #include <xlocale.h>
 #if __has_include(<zconf.h>)
 #include <zconf.h>

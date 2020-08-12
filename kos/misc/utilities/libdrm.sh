@@ -129,6 +129,8 @@ install_symlink /$TARGET_LIBPATH/libdrm.so libdrm.so.$SO_VERSION_MAJOR
 for f in "$SRCPATH"/include/drm/*.h; do
 	install_rawfile "$KOS_ROOT/kos/include/drm/$(basename "$f")" "$f"
 done
+install_rawfile "$KOS_ROOT/kos/include/xf86drm.h" "$SRCPATH/xf86drm.h"
+install_rawfile "$KOS_ROOT/kos/include/xf86drmMode.h" "$SRCPATH/xf86drmMode.h"
 
 if ! [ -f "$KOS_ROOT/kos/include/drm.h" ]; then
 	echo '#include "drm/drm.h"' > "$KOS_ROOT/kos/include/drm.h"
