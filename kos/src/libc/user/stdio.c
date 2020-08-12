@@ -586,8 +586,8 @@ void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 		atomic_rwlock_read(&all_files_lock);
 		fp = all_files;
 		while (fp &&
-		       fp->if_exdata->io_fver == version &&
-		       !file_tryincref(fp))
+		       (fp->if_exdata->io_fver == version ||
+		        !file_tryincref(fp)))
 			fp = LLIST_NEXT(fp, if_exdata->io_link);
 		atomic_rwlock_endread(&all_files_lock);
 		if (!fp)
@@ -605,8 +605,8 @@ do_flush_fp:
 		atomic_rwlock_read(&all_files_lock);
 		next_fp = LLIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
-		       next_fp->if_exdata->io_fver == version &&
-		       !file_tryincref(next_fp))
+		       (next_fp->if_exdata->io_fver == version ||
+		        !file_tryincref(next_fp)))
 			next_fp = LLIST_NEXT(next_fp, if_exdata->io_link);
 		atomic_rwlock_endread(&all_files_lock);
 		file_decref(fp);
