@@ -2879,7 +2879,7 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 /*AUTO*/{
 	(void)command;
 	(void)modes;
-	CRT_UNIMPLEMENTED("popen"); /* TODO */
+	CRT_UNIMPLEMENTEDF("popen(%q, %q)", command, modes); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3199,7 +3199,7 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 /*[[[body:libc_tmpnam]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTED("tmpnam"); /* TODO */
+	CRT_UNIMPLEMENTEDF("tmpnam(%q)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3213,7 +3213,7 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 /*AUTO*/{
 	(void)dir;
 	(void)pfx;
-	CRT_UNIMPLEMENTED("tempnam"); /* TODO */
+	CRT_UNIMPLEMENTEDF("tempnam(%q, %q)", dir, pfx); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3304,7 +3304,7 @@ NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_,
 	(void)obstack_;
 	(void)format;
 	(void)args;
-	CRT_UNIMPLEMENTED("obstack_vprintf"); /* TODO */
+	CRT_UNIMPLEMENTEDF("obstack_vprintf(%p, %q, %p)", obstack_, format, args); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -3328,7 +3328,7 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 /*[[[body:libc__set_output_format]]]*/
 /*AUTO*/{
 	(void)format;
-	CRT_UNIMPLEMENTED("_set_output_format"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_output_format(%" PRIx32 ")", format); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -3355,7 +3355,7 @@ NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int val)
 /*[[[body:libc__setmaxstdio]]]*/
 /*AUTO*/{
 	(void)val;
-	CRT_UNIMPLEMENTED("_setmaxstdio"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_setmaxstdio(%x)", val); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -3378,7 +3378,7 @@ NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 /*[[[body:libc__set_printf_count_output]]]*/
 /*AUTO*/{
 	(void)val;
-	CRT_UNIMPLEMENTED("_set_printf_count_output"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_printf_count_output(%x)", val); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

@@ -178,7 +178,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportMode)(int report_type,
 /*AUTO*/{
 	(void)report_type;
 	(void)report_mode;
-	CRT_UNIMPLEMENTED("_CrtSetReportMode"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetReportMode(%x, %x)", report_type, report_mode); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -226,7 +226,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_thres
 /*[[[body:libc__CrtSetDebugFillThreshold]]]*/
 /*AUTO*/{
 	(void)new_debug_fill_threshold;
-	CRT_UNIMPLEMENTED("_CrtSetDebugFillThreshold"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetDebugFillThreshold(%Ix)", new_debug_fill_threshold); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -270,7 +270,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 /*[[[body:libc__CrtSetBreakAlloc]]]*/
 /*AUTO*/{
 	(void)break_alloc;
-	CRT_UNIMPLEMENTED("_CrtSetBreakAlloc"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetBreakAlloc(%" PRIx32 ")", break_alloc); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

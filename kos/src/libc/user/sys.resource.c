@@ -135,7 +135,7 @@ NOTHROW_NCX(LIBCCALL libc_getrusage64)(__rusage_who_t who,
 /*AUTO*/{
 	(void)who;
 	(void)usage;
-	CRT_UNIMPLEMENTED("getrusage64"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrusage64(%x, %p)", who, usage); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -190,7 +190,7 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
 /*AUTO*/{
 	(void)resource;
 	(void)rlimits;
-	CRT_UNIMPLEMENTED("getrlimit64"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrlimit64(%x, %p)", resource, rlimits); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -211,7 +211,7 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
 /*AUTO*/{
 	(void)resource;
 	(void)rlimits;
-	CRT_UNIMPLEMENTED("setrlimit64"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setrlimit64(%x, %p)", resource, rlimits); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

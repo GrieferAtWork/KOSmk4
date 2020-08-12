@@ -92,7 +92,7 @@ NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 /*[[[body:libc_getdate]]]*/
 /*AUTO*/{
 	(void)string;
-	CRT_UNIMPLEMENTED("getdate"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getdate(%q)", string); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id,
 /*AUTO*/{
 	(void)clock_id;
 	(void)utx;
-	CRT_UNIMPLEMENTED("clock_adjtime"); /* TODO */
+	CRT_UNIMPLEMENTEDF("clock_adjtime(%" PRIxN(__SIZEOF_CLOCKID_T__) ", %p)", clock_id, utx); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -123,7 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
 /*AUTO*/{
 	(void)clock_id;
 	(void)utx;
-	CRT_UNIMPLEMENTED("clock_adjtime64"); /* TODO */
+	CRT_UNIMPLEMENTEDF("clock_adjtime64(%" PRIxN(__SIZEOF_CLOCKID_T__) ", %p)", clock_id, utx); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -140,7 +140,7 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
 /*AUTO*/{
 	(void)ts;
 	(void)base;
-	CRT_UNIMPLEMENTED("timespec_get"); /* TODO */
+	CRT_UNIMPLEMENTEDF("timespec_get(%p, %x)", ts, base); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -312,7 +312,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
 /*AUTO*/{
 	(void)pid;
 	(void)clock_id;
-	CRT_UNIMPLEMENTED("clock_getcpuclockid"); /* TODO */
+	CRT_UNIMPLEMENTEDF("clock_getcpuclockid(%" PRIxN(__SIZEOF_PID_T__) ", %p)", pid, clock_id); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

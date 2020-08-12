@@ -1191,10 +1191,8 @@ again_dotab:
 					oldptr = ATOMIC_READ(me->v_textptr);
 					cur_x  = ((size_t)(oldptr - me->v_textbase) % size_x);
 #ifdef CONFIG_VGA_LESS_LINE_FEEDS
-					if (cur_x == 0 && cp437_encode(me->v_lastch) != 0) {
+					if (cur_x == 0 && cp437_encode(me->v_lastch) != 0)
 						cur_x = size_x;
-						printk(KERN_DEBUG "GOTO_PREV_LINE\n");
-					}
 #endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 				} while (!ATOMIC_CMPXCH(me->v_textptr, oldptr, oldptr - cur_x));
 			}

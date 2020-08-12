@@ -383,7 +383,7 @@ NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
 	(void)namelist;
 	(void)selector;
 	(void)cmp;
-	CRT_UNIMPLEMENTED("scandirat"); /* TODO */
+	CRT_UNIMPLEMENTEDF("scandirat(%" PRIxN(__SIZEOF_FD_T__) ", %q, %p, %p, %p)", dirfd, dir, namelist, selector, cmp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

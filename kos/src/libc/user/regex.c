@@ -267,7 +267,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
 	(void)start;
 	(void)regs;
 	(void)stop;
-	CRT_UNIMPLEMENTED("re_match_2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("re_match_2(%p, %q, %x, %q, %x, %x, %p, %x)", buffer, string1, length1, string2, length2, start, regs, stop); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -294,7 +294,7 @@ NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
 	(void)num_regs;
 	(void)starts;
 	(void)ends;
-	CRT_UNIMPLEMENTED("re_set_registers"); /* TODO */
+	CRT_UNIMPLEMENTEDF("re_set_registers(%p, %p, %x, %p, %p)", buffer, regs, num_regs, starts, ends); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_re_set_registers]]]*/
@@ -309,7 +309,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg,
 	(void)preg;
 	(void)pattern;
 	(void)cflags;
-	CRT_UNIMPLEMENTED("regcomp"); /* TODO */
+	CRT_UNIMPLEMENTEDF("regcomp(%p, %q, %x)", preg, pattern, cflags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -329,7 +329,7 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
 	(void)nmatch;
 	(void)pmatch;
 	(void)eflags;
-	CRT_UNIMPLEMENTED("regexec"); /* TODO */
+	CRT_UNIMPLEMENTEDF("regexec(%p, %q, %Ix, %p, %x)", preg, string, nmatch, pmatch, eflags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -347,7 +347,7 @@ NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
 	(void)preg;
 	(void)errbuf;
 	(void)errbuf_size;
-	CRT_UNIMPLEMENTED("regerror"); /* TODO */
+	CRT_UNIMPLEMENTEDF("regerror(%x, %p, %q, %Ix)", errcode, preg, errbuf, errbuf_size); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

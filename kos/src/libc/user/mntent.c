@@ -41,7 +41,7 @@ NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
 /*AUTO*/{
 	(void)file;
 	(void)mode;
-	CRT_UNIMPLEMENTED("setmntent"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setmntent(%q, %q)", file, mode); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
 /*[[[body:libc_getmntent]]]*/
 /*AUTO*/{
 	(void)stream;
-	CRT_UNIMPLEMENTED("getmntent"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getmntent(%p)", stream); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -74,7 +74,7 @@ NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
 	(void)result;
 	(void)buffer;
 	(void)bufsize;
-	CRT_UNIMPLEMENTED("getmntent_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getmntent_r(%p, %p, %q, %x)", stream, result, buffer, bufsize); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -90,7 +90,7 @@ NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
 /*AUTO*/{
 	(void)stream;
 	(void)mnt;
-	CRT_UNIMPLEMENTED("addmntent"); /* TODO */
+	CRT_UNIMPLEMENTEDF("addmntent(%p, %p)", stream, mnt); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -103,7 +103,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 /*[[[body:libc_endmntent]]]*/
 /*AUTO*/{
 	(void)stream;
-	CRT_UNIMPLEMENTED("endmntent"); /* TODO */
+	CRT_UNIMPLEMENTEDF("endmntent(%p)", stream); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

@@ -1355,7 +1355,7 @@ NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 /*[[[body:libc___locale_ctype_ptr_l]]]*/
 /*AUTO*/{
 	(void)locale;
-	CRT_UNIMPLEMENTED("__locale_ctype_ptr_l"); /* TODO */
+	CRT_UNIMPLEMENTEDF("__locale_ctype_ptr_l(%p)", locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -1369,7 +1369,7 @@ NOTHROW(LIBCCALL libc__isctype)(int ch,
 /*AUTO*/{
 	(void)ch;
 	(void)mask;
-	CRT_UNIMPLEMENTED("_isctype"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_isctype(%x, %x)", ch, mask); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -1385,7 +1385,7 @@ NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
 	(void)ch;
 	(void)mask;
 	(void)locale;
-	CRT_UNIMPLEMENTED("_isctype_l"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_isctype_l(%x, %x, %p)", ch, mask, locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

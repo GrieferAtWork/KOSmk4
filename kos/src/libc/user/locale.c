@@ -118,7 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
 	(void)category_mask;
 	(void)locale;
 	(void)base;
-	CRT_UNIMPLEMENTED("newlocale"); /* TODO */
+	CRT_UNIMPLEMENTEDF("newlocale(%x, %q, %p)", category_mask, locale, base); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -132,7 +132,7 @@ NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
 /*[[[body:libc_duplocale]]]*/
 /*AUTO*/{
 	(void)dataset;
-	CRT_UNIMPLEMENTED("duplocale"); /* TODO */
+	CRT_UNIMPLEMENTEDF("duplocale(%p)", dataset); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
 /*[[[body:libc_freelocale]]]*/
 /*AUTO*/{
 	(void)dataset;
-	CRT_UNIMPLEMENTED("freelocale"); /* TODO */
+	CRT_UNIMPLEMENTEDF("freelocale(%p)", dataset); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_freelocale]]]*/
@@ -162,7 +162,7 @@ NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 /*[[[body:libc_uselocale]]]*/
 /*AUTO*/{
 	(void)dataset;
-	CRT_UNIMPLEMENTED("uselocale"); /* TODO */
+	CRT_UNIMPLEMENTEDF("uselocale(%p)", dataset); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

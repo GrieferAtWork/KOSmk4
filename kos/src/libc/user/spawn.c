@@ -50,7 +50,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
 	(void)attrp;
 	(void)___argv;
 	(void)___envp;
-	CRT_UNIMPLEMENTED("posix_spawn"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawn(%p, %q, %p, %p, %p, %p)", pid, path, file_actions, attrp, ___argv, ___envp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -74,7 +74,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
 	(void)attrp;
 	(void)___argv;
 	(void)___envp;
-	CRT_UNIMPLEMENTED("posix_spawnp"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnp(%p, %q, %p, %p, %p, %p)", pid, file, file_actions, attrp, ___argv, ___envp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -87,7 +87,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict at
 /*[[[body:libc_posix_spawnattr_init]]]*/
 /*AUTO*/{
 	(void)attr;
-	CRT_UNIMPLEMENTED("posix_spawnattr_init"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_init(%p)", attr); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict
 /*[[[body:libc_posix_spawnattr_destroy]]]*/
 /*AUTO*/{
 	(void)attr;
-	CRT_UNIMPLEMENTED("posix_spawnattr_destroy"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_destroy(%p)", attr); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -115,7 +115,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const
 /*AUTO*/{
 	(void)attr;
 	(void)sigdefault;
-	CRT_UNIMPLEMENTED("posix_spawnattr_getsigdefault"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_getsigdefault(%p, %p)", attr, sigdefault); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -130,7 +130,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__re
 /*AUTO*/{
 	(void)attr;
 	(void)sigdefault;
-	CRT_UNIMPLEMENTED("posix_spawnattr_setsigdefault"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_setsigdefault(%p, %p)", attr, sigdefault); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -145,7 +145,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *_
 /*AUTO*/{
 	(void)attr;
 	(void)sigmask;
-	CRT_UNIMPLEMENTED("posix_spawnattr_getsigmask"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_getsigmask(%p, %p)", attr, sigmask); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -160,7 +160,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restr
 /*AUTO*/{
 	(void)attr;
 	(void)sigmask;
-	CRT_UNIMPLEMENTED("posix_spawnattr_setsigmask"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_setsigmask(%p, %p)", attr, sigmask); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -175,7 +175,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
 /*AUTO*/{
 	(void)attr;
 	(void)flags;
-	CRT_UNIMPLEMENTED("posix_spawnattr_getflags"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_getflags(%p, %p)", attr, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -190,7 +190,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restric
 /*AUTO*/{
 	(void)attr;
 	(void)flags;
-	CRT_UNIMPLEMENTED("posix_spawnattr_setflags"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_setflags(%p, %" PRIx16 ")", attr, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -205,7 +205,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__
 /*AUTO*/{
 	(void)attr;
 	(void)pgroup;
-	CRT_UNIMPLEMENTED("posix_spawnattr_getpgroup"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_getpgroup(%p, %p)", attr, pgroup); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -220,7 +220,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restri
 /*AUTO*/{
 	(void)attr;
 	(void)pgroup;
-	CRT_UNIMPLEMENTED("posix_spawnattr_setpgroup"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_setpgroup(%p, %" PRIxN(__SIZEOF_PID_T__) ")", attr, pgroup); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -235,7 +235,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t cons
 /*AUTO*/{
 	(void)attr;
 	(void)schedpolicy;
-	CRT_UNIMPLEMENTED("posix_spawnattr_getschedpolicy"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_getschedpolicy(%p, %p)", attr, schedpolicy); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -250,7 +250,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__r
 /*AUTO*/{
 	(void)attr;
 	(void)schedpolicy;
-	CRT_UNIMPLEMENTED("posix_spawnattr_setschedpolicy"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_setschedpolicy(%p, %x)", attr, schedpolicy); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -265,7 +265,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const
 /*AUTO*/{
 	(void)attr;
 	(void)schedparam;
-	CRT_UNIMPLEMENTED("posix_spawnattr_getschedparam"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_getschedparam(%p, %p)", attr, schedparam); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -280,7 +280,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__re
 /*AUTO*/{
 	(void)attr;
 	(void)schedparam;
-	CRT_UNIMPLEMENTED("posix_spawnattr_setschedparam"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawnattr_setschedparam(%p, %p)", attr, schedparam); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -293,7 +293,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_action
 /*[[[body:libc_posix_spawn_file_actions_init]]]*/
 /*AUTO*/{
 	(void)file_actions;
-	CRT_UNIMPLEMENTED("posix_spawn_file_actions_init"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawn_file_actions_init(%p)", file_actions); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -306,7 +306,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 /*[[[body:libc_posix_spawn_file_actions_destroy]]]*/
 /*AUTO*/{
 	(void)file_actions;
-	CRT_UNIMPLEMENTED("posix_spawn_file_actions_destroy"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawn_file_actions_destroy(%p)", file_actions); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -328,7 +328,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_act
 	(void)path;
 	(void)oflags;
 	(void)mode;
-	CRT_UNIMPLEMENTED("posix_spawn_file_actions_addopen"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawn_file_actions_addopen(%p, %" PRIxN(__SIZEOF_FD_T__) ", %q, %" PRIxN(__SIZEOF_OFLAG_T__) ", %" PRIxN(__SIZEOF_MODE_T__) ")", file_actions, fd, path, oflags, mode); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -344,7 +344,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_ac
 /*AUTO*/{
 	(void)file_actions;
 	(void)fd;
-	CRT_UNIMPLEMENTED("posix_spawn_file_actions_addclose"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawn_file_actions_addclose(%p, %" PRIxN(__SIZEOF_FD_T__) ")", file_actions, fd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -362,7 +362,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_act
 	(void)file_actions;
 	(void)fd;
 	(void)newfd;
-	CRT_UNIMPLEMENTED("posix_spawn_file_actions_adddup2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_spawn_file_actions_adddup2(%p, %" PRIxN(__SIZEOF_FD_T__) ", %" PRIxN(__SIZEOF_FD_T__) ")", file_actions, fd, newfd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

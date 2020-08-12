@@ -137,6 +137,16 @@ INTERN void LIBCCALL
 libc_unimplemented(char const *__restrict name) {
 	syslog(LOG_WARN, "[libc] Unimplemented function called: `%#q()'\n", name);
 }
+
+INTERN void VLIBCCALL
+libc_unimplementedf(char const *__restrict format, ...) {
+	va_list args;
+	syslog(LOG_WARN, "[libc] Unimplemented function called: `");
+	va_start(args, format);
+	vsyslog(LOG_WARN, format, args);
+	va_end(args);
+	syslog(LOG_WARN, "'\n");
+}
 #endif /* CONFIG_LOG_LIBC_UNIMPLEMENTED */
 
 DECL_END

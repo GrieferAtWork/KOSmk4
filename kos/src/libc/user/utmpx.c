@@ -72,7 +72,7 @@ NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id)
 /*[[[body:libc_getutxid]]]*/
 /*AUTO*/{
 	(void)id;
-	CRT_UNIMPLEMENTED("getutxid"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutxid(%p)", id); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -85,7 +85,7 @@ NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line)
 /*[[[body:libc_getutxline]]]*/
 /*AUTO*/{
 	(void)line;
-	CRT_UNIMPLEMENTED("getutxline"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutxline(%p)", line); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -98,7 +98,7 @@ NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx)
 /*[[[body:libc_pututxline]]]*/
 /*AUTO*/{
 	(void)utmpx;
-	CRT_UNIMPLEMENTED("pututxline"); /* TODO */
+	CRT_UNIMPLEMENTEDF("pututxline(%p)", utmpx); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -112,7 +112,7 @@ NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
 /*[[[body:libc_utmpxname]]]*/
 /*AUTO*/{
 	(void)file;
-	CRT_UNIMPLEMENTED("utmpxname"); /* TODO */
+	CRT_UNIMPLEMENTEDF("utmpxname(%q)", file); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -128,7 +128,7 @@ NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file,
 /*AUTO*/{
 	(void)wtmpx_file;
 	(void)utmpx;
-	CRT_UNIMPLEMENTED("updwtmpx"); /* TODO */
+	CRT_UNIMPLEMENTEDF("updwtmpx(%q, %p)", wtmpx_file, utmpx); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_updwtmpx]]]*/
@@ -143,7 +143,7 @@ NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx,
 /*AUTO*/{
 	(void)utmpx;
 	(void)utmp;
-	CRT_UNIMPLEMENTED("getutmp"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutmp(%p, %p)", utmpx, utmp); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutmp]]]*/
@@ -158,7 +158,7 @@ NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
 /*AUTO*/{
 	(void)utmp;
 	(void)utmpx;
-	CRT_UNIMPLEMENTED("getutmpx"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutmpx(%p, %p)", utmp, utmpx); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutmpx]]]*/

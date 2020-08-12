@@ -123,10 +123,12 @@
 
 #include <hybrid/host.h>
 
+#include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -225,7 +227,9 @@ INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value);
 #if 1
 #define CONFIG_LOG_LIBC_UNIMPLEMENTED 1
 INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
+INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #define CRT_UNIMPLEMENTED(name) libc_unimplemented(name)
+#define CRT_UNIMPLEMENTEDF(...) libc_unimplementedf(__VA_ARGS__)
 #else
 #define CRT_UNIMPLEMENTED(name) (void)0
 #endif

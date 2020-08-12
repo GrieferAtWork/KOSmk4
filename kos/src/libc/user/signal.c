@@ -203,7 +203,7 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 /*[[[body:libc_sigreturn]]]*/
 /*AUTO*/{
 	(void)scp;
-	CRT_UNIMPLEMENTED("sigreturn"); /* TODO */
+	CRT_UNIMPLEMENTEDF("sigreturn(%p)", scp); /* TODO */
 	assert_failed("Not implemented");
 }
 /*[[[end:libc_sigreturn]]]*/
@@ -257,7 +257,7 @@ NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(signo_t signo)
 /*[[[body:libc___xpg_sigpause]]]*/
 /*AUTO*/{
 	(void)signo;
-	CRT_UNIMPLEMENTED("__xpg_sigpause"); /* TODO */
+	CRT_UNIMPLEMENTEDF("__xpg_sigpause(%" PRIxN(__SIZEOF_SIGNO_T__) ")", signo); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -500,7 +500,7 @@ NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
 /*AUTO*/{
 	(void)signo;
 	(void)s;
-	CRT_UNIMPLEMENTED("psignal"); /* TODO */
+	CRT_UNIMPLEMENTEDF("psignal(%" PRIxN(__SIZEOF_SIGNO_T__) ", %q)", signo, s); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_psignal]]]*/
@@ -513,7 +513,7 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 /*AUTO*/{
 	(void)pinfo;
 	(void)s;
-	CRT_UNIMPLEMENTED("psiginfo"); /* TODO */
+	CRT_UNIMPLEMENTEDF("psiginfo(%p, %q)", pinfo, s); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_psiginfo]]]*/

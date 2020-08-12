@@ -42,7 +42,7 @@ NOTHROW(LIBCCALL libc_acos)(double x)
 /*[[[body:libc_acos]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("acos"); /* TODO */
+	CRT_UNIMPLEMENTEDF("acos(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -55,7 +55,7 @@ NOTHROW(LIBCCALL libc_asin)(double x)
 /*[[[body:libc_asin]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("asin"); /* TODO */
+	CRT_UNIMPLEMENTEDF("asin(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -68,7 +68,7 @@ NOTHROW(LIBCCALL libc_cos)(double x)
 /*[[[body:libc_cos]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("cos"); /* TODO */
+	CRT_UNIMPLEMENTEDF("cos(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -81,7 +81,7 @@ NOTHROW(LIBCCALL libc_sin)(double x)
 /*[[[body:libc_sin]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("sin"); /* TODO */
+	CRT_UNIMPLEMENTEDF("sin(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -94,7 +94,7 @@ NOTHROW(LIBCCALL libc_tan)(double x)
 /*[[[body:libc_tan]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("tan"); /* TODO */
+	CRT_UNIMPLEMENTEDF("tan(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -107,7 +107,7 @@ NOTHROW(LIBCCALL libc_cosh)(double x)
 /*[[[body:libc_cosh]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("cosh"); /* TODO */
+	CRT_UNIMPLEMENTEDF("cosh(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -120,7 +120,7 @@ NOTHROW(LIBCCALL libc_sinh)(double x)
 /*[[[body:libc_sinh]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("sinh"); /* TODO */
+	CRT_UNIMPLEMENTEDF("sinh(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -133,7 +133,7 @@ NOTHROW(LIBCCALL libc_tanh)(double x)
 /*[[[body:libc_tanh]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("tanh"); /* TODO */
+	CRT_UNIMPLEMENTEDF("tanh(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -146,7 +146,7 @@ NOTHROW(LIBCCALL libc_acosh)(double x)
 /*[[[body:libc_acosh]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("acosh"); /* TODO */
+	CRT_UNIMPLEMENTEDF("acosh(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -159,7 +159,7 @@ NOTHROW(LIBCCALL libc_asinh)(double x)
 /*[[[body:libc_asinh]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("asinh"); /* TODO */
+	CRT_UNIMPLEMENTEDF("asinh(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -172,7 +172,7 @@ NOTHROW(LIBCCALL libc_atanh)(double x)
 /*[[[body:libc_atanh]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("atanh"); /* TODO */
+	CRT_UNIMPLEMENTEDF("atanh(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -185,7 +185,7 @@ NOTHROW(LIBCCALL libc_log)(double x)
 /*[[[body:libc_log]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("log"); /* TODO */
+	CRT_UNIMPLEMENTEDF("log(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -198,7 +198,7 @@ NOTHROW(LIBCCALL libc_log10)(double x)
 /*[[[body:libc_log10]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("log10"); /* TODO */
+	CRT_UNIMPLEMENTEDF("log10(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -211,7 +211,7 @@ NOTHROW(LIBCCALL libc_log1p)(double x)
 /*[[[body:libc_log1p]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("log1p"); /* TODO */
+	CRT_UNIMPLEMENTEDF("log1p(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -224,7 +224,7 @@ NOTHROW(LIBCCALL libc_logb)(double x)
 /*[[[body:libc_logb]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("logb"); /* TODO */
+	CRT_UNIMPLEMENTEDF("logb(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -237,7 +237,7 @@ NOTHROW(LIBCCALL libc_exp2)(double x)
 /*[[[body:libc_exp2]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("exp2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("exp2(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -250,7 +250,7 @@ NOTHROW(LIBCCALL libc_log2)(double x)
 /*[[[body:libc_log2]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("log2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("log2(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -265,7 +265,7 @@ NOTHROW(LIBCCALL libc_hypot)(double x,
 /*AUTO*/{
 	(void)x;
 	(void)y;
-	CRT_UNIMPLEMENTED("hypot"); /* TODO */
+	CRT_UNIMPLEMENTEDF("hypot(%f, %f)", x, y); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -277,7 +277,7 @@ NOTHROW(LIBCCALL libc_erf)(double x)
 /*[[[body:libc_erf]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("erf"); /* TODO */
+	CRT_UNIMPLEMENTEDF("erf(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -289,7 +289,7 @@ NOTHROW(LIBCCALL libc_erfc)(double x)
 /*[[[body:libc_erfc]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("erfc"); /* TODO */
+	CRT_UNIMPLEMENTEDF("erfc(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -301,7 +301,7 @@ NOTHROW(LIBCCALL libc_lgamma)(double x)
 /*[[[body:libc_lgamma]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("lgamma"); /* TODO */
+	CRT_UNIMPLEMENTEDF("lgamma(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -314,7 +314,7 @@ NOTHROW(LIBCCALL libc_tgamma)(double x)
 /*[[[body:libc_tgamma]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("tgamma"); /* TODO */
+	CRT_UNIMPLEMENTEDF("tgamma(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -333,7 +333,7 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
 	(void)x;
 	(void)y;
 	(void)pquo;
-	CRT_UNIMPLEMENTED("remquo"); /* TODO */
+	CRT_UNIMPLEMENTEDF("remquo(%f, %f, %p)", x, y, pquo); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -350,7 +350,7 @@ NOTHROW(LIBCCALL libc_sincos)(double x,
 	(void)x;
 	(void)psinx;
 	(void)pcosx;
-	CRT_UNIMPLEMENTED("sincos"); /* TODO */
+	CRT_UNIMPLEMENTEDF("sincos(%f, %p, %p)", x, psinx, pcosx); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_sincos]]]*/
@@ -362,7 +362,7 @@ NOTHROW(LIBCCALL libc_exp10)(double x)
 /*[[[body:libc_exp10]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("exp10"); /* TODO */
+	CRT_UNIMPLEMENTEDF("exp10(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -374,7 +374,7 @@ NOTHROW(LIBCCALL libc_j0)(double x)
 /*[[[body:libc_j0]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("j0"); /* TODO */
+	CRT_UNIMPLEMENTEDF("j0(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -386,7 +386,7 @@ NOTHROW(LIBCCALL libc_j1)(double x)
 /*[[[body:libc_j1]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("j1"); /* TODO */
+	CRT_UNIMPLEMENTEDF("j1(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -400,7 +400,7 @@ NOTHROW(LIBCCALL libc_jn)(int n,
 /*AUTO*/{
 	(void)n;
 	(void)x;
-	CRT_UNIMPLEMENTED("jn"); /* TODO */
+	CRT_UNIMPLEMENTEDF("jn(%x, %f)", n, x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -412,7 +412,7 @@ NOTHROW(LIBCCALL libc_y0)(double x)
 /*[[[body:libc_y0]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("y0"); /* TODO */
+	CRT_UNIMPLEMENTEDF("y0(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -424,7 +424,7 @@ NOTHROW(LIBCCALL libc_y1)(double x)
 /*[[[body:libc_y1]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("y1"); /* TODO */
+	CRT_UNIMPLEMENTEDF("y1(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -438,7 +438,7 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 /*AUTO*/{
 	(void)n;
 	(void)x;
-	CRT_UNIMPLEMENTED("yn"); /* TODO */
+	CRT_UNIMPLEMENTEDF("yn(%x, %f)", n, x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -455,7 +455,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 /*AUTO*/{
 	(void)x;
 	(void)signgamp;
-	CRT_UNIMPLEMENTED("lgamma_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("lgamma_r(%f, %p)", x, signgamp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

@@ -48,7 +48,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
 /*[[[body:libc_getttynam]]]*/
 /*AUTO*/{
 	(void)tty;
-	CRT_UNIMPLEMENTED("getttynam"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getttynam(%q)", tty); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }

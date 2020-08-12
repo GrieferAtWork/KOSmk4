@@ -169,7 +169,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 	(void)name;
 	(void)oflags;
 	(void)mode;
-	CRT_UNIMPLEMENTED("shm_open"); /* TODO */
+	CRT_UNIMPLEMENTEDF("shm_open(%q, %" PRIxN(__SIZEOF_OFLAG_T__) ", %" PRIxN(__SIZEOF_MODE_T__) ")", name, oflags, mode); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -181,7 +181,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name)
 /*[[[body:libc_shm_unlink]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTED("shm_unlink"); /* TODO */
+	CRT_UNIMPLEMENTEDF("shm_unlink(%q)", name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -327,7 +327,7 @@ NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
 /*AUTO*/{
 	(void)name;
 	(void)flags;
-	CRT_UNIMPLEMENTED("memfd_create"); /* TODO */
+	CRT_UNIMPLEMENTEDF("memfd_create(%q, %x)", name, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -343,7 +343,7 @@ NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
 	(void)addr;
 	(void)length;
 	(void)flags;
-	CRT_UNIMPLEMENTED("mlock2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("mlock2(%p, %Ix, %x)", addr, length, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -357,7 +357,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags,
 /*AUTO*/{
 	(void)flags;
 	(void)access_rights;
-	CRT_UNIMPLEMENTED("pkey_alloc"); /* TODO */
+	CRT_UNIMPLEMENTEDF("pkey_alloc(%x, %x)", flags, access_rights); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -371,7 +371,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_set)(int key,
 /*AUTO*/{
 	(void)key;
 	(void)access_rights;
-	CRT_UNIMPLEMENTED("pkey_set"); /* TODO */
+	CRT_UNIMPLEMENTEDF("pkey_set(%x, %x)", key, access_rights); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -383,7 +383,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_get)(int key)
 /*[[[body:libc_pkey_get]]]*/
 /*AUTO*/{
 	(void)key;
-	CRT_UNIMPLEMENTED("pkey_get"); /* TODO */
+	CRT_UNIMPLEMENTEDF("pkey_get(%x)", key); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -395,7 +395,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_free)(int key)
 /*[[[body:libc_pkey_free]]]*/
 /*AUTO*/{
 	(void)key;
-	CRT_UNIMPLEMENTED("pkey_free"); /* TODO */
+	CRT_UNIMPLEMENTEDF("pkey_free(%x)", key); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -413,7 +413,7 @@ NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
 	(void)len;
 	(void)prot;
 	(void)pkey;
-	CRT_UNIMPLEMENTED("pkey_mprotect"); /* TODO */
+	CRT_UNIMPLEMENTEDF("pkey_mprotect(%p, %Ix, %x, %x)", addr, len, prot, pkey); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

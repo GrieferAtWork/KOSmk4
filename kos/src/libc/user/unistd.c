@@ -526,7 +526,7 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 /*AUTO*/{
 	(void)name;
 	(void)name_len;
-	CRT_UNIMPLEMENTED("getlogin_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getlogin_r(%q, %Ix)", name, name_len); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -549,7 +549,7 @@ NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 /*[[[body:libc_setlogin]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTED("setlogin"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setlogin(%q)", name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -1815,7 +1815,7 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:libc_revoke]]]*/
 /*AUTO*/{
 	(void)file;
-	CRT_UNIMPLEMENTED("revoke"); /* TODO */
+	CRT_UNIMPLEMENTEDF("revoke(%q)", file); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -1845,7 +1845,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
 /*[[[body:libc_getpass]]]*/
 /*AUTO*/{
 	(void)prompt;
-	CRT_UNIMPLEMENTED("getpass"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getpass(%q)", prompt); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }

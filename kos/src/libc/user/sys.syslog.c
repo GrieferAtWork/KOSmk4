@@ -54,7 +54,7 @@ NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident,
 	(void)ident;
 	(void)option;
 	(void)facility;
-	CRT_UNIMPLEMENTED("openlog"); /* TODO */
+	CRT_UNIMPLEMENTEDF("openlog(%q, %x, %x)", ident, option, facility); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_openlog]]]*/
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask)
 /*[[[body:libc_setlogmask]]]*/
 /*AUTO*/{
 	(void)mask;
-	CRT_UNIMPLEMENTED("setlogmask"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setlogmask(%x)", mask); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

@@ -38,7 +38,7 @@ NOTHROW(LIBCCALL libc_isastream)(fd_t fildes)
 /*[[[body:libc_isastream]]]*/
 /*AUTO*/{
 	(void)fildes;
-	CRT_UNIMPLEMENTED("isastream"); /* TODO */
+	CRT_UNIMPLEMENTEDF("isastream(%" PRIxN(__SIZEOF_FD_T__) ")", fildes); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -57,7 +57,7 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
 	(void)ctlptr;
 	(void)dataptr;
 	(void)flagsp;
-	CRT_UNIMPLEMENTED("getmsg"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p)", fildes, ctlptr, dataptr, flagsp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -78,7 +78,7 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
 	(void)dataptr;
 	(void)bandp;
 	(void)flagsp;
-	CRT_UNIMPLEMENTED("getpmsg"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p, %p)", fildes, ctlptr, dataptr, bandp, flagsp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -97,7 +97,7 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
 	(void)ctlptr;
 	(void)dataptr;
 	(void)flags;
-	CRT_UNIMPLEMENTED("putmsg"); /* TODO */
+	CRT_UNIMPLEMENTEDF("putmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x)", fildes, ctlptr, dataptr, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -118,7 +118,7 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes,
 	(void)dataptr;
 	(void)band;
 	(void)flags;
-	CRT_UNIMPLEMENTED("putpmsg"); /* TODO */
+	CRT_UNIMPLEMENTEDF("putpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x, %x)", fildes, ctlptr, dataptr, band, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -133,7 +133,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fildes,
 /*AUTO*/{
 	(void)fildes;
 	(void)path;
-	CRT_UNIMPLEMENTED("fattach"); /* TODO */
+	CRT_UNIMPLEMENTEDF("fattach(%" PRIxN(__SIZEOF_FD_T__) ", %q)", fildes, path); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -146,7 +146,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 /*[[[body:libc_fdetach]]]*/
 /*AUTO*/{
 	(void)path;
-	CRT_UNIMPLEMENTED("fdetach"); /* TODO */
+	CRT_UNIMPLEMENTEDF("fdetach(%q)", path); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

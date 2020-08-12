@@ -44,7 +44,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 /*[[[body:libc_getgrgid]]]*/
 /*AUTO*/{
 	(void)gid;
-	CRT_UNIMPLEMENTED("getgrgid"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getgrgid(%" PRIxN(__SIZEOF_GID_T__) ")", gid); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -57,7 +57,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 /*[[[body:libc_getgrnam]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTED("getgrnam"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getgrnam(%q)", name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -106,7 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
 /*AUTO*/{
 	(void)entry;
 	(void)stream;
-	CRT_UNIMPLEMENTED("putgrent"); /* TODO */
+	CRT_UNIMPLEMENTEDF("putgrent(%p, %p)", entry, stream); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -127,7 +127,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTED("getgrgid_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getgrgid_r(%" PRIxN(__SIZEOF_GID_T__) ", %p, %q, %Ix, %p)", gid, resultbuf, buffer, buflen, result); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -148,7 +148,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTED("getgrnam_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getgrnam_r(%q, %p, %q, %Ix, %p)", name, resultbuf, buffer, buflen, result); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -167,7 +167,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTED("getgrent_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getgrent_r(%p, %q, %Ix, %p)", resultbuf, buffer, buflen, result); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -188,7 +188,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTED("fgetgrent_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("fgetgrent_r(%p, %p, %q, %Ix, %p)", stream, resultbuf, buffer, buflen, result); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -201,7 +201,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 /*[[[body:libc_fgetgrent]]]*/
 /*AUTO*/{
 	(void)stream;
-	CRT_UNIMPLEMENTED("fgetgrent"); /* TODO */
+	CRT_UNIMPLEMENTEDF("fgetgrent(%p)", stream); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -239,7 +239,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
 	(void)group;
 	(void)groups;
 	(void)ngroups;
-	CRT_UNIMPLEMENTED("getgrouplist"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getgrouplist(%q, %" PRIxN(__SIZEOF_GID_T__) ", %p, %p)", user, group, groups, ngroups); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -256,7 +256,7 @@ NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
 /*AUTO*/{
 	(void)user;
 	(void)group;
-	CRT_UNIMPLEMENTED("initgroups"); /* TODO */
+	CRT_UNIMPLEMENTEDF("initgroups(%q, %" PRIxN(__SIZEOF_GID_T__) ")", user, group); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

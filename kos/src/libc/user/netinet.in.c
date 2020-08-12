@@ -40,7 +40,7 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
 /*AUTO*/{
 	(void)sockfd;
 	(void)sock_in;
-	CRT_UNIMPLEMENTED("bindresvport"); /* TODO */
+	CRT_UNIMPLEMENTEDF("bindresvport(%" PRIxN(__SIZEOF_FD_T__) ", %p)", sockfd, sock_in); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd,
 /*AUTO*/{
 	(void)sockfd;
 	(void)sock_in;
-	CRT_UNIMPLEMENTED("bindresvport6"); /* TODO */
+	CRT_UNIMPLEMENTEDF("bindresvport6(%" PRIxN(__SIZEOF_FD_T__) ", %p)", sockfd, sock_in); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -68,7 +68,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes)
 /*[[[body:libc_inet6_option_space]]]*/
 /*AUTO*/{
 	(void)nbytes;
-	CRT_UNIMPLEMENTED("inet6_option_space"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_option_space(%x)", nbytes); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -85,7 +85,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp,
 	(void)bp;
 	(void)cmsgp;
 	(void)type;
-	CRT_UNIMPLEMENTED("inet6_option_init"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_option_init(%p, %p, %x)", bp, cmsgp, type); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -104,7 +104,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg,
 	(void)typep;
 	(void)multx;
 	(void)plusy;
-	CRT_UNIMPLEMENTED("inet6_option_append"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_option_append(%p, %p, %x, %x)", cmsg, typep, multx, plusy); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -123,7 +123,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg,
 	(void)datalen;
 	(void)multx;
 	(void)plusy;
-	CRT_UNIMPLEMENTED("inet6_option_alloc"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_option_alloc(%p, %x, %x, %x)", cmsg, datalen, multx, plusy); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -138,7 +138,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_next)(struct cmsghdr const *cmsg,
 /*AUTO*/{
 	(void)cmsg;
 	(void)tptrp;
-	CRT_UNIMPLEMENTED("inet6_option_next"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_option_next(%p, %p)", cmsg, tptrp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -155,7 +155,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_find)(struct cmsghdr const *cmsg,
 	(void)cmsg;
 	(void)tptrp;
 	(void)type;
-	CRT_UNIMPLEMENTED("inet6_option_find"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_option_find(%p, %p, %x)", cmsg, tptrp, type); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -170,7 +170,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_init)(void *extbuf,
 /*AUTO*/{
 	(void)extbuf;
 	(void)extlen;
-	CRT_UNIMPLEMENTED("inet6_opt_init"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_init(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ")", extbuf, extlen); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -195,7 +195,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
 	(void)len;
 	(void)align;
 	(void)databufp;
-	CRT_UNIMPLEMENTED("inet6_opt_append"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_append(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x, %" PRIx8 ", %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %" PRIx8 ", %p)", extbuf, extlen, offset, type, len, align, databufp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -212,7 +212,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_finish)(void *extbuf,
 	(void)extbuf;
 	(void)extlen;
 	(void)offset;
-	CRT_UNIMPLEMENTED("inet6_opt_finish"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_finish(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x)", extbuf, extlen, offset); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -231,7 +231,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_set_val)(void *databuf,
 	(void)offset;
 	(void)val;
 	(void)vallen;
-	CRT_UNIMPLEMENTED("inet6_opt_set_val"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_set_val(%p, %x, %p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ")", databuf, offset, val, vallen); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -254,7 +254,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_next)(void *extbuf,
 	(void)typep;
 	(void)lenp;
 	(void)databufp;
-	CRT_UNIMPLEMENTED("inet6_opt_next"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_next(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x, %p, %p, %p)", extbuf, extlen, offset, typep, lenp, databufp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -277,7 +277,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_find)(void *extbuf,
 	(void)type;
 	(void)lenp;
 	(void)databufp;
-	CRT_UNIMPLEMENTED("inet6_opt_find"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_find(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x, %" PRIx8 ", %p, %p)", extbuf, extlen, offset, type, lenp, databufp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -296,7 +296,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_get_val)(void *databuf,
 	(void)offset;
 	(void)val;
 	(void)vallen;
-	CRT_UNIMPLEMENTED("inet6_opt_get_val"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_opt_get_val(%p, %x, %p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ")", databuf, offset, val, vallen); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -311,7 +311,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_space)(int type,
 /*AUTO*/{
 	(void)type;
 	(void)segments;
-	CRT_UNIMPLEMENTED("inet6_rth_space"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_rth_space(%x, %x)", type, segments); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -330,7 +330,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_init)(void *bp,
 	(void)bp_len;
 	(void)type;
 	(void)segments;
-	CRT_UNIMPLEMENTED("inet6_rth_init"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_rth_init(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x, %x)", bp, bp_len, type, segments); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -345,7 +345,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_add)(void *bp,
 /*AUTO*/{
 	(void)bp;
 	(void)addr;
-	CRT_UNIMPLEMENTED("inet6_rth_add"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_rth_add(%p, %p)", bp, addr); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -360,7 +360,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_reverse)(void const *in,
 /*AUTO*/{
 	(void)in;
 	(void)out;
-	CRT_UNIMPLEMENTED("inet6_rth_reverse"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_rth_reverse(%p, %p)", in, out); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -373,7 +373,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_segments)(void const *bp)
 /*[[[body:libc_inet6_rth_segments]]]*/
 /*AUTO*/{
 	(void)bp;
-	CRT_UNIMPLEMENTED("inet6_rth_segments"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_rth_segments(%p)", bp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -388,7 +388,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp,
 /*AUTO*/{
 	(void)bp;
 	(void)index;
-	CRT_UNIMPLEMENTED("inet6_rth_getaddr"); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet6_rth_getaddr(%p, %x)", bp, index); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -459,7 +459,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
 	(void)fmode;
 	(void)numsrc;
 	(void)slist;
-	CRT_UNIMPLEMENTED("getsourcefilter"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getsourcefilter(%" PRIxN(__SIZEOF_FD_T__) ", %" PRIx32 ", %p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %p, %p, %p)", sockfd, interface_addr, group, grouplen, fmode, numsrc, slist); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -484,7 +484,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
 	(void)fmode;
 	(void)numsrc;
 	(void)slist;
-	CRT_UNIMPLEMENTED("setsourcefilter"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setsourcefilter(%" PRIxN(__SIZEOF_FD_T__) ", %" PRIx32 ", %p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %" PRIx32 ", %" PRIx32 ", %p)", sockfd, interface_addr, group, grouplen, fmode, numsrc, slist); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

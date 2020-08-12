@@ -1434,6 +1434,13 @@ function defineFunctionInMapping(
 }
 
 
+#define DELAY_printDefaultLibraryImplementationForPrototype
+#ifdef DELAY_printDefaultLibraryImplementationForPrototype
+#define DELAY_cb []->
+#else /* DELAY_printDefaultLibraryImplementationForPrototype */
+#define DELAY_cb /* nothing */
+#endif /* !DELAY_printDefaultLibraryImplementationForPrototype */
+
 @@Print a default, stub-library-implementation for a given @prototype
 function printDefaultLibraryImplementationForPrototype(
 		fp: File, prototype: FunctionPrototype,
@@ -1443,7 +1450,106 @@ function printDefaultLibraryImplementationForPrototype(
 		if (a.name)
 			fp << "\t(void)" << a.name << ";\n";
 	}
-	fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n";
+#ifdef DELAY_printDefaultLibraryImplementationForPrototype
+	if (!prototype.argv) {
+generic_unimplemented:
+#endif /* DELAY_printDefaultLibraryImplementationForPrototype */
+		fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n";
+#ifdef DELAY_printDefaultLibraryImplementationForPrototype
+	} else {
+		local priArgs = [];
+		for (local a: prototype.argv) {
+			if (!a.name)
+				goto generic_unimplemented;
+			local ct = a.ctype;
+			local effectiveBeforeName = str(ct.beforeName).strip();
+			if (ct.afterName)
+				effectiveBeforeName += " *";
+			effectiveBeforeName = effectiveBeforeName
+				.replace("$", "").replace("\t", " ");
+			for (;;) {
+				local newEffectiveBeforeName = effectiveBeforeName
+					.replace("  ", " ")
+					.replace(" const ", " ")
+					.replace(" volatile ", " ")
+					.replace(" __restrict ", " ")
+					.replace(" *", "*")
+					.replace("* ", "*")
+					.replace(" &", "&")
+					.replace("& ", "&")
+					.strip();
+				if (newEffectiveBeforeName.endswith("const"))
+					newEffectiveBeforeName = newEffectiveBeforeName[:-5];
+				if (newEffectiveBeforeName.endswith("volatile"))
+					newEffectiveBeforeName = newEffectiveBeforeName[:-8];
+				if (newEffectiveBeforeName.endswith("__restrict"))
+					newEffectiveBeforeName = newEffectiveBeforeName[:-10];
+				if (newEffectiveBeforeName.startswith("const"))
+					newEffectiveBeforeName = newEffectiveBeforeName[5:];
+				if (newEffectiveBeforeName.startswith("volatile"))
+					newEffectiveBeforeName = newEffectiveBeforeName[8:];
+				if (newEffectiveBeforeName.startswith("__restrict"))
+					newEffectiveBeforeName = newEffectiveBeforeName[10:];
+				if (newEffectiveBeforeName == effectiveBeforeName)
+					break;
+				effectiveBeforeName = newEffectiveBeforeName;
+			}
+			local pri = {
+				"char*" : "q",
+			}.get(effectiveBeforeName);
+			if (pri !is none) {
+				priArgs.append(pri);
+				continue;
+			}
+			local tc = ct.typeClass;
+			if (tc is none)
+				goto generic_unimplemented;
+			if (tc == "TV")
+				goto generic_unimplemented;
+			if (tc.startswith("TS("))
+				goto generic_unimplemented;
+			local pri = {
+				"THH"  : "hhx",
+				"TH"   : "hx",
+				"TD"   : "x",
+				"TL"   : "lx",
+				"TLL"  : "llx",
+				"TF"   : "f",
+				"TFD"  : "f",
+				"TFL"  : "lf",
+				"TP"   : "p",
+				"TI"   : "Ix",
+				"TI8"  : "\" PRIx8 \"",
+				"TI16" : "\" PRIx16 \"",
+				"TI32" : "\" PRIx32 \"",
+				"TI64" : "\" PRIx64 \"",
+			}.get(tc);
+			if (pri !is none) {
+				priArgs.append(pri);
+				continue;
+			}
+			if (tc.startswith("TIn(")) {
+				priArgs.append("\" PRIxN(" + tc[4:] + " \"");
+				continue;
+			}
+			goto generic_unimplemented;
+		}
+		fp << "\tCRT_UNIMPLEMENTEDF(\""
+			<< functionName.encode("c-escape")
+			<< "(";
+		local isFirst = true;
+		for (local p: priArgs) {
+			if (!isFirst)
+				fp << ", ";
+			isFirst = false;
+			fp << "%" << p;
+		}
+		fp << ")\"";
+		for (local a: prototype.argv)
+			fp << ", " << a.name;
+		fp << "); /* TO" "DO */\n";
+	}
+#endif /* DELAY_printDefaultLibraryImplementationForPrototype */
 	if (prototype.isNoreturn) {
 		fp << "\tassert_failed(\"Not implemented\");\n";
 	} else {
@@ -4764,10 +4870,10 @@ again_lookup_wcsCurrent:
 							/* Create a default implementation for user-sources */
 							dosLibImpl = dosProto is Callable
 								? [] -> getDefaultLibraryImplementationForPrototype(dosProto(), crtName)
-								: getDefaultLibraryImplementationForPrototype(dosProto, crtName);
+								: DELAY_cb getDefaultLibraryImplementationForPrototype(dosProto, crtName);
 							kosLibImpl = kosProto is Callable
 								? [] -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
-								: getDefaultLibraryImplementationForPrototype(kosProto, crtName);
+								: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 						}
 						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
 							ppCond:      currentFeatures.crt_dosImplRequires,
@@ -4799,7 +4905,7 @@ again_lookup_wcsCurrent:
 						/* Create a default implementation for user-sources */
 						libImpl = kosProto is Callable
 							? [] -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
-							: getDefaultLibraryImplementationForPrototype(kosProto, crtName);
+							: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 					}
 					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
 						ppCond:      currentFeatures.crt_kosImplRequires,

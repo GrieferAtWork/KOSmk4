@@ -205,7 +205,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
 	(void)path;
 	(void)___argv;
 	(void)___envp;
-	CRT_UNIMPLEMENTED("spawnve"); /* TODO */
+	CRT_UNIMPLEMENTEDF("spawnve(%x, %q, %p, %p)", mode, path, ___argv, ___envp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

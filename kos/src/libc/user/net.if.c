@@ -38,7 +38,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
 /*[[[body:libc_if_nametoindex]]]*/
 /*AUTO*/{
 	(void)ifname;
-	CRT_UNIMPLEMENTED("if_nametoindex"); /* TODO */
+	CRT_UNIMPLEMENTEDF("if_nametoindex(%q)", ifname); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -53,7 +53,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
 /*AUTO*/{
 	(void)ifindex;
 	(void)ifname;
-	CRT_UNIMPLEMENTED("if_indextoname"); /* TODO */
+	CRT_UNIMPLEMENTEDF("if_indextoname(%x, %q)", ifindex, ifname); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -78,7 +78,7 @@ NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
 /*[[[body:libc_if_freenameindex]]]*/
 /*AUTO*/{
 	(void)ptr;
-	CRT_UNIMPLEMENTED("if_freenameindex"); /* TODO */
+	CRT_UNIMPLEMENTEDF("if_freenameindex(%p)", ptr); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_if_freenameindex]]]*/

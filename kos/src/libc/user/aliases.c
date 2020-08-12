@@ -84,7 +84,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTED("getaliasent_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getaliasent_r(%p, %q, %Ix, %p)", result_buf, buffer, buflen, result); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_getaliasent_r]]]*/
@@ -99,7 +99,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
 /*[[[body:libc_getaliasbyname]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTED("getaliasbyname"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getaliasbyname(%q)", name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -120,7 +120,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTED("getaliasbyname_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("getaliasbyname_r(%q, %p, %q, %Ix, %p)", name, result_buf, buffer, buflen, result); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_getaliasbyname_r]]]*/

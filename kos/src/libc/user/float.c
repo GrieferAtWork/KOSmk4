@@ -50,7 +50,7 @@ NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
 /*AUTO*/{
 	(void)newval;
 	(void)mask;
-	CRT_UNIMPLEMENTED("_controlfp"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_controlfp(%" PRIx32 ", %" PRIx32 ")", newval, mask); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -64,7 +64,7 @@ NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval,
 /*AUTO*/{
 	(void)newval;
 	(void)mask;
-	CRT_UNIMPLEMENTED("_set_controlfp"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_controlfp(%" PRIx32 ", %" PRIx32 ")", newval, mask); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_controlfp]]]*/
@@ -79,7 +79,7 @@ NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
 	(void)pcurrent;
 	(void)newval;
 	(void)mask;
-	CRT_UNIMPLEMENTED("_controlfp_s"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_controlfp_s(%p, %" PRIx32 ", %" PRIx32 ")", pcurrent, newval, mask); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__controlfp_s]]]*/
@@ -104,7 +104,7 @@ NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat,
 /*AUTO*/{
 	(void)x86_stat;
 	(void)sse2_stat;
-	CRT_UNIMPLEMENTED("_statusfp2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_statusfp2(%p, %p)", x86_stat, sse2_stat); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__statusfp2]]]*/
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
 /*AUTO*/{
 	(void)newval;
 	(void)mask;
-	CRT_UNIMPLEMENTED("_control87"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_control87(%" PRIx32 ", %" PRIx32 ")", newval, mask); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -135,7 +135,7 @@ NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval,
 	(void)mask;
 	(void)x86_control_word;
 	(void)sse2_control_word;
-	CRT_UNIMPLEMENTED("__control87_2"); /* TODO */
+	CRT_UNIMPLEMENTEDF("__control87_2(%" PRIx32 ", %" PRIx32 ", %p, %p)", newval, mask, x86_control_word, sse2_control_word); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -165,7 +165,7 @@ NOTHROW(LIBCCALL libc__fpclass)(double x)
 /*[[[body:libc__fpclass]]]*/
 /*AUTO*/{
 	(void)x;
-	CRT_UNIMPLEMENTED("_fpclass"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_fpclass(%f)", x); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

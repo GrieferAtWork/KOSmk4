@@ -52,7 +52,7 @@ NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd)
 /*[[[body:libc_wttyname]]]*/
 /*AUTO*/{
 	(void)fd;
-	CRT_UNIMPLEMENTED("wttyname"); /* TODO */
+	CRT_UNIMPLEMENTEDF("wttyname(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd)
 /*[[[body:libd_wttyname]]]*/
 /*AUTO*/{
 	(void)fd;
-	CRT_UNIMPLEMENTED("DOS$wttyname"); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$wttyname(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -84,7 +84,7 @@ NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
 	(void)fd;
 	(void)buf;
 	(void)buflen;
-	CRT_UNIMPLEMENTED("wttyname_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("wttyname_r(%" PRIxN(__SIZEOF_FD_T__) ", %p, %Ix)", fd, buf, buflen); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -102,7 +102,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 	(void)fd;
 	(void)buf;
 	(void)buflen;
-	CRT_UNIMPLEMENTED("DOS$wttyname_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$wttyname_r(%" PRIxN(__SIZEOF_FD_T__) ", %p, %Ix)", fd, buf, buflen); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -559,7 +559,7 @@ NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
 	(void)buf;
 	(void)buflen;
 	(void)flags;
-	CRT_UNIMPLEMENTED("wfreadlinkat"); /* TODO */
+	CRT_UNIMPLEMENTEDF("wfreadlinkat(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %Ix, %" PRIxN(__SIZEOF_ATFLAG_T__) ")", dfd, path, buf, buflen, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -582,7 +582,7 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
 	(void)buf;
 	(void)buflen;
 	(void)flags;
-	CRT_UNIMPLEMENTED("DOS$wfreadlinkat"); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$wfreadlinkat(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %Ix, %" PRIxN(__SIZEOF_ATFLAG_T__) ")", dfd, path, buf, buflen, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -636,7 +636,7 @@ NOTHROW_RPC(LIBKCALL libc_wgetlogin_r)(char32_t *name,
 /*AUTO*/{
 	(void)name;
 	(void)name_len;
-	CRT_UNIMPLEMENTED("wgetlogin_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("wgetlogin_r(%p, %Ix)", name, name_len); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -650,7 +650,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name,
 /*AUTO*/{
 	(void)name;
 	(void)name_len;
-	CRT_UNIMPLEMENTED("DOS$wgetlogin_r"); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$wgetlogin_r(%p, %Ix)", name, name_len); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

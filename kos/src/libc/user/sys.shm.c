@@ -41,7 +41,7 @@ NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,
 	(void)shmid;
 	(void)cmd;
 	(void)buf;
-	CRT_UNIMPLEMENTED("shmctl"); /* TODO */
+	CRT_UNIMPLEMENTEDF("shmctl(%x, %x, %p)", shmid, cmd, buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key,
 	(void)key;
 	(void)size;
 	(void)shmflg;
-	CRT_UNIMPLEMENTED("shmget"); /* TODO */
+	CRT_UNIMPLEMENTEDF("shmget(%" PRIxN(__SIZEOF_KEY_T__) ", %Ix, %x)", key, size, shmflg); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -73,7 +73,7 @@ NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid,
 	(void)shmid;
 	(void)shmaddr;
 	(void)shmflg;
-	CRT_UNIMPLEMENTED("shmat"); /* TODO */
+	CRT_UNIMPLEMENTEDF("shmat(%x, %p, %x)", shmid, shmaddr, shmflg); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -85,7 +85,7 @@ NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 /*[[[body:libc_shmdt]]]*/
 /*AUTO*/{
 	(void)shmaddr;
-	CRT_UNIMPLEMENTED("shmdt"); /* TODO */
+	CRT_UNIMPLEMENTEDF("shmdt(%p)", shmaddr); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
