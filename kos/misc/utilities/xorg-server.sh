@@ -258,7 +258,7 @@ Name: xorg-server
 Description: Modular X.Org X Server
 Version: $VERSION
 Requires.private: xproto >= 7.0.22 randrproto >= 1.2.99.3 renderproto >= 0.11 xextproto >= 7.1.99 inputproto >= 2.1.99.6 kbproto >= 1.0.3 fontsproto pixman-1 >= 0.21.8 videoproto pciaccess >= 0.12.901
-Cflags: -I${sdkdir} -fvisibility=hidden
+Cflags: -I$KOS_ROOT/kos/include/xorg -fvisibility=hidden
 Libs:
 EOF
 fi
