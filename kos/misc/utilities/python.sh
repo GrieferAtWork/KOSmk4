@@ -103,7 +103,7 @@ Requires:
 Version: ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
 Libs.private: -ldl
 Libs: -lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
-Cflags: -I${includedir}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+Cflags: -I$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
 EOF
 fi
 
