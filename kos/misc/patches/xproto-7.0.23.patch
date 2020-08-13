@@ -1,3 +1,15 @@
+diff -Naur xproto-7.0.23-orig/Xarch.h xproto-7.0.23/Xarch.h
+--- xproto-7.0.23-orig/Xarch.h	2012-03-16 07:11:44.000000000 +0100
++++ xproto-7.0.23/Xarch.h	2020-08-13 15:48:43.177429200 +0200
+@@ -47,7 +47,7 @@
+ #    include <sys/types.h>
+ #   endif
+ #   include <machine/endian.h>
+-#  elif defined(linux)
++#  elif defined(linux) || defined(__KOS__)
+ #   if defined __STRICT_ANSI__
+ #    undef __STRICT_ANSI__
+ #    include <endian.h>
 diff -Naur xproto-7.0.23-orig/Xthreads.h xproto-7.0.23/Xthreads.h
 --- xproto-7.0.23-orig/Xthreads.h	2012-03-16 07:11:44.000000000 +0100
 +++ xproto-7.0.23/Xthreads.h	2020-08-11 09:53:07.369682500 +0200
