@@ -242,6 +242,15 @@ diff -Naur xorg-server-1.12.2-orig/hw/xfree86/sdksyms.sh xorg-server-1.12.2/hw/x
      }
  }
  
+diff -Naur xorg-server-1.12.2-orig/hw/xfree86/vbe/vbeModes.c xorg-server-1.12.2/hw/xfree86/vbe/vbeModes.c
+--- xorg-server-1.12.2-orig/hw/xfree86/vbe/vbeModes.c	2012-05-17 19:09:03.000000000 +0200
++++ xorg-server-1.12.2/hw/xfree86/vbe/vbeModes.c	2020-08-13 17:48:34.874498000 +0200
+@@ -1,4 +1,4 @@
+-#define DEBUG_VERB 2
++#define DEBUG_VERB 4
+ /*
+  * Copyright © 2002 David Dawes
+  *
 diff -Naur xorg-server-1.12.2-orig/os/log.c xorg-server-1.12.2/os/log.c
 --- xorg-server-1.12.2-orig/os/log.c	2012-05-29 22:04:19.000000000 +0200
 +++ xorg-server-1.12.2/os/log.c	2020-08-11 10:01:46.497062500 +0200
