@@ -739,18 +739,70 @@
 	pos_t bd_total_bytes; lba_t bd_sector_count; size_t bd_sector_size;             \
 	uintptr_half_t bd_flags; char bd_name[16];
 
-#define _os_heap_gfparg(var_name)   , int var_name
-#define _os_heap_gfppar(var_name)   , var_name
-#define os_heap_gfparg_(var_name)   int var_name,
-#define os_heap_gfppar_(var_name)   var_name,
-#define os_heap_gfparg(var_name)    int var_name
-#define os_heap_gfppar(var_name)    var_name
-#define os_heap_gfpvar(var_name)    int var_name;
+#define _os_heap_gfparg(v) , int v
+#define _os_heap_gfppar(v) , v
+#define os_heap_gfparg_(v) int v,
+#define os_heap_gfppar_(v) v,
+#define os_heap_gfparg(v) int v
+#define os_heap_gfppar(v) v
+#define os_heap_gfpvar(v) int v;
 
 
-#define PNG_FUNCTION(type,name,args,attributes) type name args
-#define PNG_EXPORTA(ordinal,type,name,args,attributes) type name args
-#define PNG_EXPORT(ordinal,type,name,args) type name args
-#define PNG_CALLBACK(type,name,args) type (name) args
-#define PNGARG(arglist) arglist
-#define BZ_API(func) func
+#define BZ_API(f) f
+#define PIXMAN_API
+#define _Xconst const
+#define _XFUNCPROTOBEGIN
+#define _XFUNCPROTOEND
+#define _X_SENTINEL(x)
+#define _X_EXPORT
+#define _X_HIDDEN
+#define _X_INTERNAL
+#define _X_DEPRECATED
+#define _X_NORETURN
+#define _X_ATTRIBUTE_PRINTF(x,y)
+#define _X_NONNULL(...)
+#define _X_UNUSED
+#define _X_INLINE
+#define _X_RESTRICT_KYWD restrict
+#define B32
+#define B16
+#define DRM_PRINTFLIKE(f,a)
+#define FT_BEGIN_HEADER
+#define FT_END_HEADER
+#define FT_LOCAL(x) x
+#define FT_LOCAL_DEF(x) x
+#define FT_LOCAL_ARRAY(x) const x
+#define FT_LOCAL_ARRAY_DEF(x) const x
+#define FT_BASE(x) x
+#define FT_BASE_DEF(x) x
+#define FT_EXPORT(x) x
+#define FT_EXPORT_DEF(x) x
+#define FT_EXPORT_VAR(x) x
+#define FT_CALLBACK_DEF(x) x
+#define FT_BASE_CALLBACK(x) x
+#define FT_BASE_CALLBACK_DEF(x) x
+#define FT_CALLBACK_TABLE
+#define FT_CALLBACK_TABLE_DEF
+#define PNG_CONST const
+#define PNGARG(x) x
+#define PNGAPI
+#define PNGCAPI
+#define PNGCBAPI
+#define PNG_DLL_EXPORT
+#define PNG_DLL_IMPORT
+#define PNG_IMPEXP
+#define PNG_EMPTY
+#define PNG_FUNCTION(x,y,z,w) x y z
+#define PNG_EXPORT_TYPE(t) t
+#define PNG_EXPORTA(v,x,y,z,w) x y z
+#define PNG_EXPORT(v,x,y,z) x y z
+#define PNG_CALLBACK(x,y,z) x y z
+#define PNG_USE_RESULT
+#define PNG_NORETURN
+#define PNG_ALLOCATED
+#define PNG_DEPRECATED
+#define PNG_PRIVATE
+#define PNG_RESTRICT restrict
+#define PNG_FP_EXPORT(v,x,y,z) x y z
+#define PNG_FIXED_EXPORT(v,x,y,z) x y z
+#define DECLARE_DEPRECATED(f) f;
