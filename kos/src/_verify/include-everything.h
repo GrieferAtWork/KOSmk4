@@ -139,7 +139,7 @@ function incdir(prefix, path) {
 					"i386-kos", "c++", "local", "compiler",
 					"crt-features", "__ice__", "system-test",
 					"libdl", "X11", "xcb", "freetype", "GL",
-					"xorg"])
+					"xorg", "python2.7"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
@@ -1094,6 +1094,7 @@ incdir("", "../../include");
 #if __has_include(<ncursesw/unctrl.h>)
 #include <ncursesw/unctrl.h>
 #endif /* __has_include(<ncursesw/unctrl.h>) */
+#include <ndir.h>
 #include <net/bits/types.h>
 #include <net/ethernet.h>
 #include <net/if.h>
@@ -1551,6 +1552,7 @@ incdir("", "../../include");
 #include <sys/mmio.h>
 #include <sys/mount.h>
 #include <sys/msg.h>
+#include <sys/ndir.h>
 #include <sys/param.h>
 #include <sys/pci.h>
 #include <sys/perm.h>

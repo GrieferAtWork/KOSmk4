@@ -49,6 +49,10 @@ __ice__
 /kos/include/zconf.h
 /kos/include/zlib.h
 
+# These headers are installed by `make_utility.sh ... python`
+/kos/include/python2.7/
+/kos/include/i386-kos/python2.7/
+
 # These headers are installed by `make_utility.sh [i386|x86_64] libffi`
 /kos/include/i386-kos/_libffi
 /kos/include/i386-kos/ffi.h
