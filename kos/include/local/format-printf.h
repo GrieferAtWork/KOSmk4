@@ -447,7 +447,10 @@ __nextfmt:
 		if __unlikely((__flags & __PRINTF_F_HASWIDTH) && __width > __print_width) {
 			__space_width = __width - __print_width;
 			if (!(__flags & __PRINTF_F_LJUST)) {
-				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __space_width);
+				__CHAR_TYPE __padch = ' ';
+				if (__flags & __PRINTF_F_PADZERO)
+					__padch = '0';
+				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __space_width);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -493,7 +496,10 @@ __nextfmt:
 			goto __err;
 		__result += __temp;
 		if __unlikely(__space_width) {
-			__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __space_width);
+			__CHAR_TYPE __padch = ' ';
+			if (__flags & __PRINTF_F_PADZERO)
+				__padch = '0';
+			__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __space_width);
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;
@@ -620,7 +626,10 @@ __do_wchar:;
 						__string_width = __string_length;
 					}*/
 					if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
-						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+						__CHAR_TYPE __padch = ' ';
+						if __unlikely(__flags & __PRINTF_F_PADZERO)
+							__padch = '0';
+						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __string_width);
 						if __unlikely(__temp < 0)
 							goto __err;
 						__result += __temp;
@@ -693,7 +702,10 @@ __do_wchar:;
 						__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH16(__NULLPTR, (__CHAR16_TYPE__ const *)__string, __string_length);
 					}
 					if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
-						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+						__CHAR_TYPE __padch = ' ';
+						if __unlikely(__flags & __PRINTF_F_PADZERO)
+							__padch = '0';
+						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __string_width);
 						if __unlikely(__temp < 0)
 							goto __err;
 						__result += __temp;
@@ -766,7 +778,10 @@ __do_wchar:;
 						__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH8(__NULLPTR, (char const *)__string, __string_length);
 					}
 					if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
-						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+						__CHAR_TYPE __padch = ' ';
+						if __unlikely(__flags & __PRINTF_F_PADZERO)
+							__padch = '0';
+						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __string_width);
 						if __unlikely(__temp < 0)
 							goto __err;
 						__result += __temp;
@@ -847,7 +862,10 @@ print_string:
 #endif /* __CHAR_SIZE != 4 */
 			}
 			if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
-				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+				__CHAR_TYPE __padch = ' ';
+				if __unlikely(__flags & __PRINTF_F_PADZERO)
+					__padch = '0';
+				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __string_width);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -871,7 +889,10 @@ __check_string_error_and_print_tail:
 			goto __err;
 		__result += __temp;
 		if ((__width > __string_width) && (__flags & __PRINTF_F_LJUST)) {
-			__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+			__CHAR_TYPE __padch = ' ';
+			if __unlikely(__flags & __PRINTF_F_PADZERO)
+				__padch = '0';
+			__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __string_width);
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;
@@ -1500,7 +1521,10 @@ __do_special_float:
 			if ((__flags & (__PRINTF_F_HASWIDTH | __PRINTF_F_LJUST)) ==
 			               (__PRINTF_F_HASWIDTH | __PRINTF_F_LJUST) &&
 			    (__width > __total_len)) {
-				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __total_len);
+				__CHAR_TYPE __padch = ' ';
+				if __unlikely(__flags & __PRINTF_F_PADZERO)
+					__padch = '0';
+				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __total_len);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -1522,7 +1546,10 @@ __do_special_float:
 			if ((__flags & (__PRINTF_F_HASWIDTH | __PRINTF_F_LJUST)) ==
 			               (__PRINTF_F_HASWIDTH) &&
 			    (__width > __total_len)) {
-				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __total_len);
+				__CHAR_TYPE __padch = ' ';
+				if __unlikely(__flags & __PRINTF_F_PADZERO)
+					__padch = '0';
+				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, __padch, __width - __total_len);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -1639,8 +1666,9 @@ __do_float_normal_width:
 				__buf[--__len] = '-';
 			else if (__flags & __PRINTF_F_SIGN)
 				__buf[--__len] = '+';
-			else if (__flags & __PRINTF_F_SPACE)
+			else if (__flags & __PRINTF_F_SPACE) {
 				__buf[--__len] = ' ';
+			}
 		}
 		__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __buf + __len, __COMPILER_LENOF(__buf) - __len);
 		if __unlikely(__temp < 0)
