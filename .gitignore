@@ -54,7 +54,7 @@ __ice__
 /kos/include/i386-kos/python2.7/
 
 # These headers are installed by `make_utility.sh [i386|x86_64] libffi`
-/kos/include/i386-kos/_libffi
+/kos/include/i386-kos/_libffi/
 /kos/include/i386-kos/ffi.h
 /kos/include/i386-kos/ffitarget.h
 
