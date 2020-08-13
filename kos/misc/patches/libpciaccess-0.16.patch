@@ -80,7 +80,7 @@ diff -Naur libpciaccess-0.16-orig/src/pciaccess_private.h libpciaccess-0.16/src/
  #warning O_CLOEXEC not available, please upgrade.
 diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
 --- libpciaccess-0.16-orig/src/x86_pci.c	2020-08-13 13:23:17.248284600 +0200
-+++ libpciaccess-0.16/src/x86_pci.c	2020-08-08 15:57:45.350282900 +0200
++++ libpciaccess-0.16/src/x86_pci.c	2020-08-13 16:35:17.998443800 +0200
 @@ -58,11 +58,11 @@
      return errno;
  }
@@ -104,3 +104,43 @@ diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
  x86_disable_io(void)
  {
      if (!iopl(0))
+@@ -723,7 +723,7 @@
+ {
+     error_t err;
+     uint8_t dev, func, nfuncs, hdrtype, secbus;
+-    uint32_t reg;
++    uint32_t vendor_reg, reg;
+     struct pci_device_private *d, *devices;
+     struct pci_device scratchdev;
+ 
+@@ -740,11 +740,11 @@
+         for (func = 0; func < nfuncs; func++)
+         {
+             scratchdev.func = func;
+-            err = pci_device_cfg_read_u32 (&scratchdev, &reg, PCI_VENDOR_ID);
++            err = pci_device_cfg_read_u32 (&scratchdev, &vendor_reg, PCI_VENDOR_ID);
+             if (err)
+                 return err;
+ 
+-            if (PCI_VENDOR (reg) == PCI_VENDOR_INVALID || PCI_VENDOR (reg) == 0)
++            if (PCI_VENDOR (vendor_reg) == PCI_VENDOR_INVALID || PCI_VENDOR (vendor_reg) == 0)
+                 continue;
+ 
+             err = pci_device_cfg_read_u32 (&scratchdev, &reg, PCI_CLASS);
+@@ -769,8 +769,16 @@
+             d->base.bus = bus;
+             d->base.dev = dev;
+             d->base.func = func;
++            d->base.vendor_id = PCI_VENDOR(vendor_reg);
++            d->base.device_id = PCI_DEVICE(vendor_reg);
++            err = pci_device_cfg_read_u32 (&scratchdev, &reg, PCI_SUB_VENDOR_ID);
++            if (!err) {
++                d->base.subvendor_id = PCI_VENDOR(reg);
++                d->base.subdevice_id = PCI_DEVICE(reg);
++            }
+ 
+             d->base.device_class = reg >> 8;
++            d->base.revision     = reg & 0xFF;
+ 
+             err = pci_device_x86_probe (&d->base);
+             if (err)
