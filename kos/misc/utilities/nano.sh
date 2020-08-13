@@ -21,10 +21,8 @@ if [ -z "$VERSION" ]; then VERSION="4.4"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/nano-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/nano-$VERSION"
-if [ "$MODE_FORCE_MAKE" == yes ] || \
- ! [ -f "$OPTPATH/src/nano" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || \
-	 ! [ -f "$OPTPATH/Makefile" ]; then
+if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/nano" ]; then
+	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			cmd cd "$KOS_ROOT/binutils/src"
 			download_file \

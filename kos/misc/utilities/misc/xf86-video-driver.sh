@@ -30,8 +30,8 @@ SRCPATH="$KOS_ROOT/binutils/src/x/$NAME-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/x/$NAME-$VERSION"
 BINFILE="$OPTPATH/src/.libs/${DRIVER_NAME}_drv.so"
 
-if ! [ -f "$BINFILE" ]; then
-	if ! [ -f "$OPTPATH/Makefile" ]; then
+if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$BINFILE" ]; then
+	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			cmd cd "$KOS_ROOT/binutils/src/x"
 			cmd rm -rf "$NAME-$VERSION"

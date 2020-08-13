@@ -71,8 +71,8 @@ X_xkb_bin_directory="$X_prefix/bin"                    # Should be: ${bindir}
 
 
 # xorg-server
-if ! [ -f "$OPTPATH/hw/xfree86/Xorg" ]; then
-	if ! [ -f "$OPTPATH/Makefile" ]; then
+if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/hw/xfree86/Xorg" ]; then
+	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			if ! [ -f "$SRCPATH/configure.ac" ]; then
 				cmd cd "$KOS_ROOT/binutils/src/x"
