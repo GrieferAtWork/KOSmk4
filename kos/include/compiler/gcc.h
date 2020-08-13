@@ -828,6 +828,7 @@ __extension__ typedef unsigned long long __ulonglong_t;
 /* `__builtin_types_compatible_p()' isn't consistently defined by g++.
  * So to prevent problems with that, simply re-implement it using a
  * macro alongside C++ templates. */
+extern "C++" {
 namespace __intern {
 template<class __T> struct __gcc_types_compatible_remcv{typedef __T __type;};
 template<class __T> struct __gcc_types_compatible_remcv<__T const>{typedef __T __type;};
@@ -838,6 +839,7 @@ template<class __T1> struct __gcc_types_compatible_impl<__T1,__T1>{enum{__val=tr
 template<class __T1, class __T2> struct __gcc_types_compatible:
 	__gcc_types_compatible_impl<typename __gcc_types_compatible_remcv<__T1>::__type,
 	                            typename __gcc_types_compatible_remcv<__T2>::__type>{};
+}
 }
 #undef __builtin_types_compatible_p
 #define __builtin_types_compatible_p(...) (::__intern::__gcc_types_compatible< __VA_ARGS__ >::__val)
