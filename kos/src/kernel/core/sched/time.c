@@ -1044,6 +1044,26 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 	if (!kernel_poisoned() /* && me == &_bootcpu*/) {
 		struct timespec before;
 		before = FORCPU(me, last_realtime);
+		/* FIXME: This assert is _still_ breaking:
+		 * [2020-08-13T15:10:20.493088644:emerg ] Assertion Check [pc=C026AE42]
+		 * kos/src/kernel/core/sched/time.c(1047) : realtime : before <= resync_real
+		 * Backwards realtime: { { 1597331420, 470717184 }, { 1597331420, 442622109 } } (diff: { 0, 28095075 })
+		 * 
+		 * kos/src/kernel/core/sched/time.c(1047,3) : realtime+100 : C026AE3D+5 : Caused here [sp=EAFF7C48]
+		 * kos/src/kernel/core/misc/syslog.c(572,28) : syslog_packet_append_impl+13 : C01B2FDB+5 : Called here [sp=EAFF7D20]
+		 * kos/src/kernel/core/misc/syslog.c(628,38) : syslog_packet_append+494 : C01B2FCE+66 : Called here [sp=EAFF7D20]
+		 * kos/src/kernel/core/misc/syslog.c(678,23) : syslog_printer+494 : C01B2FCE+66 : Called here [sp=EAFF7D20]
+		 * kos/include/local/format-printf.h(174,31) : libc_format_vprintf+131 : C020CA53+2 : Called here [sp=EAFF7D74]
+		 * kos/src/kernel/core/misc/printk.c(64,23) : vprintk+45 : C01B1FFD+5 : Called here [sp=EAFF7EE0]
+		 * kos/src/kernel/core/misc/printk.c(49,18) : printk+9 : C01B2019+5 : Called here [sp=EAFF7EF8]
+		 * D0001414: Called here
+		 * kos/src/kernel/core/misc/syscall-trace.c(395,26) : syscall_trace+141 : C01B2B4D+5 : Called here [sp=EAFF7FA0]
+		 * kos/src/kernel/core/arch/i386/syscall/syscall-sysenter-32.S(223) : ???+0 : C010117B+5 : Called here [sp=EAFF7FC0]
+		 * 0DF6D044+5 : Called here [sp=762A38DC]
+		 * expr: before <= resync_real
+		 * file: kos/src/kernel/core/sched/time.c (line 1047)
+		 * func: realtime
+		 * mesg: Backwards realtime: { { 1597331420, 470717184 }, { 1597331420, 442622109 } } (diff: { 0, 28095075 }) */
 		assertf(before <= resync_real,
 		        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
 		        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,

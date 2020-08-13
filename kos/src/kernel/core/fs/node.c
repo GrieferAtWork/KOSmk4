@@ -1690,7 +1690,7 @@ directory_getentry(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct directory_entry *result;
 	assert(sync_reading(self));
-	assert(self->d_mask != 0);
+	assert(self->d_mask != 0); /* TODO: This fails after all files in a directory were deleted! */
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
 			return (*self->i_type->it_directory.d_oneshot.o_lookup)(self,
