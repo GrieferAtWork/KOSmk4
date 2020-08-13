@@ -80,8 +80,45 @@ diff -Naur libpciaccess-0.16-orig/src/pciaccess_private.h libpciaccess-0.16/src/
  #warning O_CLOEXEC not available, please upgrade.
 diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
 --- libpciaccess-0.16-orig/src/x86_pci.c	2020-08-13 13:23:17.248284600 +0200
-+++ libpciaccess-0.16/src/x86_pci.c	2020-08-13 17:32:45.071186400 +0200
-@@ -58,11 +58,11 @@
++++ libpciaccess-0.16/src/x86_pci.c	2020-08-13 18:05:34.649640400 +0200
+@@ -38,6 +38,36 @@
+ #include "pciaccess.h"
+ #include "pciaccess_private.h"
+ 
++
++#ifdef __KOS__
++/* This is faster, even it it leaks 1 fd
++ * Also note that when not using the KOS-patched version of this
++ * library, it will always leak /dev/mem in multiple locations... */
++#include <hybrid/atomic.h>
++static int _fd_dev_mem = -1;
++static int _dev_mem_open(void) {
++	int result = ATOMIC_READ(_fd_dev_mem);
++	if __unlikely(result == -1) {
++		result = open("/dev/mem", O_RDWR | O_CLOEXEC);
++		if __likely(result != -1) {
++			int new_result;
++			new_result = ATOMIC_CMPXCH_VAL(_fd_dev_mem, -1, result);
++			if __unlikely(new_result != -1) {
++				close(result);
++				result = new_result;
++			}
++		}
++	}
++	return result;
++}
++#define DEV_MEM_OPEN()     _dev_mem_open()
++#define DEV_MEM_CLOSE(fd)  (void)0 /* Nothing. - Keep /dev/mem open */
++#else
++#define DEV_MEM_OPEN()     open("/dev/mem", O_RDWR | O_CLOEXEC)
++#define DEV_MEM_CLOSE(fd)  close(fd)
++#endif
++
++
+ #if defined(__GNU__)
+ 
+ #include <sys/io.h>
+@@ -58,11 +88,11 @@
      return errno;
  }
  
@@ -95,7 +132,7 @@ diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
  x86_enable_io(void)
  {
      if (!iopl(3))
-@@ -70,7 +70,7 @@
+@@ -70,7 +100,7 @@
      return errno;
  }
  
@@ -104,15 +141,52 @@ diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
  x86_disable_io(void)
  {
      if (!iopl(0))
-@@ -607,6 +607,7 @@
-             close (memfd);
+@@ -441,20 +471,20 @@
+     int memfd;
+     struct pci_device_private *d = (struct pci_device_private *)dev;
+ 
+-    memfd = open("/dev/mem", O_RDONLY | O_CLOEXEC);
++    memfd = DEV_MEM_OPEN();
+     if (memfd == -1)
+ 	return errno;
+ 
+     bios = mmap(NULL, dev->rom_size, PROT_READ, MAP_SHARED, memfd, d->rom_base);
+     if (bios == MAP_FAILED) {
+-	close(memfd);
++	DEV_MEM_CLOSE(memfd);
+ 	return errno;
+     }
+ 
+     memcpy(buffer, bios, dev->rom_size);
+ 
+     munmap(bios, dev->rom_size);
+-    close(memfd);
++    DEV_MEM_CLOSE(memfd);
+ 
+     return 0;
+ }
+@@ -594,7 +624,7 @@
+         }
+ 
+         /* Map the region in our space */
+-        memfd = open ("/dev/mem", O_RDWR | O_CLOEXEC);
++        memfd = DEV_MEM_OPEN();
+         if (memfd == -1)
+             return errno;
+ 
+@@ -604,9 +634,10 @@
+         if (dev->regions[reg_num].memory == MAP_FAILED)
+         {
+             dev->regions[reg_num].memory = 0;
+-            close (memfd);
++            DEV_MEM_CLOSE (memfd);
              return errno;
          }
-+        close (memfd);
++        DEV_MEM_CLOSE (memfd);
      }
  
      return 0;
-@@ -723,7 +724,7 @@
+@@ -723,7 +754,7 @@
  {
      error_t err;
      uint8_t dev, func, nfuncs, hdrtype, secbus;
@@ -121,7 +195,7 @@ diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
      struct pci_device_private *d, *devices;
      struct pci_device scratchdev;
  
-@@ -740,11 +741,11 @@
+@@ -740,11 +771,11 @@
          for (func = 0; func < nfuncs; func++)
          {
              scratchdev.func = func;
@@ -135,7 +209,7 @@ diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
                  continue;
  
              err = pci_device_cfg_read_u32 (&scratchdev, &reg, PCI_CLASS);
-@@ -769,8 +770,16 @@
+@@ -769,8 +800,16 @@
              d->base.bus = bus;
              d->base.dev = dev;
              d->base.func = func;
@@ -153,3 +227,24 @@ diff -Naur libpciaccess-0.16-orig/src/x86_pci.c libpciaccess-0.16/src/x86_pci.c
  
              err = pci_device_x86_probe (&d->base);
              if (err)
+@@ -845,7 +884,7 @@
+ pci_device_x86_map_range(struct pci_device *dev,
+     struct pci_device_mapping *map)
+ {
+-    int memfd = open("/dev/mem", O_RDWR | O_CLOEXEC);
++    int memfd = DEV_MEM_OPEN();
+     int prot = PROT_READ;
+ 
+     if (memfd == -1)
+@@ -856,9 +895,10 @@
+ 
+     map->memory = mmap(NULL, map->size, prot, MAP_SHARED, memfd, map->base);
+     if (map->memory == MAP_FAILED) {
+-    	close(memfd);
++	DEV_MEM_CLOSE(memfd);
+ 	return errno;
+     }
++    DEV_MEM_CLOSE(memfd);
+     return 0;
+ }
+ 
