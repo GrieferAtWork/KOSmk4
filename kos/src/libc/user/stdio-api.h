@@ -162,6 +162,7 @@ struct iofile_data: iofile_data_novtab {
 #define FMUSTLOCK(self) 1
 #endif /* !IO_NOLOCK */
 
+#define IOBUF_FACTOR             4    /* Try to scale up the I/O buffer, such that bufsize ~= FPOS / IOBUF_FACTOR */
 #define IOBUF_MAX                8192
 #define IOBUF_MIN                512
 #define IOBUF_RELOCATE_THRESHOLD 2048 /* When >= this amount of bytes are unused in the buffer, free them. */

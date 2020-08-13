@@ -295,6 +295,22 @@ file_buffer_realloc(FILE *__restrict self, size_t new_size) {
 	return (byte_t *)realloc(self->if_base, new_size);
 }
 
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_buffer_realloc_dynscale") byte_t *LIBCCALL
+file_buffer_realloc_dynscale(FILE *__restrict self,
+                             size_t *__restrict pnew_size,
+                             pos64_t fpos) {
+	size_t lower_limit;
+	if (fpos >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
+		lower_limit = IOBUF_MAX;
+	else {
+		lower_limit = (size_t)(fpos / IOBUF_FACTOR);
+	}
+	if (*pnew_size < lower_limit)
+		*pnew_size = lower_limit;
+	return file_buffer_realloc(self, *pnew_size);
+
+}
+
 
 /* Change the operations mode of a given buffer. */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_setmode")
@@ -698,7 +714,6 @@ NONNULL((1)) size_t LIBCCALL file_readdata(FILE *__restrict self,
 	size_t bufavail;
 	uint32_t old_flags;
 	pos64_t next_data;
-	uint8_t *new_buffer;
 	bool did_read_data = false;
 	struct iofile_data *ex;
 	assert(self);
@@ -758,7 +773,8 @@ read_from_buffer:
 	/* If no buf had been allocated, allocate one now. */
 	if unlikely(!self->if_bufsiz) {
 		/* Start out with the smallest size. */
-		size_t initial_bufsize;
+		uint8_t *new_buffer;
+		size_t new_bufsize;
 		if unlikely(self->if_flag & IO_NODYNSCALE) {
 			/* Dynamic scaling is disabled. Must forward the read() to the underlying file. */
 read_through:
@@ -785,16 +801,22 @@ read_through:
 		}
 		if (num_bytes >= IOBUF_MAX)
 			goto read_through;
-		initial_bufsize = num_bytes;
-		if (initial_bufsize < IOBUF_MIN)
-			initial_bufsize = IOBUF_MIN;
-		new_buffer = file_buffer_realloc(self, initial_bufsize);
-		if unlikely(!new_buffer)
-			goto read_through;
+		new_bufsize = num_bytes;
+		if (new_bufsize < IOBUF_MIN)
+			new_bufsize = IOBUF_MIN;
+		new_buffer = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
+		if unlikely(!new_buffer) {
+			new_bufsize = IOBUF_MIN;
+			new_buffer  = file_buffer_realloc(self, new_bufsize);
+			if unlikely(!new_buffer)
+				goto read_through;
+		}
 		self->if_base   = new_buffer;
-		self->if_bufsiz = initial_bufsize;
+		self->if_bufsiz = new_bufsize;
 		self->if_flag  |= IO_MALLBUF;
 	} else if (num_bytes >= self->if_bufsiz) {
+		size_t new_bufsize;
+		uint8_t *new_buffer;
 		/* The caller wants at least as much as this buf could even handle.
 		 * Upscale the buf, or use load data using read-through mode. */
 		if (self->if_flag & (IO_NODYNSCALE | IO_READING))
@@ -802,13 +824,38 @@ read_through:
 		if (num_bytes > IOBUF_MAX)
 			goto read_through;
 		/* Upscale the buf. */
-		new_buffer = file_buffer_realloc(self, num_bytes);
+		new_bufsize = num_bytes;
+		new_buffer  = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
 		/* If the allocation failed, also use read-through mode. */
-		if unlikely(!new_buffer)
-			goto read_through;
+		if unlikely(!new_buffer) {
+			new_bufsize = num_bytes;
+			new_buffer  = file_buffer_realloc(self, new_bufsize);
+			if unlikely(!new_buffer)
+				goto read_through;
+		}
 		self->if_base   = new_buffer;
-		self->if_bufsiz = num_bytes;
+		self->if_bufsiz = new_bufsize;
 		self->if_flag  |= IO_MALLBUF;
+	} else {
+		size_t new_bufsize;
+		/* Make use of the current file-offset to dynamically increase the
+		 * max buffer size, such that we try to keep said max buffer size
+		 * capped around `ftell() / IOBUF_FACTOR'  (though still cap it with its limit) */
+		if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
+			new_bufsize = IOBUF_MAX;
+		else {
+			new_bufsize = (size_t)(next_data / IOBUF_FACTOR);
+		}
+		if (new_bufsize > self->if_bufsiz) {
+			/* Try to increase the buffer size. */
+			uint8_t *new_buffer;
+			new_buffer = file_buffer_realloc(self, new_bufsize);
+			if likely(new_buffer) {
+				self->if_base   = new_buffer;
+				self->if_bufsiz = new_bufsize;
+				self->if_flag  |= IO_MALLBUF;
+			}
+		}
 	}
 
 	self->if_ptr = self->if_base;
@@ -830,8 +877,7 @@ read_through:
 	}
 
 	/* Actually read the data. */
-	new_buffer = self->if_base;
-	old_flags  = self->if_flag;
+	old_flags = self->if_flag;
 	self->if_flag |= IO_READING;
 	COMPILER_BARRIER();
 	read_size = file_system_read(self,
@@ -1106,6 +1152,7 @@ err0:
 INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_getc")
 WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self) {
 	uint8_t *new_buffer;
+	size_t new_bufsize;
 	ssize_t read_size;
 	uint32_t old_flags;
 	int result;
@@ -1183,22 +1230,35 @@ read_through:
 			}
 			goto done;
 		}
-			/* Start out with the smallest size. */
-		new_buffer = file_buffer_realloc(self, IOBUF_MIN);
-		if unlikely(!new_buffer)
-			goto read_through;
-		self->if_base   = new_buffer;
-		self->if_bufsiz = IOBUF_MIN;
-	} else {
-		if (self->if_bufsiz < IOBUF_MIN &&
-		    !(self->if_flag & (IO_NODYNSCALE | IO_READING))) {
-			/* Upscale the buffer. */
-			new_buffer = file_buffer_realloc(self, IOBUF_MIN);
+		/* Start out with the smallest size. */
+		new_bufsize = IOBUF_MIN;
+		new_buffer  = file_buffer_realloc_dynscale(self, &new_bufsize, next_data);
+		if unlikely(!new_buffer) {
+			new_bufsize = IOBUF_MIN;
+			new_buffer  = file_buffer_realloc(self, new_bufsize);
 			if unlikely(!new_buffer)
 				goto read_through;
-			self->if_base   = new_buffer;
-			self->if_bufsiz = IOBUF_MIN;
-			self->if_flag  |= IO_MALLBUF;
+		}
+		self->if_base   = new_buffer;
+		self->if_bufsiz = new_bufsize;
+	} else {
+		if (!(self->if_flag & (IO_NODYNSCALE | IO_READING))) {
+			/* Upscale the buffer. */
+			if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
+				new_bufsize = IOBUF_MAX;
+			else {
+				new_bufsize = (size_t)(next_data / IOBUF_FACTOR);
+				if (new_bufsize < IOBUF_MIN)
+					new_bufsize = IOBUF_MIN;
+			}
+			if (new_bufsize > self->if_bufsiz) {
+				new_buffer = file_buffer_realloc(self, new_bufsize);
+				if likely(new_buffer) {
+					self->if_base   = new_buffer;
+					self->if_bufsiz = new_bufsize;
+					self->if_flag  |= IO_MALLBUF;
+				}
+			}
 		}
 	}
 
