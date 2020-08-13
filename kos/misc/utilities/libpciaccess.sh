@@ -88,6 +88,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$
 				--enable-shared \
 				--enable-linux-rom-fallback \
 				--with-gnu-ld \
+				--with-pciids-path="/usr/share/hwdata" \
 				--with-zlib
 		) || exit $?
 	fi
