@@ -925,16 +925,16 @@ keyboard_device_poll(struct character_device *__restrict self,
 LOCAL unsigned int KCALL
 linux_keyboard_getmode(struct keyboard_device *__restrict self) {
 	if (ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDKEYS)
-		return K_XLATE;
+		return K_OFF;
 	return K_UNICODE;
 }
 
 LOCAL void KCALL
 linux_keyboard_setmode(struct keyboard_device *__restrict self,
                        unsigned int mode) {
-	if (mode == K_XLATE) {
+	if (mode == K_RAW || mode == K_MEDIUMRAW || mode == K_OFF) {
 		ATOMIC_FETCHOR(self->kd_flags, KEYBOARD_DEVICE_FLAG_RDKEYS);
-	} else if (mode == K_UNICODE) {
+	} else if (mode == K_XLATE || mode == K_UNICODE) {
 		ATOMIC_FETCHAND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_RDKEYS);
 	} else {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -1416,14 +1416,25 @@ do_KDGKBMODE_compat:
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
 	case _IOW(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), longptr_t):
-		validate_readable(arg, sizeof(longptr_t));
-		linux_keyboard_setmode(me, (unsigned int)(int)*(longptr_t *)arg);
+		if ((uintptr_t)arg < PAGESIZE) {
+			/* Compatibility with linux. */
+			linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
+		} else {
+			validate_readable(arg, sizeof(longptr_t));
+			linux_keyboard_setmode(me, (unsigned int)(int)*(longptr_t *)arg);
+		}
 		break;
+
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOR(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), __ARCH_COMPAT_LONGPTR_TYPE):
 do_KDSKBMODE_compat:
-		validate_readable(arg, sizeof(__ARCH_COMPAT_LONGPTR_TYPE));
-		linux_keyboard_setmode(me, (unsigned int)(int)*(__ARCH_COMPAT_LONGPTR_TYPE *)arg);
+		if ((uintptr_t)arg < PAGESIZE) {
+			/* Compatibility with linux. */
+			linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
+		} else {
+			validate_readable(arg, sizeof(__ARCH_COMPAT_LONGPTR_TYPE));
+			linux_keyboard_setmode(me, (unsigned int)(int)*(__ARCH_COMPAT_LONGPTR_TYPE *)arg);
+		}
 		break;
 #endif /* __ARCH_HAVE_COMPAT */
 

@@ -29,10 +29,11 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 
-#include <kos/except/inval.h>
 #include <kos/except.h>
+#include <kos/except/inval.h>
 #include <kos/ioctl/video.h>
 #include <linux/kd.h>
+#include <linux/vt.h>
 
 #include <assert.h>
 #include <string.h>
@@ -135,6 +136,50 @@ video_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd
 		validate_writable(arg, sizeof(int));
 		*(USER CHECKED int *)arg = vd_format_istext(&fmt) ? KD_TEXT : KD_GRAPHICS;
 	}	break;
+
+	case VT_OPENQRY: {
+		validate_writable(arg, sizeof(int));
+		*(USER CHECKED int *)arg = 0;
+	}	break;
+
+	case VT_GETSTATE: {
+		USER CHECKED struct vt_stat *vs;
+		validate_writable(arg, sizeof(struct vt_stat));
+		vs = (USER CHECKED struct vt_stat *)arg;
+		vs->v_active = 0;
+		vs->v_state  = 1;
+	}	break;
+
+	case VT_ACTIVATE:
+		/* No-op... (for now) */
+		break;
+
+	case VT_WAITACTIVE:
+		/* No-op... (for now) */
+		break;
+
+	case VT_DISALLOCATE:
+		/* No-op... (for now) */
+		break;
+
+	case VT_RELDISP:
+		/* No-op... (for now) */
+		break;
+
+	case VT_GETMODE: {
+		USER CHECKED struct vt_mode *vs;
+		validate_writable(arg, sizeof(struct vt_mode));
+		vs = (USER CHECKED struct vt_mode *)arg;
+		vs->mode   = VT_AUTO;
+		vs->waitv  = 0;
+		vs->relsig = 0;
+		vs->acqsig = 0;
+		vs->frsig  = 0;
+	}	break;
+
+	case VT_SETMODE:
+		/* No-op... (for now) */
+		break;
 
 //TODO:	case PIO_CMAP:
 //TODO:		validate_readable(arg, 48);

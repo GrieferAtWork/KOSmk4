@@ -37,19 +37,19 @@
 
 /* 0x56 is 'V', to avoid collision with termios and kd */
 
-#define VT_OPENQRY _IO('V', 0x00) /* find available vt */
+#define VT_OPENQRY _IO('V', 0x00) /* [int *pvtno] find available vt */
 
 #ifdef __CC__
 struct vt_mode {
-	__int8_t  mode;   /* vt mode */
+	__int8_t  mode;   /* vt mode (one of `VT_AUTO', `VT_PROCESS' or `VT_ACKACQ') */
 	__int8_t  waitv;  /* if set, hang on writes if not active */
 	__int16_t relsig; /* signal to raise on release req */
 	__int16_t acqsig; /* signal to raise on acquisition */
 	__int16_t frsig;  /* unused (set to 0) */
 };
 #endif /* __CC__ */
-#define VT_GETMODE _IO('V', 0x01) /* get mode of active vt */
-#define VT_SETMODE _IO('V', 0x02) /* set mode of active vt */
+#define VT_GETMODE _IO('V', 0x01) /* [struct vt_mode *mode] get mode of active vt */
+#define VT_SETMODE _IO('V', 0x02) /* [struct vt_mode const *mode] set mode of active vt */
 #define    VT_AUTO    0x00 /* auto vt switching */
 #define    VT_PROCESS 0x01 /* process controls switching */
 #define    VT_ACKACQ  0x02 /* acknowledge switch */
@@ -64,7 +64,7 @@ struct vt_stat {
 
 /* Note: the ioctl VT_GETSTATE does not work for
  * consoles 16 and higher (since it returns a short) */
-#define VT_GETSTATE    _IO('V', 0x03) /* get global vt state info */
+#define VT_GETSTATE    _IO('V', 0x03) /* [struct vt_stat *st] get global vt state info */
 #define VT_SENDSIG     _IO('V', 0x04) /* signal to send to bitmask of vts */
 
 #define VT_RELDISP     _IO('V', 0x05) /* release display */

@@ -251,8 +251,8 @@ tty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
 			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    error_data()->e_pointers[0] != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
-			    error_data()->e_pointers[1] != cmd)
+			    PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    PERTASK_GET(this_exception_pointers[1]) != cmd)
 				RETHROW();
 		}
 		/* Try to have the input device handle the command. */
@@ -261,17 +261,17 @@ tty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 	}	break;
 	}
 	return 0;
-predict_input_device_command:
 	{
 		syscall_slong_t result;
+predict_input_device_command:
 		TRY {
 			return (*handle_type_db.h_ioctl[me->t_ihandle_typ])(me->t_ihandle_ptr, cmd, arg, mode);
 		} EXCEPT {
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
 			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    error_data()->e_pointers[0] != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
-			    error_data()->e_pointers[1] != cmd)
+			    PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    PERTASK_GET(this_exception_pointers[1]) != cmd)
 				RETHROW();
 		}
 		result = ttybase_device_tryioctl(self, cmd, arg, mode);
@@ -280,17 +280,17 @@ predict_input_device_command:
 		/* Try to have the output device handle the command. */
 		return (*handle_type_db.h_ioctl[me->t_ohandle_typ])(me->t_ohandle_ptr, cmd, arg, mode);
 	}
-predict_output_device_command:
 	{
 		syscall_slong_t result;
+predict_output_device_command:
 		TRY {
 			return (*handle_type_db.h_ioctl[me->t_ohandle_typ])(me->t_ohandle_ptr, cmd, arg, mode);
 		} EXCEPT {
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
 			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    error_data()->e_pointers[0] != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
-			    error_data()->e_pointers[1] != cmd)
+			    PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    PERTASK_GET(this_exception_pointers[1]) != cmd)
 				RETHROW();
 		}
 		result = ttybase_device_tryioctl(self, cmd, arg, mode);
