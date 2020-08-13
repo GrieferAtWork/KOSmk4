@@ -21,9 +21,14 @@
 #define _IEEE754_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/__byteorder.h>
 #include <hybrid/typecore.h>
+
+#ifdef __USE_GLIBC
+#include <endian.h>
+#endif /* __USE_GLIBC */
 
 /* Partially derived from GNU C /usr/include/i386-linux-gnu/ieee754.h */
 

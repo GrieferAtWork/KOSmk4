@@ -66,7 +66,7 @@
 #define __LONG_LONG_PAIR(hi, lo) lo, hi
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define __LONG_LONG_PAIR(hi, lo) hi, lo
-#endif
+#endif /* ... */
 
 #ifdef __USE_MISC
 #include <hybrid/__byteswap.h>

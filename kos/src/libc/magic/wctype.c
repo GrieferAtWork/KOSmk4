@@ -70,6 +70,10 @@
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 
+#ifdef __USE_GLIBC
+#include <endian.h>
+#endif /* __USE_GLIBC */
+
 __SYSDECL_BEGIN
 
 #if !defined(WEOF) && defined(__WEOF)

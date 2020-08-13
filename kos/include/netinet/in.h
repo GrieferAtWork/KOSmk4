@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe13268ea */
+/* HASH CRC-32:0xc0218660 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,8 +44,10 @@
 #include <netinet/ipproto.h>
 
 #ifdef __USE_GLIBC
-#include <stdint.h>
 #include <sys/socket.h>
+
+#include <endian.h>
+#include <stdint.h>
 #endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */

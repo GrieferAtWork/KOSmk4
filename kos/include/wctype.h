@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46592a4e */
+/* HASH CRC-32:0xaa201abf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,6 +89,10 @@ __NAMESPACE_STD_USING(towupper)
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
+
+#ifdef __USE_GLIBC
+#include <endian.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 

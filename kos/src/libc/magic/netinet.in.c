@@ -37,8 +37,10 @@
 #include <netinet/ipproto.h>
 
 #ifdef __USE_GLIBC
-#include <stdint.h>
 #include <sys/socket.h>
+
+#include <endian.h>
+#include <stdint.h>
 #endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */

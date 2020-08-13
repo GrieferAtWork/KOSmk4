@@ -39,9 +39,14 @@
 
 %{
 #include <features.h>
+
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+
+#ifdef __USE_GLIBC
+#include <endian.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
