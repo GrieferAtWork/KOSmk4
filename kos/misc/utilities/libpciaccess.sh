@@ -125,6 +125,8 @@ install_symlink /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION libpciaccess.so.$SO
 install_symlink /$TARGET_LIBPATH/libpciaccess.so libpciaccess.so.$SO_VERSION_MAJOR
 install_file_nodisk /$TARGET_LIBPATH/libpciaccess.a "$OPTPATH/src/.libs/libpciaccess.a"
 
+install_file /bin/scanpci "$OPTPATH/scanpci/.libs/scanpci"
+
 # Install headers
 install_rawfile "$KOS_ROOT/kos/include/pciaccess.h" "$SRCPATH/include/pciaccess.h"
 
