@@ -460,8 +460,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       - But that's also where it ends...
 	 *
 	 * Blocker:
-	 *     - "could not open default font 'fixed'"
-	 *       - Solution: Have to port fonts to-be used by the Xorg server
+	 *     - "Keyboard initialization failed. This could be a missing or incorrect setup of xkeyboard-config"
+	 *       - Solution: It's fairly accurate on the "missing [...] setup of xkeyboard-config".
+	 *                   The solution will be to port whatever X11 uses for keyboard input!
 	 *
 	 * TODO:
 	 *     - Implement proper libsctrace support for arguments names of sys_socket
@@ -476,283 +477,297 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     | ...
 	 *
 	 *     $ cat /var/log/Xorg.0.log
-	 *     | [3898550.559] _XSERVTransPTSOpenServer: Unable to open /dev/ptmx
-	 *     | [3898550.568] _XSERVTransOpen: transport open failed for pts/(none):0
-	 *     | [3898550.571] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for pts
-	 *     | [3898550.665] 
+	 *     | [3910736.390] _XSERVTransPTSOpenServer: Unable to open /dev/ptmx
+	 *     | [3910736.394] _XSERVTransOpen: transport open failed for pts/(none):0
+	 *     | [3910736.397] _XSERVTransMakeAllCOTSServerListeners: failed to open listener for pts
+	 *     | [3910736.461] 
 	 *     | X.Org X Server 1.12.2
 	 *     | Release Date: 2012-05-29
-	 *     | [3898550.668] X Protocol Version 11, Revision 0
-	 *     | [3898550.670] Build Operating System: KOS Griefer@Work
-	 *     | [3898550.673] Current Operating System: KOS (none) KOS Mk4 - yakal 4.0.0 i386
-	 *     | [3898550.676]  
-	 *     | [3898550.679] Current version of pixman: 0.40.0
-	 *     | [3898550.687] 	Before reporting problems, check https://github.com/GrieferAtWork/KOSmk4
+	 *     | [3910736.464] X Protocol Version 11, Revision 0
+	 *     | [3910736.465] Build Operating System: KOS Griefer@Work
+	 *     | [3910736.469] Current Operating System: KOS (none) KOS Mk4 - yakal 4.0.0 i386
+	 *     | [3910736.471]  
+	 *     | [3910736.474] Current version of pixman: 0.40.0
+	 *     | [3910736.476] 	Before reporting problems, check https://github.com/GrieferAtWork/KOSmk4
 	 *     | 	to make sure that you have the latest version.
-	 *     | [3898550.689] Markers: (--) probed, (**) from config file, (==) default setting,
+	 *     | [3910736.478] Markers: (--) probed, (**) from config file, (==) default setting,
 	 *     | 	(++) from command line, (!!) notice, (II) informational,
 	 *     | 	(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
-	 *     | [3898550.699] (==) Log file: "/var/log/Xorg.0.log", Time: Thu Aug 13 15:10:17 2020
-	 *     | [3898550.730] (II) Loader magic: 082337E0
-	 *     | [3898550.732] (II) Module ABI versions:
-	 *     | [3898550.734] 	X.Org ANSI C Emulation: 0.4
-	 *     | [3898550.736] 	X.Org Video Driver: 12.0
-	 *     | [3898550.737] 	X.Org XInput driver : 16.0
-	 *     | [3898550.739] 	X.Org Server Extension : 6.0
-	 *     | [3898550.804] (--) PCI:*(0:0:2:0) 1234:1111:1af4:1100 rev 2, Mem @ 0xfd000000/16777216, 0xfebd0000/4096, BIOS @ 0x????????/65536
-	 *     | [3898550.816] (==) Using default built-in configuration (21 lines)
-	 *     | [3898550.818] (==) --- Start of built-in configuration ---
-	 *     | [3898550.820] 	Section "Device"
-	 *     | [3898550.822] 		Identifier	"Builtin Default vesa Device 0"
-	 *     | [3898550.824] 		Driver	"vesa"
-	 *     | [3898550.825] 	EndSection
-	 *     | [3898550.827] 	Section "Screen"
-	 *     | [3898550.829] 		Identifier	"Builtin Default vesa Screen 0"
-	 *     | [3898550.831] 		Device	"Builtin Default vesa Device 0"
-	 *     | [3898550.832] 	EndSection
-	 *     | [3898550.834] 	Section "Device"
-	 *     | [3898550.835] 		Identifier	"Builtin Default fbdev Device 0"
-	 *     | [3898550.837] 		Driver	"fbdev"
-	 *     | [3898550.839] 	EndSection
-	 *     | [3898550.842] 	Section "Screen"
-	 *     | [3898550.844] 		Identifier	"Builtin Default fbdev Screen 0"
-	 *     | [3898550.845] 		Device	"Builtin Default fbdev Device 0"
-	 *     | [3898550.847] 	EndSection
-	 *     | [3898550.849] 	Section "ServerLayout"
-	 *     | [3898550.851] 		Identifier	"Builtin Default Layout"
-	 *     | [3898550.852] 		Screen	"Builtin Default vesa Screen 0"
-	 *     | [3898550.854] 		Screen	"Builtin Default fbdev Screen 0"
-	 *     | [3898550.856] 	EndSection
-	 *     | [3898550.857] (==) --- End of built-in configuration ---
-	 *     | [3898550.866] (==) ServerLayout "Builtin Default Layout"
-	 *     | [3898550.869] (**) |-->Screen "Builtin Default vesa Screen 0" (0)
-	 *     | [3898550.871] (**) |   |-->Monitor "<default monitor>"
-	 *     | [3898550.882] (**) |   |-->Device "Builtin Default vesa Device 0"
-	 *     | [3898550.884] (==) No monitor specified for screen "Builtin Default vesa Screen 0".
+	 *     | [3910736.486] (==) Log file: "/var/log/Xorg.0.log", Time: Thu Aug 13 18:33:23 2020
+	 *     | [3910736.508] (II) Loader magic: 082349C0
+	 *     | [3910736.510] (II) Module ABI versions:
+	 *     | [3910736.511] 	X.Org ANSI C Emulation: 0.4
+	 *     | [3910736.513] 	X.Org Video Driver: 12.0
+	 *     | [3910736.514] 	X.Org XInput driver : 16.0
+	 *     | [3910736.515] 	X.Org Server Extension : 6.0
+	 *     | [3910736.552] (--) PCI:*(0:0:2:0) 1234:1111:1af4:1100 rev 2, Mem @ 0xfd000000/16777216, 0xfebd0000/4096, BIOS @ 0x????????/65536
+	 *     | [3910736.562] (==) Using default built-in configuration (21 lines)
+	 *     | [3910736.563] (==) --- Start of built-in configuration ---
+	 *     | [3910736.564] 	Section "Device"
+	 *     | [3910736.565] 		Identifier	"Builtin Default vesa Device 0"
+	 *     | [3910736.566] 		Driver	"vesa"
+	 *     | [3910736.567] 	EndSection
+	 *     | [3910736.568] 	Section "Screen"
+	 *     | [3910736.569] 		Identifier	"Builtin Default vesa Screen 0"
+	 *     | [3910736.571] 		Device	"Builtin Default vesa Device 0"
+	 *     | [3910736.572] 	EndSection
+	 *     | [3910736.573] 	Section "Device"
+	 *     | [3910736.574] 		Identifier	"Builtin Default fbdev Device 0"
+	 *     | [3910736.575] 		Driver	"fbdev"
+	 *     | [3910736.576] 	EndSection
+	 *     | [3910736.577] 	Section "Screen"
+	 *     | [3910736.579] 		Identifier	"Builtin Default fbdev Screen 0"
+	 *     | [3910736.580] 		Device	"Builtin Default fbdev Device 0"
+	 *     | [3910736.581] 	EndSection
+	 *     | [3910736.582] 	Section "ServerLayout"
+	 *     | [3910736.583] 		Identifier	"Builtin Default Layout"
+	 *     | [3910736.584] 		Screen	"Builtin Default vesa Screen 0"
+	 *     | [3910736.588] 		Screen	"Builtin Default fbdev Screen 0"
+	 *     | [3910736.589] 	EndSection
+	 *     | [3910736.590] (==) --- End of built-in configuration ---
+	 *     | [3910736.596] (==) ServerLayout "Builtin Default Layout"
+	 *     | [3910736.597] (**) |-->Screen "Builtin Default vesa Screen 0" (0)
+	 *     | [3910736.599] (**) |   |-->Monitor "<default monitor>"
+	 *     | [3910736.606] (**) |   |-->Device "Builtin Default vesa Device 0"
+	 *     | [3910736.607] (==) No monitor specified for screen "Builtin Default vesa Screen 0".
 	 *     | 	Using a default monitor configuration.
-	 *     | [3898550.886] (**) |-->Screen "Builtin Default fbdev Screen 0" (1)
-	 *     | [3898550.887] (**) |   |-->Monitor "<default monitor>"
-	 *     | [3898550.892] (**) |   |-->Device "Builtin Default fbdev Device 0"
-	 *     | [3898550.894] (==) No monitor specified for screen "Builtin Default fbdev Screen 0".
+	 *     | [3910736.608] (**) |-->Screen "Builtin Default fbdev Screen 0" (1)
+	 *     | [3910736.609] (**) |   |-->Monitor "<default monitor>"
+	 *     | [3910736.613] (**) |   |-->Device "Builtin Default fbdev Device 0"
+	 *     | [3910736.614] (==) No monitor specified for screen "Builtin Default fbdev Screen 0".
 	 *     | 	Using a default monitor configuration.
-	 *     | [3898550.898] (==) Disabling SIGIO handlers for input devices
-	 *     | [3898550.900] (==) Not automatically adding devices
-	 *     | [3898550.902] (==) Not automatically enabling devices
-	 *     | [3898550.907] (WW) The directory "/usr/share/fonts/X11/misc/" does not exist.
-	 *     | [3898550.909] 	Entry deleted from font path.
-	 *     | [3898550.911] (WW) The directory "/usr/share/fonts/X11/ttf/" does not exist.
-	 *     | [3898550.913] 	Entry deleted from font path.
-	 *     | [3898550.917] (WW) The directory "/usr/share/fonts/X11/otf/" does not exist.
-	 *     | [3898550.919] 	Entry deleted from font path.
-	 *     | [3898550.921] (WW) The directory "/usr/share/fonts/X11/Type1/" does not exist.
-	 *     | [3898550.924] 	Entry deleted from font path.
-	 *     | [3898550.926] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
-	 *     | [3898550.928] 	Entry deleted from font path.
-	 *     | [3898550.930] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
-	 *     | [3898550.932] 	Entry deleted from font path.
-	 *     | [3898550.935] (==) FontPath set to:
-	 *     | 	
-	 *     | [3898550.937] (==) ModulePath set to "/lib/xorg/modules"
-	 *     | [3898550.939] (==) |-->Input Device "<default pointer>"
-	 *     | [3898550.942] (==) |-->Input Device "<default keyboard>"
-	 *     | [3898550.944] (==) The core pointer device wasn't specified explicitly in the layout.
+	 *     | [3910736.617] (==) Disabling SIGIO handlers for input devices
+	 *     | [3910736.619] (==) Not automatically adding devices
+	 *     | [3910736.620] (==) Not automatically enabling devices
+	 *     | [3910736.624] (WW) The directory "/usr/share/fonts/X11/misc/" does not exist.
+	 *     | [3910736.625] 	Entry deleted from font path.
+	 *     | [3910736.626] (WW) The directory "/usr/share/fonts/X11/ttf/" does not exist.
+	 *     | [3910736.627] 	Entry deleted from font path.
+	 *     | [3910736.629] (WW) The directory "/usr/share/fonts/X11/otf/" does not exist.
+	 *     | [3910736.630] 	Entry deleted from font path.
+	 *     | [3910736.632] (WW) The directory "/usr/share/fonts/X11/Type1/" does not exist.
+	 *     | [3910736.633] 	Entry deleted from font path.
+	 *     | [3910736.635] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
+	 *     | [3910736.636] 	Entry deleted from font path.
+	 *     | [3910736.638] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
+	 *     | [3910736.639] 	Entry deleted from font path.
+	 *     | [3910736.640] (==) FontPath set to:
+	 *     | 	built-ins
+	 *     | [3910736.642] (==) ModulePath set to "/lib/xorg/modules"
+	 *     | [3910736.645] (==) |-->Input Device "<default pointer>"
+	 *     | [3910736.647] (==) |-->Input Device "<default keyboard>"
+	 *     | [3910736.648] (==) The core pointer device wasn't specified explicitly in the layout.
 	 *     | 	Using the default mouse configuration.
-	 *     | [3898550.947] (==) The core keyboard device wasn't specified explicitly in the layout.
+	 *     | [3910736.649] (==) The core keyboard device wasn't specified explicitly in the layout.
 	 *     | 	Using the default keyboard configuration.
-	 *     | [3898550.950] (II) LoadModule: "extmod"
-	 *     | [3898550.976] (II) Loading /lib/xorg/modules/extensions/libextmod.so
-	 *     | [3898551.110] (II) Module extmod: vendor="X.Org Foundation"
-	 *     | [3898551.130] 	compiled for 1.12.2, module version = 1.0.0
-	 *     | [3898551.150] 	Module class: X.Org Server Extension
-	 *     | [3898551.170] 	ABI class: X.Org Server Extension, version 6.0
-	 *     | [3898551.200] (II) Loading extension MIT-SCREEN-SAVER
-	 *     | [3898551.220] (II) Loading extension XFree86-VidModeExtension
-	 *     | [3898551.240] (II) Loading extension XFree86-DGA
-	 *     | [3898551.270] (II) Loading extension DPMS
-	 *     | [3898551.290] (II) Loading extension XVideo
-	 *     | [3898551.320] (II) Loading extension XVideo-MotionCompensation
-	 *     | [3898551.350] (II) Loading extension X-Resource
-	 *     | [3898551.370] (II) LoadModule: "dbe"
-	 *     | [3898551.480] (II) Loading /lib/xorg/modules/extensions/libdbe.so
-	 *     | [3898551.560] (II) Module dbe: vendor="X.Org Foundation"
-	 *     | [3898551.580] 	compiled for 1.12.2, module version = 1.0.0
-	 *     | [3898551.600] 	Module class: X.Org Server Extension
-	 *     | [3898551.620] 	ABI class: X.Org Server Extension, version 6.0
-	 *     | [3898551.650] (II) Loading extension DOUBLE-BUFFER
-	 *     | [3898551.670] (II) LoadModule: "record"
-	 *     | [3898551.780] (II) Loading /lib/xorg/modules/extensions/librecord.so
-	 *     | [3898551.890] (II) Module record: vendor="X.Org Foundation"
-	 *     | [3898551.910] 	compiled for 1.12.2, module version = 1.13.0
-	 *     | [3898551.940] 	Module class: X.Org Server Extension
-	 *     | [3898551.950] 	ABI class: X.Org Server Extension, version 6.0
-	 *     | [3898551.980] (II) Loading extension RECORD
-	 *     | [3898551.101] (II) LoadModule: "vesa"
-	 *     | [3898551.141] (II) Loading /lib/xorg/modules/drivers/vesa_drv.so
-	 *     | [3898551.149] (II) Module vesa: vendor="X.Org Foundation"
-	 *     | [3898551.153] 	compiled for 1.12.2, module version = 2.3.1
-	 *     | [3898551.155] 	Module class: X.Org Video Driver
-	 *     | [3898551.157] 	ABI class: X.Org Video Driver, version 12.0
-	 *     | [3898551.160] (II) LoadModule: "fbdev"
-	 *     | [3898551.212] (WW) Warning, couldn't open module fbdev
-	 *     | [3898551.214] (II) UnloadModule: "fbdev"
-	 *     | [3898551.215] (II) Unloading fbdev
-	 *     | [3898551.217] (EE) Failed to load module "fbdev" (module does not exist, 0)
-	 *     | [3898551.219] (II) LoadModule: "mouse"
-	 *     | [3898551.266] (WW) Warning, couldn't open module mouse
-	 *     | [3898551.268] (II) UnloadModule: "mouse"
-	 *     | [3898551.269] (II) Unloading mouse
-	 *     | [3898551.271] (EE) Failed to load module "mouse" (module does not exist, 0)
-	 *     | [3898551.274] (II) LoadModule: "kbd"
-	 *     | [3898551.320] (WW) Warning, couldn't open module kbd
-	 *     | [3898551.322] (II) UnloadModule: "kbd"
-	 *     | [3898551.324] (II) Unloading kbd
-	 *     | [3898551.325] (EE) Failed to load module "kbd" (module does not exist, 0)
-	 *     | [3898551.327] (II) VESA: driver for VESA chipsets: vesa
-	 *     | [3898551.332] (--) using VT number 0
+	 *     | [3910736.652] (II) LoadModule: "extmod"
+	 *     | [3910736.670] (II) Loading /lib/xorg/modules/extensions/libextmod.so
+	 *     | [3910736.691] (II) Module extmod: vendor="X.Org Foundation"
+	 *     | [3910736.692] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3910736.694] 	Module class: X.Org Server Extension
+	 *     | [3910736.695] 	ABI class: X.Org Server Extension, version 6.0
+	 *     | [3910736.697] (II) Loading extension MIT-SCREEN-SAVER
+	 *     | [3910736.698] (II) Loading extension XFree86-VidModeExtension
+	 *     | [3910736.699] (II) Loading extension XFree86-DGA
+	 *     | [3910736.701] (II) Loading extension DPMS
+	 *     | [3910736.702] (II) Loading extension XVideo
+	 *     | [3910736.704] (II) Loading extension XVideo-MotionCompensation
+	 *     | [3910736.705] (II) Loading extension X-Resource
+	 *     | [3910736.706] (II) LoadModule: "dbe"
+	 *     | [3910736.712] (II) Loading /lib/xorg/modules/extensions/libdbe.so
+	 *     | [3910736.716] (II) Module dbe: vendor="X.Org Foundation"
+	 *     | [3910736.718] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3910736.719] 	Module class: X.Org Server Extension
+	 *     | [3910736.720] 	ABI class: X.Org Server Extension, version 6.0
+	 *     | [3910736.722] (II) Loading extension DOUBLE-BUFFER
+	 *     | [3910736.723] (II) LoadModule: "record"
+	 *     | [3910736.729] (II) Loading /lib/xorg/modules/extensions/librecord.so
+	 *     | [3910736.737] (II) Module record: vendor="X.Org Foundation"
+	 *     | [3910736.738] 	compiled for 1.12.2, module version = 1.13.0
+	 *     | [3910736.740] 	Module class: X.Org Server Extension
+	 *     | [3910736.742] 	ABI class: X.Org Server Extension, version 6.0
+	 *     | [3910736.743] (II) Loading extension RECORD
+	 *     | [3910736.744] (II) LoadModule: "vesa"
+	 *     | [3910736.781] (II) Loading /lib/xorg/modules/drivers/vesa_drv.so
+	 *     | [3910736.788] (II) Module vesa: vendor="X.Org Foundation"
+	 *     | [3910736.789] 	compiled for 1.12.2, module version = 2.3.1
+	 *     | [3910736.791] 	Module class: X.Org Video Driver
+	 *     | [3910736.793] 	ABI class: X.Org Video Driver, version 12.0
+	 *     | [3910736.795] (II) LoadModule: "fbdev"
+	 *     | [3910736.829] (WW) Warning, couldn't open module fbdev
+	 *     | [3910736.830] (II) UnloadModule: "fbdev"
+	 *     | [3910736.832] (II) Unloading fbdev
+	 *     | [3910736.833] (EE) Failed to load module "fbdev" (module does not exist, 0)
+	 *     | [3910736.834] (II) LoadModule: "mouse"
+	 *     | [3910736.869] (WW) Warning, couldn't open module mouse
+	 *     | [3910736.870] (II) UnloadModule: "mouse"
+	 *     | [3910736.872] (II) Unloading mouse
+	 *     | [3910736.873] (EE) Failed to load module "mouse" (module does not exist, 0)
+	 *     | [3910736.874] (II) LoadModule: "kbd"
+	 *     | [3910736.909] (WW) Warning, couldn't open module kbd
+	 *     | [3910736.910] (II) UnloadModule: "kbd"
+	 *     | [3910736.911] (II) Unloading kbd
+	 *     | [3910736.912] (EE) Failed to load module "kbd" (module does not exist, 0)
+	 *     | [3910736.916] (II) VESA: driver for VESA chipsets: vesa
+	 *     | [3910736.919] (--) using VT number 0
 	 *     | 
-	 *     | [3898551.338] (WW) xf86OpenConsole: setpgid failed: Operation not permitted
-	 *     | [3898551.383] (WW) VGA arbiter: cannot open kernel arbiter, no multi-card support
-	 *     | [3898551.390] (II) Loading sub module "vbe"
-	 *     | [3898551.391] (II) LoadModule: "vbe"
-	 *     | [3898551.409] (II) Loading /lib/xorg/modules/libvbe.so
-	 *     | [3898551.416] (II) Module vbe: vendor="X.Org Foundation"
-	 *     | [3898551.417] 	compiled for 1.12.2, module version = 1.1.0
-	 *     | [3898551.419] 	ABI class: X.Org Video Driver, version 12.0
-	 *     | [3898551.423] (II) Loading sub module "int10"
-	 *     | [3898551.424] (II) LoadModule: "int10"
-	 *     | [3898551.436] (II) Loading /lib/xorg/modules/libint10.so
-	 *     | [3898551.447] (II) Module int10: vendor="X.Org Foundation"
-	 *     | [3898551.449] 	compiled for 1.12.2, module version = 1.0.0
-	 *     | [3898551.451] 	ABI class: X.Org Video Driver, version 12.0
-	 *     | [3898551.453] (II) VESA(0): initializing int10
-	 *     | [3898551.473] (II) VESA(0): Primary V_BIOS segment is: 0xc000
-	 *     | [3898551.508] (II) VESA(0): VESA BIOS detected
-	 *     | [3898551.511] (II) VESA(0): VESA VBE Version 3.0
-	 *     | [3898551.512] (II) VESA(0): VESA VBE Total Mem: 16384 kB
-	 *     | [3898551.515] (II) VESA(0): VESA VBE OEM: 
-	 *     | [3898551.994] (II) VESA(0): Creating default Display subsection in Screen section
+	 *     | [3910736.924] (WW) xf86OpenConsole: setpgid failed: Operation not permitted
+	 *     | [3910736.958] (WW) VGA arbiter: cannot open kernel arbiter, no multi-card support
+	 *     | [3910736.960] (II) Loading sub module "vbe"
+	 *     | [3910736.962] (II) LoadModule: "vbe"
+	 *     | [3910736.973] (II) Loading /lib/xorg/modules/libvbe.so
+	 *     | [3910736.981] (II) Module vbe: vendor="X.Org Foundation"
+	 *     | [3910736.982] 	compiled for 1.12.2, module version = 1.1.0
+	 *     | [3910736.983] 	ABI class: X.Org Video Driver, version 12.0
+	 *     | [3910736.986] (II) Loading sub module "int10"
+	 *     | [3910736.988] (II) LoadModule: "int10"
+	 *     | [3910736.996] (II) Loading /lib/xorg/modules/libint10.so
+	 *     | [3910737.200] (II) Module int10: vendor="X.Org Foundation"
+	 *     | [3910737.400] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3910737.500] 	ABI class: X.Org Video Driver, version 12.0
+	 *     | [3910737.700] (II) VESA(0): initializing int10
+	 *     | [3910737.250] (II) VESA(0): Primary V_BIOS segment is: 0xc000
+	 *     | [3910737.510] (II) VESA(0): VESA BIOS detected
+	 *     | [3910737.530] (II) VESA(0): VESA VBE Version 3.0
+	 *     | [3910737.540] (II) VESA(0): VESA VBE Total Mem: 16384 kB
+	 *     | [3910737.560] (II) VESA(0): VESA VBE OEM: SeaBIOS VBE(C) 2011
+	 *     | [3910737.580] (II) VESA(0): VESA VBE OEM Software Rev: 0.0
+	 *     | [3910737.610] (II) VESA(0): VESA VBE OEM Vendor: SeaBIOS Developers
+	 *     | [3910737.630] (II) VESA(0): VESA VBE OEM Product: SeaBIOS VBE Adapter
+	 *     | [3910737.640] (II) VESA(0): VESA VBE OEM Product Rev: Rev. 1
+	 *     | [3910737.395] (II) VESA(0): Creating default Display subsection in Screen section
 	 *     | 	"Builtin Default vesa Screen 0" for depth/fbbpp 24/32
-	 *     | [3898551.997] (==) VESA(0): Depth 24, (--) framebuffer bpp 32
-	 *     | [3898551.999] (==) VESA(0): RGB weight 888
-	 *     | [3898552.200] (==) VESA(0): Default visual is TrueColor
-	 *     | [3898552.500] (==) VESA(0): Using gamma correction (1.0, 1.0, 1.0)
-	 *     | [3898552.600] (II) Loading sub module "ddc"
-	 *     | [3898552.800] (II) LoadModule: "ddc"
-	 *     | [3898552.110] (II) Module "ddc" already built-in
-	 *     | [3898552.240] (II) VESA(0): VESA VBE PanelID invalid
-	 *     | [3898552.280] (II) VESA(0): Searching for matching VESA mode(s):
-	 *     | ...
-	 *     | [3898766.297] (II) VESA(0): Total Memory: 256 64KB banks (16384kB)
-	 *     | [3898766.301] (II) VESA(0): <default monitor>: Using default hsync range of 31.50-48.00 kHz
-	 *     | [3898766.302] (II) VESA(0): <default monitor>: Using default vrefresh range of 50.00-70.00 Hz
-	 *     | [3898766.303] (II) VESA(0): <default monitor>: Using default maximum pixel clock of 65.00 MHz
-	 *     | [3898766.304] (WW) VESA(0): Unable to estimate virtual size
-	 *     | [3898766.306] (II) VESA(0): Not using built-in mode "2560x1600" (no mode of this name)
-	 *     | [3898766.307] (II) VESA(0): Not using built-in mode "1920x1200" (no mode of this name)
-	 *     | [3898766.308] (II) VESA(0): Not using built-in mode "1920x1080" (no mode of this name)
-	 *     | [3898766.309] (II) VESA(0): Not using built-in mode "1600x1200" (no mode of this name)
-	 *     | [3898766.309] (II) VESA(0): Not using built-in mode "1680x1050" (no mode of this name)
-	 *     | [3898766.310] (II) VESA(0): Not using built-in mode "1400x1050" (no mode of this name)
-	 *     | [3898766.311] (II) VESA(0): Not using built-in mode "1280x1024" (no mode of this name)
-	 *     | [3898766.312] (II) VESA(0): Not using built-in mode "1440x900" (no mode of this name)
-	 *     | [3898766.313] (II) VESA(0): Not using built-in mode "1280x960" (no mode of this name)
-	 *     | [3898766.314] (II) VESA(0): Not using built-in mode "1280x800" (no mode of this name)
-	 *     | [3898766.315] (II) VESA(0): Not using built-in mode "1152x864" (no mode of this name)
-	 *     | [3898766.316] (II) VESA(0): Not using built-in mode "1280x768" (no mode of this name)
-	 *     | [3898766.317] (II) VESA(0): Not using built-in mode "1280x720" (no mode of this name)
-	 *     | [3898766.318] (II) VESA(0): Not using built-in mode "1024x768" (no mode of this name)
-	 *     | [3898766.319] (II) VESA(0): Not using built-in mode "800x600" (no mode of this name)
-	 *     | [3898766.320] (II) VESA(0): Not using built-in mode "640x480" (no mode of this name)
-	 *     | [3898766.321] (II) VESA(0): Not using built-in mode "640x400" (no mode of this name)
-	 *     | [3898766.322] (II) VESA(0): Not using built-in mode "320x200" (no mode of this name)
-	 *     | [3898766.323] (WW) VESA(0): No valid modes left. Trying less strict filter...
-	 *     | [3898766.324] (II) VESA(0): <default monitor>: Using hsync range of 31.50-48.00 kHz
-	 *     | [3898766.325] (II) VESA(0): <default monitor>: Using vrefresh range of 50.00-70.00 Hz
-	 *     | [3898766.326] (II) VESA(0): <default monitor>: Using maximum pixel clock of 65.00 MHz
-	 *     | [3898766.327] (WW) VESA(0): Unable to estimate virtual size
-	 *     | [3898766.330] (II) VESA(0): Not using built-in mode "2560x1600" (hsync out of range)
-	 *     | [3898766.331] (II) VESA(0): Not using built-in mode "1920x1200" (hsync out of range)
-	 *     | [3898766.332] (II) VESA(0): Not using built-in mode "1920x1080" (hsync out of range)
-	 *     | [3898766.333] (II) VESA(0): Not using built-in mode "1600x1200" (hsync out of range)
-	 *     | [3898766.334] (II) VESA(0): Not using built-in mode "1680x1050" (hsync out of range)
-	 *     | [3898766.335] (II) VESA(0): Not using built-in mode "1400x1050" (hsync out of range)
-	 *     | [3898766.336] (II) VESA(0): Not using built-in mode "1280x1024" (hsync out of range)
-	 *     | [3898766.337] (II) VESA(0): Not using built-in mode "1440x900" (hsync out of range)
-	 *     | [3898766.338] (II) VESA(0): Not using built-in mode "1280x960" (hsync out of range)
-	 *     | [3898766.339] (II) VESA(0): Not using built-in mode "1280x800" (hsync out of range)
-	 *     | [3898766.340] (II) VESA(0): Not using built-in mode "1152x864" (hsync out of range)
-	 *     | [3898766.341] (II) VESA(0): Not using built-in mode "1280x768" (hsync out of range)
-	 *     | [3898766.342] (II) VESA(0): Not using built-in mode "640x400" (hsync out of range)
-	 *     | [3898766.343] (II) VESA(0): Not using built-in mode "320x200" (illegal horizontal timings)
-	 *     | [3898766.345] (--) VESA(0): Virtual size is 1280x768 (pitch 1280)
-	 *     | [3898766.346] (**) VESA(0): *Built-in mode "1280x720"
-	 *     | [3898766.347] (**) VESA(0): *Built-in mode "1024x768"
-	 *     | [3898766.348] (**) VESA(0): *Built-in mode "800x600"
-	 *     | [3898766.349] (**) VESA(0): *Built-in mode "640x480"
-	 *     | [3898766.350] (==) VESA(0): DPI set to (96, 96)
-	 *     | [3898766.353] (II) VESA(0): Attempting to use 60Hz refresh for mode "1024x768" (144)
-	 *     | [3898766.361] (II) VESA(0): Attempting to use 60Hz refresh for mode "800x600" (143)
-	 *     | [3898766.366] (II) VESA(0): Attempting to use 60Hz refresh for mode "640x480" (142)
-	 *     | [3898766.372] (**) VESA(0): Using "Shadow Framebuffer"
-	 *     | [3898766.373] (II) Loading sub module "shadow"
-	 *     | [3898766.374] (II) LoadModule: "shadow"
-	 *     | [3898766.381] (II) Loading /lib/xorg/modules/libshadow.so
-	 *     | [3898766.386] (II) Module shadow: vendor="X.Org Foundation"
-	 *     | [3898766.387] 	compiled for 1.12.2, module version = 1.1.0
-	 *     | [3898766.388] 	ABI class: X.Org ANSI C Emulation, version 0.4
-	 *     | [3898766.389] (II) Loading sub module "fb"
-	 *     | [3898766.390] (II) LoadModule: "fb"
-	 *     | [3898766.396] (II) Loading /lib/xorg/modules/libfb.so
-	 *     | [3898766.401] (II) Module fb: vendor="X.Org Foundation"
-	 *     | [3898766.402] 	compiled for 1.12.2, module version = 1.0.0
-	 *     | [3898766.403] 	ABI class: X.Org ANSI C Emulation, version 0.4
-	 *     | [3898766.407] (==) Depth 24 pixmap format is 32 bpp
-	 *     | [3898766.409] (II) Loading sub module "int10"
-	 *     | [3898766.410] (II) LoadModule: "int10"
-	 *     | [3898766.416] (II) Loading /lib/xorg/modules/libint10.so
-	 *     | [3898766.417] (II) Module int10: vendor="X.Org Foundation"
-	 *     | [3898766.418] 	compiled for 1.12.2, module version = 1.0.0
-	 *     | [3898766.419] 	ABI class: X.Org Video Driver, version 12.0
-	 *     | [3898766.420] (II) VESA(0): initializing int10
-	 *     | [3898766.424] (II) VESA(0): Primary V_BIOS segment is: 0xc000
-	 *     | [3898766.429] (II) VESA(0): VESA BIOS detected
-	 *     | [3898766.429] (II) VESA(0): VESA VBE Version 3.0
-	 *     | [3898766.430] (II) VESA(0): VESA VBE Total Mem: 16384 kB
-	 *     | [3898766.431] (II) VESA(0): VESA VBE OEM: 
-	 *     | [3898766.433] (II) VESA(0): virtual address = 00000000,
+	 *     | [3910737.397] (==) VESA(0): Depth 24, (--) framebuffer bpp 32
+	 *     | [3910737.398] (==) VESA(0): RGB weight 888
+	 *     | [3910737.400] (==) VESA(0): Default visual is TrueColor
+	 *     | [3910737.402] (==) VESA(0): Using gamma correction (1.0, 1.0, 1.0)
+	 *     | [3910737.403] (II) Loading sub module "ddc"
+	 *     | [3910737.404] (II) LoadModule: "ddc"
+	 *     | [3910737.407] (II) Module "ddc" already built-in
+	 *     | [3910737.416] (II) VESA(0): VESA VBE DDC not supported
+	 *     | [3910737.425] (II) VESA(0): VESA VBE PanelID invalid
+	 *     | [3910737.427] (II) VESA(0): Searching for matching VESA mode(s):
+	 *     | [3910737.749] 
+	 *     | [3910737.750] (II) VESA(0): Total Memory: 256 64KB banks (16384kB)
+	 *     | [3910737.754] (II) VESA(0): <default monitor>: Using default hsync range of 31.50-48.00 kHz
+	 *     | [3910737.755] (II) VESA(0): <default monitor>: Using default vrefresh range of 50.00-70.00 Hz
+	 *     | [3910737.756] (II) VESA(0): <default monitor>: Using default maximum pixel clock of 65.00 MHz
+	 *     | [3910737.757] (WW) VESA(0): Unable to estimate virtual size
+	 *     | [3910737.760] (II) VESA(0): Not using built-in mode "2560x1600" (no mode of this name)
+	 *     | [3910737.762] (II) VESA(0): Not using built-in mode "1920x1200" (no mode of this name)
+	 *     | [3910737.763] (II) VESA(0): Not using built-in mode "1920x1080" (no mode of this name)
+	 *     | [3910737.764] (II) VESA(0): Not using built-in mode "1600x1200" (no mode of this name)
+	 *     | [3910737.765] (II) VESA(0): Not using built-in mode "1680x1050" (no mode of this name)
+	 *     | [3910737.767] (II) VESA(0): Not using built-in mode "1400x1050" (no mode of this name)
+	 *     | [3910737.768] (II) VESA(0): Not using built-in mode "1280x1024" (no mode of this name)
+	 *     | [3910737.771] (II) VESA(0): Not using built-in mode "1440x900" (no mode of this name)
+	 *     | [3910737.772] (II) VESA(0): Not using built-in mode "1280x960" (no mode of this name)
+	 *     | [3910737.774] (II) VESA(0): Not using built-in mode "1280x800" (no mode of this name)
+	 *     | [3910737.775] (II) VESA(0): Not using built-in mode "1152x864" (no mode of this name)
+	 *     | [3910737.777] (II) VESA(0): Not using built-in mode "1280x768" (no mode of this name)
+	 *     | [3910737.778] (II) VESA(0): Not using built-in mode "1280x720" (no mode of this name)
+	 *     | [3910737.779] (II) VESA(0): Not using built-in mode "1024x768" (no mode of this name)
+	 *     | [3910737.780] (II) VESA(0): Not using built-in mode "800x600" (no mode of this name)
+	 *     | [3910737.782] (II) VESA(0): Not using built-in mode "640x480" (no mode of this name)
+	 *     | [3910737.783] (II) VESA(0): Not using built-in mode "640x400" (no mode of this name)
+	 *     | [3910737.784] (II) VESA(0): Not using built-in mode "320x200" (no mode of this name)
+	 *     | [3910737.786] (WW) VESA(0): No valid modes left. Trying less strict filter...
+	 *     | [3910737.787] (II) VESA(0): <default monitor>: Using hsync range of 31.50-48.00 kHz
+	 *     | [3910737.788] (II) VESA(0): <default monitor>: Using vrefresh range of 50.00-70.00 Hz
+	 *     | [3910737.789] (II) VESA(0): <default monitor>: Using maximum pixel clock of 65.00 MHz
+	 *     | [3910737.790] (WW) VESA(0): Unable to estimate virtual size
+	 *     | [3910737.794] (II) VESA(0): Not using built-in mode "2560x1600" (hsync out of range)
+	 *     | [3910737.796] (II) VESA(0): Not using built-in mode "1920x1200" (hsync out of range)
+	 *     | [3910737.797] (II) VESA(0): Not using built-in mode "1920x1080" (hsync out of range)
+	 *     | [3910737.798] (II) VESA(0): Not using built-in mode "1600x1200" (hsync out of range)
+	 *     | [3910737.800] (II) VESA(0): Not using built-in mode "1680x1050" (hsync out of range)
+	 *     | [3910737.802] (II) VESA(0): Not using built-in mode "1400x1050" (hsync out of range)
+	 *     | [3910737.803] (II) VESA(0): Not using built-in mode "1280x1024" (hsync out of range)
+	 *     | [3910737.805] (II) VESA(0): Not using built-in mode "1440x900" (hsync out of range)
+	 *     | [3910737.806] (II) VESA(0): Not using built-in mode "1280x960" (hsync out of range)
+	 *     | [3910737.807] (II) VESA(0): Not using built-in mode "1280x800" (hsync out of range)
+	 *     | [3910737.808] (II) VESA(0): Not using built-in mode "1152x864" (hsync out of range)
+	 *     | [3910737.810] (II) VESA(0): Not using built-in mode "1280x768" (hsync out of range)
+	 *     | [3910737.812] (II) VESA(0): Not using built-in mode "640x400" (hsync out of range)
+	 *     | [3910737.813] (II) VESA(0): Not using built-in mode "320x200" (illegal horizontal timings)
+	 *     | [3910737.815] (--) VESA(0): Virtual size is 1280x768 (pitch 1280)
+	 *     | [3910737.817] (**) VESA(0): *Built-in mode "1280x720"
+	 *     | [3910737.818] (**) VESA(0): *Built-in mode "1024x768"
+	 *     | [3910737.819] (**) VESA(0): *Built-in mode "800x600"
+	 *     | [3910737.819] (**) VESA(0): *Built-in mode "640x480"
+	 *     | [3910737.821] (==) VESA(0): DPI set to (96, 96)
+	 *     | [3910737.826] (II) VESA(0): Attempting to use 60Hz refresh for mode "1024x768" (144)
+	 *     | [3910737.835] (II) VESA(0): Attempting to use 60Hz refresh for mode "800x600" (143)
+	 *     | [3910737.842] (II) VESA(0): Attempting to use 60Hz refresh for mode "640x480" (142)
+	 *     | [3910737.850] (**) VESA(0): Using "Shadow Framebuffer"
+	 *     | [3910737.852] (II) Loading sub module "shadow"
+	 *     | [3910737.853] (II) LoadModule: "shadow"
+	 *     | [3910737.885] (II) Loading /lib/xorg/modules/libshadow.so
+	 *     | [3910737.897] (II) Module shadow: vendor="X.Org Foundation"
+	 *     | [3910737.898] 	compiled for 1.12.2, module version = 1.1.0
+	 *     | [3910737.900] 	ABI class: X.Org ANSI C Emulation, version 0.4
+	 *     | [3910737.901] (II) Loading sub module "fb"
+	 *     | [3910737.902] (II) LoadModule: "fb"
+	 *     | [3910737.910] (II) Loading /lib/xorg/modules/libfb.so
+	 *     | [3910737.917] (II) Module fb: vendor="X.Org Foundation"
+	 *     | [3910737.918] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3910737.920] 	ABI class: X.Org ANSI C Emulation, version 0.4
+	 *     | [3910737.927] (==) Depth 24 pixmap format is 32 bpp
+	 *     | [3910737.929] (II) Loading sub module "int10"
+	 *     | [3910737.930] (II) LoadModule: "int10"
+	 *     | [3910737.939] (II) Loading /lib/xorg/modules/libint10.so
+	 *     | [3910737.940] (II) Module int10: vendor="X.Org Foundation"
+	 *     | [3910737.941] 	compiled for 1.12.2, module version = 1.0.0
+	 *     | [3910737.943] 	ABI class: X.Org Video Driver, version 12.0
+	 *     | [3910737.944] (II) VESA(0): initializing int10
+	 *     | [3910737.949] (II) VESA(0): Primary V_BIOS segment is: 0xc000
+	 *     | [3910737.955] (II) VESA(0): VESA BIOS detected
+	 *     | [3910737.956] (II) VESA(0): VESA VBE Version 3.0
+	 *     | [3910737.958] (II) VESA(0): VESA VBE Total Mem: 16384 kB
+	 *     | [3910737.959] (II) VESA(0): VESA VBE OEM: SeaBIOS VBE(C) 2011
+	 *     | [3910737.960] (II) VESA(0): VESA VBE OEM Software Rev: 0.0
+	 *     | [3910737.961] (II) VESA(0): VESA VBE OEM Vendor: SeaBIOS Developers
+	 *     | [3910737.962] (II) VESA(0): VESA VBE OEM Product: SeaBIOS VBE Adapter
+	 *     | [3910737.963] (II) VESA(0): VESA VBE OEM Product Rev: Rev. 1
+	 *     | [3910737.965] (II) VESA(0): virtual address = 00000000,
 	 *     | 	physical address = 0xfd000000, size = 16777216
-	 *     | [3898766.435] (II) VESA(0): virtual address = 10082000,
+	 *     | [3910737.968] (II) VESA(0): virtual address = 100A8000,
 	 *     | 	physical address = 0xa0000, size = 65536
-	 *     | [3898766.445] (II) VESA(0): Setting up VESA Mode 0x18F (1280x720)
-	 *     | [3898766.470] (==) VESA(0): Default visual is TrueColor
-	 *     | [3898766.490] (==) VESA(0): Backing store disabled
-	 *     | [3898766.499] (==) VESA(0): DPMS enabled
-	 *     | [3898766.502] (==) RandR enabled
-	 *     | [3898766.504] (II) Initializing built-in extension Generic Event Extension
-	 *     | [3898766.505] (II) Initializing built-in extension SHAPE
-	 *     | [3898766.506] (II) Initializing built-in extension MIT-SHM
-	 *     | [3898766.506] (II) Initializing built-in extension XInputExtension
-	 *     | [3898766.507] (II) Initializing built-in extension XTEST
-	 *     | [3898766.508] (II) Initializing built-in extension BIG-REQUESTS
-	 *     | [3898766.509] (II) Initializing built-in extension SYNC
-	 *     | [3898766.510] (II) Initializing built-in extension XKEYBOARD
-	 *     | [3898766.511] (II) Initializing built-in extension XC-MISC
-	 *     | [3898766.512] (II) Initializing built-in extension XFIXES
-	 *     | [3898766.513] (II) Initializing built-in extension XFree86-Bigfont
-	 *     | [3898766.514] (II) Initializing built-in extension RENDER
-	 *     | [3898766.514] (II) Initializing built-in extension RANDR
-	 *     | [3898766.515] (II) Initializing built-in extension COMPOSITE
-	 *     | [3898766.516] (II) Initializing built-in extension DAMAGE
-	 *     | [3898766.839] [dix] failed to set default font path ''
+	 *     | [3910738.200] (II) VESA(0): Setting up VESA Mode 0x18F (1280x720)
+	 *     | [3910738.270] (==) VESA(0): Default visual is TrueColor
+	 *     | [3910738.630] (==) VESA(0): Backing store disabled
+	 *     | [3910738.840] (==) VESA(0): DPMS enabled
+	 *     | [3910738.880] (==) RandR enabled
+	 *     | [3910738.920] (II) Initializing built-in extension Generic Event Extension
+	 *     | [3910738.940] (II) Initializing built-in extension SHAPE
+	 *     | [3910738.950] (II) Initializing built-in extension MIT-SHM
+	 *     | [3910738.970] (II) Initializing built-in extension XInputExtension
+	 *     | [3910738.980] (II) Initializing built-in extension XTEST
+	 *     | [3910738.100] (II) Initializing built-in extension BIG-REQUESTS
+	 *     | [3910738.101] (II) Initializing built-in extension SYNC
+	 *     | [3910738.102] (II) Initializing built-in extension XKEYBOARD
+	 *     | [3910738.103] (II) Initializing built-in extension XC-MISC
+	 *     | [3910738.104] (II) Initializing built-in extension XFIXES
+	 *     | [3910738.105] (II) Initializing built-in extension XFree86-Bigfont
+	 *     | [3910738.107] (II) Initializing built-in extension RENDER
+	 *     | [3910738.108] (II) Initializing built-in extension RANDR
+	 *     | [3910738.109] (II) Initializing built-in extension COMPOSITE
+	 *     | [3910738.110] (II) Initializing built-in extension DAMAGE
+	 *     | [3910738.404] (EE) XKB: Couldn't open rules file /usr/share/X11/xkb/rules/base
+	 *     | [3910738.406] (EE) XKB: Failed to load keymap. Loading default keymap instead.
+	 *     | [3910738.408] (EE) XKB: Couldn't open rules file /usr/share/X11/xkb/rules/base
+	 *     | [3910738.409] XKB: Failed to compile keymap
+	 *     | [3910738.411] Keyboard initialization failed. This could be a missing or incorrect setup of xkeyboard-config.
+	 *     | [3910738.413] 
 	 *     | Fatal server error:
-	 *     | [3898766.841] could not open default font 'fixed'
-	 *     | [3898766.843] 
+	 *     | [3910738.414] Failed to activate core devices.
+	 *     | [3910738.416] 
 	 *     | Please consult the Griefer@Work support 
 	 *     | 	 at https://github.com/GrieferAtWork/KOSmk4
 	 *     |  for help. 
-	 *     | [3898766.844] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
-	 *     | [3898766.845] 
-	 *     | [3898766.883] Server terminated with error (1). Closing log file.
+	 *     | [3910738.417] Please also check the log file at "/var/log/Xorg.0.log" for additional information.
+	 *     | [3910738.419] 
+	 *     | [3910738.503] Server terminated with error (1). Closing log file.
 	 */
 
 	return state;

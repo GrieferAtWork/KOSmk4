@@ -216,7 +216,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/hw/xfree86/Xorg" ]; then
 				--with-font75dpidir="$X_fontrootdir/75dpi" \
 				--with-font100dpidir="$X_fontrootdir/100dpi" \
 				--with-default-font-path="\
-$X_fontrootdir/misc/,$X_fontrootdir/ttf/,$X_fontrootdir/otf/,\
+built-ins,$X_fontrootdir/misc/,$X_fontrootdir/ttf/,$X_fontrootdir/otf/,\
 $X_fontrootdir/Type1/,$X_fontrootdir/100dpi/,$X_fontrootdir/75dpi/" \
 				--with-xkb-path="$X_xkb_path" \
 				--with-xkb-output="$X_xkb_output" \
