@@ -454,10 +454,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Latest milestone:
-	 *     - Starting the Xorg server will actually go so far as to:
-	 *       - Switch to graphics mode
-	 *       - Resize the monitor to a resolution much larger than my vga driver is capable of
-	 *       - But that's also where it ends...
+	 *     - The Xorg server actually manages to start & sets up graphics properly:
+	 *       $ Xorg
+	 *       Result: Resize QEMU to a much larger resolution, and display a black screen
+	 *       $ Xorg -wr
+	 *       Result: Resize QEMU to a much larger resolution, and display a white screen
+	 *       -> Xorg is able to properly initialize graphics!
 	 *
 	 * Blocker:
 	 *     - Xorg server doesn't know how to interface with the mouse/keyboard:

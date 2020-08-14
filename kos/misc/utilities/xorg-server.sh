@@ -50,6 +50,9 @@
 
 # depends: xtrans
 
+# rt-depends: xkbcomp
+# rt-depends: xkeyboard-config
+
 
 # xorg-macros
 . "$KOS_MISC/utilities/misc/xorg-macros.sh"
