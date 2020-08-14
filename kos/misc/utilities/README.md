@@ -38,3 +38,5 @@ Utilities:
 - [libXxf86dga-1.1.3](https://www.x.org/releases/X11R7.7/src/everything)
 - [xorg-server-1.12.2](https://www.x.org/releases/X11R7.7/src/everything)
 - [xf86-video-vesa-2.3.1](https://www.x.org/releases/X11R7.7/src/everything)
+- [xkbcomp-1.2.4](https://www.x.org/releases/X11R7.7/src/everything)
+- [xkeyboard-config-2.6](https://www.x.org/releases/X11R7.7/src/everything)
