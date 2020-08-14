@@ -50,14 +50,14 @@
 __DECL_BEGIN
 
 struct __dos_bstat {
-	__dos_dev_t    st_dev;
-	__dos_ino_t    st_ino;
+	__uint32_t     st_dev;
+	__uint16_t     st_ino;
 	__uint16_t     st_mode;
 	__int16_t      st_nlink;
 	__int16_t      st_uid;
 	__int16_t      st_gid;
 	__int16_t    __st_pad0;
-	__dos_dev_t    st_rdev;
+	__uint32_t     st_rdev;
 #ifdef __USE_FILE_OFFSET64
 #ifdef __USE_KOS
 	union {
@@ -75,7 +75,7 @@ struct __dos_bstat {
 		__UINT32_TYPE__ st_size;
 		__UINT32_TYPE__ st_size32;
 #else /* __USE_KOS */
-		__dos_off_t    st_size;
+		__INT32_TYPE__  st_size;
 #endif /* !__USE_KOS */
 		__INT64_TYPE__ __st_pad2;
 	};
@@ -84,9 +84,9 @@ struct __dos_bstat {
 		__UINT32_TYPE__ st_size;
 		__UINT32_TYPE__ st_size32;
 	};
-#else
-	__dos_off_t    st_size;
-#endif
+#else /* ... */
+	__INT32_TYPE__ st_size;
+#endif /* !... */
 #ifdef __USE_KOS
 #ifdef __USE_TIME_BITS64
 	union { __time64_t st_atime; __time32_t st_atime32; __time64_t st_atime64; };
@@ -105,14 +105,14 @@ struct __dos_bstat {
 };
 
 struct __dos_bstat64 {
-	__dos_dev_t    st_dev;
-	__dos_ino_t    st_ino;
+	__uint32_t     st_dev;
+	__uint16_t     st_ino;
 	__uint16_t     st_mode;
 	__int16_t      st_nlink;
 	__int16_t      st_uid;
 	__int16_t      st_gid;
 	__int16_t    __st_pad0;
-	__dos_dev_t    st_rdev;
+	__uint32_t     st_rdev;
 #ifdef __USE_KOS
 	union {
 		__UINT64_TYPE__ st_size;
@@ -137,14 +137,14 @@ struct __dos_bstat64 {
 #ifdef __DEFINE_DOS_STAT_STRUCTURES
 #undef __DEFINE_DOS_STAT_STRUCTURES
 struct __dos_stat32 {
-	__dos_dev_t    st_dev;
-	__dos_ino_t    st_ino;
+	__uint32_t     st_dev;
+	__uint16_t     st_ino;
 	__uint16_t     st_mode;
 	__int16_t      st_nlink;
 	__int16_t      st_uid;
 	__int16_t      st_gid;
 	__int16_t    __st_pad0;
-	__dos_dev_t    st_rdev;
+	__uint32_t     st_rdev;
 #ifdef __USE_KOS
 	union {
 		__UINT32_TYPE__ st_size;
@@ -154,21 +154,21 @@ struct __dos_stat32 {
 	union { __time32_t st_mtime; __time32_t st_mtime32; };
 	union { __time32_t st_ctime; __time32_t st_ctime32; };
 #else /* __USE_KOS */
-	__dos_off_t    st_size;
+	__INT32_TYPE__    st_size;
 	__time32_t     st_atime;
 	__time32_t     st_mtime;
 	__time32_t     st_ctime;
 #endif /* !__USE_KOS */
 };
 struct __dos_stat32i64 {
-	__dos_dev_t    st_dev;
-	__dos_ino_t    st_ino;
+	__uint32_t     st_dev;
+	__uint16_t     st_ino;
 	__uint16_t     st_mode;
 	__int16_t      st_nlink;
 	__int16_t      st_uid;
 	__int16_t      st_gid;
 	__int16_t    __st_pad0;
-	__dos_dev_t    st_rdev;
+	__uint32_t     st_rdev;
 	__int32_t    __st_pad1;
 #ifdef __USE_KOS
 	union {
@@ -188,14 +188,14 @@ struct __dos_stat32i64 {
 	__int32_t    __st_pad2;
 };
 struct __dos_stat64i32 {
-	__dos_dev_t    st_dev;
-	__dos_ino_t    st_ino;
+	__uint32_t     st_dev;
+	__uint16_t     st_ino;
 	__uint16_t     st_mode;
 	__int16_t      st_nlink;
 	__int16_t      st_uid;
 	__int16_t      st_gid;
 	__int16_t    __st_pad0;
-	__dos_dev_t    st_rdev;
+	__uint32_t     st_rdev;
 	__int32_t    __st_pad1;
 #ifdef __USE_KOS
 	union {
@@ -209,7 +209,7 @@ struct __dos_stat64i32 {
 	union { __time64_t st_ctime; __time64_t st_ctime32; __time64_t st_ctime64; };
 #else /* __USE_KOS */
 	union {
-		__dos_off_t    st_size;
+		__INT32_TYPE__   st_size;
 		__INT64_TYPE__ __st_pad2; /* This is what DOS silently does to match the
 		                           * binary layout of `stat64i32' with `stat64'. */
 	};
@@ -219,14 +219,14 @@ struct __dos_stat64i32 {
 #endif /* !__USE_KOS */
 };
 struct __dos_stat64 {
-	__dos_dev_t    st_dev;
-	__dos_ino_t    st_ino;
+	__uint32_t     st_dev;
+	__uint16_t     st_ino;
 	__uint16_t     st_mode;
 	__int16_t      st_nlink;
 	__int16_t      st_uid;
 	__int16_t      st_gid;
 	__int16_t    __st_pad0;
-	__dos_dev_t    st_rdev;
+	__uint32_t     st_rdev;
 	__int32_t    __st_pad1;
 #ifdef __USE_KOS
 	union {

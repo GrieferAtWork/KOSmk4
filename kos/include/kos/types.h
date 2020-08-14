@@ -124,9 +124,9 @@ typedef __time64_t time64_t; /* UNIX time in seconds since 01.01.1970 */
 #ifndef __dev_t_defined
 #define __dev_t_defined 1
 #ifdef __KERNEL__
-__HYBRID_ALTINT_TYPEDEF(__typedef_dev_t, dev_t, false);
+__HYBRID_ALTINT_TYPEDEF(__dev_t, dev_t, false);
 #else /* __KERNEL__ */
-typedef __typedef_dev_t dev_t;
+typedef __dev_t dev_t;
 #endif /* !__KERNEL__ */
 #endif /* !__dev_t_defined */
 
@@ -350,7 +350,7 @@ typedef __id_t id_t;
 
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 
 #ifndef __blkcnt_t_defined

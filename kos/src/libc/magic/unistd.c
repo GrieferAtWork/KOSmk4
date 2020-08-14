@@ -199,7 +199,7 @@ typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __typedef_off_t off_t;
+typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 #ifndef __useconds_t_defined
 #define __useconds_t_defined 1

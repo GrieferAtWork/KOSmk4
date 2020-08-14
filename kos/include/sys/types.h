@@ -88,7 +88,7 @@ typedef __loff_t loff_t; /* Large file/device offset */
 
 #ifndef __ino_t_defined
 #define __ino_t_defined 1
-typedef __typedef_ino_t ino_t;  /* INode number */
+typedef __FS_TYPE(ino) ino_t;  /* INode number */
 #endif /* !__ino_t_defined */
 
 #ifdef __USE_LARGEFILE64
@@ -105,7 +105,7 @@ typedef __off64_t off64_t;
 
 #ifndef __dev_t_defined
 #define __dev_t_defined 1
-typedef __typedef_dev_t dev_t;
+typedef __dev_t dev_t;
 #endif /* !__dev_t_defined */
 
 #ifndef __gid_t_defined
@@ -130,7 +130,7 @@ typedef __uid_t uid_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined 1
-typedef __typedef_off_t off_t;
+typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __pid_t_defined
@@ -146,7 +146,7 @@ typedef __id_t id_t;
 
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
@@ -279,17 +279,17 @@ typedef __fsfilcnt64_t fsfilcnt64_t;
 /* Define ~~"aliases"~~ used by DOS. */
 #ifndef _INO_T_DEFINED
 #define _INO_T_DEFINED 1
-typedef __typedef_ino_t _ino_t;
+typedef __FS_TYPE(ino) _ino_t;
 #endif /* !_INO_T_DEFINED */
 
 #ifndef _DEV_T_DEFINED
 #define _DEV_T_DEFINED 1
-typedef __typedef_dev_t _dev_t;
+typedef __dev_t _dev_t;
 #endif /* !_DEV_T_DEFINED */
 
 #ifndef _OFF_T_DEFINED
 #define _OFF_T_DEFINED 1
-typedef __typedef_off_t _off_t;
+typedef __FS_TYPE(off) _off_t;
 #endif /* !_OFF_T_DEFINED */
 #endif /* __USE_DOS */
 

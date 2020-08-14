@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc42b062 */
+/* HASH CRC-32:0x3aea4369 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,7 +167,7 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__std_size_t_defined */
 #ifndef __std_clock_t_defined
 #define __std_clock_t_defined 1
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 #endif /* !__std_clock_t_defined */
 #ifndef __std_time_t_defined
 #define __std_time_t_defined 1

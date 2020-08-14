@@ -233,7 +233,6 @@ global knownTypeClasses: {string: string} = Dict({
 	"__quantum_diff_t"  : "TIn(__SIZEOF_QUANTUM_DIFF_T__)",
 	"clock_t"           : "TIn(__SIZEOF_CLOCK_T__)",
 	"__clock_t"         : "TIn(__SIZEOF_CLOCK_T__)",
-	"__typedef_clock_t" : "TIn(__SIZEOF_CLOCK_T__)",
 	"useconds_t"        : "TIn(__SIZEOF_USECONDS_T__)",
 	"__useconds_t"      : "TIn(__SIZEOF_USECONDS_T__)",
 	"suseconds_t"       : "TIn(__SIZEOF_SUSECONDS_T__)",

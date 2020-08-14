@@ -24,7 +24,7 @@
 %[define_replacement(time_t    = "__TM_TYPE(time)")]
 %[define_replacement(time32_t  = __time32_t)]
 %[define_replacement(time64_t  = __time64_t)]
-%[define_replacement(clock_t   = __typedef_clock_t)]
+%[define_replacement(clock_t   = __clock_t)]
 %[define_replacement(pid_t     = __pid_t)]
 %[define_replacement(clockid_t = __clockid_t)]
 %[define_replacement(timer_t   = __timer_t)]
@@ -129,7 +129,7 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__std_size_t_defined */
 #ifndef __std_clock_t_defined
 #define __std_clock_t_defined 1
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 #endif /* !__std_clock_t_defined */
 #ifndef __std_time_t_defined
 #define __std_time_t_defined 1

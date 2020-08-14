@@ -354,13 +354,13 @@ DEFINE_INTERN_ALIAS(libc__stat64i32, libc_dos_stat64);
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (__dos_dev_t)src->st_dev;
-	dst->st_ino     = (__dos_ino_t)src->st_ino32;
+	dst->st_dev     = (u32)src->st_dev;
+	dst->st_ino     = (u16)src->st_ino32;
 	dst->st_mode    = (u16)src->st_mode;
 	dst->st_nlink   = (s16)src->st_nlink;
 	dst->st_uid     = (s16)src->st_uid;
 	dst->st_gid     = (s16)src->st_gid;
-	dst->st_rdev    = (__dos_dev_t)src->st_rdev;
+	dst->st_rdev    = (u32)src->st_rdev;
 	dst->st_size32  = (u32)src->st_size32;
 	dst->st_atime32 = (time32_t)src->st_atim32.tv_sec;
 	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
@@ -369,13 +369,13 @@ convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
                       struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (__dos_dev_t)src->st_dev;
-	dst->st_ino     = (__dos_ino_t)src->st_ino32;
+	dst->st_dev     = (u32)src->st_dev;
+	dst->st_ino     = (u16)src->st_ino32;
 	dst->st_mode    = (u16)src->st_mode;
 	dst->st_nlink   = (s16)src->st_nlink;
 	dst->st_uid     = (s16)src->st_uid;
 	dst->st_gid     = (s16)src->st_gid;
-	dst->st_rdev    = (__dos_dev_t)src->st_rdev;
+	dst->st_rdev    = (u32)src->st_rdev;
 	dst->st_size64  = (u64)src->st_size64;
 	dst->st_atime32 = (time32_t)src->st_atim32.tv_sec;
 	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
@@ -385,13 +385,13 @@ convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (__dos_dev_t)src->st_dev;
-	dst->st_ino     = (__dos_ino_t)src->st_ino32;
+	dst->st_dev     = (u32)src->st_dev;
+	dst->st_ino     = (u16)src->st_ino32;
 	dst->st_mode    = (u16)src->st_mode;
 	dst->st_nlink   = (s16)src->st_nlink;
 	dst->st_uid     = (s16)src->st_uid;
 	dst->st_gid     = (s16)src->st_gid;
-	dst->st_rdev    = (__dos_dev_t)src->st_rdev;
+	dst->st_rdev    = (u32)src->st_rdev;
 	dst->st_size64  = (u64)src->st_size64;
 	dst->st_atime64 = (time64_t)src->st_atim64.tv_sec;
 	dst->st_mtime64 = (time64_t)src->st_mtim64.tv_sec;

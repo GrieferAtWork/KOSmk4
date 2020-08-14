@@ -64,10 +64,10 @@
 __SYSDECL_BEGIN
 #ifdef __CRT_HAVE___sysconf
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),(__confno))
-#define CLK_TCK ((__typedef_clock_t)__sysconf(2))
+#define CLK_TCK ((__clock_t)__sysconf(2))
 #elif defined(__CRT_HAVE_sysconf)
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),sysconf,(__confno))
-#define CLK_TCK ((__typedef_clock_t)__sysconf(2))
+#define CLK_TCK ((__clock_t)__sysconf(2))
 #else /* ... */
 #define CLK_TCK   CLOCKS_PER_SEC
 #endif /* !... */

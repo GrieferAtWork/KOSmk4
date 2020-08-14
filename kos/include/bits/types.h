@@ -564,40 +564,51 @@ typedef __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__) __fsword_t;
 #endif /* __CC__ */
 
 
-#define __SIZEOF_INO_T__   __FS_SIZEOF(INO)
-#define __SIZEOF_OFF_T__   __FS_SIZEOF(OFF)
-#define __SIZEOF_POS_T__   __FS_SIZEOF(OFF)
+#define __SIZEOF_INO_T__ __FS_SIZEOF(INO) /* == sizeof(ino_t) */
+#define __SIZEOF_OFF_T__ __FS_SIZEOF(OFF) /* == sizeof(off_t) */
+#define __SIZEOF_POS_T__ __FS_SIZEOF(OFF) /* == sizeof(pos_t) */
 
 
-#define __SIZEOF_DOS_DEV_T__   4
-#define __dos_dev_t            __UINT32_TYPE__
-#define __SIZEOF_DOS_INO_T__   2
-#define __dos_ino_t            __UINT16_TYPE__
-#define __SIZEOF_DOS_OFF_T__   4
-#define __dos_off_t            __INT32_TYPE__
-#define __SIZEOF_DOS_CLOCK_T__ 4
-#define __dos_clock_t          __LONG32_TYPE__
 
 #ifdef __CRT_DOS_PRIMARY
 /* DOS filesystem headers contain different types for these... */
-#define __typedef_dev_t            __dos_dev_t
-#define __typedef_ino_t            __dos_ino_t
-#define __typedef_off_t            __dos_off_t
-#define __typedef_clock_t          __dos_clock_t
-#define __SIZEOF_TYPEDEF_DEV_T__   __SIZEOF_DOS_DEV_T__
-#define __SIZEOF_TYPEDEF_INO_T__   __SIZEOF_DOS_INO_T__
-#define __SIZEOF_TYPEDEF_OFF_T__   __SIZEOF_DOS_OFF_T__
-#define __SIZEOF_TYPEDEF_CLOCK_T__ __SIZEOF_DOS_CLOCK_T__
-#else /* __CRT_DOS_PRIMARY */
-#define __typedef_dev_t            __dev_t
-#define __typedef_ino_t            __FS_TYPE(ino)
-#define __typedef_off_t            __FS_TYPE(off)
-#define __typedef_clock_t          __clock_t
-#define __SIZEOF_TYPEDEF_DEV_T__   __SIZEOF_DEV_T__
-#define __SIZEOF_TYPEDEF_INO_T__   __FS_SIZEOF(INO)
-#define __SIZEOF_TYPEDEF_OFF_T__   __FS_SIZEOF(OFF)
-#define __SIZEOF_TYPEDEF_CLOCK_T__ __SIZEOF_CLOCK_T__
-#endif /* !__CRT_DOS_PRIMARY */
+#undef __dev_t
+#undef __ino32_t
+#undef __ino64_t
+#undef __off_t
+#undef __off32_t
+#undef __off64_t
+#undef __pos_t
+#undef __pos32_t
+#undef __pos64_t
+#undef __clock_t
+#undef __SIZEOF_DEV_T__
+#undef __SIZEOF_INO_T__
+#undef __SIZEOF_OFF_T__
+#undef __SIZEOF_OFF32_T__
+#undef __SIZEOF_OFF64_T__
+#undef __SIZEOF_POS_T__
+#undef __SIZEOF_POS32_T__
+#undef __SIZEOF_POS64_T__
+#undef __SIZEOF_CLOCK_T__
+#define __dev_t            __UINT32_TYPE__
+#define __ino32_t          __UINT16_TYPE__
+#define __ino64_t          __UINT16_TYPE__
+#define __off32_t          __INT32_TYPE__
+#define __off64_t          __INT32_TYPE__
+#define __pos32_t          __UINT32_TYPE__
+#define __pos64_t          __UINT32_TYPE__
+#define __clock_t          __LONG32_TYPE__
+#define __SIZEOF_DEV_T__   4
+#define __SIZEOF_INO_T__   2
+#define __SIZEOF_OFF_T__   4
+#define __SIZEOF_OFF32_T__ 4
+#define __SIZEOF_OFF64_T__ 4
+#define __SIZEOF_POS_T__   4
+#define __SIZEOF_POS32_T__ 4
+#define __SIZEOF_POS64_T__ 4
+#define __SIZEOF_CLOCK_T__ 4
+#endif /* __CRT_DOS_PRIMARY */
 
 __DECL_END
 

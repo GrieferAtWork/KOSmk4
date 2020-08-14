@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85a0b5a */
+/* HASH CRC-32:0xe0d4e0bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 
 /* Store the CPU time used by this process and all its

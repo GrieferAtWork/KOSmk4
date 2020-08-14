@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(clock_t = __typedef_clock_t)]
+%[define_replacement(clock_t = __clock_t)]
 
 %{
 #include <bits/types.h>
@@ -50,7 +50,7 @@ __SYSDECL_BEGIN
 
 #ifndef __clock_t_defined
 #define __clock_t_defined 1
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 
 }

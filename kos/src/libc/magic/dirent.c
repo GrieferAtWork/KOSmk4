@@ -182,7 +182,7 @@ __SYSDECL_BEGIN
 #ifdef __USE_XOPEN
 #ifndef __ino_t_defined
 #define __ino_t_defined 1
-typedef __typedef_ino_t ino_t; /* INode number */
+typedef __FS_TYPE(ino) ino_t; /* INode number */
 #endif /* !__ino_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __ino64_t_defined

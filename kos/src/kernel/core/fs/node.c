@@ -2737,14 +2737,14 @@ acquire_sourcedir_writelock:
 								assertf(target_inode->i_fileino == target_entry->de_ino,
 								        "d_rename created a new INode, but didn't update the INO number "
 								        "within the associated directory entry:\n"
-								        "target_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
-								        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+								        "target_inode->i_fileino = %#" PRIxN(__SIZEOF_INO_T__) "\n"
+								        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO_T__) "\n",
 								        target_inode->i_fileino, target_entry->de_ino);
 								assertf(target_inode->i_fileino != source_inode->i_fileino,
 								        "d_rename created a new INode, but that new INode has the same "
 								        "INO number as the old INode:\n"
-								        "target_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) " (created)\n"
-								        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) " (old)\n",
+								        "target_inode->i_fileino = %#" PRIxN(__SIZEOF_INO_T__) " (created)\n"
+								        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO_T__) " (old)\n",
 								        target_inode->i_fileino, source_inode->i_fileino);
 								assert(!(ATOMIC_READ(source_inode->i_flags) & (INODE_FCHANGED | INODE_FATTRCHANGED)));
 								/* Remove the old node from the superblock's file-tree, and replace it with the new one. */
@@ -2840,8 +2840,8 @@ acquire_sourcedir_writelock:
 						assertf(source_inode->i_fileino == target_entry->de_ino,
 						        "Inode number of the directory entry doesn't "
 						        "match that of the INode itself (before d_link):\n"
-						        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
-						        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+						        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO_T__) "\n"
+						        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO_T__) "\n",
 						        source_inode->i_fileino, target_entry->de_ino);
 						TRY {
 							/* Invoke the LINK-operator. */
@@ -2855,9 +2855,9 @@ acquire_sourcedir_writelock:
 							        source_inode->i_fileino == source_entry->de_ino,
 							        "Inode number of the directory entry doesn't "
 							        "match that of the INode itself (after d_link):\n"
-							        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
-							        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
-							        "source_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+							        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO_T__) "\n"
+							        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO_T__) "\n"
+							        "source_entry->de_ino    = %#" PRIxN(__SIZEOF_INO_T__) "\n",
 							        source_inode->i_fileino,
 							        target_entry->de_ino,
 							        source_entry->de_ino);
@@ -2897,8 +2897,8 @@ acquire_sourcedir_writelock:
 							assertf(source_inode->i_fileino == target_entry->de_ino,
 							        "Inode number of the directory entry doesn't "
 							        "match that of the INode itself (after d_unlink):\n"
-							        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO64_T__) "\n"
-							        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO64_T__) "\n",
+							        "source_inode->i_fileino = %#" PRIxN(__SIZEOF_INO_T__) "\n"
+							        "target_entry->de_ino    = %#" PRIxN(__SIZEOF_INO_T__) "\n",
 							        source_inode->i_fileino, target_entry->de_ino);
 						} EXCEPT {
 							if (source_path && source_entry->de_type == DT_DIR) {

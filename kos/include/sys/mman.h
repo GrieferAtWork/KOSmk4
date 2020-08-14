@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72575fce */
+/* HASH CRC-32:0x8fa1a9b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 #ifndef __off_t_defined
 #define __off_t_defined 1
-typedef __typedef_off_t off_t;
+typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __size_t_defined

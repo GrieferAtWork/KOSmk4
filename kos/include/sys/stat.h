@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb725b15c */
+/* HASH CRC-32:0xf1cd71f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __SYSDECL_BEGIN
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __dev_t_defined
 #define __dev_t_defined 1
-typedef __typedef_dev_t dev_t;
+typedef __dev_t dev_t;
 #endif /* __dev_t_defined */
 
 #ifndef __gid_t_defined
@@ -56,7 +56,7 @@ typedef __gid_t gid_t;
 
 #ifndef __ino_t_defined
 #define __ino_t_defined 1
-typedef __typedef_ino_t ino_t;  /* INode number */
+typedef __FS_TYPE(ino) ino_t;  /* INode number */
 #endif /* __ino_t_defined */
 
 #ifndef __mode_t_defined
@@ -71,7 +71,7 @@ typedef __nlink_t nlink_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined 1
-typedef __typedef_off_t off_t;
+typedef __FS_TYPE(off) off_t;
 #endif /* __off_t_defined */
 
 #ifndef __uid_t_defined

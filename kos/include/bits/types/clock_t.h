@@ -24,7 +24,7 @@
 #define __clock_t_defined 1
 #ifdef __CC__
 __DECL_BEGIN
-typedef __typedef_clock_t clock_t;
+typedef __clock_t clock_t;
 __DECL_END
 #endif /* __CC__ */
 #endif /* !__clock_t_defined */

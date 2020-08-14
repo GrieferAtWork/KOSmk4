@@ -52,11 +52,7 @@
 #   define __CRT_KOS 1
 #   define __CRT_GLC 1 /* Emulated by KOS */
 #   define __CRT_DOS 1 /* Emulated by KOS */
-#ifdef __PE__
-#   define __CRT_DOS_PRIMARY 1
-#else /* __PE__ */
 #   define __CRT_KOS_PRIMARY 1
-#endif /* !__PE__ */
 #elif defined(__CYGWIN__) || defined(__CYGWIN32__)
 #   define __CRT_CYG_PRIMARY 1
 #   define __CRT_CYG 1

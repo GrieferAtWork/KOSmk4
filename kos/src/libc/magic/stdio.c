@@ -233,7 +233,7 @@ __NAMESPACE_STD_USING(size_t)
 #ifdef __USE_XOPEN2K8
 #ifndef __off_t_defined
 #define __off_t_defined 1
-typedef __typedef_off_t off_t;
+typedef __FS_TYPE(off) off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __ssize_t_defined
