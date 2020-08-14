@@ -851,6 +851,7 @@ __do_consume_fp_sign:
 				unsigned int __fp_basei = 10;
 				__SIZE_TYPE__ __fp_start;
 				__INTMAX_TYPE__ __exp_power = 0;
+				__has_temp = 1;
 				if (__temp == '0') {
 					/* Check for hex floating point values. */
 					++__read_count;
@@ -888,8 +889,14 @@ __fp_loop:
 					__val = __val * __fp_basef + (__FP_VAL_TYPE)__digit;
 					++__read_count;
 					__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
-					if __unlikely(__temp < 0)
+					if __unlikely(__temp < 0) {
+						/* Special handling for EOF */
+						if (__temp == __EOF) {
+							__has_temp = 0;
+							break;
+						}
 						goto __err_or_eof;
+					}
 				}
 				if (!__exp_power && __temp == '.') {
 					++__read_count; /* Consume the '.' */
@@ -961,15 +968,20 @@ __fp_loop:
 						}
 						++__read_count; /* Consume digit */
 						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
-						if __unlikely(__temp < 0)
-							goto __err_or_eof;
+						if __unlikely(__temp < 0) {
+							/* Special handling for EOF */
+							if (__temp == __EOF) {
+								__has_temp = 0;
+								break;
+							}
+							goto __err;
+						}
 					}
 					if (__exp_negative)
 						__exp_addend = -__exp_addend;
 					__exp_power -= __exp_addend;
 				}
 __fp_no_exp_addend:
-				__has_temp = 1;
 				if (__exp_power != 0) {
 					__UINTMAX_TYPE__ __exp_abs;
 					/* >> result = __val / (__fp_basef ^ __exp_power) */

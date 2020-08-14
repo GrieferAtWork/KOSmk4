@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87d1f2e1 */
+/* HASH CRC-32:0xaec0dc21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,8 +125,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8)((char const **)__arg);
-	return __result ? __result : __EOF;
+	char const *__reader = *(char const **)__arg;
+	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8)(&__reader);
+	if (!__result)
+		return __EOF;
+	*(char const **)__arg = __reader;
+	return __result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
@@ -142,8 +146,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc16scanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = __unicode_readutf16((__CHAR16_TYPE__ const **)__arg);
-	return __result ? __result : __EOF;
+	__CHAR16_TYPE__ const *__reader = *(__CHAR16_TYPE__ const **)__arg;
+	__CHAR32_TYPE__ __result = __unicode_readutf16(&__reader);
+	if (!__result)
+		return __EOF;
+	*(__CHAR16_TYPE__ const **)__arg = __reader;
+	return __result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
@@ -159,10 +167,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc32scanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = **(__CHAR32_TYPE__ const **)__arg;
+	__CHAR32_TYPE__ const *__reader = *(__CHAR32_TYPE__ const **)__arg;
+	__CHAR32_TYPE__ __result = *__reader++;
 	if (!__result)
 		return __EOF;
-	++*(__CHAR32_TYPE__ const **)__arg;
+	*(__CHAR32_TYPE__ const **)__arg = __reader;
 	return __result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) __SSIZE_TYPE__
@@ -177,7 +186,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtod) __ATTR_LEAF __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtod))(char const *__restrict __nptr, char **__endptr) {
-	__LONGDOUBLE __result;
+	double __result;
 	char const *__text_pointer = __nptr;
 
 	if (!__localdep_format_scanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,

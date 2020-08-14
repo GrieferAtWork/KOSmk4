@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78349dbc */
+/* HASH CRC-32:0xf94e4ff9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1124,6 +1124,10 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
@@ -1132,8 +1136,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
-	char32_t result = unicode_readutf16((char16_t const **)arg);
-	return result ? result : __EOF;
+	char16_t const *reader = *(char16_t const **)arg;
+	char32_t result = unicode_readutf16(&reader);
+	if (!result)
+		return __EOF;
+	*(char16_t const **)arg = reader;
+	return result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
@@ -1160,11 +1168,12 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
 __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd_wcstod)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
-	__LONGDOUBLE result;
+	double result;
 	char16_t const *text_pointer = nptr;
 
 
@@ -1198,12 +1207,20 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
 
 
 __NAMESPACE_LOCAL_BEGIN
+
+
+
+
 
 
 
@@ -1222,10 +1239,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
-	char32_t result = **(char32_t const **)arg;
+	char32_t const *reader = *(char32_t const **)arg;
+	char32_t result = *reader++;
 	if (!result)
 		return __EOF;
-	++*(char32_t const **)arg;
+	*(char32_t const **)arg = reader;
 	return result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
@@ -1238,7 +1256,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
 NOTHROW_NCX(LIBKCALL libc_wcstod)(char32_t const *__restrict nptr,
                                   char32_t **endptr) {
-	__LONGDOUBLE result;
+	double result;
 	char32_t const *text_pointer = nptr;
 
 
@@ -1272,6 +1290,10 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
@@ -1280,8 +1302,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
-	char32_t result = unicode_readutf16((char16_t const **)arg);
-	return result ? result : __EOF;
+	char16_t const *reader = *(char16_t const **)arg;
+	char32_t result = unicode_readutf16(&reader);
+	if (!result)
+		return __EOF;
+	*(char16_t const **)arg = reader;
+	return result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
@@ -1295,6 +1321,7 @@ __NAMESPACE_LOCAL_END
 
 
 __NAMESPACE_LOCAL_BEGIN
+
 
 
 
@@ -1346,12 +1373,20 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
 
 
 __NAMESPACE_LOCAL_BEGIN
+
+
+
+
 
 
 
@@ -1370,10 +1405,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
-	char32_t result = **(char32_t const **)arg;
+	char32_t const *reader = *(char32_t const **)arg;
+	char32_t result = *reader++;
 	if (!result)
 		return __EOF;
-	++*(char32_t const **)arg;
+	*(char32_t const **)arg = reader;
 	return result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
@@ -1420,6 +1456,10 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
@@ -1428,8 +1468,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
-	char32_t result = unicode_readutf16((char16_t const **)arg);
-	return result ? result : __EOF;
+	char16_t const *reader = *(char16_t const **)arg;
+	char32_t result = unicode_readutf16(&reader);
+	if (!result)
+		return __EOF;
+	*(char16_t const **)arg = reader;
+	return result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
@@ -1443,6 +1487,7 @@ __NAMESPACE_LOCAL_END
 
 
 __NAMESPACE_LOCAL_BEGIN
+
 
 
 
@@ -1494,12 +1539,20 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
 
 
 __NAMESPACE_LOCAL_BEGIN
+
+
+
+
 
 
 
@@ -1518,10 +1571,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
-	char32_t result = **(char32_t const **)arg;
+	char32_t const *reader = *(char32_t const **)arg;
+	char32_t result = *reader++;
 	if (!result)
 		return __EOF;
-	++*(char32_t const **)arg;
+	*(char32_t const **)arg = reader;
 	return result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t

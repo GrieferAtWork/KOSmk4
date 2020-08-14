@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7727253f */
+/* HASH CRC-32:0xa2f9c821 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,12 +98,20 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 
+
+
+
+
 __NAMESPACE_LOCAL_END
 
 
 
 
 __NAMESPACE_LOCAL_BEGIN
+
+
+
+
 
 
 
@@ -122,10 +130,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc32scanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = **(__CHAR32_TYPE__ const **)__arg;
+	__CHAR32_TYPE__ const *__reader = *(__CHAR32_TYPE__ const **)__arg;
+	__CHAR32_TYPE__ __result = *__reader++;
 	if (!__result)
 		return __EOF;
-	++*(__CHAR32_TYPE__ const **)__arg;
+	*(__CHAR32_TYPE__ const **)__arg = __reader;
 	return __result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) __SSIZE_TYPE__
@@ -138,7 +147,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32stod) __ATTR_LEAF __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stod))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr) {
-	__LONGDOUBLE __result;
+	double __result;
 	__CHAR32_TYPE__ const *__text_pointer = __nptr;
 
 

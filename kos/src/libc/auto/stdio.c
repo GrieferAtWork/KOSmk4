@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeaeb4f1 */
+/* HASH CRC-32:0x9e7730c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -334,8 +334,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) ssize_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
-	char32_t result = libc_unicode_readutf8((char const **)arg);
-	return result ? result : __EOF;
+	char const *reader = *(char const **)arg;
+	char32_t result = libc_unicode_readutf8(&reader);
+	if (!result)
+		return __EOF;
+	*(char const **)arg = reader;
+	return result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
 (FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
@@ -351,8 +355,12 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
-	char32_t result = unicode_readutf16((char16_t const **)arg);
-	return result ? result : __EOF;
+	char16_t const *reader = *(char16_t const **)arg;
+	char32_t result = unicode_readutf16(&reader);
+	if (!result)
+		return __EOF;
+	*(char16_t const **)arg = reader;
+	return result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
 (FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
@@ -368,10 +376,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf_getc) ssize_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
-	char32_t result = **(char32_t const **)arg;
+	char32_t const *reader = *(char32_t const **)arg;
+	char32_t result = *reader++;
 	if (!result)
 		return __EOF;
-	++*(char32_t const **)arg;
+	*(char32_t const **)arg = reader;
 	return result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t

@@ -838,7 +838,7 @@ DEFINE_VSSCANF_HELPERS_C32
 [[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold")]]
 double strtod([[nonnull]] char const *__restrict nptr,
               [[nullable]] char **endptr) {
-	__LONGDOUBLE result;
+	double result;
 	char const *text_pointer = nptr;
 @@pp_if __SIZEOF_CHAR__ == 1@@
 	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
