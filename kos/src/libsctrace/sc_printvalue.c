@@ -115,6 +115,308 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
 
 
+
+/* Figure out what we actually need to define. */
+#ifdef HAVE_SC_REPR_DEV_T
+#define NEED_print_dev_blk
+#define NEED_print_dev_chr
+#endif /* HAVE_SC_REPR_DEV_T */
+
+#ifdef HAVE_SC_REPR_DEV_BLK
+#define NEED_print_dev_blk
+#endif /* HAVE_SC_REPR_DEV_BLK */
+
+#ifdef HAVE_SC_REPR_DEV_CHR
+#define NEED_print_dev_chr
+#endif /* HAVE_SC_REPR_DEV_CHR */
+
+#ifdef HAVE_SC_REPR_MODE_T
+#define NEED_print_mode_t
+#endif /* HAVE_SC_REPR_MODE_T */
+
+#ifdef HAVE_SC_REPR_OFLAG_T
+#define NEED_print_oflag_t
+#endif /* HAVE_SC_REPR_OFLAG_T */
+
+#ifdef HAVE_SC_REPR_OFLAG__CLOEXEC__CLOFORK
+#define NEED_print_oflag_t
+#endif /* HAVE_SC_REPR_OFLAG__CLOEXEC__CLOFORK */
+
+#ifdef HAVE_SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK
+#define NEED_print_oflag_t
+#endif /* HAVE_SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK */
+
+#ifdef HAVE_SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT
+#define NEED_print_oflag_t
+#endif /* HAVE_SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT */
+
+#ifdef HAVE_SC_REPR_ATFLAG_T
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG_T */
+
+#ifdef HAVE_SC_REPR_ATFLAG__ALTPATH__READLINK_REQSIZE__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__ALTPATH__READLINK_REQSIZE__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__ALTPATH__SYMLINK_NOFOLLOW__READLINK_REQSIZE__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__ALTPATH__SYMLINK_NOFOLLOW__READLINK_REQSIZE__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_FOLLOW__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__READLINK_REQSIZE__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__READLINK_REQSIZE__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH */
+
+#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH
+#define NEED_print_atflag_t
+#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH */
+
+#ifdef HAVE_SC_REPR_IOMODE_T
+#define NEED_print_iomode_t
+#endif /* HAVE_SC_REPR_IOMODE_T */
+
+#ifdef HAVE_SC_REPR_FD_T
+#define NEED_print_fd_t
+#endif /* HAVE_SC_REPR_FD_T */
+
+#ifdef HAVE_SC_REPR_CLOCKID_T
+#define NEED_print_clockid_t
+#endif /* HAVE_SC_REPR_CLOCKID_T */
+
+#ifdef HAVE_SC_REPR_FILENAME
+#define NEED_print_string
+#endif /* HAVE_SC_REPR_FILENAME */
+
+#ifdef HAVE_SC_REPR_BUFFER
+#define NEED_print_string
+#endif /* HAVE_SC_REPR_BUFFER */
+
+#ifdef HAVE_SC_REPR_STRING
+#define NEED_print_string
+#endif /* HAVE_SC_REPR_STRING */
+
+#ifdef HAVE_SC_REPR_SIGHANDLER_T
+#define NEED_print_sighandler_t
+#endif /* HAVE_SC_REPR_SIGHANDLER_T */
+
+#ifdef HAVE_SC_REPR_STRUCT_POLLFD
+#define NEED_print_pollfds
+#endif /* HAVE_SC_REPR_STRUCT_POLLFD */
+
+#ifdef HAVE_SC_REPR_IOCTL_COMMAND
+#define NEED_print_ioctl_command
+#endif /* HAVE_SC_REPR_IOCTL_COMMAND */
+
+#ifdef HAVE_SC_REPR_STRING_VECTOR
+#define NEED_print_string_vector
+#endif /* HAVE_SC_REPR_STRING_VECTOR */
+
+#ifdef HAVE_SC_REPR_STRING_VECTOR32
+#define NEED_print_string_vector
+#endif /* HAVE_SC_REPR_STRING_VECTOR32 */
+
+#ifdef HAVE_SC_REPR_STRING_VECTOR64
+#define NEED_print_string_vector
+#endif /* HAVE_SC_REPR_STRING_VECTOR64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC_VEC2_OR_3
+#define NEED_print_timespec_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC_VEC2_OR_3 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC32_VEC2_OR_3
+#define NEED_print_timespec_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC32_VEC2_OR_3 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC64_VEC2_OR_3
+#define NEED_print_timespec_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC64_VEC2_OR_3 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX32_VEC2_OR_3
+#define NEED_print_timespec_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX32_VEC2_OR_3 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX32_64_VEC2_OR_3
+#define NEED_print_timespec_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX32_64_VEC2_OR_3 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX64_VEC2_OR_3
+#define NEED_print_timespec_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX64_VEC2_OR_3 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC32_OR_UINT32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC32_OR_UINT32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC64_OR_UINT32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC64_OR_UINT32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX32_OR_UINT32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX32_OR_UINT32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX32_64_OR_UINT32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX32_64_OR_UINT32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX64_OR_UINT32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX64_OR_UINT32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPEC64
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPEC64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX32
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX32_64
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX32_64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMESPECX64
+#define NEED_print_timespec
+#endif /* HAVE_SC_REPR_STRUCT_TIMESPECX64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL_VEC2
+#define NEED_print_timeval_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL32_VEC2
+#define NEED_print_timeval_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL32_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL64_VEC2
+#define NEED_print_timeval_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL64_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32_VEC2
+#define NEED_print_timeval_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32_64_VEC2
+#define NEED_print_timeval_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_64_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX64_VEC2
+#define NEED_print_timeval_vector
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX64_VEC2 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL
+#define NEED_print_timeval
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL32
+#define NEED_print_timeval
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVAL64
+#define NEED_print_timeval
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVAL64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32
+#define NEED_print_timeval
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX32_64
+#define NEED_print_timeval
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX32_64 */
+
+#ifdef HAVE_SC_REPR_STRUCT_TIMEVALX64
+#define NEED_print_timeval
+#endif /* HAVE_SC_REPR_STRUCT_TIMEVALX64 */
+
+#ifdef HAVE_SC_REPR_SIGNO_T
+#define NEED_print_signo_t
+#endif /* HAVE_SC_REPR_SIGNO_T */
+
+#ifdef HAVE_SC_REPR_SOCKET_DOMAIN
+#define NEED_print_socket_domain
+#endif /* HAVE_SC_REPR_SOCKET_DOMAIN */
+
+#ifdef HAVE_SC_REPR_SOCKET_PROTOCOL
+#define NEED_print_socket_proto
+#endif /* HAVE_SC_REPR_SOCKET_PROTOCOL */
+
+#ifdef HAVE_SC_REPR_SOCKET_TYPE
+#define NEED_print_socket_type
+#endif /* HAVE_SC_REPR_SOCKET_TYPE */
+
+
+
+
+/* Inter-printer dependencies */
+#ifdef NEED_print_pollfds
+#define NEED_print_pollfd
+#endif /* NEED_print_pollfds */
+
+#ifdef NEED_print_pollfd
+#define NEED_print_fd_t
+#define NEED_print_poll_events
+#endif /* NEED_print_pollfd */
+
+#ifdef NEED_print_string_vector
+#define NEED_print_string
+#endif /* NEED_print_string_vector */
+
+#ifdef NEED_print_timespec_vector
+#define NEED_print_timespec
+#endif /* NEED_print_timespec_vector */
+
+#ifdef NEED_print_timeval_vector
+#define NEED_print_timeval
+#endif /* NEED_print_timeval_vector */
+
+#ifdef NEED_print_socket_domain
+#define NEED_print_socket_af_pf
+#endif /* NEED_print_socket_domain */
+
+#ifdef NEED_print_socket_proto
+#define NEED_print_socket_af_pf
+#endif /* NEED_print_socket_proto */
+
+
+
+/* Configure special printer extensions */
+#undef HAVE_STRING_VECTOR_POINTER_SIZE
+#if ((defined(HAVE_SC_REPR_STRING_VECTOR32) && defined(HAVE_SC_REPR_STRING_VECTOR64)) ||                            \
+     (defined(HAVE_SC_REPR_STRING_VECTOR) && (defined(HAVE_SC_REPR_STRING_VECTOR32) && __SIZEOF_POINTER__ != 4)) || \
+     (defined(HAVE_SC_REPR_STRING_VECTOR) && (defined(HAVE_SC_REPR_STRING_VECTOR64) && __SIZEOF_POINTER__ != 8)))
+#define HAVE_STRING_VECTOR_POINTER_SIZE 1
+#endif /* ... */
+
 DECL_BEGIN
 
 #define LINUX_FUTEX_USES_TIMEOUT(futex_op)    \
@@ -149,12 +451,13 @@ DECL_BEGIN
 
 
 /* The representation of bit-wide OR in flagsets */
-#define PIPESTR SYNSPACE "|" SYNSPACE
+#define PIPESTR_S SYNSPACE "|" SYNSPACE
+#define PIPESTR   PIPESTR_S
 
 
 /* Ensure that `PIPESTR' doesn't get allocated multiple times. */
 PRIVATE ATTR_UNUSED char const PIPESTR_[] = PIPESTR;
-PRIVATE ATTR_UNUSED char const NULLSTR[]  = "NULL";
+PRIVATE /*ATTR_UNUSED*/ char const NULLSTR[]  = "NULL";
 #undef PIPESTR
 #define PIPESTR PIPESTR_
 
@@ -179,7 +482,10 @@ typedef uint8_t va_uint_t;
 #error "Unsupported `__VA_SIZE'"
 #endif
 
-PRIVATE ATTR_UNUSED NONNULL((1)) ssize_t CC
+
+
+#ifdef NEED_print_dev_blk
+PRIVATE NONNULL((1)) ssize_t CC
 print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
 	ssize_t result;
 	result = format_printf(printer, arg,
@@ -205,8 +511,11 @@ print_dev_blk(pformatprinter printer, void *arg, dev_t devno) {
 #endif /* __KERNEL__ */
 	return result;
 }
+#endif /* NEED_print_dev_blk */
 
-PRIVATE ATTR_UNUSED NONNULL((1)) ssize_t CC
+
+#ifdef NEED_print_dev_chr
+PRIVATE NONNULL((1)) ssize_t CC
 print_dev_chr(pformatprinter printer, void *arg, dev_t devno) {
 	ssize_t result;
 	result = format_printf(printer, arg,
@@ -232,9 +541,13 @@ print_dev_chr(pformatprinter printer, void *arg, dev_t devno) {
 #endif /* __KERNEL__ */
 	return result;
 }
+#endif /* NEED_print_dev_chr */
 
 
-PRIVATE ATTR_UNUSED struct {
+
+
+#ifdef NEED_print_mode_t
+PRIVATE struct {
 	mode_t mn_mode;    /* Flag value */
 	char   mn_name[8]; /* Flag name */
 } const mode_names[] = {
@@ -243,7 +556,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ S_ISUID, "S_ISUID" }
 };
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_mode_t(pformatprinter printer, void *arg, mode_t mode) {
 	ssize_t temp, result = 0;
 	char const *name;
@@ -305,9 +618,12 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_mode_t */
 
 
-PRIVATE ATTR_UNUSED struct {
+
+#ifdef NEED_print_oflag_t
+PRIVATE struct {
 	oflag_t on_flag;     /* Flag value */
 	char    on_name[12]; /* Flag name */
 } const oflag_names[] = {
@@ -333,8 +649,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ O_DOSPATH,   "O_DOSPATH" },
 };
 
-
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_oflag_t_impl(pformatprinter printer, void *arg,
                    oflag_t oflags, bool force_accmode) {
 	ssize_t temp, result = 0;
@@ -398,7 +713,7 @@ err:
 	return temp;
 }
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_oflag_t(pformatprinter printer, void *arg,
               oflag_t oflags, oflag_t allowed_oflags) {
 	ssize_t temp, result;
@@ -417,10 +732,12 @@ print_oflag_t(pformatprinter printer, void *arg,
 err:
 	return temp;
 }
+#endif /* NEED_print_oflag_t */
 
 
 
-PRIVATE ATTR_UNUSED struct {
+#ifdef NEED_print_atflag_t
+PRIVATE struct {
 	atflag_t an_flag;     /* Flag value */
 	char     an_name[20]; /* Flag name */
 } const atflag_names[] = {
@@ -435,7 +752,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ AT_DOSPATH,          "AT_DOSPATH" },
 };
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_atflag_t_impl(pformatprinter printer, void *arg,
                     atflag_t atflags,
                     char const *nameof_AT_READLINK_REQSIZE) {
@@ -482,7 +799,7 @@ err:
 	return temp;
 }
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_atflag_t(pformatprinter printer, void *arg,
                atflag_t atflags, atflag_t allowed_atflags,
                char const *nameof_AT_READLINK_REQSIZE) {
@@ -501,9 +818,12 @@ print_atflag_t(pformatprinter printer, void *arg,
 err:
 	return temp;
 }
+#endif /* NEED_print_atflag_t */
 
 
-PRIVATE ATTR_UNUSED struct {
+
+#ifdef NEED_print_iomode_t
+PRIVATE struct {
 	iomode_t on_flag;     /* Flag value */
 	char    on_name[12]; /* Flag name */
 } const iomode_names[] = {
@@ -517,8 +837,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ IO_NODATAZERO, "NODATAZERO" },
 };
 
-
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_iomode_t_impl(pformatprinter printer, void *arg,
                    iomode_t iomodes, bool force_accmode) {
 	ssize_t temp, result = 0;
@@ -573,7 +892,7 @@ err:
 	return temp;
 }
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_iomode_t(pformatprinter printer, void *arg,
               iomode_t iomodes, iomode_t allowed_iomodes) {
 	ssize_t temp, result;
@@ -592,11 +911,16 @@ print_iomode_t(pformatprinter printer, void *arg,
 err:
 	return temp;
 }
+#endif /* NEED_print_iomode_t */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+#ifdef NEED_print_fd_t
+PRIVATE ssize_t CC
 print_fd_t(pformatprinter printer, void *arg, fd_t fd) {
 	ssize_t result;
 	char const *name;
+	/* XXX: Don't use a switch() here? */
 	switch (fd) {
 		/* Deal with symbolic file handles. */
 	case AT_FDCWD:          name = "AT_FDCWD"; break;
@@ -634,9 +958,12 @@ print_fd_t(pformatprinter printer, void *arg, fd_t fd) {
 done:
 	return result;
 }
+#endif /* NEED_print_fd_t */
 
 
-PRIVATE ATTR_UNUSED struct {
+
+#ifdef NEED_print_clockid_t
+PRIVATE struct {
 	clockid_t cn_clid;     /* Clock ID */
 	char      cn_name[20]; /* Clock ID name. */
 } const clockid_names[] = {
@@ -653,7 +980,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ CLOCK_TAI,                "TAI" },
 };
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_clockid_t(pformatprinter printer, void *arg, clockid_t clockid) {
 	ssize_t result;
 	unsigned int i;
@@ -671,8 +998,12 @@ print_clockid_t(pformatprinter printer, void *arg, clockid_t clockid) {
 done:
 	return result;
 }
+#endif /* NEED_print_clockid_t */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+#ifdef NEED_print_string
+PRIVATE ssize_t CC
 print_string(pformatprinter printer, void *arg,
              USER UNCHECKED char const *str,
              struct sc_argument *length_link) {
@@ -696,8 +1027,12 @@ print_string(pformatprinter printer, void *arg,
 	}
 	return result;
 }
+#endif /* NEED_print_string */
 
-PRIVATE ATTR_UNUSED struct {
+
+
+#ifdef NEED_print_sighandler_t
+PRIVATE struct {
 	sighandler_t sn_hand;    /* Signal handler constant */
 	char         sn_name[8]; /* Signal handler name. */
 } const sighandler_names[] = {
@@ -713,7 +1048,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ SIG_GET,  "GET" }
 };
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_sighandler_t(pformatprinter printer, void *arg,
                    sighandler_t hand) {
 	ssize_t result;
@@ -731,7 +1066,11 @@ print_sighandler_t(pformatprinter printer, void *arg,
 done:
 	return result;
 }
+#endif /* NEED_print_sighandler_t */
 
+
+
+#ifdef NEED_print_poll_events
 #ifndef POLLRDNORM
 #define POLLRDNORM __POLLRDNORM /* 100% identical to `POLLIN' (Normal data may be read). */
 #endif /* !POLLRDNORM */
@@ -745,7 +1084,7 @@ done:
 #define POLLWRBAND __POLLWRBAND /* Priority data may be written. */
 #endif /* !POLLWRBAND */
 
-PRIVATE ATTR_UNUSED struct {
+PRIVATE struct {
 	uint16_t   pn_flag;
 	char const pn_name[8];
 } const poll_event_flag_names[] = {
@@ -764,7 +1103,7 @@ PRIVATE ATTR_UNUSED struct {
 	{ POLLNVAL,   "NVAL" }
 };
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_poll_events(pformatprinter printer, void *arg, uint16_t events) {
 	enum {
 		VALID_MASK = (POLLIN | POLLPRI | POLLOUT | POLLRDNORM |
@@ -798,8 +1137,12 @@ print_poll_events(pformatprinter printer, void *arg, uint16_t events) {
 err:
 	return temp;
 }
+#endif /* NEED_print_poll_events */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+#ifdef NEED_print_pollfd
+PRIVATE ssize_t CC
 print_pollfd(pformatprinter printer, void *arg,
              struct pollfd const *__restrict pfd) {
 	ssize_t temp, result;
@@ -815,8 +1158,12 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_pollfd */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+#ifdef NEED_print_pollfds
+PRIVATE ssize_t CC
 print_pollfds(pformatprinter printer, void *arg,
               USER CHECKED struct pollfd const *fds, size_t count) {
 	ssize_t temp, result = 0;
@@ -849,9 +1196,12 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_pollfds */
 
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+#ifdef NEED_print_timespec
+PRIVATE ssize_t CC
 print_timespec(pformatprinter printer, void *arg,
                struct timespec const *__restrict ts) {
 	ssize_t result;
@@ -862,8 +1212,13 @@ print_timespec(pformatprinter printer, void *arg,
 	                       ts->tv_sec, ts->tv_nsec);
 	return result;
 }
+#endif /* NEED_print_timespec */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+
+#ifdef NEED_print_timespec_vector
+PRIVATE ssize_t CC
 print_timespec_vector(pformatprinter printer, void *arg,
                       struct timespec const *__restrict tsv,
                       size_t count) {
@@ -883,8 +1238,12 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_timespec_vector */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+#ifdef NEED_print_timeval
+PRIVATE ssize_t CC
 print_timeval(pformatprinter printer, void *arg,
               struct timeval const *__restrict ts) {
 	ssize_t result;
@@ -895,8 +1254,12 @@ print_timeval(pformatprinter printer, void *arg,
 	                       ts->tv_sec, ts->tv_usec);
 	return result;
 }
+#endif /* NEED_print_timeval */
 
-PRIVATE ATTR_UNUSED ssize_t CC
+
+
+#ifdef NEED_print_timeval_vector
+PRIVATE ssize_t CC
 print_timeval_vector(pformatprinter printer, void *arg,
                      struct timeval const *__restrict tsv,
                      size_t count) {
@@ -916,8 +1279,11 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_timeval_vector */
 
 
+
+#if defined(NEED_print_ioctl_command) || defined(__DEEMON__)
 /* Use the same trick as also used in libdebuginfo/repr.c to encode
  * symbolic constant names (such as those for ioctl() commands) as
  * efficiently as possible. */
@@ -930,13 +1296,13 @@ local ioctls = [];
 local kos_ioctls = [];
 
 for (local macroName, macroValue: enumerateMacrosFromFiles({
-	"../../include/asm/ioctls/*.h",
+	"../../include/asm/ioctls/" "*.h",
 	"../../include/linux/kd.h",
 	"../../include/linux/fd.h",
 	"../../include/linux/hdreg.h",
 	"../../include/linux/msdos_fs.h",
 	"../../include/linux/vt.h",
-	"../../include/kos/ioctl/*.h",
+	"../../include/kos/ioctl/" "*.h",
 })) {
 	local ns = ioctls;
 	for (local prefix: {
@@ -1093,7 +1459,7 @@ PRIVATE char const repr_KOS_IOCTLS_5600h[] =
 "VIDEOIO_LISTFORMAT\0VIDEOIO_GETFORMAT\0VIDEOIO_GETPAL";
 //[[[end]]]
 
-PRIVATE ATTR_UNUSED ATTR_CONST WUNUSED char const *CC
+PRIVATE ATTR_CONST WUNUSED char const *CC
 get_ioctl_command_name(syscall_ulong_t command) {
 	char const *result = NULL;
 	if (_IOC_ISKOS(command)) {
@@ -1113,7 +1479,7 @@ done:
 	return result;
 }
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_ioctl_command_size(pformatprinter printer, void *arg, size_t size) {
 	ssize_t result;
 	char const *name;
@@ -1132,7 +1498,7 @@ print_ioctl_command_size(pformatprinter printer, void *arg, size_t size) {
 	return result;
 }
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_ioctl_type(pformatprinter printer, void *arg,
                  syscall_ulong_t type) {
 	ssize_t result;
@@ -1146,7 +1512,7 @@ print_ioctl_type(pformatprinter printer, void *arg,
 	return result;
 }
 
-PRIVATE ATTR_UNUSED ssize_t CC
+PRIVATE ssize_t CC
 print_ioctl_command(pformatprinter printer, void *arg,
                     syscall_ulong_t command) {
 	char const *name;
@@ -1217,27 +1583,22 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_ioctl_command */
 
 
 
-#undef NEED_STRING_VECTOR_POINTER_SIZE
-#if ((defined(HAVE_SC_REPR_STRING_VECTOR32) && defined(HAVE_SC_REPR_STRING_VECTOR64)) ||                            \
-     (defined(HAVE_SC_REPR_STRING_VECTOR) && (defined(HAVE_SC_REPR_STRING_VECTOR32) && __SIZEOF_POINTER__ != 4)) || \
-     (defined(HAVE_SC_REPR_STRING_VECTOR) && (defined(HAVE_SC_REPR_STRING_VECTOR64) && __SIZEOF_POINTER__ != 8)))
-#define NEED_STRING_VECTOR_POINTER_SIZE 1
-#endif
-
-PRIVATE ATTR_UNUSED ssize_t CC
+#ifdef NEED_print_string_vector
+PRIVATE ssize_t CC
 print_string_vector(pformatprinter printer, void *arg,
                     USER UNCHECKED char const *USER UNCHECKED const *vector
-#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+#ifdef HAVE_STRING_VECTOR_POINTER_SIZE
                     ,
                     size_t sizeof_pointer
-#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+#endif /* HAVE_STRING_VECTOR_POINTER_SIZE */
                     ) {
-#ifndef NEED_STRING_VECTOR_POINTER_SIZE
+#ifndef HAVE_STRING_VECTOR_POINTER_SIZE
 	enum { sizeof_pointer = sizeof(void *) };
-#endif /* !NEED_STRING_VECTOR_POINTER_SIZE */
+#endif /* !HAVE_STRING_VECTOR_POINTER_SIZE */
 	ssize_t temp, result;
 	if (!vector) {
 		result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
@@ -1250,15 +1611,15 @@ print_string_vector(pformatprinter printer, void *arg,
 		for (i = 0;; ++i) {
 			USER UNCHECKED char const *string;
 			TRY {
-#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+#ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 				if (sizeof_pointer == 4) {
 					string = (USER UNCHECKED char const *)(uintptr_t)((uint32_t *)vector)[i];
 				} else {
 					string = (USER UNCHECKED char const *)(uintptr_t)((uint64_t *)vector)[i];
 				}
-#else /* NEED_STRING_VECTOR_POINTER_SIZE */
+#else /* HAVE_STRING_VECTOR_POINTER_SIZE */
 				string = vector[i];
-#endif /* !NEED_STRING_VECTOR_POINTER_SIZE */
+#endif /* !HAVE_STRING_VECTOR_POINTER_SIZE */
 			} EXCEPT {
 				if (!was_thrown(E_SEGFAULT))
 					RETHROW();
@@ -1288,6 +1649,261 @@ done:
 err:
 	return temp;
 }
+#endif /* NEED_print_string_vector */
+
+
+
+#if defined(NEED_print_signo_t) || defined(__DEEMON__)
+#if defined(__KERNEL__) || defined(__DEEMON__) || defined(__INTELLISENSE__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+
+function getSigno(filename: string, prefix: string): {string...} {
+	local result = [];
+	for (local macroName, macroValue: enumerateMacrosFromFile(filename)) {
+		if (!macroName.startswith(prefix))
+			continue;
+		macroName = macroName[#prefix:];
+		if (macroName in ["RTMIN", "RTMAX"])
+			continue;
+		if (macroName.startswith("_"))
+			continue;
+		macroValue = getMacroIntValue(macroValue);
+		if (macroValue !is int)
+			continue;
+		if (macroValue >= #result)
+			result.resize(macroValue + 1);
+		if (result[macroValue] is none)
+			result[macroValue] = macroName;
+	}
+	return result;
+}
+
+print("#if defined(__x86_64__) || defined(__i386__)");
+printStrendNDatabase("SIGNO", getSigno("../../include/i386-kos/asm/signum-values-kos.h", "__KOS_SIG"));
+print("#else /" "* ... *" "/");
+printStrendNDatabase("SIGNO", getSigno("../../include/asm/signum-values.h", "__SIG"));
+print("#endif /" "* !... *" "/");
+
+]]]*/
+#if defined(__x86_64__) || defined(__i386__)
+#define GETBASE_SIGNO(result, index) \
+	(((index) <= 0x1f) ? ((result) = repr_SIGNO_0h, true) : false)
+PRIVATE char const repr_SIGNO_0h[] =
+"\0HUP\0INT\0QUIT\0ILL\0TRAP\0ABRT\0BUS\0FPE\0KILL\0USR1\0SEGV\0USR2\0PIPE\0ALR"
+"M\0TERM\0STKFLT\0CHLD\0CONT\0STOP\0TSTP\0TTIN\0TTOU\0URG\0XCPU\0XFSZ\0VTALRM"
+"\0PROF\0WINCH\0IO\0PWR\0SYS";
+
+#else /* ... */
+#define GETBASE_SIGNO(result, index) \
+	(((index) <= 0x1f) ? ((result) = repr_SIGNO_0h, true) : false)
+PRIVATE char const repr_SIGNO_0h[] =
+"\0HUP\0INT\0QUIT\0ILL\0TRAP\0ABRT\0BUS\0FPE\0KILL\0USR1\0SEGV\0USR2\0PIPE\0ALR"
+"M\0TERM\0STKFLT\0CHLD\0CONT\0STOP\0TSTP\0TTIN\0TTOU\0URG\0XCPU\0XFSZ\0VTALRM"
+"\0PROF\0WINCH\0IO\0PWR\0SYS";
+
+#endif /* !... */
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_signo_name(syscall_ulong_t signo) {
+	char const *result = NULL;
+	if (!GETBASE_SIGNO(result, signo))
+		goto done;
+	for (; signo; --signo)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+#else /* __KERNEL__ || ... */
+#define get_signo_name(signo) strsignal_s(signo)
+#endif /* !__KERNEL__ && !... */
+
+PRIVATE ssize_t CC
+print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
+	char const *name = get_signo_name(signo);
+	if (name) {
+#ifdef __KERNEL__
+		return format_printf(printer, arg, "SIG%s", name);
+#else /* __KERNEL__ */
+		return (*printer)(arg, name, strlen(name));
+#endif /* !__KERNEL__ */
+	}
+	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
+		return format_printf(printer, arg, "SIGRTMIN+%d",
+		                     (int)(signo - __SIGRTMIN));
+	} else {
+		/* Fallback: Print the integer value */
+		return format_printf(printer, arg, "%d", signo);
+	}
+}
+#endif /* NEED_print_signo_t */
+
+
+
+#if defined(NEED_print_socket_af_pf) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local sockaf = getPrefixedMacrosFromFile("../../include/asm/socket-families.h", "AF_");
+local sockpf = getPrefixedMacrosFromFile("../../include/asm/socket-families.h", "PF_");
+
+printStrendNDatabase("SOCKAF", sockaf);
+if (sockaf == sockpf) {
+	print("#define GETBASE_SOCKPF_IS_SOCKAF");
+	print("#define GETBASE_SOCKPF GETBASE_SOCKAF");
+} else {
+	printStrendNDatabase("SOCKPF", sockpf);
+}
+]]]*/
+#define GETBASE_SOCKAF(result, index) \
+	(((index) <= 0x29) ? ((result) = repr_SOCKAF_0h, true) : false)
+PRIVATE char const repr_SOCKAF_0h[] =
+"UNSPEC\0LOCAL\0INET\0AX25\0IPX\0APPLETALK\0NETROM\0BRIDGE\0ATMPVC\0X25\0IN"
+"ET6\0ROSE\0DECnet\0NETBEUI\0SECURITY\0KEY\0NETLINK\0PACKET\0ASH\0ECONET\0A"
+"TMSVC\0RDS\0SNA\0IRDA\0PPPOX\0WANPIPE\0LLC\0IB\0MPLS\0CAN\0TIPC\0BLUETOOTH\0"
+"IUCV\0RXRPC\0ISDN\0PHONET\0IEEE802154\0CAIF\0ALG\0NFC\0VSOCK\0MAX";
+
+#define GETBASE_SOCKPF_IS_SOCKAF
+#define GETBASE_SOCKPF GETBASE_SOCKAF
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_socket_domain_name(syscall_ulong_t domain) {
+	char const *result = NULL;
+	if (!GETBASE_SOCKAF(result, domain))
+		goto done;
+	for (; domain; --domain)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+#ifdef GETBASE_SOCKPF_IS_SOCKAF
+#define get_socket_proto_name get_socket_domain_name
+#else /* GETBASE_SOCKPF_IS_SOCKAF */
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_socket_proto_name(syscall_ulong_t proto) {
+	char const *result = NULL;
+	if (!GETBASE_SOCKPF(result, proto))
+		goto done;
+	for (; proto; --proto)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+#endif /* !GETBASE_SOCKPF_IS_SOCKAF */
+
+#endif /* NEED_print_socket_af_pf */
+
+
+
+#ifdef NEED_print_socket_domain
+PRIVATE ssize_t CC
+print_socket_domain(pformatprinter printer, void *arg,
+                    syscall_ulong_t domain) {
+	char const *name;
+	name = get_socket_domain_name(domain);
+	if (name)
+		return format_printf(printer, arg, "AF_%s", name);
+	/* Fallback: Print the integer value */
+	return format_printf(printer, arg,
+	                     "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__),
+	                     domain);
+}
+#endif /* NEED_print_socket_domain */
+
+
+
+#ifdef NEED_print_socket_proto
+PRIVATE ssize_t CC
+print_socket_proto(pformatprinter printer, void *arg,
+                   syscall_ulong_t proto) {
+	char const *name;
+	name = get_socket_proto_name(proto);
+	if (name)
+		return format_printf(printer, arg, "PF_%s", name);
+	/* Fallback: Print the integer value */
+	return format_printf(printer, arg,
+	                     "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__),
+	                     proto);
+}
+#endif /* NEED_print_socket_proto */
+
+
+
+#if defined(NEED_print_socket_type) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFile("../../include/bits/socket_type.h", "SOCK_");
+printStrendNDatabase("SOCKTYPE", typ[:256]);
+]]]*/
+#define GETBASE_SOCKTYPE(result, index) \
+	(((index) <= 0xa) ? ((result) = repr_SOCKTYPE_0h, true) : false)
+PRIVATE char const repr_SOCKTYPE_0h[] =
+"\0STREAM\0DGRAM\0RAW\0RDM\0SEQPACKET\0DCCP\0\0\0\0PACKET";
+/*[[[end]]]*/
+
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_socket_type_name(syscall_ulong_t type) {
+	char const *result = NULL;
+	if (!GETBASE_SOCKTYPE(result, type))
+		goto done;
+	for (; type; --type)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_socket_type(pformatprinter printer, void *arg,
+                  syscall_ulong_t type) {
+	syscall_ulong_t flags;
+	char const *type_name;
+	ssize_t temp, result;
+	flags = type & (SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK);
+	type &= ~(SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK);
+	type_name = get_socket_type_name(type & 0xff);
+	if (type_name) {
+		result = format_printf(printer, arg,
+		                       "SOCK_%s",
+		                       type_name);
+	} else {
+		result = format_printf(printer, arg,
+		                       "%#x",
+		                       (unsigned int)(type & 0xff));
+	}
+	type &= ~0xff;
+	if (type != 0) {
+		DO(format_printf(printer, arg,
+		                 PIPESTR_S "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		                 type));
+	}
+	/* Append flags */
+	if (flags & SOCK_CLOEXEC)
+		PRINT(PIPESTR_S "SOCK_CLOEXEC");
+	if (flags & SOCK_CLOFORK)
+		PRINT(PIPESTR_S "SOCK_CLOFORK");
+	if (flags & SOCK_NONBLOCK)
+		PRINT(PIPESTR_S "SOCK_NONBLOCK");
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_socket_type */
+
+
+
 
 
 
@@ -1354,17 +1970,13 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_SEEK_WHENCE 1
 	// TODO: #define HAVE_SC_REPR_SIGMASK 1
 	// TODO: #define HAVE_SC_REPR_SIGNALFD4_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_SIGNO_T 1
 	// TODO: #define HAVE_SC_REPR_SIGPROCMASK_HOW 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_ARGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_CALL 1
-	// TODO: #define HAVE_SC_REPR_SOCKET_DOMAIN 1
-	// TODO: #define HAVE_SC_REPR_SOCKET_PROTOCOL 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS2 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_SENDMSG_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_SHUTDOWN_HOW 1
-	// TODO: #define HAVE_SC_REPR_SOCKET_TYPE 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_LEVEL 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTNAME 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTVAL 1
@@ -1453,15 +2065,38 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_HOP_ARG 1
 	// TODO: #define HAVE_SC_REPR_HOP_COMMAND 1
 
+#ifdef HAVE_SC_REPR_SIGNO_T
+	case SC_REPR_SIGNO_T:
+		result = print_signo_t(printer, arg, (signo_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SIGNO_T */
+
+#ifdef HAVE_SC_REPR_SOCKET_DOMAIN
+	case SC_REPR_SOCKET_DOMAIN:
+		result = print_socket_domain(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_DOMAIN */
+
+#ifdef HAVE_SC_REPR_SOCKET_PROTOCOL
+	case SC_REPR_SOCKET_PROTOCOL:
+		result = print_socket_proto(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_PROTOCOL */
+
+#ifdef HAVE_SC_REPR_SOCKET_TYPE
+	case SC_REPR_SOCKET_TYPE:
+		result = print_socket_type(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_TYPE */
 
 #ifdef HAVE_SC_REPR_STRING_VECTOR
 	case SC_REPR_STRING_VECTOR:
 		result = print_string_vector(printer, arg,
 		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
-#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+#ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 		                             ,
 		                             sizeof(void *)
-#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+#endif /* HAVE_STRING_VECTOR_POINTER_SIZE */
 		                             );
 		break;
 #endif /* HAVE_SC_REPR_STRING_VECTOR */
@@ -1470,10 +2105,10 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	case SC_REPR_STRING_VECTOR32:
 		result = print_string_vector(printer, arg,
 		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
-#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+#ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 		                             ,
 		                             4
-#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+#endif /* HAVE_STRING_VECTOR_POINTER_SIZE */
 		                             );
 		break;
 #endif /* HAVE_SC_REPR_STRING_VECTOR32 */
@@ -1482,10 +2117,10 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	case SC_REPR_STRING_VECTOR64:
 		result = print_string_vector(printer, arg,
 		                             (USER UNCHECKED char const *USER UNCHECKED const *)(uintptr_t)value.sv_u64
-#ifdef NEED_STRING_VECTOR_POINTER_SIZE
+#ifdef HAVE_STRING_VECTOR_POINTER_SIZE
 		                             ,
 		                             8
-#endif /* NEED_STRING_VECTOR_POINTER_SIZE */
+#endif /* HAVE_STRING_VECTOR_POINTER_SIZE */
 		                             );
 		break;
 #endif /* HAVE_SC_REPR_STRING_VECTOR64 */
@@ -1506,7 +2141,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 		tsv[1].tv_usec = (syscall_ulong_t)utms[1].tv_usec;                        \
 		COMPILER_READ_BARRIER();                                                  \
 		result = print_timeval_vector(printer, arg, tsv, 2);                      \
-	} __WHILE0
+	}	__WHILE0
 #ifdef HAVE_SC_REPR_STRUCT_TIMEVAL_VEC2
 	case SC_REPR_STRUCT_TIMEVAL_VEC2:
 		DO_REPR_STRUCT_TIMEVAL_VEC2(struct timeval);
@@ -1558,7 +2193,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 		ts.tv_usec = (syscall_ulong_t)utms->tv_usec;                              \
 		COMPILER_READ_BARRIER();                                                  \
 		result = print_timeval(printer, arg, &ts);                                \
-	} __WHILE0
+	}	__WHILE0
 
 #if defined(HAVE_SC_REPR_STRUCT_TIMEVAL) || defined(NEED_do_struct_timeval)
 #ifdef HAVE_SC_REPR_STRUCT_TIMEVAL
@@ -1651,7 +2286,7 @@ do_struct_timevalx64:
 		}                                                                          \
 		COMPILER_READ_BARRIER();                                                   \
 		result = print_timespec_vector(printer, arg, tsv, count);                  \
-	} __WHILE0
+	}	__WHILE0
 #ifdef HAVE_SC_REPR_STRUCT_TIMESPEC_VEC2_OR_3
 	case SC_REPR_STRUCT_TIMESPEC_VEC2_OR_3:
 		DO_REPR_STRUCT_TIMESPEC_VEC2_OR_3(struct timespec);
@@ -1695,7 +2330,7 @@ do_struct_timevalx64:
 	do {                                                                               \
 		if (!link || LINUX_FUTEX_USES_TIMEOUT((syscall_ulong_t)link->sa_value.sv_u64)) \
 			goto do_uint32_t;                                                          \
-	} __WHILE0
+	}	__WHILE0
 #ifdef HAVE_SC_REPR_STRUCT_TIMESPEC32_OR_UINT32
 	case SC_REPR_STRUCT_TIMESPEC32_OR_UINT32:
 		DO_REPR_STRUCT_TIMESPEC_OR_UINT32();
@@ -1747,7 +2382,7 @@ do_struct_timevalx64:
 		ts.tv_nsec = (syscall_ulong_t)utms->tv_nsec;                               \
 		COMPILER_READ_BARRIER();                                                   \
 		result = print_timespec(printer, arg, &ts);                                \
-	} __WHILE0
+	}	__WHILE0
 
 #if defined(HAVE_SC_REPR_STRUCT_TIMESPEC) || defined(NEED_do_struct_timespec)
 #ifdef HAVE_SC_REPR_STRUCT_TIMESPEC

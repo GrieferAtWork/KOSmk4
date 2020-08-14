@@ -51,7 +51,7 @@ socket_create(syscall_ulong_t family,
 
 	case AF_UNIX:
 		if (type == SOCK_STREAM) {
-			if (protocol == 0 || protocol == PF_UNIX) {
+			if (protocol == PF_UNSPEC || protocol == PF_UNIX) {
 				result = unix_socket_create();
 			} else {
 				goto bad_protocol;
@@ -63,7 +63,7 @@ socket_create(syscall_ulong_t family,
 
 	case AF_INET:
 		if (type == SOCK_DGRAM) {
-			if (protocol == 0 || protocol == IPPROTO_UDP) {
+			if (protocol == PF_UNSPEC || protocol == IPPROTO_UDP) {
 				result = udp_socket_create();
 			} else {
 				goto bad_protocol;

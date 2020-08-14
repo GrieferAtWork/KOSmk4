@@ -171,7 +171,7 @@ function splitValues(values: {string...}): {(int, {string...})...} {
 			numEmptySlots = 0;
 		}
 	}
-	yield (currentStart, values[currentStart:]);
+	yield (currentStart, values[currentStart:count]);
 }
 
 function printStrendNDatabase(
@@ -220,6 +220,24 @@ function printStrendNDatabase(
 			";");
 	}
 	print;
+}
+
+
+function getPrefixedMacrosFromFile(filename: string, prefix: string): {string...} {
+	local result = [];
+	for (local macroName, macroValue: enumerateMacrosFromFile(filename)) {
+		if (!macroName.startswith(prefix))
+			continue;
+		macroName = macroName[#prefix:];
+		macroValue = getMacroIntValue(macroValue);
+		if (macroValue !is int)
+			continue;
+		if (macroValue >= #result)
+			result.resize(macroValue + 1);
+		if (result[macroValue] is none)
+			result[macroValue] = macroName;
+	}
+	return result;
 }
 
 
