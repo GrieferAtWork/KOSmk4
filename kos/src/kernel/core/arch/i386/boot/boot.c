@@ -460,9 +460,22 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       - But that's also where it ends...
 	 *
 	 * Blocker:
-	 *     - /bin/xkbcomp uses `scanf("%g")' to parse float strings.
-	 *     - format_scanf() (the back-end for scanf()) doesn't support floats
-	 *     - As such, floating-point support must be added to format_scanf()
+	 *     - Xorg server doesn't know how to interface with the mouse/keyboard:
+	 *       [3986739.491] (II) LoadModule: "mouse"
+	 *       [3986739.532] (WW) Warning, couldn't open module mouse
+	 *       [3986739.534] (II) UnloadModule: "mouse"
+	 *       [3986739.535] (II) Unloading mouse
+	 *       [3986739.536] (EE) Failed to load module "mouse" (module does not exist, 0)
+	 *       [3986739.538] (EE) No input driver matching `mouse'
+	 *       [3986739.539] (II) LoadModule: "kbd"
+	 *       [3986739.580] (WW) Warning, couldn't open module kbd
+	 *       [3986739.582] (II) UnloadModule: "kbd"
+	 *       [3986739.584] (II) Unloading kbd
+	 *       [3986739.585] (EE) Failed to load module "kbd" (module does not exist, 0)
+	 *       [3986739.587] (EE) No input driver matching `kbd'
+	 *     - Must port:
+	 *       - https://www.x.org/releases/X11R7.7/src/everything/xf86-input-keyboard-1.6.1.tar.gz
+	 *       - https://www.x.org/releases/X11R7.7/src/everything/xf86-input-mouse-1.7.2.tar.gz
 	 *
 	 * TODO:
 	 *     - Finish implementing support for unix domain sockets
@@ -477,15 +490,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *
 	 *     $ cat /var/log/Xorg.0.log
 	 *     | ...
-	 *     irrelevant (doesn't actually contain text from /bin/xkbcomp)
-	 * Relevant syslog portion:
-	 * sys_write(fd: STDERR_FILENO, buf: "Malformed number 1.5\n", bufsize: 21)
-	 * sys_write(fd: STDERR_FILENO, buf: "syntax error: line 939 of pc\n", bufsize: 29)
-	 * sys_write(fd: STDERR_FILENO, buf: "The XKEYBOARD keymap compiler (xkbcomp) reports:\n", bufsize: 49)
-	 * sys_write(fd: STDERR_FILENO, buf: "> Error:            Error interpreting include file \"pc\"\n", bufsize: 57)
-	 * sys_write(fd: STDERR_FILENO, buf: ">                   Exiting\n", bufsize: 28)
-	 * sys_write(fd: STDERR_FILENO, buf: ">                   Abandoning geometry file \"default\"\n", bufsize: 55)
-	 * sys_write(fd: STDERR_FILENO, buf: "Errors from xkbcomp are not fatal to the X server\n", bufsize: 50)
 	 */
 
 	return state;
