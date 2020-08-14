@@ -275,7 +275,7 @@ diff -Naur xorg-server-1.12.2-orig/os/log.c xorg-server-1.12.2/os/log.c
                  }
 diff -Naur xorg-server-1.12.2-orig/os/utils.c xorg-server-1.12.2/os/utils.c
 --- xorg-server-1.12.2-orig/os/utils.c	2012-05-17 19:09:04.000000000 +0200
-+++ xorg-server-1.12.2/os/utils.c	2020-08-10 15:33:01.674984600 +0200
++++ xorg-server-1.12.2/os/utils.c	2020-08-14 14:01:51.997888200 +0200
 @@ -204,7 +204,7 @@
  
  char *SeatId = NULL;
@@ -285,3 +285,33 @@ diff -Naur xorg-server-1.12.2-orig/os/utils.c xorg-server-1.12.2/os/utils.c
  #define HAS_SAVED_IDS_AND_SETEUID
  #endif
  
+@@ -1234,6 +1234,9 @@
+             _exit(127);
+         if (setuid(getuid()) == -1)
+             _exit(127);
++#ifdef __KOS__
++        execl("/bin/busybox", "sh", "-c", command, (char *) NULL);
++#endif /* __KOS__ */
+         execl("/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     default:                   /* parent */
+@@ -1319,6 +1322,9 @@
+             }
+             close(pdes[1]);
+         }
++#ifdef __KOS__
++        execl("/bin/busybox", "sh", "-c", command, (char *) NULL);
++#endif /* __KOS__ */
+         execl("/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     }
+@@ -1397,6 +1403,9 @@
+             }
+             close(pdes[1]);
+         }
++#ifdef __KOS__
++        execl("/bin/busybox", "cat", file, (char *) NULL);
++#endif /* __KOS__ */
+         execl("/bin/cat", "cat", file, (char *) NULL);
+         _exit(127);
+     }
