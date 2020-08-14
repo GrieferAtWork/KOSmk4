@@ -32,6 +32,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -1300,6 +1301,11 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 	case FAT_IOCTL_GET_ATTRIBUTES:
 		validate_writable(arg, sizeof(u32));
 		inode_loadattr(self);
+		/* XXX: Technically, should should instead check for
+		 *      `inode_access(R_OK)' on the directory that is
+		 *      containing `self'. However, at this point we
+		 *      have no easy way of determining that directory. */
+		require(CAP_FOWNER);
 		*(u32 *)arg = self->i_fsdata->i_file.f_attr;
 		break;
 
@@ -1310,6 +1316,11 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		COMPILER_READ_BARRIER();
 		value = *(u32 *)arg;
 		COMPILER_READ_BARRIER();
+		/* XXX: Technically, should should instead check for
+		 *      `inode_access(W_OK)' on the directory that is
+		 *      containing `self'. However, at this point we
+		 *      have no easy way of determining that directory. */
+		require(CAP_FOWNER);
 		if unlikely(value & ~0xff)
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_GENERIC, value);
@@ -1320,10 +1331,13 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 		inode_changedattr(self);
 	}	break;
 
-	case FAT_IOCTL_GET_VOLUME_ID:
+	case FAT_IOCTL_GET_VOLUME_ID: {
+		FatSuperblock *super;
 		validate_writable(arg, sizeof(u32));
-		*(u32 *)arg = ((FatSuperblock *)self->i_super)->f_volid;
-		break;
+		super = (FatSuperblock *)self->i_super;
+		inode_access(super, R_OK);
+		*(u32 *)arg = super->f_volid;
+	}	break;
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
