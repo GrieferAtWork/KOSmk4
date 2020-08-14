@@ -66,6 +66,7 @@ DECL_BEGIN
 
 /*[[[deemon
 import * from deemon;
+import * from ...misc.libgen.strendN;
 import util;
 local ns = {
 	("DW_TAG_",   []),
@@ -77,105 +78,28 @@ local ns = {
 	("DW_EH_PE_", []),
 };
 
-for (local filename: [
+for (local macroName, macroValue: enumerateMacrosFromFiles({
 	"../../include/libdebuginfo/dwarf.h",
 	"../../include/libunwind/cfi.h",
-]) {
-	with (local fp = File.open(filename)) {
-		for (local l: fp) {
-			l = l.strip();
-			local macroName, macroValue;
-			try {
-				macroName, macroValue = l.scanf(" # define %[^ ] %[^ ]")...;
-				macroValue = int(macroValue);
-			} catch (...) {
-				continue;
-			}
-			for (local prefix, values: ns) {
-				if (!macroName.startswith(prefix))
-					continue;
-				local name = macroName[#prefix:];
-				if (name in ["lo_user", "hi_user"])
-					continue;
-				if (macroValue >= #values)
-					values.resize(macroValue + 1);
-				values[macroValue] = name;
-				break;
-			}
-		}
-	}
-}
-
-#define REPR_SPLIT_THRESHOLD 24
-
-@@Split a given set of @values to prevent large holes within the data-set
-function splitValues(values: {string...}): {(int, {string...})...} {
-	local currentStart = 0;
-	local numEmptySlots = 0;
-	local count = #values;
-	while (count && !values[count - 1])
-		--count;
-	for (local i = 0; i < count; ++i) {
-		if (values[i]) {
-			numEmptySlots = 0;
+})) {
+	macroValue = getMacroIntValue(macroValue);
+	if (macroValue !is int)
+		continue;
+	for (local prefix, values: ns) {
+		if (!macroName.startswith(prefix))
 			continue;
-		}
-		++numEmptySlots;
-		if (numEmptySlots >= REPR_SPLIT_THRESHOLD) {
-			yield (currentStart, values[currentStart:i - (numEmptySlots - 1)]);
-			do {
-				++i;
-			} while (i < count && !values[i]);
-			currentStart = i;
-			numEmptySlots = 0;
-		}
+		local name = macroName[#prefix:];
+		if (name in ["lo_user", "hi_user"])
+			continue;
+		if (macroValue >= #values)
+			values.resize(macroValue + 1);
+		values[macroValue] = name;
+		break;
 	}
-	yield (currentStart, values[currentStart:]);
 }
 
-for (local prefix, values: ns) {
-	local splitSet = List(splitValues(values));
-	print("#define GETBASE_", prefix.strip("_"), "(result, index) \\");
-	for (local i, startAndItems: util.enumerate(splitSet)) {
-		local stringName = "repr_{}_{}h"
-			.format({ prefix.strip("_"), startAndItems[0].hex()[2:] });
-		local minIndex = startAndItems[0];
-		local maxIndex = minIndex + #startAndItems[1] - 1;
-		print("\t", i ? " " : "("),;
-		if (minIndex == maxIndex) {
-			print("((index) == ", minIndex.hex(), ") ? ("),;
-		} else if (minIndex == 0) {
-			print("((index) <= ", maxIndex.hex(), ") ? ("),;
-		} else {
-			print("((index) >= ", minIndex.hex(), " && (index) <= ", maxIndex.hex(), ") ? ("),;
-		}
-		if (minIndex != 0) {
-			if (minIndex == maxIndex) {
-				print("(index) = 0, "),;
-			} else {
-				print("(index) -= ", minIndex.hex(), ", "),;
-			}
-		}
-		print("(result) = ", stringName, ", true)"),;
-		print(i == #splitSet - 1 ? " : false)" : " : \\");
-	}
-	for (local start, items: splitSet) {
-		File.Writer text;
-		for (local i, item: util.enumerate(items)) {
-			if (!item)
-				item = "";
-			if (i != #items - 1)
-				item = item + "\0";
-			text << item;
-		}
-		print("PRIVATE REPR_RODATASECTION char const repr_",
-			prefix.strip("_"), "_", start.hex()[2:], "h[] =\n",
-			"\n".join(for (local e: text.string.segments(64)) repr(e)),
-			";");
-	}
-	print;
-}
-
+for (local prefix, values: ns)
+	printStrendNDatabase(prefix, values, attr: "REPR_RODATASECTION");
 ]]]*/
 #define GETBASE_DW_TAG(result, index) \
 	(((index) <= 0x47) ? ((result) = repr_DW_TAG_0h, true) : false)

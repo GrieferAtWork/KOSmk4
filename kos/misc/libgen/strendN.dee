@@ -1,0 +1,226 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Helpers for writing self-generating code for strend()^N string databases */
+import fs;
+import util;
+import * from deemon;
+
+function removeComments(text: string): string {
+	for (;;) {
+		local i = text.find("/*");
+		if (i < 0)
+			break;
+		local e = text.find("*/", i + 2);
+		if (e < 0)
+			e = #text;
+		else {
+			e += 2;
+		}
+		text = text[:i] + text[e:];
+	}
+	local i = text.find("//");
+	if (i >= 0)
+		text = text[:text];
+	return text;
+}
+
+function replaceKeywordsWithMacros(
+		text: string, macros: {string: string}): string {
+	local i = 0;
+	local len = #text;
+	local flushStart = 0;
+	File.Writer tempfp;
+	while (i < len) {
+		if (!text.issymstrt(i)) {
+			++i;
+			continue;
+		}
+		local symbEnd = i + 1;
+		while (symbEnd < len && text.issymcont(symbEnd))
+			++symbEnd;
+		local repl = macros.get(text[i:symbEnd]);
+		if (repl !is none) {
+			/* Insert the replacement text */
+			tempfp << text[:flushStart] << repl;
+			flushStart = symbEnd;
+		}
+		i = symbEnd;
+	}
+	if (!flushStart)
+		return text;
+	tempfp << text[flushStart:];
+	return tempfp.string;
+}
+
+@@Enumerate the C-macro definitions from a given @filename
+@@Macros are enumerated as @(macroName: string, macroDecl: string) pairs.
+@@Note that function-like macros are not enumerated
+@@Also note that keyword-style macros already enumerated are
+@@automatically replaced with their values, should they appear
+@@in later macros:
+@@> #define FOO 42
+@@> #define BAR FOO
+@@This will be enumerated as:
+@@> yield ("FOO", 42);
+@@> yield ("BAR", 42);
+function enumerateMacrosFromFile(filename: string): {(string, string)...} {
+	local knownMacros: {string: string} = Dict();
+	with (local fp = File.open(filename)) {
+		for (local l: fp) {
+			l = l.strip();
+			local macroName, macroValue;
+			try {
+				macroName, macroValue = l.scanf(" # define %[^ ] %[^]")...;
+			} catch (...) {
+				continue;
+			}
+			macroValue = removeComments(macroValue);
+			knownMacros.pop(macroName, none);
+			macroValue = replaceKeywordsWithMacros(
+				macroValue.strip(), knownMacros);
+			knownMacros[macroName] = macroValue;
+			yield (macroName, macroValue);
+		}
+	}
+}
+
+@@Same as @enumerateMacrosFromFile, but enumerate multiple files
+@@Note that function also accepts wildcards in filenames!
+function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...} {
+	for (local filename: filenames) {
+		if ("*" !in filename && "?" !in filename) {
+			yield enumerateMacrosFromFile(filename)...;
+			continue;
+		}
+		/* `filename' contains wildcards! */
+		local head = fs.headof(filename);
+		local tail = fs.tailof(filename);
+		for (local e: fs.dir(head)) {
+			if (!e.wmatch(tail))
+				continue;
+			yield enumerateMacrosFromFile(fs.joinpath(head, e))...;
+		}
+	}
+}
+
+@@Convert a macro's expansion value to an integer
+@@If this is impossible, return @none instead
+function getMacroIntValue(macroValue: string): int | none {
+	try {
+		return int(macroValue);
+	} catch (...) {
+	}
+	/* It's more complicated than that...
+	 * -> Check for character literals */
+	if (macroValue.startswith("'") && macroValue.endswith("'")) {
+		local ords = macroValue[1:-1].decode("c-escape").ordinals;
+		if (!ords)
+			return none; /* Empty string? */
+		local result = 0;
+		for (local v: ords)
+			result = (result << 8) | (v & 0xff);
+		return result;
+	}
+	return none;
+}
+
+
+#define REPR_SPLIT_THRESHOLD 24
+
+@@Split a given set of @values to prevent large holes within the data-set
+function splitValues(values: {string...}): {(int, {string...})...} {
+	local currentStart = 0;
+	local numEmptySlots = 0;
+	local count = #values;
+	while (count && !values[count - 1])
+		--count;
+	while (currentStart < count && !values[currentStart])
+		++currentStart;
+	if (currentStart < 12)
+		currentStart = 0; /* A base-start of 0 simplifies branching. */
+	for (local i = currentStart; i < count; ++i) {
+		if (values[i]) {
+			numEmptySlots = 0;
+			continue;
+		}
+		++numEmptySlots;
+		if (numEmptySlots >= REPR_SPLIT_THRESHOLD) {
+			yield (currentStart, values[currentStart:i - (numEmptySlots - 1)]);
+			do {
+				++i;
+			} while (i < count && !values[i]);
+			currentStart = i;
+			numEmptySlots = 0;
+		}
+	}
+	yield (currentStart, values[currentStart:]);
+}
+
+function printStrendNDatabase(
+		prefix: string, values: {string...},
+		attr: string = "") {
+	local splitSet = List(splitValues(values));
+	print("#define GETBASE_", prefix.strip("_"), "(result, index) \\");
+	for (local i, startAndItems: util.enumerate(splitSet)) {
+		local stringName = "repr_{}_{}h"
+			.format({ prefix.strip("_"), startAndItems[0].hex()[2:] });
+		local minIndex = startAndItems[0];
+		local maxIndex = minIndex + #startAndItems[1] - 1;
+		print("\t", i ? " " : "("),;
+		if (minIndex == maxIndex) {
+			print("((index) == ", minIndex.hex(), ") ? ("),;
+		} else if (minIndex == 0) {
+			print("((index) <= ", maxIndex.hex(), ") ? ("),;
+		} else {
+			print("((index) >= ", minIndex.hex(), " && (index) <= ", maxIndex.hex(), ") ? ("),;
+		}
+		if (minIndex != 0) {
+			if (minIndex == maxIndex) {
+				print("(index) = 0, "),;
+			} else {
+				print("(index) -= ", minIndex.hex(), ", "),;
+			}
+		}
+		print("(result) = ", stringName, ", true)"),;
+		print(i == #splitSet - 1 ? " : false)" : " : \\");
+	}
+	for (local start, items: splitSet) {
+		File.Writer text;
+		for (local i, item: util.enumerate(items)) {
+			if (!item)
+				item = "";
+			if (i != #items - 1)
+				item = item + "\0";
+			text << item;
+		}
+		print "PRIVATE ",;
+		if (attr)
+			print(attr, " "),;
+		print("char const repr_",
+			prefix.strip("_"), "_", start.hex()[2:], "h[] =\n",
+			"\n".join(for (local e: text.string.segments(64)) repr(e)),
+			";");
+	}
+	print;
+}
+
+
+

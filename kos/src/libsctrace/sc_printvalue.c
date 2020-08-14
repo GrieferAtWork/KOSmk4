@@ -924,150 +924,54 @@ err:
 
 /*[[[deemon
 import * from deemon;
+import * from ...misc.libgen.strendN;
 import util;
 local ioctls = [];
 local kos_ioctls = [];
 
-function decodeInt(x: string): int {
-	x = x.strip();
-	if (x.startswith("'") && x.endswith("'"))
-		return x[1:-1].ord();
-	return int(x);
-}
-
-for (local filename: [
-	"../../include/asm/ioctls/block.h",
-	"../../include/asm/ioctls/block_ex.h",
-	"../../include/asm/ioctls/socket.h",
-	"../../include/asm/ioctls/socket_ex.h",
-	"../../include/asm/ioctls/tty.h",
+for (local macroName, macroValue: enumerateMacrosFromFiles({
+	"../../include/asm/ioctls/*.h",
 	"../../include/linux/kd.h",
 	"../../include/linux/fd.h",
 	"../../include/linux/hdreg.h",
 	"../../include/linux/msdos_fs.h",
 	"../../include/linux/vt.h",
-	"../../include/kos/ioctl/clock.h",
-	"../../include/kos/ioctl/keyboard.h",
-	"../../include/kos/ioctl/mouse.h",
-	"../../include/kos/ioctl/tty.h",
-	"../../include/kos/ioctl/video.h",
-]) {
-	with (local fp = File.open(filename)) {
-		for (local l: fp) {
-			l = l.strip();
-			local macroName, macroValue;
-			try {
-				macroName, macroValue = l.scanf(" # define %[^ ] %[^]")...;
-			} catch (...) {
-				continue;
-			}
-			print File.stderr: "HERE:", repr macroName, repr macroValue;
-			local ns = ioctls;
-			for (local prefix: {
-				"_IO(", "_IOR(", "_IOW(", "_IOWR(",
-				"_IO_KOS(", "_IOR_KOS(", "_IOW_KOS(", "_IOWR_KOS(" }) {
-				if (!macroValue.startswith(prefix))
-					continue;
-				local a, b;
-				try {
-					a, b = macroValue[#prefix:].scanf(" %[^,], %[^,)] ")...;
-					a = decodeInt(a);
-					b = decodeInt(b);
-				} catch (...) {
-					continue;
-				}
-				if (a < 0 || a > 0xff || b < 0 || b > 0xff)
-					continue;
-				macroValue = a << 8 | b;
-				if ("KOS" in prefix)
-					ns = kos_ioctls;
-				break;
-			}
-			if (macroValue !is int)
-				continue;
-			if (macroValue >= #ns)
-				ns.resize(macroValue + 1);
-			ns[macroValue] = macroName;
-		}
-	}
-}
-
-#define REPR_SPLIT_THRESHOLD 24
-
-@@Split a given set of @values to prevent large holes within the data-set
-function splitValues(values: {string...}): {(int, {string...})...} {
-	local currentStart = 0;
-	local numEmptySlots = 0;
-	local count = #values;
-	while (count && !values[count - 1])
-		--count;
-	while (currentStart < count && !values[currentStart])
-		++currentStart;
-	for (local i = currentStart; i < count; ++i) {
-		if (values[i]) {
-			numEmptySlots = 0;
+	"../../include/kos/ioctl/*.h",
+})) {
+	local ns = ioctls;
+	for (local prefix: {
+		"_IO(", "_IOR(", "_IOW(", "_IOWR(",
+		"_IO_KOS(", "_IOR_KOS(", "_IOW_KOS(", "_IOWR_KOS(" }) {
+		if (!macroValue.startswith(prefix))
+			continue;
+		local a, b;
+		try {
+			a, b = macroValue[#prefix:].scanf(" %[^,], %[^,)] ")...;
+			a = getMacroIntValue(a);
+			b = getMacroIntValue(b);
+		} catch (...) {
 			continue;
 		}
-		++numEmptySlots;
-		if (numEmptySlots >= REPR_SPLIT_THRESHOLD) {
-			yield (currentStart, values[currentStart:i - (numEmptySlots - 1)]);
-			do {
-				++i;
-			} while (i < count && !values[i]);
-			currentStart = i;
-			numEmptySlots = 0;
-		}
+		if (a < 0 || a > 0xff || b < 0 || b > 0xff)
+			continue;
+		macroValue = a << 8 | b;
+		if ("KOS" in prefix)
+			ns = kos_ioctls;
+		break;
 	}
-	yield (currentStart, values[currentStart:]);
+	if (macroValue !is int)
+		continue;
+	if (macroValue >= #ns)
+		ns.resize(macroValue + 1);
+	if (ns[macroValue] is none)
+		ns[macroValue] = macroName;
 }
 
-for (local values: { ioctls, kos_ioctls }) {
-	local prefix = values === ioctls ? "IOCTLS" : "KOS_IOCTLS";
-	local splitSet = List(splitValues(values));
-	print("#define GETBASE_", prefix.strip("_"), "(result, index) \\");
-	for (local i, startAndItems: util.enumerate(splitSet)) {
-		local stringName = "repr_{}_{}h"
-			.format({ prefix.strip("_"), startAndItems[0].hex()[2:] });
-		local minIndex = startAndItems[0];
-		local maxIndex = minIndex + #startAndItems[1] - 1;
-		print("\t", i ? " " : "("),;
-		if (minIndex == maxIndex) {
-			print("((index) == ", minIndex.hex(), ") ? ("),;
-		} else if (minIndex == 0) {
-			print("((index) <= ", maxIndex.hex(), ") ? ("),;
-		} else {
-			print("((index) >= ", minIndex.hex(), " && (index) <= ", maxIndex.hex(), ") ? ("),;
-		}
-		if (minIndex != 0) {
-			if (minIndex == maxIndex) {
-				print("(index) = 0, "),;
-			} else {
-				print("(index) -= ", minIndex.hex(), ", "),;
-			}
-		}
-		print("(result) = ", stringName, ", true)"),;
-		print(i == #splitSet - 1 ? " : false)" : " : \\");
-	}
-	for (local start, items: splitSet) {
-		File.Writer text;
-		for (local i, item: util.enumerate(items)) {
-			if (!item)
-				item = "";
-			if (i != #items - 1)
-				item = item + "\0";
-			text << item;
-		}
-		print("PRIVATE char const repr_",
-			prefix.strip("_"), "_", start.hex()[2:], "h[] =\n",
-			"\n".join(for (local e: text.string.segments(64)) repr(e)),
-			";");
-	}
-	print;
-}
-
+printStrendNDatabase("IOCTLS", ioctls);
+printStrendNDatabase("KOS_IOCTLS", kos_ioctls);
 ]]]*/
 #define GETBASE_IOCTLS(result, index) \
-	(((index) >= 0x1 && (index) <= 0x2) ? ((index) -= 0x1, (result) = repr_IOCTLS_1h, true) : \
+	(((index) <= 0x2) ? ((result) = repr_IOCTLS_0h, true) : \
 	 ((index) >= 0x204 && (index) <= 0x217) ? ((index) -= 0x204, (result) = repr_IOCTLS_204h, true) : \
 	 ((index) >= 0x241 && (index) <= 0x25a) ? ((index) -= 0x241, (result) = repr_IOCTLS_241h, true) : \
 	 ((index) == 0x290) ? ((index) = 0, (result) = repr_IOCTLS_290h, true) : \
@@ -1084,8 +988,8 @@ for (local values: { ioctls, kos_ioctls }) {
 	 ((index) >= 0x7601 && (index) <= 0x7602) ? ((index) -= 0x7601, (result) = repr_IOCTLS_7601h, true) : \
 	 ((index) >= 0x8901 && (index) <= 0x89b1) ? ((index) -= 0x8901, (result) = repr_IOCTLS_8901h, true) : \
 	 ((index) >= 0x89e0 && (index) <= 0x89f0) ? ((index) -= 0x89e0, (result) = repr_IOCTLS_89e0h, true) : false)
-PRIVATE char const repr_IOCTLS_1h[] =
-"FIBMAP\0FIGETBSZ";
+PRIVATE char const repr_IOCTLS_0h[] =
+"\0FIBMAP\0FIGETBSZ";
 PRIVATE char const repr_IOCTLS_204h[] =
 "FDGETPRM\0\0\0\0\0\0\0\0\0\0FDGETMAXERRS\0FDGETDRVTYP\0\0FDGETDRVPRM\0FDGETDRV"
 "STAT\0FDPOLLDRVSTAT\0\0FDGETFDCSTAT\0\0FDWERRORGET";
@@ -1107,7 +1011,7 @@ PRIVATE char const repr_IOCTLS_125dh[] =
 "F\0BLKPBSZGET\0BLKDISCARDZEROES\0BLKSECDISCARD\0BLKROTATIONAL\0BLKZER"
 "OOUT";
 PRIVATE char const repr_IOCTLS_4300h[] =
-"CDIO_SETTIME\0\0CDIO_GETBASE\0CDIO_SETWALLCLOCK";
+"CDIO_GETTIME\0\0CDIO_GETBASE\0CDIO_SETWALLCLOCK";
 PRIVATE char const repr_IOCTLS_4b2fh[] =
 "KIOCSOUND\0KDMKTONE\0KDGETLED\0KDSETLED\0KDGKBTYPE\0KDADDIO\0KDDELIO\0K"
 "DENABIO\0KDDISABIO\0\0\0KDSETMODE\0KDGETMODE\0KDMAPDISP\0KDUNMAPDISP\0\0\0"
@@ -1126,12 +1030,12 @@ PRIVATE char const repr_IOCTLS_5401h[] =
 "IC\0TIOCMSET\0TIOCGSOFTCAR\0TIOCSSOFTCAR\0TIOCINQ\0TIOCLINUX\0TIOCCONS"
 "\0TIOCGSERIAL\0TIOCSSERIAL\0TIOCPKT\0FIONBIO\0TIOCNOTTY\0TIOCSETD\0TIOC"
 "GETD\0TCSBRKP\0\0TIOCSBRK\0TIOCCBRK\0TIOCGSID\0TCGETS2\0TCSETS2\0TCSETSW"
-"2\0TCSETSF2\0TIOCGRS485\0TIOCSRS485\0TIOCGPTN\0TIOCSPTLCK\0TCGETX\0TCSE"
-"TX\0TCSETXF\0TCSETXW\0TIOCSIG\0TIOCVHANGUP\0TIOCGPKT\0TIOCGPTLCK\0\0\0\0\0\0"
-"\0TIOCGEXCL\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FIONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCONFI"
-"G\0TIOCSERGWILD\0TIOCSERSWILD\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOCSE"
-"RGSTRUCT\0TIOCSERGETLSR\0TIOCSERGETMULTI\0TIOCSERSETMULTI\0TIOCMIWAI"
-"T\0TIOCGICOUNT\0\0\0FIOQSIZE";
+"2\0TCSETSF2\0TIOCGRS485\0TIOCSRS485\0TIOCGPTN\0TIOCSPTLCK\0TIOCGDEV\0TC"
+"SETX\0TCSETXF\0TCSETXW\0TIOCSIG\0TIOCVHANGUP\0TIOCGPKT\0TIOCGPTLCK\0\0\0\0"
+"\0\0\0TIOCGEXCL\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FIONCLEX\0FIOCLEX\0FIOASYNC\0TIOCSERCON"
+"FIG\0TIOCSERGWILD\0TIOCSERSWILD\0TIOCGLCKTRMIOS\0TIOCSLCKTRMIOS\0TIOC"
+"SERGSTRUCT\0TIOCSERGETLSR\0TIOCSERGETMULTI\0TIOCSERSETMULTI\0TIOCMIW"
+"AIT\0TIOCGICOUNT\0\0\0FIOQSIZE";
 PRIVATE char const repr_IOCTLS_5600h[] =
 "VT_OPENQRY\0VT_GETMODE\0VT_SETMODE\0VT_GETSTATE\0VT_SENDSIG\0VT_RELDI"
 "SP\0VT_ACTIVATE\0VT_WAITACTIVE\0VT_DISALLOCATE\0VT_RESIZE\0VT_RESIZEX"
@@ -1140,13 +1044,13 @@ PRIVATE char const repr_IOCTLS_5600h[] =
 PRIVATE char const repr_IOCTLS_5877h[] =
 "FIFREEZE\0FITHAW\0FITRIM";
 PRIVATE char const repr_IOCTLS_6601h[] =
-"FS_IOC32_GETFLAGS\0FS_IOC32_SETFLAGS\0\0\0\0\0\0\0\0\0FS_IOC_FIEMAP";
+"FS_IOC_GETFLAGS\0FS_IOC_SETFLAGS\0\0\0\0\0\0\0\0\0FS_IOC_FIEMAP";
 PRIVATE char const repr_IOCTLS_7201h[] =
 "VFAT_IOCTL_READDIR_BOTH\0VFAT_IOCTL_READDIR_SHORT\0\0\0\0\0\0\0\0\0\0\0\0\0\0FA"
 "T_IOCTL_GET_ATTRIBUTES\0FAT_IOCTL_SET_ATTRIBUTES\0\0FAT_IOCTL_GET_V"
 "OLUME_ID";
 PRIVATE char const repr_IOCTLS_7601h[] =
-"FS_IOC32_GETVERSION\0FS_IOC32_SETVERSION";
+"FS_IOC_GETVERSION\0FS_IOC_SETVERSION";
 PRIVATE char const repr_IOCTLS_8901h[] =
 "FIOSETOWN\0SIOCSPGRP\0FIOGETOWN\0SIOCGPGRP\0SIOCATMARK\0__SIOCGSTAMP3"
 "2\0__SIOCGSTAMPNS32\0\0\0\0SIOCADDRT\0SIOCDELRT\0SIOCRTMSG\0\0\0SIOCGIFNAM"
@@ -1175,18 +1079,18 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x5602) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : false)
 PRIVATE char const repr_KOS_IOCTLS_4b00h[] =
-"KBDIO_SETRDKEY\0KBDIO_TRYGETCHAR\0KBDIO_GETCHAR\0KBDIO_TRYGETKEY\0KB"
-"DIO_GETKEY\0KBDIO_MASKLED\0KBDIO_RESETKEYMAP\0KBDIO_FLUSHPENDING\0KB"
-"DIO_PUTSTR\0KBDIO_PUTKEY\0KBDIO_SETDBGF12\0KBDIO_MASKMOD";
+"KBDIO_GETRDKEY\0KBDIO_TRYGETCHAR\0KBDIO_GETCHAR\0KBDIO_TRYGETKEY\0KB"
+"DIO_GETKEY\0KBDIO_GETLED\0KBDIO_GETKEYMAP\0KBDIO_FLUSHPENDING\0KBDIO"
+"_PUTCHAR\0KBDIO_PUTKEY\0KBDIO_GETDBGF12\0KBDIO_GETMOD";
 PRIVATE char const repr_KOS_IOCTLS_4d00h[] =
-"MOUSEIO_SETABSMODE\0MOUSEIO_SETABSRECT\0MOUSEIO_PUTMOTION\0MOUSEIO_"
-"SETPOS\0MOUSEIO_PUTBUTTON\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL\0MOU"
-"SEIO_FLUSHPENDING";
+"MOUSEIO_GETABSMODE\0MOUSEIO_GETABSRECT\0MOUSEIO_PUTMOTION\0MOUSEIO_"
+"GETPOS\0MOUSEIO_GETBUTTONS\0MOUSEIO_PUTVWHEEL\0MOUSEIO_PUTHWHEEL\0MO"
+"USEIO_FLUSHPENDING";
 PRIVATE char const repr_KOS_IOCTLS_5400h[] =
-"TTYIO_IBUF_SETLIMIT\0TTYIO_CANON_SETLIMIT\0TTYIO_OPEND_SETLIMIT\0TT"
-"YIO_IPEND_SETLIMIT";
+"TTYIO_IBUF_GETLIMIT\0TTYIO_CANON_GETLIMIT\0TTYIO_OPEND_GETLIMIT\0TT"
+"YIO_IPEND_GETLIMIT";
 PRIVATE char const repr_KOS_IOCTLS_5600h[] =
-"VIDEOIO_LISTFORMAT\0VIDEOIO_SETFORMAT\0VIDEOIO_SETPAL";
+"VIDEOIO_LISTFORMAT\0VIDEOIO_GETFORMAT\0VIDEOIO_GETPAL";
 //[[[end]]]
 
 PRIVATE ATTR_UNUSED ATTR_CONST WUNUSED char const *CC
