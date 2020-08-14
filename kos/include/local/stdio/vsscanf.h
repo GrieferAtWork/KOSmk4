@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c7d8ddc */
+/* HASH CRC-32:0x62044695 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,6 +122,9 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
 #include <bits/format-printer.h>
+#if __SIZEOF_CHAR__ == 1
+#ifndef ____vsscanf_getc_defined
+#define ____vsscanf_getc_defined 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
@@ -134,15 +137,65 @@ __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#endif /* !____vsscanf_getc_defined */
+
+#elif __SIZEOF_CHAR__ == 2
+#ifndef ____vsc16scanf_getc_defined
+#define ____vsc16scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsc16scanf_getc)(void *__arg) {
+	__CHAR32_TYPE__ __result = __unicode_readutf16((__CHAR16_TYPE__ const **)__arg);
+	return __result ? __result : __EOF;
+}
+__LOCAL_LIBC(vsc16scanf_ungetc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+	__unicode_readutf16_rev((__CHAR16_TYPE__ const **)__arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc16scanf_getc_defined */
+
+#else /* ... */
+#ifndef ____vsc32scanf_getc_defined
+#define ____vsc32scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf_getc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsc32scanf_getc)(void *__arg) {
+	__CHAR32_TYPE__ __result = **(__CHAR32_TYPE__ const **)__arg;
+	if (!__result)
+		return __EOF;
+	++*(__CHAR32_TYPE__ const **)__arg;
+	return __result;
+}
+__LOCAL_LIBC(vsc32scanf_ungetc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsc32scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+	--*(__CHAR32_TYPE__ const **)__arg;
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc32scanf_getc_defined */
+
+#endif /* !... */
 __NAMESPACE_LOCAL_BEGIN
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __LOCAL_LIBC(vsscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsscanf))(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) {
 	char const *__input_pointer = __input;
+
 	return __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
 	                     (void *)&__input_pointer, __format, __args);
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vsscanf_defined

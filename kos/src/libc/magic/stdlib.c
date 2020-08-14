@@ -823,37 +823,119 @@ double atof([[nonnull]] char const *__restrict nptr) {
 }
 
 [[std, ATTR_LEAF]]
+[[impl_include("<asm/crt/stdio.h>")]]
+[[impl_prefix(
+@@pp_if __SIZEOF_CHAR__ == 1@@
+DEFINE_VSSCANF_HELPERS_C8
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+DEFINE_VSSCANF_HELPERS_C16
+@@pp_else@@
+DEFINE_VSSCANF_HELPERS_C32
+@@pp_endif@@
+)]]
+[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
+[[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]]
 [[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold")]]
 double strtod([[nonnull]] char const *__restrict nptr,
               [[nullable]] char **endptr) {
-	/* TODO */
-	COMPILER_IMPURE();
+	__LONGDOUBLE result;
+	char const *text_pointer = nptr;
+@@pp_if __SIZEOF_CHAR__ == 1@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
+	                  (void *)&text_pointer, "%lf", &result))
+		result = 0.0;
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
+	                  (void *)&text_pointer, "%lf", &result))
+		result = 0.0;
+@@pp_else@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
+	                  (void *)&text_pointer, "%lf", &result))
+		result = 0.0;
+@@pp_endif@@
 	if (endptr)
-		*endptr = (char *)nptr;
-	return 0;
+		*endptr = (char *)text_pointer;
+	return result;
 }
 
 %(std)#ifdef __USE_ISOC99
 [[guard, std, ATTR_LEAF]]
+[[impl_include("<asm/crt/stdio.h>")]]
+[[impl_prefix(
+@@pp_if __SIZEOF_CHAR__ == 1@@
+DEFINE_VSSCANF_HELPERS_C8
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+DEFINE_VSSCANF_HELPERS_C16
+@@pp_else@@
+DEFINE_VSSCANF_HELPERS_C32
+@@pp_endif@@
+)]]
+[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
 float strtof([[nonnull]] char const *__restrict nptr,
              [[nullable]] char **endptr) {
-	/* TODO */
-	COMPILER_IMPURE();
+	float result;
+	char const *text_pointer = nptr;
+@@pp_if __SIZEOF_CHAR__ == 1@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
+	                  (void *)&text_pointer, "%f", &result))
+		result = 0.0f;
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
+	                  (void *)&text_pointer, "%f", &result))
+		result = 0.0f;
+@@pp_else@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
+	                  (void *)&text_pointer, "%f", &result))
+		result = 0.0f;
+@@pp_endif@@
 	if (endptr)
-		*endptr = (char *)nptr;
-	return 0;
+		*endptr = (char *)text_pointer;
+	return result;
 }
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[guard, std, ATTR_LEAF]]
+[[impl_include("<asm/crt/stdio.h>")]]
+[[impl_prefix(
+@@pp_if __SIZEOF_CHAR__ == 1@@
+DEFINE_VSSCANF_HELPERS_C8
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+DEFINE_VSSCANF_HELPERS_C16
+@@pp_else@@
+DEFINE_VSSCANF_HELPERS_C32
+@@pp_endif@@
+)]]
+[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
 [[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]]
 __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
                      [[nullable]] char **endptr) {
-	/* TODO */
-	COMPILER_IMPURE();
+	__LONGDOUBLE result;
+	char const *text_pointer = nptr;
+@@pp_if __SIZEOF_CHAR__ == 1@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
+	                  (void *)&text_pointer, "%Lf", &result))
+		result = 0.0L;
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
+	                  (void *)&text_pointer, "%Lf", &result))
+		result = 0.0L;
+@@pp_else@@
+	if (!format_scanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
+	                  (void *)&text_pointer, "%Lf", &result))
+		result = 0.0L;
+@@pp_endif@@
 	if (endptr)
-		*endptr = (char *)nptr;
-	return 0;
+		*endptr = (char *)text_pointer;
+	return result;
 }
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std)#endif /* __USE_ISOC99 */

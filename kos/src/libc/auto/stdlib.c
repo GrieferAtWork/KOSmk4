@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ced4179 */
+/* HASH CRC-32:0x237aef67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/stdlib.h"
 #include "../user/fcntl.h"
+#include "format-printer.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
 #include "unicode.h"
@@ -398,35 +399,255 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF WUNUSED NONNUL
 NOTHROW_NCX(LIBCCALL libc_atof)(char const *__restrict nptr) {
 	return libc_strtod(nptr, NULL);
 }
+#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+DEFINE_INTERN_ALIAS(libc_strtod, libc_strtod);
+#else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
+#include <asm/crt/stdio.h>
+#if __SIZEOF_CHAR__ == 1
+#ifndef ____vsscanf_getc_defined
+#define ____vsscanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsscanf_getc) ssize_t
+(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+	char32_t result = libc_unicode_readutf8((char const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsscanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	libc_unicode_readutf8_rev((char const **)arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsscanf_getc_defined */
+
+#elif __SIZEOF_CHAR__ == 2
+#ifndef ____vsc16scanf_getc_defined
+#define ____vsc16scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
+	char32_t result = unicode_readutf16((char16_t const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	unicode_readutf16_rev((char16_t const **)arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc16scanf_getc_defined */
+
+#else /* ... */
+#ifndef ____vsc32scanf_getc_defined
+#define ____vsc32scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
+	char32_t result = **(char32_t const **)arg;
+	if (!result)
+		return __EOF;
+	++*(char32_t const **)arg;
+	return result;
+}
+__LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	--*(char32_t const **)arg;
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc32scanf_getc_defined */
+
+#endif /* !... */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
 NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
                                   char **endptr) {
-	/* TODO */
-	COMPILER_IMPURE();
+	__LONGDOUBLE result;
+	char const *text_pointer = nptr;
+
+	if (!libc_format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
+	                  (void *)&text_pointer, "%lf", &result))
+		result = 0.0;
+
+
+
+
+
+
+
+
+
+
+
 	if (endptr)
-		*endptr = (char *)nptr;
+		*endptr = (char *)text_pointer;
+	return result;
+}
+#endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+#include <asm/crt/stdio.h>
+#if __SIZEOF_CHAR__ == 1
+#ifndef ____vsscanf_getc_defined
+#define ____vsscanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsscanf_getc) ssize_t
+(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+	char32_t result = libc_unicode_readutf8((char const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsscanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	libc_unicode_readutf8_rev((char const **)arg);
 	return 0;
 }
+__NAMESPACE_LOCAL_END
+#endif /* !____vsscanf_getc_defined */
+
+#elif __SIZEOF_CHAR__ == 2
+#ifndef ____vsc16scanf_getc_defined
+#define ____vsc16scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
+	char32_t result = unicode_readutf16((char16_t const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	unicode_readutf16_rev((char16_t const **)arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc16scanf_getc_defined */
+
+#else /* ... */
+#ifndef ____vsc32scanf_getc_defined
+#define ____vsc32scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
+	char32_t result = **(char32_t const **)arg;
+	if (!result)
+		return __EOF;
+	++*(char32_t const **)arg;
+	return result;
+}
+__LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	--*(char32_t const **)arg;
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc32scanf_getc_defined */
+
+#endif /* !... */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) float
 NOTHROW_NCX(LIBCCALL libc_strtof)(char const *__restrict nptr,
                                   char **endptr) {
-	/* TODO */
-	COMPILER_IMPURE();
+	float result;
+	char const *text_pointer = nptr;
+
+	if (!libc_format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
+	                  (void *)&text_pointer, "%f", &result))
+		result = 0.0f;
+
+
+
+
+
+
+
+
+
+
+
 	if (endptr)
-		*endptr = (char *)nptr;
-	return 0;
+		*endptr = (char *)text_pointer;
+	return result;
 }
 #if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
+#include <asm/crt/stdio.h>
+#if __SIZEOF_CHAR__ == 1
+#ifndef ____vsscanf_getc_defined
+#define ____vsscanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsscanf_getc) ssize_t
+(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+	char32_t result = libc_unicode_readutf8((char const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsscanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	libc_unicode_readutf8_rev((char const **)arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsscanf_getc_defined */
+
+#elif __SIZEOF_CHAR__ == 2
+#ifndef ____vsc16scanf_getc_defined
+#define ____vsc16scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
+	char32_t result = unicode_readutf16((char16_t const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	unicode_readutf16_rev((char16_t const **)arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc16scanf_getc_defined */
+
+#else /* ... */
+#ifndef ____vsc32scanf_getc_defined
+#define ____vsc32scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
+	char32_t result = **(char32_t const **)arg;
+	if (!result)
+		return __EOF;
+	++*(char32_t const **)arg;
+	return result;
+}
+__LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	--*(char32_t const **)arg;
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc32scanf_getc_defined */
+
+#endif /* !... */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
                                    char **endptr) {
-	/* TODO */
-	COMPILER_IMPURE();
+	__LONGDOUBLE result;
+	char const *text_pointer = nptr;
+
+	if (!libc_format_scanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                  &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
+	                  (void *)&text_pointer, "%Lf", &result))
+		result = 0.0L;
+
+
+
+
+
+
+
+
+
+
+
 	if (endptr)
-		*endptr = (char *)nptr;
-	return 0;
+		*endptr = (char *)text_pointer;
+	return result;
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
 #endif /* !__KERNEL__ */

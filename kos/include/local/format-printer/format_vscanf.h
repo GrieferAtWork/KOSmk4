@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd413334b */
+/* HASH CRC-32:0x323ebb83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/string.h>
 #include <libc/unicode.h>
+#include <parts/printf-config.h>
+#include <bits/math-constants.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these

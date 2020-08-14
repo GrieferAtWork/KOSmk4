@@ -48,6 +48,7 @@
 
 #ifdef __INTELLISENSE__
 #include <bits/format-printer.h>
+#include <bits/math-constants.h>
 
 #include <libc/string.h>
 #include <libc/unicode.h>
@@ -115,12 +116,23 @@ __skip_whitespace_has_temp:
 		__builtin_unreachable();
 
 	case '%': {
-#define __SCANF_FLAG_SIGNED   0x01
-#define __SCANF_FLAG_UNSIGNED 0x02
-#define __SCANF_FLAG_INVERT   0x04
-#define __SCANF_FLAG_ISEOF    0x20
-#define __SCANF_FLAG_IGNORED  0x40
-#define __SCANF_FLAG_INSIDE   0x80
+#undef __SCANF_FLAG_L
+#define __SCANF_FLAG_SIGNED   0x0001
+#define __SCANF_FLAG_UNSIGNED 0x0002
+#define __SCANF_FLAG_INVERT   0x0004
+#define __SCANF_FLAG_ISEOF    0x0020
+#define __SCANF_FLAG_IGNORED  0x0040
+#define __SCANF_FLAG_INSIDE   0x0080
+#if (defined(__COMPILER_HAVE_LONGDOUBLE) &&   \
+     (!defined(__NO_FPU) &&                   \
+      !defined(__NO_SCANF_FLOATING_POINT)) && \
+     (defined(__SIZEOF_LONG_LONG__)           \
+      ? __SIZEOF_LONG_LONG__                  \
+      : __SIZEOF_LONG_DOUBLE__) == __SIZEOF_LONG__)
+#define __SCANF_FLAG_L        0x0100 /* 'L' was used */
+#endif /* ... */
+
+
 		__SIZE_TYPE__ __type_size;
 		__SIZE_TYPE__ __width;
 		__SIZE_TYPE__ __bufsize;
@@ -154,12 +166,23 @@ __next_mod_curr:
 			goto __next_mod_curr;
 		case 'l':
 			__ch = *__FORMAT_FORMAT++;
-#ifdef __LONGLONG
+#if (defined(__LONGLONG) ||                  \
+     (defined(__COMPILER_HAVE_LONGDOUBLE) && \
+      (!defined(__NO_FPU) &&                 \
+       !defined(__NO_SCANF_FLOATING_POINT))))
 			if (__ch == 'l') {
+		case 'L':
+#ifdef __SIZEOF_LONG_LONG__
 				__type_size = sizeof(__LONGLONG);
+#else /* __SIZEOF_LONG_LONG__ */
+				__type_size = __SIZEOF_LONG_DOUBLE__;
+#endif /* !__SIZEOF_LONG_LONG__ */
+#ifdef __SCANF_FLAG_L
+				__flags |= __SCANF_FLAG_L;
+#endif /* __SCANF_FLAG_L */
 				__ch = *__FORMAT_FORMAT++;
 			} else
-#endif /* __LONGLONG */
+#endif /* __LONGLONG || ... */
 			{
 				__type_size = sizeof(long);
 			}
@@ -174,10 +197,6 @@ __next_mod_curr:
 		case 'z':
 			__flags |= __SCANF_FLAG_UNSIGNED;
 			__type_size = sizeof(__SIZE_TYPE__);
-			goto __next_mod;
-		case 'L':
-			/* NOTE: Also functions as `long long' for d, i, o, u or x */
-			__type_size = (__SIZE_TYPE__)__ch;
 			goto __next_mod;
 		case 'I':
 			__ch = *__FORMAT_FORMAT++;
@@ -284,8 +303,10 @@ __do_scanf_integer_read_initial:
 				if __unlikely(__temp < 0)
 					goto __err_or_eof;
 			}
-			if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
+			if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp)) {
+				++__read_count;
 				goto __do_scanf_integer_read_initial; /* Skip leading space */
+			}
 			if (!(__flags & __SCANF_FLAG_UNSIGNED)) {
 				__flags &= ~__SCANF_FLAG_SIGNED;
 				/* Process sign prefixes. */
@@ -345,12 +366,14 @@ __read_chr_after_radix_prefix:
 			/* Parse the integer. */
 			while (__width) {
 				__UINT8_TYPE__ __digit;
-				if (__libc_unicode_isdecimal((__CHAR32_TYPE__)__temp))
-					__digit = __libc_unicode_asdigit((__CHAR32_TYPE__)__temp);
+				if ((__CHAR32_TYPE__)__temp >= '0' && (__CHAR32_TYPE__)__temp <= '9')
+					__digit = (__UINT8_TYPE__)__temp - '0';
 				else if ((__CHAR32_TYPE__)__temp >= 'A' && (__CHAR32_TYPE__)__temp <= 'F')
 					__digit = 10 + ((__UINT8_TYPE__)__temp - 'A');
 				else if ((__CHAR32_TYPE__)__temp >= 'a' && (__CHAR32_TYPE__)__temp <= 'f')
 					__digit = 10 + ((__UINT8_TYPE__)__temp - 'a');
+				else if (__libc_unicode_isdecimal((__CHAR32_TYPE__)__temp))
+					__digit = __libc_unicode_asdigit((__CHAR32_TYPE__)__temp);
 				else {
 					break;
 				}
@@ -450,8 +473,10 @@ __do_scanf_string_ignored_read_initial:
 						if __unlikely(__temp < 0)
 							goto __err_or_eof;
 					}
-					if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
+					if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp)) {
+						++__read_count;
 						goto __do_scanf_string_ignored_read_initial; /* Skip leading space */
+					}
 					for (;;) {
 						if (!__width)
 							break;
@@ -484,8 +509,10 @@ __done_string_terminate_eof:
 							goto __end;
 						}
 					}
-					if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp))
+					if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp)) {
+						++__read_count;
 						goto __do_scanf_string_read_initial; /* Skip leading space */
+					}
 					for (;;) {
 						char __buf[__LIBC_UNICODE_UTF8_CURLEN];
 						__SIZE_TYPE__ __cnt;
@@ -633,6 +660,7 @@ __pattern_has_char:
 				if (!__has_temp)
 					goto __read_temp_for_ignored_format_c;
 				for (;;) {
+					++__read_count;
 					--__width;
 					if (!__width)
 						break;
@@ -674,6 +702,7 @@ __write_temp_for_format_c:
 					} else {
 						goto __write_temp_for_format_c;
 					}
+					++__read_count;
 					--__width;
 					if (!__width)
 						break;
@@ -686,6 +715,313 @@ __read_temp_for_format_c:
 			__has_temp = 0;
 			++__result;
 		}	break;
+
+
+
+#if (!defined(__NO_FPU) && \
+     !defined(__NO_SCANF_FLOATING_POINT))
+		case 'f':
+		case 'e':
+		case 'g':
+		case 'E':
+		case 'a': {
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#define __FP_VAL_TYPE __LONGDOUBLE
+#else /* __COMPILER_HAVE_LONGDOUBLE */
+#define __FP_VAL_TYPE double
+#endif /* !__COMPILER_HAVE_LONGDOUBLE */
+			__FP_VAL_TYPE __val = 0;
+			__BOOL __isneg = 0;
+			if (!__has_temp) {
+__fp_do_read_initial:
+				__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+				if __unlikely(__temp < 0)
+					goto __err_or_eof;
+			}
+			if (__libc_unicode_isspace((__CHAR32_TYPE__)__temp)) {
+				++__read_count;
+				goto __fp_do_read_initial; /* Skip leading space */
+			}
+			if (__temp == '-') {
+				__isneg = 1;
+				goto __do_consume_fp_sign;
+			} else if (__temp == '+') {
+__do_consume_fp_sign:
+				++__read_count;
+				__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+				if __unlikely(__temp < 0)
+					goto __err_or_eof;
+			}
+#ifdef __NANL
+			if (__temp == 'n' || __temp == 'N') {
+				__SSIZE_TYPE__ __temp2, __temp3;
+				__temp2 = (*__FORMAT_PGETC)(__FORMAT_ARG);
+				if __unlikely(__temp2 < 0) {
+					if (__temp2 != __EOF)
+						return __temp2;
+					__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp);
+					if __unlikely(__temp < 0)
+						goto __err;
+					goto __end;
+				}
+				if (__temp2 == 'a' || __temp == 'A') {
+					__temp3 = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp3 < 0) {
+						if (__temp3 != __EOF)
+							return __temp3;
+						__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+						if __unlikely(__temp2 < 0)
+							return __temp2;
+						__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp);
+						if __unlikely(__temp < 0)
+							goto __err;
+						goto __end;
+					}
+					if (__temp3 == 'n' || __temp3 == 'N') {
+						__val = __NANL;
+						__has_temp = 0;
+						__read_count += 3;
+					} else {
+						__temp3 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp3);
+						if __unlikely(__temp3 < 0)
+							return __temp3;
+						__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+						if __unlikely(__temp2 < 0)
+							return __temp2;
+						__has_temp = 1;
+					}
+				} else {
+					__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+					if __unlikely(__temp2 < 0)
+						return __temp2;
+					__has_temp = 1;
+				}
+			} else
+#endif /* __NANL */
+#ifdef __INFINITYL
+			if (__temp == 'i' || __temp == 'I') {
+				__SSIZE_TYPE__ __temp2, __temp3;
+				__temp2 = (*__FORMAT_PGETC)(__FORMAT_ARG);
+				if __unlikely(__temp2 < 0) {
+					if (__temp2 != __EOF)
+						return __temp2;
+					__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp);
+					if __unlikely(__temp < 0)
+						goto __err;
+					goto __end;
+				}
+				if (__temp2 == 'n' || __temp == 'N') {
+					__temp3 = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp3 < 0) {
+						if (__temp3 != __EOF)
+							return __temp3;
+						__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+						if __unlikely(__temp2 < 0)
+							return __temp2;
+						__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp);
+						if __unlikely(__temp < 0)
+							goto __err;
+						goto __end;
+					}
+					if (__temp3 == 'f' || __temp3 == 'F') {
+						__val = __INFINITYL;
+						__has_temp = 0;
+						__read_count += 3;
+					} else {
+						__temp3 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp3);
+						if __unlikely(__temp3 < 0)
+							return __temp3;
+						__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+						if __unlikely(__temp2 < 0)
+							return __temp2;
+						__has_temp = 1;
+					}
+				} else {
+					__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+					if __unlikely(__temp2 < 0)
+						return __temp2;
+					__has_temp = 1;
+				}
+			} else
+#endif /* __INFINITYL */
+			{
+				__CHAR_TYPE __fp_expch = 'e';
+				__CHAR_TYPE __fp_expch2 = 'E';
+				__FP_VAL_TYPE __fp_basef = 10;
+				unsigned int __fp_basei = 10;
+				__SIZE_TYPE__ __fp_start;
+				__INTMAX_TYPE__ __exp_power = 0;
+				if (__temp == '0') {
+					/* Check for hex floating point values. */
+					++__read_count;
+					__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp < 0)
+						goto __err_or_eof;
+					if (__temp == 'x' || __temp == 'X') {
+						__fp_basef = 16;
+						__fp_basei = 16;
+						__fp_expch = 'p';
+						__fp_expch2 = 'P';
+						++__read_count;
+						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+						if __unlikely(__temp < 0)
+							goto __err_or_eof;
+					}
+				}
+__fp_loop:
+				__fp_start = __read_count;
+				for (;;) {
+					unsigned int __digit;
+					if (__temp >= '0' && __temp <= '9')
+						__digit = (unsigned int)(__temp - '0');
+					else if (__temp >= 'a' && __temp <= 'f')
+						__digit = (unsigned int)(__temp - 'a');
+					else if (__temp >= 'A' && __temp <= 'F')
+						__digit = (unsigned int)(__temp - 'A');
+					else if (__libc_unicode_isdecimal((__CHAR32_TYPE__)__temp))
+						__digit = __libc_unicode_asdigit((__CHAR32_TYPE__)__temp);
+					else {
+						break;
+					}
+					if (__digit >= __fp_basei)
+						break;
+					__val = __val * __fp_basef + (__FP_VAL_TYPE)__digit;
+					++__read_count;
+					__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp < 0)
+						goto __err_or_eof;
+				}
+				if (!__exp_power && __temp == '.') {
+					++__read_count; /* Consume the '.' */
+					__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp < 0)
+						goto __err_or_eof;
+					__exp_power = 1;
+					goto __fp_loop;
+				}
+				if (__exp_power)
+					__exp_power = __read_count - __fp_start;
+				if (__temp == __fp_expch || __temp == __fp_expch2) {
+					__SSIZE_TYPE__ __temp2;
+					__BOOL __exp_negative = 0;
+					__INTMAX_TYPE__ __exp_addend;
+					/* An explicit exponent may have been given. */
+					__temp2 = (*__FORMAT_PGETC)(__FORMAT_ARG);
+					if __unlikely(__temp2 < 0) {
+						if (__temp2 != __EOF)
+							return __temp2;
+						__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp);
+						if __unlikely(__temp < 0)
+							goto __err;
+						goto __end;
+					}
+					if (__temp2 == '-' || __temp2 == '+') {
+						__SSIZE_TYPE__ __temp3;
+						__exp_negative = __temp2 == '-';
+						__temp3 = (*__FORMAT_PGETC)(__FORMAT_ARG);
+						if __unlikely(__temp3 < 0) {
+							if (__temp3 != __EOF)
+								return __temp3;
+							__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+							if __unlikely(__temp2 < 0)
+								return __temp2;
+							__temp = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp);
+							if __unlikely(__temp < 0)
+								goto __err;
+							goto __end;
+						}
+						if (!(__temp3 >= '0' && __temp3 <= '9')) {
+							__temp3 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp3);
+							if __unlikely(__temp3 < 0)
+								return __temp3;
+							__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+							if __unlikely(__temp2 < 0)
+								return __temp2;
+							goto __fp_no_exp_addend;
+						}
+						++__read_count; /* Consume the '+' or '-' */
+						__temp2 = __temp3;
+					} else {
+						if (!(__temp2 >= '0' && __temp2 <= '9')) {
+							__temp2 = (*__FORMAT_PUNGETC)(__FORMAT_ARG, __temp2);
+							if __unlikely(__temp2 < 0)
+								return __temp2;
+							goto __fp_no_exp_addend;
+						}
+					}
+					__temp = __temp2;
+					++__read_count; /* Consume the '.' */
+					__exp_addend = 0;
+					for (;;) {
+						if (__temp >= '0' && __temp <= '9') {
+							__exp_addend = (__exp_addend * 10) +
+							               (__temp - '0');
+						} else {
+							break;
+						}
+						++__read_count; /* Consume digit */
+						__temp = (*__FORMAT_PGETC)(__FORMAT_ARG);
+						if __unlikely(__temp < 0)
+							goto __err_or_eof;
+					}
+					if (__exp_negative)
+						__exp_addend = -__exp_addend;
+					__exp_power -= __exp_addend;
+				}
+__fp_no_exp_addend:
+				__has_temp = 1;
+				if (__exp_power != 0) {
+					__UINTMAX_TYPE__ __exp_abs;
+					/* >> result = __val / (__fp_basef ^ __exp_power) */
+					__exp_abs = (__UINTMAX_TYPE__)__exp_power;
+					if (__exp_power < 0)
+						__exp_abs = (__UINTMAX_TYPE__)-__exp_abs;
+					while (__exp_abs) {
+						if (__exp_abs & 1) {
+							if (__exp_power < 0) {
+								__val = __val * __fp_basef;
+							} else {
+								__val = __val / __fp_basef;
+							}
+						}
+						__exp_abs >>= 1;
+						__fp_basef = __fp_basef * __fp_basef;
+					}
+				}
+			}
+			if (__isneg)
+				__val = -__val;
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifdef __SCANF_FLAG_L
+			if (__flags & __SCANF_FLAG_L)
+#elif defined(__SIZEOF_LONG_LONG__)
+			if (__type_size == __SIZEOF_LONG_LONG__)
+#else /* __SIZEOF_LONG_LONG__ */
+			if (__type_size == __SIZEOF_LONG_DOUBLE__)
+#endif /* !__SIZEOF_LONG_LONG__ */
+			{
+				/* Result pointer is a long-double */
+				__LONGDOUBLE *__dst;
+				__dst = __builtin_va_arg(__FORMAT_ARGS, __LONGDOUBLE *);
+				*__dst = (__LONGDOUBLE)__val;
+			} else
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+			if (__type_size == __SIZEOF_LONG__) {
+				/* Result pointer is a double */
+				double *__dst;
+				__dst = __builtin_va_arg(__FORMAT_ARGS, double *);
+				*__dst = (double)__val;
+			} else {
+				/* Result pointer is a float */
+				float *__dst;
+				__dst = __builtin_va_arg(__FORMAT_ARGS, float *);
+				*__dst = (float)__val;
+			}
+			++__result;
+		}	break;
+#endif /* !__NO_FPU && !__NO_SCANF_FLOATING_POINT */
+
+
 
 		default:
 			if (__ch >= '0' && __ch <= '9') {
@@ -700,6 +1036,7 @@ __read_temp_for_format_c:
 			}
 			break;
 		}
+#undef __SCANF_FLAG_L
 #undef __SCANF_FLAG_INSIDE
 #undef __SCANF_FLAG_IGNORED
 #undef __SCANF_FLAG_ISEOF

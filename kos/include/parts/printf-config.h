@@ -20,8 +20,8 @@
 #ifndef _PARTS_PRINTF_CONFIG_H
 #define _PARTS_PRINTF_CONFIG_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
 
 /* Disable unsupported/unwanted/unneeded printf() features */
 
@@ -33,14 +33,13 @@
 /* #define __NO_PRINTF_DISASM 1 */
 /* #define __NO_PRINTF_VINFO 1 */
 /* #define __NO_PRINTF_FLOATING_POINT 1 */
+/* #define __NO_SCANF_FLOATING_POINT 1 */
 
 #if defined(__KOS__) && defined(__KERNEL__)
 #undef __NO_PRINTF_UNICODE_STRING
 #define __NO_PRINTF_UNICODE_STRING 1
 #undef __NO_PRINTF_UNICODE_CHARS
 #define __NO_PRINTF_UNICODE_CHARS 1
-#undef __NO_PRINTF_FLOATING_POINT
-#define __NO_PRINTF_FLOATING_POINT 1
 #undef __NO_PRINTF_DISASM
 #define __NO_PRINTF_DISASM 1
 #elif !defined(__CRT_KOS) || !defined(__KOS__)
@@ -49,6 +48,13 @@
 #undef __NO_PRINTF_VINFO
 #define __NO_PRINTF_VINFO 1
 #endif /* !__CRT_KOS || !__KOS__ */
+
+#ifdef __NO_FPU
+#undef __NO_PRINTF_FLOATING_POINT
+#define __NO_PRINTF_FLOATING_POINT 1
+#undef __NO_SCANF_FLOATING_POINT
+#define __NO_SCANF_FLOATING_POINT 1
+#endif /* __NO_FPU */
 
 
 #endif /* !_PARTS_PRINTF_CONFIG_H */

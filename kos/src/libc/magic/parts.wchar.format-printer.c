@@ -52,6 +52,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+#include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
 #ifdef __KERNEL__

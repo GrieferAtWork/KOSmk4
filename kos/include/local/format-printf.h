@@ -1469,8 +1469,8 @@ __err_vinfo:
 
 
 	/* Floating point to string conversion */
-#if !defined(__NO_PRINTF_FLOATING_POINT) && \
-    !defined(__NO_FPU)
+#if (!defined(__NO_PRINTF_FLOATING_POINT) && \
+     !defined(__NO_FPU))
 	case 'f': case 'F':
 	case 'e': case 'E':
 	case 'g': case 'G':

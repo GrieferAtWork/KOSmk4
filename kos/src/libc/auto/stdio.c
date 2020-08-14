@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80602e7c */
+/* HASH CRC-32:0xdeaeb4f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -328,18 +328,61 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
 #include <bits/format-printer.h>
+#if __SIZEOF_CHAR__ == 1
+#ifndef ____vsscanf_getc_defined
+#define ____vsscanf_getc_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = libc_unicode_readutf8((char const **)__arg);
-	return __result ? __result : __EOF;
+__LOCAL_LIBC(vsscanf_getc) ssize_t
+(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+	char32_t result = libc_unicode_readutf8((char const **)arg);
+	return result ? result : __EOF;
 }
-__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	libc_unicode_readutf8_rev((char const **)__arg);
+__LOCAL_LIBC(vsscanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	libc_unicode_readutf8_rev((char const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#endif /* !____vsscanf_getc_defined */
+
+#elif __SIZEOF_CHAR__ == 2
+#ifndef ____vsc16scanf_getc_defined
+#define ____vsc16scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
+	char32_t result = unicode_readutf16((char16_t const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	unicode_readutf16_rev((char16_t const **)arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc16scanf_getc_defined */
+
+#else /* ... */
+#ifndef ____vsc32scanf_getc_defined
+#define ____vsc32scanf_getc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
+	char32_t result = **(char32_t const **)arg;
+	if (!result)
+		return __EOF;
+	++*(char32_t const **)arg;
+	return result;
+}
+__LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	--*(char32_t const **)arg;
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc32scanf_getc_defined */
+
+#endif /* !... */
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
@@ -347,9 +390,19 @@ NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
                                    char const *__restrict format,
                                    va_list args) {
 	char const *input_pointer = input;
-	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
-	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
+
+	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
 	                     (void *)&input_pointer, format, args);
+
+
+
+
+
+
+
+
+
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

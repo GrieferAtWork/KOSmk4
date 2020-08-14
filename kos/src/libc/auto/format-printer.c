@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbc7723b */
+/* HASH CRC-32:0xc6d58f02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@ DECL_BEGIN
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+#include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
 #ifdef __KERNEL__
@@ -916,6 +917,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1
 	return result;
 }
 #include <libc/unicode.h>
+#include <bits/math-constants.h>
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in

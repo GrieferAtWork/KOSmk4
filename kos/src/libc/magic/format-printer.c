@@ -20,9 +20,10 @@
 
 %[default:section(".text.crt{|.dos}.string.format")]
 
-%[define_replacement(pformatprinter = __pformatprinter)]
-%[define_replacement(pformatgetc    = __pformatgetc)]
-%[define_replacement(pformatungetc  = __pformatungetc)]
+%[define_replacement(pformatprinter   = __pformatprinter)]
+%[define_replacement(pformatgetc      = __pformatgetc)]
+%[define_replacement(pformatungetc    = __pformatungetc)]
+%[define_replacement(FORMATPRINTER_CC = __FORMATPRINTER_CC)]
 
 %[define_type_class(__pformatprinter    = "TP")]
 %[define_type_class(__pformatgetc       = "TP")]
@@ -59,6 +60,7 @@
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+#include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
 #ifdef __KERNEL__
@@ -892,6 +894,8 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 [[throws, kernel, ATTR_LIBC_SCANF(4, 0)]]
 [[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
+[[impl_include("<parts/printf-config.h>")]]
+[[impl_include("<bits/math-constants.h>")]]
 $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
                        [[nonnull]] pformatungetc pungetc, void *arg,
                        [[nonnull]] char const *__restrict format, $va_list args) {

@@ -1025,32 +1025,95 @@ char *gets([[nonnull]] char *__restrict buf) {
 %(std)#if defined(__USE_ISOC99) || defined(__USE_DOS)
 
 
-@@Scan data from a given `INPUT' string, following `FORMAT'
-@@Return the number of successfully scanned data items
-[[decl_include("<features.h>")]]
-[[guard, std, guard, crtbuiltin, impl_include("<asm/crt/stdio.h>")]]
-[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
-[[impl_include("<hybrid/typecore.h>", "<bits/format-printer.h>"), impl_prefix(
+%[define(DEFINE_VSSCANF_HELPERS_C8 =
+@@pp_ifndef ____vsscanf_getc_defined@@
+#define ____vsscanf_getc_defined 1
 @@push_namespace(local)@@
-__LOCAL_LIBC(@vsscanf_getc@) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = unicode_readutf8((char const **)__arg);
-	return __result ? __result : __EOF;
+__LOCAL_LIBC(@vsscanf_getc@) ssize_t
+(FORMATPRINTER_CC vsscanf_getc)(void *arg) {
+	char32_t result = unicode_readutf8((char const **)arg);
+	return result ? result : __EOF;
 }
-__LOCAL_LIBC(@vsscanf_ungetc@) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	unicode_readutf8_rev((char const **)__arg);
+__LOCAL_LIBC(@vsscanf_ungetc@) ssize_t
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	unicode_readutf8_rev((char const **)arg);
 	return 0;
 }
 @@pop_namespace@@
-), ATTR_LIBC_SCANF(2, 0), wunused, alias("_vsscanf", "_vsscanf_s")]]
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VSSCANF_HELPERS_C16 =
+@@pp_ifndef ____vsc16scanf_getc_defined@@
+#define ____vsc16scanf_getc_defined 1
+@@push_namespace(local)@@
+__LOCAL_LIBC(@vsc16scanf_getc@) ssize_t
+(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
+	char32_t result = unicode_readutf16((char16_t const **)arg);
+	return result ? result : __EOF;
+}
+__LOCAL_LIBC(@vsc16scanf_ungetc@) ssize_t
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	unicode_readutf16_rev((char16_t const **)arg);
+	return 0;
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VSSCANF_HELPERS_C32 =
+@@pp_ifndef ____vsc32scanf_getc_defined@@
+#define ____vsc32scanf_getc_defined 1
+@@push_namespace(local)@@
+__LOCAL_LIBC(@vsc32scanf_getc@) ssize_t
+(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
+	char32_t result = **(char32_t const **)arg;
+	if (!result)
+		return __EOF;
+	++*(char32_t const **)arg;
+	return result;
+}
+__LOCAL_LIBC(@vsc32scanf_ungetc@) ssize_t
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
+	--*(char32_t const **)arg;
+	return 0;
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+@@Scan data from a given `INPUT' string, following `FORMAT'
+@@Return the number of successfully scanned data items
+[[guard, std, guard, crtbuiltin, impl_include("<asm/crt/stdio.h>")]]
+[[wunused, ATTR_LIBC_SCANF(2, 0), decl_include("<features.h>")]]
+[[dependency(unicode_readutf8, unicode_readutf8_rev)]]
+[[impl_include("<hybrid/typecore.h>", "<bits/format-printer.h>")]]
+[[impl_prefix(
+@@pp_if __SIZEOF_CHAR__ == 1@@
+DEFINE_VSSCANF_HELPERS_C8
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+DEFINE_VSSCANF_HELPERS_C16
+@@pp_else@@
+DEFINE_VSSCANF_HELPERS_C32
+@@pp_endif@@
+), alias("_vsscanf", "_vsscanf_s")]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf"), export_alias("__vsscanf")]]
 __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
                              [[nonnull]] char const *__restrict format, $va_list args) {
 	char const *input_pointer = input;
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
-	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
+@@pp_if __SIZEOF_CHAR__ == 1@@
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
 	                     (void *)&input_pointer, format, args);
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM vsc16scanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
+	                     (void *)&input_pointer, format, args);
+@@pp_else@@
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
+	                     (void *)&input_pointer, format, args);
+@@pp_endif@@
 }
 %(std)#endif /* __USE_ISOC99 || __USE_DOS */
 
