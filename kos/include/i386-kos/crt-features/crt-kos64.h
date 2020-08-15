@@ -1750,6 +1750,8 @@
 #define __CRT_HAVE_fscanf 1
 #define __CRT_HAVE_fscanf_unlocked 1
 #define __CRT_HAVE_fseek 1
+#define __CRT_HAVE_fseek64 1
+#define __CRT_HAVE_fseek64_unlocked 1
 #define __CRT_HAVE_fseek_unlocked 1
 #define __CRT_HAVE_fseeko 1
 #define __CRT_HAVE_fseeko64 1
@@ -1770,6 +1772,8 @@
 #define __CRT_HAVE_fstatvfs64 1
 #define __CRT_HAVE_fsync 1
 #define __CRT_HAVE_ftell 1
+#define __CRT_HAVE_ftell64 1
+#define __CRT_HAVE_ftell64_unlocked 1
 #define __CRT_HAVE_ftell_unlocked 1
 #define __CRT_HAVE_ftello 1
 #define __CRT_HAVE_ftello64 1
@@ -5994,6 +5998,8 @@
 #define __CRT_HAVE_KOS$fscanf 1
 #define __CRT_HAVE_KOS$fscanf_unlocked 1
 #define __CRT_HAVE_KOS$fseek 1
+#define __CRT_HAVE_KOS$fseek64 1
+#define __CRT_HAVE_KOS$fseek64_unlocked 1
 #define __CRT_HAVE_KOS$fseek_unlocked 1
 #define __CRT_HAVE_KOS$fseeko 1
 #define __CRT_HAVE_KOS$fseeko64 1
@@ -6014,6 +6020,8 @@
 #define __CRT_HAVE_KOS$fstatvfs64 1
 #define __CRT_HAVE_KOS$fsync 1
 #define __CRT_HAVE_KOS$ftell 1
+#define __CRT_HAVE_KOS$ftell64 1
+#define __CRT_HAVE_KOS$ftell64_unlocked 1
 #define __CRT_HAVE_KOS$ftell_unlocked 1
 #define __CRT_HAVE_KOS$ftello 1
 #define __CRT_HAVE_KOS$ftello64 1
@@ -9363,6 +9371,8 @@
 #define __CRT_HAVE_DOS$fscanf 1
 #define __CRT_HAVE_DOS$fscanf_unlocked 1
 #define __CRT_HAVE_DOS$fseek 1
+#define __CRT_HAVE_DOS$fseek64 1
+#define __CRT_HAVE_DOS$fseek64_unlocked 1
 #define __CRT_HAVE_DOS$fseek_unlocked 1
 #define __CRT_HAVE_DOS$fseeko 1
 #define __CRT_HAVE_DOS$fseeko64 1
@@ -9383,6 +9393,8 @@
 #define __CRT_HAVE_DOS$fstatvfs64 1
 #define __CRT_HAVE_DOS$fsync 1
 #define __CRT_HAVE_DOS$ftell 1
+#define __CRT_HAVE_DOS$ftell64 1
+#define __CRT_HAVE_DOS$ftell64_unlocked 1
 #define __CRT_HAVE_DOS$ftell_unlocked 1
 #define __CRT_HAVE_DOS$ftello 1
 #define __CRT_HAVE_DOS$ftello64 1
