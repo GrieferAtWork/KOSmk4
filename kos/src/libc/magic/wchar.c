@@ -825,16 +825,19 @@ __STDC_INT_AS_SIZE_T swprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__r
 
 %(std,c,ccompat)#ifndef __NO_FPU
 [[std, guard, wchar]]
+[[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstod(*) %{generate(str2wcs("strtod"))}
 %(std,c,ccompat)#endif /* !__NO_FPU */
 
 %(std)#ifdef __USE_ISOC99
 %(std,c,ccompat)#ifndef __NO_FPU
 [[std, guard, wchar]]
+[[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstof(*) %{generate(str2wcs("strtof"))}
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[std, guard, wchar]]
+[[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstold(*) %{generate(str2wcs("strtold"))}
 %(std,c,ccompat)#endif /* !__NO_FPU */
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed172147 */
+/* HASH CRC-32:0x4d371942 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -328,7 +328,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
 #include <bits/format-printer.h>
-#if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined 1
 __NAMESPACE_LOCAL_BEGIN
@@ -348,50 +347,6 @@ __LOCAL_LIBC(vsscanf_ungetc) ssize_t
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____vsscanf_getc_defined */
-
-#elif __SIZEOF_CHAR__ == 2
-#ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc16scanf_getc) ssize_t
-(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
-	char16_t const *reader = *(char16_t const **)arg;
-	char32_t result = unicode_readutf16(&reader);
-	if (!result)
-		return __EOF;
-	*(char16_t const **)arg = reader;
-	return result;
-}
-__LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	unicode_readutf16_rev((char16_t const **)arg);
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !____vsc16scanf_getc_defined */
-
-#else /* ... */
-#ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf_getc) ssize_t
-(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
-	char32_t const *reader = *(char32_t const **)arg;
-	char32_t result = *reader++;
-	if (!result)
-		return __EOF;
-	*(char32_t const **)arg = reader;
-	return result;
-}
-__LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	--*(char32_t const **)arg;
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !____vsc32scanf_getc_defined */
-
-#endif /* !... */
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T

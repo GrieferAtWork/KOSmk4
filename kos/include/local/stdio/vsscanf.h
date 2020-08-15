@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10fb9381 */
+/* HASH CRC-32:0x9fd836d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,7 +122,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
 #include <bits/format-printer.h>
-#if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined 1
 __NAMESPACE_LOCAL_BEGIN
@@ -142,50 +141,6 @@ __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____vsscanf_getc_defined */
-
-#elif __SIZEOF_CHAR__ == 2
-#ifndef ____vsc16scanf_getc_defined
-#define ____vsc16scanf_getc_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsc16scanf_getc)(void *__arg) {
-	__CHAR16_TYPE__ const *__reader = *(__CHAR16_TYPE__ const **)__arg;
-	__CHAR32_TYPE__ __result = __unicode_readutf16(&__reader);
-	if (!__result)
-		return __EOF;
-	*(__CHAR16_TYPE__ const **)__arg = __reader;
-	return __result;
-}
-__LOCAL_LIBC(vsc16scanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	__unicode_readutf16_rev((__CHAR16_TYPE__ const **)__arg);
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !____vsc16scanf_getc_defined */
-
-#else /* ... */
-#ifndef ____vsc32scanf_getc_defined
-#define ____vsc32scanf_getc_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf_getc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsc32scanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ const *__reader = *(__CHAR32_TYPE__ const **)__arg;
-	__CHAR32_TYPE__ __result = *__reader++;
-	if (!__result)
-		return __EOF;
-	*(__CHAR32_TYPE__ const **)__arg = __reader;
-	return __result;
-}
-__LOCAL_LIBC(vsc32scanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsc32scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	--*(__CHAR32_TYPE__ const **)__arg;
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !____vsc32scanf_getc_defined */
-
-#endif /* !... */
 __NAMESPACE_LOCAL_BEGIN
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */

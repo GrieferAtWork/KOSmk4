@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad229d6b */
+/* HASH CRC-32:0x95b9d6ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,6 +85,38 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_scanf __LIBC_LOCAL_NAME(format_scanf)
 #endif /* !__CRT_HAVE_format_scanf */
 #endif /* !__local___localdep_format_scanf_defined */
+/* Dependency: unicode_readutf16 from unicode */
+#ifndef __local___localdep_unicode_readutf16_defined
+#define __local___localdep_unicode_readutf16_defined 1
+#ifdef __CRT_HAVE_unicode_readutf16
+/* Read a single Unicode character from a given UTF-16 string */
+__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16,(__ptext))
+#else /* __CRT_HAVE_unicode_readutf16 */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_readutf16.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Read a single Unicode character from a given UTF-16 string */
+#define __localdep_unicode_readutf16 __LIBC_LOCAL_NAME(unicode_readutf16)
+#endif /* !__CRT_HAVE_unicode_readutf16 */
+#endif /* !__local___localdep_unicode_readutf16_defined */
+/* Dependency: unicode_readutf16_rev from unicode */
+#ifndef __local___localdep_unicode_readutf16_rev_defined
+#define __local___localdep_unicode_readutf16_rev_defined 1
+#ifdef __CRT_HAVE_unicode_readutf16_rev
+/* Same as `unicode_readutf16', but read backwards, with `*ptext'
+ * starting out as a pointer after the character to be read, before
+ * being updated to point to the start of the character that was read */
+__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_rev,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16_rev,(__ptext))
+#else /* __CRT_HAVE_unicode_readutf16_rev */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_readutf16_rev.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `unicode_readutf16', but read backwards, with `*ptext'
+ * starting out as a pointer after the character to be read, before
+ * being updated to point to the start of the character that was read */
+#define __localdep_unicode_readutf16_rev __LIBC_LOCAL_NAME(unicode_readutf16_rev)
+#endif /* !__CRT_HAVE_unicode_readutf16_rev */
+#endif /* !__local___localdep_unicode_readutf16_rev_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -111,7 +143,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc16scanf_getc)(void *__arg) {
 	__CHAR16_TYPE__ const *__reader = *(__CHAR16_TYPE__ const **)__arg;
-	__CHAR32_TYPE__ __result = __unicode_readutf16(&__reader);
+	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16)(&__reader);
 	if (!__result)
 		return __EOF;
 	*(__CHAR16_TYPE__ const **)__arg = __reader;
@@ -119,7 +151,7 @@ __LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	__unicode_readutf16_rev((__CHAR16_TYPE__ const **)__arg);
+	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_rev)((__CHAR16_TYPE__ const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

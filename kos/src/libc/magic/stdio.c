@@ -1347,15 +1347,7 @@ __LOCAL_LIBC(@vsc32scanf_ungetc@) ssize_t
 [[wunused, ATTR_LIBC_SCANF(2, 0), decl_include("<features.h>")]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
 [[impl_include("<hybrid/typecore.h>", "<bits/format-printer.h>")]]
-[[impl_prefix(
-@@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS_C8
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSSCANF_HELPERS_C16
-@@pp_else@@
-DEFINE_VSSCANF_HELPERS_C32
-@@pp_endif@@
-), alias("_vsscanf", "_vsscanf_s")]]
+[[impl_prefix(DEFINE_VSSCANF_HELPERS_C8), alias("_vsscanf", "_vsscanf_s")]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf"), export_alias("__vsscanf")]]
 __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
                              [[nonnull]] char const *__restrict format, $va_list args) {
