@@ -174,7 +174,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- `invlpg` (selected using `cpuid`)
 		- `PGE` global pages (selected using `cpuid`)
 		- `P32` (normal) and `PAE` paging on i386 (selected using `cpuid`)
-		- `PAE.2MiB` and `P32.4MiB` large pages (selected using `cpuid`, automatically made use of memory mappings allow for it)
+		- `PAE.2MiB` and `P32.4MiB` large pages (selected using `cpuid`, automatically made use of if memory mappings allow for it)
 		- `PAE.XD` (Execute-disable) (selected using `cpuid`)
 		- `P64` (4-level) paging on x86_64
 		- `P64.2MiB` and `P64.1GiB` large pages (the later being selected using `cpuid`)
@@ -194,7 +194,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 					- What I find really funny about this is I remember seeing this video on YouTube about that mov-only C compiler, and the dev having to do some questionable hacking to be able to actually have his program loop around. - Well. With this, you can now literally do a `movl $SOME_ADDRESS, %gs:OFFSETOF_REGISTER_MAP_EIP` as an alias for `jmp SOME_ADDRESS`
 				- A page of memory that always returns a random value when read
 					- You're literally able to `mmap("/dev/urandom")`, and the result is a memory mapping where every read, regardless of where is't made, will return a random value each time it is made.
-					- And just to re-emphasize: reads from the same location will return different values each time!
+					- And just to re-emphasize: reads from the same location will return different values each time they're read from!
 				- An address that, when written to, will terminate the calling thread/process
 				- Fields for reading (and for some: writing) the uid/gid/tid/pid/pgid/sid of the current thread
 			- Really though: the possibilities are endless here, and this really isn't something that I've seen before (probably because of the insanity that is emulating every x86 instruction that may access memory), I call dips on naming it VIO!
@@ -207,7 +207,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- 3-part implementation
 		- `heap_alloc()`: Raw heap allocators (need to specify size when freeing memory)
 			- Used to implement `kmalloc()`
-			- Uses `vm_map()` (The kernel equivalent of `mmap()`) to allocate whole of pages
+			- Uses `vm_map()` (The kernel equivalent of `mmap()`) to allocate whole pages
 		- `slab_kmalloc()`: Slab allocator support
 			- Used to implement `kmalloc()`
 			- Slabs are sections of memory suitable for allocating fixed-length structures
@@ -222,10 +222,11 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Any arbitrary directory can be re-used as a mounting point for another filesystem
 	- Support for both DOS (Windows) and UNIX-like paths, with the ability to bind arbitrary folders for drives
 		- KOS provides flags `O_DOSPATH` and `AT_DOSPATH` to specify that some given path should be interpreted using DOS semantics
+		- Additionally, a system call `fsmode(2)` exists that can force-enable/disable `DOSPATH`-mode for an entire process
 	- Support for symbolic links
 	- Support for device files (both block-(`S_ISBLK()`) and character(`S_ISCHR()`)-devices)
-	- Support for devfs (`/dev/...`)
-	- Support for ram file system (as one would expect `/tmp` to be)
+	- Support for devfs (`/dev`)
+	- Support for ramfs (`/tmp`)
 	- Support for procfs (`/proc/[pid]/...`)
 		- `/proc/self`
 		- `/proc/[pid]/exe`
@@ -243,7 +244,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Custom mechanism: Call into ukern segment (s.a. `/kos/include/kos/ukern.h:userkern_syscall()`)
 	- System call tracing
 		- Every time a system call is invoked, its name and arguments can be logged in a human-readable format
-		- s.a. `/kos/src/kernel/modsctrace`
+		- s.a. `/kos/src/kernel/modsctrace` and `/kos/src/libsctrace`
 - Modular kernel
 	- Allow drivers to be loaded into the kernel at runtime
 	- Drivers are ELF binaries
@@ -254,6 +255,10 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Branch profiling support
 		- Using preprocessor magic, every `if`-statement and every use of `likely` / `unlikely` within any kernel source file keeps track of which of its branches got taken what number of times
 		- Allows for easy detection of *hot* zones within the kernel, as well as finding `likely` / `unlikely` annotations that are just plainly wrong
+	- Build-in bootloader
+		- If you flatten the kernel binary, you can directly `dd` it onto some bootable storage device, and have it boot
+		- s.a. `/kos/src/kernel/core/arch/i386/boot/_boot0.S`
+		- Hint: This bootloader is used for booting KOS in Bochs and VBox
 - Drivers
 	- pci
 		- Required for detecting IDE ports
@@ -304,7 +309,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- libbuffer (user/kernel)
 		- Implement line/ring buffers used for implementing `pipe()` and terminal canon buffers
 	- libc (user/kernel-limited)
-		- Hand-written and optimized to minimize the number of necessary startup relocations
+		- Home-made and optimized to minimize the number of necessary startup relocations
 			- Have you ever done `readelf -r /lib/i386-linux-gnu/libc.so.6`?
 			- Do you realize that every single one of the lines your terminal just got spammed with will slow down the startup of any program you run on your system?
 				- Even with lazy symbol resolving, rtld has to perform 1 write to memory for every relocation it finds
