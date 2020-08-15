@@ -176,7 +176,7 @@ __NAMESPACE_INT_END __DECL_END
 __DECL_BEGIN
 __NAMESPACE_INT_BEGIN
 __IMPDEF __ULONG32_TYPE__ __ATTR_STDCALL SleepEx(__ULONG32_TYPE__ __msec, __INT32_TYPE__ __alertable);
-#define __hybrid_yield() ((__NAMESPACE_INT_SYM SleepEx)(20,0))
+#define __hybrid_yield() ((__NAMESPACE_INT_SYM SleepEx)(0, 0))
 __NAMESPACE_INT_END
 __DECL_END
 

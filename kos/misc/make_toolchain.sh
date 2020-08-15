@@ -35,8 +35,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Make sure to #undef cpu_count() methods before selecting which one to use
-DEEMON_VERSION="452ef8ed081f342739a04ca776f83e5fb3161733"
+#     v -- Change the yield() backend on Windows
+DEEMON_VERSION="f6350a843c14f7344b6f4a1735d9fe4b17bcae5c"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 
