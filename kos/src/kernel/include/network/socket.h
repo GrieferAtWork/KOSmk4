@@ -125,9 +125,9 @@ ancillary_message_readcmsghdr(USER CHECKED void const *reader,
 }
 
 LOCAL USER CHECKED byte_t *KCALL
-ancillary_rmessage_makecmsghdr(USER CHECKED void *writer, size_t len,
-                               u32 level, u32 type,
-                               syscall_ulong_t msg_flags) {
+ancillary_message_makecmsghdr(USER CHECKED void *writer, size_t len,
+                              u32 level, u32 type,
+                              syscall_ulong_t msg_flags) {
 	USER CHECKED byte_t *result;
 	result = (USER CHECKED byte_t *)writer;
 	if (msg_flags & MSG_CMSG_COMPAT) {
