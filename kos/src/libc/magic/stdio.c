@@ -331,86 +331,305 @@ __LIBC __FILE *stderr;
 
 %[insert:std]
 %
-;
+
+
+/************************************************************************/
+/* CRT symbol name linkage lists for various functions.                 */
+/************************************************************************/
+%[define_crt_name_list(CNL_fgetpos            = ["fgetpos", "_IO_fgetpos"])]     /*  int fgetpos(FILE *, pos32_t *) */
+%[define_crt_name_list(CNL_fgetpos64          = ["fgetpos64", "_IO_fgetpos64"])] /*  int fgetpos64(FILE *, pos64_t *) */
+%[define_crt_name_list(CNL_fgetpos_unlocked   = ["fgetpos_unlocked"])]           /*  int fgetpos_unlocked(FILE *, pos32_t *) */
+%[define_crt_name_list(CNL_fgetpos64_unlocked = ["fgetpos64_unlocked"])]         /*  int fgetpos64_unlocked(FILE *, pos64_t *) */
+
+%[define_crt_name_list(CNL_fsetpos            = ["fsetpos", "_IO_fsetpos"])]     /*  int fsetpos(FILE *, pos32_t const *) */
+%[define_crt_name_list(CNL_fsetpos64          = ["fsetpos64", "_IO_fsetpos64"])] /*  int fsetpos64(FILE *, pos64_t const *) */
+%[define_crt_name_list(CNL_fsetpos_unlocked   = ["fsetpos_unlocked"])]           /*  int fsetpos_unlocked(FILE *, pos32_t const *) */
+%[define_crt_name_list(CNL_fsetpos64_unlocked = ["fsetpos64_unlocked"])]         /*  int fsetpos64_unlocked(FILE *, pos64_t const *) */
+
+%[define_crt_name_list(CNL_fseek             = ["fseek"])]                                                              /*  int fseek(FILE *, long int, int) */
+%[define_crt_name_list(CNL_fseeko            = ["fseeko"])]                                                             /*  int fseeko(FILE *, off32_t, int) */
+%[define_crt_name_list(CNL_fseeko64          = ["fseeko64", "fseek64", dos_only:"_fseeki64"])]                          /*  int fseeko64(FILE *, off64_t, int) */
+%[define_crt_name_list(CNL_fseek_unlocked    = ["fseek_unlocked", dos_only:"_fseek_nolock"])]                           /*  int fseek_unlocked(FILE *, long int, int) */
+%[define_crt_name_list(CNL_fseeko_unlocked   = ["fseeko_unlocked"])]                                                    /*  int fseeko_unlocked(FILE *, off32_t, int) */
+%[define_crt_name_list(CNL_fseeko64_unlocked = ["fseeko64_unlocked", "fseek64_unlocked", dos_only:"_fseeki64_nolock"])] /*  int fseeko64_unlocked(FILE *, off64_t, int) */
+
+%[define_crt_name_list(CNL_ftell             = ["ftell", "_IO_ftell"])]                                                 /* long int ftell(FILE *) */
+%[define_crt_name_list(CNL_ftello            = ["ftello"])]                                                             /* off32_t ftello(FILE *) */
+%[define_crt_name_list(CNL_ftello64          = ["ftello64", "ftell64", dos_only:"_ftelli64"])]                          /* off64_t ftello64(FILE *) */
+%[define_crt_name_list(CNL_ftell_unlocked    = ["ftell_unlocked", dos_only:"_ftell_nolock"])]                           /* long int ftell_unlocked(FILE *) */
+%[define_crt_name_list(CNL_ftello_unlocked   = ["ftello_unlocked"])]                                                    /* off32_t ftello_unlocked(FILE *) */
+%[define_crt_name_list(CNL_ftello64_unlocked = ["ftello64_unlocked", "ftell64_unlocked", dos_only:"_ftelli64_nolock"])] /* off64_t ftello64_unlocked(FILE *) */
+
+%[define_crt_name_list(CNL_fgetc             = ["fgetc", "getc", "_IO_getc"])]        /* int fgetc(FILE *) */
+%[define_crt_name_list(CNL_fgetc_unlocked    = ["fgetc_unlocked", "getc_unlocked"])]  /* int fgetc_unlocked(FILE *) */
+
+%[define_crt_name_list(CNL_fputc             = ["fputc", "putc", "_IO_putc"])]        /* int fputc(FILE *) */
+%[define_crt_name_list(CNL_fputc_unlocked    = ["fputc_unlocked", "putc_unlocked"])]  /* int fputc_unlocked(FILE *) */
+
+%[define_crt_name_list(CNL_ungetc            = ["ungetc", "_IO_ungetc"])]              /* int ungetc(int, FILE *) */
+%[define_crt_name_list(CNL_ungetc_unlocked   = ["ungetc_unlocked", dos_only:"_ungetc_nolock"])] /* int ungetc_unlocked(int, FILE *) */
+
+%[define_crt_name_list(CNL_fread             = ["fread", "_IO_fread"])]                       /* size_t fread(void *, size_t, size_t, FILE *) */
+%[define_crt_name_list(CNL_fread_unlocked    = ["fread_unlocked", dos_only:"_fread_nolock"])] /* size_t fread_unlocked(void *, size_t, size_t, FILE *) */
+
+%[define_crt_name_list(CNL_fwrite            = ["fwrite", "_IO_fwrite", "fwrite_s"])]           /* size_t fwrite(void *, size_t, size_t, FILE *) */
+%[define_crt_name_list(CNL_fwrite_unlocked   = ["fwrite_unlocked", dos_only:"_fwrite_nolock"])] /* size_t fwrite_unlocked(void *, size_t, size_t, FILE *) */
+
+%[define_crt_name_list(CNL_flushall          = ["_flushall", "_IO_flush_all"])] /* int flushall(); */
+%[define_crt_name_list(CNL_flushall_unlocked = ["flushall_unlocked"])]          /* int flushall_unlocked(); */
+
+%[define_crt_name_list(CNL_fflush          = ["fflush", "_IO_fflush"])]                       /* int fflush(FILE *); */
+%[define_crt_name_list(CNL_fflush_unlocked = ["fflush_unlocked", dos_only:"_fflush_nolock"])] /* int fflush_unlocked(FILE *); */
+
+%[define_crt_name_list(CNL_setvbuf          = ["setvbuf", "_IO_setvbuf"])] /* int setvbuf(FILE *, char *, int, size_t); */
+%[define_crt_name_list(CNL_setvbuf_unlocked = ["setvbuf_unlocked"])]       /* int setvbuf_unlocked(FILE *, char *, int, size_t); */
+
+%[define_crt_name_list(CNL_fftruncate            = ["fftruncate"])]            /* int fftruncate(File *, pos32_t); */
+%[define_crt_name_list(CNL_fftruncate_unlocked   = ["fftruncate_unlocked"])]   /* int fftruncate_unlocked(File *, pos32_t); */
+%[define_crt_name_list(CNL_fftruncate64          = ["fftruncate64"])]          /* int fftruncate64(File *, pos64_t); */
+%[define_crt_name_list(CNL_fftruncate64_unlocked = ["fftruncate64_unlocked"])] /* int fftruncate64_unlocked(File *, pos64_t); */
+
+
 /************************************************************************/
 /* BEGIN: Declare crt-only variants of file Apis                        */
 /************************************************************************/
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, ignore, nocrt, alias("fwrite", "fwrite_s", "fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite")]]
+[[cp_stdio, ignore, nocrt, decl_include("<hybrid/typecore.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fwrite_unlocked...)]]
+[[                                   alias(CNL_fwrite...)]]
+[[                                   alias(CNL_fwrite_unlocked...)]]
 $size_t crt_fwrite([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
                    $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, ignore, nocrt, alias("fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite", "fwrite", "fwrite_s")]]
+[[cp_stdio, ignore, nocrt, decl_include("<hybrid/typecore.h>")]]
+[[alias(CNL_fwrite..., CNL_fwrite_unlocked...)]]
 $size_t crt_fwrite_unlocked([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
                             $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, ignore, wunused, nocrt, alias("fread", "fread_unlocked", "_fread_nolock", "_IO_fread")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fread_unlocked", "_fread_nolock", "_IO_fread")]]
+[[cp_stdio, ignore, wunused, nocrt, decl_include("<hybrid/typecore.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fread_unlocked...)]]
+[[                                   alias(CNL_fread...)]]
+[[                                   alias(CNL_fread_unlocked...)]]
 $size_t crt_fread([[outp(elemsize * elemcount)]] void *__restrict buf,
-                  $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
+                  $size_t elemsize, $size_t elemcount,
+                  [[nonnull]] $FILE *__restrict stream);
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, ignore, wunused, nocrt, alias("fread_unlocked", "_fread_nolock", "_IO_fread", "fread")]]
+[[cp_stdio, ignore, wunused, nocrt, decl_include("<hybrid/typecore.h>")]]
+[[alias(CNL_fread..., CNL_fread_unlocked...)]]
 $size_t crt_fread_unlocked([[outp(elemsize * elemcount)]] void *__restrict buf,
-                           $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream);
+                           $size_t elemsize, $size_t elemcount,
+                           [[nonnull]] $FILE *__restrict stream);
 
-[[cp_stdio, ignore, nocrt, alias("fgetc", "_IO_getc", "fgetc_unlocked", "getc_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetc_unlocked", "getc_unlocked")]]
+[[cp_stdio, ignore, nocrt]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fgetc_unlocked...)]]
+[[                                   alias(CNL_fgetc...)]]
+[[                                   alias(CNL_fgetc_unlocked...)]]
 int crt_fgetc([[nonnull]] $FILE *__restrict stream);
 
-[[cp_stdio, ignore, nocrt, alias("fgetc_unlocked", "getc_unlocked", "fgetc", "getc", "_IO_getc")]]
+[[cp_stdio, ignore, nocrt, alias(CNL_fgetc_unlocked..., CNL_fgetc...)]]
 int crt_fgetc_unlocked([[nonnull]] $FILE *__restrict stream);
 
-[[cp_stdio, ignore, nocrt, alias("fputc", "putc", "_IO_putc", "fputc_unlocked", "putc_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputc_unlocked", "putc_unlocked")]]
+[[cp_stdio, ignore, nocrt]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fputc_unlocked...)]]
+[[                                   alias(CNL_fputc...)]]
+[[                                   alias(CNL_fputc_unlocked...)]]
 int crt_fputc(int ch, [[nonnull]] $FILE *__restrict stream);
 
-[[cp_stdio, ignore, nocrt, alias("fputc_unlocked", "putc_unlocked", "fputc", "putc", "_IO_putc")]]
+[[cp_stdio, ignore, nocrt, alias(CNL_fputc_unlocked..., CNL_fputc...)]]
 int crt_fputc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream);
 
-[[stdio_throws, ignore, nocrt, alias("fgetpos", "_IO_fgetpos", "fgetpos_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetpos_unlocked")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fgetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64_unlocked...)]]
+[[                                                                               alias(CNL_fgetpos...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64...)]]
+[[                                                                               alias(CNL_fgetpos_unlocked...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64_unlocked...)]]
 int crt_fgetpos([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos32_t *__restrict pos);
 
-[[stdio_throws, ignore, nocrt, alias("fgetpos64", "_IO_fgetpos64", "fgetpos64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetpos64_unlocked")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fgetpos64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos...)]]
+[[                                                                               alias(CNL_fgetpos64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[                                                                               alias(CNL_fgetpos64_unlocked...)]]
 int crt_fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos64_t *__restrict pos);
 
-[[stdio_throws, ignore, nocrt, alias("fsetpos", "_IO_fsetpos", "fsetpos_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fsetpos_unlocked")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fsetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64_unlocked...)]]
+[[                                                                               alias(CNL_fsetpos...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64...)]]
+[[                                                                               alias(CNL_fsetpos_unlocked...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64_unlocked...)]]
 int crt_fsetpos([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos32_t const *__restrict pos);
 
-[[stdio_throws, ignore, nocrt, alias("fsetpos64", "_IO_fsetpos64", "fsetpos64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fsetpos64_unlocked")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fsetpos64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos...)]]
+[[                                                                               alias(CNL_fsetpos64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[                                                                               alias(CNL_fsetpos64_unlocked...)]]
 int crt_fsetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos64_t const *__restrict pos);
 
-[[stdio_throws, ignore, nocrt, alias("ftell", "ftell_unlocked", "_ftell_nolock", "_IO_ftell")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftell_unlocked", "_ftell_nolock")]]
-long int crt_ftell([[nonnull]] $FILE *__restrict stream);
-
-[[stdio_throws, ignore, nocrt, alias("fseek", "fseek_unlocked", "_fseek_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fseek_unlocked", "_fseek_nolock")]]
+[[stdio_throws, ignore, nocrt]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                         ), alias(CNL_fseek_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[                                                                            alias(CNL_fseek...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[                                                                            alias(CNL_fseek_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
 int crt_fseek([[nonnull]] $FILE *__restrict stream, long int off, int whence);
 
-[[stdio_throws, ignore, nocrt, alias("fseeko", "fseeko_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fseeko_unlocked")]]
+[[stdio_throws, ignore, nocrt]]
+[[if(defined(__USE_STDIO_UNLOCKED)),                                          alias(CNL_ftell_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[                                                                            alias(CNL_ftell...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[                                                                            alias(CNL_ftell_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+long int crt_ftell([[nonnull]] $FILE *__restrict stream);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fseeko_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[                                                                               alias(CNL_fseeko...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[                                                                               alias(CNL_fseeko_unlocked...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
 int crt_fseeko([[nonnull]] $FILE *__restrict stream, $off32_t off, int whence);
 
-[[stdio_throws, ignore, nocrt, alias("ftello", "ftello_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftello_unlocked")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_ftello_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[                                                                               alias(CNL_ftello...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[                                                                               alias(CNL_ftello_unlocked...)]]
+[[if(                                 __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
 $off32_t crt_ftello([[nonnull]] $FILE *__restrict stream);
 
-[[stdio_throws, ignore, nocrt, alias("fseeko64", "fseeko64_unlocked", "_fseeki64_nolock", "_fseeki64")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fseeko64_unlocked", "_fseeki64_nolock")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fseeko64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[                                                                               alias(CNL_fseeko64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[                                                                               alias(CNL_fseeko64_unlocked...)]]
 int crt_fseeko64([[nonnull]] $FILE *__restrict stream, $off32_t off, int whence);
 
-[[stdio_throws, ignore, nocrt, alias("ftello", "ftello64_unlocked", "_ftelli64_nolock", "_ftelli64")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftello64_unlocked", "_ftelli64_nolock")]]
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_ftello64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[                                                                               alias(CNL_ftello64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[                                                                               alias(CNL_ftello64_unlocked...)]]
 $off64_t crt_ftello64([[nonnull]] $FILE *__restrict stream);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[                                              alias(CNL_fgetpos_unlocked...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64_unlocked...)]]
+[[                                              alias(CNL_fgetpos...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64...)]]
+int crt_fgetpos_unlocked([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos32_t *__restrict pos);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[                                              alias(CNL_fsetpos_unlocked...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64_unlocked...)]]
+[[                                              alias(CNL_fsetpos...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64...)]]
+int crt_fsetpos_unlocked([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos32_t const *__restrict pos);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[                                              alias(CNL_fgetpos64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos...)]]
+[[                                              alias(CNL_fgetpos64...)]]
+int crt_fgetpos64_unlocked([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos64_t *__restrict pos);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[                                              alias(CNL_fsetpos64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos...)]]
+[[                                              alias(CNL_fsetpos64...)]]
+int crt_fsetpos64_unlocked([[nonnull]] $FILE *__restrict stream, [[nonnull]] $pos64_t const *__restrict pos);
+
+[[stdio_throws, ignore, nocrt]]
+[[                                           alias(CNL_fseek_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[                                           alias(CNL_fseek...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+int crt_fseek_unlocked([[nonnull]] $FILE *__restrict stream, long int off, int whence);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[                                           alias(CNL_ftell_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[                                           alias(CNL_ftell...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+long int crt_ftell_unlocked([[nonnull]] $FILE *__restrict stream);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[                                              alias(CNL_fseeko_unlocked...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[                                              alias(CNL_fseeko...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+int crt_fseeko_unlocked([[nonnull]] $FILE *__restrict stream, $off32_t off, int whence);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[                                              alias(CNL_ftello_unlocked...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[                                              alias(CNL_ftello...)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+$off32_t crt_ftello_unlocked([[nonnull]] $FILE *__restrict stream);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[                                              alias(CNL_fseeko64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[                                              alias(CNL_fseeko64...)]]
+int crt_fseeko64_unlocked([[nonnull]] $FILE *__restrict stream, $off32_t off, int whence);
+
+[[stdio_throws, ignore, nocrt, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[                                              alias(CNL_ftello64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[                                              alias(CNL_ftello64...)]]
+$off64_t crt_ftello64_unlocked([[nonnull]] $FILE *__restrict stream);
+
+[[cp_stdio, ignore, nocrt, alias(CNL_flushall...)]]
+int crt_flushall();
+
 
 /************************************************************************/
 /* END: Declare crt-only variants of file Apis                          */
@@ -446,13 +665,14 @@ int rename([[nonnull]] char const *oldname,
 int fclose([[nonnull]] FILE *__restrict stream);
 
 %[default:section(".text.crt{|.dos}.FILE.locked.write.utility")]
-[[cp_stdio, ignore, nocrt, alias("_flushall", "_IO_flush_all")]] int crt_flushall();
 
 @@Flush any unwritten data from `STREAM' to the underlying filesystem/TTY
 [[std, cp_stdio, userimpl]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fflush_unlocked", "_fflush_nolock")]]
-[[export_alias("_IO_fflush"), alias("fflush_unlocked", "_fflush_nolock")]]
-fflush:([[nullable]] FILE *stream) -> int {
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fflush...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fflush_unlocked...)]]
+[[                                   alias(CNL_fflush...)]]
+[[                                   alias(CNL_fflush_unlocked...)]]
+int fflush([[nullable]] FILE *stream) {
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
 @@pp_if $has_function(crt_flushall)@@
@@ -467,7 +687,8 @@ fflush:([[nullable]] FILE *stream) -> int {
 
 @@Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)'
 [[std, requires_include("<asm/crt/stdio.h>"), impl_include("<asm/crt/stdio.h>")]]
-[[requires(defined(___IOFBF) && defined(___IONBF) && defined(__BUFSIZ) && $has_function(setvbuf))]]
+[[requires(defined(___IOFBF) && defined(___IONBF) &&
+           defined(__BUFSIZ) && $has_function(setvbuf))]]
 void setbuf([[nonnull]] FILE *__restrict stream, [[nullable]] char *buf) {
 	setvbuf(stream, buf,
 	        buf ? ___IOFBF : ___IONBF,
@@ -477,8 +698,10 @@ void setbuf([[nonnull]] FILE *__restrict stream, [[nullable]] char *buf) {
 @@Set the buffer and buffer-mode to-be used by the given `STREAM'
 @@@param modes: One of `_IOFBF', `_IOLBF' or `_IONBF'
 [[decl_include("<hybrid/typecore.h>")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("setvbuf_unlocked")]]
-[[std, export_alias("_IO_setvbuf"), alias("setvbuf_unlocked")]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_setvbuf...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_setvbuf_unlocked...)]]
+[[                                   alias(CNL_setvbuf...)]]
+[[                                   alias(CNL_setvbuf_unlocked...)]]
 int setvbuf([[nonnull]] FILE *__restrict stream,
             char *__restrict buf, int modes,
             size_t bufsize);
@@ -488,9 +711,12 @@ int setvbuf([[nonnull]] FILE *__restrict stream,
 @@Read and return a single character from `STREAM'
 @@If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
 @@returned and the exact cause can be determined by using `ferror' and `feof'
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetc_unlocked", "getc_unlocked")]]
-[[std, cp_stdio, export_alias("getc", "_IO_getc"), alias("fgetc_unlocked", "getc_unlocked")]]
+[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fgetc...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fgetc_unlocked...)]]
+[[                                   alias(CNL_fgetc...)]]
+[[                                   alias(CNL_fgetc_unlocked...)]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread))]]
+[[impl_include("<bits/crt/io-file.h>")]]
 int fgetc([[nonnull]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_filbuf) && (!defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fread))@@
 	return --stream->__f_cnt >= 0 ? (int)((u8)*stream->__f_ptr++) : _filbuf(stream);
@@ -516,9 +742,12 @@ int getchar() {
 %[default:section(".text.crt{|.dos}.FILE.locked.write.putc")]
 @@Write a single character `CH' to `STREAM'
 [[std, cp_stdio, crtbuiltin]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputc_unlocked", "putc_unlocked")]]
-[[export_alias("putc", "_IO_putc"), alias("fputc_unlocked", "putc_unlocked")]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fputc...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fputc_unlocked...)]]
+[[                                   alias(CNL_fputc...)]]
+[[                                   alias(CNL_fputc_unlocked...)]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite))]]
+[[impl_include("<bits/crt/io-file.h>")]]
 int fputc(int ch, [[nonnull]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf) && (!defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fwrite))@@
 	return --stream->__f_cnt >= 0 ? (int)((u8)(*stream->__f_ptr++ = (char)ch)) : _flsbuf(ch, stream);
@@ -627,17 +856,20 @@ __STDC_INT_AS_SSIZE_T puts([[nonnull]] char const *__restrict string) {
 }
 
 @@Unget a single character byte of data previously returned by `getc()'
-[[std, section(".text.crt{|.dos}.FILE.locked.read.getc")]]
-[[export_alias("_IO_ungetc"), alias("ungetc_unlocked", "_ungetc_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetc_unlocked", "_ungetc_nolock")]]
+[[std, no_crt_self_import, no_crt_self_export, export_as(CNL_ungetc...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_ungetc_unlocked...)]]
+[[                                   alias(CNL_ungetc...)]]
+[[                                   alias(CNL_ungetc_unlocked...)]]
+[[section(".text.crt{|.dos}.FILE.locked.read.getc")]]
 int ungetc(int ch, [[nonnull]] FILE *__restrict stream);
 
 @@Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF'
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, cp_stdio, wunused, section(".text.crt{|.dos}.FILE.locked.read.read")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fread_unlocked", "_fread_nolock", "_IO_fread")]]
-[[alias("fread_unlocked", "_fread_nolock", "_IO_fread")]]
-[[userimpl, requires_function(fgetc)]]
+[[std, cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fread...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fread_unlocked...)]]
+[[                                   alias(CNL_fread...)]]
+[[                                   alias(CNL_fread_unlocked...)]]
+[[userimpl, requires_function(fgetc), section(".text.crt{|.dos}.FILE.locked.read.read")]]
 size_t fread([[inp(min(elemsize * return, elemsize * elemcount))]] void *__restrict buf,
              size_t elemsize, size_t elemcount, [[nonnull]] FILE *__restrict stream) {
 	size_t i, result = 0;
@@ -657,10 +889,13 @@ done:
 
 
 @@Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM'
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, cp_stdio, crtbuiltin, section(".text.crt{|.dos}.FILE.locked.write.write")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fwrite_unlocked", "_fwrite_nolock", "_IO_fwrite")]]
-[[export_alias("fwrite_s"), userimpl, requires_function(fputc)]]
+[[std, cp_stdio, crtbuiltin, decl_include("<hybrid/typecore.h>")]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fwrite...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_fwrite_unlocked...)]]
+[[                                   alias(CNL_fwrite...)]]
+[[                                   alias(CNL_fwrite_unlocked...)]]
+[[section(".text.crt{|.dos}.FILE.locked.write.write")]]
+[[userimpl, requires_function(fputc)]]
 size_t fwrite([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
               size_t elemsize, size_t elemcount, [[nonnull]] FILE *__restrict stream) {
 	size_t i, result = 0;
@@ -679,12 +914,16 @@ done:
 
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.seek")]
 @@Change the current in-file position of `STREAM' as a byte-offet from the start of the file
-[[stdio_throws, std, alias("fseek_unlocked", "_fseek_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fseek_unlocked", "_fseek_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), preferred_alias("fseeko_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), preferred_alias("fseeko64_unlocked", "_fseeki64_nolock")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias("fseeko")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias("fseeko64", "_fseeki64")]]
+[[stdio_throws, std, no_crt_self_import, no_crt_self_export, export_as(CNL_fseek...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                         ), alias(CNL_fseek_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[                                                                            alias(CNL_fseek...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[                                                                            alias(CNL_fseek_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fseeko) || $has_function(crt_fseeko64))]]
 int fseek([[nonnull]] FILE *__restrict stream, long int off, int whence) {
 @@pp_if __SIZEOF_OFF64_T__ == __SIZEOF_LONG__ && $has_function(crt_fseeko64)@@
@@ -697,12 +936,16 @@ int fseek([[nonnull]] FILE *__restrict stream, long int off, int whence) {
 }
 
 @@Return the current in-file position of `STREAM' as a byte-offet from the start of the file
-[[stdio_throws, std, wunused, export_alias("_IO_ftell")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftell_unlocked", "_ftell_nolock")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__ && defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftello_unlocked")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__ && defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftello64_unlocked", "_ftelli64_nolock")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias("ftello")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias("ftello64", "_ftelli64")]]
+[[stdio_throws, std, wunused, no_crt_self_import, no_crt_self_export, export_as(CNL_ftell...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                         ), alias(CNL_ftell_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[                                                                            alias(CNL_ftell...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[                                                                            alias(CNL_ftell_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(                                 __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello64) || $has_function(crt_ftello))]]
 long int ftell([[nonnull]] FILE *__restrict stream) {
@@ -738,7 +981,7 @@ long int ftell([[nonnull]] FILE *__restrict stream) {
 @@Rewind the current in-file position of `STREAM' to its starting position
 [[stdio_throws, std, export_alias("rewind_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("rewind_unlocked")]]
-[[userimpl, requires($has_function(fsetpos))]]
+[[userimpl, requires_function(fsetpos)]]
 void rewind([[nonnull]] FILE *__restrict stream) {
 	fsetpos(stream, 0);
 }
@@ -778,7 +1021,8 @@ int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 [[cp, std, guard]]
 [[requires_include("<__crt.h>", "<parts/errno.h>")]]
 [[impl_include("<local/stdstreams.h>", "<parts/errno.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && $has_function(fprintf) && $has_function(strerror))]]
+[[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) &&
+           $has_function(fprintf) && $has_function(strerror))]]
 void perror([[nullable]] char const *message) {
 	char const *enodesc;
 	enodesc = strerror(__libc_geterrno());
@@ -808,8 +1052,8 @@ FILE *fopen([[nonnull]] char const *__restrict filename,
 @@Re-open the given `STREAM' as a file-stream for accessing `FILENAME'
 [[cp, std]]
 [[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("freopen64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("freopen_unlocked")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("freopen64")]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                ), preferred_alias("freopen_unlocked")]]
+[[if(defined(__USE_FILE_OFFSET64)                                 ), preferred_alias("freopen64")]]
 [[alias("freopen64", "freopen_unlocked", "freopen64_unlocked")]]
 FILE *freopen([[nonnull]] char const *__restrict filename,
               [[nonnull]] char const *__restrict modes,
@@ -819,11 +1063,14 @@ FILE *freopen([[nonnull]] char const *__restrict filename,
 
 @@Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
 @@Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()'
-[[stdio_throws, std, export_as("_IO_fgetpos"), decl_include("<bits/types.h>")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos_unlocked")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos", "_IO_fgetpos")]]
+[[stdio_throws, std, decl_include("<bits/types.h>")]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fgetpos...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fgetpos...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64_unlocked...)]]
 [[userimpl, requires($has_function(crt_ftello64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_fgetpos64) || $has_function(crt_ftello64) ||
                      $has_function(crt_ftello) || $has_function(crt_ftell))]]
@@ -852,17 +1099,20 @@ int fgetpos([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t *__restrict 
 }
 
 @@Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()'
-[[stdio_throws, std, export_as("_IO_fsetpos"), no_crt_self_import, decl_include("<bits/types.h>")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos_unlocked")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos", "_IO_fsetpos")]]
+[[stdio_throws, std, decl_include("<bits/types.h>")]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fsetpos...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fsetpos...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fseeko64) || $has_function(crt_fsetpos) ||
                      $has_function(crt_fsetpos64) || $has_function(crt_fseeko) ||
                      $has_function(crt_fseek))]]
 int fsetpos([[nonnull]] FILE *__restrict stream,
             [[nonnull]] fpos_t const *__restrict pos) {
-@@pp_if defined(__USE_FILE_OFFSET64) && $has_function(crt_fseeko64)@@
+@@pp_if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ && $has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)*pos, SEEK_SET);
 @@pp_elif $has_function(crt_fsetpos)@@
 	pos32_t pos32 = (pos32_t)*pos;
@@ -1198,7 +1448,8 @@ __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restric
 }
 
 @@Print a formatted string to a given in-member string buffer `BUF'
-@@Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF'
+@@Always return the REQUIRED buffer size (excluding a trailing NUL-character),
+@@and never write more than `BUFLEN' characters to `BUF'
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[std, kernel, guard, crtbuiltin, ATTR_LIBC_PRINTF(3, 4)]]
 [[section(".text.crt{|.dos}.unicode.static.format.printf")]]
@@ -1293,7 +1544,8 @@ void setlinebuf([[nonnull]] $FILE *__restrict stream) {
 
 @@Same as `fflush()', but performs I/O without acquiring a lock to `STREAM'
 [[section(".text.crt{|.dos}.FILE.unlocked.write.utility")]]
-[[cp_stdio, userimpl, dos_export_alias("_fflush_nolock"), alias("fflush", "_IO_fflush")]]
+[[cp_stdio, userimpl, no_crt_self_import, no_crt_self_export]]
+[[export_alias(CNL_fflush_unlocked...), alias(CNL_fflush...)]]
 int fflush_unlocked([[nullable]] $FILE *stream) {
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
@@ -1306,10 +1558,11 @@ int fflush_unlocked([[nullable]] $FILE *stream) {
 }
 
 @@Same as `fread()', but performs I/O without acquiring a lock to `STREAM'
-[[decl_include("<hybrid/typecore.h>")]]
+[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
+[[no_crt_self_import, no_crt_self_export]]
+[[export_alias(CNL_fread_unlocked...), alias(CNL_fread...)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
-[[alias("fread"), userimpl, requires_function(fgetc_unlocked)]]
-[[cp_stdio, wunused, dos_export_alias("_fread_nolock"), export_alias("_IO_fread")]]
+[[userimpl, requires_function(fgetc_unlocked)]]
 $size_t fread_unlocked([[outp(min(return * elemsize, elemcount * elemsize))]] void *__restrict buf,
                        $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream) {
 	$size_t i, result = 0;
@@ -1328,10 +1581,11 @@ done:
 }
 
 @@Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM'
-[[decl_include("<hybrid/typecore.h>")]]
+[[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
+[[no_crt_self_import, no_crt_self_export]]
+[[export_alias(CNL_fwrite_unlocked...), alias(CNL_fwrite...)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.write.write")]]
-[[alias("fwrite"), userimpl, requires_function(fgetc_unlocked)]]
-[[cp_stdio, wunused, dos_export_alias("_fwrite_nolock"), export_alias("_IO_fwrite")]]
+[[userimpl, requires_function(fgetc_unlocked)]]
 $size_t fwrite_unlocked([[inp(min(return * elemsize, elemcount * elemsize))]] void const *__restrict buf,
                         $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream) {
 	$size_t i, result = 0;
@@ -1364,8 +1618,9 @@ fileno_unlocked(*) = fileno;
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.read.getc")]
 @@Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM'
-[[cp_stdio, export_alias("getc_unlocked")]]
-[[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)), alias("getc", "fgetc", "_IO_getc")]]
+[[impl_include("<bits/crt/io-file.h>")]]
+[[cp_stdio, no_crt_self_import, no_crt_self_export, export_alias(CNL_fgetc_unlocked...)]]
+[[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)), alias(CNL_fgetc...)]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread_unlocked))]]
 int fgetc_unlocked([[nonnull]] $FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_filbuf)@@
@@ -1381,9 +1636,9 @@ int fgetc_unlocked([[nonnull]] $FILE *__restrict stream) {
 %[default:section(".text.crt{|.dos}.FILE.unlocked.write.putc")]
 
 @@Same as `fputc()', but performs I/O without acquiring a lock to `STREAM'
-[[cp_stdio, export_alias("putc_unlocked"), crtbuiltin]]
-[[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias("putc", "fputc", "_IO_putc")]]
-[[userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]]
+[[cp_stdio, no_crt_self_import, no_crt_self_export, export_alias(CNL_fputc_unlocked...)]]
+[[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias(CNL_fputc...)]]
+[[crtbuiltin, userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]]
 int fputc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf)@@
 	return --stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*stream->__f_ptr++ = (char)ch)) : _flsbuf(ch, stream);
@@ -1705,15 +1960,16 @@ int obstack_printf([[nonnull]] struct obstack *__restrict obstack_,
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.seek")]
 %#if defined(__USE_LARGEFILE) || defined(__USE_XOPEN2K)
 @@Change the current in-file position of `STREAM'
-[[stdio_throws, no_crt_self_import]]
-[[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko64_unlocked", "_fseeki64_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && (defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__)), preferred_alias("fseek_unlocked", "_fseek_nolock")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko64", "_fseeki64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko")]]
-[[if((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__)), preferred_alias("fseek", "fseek_unlocked", "_fseek_nolock")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko64_unlocked", "_fseeki64_nolock")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko_unlocked")]]
+[[stdio_throws, no_crt_self_import, no_crt_self_export, export_as(CNL_fseeko...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fseeko64) || $has_function(crt_fseeko) || $has_function(crt_fseek))]]
 int fseeko([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
 @@pp_if $has_function(crt_fseeko64)@@
@@ -1726,13 +1982,16 @@ int fseeko([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
 }
 
 @@Return the current in-file position of `STREAM'
-[[stdio_throws, wunused, no_crt_self_import]]
-[[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("ftello64_unlocked", "_ftelli64_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("ftello_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && (defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__)), preferred_alias("ftell_unlocked", "_ftell_nolock")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftello64", "_ftelli64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("ftello")]]
-[[if((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__)), preferred_alias("ftell", "_IO_ftell")]]
+[[stdio_throws, wunused, no_crt_self_import, no_crt_self_export, export_as(CNL_ftello...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello64) || $has_function(crt_ftello) ||
                      $has_function(crt_ftell))]]
@@ -1780,10 +2039,17 @@ $FILE *tmpfile64();
 
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.seek")]
 @@64-bit variant of `fseeko'
-[[stdio_throws, dos_export_alias("_fseeki64"), alias("fseeko64_unlocked", "_fseeki64_nolock"), off64_variant_of(fseeko)]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fseeko64_unlocked", "_fseeki64_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__), preferred_alias("fseek_unlocked", "_fseek_nolock")]]
-[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__), alias("fseek_unlocked", "_fseek_nolock")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fseeko)]]
+[[stdio_throws, no_crt_self_import, no_crt_self_export, export_as(CNL_fseeko64...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fseeko64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[                                                                               alias(CNL_fseeko64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[                                                                               alias(CNL_fseeko64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fseeko) || $has_function(crt_fseek))]]
 int fseeko64([[nonnull]] $FILE *__restrict stream, $off64_t off, int whence) {
 @@pp_if $has_function(crt_fseeko)@@
@@ -1794,10 +2060,17 @@ int fseeko64([[nonnull]] $FILE *__restrict stream, $off64_t off, int whence) {
 }
 
 @@64-bit variant of `ftello'
-[[stdio_throws, dos_export_alias("_ftelli64"), alias("ftello64_unlocked", "_ftelli64_nolock"), off64_variant_of(ftello), wunused]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ftello64_unlocked", "_ftelli64_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__), preferred_alias("ftell_unlocked", "_ftell_nolock")]]
-[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__), alias("ftell", "_IO_ftell")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(ftello)]]
+[[stdio_throws, wunused, no_crt_self_import, no_crt_self_export, export_as(CNL_ftello64...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_ftello64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[                                                                               alias(CNL_ftello64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[                                                                               alias(CNL_ftello64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello) || $has_function(crt_ftell))]]
 $off64_t ftello64([[nonnull]] $FILE *__restrict stream) {
@@ -1821,7 +2094,7 @@ $off64_t ftello64([[nonnull]] $FILE *__restrict stream) {
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
 @@64-bit variant of `fopen'
-[[cp, alias("fopen"), wunused, largefile64_variant_of(fopen)]]
+[[cp, wunused, alias("fopen"), largefile64_variant_of(fopen)]]
 [[userimpl, requires_function(fopen)]]
 $FILE *fopen64([[nonnull]] char const *__restrict filename,
                [[nonnull]] char const *__restrict modes) {
@@ -1842,9 +2115,15 @@ $FILE *freopen64([[nonnull]] char const *__restrict filename,
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.pos")]
 
 @@64-bit variant of `fgetpos'
-[[stdio_throws, off64_variant_of(fgetpos), export_alias("_IO_fgetpos64")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetpos64_unlocked")]]
-[[alias("fgetpos64_unlocked"), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fgetpos)]]
+[[stdio_throws, no_crt_self_import, no_crt_self_export, export_as(CNL_fgetpos64...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fgetpos64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos...)]]
+[[                                                                               alias(CNL_fgetpos64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[                                                                               alias(CNL_fgetpos64_unlocked...)]]
 [[userimpl, requires($has_function(crt_ftello64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello) || $has_function(crt_ftell))]]
 int fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t *__restrict pos) {
@@ -1864,9 +2143,15 @@ int fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t *__rest
 }
 
 @@64-bit variant of `fsetpos'
-[[stdio_throws, off64_variant_of(fsetpos), export_alias("_IO_fsetpos64")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fsetpos64_unlocked)]]
-[[alias("fsetpos64_unlocked"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fsetpos)]]
+[[stdio_throws, no_crt_self_import, no_crt_self_export, export_as(CNL_fsetpos64...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fsetpos64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos...)]]
+[[                                                                               alias(CNL_fsetpos64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[                                                                               alias(CNL_fsetpos64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fsetpos) ||
                      (defined(__SEEK_SET) && ($has_function(crt_fseeko64) ||
                                               $has_function(crt_fseeko) ||
@@ -1925,7 +2210,7 @@ $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
 [[decl_include("<features.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
-[[ATTR_LIBC_PRINTF(2, 3), wunused, impl_include("<hybrid/__assert.h>")]]
+[[ATTR_LIBC_PRINTF(2, 3), impl_include("<hybrid/__assert.h>")]]
 [[requires_function(format_aprintf_pack, format_aprintf_printer, free)]]
 [[impl_prefix(
 #ifndef __format_aprintf_data_defined
@@ -1950,18 +2235,19 @@ __STDC_INT_AS_SSIZE_T vasprintf([[nonnull]] char **__restrict pstr,
 	error = format_vprintf(&format_aprintf_printer, &data, format, args);
 	if unlikely(error < 0) {
 		free(data.@ap_base@);
+		*pstr = NULL;
 		return -1;
 	}
 	result = format_aprintf_pack(&data, NULL);
+	*pstr  = result;
 	if unlikely(!result)
 		return -1;
-	*pstr = result;
 	return (__STDC_INT_AS_SSIZE_T)error;
 }
 
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
 [[decl_include("<features.h>")]]
-[[wunused, ATTR_LIBC_PRINTF(2, 3), export_alias("__asprintf")]]
+[[ATTR_LIBC_PRINTF(2, 3), export_alias("__asprintf")]]
 __STDC_INT_AS_SSIZE_T asprintf([[nonnull]] char **__restrict pstr,
                                [[nonnull]] char const *__restrict format, ...)
 	%{printf("vasprintf")}
@@ -1981,8 +2267,8 @@ __STDC_INT_AS_SSIZE_T asprintf([[nonnull]] char **__restrict pstr,
 
 @@Re-open the given `STREAM' as a file-stream for accessing `FD'
 [[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fdreopen64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fdreopen_unlocked")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fdreopen64")]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                ), preferred_alias("fdreopen_unlocked")]]
+[[if(defined(__USE_FILE_OFFSET64)                                 ), preferred_alias("fdreopen64")]]
 [[cp, alias("fdreopen64", "fdreopen_unlocked", "fdreopen64_unlocked")]]
 $FILE *fdreopen($fd_t fd, [[nonnull]] char const *__restrict modes,
                 [[nonnull]] $FILE *__restrict stream);
@@ -2016,60 +2302,83 @@ $FILE *freopen64_unlocked([[nonnull]] char const *__restrict filename,
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.seek.seek")];
 
-[[stdio_throws, dos_export_alias("_fseek_nolock")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias("fseeko_unlocked", "fseeko")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias("fseeko64_unlocked", "_fseeki64_nolock", "fseeko64", "_fseeki64")]]
+[[stdio_throws, no_crt_self_import, no_crt_self_export, export_as(CNL_fseek_unlocked...)]]
+[[                                           alias(CNL_fseek_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[                                           alias(CNL_fseek...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
 [[userimpl, requires_function(fseek)]]
 int fseek_unlocked([[nonnull]] $FILE *__restrict stream, long int off, int whence) {
 	return fseek(stream, off, whence);
 }
 
-[[stdio_throws, dos_export_alias("_ftell_nolock")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias("ftello_unlocked", "ftello", "_IO_ftell")]]
-[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias("ftello64_unlocked", "_ftelli64_nolock", "ftello64", "_ftelli64")]]
+[[stdio_throws, wunused, no_crt_self_import, no_crt_self_export, export_as(CNL_ftell_unlocked...)]]
+[[                                           alias(CNL_ftell_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[                                           alias(CNL_ftell...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
 [[userimpl, requires_function(ftell)]]
 long int ftell_unlocked([[nonnull]] $FILE *__restrict stream) {
 	return ftell(stream);
 }
 
-[[stdio_throws, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko64_unlocked", "_fseeki64_nolock", "fseeko64", "_fseeki64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko_unlocked", "fseeko")]]
-[[if((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__)), preferred_alias("fseek_unlocked", "_fseek_nolock", "fseek")]]
+[[stdio_throws]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fseeko_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
 [[userimpl, requires_function(fseeko)]]
 int fseeko_unlocked([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
 	return fseeko(stream, off, whence);
 }
 
-[[stdio_throws, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftello64_unlocked", "_ftelli64_nolock", "_ftelli64_nolock", "ftello64", "_ftelli64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("ftello_unlocked", "ftello")]]
-[[if((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__)), preferred_alias("ftell_unlocked", "_ftell_nolock", "ftell")]]
+[[stdio_throws, wunused]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_ftello_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
 [[userimpl, requires_function(ftello)]]
 $off_t ftello_unlocked([[nonnull]] $FILE *__restrict stream) {
 	return ftello(stream);
 }
 
 [[section(".text.crt{|.dos}.FILE.unlocked.write.utility")]]
-[[stdio_throws, alias("_flushall", "_IO_flush_all")]]
+[[stdio_throws, no_crt_self_export, no_crt_self_import]]
+[[export_alias(CNL_flushall_unlocked...), alias(CNL_flushall...)]]
 [[userimpl, requires_function(fflush_unlocked)]]
 int flushall_unlocked() {
 	return fflush_unlocked(NULL);
 }
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.seek.pos")];
-[[stdio_throws, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos64_unlocked", "fgetpos64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fgetpos_unlocked", "fgetpos")]]
+[[stdio_throws]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fgetpos_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fgetpos...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fgetpos64...)]]
 [[userimpl, requires_function(fgetpos), decl_include("<bits/types.h>")]]
 int fgetpos_unlocked([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] $fpos_t *__restrict pos) {
 	return fgetpos(stream, pos);
 }
 
-[[stdio_throws, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos64_unlocked", "fsetpos64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fsetpos_unlocked", "fsetpos")]]
+[[stdio_throws]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fsetpos_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fsetpos...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fsetpos64...)]]
 [[userimpl, requires_function(fsetpos), decl_include("<bits/types.h>")]]
 int fsetpos_unlocked([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] $fpos_t const *__restrict pos) {
@@ -2083,7 +2392,7 @@ int fsetpos_unlocked([[nonnull]] $FILE *__restrict stream,
 int getw_unlocked([[nonnull]] $FILE *__restrict stream) {
 	u16 result;
 	return fread_unlocked(&result, sizeof(result), 1, stream)
-	       ? (int)result
+	       ? (int)(unsigned int)result
 	       : (int)EOF;
 }
 
@@ -2097,17 +2406,19 @@ int putw_unlocked(int w, [[nonnull]] $FILE *__restrict stream) {
 	       : EOF;
 }
 
-[[alias("setvbuf", "_IO_setvbuf")]]
+
+[[decl_include("<hybrid/typecore.h>"), no_crt_self_import, no_crt_self_export]]
+[[export_alias(CNL_setvbuf_unlocked...), alias(CNL_setvbuf...)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.utility")]]
 [[userimpl, requires_function(setvbuf)]]
-[[decl_include("<hybrid/typecore.h>")]]
 int setvbuf_unlocked([[nonnull]] $FILE *__restrict stream,
                      char *__restrict buf, int modes,
                      $size_t bufsize) {
 	return setvbuf(stream, buf, modes, bufsize);
 }
 
-[[dos_export_alias("_ungetc_nolock"), alias("ungetc", "_IO_ungetc")]]
+[[no_crt_self_import, no_crt_self_export]]
+[[export_alias(CNL_ungetc_unlocked...), alias(CNL_ungetc...)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.getc")]]
 [[userimpl, requires_function(ungetc)]]
 int ungetc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
@@ -2218,13 +2529,13 @@ int fisatty([[nonnull]] $FILE *__restrict stream) {
 
 @@>> fftruncate(3)
 @@Truncate the given file `STREAM' to a length of `LENGTH'
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate_unlocked")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate64_unlocked")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate_unlocked")]]
+[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if(                                 __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
 [[userimpl, requires_function(ftruncate, fileno)]]
 int fftruncate([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET length) {
@@ -2237,11 +2548,12 @@ int fftruncate([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET length) {
 
 @@>> fftruncate_unlocked(3)
 @@Same as `fftruncate()', but don't acquire a lock to the file
-[[decl_prefix(DEFINE_PIO_OFFSET), cp_stdio, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate64_unlocked")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate_unlocked")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fftruncate")]]
+[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
+[[if(__FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64...)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.utility")]]
 [[userimpl, requires_function(ftruncate, fileno_unlocked)]]
 int fftruncate_unlocked([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET length) {
@@ -2272,23 +2584,45 @@ __STDC_INT_AS_SSIZE_T puts_unlocked([[nonnull]] char const *__restrict string) {
 %
 %#ifdef __USE_LARGEFILE64
 
-[[stdio_throws, dos_export_alias("_fseeki64_nolock"), alias("fseeko64", "_fseeki64")]]
-[[off64_variant_of(fseeko_unlocked), section(".text.crt{|.dos}.FILE.unlocked.seek.seek")]]
+[[stdio_throws, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fseeko_unlocked)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fseeko64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[                                              alias(CNL_fseeko64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[                                              alias(CNL_fseeko64...)]]
+[[section(".text.crt{|.dos}.FILE.unlocked.seek.seek")]]
 [[userimpl, requires_function(fseeko64)]]
 int fseeko64_unlocked([[nonnull]] $FILE *__restrict stream,
                       $off64_t off, int whence) {
 	return fseeko64(stream, off, whence);
 }
 
-[[stdio_throws, wunused, dos_export_alias("_ftelli64_nolock"), alias("ftello64", "_ftelli64")]]
-[[off64_variant_of(ftello_unlocked), section(".text.crt{|.dos}.FILE.unlocked.seek.seek")]]
+[[stdio_throws, wunused, decl_include("<bits/types.h>")]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(ftello_unlocked)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_ftello64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[                                              alias(CNL_ftello64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[                                              alias(CNL_ftello64...)]]
+[[section(".text.crt{|.dos}.FILE.unlocked.seek.seek")]]
 [[userimpl, requires_function(ftello64)]]
 $off64_t ftello64_unlocked([[nonnull]] $FILE *__restrict stream) {
 	return ftello64(stream);
 }
 
-[[stdio_throws, alias("fgetpos64", "_IO_fgetpos64")]]
-[[off64_variant_of(fgetpos_unlocked), section(".text.crt{|.dos}.FILE.unlocked.seek.pos")]]
+[[stdio_throws]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fgetpos_unlocked)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fgetpos64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[                                              alias(CNL_fgetpos64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fgetpos...)]]
+[[                                              alias(CNL_fgetpos64...)]]
+[[section(".text.crt{|.dos}.FILE.unlocked.seek.pos")]]
 [[userimpl, requires_function(fgetpos64), decl_include("<bits/types.h>")]]
 int fgetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
                        [[nonnull]] fpos64_t *__restrict pos) {
@@ -2296,8 +2630,14 @@ int fgetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
 }
 
 
-[[stdio_throws, alias("fsetpos64", "_IO_fsetpos64")]]
-[[off64_variant_of(fsetpos_unlocked), section(".text.crt{|.dos}.FILE.unlocked.seek.pos")]]
+[[stdio_throws]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fsetpos_unlocked)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fsetpos64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[                                              alias(CNL_fsetpos64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fsetpos...)]]
+[[                                              alias(CNL_fsetpos64...)]]
+[[section(".text.crt{|.dos}.FILE.unlocked.seek.pos")]]
 [[userimpl, requires_function(fsetpos64), decl_include("<bits/types.h>")]]
 int fsetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
                        [[nonnull]] fpos64_t const *__restrict pos) {
@@ -2307,9 +2647,16 @@ int fsetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
 
 @@>> fftruncate64(3)
 @@Truncate the given file `STREAM' to a length of `LENGTH'
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET), alias("fftruncate64_unlocked")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fftruncate64_unlocked")]]
-[[off64_variant_of(fftruncate), section(".text.crt{|.dos}.FILE.locked.utility")]]
+[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fftruncate)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate64...)]]
+[[if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)                                            ), alias(CNL_fftruncate64_unlocked...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
+[[                                                                               alias(CNL_fftruncate64...)]]
+[[if(                                 __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[                                                                               alias(CNL_fftruncate64_unlocked...)]]
+[[section(".text.crt{|.dos}.FILE.locked.utility")]]
 [[userimpl, requires_function(ftruncate64, fileno)]]
 int fftruncate64([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET64 length) {
 	int result = -1;
@@ -2321,8 +2668,14 @@ int fftruncate64([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET64 length) {
 
 @@>> fftruncate64_unlocked(3)
 @@Truncate the given file `STREAM' to a length of `LENGTH'
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET), alias("fftruncate64")]]
-[[off64_variant_of(fftruncate_unlocked), section(".text.crt{|.dos}.FILE.unlocked.utility")]]
+[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET)]]
+[[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias(fftruncate_unlocked)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[                                              alias(CNL_fftruncate64_unlocked...)]]
+[[if(__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
+[[                                              alias(CNL_fftruncate64...)]]
+[[section(".text.crt{|.dos}.FILE.unlocked.utility")]]
 [[userimpl, requires_function(ftruncate64, fileno_unlocked)]]
 int fftruncate64_unlocked([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET64 length) {
 	int result = -1;
@@ -2538,7 +2891,10 @@ $FILE *_fsopen([[nonnull]] char const *filename,
 %[insert:function(_fdopen = fdopen)]
 
 [[section(".text.crt{|.dos}.application.exit")]]
-[[cp_stdio, userimpl, export_alias("_IO_flush_all")]]
+[[cp_stdio, userimpl, no_crt_self_import, no_crt_self_export, export_as(CNL_flushall...)]]
+[[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_flushall_unlocked...)]]
+[[                                   alias(CNL_flushall...)]]
+[[                                   alias(CNL_flushall_unlocked...)]]
 int _flushall() {
 	return fflush(NULL);
 }

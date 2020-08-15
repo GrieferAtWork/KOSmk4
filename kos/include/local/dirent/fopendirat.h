@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x563217b2 */
+/* HASH CRC-32:0x58121a99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,13 +57,11 @@ __CREDIRECT(__ATTR_WUNUSED,struct __dirstream *,__NOTHROW_NCX,__localdep_fdopend
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/fcntl/openat.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_openat __LIBC_LOCAL_NAME(openat)
-#else /* ... */
-#undef __local___localdep_openat_defined
 #endif /* !... */
 #endif /* !__local___localdep_openat_defined */
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */

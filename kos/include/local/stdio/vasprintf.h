@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78ea3bb1 */
+/* HASH CRC-32:0x70da2576 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -315,7 +315,7 @@ struct format_aprintf_data {
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-__LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(vasprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args) {
 	char *__result;
 	__SSIZE_TYPE__ __error;
@@ -327,12 +327,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 	__error = __localdep_format_vprintf(&__localdep_format_aprintf_printer, &__data, __format, __args);
 	if __unlikely(__error < 0) {
 		__localdep_free(__data.ap_base);
+		*__pstr = __NULLPTR;
 		return -1;
 	}
 	__result = __localdep_format_aprintf_pack(&__data, __NULLPTR);
+	*__pstr  = __result;
 	if __unlikely(!__result)
 		return -1;
-	*__pstr = __result;
 	return (__STDC_INT_AS_SSIZE_T)__error;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x242d8ff3 */
+/* HASH CRC-32:0xa856650a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __LOCAL_LIBC(utimensat) __ATTR_NONNULL((2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat))(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) {
-#if defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
+
 #ifdef __AT_CHANGE_CTIME
 	struct __timespec64 __tms[3];
 	if (!__times)
@@ -75,31 +75,31 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat))(__fd_t __dirfd, char cons
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return __localdep_utimensat64(__dirfd, __filename, __tms, __flags);
 #endif /* !__AT_CHANGE_CTIME */
-#else /* __CRT_HAVE_utimensat64 || __CRT_HAVE_utimensat */
-#ifdef __AT_CHANGE_CTIME
-	struct __timespec32 __tms[3];
-	if (!__times)
-		return __localdep_utimensat32(__dirfd, __filename, __NULLPTR, __flags);
-	__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
-	__tms[0].tv_nsec = __times[0].tv_nsec;
-	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
-	__tms[1].tv_nsec = __times[1].tv_nsec;
-	if (__flags & __AT_CHANGE_CTIME) {
-		__tms[2].tv_sec  = (__time32_t)__times[2].tv_sec;
-		__tms[2].tv_nsec = __times[2].tv_nsec;
-	}
-	return __localdep_utimensat32(__dirfd, __filename, __tms, __flags);
-#else /* __AT_CHANGE_CTIME */
-	struct __timespec32 __tms[2];
-	if (!__times)
-		return __localdep_utimensat32(__dirfd, __filename, __NULLPTR, __flags);
-	__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
-	__tms[0].tv_nsec = __times[0].tv_nsec;
-	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
-	__tms[1].tv_nsec = __times[1].tv_nsec;
-	return __localdep_utimensat32(__dirfd, __filename, __tms, __flags);
-#endif /* !__AT_CHANGE_CTIME */
-#endif /* !__CRT_HAVE_utimensat64 && !__CRT_HAVE_utimensat */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_utimensat_defined

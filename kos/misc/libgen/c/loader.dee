@@ -2355,6 +2355,70 @@ again:
 		parseDirective_define_replacement(keywordMacros);
 	}
 
+#define CRT_NAME_LIST_ANY 0 /* export_as(): Both */
+#define CRT_NAME_LIST_DOS 1 /* export_as(): DOS-only */
+#define CRT_NAME_LIST_KOS 2 /* export_as(): KOS-only */
+	@@NOTE: The int-value is one of `CRT_NAME_LIST_*`
+	public member crtNameLists: {string: {(string, int)...}} = none;
+
+	@@Parse `foo` or `foo...`, and return { "foo" } for
+	@@the former, and crtNameLists["foo"] for the later
+	public function parseAliasNameOrList(): {(string, int)...} {
+		local self = this.self;
+		local name = self.parseCStringOrKeyword();
+		if (self.tok != "...")
+			return { (name, CRT_NAME_LIST_ANY) };
+		local result = crtNameLists.get(name);
+		if (result is none) {
+			self.err("No CRT name list defined for {!r}"
+				.format({ name }));
+		}
+		self.next();
+		return result;
+	}
+
+	@@Define a list of CRT symbol names for use in alias() and similar attributes
+	@@>%[define_crt_name_list(NAME = [FIRST_NAME, SECOND_NAME, ...])]
+	@@The list of names can then be used in declarations:
+	@@>[[alias(NAME...)]]
+	@@>foo();
+	@@Which behaves the same as:
+	@@>[[alias(FIRST_NAME, SECOND_NAME, ...)]]
+	@@>foo();
+	public function parseDirective_define_crt_name_list() {
+		if (crtNameLists is none)
+			crtNameLists = Dict();
+		local self = this.self;
+		self.next();
+		self.skip("(");
+		local listName = str(self.parseCStringOrKeyword());
+		if (listName in crtNameLists)
+			self.err("Duplicate CRT name list: {!r}".format({ listName }));
+		self.skip("=");
+		self.skip("[");
+		local listElem;
+		crtNameLists[listName] = listElem = [];
+		while (self.tok != "]") {
+			local how = CRT_NAME_LIST_ANY;
+			if (self.tok == "dos_only") {
+				how = CRT_NAME_LIST_DOS;
+				self.next();
+				self.skip(":");
+			} else if (self.tok == "kos_only") {
+				how = CRT_NAME_LIST_KOS;
+				self.next();
+				self.skip(":");
+			}
+			listElem.append((
+				str(self.parseCStringOrKeyword()),
+				how));
+			if (self.tok != ",")
+				break;
+			self.next();
+		}
+		self.skip("]");
+		self.skip(")");
+	}
 
 	@@Parse a directive. Upon entry, the parser will
 	@@point at the directive's name, and upon exit, the
@@ -2764,39 +2828,42 @@ again_parse_annotations:
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
-						if (isCString(tok))
-							tok = tok.decode("c-escape");
-						else if (!tok.issymbol()) {
-							self.err("Expected string or keyword for [{}(...)], but got {!r}"
-								.format({ mode, tok }));
+						for (local name, how: context.parseAliasNameOrList()) {
+							local ppCond = currentConditions;
+							if (!mode.endswith("raw_alias"))
+								ppCond = constructAliasConditions(ppCond, name);
+							if (ppCond is none)
+								ppCond = "1";
+							local binding = FunctionBinding(
+								ppCond:     ppCond,
+								prototypes: currentPrototypes,
+								binding:    name);
+							if (mode.startswith("preferred_")) {
+								current.bindings.insert(numPreferredBindings, binding);
+								++numPreferredBindings;
+							} else {
+								current.bindings.append(binding);
+							}
+							local usedLibFuncs = libFuncs;
+							if (#usedLibFuncs == 2) {
+								if (how == CRT_NAME_LIST_DOS)
+									usedLibFuncs = { currentDosLibraryFunction };
+								else if (how == CRT_NAME_LIST_KOS) {
+									usedLibFuncs = { currentKosLibraryFunction };
+								}
+							}
+							for (local lf: usedLibFuncs) {
+								local usedAsmname = name;
+								if (lf === currentDosLibraryFunction)
+									usedAsmname = "DOS$" + name;
+								lf.exportSymbolNames.append((
+									currentConditions is none
+										? "1"
+										: currentConditions,
+									usedAsmname));
+							}
 						}
-						local ppCond = currentConditions;
-						if (!mode.endswith("raw_alias"))
-							ppCond = constructAliasConditions(ppCond, tok);
-						if (ppCond is none)
-							ppCond = "1";
-						local binding = FunctionBinding(
-							ppCond:     ppCond,
-							prototypes: currentPrototypes,
-							binding:    tok);
-						if (mode.startswith("preferred_")) {
-							current.bindings.insert(numPreferredBindings, binding);
-							++numPreferredBindings;
-						} else {
-							current.bindings.append(binding);
-						}
-						for (local lf: libFuncs) {
-							local usedAsmname = tok;
-							if (lf === currentDosLibraryFunction)
-								usedAsmname = "DOS$" + tok;
-							lf.exportSymbolNames.append((
-								currentConditions is none
-									? "1"
-									: currentConditions,
-								usedAsmname));
-						}
-						tok = self.next();
-						if (tok != ",")
+						if (self.tok != ",")
 							break;
 						tok = self.next();
 					}
@@ -2810,34 +2877,38 @@ again_parse_annotations:
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
-						if (isCString(tok))
-							tok = tok.decode("c-escape");
-						else if (!tok.issymbol()) {
-							self.err("Expected string or keyword for [export_as(...)], but got {!r}"
-								.format({ tok }));
+						for (local name, how: context.parseAliasNameOrList()) {
+							local exportAsKos: bool;
+							local exportAsDos: bool;
+							if (mode == "export_as") {
+								exportAsKos = how != CRT_NAME_LIST_DOS;
+								exportAsDos = how != CRT_NAME_LIST_KOS;
+							} else {
+								exportAsKos = mode == "kos_export_as";
+								exportAsDos = mode == "dos_export_as";
+							}
+							if (exportAsKos) {
+								if (currentKosLibraryFunction is none)
+									currentKosLibraryFunction = LibraryFunction();
+								currentKosLibraryFunction.exportSymbolNames.append((
+									currentConditions !is none
+										? currentConditions
+										: "1",
+									name));
+							}
+							if (exportAsDos) {
+								if (mode == "export_as")
+									name = "DOS$" + name;
+								if (currentDosLibraryFunction is none)
+									currentDosLibraryFunction = LibraryFunction();
+								currentDosLibraryFunction.exportSymbolNames.append((
+									currentConditions !is none
+										? currentConditions
+										: "1",
+									name));
+							}
 						}
-						if (mode != "dos_export_as") {
-							if (currentKosLibraryFunction is none)
-								currentKosLibraryFunction = LibraryFunction();
-							currentKosLibraryFunction.exportSymbolNames.append((
-								currentConditions !is none
-									? currentConditions
-									: "1",
-								tok));
-						}
-						if (mode != "kos_export_as") {
-							if (mode == "export_as")
-								tok = "DOS$" + tok;
-							if (currentDosLibraryFunction is none)
-								currentDosLibraryFunction = LibraryFunction();
-							currentDosLibraryFunction.exportSymbolNames.append((
-								currentConditions !is none
-									? currentConditions
-									: "1",
-								tok));
-						}
-						tok = self.next();
-						if (tok != ",")
+						if (self.tok != ",")
 							break;
 						tok = self.next();
 					}
@@ -2851,19 +2922,20 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					while (self.tok !in ["", ")"]) {
-						local assemblyName = self.parseCStringOrFunctionLikeExpression();
-						local ppCond = currentConditions;
-						if (!tok.endswith("raw_alias"))
-							ppCond = constructAliasConditions(ppCond, assemblyName);
-						local binding = FunctionBinding(
-							ppCond:     ppCond,
-							prototypes: currentPrototypes,
-							binding:    assemblyName);
-						if (tok.startswith("preferred_")) {
-							current.bindings.insert(numPreferredBindings, binding);
-							++numPreferredBindings;
-						} else {
-							current.bindings.append(binding);
+						for (local assemblyName, none: context.parseAliasNameOrList()) {
+							local ppCond = currentConditions;
+							if (!tok.endswith("raw_alias"))
+								ppCond = constructAliasConditions(ppCond, assemblyName);
+							local binding = FunctionBinding(
+								ppCond:     ppCond,
+								prototypes: currentPrototypes,
+								binding:    assemblyName);
+							if (tok.startswith("preferred_")) {
+								current.bindings.insert(numPreferredBindings, binding);
+								++numPreferredBindings;
+							} else {
+								current.bindings.append(binding);
+							}
 						}
 						if (self.tok != ",")
 							break;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90d9b39e */
+/* HASH CRC-32:0xf20d1d39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,21 +55,21 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_select64_defined */
 __LOCAL_LIBC(select) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct timeval *__restrict __timeout) {
-#if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
+
 	struct __timeval64 __tmv;
 	if (!__timeout)
 		return __localdep_select64(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR);
 	__tmv.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tmv.tv_usec = __timeout->tv_usec;
 	return __localdep_select64(__nfds, __readfds, __writefds, __exceptfds, &__tmv);
-#else /* __CRT_HAVE_select64 || __CRT_HAVE_select || __CRT_HAVE___select */
-	struct __timeval32 __tmv;
-	if (!__timeout)
-		return __localdep_select32(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR);
-	__tmv.tv_sec  = (__time32_t)__timeout->tv_sec;
-	__tmv.tv_usec = __timeout->tv_usec;
-	return __localdep_select32(__nfds, __readfds, __writefds, __exceptfds, &__tmv);
-#endif /* !__CRT_HAVE_select64 && !__CRT_HAVE_select && !__CRT_HAVE___select */
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_select_defined

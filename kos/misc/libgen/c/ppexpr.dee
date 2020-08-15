@@ -133,6 +133,23 @@ class PPAssume {
 		return result;
 	}
 
+	@@Return all assumptions for typ-type
+	@@collections, where data contains @branch
+	@@Only collections with at most @maxlen items are returned
+	public function getAssumptionsForTypedCollectionContaining(
+			typ: int, branch: PPBranch, maxlen: int): {(PPBranch, int | bool)...} {
+		for (local br, val: assumptions) {
+			if (br.typ != typ)
+				continue;
+			local brdat = br.data;
+			if (#brdat > maxlen)
+				continue;
+			if (branch !in brdat)
+				continue;
+			yield (br, val);
+		}
+	}
+
 	@@Register the assumption that @branch evaluates to @value
 	public function addAssumption(branch: PPBranch, value: int | bool = true) {
 		local typ  = branch.typ;
@@ -237,6 +254,74 @@ default_assume:
 	}
 
 }
+
+
+function eliminateKnownSubExpressionsWithIndices(
+		data: {PPBranch...}, n: int,
+		matchingIndices: {int...}, maxUsedIndex: int,
+		assumes: {(PPBranch, int | bool)...})
+		: {PPBranch...} {
+	/*assert assumes;*/
+	if (#assumes == 1) {
+		/* Exactly one match -> This is the one! */
+		local optBr = assumes.first;
+		if (#optBr.first.data == #matchingIndices) {
+			local newData = [PPBranch(BRT_CONST, int(optBr.last))];
+			for (local i: [:n]) {
+				if (i !in matchingIndices)
+					newData.append(data[i]);
+			}
+			return newData;
+		}
+	}
+	for (local i: [maxUsedIndex+1:n]) {
+		/* Try to restrict assumptions with `i' */
+		local e = data[i];
+		local newAssumes = List();
+		for (local pair: assumes) {
+			if (e in pair.first.data)
+				newAssumes.append(pair);
+		}
+		if (newAssumes) {
+			local newMatchingIndices = List(matchingIndices);
+			newMatchingIndices.append(i);
+			local newData = eliminateKnownSubExpressionsWithIndices(
+				data, n, newMatchingIndices, i, newAssumes);
+			if (newData !== data)
+				return newData;
+		}
+	}
+	return data;
+}
+
+@@Search for element pairs of at least 2 elements in @data,
+@@and check if @assume can make assumptions when looking at
+@@these pairs.
+@@If assumptions can be made, then do make them and return a
+@@new set of branches that are equivalent to those from @data
+@@The caller must ensure that @(#data >= 2)
+function eliminateKnownSubExpressions(
+		data: {PPBranch...}, typ: int,
+		assume: PPAssume): {PPBranch...} {
+again:
+	local n = #data;
+	if (n >= 2) {
+		for (local i, e1: util.enumerate(data)) {
+			local assumes: {(PPBranch, int | bool)...} = List(assume
+				.getAssumptionsForTypedCollectionContaining(typ, e1, n));
+			if (assumes) {
+				local newData = eliminateKnownSubExpressionsWithIndices(
+					data, n, { i }, i, assumes);
+				if (newData !== data) {
+					data = newData;
+					goto again;
+				}
+			}
+		}
+	}
+	return data;
+}
+
 
 
 class PPBranch {
@@ -705,6 +790,14 @@ have_non_boolean_in_brt_all:
 			}
 			if (hasInner)
 				goto again_flatten_all;
+			if (nm1 >= 1) { /* #data >= 2 */
+				/* Check if `assume' contains assumptions
+				 * for sub-expressions from `data':
+				 * >> foo && bar && foobar
+				 * There may be an assumption `(foo && foobar) == V', which
+				 * would allow us to be optimize ourself to `V && foobar' */
+				data = eliminateKnownSubExpressions(data, typ, assume);
+			}
 			for (local e: data) {
 				ASSERT(e is PPBranch);
 				if (e.typ == BRT_CONST) {
@@ -813,6 +906,14 @@ have_non_boolean_in_brt_any:
 			}
 			if (hasInner)
 				goto again_flatten_any;
+			if (nm1 >= 1) { /* #data >= 2 */
+				/* Check if `assume' contains assumptions
+				 * for sub-expressions from `data':
+				 * >> foo || bar || foobar
+				 * There may be an assumption `(foo || foobar) == V', which
+				 * would allow us to be optimize ourself to `V || foobar' */
+				data = eliminateKnownSubExpressions(data, typ, assume);
+			}
 			for (local e: data) {
 				if (e.typ == BRT_CONST) {
 					/* Merge constant addends */
@@ -1504,8 +1605,15 @@ assert optimize(
 assert optimize("!(4 == __SIZEOF_POINTER__) && !defined(__x86_64__)") ==
 "__SIZEOF_POINTER__ != 4 && !defined(__x86_64__)";
 
+assert optimize("(a || b || c) && (a || b)") == "a || b";
+assert optimize("(a && b && c) || (a && b)") == "a && b";
+assert optimize("(a || b) && (a || b || c)") == "a || b";
+assert optimize("(a && b) || (a && b && c)") == "a && b";
+assert optimize("(a || b) && (b || c) && (a || b || c)") == "(a || b) && (b || c)";
+assert optimize("(a || b || c) && (a || b) && (b || c)") == "(a || b) && (b || c)";
+assert optimize("(a && b) || (b && c) || (a && b && c)") == "(a && b) || (b && c)";
+assert optimize("(a && b && c) || (a && b) || (b && c)") == "(a && b) || (b && c)";
 #endif /* __MAIN__ */
-
 
 
 

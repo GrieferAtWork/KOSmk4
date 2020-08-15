@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ca9b90 */
+/* HASH CRC-32:0xea76b232 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,21 +47,21 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_sigtimedwait64_defined */
 __LOCAL_LIBC(sigtimedwait) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct timespec const *__timeout) {
-#if defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait)
+
 	struct __timespec64 __tmv;
 	if (!__timeout)
 		return __localdep_sigtimedwait64(__set, __info, __NULLPTR);
 	__tmv.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tmv.tv_nsec = __timeout->tv_nsec;
 	return __localdep_sigtimedwait64(__set, __info, __NULLPTR);
-#else /* __CRT_HAVE_sigtimedwait64 || __CRT_HAVE_sigtimedwait */
-	struct __timespec32 __tmv;
-	if (!__timeout)
-		return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
-	__tmv.tv_sec  = (__time32_t)__timeout->tv_sec;
-	__tmv.tv_nsec = __timeout->tv_nsec;
-	return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
-#endif /* !__CRT_HAVE_sigtimedwait64 && !__CRT_HAVE_sigtimedwait */
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigtimedwait_defined

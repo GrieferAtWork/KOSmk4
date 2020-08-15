@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x320e0686 */
+/* HASH CRC-32:0xcfa71ed9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -277,11 +277,13 @@ INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBD
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character),
+ * and never write more than `BUFLEN' characters to `BUF' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character),
+ * and never write more than `BUFLEN' characters to `BUF' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
@@ -429,19 +431,19 @@ INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fp
 /* 64-bit variant of `fsetpos' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTDEF WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTDEF WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTDEF WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTDEF WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Re-open the given `STREAM' as a file-stream for accessing `FD' */
@@ -453,9 +455,9 @@ INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char
 /* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);
-INTDEF NONNULL((1)) long int (LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) long int (LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence) THROWS(...);
-INTDEF NONNULL((1)) off_t (LIBDCALL libd_ftello_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) off_t (LIBDCALL libd_ftello_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos_unlocked)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fsetpos_unlocked)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
 INTDEF NONNULL((1)) int (LIBDCALL libd_getw_unlocked)(FILE *__restrict stream) THROWS(...);

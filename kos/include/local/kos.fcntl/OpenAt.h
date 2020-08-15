@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f95463 */
+/* HASH CRC-32:0x1cb97b8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,11 +51,11 @@ __LOCAL_LIBC(OpenAt) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
-#if defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)
+
 	__result = __localdep_OpenAt64(__dirfd, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#else /* __CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt */
-	__result = __localdep_OpenAt32(__dirfd, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#endif /* !__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt */
+
+
+
 	__builtin_va_end(__args);
 	return __result;
 }

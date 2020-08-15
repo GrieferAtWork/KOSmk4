@@ -1754,6 +1754,8 @@
 #define __CRT_HAVE_fscanf 1
 #define __CRT_HAVE_fscanf_unlocked 1
 #define __CRT_HAVE_fseek 1
+#define __CRT_HAVE_fseek64 1
+#define __CRT_HAVE_fseek64_unlocked 1
 #define __CRT_HAVE_fseek_unlocked 1
 #define __CRT_HAVE_fseeko 1
 #define __CRT_HAVE_fseeko64 1
@@ -1774,6 +1776,8 @@
 #define __CRT_HAVE_fstatvfs64 1
 #define __CRT_HAVE_fsync 1
 #define __CRT_HAVE_ftell 1
+#define __CRT_HAVE_ftell64 1
+#define __CRT_HAVE_ftell64_unlocked 1
 #define __CRT_HAVE_ftell_unlocked 1
 #define __CRT_HAVE_ftello 1
 #define __CRT_HAVE_ftello64 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x169e6cd1 */
+/* HASH CRC-32:0x7994b772 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,9 +152,9 @@ INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char
 /* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);
-INTDEF NONNULL((1)) long int (LIBCCALL libc_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) long int (LIBCCALL libc_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence) THROWS(...);
-INTDEF NONNULL((1)) off_t (LIBCCALL libc_ftello_unlocked)(FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) off_t (LIBCCALL libc_ftello_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF int (LIBCCALL libc_flushall_unlocked)(void) THROWS(...);
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos_unlocked)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos_unlocked)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);

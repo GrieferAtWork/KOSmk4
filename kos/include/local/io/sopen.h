@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1edbc383 */
+/* HASH CRC-32:0x91eeeec0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,13 +35,11 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/fcntl/open.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_open __LIBC_LOCAL_NAME(open)
-#else /* ... */
-#undef __local___localdep_open_defined
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 __LOCAL_LIBC(sopen) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t

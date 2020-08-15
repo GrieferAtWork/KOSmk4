@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dbdebbd */
+/* HASH CRC-32:0xd94306a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_futimens64_defined */
 __LOCAL_LIBC(futimens) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) {
-#if defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
+
 	struct __timespec64 __tms[2];
 	if (!__times)
 		return __localdep_futimens64(__fd, __NULLPTR);
@@ -55,16 +55,16 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd, struct timesp
 	__tms[1].tv_sec  = (__time64_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return __localdep_futimens64(__fd, __tms);
-#else /* __CRT_HAVE_futimens64 || __CRT_HAVE_futimens */
-	struct __timespec32 __tms[2];
-	if (!__times)
-		return __localdep_futimens32(__fd, __NULLPTR);
-	__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
-	__tms[0].tv_nsec = __times[0].tv_nsec;
-	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
-	__tms[1].tv_nsec = __times[1].tv_nsec;
-	return __localdep_futimens32(__fd, __tms);
-#endif /* !__CRT_HAVE_futimens64 && !__CRT_HAVE_futimens */
+
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futimens_defined

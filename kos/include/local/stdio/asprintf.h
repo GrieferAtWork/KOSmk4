@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8463da55 */
+/* HASH CRC-32:0x319622bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_vasprintf_defined 1
 #ifdef __CRT_HAVE_vasprintf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),vasprintf,(__pstr,__format,__args))
+__CREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),vasprintf,(__pstr,__format,__args))
 #elif (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 __NAMESPACE_LOCAL_END
 #include <local/stdio/vasprintf.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vasprintf_defined */
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-__LOCAL_LIBC(asprintf) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(asprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(asprintf))(char **__restrict __pstr, char const *__restrict __format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

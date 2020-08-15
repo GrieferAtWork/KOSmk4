@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ef6167b */
+/* HASH CRC-32:0x40b7c149 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Return the number of written bytes, or -1 in case of error */
 __LOCAL_LIBC(sendfile) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, __SIZE_TYPE__ __count) {
-#if defined(__CRT_HAVE_sendfile64) || defined(__CRT_HAVE_sendfile)
+
 	__SSIZE_TYPE__ __result;
 	if (__offset) {
 		__off64_t __temp = *__offset;
@@ -77,17 +77,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd, __fd_t __
 		__result = __localdep_sendfile64(__out_fd, __in_fd, __NULLPTR, __count);
 	}
 	return __result;
-#else /* __CRT_HAVE_sendfile64 || __CRT_HAVE_sendfile */
-	__SSIZE_TYPE__ __result;
-	if (__offset) {
-		__off32_t __temp = (__off32_t)*__offset;
-		__result = __localdep_sendfile32(__out_fd, __in_fd, &__temp, __count);
-		*__offset = (__FS_TYPE(off))__temp;
-	} else {
-		__result = __localdep_sendfile32(__out_fd, __in_fd, __NULLPTR, __count);
-	}
-	return __result;
-#endif /* !__CRT_HAVE_sendfile64 && !__CRT_HAVE_sendfile */
+
+
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sendfile_defined

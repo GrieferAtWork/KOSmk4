@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3a84cf4 */
+/* HASH CRC-32:0x70fbfbf7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fputc_defined
 #define __local_fputc_defined 1
 #include <__crt.h>
-#if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
+#if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _flsbuf from stdio */
@@ -42,16 +42,16 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream))
-#elif defined(__CRT_HAVE__IO_fwrite) && defined(__USE_STDIO_UNLOCKED)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fwrite)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream))
+#elif defined(__CRT_HAVE__IO_fwrite)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fwrite_s)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -67,33 +67,31 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream))
-#elif defined(__CRT_HAVE__IO_fwrite)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream))
 #else /* ... */
 #undef __local___localdep_crt_fwrite_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fwrite_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/crt/io-file.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Write a single character `CH' to `STREAM' */
 __LOCAL_LIBC(fputc) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
-#if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf) && (!defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fwrite) && !defined(__CRT_HAVE_fwrite_s) && !defined(__CRT_HAVE_fwrite_unlocked) && !defined(__CRT_HAVE__fwrite_nolock) && !defined(__CRT_HAVE__IO_fwrite)))
+#if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf) && (!defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fwrite) && !defined(__CRT_HAVE__IO_fwrite) && !defined(__CRT_HAVE_fwrite_s) && !defined(__CRT_HAVE_fwrite_unlocked) && !defined(__CRT_HAVE__fwrite_nolock)))
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*__stream->__f_ptr++ = (char)__ch)) : __localdep__flsbuf(__ch, __stream);
-#else /* __CRT_DOS && __CRT_HAVE__flsbuf && (!__USE_STDIO_UNLOCKED || (!__CRT_HAVE_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite)) */
+#else /* __CRT_DOS && __CRT_HAVE__flsbuf && (!__USE_STDIO_UNLOCKED || (!__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock)) */
 	unsigned char __byte = (unsigned char)(unsigned int)__ch;
 	if (!__localdep_crt_fwrite(&__byte, sizeof(unsigned char), 1, __stream))
 		return __EOF;
 	return __ch;
-#endif /* !__CRT_DOS || !__CRT_HAVE__flsbuf || (__USE_STDIO_UNLOCKED && (__CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite)) */
+#endif /* !__CRT_DOS || !__CRT_HAVE__flsbuf || (__USE_STDIO_UNLOCKED && (__CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock)) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fputc_defined
 #define __local___localdep_fputc_defined 1
 #define __localdep_fputc __LIBC_LOCAL_NAME(fputc)
 #endif /* !__local___localdep_fputc_defined */
-#else /* (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite */
+#else /* (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock */
 #undef __local_fputc_defined
-#endif /* (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite */
+#endif /* (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock */
 #endif /* !__local_fputc_defined */

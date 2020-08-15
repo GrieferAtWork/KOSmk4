@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99623289 */
+/* HASH CRC-32:0xb6d20b7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,15 +49,13 @@ __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TY
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/unistd/lseek.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 #define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
-#else /* ... */
-#undef __local___localdep_lseek_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
 /* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */

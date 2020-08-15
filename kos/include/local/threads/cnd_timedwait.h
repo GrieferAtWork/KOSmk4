@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9606ac80 */
+/* HASH CRC-32:0xb31e80ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_cond_timedwait.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -57,8 +57,6 @@ __NAMESPACE_LOCAL_BEGIN
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
 #define __localdep_pthread_cond_timedwait __LIBC_LOCAL_NAME(pthread_cond_timedwait)
-#else /* ... */
-#undef __local___localdep_pthread_cond_timedwait_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_cond_timedwait_defined */
 __NAMESPACE_LOCAL_END

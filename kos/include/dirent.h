@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42d61d80 */
+/* HASH CRC-32:0xe33f18e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -483,9 +483,6 @@ __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddirf,(__fd_t __fd, 
 #ifdef __CRT_HAVE_kreaddir64
 /* 64-bit variant of `kreaddir()' */
 __CDECLARE(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddir64,(__fd_t __fd, struct dirent64 *__buf, size_t __bufsize, unsigned int __mode),(__fd,__buf,__bufsize,__mode))
-#elif defined(__CRT_HAVE_kreaddir) && defined(_DIRENT_MATCHES_DIRENT64)
-/* 64-bit variant of `kreaddir()' */
-__CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddir64,(__fd_t __fd, struct dirent64 *__buf, size_t __bufsize, unsigned int __mode),kreaddir,(__fd,__buf,__bufsize,__mode))
 #elif defined(__CRT_HAVE_kreaddir) && defined(_DIRENT_MATCHES_DIRENT64)
 /* 64-bit variant of `kreaddir()' */
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,kreaddir64,(__fd_t __fd, struct dirent64 *__buf, size_t __bufsize, unsigned int __mode),kreaddir,(__fd,__buf,__bufsize,__mode))

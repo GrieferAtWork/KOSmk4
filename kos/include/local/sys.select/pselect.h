@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd79393d */
+/* HASH CRC-32:0x669be5c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,21 +50,21 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_pselect64_defined */
 __LOCAL_LIBC(pselect) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect))(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) {
-#if defined(__CRT_HAVE_pselect64) || defined(__CRT_HAVE_pselect)
+
 	struct __timespec64 __tmv;
 	if (!__timeout)
 		return __localdep_pselect64(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR, __sigmask);
 	__tms.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tms.tv_nsec = __timeout->tv_nsec;
 	return __localdep_pselect64(__nfds, __readfds, __writefds, __exceptfds, &__tms, __sigmask);
-#else /* __CRT_HAVE_pselect64 || __CRT_HAVE_pselect */
-	struct __timespec32 __tms;
-	if (!__timeout)
-		return __localdep_pselect32(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR, __sigmask);
-	__tms.tv_sec  = (__time32_t)__timeout->tv_sec;
-	__tms.tv_nsec = __timeout->tv_nsec;
-	return __localdep_pselect32(__nfds, __readfds, __writefds, __exceptfds, &__tms, __sigmask);
-#endif /* !__CRT_HAVE_pselect64 && !__CRT_HAVE_pselect */
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pselect_defined

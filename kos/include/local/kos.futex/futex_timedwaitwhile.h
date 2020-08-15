@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa916707 */
+/* HASH CRC-32:0xc5bc8a07 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex,
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
-#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/kos.futex/lfutex.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -103,8 +103,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 #define __localdep_lfutex __LIBC_LOCAL_NAME(lfutex)
-#else /* ... */
-#undef __local___localdep_lfutex_defined
 #endif /* !... */
 #endif /* !__local___localdep_lfutex_defined */
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e7730c9 */
+/* HASH CRC-32:0xed172147 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -513,7 +513,8 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character),
+ * and never write more than `BUFLEN' characters to `BUF' */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf,
                                      size_t buflen,
@@ -528,7 +529,8 @@ NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character),
+ * and never write more than `BUFLEN' characters to `BUF' */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
                                      size_t buflen,
@@ -787,7 +789,7 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTERN ATTR_SECTION(".text.crt.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr,
                                      char const *__restrict format,
                                      va_list args) {
@@ -801,18 +803,19 @@ NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr,
 	error = libc_format_vprintf(&libc_format_aprintf_printer, &data, format, args);
 	if unlikely(error < 0) {
 		libc_free(data.ap_base);
+		*pstr = NULL;
 		return -1;
 	}
 	result = libc_format_aprintf_pack(&data, NULL);
+	*pstr  = result;
 	if unlikely(!result)
 		return -1;
-	*pstr = result;
 	return (__STDC_INT_AS_SSIZE_T)error;
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr,
                                      char const *__restrict format,
                                      ...) {
@@ -826,7 +829,7 @@ NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTERN ATTR_SECTION(".text.crt.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
                                      char const *__restrict format,
                                      ...) {
@@ -842,7 +845,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) THROWS(...) {
 	u16 result;
 	return libc_fread_unlocked(&result, sizeof(result), 1, stream)
-	       ? (int)result
+	       ? (int)(unsigned int)result
 	       : (int)EOF;
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
