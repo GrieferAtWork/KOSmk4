@@ -61,16 +61,17 @@ __DECL_BEGIN
 #define PB_PACKET_HEADER_SIZE   8
 #define PB_PACKET_NEXTLINK_SIZE (8 + 2 * __SIZEOF_POINTER__)
 struct pb_packet {
-	__uint16_t p_total;     /* [!0] Total size size of the packet (in bytes, including this header and
-	                         *      any trailing data used for padding, as well as ancillary data)
+	__uint16_t p_total;     /* [!0][const] Total size size of the packet (in bytes, including this
+	                         * header and any trailing data used for padding, as well as ancillary data)
 	                         * NOTE: Aligned by `PACKET_BUFFER_ALIGNMENT' */
-	__uint16_t p_payload;   /* Size of the packet's payload (located immediately after the header)
-	                         * NOTE: Allowed to be ZERO(0) */
-	__uint16_t p_ancillary; /* Size of ancillary data (in bytes; located at the next `PACKET_BUFFER_ALIGNMENT'
+	__uint16_t p_payload;   /* [lock(p_state == PB_PACKET_STATE_READABLE)] Size of the packet's payload
+	                         * (located immediately after the header) NOTE: Allowed to be ZERO(0) */
+	__uint16_t p_ancillary; /* [lock(p_state == PB_PACKET_STATE_READABLE)] Size of ancillary data
+	                         * (in bytes; located at the next `PACKET_BUFFER_ALIGNMENT'
 	                         * aligned address after the payload, and spans for `p_ancillary')
 	                         * With that in mind:
-	                         * >> `p_payload + p_ancillary + sizeof(struct packet_header) <= p_total' */
-	__uint16_t p_state;     /* Packet state (one of `PB_PACKET_STATE_*') */
+	                         * >> `PB_PACKET_HEADER_SIZE + p_payload + p_ancillary <= p_total' */
+	__uint16_t p_state;     /* [lock(pb_lock)] Packet state (one of `PB_PACKET_STATE_*') */
 #if 0
 	__byte_t  p_payload_data[p_payload];
 	__byte_t _p_ancillary_align[ALIGN(PACKET_BUFFER_ALIGNMENT)];
@@ -89,6 +90,7 @@ struct pb_buffer {
 	 * >>     struct pb_packet *packet;
 	 * >> again:
 	 * >>     lock();
+	 * >> again_locked:
 	 * >>     packet = pb_rptr;
 	 * >>     if (packet->p_total == 0) {
 	 * >>         // Packet exists the next buffer over!
@@ -97,7 +99,19 @@ struct pb_buffer {
 	 * >>         free(packet->p_base);
 	 * >>         goto again;
 	 * >>     }
-	 * >>     if (packet->p_state == PB_PACKET_STATE_READING) {
+	 * >>     if (packet->p_state != PB_PACKET_STATE_READABLE) {
+	 * >>         if (packet->p_state == PB_PACKET_STATE_DISCARD) {
+	 * >>             // Skip packet
+	 * >>             pb_used -= packet->p_total;
+	 * >>             pb_rptr += packet->p_total;
+	 * >>             goto again_locked;
+	 * >>         }
+	 * >>         if (packet->p_state == PB_PACKET_STATE_INIT) {
+	 * >>             // Wait for packet to become initialized
+	 * >>             unlock();
+	 * >>             WAIT_FOR_PACKET_TO_CHANGE_STATE_TO_READABLE_OR_DISCARD();
+	 * >>             goto again;
+	 * >>         }
 	 * >>         unlock();
 	 * >>         task_serve();  // Allow CTRL+C in case we got here recursively (e.g. through VIO)
 	 * >>         task_yield();
@@ -252,8 +266,10 @@ struct pb_buffer {
 	struct pb_packet    *pb_wptr; /* [lock(pb_lock)][1..1] Offset to the end of the last unread packet. */
 	__size_t             pb_used; /* [lock(pb_lock)] Amount of allocated buffer memory. */
 	__WEAK __size_t      pb_limt; /* Max size of the packet buffer. */
-	sched_signal_t       pb_psta; /* Signal broadcast when new packet are added
-	                               * or the state of a packet is changed. */
+	sched_signal_t       pb_psta; /* Signal broadcast any packet changes state to one of:
+	                               *   - PB_PACKET_STATE_READABLE
+	                               *   - PB_PACKET_STATE_DISCARD
+	                               */
 };
 
 
