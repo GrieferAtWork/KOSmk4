@@ -184,6 +184,7 @@ again_locked:
 		}
 		packet              = self->pb_wptr;
 		packet->p_total     = total_size;
+		packet->p_payoff    = PB_PACKET_HEADER_SIZE;
 		packet->p_payload   = payload_size;
 		packet->p_ancillary = ancillary_size;
 		packet->p_state     = PB_PACKET_STATE_INIT;
