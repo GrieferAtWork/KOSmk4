@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d3eaf46 */
+/* HASH CRC-32:0xfaac3feb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@
 #include "core/malloc.h"
 
 #include "stdlib.h"
+#if !defined(____libc_realloc_in_place_defined) && defined(____libc_core_realloc_in_place_defined)
+#define ____libc_realloc_in_place_defined 1
+#define __libc_realloc_in_place __libc_core_realloc_in_place
+#endif /* !____libc_realloc_in_place_defined && ____libc_core_realloc_in_place_defined */
+#if !defined(____libc_malloc_usable_size_defined) && defined(____libc_core_malloc_usable_size_defined)
+#define ____libc_malloc_usable_size_defined 1
+#define __libc_malloc_usable_size __libc_core_malloc_usable_size
+#endif /* !____libc_malloc_usable_size_defined && ____libc_core_malloc_usable_size_defined */
 
 #endif /* __CC__ */
 
