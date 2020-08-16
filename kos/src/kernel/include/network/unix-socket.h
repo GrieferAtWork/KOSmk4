@@ -150,6 +150,15 @@ struct unix_socket
 	                                          * When non-NULL, this is a connected client socket.
 	                                          * Otherwise, if `us_node' is valid, this is a bound
 	                                          * server socket. */
+	/* Need to differentiate between client-side-sockets and server-side-sockets.
+	 * Aside from this, the sockets returned by accept() are set-up identical to those
+	 * produced as the result of socket()+connect(), but when it comes to actually
+	 * sending data, we need to make a difference between the two, such that recv
+	 * and send read/write to/from the correct packet buffers! */
+	struct pb_buffer           *us_recvbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
+	                                          * One of `us_client->uc_bufs' (used for `recv()') */
+	struct pb_buffer           *us_sendbuf;  /* [1..1][valid_if(us_node && us_client)][lock(WRITE_ONCE)]
+	                                          * One of `us_client->uc_bufs' (used for `send()') */
 };
 
 /* Socket operators for UNIX sockets. */

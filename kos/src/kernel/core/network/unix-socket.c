@@ -536,10 +536,13 @@ UnixSocket_Bind(struct socket *__restrict self,
 
 
 struct async_accept_wait {
-	REF struct unix_client     *aw_client;    /* [1..1] The client descriptor. */
-	REF struct socket_node     *aw_bind_node; /* [1..1] The socket to which to connect */
-	REF struct path            *aw_bind_path; /* [1..1] The path containing `ac_bind_node' */
-	REF struct directory_entry *aw_bind_name; /* [1..1] The name of `ac_bind_node' */
+	WEAK REF UnixSocket        *aw_socket;    /* [1..1] The pointed-to socket. */
+	/* NOTE: All of the following are [1..1] before
+	 * `UnixSocket_WaitForAccept_Work()' finishes the async job. */
+	REF struct unix_client     *aw_client;    /* [0..1] The client descriptor. */
+	REF struct socket_node     *aw_bind_node; /* [0..1] The socket to which to connect */
+	REF struct path            *aw_bind_path; /* [0..1] The path containing `ac_bind_node' */
+	REF struct directory_entry *aw_bind_name; /* [0..1] The name of `ac_bind_node' */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -550,6 +553,7 @@ NOTHROW(ASYNC_CALLBACK_CC UnixSocket_WaitForAccept_Fini)(async_job_t self) {
 	xdecref(me->aw_bind_node);
 	xdecref(me->aw_bind_path);
 	xdecref(me->aw_bind_name);
+	weakdecref(me->aw_socket);
 }
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
@@ -577,11 +581,35 @@ PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
 UnixSocket_WaitForAccept_Work(async_job_t self) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
+	REF UnixSocket *socket;
 	me     = (struct async_accept_wait *)self;
 	client = me->aw_client;
 	if (ATOMIC_READ(client->uc_status) == UNIX_CLIENT_STATUS_PENDING)
 		return true; /* Still some work left to do! */
 	/* The connection has been established! */
+	socket = me->aw_socket;
+	if unlikely(!tryincref(socket)) {
+		/* The socket died? Ok... In that case, just force a disconnect */
+		if (!unix_client_refuse_connection(client))
+			unix_client_close_connection(client);
+		return false;
+	}
+	/* Fill in fields of the socket. */
+	socket->us_recvbuf  = &client->uc_fromserver;
+	socket->us_sendbuf  = &client->uc_fromclient;
+	socket->us_nodepath = me->aw_bind_path; /* Inherit reference */
+	socket->us_nodename = me->aw_bind_name; /* Inherit reference */
+	socket->us_client   = client;           /* Inherit reference */
+	me->aw_bind_path    = NULL;             /* Inherited by `socket->us_nodepath' */
+	me->aw_bind_name    = NULL;             /* Inherited by `socket->us_nodename' */
+	me->aw_client       = NULL;             /* Inherited by `socket->us_client' */
+	COMPILER_WRITE_BARRIER();
+	/* Fill in the node-pointer, thus marking the socket
+	 * as having been connected (from its own view-point) */
+	ATOMIC_WRITE(socket->us_node, me->aw_bind_node); /* Inherit reference */
+	me->aw_bind_node = NULL;
+	COMPILER_WRITE_BARRIER();
+	weakdecref_unlikely(socket);
 	return false;
 }
 
@@ -734,6 +762,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 			RETHROW();
 		}
 		con = (struct async_accept_wait *)job;
+		con->aw_socket    = (REF UnixSocket *)weakincref(self);
 		con->aw_client    = client;    /* Inherit reference */
 		con->aw_bind_path = bind_path; /* Inherit reference */
 		con->aw_bind_name = bind_name; /* Inherit reference */
@@ -878,6 +907,8 @@ again_wait_for_client:
 	result->us_nodepath = incref(me->us_nodepath);
 	result->us_nodename = incref(me->us_nodename);
 	result->us_node     = (REF struct socket_node *)incref(me->us_node);
+	result->us_recvbuf  = &result_client->uc_fromclient;
+	result->us_sendbuf  = &result_client->uc_fromserver;
 	return result;
 }
 
