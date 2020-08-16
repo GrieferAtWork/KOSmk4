@@ -859,6 +859,7 @@
 #define __CRT_HAVE__fcvt_s 1
 #define __CRT_HAVE__fdclass 1
 #define __CRT_HAVE__fdsign 1
+#define __CRT_HAVE__fflush_nolock 1
 #define __CRT_HAVE__filbuf 1
 #define __CRT_HAVE__filelength 1
 #define __CRT_HAVE__filelengthi64 1
@@ -885,10 +886,14 @@
 #define __CRT_HAVE__fprintf_p 1
 #define __CRT_HAVE__fprintf_p_l 1
 #define __CRT_HAVE__fprintf_s_l 1
+#define __CRT_HAVE__fread_nolock 1
 #define __CRT_HAVE__fread_nolock_s 1
 #define __CRT_HAVE__free_dbg 1
 #define __CRT_HAVE__fscanf_l 1
 #define __CRT_HAVE__fscanf_s_l 1
+#define __CRT_HAVE__fseek_nolock 1
+#define __CRT_HAVE__fseeki64 1
+#define __CRT_HAVE__fseeki64_nolock 1
 #define __CRT_HAVE__fsopen 1
 #define __CRT_HAVE__fstat 1
 #define __CRT_HAVE__fstat32 1
@@ -896,6 +901,9 @@
 #define __CRT_HAVE__fstat64 1
 #define __CRT_HAVE__fstat64i32 1
 #define __CRT_HAVE__fstati64 1
+#define __CRT_HAVE__ftell_nolock 1
+#define __CRT_HAVE__ftelli64 1
+#define __CRT_HAVE__ftelli64_nolock 1
 #define __CRT_HAVE__ftime32 1
 #define __CRT_HAVE__ftime32_s 1
 #define __CRT_HAVE__ftime64 1
@@ -908,6 +916,7 @@
 #define __CRT_HAVE__fwprintf_p 1
 #define __CRT_HAVE__fwprintf_p_l 1
 #define __CRT_HAVE__fwprintf_s_l 1
+#define __CRT_HAVE__fwrite_nolock 1
 #define __CRT_HAVE__fwscanf_l 1
 #define __CRT_HAVE__gcvt 1
 #define __CRT_HAVE__gcvt_s 1
@@ -1163,6 +1172,7 @@
 #define __CRT_HAVE__ultow 1
 #define __CRT_HAVE__ultow_s 1
 #define __CRT_HAVE__umask 1
+#define __CRT_HAVE__ungetc_nolock 1
 #define __CRT_HAVE__unlink 1
 #define __CRT_HAVE__unloaddll 1
 #define __CRT_HAVE__unlock_fhandle 1
@@ -1277,6 +1287,7 @@
 #define __CRT_HAVE__wtoi_l 1
 #define __CRT_HAVE__wtol_l 1
 #define __CRT_HAVE__wtoll_l 1
+#define __CRT_HAVE__wutime32 1
 #define __CRT_HAVE_a64l 1
 #define __CRT_HAVE_abort 1
 #define __CRT_HAVE_abs 1
@@ -4816,7 +4827,7 @@
 #define __CRT_HAVE__wtoll 1
 #define __CRT_HAVE_KOS$_wtoll_l 1
 #define __CRT_HAVE__wunlink 1
-#define __CRT_HAVE__wutime32 1
+#define __CRT_HAVE_KOS$_wutime32 1
 #define __CRT_HAVE__wutime64 1
 #define __CRT_HAVE_KOS$bsd_signal 1
 #define __CRT_HAVE_KOS$btowc 1

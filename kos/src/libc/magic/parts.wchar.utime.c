@@ -48,7 +48,7 @@ int crt_wutime32([[nonnull]] $wchar_t const *filename,
 int crt_wutime64([[nonnull]] $wchar_t const *filename,
                  [[nullable]] struct $utimbuf64 const *file_times);
 
-[[cp, wchar, dos_export_as("DOS$_wutime32"), no_crt_self_import]]
+[[cp, wchar, export_as("_wutime32"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wutime64", "_wutime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wutime", "_wutime32")]]
 [[userimpl, requires($has_function(crt_wutime32) || $has_function(crt_wutime64))]]

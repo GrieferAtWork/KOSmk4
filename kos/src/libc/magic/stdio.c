@@ -346,19 +346,19 @@ __LIBC __FILE *stderr;
 %[define_crt_name_list(CNL_fsetpos_unlocked   = ["fsetpos_unlocked"])]           /*  int fsetpos_unlocked(FILE *, pos32_t const *) */
 %[define_crt_name_list(CNL_fsetpos64_unlocked = ["fsetpos64_unlocked"])]         /*  int fsetpos64_unlocked(FILE *, pos64_t const *) */
 
-%[define_crt_name_list(CNL_fseek             = ["fseek"])]                                                              /*  int fseek(FILE *, long int, int) */
-%[define_crt_name_list(CNL_fseeko            = ["fseeko"])]                                                             /*  int fseeko(FILE *, off32_t, int) */
-%[define_crt_name_list(CNL_fseeko64          = ["fseeko64", "fseek64", dos_only:"_fseeki64"])]                          /*  int fseeko64(FILE *, off64_t, int) */
-%[define_crt_name_list(CNL_fseek_unlocked    = ["fseek_unlocked", dos_only:"_fseek_nolock"])]                           /*  int fseek_unlocked(FILE *, long int, int) */
-%[define_crt_name_list(CNL_fseeko_unlocked   = ["fseeko_unlocked"])]                                                    /*  int fseeko_unlocked(FILE *, off32_t, int) */
-%[define_crt_name_list(CNL_fseeko64_unlocked = ["fseeko64_unlocked", "fseek64_unlocked", dos_only:"_fseeki64_nolock"])] /*  int fseeko64_unlocked(FILE *, off64_t, int) */
+%[define_crt_name_list(CNL_fseek             = ["fseek"])]                                                     /*  int fseek(FILE *, long int, int) */
+%[define_crt_name_list(CNL_fseeko            = ["fseeko"])]                                                    /*  int fseeko(FILE *, off32_t, int) */
+%[define_crt_name_list(CNL_fseeko64          = ["fseeko64", "fseek64", "_fseeki64"])]                          /*  int fseeko64(FILE *, off64_t, int) */
+%[define_crt_name_list(CNL_fseek_unlocked    = ["fseek_unlocked", "_fseek_nolock"])]                           /*  int fseek_unlocked(FILE *, long int, int) */
+%[define_crt_name_list(CNL_fseeko_unlocked   = ["fseeko_unlocked"])]                                           /*  int fseeko_unlocked(FILE *, off32_t, int) */
+%[define_crt_name_list(CNL_fseeko64_unlocked = ["fseeko64_unlocked", "fseek64_unlocked", "_fseeki64_nolock"])] /*  int fseeko64_unlocked(FILE *, off64_t, int) */
 
-%[define_crt_name_list(CNL_ftell             = ["ftell", "_IO_ftell"])]                                                 /* long int ftell(FILE *) */
-%[define_crt_name_list(CNL_ftello            = ["ftello"])]                                                             /* off32_t ftello(FILE *) */
-%[define_crt_name_list(CNL_ftello64          = ["ftello64", "ftell64", dos_only:"_ftelli64"])]                          /* off64_t ftello64(FILE *) */
-%[define_crt_name_list(CNL_ftell_unlocked    = ["ftell_unlocked", dos_only:"_ftell_nolock"])]                           /* long int ftell_unlocked(FILE *) */
-%[define_crt_name_list(CNL_ftello_unlocked   = ["ftello_unlocked"])]                                                    /* off32_t ftello_unlocked(FILE *) */
-%[define_crt_name_list(CNL_ftello64_unlocked = ["ftello64_unlocked", "ftell64_unlocked", dos_only:"_ftelli64_nolock"])] /* off64_t ftello64_unlocked(FILE *) */
+%[define_crt_name_list(CNL_ftell             = ["ftell", "_IO_ftell"])]                                        /* long int ftell(FILE *) */
+%[define_crt_name_list(CNL_ftello            = ["ftello"])]                                                    /* off32_t ftello(FILE *) */
+%[define_crt_name_list(CNL_ftello64          = ["ftello64", "ftell64", "_ftelli64"])]                          /* off64_t ftello64(FILE *) */
+%[define_crt_name_list(CNL_ftell_unlocked    = ["ftell_unlocked", "_ftell_nolock"])]                           /* long int ftell_unlocked(FILE *) */
+%[define_crt_name_list(CNL_ftello_unlocked   = ["ftello_unlocked"])]                                           /* off32_t ftello_unlocked(FILE *) */
+%[define_crt_name_list(CNL_ftello64_unlocked = ["ftello64_unlocked", "ftell64_unlocked", "_ftelli64_nolock"])] /* off64_t ftello64_unlocked(FILE *) */
 
 %[define_crt_name_list(CNL_fgetc             = ["fgetc", "getc", "_IO_getc"])]        /* int fgetc(FILE *) */
 %[define_crt_name_list(CNL_fgetc_unlocked    = ["fgetc_unlocked", "getc_unlocked"])]  /* int fgetc_unlocked(FILE *) */
@@ -367,19 +367,19 @@ __LIBC __FILE *stderr;
 %[define_crt_name_list(CNL_fputc_unlocked    = ["fputc_unlocked", "putc_unlocked"])]  /* int fputc_unlocked(FILE *) */
 
 %[define_crt_name_list(CNL_ungetc            = ["ungetc", "_IO_ungetc"])]              /* int ungetc(int, FILE *) */
-%[define_crt_name_list(CNL_ungetc_unlocked   = ["ungetc_unlocked", dos_only:"_ungetc_nolock"])] /* int ungetc_unlocked(int, FILE *) */
+%[define_crt_name_list(CNL_ungetc_unlocked   = ["ungetc_unlocked", "_ungetc_nolock"])] /* int ungetc_unlocked(int, FILE *) */
 
-%[define_crt_name_list(CNL_fread             = ["fread", "_IO_fread"])]                       /* size_t fread(void *, size_t, size_t, FILE *) */
-%[define_crt_name_list(CNL_fread_unlocked    = ["fread_unlocked", dos_only:"_fread_nolock"])] /* size_t fread_unlocked(void *, size_t, size_t, FILE *) */
+%[define_crt_name_list(CNL_fread             = ["fread", "_IO_fread"])]              /* size_t fread(void *, size_t, size_t, FILE *) */
+%[define_crt_name_list(CNL_fread_unlocked    = ["fread_unlocked", "_fread_nolock"])] /* size_t fread_unlocked(void *, size_t, size_t, FILE *) */
 
-%[define_crt_name_list(CNL_fwrite            = ["fwrite", "_IO_fwrite", "fwrite_s"])]           /* size_t fwrite(void *, size_t, size_t, FILE *) */
-%[define_crt_name_list(CNL_fwrite_unlocked   = ["fwrite_unlocked", dos_only:"_fwrite_nolock"])] /* size_t fwrite_unlocked(void *, size_t, size_t, FILE *) */
+%[define_crt_name_list(CNL_fwrite            = ["fwrite", "_IO_fwrite", "fwrite_s"])]  /* size_t fwrite(void *, size_t, size_t, FILE *) */
+%[define_crt_name_list(CNL_fwrite_unlocked   = ["fwrite_unlocked", "_fwrite_nolock"])] /* size_t fwrite_unlocked(void *, size_t, size_t, FILE *) */
 
 %[define_crt_name_list(CNL_flushall          = ["_flushall", "_IO_flush_all"])] /* int flushall(); */
 %[define_crt_name_list(CNL_flushall_unlocked = ["flushall_unlocked"])]          /* int flushall_unlocked(); */
 
-%[define_crt_name_list(CNL_fflush          = ["fflush", "_IO_fflush"])]                       /* int fflush(FILE *); */
-%[define_crt_name_list(CNL_fflush_unlocked = ["fflush_unlocked", dos_only:"_fflush_nolock"])] /* int fflush_unlocked(FILE *); */
+%[define_crt_name_list(CNL_fflush          = ["fflush", "_IO_fflush"])]              /* int fflush(FILE *); */
+%[define_crt_name_list(CNL_fflush_unlocked = ["fflush_unlocked", "_fflush_nolock"])] /* int fflush_unlocked(FILE *); */
 
 %[define_crt_name_list(CNL_setvbuf          = ["setvbuf", "_IO_setvbuf"])] /* int setvbuf(FILE *, char *, int, size_t); */
 %[define_crt_name_list(CNL_setvbuf_unlocked = ["setvbuf_unlocked"])]       /* int setvbuf_unlocked(FILE *, char *, int, size_t); */

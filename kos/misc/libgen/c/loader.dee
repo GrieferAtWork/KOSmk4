@@ -2355,19 +2355,16 @@ again:
 		parseDirective_define_replacement(keywordMacros);
 	}
 
-#define CRT_NAME_LIST_ANY 0 /* export_as(): Both */
-#define CRT_NAME_LIST_DOS 1 /* export_as(): DOS-only */
-#define CRT_NAME_LIST_KOS 2 /* export_as(): KOS-only */
 	@@NOTE: The int-value is one of `CRT_NAME_LIST_*`
-	public member crtNameLists: {string: {(string, int)...}} = none;
+	public member crtNameLists: {string: {string...}} = none;
 
 	@@Parse `foo` or `foo...`, and return { "foo" } for
 	@@the former, and crtNameLists["foo"] for the later
-	public function parseAliasNameOrList(): {(string, int)...} {
+	public function parseAliasNameOrList(): {string...} {
 		local self = this.self;
 		local name = self.parseCStringOrKeyword();
 		if (self.tok != "...")
-			return { (name, CRT_NAME_LIST_ANY) };
+			return { name };
 		local result = crtNameLists.get(name);
 		if (result is none) {
 			self.err("No CRT name list defined for {!r}"
@@ -2399,19 +2396,7 @@ again:
 		local listElem;
 		crtNameLists[listName] = listElem = [];
 		while (self.tok != "]") {
-			local how = CRT_NAME_LIST_ANY;
-			if (self.tok == "dos_only") {
-				how = CRT_NAME_LIST_DOS;
-				self.next();
-				self.skip(":");
-			} else if (self.tok == "kos_only") {
-				how = CRT_NAME_LIST_KOS;
-				self.next();
-				self.skip(":");
-			}
-			listElem.append((
-				str(self.parseCStringOrKeyword()),
-				how));
+			listElem.append(str(self.parseCStringOrKeyword()));
 			if (self.tok != ",")
 				break;
 			self.next();
@@ -2828,7 +2813,7 @@ again_parse_annotations:
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
-						for (local name, how: context.parseAliasNameOrList()) {
+						for (local name: context.parseAliasNameOrList()) {
 							local ppCond = currentConditions;
 							if (!mode.endswith("raw_alias"))
 								ppCond = constructAliasConditions(ppCond, name);
@@ -2844,15 +2829,7 @@ again_parse_annotations:
 							} else {
 								current.bindings.append(binding);
 							}
-							local usedLibFuncs = libFuncs;
-							if (#usedLibFuncs == 2) {
-								if (how == CRT_NAME_LIST_DOS)
-									usedLibFuncs = { currentDosLibraryFunction };
-								else if (how == CRT_NAME_LIST_KOS) {
-									usedLibFuncs = { currentKosLibraryFunction };
-								}
-							}
-							for (local lf: usedLibFuncs) {
+							for (local lf: libFuncs) {
 								local usedAsmname = name;
 								if (lf === currentDosLibraryFunction)
 									usedAsmname = "DOS$" + name;
@@ -2877,17 +2854,8 @@ again_parse_annotations:
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
-						for (local name, how: context.parseAliasNameOrList()) {
-							local exportAsKos: bool;
-							local exportAsDos: bool;
-							if (mode == "export_as") {
-								exportAsKos = how != CRT_NAME_LIST_DOS;
-								exportAsDos = how != CRT_NAME_LIST_KOS;
-							} else {
-								exportAsKos = mode == "kos_export_as";
-								exportAsDos = mode == "dos_export_as";
-							}
-							if (exportAsKos) {
+						for (local name: context.parseAliasNameOrList()) {
+							if (mode != "dos_export_as") {
 								if (currentKosLibraryFunction is none)
 									currentKosLibraryFunction = LibraryFunction();
 								currentKosLibraryFunction.exportSymbolNames.append((
@@ -2896,7 +2864,7 @@ again_parse_annotations:
 										: "1",
 									name));
 							}
-							if (exportAsDos) {
+							if (mode != "kos_export_as") {
 								if (mode == "export_as")
 									name = "DOS$" + name;
 								if (currentDosLibraryFunction is none)
@@ -2922,7 +2890,7 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					while (self.tok !in ["", ")"]) {
-						for (local assemblyName, none: context.parseAliasNameOrList()) {
+						for (local assemblyName: context.parseAliasNameOrList()) {
 							local ppCond = currentConditions;
 							if (!tok.endswith("raw_alias"))
 								ppCond = constructAliasConditions(ppCond, assemblyName);

@@ -113,9 +113,10 @@ NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4574b309]]]*/
+/*[[[start:exports,hash:CRC-32=0x3270696a]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_wutime32, libd_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$wutime, libd_wutime);
+DEFINE_PUBLIC_ALIAS(_wutime32, libc_wutime);
 DEFINE_PUBLIC_ALIAS(wutime, libc_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$_wutime64, libd_wutime64);
 DEFINE_PUBLIC_ALIAS(DOS$wutime64, libd_wutime64);
