@@ -1367,12 +1367,9 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 		if ((cmd & 0xffff0000) == (HOP_HANDLE_STAT & 0xffff0000)) {
 			result = hop_do_generic_operation(&hand, cmd, (unsigned int)fd, arg);
 		} else {
-			/* TODO: Do implicit handle casting based on
-			 *       the expected type encoded in `cmd >> 16'.
-			 *       e.g.: A DATABLOCK command on a FILE object
-			 *             should be allowed, but would require
-			 *             an implicit cast */
 			uintptr_half_t wanted_type;
+			/* Do implicit handle casting based on the expected type encoded in `cmd >> 16'.
+			 * e.g.: A DATABLOCK command on a FILE object should be allowed */
 			wanted_type = (u16)(cmd >> 16);
 			if (wanted_type != hand.h_type) {
 				hand.h_data = handle_as(hand, wanted_type);

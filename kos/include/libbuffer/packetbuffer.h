@@ -82,6 +82,7 @@ struct pb_packet {
 	                         * aligned address after the payload, and spans for `p_ancillary')
 	                         * With that in mind:
 	                         * >> `p_payoff + p_payload + p_ancillary <= p_total' */
+	/* OFFSET_FROM_BASE == PB_PACKET_HEADER_SIZE */
 #if 0
 	__byte_t _p_payload_offs[p_payoff - PB_PACKET_HEADER_SIZE];
 	__byte_t  p_payload_data[p_payload];
@@ -90,6 +91,7 @@ struct pb_packet {
 #endif
 	struct pb_packet *p_cont; /* [1..1][valid_if(p_total == 0)] Pointer to the first packet of the next buffer. */
 	__byte_t         *p_base; /* [1..1][valid_if(p_total == 0)][owned] Base address of the buffer which this packet terminates. */
+	/* OFFSET_FROM_BASE == PB_PACKET_NEXTLINK_SIZE */
 };
 
 
@@ -423,12 +425,6 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit)(struct pb_buffer *
 __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_init_ex)(struct pb_buffer *__restrict self, __size_t limit);
 __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffer *__restrict self, __size_t limit);
 #else /* __INTELLISENSE__ */
-#define __pb_buffer_cb_fini_ancillary_noop(p, len) (void)0
-#ifdef NDEBUG
-#define __pb_buffer_fini_debug(self) (void)0
-#else /* NDEBUG */
-#define __pb_buffer_fini_debug(self) __libc_memset(self, 0xcc, sizeof(struct pb_buffer))
-#endif /* !NDEBUG */
 #define pb_buffer_init(self)  pb_buffer_init_ex(self, PB_BUFFER_DEFAULT_LIMIT)
 #define pb_buffer_cinit(self) pb_buffer_cinit_ex(self, PB_BUFFER_DEFAULT_LIMIT)
 #define pb_buffer_init_ex(self, limit)     \
@@ -450,6 +446,13 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 	 (self)->pb_limt = (limit),                     \
 	 sched_signal_cinit(&(self)->pb_psta))
 #endif /* !__INTELLISENSE__ */
+
+#ifdef NDEBUG
+#define __pb_buffer_fini_debug(self) (void)0
+#else /* NDEBUG */
+#define __pb_buffer_fini_debug(self) __libc_memset(self, 0xcc, sizeof(struct pb_buffer))
+#endif /* !NDEBUG */
+#define __pb_buffer_cb_fini_ancillary_noop(p, len) (void)0
 
 
 /* Finalize the given packet-buffer.

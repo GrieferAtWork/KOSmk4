@@ -52,7 +52,13 @@ typedef struct unix_socket UnixSocket;
 /* Destroy a given Unix domain socket client descriptor. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self) {
-	/* TODO: Finalize data buffers. */
+	unsigned int i;
+	/* Finalize data buffers. */
+	for (i = 0; i < COMPILER_LENOF(self->uc_bufs); ++i) {
+		/* TODO: Use `pb_buffer_fini_ex()' to decref() file
+		 *       descriptors from ancillary data blobs. */
+		pb_buffer_fini(&self->uc_bufs[i]);
+	}
 	sig_broadcast(&self->uc_status_sig); /* In case someone was still connected... */
 	kfree(self);
 }
@@ -86,8 +92,8 @@ NOTHROW(FCALL unix_client_close_connection)(struct unix_client *__restrict self)
 	                   UNIX_CLIENT_STATUS_ACCEPTED,
 	                   UNIX_CLIENT_STATUS_CLOSED))
 		return false;
-	sig_broadcast(&self->uc_status_sig);
 	unix_client_close_buffers(self);
+	sig_broadcast(&self->uc_status_sig);
 	return true;
 }
 
@@ -690,7 +696,9 @@ UnixSocket_Connect(struct socket *__restrict self,
 		client->uc_refcnt = 1;
 		client->uc_status = UNIX_CLIENT_STATUS_PENDING;
 		sig_init(&client->uc_status_sig);
-		/* TODO: Initialize all of the other fields of `client' */
+		/* Initialize the client/server packet buffers. */
+		pb_buffer_init(&client->uc_fromclient);
+		pb_buffer_init(&client->uc_fromserver);
 
 		TRY {
 			/* Construct an async worker for informing the server of our

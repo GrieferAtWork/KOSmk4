@@ -450,6 +450,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Add auto-completion to the `cpuid' debugger command.
 	 *       We can easily determine valid leafs by looking at the value of CPUID[0].EAX! */
 
+	/* TODO: Now that there's once again a packet-buffer controller,
+	 *       add support for pipe2(O_DIRECT) (aka. packet-mode)
+	 *       Do this via new handle types:
+	 *        - HANDLE_TYPE_PACKET_PIPE
+	 *        - HANDLE_TYPE_PACKET_PIPE_READER
+	 *        - HANDLE_TYPE_PACKET_PIPE_WRITER */
+
 
 	/* Xorg X-Window server support roadmap.
 	 *

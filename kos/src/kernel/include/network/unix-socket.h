@@ -27,13 +27,15 @@
 
 #include <network/socket.h>
 
+#include <libbuffer/packetbuffer.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
 
 
 /*
- * The line-cycle of a unix domain socket:
+ * The life-cycle of a unix domain socket:
  *
  *  #1: unix_socket_create()
  *  #2: unix_socket_ops.so_bind("/path/to/some/file")
@@ -63,14 +65,26 @@ struct unix_client {
 	                                        * Next client in the chain of clients to-be accepted. */
 	syscall_ulong_t         uc_status;     /* [lock(ATOMIC)] Client status (one of `UNIX_CLIENT_STATUS_*') */
 	struct sig              uc_status_sig; /* Signal broadcast when `uc_status' changes. */
-	/* TODO: full-duplex packet-buffer for messages send to/from the server.
-	 *       Note that we need special buffers for this, as file descriptors
-	 *       must be received in the same order as the associated data-stream.
+	/* Full-duplex packet-buffers for messages send to/from the server.
+	 * Note that we need special buffers for this, as file descriptors
+	 * must be received in the same order as the associated data-stream.
+	 * This is done via the ancillary data blobs that can appear within
+	 * packets sent via packet-buffers (`struct pb_buffer').
+	 *
 	 * This behavior is documented under `Ancillary messages' in `man 7 unix':
 	 * https://www.man7.org/linux/man-pages/man7/unix.7.html */
+	union {
+		struct {
+			struct pb_buffer uc_fromclient; /* Buffer of pending packets originating from the client. */
+			struct pb_buffer uc_fromserver; /* Buffer of pending packets originating from the server. */
+		};
+		struct pb_buffer uc_bufs[2]; /* Buffers. */
+	};
 };
 
-#define unix_client_close_buffers(self) (void)0 /* TODO: Close buffers */
+#define unix_client_close_buffers(self)       \
+	(pb_buffer_close(&(self)->uc_fromclient), \
+	 pb_buffer_close(&(self)->uc_fromserver))
 
 
 
