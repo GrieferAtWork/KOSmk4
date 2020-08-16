@@ -23,7 +23,11 @@
 #include <libbuffer/api.h>
 /**/
 
+#include <__crt.h>
 #include <hybrid/compiler.h>
+
+#include <kos/anno.h>
+
 
 #define CC LIBBUFFER_CC
 
@@ -36,5 +40,9 @@
 #define IF_NOT_KERNEL(...)                      __VA_ARGS__
 #define KERNEL_SELECT(if_kernel, if_not_kernel) if_not_kernel
 #endif /* !__KERNEL__ */
+
+#ifndef NOBLOCK
+#define NOBLOCK __NOBLOCK
+#endif /* !NOBLOCK */
 
 #endif /* !GUARD_LIBBUFFER_API_H */

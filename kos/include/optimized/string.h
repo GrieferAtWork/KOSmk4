@@ -4437,9 +4437,10 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict _
 
 #undef __OPTIMIZE_STRING_MEMOVE_DIRECTION
 /* NOTE: I remember this not correctly working in the past.
- *       I think it was broken back in gcc7 */
-#if !defined(__GNUC__) || \
-    (defined(__GNUC__) && __GNUC__ > 7)
+ *       I think it was broken back in gcc7
+ * EDIT: Nope! It's still broken (complains about the `memmovedown()' in
+ *       `/kos/src/libbuffer/packetbuffer.c:lib_pb_buffer_startwrite') */
+#if (!defined(__GNUC__) || (defined(__GNUC__) && __GNUC__ > 7)) && 0
 #define __OPTIMIZE_STRING_MEMOVE_DIRECTION 1
 #endif
 

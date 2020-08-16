@@ -22,11 +22,23 @@
 
 #include "api.h"
 
+#include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/hybrid/sched-signal.h>
+
+#include <libc/string.h>
+
+#ifndef __INTELLISENSE__
+#ifdef __KERNEL__
+#include <kernel/heap.h>
+#else /* __KERNEL__ */
+#include <libc/malloc.h>
+#endif /* !__KERNEL__ */
+#endif /* !__INTELLISENSE__ */
 
 #ifndef __INTELLISENSE__
 #include <hybrid/__atomic.h>
@@ -37,21 +49,14 @@
 
 
 /* Min alignment of all packet buffer data. */
-#define PACKET_BUFFER_ALIGNMENT 8
+#define PACKET_BUFFER_ALIGNMENT __SIZEOF_POINTER__
 
-#ifdef __CC__
-__DECL_BEGIN
 
-#ifdef __KERNEL__
-#define __KERNEL_SELECT(if_kernel, if_not_kernel) if_kernel
-#else /* __KERNEL__ */
-#define __KERNEL_SELECT(if_kernel, if_not_kernel) if_not_kernel
-#endif /* !__KERNEL__ */
 
 #define PB_PACKET_STATE_UNDEF    0 /* Undefined packet state (cannot happen) */
 #define PB_PACKET_STATE_INIT     1 /* Packet is being initialized. This state may transition to:
-                                    * - PB_PACKET_STATE_READABLE  (s.a. `pb_buffer_packet_commit()')
-                                    * - PB_PACKET_STATE_DISCARD   (s.a. `pb_buffer_packet_abort()') */
+                                    * - PB_PACKET_STATE_READABLE  (s.a. `pb_buffer_endwrite_commit()')
+                                    * - PB_PACKET_STATE_DISCARD   (s.a. `pb_buffer_endwrite_abort()') */
 #define PB_PACKET_STATE_READABLE 2 /* Packet is available to be read. */
 #define PB_PACKET_STATE_READING  3 /* Packet is currently being read. */
 #define PB_PACKET_STATE_DISCARD  4 /* Packet has been discarded. */
@@ -60,19 +65,25 @@ __DECL_BEGIN
 
 #define PB_PACKET_HEADER_SIZE   8
 #define PB_PACKET_NEXTLINK_SIZE (8 + 2 * __SIZEOF_POINTER__)
+
+#ifdef __CC__
+__DECL_BEGIN
+
 struct pb_packet {
 	__uint16_t p_total;     /* [!0][const] Total size size of the packet (in bytes, including this
 	                         * header and any trailing data used for padding, as well as ancillary data)
 	                         * NOTE: Aligned by `PACKET_BUFFER_ALIGNMENT' */
+	__uint8_t  p_state;     /* [lock(pb_lock)] Packet state (one of `PB_PACKET_STATE_*') */
+	__uint8_t  p_payoff;    /* [lock(p_state == PB_PACKET_STATE_READABLE)] Offset to the start of payload data. */
 	__uint16_t p_payload;   /* [lock(p_state == PB_PACKET_STATE_READABLE)] Size of the packet's payload
 	                         * (located immediately after the header) NOTE: Allowed to be ZERO(0) */
 	__uint16_t p_ancillary; /* [lock(p_state == PB_PACKET_STATE_READABLE)] Size of ancillary data
 	                         * (in bytes; located at the next `PACKET_BUFFER_ALIGNMENT'
 	                         * aligned address after the payload, and spans for `p_ancillary')
 	                         * With that in mind:
-	                         * >> `PB_PACKET_HEADER_SIZE + p_payload + p_ancillary <= p_total' */
-	__uint16_t p_state;     /* [lock(pb_lock)] Packet state (one of `PB_PACKET_STATE_*') */
+	                         * >> `p_payoff + p_payload + p_ancillary <= p_total' */
 #if 0
+	__byte_t _p_payload_offs[p_payoff - PB_PACKET_HEADER_SIZE];
 	__byte_t  p_payload_data[p_payload];
 	__byte_t _p_ancillary_align[ALIGN(PACKET_BUFFER_ALIGNMENT)];
 	__byte_t  p_ancillary_data[p_ancillary];
@@ -82,8 +93,56 @@ struct pb_packet {
 };
 
 
+
+/* Return a pointer to the payload of `self'
+ * The returned pointer points to a data-blob of `self->p_payload' bytes. */
+#define pb_packet_payload(self) \
+	((__byte_t *)(self) + (self)->p_payoff)
+
+/* Return a pointer to ancillary data stored within `self'
+ * The returned pointer points to a data-blob of `self->p_ancillary' bytes. */
+#define pb_packet_ancillary(self)                                      \
+	((__byte_t *)(self) + ((self)->p_payoff + (self)->p_payload + \
+	                       (PACKET_BUFFER_ALIGNMENT - 1)) &            \
+	 ~(PACKET_BUFFER_ALIGNMENT - 1))
+
+
+/* Return the base address/size of the containing buffer for buffer control packet.
+ * NOTE: Buffer control packets can be identified by having `p_total == 0', though
+ *       also note that the public pb_buffer API never exposes buffer control packets
+ *       to the user.
+ * Also note that `_pb_packet_bufctl_bufsize()' is only valid when the packet-buffer
+ * API was built with `#define PB_BUFFER_BLOB_FREE_NEEDS_SIZE' */
+#define _pb_packet_bufctl_bufbase(self) ((self)->p_base)
+#define _pb_packet_bufctl_bufsize(self) (__size_t)(((__byte_t *)(self) + (self)->p_ancillary) - (self)->p_base)
+
+
+/* Packet buffer data blob free function */
+#undef pb_buffer_blob_free
+#undef pb_buffer_blob_free_p
+#ifdef __INTELLISENSE__
+#ifdef __KERNEL__
+#define PB_BUFFER_BLOB_FREE_NEEDS_SIZE 1
+#endif /* __KERNEL__ */
+#define pb_buffer_blob_free(ptr, num_bytes)   (void)0
+#define pb_buffer_blob_free_p(ptr, num_bytes) (void)0
+#elif defined(__KERNEL__)
+#define PB_BUFFER_BLOB_FREE_NEEDS_SIZE 1
+#define pb_buffer_blob_free(ptr, num_bytes) \
+	heap_free(&kernel_default_heap, ptr, num_bytes, GFP_NORMAL)
+#define pb_buffer_blob_free_p(ptr, num_bytes)                            \
+	((ptr) ? heap_free(&kernel_default_heap, ptr, num_bytes, GFP_NORMAL) \
+	       : (void)0)
+#else /* __KERNEL__ */
+#undef PB_BUFFER_BLOB_FREE_NEEDS_SIZE
+#define pb_buffer_blob_free(ptr, num_bytes)   __libc_free(ptr)
+#define pb_buffer_blob_free_p(ptr, num_bytes) __libc_free(ptr)
+#endif /* !__KERNEL__ */
+
+
+
 struct pb_buffer {
-	/* Buffer API:
+	/* Packet buffer API:
 	 *
 	 * >> struct pb_packet *
 	 * >> begin_read() {
@@ -96,72 +155,103 @@ struct pb_buffer {
 	 * >>         // Packet exists the next buffer over!
 	 * >>         pb_rptr = packet->p_cont;
 	 * >>         unlock();
-	 * >>         free(packet->p_base);
+	 * >>         pb_buffer_blob_free(_pb_packet_bufctl_bufbase(packet),
+	 * >>                             _pb_packet_bufctl_bufsize(packet));
 	 * >>         goto again;
 	 * >>     }
 	 * >>     if (packet->p_state != PB_PACKET_STATE_READABLE) {
 	 * >>         if (packet->p_state == PB_PACKET_STATE_DISCARD) {
-	 * >>             // Skip packet
-	 * >>             pb_used -= packet->p_total;
+	 * >>             // Skip packets that were discarded
+	 * >>             pb_used -= packet->p_total; // atomic!
 	 * >>             pb_rptr += packet->p_total;
 	 * >>             goto again_locked;
 	 * >>         }
-	 * >>         if (packet->p_state == PB_PACKET_STATE_INIT) {
-	 * >>             // Wait for packet to become initialized
-	 * >>             unlock();
-	 * >>             WAIT_FOR_PACKET_TO_CHANGE_STATE_TO_READABLE_OR_DISCARD();
-	 * >>             goto again;
-	 * >>         }
 	 * >>         unlock();
-	 * >>         task_serve();  // Allow CTRL+C in case we got here recursively (e.g. through VIO)
-	 * >>         task_yield();
-	 * >>         goto again;
+	 * >>         // Let the caller handle all of the blocking.
+	 * >>         return NULL;
 	 * >>     }
-	 * >>     packet->p_state = PB_PACKET_STATE_READING;
+	 * >>     packet->p_state = PB_PACKET_STATE_READING; // atomic!
 	 * >>     unlock();
 	 * >>     return packet;
 	 * >> }
 	 *
-	 * >> end_read(bool discard_packet) {
-	 * >>     struct pb_packet *packet;
-	 * >>     lock();
-	 * >>     packet = pb_rptr;
-	 * >>     assert(packet->p_state == PB_PACKET_STATE_READING);
-	 * >>     if (discard_packet) {
-	 * >>         pb_used -= packet->p_total;
-	 * >>         pb_rptr += packet->p_total;
-	 * >>     } else {
-	 * >>         packet->p_state = PB_PACKET_STATE_READABLE;
+	 * >> struct pb_packet *
+	 * >> NOBLOCK read_truncate(struct pb_packet *packet, uint16_t num_bytes) {
+	 * >>     struct pb_packet *result;
+	 * >>     uint16_t new_payload_start;
+	 * >>     uint16_t new_packet_offset;
+	 * >>     assert(bytes_to_consume < packet->p_payload);
+	 * >>     packet->p_payload -= bytes_to_consume;
+	 * >>     new_payload_start = packet->p_payoff + bytes_to_consume;
+	 * >>     if (new_payload_start <= 0xff) {
+	 * >>         // Simple case: Can just edit `packet->p_payoff'
+	 * >>         packet->p_payoff = new_payload_start;
+	 * >>         return packet;
 	 * >>     }
-	 * >>     unlock();
+	 * >>     // Difficult case: Must actually move the packet's header.
+	 * >>     new_packet_offset = new_payload_start & ~(PACKET_BUFFER_ALIGNMENT - 1);
+	 * >>     result = (struct pb_packet *)((byte_t *)packet + new_packet_offset);
+	 * >>     // Fill in the new packet header.
+	 * >>     result->p_total     = packet->p_total - new_packet_offset;
+	 * >>     result->p_state     = PB_PACKET_STATE_READING;
+	 * >>     result->p_payoff    = new_payload_start & (PACKET_BUFFER_ALIGNMENT - 1);
+	 * >>     result->p_payload   = packet->p_payload;
+	 * >>     result->p_ancillary = packet->p_ancillary;
+	 * >>     // Account for all of the memory that just became unused.
+	 * >>     pb_used -= new_packet_offset; // atomic!
+	 * >>     return result;
+	 * >> }
+	 *
+	 * // End reading, but allow `packet' to be returned by `begin_read()' once again
+	 * // HINT: This is actually the same as `end_read_update()', but may assume that
+	 * //       the given packet pointer hasn't actually been modified.
+	 * >> NOBLOCK end_read_abort(struct pb_packet *packet) {
+	 * >>     assert(packet          == pb_rptr);
+	 * >>     assert(packet->p_state == PB_PACKET_STATE_READING);
+	 * >>     packet->p_state = PB_PACKET_STATE_READABLE; // atomic!
+	 * >> }
+	 *
+	 * // End reading, and discard the given `packet'
+	 * >> NOBLOCK end_read_consume(struct pb_packet *packet) {
+	 * >>     assert(packet          == pb_rptr);
+	 * >>     assert(packet->p_state == PB_PACKET_STATE_READING);
+	 * >>     total    = packet->p_total; // atomic!
+	 * >>     pb_used -= total;           // atomic!
+	 * >>     pb_rptr += total;           // atomic!
 	 * >> }
 	 *
 	 * >> struct pb_packet *
 	 * >> begin_write(u16 payload_size, u16 ancillary_size) {
-	 * >>     struct pb_packet *packet;
-	 * >>     total_size = CEIL_ALIGN(payload_size + ancillary_size +
-	 * >>                             PB_PACKET_HEADER_SIZE,
-	 * >>                             PACKET_BUFFER_ALIGNMENT);
+	 * >>     total_size = CEIL_ALIGN(payload_size,          PACKET_BUFFER_ALIGNMENT) +
+	 * >>                  CEIL_ALIGN(ancillary_size,        PACKET_BUFFER_ALIGNMENT) +
+	 * >>                  CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT);
 	 * >>     lock();
 	 * >> again_locked:
 	 * >>     if (pb_rptr == pb_wptr) {
-	 * >>         // Rewind unread packet buffer
-	 * >>         pb_rptr = pb_bbas;
+	 * >>         // Rewind the packet buffer
+	 * >>         pb_rptr = pb_bbas; // This must happen atomically!
 	 * >>         pb_wptr = pb_bbas;
 	 * >>     }
 	 * >>     avail = pb_bend - pb_wptr;
 	 * >>     if (avail <= total_size + PB_PACKET_NEXTLINK_SIZE) {
+	 * >>         struct pb_packet *packet;
+	 * >>         if (!pb_limt) {
+	 * >>             // Special case: The buffer was closed
+	 * >>             unlock();
+	 * >>             return NULL;
+	 * >>         }
 	 * >>         packet = pb_wptr;
 	 * >>         packet->p_total     = total_size;
+	 * >>         packet->p_state     = PB_PACKET_STATE_INIT;
+	 * >>         packet->p_payoff    = PB_PACKET_HEADER_SIZE;
 	 * >>         packet->p_payload   = payload_size;
 	 * >>         packet->p_ancillary = ancillary_size;
-	 * >>         packet->p_state     = PB_PACKET_STATE_INIT;
 	 * >>         pb_wptr += total_size;
-	 * >>         pb_used += total_size;
+	 * >>         pb_used += total_size; // atomic!
 	 * >>         unlock();
 	 * >>         return packet;
 	 * >>     }
-	 * >>     if (pb_used + total_size + PB_PACKET_NEXTLINK_SIZE >= pb_limt) {
+	 * >>     if (pb_used + total_size >= pb_limt) {
 	 * >>         unlock();
 	 * >>         if (SHOULD_BLOCK) {
 	 * >>             wait_for_packets_to_be_read();
@@ -169,32 +259,56 @@ struct pb_buffer {
 	 * >>         }
 	 * >>         return NULL;
 	 * >>     }
-	 * >>     FOR_EACH_UNREAD_PACKET(p) {
+	 * >>     FOREACH_UNREAD_PACKET(p) {
+	 * >>         if (!(p >= pb_bbas && p < pb_bend))
+	 * >>             continue;
 	 * >>         if (PB_PACKET_STATE_INUSE(p->p_state)) {
-	 * >>             // Try to nonblocking_realloc_in_place() to get more memory
-	 * >>             if (HAS_NONBLOCKING_REALLOC_IN_PLACE) {
+	 * >>             // Try to NONBLOCK_REALLOC_IN_PLACE_NX() to get more memory
+	 * >>             if (HAS_NONBLOCK_REALLOC_IN_PLACE_NX) {
 	 * >>                 size_t minsize;
 	 * >>                 minsize = (pb_wptr - pb_bbas) + total_size + PB_PACKET_NEXTLINK_SIZE;
-	 * >>                 if (nonblocking_realloc_in_place(pb_bbas, minsize)) {
-	 * >>                     pb_bend = buf + malloc_usable_size(pb_bbas);
+	 * >>                 if (NONBLOCK_REALLOC_IN_PLACE_NX(pb_bbas, minsize)) {
+	 * >>                     pb_bend = buf + USABLE_SIZE_OR(pb_bbas, minsize);
 	 * >>                     goto again_locked;
 	 * >>                 }
 	 * >>             }
-	 * >>             // Cannot realloc the current buffer, but must alloc a new one
+	 * >>             // Cannot realloc the current buffer, so must alloc a new one
 	 * >>             byte_t *buf;
 	 * >> allocate_buffer_extension:
-	 * >>             unlock();
-	 * >>             buf = ALLOC_BUFFER_WITH_AT_LEAST(total_size + PB_PACKET_NEXTLINK_SIZE);
-	 * >>             lock();
-	 * >>             RECHECK_IF_WE_WOULD_STILL_GET_HERE_AFTER_THE_UNLOCK_AND_LOCK();
-	 * >>             struct pb_packet *link_packet;
-	 * >>             link_packet          = pb_wptr;
-	 * >>             link_packet->p_total = 0;
-	 * >>             link_packet->p_cont  = buf;
-	 * >>             link_packet->p_base  = pb_bbas;
-	 * >>             pb_wptr              = buf;
-	 * >>             pb_bbas              = buf;
-	 * >>             pb_bend              = buf + ALLOCATED_BUFFER_SIZE;
+	 * >> #if !defined(__OPTIMIZE_SIZE__) && defined(HAS_NONBLOCK_MALLOC_NX)
+	 * >>             buf = NONBLOCK_MALLOC_NX(total_size + PB_PACKET_NEXTLINK_SIZE);
+	 * >>             if (!buf)
+	 * >> #endif
+	 * >>             {
+	 * >>                 unlock();
+	 * >>                 buf = MALLOC_UNX(total_size + PB_PACKET_NEXTLINK_SIZE);
+	 * >> #ifndef __KERNEL__
+	 * >>                 if (!buf)
+	 * >>                     return NULL;
+	 * >> #endif
+	 * >>                 lock();
+	 * >>                 RECHECK_IF_WE_WOULD_STILL_GET_HERE_AFTER_THE_UNLOCK_AND_LOCK(
+	 * >>                     IF_NOT(pb_buffer_blob_free(buf, USABLE_SIZE_OR(buf, total_size + PB_PACKET_NEXTLINK_SIZE));
+	 * >>                            goto again_locked;
+	 * >>                     ));
+	 * >>             }
+	 * >>             if (pb_rptr == pb_wptr) {
+	 * >>                 pb_rptr = buf;
+	 * >>                 pb_buffer_blob_free(pb_bbas,
+	 * >>                                     pb_bend - pb_bbas);
+	 * >>             } else {
+	 * >>                 struct pb_packet *link_packet;
+	 * >>                 link_packet              = pb_wptr;
+	 * >>                 link_packet->p_total     = 0;
+	 * >> #ifdef PB_BUFFER_BLOB_FREE_NEEDS_SIZE
+	 * >>                 link_packet->p_ancillary = avail;
+	 * >> #endif
+	 * >>                 link_packet->p_cont      = buf;
+	 * >>                 link_packet->p_base      = pb_bbas;
+	 * >>             }
+	 * >>             pb_wptr = buf;
+	 * >>             pb_bbas = buf;
+	 * >>             pb_bend = buf + ALLOCATED_BUFFER_SIZE;
 	 * >>             goto again_locked;
 	 * >>         }
 	 * >>     }
@@ -202,30 +316,32 @@ struct pb_buffer {
 	 * >>     if (pb_rptr > pb_bbas && pb_rptr <= pb_bend) {
 	 * >>         // Try to shift unread packets downwards,
 	 * >>         // so-as to reclaim buffer space near the top.
-	 * >>         size_t reclaim;
+	 * >>         size_t reclaim, used;
 	 * >>         reclaim = (byte_t *)pb_rptr - (byte_t *)pb_bbas;
-	 * >>         assert(pb_used == (size_t)((byte_t *)pb_wptr - (byte_t *)pb_rptr));
-	 * >>         pb_rptr = memmovedown(pb_bbas, pb_rptr, pb_used);
+	 * >>         used    = (size_t)((byte_t *)pb_wptr - (byte_t *)pb_rptr);
+	 * >>         pb_rptr = memmovedown(pb_bbas, pb_rptr, used);
 	 * >>         pb_wptr -= reclaim;
 	 * >>         goto again_locked;
 	 * >>     }
 	 * >> #endif
-	 * >>     if (!HAS_NONBLOCKING_REALLOC)
+	 * >>     if (!HAS_NONBLOCK_REALLOC_NX)
 	 * >>         goto allocate_buffer_extension_after_truncate;
 	 * >>     {
 	 * >>         byte_t *buf;
 	 * >>         size_t minsize;
 	 * >>         minsize = (pb_wptr - pb_bbas) + total_size + PB_PACKET_NEXTLINK_SIZE;
-	 * >>         buf = NONBLOCKING_REALLOC_WITH_AT_LEAST(pb_bbas, minsize);
+	 * >>         buf = NONBLOCK_REALLOC_NX(pb_bbas, minsize);
 	 * >>         if (!buf) {
 	 * >>             // Allocation failed, or would have had to block
 	 * >> allocate_buffer_extension_after_truncate:
-	 * >>             if (HAS_NONBLOCKING_REALLOC_IN_PLACE) {
+	 * >>             if (HAS_NONBLOCK_REALLOC_IN_PLACE_NX) {
 	 * >>                 // Try to reclaim unused memory
 	 * >>                 size_t final_size;
 	 * >>                 final_size = (pb_wptr - pb_bbas) + PB_PACKET_NEXTLINK_SIZE;
-	 * >>                 if (nonblocking_realloc_in_place(pb_bbas, final_size)) {
-	 * >>                     // pb_bend = pb_bbas + final_size; // Assignment not actually needed
+	 * >>                 if (NONBLOCK_REALLOC_IN_PLACE_NX(pb_bbas, final_size)) {
+	 * >> #ifdef PB_BUFFER_BLOB_FREE_NEEDS_SIZE
+	 * >>                     pb_bend = pb_bbas + final_size;
+	 * >> #endif
 	 * >>                 }
 	 * >>             }
 	 * >>             goto allocate_buffer_extension;
@@ -235,42 +351,151 @@ struct pb_buffer {
 	 * >>         pb_wptr = buf + ((byte_t *)pb_wptr - (byte_t *)pb_bbas);
 	 * >>         // Install the extended buffer
 	 * >>         pb_bbas = buf;
-	 * >>         pb_bend = buf + malloc_usable_size(buf);
+	 * >>         pb_bend = buf + USABLE_SIZE_OR(buf, minsize);
 	 * >>     }
 	 * >>     goto again_locked;
 	 * >> }
 	 *
-	 * >> commit_write(struct pb_packet *packet) {
+	 * >> NOBLOCK commit_write(struct pb_packet *packet) {
 	 * >>     ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_READABLE);
 	 * >> }
 	 *
-	 * >> abort_write(struct pb_packet *packet) {
+	 * >> NOBLOCK abort_write(struct pb_packet *packet) {
 	 * >>     ATOMIC_WRITE(packet->p_state, PB_PACKET_STATE_DISCARD);
 	 * >>     if (trylock()) {
 	 * >>         // Optional: Try to reclaim unused packet memory, if the one
 	 * >>         //           being discarded is still the most recent packet.
 	 * >>         if (pb_wptr == (byte_t *)packet + packet->p_total) {
-	 * >>             pb_used -= packet->p_total;
+	 * >>             pb_used -= packet->p_total; // atomic!
 	 * >>             pb_wptr = packet;
 	 * >>         }
 	 * >>         unlock();
 	 * >>     }
 	 * >> }
-	 *
 	 */
-
 	struct atomic_rwlock pb_lock; /* Lock for this packet buffer. */
 	__byte_t            *pb_bbas; /* [lock(pb_lock)][<= pb_bend][owned] Base address of the current buffer data blob. */
 	__byte_t            *pb_bend; /* [lock(pb_lock)][>= pb_bbas] End address of the current buffer data blob. */
-	struct pb_packet    *pb_rptr; /* [lock(pb_lock)][1..1][valid_if(!= pb_wptr)] Pointer to the next unread packet/the packet currently being read. */
+#ifdef PB_BUFFER_WANT_PB_RPTR_UINTPTR_ALIAS
+	union {
+		struct pb_packet*pb_rptr; /* [lock(pb_lock || PB_PACKET_STATE_READING)][1..1][valid_if(!= pb_wptr)]
+		                           * Pointer to the next unread packet/the packet currently being read. */
+		__uintptr_t      pb_rptr_uint;
+	};
+#else /* PB_BUFFER_WANT_PB_RPTR_UINTPTR_ALIAS */
+	struct pb_packet    *pb_rptr; /* [lock(pb_lock || PB_PACKET_STATE_READING)][1..1][valid_if(!= pb_wptr)]
+	                               * Pointer to the next unread packet/the packet currently being read. */
+#endif /* !PB_BUFFER_WANT_PB_RPTR_UINTPTR_ALIAS */
 	struct pb_packet    *pb_wptr; /* [lock(pb_lock)][1..1] Offset to the end of the last unread packet. */
-	__size_t             pb_used; /* [lock(pb_lock)] Amount of allocated buffer memory. */
-	__WEAK __size_t      pb_limt; /* Max size of the packet buffer. */
+	__WEAK __size_t      pb_used; /* Total amount of used buffer space. (checked against `pb_limt') */
+	__WEAK __size_t      pb_limt; /* Max size of the packet buffer. (set to 0 when the buffer was closed) */
 	sched_signal_t       pb_psta; /* Signal broadcast any packet changes state to one of:
 	                               *   - PB_PACKET_STATE_READABLE
-	                               *   - PB_PACKET_STATE_DISCARD
-	                               */
+	                               *   - PB_PACKET_STATE_DISCARD */
 };
+
+/* Broadcast the `pb_psta' signal.
+ * NOTE: In user-space, we increment the signal counter before broadcasting,
+ *       since other code uses the value of the signal itself for inter-locking
+ *       with the monitoring of changes made to components affected by the signal. */
+#ifdef __KERNEL__
+#define pb_buffer_broadcast_psta(self) sig_broadcast(&(self)->pb_psta)
+#else /* __KERNEL__ */
+#define pb_buffer_broadcast_psta(self)                            \
+	(__hybrid_atomic_fetchinc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+	 sched_signal_broadcast(&(self)->pb_psta))
+#endif /* !__KERNEL__ */
+
+
+/* The default buffer size limit for packet buffers. */
+#define PB_BUFFER_DEFAULT_LIMIT 8192
+
+/* Initialize a given packet-buffer. */
+#define PB_BUFFER_INIT PB_BUFFER_INIT_EX(PB_BUFFER_DEFAULT_LIMIT)
+#define PB_BUFFER_INIT_EX(limit)                \
+	{ ATOMIC_RWLOCK_INIT, __NULLPTR, __NULLPTR, \
+	  __NULLPTR, __NULLPTR, 0, limit, SCHED_SIGNAL_INIT }
+
+/* Initialize a given packet-buffer. */
+#ifdef __INTELLISENSE__
+__NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_init)(struct pb_buffer *__restrict self);
+__NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit)(struct pb_buffer *__restrict self);
+__NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_init_ex)(struct pb_buffer *__restrict self, __size_t limit);
+__NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffer *__restrict self, __size_t limit);
+#else /* __INTELLISENSE__ */
+#define __pb_buffer_cb_fini_ancillary_noop(p, len) (void)0
+#ifdef NDEBUG
+#define __pb_buffer_fini_debug(self) (void)0
+#else /* NDEBUG */
+#define __pb_buffer_fini_debug(self) __libc_memset(self, 0xcc, sizeof(struct pb_buffer))
+#endif /* !NDEBUG */
+#define pb_buffer_init(self)  pb_buffer_init_ex(self, PB_BUFFER_DEFAULT_LIMIT)
+#define pb_buffer_cinit(self) pb_buffer_cinit_ex(self, PB_BUFFER_DEFAULT_LIMIT)
+#define pb_buffer_init_ex(self, limit)     \
+	(atomic_rwlock_init(&(self)->pb_lock), \
+	 (self)->pb_bbas = __NULLPTR,          \
+	 (self)->pb_bend = __NULLPTR,          \
+	 (self)->pb_rptr = __NULLPTR,          \
+	 (self)->pb_wptr = __NULLPTR,          \
+	 (self)->pb_used = 0,                  \
+	 (self)->pb_limt = (limit),            \
+	 sched_signal_init(&(self)->pb_psta))
+#define pb_buffer_cinit_ex(self, limit)             \
+	(atomic_rwlock_cinit(&(self)->pb_lock),         \
+	 __hybrid_assert((self)->pb_bbas == __NULLPTR), \
+	 __hybrid_assert((self)->pb_bend == __NULLPTR), \
+	 __hybrid_assert((self)->pb_rptr == __NULLPTR), \
+	 __hybrid_assert((self)->pb_wptr == __NULLPTR), \
+	 __hybrid_assert((self)->pb_used == 0),         \
+	 (self)->pb_limt = (limit),                     \
+	 sched_signal_cinit(&(self)->pb_psta))
+#endif /* !__INTELLISENSE__ */
+
+
+/* Finalize the given packet-buffer.
+ * If given, `cb_fini_ancillary(void *ptr, u16 len)' is invoked
+ * for the ancillary data blob of any packet that was never read. */
+#define pb_buffer_fini(self) pb_buffer_fini_ex(self, __pb_buffer_cb_fini_ancillary_noop)
+#define pb_buffer_fini_ex(self, cb_fini_ancillary)                     \
+	do {                                                               \
+		struct pb_packet *_rptr;                                       \
+		struct pb_packet *_wptr;                                       \
+		_rptr = (self)->pb_rptr;                                       \
+		_wptr = (self)->pb_wptr;                                       \
+		while (_rptr != _wptr) {                                       \
+			if (!_rptr->p_total) {                                     \
+				struct pb_packet *_cptr;                               \
+				/* Buffer control packet */                            \
+				_cptr = _rptr->p_cont;                                 \
+				pb_buffer_blob_free(_pb_packet_bufctl_bufbase(_rptr),  \
+				                    _pb_packet_bufctl_bufsize(_rptr)); \
+				_rptr = _cptr;                                         \
+				continue;                                              \
+			}                                                          \
+			cb_fini_ancillary(pb_packet_ancillary(_rptr),              \
+			                  _rptr->p_ancillary);                     \
+			_rptr = (struct pb_packet *)((__byte_t *)_rptr +           \
+			                             _rptr->p_total);              \
+		}                                                              \
+		/* Free the current buffer */                                  \
+		pb_buffer_blob_free_p((self)->pb_bbas,                         \
+		                      (__size_t)((self)->pb_bend -             \
+		                                 (self)->pb_bbas));            \
+		__pb_buffer_fini_debug(self);                                  \
+	}	__WHILE0
+
+/* Close the given packet buffer, making it impossible to enqueue as further packets.
+ * Any attempt at writing more data will result in `pb_buffer_startwrite()' simply
+ * returning `NULL' */
+#ifdef __INTELLISENSE__
+__NOBLOCK __ATTR_NONNULL((1)) void
+__NOTHROW(pb_buffer_close)(struct pb_buffer *__restrict self);
+#else /* __INTELLISENSE__ */
+#define pb_buffer_close(self)                                     \
+	(__hybrid_atomic_store((self)->pb_limt, 0, __ATOMIC_RELEASE), \
+	 pb_buffer_broadcast_psta(self))
+#endif /* !__INTELLISENSE__ */
+
 
 
 /* Begin construction of a new packet to-be appended to `self'
@@ -281,44 +506,185 @@ struct pb_buffer {
  *   - The only guaranty in concerns to packet read order is that packets that are
  *     generated linearly by the same thread will always be read in that same order
  *     in relation to each other.
- *   - Similarly, a packet that for which `pb_buffer_packet_commit()' was caled before
- *     the call to `pb_buffer_packet_begin()' of another packet will always be read
+ *   - Similarly, a packet that for which `pb_buffer_endwrite_commit()' was caled before
+ *     the call to `pb_buffer_startwrite()' of another packet will always be read
  *     before that other packet.
  * @return: * : Pointer to the packet's descriptor. Once the caller has finished filling
- *              in the packet's contents, they must use `pb_buffer_packet_commit()' in
+ *              in the packet's contents, they must use `pb_buffer_endwrite_commit()' in
  *              order to make the packet available for being read.
- *              In case that packet initialization should fail, `pb_buffer_packet_abort()'
+ *              In case that packet initialization should fail, `pb_buffer_endwrite_abort()'
  *              may be called to undo what was previously done by this function.
+ *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
+ *                    >> void *pb_packet_payload(struct pb_packet *);
+ *                    >> void *pb_packet_ancillary(struct pb_packet *);
  * @return: NULL: [kernel || errno == UNCHANGED] Packet too large (`pb_limt' would be exceeded)
- * @return: NULL: [kernel || errno == UNCHANGED] 
  * @return: NULL: [!kernel && errno == ENOMEM]   Failed to allocate more buffer memory
  * @throw: E_BADALLOC: [kernel]                  Failed to allocate more buffer memory */
 #ifdef __KERNEL__
-LIBBUFFER_DECL struct pb_packet *LIBBUFFER_CC
-pb_buffer_packet_begin(struct pb_buffer *__restrict self,
-                       __uint16_t payload_size,
-                       __uint16_t ancillary_size)
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+(LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
+                                      __uint16_t payload_size,
+                                      __uint16_t ancillary_size)
+		/*__THROWS(E_BADALLOC)*/;
+#else /* __KERNEL__ */
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
+                                                    __uint16_t payload_size,
+                                                    __uint16_t ancillary_size);
+#endif /* !__KERNEL__ */
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+#ifdef __KERNEL__
+LIBBUFFER_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *LIBBUFFER_CC
+pb_buffer_startwrite(struct pb_buffer *__restrict self,
+                     __uint16_t payload_size,
+                     __uint16_t ancillary_size)
 		__THROWS(E_BADALLOC);
 #else /* __KERNEL__ */
-LIBBUFFER_DECL struct pb_packet *
-__NOTHROW_NCX(LIBBUFFER_CC pb_buffer_packet_begin)(struct pb_buffer *__restrict self,
-                                                   __uint16_t payload_size,
-                                                   __uint16_t ancillary_size);
+LIBBUFFER_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+__NOTHROW(LIBBUFFER_CC pb_buffer_startwrite)(struct pb_buffer *__restrict self,
+                                             __uint16_t payload_size,
+                                             __uint16_t ancillary_size);
 #endif /* !__KERNEL__ */
-
-/* Commit a given `packet' to the packet stream */
-LIBBUFFER_DECL void
-__NOTHROW(LIBBUFFER_CC pb_buffer_packet_commit)(struct pb_buffer *__restrict self,
-                                                struct pb_packet *__restrict packet);
-
-LIBBUFFER_DECL void
-__NOTHROW(LIBBUFFER_CC pb_buffer_packet_abort)(struct pb_buffer *__restrict self,
-                                               struct pb_packet *__restrict packet);
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 
+/* Commit a given `packet' to the packet stream. */
+#ifdef __INTELLISENSE__
+__NOBLOCK __ATTR_NONNULL((1, 2)) void
+__NOTHROW(pb_buffer_endwrite_commit)(struct pb_buffer *__restrict self,
+                                     struct pb_packet *__restrict packet);
+#else /* __INTELLISENSE__ */
+#define pb_buffer_endwrite_commit(self, packet) \
+	__hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE)
+#endif /* !__INTELLISENSE__ */
+
+/* Abort writing/discard the given `packet' from the packet stream. */
+typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_ENDWRITE_ABORT)(struct pb_buffer *__restrict self,
+                                                        struct pb_packet *__restrict packet);
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) void
+__NOTHROW(LIBBUFFER_CC pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
+                                                 struct pb_packet *__restrict packet);
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 
-#undef __KERNEL_SELECT
+/* Try to begin reading the next unread packet. If no unread packet exists,
+ * or if the next unread packet is already being read at the moment, return
+ * NULL without blocking.
+ * In this case, the caller may wait for the next readable packet by doing
+ * >> while ((packet = pb_buffer_startread(self)) == NULL) {
+ * >> #ifdef __KERNEL__
+ * >>     task_connect(&self->pb_psta);
+ * >>     packet = pb_buffer_startread(self);
+ * >>     if (packet) {
+ * >>         task_disconnectall();
+ * >>         break;
+ * >>     }
+ * >>     task_waitfor();
+ * >> #else
+ * >>     lfutex_t status;
+ * >>     status = ATOMIC_READ(self->pb_psta);
+ * >>     packet = pb_buffer_startread(self);
+ * >>     if (packet)
+ * >>         break;
+ * >>     futex_waitwhile(&self->pb_psta, status);
+ * >> #endif
+ * >> }
+ * Note that with this design, recursive- or parallel read operations
+ * aren't allowed (which also wouldn't really make much sense, since
+ * packets are meant to be read in order, alongside the guaranty that
+ * any packet will only ever be read once).
+ * However, due to things such as VIO, there is a good chance that a
+ * malicious program might cause a recursive read operation to be
+ * performed. (i.e. recv(2) is called with a VIO-buffer, who's write
+ * callbacks will invoke recv(2) again). If this happens, then the
+ * second call to recv(2) will block indefinitely, and the malicious
+ * program will be soft-locked (but can still be CTRL+C'd, so it's ok)
+ *
+ * @return: * :   A pointer to a read-handle for the packet that is next-in-line to-be received.
+ *                This handle must be released by a call to one of the pb_buffer_read_[end/...]
+ *                functions.
+ * @return: NULL: No unread packet is available at the moment, or the most recent packet is
+ *                currently being read. */
+#ifdef __KERNEL__
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+(LIBBUFFER_CC *PPB_BUFFER_STARTREAD)(struct pb_buffer *__restrict self)
+		/*__THROWS(E_WOULDBLOCK)*/;
+#else /* __KERNEL__ */
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_STARTREAD)(struct pb_buffer *__restrict self);
+#endif /* !__KERNEL__ */
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+#ifdef __KERNEL__
+LIBBUFFER_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *LIBBUFFER_CC
+pb_buffer_startread(struct pb_buffer *__restrict self)
+		__THROWS(E_WOULDBLOCK);
+#else /* __KERNEL__ */
+LIBBUFFER_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+__NOTHROW_NCX(LIBBUFFER_CC pb_buffer_startread)(struct pb_buffer *__restrict self);
+#endif /* !__KERNEL__ */
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
+
+
+/* Truncate the packet from which the caller is currently reading by updating
+ * its base-pointer, acting as though the first `bytes_to_consume' bytes of the
+ * packet weren't actually apart of its payload.
+ * This can be called any number of times, though the caller must always ensure
+ * that `bytes_to_consume <= packet->p_payload', and that the returned pointer
+ * becomes the new handle that must be used for reading from the current packet:
+ * >> struct pb_packet *packet;
+ * >> packet = pb_buffer_startread(self);
+ * >> if (packet) {
+ * >>     size_t bytes_consumed;
+ * >>     while ((bytes_consumed = PROCESS_PACKET(self)) != 0)
+ * >>         packet = pb_buffer_truncate_packet(self, packet, bytes_consumed);
+ * >>     if (SHOULD_CONSUME(packet)) {
+ * >>         pb_buffer_endread_consume(self, packet);
+ * >>     } else {
+ * >>         pb_buffer_endread_restore(self, packet);
+ * >>     }
+ * >> }
+ * @return: * : A new handle that should be used for reading packet data. */
+typedef __NOBLOCK __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct pb_packet *
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_TRUNCATE_PACKET)(struct pb_buffer *__restrict self,
+                                                         struct pb_packet *__restrict packet,
+                                                         uint16_t bytes_to_consume);
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+LIBBUFFER_DECL __NOBLOCK __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct pb_packet *
+__NOTHROW(LIBBUFFER_CC pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
+                                                  struct pb_packet *__restrict packet,
+                                                  uint16_t bytes_to_consume);
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
+
+/* End reading the current packet, and discard the packet from the data stream.
+ * The next call to `pb_buffer_startread()' will return NULL or a different packet. */
+typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_ENDREAD_CONSUME)(struct pb_buffer *__restrict self,
+                                                         struct pb_packet *__restrict packet);
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) void
+__NOTHROW(LIBBUFFER_CC pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
+                                                  struct pb_packet *__restrict packet);
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
+
+
+/* End reading the current packet, and restore it to have it
+ * be returned by the next call to `pb_buffer_startread()' */
+#ifdef __INTELLISENSE__
+__NOBLOCK __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(pb_buffer_endread_restore)(struct pb_buffer *__restrict self,
+                                         struct pb_packet *__restrict packet);
+#else /* __INTELLISENSE__ */
+#define pb_buffer_endread_restore(self, packet)                                                 \
+	(__hybrid_assertf((packet) == (self)->pb_rptr, "%p != %p", (packet), (self)->pb_rptr),      \
+	 __hybrid_assertf((packet)->p_state == PB_PACKET_STATE_READING, "%I8u", (packet)->p_state), \
+	 __hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE),      \
+	 pb_buffer_broadcast_psta(self))
+#endif /* !__INTELLISENSE__ */
+
+
+
 
 __DECL_END
 #endif /* __CC__ */

@@ -45,7 +45,7 @@ typedef struct sig sched_signal_t;
 #define SCHED_SIGNAL_INIT SIG_INIT
 #else /* __KERNEL__ */
 typedef lfutex_t sched_signal_t;
-#define SCHED_SIGNAL_INIT { 0 }
+#define SCHED_SIGNAL_INIT 0
 #endif /* !__KERNEL__ */
 
 #ifdef __INTELLISENSE__
