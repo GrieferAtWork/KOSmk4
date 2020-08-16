@@ -609,7 +609,7 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 	ATOMIC_WRITE(socket->us_node, me->aw_bind_node); /* Inherit reference */
 	me->aw_bind_node = NULL;
 	COMPILER_WRITE_BARRIER();
-	weakdecref_unlikely(socket);
+	decref_unlikely(socket);
 	return false;
 }
 
