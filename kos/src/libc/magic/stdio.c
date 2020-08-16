@@ -2780,6 +2780,22 @@ __STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull]] char const *__restrict format, .
 %#endif /* __USE_SOLARIS */
 
 
+%
+%#ifdef __USE_LARGEFILE64
+/* I wish I could find some <stdio.h> header that declares these (aside
+ * of my own), since I don't really know where exactly to put them.
+ *
+ * For now, it makes sense to encapsulate them behind _LARGEFILE64_SOURCE,
+ * given that these are the 64-bit variants of fseek() and ftell(), however
+ * there may be other _*_SOURCE macros out there that are supposed to do
+ * the same (only I can't find them...) */
+%[insert:function(fseek64 = fseeko64)]
+%[insert:function(ftell64 = ftello64)]
+%#endif /* __USE_LARGEFILE64 */
+
+
+
+
 %{
 
 #endif /* __CC__ */
