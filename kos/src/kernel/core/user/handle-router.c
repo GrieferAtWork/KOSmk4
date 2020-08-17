@@ -292,6 +292,7 @@ INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.datasync") void 
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.stat") void KCALL handle_undefined_stat(void *__restrict UNUSED(self), USER CHECKED struct stat *UNUSED(result)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT); }
 INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.poll") poll_mode_t KCALL handle_undefined_poll(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.hop") syscall_slong_t KCALL handle_undefined_hop(void *__restrict UNUSED(self), syscall_ulong_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd); }
+INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryas") REF void *KCALL handle_undefined_tryas(void *__restrict UNUSED(self), uintptr_half_t UNUSED(wanted_type)) THROWS(E_WOULDBLOCK) { return NULL; }
 
 
 /* Handle type database */
@@ -1016,6 +1017,36 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_UAIO]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_uaio_hop,
 		/* [HANDLE_TYPE_FIFO_USER]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fifo_user_hop
 	},
+	/* .h_tryas = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_datablock_tryas,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_blockdevice_tryas,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_directoryentry_tryas,
+		/* [HANDLE_TYPE_FILE]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_file_tryas,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_oneshot_directory_file_tryas,
+		/* [HANDLE_TYPE_PATH]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_path_tryas,
+		/* [HANDLE_TYPE_FS]                     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fs_tryas,
+		/* [HANDLE_TYPE_VM]                     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_vm_tryas,
+		/* [HANDLE_TYPE_TASK]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_task_tryas,
+		/* [HANDLE_TYPE_CLOCK]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_clock_tryas,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_tryas,
+		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_tryas,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_reader_tryas,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_writer_tryas,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pidns_tryas,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_state_tryas,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_characterdevice_tryas,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_fence_tryas,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_sema_tryas,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_signalfd_tryas,
+		/* [HANDLE_TYPE_DATAPART]               = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_datapart_tryas,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futex_tryas,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futexfd_tryas,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_section_tryas,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_socket_tryas,
+		/* [HANDLE_TYPE_UAIO]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_uaio_tryas,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fifo_user_tryas
+	},
 };
 
 
@@ -1044,6 +1075,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datablock_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryincref, handle_undefined_tryincref);
@@ -1069,6 +1101,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_datasync, handle_undefined_datasync)
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryincref, handle_undefined_tryincref);
@@ -1094,6 +1127,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_datasync, handle_undefined_datasy
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FILE' (`struct file') */
 DEFINE_INTERN_WEAK_ALIAS(handle_file_tryincref, handle_undefined_tryincref);
@@ -1119,6 +1153,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_file_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryincref, handle_undefined_tryincref);
@@ -1144,6 +1179,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_datasync, handle_undefine
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PATH' (`struct path') */
 DEFINE_INTERN_WEAK_ALIAS(handle_path_tryincref, handle_undefined_tryincref);
@@ -1169,6 +1205,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_path_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FS' (`struct fs') */
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryincref, handle_undefined_tryincref);
@@ -1194,6 +1231,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fs_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_VM' (`struct vm') */
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryincref, handle_undefined_tryincref);
@@ -1219,6 +1257,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_vm_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
 DEFINE_INTERN_WEAK_ALIAS(handle_task_tryincref, handle_undefined_tryincref);
@@ -1244,6 +1283,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_task_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_CLOCK' (`struct realtime_clock_struct') */
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_tryincref, handle_undefined_tryincref);
@@ -1269,6 +1309,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_clock_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_clock_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryincref, handle_undefined_tryincref);
@@ -1294,6 +1335,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryincref, handle_undefined_tryincref);
@@ -1319,6 +1361,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE_READER' (`struct pipe_reader') */
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryincref, handle_undefined_tryincref);
@@ -1344,6 +1387,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_datasync, handle_undefined_datasync)
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE_WRITER' (`struct pipe_writer') */
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryincref, handle_undefined_tryincref);
@@ -1369,6 +1413,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_datasync, handle_undefined_datasync)
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryincref, handle_undefined_tryincref);
@@ -1394,6 +1439,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pidns_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_state') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryincref, handle_undefined_tryincref);
@@ -1419,6 +1465,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_datasync, handle_undefined_datasync
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryincref, handle_undefined_tryincref);
@@ -1444,6 +1491,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_datasync, handle_undefined_datas
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryincref, handle_undefined_tryincref);
@@ -1469,6 +1517,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_datasync, handle_undefined_datasyn
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_SEMA' (`struct eventfd') */
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryincref, handle_undefined_tryincref);
@@ -1494,6 +1543,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_datasync, handle_undefined_datasync
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_SIGNALFD' (`struct signalfd') */
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryincref, handle_undefined_tryincref);
@@ -1519,6 +1569,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DATAPART' (`struct vm_datapart') */
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryincref, handle_undefined_tryincref);
@@ -1544,6 +1595,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datapart_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEX' (`struct vm_futex') */
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryincref, handle_undefined_tryincref);
@@ -1569,6 +1621,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futex_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEXFD' (`struct vm_futexfd') */
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryincref, handle_undefined_tryincref);
@@ -1594,6 +1647,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER_SECTION' (`struct driver_section') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_tryincref, handle_undefined_tryincref);
@@ -1619,6 +1673,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_datasync, handle_undefined_datasy
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryincref, handle_undefined_tryincref);
@@ -1644,6 +1699,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_socket_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryincref, handle_undefined_tryincref);
@@ -1669,6 +1725,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_uaio_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryincref, handle_undefined_tryincref);
@@ -1694,6 +1751,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryas, handle_undefined_tryas);
 //[[[end]]]
 
 

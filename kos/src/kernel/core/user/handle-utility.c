@@ -69,6 +69,10 @@ NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 				return HANDLE_TYPEKIND_DATABLOCK_DIRECTORY;
 			if (INODE_ISLNK((struct inode *)self->h_data))
 				return HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE;
+			if (INODE_ISFIFO((struct inode *)self->h_data))
+				return HANDLE_TYPEKIND_DATABLOCK_FIFONODE;
+			if (INODE_ISSOCK((struct inode *)self->h_data))
+				return HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE;
 			return HANDLE_TYPEKIND_DATABLOCK_INODE;
 		}
 		break;
@@ -421,6 +425,437 @@ handle_print(struct handle const *__restrict self,
 	}
 	return result;
 }
+
+
+
+PRIVATE ATTR_COLD ATTR_NOINLINE ATTR_NORETURN void KCALL
+throw_invalid_handle_type(struct handle const *__restrict self,
+                          uintptr_half_t wanted_type,
+                          uintptr_half_t wanted_kind)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	THROW(E_INVALID_HANDLE_FILETYPE,
+	      /* fd:                 */ 0, /* Filled in the caller */
+	      /* needed_handle_type: */ wanted_type,
+	      /* actual_handle_type: */ self->h_type,
+	      /* needed_handle_kind: */ wanted_kind,
+	      /* actual_handle_kind: */ handle_typekind(self));
+}
+
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF void *FCALL
+handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self,
+          uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF void *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == wanted_type)
+		return self->h_data;
+	result = _handle_tryas(*self, wanted_type);
+	if likely(result) {
+		handle_decref(*self);
+		return result;
+	}
+	throw_invalid_handle_type(self, wanted_type, HANDLE_TYPEKIND_GENERIC);
+}
+
+
+/* Complete a thrown exception, inherit a reference to
+ * `hnd', and rethrow the already thrown exception. */
+PRIVATE ATTR_COLD ATTR_NOINLINE ATTR_NORETURN void FCALL
+handle_getas_complete_except(unsigned int fd) {
+	if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
+		if (!PERTASK_GET(this_exception_pointers[0]))
+			PERTASK_SET(this_exception_pointers[0], (uintptr_t)fd);
+	}
+	RETHROW();
+}
+
+
+
+/* Directly translate handlers to references to objects of specific types. */
+PUBLIC WUNUSED ATTR_RETNONNULL REF void *FCALL
+handle_getas(unsigned int fd, uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as(hnd, wanted_type);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct inode *FCALL
+handle_get_inode(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_inode(hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct regular_node *FCALL
+handle_get_regular_node(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_regular_node(&hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct directory_node *FCALL
+handle_get_directory_node(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_directory_node(&hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL
+handle_get_superblock(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_superblock(&hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL
+handle_get_superblock_relaxed(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_superblock_relaxed(&hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct task *FCALL
+handle_get_task(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
+	REF struct handle hnd;
+	switch (fd) {
+
+	case HANDLE_SYMBOLIC_THISTASK:
+		return incref(THIS_TASK);
+
+	case HANDLE_SYMBOLIC_THISPROCESS:
+		return incref(task_getprocess());
+
+	case HANDLE_SYMBOLIC_GROUPLEADER:
+		return task_getprocessgroupleader_srch();
+
+	case HANDLE_SYMBOLIC_SESSIONLEADER:
+		return task_getsessionleader_srch();
+
+	case HANDLE_SYMBOLIC_PARENTPROCESS: {
+		REF struct task *temp;
+		temp = task_getprocessparent();
+		if likely(temp)
+			return temp;
+	}	break;
+
+	default: break;
+	}
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_task(&hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct vfs *FCALL
+handle_get_vfs(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE) {
+	REF struct handle hnd;
+	hnd = handle_lookup(fd);
+	TRY {
+		return handle_as_vfs(&hnd);
+	} EXCEPT {
+		handle_getas_complete_except(fd);
+	}
+}
+
+
+
+/* Extended handle converted functions */
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct inode *FCALL
+handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct inode *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct inode *)self->h_data;
+		if likely(vm_datablock_isinode(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_INODE);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct regular_node *FCALL
+handle_as_regular_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct regular_node *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct regular_node *)self->h_data;
+		if likely(vm_datablock_isinode(result) && INODE_ISREG(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct regular_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result) && INODE_ISREG(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_REGULARNODE);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct directory_node *FCALL
+handle_as_directory_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct directory_node *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct directory_node *)self->h_data;
+		if likely(vm_datablock_isinode(result) && INODE_ISDIR(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct directory_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result) && INODE_ISDIR(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_DIRECTORY);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct superblock *FCALL
+handle_as_superblock(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct superblock *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct superblock *)self->h_data;
+		if likely(vm_datablock_isinode(result) && INODE_ISSUPER(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct superblock *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result) && INODE_ISSUPER(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct superblock *FCALL
+handle_as_superblock_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct superblock *result;
+	REF struct inode *ino;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		ino = (REF struct inode *)self->h_data;
+		if likely(vm_datablock_isinode(ino)) {
+			result = (REF struct superblock *)incref(ino->i_super);
+			decref_unlikely(ino); /* inherit: on_success */
+			return result;
+		}
+	} else {
+		ino = (REF struct inode *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(ino) {
+			if likely(vm_datablock_isinode(ino)) {
+				result = (REF struct superblock *)incref(ino->i_super);
+				decref_unlikely(ino);
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(ino);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct symlink_node *FCALL
+handle_as_symlink_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct symlink_node *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct symlink_node *)self->h_data;
+		if likely(vm_datablock_isinode(result) && INODE_ISLNK(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct symlink_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result) && INODE_ISLNK(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct fifo_node *FCALL
+handle_as_fifo_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct fifo_node *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct fifo_node *)self->h_data;
+		if likely(vm_datablock_isinode(result) && INODE_ISFIFO(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct fifo_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result) && INODE_ISFIFO(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_FIFONODE);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct socket_node *FCALL
+handle_as_socket_node(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct socket_node *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_DATABLOCK) {
+		result = (REF struct socket_node *)self->h_data;
+		if likely(vm_datablock_isinode(result) && INODE_ISSOCK(result))
+			return result; /* inherit */
+	} else {
+		result = (REF struct socket_node *)_handle_tryas(*self, HANDLE_TYPE_DATABLOCK);
+		if likely(result) {
+			if likely(vm_datablock_isinode(result) && INODE_ISSOCK(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_DATABLOCK,
+	                          HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE);
+}
+
+/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *FCALL
+handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_TASK) {
+		REF struct task *result;
+		struct taskpid *tpid;
+		tpid   = (REF struct taskpid *)self->h_data;
+		result = taskpid_gettask_srch(tpid);
+		decref_unlikely(tpid); /* inherit: on_success */
+		return result;
+	} else {
+		REF struct taskpid *tpid;
+		tpid = (REF struct taskpid *)_handle_tryas(*self, HANDLE_TYPE_TASK);
+		if likely(tpid) {
+			REF struct task *result;
+			{
+				FINALLY_DECREF_UNLIKELY(tpid);
+				result = taskpid_gettask_srch(tpid);
+			}
+			decref_unlikely(self); /* inherit: on_success */
+			return result;
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_TASK,
+	                          HANDLE_TYPEKIND_GENERIC);
+}
+
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vfs *FCALL
+handle_as_vfs(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF struct vfs *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_PATH) {
+		result = (REF struct vfs *)self->h_data;
+		if likely(result->p_vfs == result)
+			return result; /* inherit */
+	} else {
+		result = (REF struct vfs *)_handle_tryas(*self, HANDLE_TYPE_PATH);
+		if likely(result) {
+			if likely(result->p_vfs == result) {
+				decref_unlikely(self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_PATH,
+	                          HANDLE_TYPEKIND_PATH_VFSROOT);
+}
+
 
 
 

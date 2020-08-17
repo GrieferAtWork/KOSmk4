@@ -48,6 +48,30 @@ DECL_BEGIN
 
 DEFINE_HANDLE_REFCNT_FUNCTIONS(blockdevice, struct basic_block_device)
 
+INTERN NONNULL((1)) REF void *KCALL
+handle_blockdevice_tryas(struct basic_block_device *__restrict self,
+                         uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_DATABLOCK: {
+		REF struct inode *result;
+		result = ATOMIC_READ(self->bd_devfs_inode);
+		if (result)
+			return incref(result);
+	}	break;
+
+	case HANDLE_TYPE_DIRECTORYENTRY: {
+		if (ATOMIC_READ(self->bd_devfs_inode))
+			return incref(self->bd_devfs_entry);
+	}	break;
+
+	default:
+		break;
+	}
+	return NULL;
+}
+
 
 INTERN size_t KCALL
 handle_blockdevice_pread(struct basic_block_device *__restrict self,

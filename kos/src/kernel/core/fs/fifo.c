@@ -51,7 +51,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(fifo_user, struct fifo_user)
 #define fifo_buffer(user) (&(user)->fu_fifo->f_fifo.ff_buffer)
 
 
-INTDEF WUNUSED NONNULL((1)) size_t KCALL
+INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_fifo_user_read(struct fifo_user *__restrict self,
                       USER CHECKED void *dst,
                       size_t num_bytes, iomode_t mode)
@@ -93,7 +93,7 @@ done:
 	return result;
 }
 
-INTDEF WUNUSED NONNULL((1)) size_t KCALL
+INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_fifo_user_write(struct fifo_user *__restrict self,
                        USER CHECKED void const *src,
                        size_t num_bytes, iomode_t mode)
@@ -144,7 +144,7 @@ done:
 	return result;
 }
 
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_fifo_user_readv(struct fifo_user *__restrict self,
                        struct aio_buffer *__restrict dst,
                        size_t num_bytes, iomode_t mode)
@@ -196,7 +196,7 @@ again_read_ent:
 }
 
 
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_fifo_user_writev(struct fifo_user *__restrict self,
                         struct aio_buffer *__restrict src,
                         size_t num_bytes, iomode_t mode)
@@ -259,7 +259,7 @@ again_write_ent:
 	return result;
 }
 
-INTDEF NONNULL((1)) void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_fifo_user_truncate(struct fifo_user *__restrict self,
                           pos_t new_size)
 		THROWS(...) {
@@ -267,7 +267,7 @@ handle_fifo_user_truncate(struct fifo_user *__restrict self,
 	                      (size_t)new_size);
 }
 
-INTDEF NONNULL((1)) void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_fifo_user_stat(struct fifo_user *__restrict self,
                       USER CHECKED struct stat *result)
 		THROWS(...) {
@@ -281,14 +281,14 @@ handle_fifo_user_stat(struct fifo_user *__restrict self,
 	result->st_blocks  = size;
 }
 
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL
+INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
 handle_fifo_user_poll(struct fifo_user *__restrict self,
                       poll_mode_t what)
 		THROWS(...) {
 	return ringbuffer_poll(fifo_buffer(self), what);
 }
 
-INTDEF NONNULL((1)) syscall_slong_t KCALL
+INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_fifo_user_hop(struct fifo_user *__restrict self,
                      syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode)

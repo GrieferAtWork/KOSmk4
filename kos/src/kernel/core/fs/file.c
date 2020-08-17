@@ -24,8 +24,10 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
+#include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
@@ -287,7 +289,8 @@ handle_file_truncate(struct file *__restrict self, pos_t new_size) {
 INTERN pos_t KCALL /* TODO */
 handle_file_allocate(struct file *__restrict self,
                      fallocate_mode_t mode,
-                     pos_t start, pos_t length);
+                     pos_t start, pos_t length)
+		THROWS(...);
 
 INTERN void (KCALL handle_file_sync)(struct file *__restrict self) {
 	inode_sync(self->f_node);
@@ -967,6 +970,47 @@ DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_ioctl, handle_file_ioctl);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_hop, handle_file_hop);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_seek, handle_file_seek);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_truncate, handle_file_truncate);
+
+
+/* Alias the handle_file_tryas() to some other handle types. */
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_tryas, handle_file_tryas);
+DEFINE_INTERN_ALIAS(handle_fifo_user_tryas, handle_file_tryas);
+
+STATIC_ASSERT(offsetof(struct file, f_node) == offsetof(struct oneshot_directory_file, d_node));
+STATIC_ASSERT(offsetof(struct file, f_path) == offsetof(struct oneshot_directory_file, d_path));
+STATIC_ASSERT(offsetof(struct file, f_dirent) == offsetof(struct oneshot_directory_file, d_dirent));
+STATIC_ASSERT(offsetof(struct file, f_node) == offsetof(struct fifo_user, fu_fifo));
+STATIC_ASSERT(offsetof(struct file, f_path) == offsetof(struct fifo_user, fu_path));
+STATIC_ASSERT(offsetof(struct file, f_dirent) == offsetof(struct fifo_user, fu_dirent));
+
+/* This is the most-used handle converter function,
+ * since most open() calls return FILE-objects. */
+INTERN NONNULL((1)) REF void *KCALL
+handle_file_tryas(struct file *__restrict self,
+                  uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_DATABLOCK:
+		return incref(self->f_node);
+
+	case HANDLE_TYPE_DIRECTORYENTRY:
+		if (!self->f_dirent)
+			break;
+		return incref(self->f_dirent);
+
+	case HANDLE_TYPE_PATH:
+		if (!self->f_path)
+			break;
+		return incref(self->f_path);
+
+	default:
+		break;
+	}
+	return NULL;
+}
+
+
 
 DECL_END
 

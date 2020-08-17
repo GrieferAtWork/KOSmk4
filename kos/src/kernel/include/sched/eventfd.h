@@ -32,9 +32,9 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct eventfd {
-	WEAK refcnt_t   ef_refcnt; /* Reference counter. */
-	struct sig      ef_signal; /* Signal broadcast when reading or writing becomes non-blocking. */
-	atomic64_t ef_value;  /* Eventfd value. */
+	WEAK refcnt_t ef_refcnt; /* Reference counter. */
+	struct sig    ef_signal; /* Signal broadcast when reading or writing becomes non-blocking. */
+	atomic64_t    ef_value;  /* Eventfd value. */
 };
 
 DEFINE_REFCOUNT_FUNCTIONS(struct eventfd, ef_refcnt, kfree)

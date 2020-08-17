@@ -23,10 +23,12 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/user.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
@@ -438,6 +440,39 @@ err_exited:
 	THROW(E_PROCESS_EXITED,
 	      taskpid_getpid(self, THIS_PIDNS));
 }
+
+
+INTERN NONNULL((1)) REF void *KCALL
+handle_task_tryas(struct taskpid *__restrict self,
+                  uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_VM:
+		if (self != THIS_TASKPID)
+			break;
+		return incref(THIS_VM);
+
+	case HANDLE_TYPE_FS:
+		if (self != THIS_TASKPID)
+			break;
+		return incref(THIS_FS);
+
+	case HANDLE_TYPE_PATH:
+		if (self != THIS_TASKPID)
+			break;
+		return incref(THIS_VFS);
+
+	case HANDLE_TYPE_PIDNS:
+		if (self != THIS_TASKPID)
+			break;
+		return incref(THIS_PIDNS);
+
+	default: break;
+	}
+	return NULL;
+}
+
 
 
 DECL_END

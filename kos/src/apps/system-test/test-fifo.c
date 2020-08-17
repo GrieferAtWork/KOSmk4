@@ -50,7 +50,7 @@ DEFINE_TEST(fifo) {
 	unlink(FIFO_NAME);
 
 	/* Create the FIFO filesystem object. */
-	assertf(mknod(FIFO_NAME, S_IFIFO, 0) == 0, "%s", strerror(errno));
+	assertf(mknod(FIFO_NAME, S_IFIFO | 0644, 0) == 0, "%s", strerror(errno));
 
 	/* Use stat to verify that this is indeed the correct kind of file. */
 	assertf(stat(FIFO_NAME, &st) == 0, "%s", strerror(errno));

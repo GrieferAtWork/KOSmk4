@@ -64,6 +64,28 @@ NOTHROW(FCALL handle_datapart_decref)(REF struct vm_datapart *__restrict self) {
 	vm_datapart_decref_and_merge(self);
 }
 
+INTERN NONNULL((1)) REF void *KCALL
+handle_datapart_tryas(struct vm_datapart *__restrict self,
+                      uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_DATABLOCK: {
+		REF struct vm_datablock *result;
+		sync_read(self);
+		result = incref(self->dp_block);
+		sync_endread(self);
+		return result;
+	}	break;
+
+	default:
+		break;
+	}
+	return NULL;
+}
+
+
+
 /* TODO */
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datapart_pread(struct vm_datapart *__restrict self,

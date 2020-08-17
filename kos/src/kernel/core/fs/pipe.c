@@ -135,6 +135,22 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe, struct pipe);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe_reader, struct pipe_reader);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe_writer, struct pipe_writer);
 
+DEFINE_INTERN_ALIAS(handle_pipe_writer_tryas, handle_pipe_reader_tryas);
+INTERN NONNULL((1)) REF void *KCALL
+handle_pipe_reader_tryas(struct pipe_reader *__restrict self,
+                         uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_PIPE:
+		return incref(self->pr_pipe);
+
+	default: break;
+	}
+	return NULL;
+}
+
+
 
 PRIVATE size_t KCALL
 user_set_pipe_limit(struct pipe *__restrict self,

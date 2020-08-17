@@ -2058,13 +2058,13 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 		FINALLY_DECREF_UNLIKELY(root);
 		FINALLY_DECREF_UNLIKELY(cwd);
 		/* Open the underlying file. */
-		result_handle = fs_open_ex(filesystem,
-		                           cwd,
-		                           root,
-		                           filename,
-		                           oflags,
-		                           mode,
-		                           fsmode);
+		result_handle = fs_open_ex(/* filesystem: */ filesystem,
+		                           /* cwd:        */ cwd,
+		                           /* root:       */ root,
+		                           /* upath:      */ filename,
+		                           /* oflags:     */ oflags,
+		                           /* mode:       */ mode,
+		                           /* fsmode:     */ fsmode);
 	}
 	/* Set the I/O mode, and install the resulting object handle. */
 	STATIC_ASSERT(IO_FROM_OPENFLAG(O_CLOFORK) == IO_CLOFORK);

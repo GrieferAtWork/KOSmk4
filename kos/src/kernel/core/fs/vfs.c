@@ -61,6 +61,32 @@ DEFINE_PREALLOCATION_CACHE(PUBLIC, path, struct path, 256)
 
 DEFINE_HANDLE_REFCNT_FUNCTIONS(path, struct path)
 
+INTERN NONNULL((1)) REF void *KCALL
+handle_path_tryas(struct path *__restrict self,
+                  uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	switch (wanted_type) {
+
+	case HANDLE_TYPE_DATABLOCK: {
+		REF struct directory_node *result;
+		sync_read(self);
+		result = (REF struct directory_node *)xincref(self->p_inode);
+		sync_endread(self);
+		return result;
+	}	break;
+
+	case HANDLE_TYPE_DIRECTORYENTRY:
+		if (!self->p_parent)
+			break;
+		return incref(self->p_dirent);
+
+	default:
+		break;
+	}
+	return NULL;
+}
+
+
 INTERN void KCALL
 handle_path_truncate(struct path *__restrict self, pos_t new_size) {
 	REF struct inode *node;

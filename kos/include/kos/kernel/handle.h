@@ -136,8 +136,10 @@
 #define HANDLE_TYPEKIND_DATABLOCK_INODE       0x0001 /* The handle refers to a `struct inode' */
 #define HANDLE_TYPEKIND_DATABLOCK_REGULARNODE 0x0002 /* The handle refers to a `struct regular_node' */
 #define HANDLE_TYPEKIND_DATABLOCK_DIRECTORY   0x0003 /* The handle refers to a `struct directory_node' */
-#define HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE 0x0004 /* The handle refers to a `struct symlink_node' */
-#define HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK  0x0005 /* The handle refers to a `struct superblock' */
+#define HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK  0x0004 /* The handle refers to a `struct superblock' */
+#define HANDLE_TYPEKIND_DATABLOCK_SYMLINKNODE 0x0005 /* The handle refers to a `struct symlink_node' */
+#define HANDLE_TYPEKIND_DATABLOCK_FIFONODE    0x0006 /* The handle refers to a `struct fifo_node' */
+#define HANDLE_TYPEKIND_DATABLOCK_SOCKETNODE  0x0007 /* The handle refers to a `struct socket_node' */
 /* Handle kinds for `HANDLE_TYPE_BLOCKDEVICE' */
 #define HANDLE_TYPEKIND_BLOCKDEVICE_GENERIC   0x0000 /* The handle refers to a `struct basic_block_device' */
 #define HANDLE_TYPEKIND_BLOCKDEVICE_PARTITION 0x0001 /* The handle refers to a `struct block_device_partition' */
