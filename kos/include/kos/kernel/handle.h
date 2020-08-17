@@ -81,7 +81,8 @@
 #define HANDLE_TYPE_DRIVER_SECTION  0x0018 /* `struct driver_section' */
 #define HANDLE_TYPE_SOCKET          0x0019 /* `struct socket' */
 #define HANDLE_TYPE_UAIO            0x001a /* `struct uaio_controller' */
-#define HANDLE_TYPE_COUNT           0x001b /* # of recognized handle types
+#define HANDLE_TYPE_FIFO_USER       0x001b /* `struct fifo_user' */
+#define HANDLE_TYPE_COUNT           0x001c /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 

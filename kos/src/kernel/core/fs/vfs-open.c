@@ -27,8 +27,10 @@
 #include <dev/block.h>
 #include <dev/char.h>
 #include <dev/tty.h>
+#include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
+#include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
@@ -452,7 +454,6 @@ check_result_inode_for_symlink:
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct file, f_refcnt));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct file, f_node));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct file, f_path));
-					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dir) == offsetof(struct file, f_dir));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct file, f_dirent));
 					STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct file, f_offset));
 	
@@ -508,8 +509,21 @@ check_result_inode_for_symlink:
 					decref(result_containing_dirent);
 				}	break;
 	
-				//TODO:Filesystem pipes:case S_IFIFO:
-				//TODO:Filesystem pipes:    Return a `HANDLE_TYPE_NAMED_PIPE' object
+				case S_IFIFO: {
+					struct fifo_node *fn;
+					REF struct fifo_user *user;
+					STATIC_ASSERT(IO_ACCMODE == O_ACCMODE);
+					STATIC_ASSERT(IO_NONBLOCK == O_NONBLOCK);
+					fn   = (struct fifo_node *)result_inode;
+					user = fifo_user_create(fn, (iomode_t)(oflags & (O_ACCMODE | O_NONBLOCK)));
+					user->fu_path   = result_containing_path;   /* Inherit reference */
+					user->fu_dirent = result_containing_dirent; /* Inherit reference */
+					COMPILER_WRITE_BARRIER();
+					result.h_type = HANDLE_TYPE_FIFO_USER;
+					result.h_data = user;
+					decref_unlikely(result_containing_directory);
+					decref_nokill(result_inode); /* Nokill, because one ref exists in `user->fu_fifo' */
+				}	break;
 
 				//TODO:Unix domain sockets:case S_IFSOCK:
 				//TODO:Unix domain sockets:    Read up on what kind of object this should return.
@@ -535,7 +549,6 @@ open_result_inode:
 						result_file->d_refcnt = 1;
 						result_file->d_node   = (REF struct directory_node *)result_inode; /* Inherit reference */
 						result_file->d_path   = result_containing_path;                    /* Inherit reference */
-						result_file->d_dir    = result_containing_directory;               /* Inherit reference */
 						result_file->d_dirent = result_containing_dirent;                  /* Inherit reference */
 						result_file->d_offset = 0;
 						atomic_rwlock_init(&result_file->d_curlck);
@@ -545,6 +558,7 @@ open_result_inode:
 						result_file->d_buf    = NULL;
 						result.h_type  = HANDLE_TYPE_ONESHOT_DIRECTORY_FILE;
 						result.h_data  = result_file;
+						decref_unlikely(result_containing_directory);
 						break;
 					}
 					ATTR_FALLTHROUGH
@@ -555,7 +569,6 @@ open_result_inode:
 					result_file->f_refcnt = 1;
 					result_file->f_node   = result_inode;                /* Inherit reference */
 					result_file->f_path   = result_containing_path;      /* Inherit reference */
-					result_file->f_dir    = result_containing_directory; /* Inherit reference */
 					result_file->f_dirent = result_containing_dirent;    /* Inherit reference */
 					result_file->f_offset = 0;
 					atomic_rwlock_init(&result_file->f_curlck);
@@ -563,6 +576,7 @@ open_result_inode:
 					result_file->f_curent = NULL;
 					result.h_type  = HANDLE_TYPE_FILE;
 					result.h_data  = result_file;
+					decref_unlikely(result_containing_directory);
 				}	break;
 	
 				}

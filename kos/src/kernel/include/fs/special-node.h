@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/fifo.h>
 #include <fs/node.h>
 
 #include <network/unix-socket.h>
@@ -42,24 +43,7 @@ struct fifo_node /* S_ISFIFO */
 	                      * [OVERRIDE(.i_filerdev,[== 0])]
 	                      * The underlying node. */
 #endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
-	/* TODO: fifo_node Sockets should act like named pipes, where
-	 *       opening then will return the associated INode object
-	 *       wrapped inside of a custom HANDLE_TYPE_NAMED_PIPE object,
-	 *       such that using open(2) (fs_open_ex()) with that object
-	 *       has a special-case branch for `S_IFIFO' that will return
-	 *       objects of that type.
-	 * -> Finally, the actual `struct fifo_node' only needs to contain
-	 *    yet another `struct ringbuffer', aking to `struct pipe::p_buffer'
-	 * XXX: Read up on S_IFIFO files. - There is a chance that we need
-	 *      a proper wrapper object that has a pointer to this INode,
-	 *      rather than is this INode in itself.
-	 *      Normal Pipes have this mechanism where they automatically
-	 *      keep track of the # of open readers/writers, and there is
-	 *      a chance that FIFO-files have to do the same.
-	 *      If this is the case, this structure also needs to hold 2
-	 *      counters `p_rdcnt' and `p_wrcnt' that do the same as the
-	 *      same-named fields from `struct pipe' from <fs/pipe.h> */
-	void *f_placeholder; /* TODO */
+	struct fifo f_fifo;  /* The actual FIFO buffer for this fifo-INode. */
 };
 
 

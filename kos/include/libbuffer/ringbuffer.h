@@ -96,13 +96,16 @@ struct ringbuffer {
 
 #ifdef __KERNEL__
 #define ringbuffer_fini(self)                                                        \
-	(ringbuffer_close(self),                                                         \
+	(sched_signal_broadcast(&(self)->rb_nempty),                                     \
+	 sched_signal_broadcast(&(self)->rb_nfull),                                      \
 	 (self)->rb_size                                                                 \
 	 ? heap_free(&kernel_default_heap, (self)->rb_data, (self)->rb_size, GFP_NORMAL) \
 	 : (void)0)
 #else /* __KERNEL__ */
-#define ringbuffer_fini(self) \
-	(ringbuffer_close(self), __libc_free((self)->rb_data))
+#define ringbuffer_fini(self)                    \
+	(sched_signal_broadcast(&(self)->rb_nempty), \
+	 sched_signal_broadcast(&(self)->rb_nfull),  \
+	 __libc_free((self)->rb_data))
 #endif /* !__KERNEL__ */
 
 
@@ -110,7 +113,7 @@ struct ringbuffer {
 #ifdef __INTELLISENSE__
 __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(ringbuffer_close)(struct ringbuffer *__restrict self);
-__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) bool
+__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(ringbuffer_closed)(struct ringbuffer *__restrict self);
 #else /* __INTELLISENSE__ */
 #define ringbuffer_close(self)                                     \

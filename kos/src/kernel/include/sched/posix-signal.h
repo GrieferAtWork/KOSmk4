@@ -430,7 +430,7 @@ task_raisesignalthread(struct task *__restrict target,
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));
 	info.si_signo = signo;
-	return task_raisesignalprocess(target, &info, rpc_flags);
+	return task_raisesignalthread(target, &info, rpc_flags);
 }
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int

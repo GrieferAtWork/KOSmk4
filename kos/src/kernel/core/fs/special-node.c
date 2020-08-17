@@ -38,8 +38,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fifo_node_fini)(struct inode *__restrict self) {
 	struct fifo_node *me;
 	me = (struct fifo_node *)self;
-	/* TODO */
-	(void)me;
+	fifo_fini(&me->f_fifo);
 }
 
 /* Same as `fifo_node_fini()', but for `S_ISSOCK()' nodes. */

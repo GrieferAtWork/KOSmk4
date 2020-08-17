@@ -502,7 +502,7 @@ done:
 }
 /*[[[end:libd_wsymlinkat]]]*/
 
-/*[[[head:libc_wreadlinkat,hash:CRC-32=0xb2de61b]]]*/
+/*[[[head:libc_wreadlinkat,hash:CRC-32=0x6970d8df]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -513,8 +513,8 @@ done:
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
-                                       char32_t const *__restrict path,
-                                       char32_t *__restrict buf,
+                                       char32_t const *path,
+                                       char32_t *buf,
                                        size_t buflen)
 /*[[[body:libc_wreadlinkat]]]*/
 {
@@ -522,7 +522,7 @@ NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wreadlinkat]]]*/
 
-/*[[[head:libd_wreadlinkat,hash:CRC-32=0x123a1ec4]]]*/
+/*[[[head:libd_wreadlinkat,hash:CRC-32=0xc18b914]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -533,8 +533,8 @@ NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
-                                       char16_t const *__restrict path,
-                                       char16_t *__restrict buf,
+                                       char16_t const *path,
+                                       char16_t *buf,
                                        size_t buflen)
 /*[[[body:libd_wreadlinkat]]]*/
 {
@@ -542,14 +542,14 @@ NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
 }
 /*[[[end:libd_wreadlinkat]]]*/
 
-/*[[[head:libc_wfreadlinkat,hash:CRC-32=0xcbdf4e8c]]]*/
+/*[[[head:libc_wfreadlinkat,hash:CRC-32=0x4fa5e505]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
-                                        char32_t const *__restrict path,
-                                        char32_t *__restrict buf,
+                                        char32_t const *path,
+                                        char32_t *buf,
                                         size_t buflen,
                                         atflag_t flags)
 /*[[[body:libc_wfreadlinkat]]]*/
@@ -565,14 +565,14 @@ NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wfreadlinkat]]]*/
 
-/*[[[head:libd_wfreadlinkat,hash:CRC-32=0xf4b0cb91]]]*/
+/*[[[head:libd_wfreadlinkat,hash:CRC-32=0xe2270f14]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
-                                        char16_t const *__restrict path,
-                                        char16_t *__restrict buf,
+                                        char16_t const *path,
+                                        char16_t *buf,
                                         size_t buflen,
                                         atflag_t flags)
 /*[[[body:libd_wfreadlinkat]]]*/
@@ -1312,7 +1312,7 @@ NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
 }
 /*[[[end:libd_wsymlink]]]*/
 
-/*[[[head:libc_wreadlink,hash:CRC-32=0x597b85cf]]]*/
+/*[[[head:libc_wreadlink,hash:CRC-32=0xbb5a15d5]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -1323,8 +1323,8 @@ NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) ssize_t
-NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *__restrict path,
-                                     char32_t *__restrict buf,
+NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
+                                     char32_t *buf,
                                      size_t buflen)
 /*[[[body:libc_wreadlink]]]*/
 {
@@ -1332,7 +1332,7 @@ NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *__restrict path,
 }
 /*[[[end:libc_wreadlink]]]*/
 
-/*[[[head:libd_wreadlink,hash:CRC-32=0x91487f8c]]]*/
+/*[[[head:libd_wreadlink,hash:CRC-32=0x2bb64aea]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -1343,8 +1343,8 @@ NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *__restrict path,
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1, 2)) ssize_t
-NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path,
-                                     char16_t *__restrict buf,
+NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
+                                     char16_t *buf,
                                      size_t buflen)
 /*[[[body:libd_wreadlink]]]*/
 {

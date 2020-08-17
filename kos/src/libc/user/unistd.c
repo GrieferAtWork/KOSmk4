@@ -915,7 +915,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
 }
 /*[[[end:libc_symlinkat]]]*/
 
-/*[[[head:libc_readlinkat,hash:CRC-32=0x8f4f8829]]]*/
+/*[[[head:libc_readlinkat,hash:CRC-32=0x395bb63b]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -926,8 +926,8 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
-                                      char const *__restrict path,
-                                      char *__restrict buf,
+                                      char const *path,
+                                      char *buf,
                                       size_t buflen)
 /*[[[body:libc_readlinkat]]]*/
 {
@@ -1606,7 +1606,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
 }
 /*[[[end:libc_symlink]]]*/
 
-/*[[[head:libc_readlink,hash:CRC-32=0x270a309b]]]*/
+/*[[[head:libc_readlink,hash:CRC-32=0x9e5deaad]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -1617,8 +1617,8 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1, 2)) ssize_t
-NOTHROW_RPC(LIBCCALL libc_readlink)(char const *__restrict path,
-                                    char *__restrict buf,
+NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path,
+                                    char *buf,
                                     size_t buflen)
 /*[[[body:libc_readlink]]]*/
 {
@@ -3272,14 +3272,14 @@ for (local name: SYSCONF_VALUES_LO_INT32) {
 }
 /*[[[end:libc_sysconf]]]*/
 
-/*[[[head:libc_freadlinkat,hash:CRC-32=0x738f4274]]]*/
+/*[[[head:libc_freadlinkat,hash:CRC-32=0xd73b6b7d]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
-                                       char const *__restrict path,
-                                       char *__restrict buf,
+                                       char const *path,
+                                       char *buf,
                                        size_t buflen,
                                        atflag_t flags)
 /*[[[body:libc_freadlinkat]]]*/

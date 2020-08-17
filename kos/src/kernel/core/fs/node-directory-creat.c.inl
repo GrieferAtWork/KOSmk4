@@ -240,7 +240,7 @@ again:
 				                    FS_GFP | GFP_CALLOC);
 				result      = (RETURN_NODE_TYPE *)resptr.hp_ptr;
 				real_result = (struct fifo_node *)resptr.hp_ptr;
-				real_result->f_placeholder = NULL; /* TODO */
+				fifo_init(&real_result->f_fifo);
 			} else if (S_ISSOCK(mode)) {
 				struct socket_node *real_result;
 				resptr = heap_alloc(FS_HEAP,

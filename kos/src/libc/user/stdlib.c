@@ -1324,7 +1324,7 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s)
 }
 /*[[[end:libc_a64l]]]*/
 
-/*[[[head:libc_realpath,hash:CRC-32=0x30ce7bd1]]]*/
+/*[[[head:libc_realpath,hash:CRC-32=0x6c88b30c]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
@@ -1332,7 +1332,7 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s)
  *                   path, or NULL to automatically `malloc()'ate and return a
  *                   buffer of sufficient size. */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
-NOTHROW_RPC(LIBCCALL libc_realpath)(char const *__restrict filename,
+NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
                                     char *resolved)
 /*[[[body:libc_realpath]]]*/
 {

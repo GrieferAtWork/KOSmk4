@@ -56,7 +56,6 @@ NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
 		xdecref(self->f_curent);
 	decref(self->f_node);
 	xdecref(self->f_path);
-	xdecref(self->f_dir);
 	xdecref(self->f_dirent);
 	kfree(self);
 }
@@ -610,17 +609,6 @@ handle_file_hop(struct file *__restrict self,
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
-	case HOP_FILE_OPENDIR: {
-		struct handle temp;
-		temp.h_type = HANDLE_TYPE_DATABLOCK;
-		temp.h_mode = mode;
-		temp.h_data = self->f_dir;
-		if unlikely(!temp.h_data)
-			THROW(E_NO_SUCH_OBJECT);
-		inode_access_accmode((struct inode *)temp.h_data, mode);
-		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
-	}	break;
-
 	case HOP_FILE_OPENDENTRY: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
@@ -772,7 +760,6 @@ NOTHROW(KCALL oneshot_directory_file_destroy)(struct oneshot_directory_file *__r
 		oneshot_freeentries(self->d_buf);
 	decref(self->d_node);
 	xdecref(self->d_path);
-	xdecref(self->d_dir);
 	xdecref(self->d_dirent);
 	kfree(self);
 }

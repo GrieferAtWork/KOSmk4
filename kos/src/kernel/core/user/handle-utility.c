@@ -31,10 +31,12 @@
 #include <dev/pty.h>
 #include <dev/tty.h>
 #include <dev/ttybase.h>
+#include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
 #include <fs/pipe.h>
 #include <fs/ramfs.h>
+#include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
@@ -340,6 +342,25 @@ handle_print(struct handle const *__restrict self,
 		result = format_printf(printer, arg,
 		                       "anon_inode:[writer:pipe:%Iu]",
 		                       p->pw_pipe);
+	}	break;
+
+	case HANDLE_TYPE_FIFO_USER: {
+		struct fifo_user *f = (struct fifo_user *)self->h_data;
+		if (f->fu_path && f->fu_dirent) {
+			result = path_printent(f->fu_path,
+			                       f->fu_dirent->de_name,
+			                       f->fu_dirent->de_namelen,
+			                       printer, arg);
+		} else {
+			result = format_printf(printer, arg,
+			                       "anon_inode:[%s:pipe:%Iu]",
+			                       f->fu_accmode == IO_RDONLY
+			                       ? "reader"
+			                       : f->fu_accmode == IO_WRONLY
+			                         ? "writer"
+			                         : "reader+writer",
+			                       f->fu_fifo->i_fileino);
+		}
 	}	break;
 
 	case HANDLE_TYPE_PIDNS: {

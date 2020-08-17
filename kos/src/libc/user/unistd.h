@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9ddf737 */
+/* HASH CRC-32:0x30869ec1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -236,11 +236,11 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen);
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen, atflag_t flags);
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
@@ -366,7 +366,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_t
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *__restrict path, char *__restrict buf, size_t buflen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, size_t name_len);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */

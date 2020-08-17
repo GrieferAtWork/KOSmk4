@@ -941,8 +941,8 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'.
 [[cp, decl_include("<bits/types.h>")]]
-ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
-                   [[outp(buflen)]] char *__restrict buf, size_t buflen);
+ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
+                   [[outp(buflen)]] char *buf, size_t buflen);
 
 %
 %#ifdef __USE_KOS
@@ -950,8 +950,9 @@ ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
 @@Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
 @@@param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE'
 [[cp, decl_include("<bits/types.h>")]]
-ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
-                    [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags);
+ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
+                    [[outp(buflen)]] char *buf, size_t buflen,
+                    $atflag_t flags);
 %#endif /* __USE_KOS */
 
 %[default:section(".text.crt{|.dos}.fs.modify")];
@@ -1674,8 +1675,8 @@ int symlink([[nonnull]] char const *link_text,
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'
 [[cp, section(".text.crt{|.dos}.fs.property")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(readlinkat))]]
-ssize_t readlink([[nonnull]] char const *__restrict path,
-                 [[outp(buflen)]] char *__restrict buf,
+ssize_t readlink([[nonnull]] char const *path,
+                 [[outp(buflen)]] char *buf,
                  size_t buflen) {
 	return readlinkat(__CRT_AT_FDCWD, path, buf, buflen);
 }

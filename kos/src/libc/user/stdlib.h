@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3509bc22 */
+/* HASH CRC-32:0x23bc4299 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char 
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL to automatically `malloc()'ate and return a
  *                   buffer of sufficient size. */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_realpath)(char const *__restrict filename, char *resolved);
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename, char *resolved);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'

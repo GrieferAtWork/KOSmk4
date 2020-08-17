@@ -38,7 +38,6 @@ struct file {
 	WEAK refcnt_t               f_refcnt; /* File reference counter. */
 	REF struct inode           *f_node;   /* [1..1][const] The opened file INode. */
 	REF struct path            *f_path;   /* [0..1][const] The path from which `f_node' was opened. */
-	REF struct directory_node  *f_dir;    /* [0..1][const] The directory node bound to `f_path' at the time of the file being opened. */
 	REF struct directory_entry *f_dirent; /* [0..1][const] The directory entry associated with `f_node' that was used to open the file. */
 	WEAK pos_t                  f_offset; /* File I/O read/write position. */
 	struct atomic_rwlock        f_curlck; /* Lock for accessing the current directory entry & its index. */
@@ -67,7 +66,6 @@ struct oneshot_directory_file {
 	WEAK refcnt_t                    d_refcnt; /* File reference counter. */
 	REF struct directory_node       *d_node;   /* [1..1] The opened directory INode. */
 	REF struct path                 *d_path;   /* [0..1] The path from which `d_node' was opened. */
-	REF struct directory_node       *d_dir;    /* [0..1] The directory node bound to `d_path' at the time of the file being opened. */
 	REF struct directory_entry      *d_dirent; /* [0..1] The directory entry associated with `d_node' that was used to open the file. */
 	WEAK pos_t                       d_offset; /* [lock(d_node)] File I/O read/write position. */
 	struct atomic_rwlock             d_curlck; /* Lock for accessing the current directory entry & its index. */

@@ -1522,7 +1522,7 @@ long a64l([[nonnull]] char const *s); /* TODO: Implement here */
 @@                  path, or NULL to automatically `malloc()'ate and return a
 @@                  buffer of sufficient size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
-char *realpath([[nonnull]] char const *__restrict filename, char *resolved);
+char *realpath([[nonnull]] char const *filename, char *resolved);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %

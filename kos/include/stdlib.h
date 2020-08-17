@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f4620d0 */
+/* HASH CRC-32:0xce3d1d01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1701,7 +1701,7 @@ __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL to automatically `malloc()'ate and return a
  *                   buffer of sufficient size. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(char const *__restrict __filename, char *__resolved),(__filename,__resolved))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(char const *__filename, char *__resolved),(__filename,__resolved))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)

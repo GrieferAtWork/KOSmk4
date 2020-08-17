@@ -28,9 +28,11 @@
 #include <dev/block.h>
 #include <dev/char.h>
 #include <dev/ttybase.h>
+#include <fs/fifo.h>
 #include <fs/file.h>
 #include <fs/node.h>
 #include <fs/ramfs.h>
+#include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -244,9 +246,9 @@ DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
 	mode &= ~ATOMIC_READ(f->f_umask);
 	VALIDATE_FLAGSET(mode, 07777 | S_IFMT,
 	                 E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE);
-	if ((mode & S_IFMT) != S_IFREG &&
-	    (mode & S_IFMT) != S_IFCHR &&
-	    (mode & S_IFMT) != S_IFBLK) {
+	/* sys_mknod() can only be used to create files of the following types. */
+	if ((mode & S_IFMT) != S_IFREG && (mode & S_IFMT) != S_IFCHR &&
+	    (mode & S_IFMT) != S_IFBLK && (mode & S_IFMT) != S_IFIFO) {
 		THROW(E_INVALID_ARGUMENT_BAD_FLAG_MASK,
 		      E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE,
 		      mode,
@@ -2181,7 +2183,11 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		case HANDLE_TYPE_FILE:
 		case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
 			struct file *me;
-			me     = (struct file *)hnd.h_data;
+			me = (struct file *)hnd.h_data;
+			if unlikely(!me->f_path)
+				goto bad_handle_type;
+			if unlikely(!me->f_dirent)
+				goto bad_handle_type;
 			result = path_sprintentex(buf,
 			                          buflen,
 			                          me->f_path,
@@ -2214,6 +2220,22 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 				                       print_mode,
 				                       root);
 			}
+		}	break;
+
+		case HANDLE_TYPE_FIFO_USER: {
+			struct fifo_user *me;
+			me = (struct fifo_user *)hnd.h_data;
+			if unlikely(!me->fu_path)
+				goto bad_handle_type;
+			if unlikely(!me->fu_dirent)
+				goto bad_handle_type;
+			result = path_sprintentex(buf,
+			                          buflen,
+			                          me->fu_path,
+			                          me->fu_dirent->de_name,
+			                          me->fu_dirent->de_namelen,
+			                          print_mode,
+			                          root);
 		}	break;
 
 		default:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x338ea588 */
+/* HASH CRC-32:0x59697fb7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c32readlinkat,(__fd_t __dfd, __CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c32readlinkat,(__fd_t __dfd, __CHAR32_TYPE__ const *__path, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_KOS$wreadlinkat)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c32readlinkat,(__fd_t __dfd, __CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c32readlinkat,(__fd_t __dfd, __CHAR32_TYPE__ const *__path, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #else /* ... */
 #undef __local___localdep_c32readlinkat_defined
 #endif /* !... */
@@ -66,7 +66,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(c32readlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32readlink))(__CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen) {
+__NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32readlink))(__CHAR32_TYPE__ const *__path, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
 	return __localdep_c32readlinkat(__CRT_AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END

@@ -177,6 +177,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE,                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
 	E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS,                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
 	E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+	E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS,        /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
+	E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS,              /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -329,6 +331,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
 #define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
 #define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
+#define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -478,6 +482,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_OPCODE                    131 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The kernel doesn't recognize, or doesn't support the given `struct uvio_response::ur_opcode' */
 #define E_INVALID_ARGUMENT_CONTEXT_UVIO_BAD_RESPFLAGS                 132 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags given in `struct uvio_response::ur_respflags' isn't masked by `UVIO_RESPONSE_FLAG_NORMAL' */
 #define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    133 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        134 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
+#define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              135 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

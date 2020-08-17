@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7777b257 */
+/* HASH CRC-32:0x77fa3f6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const 
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen);
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -157,15 +157,15 @@ INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, 
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd, char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen);
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd, char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen, atflag_t flags);
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen, atflag_t flags);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd, char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen, atflag_t flags);
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen, atflag_t flags);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd, char16_t const *name, atflag_t flags);
@@ -211,7 +211,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *l
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path, char16_t *buf, size_t buflen);
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -221,7 +221,7 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t con
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path, char32_t *buf, size_t buflen);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name, size_t name_len);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wgetlogin_r)(char32_t *name, size_t name_len);
 /* >> gethostname(3)

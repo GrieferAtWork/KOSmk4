@@ -298,6 +298,7 @@ struct vm_futexfd;
 struct driver_section;
 struct socket;
 struct uaio_controller;
+struct fifo_user;
 
 
 
@@ -950,6 +951,31 @@ INTDEF NONNULL((1)) void KCALL handle_uaio_datasync(struct uaio_controller *__re
 INTDEF NONNULL((1)) void KCALL handle_uaio_stat(struct uaio_controller *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_uaio_poll(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_hop(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+
+/* Handle operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_fifo_user_tryincref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_incref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_decref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fifo_user_refcnt)(struct fifo_user const *__restrict self);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_read(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_write(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pread(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pwrite(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_readv(struct fifo_user *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_writev(struct fifo_user *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_preadv(struct fifo_user *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_fifo_user_pwritev(struct fifo_user *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_readdir(struct fifo_user *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_seek(struct fifo_user *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_ioctl(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_truncate(struct fifo_user *__restrict self, pos_t new_size) THROWS(...);
+INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_fifo_user_mmap(struct fifo_user *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_allocate(struct fifo_user *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_sync(struct fifo_user *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_datasync(struct fifo_user *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_stat(struct fifo_user *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fifo_user_poll(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_hop(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
