@@ -152,34 +152,43 @@ handle_pipe_reader_tryas(struct pipe_reader *__restrict self,
 
 
 
-PRIVATE size_t KCALL
-user_set_pipe_limit(struct pipe *__restrict self,
-                    size_t new_lim) {
+INTERN size_t KCALL
+ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
+                          size_t new_lim) {
 	size_t result;
-	if (new_lim > 0x10000)
-		new_lim = 0x10000; /* XXX: This could be done better... */
-	result = ATOMIC_XCH(self->p_buffer.rb_limit, new_lim);
+	if (new_lim > pipe_max_bufsize_unprivileged) {
+		for (;;) {
+			result = ATOMIC_READ(self->rb_limit);
+			/* When trying to set some limit greater than the max-unprivileged-buffer-size
+			 * limit, the caller needs `CAP_SYS_RESOURCE' capabilities, or the new limit
+			 * must be lower than the previous limit. */
+			if (new_lim > result)
+				require(CAP_SYS_RESOURCE);
+			if (ATOMIC_CMPXCH_WEAK(self->rb_limit, result, new_lim))
+				break;
+		}
+	} else {
+		result = ATOMIC_XCH(self->rb_limit, new_lim);
+	}
 	if (new_lim == 0) {
-		sig_broadcast(&self->p_buffer.rb_nempty);
-		sig_broadcast(&self->p_buffer.rb_nfull);
+		sig_broadcast(&self->rb_nempty);
+		sig_broadcast(&self->rb_nfull);
 	}
 	return result;
 }
 
 INTERN syscall_slong_t KCALL
-handle_pipe_hop(struct pipe *__restrict self,
-                syscall_ulong_t cmd,
-                USER UNCHECKED void *arg,
-                iomode_t mode) {
-	syscall_ulong_t used_cmd;
-	used_cmd = cmd;
-again:
-	switch (used_cmd) {
+ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
+                    syscall_ulong_t cmd,
+                    USER UNCHECKED void *arg,
+                    iomode_t mode) {
+	switch (cmd) {
 
 	case HOP_PIPE_STAT: {
 		size_t struct_size;
 		USER CHECKED struct hop_pipe_stat *data;
-		size_t ps_rdtotal; /* Total number of bytes read since the pipe buffer was last defragmented (which must be done before it can be re-allocated) */
+		size_t ps_rdtotal; /* Total number of bytes read since the pipe buffer was last defragmented
+		                    * (which must be done before it can be re-allocated) */
 		size_t ps_avail;   /* Number of bytes currently available for reading */
 		size_t ps_bufcur;  /* Current buffer size of the pipe */
 		size_t ps_buflim;  /* Max buffer size of the pipe */
@@ -189,12 +198,12 @@ again:
 		if (struct_size != sizeof(struct hop_pipe_stat))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_stat), struct_size);
 		COMPILER_BARRIER();
-		sync_read(&self->p_buffer.rb_lock);
-		ps_rdtotal = self->p_buffer.rb_rdtot;
-		ps_avail   = self->p_buffer.rb_avail;
-		ps_bufcur  = self->p_buffer.rb_size;
-		ps_buflim  = ATOMIC_READ(self->p_buffer.rb_limit);
-		sync_endread(&self->p_buffer.rb_lock);
+		sync_read(&self->rb_lock);
+		ps_rdtotal = self->rb_rdtot;
+		ps_avail   = self->rb_avail;
+		ps_bufcur  = self->rb_size;
+		ps_buflim  = ATOMIC_READ(self->rb_limit);
+		sync_endread(&self->rb_lock);
 		COMPILER_BARRIER();
 		data->ps_rdtotal = (u64)ps_rdtotal;
 		data->ps_avail   = (u64)ps_avail;
@@ -204,11 +213,11 @@ again:
 
 	case HOP_PIPE_GETLIM: /* [OUT:uint64_t *result] Return the max allocated size of the pipe. */
 		validate_writable(arg, sizeof(u64));
-		*(u64 *)arg = (u64)ATOMIC_READ(self->p_buffer.rb_limit);
+		*(u64 *)arg = (u64)ATOMIC_READ(self->rb_limit);
 		break;
 
 	case HOP_PIPE_SETLIM: /* [size_t value] Set the max allocated pipe size to `value'. */
-		user_set_pipe_limit(self, (size_t)arg);
+		ringbuffer_set_pipe_limit(self, (size_t)arg);
 		break;
 
 	case HOP_PIPE_XCHLIM: {
@@ -218,7 +227,7 @@ again:
 		value = (u64 *)arg;
 		validate_writable(value, sizeof(*value));
 		temp = (size_t)ATOMIC_READ(*value);
-		temp = user_set_pipe_limit(self, temp);
+		temp = ringbuffer_set_pipe_limit(self, temp);
 		ATOMIC_WRITE(*value, temp);
 	}	break;
 
@@ -240,12 +249,12 @@ again:
 		validate_readable(buf, buflen);
 		if (mode & IO_NONBLOCK) {
 			size_t temp;
-			temp = ringbuffer_write_nonblock(&self->p_buffer, buf, buflen);
-			if (!temp && buflen && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
+			temp = ringbuffer_write_nonblock(self, buf, buflen);
+			if (!temp && buflen && !(mode & IO_NODATAZERO) && !ringbuffer_closed(self))
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 			buflen = temp;
 		} else {
-			buflen = ringbuffer_writesome(&self->p_buffer, buf, buflen);
+			buflen = ringbuffer_writesome(self, buf, buflen);
 		}
 		ATOMIC_WRITE(data->pws_written, buflen);
 	}	break;
@@ -275,13 +284,13 @@ again:
 			ent.iov_len  = ATOMIC_READ(buf[i].iov_len);
 			validate_readable(ent.iov_base, ent.iov_len);
 			if (result) {
-				temp = ringbuffer_write_nonblock(&self->p_buffer, ent.iov_base, ent.iov_len);
+				temp = ringbuffer_write_nonblock(self, ent.iov_base, ent.iov_len);
 			} else if (mode & IO_NONBLOCK) {
-				temp = ringbuffer_write_nonblock(&self->p_buffer, ent.iov_base, ent.iov_len);
-				if (!temp && ent.iov_len && !(mode & IO_NODATAZERO) && !ringbuffer_closed(&self->p_buffer))
+				temp = ringbuffer_write_nonblock(self, ent.iov_base, ent.iov_len);
+				if (!temp && ent.iov_len && !(mode & IO_NODATAZERO) && !ringbuffer_closed(self))
 					THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
 			} else {
-				temp = ringbuffer_writesome(&self->p_buffer, ent.iov_base, ent.iov_len);
+				temp = ringbuffer_writesome(self, ent.iov_base, ent.iov_len);
 			}
 			result += temp;
 			if (temp < ent.iov_len)
@@ -302,7 +311,7 @@ again:
 		if (struct_size != sizeof(struct hop_pipe_skipdata))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_skipdata), struct_size);
 		COMPILER_BARRIER();
-		result = ringbuffer_skipread(&self->p_buffer,
+		result = ringbuffer_skipread(self,
 		                             ATOMIC_READ(data->psd_num_bytes),
 		                             &new_rdpos);
 		ATOMIC_WRITE(data->psd_rdpos, new_rdpos);
@@ -321,7 +330,7 @@ again:
 		if (struct_size != sizeof(struct hop_pipe_unread))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_unread), struct_size);
 		COMPILER_BARRIER();
-		result = ringbuffer_unread(&self->p_buffer,
+		result = ringbuffer_unread(self,
 		                           ATOMIC_READ(data->pur_num_bytes),
 		                           &new_rdpos);
 		ATOMIC_WRITE(data->pur_rdpos, new_rdpos);
@@ -340,7 +349,7 @@ again:
 		if (struct_size != sizeof(struct hop_pipe_unwrite))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_unwrite), struct_size);
 		COMPILER_BARRIER();
-		result = ringbuffer_unread(&self->p_buffer,
+		result = ringbuffer_unread(self,
 		                           ATOMIC_READ(data->puw_num_bytes),
 		                           &new_wrpos);
 		ATOMIC_WRITE(data->puw_wrpos, new_wrpos);
@@ -355,9 +364,26 @@ again:
 		validate_writable(arg, sizeof(u64));
 		data = (USER CHECKED u64 *)arg;
 		temp = ATOMIC_READ(*(size_t *)data);
-		temp = ringbuffer_setwritten(&self->p_buffer, temp);
+		temp = ringbuffer_setwritten(self, temp);
 		ATOMIC_WRITE(*data, temp);
 	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+		      cmd);
+		break;
+	}
+	return 0;
+}
+
+
+INTERN syscall_slong_t KCALL
+handle_pipe_hop(struct pipe *__restrict self,
+                syscall_ulong_t cmd,
+                USER UNCHECKED void *arg,
+                iomode_t mode) {
+	switch (cmd) {
 
 	case HOP_PIPE_OPEN_PIPE: {
 		struct handle temp;
@@ -408,19 +434,8 @@ again:
 	}	break;
 
 	default:
-		if (used_cmd == cmd) {
-			if ((cmd >> 16) == HANDLE_TYPE_PIPE_READER ||
-			    (cmd >> 16) == HANDLE_TYPE_PIPE_WRITER) {
-				/* Alias all `HANDLE_TYPE_PIPE' commands within the PIPE_READER and PIPE_WRITER namespaces. */
-				used_cmd &= 0xffff;
-				used_cmd |= HANDLE_TYPE_PIPE << 16;
-				goto again;
-			}
-		}
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-		      cmd);
-		break;
+		/* Execute generic pipe-HOPs on our ring-buffer. */
+		return ringbuffer_pipe_hop(&self->p_buffer, cmd, arg, mode);
 	}
 	return 0;
 }

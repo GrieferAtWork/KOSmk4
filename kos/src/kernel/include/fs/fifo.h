@@ -30,6 +30,8 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+struct fifo_node;
+
 struct fifo {
 	/* Fifo semantics for read/write/open/close:
 	 *
@@ -138,7 +140,22 @@ struct fifo {
 #define fifo_fini(self) \
 	ringbuffer_fini(&(self)->ff_buffer)
 
-struct fifo_node;
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+/* Perform a generic HOP() operation for objects that point to FIFOs.
+ * Called from:
+ *    - HANDLE_TYPE_DATABLOCK   (When describing a `struct fifo_node *')
+ *    - HANDLE_TYPE_FILE
+ *    - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE
+ *    - HANDLE_TYPE_FIFO_USER
+ * This hop-backend implements command codes normally reserved for pipe
+ * objects, thus allowing user-space to make use of pipe hop commands
+ * with FIFO objects. */
+INTDEF syscall_slong_t KCALL
+fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
+         USER UNCHECKED void *arg, iomode_t mode);
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+
 
 struct fifo_user {
 	/* HANDLE:HANDLE_TYPE_FIFO_USER */

@@ -621,6 +621,9 @@ handle_file_hop(struct file *__restrict self,
 	}	break;
 
 	default:
+		/* Handle FIFO control operations if we are referring to one. */
+		if (INODE_ISFIFO(self->f_node))
+			return fifo_hop((struct fifo_node *)self->f_node, cmd, arg, mode);
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
 		      cmd);

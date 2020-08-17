@@ -23,7 +23,9 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/fifo.h>
 #include <fs/node.h>
+#include <fs/special-node.h>
 #include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
@@ -1225,6 +1227,9 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		/* TODO: HOP for using `inode_readv_blocking()' */
 
 	default:
+		/* Handle FIFO control operations if we are referring to one. */
+		if (vm_datablock_isinode(self) && INODE_ISFIFO((struct inode *)self))
+			return fifo_hop((struct fifo_node *)self, cmd, arg, mode);
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
 		      cmd);

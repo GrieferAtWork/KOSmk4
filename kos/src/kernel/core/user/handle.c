@@ -2102,6 +2102,10 @@ handle_stflags(struct handle_manager *__restrict self,
 }
 
 
+INTDEF size_t KCALL
+ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
+                          size_t new_lim);
+
 /* The kernel-space equivalent of the user-space `fcntl()' function. */
 PUBLIC NONNULL((1)) syscall_ulong_t KCALL
 handle_fcntl(struct handle_manager *__restrict self,
@@ -2246,6 +2250,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 		TRY {
 			struct pipe *p;
 			size_t newsize;
+			/* TODO: Support for named pipes */
 			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
 			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
 				p = ((struct pipe_reader *)temp.h_data)->pr_pipe;
@@ -2253,7 +2258,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 				p = (struct pipe *)temp.h_data;
 			} else {
 				THROW(E_INVALID_HANDLE_FILETYPE, fd,
-				      HANDLE_TYPE_PIDNS, temp.h_type,
+				      HANDLE_TYPE_PIPE, temp.h_type,
 				      HANDLE_TYPEKIND_GENERIC,
 				      handle_typekind(&temp));
 			}
@@ -2264,10 +2269,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 				      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
 				      newsize);
 			}
-			/* Require `CAP_SYS_RESOURCE' for very large buffers */
-			if (newsize > pipe_max_bufsize_unprivileged)
-				require(CAP_EXCEED_PIPE_MAX_SIZE);
-			ATOMIC_WRITE(p->p_buffer.rb_limit, newsize);
+			ringbuffer_set_pipe_limit(&p->p_buffer, newsize);
 		} EXCEPT {
 			decref_unlikely(temp);
 			RETHROW();

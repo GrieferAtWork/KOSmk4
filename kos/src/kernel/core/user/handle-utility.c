@@ -200,6 +200,8 @@ handle_datasize(struct handle const *__restrict self,
 		value = (pos_t)((struct driver_state *)self->h_data)->ds_count;
 		break;
 
+		/* TODO: HANDLE_TYPE_FIFO_USER */
+
 	default:
 badtype:
 		return false;

@@ -1372,11 +1372,15 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 			 * e.g.: A DATABLOCK command on a FILE object should be allowed */
 			wanted_type = (u16)(cmd >> 16);
 			if (wanted_type != hand.h_type) {
-				/* TODO: This should be a try-as!
-				 *       If handles cannot be converted, we should invoke the HOP on the original
-				 *       handle, thus allowing FIFO-related handles to re-use PIPE-hop()s! */
-				hand.h_data = handle_as(hand, wanted_type);
-				hand.h_type = wanted_type;
+				/* This should be a try-as!
+				 * If handles cannot be converted, we should invoke the HOP on the original
+				 * handle, for example allowing FIFO-related handles to re-use PIPE-hop()s! */
+				REF void *new_data;
+				new_data = handle_tryas(hand, wanted_type);
+				if (new_data) {
+					hand.h_data = new_data; /* Inherit reference */
+					hand.h_type = wanted_type;
+				}
 			}
 			result = (*handle_type_db.h_hop[wanted_type])(hand.h_data,
 			                                              cmd,

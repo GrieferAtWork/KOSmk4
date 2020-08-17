@@ -33,12 +33,14 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <sched/cred.h>
 #include <sched/posix-signal.h>
 #include <sched/signal.h>
 
 #include <hybrid/atomic.h>
 
 #include <kos/except/inval.h>
+#include <kos/hop/pipe.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -48,9 +50,87 @@ DECL_BEGIN
 
 DEFINE_HANDLE_REFCNT_FUNCTIONS(fifo_user, struct fifo_user)
 
+INTDEF syscall_slong_t KCALL
+ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
+                    syscall_ulong_t cmd,
+                    USER UNCHECKED void *arg,
+                    iomode_t mode);
+
+/* Perform a generic HOP() operation for objects that point to FIFOs.
+ * Called from:
+ *    - HANDLE_TYPE_DATABLOCK   (When describing a `struct fifo_node *')
+ *    - HANDLE_TYPE_FILE
+ *    - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE
+ *    - HANDLE_TYPE_FIFO_USER
+ * This hop-backend implements command codes normally reserved for pipe
+ * objects, thus allowing user-space to make use of pipe hop commands
+ * with FIFO objects. */
+INTERN syscall_slong_t KCALL
+fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
+         USER UNCHECKED void *arg, iomode_t mode) {
+	switch (cmd) {
+
+	case HOP_PIPE_OPEN_PIPE: {
+		struct handle temp;
+		if ((mode & IO_ACCMODE) != IO_RDWR)
+			require(CAP_PIPE_OPEN_CONTROLLER);
+		temp.h_type = HANDLE_TYPE_DATABLOCK;
+		temp.h_mode = mode;
+		temp.h_data = self;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+	}	break;
+
+#if 0 /* TODO */
+	case HOP_PIPE_CREATE_READER: {
+		struct handle temp;
+		unsigned int result;
+		require(CAP_PIPE_CREATE_WRAPPERS);
+		temp.h_type = HANDLE_TYPE_PIPE_READER;
+		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
+		ATOMIC_FETCHINC(self->p_rdcnt); /* Prevent the PIPE from being closed on error */
+		TRY {
+			temp.h_data = pipe_reader_create(self);
+			FINALLY_DECREF((struct pipe_reader *)temp.h_data);
+			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		} EXCEPT {
+			ATOMIC_FETCHDEC(self->p_rdcnt);
+			RETHROW();
+		}
+		ATOMIC_FETCHDEC(self->p_rdcnt);
+		return result;
+	}	break;
+
+	case HOP_PIPE_CREATE_WRITER: {
+		struct handle temp;
+		unsigned int result;
+		require(CAP_PIPE_CREATE_WRAPPERS);
+		temp.h_type = HANDLE_TYPE_PIPE_WRITER;
+		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
+		ATOMIC_FETCHINC(self->p_wrcnt); /* Prevent the PIPE from being closed on error */
+		TRY {
+			temp.h_data = pipe_writer_create(self);
+			FINALLY_DECREF((struct pipe_writer *)temp.h_data);
+			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+		} EXCEPT {
+			ATOMIC_FETCHDEC(self->p_wrcnt);
+			RETHROW();
+		}
+		ATOMIC_FETCHDEC(self->p_wrcnt);
+		return result;
+	}	break;
+#endif
+
+	default:
+		/* Execute generic pipe-HOPs on our ring-buffer. */
+		return ringbuffer_pipe_hop(&self->f_fifo.ff_buffer, cmd, arg, mode);
+	}
+	return 0;
+}
+
+
+
+
 #define fifo_buffer(user) (&(user)->fu_fifo->f_fifo.ff_buffer)
-
-
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_fifo_user_read(struct fifo_user *__restrict self,
                       USER CHECKED void *dst,
@@ -293,15 +373,8 @@ handle_fifo_user_hop(struct fifo_user *__restrict self,
                      syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
-	(void)self;
-	(void)cmd;
-	(void)arg;
-	(void)mode;
-	/* TODO */
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
-	      cmd);
-	return 0;
+	/* Service generic FIFO HOP commands. */
+	return fifo_hop(self->fu_fifo, cmd, arg, mode);
 }
 
 
