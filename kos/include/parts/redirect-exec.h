@@ -29,21 +29,21 @@
 /* On i386, we can take advantage of how varargs are passed as
  * a 4-byte aligned vector (with is the same as a pointer array) */
 #define __REDIRECT_EXECL(T, execv, path, args)                       { return execv(path, (T **)&args); }
-#define __REDIRECT_EXECLE(T, execve, path, args)                     { T **__penv = (T **)&args; while (*__penv++); return execve(path, (T **)&args, __penv); }
+#define __REDIRECT_EXECLE(T, execve, path, args)                     { T ***__penv = (T ***)&args; while (*__penv++); return execve(path, (T **)&args, *__penv); }
 #define __REDIRECT_SPAWNL(T, spawnv, mode, path, args)               { return spawnv(mode, path, (T **)&args); }
-#define __REDIRECT_SPAWNLE(T, spawnve, mode, path, args)             { T **__penv = (T **)&args; while (*__penv++); return spawnve(mode, path, (T **)&args, __penv); }
+#define __REDIRECT_SPAWNLE(T, spawnve, mode, path, args)             { T ***__penv = (T ***)&args; while (*__penv++); return spawnve(mode, path, (T **)&args, *__penv); }
 #define __REDIRECT_FEXECLAT(T, fexecvat, dfd, path, args)            { T **__pflags = (T **)&args; while (*__penv++); return fexecvat(dfd, path, (T **)&args, *(int *)__pflags); }
-#define __REDIRECT_FEXECLEAT(T, fexecveat, dfd, path, args)          { T **__penv = (T **)&args; while (*__penv++); return fexecveat(dfd, path, (T **)&args, __penv, *(int *)(__penv+1)); }
+#define __REDIRECT_FEXECLEAT(T, fexecveat, dfd, path, args)          { T ***__penv = (T ***)&args; while (*__penv++); return fexecveat(dfd, path, (T **)&args, *__penv, *(int *)(__penv + 1)); }
 #define __REDIRECT_FSPAWNLAT(T, fspawnvat, mode, dfd, path, args)    { T **__pflags = (T **)&args; while (*__penv++); return fspawnvat(mode, dfd, path, (T **)&args, *(int *)__pflags); }
-#define __REDIRECT_FSPAWNLEAT(T, fspawnveat, mode, dfd, path, args)  { T **__penv = (T **)&args; while (*__penv++); return fspawnveat(mode, dfd, path, (T **)&args, __penv, *(int *)(__penv+1)); }
+#define __REDIRECT_FSPAWNLEAT(T, fspawnveat, mode, dfd, path, args)  { T ***__penv = (T ***)&args; while (*__penv++); return fspawnveat(mode, dfd, path, (T **)&args, *__penv, *(int *)(__penv + 1)); }
 #define __REDIRECT_XEXECL(T, Execv, path, args)                      { Execv(path, (T **)&args); }
-#define __REDIRECT_XEXECLE(T, Execve, path, args)                    { T **__penv = (T **)&args; while (*__penv++); Execve(path, (T **)&args, __penv); }
+#define __REDIRECT_XEXECLE(T, Execve, path, args)                    { T ***__penv = (T ***)&args; while (*__penv++); Execve(path, (T **)&args, *__penv); }
 #define __REDIRECT_XSPAWNL(T, Spawnv, mode, path, args)              { return Spawnv(mode, path, (T **)&args); }
-#define __REDIRECT_XSPAWNLE(T, Spawnve, mode, path, args)            { T **__penv = (T **)&args; while (*__penv++); return Spawnve(mode, path, (T **)&args, __penv); }
+#define __REDIRECT_XSPAWNLE(T, Spawnve, mode, path, args)            { T ***__penv = (T ***)&args; while (*__penv++); return Spawnve(mode, path, (T **)&args, *__penv); }
 #define __REDIRECT_XFEXECLAT(T, FExecvAt, dfd, path, args)           { T **__pflags = (T **)&args; while (*__penv++); FExecvAt(dfd, path, (T **)&args, *(int *)__pflags); }
-#define __REDIRECT_XFEXECLEAT(T, FExecveAt, dfd, path, args)         { T **__penv = (T **)&args; while (*__penv++); FExecveAt(dfd, path, (T **)&args, __penv, *(int *)(__penv+1)); }
+#define __REDIRECT_XFEXECLEAT(T, FExecveAt, dfd, path, args)         { T ***__penv = (T ***)&args; while (*__penv++); FExecveAt(dfd, path, (T **)&args, *__penv, *(int *)(__penv + 1)); }
 #define __REDIRECT_XFSPAWNLAT(T, FSpawnvAt, mode, dfd, path, args)   { T **__pflags = (T **)&args; while (*__penv++); return FSpawnvAt(mode, dfd, path, (T **)&args, *(int *)__pflags); }
-#define __REDIRECT_XFSPAWNLEAT(T, FSpawnveAt, mode, dfd, path, args) { T **__penv = (T **)&args; while (*__penv++); return FSpawnveAt(mode, dfd, path, (T **)&args, __penv, *(int *)(__penv+1)); }
+#define __REDIRECT_XFSPAWNLEAT(T, FSpawnveAt, mode, dfd, path, args) { T ***__penv = (T ***)&args; while (*__penv++); return FSpawnveAt(mode, dfd, path, (T **)&args, *__penv, *(int *)(__penv + 1)); }
 #else /* Arch... */
 #include <hybrid/__alloca.h>
 #include <hybrid/typecore.h>

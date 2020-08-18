@@ -249,7 +249,7 @@ done_tmpfs:
 			console_set_fgproc();
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
-			execle("/bin/hash", "hash", (char *)NULL, init_envp);
+			execle("/bin/bash", "bash", (char *)NULL, init_envp);
 			dprintf(STDOUT_FILENO, "Failed to launch shell: %s\n", strerror(errno));
 			for (;;) {
 				char buf[1];
