@@ -2235,7 +2235,7 @@ again_read_status:
 						if (wstatus)
 							*wstatus = status.w_status;
 						if (infop) {
-							infop->si_signo  = SIGCLD + 1;
+							infop->si_signo  = SIGCLD;
 							infop->si_errno  = 0;
 							infop->si_code   = WIFCONTINUED(status)
 							                 ? CLD_CONTINUED

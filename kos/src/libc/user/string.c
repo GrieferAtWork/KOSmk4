@@ -257,6 +257,7 @@ NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum)
 /*[[[body:libc_strsignal_s]]]*/
 {
 	char const *result;
+	--signum; /* Signal #0 isn't actually a valid signal. */
 	if ((unsigned int)signum >= COMPILER_LENOF(strsignal_offsets_db))
 		return NULL;
 	result = (char const *)((byte_t const *)&strsignal_names_db +

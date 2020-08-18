@@ -129,7 +129,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 			                NULL,
 			                NULL,
 			                NULL,
-			                UNWIND_SUCCESS);
+			                unwind_error);
 		} else if (unwind_error == UNWIND_SUCCESS) {
 			/* Coredump caused by a signal. */
 			siginfo_t si;
