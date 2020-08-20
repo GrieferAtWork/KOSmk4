@@ -86,6 +86,9 @@ BEGIN
 //		"../../libviocore/*.c", /* Empty folder... */
 		"../../libviocore/arch/" + XARCH + "/*.c",
 
+		/* Required for: Video mode switching within the builtin debugger */
+		"../../libvgastate/*.c",
+
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",
 		"debugger-apps/*.c",

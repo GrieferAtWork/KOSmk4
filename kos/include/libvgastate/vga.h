@@ -1,0 +1,89 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _LIBVGASTATE_VGA_H
+#define _LIBVGASTATE_VGA_H 1
+
+#include "api.h"
+/**/
+
+#include <bits/types.h>
+#include <hw/video/vga.h>
+
+/* libvgastate:
+ *
+ * A (from the outside) simple utility library that only has 4 functions:
+ *
+ * Save whatever the current display mode might be, such that it can
+ * be restored at a later point in time using `vga_state_load()'
+ * This includes extended VGA modes, such as VESA, and the like, as
+ * well as the contents of display memory (at least those that may
+ * be modified by text-mode font data, as well as text memory; s.a.
+ * the function `vga_state_text()' below)
+ *  - unsigned int vga_state_save(struct vga_state *self);
+ *
+ * Restore the VGA state, as previously saved by `vga_state_save()'
+ *  - unsigned int vga_state_load(struct vga_state const *self);
+ *
+ * Finalize a vga_state previously initialized by `vga_state_save()'
+ *  - void vga_state_fini(struct vga_state *self);
+ *
+ * Force the display into 80x25, ANSI-compliant text-mode. The VGA
+ * buffer itself can be found in physical memory at 0xb8000
+ *  - unsigned int vga_state_text(void);
+ *
+ * unsigned int-return values are one of `VGA_STATE_ERROR_*'
+ */
+
+
+#define VGA_STATE_ERROR_SUCCESS 0 /* Success */
+#define VGA_STATE_ERROR_IO      1 /* I/O error */
+#define VGA_STATE_ERROR_NOMEM   2 /* Insufficient memory */
+#ifndef __KERNEL__
+#define VGA_STATE_ERROR_ACCES   3 /* Access denied */
+#endif /* !__KERNEL__ */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct vga_state {
+	struct vga_mode       vs_mode;          /* VGA display mode. */
+	struct vga_palette256 vs_pal;           /* VGA palette. */
+	struct vga_font       vs_font;          /* VGA font memory. */
+	__uint16_t            vs_text[80 * 25]; /* VGA text memory. */
+	/* TODO: Extended VGA modes (VESA, etc...) */
+};
+
+
+typedef __ATTR_NONNULL((1)) unsigned int /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_SAVE)(struct vga_state *__restrict self);
+typedef __ATTR_NONNULL((1)) unsigned int /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_LOAD)(struct vga_state const *__restrict self);
+typedef __ATTR_NONNULL((1)) void /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_FINI)(struct vga_state const *__restrict self);
+typedef unsigned int /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_TEXT)(void);
+
+#ifdef LIBVGASTATE_WANT_PROTOTYPES
+LIBVGASTATE_DECL __ATTR_NONNULL((1)) unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_save)(struct vga_state *__restrict self);
+LIBVGASTATE_DECL __ATTR_NONNULL((1)) unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_load)(struct vga_state const *__restrict self);
+LIBVGASTATE_DECL __ATTR_NONNULL((1)) void __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_fini)(struct vga_state const *__restrict self);
+LIBVGASTATE_DECL unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_text)(void);
+#endif /* LIBVGASTATE_WANT_PROTOTYPES */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_LIBVGASTATE_VGA_H */

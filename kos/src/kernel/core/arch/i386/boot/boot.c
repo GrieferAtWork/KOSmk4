@@ -302,11 +302,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Evaluate commandline options defined as `DEFINE_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_stable();
 
-#ifndef CONFIG_NO_DEBUGGER
-	/* Before loading drivers proper, copy the BIOS's VGA font. */
-	x86_initialize_debugger_textfont();
-#endif /* !CONFIG_NO_DEBUGGER */
-
 	/* Initialize builtin core drivers. */
 	kernel_initialize_devfs_driver();
 	kernel_initialize_pci_driver();

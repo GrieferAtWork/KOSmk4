@@ -55,6 +55,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <unicode.h>
 
 #include <libansitty/ansitty.h>
+#include <libvgastate/vga.h>
 
 DECL_BEGIN
 
@@ -337,8 +338,9 @@ NOTHROW(FCALL vga_backlog_setscrollpos)(unsigned int pos) {
 		                            maxpos);
 		dest = vga_terminal_end - len;
 		for (i = 0; i < len; ++i) {
-			dest[i] = (u16)(u8)buf[i] | ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY,
-			                                           ANSITTY_CL_DARK_GRAY);
+			dest[i] = (u16)(u8)buf[i] |
+			          ((u16)ANSITTY_PALETTE_INDEX(ANSITTY_CL_LIGHT_GRAY,
+			                                      ANSITTY_CL_DARK_GRAY) << 8);
 		}
 	}
 #endif
@@ -1361,167 +1363,6 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(FCALL vga_unmap)(void) {
 }
 
 
-PRIVATE NOBLOCK void
-NOTHROW(FCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
-	unsigned int i;
-	u8 temp, qr1;
-	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
-
-	/* Turn off the screen. */
-	vga_wseq(VGA_SEQ_RESET, 0x1);
-	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1 | VGA_SR01_FSCREEN_OFF);
-	vga_wseq(VGA_SEQ_RESET, 0x3);
-
-	/* Enable graphics mode. */
-	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x00);
-	vga_r(VGA_IS1_RC), temp = vga_rattr(VGA_ATC_MODE);
-	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_MODE, (temp & VGA_AT10_FRESERVED) | mode->vm_att_mode);
-	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_OVERSCAN, mode->vm_att_overscan);
-	vga_r(VGA_IS1_RC), temp = vga_rattr(VGA_ATC_PLANE_ENABLE);
-	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_PLANE_ENABLE, (temp & VGA_AT12_FRESERVED) | mode->vm_att_plane_enable);
-	vga_r(VGA_IS1_RC), temp = vga_rattr(VGA_ATC_PEL);
-	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_PEL, (temp & VGA_AT13_FRESERVED) | mode->vm_att_pel);
-	vga_r(VGA_IS1_RC), temp = vga_rattr(VGA_ATC_COLOR_PAGE);
-	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_COLOR_PAGE, (temp & VGA_AT14_FRESERVED) | mode->vm_att_color_page);
-	for (i = 0; i < 16; ++i) {
-		vga_r(VGA_IS1_RC);
-		temp = vga_rattr(VGA_ATC_PALETTE0 + i);
-		vga_r(VGA_IS1_RC);
-		vga_wattr(VGA_ATC_PALETTE0 + i,
-		          (temp & VGA_ATC_PALETTEn_FRESERVED) |
-		          mode->vm_att_pal[i]);
-	}
-	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x20);
-
-	temp = vga_r(VGA_MIS_R);
-	vga_w(VGA_MIS_W, (temp & VGA_MIS_FRESERVED) | mode->vm_mis);
-
-	temp = vga_rseq(VGA_SEQ_PLANE_WRITE);
-	vga_wseq(VGA_SEQ_PLANE_WRITE, (temp & VGA_SR02_FRESERVED) | mode->vm_seq_plane_write);
-	temp = vga_rseq(VGA_SEQ_CHARACTER_MAP);
-	vga_wseq(VGA_SEQ_CHARACTER_MAP, (temp & VGA_SR03_FRESERVED) | mode->vm_seq_character_map);
-	temp = vga_rseq(VGA_SEQ_MEMORY_MODE);
-	vga_wseq(VGA_SEQ_MEMORY_MODE, (temp & VGA_SR04_FRESERVED) | mode->vm_seq_memory_mode);
-
-	temp = vga_rgfx(VGA_GFX_SR_VALUE), vga_wgfx(VGA_GFX_SR_VALUE, (temp & VGA_GR00_FRESERVED) | mode->vm_gfx_sr_value);
-	temp = vga_rgfx(VGA_GFX_SR_ENABLE), vga_wgfx(VGA_GFX_SR_ENABLE, (temp & VGA_GR01_FRESERVED) | mode->vm_gfx_sr_enable);
-	temp = vga_rgfx(VGA_GFX_COMPARE_VALUE), vga_wgfx(VGA_GFX_COMPARE_VALUE, (temp & VGA_GR02_FRESERVED) | mode->vm_gfx_compare_value);
-	temp = vga_rgfx(VGA_GFX_DATA_ROTATE), vga_wgfx(VGA_GFX_DATA_ROTATE, (temp & VGA_GR03_FRESERVED) | mode->vm_gfx_data_rotate);
-	temp = vga_rgfx(VGA_GFX_PLANE_READ), vga_wgfx(VGA_GFX_PLANE_READ, (temp & VGA_GR04_FRESERVED) | mode->vm_gfx_plane_read);
-	temp = vga_rgfx(VGA_GFX_MODE), vga_wgfx(VGA_GFX_MODE, (temp & VGA_GR05_FRESERVED) | mode->vm_gfx_mode);
-	temp = vga_rgfx(VGA_GFX_MISC), vga_wgfx(VGA_GFX_MISC, (temp & VGA_GR06_FRESERVED) | mode->vm_gfx_misc);
-	temp = vga_rgfx(VGA_GFX_COMPARE_MASK), vga_wgfx(VGA_GFX_COMPARE_MASK, (temp & VGA_GR07_FRESERVED) | mode->vm_gfx_compare_mask);
-	vga_wgfx(VGA_GFX_BIT_MASK, mode->vm_gfx_bit_mask);
-
-	/* Apply new graphics settings. */
-	vga_wcrt(VGA_CRTC_H_TOTAL, mode->vm_crt_h_total);
-	vga_wcrt(VGA_CRTC_H_DISP, mode->vm_crt_h_disp);
-	vga_wcrt(VGA_CRTC_H_BLANK_START, mode->vm_crt_h_blank_start);
-	vga_wcrt(VGA_CRTC_H_BLANK_END, mode->vm_crt_h_blank_end);
-	vga_wcrt(VGA_CRTC_H_SYNC_START, mode->vm_crt_h_sync_start);
-	vga_wcrt(VGA_CRTC_H_SYNC_END, mode->vm_crt_h_sync_end);
-	vga_wcrt(VGA_CRTC_V_TOTAL, mode->vm_crt_v_total);
-	vga_wcrt(VGA_CRTC_OVERFLOW, mode->vm_crt_overflow);
-	temp = vga_rcrt(VGA_CRTC_PRESET_ROW);
-	vga_wcrt(VGA_CRTC_PRESET_ROW, (temp & VGA_CR8_FRESERVED) | mode->vm_crt_preset_row);
-	vga_wcrt(VGA_CRTC_MAX_SCAN, mode->vm_crt_max_scan);
-	vga_wcrt(VGA_CRTC_V_SYNC_START, mode->vm_crt_v_sync_start);
-	temp = vga_rcrt(VGA_CRTC_V_SYNC_END);
-	vga_wcrt(VGA_CRTC_V_SYNC_END, (temp & VGA_CR11_FRESERVED) | mode->vm_crt_v_sync_end);
-	vga_wcrt(VGA_CRTC_V_DISP_END, mode->vm_crt_v_disp_end);
-	vga_wcrt(VGA_CRTC_OFFSET, mode->vm_crt_offset);
-	vga_wcrt(VGA_CRTC_UNDERLINE, mode->vm_crt_underline);
-	vga_wcrt(VGA_CRTC_V_BLANK_START, mode->vm_crt_v_blank_start);
-	temp = vga_rcrt(VGA_CRTC_V_BLANK_END);
-	vga_wcrt(VGA_CRTC_V_BLANK_END, (temp & VGA_CR16_FRESERVED) | mode->vm_crt_v_blank_end);
-	temp = vga_rcrt(VGA_CRTC_MODE);
-	vga_wcrt(VGA_CRTC_MODE, (temp & VGA_CR17_FRESERVED) | mode->vm_crt_mode);
-	vga_wcrt(VGA_CRTC_LINE_COMPARE, mode->vm_crt_line_compare);
-
-	/* Turn the screen back on. */
-	vga_wseq(VGA_SEQ_RESET, 0x1);
-	vga_wseq(VGA_SEQ_CLOCK_MODE,
-	         (qr1 & VGA_SR01_FRESERVED) |
-	         (mode->vm_seq_clock_mode & ~VGA_SR01_FSCREEN_OFF));
-	vga_wseq(VGA_SEQ_RESET, 0x3);
-}
-
-
-PRIVATE NOBLOCK void
-NOTHROW(FCALL VGA_GetMode)(struct vga_mode *__restrict mode) {
-	unsigned int i;
-	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x00);
-	vga_r(VGA_IS1_RC), mode->vm_att_mode         = vga_rattr(VGA_ATC_MODE) & ~VGA_AT10_FRESERVED;
-	vga_r(VGA_IS1_RC), mode->vm_att_overscan     = vga_rattr(VGA_ATC_OVERSCAN);
-	vga_r(VGA_IS1_RC), mode->vm_att_plane_enable = vga_rattr(VGA_ATC_PLANE_ENABLE) & ~VGA_AT12_FRESERVED;
-	vga_r(VGA_IS1_RC), mode->vm_att_pel          = vga_rattr(VGA_ATC_PEL) & ~VGA_AT13_FRESERVED;
-	vga_r(VGA_IS1_RC), mode->vm_att_color_page   = vga_rattr(VGA_ATC_COLOR_PAGE) & ~VGA_AT14_FRESERVED;
-	for (i = 0; i < 16; ++i) {
-		vga_r(VGA_IS1_RC);
-		mode->vm_att_pal[i] = vga_rattr(VGA_ATC_PALETTE0 + i) & ~VGA_ATC_PALETTEn_FRESERVED;
-	}
-	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x20);
-
-	mode->vm_mis               = vga_r(VGA_MIS_R) & ~VGA_MIS_FRESERVED;
-	mode->vm_gfx_sr_value      = vga_rgfx(VGA_GFX_SR_VALUE) & ~VGA_GR00_FRESERVED;
-	mode->vm_gfx_sr_enable     = vga_rgfx(VGA_GFX_SR_ENABLE) & ~VGA_GR01_FRESERVED;
-	mode->vm_gfx_compare_value = vga_rgfx(VGA_GFX_COMPARE_VALUE) & ~VGA_GR02_FRESERVED;
-	mode->vm_gfx_data_rotate   = vga_rgfx(VGA_GFX_DATA_ROTATE) & ~VGA_GR03_FRESERVED;
-	mode->vm_gfx_plane_read    = vga_rgfx(VGA_GFX_PLANE_READ) & ~VGA_GR04_FRESERVED;
-	mode->vm_gfx_mode          = vga_rgfx(VGA_GFX_MODE) & ~VGA_GR05_FRESERVED;
-	mode->vm_gfx_misc          = vga_rgfx(VGA_GFX_MISC) & ~VGA_GR06_FRESERVED;
-	mode->vm_gfx_compare_mask  = vga_rgfx(VGA_GFX_COMPARE_MASK) & ~VGA_GR07_FRESERVED;
-	mode->vm_gfx_bit_mask      = vga_rgfx(VGA_GFX_BIT_MASK);
-	mode->vm_crt_h_total       = vga_rcrt(VGA_CRTC_H_TOTAL);
-	mode->vm_crt_h_disp        = vga_rcrt(VGA_CRTC_H_DISP);
-	mode->vm_crt_h_blank_start = vga_rcrt(VGA_CRTC_H_BLANK_START);
-	mode->vm_crt_h_blank_end   = vga_rcrt(VGA_CRTC_H_BLANK_END);
-	mode->vm_crt_h_sync_start  = vga_rcrt(VGA_CRTC_H_SYNC_START);
-	mode->vm_crt_h_sync_end    = vga_rcrt(VGA_CRTC_H_SYNC_END);
-	mode->vm_crt_v_total       = vga_rcrt(VGA_CRTC_V_TOTAL);
-	mode->vm_crt_overflow      = vga_rcrt(VGA_CRTC_OVERFLOW);
-	mode->vm_crt_preset_row    = vga_rcrt(VGA_CRTC_PRESET_ROW) & ~VGA_CR8_FRESERVED;
-	mode->vm_crt_max_scan      = vga_rcrt(VGA_CRTC_MAX_SCAN);
-	mode->vm_crt_v_sync_start  = vga_rcrt(VGA_CRTC_V_SYNC_START);
-	mode->vm_crt_v_sync_end    = vga_rcrt(VGA_CRTC_V_SYNC_END) & ~VGA_CR11_FRESERVED;
-	mode->vm_crt_v_disp_end    = vga_rcrt(VGA_CRTC_V_DISP_END);
-	mode->vm_crt_offset        = vga_rcrt(VGA_CRTC_OFFSET);
-	mode->vm_crt_underline     = vga_rcrt(VGA_CRTC_UNDERLINE);
-	mode->vm_crt_v_blank_start = vga_rcrt(VGA_CRTC_V_BLANK_START);
-	mode->vm_crt_v_blank_end   = vga_rcrt(VGA_CRTC_V_BLANK_END) & ~VGA_CR16_FRESERVED;
-	mode->vm_crt_mode          = vga_rcrt(VGA_CRTC_MODE) & ~VGA_CR17_FRESERVED;
-	mode->vm_crt_line_compare  = vga_rcrt(VGA_CRTC_LINE_COMPARE);
-	mode->vm_seq_plane_write   = vga_rseq(VGA_SEQ_PLANE_WRITE) & ~VGA_SR02_FRESERVED;
-	mode->vm_seq_character_map = vga_rseq(VGA_SEQ_CHARACTER_MAP) & ~VGA_SR03_FRESERVED;
-	mode->vm_seq_memory_mode   = vga_rseq(VGA_SEQ_MEMORY_MODE) & ~VGA_SR04_FRESERVED;
-	mode->vm_seq_clock_mode    = vga_rseq(VGA_SEQ_CLOCK_MODE) & ~VGA_SR01_FRESERVED;
-}
-
-
-PRIVATE ATTR_DBGTEXT void
-NOTHROW(FCALL VGA_SetPalette)(void const *__restrict pal, size_t num_bytes) {
-	unsigned int i;
-	assert(num_bytes <= 768);
-	vga_w(VGA_PEL_MSK, 0xff);
-	vga_w(VGA_PEL_IW, 0x00);
-	for (i = 0; i < num_bytes; ++i)
-		vga_w(VGA_PEL_D, ((u8 *)pal)[i]);
-	for (; i < 768; ++i)
-		vga_w(VGA_PEL_D, 0);
-}
-
-PRIVATE ATTR_DBGTEXT void
-NOTHROW(FCALL VGA_GetPalette)(void *__restrict pal, size_t num_bytes) {
-	unsigned int i;
-	assert(num_bytes <= 768);
-	vga_w(VGA_PEL_MSK, 0xff);
-	vga_w(VGA_PEL_IR, 0x00);
-	for (i = 0; i < num_bytes; ++i)
-		((u8 *)pal)[i] = vga_r(VGA_PEL_D);
-	for (; i < 768; ++i)
-		vga_r(VGA_PEL_D);
-}
-
 PRIVATE ATTR_DBGTEXT byte_t *
 NOTHROW(FCALL vga_vram)(u32 vram_offset) {
 	u32 offset;
@@ -1552,74 +1393,6 @@ NOTHROW(FCALL vga_vram)(u32 vram_offset) {
 	return (byte_t *)vga_real_terminal_start + offset;
 }
 
-
-PRIVATE ATTR_DBGTEXT void
-NOTHROW(FCALL VGA_SetFont)(struct vga_font const *__restrict font) {
-	unsigned int i;
-	u32 dst = 0;
-	u8 old_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
-	u8 old_seq_memory_mode = vga_rseq(VGA_SEQ_MEMORY_MODE);
-	u8 old_gfx_plane_read  = vga_rgfx(VGA_GFX_PLANE_READ);
-	u8 old_gfx_mode        = vga_rgfx(VGA_GFX_MODE);
-	u8 old_gfx_sr_enable   = vga_rgfx(VGA_GFX_SR_ENABLE);
-	u8 old_gfx_sr_value    = vga_rgfx(VGA_GFX_SR_VALUE);
-	u8 old_gfx_bit_mask    = vga_rgfx(VGA_GFX_BIT_MASK);
-	u8 old_gfx_data_rotate = vga_rgfx(VGA_GFX_DATA_ROTATE);
-	u8 old_gfx_misc        = vga_rgfx(VGA_GFX_MISC);
-	vga_wseq(VGA_SEQ_PLANE_WRITE, (old_seq_plane_write & VGA_SR02_FRESERVED) | VGA_SR02_FPLANE(2));
-	vga_wseq(VGA_SEQ_MEMORY_MODE, (old_seq_memory_mode & VGA_SR04_FRESERVED) |
-	                              (VGA_SR04_FEXT_MEM | VGA_SR04_FSEQ_MODE));
-	vga_wgfx(VGA_GFX_PLANE_READ, (old_gfx_plane_read & VGA_GR04_FRESERVED) | 0x02);
-	vga_wgfx(VGA_GFX_MODE, (old_gfx_mode & VGA_GR05_FRESERVED) | 0x00);
-	vga_wgfx(VGA_GFX_SR_ENABLE, (old_gfx_sr_enable & VGA_GR01_FRESERVED) | 0x00);
-	vga_wgfx(VGA_GFX_SR_VALUE, (old_gfx_sr_value & VGA_GR00_FRESERVED) | 0x00);
-	vga_wgfx(VGA_GFX_BIT_MASK, 0xff);
-	vga_wgfx(VGA_GFX_DATA_ROTATE, (old_gfx_data_rotate & VGA_GR03_FRESERVED) | 0x00);
-	vga_wgfx(VGA_GFX_MISC, (old_gfx_misc & VGA_GR06_FRESERVED) |
-	                       (VGA_GR06_FGRAPHICS_MODE | VGA_GR06_FMM_64K));
-	for (i = 0; i < 256; ++i) {
-		memcpy(vga_vram(dst), &font->vf_blob[i], 16);
-		dst += 32;
-	}
-	vga_wseq(VGA_SEQ_PLANE_WRITE, old_seq_plane_write);
-	vga_wseq(VGA_SEQ_MEMORY_MODE, old_seq_memory_mode);
-	vga_wgfx(VGA_GFX_PLANE_READ, old_gfx_plane_read);
-	vga_wgfx(VGA_GFX_MODE, old_gfx_mode);
-	vga_wgfx(VGA_GFX_SR_ENABLE, old_gfx_sr_enable);
-	vga_wgfx(VGA_GFX_SR_VALUE, old_gfx_sr_value);
-	vga_wgfx(VGA_GFX_BIT_MASK, old_gfx_bit_mask);
-	vga_wgfx(VGA_GFX_DATA_ROTATE, old_gfx_data_rotate);
-	vga_wgfx(VGA_GFX_MISC, old_gfx_misc);
-}
-
-PRIVATE ATTR_DBGTEXT void
-NOTHROW(FCALL VGA_GetFont)(struct vga_font *__restrict font) {
-	unsigned int i;
-	u32 src = 0;
-	u8 old_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
-	u8 old_seq_memory_mode = vga_rseq(VGA_SEQ_MEMORY_MODE);
-	u8 old_gfx_plane_read  = vga_rgfx(VGA_GFX_PLANE_READ);
-	u8 old_gfx_mode        = vga_rgfx(VGA_GFX_MODE);
-	u8 old_gfx_misc        = vga_rgfx(VGA_GFX_MISC);
-	vga_wseq(VGA_SEQ_PLANE_WRITE, (old_seq_plane_write & VGA_SR02_FRESERVED) | VGA_SR02_FPLANE(2));
-	vga_wseq(VGA_SEQ_MEMORY_MODE, (old_seq_memory_mode & VGA_SR04_FRESERVED) |
-	                              (VGA_SR04_FEXT_MEM | VGA_SR04_FSEQ_MODE));
-	vga_wgfx(VGA_GFX_PLANE_READ, (old_gfx_plane_read & VGA_GR04_FRESERVED) | 0x02);
-	vga_wgfx(VGA_GFX_MODE, (old_gfx_mode & VGA_GR05_FRESERVED) | 0x00);
-	vga_wgfx(VGA_GFX_MISC, (old_gfx_misc & VGA_GR06_FRESERVED) |
-	                       (VGA_GR06_FGRAPHICS_MODE | VGA_GR06_FMM_64K));
-	for (i = 0; i < 256; ++i) {
-		memcpy(&font->vf_blob[i], vga_vram(src), 16);
-		src += 32;
-	}
-	vga_wseq(VGA_SEQ_PLANE_WRITE, old_seq_plane_write);
-	vga_wseq(VGA_SEQ_MEMORY_MODE, old_seq_memory_mode);
-	vga_wgfx(VGA_GFX_PLANE_READ, old_gfx_plane_read);
-	vga_wgfx(VGA_GFX_MODE, old_gfx_mode);
-	vga_wgfx(VGA_GFX_MISC, old_gfx_misc);
-}
-
-
 struct vga_cursor_regs {
 	u8 crtc_cursor_start;
 	u8 crtc_cursor_hi;
@@ -1641,26 +1414,9 @@ NOTHROW(FCALL VGA_SetCursor)(struct vga_cursor_regs const *__restrict self) {
 }
 
 
-PRIVATE ATTR_DBGRODATA struct vga_palette16 const vga_biospal = VGA_PALETTE_CGA_INIT;
-PRIVATE ATTR_DBGRODATA struct vga_mode const vga_textmode = VGA_BIOTEXT80x25_MODE_INIT(VGA_PALINDX_CGA_ANSI_INIT);
-PRIVATE ATTR_DBGBSS struct vga_font vga_textfont = {};
-PRIVATE ATTR_DBGBSS struct vga_mode vga_oldmode = {};
-PRIVATE ATTR_DBGBSS struct vga_cursor_regs vga_oldcursor = {};
-PRIVATE ATTR_DBGBSS struct vga_font vga_oldfont = {};
-PRIVATE ATTR_DBGBSS struct vga_palette256 vga_oldpal = {};
-PRIVATE ATTR_DBGBSS u16 vga_oldtext[VGA_WIDTH * VGA_HEIGHT] = {};
-
-PRIVATE ATTR_DBGBSS bool vga_did_initialized_textfont = false;
+PRIVATE ATTR_DBGBSS struct vga_state vga_oldstate = {};
 PRIVATE ATTR_DBGBSS bool vga_showscreen_enabled = false;
 PRIVATE ATTR_DBGBSS struct vga_cursor_regs vga_showscreen_oldcursor = {};
-
-INTERN ATTR_FREETEXT void
-NOTHROW(KCALL x86_initialize_debugger_textfont)(void) {
-	vga_map();
-	VGA_GetFont(&vga_textfont);
-	vga_unmap();
-	vga_did_initialized_textfont = true;
-}
 
 
 /* TTY show-screen support (display the contents of the monitor before the debugger was enabled)
@@ -1674,22 +1430,14 @@ PUBLIC void NOTHROW(FCALL dbg_beginshowscreen)(void) {
 		VGA_GetCursor(&vga_showscreen_oldcursor);
 		vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
 		memcpyw(vga_backlog_screen, vga_real_terminal_start, VGA_WIDTH * VGA_HEIGHT);
-		memcpyw(vga_real_terminal_start, vga_oldtext, VGA_WIDTH * VGA_HEIGHT);
-		if (vga_did_initialized_textfont)
-			VGA_SetFont(&vga_oldfont);
-		VGA_SetPalette(&vga_oldpal, sizeof(vga_oldpal));
-		VGA_SetMode(&vga_oldmode);
-		VGA_SetCursor(&vga_oldcursor);
+		vga_state_load(&vga_oldstate);
 		vga_showscreen_enabled = true;
 	}
 }
 
 PUBLIC void NOTHROW(FCALL dbg_endshowscreen)(void) {
 	if (vga_showscreen_enabled) {
-		VGA_SetMode(&vga_textmode);
-		VGA_SetPalette(&vga_biospal, sizeof(vga_biospal));
-		if (vga_did_initialized_textfont)
-			VGA_SetFont(&vga_textfont);
+		vga_state_text();
 		vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
 		memcpyw(vga_real_terminal_start, vga_backlog_screen, VGA_WIDTH * VGA_HEIGHT);
 		vga_showscreen_enabled = false;
@@ -1700,43 +1448,17 @@ PUBLIC void NOTHROW(FCALL dbg_endshowscreen)(void) {
 
 INTERN ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_initialize_tty)(void) {
-	/* Map a portion of VRAM into memory. */
-	vga_map();
-	/* Save the old VGA mode. */
-	VGA_GetCursor(&vga_oldcursor);
-	VGA_GetMode(&vga_oldmode);
-	/* Save the old VGA palette. */
-	VGA_GetPalette(&vga_oldpal, sizeof(vga_oldpal));
-	/* Save the old VGA font (or whatever is stored where the font goes). */
-	if (vga_did_initialized_textfont)
-		VGA_GetFont(&vga_oldfont);
-	/* Set 80x25 text mode. */
-	VGA_SetMode(&vga_textmode);
-	/* Set the expected color palette. */
-	VGA_SetPalette(&vga_biospal, sizeof(vga_biospal));
-	/* Save the old text display contents. */
+	vga_map();                     /* Map a portion of VRAM into memory. */
+	vga_state_save(&vga_oldstate); /* Save the old VGA mode. */
 	vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
-	memcpyw(vga_oldtext, vga_real_terminal_start, VGA_WIDTH * VGA_HEIGHT);
-	/* Set the font originally defined by the BIOS. */
-	if (vga_did_initialized_textfont)
-		VGA_SetFont(&vga_textfont);
 }
 
 INTERN ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_finalize_tty)(void) {
 	/* Make sure we're not in show-screen mode. */
 	dbg_endshowscreen();
-	/* Restore font memory. */
-	if (vga_did_initialized_textfont)
-		VGA_SetFont(&vga_oldfont);
-	/* Restore the old text display contents. */
-	vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
-	memcpyw(vga_real_terminal_start, vga_oldtext, VGA_WIDTH * VGA_HEIGHT);
-	/* Restore the old color palette */
-	VGA_SetPalette(&vga_oldpal, sizeof(vga_oldpal));
-	/* Restore the old video mode */
-	VGA_SetMode(&vga_oldmode);
-	VGA_SetCursor(&vga_oldcursor);
+	vga_state_load(&vga_oldstate);
+	vga_state_fini(&vga_oldstate);
 	/* Unmap video memory. */
 	vga_unmap();
 }
@@ -1745,6 +1467,7 @@ INTERN ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_reset_tty)(void) {
 	/* Make sure we're not in show-screen mode from before. */
 	dbg_endshowscreen();
+	vga_state_text(); /* Ensure that we're in text-mode */
 	vga_vram_offset = 0;
 	vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
 	ansitty_init(&dbg_tty, &vga_tty_operators);

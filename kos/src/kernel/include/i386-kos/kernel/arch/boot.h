@@ -78,9 +78,6 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_kernel_vm_unmap)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_sysenter)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_rand_entropy)(void);
-#ifndef CONFIG_NO_DEBUGGER
-INTERN FREE void NOTHROW(KCALL x86_initialize_debugger_textfont)(void);
-#endif /* !CONFIG_NO_DEBUGGER */
 #ifdef CONFIG_FPU
 INTDEF FREE void NOTHROW(KCALL x86_initialize_fpu)(void);
 #endif /* CONFIG_FPU */

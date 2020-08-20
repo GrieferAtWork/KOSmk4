@@ -225,6 +225,7 @@ __SYSDECL_BEGIN
 #   define VGA_GR03_FRESERVED       0xe0 /* Mask of reserved registers */
 #define VGA_GFX_PLANE_READ      0x04
 #   define VGA_GR04_FREADMAP        0x03 /* Source plane index in read-mode #0. */
+#   define VGA_GR04_READMAP(i)      (i)  /* Read from the i'th source plane. */
 #   define VGA_GR04_FRESERVED       0xfc /* Mask of reserved registers */
 #define VGA_GFX_MODE            0x05
 #   define VGA_GR05_FWRITEMODE_0    0x00 /* Write mode #0. */
@@ -238,13 +239,14 @@ __SYSDECL_BEGIN
 #   define VGA_GR05_FSHIFT256       0x40 /* ... */
 #   define VGA_GR05_FRESERVED       0x84 /* Mask of reserved registers */
 #define VGA_GFX_MISC            0x06
-#   define VGA_GR06_FRESERVED       0xf0 /* Mask of reserved registers */
+#   define VGA_GR06_FTEXT_MODE      0x00 /* Enable text-mode (as opposed to graphics-mode) */
 #   define VGA_GR06_FGRAPHICS_MODE  0x01 /* Enable graphics-mode (as opposed to text-mode) */
-#   define VGA_GR06_FCHAINOE        0x02 /* ??? */
+#   define VGA_GR06_FCHAINOE        0x02 /* Use address bit #0 to select between even/odd maps */
 #   define VGA_GR06_FMM_128K        0x00 /* A0000h-BFFFFh (128K region) */
 #   define VGA_GR06_FMM_64K         0x04 /* A0000h-AFFFFh (64K region) */
 #   define VGA_GR06_FMM_32K_LO      0x08 /* B0000h-B7FFFh (32K region) */
 #   define VGA_GR06_FMM_32K_HI      0x0c /* B8000h-BFFFFh (32K region) */
+#   define VGA_GR06_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_GFX_COMPARE_MASK    0x07
 #   define VGA_GR07_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_GFX_BIT_MASK        0x08
@@ -426,44 +428,48 @@ struct __ATTR_PACKED vga_mode {
 		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |           \
 		                        VGA_MIS_FCLOCK_28322_720 | VGA_MIS_FHSYNCPOL |       \
 		                        VGA_MIS_FSEL_HIGH_PAGE,                              \
-		.vm_gfx_sr_value      = 0x00,                                                \
-		.vm_gfx_sr_enable     = 0x00,                                                \
+		.vm_gfx_sr_value      = 0x00 & VGA_GR00_FMASK,                               \
+		.vm_gfx_sr_enable     = 0x00 & VGA_GR01_FMASK,                               \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x00,                                                \
-		.vm_gfx_plane_read    = 0x00,                                                \
-		.vm_gfx_mode          = VGA_GR05_FHOSTOE,                                    \
-		.vm_gfx_misc          = VGA_GR06_FCHAINOE | VGA_GR06_FMM_32K_HI,             \
+		.vm_gfx_plane_read    = VGA_GR04_READMAP(0),                                 \
+		.vm_gfx_mode          = VGA_GR05_FWRITEMODE_0 | VGA_GR05_FREADMODE_0 |       \
+		                        VGA_GR05_FHOSTOE,                                    \
+		.vm_gfx_misc          = VGA_GR06_FTEXT_MODE | VGA_GR06_FCHAINOE |            \
+		                        VGA_GR06_FMM_32K_HI,                                 \
 		.vm_gfx_compare_mask  = 0x0f,                                                \
 		.vm_gfx_bit_mask      = 0xff,                                                \
 		.vm_crt_h_total       = 0x5f,                                                \
 		.vm_crt_h_disp        = 0x4f,                                                \
 		.vm_crt_h_blank_start = 0x50,                                                \
-		.vm_crt_h_blank_end   = 0x82,                                                \
+		.vm_crt_h_blank_end   = 0x02 | VGA_CR3_FALWAYS1,                             \
 		.vm_crt_h_sync_start  = 0x55,                                                \
-		.vm_crt_h_sync_end    = 0x81,                                                \
+		.vm_crt_h_sync_end    = 0x01 | VGA_CR5_FH_BLANK_END_5,                       \
 		.vm_crt_v_total       = 0xbf,                                                \
-		.vm_crt_overflow      = 0x1f,                                                \
+		.vm_crt_overflow      = VGA_CR7_FV_TOTAL_8 | VGA_CR7_FV_DISP_END_8 |         \
+		                        VGA_CR7_FV_SYNC_START_8 | VGA_CR7_FV_BLANK_START_8 | \
+		                        VGA_CR7_FV_LINECOMP_8,                               \
 		.vm_crt_preset_row    = 0x00,                                                \
-		.vm_crt_max_scan      = 0x4f,                                                \
-		.vm_crt_cursor_start  = 0x00,                                                \
-		.vm_crt_cursor_end    = 0x00,                                                \
+		.vm_crt_max_scan      = 0x0f | VGA_CR9_FV_LINECOMP_9,                        \
+		.vm_crt_cursor_start  = 0x0d,                                                \
+		.vm_crt_cursor_end    = 0x0e,                                                \
 		.vm_crt_start_hi      = 0x00,                                                \
 		.vm_crt_start_lo      = 0x00,                                                \
 		.vm_crt_cursor_hi     = 0x00,                                                \
 		.vm_crt_cursor_lo     = 0x00,                                                \
 		.vm_crt_v_sync_start  = 0x9c,                                                \
-		.vm_crt_v_sync_end    = 0x8e,                                                \
+		.vm_crt_v_sync_end    = 0x0e | VGA_CR11_FLOCK_CR0_CR7,                       \
 		.vm_crt_v_disp_end    = 0x8f,                                                \
 		.vm_crt_offset        = 0x28,                                                \
 		.vm_crt_underline     = 0x1f,                                                \
 		.vm_crt_v_blank_start = 0x96,                                                \
 		.vm_crt_v_blank_end   = 0x39,                                                \
-		.vm_crt_mode          = 0xa3,                                                \
+		.vm_crt_mode          = 0x23 | VGA_CR17_FH_V_SIGNALS_ENABLED,                \
 		.vm_crt_line_compare  = 0xff,                                                \
 		.vm_seq_clock_mode    = 0x00,                                                \
-		.vm_seq_plane_write   = 0x03,                                                \
+		.vm_seq_plane_write   = VGA_SR02_FPLANE(0) | VGA_SR02_FPLANE(1),             \
 		.vm_seq_character_map = 0x00,                                                \
-		.vm_seq_memory_mode   = 0x02,                                                \
+		.vm_seq_memory_mode   = VGA_SR04_FEXT_MEM,                                   \
 	}
 
 #endif /* __CC__ */
