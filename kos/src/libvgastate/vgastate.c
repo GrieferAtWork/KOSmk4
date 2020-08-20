@@ -1,3 +1,9 @@
+/*[[[magic
+// Optimize this file for size
+local opt = options.setdefault("GCC.options", []);
+opt.removeif([](e) -> e.startswith("-O"));
+//opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,23 +31,37 @@
 #include "api.h"
 /**/
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/io.h>
 
+#include <string.h>
+#include <strings.h>
+
 #include <libvgastate/vga.h>
+#include <libvm86/emulator.h>
 
 #include "vgaio.h"
 #include "vgastate.h"
 
 #ifdef __KERNEL__
+#include <debugger/rt.h>
+#include <kernel/memory.h>
+#include <kernel/paging.h>
+#include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #else /* __KERNEL__ */
+#include <sys/mman.h>
+
 #include <fcntl.h>
+#include <malloc.h>
 #include <unistd.h>
 #endif /* !__KERNEL__ */
+
+#define obzero(obj) bzero(&(obj), sizeof(obj))
 
 DECL_BEGIN
 
@@ -371,6 +391,316 @@ NOTHROW_KERNEL(CC load_vga_text)(u16 const textbuf[80 * 25]) {
 	return result;
 }
 
+/* Base address where the virtual memory mapping for vm86 begins. */
+#define VGA_VM86_SP  0x7c00 /* Grows down: Address for the initial SP-value for the BIOS */
+#define VGA_VM86_BUF 0x7c00 /* Grows up:   Base address of variable-length BIOS data buffers */
+
+#define VGA_VM86_BIOS_SIZE (0xfffff + 1)
+
+typedef struct {
+	vm86_state_t      vv_vm86;       /* The underlying vm86 state. */
+	byte_t           *vv_biosbase;   /* Base address for where we've mapped the BIOS */
+#ifdef __KERNEL__
+	pagedir_pushval_t vv_backup[VGA_VM86_BIOS_SIZE / PAGESIZE]; /* Backup of page directory mappings. */
+#endif /* __KERNEL__ */
+} vga_vm86_state_t;
+
+/* Return the virtual base address of the bios communition data buffer. */
+#define vga_vm86_buffer(self, num_bytes) \
+	((self)->vv_biosbase + VGA_VM86_BUF)
+
+
+PRIVATE unsigned int
+NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
+#ifdef __KERNEL__
+	if (dbg_onstack()) {
+		unsigned int i;
+		byte_t *virt;
+		vm_phys_t phys;
+		self->vv_biosbase = (byte_t *)KERNEL_CORE_BASE;
+		for (i = 0, virt = self->vv_biosbase, phys = 0;
+		     i < VGA_VM86_BIOS_SIZE / PAGESIZE; ++i) {
+			self->vv_backup[i] = pagedir_push_mapone(virt, phys,
+			                                         PAGEDIR_MAP_FREAD |
+			                                         PAGEDIR_MAP_FWRITE);
+			phys += PAGESIZE;
+			virt += PAGESIZE;
+		}
+		pagedir_syncall();
+	} else {
+		if (!PREEMPTION_ENABLED())
+			THROW(E_WOULDBLOCK_PREEMPTED);
+		/* Use a regular memory mapping. */
+		self->vv_biosbase = (byte_t *)vm_map(&vm_kernel,
+		                                     NULL,
+		                                     VGA_VM86_BIOS_SIZE,
+		                                     PAGESIZE,
+		                                     VM_GETFREE_ABOVE | VM_GETFREE_ASLR,
+		                                     &vm_datablock_physical,
+		                                     NULL,
+		                                     NULL,
+		                                     0,
+		                                     VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
+		                                     VM_NODE_FLAG_NOMERGE,
+		                                     0);
+	}
+#else /* __KERNEL__ */
+	void *bios;
+	bios = mmap(NULL, VGA_VM86_BIOS_SIZE, dev_mem, MAP_SHARED, dev_mem, 0);
+	if (bios == MAP_FAILED)
+		return VGA_STATE_ERROR_NOMEM;
+	self->vv_biosbase = (byte_t *)bios;
+#endif /* !__KERNEL__ */
+	return VGA_STATE_ERROR_SUCCESS;
+}
+
+PRIVATE void
+NOTHROW(CC vga_vm86_state_fini)(vga_vm86_state_t *__restrict self) {
+#ifdef __KERNEL__
+	if (dbg_onstack()) {
+		unsigned int i;
+		byte_t *virt;
+		for (i = 0, virt = self->vv_biosbase;
+		     i < VGA_VM86_BIOS_SIZE / PAGESIZE; ++i) {
+			pagedir_pop_mapone(virt, self->vv_backup[i]);
+			virt += PAGESIZE;
+		}
+	} else {
+		vm_unmap(&vm_kernel,
+		         self->vv_biosbase,
+		         VGA_VM86_BIOS_SIZE);
+	}
+#else /* __KERNEL__ */
+	munmap(self->vv_biosbase, VGA_VM86_BIOS_SIZE);
+#endif /* !__KERNEL__ */
+}
+
+
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) void *LIBVM86_TRANSLATE_CC
+vm86_translate(vga_vm86_state_t *__restrict self, void *ptr) {
+	return self->vv_biosbase + (uintptr_t)ptr;
+}
+
+PRIVATE int LIBVM86_CC
+vm86_io(vm86_state_t *__restrict UNUSED(self),
+        u16 port, unsigned int action,
+        void *data) {
+	int result = VM86_SUCCESS;
+	switch (action) {
+	case VM86_HANDLE_IO_INB:
+		*(uint8_t *)data = inb((port_t)port);
+		break;
+	case VM86_HANDLE_IO_INW:
+		*(uint16_t *)data = inw((port_t)port);
+		break;
+	case VM86_HANDLE_IO_INL:
+		*(uint32_t *)data = inl((port_t)port);
+		break;
+	case VM86_HANDLE_IO_OUTB:
+		outb((port_t)port, *(uint8_t *)data);
+		break;
+	case VM86_HANDLE_IO_OUTW:
+		outw((port_t)port, *(uint16_t *)data);
+		break;
+	case VM86_HANDLE_IO_OUTL:
+		outl((port_t)port, *(uint32_t *)data);
+		break;
+	default:
+		result = VM86_BADPORT;
+		break;
+	}
+	return result;
+}
+
+PRIVATE bool
+NOTHROW_KERNEL(CC bios_interrupt)(vga_vm86_state_t *__restrict self, u8 intno) {
+	int error;
+	self->vv_vm86.vr_trans       = (vm86_translate_t)&vm86_translate;
+	self->vv_vm86.vr_io          = &vm86_io;
+	self->vv_vm86.vr_intr        = NULL;
+	self->vv_vm86.vr_regs.vr_esp = VGA_VM86_SP & 0xffff;
+	self->vv_vm86.vr_regs.vr_ss  = (VGA_VM86_SP & 0xf0000) >> 4;
+	self->vv_vm86.vr_regs.vr_eip = 0xffff;
+	self->vv_vm86.vr_regs.vr_cs  = 0xffff;
+	/* Generate a software interrupt */
+	error = vm86_intr(&self->vv_vm86, intno);
+	if (error != VM86_SUCCESS)
+		return false;
+	/* Execute VM86 code. */
+	error = vm86_exec(&self->vv_vm86);
+	return error == VM86_SUCCESS ||
+	       error == VM86_STOPPED;
+}
+
+
+#ifdef __KERNEL__
+#define BIOS_BUF_NULL                                page2addr(PAGEPTR_INVALID)
+#define BIOS_BUF_ALLOC(num_bytes)                    page2addr(page_malloc(CEILDIV(num_bytes, PAGESIZE)))
+#define BIOS_BUF_FREE(buf, num_bytes)                page_free(addr2page(buf), CEILDIV(num_bytes, PAGESIZE))
+#define BIOS_BUF_PREAD(buf, dst, num_bytes, offset)  vm_copyfromphys(dst, (buf) + (offset), num_bytes)
+#define BIOS_BUF_PWRITE(buf, src, num_bytes, offset) vm_copytophys((buf) + (offset), src, num_bytes)
+#else /* __KERNEL__ */
+#define BIOS_BUF_NULL                                NULL
+#define BIOS_BUF_ALLOC(num_bytes)                    ((__byte_t *)malloc(num_bytes))
+#define BIOS_BUF_FREE(buf, num_bytes)                free(buf)
+#define BIOS_BUF_PREAD(buf, dst, num_bytes, offset)  memcpy(dst, (__byte_t *)(buf) + (offset), num_bytes)
+#define BIOS_BUF_PWRITE(buf, src, num_bytes, offset) memcpy((__byte_t *)(buf) + (offset), src, num_bytes)
+#endif /* !__KERNEL__ */
+
+
+
+/* s.a. http://www.ctyme.com/intr/rb-0277.htm */
+PRIVATE NONNULL((1, 2)) bool
+NOTHROW_KERNEL(CC bios_save_vesa_state)(vga_vm86_state_t *__restrict vs,
+                                        struct vga_bios *__restrict self) {
+	vga_bios_buf_t buf;
+	size_t bufsize;
+	byte_t *vmbuf;
+	obzero(vs->vv_vm86.vr_regs);
+	vs->vv_vm86.vr_regs.vr_ax = 0x4f04;
+	vs->vv_vm86.vr_regs.vr_cx = 0xf;
+	vs->vv_vm86.vr_regs.vr_dl = 0;
+	/* get state buffer size (in %bx, as 64-byte blocks) */
+	if (!bios_interrupt(vs, 0x10))
+		goto fail;
+	bufsize = vs->vv_vm86.vr_regs.vr_bx * 64;
+	buf     = BIOS_BUF_ALLOC(bufsize);
+	if (buf == BIOS_BUF_NULL)
+		goto fail;
+	obzero(vs->vv_vm86.vr_regs);
+	vs->vv_vm86.vr_regs.vr_ax = 0x4f04;
+	vs->vv_vm86.vr_regs.vr_cx = 0xf;
+	vs->vv_vm86.vr_regs.vr_dl = 1;
+	vmbuf                     = vga_vm86_buffer(vs, bufsize);
+	vs->vv_vm86.vr_regs.vr_es = VM86_ADDRSEG(vmbuf);
+	vs->vv_vm86.vr_regs.vr_bx = VM86_ADDROFF(vmbuf);
+	/* load video state data. */
+	if (!bios_interrupt(vs, 0x10))
+		goto fail_buf;
+	/* Copy BIOS buffer data into our own buffer. */
+	BIOS_BUF_PWRITE(buf, vmbuf, bufsize, 0);
+	/* Store the BIOS-buffer data blob */
+	self->vb_vesa_statebuf = buf;
+	self->vb_vesa_statesiz = bufsize;
+	return true;
+fail_buf:
+	BIOS_BUF_FREE(buf, bufsize);
+fail:
+	return false;
+}
+
+PRIVATE NONNULL((1, 2)) bool
+NOTHROW_KERNEL(CC bios_load_vesa_state)(vga_vm86_state_t *__restrict vs,
+                                        struct vga_bios const *__restrict self) {
+	byte_t *vmbuf;
+	obzero(vs->vv_vm86.vr_regs);
+	vs->vv_vm86.vr_regs.vr_ax = 0x4f04;
+	vs->vv_vm86.vr_regs.vr_cx = 0xf;
+	vs->vv_vm86.vr_regs.vr_dl = 2;
+	vmbuf = vga_vm86_buffer(vs, self->vb_vesa_statesiz);
+	/* Copy bios buffer memory into the VM area */
+	BIOS_BUF_PREAD(self->vb_vesa_statebuf, vmbuf,
+	               self->vb_vesa_statesiz, 0);
+	vs->vv_vm86.vr_regs.vr_es = VM86_ADDRSEG(vmbuf);
+	vs->vv_vm86.vr_regs.vr_bx = VM86_ADDROFF(vmbuf);
+	/* Have the BIOS restore the video state. */
+	return bios_interrupt(vs, 0x10);
+}
+
+
+/* s.a. http://www.ctyme.com/intr/rb-0276.htm */
+PRIVATE NONNULL((1, 2)) bool
+NOTHROW_KERNEL(CC bios_save_vesa_mode)(vga_vm86_state_t *__restrict vs,
+                                       uint16_t *__restrict pmode) {
+	obzero(vs->vv_vm86.vr_regs);
+	vs->vv_vm86.vr_regs.vr_ax = 0x4f03;
+	if (!bios_interrupt(vs, 0x10))
+		goto fail;
+	if (vs->vv_vm86.vr_regs.vr_ax != 0x4f)
+		goto fail;
+	*pmode = vs->vv_vm86.vr_regs.vr_bx;
+	return true;
+fail:
+	return false;
+}
+
+/* s.a. http://www.ctyme.com/intr/rb-0275.htm */
+PRIVATE NONNULL((1)) bool
+NOTHROW_KERNEL(CC bios_load_vesa_mode)(vga_vm86_state_t *__restrict vs,
+                                       uint16_t mode) {
+	obzero(vs->vv_vm86.vr_regs);
+	vs->vv_vm86.vr_regs.vr_ax = 0x4f02;
+	vs->vv_vm86.vr_regs.vr_bx = mode;
+	if (!bios_interrupt(vs, 0x10))
+		goto fail;
+	if (vs->vv_vm86.vr_regs.vr_ax != 0x4f)
+		goto fail;
+	return true;
+fail:
+	return false;
+}
+
+/* s.a. https://www.stanislavs.org/helppc/int_10-0.html */
+PRIVATE NONNULL((1)) bool
+NOTHROW_KERNEL(CC bios_load_vga_mode)(vga_vm86_state_t *__restrict vs,
+                                      uint8_t mode) {
+	obzero(vs->vv_vm86.vr_regs);
+	vs->vv_vm86.vr_regs.vr_ah = 0x00;
+	vs->vv_vm86.vr_regs.vr_al = mode;
+	return bios_interrupt(vs, 0x10);
+}
+
+
+
+PRIVATE NONNULL((1)) void
+NOTHROW_KERNEL(CC save_vga_bios)(struct vga_bios *__restrict self) {
+	vga_vm86_state_t vs;
+	if (vga_vm86_state_init(&vs) != VGA_STATE_ERROR_SUCCESS)
+		return;
+	if (!bios_save_vesa_state(&vs, self)) {
+		if (bios_save_vesa_mode(&vs, &self->vb_vesa_mode))
+			self->vb_features |= VGA_BIOS_FEAT_VESA_MODE;
+	}
+	vga_vm86_state_fini(&vs);
+}
+
+PRIVATE NONNULL((1)) void
+NOTHROW_KERNEL(CC load_vga_bios)(struct vga_bios const *__restrict self) {
+	vga_vm86_state_t vs;
+	if (vga_vm86_state_init(&vs) != VGA_STATE_ERROR_SUCCESS)
+		return;
+	/* Restore the VESA state from a buffer */
+	if (self->vb_vesa_statesiz)
+		bios_load_vesa_state(&vs, self);
+	/*  Restore VESA video mode by ID. */
+	if (self->vb_features & VGA_BIOS_FEAT_VESA_MODE)
+		bios_load_vesa_mode(&vs, self->vb_vesa_mode);
+	vga_vm86_state_fini(&vs);
+}
+
+PRIVATE void
+NOTHROW_KERNEL(CC text_vga_bios)(void) {
+	vga_vm86_state_t vs;
+	if (vga_vm86_state_init(&vs) != VGA_STATE_ERROR_SUCCESS)
+		return;
+	/* Try to switch to text mode, using VESA first, but
+	 * with regular, old VGA interrupts as a fallback.
+	 * NOTE: 0x8000 is the flag `MF_NOCLEARMEM' (name taken from seabios,
+	 *       as seen apart of QEMU's source tree). This flag (when set),
+	 *       will prevent display memory from being cleared (which is
+	 *       something we really want, we want to manually save/restore
+	 *       only the part of video memory that we're actually using)
+	 */
+	if (!bios_load_vesa_mode(&vs, 0x8000 | 3)) {
+		if (!bios_load_vesa_mode(&vs, 3))
+			bios_load_vga_mode(&vs, 3);
+	}
+	vga_vm86_state_fini(&vs);
+}
+
+
+
+
 
 
 
@@ -378,6 +708,7 @@ NOTHROW_KERNEL(CC load_vga_text)(u16 const textbuf[80 * 25]) {
 INTERN NONNULL((1)) unsigned int
 NOTHROW_KERNEL(CC libvga_state_save)(struct vga_state *__restrict self) {
 	unsigned int result;
+	obzero(*self);
 	result = init_phys();
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
@@ -393,7 +724,8 @@ NOTHROW_KERNEL(CC libvga_state_save)(struct vga_state *__restrict self) {
 	result = save_vga_text(self->vs_text);
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
-	/* TODO: VESA, etc. */
+	/* Try to check if the BIOS can tell us anything we don't already know */
+	save_vga_bios(&self->vs_bios);
 done:
 	return result;
 }
@@ -401,6 +733,8 @@ done:
 INTERN NONNULL((1)) unsigned int
 NOTHROW_KERNEL(CC libvga_state_load)(struct vga_state const *__restrict self) {
 	unsigned int result;
+	/* Use the BIOS to restore state-data that we're received from it specifically. */
+	load_vga_bios(&self->vs_bios);
 	result = init_phys();
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
@@ -414,9 +748,6 @@ NOTHROW_KERNEL(CC libvga_state_load)(struct vga_state const *__restrict self) {
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
 	result = load_vga_mode(&self->vs_mode, 0x00);
-	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
-		goto done;
-	/* TODO: VESA, etc. */
 done:
 	return result;
 }
@@ -424,7 +755,8 @@ done:
 INTERN NONNULL((1)) void
 NOTHROW_KERNEL(CC libvga_state_fini)(struct vga_state const *__restrict self) {
 	(void)self;
-	/* TODO: VESA, etc. */
+	BIOS_BUF_FREE(self->vs_bios.vb_vesa_statebuf,
+	              self->vs_bios.vb_vesa_statesiz);
 }
 
 
@@ -762,6 +1094,11 @@ for (local i: [:256]) {
 INTERN unsigned int
 NOTHROW_KERNEL(CC libvga_state_text)(void) {
 	unsigned int result;
+	/* Try using the BIOS to switch to 80x25 text mode.
+	 * If user-space also used the BIOS to switch to extended graphics mode,
+	 * the bios might know more than we do about switching back to text-mode */
+	text_vga_bios();
+
 	result = load_vga_mode(&textmode, 0xff);
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;

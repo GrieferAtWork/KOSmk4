@@ -44,7 +44,10 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* The stack from which debug code is executed. */
+#ifndef __dbg_stack_defined
+#define __dbg_stack_defined 1
 DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
+#endif /* !__dbg_stack_defined */
 
 #ifndef __dbg_active_defined
 #define __dbg_active_defined 1

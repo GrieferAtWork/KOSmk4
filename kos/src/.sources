@@ -105,7 +105,6 @@ BEGIN
 	DEFINE_SIMPLE_LIBRARY("libsctrace")
 	DEFINE_SIMPLE_LIBRARY("libzlib")
 	DEFINE_SIMPLE_LIBRARY("libvio")
-	DEFINE_SIMPLE_LIBRARY("libvgastate")
 
 //	DEFINE_SIMPLE_ARCH_LIBRARY("libstdc++")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libunwind", USELIB("libdl"))
@@ -117,6 +116,7 @@ BEGIN
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		DEFINE_SIMPLE_LIBRARY("libvm86")
 		DEFINE_SIMPLE_LIBRARY("libemu86")
+		DEFINE_SIMPLE_LIBRARY("libvgastate", USELIB("libvm86"))
 	}
 
 	BEGIN GROUP("libs.libvideo-codec") { COMPILE, LINK, ARCHIVE, MCOPY };

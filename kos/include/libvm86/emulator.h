@@ -43,8 +43,10 @@ __DECL_BEGIN
 #define VM86_EFLAGS_IOPL(n) (((n)&3) << 12)/* [bit(12,13)] I/O Privilege Level (System). */
 #define VM86_EFLAGS_NT          0x4000 /* [bit(14)] Nested Task Flag (System). */
 
-
+/* Encode/Decode a segmented address. */
 #define VM86_ADDR(segment, offset) (((segment) << 4) + (offset))
+#define VM86_ADDRSEG(addr)         ((__CCAST(__uintptr_t)(addr) & 0xf0000) >> 4)
+#define VM86_ADDROFF(addr)         (__CCAST(__uintptr_t)(addr) & 0xffff)
 
 
 #ifdef __CC__

@@ -453,12 +453,12 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 #define EMU86_EMULATE_CONFIG_WANT_STMXCSR 0
 
 
-#if defined(__KERNEL__) && 1
+#if defined(__KERNEL__) && 0
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <libdisasm/disassembler.h>
 
-#if 1 /* Cause a crash on segfault */
+#if 0 /* Cause a crash on segfault */
 #undef EMU86_EMULATE_TRY
 #undef EMU86_EMULATE_EXCEPT
 #endif

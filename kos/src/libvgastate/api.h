@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVGASTATE_API_H
 #define GUARD_LIBVGASTATE_API_H 1
+#define LIBVM86_WANT_PROTOTYPES 1
 
 #include <libvgastate/api.h>
 /**/

@@ -666,6 +666,17 @@ NOTHROW(FCALL p32_pagedir_xch_e1_word)(unsigned int vec2,
 	return ATOMIC_XCH(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word, e1_word);
 }
 
+#ifdef NDEBUG
+#define p32_pagedir_xch_e1_word_nochk p32_pagedir_xch_e1_word
+#else /* NDEBUG */
+LOCAL NOBLOCK u32
+NOTHROW(FCALL p32_pagedir_xch_e1_word_nochk)(unsigned int vec2,
+                                             unsigned int vec1,
+                                             u32 e1_word) {
+	return ATOMIC_XCH(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word, e1_word);
+}
+#endif /* !NDEBUG */
+
 
 INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[16] = {
 #define COMMON_PRESENT (P32_PAGE_FACCESSED | P32_PAGE_FDIRTY | P32_PAGE_FPRESENT)
@@ -838,7 +849,7 @@ NOTHROW(FCALL p32_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
-	old_word = p32_pagedir_xch_e1_word(vec2, vec1, (u32)backup);
+	old_word = p32_pagedir_xch_e1_word_nochk(vec2, vec1, (u32)backup);
 	if (old_word & P32_PAGE_FPRESENT)
 		pagedir_syncone(addr); /* The old mapping was also present (explicitly refresh the page). */
 }

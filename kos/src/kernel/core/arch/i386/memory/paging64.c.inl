@@ -1760,6 +1760,21 @@ NOTHROW(FCALL p64_pagedir_xch_e1_word)(unsigned int vec4,
 	return ATOMIC_XCH(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_word);
 }
 
+
+#ifdef NDEBUG
+#define p64_pagedir_xch_e1_word_nochk p64_pagedir_xch_e1_word
+#else /* NDEBUG */
+LOCAL NOBLOCK u64
+NOTHROW(FCALL p64_pagedir_xch_e1_word_nochk)(unsigned int vec4,
+                                             unsigned int vec3,
+                                             unsigned int vec2,
+                                             unsigned int vec1,
+                                             u64 e1_word) {
+	return ATOMIC_XCH(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_word);
+}
+#endif /* !NDEBUG */
+
+
 INTERN u64 p64_pageperm_matrix[16] = {
 #define COMMON_PRESENT (P64_PAGE_FACCESSED | P64_PAGE_FDIRTY | P64_PAGE_FPRESENT)
 	[(0)]                                                                              = P64_PAGE_FPREPARED | P64_PAGE_FNOEXEC,
@@ -1956,7 +1971,7 @@ NOTHROW(FCALL p64_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
 	vec1 = P64_PDIR_VEC1INDEX(addr);
-	old_word = p64_pagedir_xch_e1_word(vec4, vec3, vec2, vec1, backup);
+	old_word = p64_pagedir_xch_e1_word_nochk(vec4, vec3, vec2, vec1, backup);
 	if (old_word & P64_PAGE_FPRESENT)
 		pagedir_syncone(addr); /* The old mapping was also present (explicitly refresh the page). */
 }

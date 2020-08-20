@@ -995,6 +995,18 @@ NOTHROW(FCALL pae_pagedir_xch_e1_word)(unsigned int vec3,
 	return ATOMIC_XCH(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word, e1_word);
 }
 
+#ifdef NDEBUG
+#define pae_pagedir_xch_e1_word_nochk pae_pagedir_xch_e1_word
+#else /* NDEBUG */
+LOCAL NOBLOCK u64
+NOTHROW(FCALL pae_pagedir_xch_e1_word_nochk)(unsigned int vec3,
+                                             unsigned int vec2,
+                                             unsigned int vec1,
+                                             u64 e1_word) {
+	return ATOMIC_XCH(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word, e1_word);
+}
+#endif /* !NDEBUG */
+
 
 
 INTERN ATTR_PAGING_READMOSTLY u64 pae_pageperm_matrix[16] = {
@@ -1181,7 +1193,7 @@ NOTHROW(FCALL pae_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
-	old_word = pae_pagedir_xch_e1_word(vec3, vec2, vec1, backup);
+	old_word = pae_pagedir_xch_e1_word_nochk(vec3, vec2, vec1, backup);
 	if (old_word & PAE_PAGE_FPRESENT)
 		pagedir_syncone(addr); /* The old mapping was also present (explicitly refresh the page). */
 }

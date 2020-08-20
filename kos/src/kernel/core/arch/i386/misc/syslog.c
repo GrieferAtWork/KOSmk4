@@ -27,11 +27,27 @@
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 
+#include <hybrid/sync/atomic-rwlock.h>
+
 #include <sys/io.h>
 
 #include <inttypes.h>
 #include <stdio.h> /* sprintf() */
 #include <time.h>  /* localtime_r() */
+
+
+
+#undef DBG_MONITOR_MEMORY
+#if 0 /* For debugging: Monitor a physical memory location */
+#define DBG_MONITOR_MEMORY 0x000c9574
+#define DBG_MONITOR_TYPE   u16
+#endif
+
+
+#ifdef DBG_MONITOR_MEMORY
+#include <fs/vfs.h>
+#include <kernel/paging.h>
+#endif /* DBG_MONITOR_MEMORY */
 
 DECL_BEGIN
 
@@ -53,6 +69,12 @@ PRIVATE ATTR_ALIGNED(1) char const level_prefix[][9] = {
 	/* [SYSLOG_LEVEL_DEFAULT] = */ "output] "
 };
 
+
+#ifdef DBG_MONITOR_MEMORY
+static struct atomic_rwlock monitor_memory_lock = ATOMIC_RWLOCK_INIT;
+#endif /* DBG_MONITOR_MEMORY */
+
+
 PRIVATE NOBLOCK void
 NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
                                     struct syslog_packet const *__restrict packet,
@@ -63,6 +85,22 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 		struct tm t;
 		size_t len;
 		localtime_r(&packet->sp_time, &t);
+#ifdef DBG_MONITOR_MEMORY
+		if (vfs_kernel.p_inode && sync_trywrite(&monitor_memory_lock)) {
+			pagedir_pushval_t pv;
+			byte_t *addr = (byte_t *)0xc0000000 + (DBG_MONITOR_MEMORY & ~PAGEMASK);
+			DBG_MONITOR_TYPE value;
+			pv = pagedir_push_mapone(addr, (vm_phys_t)(DBG_MONITOR_MEMORY & ~PAGEMASK), PAGEDIR_MAP_FREAD);
+			pagedir_syncone(addr);
+			value = *(DBG_MONITOR_TYPE volatile *)(0xc0000000 + DBG_MONITOR_MEMORY);
+			pagedir_pop_mapone((void *)addr, pv);
+			sync_endwrite(&monitor_memory_lock);
+			len = sprintf(buf, "[" PP_STR(DBG_MONITOR_TYPE) "@%Ix=%#I16x]",
+			              (uintptr_t)DBG_MONITOR_MEMORY, value);
+			log_write(buf, len);
+		}
+#endif /* DBG_MONITOR_MEMORY */
+
 		/* Use ISO-8601-derived format (without the timezone; plus nanoseconds) */
 		len = sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 ":",
 		              t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,

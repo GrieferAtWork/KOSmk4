@@ -34,6 +34,7 @@
 
 #include <hybrid/sequence/list.h>
 
+#include <asm/intrin.h>
 #include <asm/registers-compat.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
@@ -211,6 +212,18 @@ DATDEF struct idt_segment x86_dbgaltcoreidt[256];
 DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
 #endif /* !CONFIG_NO_SMP */
 #endif /* !__x86_dbgidt_defined */
+
+#ifndef __dbg_stack_defined
+#define __dbg_stack_defined 1
+DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
+#endif /* !__dbg_stack_defined */
+
+FORCELOCAL WUNUSED bool
+NOTHROW(FCALL dbg_onstack)(void) {
+	void *sp = __rdsp();
+	return sp >= dbg_stack &&
+	       sp <= dbg_stack + KERNEL_DEBUG_STACKSIZE;
+}
 
 
 /* Get/set a register, given its ID

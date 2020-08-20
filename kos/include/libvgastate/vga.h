@@ -25,6 +25,9 @@
 
 #include <bits/types.h>
 #include <hw/video/vga.h>
+#ifdef __KERNEL__
+#include <kos/bits/types.h>
+#endif /* __KERNEL__ */
 
 /* libvgastate:
  *
@@ -59,14 +62,32 @@
 #define VGA_STATE_ERROR_ACCES   3 /* Access denied */
 #endif /* !__KERNEL__ */
 
+
+#define VGA_BIOS_FEAT_NONE      0x0000 /* ... */
+#define VGA_BIOS_FEAT_VESA_MODE 0x0001 /* vb_vesa_mode */
+
 #ifdef __CC__
 __DECL_BEGIN
+
+#ifdef __KERNEL__
+typedef __vm_phys_t vga_bios_buf_t;
+#else /* __KERNEL__ */
+typedef __byte_t *vga_bios_buf_t;
+#endif /* !__KERNEL__ */
+
+struct vga_bios {
+	__uint16_t     vb_features;      /* Available VGA BIOS features. (Set of `VGA_BIOS_FEAT_*') */
+	vga_bios_buf_t vb_vesa_statebuf; /* [0..vb_vesa_statesiz][owned]   int10:ax=4F04h */
+	__size_t       vb_vesa_statesiz; /* sizeof(vb_vesa_statebuf)       int10:ax=4F04h */
+	__uint16_t     vb_vesa_mode;     /* [valid_if(VGA_BIOS_FEAT_SVGA)] int10:ax=4F03h */
+};
 
 struct vga_state {
 	struct vga_mode       vs_mode;          /* VGA display mode. */
 	struct vga_palette256 vs_pal;           /* VGA palette. */
 	struct vga_font       vs_font;          /* VGA font memory. */
 	__uint16_t            vs_text[80 * 25]; /* VGA text memory. */
+	struct vga_bios       vs_bios;          /* VGA BIOS mode features. */
 	/* TODO: Extended VGA modes (VESA, etc...) */
 };
 
