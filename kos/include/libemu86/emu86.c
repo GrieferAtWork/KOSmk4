@@ -344,7 +344,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 				result->mi_rm    = EMU86_R_BP;
 				if ((rmbyte & EMU86_MODRM_MOD_MASK) == (0x0 << EMU86_MODRM_MOD_SHIFT)) { /* [disp16] */
 					result->mi_rm     = 0xff;
-					result->mi_offset = (__int32_t)(__int16_t)__hybrid_unaligned_getle16((__uint16_t *)pc);
+					result->mi_offset = (__int32_t)(__uint32_t)__hybrid_unaligned_getle16((__uint16_t *)pc);
 					pc += 2;
 				}
 				break;
@@ -362,7 +362,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 				pc += 1;
 			} else if ((rmbyte & EMU86_MODRM_MOD_MASK) == (0x2 << EMU86_MODRM_MOD_SHIFT)) {
 				/* [... + disp16] */
-				result->mi_offset = (__int32_t)(__int16_t)__hybrid_unaligned_getle16((__uint16_t *)pc);
+				result->mi_offset = (__int32_t)(__uint32_t)__hybrid_unaligned_getle16((__uint16_t *)pc);
 				pc += 2;
 			}
 		}
