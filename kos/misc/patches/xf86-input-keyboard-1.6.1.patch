@@ -1,0 +1,39 @@
+diff -Naur xf86-input-keyboard-1.6.1-orig/src/lnx_KbdMap.c xf86-input-keyboard-1.6.1/src/lnx_KbdMap.c
+--- xf86-input-keyboard-1.6.1-orig/src/lnx_KbdMap.c	2011-01-06 01:32:04.000000000 +0100
++++ xf86-input-keyboard-1.6.1/src/lnx_KbdMap.c	2020-08-20 11:11:28.512026700 +0200
+@@ -34,11 +34,14 @@
+  *      and the modifiermap is computed.
+  */
+ 
++#ifndef __KOS__
+ static void readKernelMapping(InputInfoPtr pInfo,
+                               KeySymsPtr pKeySyms, CARD8 *pModMap);
++#endif /* !__KOS__ */
+ void
+ KbdGetMapping (InputInfoPtr pInfo, KeySymsPtr pKeySyms, CARD8 *pModMap)
+ {
++#ifndef __KOS__
+   KeySym        *k;
+   int           i;
+ 
+@@ -95,6 +98,7 @@
+       break;
+ 
+     }
++#endif /* !__KOS__ */
+ 
+   pKeySyms->map        = map;
+   pKeySyms->mapWidth   = GLYPHS_PER_KEY;
+@@ -102,6 +106,7 @@
+   pKeySyms->maxKeyCode = MAX_KEYCODE; 
+ }
+ 
++#ifndef __KOS__
+ #include <linux/keyboard.h>
+ 
+ static KeySym linux_to_x[256] = {
+@@ -598,3 +603,4 @@
+     pKbd->specialMap->map[i] = special;
+   }
+ }
++#endif /* !__KOS__ */
