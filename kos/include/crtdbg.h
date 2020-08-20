@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5948b76e */
+/* HASH CRC-32:0x66a311f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,10 +50,10 @@ __SYSDECL_BEGIN
 #define _CRT_ASSERT 2
 #define _CRT_ERRCNT 3
 
-#define _CRTDBG_MODE_FILE    0x1
-#define _CRTDBG_MODE_DEBUG   0x2
-#define _CRTDBG_MODE_WNDW    0x4
-#define _CRTDBG_REPORT_MODE  (-1)
+#define _CRTDBG_MODE_FILE   0x1
+#define _CRTDBG_MODE_DEBUG  0x2
+#define _CRTDBG_MODE_WNDW   0x4
+#define _CRTDBG_REPORT_MODE (-1)
 
 #define _CRTDBG_INVALID_HFILE (__CCAST(_HFILE)-1)
 #define _CRTDBG_HFILE_ERROR   (__CCAST(_HFILE)-2)
@@ -61,36 +61,36 @@ __SYSDECL_BEGIN
 #define _CRTDBG_FILE_STDERR   (__CCAST(_HFILE)-5)
 #define _CRTDBG_REPORT_FILE   (__CCAST(_HFILE)-6)
 
-#define _CRT_RPTHOOK_INSTALL  0
-#define _CRT_RPTHOOK_REMOVE   1
+#define _CRT_RPTHOOK_INSTALL 0
+#define _CRT_RPTHOOK_REMOVE  1
 
-#define _HOOK_ALLOC     1
-#define _HOOK_REALLOC   2
-#define _HOOK_FREE      3
+#define _HOOK_ALLOC   1
+#define _HOOK_REALLOC 2
+#define _HOOK_FREE    3
 
-#define _CRTDBG_ALLOC_MEM_DF        0x01
-#define _CRTDBG_DELAY_FREE_MEM_DF   0x02
-#define _CRTDBG_CHECK_ALWAYS_DF     0x04
-#define _CRTDBG_RESERVED_DF         0x08
-#define _CRTDBG_CHECK_CRT_DF        0x10
-#define _CRTDBG_LEAK_CHECK_DF       0x20
+#define _CRTDBG_ALLOC_MEM_DF      0x01
+#define _CRTDBG_DELAY_FREE_MEM_DF 0x02
+#define _CRTDBG_CHECK_ALWAYS_DF   0x04
+#define _CRTDBG_RESERVED_DF       0x08
+#define _CRTDBG_CHECK_CRT_DF      0x10
+#define _CRTDBG_LEAK_CHECK_DF     0x20
 
 #define _CRTDBG_CHECK_EVERY_16_DF   0x00100000
 #define _CRTDBG_CHECK_EVERY_128_DF  0x00800000
 #define _CRTDBG_CHECK_EVERY_1024_DF 0x04000000
 #define _CRTDBG_CHECK_DEFAULT_DF    0
 
-#define _CRTDBG_REPORT_FLAG         (-1)
+#define _CRTDBG_REPORT_FLAG (-1)
 
-#define _BLOCK_TYPE(block)          ((block) & 0xFFFF)
-#define _BLOCK_SUBTYPE(block)       ((block) >> 16 & 0xFFFF)
+#define _BLOCK_TYPE(block)    ((block) & 0xffff)
+#define _BLOCK_SUBTYPE(block) ((block) >> 16 & 0xffff)
 
-#define _FREE_BLOCK      0
-#define _NORMAL_BLOCK    1
-#define _CRT_BLOCK       2
-#define _IGNORE_BLOCK    3
-#define _CLIENT_BLOCK    4
-#define _MAX_BLOCKS      5
+#define _FREE_BLOCK   0
+#define _NORMAL_BLOCK 1
+#define _CRT_BLOCK    2
+#define _IGNORE_BLOCK 3
+#define _CLIENT_BLOCK 4
+#define _MAX_BLOCKS   5
 
 #ifndef _STATIC_ASSERT
 #define _STATIC_ASSERT(expr) __STATIC_ASSERT(expr)

@@ -68,7 +68,8 @@ struct task;
 
 
 
-#define THIS_TASK   __get_this_task()
+#define THIS_TASK __get_this_task()
+
 FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST WUNUSED
 struct task *NOTHROW(KCALL __get_this_task)(void) {
 	__register struct task *__result;
@@ -103,21 +104,28 @@ void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
 extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_size(void);
 
 #ifdef __x86_64__
-#define __pertask_get8_r(x, result)  __asm__("movb %%gs:%p1, %b0" : "=q" (result) : "mi" (x))
-#define __pertask_get16_r(x, result) __asm__("movw %%gs:%p1, %w0" : "=r" (result) : "mi" (x))
-#define __pertask_get32_r(x, result) __asm__("movl %%gs:%p1, %k0" : "=r" (result) : "mi" (x))
-#define __pertask_get64_r(x, result) __asm__("movq %%gs:%p1, %q0" : "=r" (result) : "mi" (x))
-#define __pertask_set8(x, v)         __asm__("movb %b0, %%gs:%p1" : : "q" (v), "mi" (x))
-#define __pertask_set16(x, v)        __asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_set32(x, v)        __asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_set64(x, v)        __asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_get8_r(x, result)           __asm__("movb %%gs:%p1, %b0" : "=q" (result) : "mi" (x))
+#define __pertask_get16_r(x, result)          __asm__("movw %%gs:%p1, %w0" : "=r" (result) : "mi" (x))
+#define __pertask_get32_r(x, result)          __asm__("movl %%gs:%p1, %k0" : "=r" (result) : "mi" (x))
+#define __pertask_get64_r(x, result)          __asm__("movq %%gs:%p1, %q0" : "=r" (result) : "mi" (x))
+#define __pertask_set8(x, v)                  __asm__("movb %b0, %%gs:%p1" : : "q" (v), "mi" (x))
+#define __pertask_set16(x, v)                 __asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_set32(x, v)                 __asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_set64(x, v)                 __asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%fs:%p2, %b1" : "=@cc" #cc : "q" (rhs) : "mi" (x))
+#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%fs:%p2, %w1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
+#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%fs:%p2, %k1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
+#define __pertask_cmp64_r(x, rhs, cc, result) __asm__("cmpq %%fs:%p2, %q1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
 #else /* __x86_64__ */
-#define __pertask_get8_r(x, result)  __asm__("movb %%fs:%p1, %b0" : "=q" (result) : "mi" (x))
-#define __pertask_get16_r(x, result) __asm__("movw %%fs:%p1, %w0" : "=r" (result) : "mi" (x))
-#define __pertask_get32_r(x, result) __asm__("movl %%fs:%p1, %k0" : "=r" (result) : "mi" (x))
-#define __pertask_set8(x, v)         __asm__("movb %b0, %%fs:%p1" : : "q" (v), "mi" (x))
-#define __pertask_set16(x, v)        __asm__("movw %w0, %%fs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_set32(x, v)        __asm__("movl %k0, %%fs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_get8_r(x, result)           __asm__("movb %%fs:%p1, %b0" : "=q" (result) : "mi" (x))
+#define __pertask_get16_r(x, result)          __asm__("movw %%fs:%p1, %w0" : "=r" (result) : "mi" (x))
+#define __pertask_get32_r(x, result)          __asm__("movl %%fs:%p1, %k0" : "=r" (result) : "mi" (x))
+#define __pertask_set8(x, v)                  __asm__("movb %b0, %%fs:%p1" : : "q" (v), "mi" (x))
+#define __pertask_set16(x, v)                 __asm__("movw %w0, %%fs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_set32(x, v)                 __asm__("movl %k0, %%fs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%fs:%p2, %b1" : "=@cc" #cc : "q" (rhs) : "mi" (x))
+#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%fs:%p2, %w1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
+#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%fs:%p2, %k1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
 #endif /* !__x86_64__ */
 
 /************************************************************************/
@@ -393,6 +401,80 @@ __NAMESPACE_INT_END
 	})
 #endif /* !__pertask_set64 */
 #endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+
+/************************************************************************/
+/* Define __X86_PERTASK_CMP()                                           */
+/************************************************************************/
+#ifdef __NO_XBLOCK
+/* TODO */
+#elif defined(CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
+#ifdef __pertask_cmp64_r
+#define __X86_PERTASK_CMP(x, rhs, cc)                            \
+	XBLOCK({                                                     \
+		__BOOL __xpc_res;                                        \
+		switch (sizeof(x)) {                                     \
+		case 1: __pertask_cmp8_r(x, rhs, cc, __xpc_res); break;  \
+		case 2: __pertask_cmp16_r(x, rhs, cc, __xpc_res); break; \
+		case 4: __pertask_cmp32_r(x, rhs, cc, __xpc_res); break; \
+		case 8: __pertask_cmp64_r(x, rhs, cc, __xpc_res); break; \
+		default: __invalid_pertask_object_size();                \
+		}                                                        \
+		XRETURN __xpc_res;                                       \
+	})
+#else /* __pertask_cmp64_r */
+#define __X86_PERTASK_CMP(x, rhs, cc)                            \
+	XBLOCK({                                                     \
+		__BOOL __xpc_res;                                        \
+		switch (sizeof(x)) {                                     \
+		case 1: __pertask_cmp8_r(x, rhs, cc, __xpc_res); break;  \
+		case 2: __pertask_cmp16_r(x, rhs, cc, __xpc_res); break; \
+		case 4: __pertask_cmp32_r(x, rhs, cc, __xpc_res); break; \
+		default: __invalid_pertask_object_size();                \
+		}                                                        \
+		XRETURN __xpc_res;                                       \
+	})
+#endif /* !__pertask_cmp64_r */
+#else /* CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#ifdef __pertask_cmp64_r
+#define __X86_PERTASK_CMP(x, rhs, cc)                 \
+	XBLOCK({                                          \
+		__BOOL __xpc_res;                             \
+		if __untraced(sizeof(x) == 1) {               \
+			__pertask_cmp8_r(x, rhs, cc, __xpc_res);  \
+		} else if __untraced(sizeof(x) == 2) {        \
+			__pertask_cmp16_r(x, rhs, cc, __xpc_res); \
+		} else if __untraced(sizeof(x) == 4) {        \
+			__pertask_cmp32_r(x, rhs, cc, __xpc_res); \
+		} else if __untraced(sizeof(x) == 8) {        \
+			__pertask_cmp64_r(x, rhs, cc, __xpc_res); \
+		} else {                                      \
+			__invalid_pertask_object_size();          \
+		}                                             \
+		XRETURN __xpc_res;                            \
+	})
+#else /* __pertask_cmp64_r */
+#define __X86_PERTASK_CMP(x, rhs, cc)                 \
+	XBLOCK({                                          \
+		__BOOL __xpc_res;                             \
+		if __untraced(sizeof(x) == 1) {               \
+			__pertask_cmp8_r(x, rhs, cc, __xpc_res);  \
+		} else if __untraced(sizeof(x) == 2) {        \
+			__pertask_cmp16_r(x, rhs, cc, __xpc_res); \
+		} else if __untraced(sizeof(x) == 4) {        \
+			__pertask_cmp32_r(x, rhs, cc, __xpc_res); \
+		} else {                                      \
+			__invalid_pertask_object_size();          \
+		}                                             \
+		XRETURN __xpc_res;                            \
+	})
+#endif /* !__pertask_cmp64_r */
+#endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+
+
+#ifdef __X86_PERTASK_CMP
+#define PERTASK_EQ(x, rhs) __X86_PERTASK_CMP(x, rhs, e)
+#define PERTASK_NE(x, rhs) __X86_PERTASK_CMP(x, rhs, ne)
+#endif /* __X86_PERTASK_CMP */
 
 
 #endif /* !__X86_SEG_TASK */

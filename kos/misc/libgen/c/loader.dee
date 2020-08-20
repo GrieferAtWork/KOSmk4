@@ -3457,7 +3457,7 @@ do_handle_alt_variant_of:
 				}	break;
 
 				case "crt_dos_only":
-					/* Prevent the definition of a DOS-variant, as well as force */
+					/* Prevent the definition of a DOS-variant, as well as force DOS-CC */
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
 					currentPrototype.cc = DEFAULT_DOS_CC;

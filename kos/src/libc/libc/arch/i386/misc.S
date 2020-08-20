@@ -17,30 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_MISC_S
+#define GUARD_LIBC_LIBC_ARCH_I386_MISC_S 1
+#define __ASSEMBLER__ 1
+#define _KOS_KERNEL_SOURCE 1
 
-#define LD_LINUX_SO                     "libdl.so"
-#define LD_SO                           LD_LINUX_SO
-//#define LIBANL_SO                     "libanl.so"
-//#define LIBBROKENLOCALE_SO            "libBrokenLocale.so"
-//#define LIBCIDN_SO                    "libcidn.so"
-//#define LIBCRYPT_SO                   "libcrypt.so"
-#define LIBC_SO                         "libc.so"
-#define LIBDL_SO                        LD_LINUX_SO
-#define LIBGCC_S_SO                     "libgcc_s.so.1"
-//#define LIBMVEC_SO                    "libmvec.so"
-#define LIBM_SO                         "libm.so"
-//#define LIBNSL_SO                     "libnsl.so"
-//#define LIBNSS_COMPAT_SO              "libnss_compat.so"
-//#define LIBNSS_DB_SO                  "libnss_db.so"
-//#define LIBNSS_DNS_SO                 "libnss_dns.so"
-//#define LIBNSS_FILES_SO               "libnss_files.so"
-//#define LIBNSS_HESIOD_SO              "libnss_hesiod.so"
-//#define LIBNSS_LDAP_SO                "libnss_ldap.so"
-//#define LIBNSS_NISPLUS_SO             "libnss_nisplus.so"
-//#define LIBNSS_NIS_SO                 "libnss_nis.so"
-//#define LIBNSS_TEST1_SO               "libnss_test1.so"
-#define LIBPTHREAD_SO                   LIBC_SO
-//#define LIBRESOLV_SO                  "libresolv.so"
-#define LIBRT_SO                        "librt.so"
-//#define LIBTHREAD_DB_SO               "libthread_db.so"
-#define LIBUTIL_SO                      LIBC_SO
+#include "../../pthread.h"
+/**/
+
+#include <hybrid/compiler.h>
+#include <asm/cfi.h>
+
+.section .text.crt.dos.utility
+INTERN_FUNCTION(libc__CrtDbgBreak)
+	.cfi_startproc
+	int3 /* XXX: This should actually be triggered at our call-site! */
+	ret
+	.cfi_endproc
+END(libc__CrtDbgBreak)
+
+DEFINE_PUBLIC_ALIAS(_CrtDbgBreak, libc__CrtDbgBreak)
+
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_MISC_S */

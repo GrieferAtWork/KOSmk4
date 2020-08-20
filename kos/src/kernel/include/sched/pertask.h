@@ -110,6 +110,18 @@ DECL_END
 #define PERTASK_DEC(x) (void)--PERTASK(x)
 #endif /* !PERTASK_DEC */
 
+#ifndef PERTASK_EQ
+#define PERTASK_EQ(x, rhs) (PERTASK_GET(x) == (rhs))
+#ifndef PERTASK_NE
+#define PERTASK_NE(x, rhs) (PERTASK_GET(x) != (rhs))
+#endif /* !PERTASK_NE */
+#else /* !PERTASK_EQ */
+#ifndef PERTASK_NE
+#define PERTASK_NE(x, rhs) (!PERTASK_EQ(x, rhs))
+#endif /* !PERTASK_NE */
+#endif /* PERTASK_EQ */
+
+
 #endif /* __CC__ */
 
 /* >> void KCALL func(struct task *__restrict self);

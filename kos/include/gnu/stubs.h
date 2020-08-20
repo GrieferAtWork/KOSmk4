@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2dd38f2 */
+/* HASH CRC-32:0x59a13a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __stub__CrtDbgBreak 1
 #define __stub__CrtDbgReport 1
 #define __stub_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ 1
 #define __stub__CrtDbgReportW 1

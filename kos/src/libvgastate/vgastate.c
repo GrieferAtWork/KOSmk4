@@ -644,10 +644,24 @@ fail:
 PRIVATE NONNULL((1)) bool
 NOTHROW_KERNEL(CC bios_load_vga_mode)(vga_vm86_state_t *__restrict vs,
                                       uint8_t mode) {
+	u8 expected_al;
 	obzero(vs->vv_vm86.vr_regs);
 	vs->vv_vm86.vr_regs.vr_ah = 0x00;
 	vs->vv_vm86.vr_regs.vr_al = mode;
-	return bios_interrupt(vs, 0x10);
+	if (!bios_interrupt(vs, 0x10))
+		goto fail;
+	if (mode > 7)
+		expected_al = 0x20;
+	else if (mode == 6)
+		expected_al = 0x3f;
+	else {
+		expected_al = 0x30;
+	}
+	if (vs->vv_vm86.vr_regs.vr_al != expected_al)
+		goto fail;
+	return true;
+fail:
+	return false;
 }
 
 
@@ -1108,7 +1122,6 @@ NOTHROW_KERNEL(CC libvga_state_text)(void) {
 	result = load_vga_font(&textfont);
 	if unlikely(result != VGA_STATE_ERROR_SUCCESS)
 		goto done;
-	/* TODO: VESA, etc. */
 done:
 	return result;
 }

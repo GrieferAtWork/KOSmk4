@@ -33,12 +33,11 @@
 #include "unistd.h"
 #include "wchar.h"
 
-#define libc_c16dup    libd__wcsdup
-#define libc_c16getcwd libd__wgetcwd
-#define libc__msize    libc_malloc_usable_size
+#if __has_include(<intrin.h>)
+#include <intrin.h>
+#endif /* __has_include(<intrin.h>) */
 
 DECL_BEGIN
-
 
 /*[[[head:libc___p__crtAssertBusy,hash:CRC-32=0x6476d96d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__ *
@@ -254,14 +253,17 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type,
 }
 /*[[[end:libc__CrtDbgReportW]]]*/
 
-/*[[[head:libc__CrtDbgBreak,hash:CRC-32=0x8d9260f8]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
+/*[[[head:libc__CrtDbgBreak,hash:CRC-32=0xd43487a0]]]*/
+#ifndef LIBC_ARCH_HAVE_CRTDBGBREAK
+INTERN ATTR_SECTION(".text.crt.dos.utility") void
 NOTHROW_NCX(LIBDCALL libc__CrtDbgBreak)(void)
 /*[[[body:libc__CrtDbgBreak]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_CrtDbgBreak"); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+#ifdef __debugbreak
+	__debugbreak();
+#endif /* __debugbreak */
 }
+#endif /* MAGIC:impl_if */
 /*[[[end:libc__CrtDbgBreak]]]*/
 
 /*[[[head:libc__CrtSetBreakAlloc,hash:CRC-32=0xe82fa55e]]]*/
@@ -278,7 +280,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7ffc2e98]]]*/
+/*[[[start:exports,hash:CRC-32=0xe4f493c4]]]*/
 DEFINE_PUBLIC_ALIAS(__p__crtAssertBusy, libc___p__crtAssertBusy);
 DEFINE_PUBLIC_ALIAS(__p__crtBreakAlloc, libc___p__crtBreakAlloc);
 DEFINE_PUBLIC_ALIAS(__p__crtDbgFlag, libc___p__crtDbgFlag);
@@ -296,7 +298,9 @@ DEFINE_PUBLIC_ALIAS(_CrtSetDebugFillThreshold, libc__CrtSetDebugFillThreshold);
 DEFINE_PUBLIC_ALIAS(_CrtDbgReport, libc__CrtDbgReport);
 DEFINE_PUBLIC_ALIAS("?_CrtDbgReportW@@YAHHPBGH00ZZ", libc__CrtDbgReportW);
 DEFINE_PUBLIC_ALIAS(_CrtDbgReportW, libc__CrtDbgReportW);
+#ifndef LIBC_ARCH_HAVE_CRTDBGBREAK
 DEFINE_PUBLIC_ALIAS(_CrtDbgBreak, libc__CrtDbgBreak);
+#endif /* !LIBC_ARCH_HAVE_CRTDBGBREAK */
 DEFINE_PUBLIC_ALIAS(_CrtSetBreakAlloc, libc__CrtSetBreakAlloc);
 /*[[[end:exports]]]*/
 
