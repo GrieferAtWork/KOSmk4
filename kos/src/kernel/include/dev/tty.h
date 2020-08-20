@@ -91,8 +91,6 @@ tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THRO
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
  * and ansi-compliant display output is written to `ohandle_ptr'
  * For this purpose, special handling is done for certain handles:
- *   - ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isakeyboard(ihandle_ptr):
- *     Input is read using `keyboard_device_getchar()', rather than `handle_read()'
  *   - ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isanansitty(ohandle_ptr):
  *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'

@@ -58,39 +58,35 @@ struct keyboard_string {
 #endif /* __CC__ */
 
 /* Keyboard device I/O functions. */
-#define KBDIO_GETRDKEY      _IOR_KOS('K', 0x00, int)  /* Get read()-mode (0: char; 1: struct keyboard_key_packet) */
-#define KBDIO_SETRDKEY      _IOW_KOS('K', 0x00, int)  /* Set read()-mode (0: char; 1: struct keyboard_key_packet) */
-#define KBDIO_TRYGETCHAR    _IOR_KOS('K', 0x01, char) /* Try to read a character (returns `-EAGAIN' if no key was available, or none of the keys could be translated, but doesn't throw an exception) */
-#define KBDIO_GETCHAR       _IOR_KOS('K', 0x02, char) /* Read a character (cancellation point) */
-#define KBDIO_TRYGETKEY     _IOR_KOS('K', 0x03, struct keyboard_key_packet) /* Try to read a key stroke (returns `-EAGAIN' if no key was available, but doesn't throw an exception) */
-#define KBDIO_GETKEY        _IOR_KOS('K', 0x04, struct keyboard_key_packet) /* Read a key stroke (cancellation point) */
-#define KBDIO_GETLED        _IOR_KOS('K', 0x05, __uint32_t) /* Get the set of currently lit indicator LEDs (set of `KEYBOARD_LED_*') */
-#define KBDIO_SETLED        _IOW_KOS('K', 0x05, __uint32_t) /* Set the set of currently lit indicator LEDs (set of `KEYBOARD_LED_*') */
-#define KBDIO_MASKLED       _IOR_KOS('K', 0x05, struct keyboard_ledmask) /* Mask lit indicator LEDs (new_leds = lm_newled = (((lm_oldled = old_leds) & lm_mask) | lm_flag) ^ lm_fxor); */
-#define KBDIO_GETKEYMAP     _IOR_KOS('K', 0x06, struct keyboard_keymap) /* Get the key map program of this keyboard.
+#define KBDIO_TRYGETKEY     _IOR_KOS('K', 0x00, struct keyboard_key_packet) /* Try to read a key stroke (returns `-EAGAIN' if no key was available, but doesn't throw an exception) */
+#define KBDIO_GETKEY        _IOR_KOS('K', 0x01, struct keyboard_key_packet) /* Read a key stroke (cancellation point) */
+#define KBDIO_GETLED        _IOR_KOS('K', 0x02, __uint32_t) /* Get the set of currently lit indicator LEDs (set of `KEYBOARD_LED_*') */
+#define KBDIO_SETLED        _IOW_KOS('K', 0x02, __uint32_t) /* Set the set of currently lit indicator LEDs (set of `KEYBOARD_LED_*') */
+#define KBDIO_MASKLED       _IOR_KOS('K', 0x02, struct keyboard_ledmask) /* Mask lit indicator LEDs (new_leds = lm_newled = (((lm_oldled = old_leds) & lm_mask) | lm_flag) ^ lm_fxor); */
+#define KBDIO_GETKEYMAP     _IOR_KOS('K', 0x03, struct keyboard_keymap) /* Get the key map program of this keyboard.
                                                                          * @param: km_maptext: [IN|OUT] Provided buffer for program data.
                                                                          * @param: km_mapsize: [IN] Available buffer size
                                                                          *                     [OUT] Required buffer size. */
-#define KBDIO_SETKEYMAP     _IOW_KOS('K', 0x06, struct keyboard_keymap) /* Set the key map program of this keyboard. */
-#define KBDIO_RESETKEYMAP    _IO_KOS('K', 0x06) /* Reset the keymap to en_US. */
-#define KBDIO_FLUSHPENDING   _IO_KOS('K', 0x07) /* Clear the buffer of pending keys */
-#define KBDIO_PUTCHAR       _IOW_KOS('K', 0x08, /*utf-8*/ char) /* Schedule a character acting as though it was part of the result of translating a multi-byte key stroke.
+#define KBDIO_SETKEYMAP     _IOW_KOS('K', 0x03, struct keyboard_keymap) /* Set the key map program of this keyboard. */
+#define KBDIO_RESETKEYMAP    _IO_KOS('K', 0x03) /* Reset the keymap to en_US. */
+#define KBDIO_FLUSHPENDING   _IO_KOS('K', 0x04) /* Clear the buffer of pending keys */
+#define KBDIO_PUTCHAR       _IOW_KOS('K', 0x05, /*utf-8*/ char) /* Schedule a character acting as though it was part of the result of translating a multi-byte key stroke.
                                                                  * Note that unlike `KBDIO_PUTKEY', scheduled characters can only be read with `KBDIO_SETRDKEY=1', or through use of `KBDIO_(TRY)GETCHAR'
                                                                  * Also note that the internal buffer for these character is fixed-length and fairly small.
                                                                  * @return: 0: Failed to schedule the character
                                                                  * @return: 1: Successfully scheduled the character */
-#define KBDIO_PUTSTR        _IOW_KOS('K', 0x08, struct keyboard_string) /* Same as `KBDIO_PUTCHAR', but schedule multiple characters.
+#define KBDIO_PUTSTR        _IOW_KOS('K', 0x05, struct keyboard_string) /* Same as `KBDIO_PUTCHAR', but schedule multiple characters.
                                                                          * @return: 0: Nothing could be scheduled; The buffer is full.
                                                                          * @return: *: The number of bytes from `ks_text' that were scheduled before the buffer became full
                                                                          * @return: ks_size: Successfully scheduled everything. */
-#define KBDIO_PUTKEY        _IOW_KOS('K', 0x09, __uint16_t) /* Schedule a key stroke, behaving identical to the user performing that same input (including turning LEDs on/off for locking keys)
+#define KBDIO_PUTKEY        _IOW_KOS('K', 0x06, __uint16_t) /* Schedule a key stroke, behaving identical to the user performing that same input (including turning LEDs on/off for locking keys)
                                                              * @return: == 0: Failed to schedule the key stroke (the keyboard input buffer is full)
                                                              * @return: >  0: Successfully to scheduled the key stroke */
-#define KBDIO_GETDBGF12     _IOR_KOS('K', 0x0a, int)  /* Get dbgF12-mode (0: disabled; 1: Pressing F12 4 times in a row will enter debug-mode) */
-#define KBDIO_SETDBGF12     _IOW_KOS('K', 0x0a, int)  /* Set dbgF12-mode (0: disabled; 1: Pressing F12 4 times in a row will enter debug-mode) */
-#define KBDIO_GETMOD        _IOR_KOS('K', 0x0b, __uint32_t) /* Get the set of currently active modifier keys (set of `KEYMOD_*') */
-#define KBDIO_SETMOD        _IOW_KOS('K', 0x0b, __uint32_t) /* Set the set of currently active modifier keys (set of `KEYMOD_*') */
-#define KBDIO_MASKMOD       _IOR_KOS('K', 0x0b, struct keyboard_ledmask) /* Mask active modifier keys (new_mod = lm_newled = (((lm_oldled = old_mod) & lm_mask) | lm_flag) ^ lm_fxor); */
+#define KBDIO_GETDBGF12     _IOR_KOS('K', 0x07, int)  /* Get dbgF12-mode (0: disabled; 1: Pressing F12 4 times in a row will enter debug-mode) */
+#define KBDIO_SETDBGF12     _IOW_KOS('K', 0x07, int)  /* Set dbgF12-mode (0: disabled; 1: Pressing F12 4 times in a row will enter debug-mode) */
+#define KBDIO_GETMOD        _IOR_KOS('K', 0x08, __uint32_t) /* Get the set of currently active modifier keys (set of `KEYMOD_*') */
+#define KBDIO_SETMOD        _IOW_KOS('K', 0x08, __uint32_t) /* Set the set of currently active modifier keys (set of `KEYMOD_*') */
+#define KBDIO_MASKMOD       _IOR_KOS('K', 0x08, struct keyboard_ledmask) /* Mask active modifier keys (new_mod = lm_newled = (((lm_oldled = old_mod) & lm_mask) | lm_flag) ^ lm_fxor); */
 
 __DECL_END
 

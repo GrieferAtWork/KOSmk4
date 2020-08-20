@@ -329,8 +329,6 @@ tty_device_mmap(struct character_device *__restrict self,
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
  * and ansi-compliant display output is written to `ohandle_ptr'
  * For this purpose, special handling is done for certain handles:
- *   - ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isakeyboard(ihandle_ptr):
- *     Input is read using `keyboard_device_getchar()', rather than `handle_read()'
  *   - ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && character_device_isanansitty(ohandle_ptr):
  *     `((struct ansitty_device *)ohandle_ptr)->at_tty' will be bound to the newly created tty device
  *     (s.a.. `return'), such that its output gets injected as `terminal_iwrite(&return->t_term, ...)'
@@ -389,7 +387,6 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	    character_device_isakeyboard((struct character_device *)ihandle_ptr)) {
 		struct keyboard_device *idev;
 		idev = (struct keyboard_device *)ihandle_ptr;
-		result->t_ihandle_read = (phandle_read_function_t)&keyboard_device_readchars;
 		COMPILER_BARRIER();
 		/* When the output handle is an ansitty, then we must somehow register
 		 * that ansitty within the keyboard, such that the keyboard can call

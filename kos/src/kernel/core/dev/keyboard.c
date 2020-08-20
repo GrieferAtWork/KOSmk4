@@ -48,6 +48,8 @@
 #include <string.h>
 #include <unicode.h>
 
+#include "at_scancodes.h"
+
 DECL_BEGIN
 
 #ifdef CONFIG_HAVE_DEBUGGER
@@ -545,9 +547,9 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 	size_t result;
 	assert(sync_writing(&self->kd_map_lock));
 	key &= ~(KEY_FREPEAT);
-	result = keymap_translate_buf(&self->kd_map, key, mod, self->kd_map_pend,
-	                              COMPILER_LENOF(self->kd_map_pend));
-	if unlikely(result > COMPILER_LENOF(self->kd_map_pend))
+	result = keymap_translate_buf(&self->kd_map, key, mod, (char *)self->kd_pend,
+	                              COMPILER_LENOF(self->kd_pend));
+	if unlikely(result > COMPILER_LENOF(self->kd_pend))
 		goto nope; /* XXX: Better handling? */
 	if (!result) {
 		/* No layout-specific mapping given for this key.
@@ -572,8 +574,8 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			ch = get_control_key(ch);
 			if (ch == 0xff)
 				goto nope;
-			self->kd_map_pend[0] = (char)0x1b;
-			self->kd_map_pend[1] = (char)ch;
+			self->kd_pend[0] = (byte_t)0x1b;
+			self->kd_pend[1] = (byte_t)ch;
 			result = 2;
 			goto done;
 		}
@@ -590,21 +592,21 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			ch = get_control_key(ch);
 			if (ch == 0xff)
 				goto nope;
-			self->kd_map_pend[0] = (char)ch;
+			self->kd_pend[0] = (byte_t)ch;
 			result = 1;
 			goto done;
 		}
 		if (KEYMOD_ISALT(mod & ~(KEYMOD_SHIFT))) {
 			result = keymap_translate_buf(&self->kd_map, key,
 			                              mod & ~(KEYMOD_CTRL | KEYMOD_ALT),
-			                              &self->kd_map_pend[1],
-			                              COMPILER_LENOF(self->kd_map_pend) - 1);
+			                              (char *)&self->kd_pend[1],
+			                              COMPILER_LENOF(self->kd_pend) - 1);
 			if (result == 0)
 				goto done;
-			if unlikely(result > (COMPILER_LENOF(self->kd_map_pend) - 1))
+			if unlikely(result > (COMPILER_LENOF(self->kd_pend) - 1))
 				goto nope;
 			/* Prefix with 0x1b (ESC; aka. `\e') */
-			self->kd_map_pend[0] = (char)0x1b;
+			self->kd_pend[0] = (char)0x1b;
 			++result;
 			goto done;
 		}
@@ -622,7 +624,7 @@ done:
 				atty = &ttydev->at_ansi;
 		}
 		/* Encode a misc. key using the currently active ANSI tty settings. */
-		result = ansitty_translate_misc(atty, self->kd_map_pend, result, key, mod);
+		result = ansitty_translate_misc(atty, (char *)self->kd_pend, result, key, mod);
 		xdecref_unlikely(tty);
 	}
 	return result;
@@ -639,7 +641,7 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	REF struct tty_device *tty;
 	struct ansitty_device *atty;
 	char const *reader, *end;
-	char newbuf[COMPILER_LENOF(self->kd_map_pend)];
+	char newbuf[COMPILER_LENOF(self->kd_pend)];
 	size_t newlen;
 	tty = self->kb_tty.get();
 	if (!tty)
@@ -657,8 +659,8 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 	if likely(atty->at_ansi.at_codepage == 0)
 		goto done_tty;
 	/* Re-encode unicode characters */
-	reader = self->kd_map_pend;
-	end    = self->kd_map_pend + len;
+	reader = (char const *)self->kd_pend;
+	end    = (char const *)self->kd_pend + len;
 	newlen = 0;
 	while (reader < end) {
 		char32_t ch;
@@ -669,16 +671,15 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct keyboard_device *__restrict self
 		encoded_length = memlen(tempbuf, 0, encoded_length); /* Stop on the first NUL-character */
 		if (!encoded_length) /* Fallback: Anything that can't be encoded must be discarded */
 			continue;
-		if (newlen + encoded_length >= COMPILER_LENOF(self->kd_map_pend))
+		if (newlen + encoded_length >= COMPILER_LENOF(self->kd_pend))
 			break; /* Sequence too long (drop trailing characters...) */
 		/* Append the newly encoded `tempbuf' */
 		memcpy(newbuf + newlen, tempbuf, encoded_length, sizeof(char));
 		newlen += encoded_length;
 	}
-	assert(newlen <= COMPILER_LENOF(self->kd_map_pend) - 1);
+	assert(newlen <= COMPILER_LENOF(self->kd_pend) - 1);
 	/* Apply the new pending character buffer. */
-	newbuf[newlen] = 0; /* Ensure NUL-termination! */
-	memcpy(self->kd_map_pend, newbuf, newlen + 1, sizeof(char));
+	memcpy(self->kd_pend, newbuf, newlen, sizeof(char));
 	len = newlen;
 done_tty:
 	decref_unlikely(tty);
@@ -687,169 +688,170 @@ done:
 }
 
 
-/* Try to read a character from the given keyboard buffer.
- * @return: -1: The buffer is empty. */
-PUBLIC /*utf-8*/ int KCALL
-keyboard_device_trygetchar(struct keyboard_device *__restrict self)
+
+/* Try to read a single byte from the keyboard data stream.
+ * Same as `keyboard_device_read()'.
+ * @return: -1: No data is available at the moment. */
+PUBLIC int KCALL
+keyboard_device_trygetc(struct keyboard_device *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	int result;
 again:
 	sync_write(&self->kd_map_lock);
-	if (self->kd_map_pend[0] != 0) {
-		result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
-		memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
-		            COMPILER_LENOF(self->kd_map_pend) - 1,
-		            sizeof(char));
-		self->kd_map_pend[COMPILER_LENOF(self->kd_map_pend) - 1] = 0;
+	if (self->kd_pendsz) {
+		result = (int)(unsigned int)self->kd_pend[0];
+		--self->kd_pendsz;
+		memmovedown(&self->kd_pend[0],
+		            &self->kd_pend[1],
+		            self->kd_pendsz);
 		sync_endwrite(&self->kd_map_lock);
 	} else {
-		struct keyboard_key_packet key;
+		struct keyboard_key_packet packet;
 		result = -1;
 again_getkey:
-		key = keyboard_device_trygetkey_locked_noled(self);
-		if (key.kp_key != KEY_NONE) {
+		packet = keyboard_device_trygetkey_locked_noled(self);
+		if (packet.kp_key != KEY_NONE) {
 			size_t len;
-			if (key.kp_key & KEY_FRELEASED)
-				goto again_getkey; /* Only generate characters on make-codes */
-			len = keyboard_device_do_translate(self, key.kp_key, key.kp_mod);
-			len = keyboard_device_encode_cp(self, len);
-			if (len == 0) {
-				printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): <empty>\n",
-				       self->cd_name, key.kp_key, key.kp_mod);
-				sync_endwrite(&self->kd_map_lock);
-				if (key.kp_key == KEY_CAPSLOCK ||
-				    key.kp_key == KEY_NUMLOCK ||
-				    key.kp_key == KEY_SCROLLLOCK)
-					sync_leds(self);
-				goto again;
+			/* Figure out how we're to encode key data for the user. */
+			switch (ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE) {
+
+			case K_RAW: {
+				/* Produce AT-style, scanset#1 scancodes. */
+				uint16_t kc = KEYCODE(packet.kp_key);
+				byte_t up   = KEY_ISDOWN(packet.kp_key) ? 0 : 0x80;
+				/* Need special encoding for certain keys. */
+				switch (kc) {
+
+				case KEY_PAUSE:
+					self->kd_pend[0] = 0xe1;
+					self->kd_pend[0] = 0x1d | up;
+					self->kd_pend[0] = 0x45 | up;
+					len              = 3;
+					break;
+
+				case KEY_HANGEUL:
+					if (!KEY_ISDOWN(packet.kp_key))
+						goto check_led_and_try_again;
+					self->kd_pend[0] = 0xf2;
+					len              = 1;
+					break;
+
+				case KEY_HANJA:
+					if (!KEY_ISDOWN(packet.kp_key))
+						goto check_led_and_try_again;
+					self->kd_pend[0] = 0xf1;
+					len              = 1;
+					break;
+
+				case KEY_SYSRQ:
+					if (packet.kp_mod & (KEYMOD_LALT | KEYMOD_RALT)) {
+						self->kd_pend[0] = 0x54 | up;
+						len              = 1;
+					} else {
+						self->kd_pend[0] = 0xe0;
+						self->kd_pend[1] = 0x2a | up;
+						self->kd_pend[2] = 0xe0;
+						self->kd_pend[3] = 0x37 | up;
+						len              = 4;
+					}
+					break;
+
+				default: {
+					u16 enc;
+					if (kc > 0xff)
+						goto check_led_and_try_again;
+					enc = at_scancodes[kc];
+					if (!enc)
+						goto check_led_and_try_again;
+					if (enc & 0xff00) {
+						/* 2-byte encoding. */
+						self->kd_pend[0] = (byte_t)(enc >> 8);
+						self->kd_pend[1] = (enc & 0x7f) | up;
+						len              = 2;
+					} else {
+						/* 1-byte encoding. */
+						self->kd_pend[0] = (enc & 0x7f) | up;
+						len              = 1;
+					}
+				}	break;
+				}
+			}	break;
+
+			case K_MEDIUMRAW: {
+				/* Produce specially encoded key codes. */
+				uint16_t kc = KEYCODE(packet.kp_key);
+				if (kc < 128) {
+					self->kd_pend[0] = kc | (KEY_ISDOWN(packet.kp_key) ? 0 : 0x80);
+					len              = 1;
+				} else {
+					self->kd_pend[0] = KEY_ISDOWN(packet.kp_key) ? 0 : 0x80;
+					self->kd_pend[1] = (kc >> 7) | 0x80;
+					self->kd_pend[2] = (kc & 0x7f) | 0x80;
+					len = 3;
+				}
+			}	break;
+
+			case K_OFF:
+				/* Don't produce anything. */
+				goto check_led_and_try_again;
+
+			default:
+				/* Produce ascii/unicode (XXX: currently, Kos always produces unicode). */
+				if (packet.kp_key & KEY_FRELEASED)
+					goto again_getkey; /* Only generate characters on make-codes */
+				len = keyboard_device_do_translate(self, packet.kp_key, packet.kp_mod);
+				len = keyboard_device_encode_cp(self, len);
+				if (len == 0) {
+					printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): <empty>\n",
+					       self->cd_name, packet.kp_key, packet.kp_mod);
+check_led_and_try_again:
+					sync_endwrite(&self->kd_map_lock);
+					if (packet.kp_key == KEY_CAPSLOCK ||
+					    packet.kp_key == KEY_NUMLOCK ||
+					    packet.kp_key == KEY_SCROLLLOCK)
+						sync_leds(self);
+					goto again;
+				}
+				printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): %$q\n",
+				       self->cd_name, packet.kp_key, packet.kp_mod,
+				       len, self->kd_pend);
+				break;
 			}
-			printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): %$q\n",
-			       self->cd_name, key.kp_key, key.kp_mod,
-			       len, self->kd_map_pend);
-			result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
-			if (len == 1)
-				self->kd_map_pend[0] = 0;
-			else {
-				memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
-				            len - 1, sizeof(char));
-				self->kd_map_pend[len - 1] = 0;
-			}
+			result = (int)(unsigned int)(unsigned char)self->kd_pend[0];
+			--len;
+			memmovedown(&self->kd_pend[0],
+			            &self->kd_pend[1],
+			            len);
+			self->kd_pendsz = len;
 		}
 		sync_endwrite(&self->kd_map_lock);
-		if (key.kp_key == KEY_CAPSLOCK ||
-		    key.kp_key == KEY_NUMLOCK ||
-		    key.kp_key == KEY_SCROLLLOCK)
+		if (packet.kp_key == KEY_CAPSLOCK ||
+		    packet.kp_key == KEY_NUMLOCK ||
+		    packet.kp_key == KEY_SCROLLLOCK)
 			sync_leds(self);
 	}
 	return result;
+
 }
 
-PUBLIC /*utf-8*/ char KCALL
-keyboard_device_getchar(struct keyboard_device *__restrict self)
+PUBLIC byte_t KCALL
+keyboard_device_getc(struct keyboard_device *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	int result;
-	assert(!task_isconnected());
-	while ((result = keyboard_device_trygetchar(self)) == -1) {
+again:
+	result = keyboard_device_trygetc(self);
+	if (result == -1) {
 		task_connect(&self->kd_buf.kb_avail);
-		TRY {
-			result = keyboard_device_trygetchar(self);
-		} EXCEPT {
+		result = keyboard_device_trygetc(self);
+		if (result != -1) {
 			task_disconnectall();
-			RETHROW();
-		}
-		if unlikely(result != -1) {
-			task_disconnectall();
-			break;
+			goto done;
 		}
 		task_waitfor();
+		goto again;
 	}
-	return (char)(unsigned char)(unsigned int)result;
-}
-
-
-/* Key-mode/character-mode read callbacks. */
-PUBLIC NONNULL((1)) size_t KCALL
-keyboard_device_readkeys(struct character_device *__restrict self, USER CHECKED void *dst,
-                         size_t num_bytes, iomode_t mode) THROWS(...) {
-	size_t result;
-	struct keyboard_key_packet key;
-	struct keyboard_device *me;
-	me = (struct keyboard_device *)self;
-	if unlikely(num_bytes < sizeof(struct keyboard_key_packet)) {
-		if (num_bytes != 0)
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct keyboard_key_packet), num_bytes);
-		goto empty;
-	}
-	if (mode & IO_NONBLOCK) {
-		key = keyboard_device_trygetkey(me);
-		if (key.kp_key == KEY_NONE) {
-			if (mode & IO_NODATAZERO)
-				goto empty;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-		}
-	} else {
-		key = keyboard_device_getkey(me);
-		assert(key.kp_key != KEY_NONE);
-	}
-	COMPILER_WRITE_BARRIER();
-	memcpy(dst, &key, sizeof(struct keyboard_key_packet));
-	COMPILER_WRITE_BARRIER();
-	result = sizeof(struct keyboard_key_packet);
-	while (num_bytes >= 2 * sizeof(struct keyboard_key_packet)) {
-		dst = (byte_t *)dst + sizeof(struct keyboard_key_packet);
-		num_bytes -= sizeof(struct keyboard_key_packet);
-		key = keyboard_device_trygetkey(me);
-		if (key.kp_key == KEY_NONE)
-			break;
-		COMPILER_WRITE_BARRIER();
-		memcpy(dst, &key, sizeof(struct keyboard_key_packet));
-		COMPILER_WRITE_BARRIER();
-		result += sizeof(struct keyboard_key_packet);
-	}
-	return result;
-empty:
-	return 0;
-}
-
-PUBLIC NONNULL((1)) size_t KCALL
-keyboard_device_readchars(struct character_device *__restrict self, USER CHECKED void *dst,
-                          size_t num_bytes, iomode_t mode) THROWS(...) {
-	/* Read translated characters. */
-	size_t result;
-	int ch;
-	struct keyboard_device *me;
-	me = (struct keyboard_device *)self;
-	if unlikely(num_bytes < sizeof(char))
-		goto empty;
-	if (mode & IO_NONBLOCK) {
-		ch = keyboard_device_trygetchar(me);
-		if (ch == -1) {
-			if (mode & IO_NODATAZERO)
-				goto empty;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-		}
-	} else {
-		ch = (int)(unsigned int)(unsigned char)keyboard_device_getchar(me);
-		assert(ch != -1);
-	}
-	COMPILER_WRITE_BARRIER();
-	*(char *)dst = (char)(unsigned char)(unsigned int)ch;
-	COMPILER_WRITE_BARRIER();
-	result = 1;
-	while (num_bytes >= 2 * sizeof(char)) {
-		dst = (byte_t *)dst + sizeof(char);
-		num_bytes -= sizeof(char);
-		ch = keyboard_device_trygetchar(me);
-		if (ch == -1)
-			break;
-		COMPILER_WRITE_BARRIER();
-		*(char *)dst = (char)(unsigned char)(unsigned int)ch;
-		COMPILER_WRITE_BARRIER();
-		result += sizeof(char);
-	}
-	return result;
-empty:
-	return 0;
+done:
+	return (byte_t)(unsigned int)result;
 }
 
 
@@ -858,15 +860,32 @@ PUBLIC NONNULL((1)) size_t KCALL
 keyboard_device_read(struct character_device *__restrict self,
                      USER CHECKED void *dst, size_t num_bytes,
                      iomode_t mode) THROWS(...) {
-	uintptr_t flags;
 	struct keyboard_device *me;
 	size_t result;
-	me    = (struct keyboard_device *)self;
-	flags = ATOMIC_READ(me->kd_flags);
-	if (flags & KEYBOARD_DEVICE_FLAG_RDKEYS) {
-		result = keyboard_device_readkeys(self, dst, num_bytes, mode);
-	} else {
-		result = keyboard_device_readchars(self, dst, num_bytes, mode);
+	me = (struct keyboard_device *)self;
+	for (result = 0; result < num_bytes; ++result) {
+		int ch;
+again_read_ch:
+		ch = keyboard_device_trygetc(me);
+		if (ch == -1) {
+			if (result)
+				break;
+			if (mode & IO_NONBLOCK) {
+				if (!result && !(mode & IO_NODATAZERO))
+					THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+				break;
+			}
+			task_connect(&me->kd_buf.kb_avail);
+			ch = keyboard_device_trygetc(me);
+			if (ch != -1) {
+				task_disconnectall();
+				goto do_append_ch;
+			}
+			task_waitfor();
+			goto again_read_ch;
+		}
+do_append_ch:
+		((byte_t *)dst)[result] = (byte_t)(unsigned int)ch;
 	}
 	return result;
 }
@@ -876,32 +895,18 @@ keyboard_device_stat(struct character_device *__restrict self,
                      USER CHECKED struct stat *result) THROWS(...) {
 	struct keyboard_device *me;
 	size_t bufsize;
-	uintptr_t flags;
 	me = (struct keyboard_device *)self;
-	flags = ATOMIC_READ(me->kd_flags);
-	if (flags & KEYBOARD_DEVICE_FLAG_RDKEYS) {
-		result->st_blksize = sizeof(struct keyboard_key_packet);
-		bufsize = (ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used) *
-		           sizeof(struct keyboard_key_packet));
-	} else {
-		result->st_blksize = sizeof(char);
-		for (bufsize = 0; bufsize < COMPILER_LENOF(me->kd_map_pend); ++bufsize) {
-			if (ATOMIC_READ(me->kd_map_pend[bufsize]) == 0)
-				break;
-		}
-		bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used);
-	}
+	result->st_blksize = sizeof(char);
+	bufsize = ATOMIC_READ(me->kd_pendsz);
+	bufsize += ATOMIC_READ(me->kd_buf.kb_bufstate.bs_state.s_used); /* XXX: This is inexact */
 	result->st_size = bufsize;
 }
 
 
 LOCAL bool KCALL
 keyboard_device_canread(struct keyboard_device *__restrict self) {
-	uintptr_t flags;
 	uintptr_half_t used;
-	flags = ATOMIC_READ(self->kd_flags);
-	if (!(flags & KEYBOARD_DEVICE_FLAG_RDKEYS) &&
-	    ATOMIC_READ(self->kd_map_pend[0]) != 0)
+	if (ATOMIC_READ(self->kd_pendsz) != 0)
 		return true;
 	used = ATOMIC_READ(self->kd_buf.kb_bufstate.bs_state.s_used);
 	return used != 0;
@@ -924,18 +929,18 @@ keyboard_device_poll(struct character_device *__restrict self,
 
 LOCAL unsigned int KCALL
 linux_keyboard_getmode(struct keyboard_device *__restrict self) {
-	if (ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDKEYS)
-		return K_OFF;
-	return K_UNICODE;
+	return ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE;
 }
 
 LOCAL void KCALL
 linux_keyboard_setmode(struct keyboard_device *__restrict self,
                        unsigned int mode) {
-	if (mode == K_RAW || mode == K_MEDIUMRAW || mode == K_OFF) {
-		ATOMIC_FETCHOR(self->kd_flags, KEYBOARD_DEVICE_FLAG_RDKEYS);
-	} else if (mode == K_XLATE || mode == K_UNICODE) {
-		ATOMIC_FETCHAND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_RDKEYS);
+	if (mode >= K_RAW && mode <= K_OFF) {
+		uintptr_t flags;
+		do {
+			flags = ATOMIC_READ(self->kd_flags);
+		} while (!ATOMIC_CMPXCH_WEAK(self->kd_flags, flags,
+		                             (flags & ~KEYBOARD_DEVICE_FLAG_RDMODE) | mode));
 	} else {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
@@ -976,49 +981,6 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 	(void)mode;
 	me = (struct keyboard_device *)self;
 	switch (cmd) {
-
-	case KBDIO_GETRDKEY:
-		validate_writable(arg, sizeof(int));
-		*(int *)arg = ATOMIC_READ(me->kd_flags) & KEYBOARD_DEVICE_FLAG_RDKEYS ? 1 : 0;
-		break;
-
-	case KBDIO_SETRDKEY: {
-		int rdmode;
-		validate_readable(arg, sizeof(int));
-		COMPILER_READ_BARRIER();
-		rdmode = *(int *)arg;
-		COMPILER_READ_BARRIER();
-		if (rdmode == 0) {
-			ATOMIC_FETCHAND(me->kd_flags, ~KEYBOARD_DEVICE_FLAG_RDKEYS);
-		} else if (rdmode == 1) {
-			ATOMIC_FETCHOR(me->kd_flags, KEYBOARD_DEVICE_FLAG_RDKEYS);
-		} else {
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETRDKEY_BADMODE,
-			      rdmode);
-		}
-		sig_broadcast(&me->kd_buf.kb_avail);
-	}	break;
-
-	case KBDIO_TRYGETCHAR: {
-		int ch;
-		validate_writable(arg, sizeof(char));
-		ch = keyboard_device_trygetchar(me);
-		if (ch == -1)
-			return -EAGAIN;
-		COMPILER_WRITE_BARRIER();
-		*(char *)arg = (char)(unsigned char)(unsigned int)ch;
-		COMPILER_WRITE_BARRIER();
-	}	break;
-
-	case KBDIO_GETCHAR: {
-		char ch;
-		validate_writable(arg, sizeof(char));
-		ch = keyboard_device_getchar(me);
-		COMPILER_WRITE_BARRIER();
-		*(char *)arg = ch;
-		COMPILER_WRITE_BARRIER();
-	}	break;
 
 	case KBDIO_TRYGETKEY: {
 		struct keyboard_key_packet key;
@@ -1251,26 +1213,21 @@ continue_copy_keymap:
 			if (packet.kp_key == KEY_NONE)
 				break; /* Buffer became empty. */
 		}
-		ATOMIC_WRITE(me->kd_map_pend[0], 0);
+		ATOMIC_WRITE(me->kd_pendsz, 0);
 	}	break;
 
 	case KBDIO_PUTCHAR: {
 		char ch;
-		size_t i;
 		validate_readable(arg, sizeof(char));
 		COMPILER_READ_BARRIER();
 		ch = *(char *)arg;
 		COMPILER_READ_BARRIER();
 		sync_write(&me->kd_map_lock);
-		for (i = 0; i < COMPILER_LENOF(me->kd_map_pend); ++i) {
-			if (me->kd_map_pend[i] != 0)
-				continue;
-			COMPILER_WRITE_BARRIER();
-			me->kd_map_pend[i] = ch;
-			if (i != COMPILER_LENOF(me->kd_map_pend) - 1)
-				me->kd_map_pend[i + 1] = 0;
-			COMPILER_WRITE_BARRIER();
+		if (me->kd_pendsz < COMPILER_LENOF(me->kd_pend)) {
+			me->kd_pend[me->kd_pendsz] = ch;
+			++me->kd_pendsz;
 			sync_endwrite(&me->kd_map_lock);
+			sig_broadcast(&me->kd_buf.kb_avail);
 			return 1;
 		}
 		sync_endwrite(&me->kd_map_lock);
@@ -1278,32 +1235,26 @@ continue_copy_keymap:
 
 	case KBDIO_PUTSTR: {
 		struct keyboard_string data;
-		char new_buf[COMPILER_LENOF(me->kd_map_pend)];
-		size_t i;
+		byte_t new_buf[COMPILER_LENOF(me->kd_pend)];
+		size_t avail;
 		validate_readable(arg, sizeof(struct keyboard_string));
 		COMPILER_READ_BARRIER();
 		memcpy(&data, arg, sizeof(struct keyboard_string));
 		COMPILER_READ_BARRIER();
 		validate_readable(data.ks_text, data.ks_size);
-		if (data.ks_size > COMPILER_LENOF(me->kd_map_pend))
-			data.ks_size = COMPILER_LENOF(me->kd_map_pend);
+		if (data.ks_size > COMPILER_LENOF(me->kd_pend))
+			data.ks_size = COMPILER_LENOF(me->kd_pend);
 		memcpy(new_buf, data.ks_text, data.ks_size);
 		sync_write(&me->kd_map_lock);
-		for (i = 0; i < COMPILER_LENOF(me->kd_map_pend); ++i) {
-			size_t avail;
-			if (me->kd_map_pend[i] != 0)
-				continue;
-			avail = COMPILER_LENOF(me->kd_map_pend) - i;
-			if (avail > data.ks_size)
-				avail = data.ks_size;
-			memcpy(&me->kd_map_pend[i], new_buf, avail, sizeof(char));
-			i += avail;
-			if (i < COMPILER_LENOF(me->kd_map_pend))
-				me->kd_map_pend[i] = 0;
-			sync_endwrite(&me->kd_map_lock);
-			return avail;
-		}
+		avail = COMPILER_LENOF(me->kd_pend) - me->kd_pendsz;
+		if (avail > data.ks_size)
+			avail = data.ks_size;
+		memcpy(&me->kd_pend[me->kd_pendsz], new_buf, avail);
+		me->kd_pendsz += avail;
 		sync_endwrite(&me->kd_map_lock);
+		if (avail)
+			sig_broadcast(&me->kd_buf.kb_avail);
+		return avail;
 	}	break;
 
 	case KBDIO_PUTKEY: {
@@ -1347,7 +1298,7 @@ continue_copy_keymap:
 	}	break;
 
 	case KDGETLED:
-	case _IOR(_IOC_TYPE(KDGETLED), _IOC_NR(KDGETLED), char): {
+	case _IO_WITHSIZE(KDGETLED, char): {
 		uintptr_t leds;
 		STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK >> 8 == LED_SCR);
 		STATIC_ASSERT(KEYBOARD_LED_NUMLOCK    >> 8 == LED_NUM);
@@ -1360,7 +1311,7 @@ continue_copy_keymap:
 	}	break;
 
 	case KDSETLED:
-	case _IOW(_IOC_TYPE(KDSETLED), _IOC_NR(KDSETLED), char): {
+	case _IO_WITHSIZE(KDSETLED, char): {
 		uintptr_t new_leds;
 		validate_readable(arg, sizeof(char));
 		COMPILER_READ_BARRIER();
@@ -1386,97 +1337,43 @@ continue_copy_keymap:
 	}	break;
 
 	case KDGKBTYPE:
-	case _IOR(_IOC_TYPE(KDGKBTYPE), _IOC_NR(KDGKBTYPE), int):
-		validate_writable(arg, sizeof(int));
-		*(int *)arg = KB_101;
+	case _IO_WITHSIZE(KDGKBTYPE, unsigned int):
+		validate_writable(arg, sizeof(unsigned int));
+		*(unsigned int *)arg = KB_101;
 		break;
 
 	case KDGKBMODE:
-#ifdef __ARCH_HAVE_COMPAT
-		if (syscall_iscompat())
-			goto do_KDGKBMODE_compat;
-		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
-	case _IOR(_IOC_TYPE(KDGKBMODE), _IOC_NR(KDGKBMODE), longptr_t):
-		validate_writable(arg, sizeof(longptr_t));
-		*(longptr_t *)arg = linux_keyboard_getmode(me);
+	case _IO_WITHSIZE(KDGKBMODE, unsigned int):
+		validate_writable(arg, sizeof(unsigned int));
+		*(unsigned int *)arg = linux_keyboard_getmode(me);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
-	case _IOR(_IOC_TYPE(KDGKBMODE), _IOC_NR(KDGKBMODE), __ARCH_COMPAT_LONGPTR_TYPE):
-do_KDGKBMODE_compat:
-		validate_writable(arg, sizeof(__ARCH_COMPAT_LONGPTR_TYPE));
-		*(__ARCH_COMPAT_LONGPTR_TYPE *)arg = linux_keyboard_getmode(me);
-		break;
-#endif /* __ARCH_HAVE_COMPAT */
 
 	case KDSKBMODE:
-#ifdef __ARCH_HAVE_COMPAT
-		if (syscall_iscompat())
-			goto do_KDSKBMODE_compat;
-		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
-	case _IOW(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), longptr_t):
+	case _IO_WITHSIZE(KDSKBMODE, unsigned int):
 		if ((uintptr_t)arg < PAGESIZE) {
 			/* Compatibility with linux. */
 			linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
 		} else {
-			validate_readable(arg, sizeof(longptr_t));
-			linux_keyboard_setmode(me, (unsigned int)(int)*(longptr_t *)arg);
+			validate_readable(arg, sizeof(unsigned int));
+			linux_keyboard_setmode(me, *(unsigned int *)arg);
 		}
 		break;
-
-#ifdef __ARCH_HAVE_COMPAT
-	case _IOR(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), __ARCH_COMPAT_LONGPTR_TYPE):
-do_KDSKBMODE_compat:
-		if ((uintptr_t)arg < PAGESIZE) {
-			/* Compatibility with linux. */
-			linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
-		} else {
-			validate_readable(arg, sizeof(__ARCH_COMPAT_LONGPTR_TYPE));
-			linux_keyboard_setmode(me, (unsigned int)(int)*(__ARCH_COMPAT_LONGPTR_TYPE *)arg);
-		}
-		break;
-#endif /* __ARCH_HAVE_COMPAT */
 
 	case KDGKBMETA:
-#ifdef __ARCH_HAVE_COMPAT
-		if (syscall_iscompat())
-			goto do_KDGKBMETA_compat;
-		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
-	case _IOR(_IOC_TYPE(KDGKBMETA), _IOC_NR(KDGKBMETA), longptr_t):
-		validate_writable(arg, sizeof(longptr_t));
-		*(longptr_t *)arg = linux_keyboard_getmeta(me);
+	case _IO_WITHSIZE(KDGKBMETA, unsigned int):
+		validate_writable(arg, sizeof(unsigned int));
+		*(unsigned int *)arg = linux_keyboard_getmeta(me);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
-	case _IOR(_IOC_TYPE(KDGKBMETA), _IOC_NR(KDGKBMETA), __ARCH_COMPAT_LONGPTR_TYPE):
-do_KDGKBMETA_compat:
-		validate_writable(arg, sizeof(__ARCH_COMPAT_LONGPTR_TYPE));
-		*(__ARCH_COMPAT_LONGPTR_TYPE *)arg = linux_keyboard_getmeta(me);
-		break;
-#endif /* __ARCH_HAVE_COMPAT */
 
 	case KDSKBMETA:
-#ifdef __ARCH_HAVE_COMPAT
-		if (syscall_iscompat())
-			goto do_KDSKBMETA_compat;
-		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
-	case _IOW(_IOC_TYPE(KDSKBMETA), _IOC_NR(KDSKBMETA), longptr_t):
-		validate_readable(arg, sizeof(longptr_t));
-		linux_keyboard_setmeta(me, (unsigned int)(int)*(longptr_t *)arg);
+	case _IO_WITHSIZE(KDSKBMETA, unsigned int):
+		validate_readable(arg, sizeof(unsigned int));
+		linux_keyboard_setmeta(me, *(unsigned int *)arg);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
-	case _IOR(_IOC_TYPE(KDSKBMETA), _IOC_NR(KDSKBMETA), __ARCH_COMPAT_LONGPTR_TYPE):
-do_KDSKBMETA_compat:
-		validate_readable(arg, sizeof(__ARCH_COMPAT_LONGPTR_TYPE));
-		linux_keyboard_setmeta(me, (unsigned int)(int)*(__ARCH_COMPAT_LONGPTR_TYPE *)arg);
-		break;
-#endif /* __ARCH_HAVE_COMPAT */
 
 
 	case KDGKBLED:
-	case _IOR(_IOC_TYPE(KDGKBLED), _IOC_NR(KDGKBLED), char): {
+	case _IO_WITHSIZE(KDGKBLED, char): {
 		uintptr_t mods;
 		STATIC_ASSERT(KEYMOD_SCROLLLOCK >> 8 == K_SCROLLLOCK);
 		STATIC_ASSERT(KEYMOD_NUMLOCK >> 8 == K_NUMLOCK);
@@ -1489,7 +1386,7 @@ do_KDSKBMETA_compat:
 	}	break;
 
 	case KDSKBLED:
-	case _IOW(_IOC_TYPE(KDSKBLED), _IOC_NR(KDSKBLED), char): {
+	case _IO_WITHSIZE(KDSKBLED, char): {
 		uintptr_t old_mods, new_mask, new_mods;
 		validate_readable(arg, sizeof(char));
 		COMPILER_READ_BARRIER();
@@ -1503,7 +1400,6 @@ do_KDSKBMETA_compat:
 			new_mods = (old_mods & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8)) | new_mask;
 		} while (!ATOMIC_CMPXCH(me->kd_mods, old_mods, new_mods));
 	}	break;
-
 
 	/* TODO: Add an ioctl() to pre-calculate _all_ possible ASCII keymap keys.
 	 *       This could be useful to improve security at a password prompt,
@@ -1546,9 +1442,10 @@ NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *__restrict self,
 	self->cd_type.ct_ioctl = &keyboard_device_ioctl;
 	self->cd_type.ct_stat  = &keyboard_device_stat;
 	self->cd_type.ct_poll  = &keyboard_device_poll;
+	self->kd_flags = K_UNICODE; /* Use unicode by default. */
 	/* Enable DBGF12 by default when building with debug enabled. */
 #if !defined(NDEBUG) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
-	self->kd_flags = KEYBOARD_DEVICE_FLAG_DBGF12;
+	self->kd_flags |= KEYBOARD_DEVICE_FLAG_DBGF12;
 #endif /* !NDEBUG && KEYBOARD_DEVICE_FLAG_DBGF12 */
 	keymap_init_en_US(&self->kd_map);
 	mutex_cinit(&self->kd_leds_lock);

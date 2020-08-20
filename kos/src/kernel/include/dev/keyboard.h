@@ -66,10 +66,9 @@ struct keyboard_buffer {
 
 
 #define KEYBOARD_DEVICE_FLAG_NORMAL  0x0000 /* Normal keyboard device flags. */
-#define KEYBOARD_DEVICE_FLAG_RDKEYS  0x0001 /* Using `read(2)' on the keyboard will yield `struct keyboard_key_packet',
-                                             * rather than the pre-translated ASCII characters. */
+#define KEYBOARD_DEVICE_FLAG_RDMODE  0x0007 /* Mask for the effective read-mode (one of `K_*' from <linux/kd.h>) */
 #ifndef CONFIG_NO_DEBUGGER
-#define KEYBOARD_DEVICE_FLAG_DBGF12  0x0002 /* Pressing F12 4 times in a row on this keyboard will invoke `dbg()' */
+#define KEYBOARD_DEVICE_FLAG_DBGF12  0x2000 /* Pressing F12 4 times in a row on this keyboard will invoke `dbg()' */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_ONCE   0x4000 /* F12 was pressed once */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_TWICE  0x8000 /* F12 was pressed twice */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_THRICE 0xc000 /* F12 was pressed thrice */
@@ -104,10 +103,11 @@ struct keyboard_device
 	WEAK uintptr_t             kd_flags;         /* Keyboard operation flags (set of `KEYBOARD_DEVICE_FLAG_*').
 	                                              * NOTE: When changed, you must broadcast `kd_buf.kb_avail' */
 	struct atomic_rwlock       kd_map_lock;      /* Lock for `kd_map' */
-	struct keymap              kd_map;           /* [lock(kd_maplock)][owned(kfree(.km_ext))] Keyboard key translation map. */
-	size_t                     kd_map_extsiz;    /* [lock(kd_maplock)] Size (in bytes) of `kd_map::km_ext' */
-	/*utf-8*/ char             kd_map_pend[32];  /* [lock(kd_maplock)] List of pending utf-8 characters (terminated by a NUL-character; empty if `kd_map_pend[0] == NUL') */
-	uintptr_t                  kd_mods;          /* [lock(kd_maplock)] Currently active keyboard modifiers (Set of `KEYMOD_*'). */
+	struct keymap              kd_map;           /* [lock(kd_map_lock)][owned(kfree(.km_ext))] Keyboard key translation map. */
+	size_t                     kd_map_extsiz;    /* [lock(kd_map_lock)] Size (in bytes) of `kd_map::km_ext' */
+	uintptr_t                  kd_mods;          /* [lock(kd_map_lock)] Currently active keyboard modifiers (Set of `KEYMOD_*'). */
+	byte_t                     kd_pend[32];      /* [lock(kd_map_lock)] Pending data to-be returned by `keyboard_device_read()' */
+	size_t                     kd_pendsz;        /* [lock(kd_map_lock)] # of pending bytes in `kd_pendsz' */
 	struct mutex               kd_leds_lock;     /* Lock for updating `kd_leds' */
 	uintptr_t                  kd_leds;          /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
 	XATOMIC_WEAKLYREF(struct tty_device) kb_tty; /* [0..1] Weak reference to a connected TTY (used for encoding keyboard
@@ -124,9 +124,6 @@ FUNDEF NONNULL((1)) size_t KCALL keyboard_device_read(struct character_device *_
 FUNDEF NONNULL((1)) syscall_slong_t KCALL keyboard_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL keyboard_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 FUNDEF NONNULL((1)) poll_mode_t KCALL keyboard_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
-/* Key-mode/character-mode read callbacks. */
-FUNDEF NONNULL((1)) size_t KCALL keyboard_device_readkeys(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL keyboard_device_readchars(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 
 /* Initialize/finalize the given keyboard device.
  * NOTE: Drivers that override the `ct_fini' operator of a given keyboard
@@ -168,10 +165,11 @@ FUNDEF u16 KCALL keyboard_buffer_getkey(struct keyboard_buffer *__restrict self)
 FUNDEF struct keyboard_key_packet KCALL keyboard_device_trygetkey(struct keyboard_device *__restrict self) THROWS(E_IOERROR, ...);
 FUNDEF struct keyboard_key_packet KCALL keyboard_device_getkey(struct keyboard_device *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
-/* Try to read a character from the given keyboard.
- * @return: -1: The buffer is empty. */
-FUNDEF /*utf-8*/ int KCALL keyboard_device_trygetchar(struct keyboard_device *__restrict self) THROWS(E_IOERROR, ...);
-FUNDEF /*utf-8*/ char KCALL keyboard_device_getchar(struct keyboard_device *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
+/* Try to read a single byte from the keyboard data stream.
+ * Same as `keyboard_device_read()'.
+ * @return: -1: No data is available at the moment. */
+FUNDEF int KCALL keyboard_device_trygetc(struct keyboard_device *__restrict self) THROWS(E_IOERROR, ...);
+FUNDEF byte_t KCALL keyboard_device_getc(struct keyboard_device *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
 
 #endif /* __CC__ */

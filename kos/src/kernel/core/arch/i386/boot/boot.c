@@ -457,6 +457,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *        - HANDLE_TYPE_PACKET_PIPE_READER
 	 *        - HANDLE_TYPE_PACKET_PIPE_WRITER */
 
+	/* TODO: `x86_64-kos-gcc -mno-red-zone -print-libgcc-file-name'
+	 *       This will still print the normal libgcc.a filename, which
+	 *       wasn't built with support for -mno-red-zone.
+	 * >> https://wiki.osdev.org/Libgcc_without_red_zone */
 
 	/* Xorg X-Window server support roadmap.
 	 *

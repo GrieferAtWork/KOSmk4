@@ -108,6 +108,31 @@ struct unimapinit {
 #define UNI_DIRECT_BASE 0xF000 /* start of Direct Font Region */
 #define UNI_DIRECT_MASK 0x01FF /* Direct Font Region bitmask */
 
+/* Keyboard modes (configure what is read(2) from a keyboard):
+ *
+ *  - K_RAW:       Produce raw AT-style scancodes (same as a PS/2 keyboard with scanset #1)
+ *                 s.a. `ps2_keyboard_ss1' and `ps2_keyboard_ss1_e0' from
+ *                      `/kos/src/kernel/modps2/keyboard-scansets.c'
+ *
+ *  - K_XLATE:     The *normal* (but deprecated) mode, where actual text is read from
+ *                 the keyboard. Characters encoded via `keymap_translate_buf()' must
+ *                 fall into the ascii range. If they don't, they are silently discarded.
+ *
+ *  - K_MEDIUMRAW: Produce keycodes (as found in <kos/keyboard.h>) that are encoded as:
+ *                 >> if (keycode < 128) {
+ *                 >>     putchar(keycode | (down ? 0 : 0x80));
+ *                 >> } else {
+ *                 >>     putchar(down ? 0 : 0x80);
+ *                 >>     putchar((keycode >> 7) | 0x80);
+ *                 >>     putchar((keycode & 0x7f) | 0x80);
+ *                 >> }
+ *
+ *  - K_UNICODE:   The actual default mode. Behaves the same as `K_XLATE', except that
+ *                 characters from outside the ascii range are encoded as utf-8.
+ *
+ *  - K_OFF:       Keyboard input isn't being generated. (But internal control sequences,
+ *                 including the 4xF12=dbg() behavior continue to function)
+ */
 #define KDGKBMODE _IO('K', 0x44) /* gets current keyboard mode */
 #define KDSKBMODE _IO('K', 0x45) /* sets current keyboard mode */
 #define    K_RAW       0x00
@@ -115,6 +140,7 @@ struct unimapinit {
 #define    K_MEDIUMRAW 0x02
 #define    K_UNICODE   0x03
 #define    K_OFF       0x04
+
 
 #define KDGKBMETA _IO('K', 0x62) /* gets meta key handling mode */
 #define KDSKBMETA _IO('K', 0x63) /* sets meta key handling mode */
