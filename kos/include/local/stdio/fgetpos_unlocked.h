@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99796195 */
+/* HASH CRC-32:0x80c64a02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,35 +28,35 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetpos from stdio */
 #ifndef __local___localdep_fgetpos_defined
 #define __local___localdep_fgetpos_defined 1
-#if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
-#elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
-#elif defined(__CRT_HAVE_fgetpos) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_fgetpos) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos,(__stream,__pos))
-#elif defined(__CRT_HAVE__IO_fgetpos) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE__IO_fgetpos) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),_IO_fgetpos,(__stream,__pos))
-#elif defined(__CRT_HAVE_fgetpos64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fgetpos64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos64,(__stream,__pos))
-#elif defined(__CRT_HAVE__IO_fgetpos64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE__IO_fgetpos64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
-#elif defined(__CRT_HAVE_fgetpos_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_fgetpos_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
-#elif defined(__CRT_HAVE_fgetpos64_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fgetpos64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))

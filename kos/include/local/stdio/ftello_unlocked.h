@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f1a22a7 */
+/* HASH CRC-32:0xc419beda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,58 +27,58 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ftello from stdio */
 #ifndef __local___localdep_ftello_defined
 #define __local___localdep_ftello_defined 1
-#if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_LONG__
+#if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_LONG__
+#elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftell64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_ftell64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftell) && __FS_SIZEOF(__OFF) == __SIZEOF_LONG__
+#elif defined(__CRT_HAVE_ftell) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftell,(__stream))
-#elif defined(__CRT_HAVE__IO_ftell) && __FS_SIZEOF(__OFF) == __SIZEOF_LONG__
+#elif defined(__CRT_HAVE__IO_ftell) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),_IO_ftell,(__stream))
-#elif defined(__CRT_HAVE_ftello) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_ftello) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftello,(__stream))
-#elif defined(__CRT_HAVE_ftello64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_ftello64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftello64,(__stream))
-#elif defined(__CRT_HAVE_ftell64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_ftell64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftell64,(__stream))
-#elif defined(__CRT_HAVE__ftelli64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE__ftelli64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),_ftelli64,(__stream))
-#elif defined(__CRT_HAVE_ftell_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_LONG__
+#elif defined(__CRT_HAVE_ftell_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftell_nolock) && __FS_SIZEOF(__OFF) == __SIZEOF_LONG__
+#elif defined(__CRT_HAVE__ftell_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftello_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_ftello_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftello64_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_ftello64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftell64_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_ftell64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftelli64_nolock) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE__ftelli64_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),__THROWING,__localdep_ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
 #else /* ... */

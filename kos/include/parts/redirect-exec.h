@@ -27,7 +27,7 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 /* On i386, we can take advantage of how varargs are passed as
- * a 4-byte aligned vector (with is the same as a pointer array) */
+ * a 4-byte aligned vector (which is the same as a pointer array) */
 #define __REDIRECT_EXECL(T, execv, path, args)                       { return execv(path, (T **)&args); }
 #define __REDIRECT_EXECLE(T, execve, path, args)                     { T ***__penv = (T ***)&args; while (*__penv++); return execve(path, (T **)&args, *__penv); }
 #define __REDIRECT_SPAWNL(T, spawnv, mode, path, args)               { return spawnv(mode, path, (T **)&args); }

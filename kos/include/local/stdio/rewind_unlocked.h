@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13c65645 */
+/* HASH CRC-32:0xae948054 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,32 +27,32 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fsetpos_unlocked from stdio */
 #ifndef __local___localdep_fsetpos_unlocked_defined
 #define __local___localdep_fsetpos_unlocked_defined 1
-#if defined(__CRT_HAVE_fsetpos_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#if defined(__CRT_HAVE_fsetpos_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
-#elif defined(__CRT_HAVE_fsetpos64_unlocked) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fsetpos64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
-#elif defined(__CRT_HAVE_fsetpos) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_fsetpos) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos,(__stream,__pos))
-#elif defined(__CRT_HAVE__IO_fsetpos) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE__IO_fsetpos) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
-#elif defined(__CRT_HAVE_fsetpos64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fsetpos64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64,(__stream,__pos))
-#elif defined(__CRT_HAVE__IO_fsetpos64) && __FS_SIZEOF(__OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE__IO_fsetpos64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
