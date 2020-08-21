@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4038bec9 */
+/* HASH CRC-32:0x81fc6b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1179,7 +1179,7 @@
 #define __NRRM_rt_sigpending           0
 #define __NRRM_rt_sigtimedwait         1
 #define __NRRM_rt_sigqueueinfo         0
-#define __NRRM_rt_sigsuspend           0
+#define __NRRM_rt_sigsuspend           1
 #define __NRRM_pread64                 0
 #define __NRRM_pwrite64                0
 #define __NRRM_chown                   0

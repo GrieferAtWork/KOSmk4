@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a57f616 */
+/* HASH CRC-32:0x503b3da6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1025,7 +1025,7 @@
 #define __NR64RM_rt_sigpending          0
 #define __NR64RM_rt_sigtimedwait        1
 #define __NR64RM_rt_sigqueueinfo        0
-#define __NR64RM_rt_sigsuspend          0
+#define __NR64RM_rt_sigsuspend          1
 #define __NR64RM_sigaltstack            0
 #define __NR64RM_utime                  0
 #define __NR64RM_mknod                  0

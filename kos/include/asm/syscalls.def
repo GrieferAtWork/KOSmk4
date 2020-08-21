@@ -999,6 +999,7 @@ rt_sigqueueinfox32:(pid_t tgid, signo_t signo, [tostr(STRUCT_SIGINFOX32)] struct
 rt_sigqueueinfox64:(pid_t tgid, signo_t signo, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
+[restart(dont)]
 rt_sigsuspend:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set,
                size_t sigsetsize) -> errno_t;
 
