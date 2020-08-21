@@ -44,3 +44,4 @@ Utilities:
 - [libICE-1.0.8](https://www.x.org/releases/X11R7.7/src/everything)
 - [libSM-1.2.1](https://www.x.org/releases/X11R7.7/src/everything)
 - [libXt-1.1.3](https://www.x.org/releases/X11R7.7/src/everything)
+- [libXmu-1.1.1](https://www.x.org/releases/X11R7.7/src/everything)
