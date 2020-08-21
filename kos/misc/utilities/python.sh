@@ -124,9 +124,53 @@ INCPATH="$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MI
 install_header() {
 	install_rawfile "$INCPATH/$1" "$SRCPATH/include/$1"
 }
-install_rawfile \
-	"$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" \
-	"$OPTPATH/pyconfig.h"
+
+if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
+	if [ "$TARGET_NAME" == "i386" ]; then
+		install_rawfile \
+			"$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig32.h" \
+			"$OPTPATH/pyconfig.h"
+	else
+		install_rawfile \
+			"$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig64.h" \
+			"$OPTPATH/pyconfig.h"
+	fi
+	if ! [ -f "$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" ]; then
+		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h"
+		cat > "$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" <<EOF
+#ifndef _I386_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H
+#define _I386_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H 1
+
+#include <hybrid/host.h>
+
+#ifdef __x86_64__
+#include "pyconfig64.h"
+#else /* __x86_64__ */
+#include "pyconfig32.h"
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H */
+EOF
+	else
+		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h (up to date)"
+	fi
+else
+	install_rawfile \
+		"$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" \
+		"$OPTPATH/pyconfig.h"
+fi
+if ! [ -f "$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" ]; then
+	echo "Installing file $KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h"
+	cat > "$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" <<EOF
+#ifndef _PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H
+#define _PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H 1
+#include <python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h>
+#endif /* !_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H */
+EOF
+else
+	echo "Installing file $KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h (up to date)"
+fi
+
 install_header "Python-ast.h"
 install_header "Python.h"
 install_header "abstract.h"
