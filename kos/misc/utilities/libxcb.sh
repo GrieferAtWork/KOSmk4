@@ -102,6 +102,19 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libxcb.so.1.1.0" 
 				--with-gnu-ld
 		) || exit $?
 	fi
+	if ! [ -f "$OPTPATH/src/.kos_patched_config" ]; then
+		# Because we're acting like we're linux, libxcb thinks that KOS
+		# supports linux's `HAVE_ABSTRACT_SOCKETS`, when in fact we don't.
+		# Other Xorg components don't use configure to check this, but
+		# instead check for `#ifdef linux` at compile-time, which correctly
+		# handles the behavior on KOS.
+		# However, libxcb uses configure, so we have to hack its config.h
+		# to disable support for abstract sockets.
+		echo ""                                        >> "$OPTPATH/src/config.h"
+		echo "/* KOS doesn't actually support this */" >> "$OPTPATH/src/config.h"
+		echo "#undef HAVE_ABSTRACT_SOCKETS"            >> "$OPTPATH/src/config.h"
+		> "$OPTPATH/src/.kos_patched_config"
+	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
