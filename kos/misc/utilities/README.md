@@ -46,3 +46,4 @@ Utilities:
 - [libXt-1.1.3](https://www.x.org/releases/X11R7.7/src/everything)
 - [libXmu-1.1.1](https://www.x.org/releases/X11R7.7/src/everything)
 - [xinit-1.3.2](https://www.x.org/archive//individual/app)
+- [twm-1.0.7](https://www.x.org/archive//individual/app)
