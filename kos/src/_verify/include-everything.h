@@ -103,6 +103,9 @@ local chk_include = {
 
 	"ft2build.h",
 
+	"uuid.h",
+	"uuid/uuid.h",
+
 	"pixman.h",
 	"pixman-version.h",
 
@@ -1643,6 +1646,12 @@ incdir("", "../../include");
 #include <utime.h>
 #include <utmp.h>
 #include <utmpx.h>
+#if __has_include(<uuid/uuid.h>)
+#include <uuid/uuid.h>
+#endif /* __has_include(<uuid/uuid.h>) */
+#if __has_include(<uuid.h>)
+#include <uuid.h>
+#endif /* __has_include(<uuid.h>) */
 #include <vadefs.h>
 #include <values.h>
 #include <vfork.h>
