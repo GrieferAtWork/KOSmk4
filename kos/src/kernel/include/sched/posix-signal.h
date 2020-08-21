@@ -208,7 +208,7 @@ struct kernel_sigaction {
 struct sighand {
 	/* Descriptor for how signals ought to be handled. */
 	struct atomic_rwlock    sh_lock;              /* Lock for this signal handler descriptor. */
-	WEAK refcnt_t           sh_share;             /* [lock(INC(sh_lock),DEC(ATOMIC))]
+	WEAK refcnt_t           sh_share;             /* [lock(INC(sh_lock), DEC(ATOMIC))]
 	                                               * Amount of unrelated processes sharing this sighand. */
 	struct kernel_sigaction sh_actions[NSIG - 1]; /* Signal handlers. */
 };
@@ -274,7 +274,7 @@ sighand_ptr_lockwrite(void) THROWS(E_WOULDBLOCK, E_BADALLOC);
 /* Return the default action to perform when faced with `signo' configured as `KERNEL_SIG_DFL'
  * @return: * : One of `KERNEL_SIG_*' (excluding `KERNEL_SIG_DFL' and `KERNEL_SIG_GET') */
 FUNDEF NOBLOCK WUNUSED ATTR_CONST user_sighandler_func_t
-NOTHROW(KCALL sighand_default_action)(u32 signo);
+NOTHROW(KCALL sighand_default_action)(signo_t signo);
 
 
 /* Reset the current handler for `signo' when `current_action' matches the currently set action.
@@ -283,7 +283,7 @@ NOTHROW(KCALL sighand_default_action)(u32 signo);
  * @return: true:  Successfully reset the handler
  * @return: false: The given `current_action' didn't match the currently set action. */
 FUNDEF bool KCALL
-sighand_reset_handler(u32 signo,
+sighand_reset_handler(signo_t signo,
                       struct kernel_sigaction const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -423,7 +423,7 @@ extern "C++" {
 /* Simplified variants of the functions above that directly take a kernel-space SIGNO */
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
-                       u32 signo,
+                       signo_t signo,
                        gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
@@ -435,7 +435,7 @@ task_raisesignalthread(struct task *__restrict target,
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
-                                         u32 signo,
+                                         signo_t signo,
                                          gfp_t rpc_flags DFL(GFP_NORMAL)) {
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));
@@ -445,7 +445,7 @@ NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
-                        u32 signo,
+                        signo_t signo,
                         gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
@@ -457,7 +457,7 @@ task_raisesignalprocess(struct task *__restrict target,
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
-                                          u32 signo,
+                                          signo_t signo,
                                           gfp_t rpc_flags DFL(GFP_NORMAL)) {
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));
@@ -467,7 +467,7 @@ NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
-                             u32 signo,
+                             signo_t signo,
                              gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC) {
@@ -479,7 +479,7 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) ssize_t
 NOTHROW(KCALL task_raisesignalprocessgroup_nx)(struct task *__restrict target,
-                                               u32 signo,
+                                               signo_t signo,
                                                gfp_t rpc_flags DFL(GFP_NORMAL)) {
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));

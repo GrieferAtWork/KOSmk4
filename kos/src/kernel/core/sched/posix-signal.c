@@ -200,7 +200,7 @@ sigmask_getwr(void) THROWS(E_BADALLOC) {
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL sighand_destroy)(struct sighand *__restrict self) {
-	u32 i;
+	unsigned int i;
 	for (i = 0; i < NSIG - 1; ++i)
 		xdecref(self->sh_actions[i].sa_mask);
 	kfree(self);
@@ -325,7 +325,7 @@ again_lock_ptr:
 		sync_endwrite(result);
 		copy = (struct sighand *)kmalloc(sizeof(struct sighand), GFP_NORMAL);
 		TRY {
-			u32 i;
+			unsigned int i;
 again_lock_ptr_for_copy:
 			sync_write(ptr);
 			COMPILER_READ_BARRIER();
@@ -382,7 +382,7 @@ again_lock_ptr_for_copy:
 /* Return the default action to perform when faced with `signo' configured as `KERNEL_SIG_DFL'
  * @return: * : One of `KERNEL_SIG_*' (excluding `KERNEL_SIG_DFL' and `KERNEL_SIG_GET') */
 PUBLIC NOBLOCK WUNUSED ATTR_CONST user_sighandler_func_t
-NOTHROW(KCALL sighand_default_action)(u32 signo) {
+NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 	user_sighandler_func_t result;
 	result = KERNEL_SIG_IGN;
 	switch (signo) {
@@ -513,7 +513,7 @@ NOTHROW(KCALL task_sigcont)(struct task *__restrict thread) {
  * @return: true:  Successfully reset the handler
  * @return: false: The given `current_action' didn't match the currently set action. */
 PUBLIC bool KCALL
-sighand_reset_handler(u32 signo,
+sighand_reset_handler(signo_t signo,
                       struct kernel_sigaction const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct sighand *hand;
@@ -1191,7 +1191,7 @@ again_scan_prqueue:
 /* Check if the given `thread' is masking `signo' */
 LOCAL NOBLOCK bool
 NOTHROW(KCALL is_thread_masking_signal)(struct task *__restrict thread,
-                                        u32 signo) {
+                                        signo_t signo) {
 	bool result;
 	REF struct kernel_sigmask *mask;
 	assert(!(thread->t_flags & TASK_FKERNTHREAD));
@@ -1211,12 +1211,127 @@ STATIC_ASSERT(SIGACTION_SA_RESTART == SA_RESTART);
 STATIC_ASSERT(SIGACTION_SA_NODEFER == SA_NODEFER);
 STATIC_ASSERT(SIGACTION_SA_RESETHAND == SA_RESETHAND);
 
+/* Check if `self' contains any handlers set to
+ * SIG_IGN that wouldn't be set as such by default. */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < NSIG - 1; ++i) {
+		/* Check if the handler's action is SIG_IGN */
+		if (self->sh_actions[i].sa_handler != KERNEL_SIG_IGN)
+			continue; /* Something other than SIG_IGN */
+		/* Check if the default action is something other than SIG_IGN */
+		if (sighand_default_action(i + 1) == KERNEL_SIG_IGN)
+			continue; /* Default would also be SIG_IGN */
+		/* Found one! */
+		return true;
+	}
+	return false;
+}
+
+
 /* During exec(), all signal handler dispositions of the calling thread are reset */
 DEFINE_PERVM_ONEXEC(onexec_posix_signals_reset_action);
 INTERN void KCALL onexec_posix_signals_reset_action(void) {
-	struct sighand_ptr *handptr;
+	REF struct sighand_ptr *handptr;
+	/* Posix says that signals set to SIG_IGN should remain SIG_IGN after exec(). */
 	handptr = ATOMIC_XCH(PERTASK(this_sighand_ptr), NULL);
-	xdecref(handptr);
+	if (handptr) {
+		struct sighand *hand;
+		REF struct sighand *newhand;
+		unsigned int i;
+		hand = sighand_ptr_lockread(handptr);
+		if unlikely(!hand)
+			goto done_handptr;
+		/* Check if there are any signals set to SIG_IGN, for which
+		 * `sighand_default_action()' returns something else. */
+		if (!sighand_has_nondefault_sig_ign(hand)) {
+			sync_endread(hand);
+			goto done_handptr;
+		}
+		/* We have to create a new, custom set of signal handlers... */
+		/* NOTE: Use GFP_CALLOC because `KERNEL_SIG_DFL = 0', and we only
+		 *       need to inherit handlers that were marked as `SIG_IGN' */
+		newhand = (REF struct sighand *)kmalloc_nx(sizeof(struct sighand),
+		                                           GFP_CALLOC | GFP_ATOMIC);
+		if (!newhand) {
+			sync_endread(hand);
+			newhand = (REF struct sighand *)kmalloc(sizeof(struct sighand), GFP_CALLOC);
+			TRY {
+				hand = sighand_ptr_lockread(handptr);
+			} EXCEPT {
+				kfree(newhand);
+				assert(!PERTASK_GET(this_sighand_ptr));
+				PERTASK_SET(this_sighand_ptr, handptr);
+				RETHROW();
+			}
+			if unlikely(!hand) {
+				kfree(newhand);
+				goto done_handptr;
+			}
+			if (sighand_has_nondefault_sig_ign(hand)) {
+				sync_endread(hand);
+				kfree(newhand);
+				goto done_handptr;
+			}
+		}
+		/* Copy handlers that have their disposition set to SIG_IGN.
+		 * However, don't copy anything else about those handlers,
+		 * or any other handlers for that matter.
+		 * Especially of note is that we also don't copy signal masks,
+		 * since those wouldn't actually matter for SIG_IGN handlers. */
+		for (i = 0; i < NSIG - 1; ++i) {
+			if (hand->sh_actions[i].sa_handler == KERNEL_SIG_IGN)
+				newhand->sh_actions[i].sa_handler = KERNEL_SIG_IGN;
+		}
+		atomic_rwlock_cinit(&newhand->sh_lock);
+		newhand->sh_share = 1;
+		sync_endread(hand);
+		if (!isshared(handptr)) {
+			/* We can re-use `handptr' to point to `newhand' */
+			TRY {
+				/* This really shouldn't block since handptr isn't shared.
+				 * ... But better to be safe than sorry. */
+				sync_write(&handptr->sp_lock);
+			} EXCEPT {
+				kfree(newhand);
+				decref(handptr);
+				assert(!PERTASK_GET(this_sighand_ptr));
+				PERTASK_SET(this_sighand_ptr, handptr);
+				RETHROW();
+			}
+			assert(!isshared(handptr));
+			hand = handptr->sp_hand;    /* Inherit reference */
+			handptr->sp_hand = newhand; /* Inherit reference */
+			sync_endwrite(&handptr->sp_lock);
+			/* Restore the old hand-pointer for the calling thread. */
+			assert(!PERTASK_GET(this_sighand_ptr));
+			PERTASK_SET(this_sighand_ptr, handptr);
+			/* Now that we're using `newhand', drop
+			 * our shared reference from the original */
+			sighand_decshare(hand);
+		} else {
+			/* Must allocate a new `handptr' */
+			REF struct sighand_ptr *newhandptr;
+			TRY {
+				newhandptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
+				                                               GFP_NORMAL);
+			} EXCEPT {
+				kfree(newhand);
+				decref(handptr);
+				assert(!PERTASK_GET(this_sighand_ptr));
+				PERTASK_SET(this_sighand_ptr, handptr);
+				RETHROW();
+			}
+			newhandptr->sp_refcnt = 1;
+			atomic_rwlock_init(&newhandptr->sp_lock);
+			newhandptr->sp_hand = newhand; /* Inherit reference */
+			assert(!PERTASK_GET(this_sighand_ptr));
+			PERTASK_SET(this_sighand_ptr, newhandptr); /* Inherit reference */
+done_handptr:
+			decref(handptr);
+		}
+	}
 }
 
 

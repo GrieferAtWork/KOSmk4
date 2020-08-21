@@ -247,6 +247,11 @@ done_tmpfs:
 		if (cpid == 0) {
 			/* Become the foreground process of /dev/console */
 			console_set_fgproc();
+			/* Restore default signal dispositions */
+			signal(SIGHUP, SIG_DFL);
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTTIN, SIG_DFL);
+			signal(SIGTTOU, SIG_DFL);
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
 			execle("/bin/bash", "bash", (char *)NULL, init_envp);
