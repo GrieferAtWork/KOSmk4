@@ -100,7 +100,7 @@ EOF
 				--with-gnu-ld \
 				--without-xmlto \
 				--without-fop \
-				--with-local-transport-order=TODO \
+				--with-local-transport-order=LOCAL_TRANS,UNIX_TRANS \
 				--without-launchd \
 				--without-lint
 		) || exit $?
