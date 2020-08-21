@@ -38,6 +38,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/__va_size.h>
 #include <hybrid/typecore.h>
 
+#include <arpa/inet.h>
 #include <asm/ioctl.h>
 #include <asm/ioctls/socket.h>
 #include <asm/ioctls/socket_ex.h>
@@ -71,6 +72,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -374,6 +376,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_socket_type
 #endif /* HAVE_SC_REPR_SOCKET_TYPE */
 
+#ifdef HAVE_SC_REPR_STRUCT_SOCKADDR
+#define NEED_print_sockaddr
+#endif /* HAVE_SC_REPR_STRUCT_SOCKADDR */
+
 
 
 
@@ -398,6 +404,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_timeval_vector
 #define NEED_print_timeval
 #endif /* NEED_print_timeval_vector */
+
+#ifdef NEED_print_sockaddr
+#define NEED_print_bytes
+#define NEED_print_socket_domain
+#endif /* NEED_print_sockaddr */
 
 #ifdef NEED_print_socket_domain
 #define NEED_print_socket_af_pf
@@ -442,8 +453,10 @@ DECL_BEGIN
 
 /* The syntax to use for struct field names. */
 #if 1
+#define HAVE_SYNFIELD 1
 #define SYNFIELD(name) name ":" SYNSPACE
 #elif 1
+#define HAVE_SYNFIELD 1
 #define SYNFIELD(name) "." name SYNSPACE "=" SYNSPACE
 #else
 #define SYNFIELD(name) ""
@@ -1904,6 +1917,97 @@ err:
 
 
 
+#ifdef NEED_print_bytes
+PRIVATE ssize_t CC
+print_bytes(pformatprinter printer, void *arg,
+            USER CHECKED void const *buf, size_t len) {
+	ssize_t temp, result = 0;
+	size_t i;
+	for (i = 0; i < len; ++i) {
+		byte_t b;
+		b = ((USER CHECKED byte_t const *)buf)[i];
+		if (i != 0)
+			PRINT("," SYNSPACE);
+		PRINTF("%#.2" PRIx8, b);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_bytes */
+
+
+
+#ifdef NEED_print_sockaddr
+PRIVATE ssize_t CC
+print_sockaddr(pformatprinter printer, void *arg,
+               USER CHECKED struct sockaddr const *sa,
+               socklen_t len) {
+	ssize_t temp, result = 0;
+	sa_family_t family = AF_UNSPEC;
+	USER CHECKED byte_t const *payload_data;
+	size_t payload_len = 0;
+#ifdef HAVE_SYNFIELD
+	char const *family_prefix;
+#endif /* HAVE_SYNFIELD */
+	payload_data = (USER CHECKED byte_t const *)sa + offsetafter(struct sockaddr, sa_family);
+	if likely(len >= offsetafter(struct sockaddr, sa_family)) {
+		payload_len = len - offsetafter(struct sockaddr, sa_family);
+		family      = sa->sa_family;
+	}
+#ifdef HAVE_SYNFIELD
+	family_prefix = "sa";
+	switch (family) {
+	case AF_UNIX: family_prefix = "sun"; break; /* struct sockaddr_un */
+	case AF_INET: family_prefix = "sin"; break; /* struct sockaddr_in */
+	default: break;
+	}
+	PRINTF("{" SYNSPACE SYNFIELD("%s_family"), family_prefix);
+#else /* HAVE_SYNFIELD */
+	PRINT("{" SYNSPACE SYNFIELD(-));
+#endif /* !HAVE_SYNFIELD */
+	DO(print_socket_domain(printer, arg, family));
+	switch (family) {
+
+	case AF_UNIX:
+		/* struct sockaddr_un */
+		PRINTF("," SYNSPACE SYNFIELD("sun_path") "%$q",
+		       payload_len, payload_data);
+		break;
+
+	case AF_INET: {
+		/* struct sockaddr_in */
+		char buf[INET_NTOA_R_MAXLEN];
+		USER CHECKED struct sockaddr_in const *sin;
+		if unlikely(len < offsetafter(struct sockaddr_in, sin_addr))
+			goto fallback;
+		sin = (USER CHECKED struct sockaddr_in const *)sa;
+		PRINTF("," SYNSPACE SYNFIELD("sin_port") "%" PRIu16
+		       "," SYNSPACE SYNFIELD("sin_addr") "%q",
+		       sin->sin_port, inet_ntoa_r(sin->sin_addr, buf));
+	}	break;
+
+	default:
+fallback:
+#ifdef HAVE_SYNFIELD
+		PRINTF("," SYNSPACE SYNFIELD("%s_data") "{" SYNSPACE, family_prefix);
+#else /* HAVE_SYNFIELD */
+		PRINT("," SYNSPACE SYNFIELD(-) "{" SYNSPACE);
+#endif /* !HAVE_SYNFIELD */
+		DO(print_bytes(printer, arg, payload_data, payload_len));
+		PRINT(SYNSPACE "}");
+		break;
+	}
+	PRINT(SYNSPACE "}");
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_sockaddr */
+
+
+
+
 
 
 
@@ -2023,7 +2127,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGINFOX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGSET 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_SOCKADDR 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SPAWN_ACTIONSX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SPAWN_ACTIONSX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TERMIOS 1
@@ -2049,6 +2152,20 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+	// TODO: #define HAVE_SC_REPR_STRUCT_SOCKADDR 1
+#ifdef HAVE_SC_REPR_STRUCT_SOCKADDR
+	case SC_REPR_STRUCT_SOCKADDR: {
+		USER UNCHECKED struct sockaddr *sa;
+		socklen_t len;
+		if (!link)
+			goto do_pointer;
+		sa  = (USER UNCHECKED struct sockaddr *)(uintptr_t)value.sv_u64;
+		len = (socklen_t)link->sa_value.sv_u64;
+		validate_readable(sa, len);
+		result = print_sockaddr(printer, arg, sa, len);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SOCKADDR */
 
 #ifdef HAVE_SC_REPR_IOCTL_COMMAND
 	case SC_REPR_IOCTL_COMMAND:
