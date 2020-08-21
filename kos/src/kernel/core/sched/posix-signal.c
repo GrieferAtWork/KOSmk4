@@ -2302,7 +2302,7 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	mymask = sigmask_getwr();
 	memcpy(&oldmask, &mymask->sm_mask, sizeof(sigset_t));
 	TRY {
-		memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+		memcpy(&mymask->sm_mask, uthese, sizeof(sigset_t));
 	} EXCEPT {
 		/* Always restore the old signal mask and check for signals,
 		 * so-as to prevent signals that always have to be masked from
