@@ -69,7 +69,6 @@
 DECL_BEGIN
 
 
-#ifdef CONFIG_UHCI_USE_ASYNC_WORKERS
 PRIVATE NONNULL((1, 2)) bool ASYNC_CALLBACK_CC uhci_powerctl_poll(void *__restrict arg, void *__restrict cookie);
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC uhci_powerctl_work(void *__restrict arg);
 PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC uhci_powerctl_test(void *__restrict arg);
@@ -79,7 +78,6 @@ PRIVATE struct async_worker_callbacks const uhci_powerctl_cb {
 	/* .awc_test = */ &uhci_powerctl_test
 };
 
-#endif /* CONFIG_UHCI_USE_ASYNC_WORKERS */
 
 
 
@@ -91,11 +89,6 @@ PRIVATE struct async_worker_callbacks const uhci_powerctl_cb {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-
-#undef CONFIG_UHCI_USE_QH_LOOPS
-#if 1 /* Have the QH chain loop back on itself. */
-#define CONFIG_UHCI_USE_QH_LOOPS 1
-#endif
 
 PRIVATE DEFINE_ATOMIC_RWLOCK(ostd_free_lock);
 PRIVATE DEFINE_ATOMIC_RWLOCK(osqh_free_lock);
@@ -1505,22 +1498,8 @@ NOTHROW(KCALL uhci_fini)(struct character_device *__restrict self) {
 	unsigned int i;
 	me = (struct uhci_controller *)self;
 
-#ifdef CONFIG_UHCI_USE_ASYNC_WORKERS
 	/* Unregister the power control callback. */
 	unregister_async_worker(&uhci_powerctl_cb, me);
-#else /* CONFIG_UHCI_USE_ASYNC_WORKERS */
-	/* Destroy the power control descriptor and thread. */
-	if (me->uc_powerctl_desc) {
-		xatomic_weaklyref_clear(&me->uc_powerctl_desc->up_ctrl);
-		decref_unlikely(me->uc_powerctl_desc);
-	}
-	if (me->uc_powerctl_thrd) {
-		decref(me->uc_powerctl_thrd);
-		/* In (the likely) case that the power controller was
-		 * waiting for something to happen, wake it up. */
-		sig_broadcast(&me->uc_resdec);
-	}
-#endif /* !CONFIG_UHCI_USE_ASYNC_WORKERS */
 
 	/* Make sure that the controller is stopped. */
 	if (me->uc_base.uc_mmbase != NULL)
@@ -2798,7 +2777,6 @@ uhci_handle_resume_detect(struct uhci_controller *__restrict self) {
 }
 
 
-#ifdef CONFIG_UHCI_USE_ASYNC_WORKERS
 /* Timeout handler for `uc_lastint + uc_suspdelay' */
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
 uhci_powerctl_powerctl_timeout(void *__restrict arg) {
@@ -2948,153 +2926,6 @@ uhci_powerctl_work(void *__restrict arg) {
 		uhci_handle_resume_detect(uc);
 }
 
-#else /* CONFIG_UHCI_USE_ASYNC_WORKERS */
-
-
-PRIVATE void KCALL
-uhci_powerctl_main(REF struct uhci_powerctl *__restrict ctl) {
-	FINALLY_DECREF_UNLIKELY(ctl);
-	for (;;) {
-		struct timespec timeout;
-		uintptr_t flags;
-		REF struct uhci_controller *uc;
-		bool egsm_ok;
-#define READ_CTRL() UHCI_POWERCTL_CTRL(ctl).get()
-		uc = READ_CTRL();
-		if unlikely(!uc)
-			break;
-again_read_flags:
-		flags = ATOMIC_READ(uc->uc_flags);
-		/* Check if a resume event was detected. */
-		if unlikely(flags & UHCI_CONTROLLER_FLAG_RESDECT) {
-do_resdect:
-			FINALLY_DECREF_UNLIKELY(uc);
-			uhci_handle_resume_detect(uc);
-			continue;
-		}
-		/* Connect to the `uc_resdec' lock and drop our reference from `uc'
-		 * -> We must not be holding it while sleeping, so-as to allow the
-		 *    controller to be destroyed while we're still running.
-		 *    Should this happen, we'll still be informed about it by the
-		 *    weak reference in `ctl' being cleared. */
-do_connect:
-		TRY {
-			task_connect(&uc->uc_resdec);
-		} EXCEPT {
-			decref_unlikely(uc);
-			RETHROW();
-		}
-		/* Now that we're interlocked with the RESDEC signal,
-		 * check if another resume event got triggered. */
-		flags = ATOMIC_READ(uc->uc_flags);
-		if unlikely(flags & UHCI_CONTROLLER_FLAG_RESDECT) {
-			decref_unlikely(uc);
-			task_disconnectall();
-			continue;
-		}
-		if (ATOMIC_READ(uc->uc_qhlast) != NULL) {
-			/* Wait until all queue heads have been serviced. */
-			/* XXX: We could easily add support for a watchdog here... */
-			decref_unlikely(uc);
-			task_waitfor();
-			continue;
-		}
-		if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
-			/* When the bus has already been suspended, then we can
-			 * just wait until it gets resumed before doing anything! */
-			decref_unlikely(uc);
-			task_waitfor();
-			continue;
-		}
-		/* There doesn't seem to be any traffic, so we wait for traffic
-		 * to appear with a custom timeout that specifies how long to
-		 * wait before the bus should automatically be suspended.
-		 * Note that this is a relatively short delay, because for whatever
-		 * reason, USB attach/detach events only generate interrupts when
-		 * the entire bus has been suspended (so we need to do this to be
-		 * able to handle attach/detach events!) */
-		assert(PREEMPTION_ENABLED());
-#ifndef CONFIG_NO_SMP
-		PREEMPTION_DISABLE();
-		while (!sync_tryread(&uc->uc_lastint_lock)) {
-			PREEMPTION_ENABLE();
-			task_yield();
-			PREEMPTION_DISABLE();
-		}
-#else /* !CONFIG_NO_SMP */
-		PREEMPTION_DISABLE();
-#endif /* CONFIG_NO_SMP */
-		COMPILER_READ_BARRIER();
-		timeout = uc->uc_lastint;
-		COMPILER_READ_BARRIER();
-#ifndef CONFIG_NO_SMP
-		sync_endread(&uc->uc_lastint_lock);
-#endif /* !CONFIG_NO_SMP */
-		PREEMPTION_ENABLE();
-
-		timeout.add_milliseconds(uc->uc_suspdelay);
-		decref_unlikely(uc);
-
-		/* Wait for our timeout to expire. */
-		if (task_waitfor(&timeout) != NULL)
-			continue; /* Something happened! -> Don't time out. */
-
-		/* Must (try to) suspend the controller. */
-		uc = READ_CTRL();
-		if unlikely(!uc)
-			break;
-		/* Quick check: Has something happened that we should worry about? */
-		flags = ATOMIC_READ(uc->uc_flags);
-		if (flags & UHCI_CONTROLLER_FLAG_RESDECT)
-			goto do_resdect;
-		if (ATOMIC_READ(uc->uc_qhlast) != NULL)
-			goto do_connect;
-		if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED)
-			goto do_connect;
-		/* Lock the controller since we're about to access its registers. */
-		TRY {
-			sync_write(&uc->uc_lock);
-		} EXCEPT {
-			decref_unlikely(uc);
-			RETHROW();
-		}
-		/* Check the controller state again (now that we've got the necessary lock) */
-		flags = ATOMIC_READ(uc->uc_flags);
-		if (flags & UHCI_CONTROLLER_FLAG_RESDECT) {
-			sync_endwrite(&uc->uc_lock);
-			goto do_resdect;
-		}
-		if (ATOMIC_READ(uc->uc_qhlast) != NULL) {
-			sync_endwrite(&uc->uc_lock);
-			goto do_connect;
-		}
-		if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
-			sync_endwrite(&uc->uc_lock);
-			goto do_connect;
-		}
-		/* Try to enter EGSM mode.
-		 * Note that this function returns `false' if there are
-		 * any ports with changed connectivity indicators! */
-		egsm_ok = uhci_controller_egsm_enter(uc);
-		uhci_controller_endwrite(uc);
-
-		/* If we've successfully managed to enter EGSM mode, directly loop back. */
-		if (egsm_ok)
-			goto again_read_flags;
-
-		/* There are some ports that have changed their connectivity status.
-		 * -> Handle this change in connectivity, and loop back. */
-		TRY {
-			uhci_chk_port_changes(uc);
-		} EXCEPT {
-			decref_unlikely(uc);
-			RETHROW();
-		}
-		goto again_read_flags;
-	}
-}
-
-#endif /* !CONFIG_UHCI_USE_ASYNC_WORKERS */
 
 
 PRIVATE ATTR_FREETEXT void FCALL
@@ -3301,32 +3132,8 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	result->uc_lastint   = realtime();
 	result->uc_suspdelay = 250; /* Milliseconds */
 
-#ifdef CONFIG_UHCI_USE_ASYNC_WORKERS
 	/* Register the power control callback. */
 	register_async_worker(&uhci_powerctl_cb, result);
-#else /* CONFIG_UHCI_USE_ASYNC_WORKERS */
-	{
-		REF struct task *pth;
-		REF struct uhci_powerctl *pctl;
-		/* Create the power management descriptor. */
-		pctl = (REF struct uhci_powerctl *)kmalloc(sizeof(struct uhci_powerctl),
-		                                           GFP_NORMAL);
-		pctl->up_refcnt = 1;
-		xatomic_weaklyref_init(&pctl->up_ctrl, result);
-		result->uc_powerctl_desc = pctl; /* Inherit reference */
-		/* Create the power management thread. */
-		TRY {
-			pth = task_alloc(&vm_kernel);
-		} EXCEPT {
-			decref(pctl);
-			RETHROW();
-		}
-		task_setup_kernel(pth, (thread_main_t)&uhci_powerctl_main, 1, incref(pctl));
-		task_start(pth, TASK_START_FNORMAL);
-		result->uc_powerctl_thrd = pth; /* Inherit reference. */
-	}
-#endif /* !CONFIG_UHCI_USE_ASYNC_WORKERS */
-
 
 	{
 		static int n = 0; /* TODO: better naming */

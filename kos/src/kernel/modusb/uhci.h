@@ -43,9 +43,6 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#undef CONFIG_UHCI_USE_ASYNC_WORKERS
-#define CONFIG_UHCI_USE_ASYNC_WORKERS 1
-
 DECL_BEGIN
 
 union uhci_iobase {
@@ -156,7 +153,7 @@ struct uhci_interrupt: usb_interrupt {
  *
  * IMPORTANT NOTE ABOUT UHCI:
  *   - You only get interrupts about devices attaching/detaching when `UHCI_USBCMD_EGSM' is set!
- *   - As such, plug-and-play requires a background daemon (`uc_powerctl_thrd') that handles all
+ *   - As such, plug-and-play requires a background daemon (`uhci_powerctl_cb') that handles all
  *     of the attach/detach, as well as the delayed setting of `UHCI_USBCMD_EGSM', as that flag
  *     indicates a sort-of suspension mode for the controller.
  *     I'm not entirely sure what really gets suspended by that flag on real hardware. - In QEMU
@@ -171,21 +168,18 @@ struct uhci_interrupt: usb_interrupt {
  *     changed, or that a USB device caused an interrupt (which I assume includes stuff like you
  *     pressing a key on a USB keyboard, but definitely includes device attach/detach)
  *  -> This is then handled by setting the `UHCI_CONTROLLER_FLAG_RESDECT' flag below, and broadcasting
- *     the `uc_resdec' signal, waking up the `uc_powerctl_thrd' and causing it to clear the 
+ *     the `uc_resdec' signal, waking up the `uhci_powerctl_cb' and causing it to clear the 
  *     `UHCI_USBCMD_EGSM' flag (which by the way is kept in sync with `UHCI_CONTROLLER_FLAG_SUSPENDED'),
  *     before enumerating the root hub ports (`UHCI_PORTSC(0 ... uc_portnum - 1)') and checking each
  *     of them for the `UHCI_PORTSC_CSC' flag.
  *  -> There also exists a timeout before `UHCI_CONTROLLER_FLAG_SUSPENDED' automatically gets set once
- *     again, which is also handled by `uc_powerctl_thrd' and is done in relation to the amount of time
+ *     again, which is also handled by `uhci_powerctl_cb' and is done in relation to the amount of time
  *     that has passed since the last interrupt (of any kind)
  * ...
  * This all could have been sooo much simpler if it was possible to detect device attach/detach
  * while still keeping the UHCI controller turned on in its normal configuration.
  */
 
-#ifndef CONFIG_UHCI_USE_ASYNC_WORKERS
-struct uhci_powerctl;
-#endif /* !CONFIG_UHCI_USE_ASYNC_WORKERS */
 struct uhci_controller: usb_controller {
 	union uhci_iobase          uc_base;           /* I/O base address. */
 	struct pci_device         *uc_pci;            /* [1..1][const] The associated PCI device. */
@@ -197,10 +191,6 @@ struct uhci_controller: usb_controller {
 	struct sig                 uc_resdec;         /* Signal broadcast when the `UHCI_CONTROLLER_FLAG_RESDECT' flag
 	                                               * is set, or `UHCI_CONTROLLER_FLAG_SUSPENDED' is cleared,
 	                                               * or `uc_qhlast' is set to `NULL'. */
-#ifndef CONFIG_UHCI_USE_ASYNC_WORKERS
-	REF struct uhci_powerctl  *uc_powerctl_desc;  /* [1..1][const] Power-control / Device-discover descriptor. */
-	REF struct task           *uc_powerctl_thrd;  /* [1..1][const] Power-control / Device-discover thread. */
-#endif /* !CONFIG_UHCI_USE_ASYNC_WORKERS */
 	struct atomic_rwlock       uc_lock;           /* Lock for sending commands to the controller. */
 	REF struct uhci_interrupt *uc_intreg;         /* [lock(uc_lock)][0..1] Chain of interrupts checked every frame (w/o `UHCI_INTERRUPT_FLAG_ISOCHRONOUS').
 	                                               * NOTE: The HW-next pointer of last TD of the last entry of this chain points to `uc_qhstart'! */
@@ -231,15 +221,6 @@ struct uhci_controller: usb_controller {
 	u8                         uc_portnum;        /* [const] # of available ports. */
 };
 
-#ifndef CONFIG_UHCI_USE_ASYNC_WORKERS
-struct uhci_powerctl {
-	WEAK refcnt_t                                    up_refcnt; /* Reference counter. */
-	XATOMIC_WEAKLYREF_STRUCT(struct uhci_controller) up_ctrl;   /* Weak reference to the controller (cleared when the controller dies) */
-};
-DEFINE_REFCOUNT_FUNCTIONS(struct uhci_powerctl, up_refcnt, kfree)
-#define UHCI_POWERCTL_CTRL(x) \
-	((XATOMIC_WEAKLYREF(struct uhci_controller) &)(x)->up_ctrl)
-#endif /* !CONFIG_UHCI_USE_ASYNC_WORKERS */
 
 
 
