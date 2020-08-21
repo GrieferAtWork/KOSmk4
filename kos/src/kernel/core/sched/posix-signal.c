@@ -733,7 +733,7 @@ task_signal_rpc_handler(void *arg,
 			mymask = sigmask_getrd();
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
-			 * still triggered the RPC. - Schedule the ) */
+			 * still triggered the RPC) */
 			if unlikely(mymask && sigismember(&mymask->sm_mask, info->sqe_info.si_signo)) {
 				/* Mark the signal as pending within the current thread. */
 				struct sigqueue *pertask_pending;
@@ -2404,9 +2404,11 @@ sigmask_ensure_unmasked_mandatory(struct kernel_sigmask *__restrict sigmask) {
 	}
 }
 
-DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
-                USER UNCHECKED sigset_t const *, uthese,
-                size_t, sigsetsize) {
+PRIVATE struct icpustate *FCALL
+sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
+                       USER UNCHECKED sigset_t const *uthese,
+                       size_t sigsetsize,
+                       struct rpc_syscall_info const *sc_info) {
 	struct kernel_sigmask *mymask;
 	sigset_t oldmask;
 	if unlikely(sigsetsize != sizeof(sigset_t))
@@ -2429,14 +2431,70 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	TRY {
 		/* Make sure that mandatory signals aren't masked. */
 		sigmask_ensure_unmasked_mandatory(mymask);
-		/* Wait forever until something happens. */
-		for (;;) {
-			PREEMPTION_DISABLE();
-			/* Service RPC callbacks (which include the handling of signals) */
-			if (task_serve())
-				continue;
-			/* Sleep until the next sporadic wakeup */
-			task_sleep();
+
+		/* Check if there are any pending signals which we should serve.
+		 * NOTE: This _has_ to be an immediate signal mask check.
+		 *       (see the explanation below, especially case #1) */
+
+		/* XXX: POSIX says that we should only handle SIG_TERM (which we do
+		 *      unconditionally), as well as custom user-space signal handlers.
+		 *      Currently, this call to `sigmask_check_s()' will also return
+		 *      something other than `TASK_RPC_RESTART_SYSCALL' for other
+		 *      dispositions (including SIG_IGN).
+		 * POSIX doesn't say if we're allowed to do this as an extension, but
+		 * in general I already feel like allowing sigsuspend() to return for
+		 * unmasked signals, irregardless of their disposition is the most
+		 * correct thing to do (i.e. what we're already doing at the moment).
+		 *
+		 * So if it turns our that POSIX _really_ doesn't want us to have sigsuspend()
+		 * return for SIG_IGN (i.e. I come across a program that relies on POSIX
+		 * compliant behavior, and patching it would be too complicated), the there
+		 * should at the very least be a KP_* personality (<kos/personality.h>) to
+		 * have the sigsuspend() return irregardless of disposition! */
+		state = sigmask_check_s(state, sc_info);
+		if (state == TASK_RPC_RESTART_SYSCALL) {
+			/* Wait forever until something happens.
+			 * NOTE: Once a signal become available, task_serve() will
+			 *       throw an exception that will do one of 2 things.
+			 * In every case, our EXCEPT below will get executed,
+			 * and we will restore the previous signal mask.
+			 * Afterwards, execution will end up in `task_signal_rpc_handler()',
+			 * which will check if the original signal mask (the one we've restored
+			 * below) is blocking the signal.
+			 *
+			 *   #1: If it is, then it will schedule the signal as pending for our thread,
+			 *       and unconditionally restart our interrupted system call, which will
+			 *       cause control flow to re-enter this function.
+			 *       Only at that point, our call to `sigmask_check_s()' will notice that
+			 *       an unmasked signal is available, which will cause it to IMMEDIATELY
+			 *       update the real user-space `state' to point to the associated signal
+			 *       handler.
+			 *       Note my use of IMMEDIATELY. It is important that we can handle signals
+			 *       directly, and not make use of `sigmask_check()' at that point, since
+			 *       that function will throw an E_INTERRUPT if an unmasked signal is present,
+			 *       which would cause the EXCEPT below to restore the old signal mask, before
+			 *       `task_signal_rpc_handler()' would notice that it was called for a signal
+			 *       that is being masked, which would result in it scheduling the signal as
+			 *       pending, and forcably restarting our system call, only for us to end up
+			 *       at the call to `sigmask_check()', which would do the same over and over,
+			 *       leading to us being stuck in a soft-lock.
+			 *
+			 *   #2: Old user-space also didn't have the signal blocked (unlikely case,
+			 *       since the whole idea behind sigsuspend() is to allow user-space a
+			 *       way of performing interlocked waits for signals, such that it can
+			 *       be guarantied that waiting never starts if a signal was marked as
+			 *       pending between a prior call to sigprocmask(2) and now)
+			 *       In this case, `task_signal_rpc_handler()' will do the job of handling
+			 *       the signal by performing the user-space requested signal-handle operation.
+			 */
+			for (;;) {
+				PREEMPTION_DISABLE();
+				/* Service RPC callbacks (which include the handling of signals) */
+				if (task_serve())
+					continue;
+				/* Sleep until the next sporadic wakeup */
+				task_sleep();
+			}
 		}
 	} EXCEPT {
 		/* Restore the old mask. */
@@ -2444,6 +2502,47 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 		sigmask_check_after_except();
 		RETHROW();
 	}
+	/* Restore the old signal mask.
+	 * FIXME: This is wrong! We only get here after we're received a signal. However,
+	 *        the associated handler may have already changed the signal mask once
+	 *        again (by or'ing it with its own mask), such that us restoring the old
+	 *        mask here will over-ride its efforts.
+	 *     -> The correct thing to do here would be not to use `sigmask_check_s()'
+	 *        above, but instead use a custom function that will restore `oldmask'
+	 *        _before_ calling `handle_signal()' for the first time. */
+	memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+	sigmask_check();
+
+	return state;
+}
+
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+syscall_rt_sigsuspend_rpc(void *UNUSED(arg),
+                          struct icpustate *__restrict state,
+                          unsigned int reason,
+                          struct rpc_syscall_info const *sc_info) {
+	if (reason == TASK_RPC_REASON_SYSCALL) {
+		state = sys_rt_sigsuspend_impl(state,
+		                               (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0],
+		                               (size_t)sc_info->rsi_regs[1],
+		                               sc_info);
+	}
+	return state;
+}
+
+
+DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
+                USER UNCHECKED sigset_t const *, uthese,
+                size_t, sigsetsize) {
+	(void)uthese;
+	(void)sigsetsize;
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_schedule_user_rpc(THIS_TASK,
+	                       &syscall_rt_sigsuspend_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       GFP_NORMAL);
 	__builtin_unreachable();
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGSUSPEND */
