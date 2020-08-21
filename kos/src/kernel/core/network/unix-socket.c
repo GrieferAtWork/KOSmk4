@@ -144,7 +144,7 @@ NOTHROW(FCALL unix_server_fini)(struct unix_server *__restrict self) {
  * will alter the behavior if that client was chosed to be refused,
  * such that this function returns `false' if that client in particular
  * was refused, and `true' otherwise. */
-PRIVATE NOBLOCK NONNULL((1, 2, 3)) bool
+PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL unix_server_append_acceptme)(struct unix_server *__restrict self,
                                            REF struct unix_client *acceptme_first,
                                            REF struct unix_client *acceptme_last,
@@ -152,7 +152,6 @@ NOTHROW(KCALL unix_server_append_acceptme)(struct unix_server *__restrict self,
 	/* Check if we've got too many clients. */
 	bool result = true;
 	size_t limit, count;
-	struct unix_client **piter, *iter;
 	assert((acceptme_first != NULL) ==
 	       (acceptme_last != NULL));
 	if (!acceptme_first)
@@ -179,33 +178,36 @@ refuse_everyone:
 		goto done;
 	}
 	count = 1;
-	piter = &acceptme_first->uc_next;
-	while ((iter = *piter) != acceptme_last) {
-		assert(iter);
-		++count;
-		if unlikely(count > limit) {
-			/* Refuse the request of all clients starting
-			 * with `iter', and ending with `acceptme_last' */
-			for (;;) {
-				REF struct unix_client *next;
-				next = iter->uc_next;
-				if (iter == was_i_accepted) {
-					/* Special handling required. */
-					result = false;
-				} else {
-					unix_client_refuse_connection(iter);
-					decref_unlikely(iter);
+	if (acceptme_first != acceptme_last) {
+		struct unix_client **piter, *iter;
+		piter = &acceptme_first->uc_next;
+		while ((iter = *piter) != acceptme_last) {
+			assert(iter);
+			++count;
+			if unlikely(count > limit) {
+				/* Refuse the request of all clients starting
+				 * with `iter', and ending with `acceptme_last' */
+				for (;;) {
+					REF struct unix_client *next;
+					next = iter->uc_next;
+					if (iter == was_i_accepted) {
+						/* Special handling required. */
+						result = false;
+					} else {
+						unix_client_refuse_connection(iter);
+						decref_unlikely(iter);
+					}
+					if (iter == acceptme_last)
+						break;
+					iter = next;
 				}
-				if (iter == acceptme_last)
-					break;
-				iter = next;
+				/* Set the last accepted client to the
+				 * predecessor of the original `iter' */
+				acceptme_last = container_of(piter, struct unix_client, uc_next);
+				break;
 			}
-			/* Set the last accepted client to the
-			 * predecessor of the original `iter' */
-			acceptme_last = container_of(piter, struct unix_client, uc_next);
-			break;
+			piter = &iter->uc_next;
 		}
-		piter = &iter->uc_next;
 	}
 	/* Terminate the chain. */
 	acceptme_last->uc_next = NULL;
@@ -213,7 +215,7 @@ refuse_everyone:
 	 * In the case that some other chain got
 	 * installed in the mean time, merge with it. */
 	for (;;) {
-		struct unix_client *chain;
+		struct unix_client *chain, *iter;
 		chain = ATOMIC_READ(self->us_acceptme);
 		if unlikely(chain == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 			goto refuse_everyone; /* Server was shut down -> Refuse _all_ clients. */
@@ -229,9 +231,9 @@ refuse_everyone:
 		if (!ATOMIC_CMPXCH_WEAK(self->us_acceptme, chain, NULL))
 			continue;
 		iter = chain;
-		while (chain->uc_next)
-			chain = chain->uc_next;
-		chain->uc_next = acceptme_first;
+		while (iter->uc_next)
+			iter = iter->uc_next;
+		iter->uc_next  = acceptme_first;
 		acceptme_first = chain;
 		goto again;
 	}
@@ -721,7 +723,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 		 * the fact that we wish to connect. */
 		client = (REF struct unix_client *)kmalloc(sizeof(struct unix_client),
 		                                           GFP_NORMAL);
-		client->uc_refcnt = 1;
+		client->uc_refcnt = 2; /* +1: unix_server_append_acceptme(), +1: con->aw_client */
 		client->uc_status = UNIX_CLIENT_STATUS_PENDING;
 		sig_init(&client->uc_status_sig);
 		/* Initialize the client/server packet buffers. */
@@ -745,6 +747,8 @@ UnixSocket_Connect(struct socket *__restrict self,
 				if (last) {
 					while (last->uc_next)
 						last = last->uc_next;
+				} else {
+					last = client;
 				}
 				/* Insert our new client. */
 				client->uc_next = next;
