@@ -772,6 +772,7 @@ incdir("", "../../include");
 #include <libansitty/ctl.h>
 #include <libbuffer/api.h>
 #include <libbuffer/linebuffer.h>
+#include <libbuffer/packetbuffer.h>
 #include <libbuffer/ringbuffer.h>
 #include <libc/core/ctype.h>
 #include <libc/core/error.h>
@@ -934,6 +935,8 @@ incdir("", "../../include");
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
 #include <libutil.h>
+#include <libvgastate/api.h>
+#include <libvgastate/vga.h>
 #include <libvideo/codec/api.h>
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/format.h>
@@ -1548,6 +1551,7 @@ incdir("", "../../include");
 #include <sys/isa_defs.h>
 #include <sys/kd.h>
 #include <sys/klog.h>
+#include <sys/loadavg.h>
 #include <sys/mman.h>
 #include <sys/mmio.h>
 #include <sys/mount.h>
@@ -1580,7 +1584,9 @@ incdir("", "../../include");
 #include <sys/sysinfo.h>
 #include <sys/syslog.h>
 #include <sys/sysmacros.h>
+#include <sys/termio.h>
 #include <sys/termios.h>
+#include <sys/termiox.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
 #include <sys/timerfd.h>
@@ -1602,6 +1608,7 @@ incdir("", "../../include");
 #include <sys/wait.h>
 #include <sys/xattr.h>
 #include <syscall.h>
+#include <sysexits.h>
 #include <syslimits.h>
 #include <syslog.h>
 #include <tar.h>

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe6f9ffbc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _VFORK_H
-#define _VFORK_H 1
+#ifndef _SYS_TERMIOX_H
+#define _SYS_TERMIOX_H 1
 
-#include "__stdinc.h"
-#include "__crt.h"
+#include <asm/ioctls/tty.h> /* TCGETX, TCSETX, TCSETXW, TCSETXF */
+#include <bits/ioctls/termiox.h>
 
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
-#include <features.h>
-
-#include <bits/types.h>
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-#ifndef __vfork_defined
-#define __vfork_defined 1
-#ifdef __CRT_HAVE_vfork
-/* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
-#elif defined(__CRT_HAVE___vfork)
-/* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
-#else /* ... */
-#undef __vfork_defined
-#endif /* !... */
-#endif /* !__vfork_defined */
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-#endif /* !_VFORK_H */
+#endif /* !_SYS_TERMIOX_H */

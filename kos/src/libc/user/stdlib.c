@@ -1155,10 +1155,10 @@ NOTHROW_NCX(LIBCCALL libc_mkstemps64)(char *template_,
 #endif /* MAGIC:alias */
 /*[[[end:libc_mkstemps64]]]*/
 
-/*[[[head:libc_getloadavg,hash:CRC-32=0x20bc57b0]]]*/
+/*[[[head:libc_getloadavg,hash:CRC-32=0x5e8ab693]]]*/
 INTERN ATTR_SECTION(".text.crt.system.utility") int
 NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[],
-                                      int nelem)
+                                      __STDC_INT_AS_SIZE_T nelem)
 /*[[[body:libc_getloadavg]]]*/
 /*AUTO*/{
 	(void)loadavg;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23bc4299 */
+/* HASH CRC-32:0x3572646d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_, int suffixlen);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mkstemps64)(char *template_, int suffixlen);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], int nelem);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF double NOTHROW_NCX(LIBCCALL libc_drand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_lrand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_mrand48)(void);

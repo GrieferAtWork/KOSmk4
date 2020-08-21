@@ -20,19 +20,20 @@
 
 %{
 #include <features.h>
+
 #include <bits/types.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 }
 
 %[insert:extern(vfork)]
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
 

@@ -1419,8 +1419,8 @@ int rand_r([[nonnull]] unsigned int *__restrict pseed) {
 %[insert:extern(cfree)]
 
 %#ifndef __NO_FPU
-[[cp]]
-int getloadavg(double loadavg[], int nelem);
+[[cp, guard, decl_include("<features.h>")]]
+int getloadavg(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 %#endif /* !__NO_FPU */
 %#endif /* __USE_MISC */
 

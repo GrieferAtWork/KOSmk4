@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6f9ffbc */
+/* HASH CRC-32:0x95484dda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,11 +18,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _VFORK_H
-#define _VFORK_H 1
+#ifndef _SYS_LOADAVG_H
+#define _SYS_LOADAVG_H 1
 
-#include "__stdinc.h"
-#include "__crt.h"
+#include <__stdinc.h>
+#include <__crt.h>
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -30,29 +30,21 @@
 
 #include <features.h>
 
-#include <bits/types.h>
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __vfork_defined
-#define __vfork_defined 1
-#ifdef __CRT_HAVE_vfork
-/* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
-#elif defined(__CRT_HAVE___vfork)
-/* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
-#else /* ... */
-#undef __vfork_defined
-#endif /* !... */
-#endif /* !__vfork_defined */
+#ifndef __NO_FPU
+#ifndef __getloadavg_defined
+#define __getloadavg_defined 1
+#ifdef __CRT_HAVE_getloadavg
+__CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE_T __nelem),(__loadavg,__nelem))
+#else /* __CRT_HAVE_getloadavg */
+#undef __getloadavg_defined
+#endif /* !__CRT_HAVE_getloadavg */
+#endif /* !__getloadavg_defined */
+#endif /* !__NO_FPU */
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_VFORK_H */
+#endif /* !_SYS_LOADAVG_H */

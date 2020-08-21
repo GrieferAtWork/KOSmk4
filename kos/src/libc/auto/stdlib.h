@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ff854be */
+/* HASH CRC-32:0xa5e1d259 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -286,7 +286,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(cha
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemps64)(char *template_, int suffixlen);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rand_r)(unsigned int *__restrict pseed);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_getloadavg)(double loadavg[], int nelem);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd_erand48)(unsigned short xsubi[3]);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_nrand48)(unsigned short xsubi[3]);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_jrand48)(unsigned short xsubi[3]);

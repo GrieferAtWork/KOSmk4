@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce3d1d01 */
+/* HASH CRC-32:0x71fb4d5e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1576,7 +1576,14 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),(__mallptr))
 #endif /* !... */
 #endif /* !__cfree_defined */
 #ifndef __NO_FPU
-__CDECLARE_OPT(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], int __nelem),(__loadavg,__nelem))
+#ifndef __getloadavg_defined
+#define __getloadavg_defined 1
+#ifdef __CRT_HAVE_getloadavg
+__CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE_T __nelem),(__loadavg,__nelem))
+#else /* __CRT_HAVE_getloadavg */
+#undef __getloadavg_defined
+#endif /* !__CRT_HAVE_getloadavg */
+#endif /* !__getloadavg_defined */
 #endif /* !__NO_FPU */
 #endif /* __USE_MISC */
 
