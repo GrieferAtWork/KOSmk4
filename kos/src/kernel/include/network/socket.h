@@ -193,8 +193,8 @@ struct socket_ops {
 
 	/* [0..1] Poll for special condition
 	 * The following conditions are defined:
-	 *    POLLIN:    `so_recv()' or `so_recvfrom()' if not listening,
-	 *               or `so_accept()' if listening can be called.
+	 *    POLLIN:    Can call: if not listening: `so_recv()' or `so_recvfrom()'
+	 *                         if listening:     `so_accept()'
 	 *    POLLPRI:   Socket-specific, for tcp: out-of-band data available
 	 *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
 	 *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
@@ -227,7 +227,7 @@ struct socket_ops {
 			THROWS(E_INVALID_ARGUMENT_BAD_STATE);
 
 	/* [1..1]
-	 * Bind this socket to the specified address.
+	 * Bind this socket to the specified local address.
 	 * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                  [...]
 	 * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY: [...]
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND:                 [...]
@@ -429,7 +429,9 @@ struct socket_ops {
 	 * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
 	 * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
-	 * @throws: E_NET_CONNECTION_ABORT:                                                       [...] * */
+	 * @throws: E_NET_CONNECTION_ABORT:                                                       [...] */
+	/* TODO: Filling in the peer address should not be part of this interface!
+	 *       The address is the same as returned by `socket_getpeername(return)' */
 	NONNULL((1)) REF struct socket *
 	(KCALL *so_accept)(struct socket *__restrict self,
 	                   USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -449,7 +451,7 @@ struct socket_ops {
 			THROWS(E_INVALID_ARGUMENT_BAD_STATE);
 
 	/* [0..1]
-	 * Get the value of the named socket option and store it in `optval'
+	 * Get the value of the named socket option `level:optname' and store it in `optval'
 	 * @return: * : The required buffer size.
 	 * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT: [...] */
 	NONNULL((1)) socklen_t
@@ -460,7 +462,7 @@ struct socket_ops {
 			THROWS(E_INVALID_ARGUMENT_SOCKET_OPT);
 
 	/* [0..1]
-	 * Set the value of the named socket option from what is given in `optval'
+	 * Set the value of the named socket option `level:optname' from what is given in `optval'
 	 * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT: [...]
 	 * @throws: E_BUFFER_TOO_SMALL: The specified `optlen' is invalid for the given option. */
 	NONNULL((1)) void

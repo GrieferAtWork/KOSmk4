@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67b2603d */
+/* HASH CRC-32:0x793e512f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,49 +27,59 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: recvmmsg32 from sys.socket */
 #if !defined(__local___localdep_recvmmsg32_defined) && defined(__CRT_HAVE_recvmmsg)
 #define __local___localdep_recvmmsg32_defined 1
-/* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors.
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* !__local___localdep_recvmmsg32_defined && __CRT_HAVE_recvmmsg */
 /* Dependency: recvmmsg64 from sys.socket */
 #ifndef __local___localdep_recvmmsg64_defined
 #define __local___localdep_recvmmsg64_defined 1
 #ifdef __CRT_HAVE_recvmmsg64
-/* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors.
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors.
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 __NAMESPACE_LOCAL_END
 #include <local/sys.socket/recvmmsg64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors.
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
 #define __localdep_recvmmsg64 __LIBC_LOCAL_NAME(recvmmsg64)
 #else /* ... */
 #undef __local___localdep_recvmmsg64_defined
 #endif /* !... */
 #endif /* !__local___localdep_recvmmsg64_defined */
-/* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors.
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @return: * : The # of datagrams successfully received.
+ * @return: -1: Error (s.a. `recvmsg(2)') */
 __LOCAL_LIBC(recvmmsg) __ATTR_NONNULL((2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg))(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) {
 

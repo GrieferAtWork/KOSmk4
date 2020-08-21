@@ -94,8 +94,8 @@
 #define SO_DETACH_BPF    SO_DETACH_FILTER
 
 
-#define __SHUT_RD   0 /* No more receptions. */
-#define __SHUT_WR   1 /* No more transmissions. */
-#define __SHUT_RDWR 2 /* No more receptions or transmissions. */
+#define __SHUT_RD   0 /* Don't receive any more data (already-received data can still be read, though). */
+#define __SHUT_WR   1 /* Don't allow any more data to be sent. */
+#define __SHUT_RDWR 2 /* Combination of `SHUT_RD' and `SHUT_WR'. */
 
 #endif /* !_ASM_SOCKET_H */
