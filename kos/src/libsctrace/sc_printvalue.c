@@ -1971,7 +1971,7 @@ print_sockaddr(pformatprinter printer, void *arg,
 
 	case AF_UNIX:
 		/* struct sockaddr_un */
-		PRINTF("," SYNSPACE SYNFIELD("sun_path") "%$q",
+		PRINTF("," SYNSPACE SYNFIELD("sun_path") "%.?q",
 		       payload_len, payload_data);
 		break;
 
