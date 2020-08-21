@@ -2407,14 +2407,9 @@ sigmask_ensure_unmasked_mandatory(struct kernel_sigmask *__restrict sigmask) {
 PRIVATE struct icpustate *FCALL
 sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
                        USER UNCHECKED sigset_t const *uthese,
-                       size_t sigsetsize,
                        struct rpc_syscall_info const *sc_info) {
 	struct kernel_sigmask *mymask;
 	sigset_t oldmask;
-	if unlikely(sigsetsize != sizeof(sigset_t))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
 	validate_readable(uthese, sizeof(sigset_t));
 	mymask = sigmask_getwr();
 	memcpy(&oldmask, &mymask->sm_mask, sizeof(sigset_t));
@@ -2475,7 +2470,7 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
 			 *       which would cause the EXCEPT below to restore the old signal mask, before
 			 *       `task_signal_rpc_handler()' would notice that it was called for a signal
 			 *       that is being masked, which would result in it scheduling the signal as
-			 *       pending, and forcably restarting our system call, only for us to end up
+			 *       pending, and forceably restarting our system call, only for us to end up
 			 *       at the call to `sigmask_check()', which would do the same over and over,
 			 *       leading to us being stuck in a soft-lock.
 			 *
@@ -2524,7 +2519,6 @@ syscall_rt_sigsuspend_rpc(void *UNUSED(arg),
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		state = sys_rt_sigsuspend_impl(state,
 		                               (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0],
-		                               (size_t)sc_info->rsi_regs[1],
 		                               sc_info);
 	}
 	return state;
@@ -2535,7 +2529,11 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
                 USER UNCHECKED sigset_t const *, uthese,
                 size_t, sigsetsize) {
 	(void)uthese;
-	(void)sigsetsize;
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
 	task_schedule_user_rpc(THIS_TASK,
 	                       &syscall_rt_sigsuspend_rpc,
