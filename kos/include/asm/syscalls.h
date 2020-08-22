@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdda3c401 */
+/* HASH CRC-32:0x25df08b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,8 +263,8 @@
 #define __NR_shmctl                 0xc3  /* errno_t shmctl(int TODO_PROTOTYPE) */
 #define __NR_shmat                  0xc4  /* errno_t shmat(int TODO_PROTOTYPE) */
 #define __NR_shmdt                  0xc5  /* errno_t shmdt(int TODO_PROTOTYPE) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -272,8 +272,8 @@
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define __NR_socket                 0xc6  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the

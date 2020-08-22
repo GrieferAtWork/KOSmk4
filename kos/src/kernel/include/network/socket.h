@@ -31,9 +31,9 @@
 
 #include <bits/cmsghdr-struct.h>
 #include <bits/sockaddr_storage-struct.h>
-#include <bits/socket.h>
 #include <compat/config.h>
 #include <kos/io.h>
+#include <sys/socket.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/cmsghdr-struct.h>

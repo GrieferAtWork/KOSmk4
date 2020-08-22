@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64b53700 */
+/* HASH CRC-32:0xd07469c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -988,8 +988,8 @@ __CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__
 __CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
 #endif /* __CRT_HAVE_SC(signalfd4) */
 #if __CRT_HAVE_SC(socket)
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -999,8 +999,8 @@ __CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *_
 __CDECLARE_SC(,__fd_t,socket,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol),(__domain,__type,__protocol))
 #endif /* __CRT_HAVE_SC(socket) */
 #if __CRT_HAVE_SC(socketpair)
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -2035,8 +2035,8 @@ __CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *_
 __CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
 #endif /* __CRT_HAVE_XSC(signalfd4) */
 #if __CRT_HAVE_XSC(socket)
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -2046,8 +2046,8 @@ __CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *
 __CDECLARE_XSC(,__fd_t,socket,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol),(__domain,__type,__protocol))
 #endif /* __CRT_HAVE_XSC(socket) */
 #if __CRT_HAVE_XSC(socketpair)
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the

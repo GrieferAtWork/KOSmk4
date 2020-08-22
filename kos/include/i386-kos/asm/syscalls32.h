@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81fc6b4 */
+/* HASH CRC-32:0x7cf740a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -479,8 +479,8 @@
 #define __NR_bpf                     0x165                  /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_execveat                0x166                  /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -488,8 +488,8 @@
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define __NR_socket                  0x167                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the

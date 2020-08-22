@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x886c7b51 */
+/* HASH CRC-32:0x187cf736 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -266,8 +266,8 @@
 #define SYS_shmctl                 __NR_shmctl                 /* errno_t shmctl(int TODO_PROTOTYPE) */
 #define SYS_shmat                  __NR_shmat                  /* errno_t shmat(int TODO_PROTOTYPE) */
 #define SYS_shmdt                  __NR_shmdt                  /* errno_t shmdt(int TODO_PROTOTYPE) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -275,8 +275,8 @@
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define SYS_socket                 __NR_socket                 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the

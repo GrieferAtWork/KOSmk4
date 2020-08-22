@@ -33,6 +33,7 @@ __DECL_BEGIN
 #define __OFFSET_CMSGHDR_LEVEL __SIZEOF_SIZE_T__
 #define __OFFSET_CMSGHDR_TYPE  (__SIZEOF_SIZE_T__ + 4)
 #define __OFFSET_CMSGHDR_DATA  (__SIZEOF_SIZE_T__ + 8)
+#define __ALIGNOF_CMSGHDR      __SIZEOF_SIZE_T__
 #ifdef __CC__
 
 /* Structure used for storage of ancillary data object information. */

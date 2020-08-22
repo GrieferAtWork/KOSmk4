@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f7cf878 */
+/* HASH CRC-32:0x50debd65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1983,6 +1983,7 @@ DFUN(".text.crt.dos.utility.shm", libd_shmdt, libc_shmdt, TD, 1, TP)
 DFUN(".text.crt.dos.sched.signalfd", libd_signalfd, libc_signalfd, TIn(__SIZEOF_FD_T__), 3, TIn(__SIZEOF_FD_T__), TP, TD)
 
 /* sys.socket */
+DFUN(".text.crt.dos.net.socket", libd___cmsg_nxthdr, libc___cmsg_nxthdr, TP, 2, TP, TP)
 DFUN(".text.crt.dos.net.socket", libd_socket, libc_socket, TIn(__SIZEOF_FD_T__), 3, TD, TD, TD)
 DFUN(".text.crt.dos.net.socket", libd_socketpair, libc_socketpair, TD, 4, TD, TD, TD, TP)
 DFUN(".text.crt.dos.net.socket", libd_bind, libc_bind, TD, 3, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_SOCKLEN_T__))

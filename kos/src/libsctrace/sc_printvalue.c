@@ -1761,8 +1761,8 @@ print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local sockaf = getPrefixedMacrosFromFile("../../include/asm/socket-families.h", "AF_");
-local sockpf = getPrefixedMacrosFromFile("../../include/asm/socket-families.h", "PF_");
+local sockaf = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__AF_");
+local sockpf = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__PF_");
 
 printStrendNDatabase("SOCKAF", sockaf);
 if (sockaf == sockpf) {
@@ -1855,8 +1855,8 @@ print_socket_proto(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/bits/socket_type.h", "SOCK_");
-printStrendNDatabase("SOCKTYPE", typ[:256]);
+local typ = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__SOCK_");
+printStrendNDatabase("SOCKTYPE", typ[:255]);
 ]]]*/
 #define GETBASE_SOCKTYPE(result, index) \
 	(((index) <= 0xa) ? ((result) = repr_SOCKTYPE_0h, true) : false)
@@ -1886,7 +1886,7 @@ print_socket_type(pformatprinter printer, void *arg,
 	ssize_t temp, result;
 	flags = type & (SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK);
 	type &= ~(SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK);
-	type_name = get_socket_type_name(type & 0xff);
+	type_name = get_socket_type_name(type & SOCK_TYPEMASK);
 	if (type_name) {
 		result = format_printf(printer, arg,
 		                       "SOCK_%s",
@@ -1894,9 +1894,9 @@ print_socket_type(pformatprinter printer, void *arg,
 	} else {
 		result = format_printf(printer, arg,
 		                       "%#x",
-		                       (unsigned int)(type & 0xff));
+		                       (unsigned int)(type & SOCK_TYPEMASK));
 	}
-	type &= ~0xff;
+	type &= ~SOCK_TYPEMASK;
 	if (type != 0) {
 		DO(format_printf(printer, arg,
 		                 PIPESTR_S "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),

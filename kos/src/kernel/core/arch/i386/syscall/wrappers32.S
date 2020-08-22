@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68665d63 */
+/* HASH CRC-32:0x1f543155 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13405,8 +13405,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	.cfi_endproc
 END(__x86_asm32_int80_execveat)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -13450,8 +13450,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	.cfi_endproc
 END(__x86_asm32_int80_socket)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -31069,8 +31069,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_execveat)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -31114,8 +31114,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socket)
 	.cfi_endproc
 END(__x86_asm32_sysenter_socket)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the

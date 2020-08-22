@@ -283,6 +283,7 @@
 #define __CRT_HAVE___clock_settime 1
 #define __CRT_HAVE___clone 1
 #define __CRT_HAVE___close 1
+#define __CRT_HAVE___cmsg_nxthdr 1
 #define __CRT_HAVE___connect 1
 #define __CRT_HAVE___control87_2 1
 #define __CRT_HAVE___copysign 1

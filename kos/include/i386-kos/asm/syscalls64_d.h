@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x503b3da6 */
+/* HASH CRC-32:0x1afda52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,8 +90,8 @@
 #define __NR64_setitimer              0x26                           /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 #define __NR64_getpid                 0x27                           /* pid_t getpid(void) */
 #define __NR64_sendfile               0x28                           /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
@@ -120,8 +120,8 @@
 #define __NR64_listen                 0x32                           /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 #define __NR64_getsockname            0x33                           /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 #define __NR64_getpeername            0x34                           /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the

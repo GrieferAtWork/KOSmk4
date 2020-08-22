@@ -3203,14 +3203,17 @@ again_parse_annotations:
 							current.bindings.append(binding);
 						}
 					} else {
-						if (tok !in ["inline", "forceinline"])
+						if (tok !in ["inline", "forceinline", "extern_inline"])
 							self.skip("(");
 						if (currentConditions !is none)
 							goto illegal_annotation_with_condition;
 						currentFeatures.inline = {
-							"inline"      : "LOCAL",
-							"forceinline" : "FORCELOCAL"
+							"inline"        : "LOCAL",
+							"forceinline"   : "FORCELOCAL",
+							"extern_inline" : "LOCAL"
 						}[tok];
+						if (tok == "extern_inline")
+							currentFeatures.noExternInline = false;
 					}
 					break;
 

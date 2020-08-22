@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6e6c649 */
+/* HASH CRC-32:0x7673d9b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,15 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED NONNULL((1, 2)) struct cmsghdr *NOTHROW_NCX(LIBDCALL libd___cmsg_nxthdr)(struct msghdr *mhdr, struct cmsghdr *cmsg);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1, 2)) struct cmsghdr *NOTHROW_NCX(LIBCCALL libc___cmsg_nxthdr)(struct msghdr *mhdr, struct cmsghdr *cmsg);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Create a new socket for the given domain/type/protocol triple.
- * @param: domain:   Socket address domain/family (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
@@ -45,8 +51,8 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_socket)(__STDC_INT_AS_UINT_T domai
 /* Create pair of connected sockets with the given domain/type/protocol triple
  * The sockets handles are stroed in `fds[0]' and `fds[1]', are already connected,
  * and are indistinguishable from each other.
- * @param: domain:   Socket address domain (one of `AF_*' from `<asm/socket-families.h>')
- * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ * @param: domain:   Socket address domain (one of `AF_*' from `<sys/socket.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the

@@ -35,6 +35,7 @@ __DECL_BEGIN
 #define __OFFSET_CMSGHDR_LEVEL __OFFSET_CMSGHDRX64_LEVEL
 #define __OFFSET_CMSGHDR_TYPE  __OFFSET_CMSGHDRX64_TYPE
 #define __OFFSET_CMSGHDR_DATA  __OFFSET_CMSGHDRX64_DATA
+#define __ALIGNOF_CMSGHDR      __ALIGNOF_CMSGHDRX64
 #define __cmsghdrx64 cmsghdr
 #endif /* __x86_64__ */
 
@@ -42,6 +43,7 @@ __DECL_BEGIN
 #define __OFFSET_CMSGHDRX64_LEVEL 8
 #define __OFFSET_CMSGHDRX64_TYPE  12
 #define __OFFSET_CMSGHDRX64_DATA  16
+#define __ALIGNOF_CMSGHDRX64      8
 #ifdef __CC__
 
 #ifdef __USE_KOS_KERNEL
@@ -49,6 +51,9 @@ __DECL_BEGIN
 #endif /* __USE_KOS_KERNEL */
 
 /* Structure used for storage of ancillary data object information. */
+#if __ALIGNOF_INT64__ < 8
+__ATTR_ALIGNED(8)
+#endif /* __ALIGNOF_INT64__ < 8 */
 struct __cmsghdrx64 /*[NAME(cmsghdrx64)][PREFIX(cmsg_)]*/ {
 	__UINT64_TYPE__  cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. */
 	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */

@@ -30,10 +30,10 @@
 
 #include <hybrid/__assert.h>
 
-#include <bits/socket.h>
 #include <kos/io.h>
 #include <linux/if_ether.h>
 #include <network/network.h>
+#include <sys/socket.h>
 
 DECL_BEGIN
 

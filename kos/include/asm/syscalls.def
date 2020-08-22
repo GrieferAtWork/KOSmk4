@@ -1598,8 +1598,8 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
              [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
-@@@param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
-@@@param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+@@@param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+@@@param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
 @@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
 @@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
 @@                  depend on the selected `family', and may be further specialized by the

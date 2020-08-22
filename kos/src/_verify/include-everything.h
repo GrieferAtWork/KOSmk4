@@ -258,7 +258,6 @@ incdir("", "../../include");
 #include <asm/signum-values.h>
 #include <asm/sigset.h>
 #include <asm/sigstack.h>
-#include <asm/socket-families.h>
 #include <asm/socket.h>
 #include <asm/stat.h>
 #include <asm/stdio.h>
@@ -356,8 +355,6 @@ incdir("", "../../include");
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
-#include <bits/socket.h>
-#include <bits/socket_type.h>
 #include <bits/stat-cyg.h>
 #include <bits/stat-dos.h>
 #include <bits/stat-gen.h>

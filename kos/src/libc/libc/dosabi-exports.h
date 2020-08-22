@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6db643e3 */
+/* HASH CRC-32:0xea3d0f52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2465,6 +2465,7 @@ DEFINE_PUBLIC_ALIAS(DOS$shmdt, libd_shmdt);
 DEFINE_PUBLIC_ALIAS(DOS$signalfd, libd_signalfd);
 
 /* sys.socket */
+DEFINE_PUBLIC_ALIAS(DOS$__cmsg_nxthdr, libd___cmsg_nxthdr);
 DEFINE_PUBLIC_ALIAS(DOS$__socket, libd_socket);
 DEFINE_PUBLIC_ALIAS(DOS$socket, libd_socket);
 DEFINE_PUBLIC_ALIAS(DOS$socketpair, libd_socketpair);

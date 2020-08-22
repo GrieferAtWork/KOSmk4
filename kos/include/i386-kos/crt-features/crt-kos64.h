@@ -283,6 +283,7 @@
 #define __CRT_HAVE___clock_settime 1
 #define __CRT_HAVE___clone 1
 #define __CRT_HAVE___close 1
+#define __CRT_HAVE___cmsg_nxthdr 1
 #define __CRT_HAVE___connect 1
 #define __CRT_HAVE___control87_2 1
 #define __CRT_HAVE___copysign 1
@@ -4635,6 +4636,7 @@
 #define __CRT_HAVE_KOS$__clock_settime 1
 #define __CRT_HAVE_KOS$__clone 1
 #define __CRT_HAVE_KOS$__close 1
+#define __CRT_HAVE_KOS$__cmsg_nxthdr 1
 #define __CRT_HAVE_KOS$__connect 1
 #define __CRT_HAVE_KOS$__control87_2 1
 #define __CRT_HAVE_KOS$__copysign 1
@@ -8008,6 +8010,7 @@
 #define __CRT_HAVE_DOS$__clock_settime 1
 #define __CRT_HAVE_DOS$__clone 1
 #define __CRT_HAVE_DOS$__close 1
+#define __CRT_HAVE_DOS$__cmsg_nxthdr 1
 #define __CRT_HAVE_DOS$__connect 1
 #define __CRT_HAVE_DOS$__control87_2 1
 #define __CRT_HAVE_DOS$__copysign 1

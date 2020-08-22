@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x101f1456 */
+/* HASH CRC-32:0x957e13c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,6 +134,7 @@
 #define __CRT_HAVE_DOS$Valloc 1
 #define __CRT_HAVE_DOS$Write 1
 #define __CRT_HAVE_DOS$_Exit 1
+#define __CRT_HAVE_DOS$__cmsg_nxthdr 1
 #define __CRT_HAVE_DOS$__control87_2 1
 #define __CRT_HAVE_DOS$__fbufsize 1
 #define __CRT_HAVE_DOS$__flbf 1
@@ -3034,6 +3035,7 @@
 #define __CRT_HAVE___assert_fail 1
 #define __CRT_HAVE___assert_func 1
 #define __CRT_HAVE___assertfail 1
+#define __CRT_HAVE___cmsg_nxthdr 1
 #define __CRT_HAVE___control87_2 1
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___crt_unreachable 1
