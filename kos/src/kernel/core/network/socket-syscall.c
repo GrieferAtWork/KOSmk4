@@ -166,11 +166,14 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 	struct handle sock;
 	socklen_t avail_addr_len;
 	unsigned int result_fd;
-	validate_writable(addr_len, sizeof(*addr_len));
-	COMPILER_READ_BARRIER();
-	avail_addr_len = *addr_len;
-	COMPILER_READ_BARRIER();
-	validate_writable(addr, avail_addr_len);
+	avail_addr_len = 0;
+	if (addr_len) {
+		validate_writable(addr_len, sizeof(*addr_len));
+		COMPILER_READ_BARRIER();
+		avail_addr_len = *addr_len;
+		COMPILER_READ_BARRIER();
+		validate_writable(addr, avail_addr_len);
+	}
 	sock = handle_lookup((unsigned int)sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
@@ -183,12 +186,19 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 		result = socket_accept((struct socket *)sock.h_data,
-		                       addr, avail_addr_len,
-		                       addr_len, sock.h_mode);
+		                       sock.h_mode);
 	}
 	if (!result) {
 		/* NOTE: We don't throw an exception for this case! */
 		return -EWOULDBLOCK;
+	}
+	if (avail_addr_len) {
+		TRY {
+			*addr_len = socket_getpeername(result, addr, avail_addr_len);
+		} EXCEPT {
+			decref_likely(result);
+			RETHROW();
+		}
 	}
 	sock.h_data = result;
 	sock.h_mode = IO_RDWR;
@@ -212,11 +222,14 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 	VALIDATE_FLAGSET(sock_flags,
 	                 SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK,
 	                 E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS);
-	validate_writable(addr_len, sizeof(*addr_len));
-	COMPILER_READ_BARRIER();
-	avail_addr_len = *addr_len;
-	COMPILER_READ_BARRIER();
-	validate_writable(addr, avail_addr_len);
+	avail_addr_len = 0;
+	if (addr_len) {
+		validate_writable(addr_len, sizeof(*addr_len));
+		COMPILER_READ_BARRIER();
+		avail_addr_len = *addr_len;
+		COMPILER_READ_BARRIER();
+		validate_writable(addr, avail_addr_len);
+	}
 	sock = handle_lookup((unsigned int)sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
@@ -229,12 +242,19 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 		result = socket_accept((struct socket *)sock.h_data,
-		                       addr, avail_addr_len,
-		                       addr_len, sock.h_mode);
+		                       sock.h_mode);
 	}
 	if (!result) {
 		/* NOTE: We don't throw an exception for this case! */
 		return -EWOULDBLOCK;
+	}
+	if (avail_addr_len) {
+		TRY {
+			*addr_len = socket_getpeername(result, addr, avail_addr_len);
+		} EXCEPT {
+			decref_likely(result);
+			RETHROW();
+		}
 	}
 	sock.h_data = result;
 	sock.h_mode = IO_RDWR;
@@ -996,11 +1016,12 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		struct ancillary_rmessage control, *pcontrol = NULL;
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 		if (msg.msg_controllen) {
+			STATIC_ASSERT(sizeof(message->msg_controllen) == sizeof(size_t));
 			/* Load message control buffers. */
 			pcontrol               = &control;
 			control.am_control     = msg.msg_control;
 			control.am_controllen  = msg.msg_controllen;
-			control.am_controlused = &message->msg_controllen; /* Write-back */
+			control.am_controlused = (USER CHECKED size_t *)&message->msg_controllen; /* Write-back */
 		}
 		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
 		                                             sizeof(struct aio_buffer_entry));
@@ -1218,11 +1239,12 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
 		validate_writable_opt(msg.msg_control, msg.msg_controllen);
 		pcontrol = NULL;
 		if (msg.msg_controllen) {
+			STATIC_ASSERT(sizeof(vmessages[i].msg_hdr.msg_controllen) == sizeof(size_t));
 			/* Load message control buffers. */
 			pcontrol               = &control;
 			control.am_control     = msg.msg_control;
 			control.am_controllen  = msg.msg_controllen;
-			control.am_controlused = &vmessages[i].msg_hdr.msg_controllen; /* Write-back */
+			control.am_controlused = (USER CHECKED size_t *)&vmessages[i].msg_hdr.msg_controllen; /* Write-back */
 		}
 		iov_vec = (struct aio_buffer_entry *)malloca(msg.msg_iovlen *
 		                                             sizeof(struct aio_buffer_entry));

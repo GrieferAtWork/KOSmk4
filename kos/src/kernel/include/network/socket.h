@@ -430,12 +430,8 @@ struct socket_ops {
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
 	 * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
 	 * @throws: E_NET_CONNECTION_ABORT:                                                       [...] */
-	/* TODO: Filling in the peer address should not be part of this interface!
-	 *       The address is the same as returned by `socket_getpeername(return)' */
 	NONNULL((1)) REF struct socket *
-	(KCALL *so_accept)(struct socket *__restrict self,
-	                   USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-	                   USER CHECKED socklen_t *preq_addr_len, iomode_t mode)
+	(KCALL *so_accept)(struct socket *__restrict self, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
 			       E_NET_CONNECTION_ABORT);
 
@@ -914,9 +910,7 @@ socket_listen(struct socket *__restrict self,
  * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
  * @throws: E_NET_CONNECTION_ABORT:                                                       [...] * */
 FUNDEF NONNULL((1)) REF struct socket *KCALL
-socket_accept(struct socket *__restrict self,
-              USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-              USER CHECKED socklen_t *preq_addr_len, iomode_t mode)
+socket_accept(struct socket *__restrict self, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
 		       E_NET_CONNECTION_ABORT);
 

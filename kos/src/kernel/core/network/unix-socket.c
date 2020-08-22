@@ -832,9 +832,7 @@ socket_is_not_bound:
 
 
 PRIVATE NONNULL((1)) REF struct socket *KCALL
-UnixSocket_Accept(struct socket *__restrict self,
-                  USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                  USER CHECKED socklen_t *preq_addr_len, iomode_t mode)
+UnixSocket_Accept(struct socket *__restrict self, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
 		       E_NET_CONNECTION_ABORT) {
 	REF UnixSocket *result;
@@ -903,17 +901,6 @@ again_wait_for_client:
 			 * In this case, simply discard the client and try again. */
 			decref_unlikely(result_client);
 			goto again_wait_for_client;
-		}
-		if (addr) {
-			TRY {
-				/* Copy information about the accept back into user-space. */
-				*preq_addr_len = UnixSocket_GetName(me, (USER CHECKED struct sockaddr_un *)addr,
-				                                    addr_len, true);
-			} EXCEPT {
-				unix_client_refuse_connection(result_client);
-				decref_unlikely(result_client);
-				RETHROW();
-			}
 		}
 	} EXCEPT {
 		kfree(result);

@@ -1455,11 +1455,10 @@ socket_listen(struct socket *__restrict self,
  * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
  * @throws: E_NET_CONNECTION_ABORT:                                                       [...] * */
 PUBLIC NONNULL((1)) REF struct socket *KCALL
-socket_accept(struct socket *__restrict self,
-              USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-              USER CHECKED socklen_t *preq_addr_len, iomode_t mode)
+socket_accept(struct socket *__restrict self, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
 		       E_NET_CONNECTION_ABORT) {
+	REF struct socket *result;
 	if unlikely(!self->sk_ops->so_accept) {
 		THROW(E_INVALID_HANDLE_NET_OPERATION, E_NET_OPERATION_ACCEPT,
 		      socket_getfamily(self), socket_gettype(self),
@@ -1467,7 +1466,8 @@ socket_accept(struct socket *__restrict self,
 	}
 	if (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)
 		mode |= IO_NONBLOCK;
-	return (*self->sk_ops->so_accept)(self, addr, addr_len, preq_addr_len, mode);
+	result = (*self->sk_ops->so_accept)(self, mode);
+	return result;
 }
 
 /* Disallow further reception of data (causing `recv()' to return `0' as soon
