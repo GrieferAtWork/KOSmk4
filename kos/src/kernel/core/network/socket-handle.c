@@ -41,7 +41,10 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(socket, struct socket)
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst,
                    size_t num_bytes, iomode_t mode) THROWS(...) {
-	return socket_recv(self, dst, num_bytes, NULL, NULL, 0, mode, NULL);
+	syscall_ulong_t msg_flags = 0;
+	if (mode & IO_NONBLOCK)
+		msg_flags |= MSG_DONTWAIT;
+	return socket_recv(self, dst, num_bytes, NULL, NULL, msg_flags, NULL);
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
@@ -73,7 +76,10 @@ INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
 handle_socket_readv(struct socket *__restrict self,
                     struct aio_buffer *__restrict dst,
                     size_t num_bytes, iomode_t mode) THROWS(...) {
-	return socket_recvv(self, dst, num_bytes, NULL, NULL, 0, mode, NULL);
+	syscall_ulong_t msg_flags = 0;
+	if (mode & IO_NONBLOCK)
+		msg_flags |= MSG_DONTWAIT;
+	return socket_recvv(self, dst, num_bytes, NULL, NULL, msg_flags, NULL);
 }
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL

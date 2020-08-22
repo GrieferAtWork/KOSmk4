@@ -873,243 +873,95 @@ socket_sendtov(struct socket *__restrict self,
 
 
 
-struct recvfrom_peer_job {
-	WEAK REF struct socket          *rpj_sock;        /* [1..1][const] Weak reference to the associated socket. */
-	REF struct vm                   *rpj_bufvm;       /* [1..1][const] Pointer to the user-space buffer VM. */
-	USER CHECKED u32                *rpj_presflg;     /* [0..1][const] Pointer to user-space result flags (set of `MSG_*'). */
-	syscall_ulong_t                  rpj_msgflags;    /* [const] Message flags (set of `MSG_*'). */
-	struct aio_buffer                rpj_buffer;      /* [override(.ab_entv, [if(.ab_entc != 1, [owned])])][const] I/O buffer. */
-	size_t                           rpj_bufsize;     /* [const][== aio_buffer_size(&cas_buffer)] I/O buffer size. */
-	struct ancillary_rmessage const *rpj_pcontrol;    /* [0..1][const] Pointer to ancillary message data. */
-	struct ancillary_rmessage        rpj_control;     /* [const][valid_if(cas_pcontrol)] ancillary message data. */
-	struct aio_handle_generic        rpj_aio;         /* AIO handle used for receiving data from an arbitrary  */
-	struct sockaddr                 *rpj_wantpeer;    /* [1..rpj_wantpeerlen][const][owned_if(!= &_rpj_wantpeer)] Expected peer */
-	socklen_t                        rpj_wantpeerlen; /* [const] Buffer length of `rpj_wantpeer' */
-	struct sockaddr                 *rpj_gotpeer;     /* [1..rpj_gotpeerlen][const][owned_if(!= &_rpj_gotpeer)] Actual peer */
-	socklen_t                        rpj_gotpeerlen;  /* Buffer length of `rpj_gotpeer' */
-	struct sockaddr_storage         _rpj_wantpeer;    /* Static buffer for most kinds of socket peers. */
-	struct sockaddr_storage         _rpj_gotpeer;     /* Static buffer for most kinds of socket peers. */
-};
-
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(ASYNC_CALLBACK_CC recvfrom_peer_fini)(async_job_t self) {
-	struct recvfrom_peer_job *me;
-	me = (struct recvfrom_peer_job *)self;
-	if (me->rpj_aio.ah_type)
-		aio_handle_generic_fini(&me->rpj_aio);
-	if (me->rpj_buffer.ab_entc != 1)
-		kfree((void *)me->rpj_buffer.ab_entv);
-	if (me->rpj_wantpeer != (struct sockaddr *)&me->_rpj_wantpeer)
-		kfree(me->rpj_wantpeer);
-	if (me->rpj_gotpeer != (struct sockaddr *)&me->_rpj_gotpeer)
-		kfree(me->rpj_gotpeer);
-	decref_unlikely(me->rpj_bufvm);
-	weakdecref_unlikely(me->rpj_sock);
-}
-
-PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
-recvfrom_peer_poll(async_job_t self, struct timespec *__restrict UNUSED(timeout)) {
-	struct recvfrom_peer_job *me;
-	me = (struct recvfrom_peer_job *)self;
-	if (aio_handle_generic_poll(&me->rpj_aio))
-		return ASYNC_JOB_POLL_AVAILABLE;
-	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
-}
-
-PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
-recvfrom_peer_work(async_job_t self) {
-	struct recvfrom_peer_job *me;
-	me = (struct recvfrom_peer_job *)self;
-	assert(aio_handle_generic_hascompleted(&me->rpj_aio));
-	aio_handle_generic_checkerror(&me->rpj_aio);
-	/* Check if the packet came from the correct peer. */
-	if (me->rpj_gotpeerlen != me->rpj_wantpeerlen)
-		goto wrong_peer;
-	if (memcmp(me->rpj_gotpeer, me->rpj_wantpeer, me->rpj_wantpeerlen) != 0)
-		goto wrong_peer;
-	return ASYNC_JOB_WORK_COMPLETE; /* done! */
-wrong_peer:
-	if (!tryincref(me->rpj_sock))
-		THROW(E_NO_SUCH_OBJECT);
-	/* re-start the send operation. */
-	aio_handle_generic_fini(&me->rpj_aio);
-	aio_handle_generic_init(&me->rpj_aio);
+/* Receive data, and verify that it originates from the bound peer. */
+PRIVATE WUNUSED NONNULL((1, 2)) size_t KCALL
+socket_recvfrom_peer(struct socket *__restrict self,
+                     struct aio_buffer const *__restrict buf, size_t bufsize,
+                     /*0..1*/ USER CHECKED u32 *presult_flags,
+                     struct ancillary_rmessage const *msg_control,
+                     syscall_ulong_t msg_flags,
+                     struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		       E_NET_TIMEOUT, E_WOULDBLOCK) {
+	size_t result;
+	struct sockaddr_storage _peer_want;
+	struct sockaddr_storage _peer_have;
+	struct sockaddr *peer_want = (struct sockaddr *)&_peer_want;
+	struct sockaddr *peer_have = (struct sockaddr *)&_peer_have;
+	socklen_t peer_want_len, peer_have_len;
+	peer_want_len = sizeof(_peer_want);
 	TRY {
-		REF struct vm *oldvm;
-		oldvm = incref(THIS_VM);
-		FINALLY_DECREF_UNLIKELY(oldvm);
-		task_setvm(me->rpj_bufvm); /* TODO: Bad way of switching VMs! */
-		TRY {
-			/* Reset the received socket address. */
-			me->rpj_gotpeerlen = me->rpj_wantpeerlen;
-			(*me->rpj_sock->sk_ops->so_recvfromv)(me->rpj_sock,
-			                                      &me->rpj_buffer,
-			                                      me->rpj_bufsize,
-			                                      me->rpj_gotpeer,
-			                                      me->rpj_wantpeerlen,
-			                                      &me->rpj_gotpeerlen,
-			                                      me->rpj_presflg,
-			                                      me->rpj_pcontrol,
-			                                      me->rpj_msgflags,
-			                                      &me->rpj_aio);
-		} EXCEPT {
-			task_setvm(oldvm); /* TODO: This might throw an exception! */
-			RETHROW();
+again_get_wanted_peer_name:
+		peer_want_len = socket_getpeername(self, peer_want, peer_want_len);
+		if unlikely(peer_want_len > sizeof(_peer_want)) {
+			/* Need even more memory... */
+			if (peer_want == (struct sockaddr *)&_peer_want)
+				peer_want = NULL;
+			if (peer_have == (struct sockaddr *)&_peer_have)
+				peer_have = NULL;
+			peer_want = (struct sockaddr *)krealloc(peer_want, peer_want_len, GFP_NORMAL);
+			peer_have = (struct sockaddr *)krealloc(peer_have, peer_want_len, GFP_NORMAL);
+			goto again_get_wanted_peer_name;
 		}
-		task_setvm(oldvm);
-	} EXCEPT {
-		decref_unlikely(me->rpj_sock);
-		aio_handle_init(&me->rpj_aio, &aio_noop_type);
-		aio_handle_complete(&me->rpj_aio, AIO_COMPLETION_FAILURE);
-		RETHROW();
-	}
-	return ASYNC_JOB_WORK_AGAIN;
-}
-
-PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
-recvfrom_peer_cancel(async_job_t self) {
-	struct recvfrom_peer_job *me;
-	me = (struct recvfrom_peer_job *)self;
-	/* Cancel the current AIO operation. */
-	aio_handle_cancel(&me->rpj_aio);
-}
-
-PRIVATE NOBLOCK NONNULL((1)) size_t
-NOTHROW(ASYNC_CALLBACK_CC recvfrom_peer_retsize)(async_job_t self) {
-	struct recvfrom_peer_job *me;
-	me = (struct recvfrom_peer_job *)self;
-	assert(aio_handle_generic_hascompleted(&me->rpj_aio));
-	if (!me->rpj_aio.ah_type->ht_retsize)
-		return me->rpj_bufsize;
-	return (*me->rpj_aio.ah_type->ht_retsize)(&me->rpj_aio);
-}
-
-PRIVATE struct async_job_callbacks const recvfrom_peer_cb = {
-	/* .jc_jobsize  = */ sizeof(struct recvfrom_peer_job),
-	/* .jc_jobalign = */ alignof(struct recvfrom_peer_job),
-	/* .jc_driver   = */ &drv_self,
-	/* .jc_fini     = */ &recvfrom_peer_fini,
-	/* .jc_poll     = */ &recvfrom_peer_poll,
-	/* .jc_work     = */ &recvfrom_peer_work,
-	/* .jc_time     = */ NULL, /* Unused */
-	/* .jc_cancel   = */ &recvfrom_peer_cancel,
-	/* .jc_progress = */ NULL, /* Unused */
-	/* .jc_retsize  = */ &recvfrom_peer_retsize,
-};
-
-
-
-PRIVATE NONNULL((1, 7)) void KCALL
-socket_arecvfrom_peer(struct socket *__restrict self,
-                      struct aio_buffer const *buf, size_t bufsize,
-                      /*0..1*/ USER CHECKED u32 *presult_flags,
-                      struct ancillary_rmessage const *msg_control,
-                      syscall_ulong_t msg_flags,
-                      /*out*/ struct aio_handle *__restrict aio) {
-	async_job_t aj;
-	struct recvfrom_peer_job *job;
-	assert(self->sk_ops->so_recvfromv);
-	aj = async_job_alloc(&recvfrom_peer_cb);
-	job = (struct recvfrom_peer_job *)aj;
-	TRY {
-		/* Fill in the async job. */
-		socklen_t reqlen;
-		/* Lookup the connected peer address. */
-		reqlen = socket_getpeername(self, (struct sockaddr *)&job->_rpj_wantpeer,
-		                            sizeof(job->_rpj_wantpeer));
-		if likely(reqlen <= sizeof(job->_rpj_wantpeer)) {
-			job->rpj_wantpeer    = (struct sockaddr *)&job->_rpj_wantpeer;
-			job->rpj_wantpeerlen = reqlen;
-			job->rpj_gotpeer     = (struct sockaddr *)&job->_rpj_gotpeer;
+		/* Now to actually implement the call! */
+again_receive:
+		if (buf->ab_entc == 1 && self->sk_ops->so_recvfrom) {
+			assert(bufsize == buf->ab_head.ab_size);
+			assert(bufsize == buf->ab_last);
+			assert(bufsize == buf->ab_entv[0].ab_size);
+			assert(buf->ab_head.ab_base == buf->ab_entv[0].ab_base);
+			/* Prefer the simplified normal receive buffer. */
+			result = (*self->sk_ops->so_recvfrom)(self,
+			                                      buf->ab_head.ab_base,
+			                                      bufsize,
+			                                      peer_have,
+			                                      peer_want_len,
+			                                      &peer_have_len,
+			                                      presult_flags,
+			                                      msg_control,
+			                                      msg_flags,
+			                                      timeout);
 		} else {
-			/* Must dynamically allocate the want/got peer length */
-			job->rpj_wantpeer = (struct sockaddr *)kmalloc(reqlen, GFP_NORMAL);
-			TRY {
-				socklen_t new_reqlen;
-again_want_peer_malloc:
-				new_reqlen = socket_getpeername(self, job->rpj_wantpeer, reqlen);
-				if unlikely(new_reqlen > reqlen) {
-					job->rpj_wantpeer = (struct sockaddr *)krealloc(job->rpj_wantpeer,
-					                                                new_reqlen, GFP_NORMAL);
-					reqlen = new_reqlen;
-					goto again_want_peer_malloc;
-				}
-				job->rpj_wantpeerlen = new_reqlen;
-				job->rpj_gotpeer     = (struct sockaddr *)kmalloc(new_reqlen, GFP_NORMAL);
-			} EXCEPT {
-				kfree(job->rpj_wantpeer);
-				RETHROW();
-			}
+			/* Vectored receive buffer. */
+			result = (*self->sk_ops->so_recvfromv)(self,
+			                                       buf,
+			                                       bufsize,
+			                                       peer_have,
+			                                       peer_want_len,
+			                                       &peer_have_len,
+			                                       presult_flags,
+			                                       msg_control,
+			                                       msg_flags,
+			                                       timeout);
 		}
-		/* Fill in the AIO buffer. */
-		TRY {
-			if (buf->ab_entc == 1) {
-				aio_buffer_init(&job->rpj_buffer,
-				                buf->ab_head.ab_base,
-				                buf->ab_last);
-			} else {
-				struct aio_buffer_entry *entv;
-				entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
-				                                          sizeof(struct aio_buffer_entry),
-				                                          GFP_NORMAL);
-				if (buf->ab_entc > 1)
-					memcpy(entv + 1, buf->ab_entv + 1, buf->ab_entc - 1, sizeof(struct aio_buffer_entry));
-				job->rpj_buffer.ab_entv         = entv;
-				job->rpj_buffer.ab_entc         = buf->ab_entc;
-				job->rpj_buffer.ab_head.ab_base = buf->ab_head.ab_base;
-				job->rpj_buffer.ab_head.ab_size = buf->ab_head.ab_size;
-				job->rpj_buffer.ab_last         = buf->ab_last;
-			}
-			/* Finally, start the actual recv() operation! */
-			TRY {
-				aio_handle_generic_init(&job->rpj_aio);
-				(*self->sk_ops->so_recvfromv)(self,
-				                              &job->rpj_buffer,
-				                              bufsize,
-				                              job->rpj_gotpeer,
-				                              job->rpj_wantpeerlen,
-				                              &job->rpj_gotpeerlen,
-				                              presult_flags,
-				                              msg_control,
-				                              msg_flags,
-				                              &job->rpj_aio);
-			} EXCEPT {
-				if (job->rpj_buffer.ab_entc != 1)
-					kfree((void *)job->rpj_buffer.ab_entv);
-				RETHROW();
-			}
-		} EXCEPT {
-			if (job->rpj_wantpeer != (struct sockaddr *)&job->_rpj_wantpeer)
-				kfree(job->rpj_wantpeer);
-			if (job->rpj_gotpeer != (struct sockaddr *)&job->_rpj_gotpeer)
-				kfree(job->rpj_gotpeer);
-			RETHROW();
+		/* Skip the address-match check if the socket implementation indicates EOF
+		 * Although technically, EOF shouldn't be possible for a connection-less
+		 * socket like the one we seem to be dealing with here... */
+		if (result != 0) {
+			/* Check if the peer addresses match. */
+			if (peer_have_len != peer_want_len)
+				goto again_receive;
+			if (memcmp(peer_have, peer_want, peer_want_len) != 0)
+				goto again_receive;
 		}
 	} EXCEPT {
-		async_job_free(aj);
+		if (peer_want != (struct sockaddr *)&_peer_want)
+			kfree(peer_want);
+		if (peer_have != (struct sockaddr *)&_peer_have)
+			kfree(peer_have);
 		RETHROW();
 	}
-	/* Fill in fields that are NOEXCEPT after the fact! */
-	job->rpj_sock     = weakincref(self);
-	job->rpj_bufvm    = incref(THIS_VM);
-	job->rpj_presflg  = presult_flags;
-	job->rpj_msgflags = msg_flags;
-	job->rpj_bufsize  = bufsize;
-	job->rpj_pcontrol = NULL;
-	if (msg_control) {
-		job->rpj_pcontrol = &job->rpj_control;
-		memcpy(&job->rpj_control, msg_control,
-		       sizeof(struct ancillary_rmessage));
-	}
-	decref(async_job_start(aj, aio));
+	if (peer_want != (struct sockaddr *)&_peer_want)
+		kfree(peer_want);
+	if (peer_have != (struct sockaddr *)&_peer_have)
+		kfree(peer_have);
+	return result;
 }
 
 
 /* Receive data over this socket, and store the contents within the given buffer.
- * NOTE: `aio' is initialized with a handle supporting the RETSIZE
- *        command, which in turn return the actual # of read bytes.
- * NOTE: After the socket has been shut down, `aio' should be set-up to
- *       always return `0' in its retsize operator.
+ * @return: * : The actual number of received bytes.
+ * @return: 0 : EOF after a graceful disconnect.
  * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
  *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
  *                        operation.
@@ -1119,143 +971,66 @@ again_want_peer_malloc:
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
  *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
+ * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
+ *                        that no data could be received up until that point. Ignored when already
+ *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
- * @throws: E_NET_CONNECTION_REFUSED:                                                   [...] */
-PUBLIC NONNULL((1, 7)) void KCALL
-socket_arecv(struct socket *__restrict self,
-             USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-             /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
+ * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
+ * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
+ * @throws: E_NET_TIMEOUT: The given `timeout expired' */
+PUBLIC WUNUSED NONNULL((1)) size_t KCALL
+socket_recv(struct socket *__restrict self,
+            USER CHECKED void *buf, size_t bufsize,
+            /*0..1*/ USER CHECKED u32 *presult_flags,
+            struct ancillary_rmessage const *msg_control,
+            syscall_ulong_t msg_flags,
+            struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		       E_NET_TIMEOUT, E_WOULDBLOCK) {
+	size_t result;
 	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
 	if (self->sk_ops->so_recv) {
-		(*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
-		                         msg_control, msg_flags, aio);
+		result = (*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
+		                                  msg_control, msg_flags, timeout);
 	} else {
 		struct aio_buffer iov;
 		aio_buffer_init(&iov, buf, bufsize);
 		if (self->sk_ops->so_recvv) {
-			(*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
-			                          msg_control, msg_flags, aio);
+			result = (*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
+			                                   msg_control, msg_flags, timeout);
 		} else {
-			socket_arecvfrom_peer(self, &iov, bufsize, presult_flags,
-			                      msg_control, msg_flags, aio);
+			result = socket_recvfrom_peer(self, &iov, bufsize, presult_flags,
+			                              msg_control, msg_flags, timeout);
 		}
 	}
-}
-
-PUBLIC NONNULL((1, 2, 7)) void KCALL
-socket_arecvv(struct socket *__restrict self,
-              struct aio_buffer const *__restrict buf,
-              size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-              struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-              /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
-	if (self->sk_ops->so_recvv) {
-		(*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
-		                          msg_control, msg_flags, aio);
-	} else {
-		socket_arecvfrom_peer(self, buf, bufsize, presult_flags,
-		                      msg_control, msg_flags, aio);
-	}
-}
-
-/* Recv helper functions for blocking and non-blocking operations.
- * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
- *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
- *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
- * @return: * : The actual number of received bytes (as returned by AIO) */
-PUBLIC NONNULL((1)) size_t KCALL
-socket_recv(struct socket *__restrict self,
-            USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-            struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-            iomode_t mode, struct timespec const *timeout)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT) {
-	size_t result;
-	struct aio_handle_generic aio;
-	aio_handle_generic_init(&aio);
-	socket_arecv(self, buf, bufsize, presult_flags, msg_control, msg_flags, &aio);
-	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-		}
-	} else {
-		TRY {
-			if (!aio_handle_generic_waitfor(&aio, timeout)) {
-				if (mode & IO_NODATAZERO) {
-					aio_handle_generic_fini(&aio);
-					return 0;
-				}
-				THROW(E_NET_TIMEOUT);
-			}
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
-	}
-	/* Default-return the whole buffer size. */
-	result = bufsize;
-	/* Invoke the retsize operator (if defined). */
-	if (aio.ah_type->ht_retsize)
-		result = (*aio.ah_type->ht_retsize)(&aio);
-	aio_handle_generic_fini(&aio);
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t KCALL
-socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict buf,
-             size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-             iomode_t mode, struct timespec const *timeout)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT) {
+PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
+socket_recvv(struct socket *__restrict self,
+             struct aio_buffer const *__restrict buf, size_t bufsize,
+             /*0..1*/ USER CHECKED u32 *presult_flags,
+             struct ancillary_rmessage const *msg_control,
+             syscall_ulong_t msg_flags,
+             struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
-	struct aio_handle_generic aio;
-	aio_handle_generic_init(&aio);
-	socket_arecvv(self, buf, bufsize, presult_flags, msg_control, msg_flags, &aio);
-	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-		}
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	if (self->sk_ops->so_recvv) {
+		result = (*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
+		                                   msg_control, msg_flags, timeout);
 	} else {
-		TRY {
-			if (!aio_handle_generic_waitfor(&aio, timeout)) {
-				if (mode & IO_NODATAZERO) {
-					aio_handle_generic_fini(&aio);
-					return 0;
-				}
-				THROW(E_NET_TIMEOUT);
-			}
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
+		result = socket_recvfrom_peer(self, buf, bufsize, presult_flags,
+		                              msg_control, msg_flags, timeout);
 	}
-	/* Default-return the whole buffer size. */
-	result = bufsize;
-	/* Invoke the retsize operator (if defined). */
-	if (aio.ah_type->ht_retsize)
-		result = (*aio.ah_type->ht_retsize)(&aio);
-	aio_handle_generic_fini(&aio);
 	return result;
 }
 
 
 /* Receive data over this socket, and store the contents within the given buffer.
- * NOTE: `aio' is initialized with a handle supporting the RETSIZE
- *        command, which in turn return the actual # of read bytes.
- * NOTE: After the socket has been shut down, `aio' should be set-up to
- *       always return `0' in its retsize operator.
+ * @return: * : The actual number of received bytes.
+ * @return: 0 : EOF after a graceful disconnect.
  * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
  *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
  *                        operation.
@@ -1265,78 +1040,13 @@ socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
  *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
- * @throws: E_NET_CONNECTION_REFUSED: [...] */
-PUBLIC NONNULL((1, 10)) void KCALL
-socket_arecvfrom(struct socket *__restrict self,
-                 USER CHECKED void *buf, size_t bufsize,
-                 /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                 /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-                 /*0..1*/ USER CHECKED u32 *presult_flags,
-                 struct ancillary_rmessage const *msg_control,
-                 syscall_ulong_t msg_flags,
-                 /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
-	if (self->sk_ops->so_recvfrom) {
-		(*self->sk_ops->so_recvfrom)(self, buf, bufsize, addr, addr_len,
-		                             preq_addr_len, presult_flags,
-		                             msg_control, msg_flags, aio);
-	} else if (self->sk_ops->so_recvfromv) {
-		struct aio_buffer iov;
-		aio_buffer_init(&iov, buf, bufsize);
-		(*self->sk_ops->so_recvfromv)(self, &iov, bufsize, addr, addr_len,
-		                              preq_addr_len, presult_flags,
-		                              msg_control, msg_flags, aio);
-	} else {
-		socklen_t reqlen;
-		reqlen = socket_getpeername(self, addr, addr_len);
-		*preq_addr_len = reqlen; /* Truncate if too small... */
-		if (self->sk_ops->so_recv) {
-			(*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
-			                         msg_control, msg_flags, aio);
-		} else {
-			struct aio_buffer iov;
-			assert(self->sk_ops->so_recvv);
-			aio_buffer_init(&iov, buf, bufsize);
-			(*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
-			                          msg_control, msg_flags, aio);
-		}
-	}
-}
-
-PUBLIC NONNULL((1, 2, 10)) void KCALL
-socket_arecvfromv(struct socket *__restrict self,
-                  struct aio_buffer const *__restrict buf, size_t bufsize,
-                  /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                  /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-                  /*0..1*/ USER CHECKED u32 *presult_flags,
-                  struct ancillary_rmessage const *msg_control,
-                  syscall_ulong_t msg_flags,
-                  /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED) {
-	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
-	if (self->sk_ops->so_recvfromv) {
-		(*self->sk_ops->so_recvfromv)(self, buf, bufsize, addr, addr_len,
-		                              preq_addr_len, presult_flags,
-		                              msg_control, msg_flags, aio);
-	} else {
-		socklen_t reqlen;
-		reqlen = socket_getpeername(self, addr, addr_len);
-		*preq_addr_len = reqlen; /* Truncate if too small... */
-		assert(self->sk_ops->so_recvv);
-		(*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
-		                          msg_control, msg_flags, aio);
-	}
-}
-
-/* Recv helper functions for blocking and non-blocking operations.
- * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
- *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
- *       or'd with `self->sk_msgflags & MSG_DONTWAIT'
- * @return: * : The actual number of received bytes (as returned by AIO)
- * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
- *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
-PUBLIC NONNULL((1)) size_t KCALL
+ * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
+ *                        that no data could be received up until that point. Ignored when already
+ *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+ * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
+ * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
+PUBLIC WUNUSED NONNULL((1)) size_t KCALL
 socket_recvfrom(struct socket *__restrict self,
                 USER CHECKED void *buf, size_t bufsize,
                 /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -1344,46 +1054,39 @@ socket_recvfrom(struct socket *__restrict self,
                 /*0..1*/ USER CHECKED u32 *presult_flags,
                 struct ancillary_rmessage const *msg_control,
                 syscall_ulong_t msg_flags,
-                iomode_t mode, struct timespec const *timeout)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK) {
+                struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
-	struct aio_handle_generic aio;
-	aio_handle_generic_init(&aio);
-	socket_arecvfrom(self, buf, bufsize, addr, addr_len, preq_addr_len,
-	                 presult_flags, msg_control, msg_flags, &aio);
-	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-		}
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	if (self->sk_ops->so_recvfrom) {
+		result = (*self->sk_ops->so_recvfrom)(self, buf, bufsize, addr, addr_len,
+		                                      preq_addr_len, presult_flags,
+		                                      msg_control, msg_flags, timeout);
+	} else if (self->sk_ops->so_recvfromv) {
+		struct aio_buffer iov;
+		aio_buffer_init(&iov, buf, bufsize);
+		result = (*self->sk_ops->so_recvfromv)(self, &iov, bufsize, addr, addr_len,
+		                                       preq_addr_len, presult_flags,
+		                                       msg_control, msg_flags, timeout);
 	} else {
-		TRY {
-			if (!aio_handle_generic_waitfor(&aio, timeout)) {
-				if (mode & IO_NODATAZERO) {
-					aio_handle_generic_fini(&aio);
-					return 0;
-				}
-				THROW(E_NET_TIMEOUT);
-			}
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
+		socklen_t reqlen;
+		reqlen = socket_getpeername(self, addr, addr_len);
+		*preq_addr_len = reqlen; /* Truncate if too small... */
+		if (self->sk_ops->so_recv) {
+			result = (*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
+			                                  msg_control, msg_flags, timeout);
+		} else {
+			struct aio_buffer iov;
+			assert(self->sk_ops->so_recvv);
+			aio_buffer_init(&iov, buf, bufsize);
+			result = (*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
+			                                   msg_control, msg_flags, timeout);
 		}
 	}
-	/* Default-return the whole buffer size. */
-	result = bufsize;
-	/* Invoke the retsize operator (if defined). */
-	if (aio.ah_type->ht_retsize)
-		result = (*aio.ah_type->ht_retsize)(&aio);
-	aio_handle_generic_fini(&aio);
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t KCALL
+PUBLIC WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
                  struct aio_buffer const *__restrict buf, size_t bufsize,
                  /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -1391,44 +1094,28 @@ socket_recvfromv(struct socket *__restrict self,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
-                 iomode_t mode, struct timespec const *timeout)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK, E_NET_TIMEOUT) {
+                 struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
-	struct aio_handle_generic aio;
-	aio_handle_generic_init(&aio);
-	socket_arecvfromv(self, buf, bufsize, addr, addr_len, preq_addr_len,
-	                  presult_flags, msg_control, msg_flags, &aio);
-	if ((mode & IO_NONBLOCK) || (msg_flags & MSG_DONTWAIT) ||
-	    (ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT)) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
-		}
+	msg_flags |= ATOMIC_READ(self->sk_msgflags) & SOCKET_MSGFLAGS_ADDEND_RECVMASK;
+	if (self->sk_ops->so_recvfromv) {
+		result = (*self->sk_ops->so_recvfromv)(self, buf, bufsize, addr, addr_len,
+		                                       preq_addr_len, presult_flags,
+		                                       msg_control, msg_flags, timeout);
 	} else {
-		TRY {
-			if (!aio_handle_generic_waitfor(&aio, timeout)) {
-				if (mode & IO_NODATAZERO) {
-					aio_handle_generic_fini(&aio);
-					return 0;
-				}
-				THROW(E_NET_TIMEOUT);
-			}
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
+		socklen_t reqlen;
+		reqlen = socket_getpeername(self, addr, addr_len);
+		*preq_addr_len = reqlen; /* Truncate if too small... */
+		assert(self->sk_ops->so_recvv);
+		result = (*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
+		                                   msg_control, msg_flags, timeout);
 	}
-	/* Default-return the whole buffer size. */
-	result = bufsize;
-	/* Invoke the retsize operator (if defined). */
-	if (aio.ah_type->ht_retsize)
-		result = (*aio.ah_type->ht_retsize)(&aio);
-	aio_handle_generic_fini(&aio);
 	return result;
 }
+
+
+
+
 
 /* Begin to listen for incoming client (aka. peer) connection requests.
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN: [...] (The bound address is already in use)

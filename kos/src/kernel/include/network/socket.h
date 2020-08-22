@@ -47,6 +47,7 @@ DECL_BEGIN
 struct socket;
 struct aio_buffer;
 struct sockaddr;
+struct timespec;
 
 struct ancillary_message {
 	size_t am_controllen; /* [!0] Available ancillary data buffer size. */
@@ -337,10 +338,8 @@ struct socket_ops {
 	 * Receive data over this socket, and store the contents within the given buffer.
 	 * When not implemented, this callback is emulated using
 	 * `socket_recv()' or `socket_recvfrom()' + `socket_getpeername()'
-	 * NOTE: `aio' is initialized with a handle supporting the RETSIZE
-	 *        command, which in turn return the actual # of read bytes.
-	 * NOTE: After the socket has been shut down, `aio' should be set-up to
-	 *       always return `0' in its retsize operator.
+	 * @return: * : The actual number of received bytes.
+	 * @return: 0 : EOF after a graceful disconnect.
 	 * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
 	 *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
 	 *                        operation.
@@ -349,37 +348,40 @@ struct socket_ops {
 	 *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
 	 *                        own copy of this structure)
 	 * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
-	 *                                MSG_WAITALL | MSG_CMSG_COMPAT'
+	 *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
+	 * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
+	 *                        that no data could be received up until that point. Ignored when already
+	 *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
-	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...] */
-	/* TODO: recv() should _not_ be an AIO operation. There is no situation where incoming data
-	 *       would not need to be temporarily buffered, so using AIO would _always_ require the
-	 *       use of an async job, at which point it would be just as efficient to make this interface
-	 *       blocking, unless `MSG_DONTWAIT' is passed, in which case the function won't block, and
-	 *       simply return to indicate if data could be read immediately. */
-	NONNULL((1, 7)) void
+	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
+	 * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
+	 * @throws: E_NET_TIMEOUT: The given `timeout expired' */
+	NONNULL((1)) size_t
 	(KCALL *so_recv)(struct socket *__restrict self,
-	                 USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-	                 struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-	                 /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
+	                 USER CHECKED void *buf, size_t bufsize,
+	                 /*0..1*/ USER CHECKED u32 *presult_flags,
+	                 struct ancillary_rmessage const *msg_control,
+	                 syscall_ulong_t msg_flags,
+	                 struct timespec const *timeout)
+			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+			       E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [if(!so_recvfromv, [1..1]), else([0..1])] */
-	NONNULL((1, 2, 7)) void
+	NONNULL((1, 2)) size_t
 	(KCALL *so_recvv)(struct socket *__restrict self,
-	                  struct aio_buffer const *__restrict buf,
-	                  size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-	                  struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-	                  /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
+	                  struct aio_buffer const *__restrict buf, size_t bufsize,
+	                  /*0..1*/ USER CHECKED u32 *presult_flags,
+	                  struct ancillary_rmessage const *msg_control,
+	                  syscall_ulong_t msg_flags,
+	                  struct timespec const *timeout)
+			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+			       E_NET_TIMEOUT, E_WOULDBLOCK);
 
 	/* [0..1]
 	 * Receive data over this socket, and store the contents within the given buffer.
 	 * When not implemented, this callback is emulated using
 	 * `socket_recvfromv()' or `socket_getpeername()' + `socket_recv()'
-	 * NOTE: `aio' is initialized with a handle supporting the RETSIZE
-	 *        command, which in turn return the actual # of read bytes.
-	 * NOTE: After the socket has been shut down, `aio' should be set-up to
-	 *       always return `0' in its retsize operator.
+	 * @return: * : The actual number of received bytes.
+	 * @return: 0 : EOF after a graceful disconnect.
 	 * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
 	 *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
 	 *                        operation.
@@ -388,9 +390,14 @@ struct socket_ops {
 	 *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
 	 *                        own copy of this structure)
 	 * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
-	 *                                MSG_WAITALL | MSG_CMSG_COMPAT'
-	 * @throws: E_NET_CONNECTION_REFUSED: [...] */
-	NONNULL((1, 10)) void
+	 *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
+	 * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
+	 *                        that no data could be received up until that point. Ignored when already
+	 *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
+	 * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
+	NONNULL((1)) size_t
 	(KCALL *so_recvfrom)(struct socket *__restrict self,
 	                     USER CHECKED void *buf, size_t bufsize,
 	                     /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -398,10 +405,10 @@ struct socket_ops {
 	                     /*0..1*/ USER CHECKED u32 *presult_flags,
 	                     struct ancillary_rmessage const *msg_control,
 	                     syscall_ulong_t msg_flags,
-	                     /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_NET_CONNECTION_REFUSED);
+	                     struct timespec const *timeout)
+			THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [0..1][if(!so_recvv, [1..1])] */
-	NONNULL((1, 2, 10)) void
+	NONNULL((1, 2)) size_t
 	(KCALL *so_recvfromv)(struct socket *__restrict self,
 	                      struct aio_buffer const *__restrict buf, size_t bufsize,
 	                      /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -409,8 +416,8 @@ struct socket_ops {
 	                      /*0..1*/ USER CHECKED u32 *presult_flags,
 	                      struct ancillary_rmessage const *msg_control,
 	                      syscall_ulong_t msg_flags,
-	                      /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_NET_CONNECTION_REFUSED);
+	                      struct timespec const *timeout)
+			THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 
 	/* [0..1][(!= NULL) == (so_accept != NULL)]
 	 * Begin to listen for incoming client (aka. peer) connection requests.
@@ -778,10 +785,8 @@ socket_sendtov(struct socket *__restrict self,
 		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK, E_BUFFER_TOO_SMALL);
 
 /* Receive data over this socket, and store the contents within the given buffer.
- * NOTE: `aio' is initialized with a handle supporting the RETSIZE
- *        command, which in turn return the actual # of read bytes.
- * NOTE: After the socket has been shut down, `aio' should be set-up to
- *       always return `0' in its retsize operator.
+ * @return: * : The actual number of received bytes.
+ * @return: 0 : EOF after a graceful disconnect.
  * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
  *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
  *                        operation.
@@ -790,49 +795,37 @@ socket_sendtov(struct socket *__restrict self,
  *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
- *                                MSG_WAITALL | MSG_CMSG_COMPAT'
+ *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
+ * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
+ *                        that no data could be received up until that point. Ignored when already
+ *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
- * @throws: E_NET_CONNECTION_REFUSED:                                                   [...] */
-FUNDEF NONNULL((1, 7)) void KCALL
-socket_arecv(struct socket *__restrict self,
-             USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-             /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
-FUNDEF NONNULL((1, 2, 7)) void KCALL
-socket_arecvv(struct socket *__restrict self,
-              struct aio_buffer const *__restrict buf,
-              size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-              struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-              /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
-
-/* Recv helper functions for blocking and non-blocking operations.
- * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
- *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
- *       or'd with `self->sk_sndflags & MSG_DONTWAIT'
- * @return: * : The actual number of received bytes (as returned by AIO)
- * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
- *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
-FUNDEF NONNULL((1)) size_t KCALL
+ * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
+ * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
+ * @throws: E_NET_TIMEOUT: The given `timeout expired' */
+FUNDEF WUNUSED NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
-            USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-            struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-            iomode_t mode, struct timespec const *timeout)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT);
-FUNDEF NONNULL((1, 2)) size_t KCALL
-socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict buf,
-             size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
-             iomode_t mode, struct timespec const *timeout)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT);
+            USER CHECKED void *buf, size_t bufsize,
+            /*0..1*/ USER CHECKED u32 *presult_flags,
+            struct ancillary_rmessage const *msg_control,
+            syscall_ulong_t msg_flags,
+            struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		       E_NET_TIMEOUT, E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
+socket_recvv(struct socket *__restrict self,
+             struct aio_buffer const *__restrict buf, size_t bufsize,
+             /*0..1*/ USER CHECKED u32 *presult_flags,
+             struct ancillary_rmessage const *msg_control,
+             syscall_ulong_t msg_flags,
+             struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		       E_NET_TIMEOUT, E_WOULDBLOCK);
 
 
 /* Receive data over this socket, and store the contents within the given buffer.
- * NOTE: `aio' is initialized with a handle supporting the RETSIZE
- *        command, which in turn return the actual # of read bytes.
- * NOTE: After the socket has been shut down, `aio' should be set-up to
- *       always return `0' in its retsize operator.
+ * @return: * : The actual number of received bytes.
+ * @return: 0 : EOF after a graceful disconnect.
  * @param: presult_flags: When non-NULL, filled with a set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC |
  *                        MSG_OOB | MSG_ERRQUEUE', describing the completion state of the receive
  *                        operation.
@@ -841,37 +834,14 @@ socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict
  *                        if it needs to be accessed after returning. (i.e. AIO needs to use its
  *                        own copy of this structure)
  * @param: msg_flags:     Set of `MSG_ERRQUEUE | MSG_OOB | MSG_PEEK | MSG_TRUNC |
- *                                MSG_WAITALL | MSG_CMSG_COMPAT'
- * @throws: E_NET_CONNECTION_REFUSED: [...] */
-FUNDEF NONNULL((1, 10)) void KCALL
-socket_arecvfrom(struct socket *__restrict self,
-                 USER CHECKED void *buf, size_t bufsize,
-                 /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                 /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-                 /*0..1*/ USER CHECKED u32 *presult_flags,
-                 struct ancillary_rmessage const *msg_control,
-                 syscall_ulong_t msg_flags,
-                 /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED);
-FUNDEF NONNULL((1, 2, 10)) void KCALL
-socket_arecvfromv(struct socket *__restrict self,
-                  struct aio_buffer const *__restrict buf, size_t bufsize,
-                  /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
-                  /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
-                  /*0..1*/ USER CHECKED u32 *presult_flags,
-                  struct ancillary_rmessage const *msg_control,
-                  syscall_ulong_t msg_flags,
-                  /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED);
-
-/* Recv helper functions for blocking and non-blocking operations.
- * NOTE: Additionally, these functions accept `MSG_DONTWAIT' in
- *       `msg_flags' as a bit-flag or'd with `mode & IO_NONBLOCK',
- *       or'd with `self->sk_sndflags & MSG_DONTWAIT'
- * @return: * : The actual number of received bytes (as returned by AIO)
- * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
- *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
-FUNDEF NONNULL((1)) size_t KCALL
+ *                                MSG_WAITALL | MSG_CMSG_COMPAT | MSG_DONTWAIT'
+ * @param: timeout:       When non-NULL, timeout after which to throw `E_NET_TIMEOUT' in the event
+ *                        that no data could be received up until that point. Ignored when already
+ *                        operating in non-blocking mode (aka. `MSG_DONTWAIT')
+ * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+ * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
+ * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
+FUNDEF WUNUSED NONNULL((1)) size_t KCALL
 socket_recvfrom(struct socket *__restrict self,
                 USER CHECKED void *buf, size_t bufsize,
                 /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -879,9 +849,9 @@ socket_recvfrom(struct socket *__restrict self,
                 /*0..1*/ USER CHECKED u32 *presult_flags,
                 struct ancillary_rmessage const *msg_control,
                 syscall_ulong_t msg_flags,
-                iomode_t mode, struct timespec const *timeout)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK, E_NET_TIMEOUT);
-FUNDEF NONNULL((1, 2)) size_t KCALL
+                struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
                  struct aio_buffer const *__restrict buf, size_t bufsize,
                  /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -889,8 +859,8 @@ socket_recvfromv(struct socket *__restrict self,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
-                 iomode_t mode, struct timespec const *timeout)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK, E_NET_TIMEOUT);
+                 struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 
 /* Begin to listen for incoming client (aka. peer) connection requests.
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN: [...] (The bound address is already in use)

@@ -96,7 +96,7 @@ enum {
 	MSG_ERRQUEUE     = 0x00002000, /* Fetch message from error queue. */
 	MSG_NOSIGNAL     = 0x00004000, /* Do not generate SIGPIPE. */
 	MSG_MORE         = 0x00008000, /* Sender will send more. */
-	MSG_WAITFORONE   = 0x00010000, /* Wait for at least one packet to return.*/
+	MSG_WAITFORONE   = 0x00010000, /* For `recvmmsg()': Enable `MSG_DONTWAIT' after the first message was received. */
 	MSG_FASTOPEN     = 0x20000000, /* Send data in TCP SYN. */
 	MSG_CMSG_CLOEXEC = 0x40000000, /* Set close_on_exit for file descriptor received through SCM_RIGHTS. */
 #if defined(__KOS__) && (defined(__USE_KOS) || defined(__USE_KOS_KERNEL))
