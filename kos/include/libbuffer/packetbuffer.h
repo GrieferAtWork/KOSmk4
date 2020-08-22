@@ -153,6 +153,11 @@ struct pb_buffer {
 	 * >>     lock();
 	 * >> again_locked:
 	 * >>     packet = pb_rptr;
+	 * >>     if (packet == self->pb_wptr) {
+	 * >>         // Nothing to read
+	 * >>         unlock();
+	 * >>         return NULL;
+	 * >>     }
 	 * >>     if (packet->p_total == 0) {
 	 * >>         // Packet exists the next buffer over!
 	 * >>         pb_rptr = packet->p_cont;
@@ -393,7 +398,9 @@ struct pb_buffer {
 	__WEAK __size_t      pb_limt; /* Max size of the packet buffer. (set to 0 when the buffer was closed) */
 	sched_signal_t       pb_psta; /* Signal broadcast any packet changes state to one of:
 	                               *   - PB_PACKET_STATE_READABLE
-	                               *   - PB_PACKET_STATE_DISCARD */
+	                               *   - PB_PACKET_STATE_DISCARD
+	                               * NOTE: Also broadcast when a packet was consumed!
+	                               * NOTE: Also broadcast when `pb_limt' is increased or set to 0! */
 };
 
 /* Broadcast the `pb_psta' signal.
@@ -497,6 +504,16 @@ __NOTHROW(pb_buffer_close)(struct pb_buffer *__restrict self);
 #define pb_buffer_close(self)                                     \
 	(__hybrid_atomic_store((self)->pb_limt, 0, __ATOMIC_RELEASE), \
 	 pb_buffer_broadcast_psta(self))
+#endif /* !__INTELLISENSE__ */
+
+
+/* Check if the given buffer was closed. */
+#ifdef __INTELLISENSE__
+__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(pb_buffer_closed)(struct pb_buffer const *__restrict self);
+#else /* __INTELLISENSE__ */
+#define pb_buffer_closed(self) \
+	(__hybrid_atomic_load((self)->pb_limt, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__INTELLISENSE__ */
 
 
@@ -652,12 +669,12 @@ __NOTHROW_NCX(LIBBUFFER_CC pb_buffer_startread)(struct pb_buffer *__restrict sel
 typedef __NOBLOCK __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct pb_packet *
 /*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_TRUNCATE_PACKET)(struct pb_buffer *__restrict self,
                                                          struct pb_packet *__restrict packet,
-                                                         uint16_t bytes_to_consume);
+                                                         __uint16_t bytes_to_consume);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __NOBLOCK __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct pb_packet *
 __NOTHROW(LIBBUFFER_CC pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
                                                   struct pb_packet *__restrict packet,
-                                                  uint16_t bytes_to_consume);
+                                                  __uint16_t bytes_to_consume);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 /* End reading the current packet, and discard the packet from the data stream.
@@ -686,6 +703,70 @@ __NOTHROW_NCX(pb_buffer_endread_restore)(struct pb_buffer *__restrict self,
 	 pb_buffer_broadcast_psta(self))
 #endif /* !__INTELLISENSE__ */
 
+
+
+/* Snapshot-style checks if reading/writing packets is possible right now. */
+#ifdef __KERNEL__
+typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(LIBBUFFER_CC *PPB_BUFFER_CANREAD)(struct pb_buffer *__restrict self)
+		/*__THROWS(E_WOULDBLOCK)*/;
+typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
+                                    __uint16_t payload_size,
+                                    __uint16_t ancillary_size)
+		/*__THROWS(E_WOULDBLOCK)*/;
+#else /* __KERNEL__ */
+typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_CANREAD)(struct pb_buffer *__restrict self);
+typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
+                                                  __uint16_t payload_size,
+                                                  __uint16_t ancillary_size);
+#endif /* !__KERNEL__ */
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+#ifdef __KERNEL__
+LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(LIBBUFFER_CC pb_buffer_canread)(struct pb_buffer *__restrict self)
+		__THROWS(E_WOULDBLOCK);
+LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+(LIBBUFFER_CC pb_buffer_canwrite)(struct pb_buffer *__restrict self,
+                                  __uint16_t payload_size,
+                                  __uint16_t ancillary_size)
+		__THROWS(E_WOULDBLOCK);
+#else /* __KERNEL__ */
+LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(LIBBUFFER_CC pb_buffer_canread)(struct pb_buffer *__restrict self);
+LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(LIBBUFFER_CC pb_buffer_canwrite)(struct pb_buffer *__restrict self,
+                                           __uint16_t payload_size,
+                                           __uint16_t ancillary_size);
+#endif /* !__KERNEL__ */
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
+
+
+
+
+#ifdef LIBBUFFER_WANT_PROTOTYPES
+#ifdef __KERNEL__
+/* Poll for the packet buffer to become readable. */
+#define pb_buffer_pollread(self)      \
+	(pb_buffer_canread(self) ||       \
+	 (task_connect(&(self)->pb_psta), \
+	  pb_buffer_canread(self)))
+
+/* Poll for the packet buffer to become writable. */
+#define pb_buffer_pollwrite(self, payload_size, ancillary_size) \
+	(pb_buffer_canwrite(self, payload_size, ancillary_size) ||  \
+	 (task_connect(&(self)->pb_psta),                           \
+	  pb_buffer_canwrite(self, payload_size, ancillary_size)))
+
+/* Poll for the packet buffer to become closed. */
+#define pb_buffer_pollwrite(self, payload_size, ancillary_size) \
+	(pb_buffer_canwrite(self, payload_size, ancillary_size) ||  \
+	 (task_connect(&(self)->pb_psta),                           \
+	  pb_buffer_canwrite(self, payload_size, ancillary_size)))
+#endif /* __KERNEL__ */
+#endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 
 

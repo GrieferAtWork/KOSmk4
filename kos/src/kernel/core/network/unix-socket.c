@@ -1,3 +1,7 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.removeif([](x) -> x.startswith("-O"));
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,10 +224,12 @@ refuse_everyone:
 		if unlikely(chain == UNIX_SERVER_ACCEPTME_SHUTDOWN)
 			goto refuse_everyone; /* Server was shut down -> Refuse _all_ clients. */
 		if likely(!chain) {
-			if (ATOMIC_CMPXCH_WEAK(self->us_acceptme, NULL, acceptme_first))
-				break; /* Successfully installed the chain. */
-			/* Indicate that clients that need accept(2)-ing have become available. */
-			sig_broadcast(&self->us_acceptme_sig);
+			if (ATOMIC_CMPXCH_WEAK(self->us_acceptme, NULL, acceptme_first)) {
+				/* Indicate that clients that need accept(2)-ing have become available. */
+				sig_broadcast(&self->us_acceptme_sig);
+				/* Successfully installed the chain. */
+				break;
+			}
 			continue;
 		}
 		/* Another chain was installed in the mean time.
@@ -611,7 +617,14 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 	ATOMIC_WRITE(socket->us_node, me->aw_bind_node); /* Inherit reference */
 	me->aw_bind_node = NULL;
 	COMPILER_WRITE_BARRIER();
-	decref_unlikely(socket);
+	{
+		FINALLY_DECREF_UNLIKELY(socket);
+		/* If the socket wasn't accepted, tell the caller by throwing
+		 * an `E_NET_CONNECTION_REFUSED' exception, which will translate
+		 * to connect() returning with `errno=ECONNREFUSED' */
+		if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_ACCEPTED)
+			THROW(E_NET_CONNECTION_REFUSED);
+	}
 	return false;
 }
 
@@ -917,13 +930,106 @@ again_wait_for_client:
 }
 
 
+/* Check if clients to-be accept(2)-ed are available
+ * NOTE: Also returns true if the server was shut down. */
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL unix_server_can_accept)(struct unix_server const *__restrict self) {
+	struct unix_client *clients;
+	clients = ATOMIC_READ(self->us_acceptme);
+	return clients != NULL;
+}
+
+
+/* Poll for pending clients to-be accept(2)-ed
+ * @return: true:  Clients are available, or the server was shut down.
+ * @return: false: Caller should task_waitfor() for clients. */
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+unix_server_poll_accept(struct unix_server *__restrict self) {
+	bool result;
+	result = unix_server_can_accept(self);
+	if (!result) {
+		/* Connect to the clients-became-available signal. */
+		task_connect(&self->us_acceptme_sig);
+		/* Interlocked test. */
+		result = unix_server_can_accept(self);
+	}
+	return result;
+}
+
+/* Test the given client for a hang-up condition */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL unix_client_test_hup)(struct unix_client const *__restrict self) {
+	syscall_ulong_t status;
+	status = ATOMIC_READ(self->uc_status);
+	return UNIX_CLIENT_STATUS_ISHUP(status);
+}
+
+/* Poll the given client for a hang-up condition */
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+unix_client_poll_hup(struct unix_client *__restrict self) {
+	if (unix_client_test_hup(self))
+		return true;
+	task_connect(&self->uc_status_sig);
+	return unix_client_test_hup(self);
+}
+
+
+
+
+PRIVATE NONNULL((1)) poll_mode_t KCALL
+UnixSocket_Poll(struct socket *__restrict self,
+                poll_mode_t what) {
+	poll_mode_t result = 0;
+	UnixSocket *me;
+	struct socket_node *node;
+	me   = (UnixSocket *)self;
+	node = ATOMIC_READ(me->us_node);
+	if (!node || node == (struct socket_node *)-1) {
+		/* Technically true, as neither will block (both
+		 * `recv()' and `accept()' will throw errors!) */
+		result |= what & POLLIN;
+	} else if (me->us_client) {
+		struct unix_client *client;
+		client = me->us_client;
+		/* Client socket (poll against recv()) */
+		if (what & POLLIN) {
+			if (pb_buffer_pollread(me->us_recvbuf))
+				result |= POLLIN;
+		}
+		/* Always poll for HUP conditions */
+		if (unix_client_poll_hup(client)) {
+			result |= POLLHUP;
+			result |= what & POLLRDHUP;
+		} else if (what & POLLRDHUP) {
+			/* Poll if the other end has shut down its write-end */
+			if (pb_buffer_closed(me->us_recvbuf))
+				result |= POLLRDHUP;
+			else if (!(what & POLLIN)) {
+				/* When POLLIN was tested, then we're already
+				 * connected to `me->us_recvbuf->pb_psta' */
+				task_connect(&me->us_recvbuf->pb_psta);
+				if (pb_buffer_closed(me->us_recvbuf))
+					result |= POLLRDHUP;
+			}
+		}
+	} else {
+		/* Server socket (poll against accept()) */
+		if (what & POLLIN) {
+			if (unix_server_poll_accept(&node->s_server))
+				result |= POLLIN;
+		}
+	}
+	return result;
+}
+
+
 
 
 /* Socket operators for UDP sockets. */
 PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_family      = */ AF_UNIX,
 	/* .so_fini        = */ &UnixSocket_Fini,
-	/* .so_poll        = */ NULL,
+	/* .so_poll        = */ &UnixSocket_Poll,
 	/* .so_getsockname = */ &UnixSocket_GetSockName,
 	/* .so_getpeername = */ &UnixSocket_GetPeerName,
 	/* .so_bind        = */ &UnixSocket_Bind,
@@ -938,7 +1044,7 @@ PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_recvfromv   = */ NULL, /* TODO */
 	/* .so_listen      = */ &UnixSocket_Listen,
 	/* .so_accept      = */ &UnixSocket_Accept,
-	/* .so_shutdown    = */ NULL,
+	/* .so_shutdown    = */ NULL, /* TODO: Close client read/write packet buffers */
 	/* .so_getsockopt  = */ NULL, /* TODO? */
 	/* .so_setsockopt  = */ NULL, /* TODO? */
 	/* .so_ioctl       = */ NULL, /* TODO? */

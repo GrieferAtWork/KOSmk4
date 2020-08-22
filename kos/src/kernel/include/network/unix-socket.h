@@ -59,6 +59,9 @@ struct socket_node;
 #define UNIX_CLIENT_STATUS_REFUSED  2 /* Client was refused */
 #define UNIX_CLIENT_STATUS_CLOSED   3 /* Connection was closed */
 
+/* Check if the given client status indicate a hang-up condition */
+#define UNIX_CLIENT_STATUS_ISHUP(x) ((x) >= UNIX_CLIENT_STATUS_REFUSED)
+
 struct unix_client {
 	WEAK refcnt_t           uc_refcnt;     /* Reference counter. */
 	REF struct unix_client *uc_next;       /* [lock(ATOMIC)][owner(struct unix_server)]

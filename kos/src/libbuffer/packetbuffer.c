@@ -51,6 +51,10 @@ DECL_BEGIN
 #define trylock() atomic_rwlock_trywrite(&self->pb_lock)
 #define unlock()  atomic_rwlock_endwrite(&self->pb_lock)
 
+#define rlock()    atomic_rwlock_read(&self->pb_lock)
+#define tryrlock() atomic_rwlock_tryread(&self->pb_lock)
+#define runlock()  atomic_rwlock_endread(&self->pb_lock)
+
 
 #ifdef __KERNEL__
 typedef struct heapptr heapptr_t;
@@ -488,6 +492,10 @@ again:
 	lock();
 again_locked:
 	packet = self->pb_rptr;
+	if (packet == self->pb_wptr) {
+		/* Nothing to read. */
+		goto unlock_and_return_NULL;
+	}
 	if (packet->p_total == 0) {
 		/* Packet exists the next buffer over! */
 		self->pb_rptr = packet->p_cont;
@@ -503,6 +511,7 @@ again_locked:
 			self->pb_rptr += packet->p_total;
 			goto again_locked;
 		}
+unlock_and_return_NULL:
 		unlock();
 		/* Let the caller handle all of the blocking. */
 		return NULL;
@@ -634,11 +643,99 @@ NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
 }
 
 
+
+/* Snapshot-style checks if reading/writing packets is possible right now. */
+#ifdef __KERNEL__
+INTERN NOBLOCK WUNUSED NONNULL((1)) bool
+(CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self)
+		__THROWS(E_WOULDBLOCK)
+#else /* __KERNEL__ */
+INTERN NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self)
+#endif /* !__KERNEL__ */
+{
+	struct pb_packet *packet;
+again:
+	rlock();
+again_locked:
+	packet = self->pb_rptr;
+	if (packet == self->pb_wptr) {
+		/* Nothing to read. */
+		goto unlock_and_return_false;
+	}
+	if (packet->p_total == 0) {
+		/* Packet exists the next buffer over! */
+		self->pb_rptr = packet->p_cont;
+		runlock();
+		pb_buffer_blob_free(_pb_packet_bufctl_bufbase(packet),
+		                    _pb_packet_bufctl_bufsize(packet));
+		goto again;
+	}
+	if (packet->p_state != PB_PACKET_STATE_READABLE) {
+		if (packet->p_state == PB_PACKET_STATE_DISCARD) {
+			/* Skip packets that were discarded */
+			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
+			self->pb_rptr += packet->p_total;
+			goto again_locked;
+		}
+unlock_and_return_false:
+		runlock();
+		/* Let the caller handle all of the blocking. */
+		return false;
+	}
+	runlock();
+	return true;
+}
+
+
+/* Snapshot-style checks if reading/writing packets is possible right now. */
+#ifdef __KERNEL__
+INTERN NOBLOCK WUNUSED NONNULL((1)) bool
+(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
+                            uint16_t payload_size,
+                            uint16_t ancillary_size)
+		__THROWS(E_WOULDBLOCK)
+#else /* __KERNEL__ */
+INTERN NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
+                                   uint16_t payload_size,
+                                   uint16_t ancillary_size)
+#endif /* !__KERNEL__ */
+{
+	bool result;
+	uint16_t total_size;
+	/* Calculate the total required size for the packet. */
+	total_size = CEIL_ALIGN(payload_size, PACKET_BUFFER_ALIGNMENT) +
+	             CEIL_ALIGN(ancillary_size, PACKET_BUFFER_ALIGNMENT) +
+	             CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT);
+	rlock();
+	/* Check if the buffer size limit allows for a packet of this size to be added. */
+	if unlikely(self->pb_used + total_size >= self->pb_limt) {
+		/* Packet would be too large.
+		 *
+		 * However, if it's only too large because the buffer was closed,
+		 * we must still indicate that writing is possible (and the caller
+		 * must deal with the case of an attempted write after having closed
+		 * the buffer) */
+		result = self->pb_limt == 0;
+	} else {
+		/* Sufficient space is available. */
+		result = true;
+	}
+	runlock();
+	return result;
+}
+
+
+
+
 DEFINE_PUBLIC_ALIAS(pb_buffer_startwrite, lib_pb_buffer_startwrite);
 DEFINE_PUBLIC_ALIAS(pb_buffer_endwrite_abort, lib_pb_buffer_endwrite_abort);
 DEFINE_PUBLIC_ALIAS(pb_buffer_startread, lib_pb_buffer_startread);
 DEFINE_PUBLIC_ALIAS(pb_buffer_truncate_packet, lib_pb_buffer_truncate_packet);
 DEFINE_PUBLIC_ALIAS(pb_buffer_endread_consume, lib_pb_buffer_endread_consume);
+DEFINE_PUBLIC_ALIAS(pb_buffer_canread, lib_pb_buffer_canread);
+DEFINE_PUBLIC_ALIAS(pb_buffer_canwrite, lib_pb_buffer_canwrite);
 
 DECL_END
 

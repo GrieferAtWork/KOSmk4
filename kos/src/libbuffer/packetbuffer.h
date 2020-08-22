@@ -27,6 +27,8 @@
 
 #include <kos/types.h>
 
+#include <stdbool.h>
+
 #include <libbuffer/packetbuffer.h>
 
 DECL_BEGIN
@@ -152,6 +154,26 @@ INTDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
                                           struct pb_packet *__restrict packet);
 
+
+
+/* Snapshot-style checks if reading/writing packets is possible right now. */
+#ifdef __KERNEL__
+INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
+(CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self)
+		__THROWS(E_WOULDBLOCK);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
+(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
+                            uint16_t payload_size,
+                            uint16_t ancillary_size)
+		__THROWS(E_WOULDBLOCK);
+#else /* __KERNEL__ */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
+                                   uint16_t payload_size,
+                                   uint16_t ancillary_size);
+#endif /* !__KERNEL__ */
 
 
 
