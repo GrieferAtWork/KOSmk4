@@ -558,15 +558,17 @@ connect_and_send_poll(async_job_t self, struct timespec *__restrict UNUSED(timeo
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 connect_and_send_work(async_job_t self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	/* Check for AIO errors. */
 	assert(aio_handle_generic_hascompleted(&me->cas_aio));
 	aio_handle_generic_checkerror(&me->cas_aio);
-	if (!me->cas_socket)
-		return false; /* send() has completed. */
+	if (!me->cas_socket) {
+		/* send() has completed. */
+		return ASYNC_JOB_WORK_COMPLETE;
+	}
 	if (!tryincref(me->cas_socket))
 		THROW(E_NO_SUCH_OBJECT);
 	/* connect() has completed (successfully).
@@ -600,7 +602,7 @@ connect_and_send_work(async_job_t self) {
 	}
 	decref_unlikely(me->cas_socket);
 	me->cas_socket = NULL;
-	return true;
+	return ASYNC_JOB_WORK_AGAIN;
 }
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
@@ -914,7 +916,7 @@ recvfrom_peer_poll(async_job_t self, struct timespec *__restrict UNUSED(timeout)
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 recvfrom_peer_work(async_job_t self) {
 	struct recvfrom_peer_job *me;
 	me = (struct recvfrom_peer_job *)self;
@@ -925,7 +927,7 @@ recvfrom_peer_work(async_job_t self) {
 		goto wrong_peer;
 	if (memcmp(me->rpj_gotpeer, me->rpj_wantpeer, me->rpj_wantpeerlen) != 0)
 		goto wrong_peer;
-	return false; /* done! */
+	return ASYNC_JOB_WORK_COMPLETE; /* done! */
 wrong_peer:
 	if (!tryincref(me->rpj_sock))
 		THROW(E_NO_SUCH_OBJECT);
@@ -961,7 +963,7 @@ wrong_peer:
 		aio_handle_complete(&me->rpj_aio, AIO_COMPLETION_FAILURE);
 		RETHROW();
 	}
-	return true;
+	return ASYNC_JOB_WORK_AGAIN;
 }
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC

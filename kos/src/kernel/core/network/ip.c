@@ -698,14 +698,15 @@ ip_arp_and_datagram_poll(async_job_t self, struct timespec *__restrict timeout) 
 	return ASYNC_JOB_POLL_WAITFOR;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 ip_arp_and_datagram_work(async_job_t self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	if (me->adj_arpc == 0) {
 		assert(aio_handle_generic_hascompleted(&me->adj_done));
 		aio_handle_generic_checkerror(&me->adj_done);
-		return true; /* The delete-transmit-complete is handled by poll() */
+		/* The delete-transmit-complete is handled by poll() */
+		return ASYNC_JOB_WORK_AGAIN;
 	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
@@ -741,17 +742,17 @@ ip_arp_and_datagram_work(async_job_t self) {
 		me->adj_arpc = 0;
 		COMPILER_BARRIER();
 	}
-	return true;
+	return ASYNC_JOB_WORK_AGAIN;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 ip_arp_and_datagram_time(async_job_t self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
 	assert(me->adj_arpc != 0);
 	/* Check once again if the MAC has become available (unlikely) */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return true;
+		return ASYNC_JOB_WORK_AGAIN;
 	/* Check if this was the last attempt */
 	if (me->adj_arpc == 1) {
 		THROW(E_NET_HOST_UNREACHABLE); /* XXX: Exception pointers? */
@@ -762,7 +763,7 @@ ip_arp_and_datagram_time(async_job_t self) {
 	                            me->adj_peer->npa_ip);
 	me->adj_arptmo = realtime();
 	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
-	return true;
+	return ASYNC_JOB_WORK_AGAIN;
 }
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
@@ -949,14 +950,15 @@ ip_arp_and_datagrams_poll(async_job_t self, struct timespec *__restrict timeout)
 	return ASYNC_JOB_POLL_WAITFOR;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 ip_arp_and_datagrams_work(async_job_t self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
 		assert(aio_multihandle_generic_hascompleted(&me->adj_done));
 		aio_multihandle_generic_checkerror(&me->adj_done);
-		return true; /* The delete-transmit-complete is handled by poll() */
+		/* The delete-transmit-complete is handled by poll() */
+		return ASYNC_JOB_WORK_AGAIN;
 	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
@@ -1005,17 +1007,17 @@ ip_arp_and_datagrams_work(async_job_t self) {
 		me->adj_arpc = 0;
 		COMPILER_BARRIER();
 	}
-	return true;
+	return ASYNC_JOB_WORK_AGAIN;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 ip_arp_and_datagrams_time(async_job_t self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
 	assert(me->adj_arpc != 0);
 	/* Check once again if the MAC has become available (unlikely) */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
-		return true;
+		return ASYNC_JOB_WORK_AGAIN;
 	/* Check if this was the last attempt */
 	if (me->adj_arpc == 1) {
 		THROW(E_NET_HOST_UNREACHABLE); /* XXX: Exception pointers? */
@@ -1026,7 +1028,7 @@ ip_arp_and_datagrams_time(async_job_t self) {
 	                            me->adj_peer->npa_ip);
 	me->adj_arptmo = realtime();
 	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
-	return true;
+	return ASYNC_JOB_WORK_AGAIN;
 }
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
@@ -1046,10 +1048,10 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
 	/* .jc_jobalign = */ alignof(struct ip_arp_and_datagrams_job),
 	/* .jc_driver   = */ &drv_self,
 	/* .jc_fini     = */ &ip_arp_and_datagrams_fini,
-	/* .aj_poll     = */ &ip_arp_and_datagrams_poll,
-	/* .aj_work     = */ &ip_arp_and_datagrams_work,
-	/* .aj_time     = */ &ip_arp_and_datagrams_time,
-	/* .aj_cancel   = */ &ip_arp_and_datagrams_cancel,
+	/* .jc_poll     = */ &ip_arp_and_datagrams_poll,
+	/* .jc_work     = */ &ip_arp_and_datagrams_work,
+	/* .jc_time     = */ &ip_arp_and_datagrams_time,
+	/* .jc_cancel   = */ &ip_arp_and_datagrams_cancel,
 };
 
 

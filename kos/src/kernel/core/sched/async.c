@@ -639,7 +639,7 @@ PRIVATE struct async_job *async_job_current_timeout = NULL;
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
 asyncjob_timeout_worker_timeout(void *__restrict UNUSED(self)) {
-	bool incomplete;
+	unsigned int status;
 	assert(async_job_current_timeout);
 	/* Check for `ASYNC_JOB_AIO_CANCELED' and call jc_cancel that's what happened. */
 	if (ATOMIC_READ(async_job_current_timeout->aj_aio) == ASYNC_JOB_AIO_CANCELED) {
@@ -655,7 +655,7 @@ asyncjob_timeout_worker_timeout(void *__restrict UNUSED(self)) {
 		goto do_delete_job;
 	}
 	TRY {
-		incomplete = (*async_job_current_timeout->aj_ops->jc_time)(async_job_current_timeout + 1);
+		status = (*async_job_current_timeout->aj_ops->jc_time)(async_job_current_timeout + 1);
 	} EXCEPT {
 		struct aio_handle *aio;
 		/* Signal AIO completion with error. */
@@ -674,7 +674,7 @@ asyncjob_timeout_worker_timeout(void *__restrict UNUSED(self)) {
 		}
 		goto do_delete_job;
 	}
-	if (!incomplete) {
+	if (status == ASYNC_JOB_WORK_COMPLETE) {
 		struct async_job **pjob, *job;
 do_delete_job:
 		/* Delete this job. */
@@ -795,11 +795,11 @@ handle_job:
 			switch (pollcode) {
 
 			case ASYNC_JOB_POLL_AVAILABLE: {
-				bool incomplete;
+				unsigned int status;
 				result = true;
 				task_disconnectall();
 				TRY {
-					incomplete = (*job->aj_ops->jc_work)(job + 1);
+					status = (*job->aj_ops->jc_work)(job + 1);
 				} EXCEPT {
 					struct aio_handle *aio;
 					/* Signal AIO completion with error. */
@@ -817,7 +817,7 @@ handle_job:
 					}
 					goto do_delete_job;
 				}
-				if (!incomplete) {
+				if (status == ASYNC_JOB_WORK_COMPLETE) {
 					struct aio_handle *aio;
 					struct async_job *next;
 					/* Signal successful AIO completion. */
@@ -1050,8 +1050,8 @@ PRIVATE struct aio_handle_type const async_job_aio_noretsize = {
  *     just after the job has been deleted:
  *     - AIO_COMPLETION_SUCCESS:
  *       - `jc_poll()' returning `ASYNC_JOB_POLL_DELETE'
- *       - `jc_work()' returning `false'
- *       - `jc_time()' returning `false'
+ *       - `jc_work()' returning `ASYNC_JOB_WORK_COMPLETE'
+ *       - `jc_time()' returning `ASYNC_JOB_WORK_COMPLETE'
  *     - AIO_COMPLETION_CANCEL:
  *       - `aio_handle_cancel()' has been called
  *       - `async_job_cancel()' has been called

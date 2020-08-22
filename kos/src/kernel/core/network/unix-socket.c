@@ -585,7 +585,7 @@ UnixSocket_WaitForAccept_Poll(async_job_t self,
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
 
-PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
 UnixSocket_WaitForAccept_Work(async_job_t self) {
 	struct unix_client *client;
 	struct async_accept_wait *me;
@@ -593,14 +593,14 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 	me     = (struct async_accept_wait *)self;
 	client = me->aw_client;
 	if (ATOMIC_READ(client->uc_status) == UNIX_CLIENT_STATUS_PENDING)
-		return true; /* Still some work left to do! */
+		return ASYNC_JOB_WORK_AGAIN; /* Still some work left to do! */
 	/* The connection has been established! */
 	socket = me->aw_socket;
 	if unlikely(!tryincref(socket)) {
 		/* The socket died? Ok... In that case, just force a disconnect */
 		if (!unix_client_refuse_connection(client))
 			unix_client_close_connection(client);
-		return false;
+		return ASYNC_JOB_WORK_COMPLETE;
 	}
 	/* Fill in fields of the socket. */
 	socket->us_recvbuf  = &client->uc_fromserver;
@@ -625,7 +625,7 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 		if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_ACCEPTED)
 			THROW(E_NET_CONNECTION_REFUSED);
 	}
-	return false;
+	return ASYNC_JOB_WORK_COMPLETE;
 }
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC

@@ -204,33 +204,41 @@ struct aio_handle_stat {
 
 struct aio_handle_type {
 	/* [1..1] Finalizer for this AIO handle. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ht_fini)(struct aio_handle *__restrict self);
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *ht_fini)(struct aio_handle *__restrict self);
+
 	/* [1..1] Cancel execution of the given AIO operation.
 	 * NOTE: This function is required to _immediatly_ cancel the operation associated
 	 *       with the given handle, so long as that operation hasn't yet completed.
 	 *       If the first holds true, the associated handle function must be invoked
 	 *       with `AIO_COMPLETION_CANCEL' before this operator may return.
 	 * WARNING: This callback may only be invoked _once_! */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ht_cancel)(struct aio_handle *__restrict self);
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *ht_cancel)(struct aio_handle *__restrict self);
+
 	/* [0..1] An optional operator which can be used to query the operation progress
 	 *        in order to determine how much has already been done, and how much is
 	 *        still left to be done.
 	 * @param: stat: Filled in by this operator.
 	 * @return: * :  One of `AIO_PROGRESS_STATUS_*' */
-	NOBLOCK NONNULL((1, 2)) unsigned int /*NOTHROW*/ (KCALL *ht_progress)(struct aio_handle *__restrict self,
-	                                                                      struct aio_handle_stat *__restrict stat);
+	NOBLOCK NONNULL((1, 2)) unsigned int
+	/*NOTHROW*/ (KCALL *ht_progress)(struct aio_handle *__restrict self,
+	                                 struct aio_handle_stat *__restrict stat);
 #define AIO_PROGRESS_STATUS_PENDING    0x0000 /* The operation is still pending execution. */
 #define AIO_PROGRESS_STATUS_INPROGRESS 0x0001 /* The operation is currently being performed. */
 #define AIO_PROGRESS_STATUS_COMPLETED  0x0002 /* The operation has finished (either due to being canceled, failing, or succeeding)
                                                * Note however that when this value is returned, it is not guarantied whether or
                                                * not the completion function has already been called, or has already returned. */
+
 	/* [0..1] An optional operator for AIO protocols that can consume/produce variable
 	 *        amounts of data (e.g. the USB protocol).
 	 *        For such cases, this operator returns the actual amount of transferred
 	 *        data (in bytes) once AIO operation has completed successfully.
-	 *        Calling this operator at any time other than after/during the completion
-	 *        function was called with `AIO_COMPLETION_SUCCESS' causes undefined behavior. */
-	NOBLOCK WUNUSED NONNULL((1)) size_t /*NOTHROW*/ (KCALL *ht_retsize)(struct aio_handle *__restrict self);
+	 *        Calling this operator at any time other than after the completion
+	 *        function was called with `AIO_COMPLETION_SUCCESS' causes undefined
+	 *        behavior. */
+	NOBLOCK WUNUSED NONNULL((1)) size_t
+	/*NOTHROW*/ (KCALL *ht_retsize)(struct aio_handle *__restrict self);
 };
 
 
@@ -244,7 +252,7 @@ struct aio_handle_type {
                                    * job to take that information and do with it as it
                                    * pleases (usually propagating it to whoever is waiting
                                    * for the operation to be completed, or to dump it to
-                                   * the system log when noone is waiting) */
+                                   * the system log when no one is waiting) */
 
 /* AIO completion callback. Guarantied to always be invoked _exactly_
  * once for each AIO operation started at any point before then.
@@ -319,7 +327,7 @@ NOTHROW(KCALL aio_handle_init)(struct aio_handle *__restrict self,
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_fini)(struct aio_handle *__restrict self) {
 #ifndef CONFIG_NO_SMP
-	/* Make sure that some other thread still inside of `ah_func' */
+	/* Make sure that no other thread is still inside of `ah_func' */
 	while (__hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) != AIO_HANDLE_NEXT_COMPLETED)
 		task_tryyield_or_pause();
 #endif /* !CONFIG_NO_SMP */
@@ -350,7 +358,7 @@ NOTHROW(KCALL aio_handle_cancel)(struct aio_handle *__restrict self) {
  * by setting its ah_next field to `AIO_HANDLE_NEXT_COMPLETED'
  * WARNING: Any further access to any of the members of `self' becomes
  *          illegal after the first can to this function! As such, the
- *          semantics of this function as after as the `self' argument
+ *          semantics of this function as far as the `self' argument
  *          goes are `inherit(always)'
  * WARNING: It could already be implied by the previous warning,
  *          however just to state it as clear as possible: _ONLY_

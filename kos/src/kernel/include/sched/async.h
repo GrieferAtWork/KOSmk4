@@ -184,6 +184,12 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 #define ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT 2 /* Same as `ASYNC_JOB_POLL_WAITFOR', but ignore `timeout'. */
 #define ASYNC_JOB_POLL_DELETE            3 /* Nothing left to do (delete the job with a success status) */
 
+/* Return codes for `async_job_callbacks::jc_work' adn `async_job_callbacks::jc_time' */
+#define ASYNC_JOB_WORK_COMPLETE 0 /* Work has been completed, and the async-job should delete itself. In
+                                   * this case, the caller will unlink the async-job and invoke `jc_fini' */
+#define ASYNC_JOB_WORK_AGAIN    1 /* Work is still incomplete, and the caller should call `jc_poll()' next
+                                   * until that function returns `true' before calling this function again. */
+
 /* A pointer to the `self' argument of async jobs. */
 struct async_job;
 typedef struct async_job *async_job_t;
@@ -192,12 +198,15 @@ struct aio_handle_stat;
 /* Async jobs are similar to async workers, however are designed as
  * one-time jobs that delete themself once they've been completed.
  * NOTE: async job callbacks are inherently thread-safe:
+ *
  *   - jc_fini() is the last function that may ever be called, and
  *     will only be invoked _after_ any other callback has already
  *     returned.
+ *
  *   - Only one of `jc_poll()', `jc_work()', `jc_time()' and `jc_cancel()'
  *     may ever be called at the same time. (i.e. no synchronization is
  *     necessary between these callbacks)
+ *
  *   - Only `jc_progress()' and `jc_retsize()' might be called from the
  *     outside of the async-job, however since these callbacks are meant
  *     to perform read-only operations, they should also be inherently
@@ -205,6 +214,10 @@ struct aio_handle_stat;
  *     async-job (though if done right, even that would be allowed and
  *     possible) (also note that `jc_retsize()' is only called after
  *     the job had already been deleted/canceled)
+ *
+ *   - `jc_work()' will only ever be called after `jc_poll()' returned
+ *     with `ASYNC_JOB_POLL_AVAILABLE' between `jc_poll()' returning,
+ *     and a previous call to `jc_work()', or the start of the async job.
  */
 struct async_job_callbacks {
 	size_t         jc_jobsize;  /* Size of the structure pointed-to by the `self' arguments used by callbacks. */
@@ -212,7 +225,8 @@ struct async_job_callbacks {
 	struct driver *jc_driver;   /* [1..1] The driver implementing the callbacks. */
 
 	/* [0..1] Finalizer for `self' */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (ASYNC_CALLBACK_CC *jc_fini)(async_job_t self);
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (ASYNC_CALLBACK_CC *jc_fini)(async_job_t self);
 
 	/* [1..1] Poll-callback. Behaves similar to the one for async workers.
 	 * If this function returns with an exception, the job will also be deleted.
@@ -222,24 +236,27 @@ struct async_job_callbacks {
 	 *                        NOTE: This argument only has meaning when `ASYNC_JOB_POLL_WAITFOR'
 	 *                              is returned.
 	 * @return: * : One of `ASYNC_JOB_POLL_*' */
-	NONNULL((1, 2)) unsigned int (ASYNC_CALLBACK_CC *jc_poll)(async_job_t self, /*out*/ struct timespec *__restrict timeout);
+	NONNULL((1, 2)) unsigned int
+	(ASYNC_CALLBACK_CC *jc_poll)(async_job_t self, /*out*/ struct timespec *__restrict timeout);
 
 	/* [1..1] Perform the work associated with this async-job.
 	 * If this function returns with an exception, the job will also be deleted.
-	 * @return: true:  Work is still incomplete, and the caller should call `jc_poll()' next
-	 *                 until that function returns `true' before calling this function again.
-	 * @return: false: Work has been completed, and the async-job should delete itself.
-	 *                 In this case, the caller will unlink the async-job and invoke `jc_fini'*/
-	NONNULL((1)) bool (ASYNC_CALLBACK_CC *jc_work)(async_job_t self);
+	 * NOTE: This callback will only be invoked if `jc_poll' returned
+	 *       `ASYNC_JOB_POLL_AVAILABLE' at some point between now and
+	 *       the last call to `jc_work', or the creation of the async
+	 *       job.
+	 * @return: * : One of `ASYNC_JOB_WORK_*' */
+	NONNULL((1)) unsigned int
+	(ASYNC_CALLBACK_CC *jc_work)(async_job_t self);
 
 	/* [?..1] Callback that is invoked when the timeout filled in by `jc_poll()' has elapsed.
 	 *        This callback only has to be [valid] when `jc_poll()' is able to return `ASYNC_JOB_POLL_WAITFOR'.
 	 *        If that callback only ever returns `ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT', then this callback
 	 *        doesn't need to be filled in.
 	 * If this function returns with an exception, the job will also be deleted.
-	 * @return: true:  Same as with `jc_work': don't delete the job.
-	 * @return: false: Same as with `jc_work': delete the job. */
-	NONNULL((1)) bool (ASYNC_CALLBACK_CC *jc_time)(async_job_t self);
+	 * @return: * : One of `ASYNC_JOB_WORK_*' */
+	NONNULL((1)) unsigned int
+	(ASYNC_CALLBACK_CC *jc_time)(async_job_t self);
 
 	/* [0..1] Optional callback that is invoked when the job is explicitly canceled (s.a. `async_job_cancel()').
 	 *  NOTE: When this callback is invoked, it is guarantied that none of this job's
@@ -249,7 +266,8 @@ struct async_job_callbacks {
 	 *        worker to then invoke this callback.
 	 * If this function returns with an exception, that error will be discarded,
 	 * and the job will be deleted none-the-less. */
-	NONNULL((1)) void (ASYNC_CALLBACK_CC *jc_cancel)(async_job_t self);
+	NONNULL((1)) void
+	(ASYNC_CALLBACK_CC *jc_cancel)(async_job_t self);
 
 	/* [0..1] Optional callback to facilitate the `ht_progress' operation of AIO handles.
 	 * WARNING: This callback may be called at the same time as one of the callbacks! */
@@ -316,8 +334,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL async_job_free)(async_job_t self)
  *     just after the job has been deleted:
  *     - AIO_COMPLETION_SUCCESS:
  *       - `jc_poll()' returning `ASYNC_JOB_POLL_DELETE'
- *       - `jc_work()' returning `false'
- *       - `jc_time()' returning `false'
+ *       - `jc_work()' returning `ASYNC_JOB_WORK_COMPLETE'
+ *       - `jc_time()' returning `ASYNC_JOB_WORK_COMPLETE'
  *     - AIO_COMPLETION_CANCEL:
  *       - `aio_handle_cancel()' has been called
  *       - `async_job_cancel()' has been called
