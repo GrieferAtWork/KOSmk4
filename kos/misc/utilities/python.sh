@@ -74,7 +74,7 @@ EOF
 			--enable-ipv6 \
 			--enable-unicode=ucs4 \
 			--with-suffix="" \
-			--with-system-ffi \
+			--with-system-ffi=yes \
 			--with-signal-module \
 			--with-threads \
 			--with-wctype-functions \
@@ -83,7 +83,38 @@ EOF
 			--with-computed-gotos
 	fi
 	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
+	# This is needed to appease python's annoying build system, which
+	# doesn't seem to understand that due to multi-arch (which is something
+	# that's quite standartized now-a-days), KOS (just like linux) has
+	# multiple system include paths ('/kos/include/i386-kos/' and '/kos/include/')
+	# As such, it only searches the later, and even more annoyingly, it also
+	# searches it for a line that starts with `#define LIBFFI_H`...
+	# Anyways. Make it happy by defining that file while we're running make...
+	cat > "$KOS_ROOT/kos/include/ffi.h" <<EOF
+#include <$TARGET_INCPATH/ffi.h>
+#if 0
+#define LIBFFI_H
+#endif
+EOF
+	# Another annoying thing with python+libffi: Python checks which libraries
+	# exist in a specific order, in which `libffi_convenience` comes before
+	# the actual `libffi`. Problem here is that ffi_convenience only comes as
+	# a static library, so if we let python see it, we'd end up linking libffi
+	# statically (which would completely counteract the whole idea behind using
+	# the system libffi, rather than python's builtin, static one)
+	mv	"$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/libffi_convenience.a" \
+		"$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/.libffi_convenience.a" \
+		2>&1 > /dev/null
+	make -j $MAKE_PARALLEL_COUNT
+	error=$?
+	unlink "$KOS_ROOT/kos/include/ffi.h" 2>&1 > /dev/null
+	mv	"$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/.libffi_convenience.a" \
+		"$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/libffi_convenience.a" \
+		2>&1 > /dev/null
+	[ $error == 0 ] || {
+		echo "ERROR: Command failed 'make -j $MAKE_PARALLEL_COUNT' -> '$error'";
+		exit $error;
+	}
 fi
 
 PYTHON_EXE="$OPTPATH/python"

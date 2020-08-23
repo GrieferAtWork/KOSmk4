@@ -103,6 +103,10 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 #include "_libffi/ffi32.h"
 #endif /* !__x86_64__ */
 
+/* Appease DIY, non-standard configure tools (*cough* python *cough*) */
+#ifndef LIBFFI_H
+#define LIBFFI_H
+#endif /* !LIBFFI_H */
 #endif /* !_I386_KOS_FFI_H */
 EOF
 	else
@@ -122,6 +126,10 @@ EOF
 #include "_libffi/ffitarget32.h"
 #endif /* !__x86_64__ */
 
+/* Appease DIY, non-standard configure tools */
+#ifndef LIBFFI_TARGET_H
+#define LIBFFI_TARGET_H
+#endif /* !LIBFFI_TARGET_H */
 #endif /* !_I386_KOS_FFITARGET_H */
 EOF
 	else

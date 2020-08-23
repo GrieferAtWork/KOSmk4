@@ -58,6 +58,9 @@ __ice__
 /kos/include/i386-kos/ffi.h
 /kos/include/i386-kos/ffitarget.h
 
+# Temporary file created while installing python
+/kos/include/ffi.h
+
 # These headers are installed by `make_utility.sh ... libpng`
 /kos/include/libpng/
 /kos/include/libpng16/
