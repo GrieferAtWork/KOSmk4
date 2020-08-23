@@ -17,6 +17,8 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+# depends libffi
+
 PYTHON_VERSION_MAJOR="2"
 PYTHON_VERSION_MINOR="7"
 PYTHON_VERSION_PATCH="16"
@@ -72,10 +74,11 @@ EOF
 			--enable-ipv6 \
 			--enable-unicode=ucs4 \
 			--with-suffix="" \
+			--with-system-ffi \
 			--with-signal-module \
 			--with-threads \
 			--with-wctype-functions \
-			--with-libm=-lm \
+			--with-libm="" \
 			--with-libc=-lc \
 			--with-computed-gotos
 	fi
