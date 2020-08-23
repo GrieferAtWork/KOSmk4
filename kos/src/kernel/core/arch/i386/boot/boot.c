@@ -459,45 +459,23 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Xorg X-Window server support roadmap.
 	 *
-	 * Latest milestone:
-	 *     - The Xorg server actually manages to start & sets up graphics properly:
-	 *       $ Xorg
-	 *       Result: Resize QEMU to a much larger resolution, and display a black screen
-	 *       $ Xorg -wr
-	 *       Result: Resize QEMU to a much larger resolution, and display a white screen
-	 *       -> Xorg is able to properly initialize graphics!
-	 *
-	 * Blocker:
-	 *     - Xorg server doesn't know how to interface with the mouse/keyboard:
-	 *       [3986739.491] (II) LoadModule: "mouse"
-	 *       [3986739.532] (WW) Warning, couldn't open module mouse
-	 *       [3986739.534] (II) UnloadModule: "mouse"
-	 *       [3986739.535] (II) Unloading mouse
-	 *       [3986739.536] (EE) Failed to load module "mouse" (module does not exist, 0)
-	 *       [3986739.538] (EE) No input driver matching `mouse'
-	 *       [3986739.539] (II) LoadModule: "kbd"
-	 *       [3986739.580] (WW) Warning, couldn't open module kbd
-	 *       [3986739.582] (II) UnloadModule: "kbd"
-	 *       [3986739.584] (II) Unloading kbd
-	 *       [3986739.585] (EE) Failed to load module "kbd" (module does not exist, 0)
-	 *       [3986739.587] (EE) No input driver matching `kbd'
-	 *     - Must port:
-	 *       - https://www.x.org/releases/X11R7.7/src/everything/xf86-input-keyboard-1.6.1.tar.gz
-	 *       - https://www.x.org/releases/X11R7.7/src/everything/xf86-input-mouse-1.7.2.tar.gz
+	 * Current Blocker:
+	 *     - Both Xorg and twm manage to start, and twm tries to connect
+	 *     - /binutils/src/x/libxcb-1.8.1/src/xcb_conn.c:283
+	 *       A call to `pthread_mutex_init()' that is made as part of
+	 *       the process of connecting to an X-server fails because
+	 *       that function isn't implemented, yet.
+	 *     - Similarly, further log entires seem to imply that pthread_cond_t
+	 *       will also needed for X to function properly.
 	 *
 	 * TODO:
+	 *     - Implement libc API surrounding `pthread_mutex_t'
+	 *     - Implement libc API surrounding `pthread_cond_t'
 	 *     - Finish implementing support for unix domain sockets
 	 *     - Properly implement libc's regex functions
 	 *     - Patch Xorg-server to not try to make use of "/dev/ptmx"
 	 *       KOS has an `sys_openpty(2)' system call for this purpose
 	 *       Although I have to wonder why Xorg even needs PTYs...
-	 *
-	 * Current behavior:
-	 *     $ Xorg
-	 *     | ...
-	 *
-	 *     $ cat /var/log/Xorg.0.log
-	 *     | ...
 	 */
 
 	return state;
