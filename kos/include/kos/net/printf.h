@@ -28,19 +28,21 @@
 
 #include <bits/types.h>
 
-#include <inttypes.h> /* WARNING: Not guarantied to always be included */
+#include <bits/crt/inttypes.h>
 
 /* Encode a mac address */
-#define NET_PRINTF_MACADDR_FMT \
-	"%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8
+#define NET_PRINTF_MACADDR_FMT                                           \
+	"%.2" __PRI1_PREFIX "x:%.2" __PRI1_PREFIX "x:%.2" __PRI1_PREFIX "x:" \
+	"%.2" __PRI1_PREFIX "x:%.2" __PRI1_PREFIX "x:%.2" __PRI1_PREFIX "x"
 #define NET_PRINTF_MACADDR_ARG(/*u8*/ macaddr /*[6]*/) \
 	(__uint8_t)(macaddr)[0], (__uint8_t)(macaddr)[1],  \
 	(__uint8_t)(macaddr)[2], (__uint8_t)(macaddr)[3],  \
 	(__uint8_t)(macaddr)[4], (__uint8_t)(macaddr)[5]
 
 /* Encode an IP address */
-#define NET_PRINTF_IPADDR_FMT \
-	"%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8
+#define NET_PRINTF_IPADDR_FMT                  \
+	"%" __PRI1_PREFIX "u.%" __PRI1_PREFIX "u." \
+	"%" __PRI1_PREFIX "u.%" __PRI1_PREFIX "u"
 #define NET_PRINTF_IPADDR_ARG(/*be32*/ ipaddr)   \
 	(__uint8_t)(__hybrid_betoh32(ipaddr) >> 24), \
 	(__uint8_t)(__hybrid_betoh32(ipaddr) >> 16), \
@@ -49,7 +51,7 @@
 
 /* Encode a port number address */
 #define NET_PRINTF_PORT_FMT \
-	"%" PRIu16
+	"%" __PRI2_PREFIX "u"
 #define NET_PRINTF_PORT_ARG(/*u16*/ port) \
 	(__uint16_t)(port)
 

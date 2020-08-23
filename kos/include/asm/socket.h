@@ -142,18 +142,18 @@
 
 
 /* Socket type flags */
-#define __SOCK_STREAM    0x00000001 /* Sequenced, reliable, two-way, connection-based byte streams. */
-#define __SOCK_DGRAM     0x00000002 /* Connectionless, unreliable messages of a fixed maximum length. */
-#define __SOCK_RAW       0x00000003 /* Raw network protocol access. */
-#define __SOCK_RDM       0x00000004 /* Reliable datagram layer that does not guarantee ordering. */
-#define __SOCK_SEQPACKET 0x00000005 /* sequenced, reliable, two-way connection-based, with datagrams of fixed maximum length. */
-#define __SOCK_DCCP      0x00000006 /* ??? */
-#define __SOCK_PACKET    0x0000000a /* ??? */
-#define __SOCK_TYPEMASK  0x000000ff /* Mask for the actual socket time (excluding socket creation flags) */
-#define __SOCK_NONBLOCK  0x00000800 /* Set O_NONBLOCK for the socket file descriptor(s). */
-#define __SOCK_CLOEXEC   0x00080000 /* Set O_CLOEXEC for the socket file descriptor(s). */
+#define __SOCK_STREAM    __UINT32_C(0x00000001) /* Sequenced, reliable, two-way, connection-based byte streams. */
+#define __SOCK_DGRAM     __UINT32_C(0x00000002) /* Connectionless, unreliable messages of a fixed maximum length. */
+#define __SOCK_RAW       __UINT32_C(0x00000003) /* Raw network protocol access. */
+#define __SOCK_RDM       __UINT32_C(0x00000004) /* Reliable datagram layer that does not guarantee ordering. */
+#define __SOCK_SEQPACKET __UINT32_C(0x00000005) /* sequenced, reliable, two-way connection-based, with datagrams of fixed maximum length. */
+#define __SOCK_DCCP      __UINT32_C(0x00000006) /* ??? */
+#define __SOCK_PACKET    __UINT32_C(0x0000000a) /* ??? */
+#define __SOCK_TYPEMASK  __UINT32_C(0x000000ff) /* Mask for the actual socket time (excluding socket creation flags) */
+#define __SOCK_NONBLOCK  __UINT32_C(0x00000800) /* Set O_NONBLOCK for the socket file descriptor(s). */
+#define __SOCK_CLOEXEC   __UINT32_C(0x00080000) /* Set O_CLOEXEC for the socket file descriptor(s). */
 #ifdef __KOS__
-#define __SOCK_CLOFORK   0x00100000 /* Set O_CLOFORK for the socket file descriptor(s). */
+#define __SOCK_CLOFORK   __UINT32_C(0x00100000) /* Set O_CLOFORK for the socket file descriptor(s). */
 #endif /* __KOS__ */
 
 

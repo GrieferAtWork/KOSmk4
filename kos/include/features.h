@@ -298,21 +298,21 @@
 #define _ATFILE_SOURCE 1
 #endif /* _GNU_SOURCE */
 
-#if !defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE) && \
-   (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
-    !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE))
+#if (!defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE) && \
+     (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
+      !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)))
 #undef  _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
 #endif
 
 #if (defined(_ISOC11_SOURCE) || \
-    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
 #define __ISO_C_VISIBLE 2011
 #define __USE_ISOC11 1
 #endif
 
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
-    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
 #ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 1999
 #endif /* !__ISO_C_VISIBLE */
@@ -320,31 +320,30 @@
 #endif
 
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
-    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L))
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L))
 #ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 1995
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC95 1
 #endif
 
-#if (defined(_ISOCXX11_SOURCE) || defined(_ISOCXX14_SOURCE)) || defined(_ISOCXX17_SOURCE) || \
-     defined(__GXX_EXPERIMENTAL_CXX0X__) || \
-    (defined(__cplusplus) && __cplusplus >= 201103L)
+#if (defined(_ISOCXX11_SOURCE) || defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
+     defined(__GXX_EXPERIMENTAL_CXX0X__) || (defined(__cplusplus) && __cplusplus >= 201103L))
 #define __USE_ISOCXX11 1
 #endif
 
-#if defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
-   (defined(__cplusplus) && __cplusplus >= 201103L)
+#if (defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
+     (defined(__cplusplus) && __cplusplus >= 201103L))
 #define __USE_ISOCXX14 1
 #endif
 
-#if defined(_ISOCXX17_SOURCE) || \
-   (defined(__cplusplus) && __cplusplus >= 201703L)
+#if (defined(_ISOCXX17_SOURCE) || \
+     (defined(__cplusplus) && __cplusplus >= 201703L))
 #define __USE_ISOCXX17 1
 #endif
 
-#if defined(_ISOCXX2A_SOURCE) || \
-   (defined(__cplusplus) && __cplusplus > 201703L)
+#if (defined(_ISOCXX2A_SOURCE) || \
+     (defined(__cplusplus) && __cplusplus > 201703L))
 #define __USE_ISOCXX2A 1
 #endif
 
@@ -369,10 +368,10 @@
 #define _POSIX_C_SOURCE 200809L
 #endif /* _DEFAULT_SOURCE && !__USE_ISOC_PURE */
 
-#if (!defined(__STRICT_ANSI__) || \
-     (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE+0 >= 500)) && \
-     !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && \
-     !defined(__USE_ISOC_PURE)
+#if ((!defined(__STRICT_ANSI__) ||                             \
+      (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE + 0 >= 500)) && \
+     !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) &&   \
+     !defined(__USE_ISOC_PURE))
 #define _POSIX_SOURCE 1
 #if defined(_XOPEN_SOURCE) && _XOPEN_SOURCE+0 < 500
 #define _POSIX_C_SOURCE 2
