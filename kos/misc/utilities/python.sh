@@ -122,22 +122,41 @@ fi
 
 MODPATH="${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 
-# Python doesn't want to built `imageop.so`, unless the host
-# (that is: the machine you're calling this build script from)
-# is a 32-bit machine.
-# Whilst I don't know what's the deal with this module and only
-# being meant to be built for 32-bit machines, I can't stand the
-# idea that Python once again spits the idea of cross-compiling
-# in its face, so I'm just going to built this module manually,
-# if it wasn't already built.
-if ! [ -f "$MODPATH/imageop.so" ] && [ -f "$SRCPATH/Modules/imageop.c" ]; then
-	cmd cd "$OPTPATH"
-	vcmd "${CROSS_PREFIX}gcc" \
-		-shared -fno-strict-aliasing -ggdb -DNDEBUG \
-		-g -fwrapv -O3 -Wall -Wstrict-prototypes -L. \
-		-I"$SRCPATH/Include" -I. \
-		-o "$MODPATH/imageop.so" "$SRCPATH/Modules/imageop.c" \
-		-lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+# built_missing_module <name> <sources...>
+built_missing_module() {
+	local name="$1"
+	shift
+	if ! [ -f "$MODPATH/$name.so" ]; then
+		cmd cd "$OPTPATH"
+		echo "Building module that python didn't realize it could built: $name"
+		vcmd "${CROSS_PREFIX}gcc" \
+			-shared -fno-strict-aliasing -ggdb -DNDEBUG \
+			-g -fwrapv -O3 -Wall -Wstrict-prototypes -L. \
+			-I"$SRCPATH/Include" -I. \
+			-o "$MODPATH/$name.so" $* \
+			-lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+	else
+		echo "Module was actually built: $name"
+	fi
+}
+
+
+if ! test -z "$TARGET_CONFIG_ILP32"; then
+	# Python doesn't want to built `imageop.so`, unless the host
+	# (that is: the machine you're calling this build script from)
+	# is a 32-bit machine.
+	# Whilst I don't know what's the deal with this module and only
+	# being meant to be built for 32-bit machines, I can't stand the
+	# idea that Python once again spits the idea of cross-compiling
+	# in its face, so I'm just going to built this module manually,
+	# if it wasn't already built.
+	if [ -f "$SRCPATH/Modules/imageop.c" ]; then
+		built_missing_module imageop "$SRCPATH/Modules/imageop.c"
+	fi
+
+	# Another module that python only builds conditionally, depending
+	# on host configuration (rather than target configuration)
+	built_missing_module dl "$SRCPATH/Modules/dlmodule.c"
 fi
 
 PYTHON_EXE="$OPTPATH/python"
