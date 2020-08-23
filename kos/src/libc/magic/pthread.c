@@ -920,15 +920,26 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 [[throws, export_alias("call_once")]]
 [[decl_prefix(DEFINE_PTHREAD_ONCE_ROUTINE_T)]]
 [[decl_include("<bits/crt/pthreadtypes.h>", "<bits/types.h>")]]
-[[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>")]]
+[[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>", "<hybrid/sched/__yield.h>")]]
 $errno_t pthread_once([[nonnull]] pthread_once_t *once_control,
                       [[nonnull]] __pthread_once_routine_t init_routine) {
-	if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 1,
-	                        __ATOMIC_SEQ_CST) == __PTHREAD_ONCE_INIT) {
-		/* Since init_routine() can't indicate failure, we only need a bi-state
-		 * control word, as we don't need any sort of is-executing state, and
-		 * can directly go from not-executed to was-executed. */
+	pthread_once_t status;
+	status = __hybrid_atomic_cmpxch_val(*once_control,
+	                                    __PTHREAD_ONCE_INIT,
+	                                    __PTHREAD_ONCE_INIT + 1,
+	                                    __ATOMIC_SEQ_CST,
+	                                    __ATOMIC_SEQ_CST);
+	if (status == __PTHREAD_ONCE_INIT) {
 		(*init_routine)();
+		__hybrid_atomic_store(*once_control,
+		                      __PTHREAD_ONCE_INIT + 2,
+		                      __ATOMIC_RELEASE);
+	} else if (status != __PTHREAD_ONCE_INIT + 2) {
+		/* Wait for some other thread to finish init_routine() */
+		do {
+			__hybrid_yield();
+		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) !=
+		         __PTHREAD_ONCE_INIT + 2);
 	}
 	return 0;
 }

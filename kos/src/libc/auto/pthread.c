@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25563ff5 */
+/* HASH CRC-32:0xda280638 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 }
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
+#include <hybrid/sched/__yield.h>
 /* Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
@@ -46,12 +47,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
                              __pthread_once_routine_t init_routine) THROWS(...) {
-	if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 1,
-	                        __ATOMIC_SEQ_CST) == __PTHREAD_ONCE_INIT) {
-		/* Since init_routine() can't indicate failure, we only need a bi-state
-		 * control word, as we don't need any sort of is-executing state, and
-		 * can directly go from not-executed to was-executed. */
+	pthread_once_t status;
+	status = __hybrid_atomic_cmpxch_val(*once_control,
+	                                    __PTHREAD_ONCE_INIT,
+	                                    __PTHREAD_ONCE_INIT + 1,
+	                                    __ATOMIC_SEQ_CST,
+	                                    __ATOMIC_SEQ_CST);
+	if (status == __PTHREAD_ONCE_INIT) {
 		(*init_routine)();
+		__hybrid_atomic_store(*once_control,
+		                      __PTHREAD_ONCE_INIT + 2,
+		                      __ATOMIC_RELEASE);
+	} else if (status != __PTHREAD_ONCE_INIT + 2) {
+		/* Wait for some other thread to finish init_routine() */
+		do {
+			__hybrid_yield();
+		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) !=
+		         __PTHREAD_ONCE_INIT + 2);
 	}
 	return 0;
 }
