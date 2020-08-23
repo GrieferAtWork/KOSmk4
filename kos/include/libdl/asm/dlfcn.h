@@ -45,6 +45,7 @@ __DECL_BEGIN
 /* KOS Extensions for <dlfcn.h> */
 #if (defined(__KOS__) || defined(__CRT_KOS) || \
      (defined(__KOS__) && defined(__BUILDING_LIBDL)))
+#define __RTLD_SELF    (__CCAST(void *)-3) /* -3, because that's the value on NetBSD... */
 #define __DLCACHES_SECTION_NAME ".dl_caches"
 #if __KOS_VERSION__ >= 400
 #define __RTLD_NOINIT 0x80000000 /* KOS Extension: Don't run module initializers, and consequently
@@ -128,6 +129,29 @@ __DECL_BEGIN
                                      * visible as if the object were linked directly into the program. */
 #define __RTLD_LOCAL        0x00000 /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */
 #define __CRT_HAVE_dladdr 1
+#elif defined(__NetBSD__)
+#define __CRT_HAVE_dlopen            1
+#define __CRT_HAVE_dlclose           1
+#define __CRT_HAVE_dlsym             1
+#define __CRT_HAVE_dladdr            1
+#define __CRT_HAVE_dlctl             1
+#define __CRT_HAVE_dlinfo            1
+#define __CRT_HAVE_dlvsym            1
+#define __CRT_HAVE_dlerror           1
+#define __CRT_HAVE__dlauxinfo        1
+#define __CRT_HAVE___dl_cxa_refcount 1
+#define __RTLD_DI_LINKMAP            3
+#define __RTLD_LAZY                  1
+#define __RTLD_NOW                   2
+#define __RTLD_GLOBAL                0x0100
+#define __RTLD_LOCAL                 0x0200
+#define __RTLD_NODELETE              0x1000
+#define __RTLD_NOLOAD                0x2000
+#define __RTLD_NEXT                  (__CCAST(void *)-1)
+#define __RTLD_DEFAULT               (__CCAST(void *)-2)
+#define __RTLD_SELF                  (__CCAST(void *)-3)
+#define __DL_GETERRNO                1
+#define __DL_GETSYMBOL               2
 #endif /* ... */
 
 

@@ -148,7 +148,7 @@
 #endif /* __USE_NETBSD && __RTLD_LAZY */
 
 
-#ifdef __USE_GNU
+#if defined(__USE_NETBSD) || defined(__USE_GNU)
 /* If the first argument of `dlsym' or `dlvsym' is set to RTLD_NEXT
  * the run-time address of the symbol called NAME in the next shared
  * object is returned. The "next" relation is defined by the order
@@ -169,6 +169,11 @@
 #define RTLD_DEFAULT __RTLD_DEFAULT
 #endif /* __RTLD_DEFAULT */
 
+/* Search the calling module. */
+#ifdef __RTLD_SELF
+#define RTLD_SELF __RTLD_SELF
+#endif /* __RTLD_SELF */
+
 /* Special namespace ID values. */
 #ifdef __LM_ID_BASE
 #define LM_ID_BASE __LM_ID_BASE /* Initial namespace. */
@@ -176,7 +181,7 @@
 #ifdef __LM_ID_NEWLM
 #define LM_ID_NEWLM __LM_ID_NEWLM /* For dlmopen: request new namespace. */
 #endif /* __LM_ID_NEWLM */
-#endif /* __USE_GNU */
+#endif /* __USE_NETBSD || __USE_GNU */
 
 
 

@@ -550,7 +550,7 @@ again_search_globals_module:
 			if unlikely(!symbol.ds_mod)
 				goto err_rtld_next_no_base;
 			dl_seterrorf("No module loaded after %q contains a symbol %q",
-			                symbol.ds_mod->dm_filename, name);
+			             symbol.ds_mod->dm_filename, name);
 		} else {
 			dl_seterrorf("No loaded module contains a symbol %q", name);
 		}
@@ -567,8 +567,26 @@ again_search_globals_module:
 			if likely(result)
 				goto done;
 		} else {
-			if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
-				goto err_bad_module;
+#ifdef RTLD_SELF
+			__STATIC_IF(DL_VERIFY_MODULE_HANDLE(RTLD_SELF)) {
+				if unlikely(self == RTLD_SELF)
+					self = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
+			}
+#endif /* RTLD_SELF */
+			if unlikely(!DL_VERIFY_MODULE_HANDLE(self)) {
+#ifdef RTLD_SELF
+				__STATIC_IF(!DL_VERIFY_MODULE_HANDLE(RTLD_SELF)) {
+					if unlikely(self == RTLD_SELF) {
+						self = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
+					} else {
+						goto err_bad_module;
+					}
+				} __STATIC_ELSE(!DL_VERIFY_MODULE_HANDLE(RTLD_SELF))
+#endif /* RTLD_SELF */
+				{
+					goto err_bad_module;
+				}
+			}
 			if unlikely(self->dm_ops) {
 				/* Scan the given module itself */
 				int error;
