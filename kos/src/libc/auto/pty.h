@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe199dd3b */
+/* HASH CRC-32:0x8d33de4a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,8 +36,13 @@ DECL_BEGIN
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
 /* Create child process and establish the slave pseudo
  * terminal as the child's controlling terminal */
-INTDEF NONNULL((1, 2)) pid_t NOTHROW_NCX(LIBDCALL libd_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF NONNULL((1)) pid_t NOTHROW_NCX(LIBDCALL libd_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Create child process and establish the slave pseudo
+ * terminal as the child's controlling terminal */
+INTDEF NONNULL((1)) pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

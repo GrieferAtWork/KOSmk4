@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81c63f8b */
+/* HASH CRC-32:0x930720c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,10 +75,15 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, 
 #ifdef __CRT_HAVE_forkpty
 /* Create child process and establish the slave pseudo
  * terminal as the child's controlling terminal */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__name,__termp,__winp))
-#else /* __CRT_HAVE_forkpty */
+__CDECLARE(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__name,__termp,__winp))
+#elif defined(__CRT_HAVE_openpty) && (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)) && defined(__CRT_HAVE_login_tty) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
+#include <local/pty/forkpty.h>
+/* Create child process and establish the slave pseudo
+ * terminal as the child's controlling terminal */
+__NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__LIBCCALL forkpty)(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(forkpty))(__amaster, __name, __termp, __winp); })
+#else /* ... */
 #undef __forkpty_defined
-#endif /* !__CRT_HAVE_forkpty */
+#endif /* !... */
 #endif /* !__forkpty_defined */
 
 #endif /* __CC__ */

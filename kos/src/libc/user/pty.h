@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11eb72ef */
+/* HASH CRC-32:0xb207f6c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,6 @@ DECL_BEGIN
  * attributes according to TERMP and WINP and return handles for
  * both ends in AMASTER and ASLAVE */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
-INTDEF NONNULL((1, 2)) pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__KERNEL__ */
 
 DECL_END

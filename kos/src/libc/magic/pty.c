@@ -73,10 +73,35 @@ int openpty([[nonnull]] $fd_t *amaster,
 [[guard, decl_prefix(struct termios;)]]
 [[decl_prefix(struct winsize;)]]
 [[decl_include("<bits/types.h>")]]
+[[requires_function(openpty, fork, close, login_tty, _Exit)]]
 $pid_t forkpty([[nonnull]] $fd_t *amaster,
-               [[nonnull]] char *name,
+               [[nullable]] char *name,
                [[nullable]] struct termios const *termp,
-               [[nullable]] struct winsize const *winp);
+               [[nullable]] struct winsize const *winp) {
+	int error;
+	fd_t master, slave;
+	pid_t pid;
+	error = openpty(&master, &slave, name, termp, winp);
+	if unlikely(error)
+		return error;
+	pid = fork();
+	if unlikely(pid == -1) {
+		close(master);
+		goto done_slave;
+	}
+	if (pid == 0) {
+		/* Child process. */
+		close(master);
+		if (login_tty(slave))
+			_Exit(1);
+		return 0;
+	}
+	/* Parent process. */
+	*amaster = master;
+done_slave:
+	close(slave);
+	return pid;
+}
 
 %{
 

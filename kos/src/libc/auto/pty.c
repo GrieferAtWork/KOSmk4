@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x82c6021c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,50 +18,57 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PTY_C
-#define GUARD_LIBC_USER_PTY_C 1
+#ifndef GUARD_LIBC_AUTO_PTY_C
+#define GUARD_LIBC_AUTO_PTY_C 1
 
 #include "../api.h"
-/**/
-
-#include <kos/syscalls.h>
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <utmp.h>
-
-#include "pty.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include "../user/pty.h"
+#include "../user/stdlib.h"
+#include "../user/unistd.h"
+#include "../user/utmp.h"
 
 DECL_BEGIN
 
-/*[[[head:libc_openpty,hash:CRC-32=0x874698f6]]]*/
-/* Create pseudo tty master slave pair with NAME and set terminal
- * attributes according to TERMP and WINP and return handles for
- * both ends in AMASTER and ASLAVE */
-INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster,
-                                   fd_t *aslave,
+#ifndef __KERNEL__
+/* Create child process and establish the slave pseudo
+ * terminal as the child's controlling terminal */
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) pid_t
+NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster,
                                    char *name,
                                    struct termios const *termp,
-                                   struct winsize const *winp)
-/*[[[body:libc_openpty]]]*/
-{
-	errno_t result;
-	result = sys_openpty(amaster,
-	                     aslave,
-	                     name,
-	                     termp,
-	                     winp);
-	return libc_seterrno_syserr(result);
+                                   struct winsize const *winp) {
+	int error;
+	fd_t master, slave;
+	pid_t pid;
+	error = libc_openpty(&master, &slave, name, termp, winp);
+	if unlikely(error)
+		return error;
+	pid = libc_fork();
+	if unlikely(pid == -1) {
+		libc_close(master);
+		goto done_slave;
+	}
+	if (pid == 0) {
+		/* Child process. */
+		libc_close(master);
+		if (libc_login_tty(slave))
+			libc__Exit(1);
+		return 0;
+	}
+	/* Parent process. */
+	*amaster = master;
+done_slave:
+	libc_close(slave);
+	return pid;
 }
-/*[[[end:libc_openpty]]]*/
-
-
-
-/*[[[start:exports,hash:CRC-32=0x624b46dc]]]*/
-DEFINE_PUBLIC_ALIAS(openpty, libc_openpty);
-/*[[[end:exports]]]*/
+#endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_PTY_C */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(forkpty, libc_forkpty);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_PTY_C */
