@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dd509de */
+/* HASH CRC-32:0x98ab189b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -678,6 +678,10 @@ typedef __errno_t error_t;
 #endif /* __USE_GNU */
 
 __SYSDECL_END
+
+#ifdef __USE_NETBSD
+#include <bits/crt/sys_errlist.h>
+#endif /* __USE_NETBSD */
 
 #endif /* __CC__ */
 

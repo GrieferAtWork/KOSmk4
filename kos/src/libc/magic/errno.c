@@ -952,6 +952,10 @@ typedef __errno_t error_t;
 
 __SYSDECL_END
 
+#ifdef __USE_NETBSD
+#include <bits/crt/sys_errlist.h>
+#endif /* __USE_NETBSD */
+
 #endif /* __CC__ */
 
 }
