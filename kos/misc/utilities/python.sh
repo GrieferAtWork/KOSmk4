@@ -18,6 +18,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 # depends libffi
+# depends libexpat
 
 PYTHON_VERSION_MAJOR="2"
 PYTHON_VERSION_MINOR="7"
@@ -75,6 +76,7 @@ EOF
 			--enable-unicode=ucs4 \
 			--with-suffix="" \
 			--with-system-ffi=yes \
+			--with-system-expat \
 			--with-signal-module \
 			--with-threads \
 			--with-wctype-functions \
