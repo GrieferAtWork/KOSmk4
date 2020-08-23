@@ -19,6 +19,7 @@
 
 # depends libffi
 # depends libexpat
+# depends libzlib   (optional)
 
 PYTHON_VERSION_MAJOR="2"
 PYTHON_VERSION_MINOR="7"
@@ -119,6 +120,26 @@ EOF
 	}
 fi
 
+MODPATH="${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
+
+# Python doesn't want to built `imageop.so`, unless the host
+# (that is: the machine you're calling this build script from)
+# is a 32-bit machine.
+# Whilst I don't know what's the deal with this module and only
+# being meant to be built for 32-bit machines, I can't stand the
+# idea that Python once again spits the idea of cross-compiling
+# in its face, so I'm just going to built this module manually,
+# if it wasn't already built.
+if ! [ -f "$MODPATH/imageop.so" ] && [ -f "$SRCPATH/Modules/imageop.c" ]; then
+	cmd cd "$OPTPATH"
+	vcmd "${CROSS_PREFIX}gcc" \
+		-shared -fno-strict-aliasing -ggdb -DNDEBUG \
+		-g -fwrapv -O3 -Wall -Wstrict-prototypes -L. \
+		-I"$SRCPATH/Include" -I. \
+		-o "$MODPATH/imageop.so" "$SRCPATH/Modules/imageop.c" \
+		-lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+fi
+
 PYTHON_EXE="$OPTPATH/python"
 if [ -f "$OPTPATH/python.exe" ]; then
 	PYTHON_EXE="$OPTPATH/python.exe"
@@ -153,7 +174,7 @@ install_file_nodisk /$TARGET_LIBPATH/${PYTHON_LIB}.a "$OPTPATH/${PYTHON_LIB}.a"
 
 # Install modules under `/lib/python2.7/[os.py...]'
 install_path_hardcopy /$TARGET_LIBPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR} "${SRCPATH}/Lib"
-install_path /$TARGET_LIBPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/lib-dynload "${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
+install_path /$TARGET_LIBPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/lib-dynload "$MODPATH"
 
 # Install headers
 INCPATH="$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
