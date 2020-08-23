@@ -30,7 +30,7 @@ __DECL_BEGIN
 #ifdef __CC__
 enum {
 	E_INVALID_ARGUMENT_CONTEXT_GENERIC,                            /* Generic context */
-	E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
+	E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG,                      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
 	E_INVALID_ARGUMENT_CONTEXT_SETFL_OFLAG,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 	E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG,                         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 	E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT,                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
@@ -184,7 +184,7 @@ enum {
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            E_INVALID_ARGUMENT_CONTEXT_GENERIC                            /* Generic context */
-#define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
+#define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFL_OFLAG                        E_INVALID_ARGUMENT_CONTEXT_SETFL_OFLAG                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 #define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */
@@ -335,7 +335,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
-#define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
+#define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFL_OFLAG                        2   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 #define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                         3   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
 #define E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT                          4   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `PROT_*' flag */

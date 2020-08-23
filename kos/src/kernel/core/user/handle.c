@@ -2183,10 +2183,11 @@ handle_fcntl(struct handle_manager *__restrict self,
 	case F_SETFD: {
 		struct handle *p;
 		VALIDATE_FLAGSET((uintptr_t)arg,
-		                 O_CLOEXEC | O_CLOFORK,
-		                 E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG);
+		                 FD_CLOEXEC | FD_CLOFORK,
+		                 E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG);
 		sync_write(&self->hm_lock);
 		p = handle_lookup_ptr(fd, self);
+		/* Account for old handle flags. */
 		if (p->h_mode & IO_CLOEXEC) {
 			assert(self->hm_cloexec_count);
 			--self->hm_cloexec_count;
@@ -2195,12 +2196,17 @@ handle_fcntl(struct handle_manager *__restrict self,
 			assert(self->hm_clofork_count);
 			--self->hm_clofork_count;
 		}
+		/* Delete old flags. */
 		p->h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-		p->h_mode |= IO_HANDLE_FFROM_OPENFLAG((oflag_t)(uintptr_t)arg);
-		if (p->h_mode & IO_CLOEXEC)
+		/* Apply new flags. */
+		if ((uintptr_t)arg & FD_CLOEXEC) {
+			p->h_mode |= IO_CLOEXEC;
 			++self->hm_cloexec_count;
-		if (p->h_mode & IO_CLOFORK)
+		}
+		if ((uintptr_t)arg & FD_CLOFORK) {
+			p->h_mode |= IO_CLOFORK;
 			++self->hm_clofork_count;
+		}
 		sync_endwrite(&self->hm_lock);
 		result = 0;
 	}	break;
