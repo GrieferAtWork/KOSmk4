@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8d7f910 */
+/* HASH CRC-32:0xaf57b7b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -444,7 +444,13 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restr
  * All calls must be made with the same FLAG object
  * s.a. `pthread_once()' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),(__flag,__func))
-#endif /* ... */
+#else /* ... */
+#include <local/pthread/pthread_once.h>
+/* Call function FUNC exactly once, even if invoked from several threads.
+ * All calls must be made with the same FLAG object
+ * s.a. `pthread_once()' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL call_once)(once_flag *__restrict __flag, __once_func_t __func) __THROWS(...) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))((__pthread_once_t *)__flag, (__pthread_once_routine_t)__func); }
+#endif /* !... */
 
 
 /* Condition variable functions.  */

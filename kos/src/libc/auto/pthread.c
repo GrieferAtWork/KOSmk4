@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ba27e0e */
+/* HASH CRC-32:0x25563ff5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,24 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST int
 NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
                                          pthread_t thr2) {
 	return thr1 == thr2;
+}
+#include <asm/crt/pthreadvalues.h>
+#include <hybrid/__atomic.h>
+/* Guarantee that the initialization function INIT_ROUTINE will be called
+ * only once, even if pthread_once is executed several times with the
+ * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
+ * extern variable initialized to PTHREAD_ONCE_INIT. */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
+(LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
+                             __pthread_once_routine_t init_routine) THROWS(...) {
+	if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 1,
+	                        __ATOMIC_SEQ_CST) == __PTHREAD_ONCE_INIT) {
+		/* Since init_routine() can't indicate failure, we only need a bi-state
+		 * control word, as we don't need any sort of is-executing state, and
+		 * can directly go from not-executed to was-executed. */
+		(*init_routine)();
+	}
+	return 0;
 }
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
@@ -142,6 +160,8 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(thrd_equal, libc_pthread_equal);
 DEFINE_PUBLIC_ALIAS(pthread_equal, libc_pthread_equal);
+DEFINE_PUBLIC_ALIAS(call_once, libc_pthread_once);
+DEFINE_PUBLIC_ALIAS(pthread_once, libc_pthread_once);
 DEFINE_PUBLIC_ALIAS(__pthread_cleanup_routine, libc___pthread_cleanup_routine);
 DEFINE_PUBLIC_ALIAS(pthread_spin_init, libc_pthread_spin_init);
 DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);

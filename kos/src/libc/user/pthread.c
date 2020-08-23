@@ -1396,22 +1396,6 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t pthread,
 }
 /*[[[end:libc_pthread_getaffinity_np]]]*/
 
-/*[[[head:libc_pthread_once,hash:CRC-32=0x32e4b838]]]*/
-/* Guarantee that the initialization function INIT_ROUTINE will be called
- * only once, even if pthread_once is executed several times with the
- * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
-(LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
-                             __pthread_once_routine_t init_routine) THROWS(...)
-/*[[[body:libc_pthread_once]]]*/
-/*AUTO*/{
-	(void)once_control;
-	(void)init_routine;
-	CRT_UNIMPLEMENTEDF("pthread_once(%p, %p)", once_control, init_routine); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc_pthread_once]]]*/
 
 /*[[[head:libc_pthread_setcancelstate,hash:CRC-32=0x523f272c]]]*/
 /* Set cancelability state of current thread to STATE,
@@ -2466,7 +2450,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8a20baa6]]]*/
+/*[[[start:exports,hash:CRC-32=0x4f79b57]]]*/
 DEFINE_PUBLIC_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);
@@ -2511,8 +2495,6 @@ DEFINE_PUBLIC_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_setaffinity_np, libc_pthread_setaffinity_np);
 DEFINE_PUBLIC_ALIAS(pthread_getaffinity_np, libc_pthread_getaffinity_np);
-DEFINE_PUBLIC_ALIAS(call_once, libc_pthread_once);
-DEFINE_PUBLIC_ALIAS(pthread_once, libc_pthread_once);
 DEFINE_PUBLIC_ALIAS(pthread_setcancelstate, libc_pthread_setcancelstate);
 DEFINE_PUBLIC_ALIAS(pthread_setcanceltype, libc_pthread_setcanceltype);
 DEFINE_PUBLIC_ALIAS(pthread_cancel, libc_pthread_cancel);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31404e2f */
+/* HASH CRC-32:0xbea7a1a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -780,7 +780,10 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_setaffinity_n
 __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t *__cpuset),(__pthread,__cpusetsize,__cpuset))
 #endif /* __USE_GNU */
 
+#ifndef ____pthread_once_routine_t_defined
+#define ____pthread_once_routine_t_defined 1
 typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
+#endif /* !____pthread_once_routine_t_defined */
 
 /* Functions for handling initialization. */
 
@@ -796,7 +799,14 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_onc
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine))
-#endif /* ... */
+#else /* ... */
+#include <local/pthread/pthread_once.h>
+/* Guarantee that the initialization function INIT_ROUTINE will be called
+ * only once, even if pthread_once is executed several times with the
+ * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
+ * extern variable initialized to PTHREAD_ONCE_INIT. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
+#endif /* !... */
 
 /* Functions for handling cancellation.
  * Note that these functions are explicitly not marked to not throw an

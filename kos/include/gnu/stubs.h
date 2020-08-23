@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59a13a7 */
+/* HASH CRC-32:0xa4e399b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -463,8 +463,6 @@
 #define __stub_pthread_mutexattr_setrobust_np 1
 #define __stub_pthread_mutexattr_setrobust 1
 #define __stub_pthread_mutexattr_settype 1
-#define __stub_call_once 1
-#define __stub_pthread_once 1
 #define __stub_pthread_rwlock_destroy 1
 #define __stub_pthread_rwlock_init 1
 #define __stub_pthread_rwlock_rdlock 1

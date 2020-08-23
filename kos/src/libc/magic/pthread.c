@@ -895,8 +895,19 @@ $errno_t pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
 
 
 %
+%#ifndef ____pthread_once_routine_t_defined
+%#define ____pthread_once_routine_t_defined 1
 %typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
+%#endif /* !____pthread_once_routine_t_defined */
 %[define_type_class(__pthread_once_routine_t = "TP")]
+
+%[define(DEFINE_PTHREAD_ONCE_ROUTINE_T =
+@@pp_ifndef ____pthread_once_routine_t_defined@@
+#define ____pthread_once_routine_t_defined 1
+typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
+@@pp_endif@@
+)]
+
 
 %
 %/* Functions for handling initialization. */
@@ -906,9 +917,21 @@ $errno_t pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
 @@only once, even if pthread_once is executed several times with the
 @@same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
 @@extern variable initialized to PTHREAD_ONCE_INIT.
-[[throws, export_alias("call_once"), decl_include("<bits/types.h>")]]
+[[throws, export_alias("call_once")]]
+[[decl_prefix(DEFINE_PTHREAD_ONCE_ROUTINE_T)]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/types.h>")]]
+[[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>")]]
 $errno_t pthread_once([[nonnull]] pthread_once_t *once_control,
-                      [[nonnull]] __pthread_once_routine_t init_routine);
+                      [[nonnull]] __pthread_once_routine_t init_routine) {
+	if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 1,
+	                        __ATOMIC_SEQ_CST) == __PTHREAD_ONCE_INIT) {
+		/* Since init_routine() can't indicate failure, we only need a bi-state
+		 * control word, as we don't need any sort of is-executing state, and
+		 * can directly go from not-executed to was-executed. */
+		(*init_routine)();
+	}
+	return 0;
+}
 
 %
 %/* Functions for handling cancellation.

@@ -21,7 +21,9 @@
 #define _I386_KOS_BITS_CRT_PTHREADTYPES_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/crt/pthreadtypesizes.h>
 
 __SYSDECL_BEGIN

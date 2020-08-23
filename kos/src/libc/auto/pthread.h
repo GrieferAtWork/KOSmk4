@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfec5c23 */
+/* HASH CRC-32:0x7d718109 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,6 +146,15 @@ INTDEF NONNULL((3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getaffinity_np)(pt
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
 INTDEF NONNULL((1, 2)) errno_t (LIBDCALL libd_pthread_once)(pthread_once_t *once_control, __pthread_once_routine_t init_routine) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Guarantee that the initialization function INIT_ROUTINE will be called
+ * only once, even if pthread_once is executed several times with the
+ * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
+ * extern variable initialized to PTHREAD_ONCE_INIT. */
+INTDEF NONNULL((1, 2)) errno_t (LIBCCALL libc_pthread_once)(pthread_once_t *once_control, __pthread_once_routine_t init_routine) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Set cancelability state of current thread to STATE,
  * returning old state in *OLDSTATE if OLDSTATE is not NULL */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setcancelstate)(int state, int *oldstate);
