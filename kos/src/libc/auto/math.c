@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fe82005 */
+/* HASH CRC-32:0x881be919 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,7 +268,7 @@ NOTHROW(LIBCCALL libc_exp)(double x) {
 }
 #include <libm/frexp.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
+INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) double
 NOTHROW_NCX(LIBCCALL libc_frexp)(double x,
                                  int *pexponent) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
@@ -340,7 +340,7 @@ NOTHROW(LIBCCALL libc_expf)(float x) {
 }
 #include <libm/frexp.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
+INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) float
 NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
                                   int *pexponent) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -442,7 +442,7 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 }
 #include <libm/frexp.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
                                   int *pexponent) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)

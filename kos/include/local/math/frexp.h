@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b38257 */
+/* HASH CRC-32:0xa496173d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <libm/frexp.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__LOCAL_LIBC(frexp) __ATTR_WUNUSED __ATTR_NONNULL((2)) double
+__LOCAL_LIBC(frexp) __ATTR_NONNULL((2)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexp))(double __x, int *__pexponent) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);

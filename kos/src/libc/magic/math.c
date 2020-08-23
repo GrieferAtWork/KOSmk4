@@ -335,7 +335,7 @@ double exp(double x) {
 }
 
 @@Break VALUE into a normalized fraction and an integral power of 2
-[[std, wunused, crtbuiltin, export_alias("__frexp")]]
+[[std, crtbuiltin, export_alias("__frexp")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/frexp.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||

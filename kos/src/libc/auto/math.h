@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21c6b6b5 */
+/* HASH CRC-32:0x19e619c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -285,11 +285,11 @@ INTDEF WUNUSED __DECL_SIMD_exp double NOTHROW(LIBCCALL libc_exp)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_frexp)(double x, int *pexponent);
+INTDEF NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_frexp)(double x, int *pexponent);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_frexp)(double x, int *pexponent);
+INTDEF NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_frexp)(double x, int *pexponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* X times (two to the EXP power) */
@@ -321,11 +321,11 @@ INTDEF WUNUSED __DECL_SIMD_expf float NOTHROW(LIBCCALL libc_expf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_frexpf)(float x, int *pexponent);
+INTDEF NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_frexpf)(float x, int *pexponent);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBCCALL libc_frexpf)(float x, int *pexponent);
+INTDEF NONNULL((2)) float NOTHROW_NCX(LIBCCALL libc_frexpf)(float x, int *pexponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* X times (two to the EXP power) */
@@ -369,11 +369,11 @@ INTDEF WUNUSED __DECL_SIMD_expl __LONGDOUBLE NOTHROW(LIBCCALL libc_expl)(__LONGD
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_frexpl)(__LONGDOUBLE x, int *pexponent);
+INTDEF NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_frexpl)(__LONGDOUBLE x, int *pexponent);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x, int *pexponent);
+INTDEF NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x, int *pexponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* X times (two to the EXP power) */
