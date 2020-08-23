@@ -22,46 +22,48 @@
 
 #include <__stdinc.h>
 
-#define __R_OK 4 /* Test for read permission. */
-#define __W_OK 2 /* Test for write permission. */
-#define __X_OK 1 /* Test for execute permission. */
-#define __F_OK 0 /* Test for existence. */
-
 #if defined(__KOS__) || defined(__linux__)
-#define __F_DUPFD         0    /* Duplicate file descriptor. */
-#define __F_GETFD         1    /* Get file descriptor flags. */
-#define __F_SETFD         2    /* Set file descriptor flags. */
-#define __F_GETFL         3    /* Get file status flags. */
-#define __F_SETFL         4    /* Set file status flags. */
-#define __F_GETLK         5    /* Get record locking info. */
-#define __F_SETLK         6    /* Set record locking info (non-blocking). */
-#define __F_SETLKW        7    /* Set record locking info (blocking). */
-#define __F_SETOWN        8    /* Get owner (process receiving SIGIO). */
-#define __F_GETOWN        9    /* Set owner (process receiving SIGIO). */
-#define __F_SETSIG        10   /* Set number of signal to be sent. */
-#define __F_GETSIG        11   /* Get number of signal to be sent. */
-#define __F_GETLK64       12   /* Get record locking info. */
-#define __F_SETLK64       13   /* Set record locking info (non-blocking). */
-#define __F_SETLKW64      14   /* Set record locking info (blocking). */
-#define __F_SETOWN_EX     15   /* Get owner (thread receiving SIGIO). */
-#define __F_GETOWN_EX     16   /* Set owner (thread receiving SIGIO). */
-#define __F_OFD_GETLK     36   /* TODO: DOC */
-#define __F_OFD_SETLK     37   /* TODO: DOC */
-#define __F_OFD_SETLKW    38   /* TODO: DOC */
-#define __F_SETLEASE      1024 /* Set a lease. */
-#define __F_GETLEASE      1025 /* Enquire what lease is active. */
-#define __F_NOTIFY        1026 /* Request notifications on a directory. */
-#define __F_DUPFD_CLOEXEC 1030 /* Duplicate file descriptor with close-on-exit set. */
-#define __F_SETPIPE_SZ    1031 /* Set pipe page size array. */
-#define __F_GETPIPE_SZ    1032 /* Get pipe page size array. */
+#define __F_DUPFD         0    /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
+#define __F_GETFD         1    /* [void arg] Get file descriptor flags.
+                                * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
+#define __F_SETFD         2    /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
+#define __F_GETFL         3    /* [void arg] Get file status flags.
+                                * @return: * : Set of `O_*' */
+#define __F_SETFL         4    /* [oflag_t arg] Set file status flags. */
+#define __F_GETLK         5    /* [struct flock *arg] Get record locking info. */
+#define __F_SETLK         6    /* [struct flock const *arg] Set record locking info (non-blocking). */
+#define __F_SETLKW        7    /* [struct flock const *arg] Set record locking info (blocking). */
+#define __F_SETOWN        8    /* [pid_t arg] Set owner (process receiving SIGIO). */
+#define __F_GETOWN        9    /* [void arg] Get owner (process receiving SIGIO).
+                                * @return: * : The PID of the process (warning: the PID may not
+                                *              fit into an int and -EOVERFLOW may be returned) */
+#define __F_SETSIG        10   /* [int signo] Set number of signal to be sent. */
+#define __F_GETSIG        11   /* [void arg] Get number of signal to be sent.
+                                * @return: * : One of `SIG*' */
+#define __F_GETLK64       12   /* [struct flock64 *arg] Get record locking info. */
+#define __F_SETLK64       13   /* [struct flock64 const *arg] Set record locking info (non-blocking). */
+#define __F_SETLKW64      14   /* [struct flock64 const *arg] Set record locking info (blocking). */
+#define __F_SETOWN_EX     15   /* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
+#define __F_GETOWN_EX     16   /* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
+#define __F_OFD_GETLK     36   /* [struct flock *arg] */
+#define __F_OFD_SETLK     37   /* [struct flock const *arg] */
+#define __F_OFD_SETLKW    38   /* [struct flock const *arg] */
+#define __F_SETLEASE      1024 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
+#define __F_GETLEASE      1025 /* [void arg] Enquire what lease is active.
+                                * @return: * : One of `F_RDLCK', `F_WRLCK', `F_UNLCK' */
+#define __F_NOTIFY        1026 /* [int arg = <Set of `DN_*'>] Request notifications on a directory. */
+#define __F_DUPFD_CLOEXEC 1030 /* [void arg] Duplicate file descriptor with close-on-exit set.
+                                * @[fd_t return]: * : A new FD for the same kernel object. */
+#define __F_SETPIPE_SZ    1031 /* [unsigned int arg] Set pipe buffer size (in bytes). */
+#define __F_GETPIPE_SZ    1032 /* [void arg] Get pipe buffer size (in bytes).
+                                * @return: * : The buffer size (in bytes) */
 #ifdef __KOS__
-#define __F_SETFL_XCH      5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
-#define __F_NEXT           5164 /* return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
-                                 * https://lkml.org/lkml/2012/4/1/71 */
-#define __F_CLOSEM         5165 /* close all handles >= to the one given (s.a. `https://www.unix.com/man-page/FreeBSD/2/closefrom/') */
-#define __F_MAXFD          5166 /* return the max open handle id (the given fd is ignored) */
-#define __F_DUP2FD         5167 /* Same as `dup2()' (the target FD is given as `(int)arg') */
-#define __F_DUP2FD_CLOEXEC 5168 /* Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
+#define __F_SETFL_XCH      5163 /* [int flags] Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
+#define __F_NEXT           5164 /* [void arg] Return the next open handle id >= the given fd, or `-EBADF' if no such FD exists. (s.a. `https://lkml.org/lkml/2012/4/1/71') */
+#define __F_CLOSEM         5165 /* [void arg] close all handles >= to the one given (s.a. `https://www.unix.com/man-page/FreeBSD/2/closefrom/') */
+#define __F_MAXFD          5166 /* [void arg] return the max open handle id (the given fd is ignored) */
+#define __F_DUP2FD         5167 /* [fd_t arg] Same as `dup2()' (the target FD is given as `(fd_t)arg') */
+#define __F_DUP2FD_CLOEXEC 5168 /* [fd_t arg] Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
 #endif /* __KOS__ */
 
 
@@ -291,6 +293,10 @@
 
 #endif /* !__KOS__ && !__linux__ */
 
+#define __R_OK 4 /* Test for read permission. */
+#define __W_OK 2 /* Test for write permission. */
+#define __X_OK 1 /* Test for execute permission. */
+#define __F_OK 0 /* Test for existence. */
 
 
 #endif /* !_ASM_FCNTL_H */

@@ -124,6 +124,18 @@ function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...}
 @@Convert a macro's expansion value to an integer
 @@If this is impossible, return @none instead
 function getMacroIntValue(macroValue: string): int | none {
+	if (macroValue.endswith(")")) {
+		local newval = macroValue.lstrip("_U");
+		for (local prefix: { "INT8_C", "INT16_C", "INT32_C", "INT64_C" }) {
+			if (!newval.startswith(prefix))
+				continue;
+			local newval2 = newval[#prefix:].lstrip();
+			if (newval2.startswith("(")) {
+				macroValue = newval2[1:-1].strip();
+				break;
+			}
+		}
+	}
 	try {
 		return int(macroValue);
 	} catch (...) {
@@ -223,11 +235,17 @@ function printStrendNDatabase(
 }
 
 
-function getPrefixedMacrosFromFile(filename: string, prefix: string): {string...} {
+function getPrefixedMacrosFromFile(
+		filename: string, prefix: string, suffix: string = ""): {string...} {
 	local result = [];
 	for (local macroName, macroValue: enumerateMacrosFromFile(filename)) {
 		if (!macroName.startswith(prefix))
 			continue;
+		if (suffix) {
+			if (!macroName.endswith(suffix))
+				continue;
+			macroName = macroName[:-#suffix];
+		}
 		macroName = macroName[#prefix:];
 		macroValue = getMacroIntValue(macroValue);
 		if (macroValue !is int)

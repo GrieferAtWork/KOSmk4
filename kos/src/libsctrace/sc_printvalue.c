@@ -29,6 +29,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _GNU_SOURCE 1
 #define _DOS_SOURCE 1
 #define _TIME64_SOURCE 1
+#define _LARGEFILE64_SOURCE 1
+#define _FILE_OFFSET_BITS 32 /* We also need the 32-bit file structures */
 
 #include "api.h"
 /**/
@@ -380,6 +382,19 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_sockaddr
 #endif /* HAVE_SC_REPR_STRUCT_SOCKADDR */
 
+#if defined(HAVE_SC_REPR_FCNTL64_COMMAND) || defined(HAVE_SC_REPR_FCNTL_COMMAND)
+#define NEED_print_fcntl_command
+#endif /* HAVE_SC_REPR_FCNTL64_COMMAND || HAVE_SC_REPR_FCNTL_COMMAND */
+
+#if defined(HAVE_SC_REPR_FCNTL64_ARG) || defined(HAVE_SC_REPR_FCNTL_ARG)
+#define NEED_print_fcntl_arg
+#endif /* HAVE_SC_REPR_FCNTL64_ARG || HAVE_SC_REPR_FCNTL_ARG */
+
+#ifdef HAVE_SC_REPR_SEEK_WHENCE
+#define NEED_print_seek_whence
+#endif /* HAVE_SC_REPR_SEEK_WHENCE */
+
+
 
 
 
@@ -417,6 +432,27 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_socket_proto
 #define NEED_print_socket_af_pf
 #endif /* NEED_print_socket_proto */
+
+#ifdef NEED_print_fcntl_arg
+#define NEED_print_oflag_t
+#define NEED_print_fd_flags
+#define NEED_print_dn_flags
+#define NEED_print_signo_t
+#define NEED_print_fd_t
+#define NEED_print_f_owner_ex
+#define NEED_print_f_lock
+#define NEED_print_flock64
+#endif /* NEED_print_fcntl_arg */
+
+#ifdef NEED_print_f_owner_ex
+#define NEED_print_f_owner_type
+#endif /* NEED_print_f_owner_ex */
+
+#ifdef NEED_print_flock64
+#define NEED_print_f_lock
+#define NEED_print_seek_whence
+#endif /* NEED_print_flock64 */
+
 
 
 
@@ -2007,6 +2043,419 @@ err:
 
 
 
+#if defined(NEED_print_seek_whence) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFile("../../include/asm/stdio.h", "__SEEK_");
+printStrendNDatabase("SEEK", typ);
+]]]*/
+#define GETBASE_SEEK(result, index) \
+	(((index) <= 0x4) ? ((result) = repr_SEEK_0h, true) : false)
+PRIVATE char const repr_SEEK_0h[] =
+"SET\0CUR\0END\0DATA\0HOLE";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_seek_whence_name(syscall_ulong_t whence) {
+	char const *result = NULL;
+	if (!GETBASE_SEEK(result, whence))
+		goto done;
+	for (; whence; --whence)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_seek_whence(pformatprinter printer, void *arg,
+                  syscall_ulong_t whence) {
+	char const *name;
+	name = get_seek_whence_name(whence);
+	if (name)
+		return format_printf(printer, arg, "SEEK_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), whence);
+}
+#endif /* NEED_print_seek_whence */
+
+
+
+
+
+#if defined(NEED_print_fcntl_command) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFile("../../include/asm/fcntl.h", "__F_");
+printStrendNDatabase("FCNTL", typ);
+]]]*/
+#define GETBASE_FCNTL(result, index) \
+	(((index) <= 0x26) ? ((result) = repr_FCNTL_0h, true) : \
+	 ((index) >= 0x400 && (index) <= 0x408) ? ((index) -= 0x400, (result) = repr_FCNTL_400h, true) : \
+	 ((index) >= 0x142b && (index) <= 0x1430) ? ((index) -= 0x142b, (result) = repr_FCNTL_142bh, true) : false)
+PRIVATE char const repr_FCNTL_0h[] =
+"DUPFD\0GETFD\0SETFD\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SETOWN\0GETOWN\0S"
+"ETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN_EX\0\0\0\0\0\0\0"
+"\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
+PRIVATE char const repr_FCNTL_400h[] =
+"SETLEASE\0GETLEASE\0NOTIFY\0\0\0\0DUPFD_CLOEXEC\0SETPIPE_SZ\0GETPIPE_SZ";
+PRIVATE char const repr_FCNTL_142bh[] =
+"SETFL_XCH\0NEXT\0CLOSEM\0MAXFD\0DUP2FD\0DUP2FD_CLOEXEC";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_fcntl_command_name(syscall_ulong_t cmd) {
+	char const *result = NULL;
+	if (!GETBASE_FCNTL(result, cmd))
+		goto done;
+	for (; cmd; --cmd)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_fcntl_command(pformatprinter printer, void *arg,
+                    syscall_ulong_t cmd) {
+	char const *name;
+	name = get_fcntl_command_name(cmd);
+	if (name)
+		return format_printf(printer, arg, "F_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), cmd);
+}
+#endif /* NEED_print_fcntl_command */
+
+
+
+
+
+#ifdef NEED_print_fd_flags
+PRIVATE ssize_t CC
+print_fd_flags(pformatprinter printer, void *arg,
+               syscall_ulong_t fd_flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	if (fd_flags & FD_CLOEXEC) {
+		PRINT("FD_CLOEXEC");
+		fd_flags &= ~FD_CLOEXEC;
+		is_first = false;
+	}
+	if (fd_flags & FD_CLOFORK) {
+		PRINTF("%sFD_CLOFORK", is_first ? "" : PIPESTR);
+		fd_flags &= ~FD_CLOFORK;
+		is_first = false;
+	}
+	if (fd_flags) {
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, fd_flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_fd_flags */
+
+
+
+
+
+#ifdef NEED_print_dn_flags
+struct dn_flag_name {
+	__uint32_t dfn_flag;
+	char       dfn_name[12];
+};
+PRIVATE struct dn_flag_name const dn_flag_names[] = {
+	{ DN_ACCESS, /*   */ "ACCESS" },
+	{ DN_MODIFY, /*   */ "MODIFY" },
+	{ DN_CREATE, /*   */ "CREATE" },
+	{ DN_DELETE, /*   */ "DELETE" },
+	{ DN_RENAME, /*   */ "RENAME" },
+	{ DN_ATTRIB, /*   */ "ATTRIB" },
+	{ DN_MULTISHOT, /**/ "MULTISHOT" },
+};
+
+PRIVATE ssize_t CC
+print_dn_flags(pformatprinter printer, void *arg,
+               syscall_ulong_t dn_flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(dn_flag_names); ++i) {
+		if (!(dn_flags & dn_flag_names[i].dfn_flag))
+			continue;
+		PRINTF("%sDN_%s", is_first ? "" : PIPESTR,
+		       dn_flag_names[i].dfn_name);
+		dn_flags &= ~dn_flag_names[i].dfn_flag;
+		is_first = false;
+	}
+	if (dn_flags) {
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, dn_flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_dn_flags */
+
+
+
+
+
+#if defined(NEED_print_f_owner_type) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFile("../../include/asm/fcntl.h", "__F_OWNER_");
+printStrendNDatabase("F_OWNER", typ);
+]]]*/
+#define GETBASE_F_OWNER(result, index) \
+	(((index) <= 0x2) ? ((result) = repr_F_OWNER_0h, true) : false)
+PRIVATE char const repr_F_OWNER_0h[] =
+"TID\0PID\0PGRP";
+/*[[[end]]]*/
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_f_owner_name(unsigned int type) {
+	char const *result = NULL;
+	if (!GETBASE_FCNTL(result, type))
+		goto done;
+	for (; type; --type)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_f_owner_type(pformatprinter printer, void *arg,
+                   unsigned int type) {
+	char const *name;
+	name = get_f_owner_name(type);
+	if (name)
+		return format_printf(printer, arg, "F_OWNER_%s", name);
+	return format_printf(printer, arg, "%u", type);
+}
+#endif /* NEED_print_f_owner_type */
+
+
+
+
+
+#ifdef NEED_print_f_lock
+struct f_lock_name {
+	__uint8_t f_lock;
+	char      f_name[3];
+};
+PRIVATE struct f_lock_name const f_lock_names[] = {
+	{ F_RDLCK, "RD" },
+	{ F_WRLCK, "WR" },
+	{ F_UNLCK, "UN" },
+	{ F_EXLCK, "EX" },
+	{ F_SHLCK, "SH" }
+};
+
+PRIVATE ssize_t CC
+print_f_lock(pformatprinter printer, void *arg,
+             syscall_ulong_t lock) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(f_lock_names); ++i) {
+		if (!(lock & f_lock_names[i].f_lock))
+			continue;
+		PRINTF("%sF_%sLCK", is_first ? "" : PIPESTR,
+		       f_lock_names[i].f_name);
+		lock &= ~f_lock_names[i].f_lock;
+		is_first = false;
+	}
+	if (lock) {
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, lock);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_f_lock */
+
+
+
+
+
+#ifdef NEED_print_flock64
+PRIVATE ssize_t CC
+print_flock64(pformatprinter printer, void *arg,
+              USER CHECKED struct flock64 const *obj) {
+	ssize_t result, temp;
+	result = DOPRINT("{" SYNSPACE SYNFIELD("l_type"));
+	if unlikely(result < 0)
+		goto done;
+	DO(print_f_lock(printer, arg, (unsigned int)obj->l_type));
+	PRINT("," SYNSPACE SYNFIELD("l_whence"));
+	DO(print_seek_whence(printer, arg, (unsigned int)obj->l_whence));
+	DO(format_printf(printer, arg,
+	                 "," SYNSPACE SYNFIELD("l_start") "%" PRIu64
+	                 "," SYNSPACE SYNFIELD("l_len") "%" PRIu64
+	                 "," SYNSPACE SYNFIELD("l_pid") "%" PRIuN(__SIZEOF_PID_T__)
+	                 SYNSPACE "}",
+	                 obj->l_start, obj->l_len, obj->l_pid));
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_flock64 */
+
+
+
+
+
+#ifdef NEED_print_f_owner_ex
+PRIVATE ssize_t CC
+print_f_owner_ex(pformatprinter printer, void *arg,
+                 USER CHECKED struct f_owner_ex const *obj) {
+	ssize_t result, temp;
+	result = DOPRINT("{" SYNSPACE SYNFIELD("type"));
+	if unlikely(result < 0)
+		goto done;
+	DO(print_f_owner_type(printer, arg, (unsigned int)obj->type));
+	DO(format_printf(printer, arg,
+	                 "," SYNSPACE SYNFIELD("pid") "%" PRIuN(__SIZEOF_PID_T__)
+	                 SYNSPACE "}",
+	                 obj->pid));
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_f_owner_ex */
+
+
+
+
+
+#ifdef NEED_print_fcntl_arg
+PRIVATE ssize_t CC
+print_fcntl_arg(pformatprinter printer, void *arg,
+                syscall_ulong_t cmd,
+                USER UNCHECKED void *fcntl_arg) {
+	ssize_t result;
+	switch (cmd) {
+
+	case F_DUPFD:
+	case F_GETFD:
+	case F_GETFL:
+	case F_GETOWN:
+	case F_GETSIG:
+	case F_GETLEASE:
+	case F_DUPFD_CLOEXEC:
+	case F_GETPIPE_SZ:
+	case F_NEXT:
+	case F_CLOSEM:
+	case F_MAXFD:
+		result = (*printer)(arg, "(void)0", 7);
+		break;
+
+	case F_SETFL:
+	case F_SETFL_XCH:
+		result = print_oflag_t(printer, arg,
+		                       (oflag_t)(uintptr_t)fcntl_arg,
+		                       IO_SETFL_MASK);
+		break;
+
+	case F_SETFD:
+		result = print_fd_flags(printer, arg,
+		                        (syscall_ulong_t)(uintptr_t)fcntl_arg);
+		break;
+
+	case F_SETSIG:
+		result = print_signo_t(printer, arg,
+		                       (signo_t)(uintptr_t)fcntl_arg);
+		break;
+
+	case F_GETLK:
+	case F_OFD_GETLK:
+		result = format_printf(printer, arg, "(struct flock *)%#" PRIxPTR, fcntl_arg);
+		break;
+
+	case F_GETLK64:
+		result = format_printf(printer, arg,
+		                       "(struct flock64 *)%#" PRIxPTR,
+		                       fcntl_arg);
+		break;
+
+	case F_SETLK:
+	case F_SETLKW:
+	case F_OFD_SETLK:
+	case F_OFD_SETLKW: {
+		struct flock64 lck64;
+		USER CHECKED struct flock const *ulck;
+		validate_readable(fcntl_arg, sizeof(struct flock));
+		ulck = (USER CHECKED struct flock const *)fcntl_arg;
+		lck64.l_type   = ulck->l_type;
+		lck64.l_whence = ulck->l_whence;
+		lck64.l_start  = ulck->l_start;
+		lck64.l_len    = ulck->l_len;
+		lck64.l_pid    = ulck->l_pid;
+		result = print_flock64(printer, arg, &lck64);
+	}	break;
+
+	case F_SETLK64:
+	case F_SETLKW64:
+		validate_readable(fcntl_arg, sizeof(struct flock64));
+		result = print_flock64(printer, arg, (USER CHECKED struct flock64 const *)fcntl_arg);
+		break;
+
+	case F_SETOWN_EX:
+		validate_readable(fcntl_arg, sizeof(struct f_owner_ex));
+		result = print_f_owner_ex(printer, arg, (USER CHECKED struct f_owner_ex const *)fcntl_arg);
+		break;
+
+	case F_SETOWN:
+		result = format_printf(printer, arg,
+		                       "(pid_t)%" PRIuN(__SIZEOF_PID_T__),
+		                       (pid_t)(uintptr_t)fcntl_arg);
+		break;
+
+	case F_GETOWN_EX:
+		result = format_printf(printer, arg,
+		                       "(struct f_owner_ex *)%#" PRIxPTR,
+		                       fcntl_arg);
+		break;
+
+	case F_SETLEASE:
+		result = print_f_lock(printer, arg, (syscall_ulong_t)(uintptr_t)fcntl_arg);
+		break;
+
+	case F_NOTIFY:
+		result = print_dn_flags(printer, arg, (syscall_ulong_t)(uintptr_t)fcntl_arg);
+		break;
+
+	case F_SETPIPE_SZ:
+		result = format_printf(printer, arg, "%" PRIuSIZ,
+		                       (size_t)(uintptr_t)fcntl_arg);
+		break;
+
+	case F_DUP2FD:
+	case F_DUP2FD_CLOEXEC:
+		result = print_fd_t(printer, arg, (fd_t)(uintptr_t)fcntl_arg);
+		break;
+
+	default:
+		result = format_printf(printer, arg, "(void *)%#" PRIxPTR, fcntl_arg);
+		break;
+	}
+	return result;
+}
+#endif /* NEED_print_fcntl_command */
+
+
+
 
 
 
@@ -2071,7 +2520,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_RPC_SCHEDULE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SCHED_POLICY 1
 	// TODO: #define HAVE_SC_REPR_SCHED_PRIORITY_WHICH 1
-	// TODO: #define HAVE_SC_REPR_SEEK_WHENCE 1
 	// TODO: #define HAVE_SC_REPR_SIGMASK 1
 	// TODO: #define HAVE_SC_REPR_SIGNALFD4_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SIGPROCMASK_HOW 1
@@ -2153,7 +2601,12 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
 
-	// TODO: #define HAVE_SC_REPR_STRUCT_SOCKADDR 1
+#ifdef HAVE_SC_REPR_SEEK_WHENCE
+	case SC_REPR_SEEK_WHENCE:
+		result = print_seek_whence(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SEEK_WHENCE */
+
 #ifdef HAVE_SC_REPR_STRUCT_SOCKADDR
 	case SC_REPR_STRUCT_SOCKADDR: {
 		USER UNCHECKED struct sockaddr *sa;
@@ -2175,12 +2628,36 @@ libsc_printvalue(pformatprinter printer, void *arg,
 #endif /* HAVE_SC_REPR_IOCTL_COMMAND */
 
 	// TODO: #define HAVE_SC_REPR_IOCTL_ARG 1
-	// TODO: #define HAVE_SC_REPR_FCNTL64_ARG 1
-	// TODO: #define HAVE_SC_REPR_FCNTL64_COMMAND 1
-	// TODO: #define HAVE_SC_REPR_FCNTL_ARG 1
-	// TODO: #define HAVE_SC_REPR_FCNTL_COMMAND 1
-	// TODO: #define HAVE_SC_REPR_HOP_ARG 1
+
+#if defined(HAVE_SC_REPR_FCNTL64_COMMAND) || defined(HAVE_SC_REPR_FCNTL_COMMAND)
+#ifdef HAVE_SC_REPR_FCNTL64_COMMAND
+	case SC_REPR_FCNTL64_COMMAND:
+#endif /* HAVE_SC_REPR_FCNTL64_COMMAND */
+#ifdef HAVE_SC_REPR_FCNTL_COMMAND
+	case SC_REPR_FCNTL_COMMAND:
+#endif /* HAVE_SC_REPR_FCNTL_COMMAND */
+		result = print_fcntl_command(printer, arg,
+		                             (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_FCNTL64_COMMAND || HAVE_SC_REPR_FCNTL_COMMAND */
+
+#if defined(HAVE_SC_REPR_FCNTL64_ARG) || defined(HAVE_SC_REPR_FCNTL_ARG)
+#ifdef HAVE_SC_REPR_FCNTL64_ARG
+	case SC_REPR_FCNTL64_ARG:
+#endif /* HAVE_SC_REPR_FCNTL64_ARG */
+#ifdef HAVE_SC_REPR_FCNTL_ARG
+	case SC_REPR_FCNTL_ARG:
+#endif /* HAVE_SC_REPR_FCNTL_ARG */
+		if unlikely(!link)
+			goto do_pointer;
+		result = print_fcntl_arg(printer, arg,
+		                         (syscall_ulong_t)link->sa_value.sv_u64,
+		                         (void *)(uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_FCNTL64_ARG || HAVE_SC_REPR_FCNTL_ARG */
+
 	// TODO: #define HAVE_SC_REPR_HOP_COMMAND 1
+	// TODO: #define HAVE_SC_REPR_HOP_ARG 1
 
 #ifdef HAVE_SC_REPR_SIGNO_T
 	case SC_REPR_SIGNO_T:

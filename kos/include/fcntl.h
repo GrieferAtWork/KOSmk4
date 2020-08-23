@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1c9bc74 */
+/* HASH CRC-32:0x98c96bbc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -276,12 +276,12 @@ __SYSDECL_BEGIN
 #define F_GETLK64   __F_GETLK64
 #endif /* __F_GETLK64 */
 
-/* [struct flock64 *arg] Set record locking info (non-blocking). */
+/* [struct flock64 const *arg] Set record locking info (non-blocking). */
 #ifdef __F_SETLK64
 #define F_SETLK64   __F_SETLK64
 #endif /* __F_SETLK64 */
 
-/* [struct flock64 *arg] Set record locking info (blocking). */
+/* [struct flock64 const *arg] Set record locking info (blocking). */
 #ifdef __F_SETLKW64
 #define F_SETLKW64  __F_SETLKW64
 #endif /* __F_SETLKW64 */
@@ -334,14 +334,14 @@ __SYSDECL_BEGIN
 
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-/* [void arg] Get owner (process receiving SIGIO).
- * @return: * : The PID of the process (warning: the PID may not
- *              fit into an int and -EOVERFLOW may be returned) */
+/* [pid_t arg] Set owner (process receiving SIGIO). */
 #ifdef __F_SETOWN
 #define F_SETOWN __F_SETOWN
 #endif /* __F_SETOWN */
 
-/* [pid_t arg] Set owner (process receiving SIGIO). */
+/* [void arg] Get owner (process receiving SIGIO).
+ * @return: * : The PID of the process (warning: the PID may not
+ *              fit into an int and -EOVERFLOW may be returned) */
 #ifdef __F_GETOWN
 #define F_GETOWN __F_GETOWN
 #endif /* __F_GETOWN */
@@ -360,12 +360,12 @@ __SYSDECL_BEGIN
 #define F_GETSIG __F_GETSIG
 #endif /* __F_GETSIG */
 
-/* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
+/* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
 #ifdef __F_SETOWN_EX
 #define F_SETOWN_EX __F_SETOWN_EX
 #endif /* __F_SETOWN_EX */
 
-/* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
+/* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
 #ifdef __F_GETOWN_EX
 #define F_GETOWN_EX __F_GETOWN_EX
 #endif /* __F_GETOWN_EX */
@@ -420,20 +420,21 @@ __SYSDECL_BEGIN
 #define F_SETFL_XCH __F_SETFL_XCH
 #endif /* __F_SETFL_XCH */
 
-/* return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
- * https://lkml.org/lkml/2012/4/1/71 */
+/* [void arg] Return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
+ * s.a. https://lkml.org/lkml/2012/4/1/71 */
 #ifdef __F_NEXT
 #define F_NEXT __F_NEXT
 #endif /* __F_NEXT */
 #endif /* __USE_KOS */
 
 #if defined(__USE_KOS) || defined(__USE_NETBSD)
-/* close all handles >= to the one given */
+/* [void arg] close all handles >= to the one given
+ * s.a. https://www.unix.com/man-page/FreeBSD/2/closefrom/ */
 #ifdef __F_CLOSEM
 #define F_CLOSEM __F_CLOSEM
 #endif /* __F_CLOSEM */
 
-/* return the max open handle id (the given fd is ignored) */
+/* [void arg] return the max open handle id (the given fd is ignored) */
 #ifdef __F_MAXFD
 #define F_MAXFD __F_MAXFD
 #endif /* __F_MAXFD */
@@ -441,12 +442,12 @@ __SYSDECL_BEGIN
 
 
 #if defined(__USE_KOS) || defined(__USE_BSD)
-/* Same as `dup2()' (the target FD is given as `(int)arg') */
+/* [fd_t arg] Same as `dup2()' (the target FD is given as `(fd_t)arg') */
 #ifdef __F_DUP2FD
 #define F_DUP2FD __F_DUP2FD
 #endif /* __F_DUP2FD */
 
-/* Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
+/* [fd_t arg] Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
 #ifdef __F_DUP2FD_CLOEXEC
 #define F_DUP2FD_CLOEXEC __F_DUP2FD_CLOEXEC
 #endif /* __F_DUP2FD_CLOEXEC */
