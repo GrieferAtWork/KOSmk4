@@ -1456,7 +1456,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	 *       the RPC to be executed as the result of a blocking operation,
 	 *       none of which happen anymore once the stack has gone away in
 	 *       said function! */
-	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0) != 0)
+	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC,
+	                         (void (*)())&pthread_cancel_self,
+	                         0) != 0)
 		return libc_geterrno();
 	return EOK;
 }

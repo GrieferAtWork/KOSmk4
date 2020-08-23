@@ -133,8 +133,7 @@
 #define RTLD_NODELETE __RTLD_NODELETE /* Do not delete object when closed. */
 #endif /* __RTLD_NODELETE */
 
-#ifdef __USE_KOS
-#ifdef __RTLD_NOINIT
+#if defined(__USE_KOS) && defined(__RTLD_NOINIT)
 #define RTLD_NOINIT __RTLD_NOINIT /* KOS Extension: Don't run module initializers, and consequently
                                    *                skip running finalizers as well.
                                    * When set, `dlopen()' will immeditaly return to the caller upon success,
@@ -142,8 +141,11 @@
                                    * HINT: You may run initializers (and finalizers during exit()) at a
                                    *       later time by calling `dlopen()' again without passing this flag.
                                    * WARNING: Initializers of newly loaded dependencies will not be executed either! */
-#endif /* __RTLD_NOINIT */
-#endif /* __USE_KOS */
+#endif /* __USE_KOS && __RTLD_NOINIT */
+
+#if defined(__USE_NETBSD) && defined(__RTLD_LAZY)
+#define DL_LAZY __RTLD_LAZY /* Lazy function call binding. */
+#endif /* __USE_NETBSD && __RTLD_LAZY */
 
 
 #ifdef __USE_GNU
@@ -686,8 +688,7 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
 
 
 
-#ifdef __USE_GNU
-
+#if defined(__USE_GNU) || defined(__USE_NETBSD)
 #ifdef __CRT_HAVE_dladdr
 #ifndef __Dl_info_defined
 #define __Dl_info_defined 1
@@ -699,6 +700,53 @@ __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
                                  Dl_info *__info);
 #endif /* __CRT_HAVE_dladdr */
 
+#ifdef __CRT_HAVE_dlinfo
+#ifdef __RTLD_DI_LMID
+#define RTLD_DI_LMID        __RTLD_DI_LMID
+#endif /* __RTLD_DI_LMID */
+#ifdef __RTLD_DI_LINKMAP
+#define RTLD_DI_LINKMAP     __RTLD_DI_LINKMAP
+#endif /* __RTLD_DI_LINKMAP */
+#ifdef __RTLD_DI_CONFIGADDR
+#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR
+#endif /* __RTLD_DI_CONFIGADDR */
+#ifdef __RTLD_DI_SERINFO
+#define RTLD_DI_SERINFO     __RTLD_DI_SERINFO
+#endif /* __RTLD_DI_SERINFO */
+#ifdef __RTLD_DI_SERINFOSIZE
+#define RTLD_DI_SERINFOSIZE __RTLD_DI_SERINFOSIZE
+#endif /* __RTLD_DI_SERINFOSIZE */
+#ifdef __RTLD_DI_ORIGIN
+#define RTLD_DI_ORIGIN      __RTLD_DI_ORIGIN
+#endif /* __RTLD_DI_ORIGIN */
+#ifdef __RTLD_DI_PROFILENAME
+#define RTLD_DI_PROFILENAME __RTLD_DI_PROFILENAME
+#endif /* __RTLD_DI_PROFILENAME */
+#ifdef __RTLD_DI_PROFILEOUT
+#define RTLD_DI_PROFILEOUT  __RTLD_DI_PROFILEOUT
+#endif /* __RTLD_DI_PROFILEOUT */
+#ifdef __RTLD_DI_TLS_MODID
+#define RTLD_DI_TLS_MODID   __RTLD_DI_TLS_MODID
+#endif /* __RTLD_DI_TLS_MODID */
+#ifdef __RTLD_DI_TLS_DATA
+#define RTLD_DI_TLS_DATA    __RTLD_DI_TLS_DATA
+#endif /* __RTLD_DI_TLS_DATA */
+#ifdef __RTLD_DI_MAX
+#define RTLD_DI_MAX         __RTLD_DI_MAX
+#endif /* __RTLD_DI_MAX */
+
+typedef struct __Dl_serpath Dl_serpath;
+typedef struct __Dl_serinfo Dl_serinfo;
+
+__IMPDEF __ATTR_NONNULL((1, 3)) int
+__NOTHROW_NCX(__DLFCN_CC dlinfo)(void *__restrict __handle,
+                                 int __request,
+                                 void *__arg);
+#endif /* __CRT_HAVE_dlinfo */
+#endif /* __USE_GNU || __USE_NETBSD */
+
+
+#ifdef __USE_GNU
 #if defined(__CRT_HAVE_dlmopen) && defined(__Lmid_t)
 __IMPDEF void *(__DLFCN_CC dlmopen)(__Lmid_t __nsid, char const *__file, int __mode);
 #endif /* __CRT_HAVE_dlmopen && __Lmid_t */
@@ -711,10 +759,13 @@ __NOTHROW_NCX(__DLFCN_CC dlvsym)(void *__restrict __handle,
 #endif /* __CRT_HAVE_dlvsym */
 
 #ifdef __CRT_HAVE_dladdr1
-enum {
-	RTLD_DL_SYMENT  = 1,
-	RTLD_DL_LINKMAP = 2
-};
+#ifdef __RTLD_DL_SYMENT
+#define RTLD_DL_SYMENT __RTLD_DL_SYMENT
+#endif /* __RTLD_DL_SYMENT */
+#ifdef __RTLD_DL_LINKMAP
+#define RTLD_DL_LINKMAP __RTLD_DL_LINKMAP
+#endif /* __RTLD_DL_LINKMAP */
+
 #ifndef __Dl_info_defined
 #define __Dl_info_defined 1
 typedef struct __dl_info_struct Dl_info;
@@ -724,39 +775,6 @@ __IMPDEF __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__DLFCN_CC dladdr1)(void const *__address, Dl_info *__info,
                                   void **__extra_info, int __flags);
 #endif /* __CRT_HAVE_dladdr1 */
-
-#ifdef __CRT_HAVE_dlinfo
-enum {
-	RTLD_DI_LMID        = 1,
-	RTLD_DI_LINKMAP     = 2,
-	RTLD_DI_CONFIGADDR  = 3,
-	RTLD_DI_SERINFO     = 4,
-	RTLD_DI_SERINFOSIZE = 5,
-	RTLD_DI_ORIGIN      = 6,
-	RTLD_DI_PROFILENAME = 7,
-	RTLD_DI_PROFILEOUT  = 8,
-	RTLD_DI_TLS_MODID   = 9,
-	RTLD_DI_TLS_DATA    = 10,
-	RTLD_DI_MAX         = 10
-};
-
-typedef struct {
-	char        *dls_name;
-	unsigned int dls_flags;
-} Dl_serpath;
-
-typedef struct {
-	size_t          dls_size;
-	__UINT32_TYPE__ dls_cnt;
-	Dl_serpath      dls_serpath[1];
-} Dl_serinfo;
-
-__IMPDEF __ATTR_NONNULL((1, 3)) int
-__NOTHROW_NCX(__DLFCN_CC dlinfo)(void *__restrict __handle,
-                                 int __request,
-                                 void *__arg);
-#endif /* __CRT_HAVE_dlinfo */
-
 
 #ifndef DL_CALL_FCT
 /* To support profiling of shared objects it is a good idea to call

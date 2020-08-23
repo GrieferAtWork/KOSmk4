@@ -88,12 +88,32 @@ __DECL_BEGIN
 #define __Lmid_t      __LONGPTR_TYPE__
 #define __LM_ID_BASE  0    /* Initial namespace. */
 #define __LM_ID_NEWLM (-1) /* For dlmopen: request new namespace. */
-#define __CRT_HAVE_dlmopen 1
-#define __CRT_HAVE_dlvsym 1
-#define __CRT_HAVE_dladdr1 1
-#define __CRT_HAVE_dlinfo 1
+#define __CRT_HAVE_dlmopen                  1
+#define __CRT_HAVE_dlvsym                   1
+#define __CRT_HAVE_dladdr1                  1
+#define __CRT_HAVE_dlinfo                   1
 #define __CRT_HAVE__dl_mcount_wrapper_check 1
 #endif /* !__KOS__ && !__CRT_KOS */
+
+
+#ifdef __CRT_HAVE_dlinfo
+#define __RTLD_DI_LMID        1
+#define __RTLD_DI_LINKMAP     2
+#define __RTLD_DI_CONFIGADDR  3
+#define __RTLD_DI_SERINFO     4
+#define __RTLD_DI_SERINFOSIZE 5
+#define __RTLD_DI_ORIGIN      6
+#define __RTLD_DI_PROFILENAME 7
+#define __RTLD_DI_PROFILEOUT  8
+#define __RTLD_DI_TLS_MODID   9
+#define __RTLD_DI_TLS_DATA    10
+#define __RTLD_DI_MAX         10
+#endif /* __CRT_HAVE_dlinfo */
+
+#ifdef __CRT_HAVE_dladdr1
+#define __RTLD_DL_SYMENT  1
+#define __RTLD_DL_LINKMAP 2
+#endif /* __CRT_HAVE_dladdr1 */
 
 #elif defined(__CRT_CYG)
 #define __RTLD_NEXT    (__CCAST(void *)-1)
