@@ -711,15 +711,18 @@
 
 #define NCURSES_API
 #define NCURSES_IMPEXP
-#define NCURSES_SP_NAME(name) name##_sp
-#define NCURSES_EXPORT(type) type
-#define NCURSES_EXPORT_VAR(type) type
+#define NCURSES_SP_NAME(x) x##_sp
+#define NCURSES_EXPORT(x) x
+#define NCURSES_EXPORT_VAR(x) x
+#define NCURSES_PUBLIC_VAR(x) _nc_##x
+#define NCURSES_WRAPPED_VAR(t,x) t _nc_##x(void)
 #define NCURSES_CONST const
 #define NCURSES_SBOOL char
+#define UNDEF(x) CUR_##x
 
 #define ANSITTY_INTERNAL(x) x
 
-#define DEFINE_TEST(name) void test_##name(void)
+#define DEFINE_TEST(x) void test_##x(void)
 
 #define __ASM_BEGIN
 #define __ASM_END
@@ -814,3 +817,16 @@
 #define PNG_FP_EXPORT(v,x,y,z) x y z
 #define PNG_FIXED_EXPORT(v,x,y,z) x y z
 #define DECLARE_DEPRECATED(f) f;
+#define OF(x) x
+#define Z_ARG(x) x
+#define z_const const
+#define z_longlong long long
+#define FAR
+#define ZEXTERN
+#define ZEXPORT
+#define ZEXPORTVA
+#define XMLCALL
+#define XMLIMPORT
+#define XML_ATTR_MALLOC
+#define XML_ATTR_ALLOC_SIZE(x)
+#define XMLPARSEAPI(type) type

@@ -22,6 +22,7 @@ NCURSES_VERSION_MAJOR="6"
 NCURSES_VERSION="$NCURSES_VERSION_MAJOR.1"
 SRCPATH="$KOS_ROOT/binutils/src/ncurses-$NCURSES_VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/ncurses-$NCURSES_VERSION"
+
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/lib/libncursesw.so" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
@@ -31,6 +32,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/lib/libncursesw.so" ]; then
 				ftp://ftp.gnu.org/gnu/ncurses/ncurses-$NCURSES_VERSION.tar.gz
 			cmd tar xvf "ncurses-$NCURSES_VERSION.tar.gz"
 		fi
+		apply_patch "${SRCPATH}" "$KOS_PATCHES/ncurses-$NCURSES_VERSION.patch"
 		rm -rf "$OPTPATH" > /dev/null 2>&1
 		cmd mkdir -p "$OPTPATH"
 		cmd cd "$OPTPATH"

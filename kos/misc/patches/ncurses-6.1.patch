@@ -1,0 +1,26 @@
+diff -Naur ncurses-6.1-orig/include/curses.tail ncurses-6.1/include/curses.tail
+--- ncurses-6.1-orig/include/curses.tail	2016-02-13 17:37:45.000000000 +0100
++++ ncurses-6.1/include/curses.tail	2020-08-24 13:54:52.861910600 +0200
+@@ -173,7 +173,9 @@
+ #define OPTIMIZE_ALL		0xff	/* enable all optimizations (dflt) */
+ #endif
+ 
++#ifndef NCURSES_UNCTRL_H_incl
+ #include <unctrl.h>
++#endif /* !NCURSES_UNCTRL_H_incl */
+ 
+ #ifdef __cplusplus
+ 
+diff -Naur ncurses-6.1-orig/include/unctrl.h.in ncurses-6.1/include/unctrl.h.in
+--- ncurses-6.1-orig/include/unctrl.h.in	2009-04-18 23:00:52.000000000 +0200
++++ ncurses-6.1/include/unctrl.h.in	2020-08-24 13:55:45.646059300 +0200
+@@ -51,7 +51,9 @@
+ extern "C" {
+ #endif
+ 
++#ifndef __NCURSES_H
+ #include <curses.h>
++#endif /* !__NCURSES_H */
+ 
+ #undef unctrl
+ NCURSES_EXPORT(NCURSES_CONST char *) unctrl (chtype);
