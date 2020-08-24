@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbea7a1a9 */
+/* HASH CRC-32:0x2040c15b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,6 @@
 #include <features.h>
 
 #include <asm/crt/pthreadvalues.h>
-#include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
 #include <bits/types.h>

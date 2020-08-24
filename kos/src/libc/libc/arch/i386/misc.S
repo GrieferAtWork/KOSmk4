@@ -22,7 +22,7 @@
 #define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
-#include "../../pthread.h"
+#include "../../../api.h"
 /**/
 
 #include <hybrid/compiler.h>

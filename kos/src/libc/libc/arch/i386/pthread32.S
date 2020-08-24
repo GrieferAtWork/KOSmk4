@@ -22,13 +22,16 @@
 #define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
-#include "../../pthread.h"
+#include "../../../api.h"
 /**/
 
 #include <hybrid/compiler.h>
-#include <sched.h>
+
 #include <asm/cfi.h>
 #include <sys/syscall.h>
+
+#include <pthread.h>
+#include <sched.h>
 
 
 
@@ -45,12 +48,12 @@ INTERN_FUNCTION(libc_pthread_clone)
 	/* Perform the system call with `lcall', since `int $0x80' would clobber all registers
 	 * except for %ebp, however we need 2 registers to pass both `fn' and `arg' to the child
 	 * thread. */
-	leal   OFFSET_PTHREAD_TID(%ecx), %eax /* pid_t *ctid */
-	pushl_cfi %eax                        /* ... */
-	pushl_cfi OFFSET_PTHREAD_TLS(%ecx)    /* void *newtls */
-	pushl_cfi %eax                        /* pid_t *ptid */
-	movl   OFFSET_PTHREAD_STACKADDR(%ecx), %eax
-	addl   OFFSET_PTHREAD_STACKSIZE(%ecx), %eax
+	leal   __OFFSET_PTHREAD_TID(%ecx), %eax /* pid_t *ctid */
+	pushl_cfi %eax                          /* ... */
+	pushl_cfi __OFFSET_PTHREAD_TLS(%ecx)    /* void *newtls */
+	pushl_cfi %eax                          /* pid_t *ptid */
+	movl   __OFFSET_PTHREAD_STACKADDR(%ecx), %eax
+	addl   __OFFSET_PTHREAD_STACKSIZE(%ecx), %eax
 	pushl_cfi %eax                        /* void *child_stack */
 	/* int flags */
 	pushl_cfi $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \

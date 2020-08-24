@@ -23,6 +23,7 @@
 #define _GNU_SOURCE 1
 #define __ASSEMBLER__ 1
 
+#include "../../../api.h"
 /**/
 #include <hybrid/compiler.h>
 
@@ -33,11 +34,11 @@
 #include <bits/mcontext64.h>
 #include <bits/ucontext64.h>
 
+#include <pthread.h>
 #include <signal.h>
 #include <syscall.h>
 #include <ucontext.h>
 
-#include "../../pthread.h"
 #include "ucontext.h"
 /**/
 

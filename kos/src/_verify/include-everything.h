@@ -299,7 +299,6 @@ incdir("", "../../include");
 #include <bits/crt/locale.h>
 #include <bits/crt/math-vector.h>
 #include <bits/crt/posix_spawn.h>
-#include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/semaphore.h>
 #include <bits/crt/sys_errlist.h>

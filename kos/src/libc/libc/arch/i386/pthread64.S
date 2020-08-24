@@ -22,13 +22,16 @@
 #define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
-#include "../../pthread.h"
+#include "../../../api.h"
 /**/
 
 #include <hybrid/compiler.h>
-#include <sched.h>
+
 #include <asm/cfi.h>
 #include <sys/syscall.h>
+
+#include <pthread.h>
+#include <sched.h>
 
 
 
@@ -50,11 +53,11 @@ INTERN_FUNCTION(libc_pthread_clone)
 	movq   %rdi, %r14 /* struct pthread *__restrict thread */
 	movq   %rsi, %r15 /* __pthread_start_routine_t start */
 
-	movq   OFFSET_PTHREAD_TLS(%rdi), %r8        /* void *newtls */
-	leaq   OFFSET_PTHREAD_TID(%rdi), %rdx       /* pid_t *ptid */
-	movq   %rdx, %r10                           /* pid_t *ctid */
-	movq   OFFSET_PTHREAD_STACKADDR(%rdi), %rsi
-	addq   OFFSET_PTHREAD_STACKSIZE(%rdi), %rsi /* void *child_stack */
+	movq   __OFFSET_PTHREAD_TLS(%rdi), %r8        /* void *newtls */
+	leaq   __OFFSET_PTHREAD_TID(%rdi), %rdx       /* pid_t *ptid */
+	movq   %rdx, %r10                             /* pid_t *ctid */
+	movq   __OFFSET_PTHREAD_STACKADDR(%rdi), %rsi
+	addq   __OFFSET_PTHREAD_STACKSIZE(%rdi), %rsi /* void *child_stack */
 	movq   $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
 	         CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
 	         CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID |      \

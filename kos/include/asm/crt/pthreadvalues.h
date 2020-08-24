@@ -23,32 +23,44 @@
 #include <__stdinc.h>
 
 /* PThread constants */
-#define __PTHREAD_CREATE_JOINABLE                   0
-#define __PTHREAD_CREATE_DETACHED                   1
-#define __PTHREAD_MUTEX_TIMED                       0
-#define __PTHREAD_MUTEX_RECURSIVE                   1
-#define __PTHREAD_MUTEX_ERRORCHECK                  2
-#define __PTHREAD_MUTEX_ADAPTIVE                    3
-#define __PTHREAD_MUTEX_STALLED                     0
-#define __PTHREAD_MUTEX_ROBUST                      1
-#define __PTHREAD_PRIO_NONE                         0
-#define __PTHREAD_PRIO_INHERIT                      1
-#define __PTHREAD_PRIO_PROTECT                      2
+#define __PTHREAD_CREATE_JOINABLE 0
+#define __PTHREAD_CREATE_DETACHED 1
+
+#define __PTHREAD_MUTEX_TIMED      0
+#define __PTHREAD_MUTEX_RECURSIVE  1
+#define __PTHREAD_MUTEX_ERRORCHECK 2
+#define __PTHREAD_MUTEX_ADAPTIVE   3
+
+#define __PTHREAD_MUTEX_STALLED 0
+#define __PTHREAD_MUTEX_ROBUST  1
+
+#define __PTHREAD_PRIO_NONE    0
+#define __PTHREAD_PRIO_INHERIT 1
+#define __PTHREAD_PRIO_PROTECT 2
+
 #define __PTHREAD_RWLOCK_PREFER_READER              0
 #define __PTHREAD_RWLOCK_PREFER_WRITER              1
 #define __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE 2
-#define __PTHREAD_INHERIT_SCHED                     0
-#define __PTHREAD_EXPLICIT_SCHED                    1
-#define __PTHREAD_SCOPE_SYSTEM                      0
-#define __PTHREAD_SCOPE_PROCESS                     1
-#define __PTHREAD_PROCESS_PRIVATE                   0
-#define __PTHREAD_PROCESS_SHARED                    1
-#define __PTHREAD_CANCEL_ENABLE                     0
-#define __PTHREAD_CANCEL_DISABLE                    1
-#define __PTHREAD_CANCEL_DEFERRED                   0
-#define __PTHREAD_CANCEL_ASYNCHRONOUS               1
-#define __PTHREAD_CANCELED                          (__CCAST(void *)-1)
-#define __PTHREAD_ONCE_INIT                         0
-#define __PTHREAD_BARRIER_SERIAL_THREAD             (-1)
+
+#define __PTHREAD_INHERIT_SCHED  0
+#define __PTHREAD_EXPLICIT_SCHED 1
+
+#define __PTHREAD_SCOPE_SYSTEM  0
+#define __PTHREAD_SCOPE_PROCESS 1
+
+#define __PTHREAD_PROCESS_PRIVATE 0
+#define __PTHREAD_PROCESS_SHARED  1
+
+#define __PTHREAD_CANCEL_ENABLE  0
+#define __PTHREAD_CANCEL_DISABLE 1
+
+#define __PTHREAD_CANCEL_DEFERRED     0
+#define __PTHREAD_CANCEL_ASYNCHRONOUS 1
+
+#define __PTHREAD_CANCELED (__CCAST(void *) - 1)
+
+#define __PTHREAD_ONCE_INIT 0
+
+#define __PTHREAD_BARRIER_SERIAL_THREAD (-1)
 
 #endif /* !_ASM_CRT_PTHREADVALUES_H */

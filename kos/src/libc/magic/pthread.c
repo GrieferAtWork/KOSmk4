@@ -44,7 +44,6 @@
 #include <features.h>
 
 #include <asm/crt/pthreadvalues.h>
-#include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
 #include <bits/types.h>

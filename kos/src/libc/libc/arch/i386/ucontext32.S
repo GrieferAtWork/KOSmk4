@@ -23,6 +23,7 @@
 #define _GNU_SOURCE 1
 #define __ASSEMBLER__ 1
 
+#include "../../../api.h"
 /**/
 #include <hybrid/compiler.h>
 
@@ -33,11 +34,11 @@
 #include <bits/mcontext32.h>
 #include <bits/ucontext32.h>
 
+#include <pthread.h>
 #include <signal.h>
 #include <syscall.h>
 #include <ucontext.h>
 
-#include "../../pthread.h"
 #include "ucontext.h"
 /**/
 
@@ -214,12 +215,12 @@ INTERN_FUNCTION(libc_getcontext)
 	EXTERN(libc_pthread_self)
 	call   libc_pthread_self
 
-	ttest  mask=PTHREAD_FNOSTACK, loc=OFFSET_PTHREAD_FLAGS(%eax)
+	ttest  mask=PTHREAD_FNOSTACK, loc=__OFFSET_PTHREAD_FLAGS(%eax)
 	.cfi_remember_state
 	jnz    .Lgetcontext_generic_stack
-	movl   OFFSET_PTHREAD_STACKADDR(%eax), %ecx
+	movl   __OFFSET_PTHREAD_STACKADDR(%eax), %ecx
 	movl   %ecx, UC(__OFFSET_UCONTEXTX32_STACK + __OFFSET_SIGALTSTACKX32_SP)
-	movl   OFFSET_PTHREAD_STACKSIZE(%eax), %ecx
+	movl   __OFFSET_PTHREAD_STACKSIZE(%eax), %ecx
 	movl   %ecx, UC(__OFFSET_UCONTEXTX32_STACK + __OFFSET_SIGALTSTACKX32_SIZE)
 .Lgetcontext_got_stack:
 	xorl   %ecx, %ecx

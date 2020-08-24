@@ -21,64 +21,577 @@
 #define _BITS_CRT_PTHREADTYPES_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
+
+#include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypesizes.h>
 
-__SYSDECL_BEGIN
+#undef __USE_PTHREAD_INTERNALS
+#if (defined(__BUILDING_LIBC) && defined(__KOS__)) || defined(_LIBC_SOURCE)
+#define __USE_PTHREAD_INTERNALS 1
+#endif /* (__BUILDING_LIBC && __KOS__) || _LIBC_SOURCE */
+
+#ifdef __USE_PTHREAD_INTERNALS
+#include <bits/sched_param.h> /* `struct sched_param' */
+#include <bits/types.h>       /* __pid_t, etc... */
+#include <kos/anno.h>         /* __WEAK */
+#endif /* __USE_PTHREAD_INTERNALS */
+
+__DECL_BEGIN
 
 #ifdef __CC__
-typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __pthread_t;
 typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_KEY_T) __pthread_key_t;
 typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
+#endif /* __CC__ */
 
+#ifdef __USE_PTHREAD_INTERNALS
+#ifdef __KOS__
+#define __OFFSET_PTHREAD_TID       0
+#define __OFFSET_PTHREAD_REFCNT    (__SIZEOF_POINTER__ * 1)
+#define __OFFSET_PTHREAD_RETVAL    (__SIZEOF_POINTER__ * 2)
+#define __OFFSET_PTHREAD_TLS       (__SIZEOF_POINTER__ * 3)
+#define __OFFSET_PTHREAD_STACKADDR (__SIZEOF_POINTER__ * 4)
+#define __OFFSET_PTHREAD_STACKSIZE (__SIZEOF_POINTER__ * 5)
+#define __OFFSET_PTHREAD_FLAGS     (__SIZEOF_POINTER__ * 6)
+
+#define PTHREAD_FNORMAL    0x0000 /* Normal pthread flags. */
+#define PTHREAD_FUSERSTACK 0x0001 /* The thread's stack was provided by the user
+                                   * and should not be unmapped automatically. */
+#define PTHREAD_FNOSTACK   0x0002 /* The thread's stack area is unknown (this is the case for
+                                   * the main thread, and any thread created by `clone()'). */
+
+#ifdef __CC__
+struct __cpu_set_struct;
+struct pthread {
+	__pid_t                  pt_tid;        /* [const] Secondary TID (filled in by the kernel as the PTID and CTID) */
+#if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
+	__byte_t               __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
+#endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
+	__WEAK __uintptr_t       pt_refcnt;     /* Reference counter for this control structure. */
+	void                    *pt_retval;     /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
+	void                    *pt_tls;        /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()') */
+	void                    *pt_stackaddr;  /* [const] Thread stack address */
+	__size_t                 pt_stacksize;  /* [const] Thread stack size */
+	__uintptr_t              pt_flags;      /* [const] Flags (Set of `PTHREAD_F*') */
+	struct __cpu_set_struct *pt_cpuset;     /* Initial affinity cpuset. */
+	__size_t                 pt_cpusetsize; /* Initial affinity cpuset size. */
+};
+typedef struct pthread *__pthread_t;
+#endif /* __CC__ */
+#else /* __KOS__ */
+#ifdef __CC__
+struct pthread;
+typedef struct pthread *__pthread_t;
+#endif /* __CC__ */
+#endif /* !__KOS__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
+typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __pthread_t;
+#endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
+
+#ifdef __USE_PTHREAD_INTERNALS
+#define PTHREAD_ATTR_FLAG_DETACHSTATE     0x0001 /* set:PTHREAD_CREATE_DETACHED; unset:PTHREAD_CREATE_JOINABLE */
+#define PTHREAD_ATTR_FLAG_NOTINHERITSCHED 0x0002 /* set:PTHREAD_EXPLICIT_SCHED; unset:PTHREAD_INHERIT_SCHED */
+#define PTHREAD_ATTR_FLAG_SCOPEPROCESS    0x0004 /* set:PTHREAD_SCOPE_PROCESS; unset:PTHREAD_SCOPE_SYSTEM */
+#define PTHREAD_ATTR_FLAG_STACKADDR       0x0008 /* `pa_stackaddr' and `pa_stacksize' are valid */
+#define PTHREAD_ATTR_FLAG_OLDATTR         0x0010 /* Don't `free(pa_cpuset)' */
+#define PTHREAD_ATTR_FLAG_SCHED_SET       0x0020 /* `pa_schedparam' is valid */
+#define PTHREAD_ATTR_FLAG_POLICY_SET      0x0040 /* `pa_schedpolicy' is valid */
+
+#define __OFFSET_PTHREAD_ATTR_SCHEDPARAM  0
+#define __OFFSET_PTHREAD_ATTR_SCHEDPOLICY __SIZEOF_SCHED_PARAM
+#define __OFFSET_PTHREAD_ATTR_FLAGS       (__SIZEOF_SCHED_PARAM + 4)
+#if ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1)) != 0
+#define __OFFSET_PTHREAD_ATTR_GUARDSIZE   (__SIZEOF_SCHED_PARAM + 8 + (__SIZEOF_SIZE_T__ - ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1))))
+#else /* ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1)) != 0 */
+#define __OFFSET_PTHREAD_ATTR_GUARDSIZE   (__SIZEOF_SCHED_PARAM + 8)
+#endif /* ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1)) == 0 */
+#define __OFFSET_PTHREAD_ATTR_STACKADDR   (__OFFSET_PTHREAD_ATTR_GUARDSIZE + __SIZEOF_SIZE_T__)
+#define __OFFSET_PTHREAD_ATTR_STACKSIZE   (__OFFSET_PTHREAD_ATTR_GUARDSIZE + __SIZEOF_SIZE_T__ + __SIZEOF_POINTER__)
+#define __OFFSET_PTHREAD_ATTR_CPUSET      (__OFFSET_PTHREAD_ATTR_GUARDSIZE + __SIZEOF_SIZE_T__ * 2 + __SIZEOF_POINTER__)
+#define __OFFSET_PTHREAD_ATTR_CPUSETSIZE  (__OFFSET_PTHREAD_ATTR_GUARDSIZE + __SIZEOF_SIZE_T__ * 2 + __SIZEOF_POINTER__ * 2)
+#ifdef __CC__
+struct __cpu_set_struct;
+typedef struct __pthread_attr_s {
+	/* NOTE: This structure shares binary compatibility with GLibc (for the most part)
+	 *       The only difference is that we allow the re-use of `pa_cpusetsize' as an
+	 *       in-line 32/64-bit cpuset, thus preventing the need to dynamically allocate
+	 *       small cpu sets on the heap when most of the time those structures would
+	 *       only be a couple of bytes large. */
+	struct sched_param       pa_schedparam;  /* [valid_if(PTHREAD_ATTR_FLAG_SCHED_SET)] Scheduler parameters and priority. */
+	__INT32_TYPE__           pa_schedpolicy; /* [valid_if(PTHREAD_ATTR_FLAG_POLICY_SET)] Scheduler policy */
+	__INT32_TYPE__           pa_flags;       /* Various flags like detachstate, scope, etc (Set of `PTHREAD_ATTR_FLAG_*'). */
+#if ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1)) != 0
+	__BYTE_TYPE__           _pa_pad[__SIZEOF_SIZE_T__ - ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1))];
+#endif /* ((__SIZEOF_SCHED_PARAM + 8) & (__SIZEOF_SIZE_T__ - 1)) != 0 */
+	__SIZE_TYPE__            pa_guardsize;   /* Size of the stack-overflow guard area. */
+	void                    *pa_stackaddr;   /* [valid_if(PTHREAD_ATTR_FLAG_STACKADDR)] Stack start address. */
+	__SIZE_TYPE__            pa_stacksize;   /* [valid_if(PTHREAD_ATTR_FLAG_STACKADDR)] Stack size. */
+	struct __cpu_set_struct *pa_cpuset;      /* [0..pa_cpusetsize] Thread affinity set. */
+	__SIZE_TYPE__            pa_cpusetsize;  /* Thread affinity set size (in bytes). */
+} __pthread_attr_t;
+#endif /* __CC__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
 typedef union __pthread_attr {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_ATTR_T];
+	__BYTE_TYPE__   __size[__SIZEOF_PTHREAD_ATTR_T];
 	__INTPTR_TYPE__ __align;
 } __pthread_attr_t;
+#endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
 
-typedef union __pthread_mutex {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_MUTEX_T];
-	__INTPTR_TYPE__ __align;
-} __pthread_mutex_t;
 
+
+
+
+/************************************************************************/
+/* pthread_mutex_t                                                      */
+/************************************************************************/
+#ifdef __USE_PTHREAD_INTERNALS
+#define __OFFSET_PTHREAD_MUTEXATTR_KIND 0
+#ifdef __CC__
+typedef struct __pthread_mutexattr_s {
+	__UINT32_TYPE__ ma_kind; /* bit#31 is set if the mutex is shared;
+	                          * Rest are for the PTHREAD_MUTEX_* kind. */
+} __pthread_mutexattr_t;
+#endif /* __CC__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
 typedef union __pthread_mutexattr {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_MUTEXATTR_T];
+	__BYTE_TYPE__  __size[__SIZEOF_PTHREAD_MUTEXATTR_T];
 	__INT32_TYPE__ __align;
 } __pthread_mutexattr_t;
+#endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
 
-typedef union __pthread_cond {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_COND_T];
-	__INT64_TYPE__ __align;
-} __pthread_cond_t;
+#ifdef __CC__
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+struct __pthread_internal_list {
+#ifdef __USE_PTHREAD_INTERNALS
+	struct __pthread_internal_list *_l_prev; /* Unused (on KOS) */
+	struct __pthread_internal_list *_l_next; /* Unused (on KOS) */
+#else /* __USE_PTHREAD_INTERNALS */
+	struct __pthread_internal_list *__prev;
+	struct __pthread_internal_list *__next;
+#endif /* !__USE_PTHREAD_INTERNALS */
+};
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+struct __pthread_internal_slist {
+#ifdef __USE_PTHREAD_INTERNALS
+	struct __pthread_internal_slist *_l_next; /* Unused (on KOS) */
+#else /* __USE_PTHREAD_INTERNALS */
+	struct __pthread_internal_slist *__next;
+#endif /* !__USE_PTHREAD_INTERNALS */
+};
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
 
+#ifdef __USE_GLIBC
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+struct __pthread_internal_list __pthread_list_t;
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+struct __pthread_internal_slist __pthread_slist_t;
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+#endif /* __USE_GLIBC */
+#endif /* __CC__ */
+
+#define __OFFSET_PTHREAD_MUTEX_LOCK      0
+#define __OFFSET_PTHREAD_MUTEX_COUNT     4
+#define __OFFSET_PTHREAD_MUTEX_OWNER     8
+#ifdef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
+#define __OFFSET_PTHREAD_MUTEX_NUSERS    12
+#define __OFFSET_PTHREAD_MUTEX_KIND      16
+#else /* __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+#define __OFFSET_PTHREAD_MUTEX_KIND      12
+#define __OFFSET_PTHREAD_MUTEX_NUSERS    16
+#endif /* !__PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+#define __OFFSET_PTHREAD_MUTEX_SPINS     20
+#define __OFFSET_PTHREAD_MUTEX_ELISION   22
+#ifdef __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN
+#define __OFFSET_PTHREAD_MUTEX_LIST      24
+#else /* __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+#define __OFFSET_PTHREAD_MUTEX_LIST      20
+#endif /* !__PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+#define __OFFSET_PTHREAD_MUTEX_LIST_PREV __OFFSET_PTHREAD_MUTEX_LIST
+#define __OFFSET_PTHREAD_MUTEX_LIST_NEXT (__OFFSET_PTHREAD_MUTEX_LIST + __SIZEOF_POINTER__)
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+#define __OFFSET_PTHREAD_MUTEX_LIST_NEXT __OFFSET_PTHREAD_MUTEX_LIST
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+#ifdef __CC__
+struct __pthread_mutex_s {
+#ifdef __USE_PTHREAD_INTERNALS
+	__INT32_TYPE__   m_lock;    /* Futex control word for this mutex. */
+	__UINT32_TYPE__  m_count;   /* [valid_if(PTHREAD_MUTEX_RECURSIVE)] # of recursive locks */
+	__INT32_TYPE__   m_owner;   /* [valid_if(PTHREAD_MUTEX_RECURSIVE)] PID of the owner thread */
+#ifdef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
+	__UINT32_TYPE__  _m_nusers; /* Unused (on KOS) */
+#endif /* __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+	__INT32_TYPE__   m_kind;    /* [const] The kind of this futex (one of `PTHREAD_MUTEX_*'). */
+#ifndef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
+	__UINT32_TYPE__  _m_nusers; /* Unused (on KOS) */
+#endif /* !__PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+#ifdef __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN
+	__INT16_TYPE__    _m_spins;   /* Unused (on KOS) */
+	__INT16_TYPE__    _m_elision; /* Unused (on KOS) */
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+	struct __pthread_internal_list  _m_list; /* Unused (on KOS) */
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+	struct __pthread_internal_slist _m_list; /* Unused (on KOS) */
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+#else /* __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+	union {
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+		struct __pthread_internal_list  _m_list; /* Unused (on KOS) */
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+		struct __pthread_internal_slist _m_list; /* Unused (on KOS) */
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+		struct {
+			__INT16_TYPE__ _m_spins;  /* Unused (on KOS) */
+			__INT16_TYPE__ _m_elision; /* Unused (on KOS) */
+		}
+#ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
+		;
+#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
+#define _m_spins   __elision_data._m_spins   /* Unused (on KOS) */
+#define _m_elision __elision_data._m_elision /* Unused (on KOS) */
+		__elision_data;
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+	};
+#endif /* !__PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+#else /* __USE_PTHREAD_INTERNALS */
+	__INT32_TYPE__   __lock;
+	__UINT32_TYPE__  __count;
+	__INT32_TYPE__   __owner;
+#ifdef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
+	__UINT32_TYPE__  __nusers;
+#endif /* __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+	__INT32_TYPE__   __kind;
+#ifndef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
+	__UINT32_TYPE__  __nusers;
+#endif /* !__PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+#ifdef __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN
+	__INT16_TYPE__    __spins;
+	__INT16_TYPE__    __elision;
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+	struct __pthread_internal_list __list;
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+	struct __pthread_internal_slist __list;
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+#else /* __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+	union {
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+		struct __pthread_internal_list __list;
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+		struct __pthread_internal_slist __list;
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+		struct {
+			__INT16_TYPE__ __spins;
+			__INT16_TYPE__ __elision;
+		}
+#ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
+		;
+#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
+#define __spins   __elision_data.__spins
+#define __elision __elision_data.__elision
+		__elision_data;
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+	};
+#endif /* !__PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+#endif /* !__USE_PTHREAD_INTERNALS */
+};
+
+#ifdef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
+#define __PTHREAD_MUTEX_INIT_NUSERS_AND_KIND(kind) 0, kind
+#else /* __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+#define __PTHREAD_MUTEX_INIT_NUSERS_AND_KIND(kind) kind, 0
+#endif /* !__PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
+
+#ifdef __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+#define __PTHREAD_MUTEX_INIT_LIST_AND_SPIN 0, 0, { __NULLPTR, __NULLPTR }
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+#define __PTHREAD_MUTEX_INIT_LIST_AND_SPIN 0, 0, { __NULLPTR }
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+#else /* __PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+#ifdef __PTHREAD_MUTEX_HAVE_PREV
+#define __PTHREAD_MUTEX_INIT_LIST_AND_SPIN { { __NULLPTR, __NULLPTR } }
+#else /* __PTHREAD_MUTEX_HAVE_PREV */
+#define __PTHREAD_MUTEX_INIT_LIST_AND_SPIN { { __NULLPTR } }
+#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+#endif /* !__PTHREAD_MUTEX_HAVE_DISTINCT_LIST_AND_SPIN */
+
+#define __PTHREAD_MUTEX_S_INITIALIZER_EX(kind)      \
+	{                                               \
+		/* .__lock   = */ 0,                        \
+		/* .__count  = */ 0,                        \
+		/* .__owner  = */ 0,                        \
+		__PTHREAD_MUTEX_INIT_NUSERS_AND_KIND(kind), \
+		__PTHREAD_MUTEX_INIT_LIST_AND_SPIN          \
+	}
+
+#ifdef __USE_PTHREAD_INTERNALS
+#define __PTHREAD_MUTEX_INITIALIZER_EX(kind) \
+	__PTHREAD_MUTEX_S_INITIALIZER_EX(kind)
+typedef struct __pthread_mutex_s __pthread_mutex_t;
+#else /* __USE_PTHREAD_INTERNALS */
+#define __PTHREAD_MUTEX_INITIALIZER_EX(kind) \
+	{ __PTHREAD_MUTEX_S_INITIALIZER_EX(kind) }
+typedef union __pthread_mutex {
+	struct __pthread_mutex_s __data;
+	__BYTE_TYPE__            __size[__SIZEOF_PTHREAD_MUTEX_T];
+	__INTPTR_TYPE__          __align;
+} __pthread_mutex_t;
+#endif /* !__USE_PTHREAD_INTERNALS */
+
+/* Static pthread_mutex_t initializers. */
+#define __PTHREAD_MUTEX_INITIALIZER            __PTHREAD_MUTEX_INITIALIZER_EX(0)
+#define __PTHREAD_RECURSIVE_MUTEX_INITIALIZER  __PTHREAD_MUTEX_INITIALIZER_EX(__PTHREAD_MUTEX_RECURSIVE)
+#define __PTHREAD_ERRORCHECK_MUTEX_INITIALIZER __PTHREAD_MUTEX_INITIALIZER_EX(__PTHREAD_MUTEX_ERRORCHECK)
+#define __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER   __PTHREAD_MUTEX_INITIALIZER_EX(__PTHREAD_MUTEX_ADAPTIVE)
+#endif /* __CC__ */
+
+
+
+
+/************************************************************************/
+/* pthread_cond_t                                                       */
+/************************************************************************/
+#ifdef __USE_PTHREAD_INTERNALS
+#define __OFFSET_PTHREAD_CONDATTR_VALUE 0
+#ifdef __CC__
+typedef struct __pthread_condattr_s {
+	__UINT32_TYPE__ ca_value; /* bit#0 is set if the cond is shared;
+	                           * bit#1 is used to store the clock id; */
+} __pthread_condattr_t;
+#endif /* __CC__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
 typedef union __pthread_condattr {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_CONDATTR_T];
+	__BYTE_TYPE__  __size[__SIZEOF_PTHREAD_CONDATTR_T];
 	__INT32_TYPE__ __align;
 } __pthread_condattr_t;
+#endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
 
-typedef union __pthread_rwlock {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_RWLOCK_T];
-	__INTPTR_TYPE__ __align;
-} __pthread_rwlock_t;
+#define __OFFSET_PTHREAD_COND_LOCK          0
+#define __OFFSET_PTHREAD_COND_FUTEX         4
+#define __OFFSET_PTHREAD_COND_TOTAL_SEQ     8
+#define __OFFSET_PTHREAD_COND_WAKEUP_SEQ    16
+#define __OFFSET_PTHREAD_COND_WOKEN_SEQ     24
+#define __OFFSET_PTHREAD_COND_MUTEX         32
+#define __OFFSET_PTHREAD_COND_NWAITERS      (32 + __SIZEOF_POINTER__)
+#define __OFFSET_PTHREAD_COND_BROADCAST_SEQ (36 + __SIZEOF_POINTER__)
+#ifdef __CC__
+struct __pthread_cond_s {
+#ifdef __USE_PTHREAD_INTERNALS
+	__INT32_TYPE__            c_lock;          /* TODO: ??? */
+	__UINT32_TYPE__           c_futex;         /* TODO: ??? */
+	__UINT64_TYPE__           c_total_seq;     /* TODO: ??? */
+	__UINT64_TYPE__           c_wakeup_seq;    /* TODO: ??? */
+	__UINT64_TYPE__           c_woken_seq;     /* TODO: ??? */
+	struct __pthread_mutex_s *c_mutex;         /* TODO: ??? */
+	__UINT32_TYPE__           c_nwaiters;      /* TODO: ??? */
+	__UINT32_TYPE__           c_broadcast_seq; /* TODO: ??? */
+#else /* __USE_PTHREAD_INTERNALS */
+	__INT32_TYPE__  __lock;
+	__UINT32_TYPE__ __futex;
+	__UINT64_TYPE__ __total_seq;
+	__UINT64_TYPE__ __wakeup_seq;
+	__UINT64_TYPE__ __woken_seq;
+	void           *__mutex;
+	__UINT32_TYPE__ __nwaiters;
+	__UINT32_TYPE__ __broadcast_seq;
+#endif /* !__USE_PTHREAD_INTERNALS */
+};
+#define __PTHREAD_COND_S_INITIALIZER \
+	{ 0, 0, 0, 0, 0, (void *)0, 0, 0 }
 
+/* Static pthread_cond_t initializers. */
+#ifdef __USE_PTHREAD_INTERNALS
+#define __PTHREAD_COND_INITIALIZER __PTHREAD_COND_S_INITIALIZER
+typedef struct __pthread_cond_s __pthread_cond_t;
+#else /* __USE_PTHREAD_INTERNALS */
+#define __PTHREAD_COND_INITIALIZER { __PTHREAD_COND_S_INITIALIZER }
+typedef union __pthread_cond {
+	struct __pthread_cond_s __data;
+	__BYTE_TYPE__           __size[__SIZEOF_PTHREAD_COND_T];
+	__INT64_TYPE__          __align;
+} __pthread_cond_t;
+#endif /* !__USE_PTHREAD_INTERNALS */
+#endif /* __CC__ */
+
+
+
+/************************************************************************/
+/* pthread_rwlock_t                                                     */
+/************************************************************************/
+#ifdef __USE_PTHREAD_INTERNALS
+#define __OFFSET_PTHREAD_RWLOCKATTR_KIND   0
+#define __OFFSET_PTHREAD_RWLOCKATTR_SHARED 4
+#ifdef __CC__
+typedef struct __pthread_rwlockattr_s {
+	__UINT32_TYPE__ rwa_kind;   /* What will eventually become the r/w-lock's flags */
+	__UINT32_TYPE__ rwa_shared; /* Non-zero if the r/w-lock is shared */
+} __pthread_rwlockattr_t;
+#endif /* __CC__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
 typedef union __pthread_rwlockattr {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_RWLOCKATTR_T];
+	__BYTE_TYPE__   __size[__SIZEOF_PTHREAD_RWLOCKATTR_T];
 	__INTPTR_TYPE__ __align;
 } __pthread_rwlockattr_t;
+#endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
 
-typedef int volatile __pthread_spinlock_t;
+#define __OFFSET_PTHREAD_RWLOCK_LOCK              0
+#define __OFFSET_PTHREAD_RWLOCK_NR_READERS        4
+#define __OFFSET_PTHREAD_RWLOCK_READERS_WAKEUP    8
+#define __OFFSET_PTHREAD_RWLOCK_WRITER_WAKEUP     12
+#define __OFFSET_PTHREAD_RWLOCK_NR_READERS_QUEUED 16
+#define __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED 20
 
-typedef union __pthread_barrier {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_BARRIER_T];
-	__INTPTR_TYPE__ __align;
-} __pthread_barrier_t;
+#ifndef __OFFSET_PTHREAD_RWLOCK_FLAGS
+#define __OFFSET_PTHREAD_RWLOCK_FLAGS 24
+#endif /* !__OFFSET_PTHREAD_RWLOCK_FLAGS */
+#ifndef __OFFSET_PTHREAD_RWLOCK_SHARED
+#define __OFFSET_PTHREAD_RWLOCK_SHARED 25
+#endif /* !__OFFSET_PTHREAD_RWLOCK_SHARED */
+#ifndef __OFFSET_PTHREAD_RWLOCK_RWELISION
+#define __OFFSET_PTHREAD_RWLOCK_RWELISION 26
+#endif /* !__OFFSET_PTHREAD_RWLOCK_RWELISION */
+#ifndef __OFFSET_PTHREAD_RWLOCK_WRITER
+#define __OFFSET_PTHREAD_RWLOCK_WRITER 28
+#endif /* !__OFFSET_PTHREAD_RWLOCK_WRITER */
 
+#ifdef __CC__
+struct __pthread_rwlock_s {
+#ifdef __USE_PTHREAD_INTERNALS
+	__INT32_TYPE__   rw_lock;              /* Futex/rwlock control word */
+	__UINT32_TYPE__ _rw_nr_readers;        /* Unused (on KOS) */
+	__UINT32_TYPE__ _rw_readers_wakeup;    /* Unused (on KOS) */
+	__UINT32_TYPE__ _rw_writer_wakeup;     /* Unused (on KOS) */
+	__UINT32_TYPE__ _rw_nr_readers_queued; /* Unused (on KOS) */
+	__UINT32_TYPE__ _rw_nr_writers_queued; /* Unused (on KOS) */
+#else /* __USE_PTHREAD_INTERNALS */
+	__INT32_TYPE__   __lock;
+	__UINT32_TYPE__  __nr_readers;
+	__UINT32_TYPE__  __readers_wakeup;
+	__UINT32_TYPE__  __writer_wakeup;
+	__UINT32_TYPE__  __nr_readers_queued;
+	__UINT32_TYPE__  __nr_writers_queued;
+#endif /* !__USE_PTHREAD_INTERNALS */
+#if __OFFSET_PTHREAD_RWLOCK_WRITER == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED + 4
+#define __PTHREAD_RWLOCK_S_INITIALIZER_EX(flags) \
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0 }, flags }
+#ifdef __USE_PTHREAD_INTERNALS
+	__INT32_TYPE__   rw_writer;    /* PID of the writing thread */
+	__INT32_TYPE__  _rw_shared;    /* Unused (on KOS) */
+	__INT8_TYPE__   _rw_rwelision; /* Unused (on KOS) */
+	__UINT8_TYPE__  _rw_pad1[__OFFSET_PTHREAD_RWLOCK_FLAGS - (__OFFSET_PTHREAD_RWLOCK_RWELISION + 1)];
+	__UINT32_TYPE__  rw_flags;     /* One of `PTHREAD_RWLOCK_PREFER_*' */
+#else /* __USE_PTHREAD_INTERNALS */
+	__INT32_TYPE__   __writer;
+	__INT32_TYPE__   __shared;
+	__INT8_TYPE__    __rwelision;
+	__UINT8_TYPE__   __pad1[__OFFSET_PTHREAD_RWLOCK_FLAGS - (__OFFSET_PTHREAD_RWLOCK_RWELISION + 1)];
+	__UINT32_TYPE__  __flags;
+#endif /* !__USE_PTHREAD_INTERNALS */
+#else /* __OFFSET_PTHREAD_RWLOCK_WRITER == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED + 4 */
+#define __PTHREAD_RWLOCK_S_INITIALIZER_EX(flags) \
+	{ 0, 0, 0, 0, 0, 0, flags, 0, 0, 0, 0 }
+#ifdef __USE_PTHREAD_INTERNALS
+	__UINT8_TYPE__   rw_flags;     /* One of `PTHREAD_RWLOCK_PREFER_*' */
+	__UINT8_TYPE__  _rw_shared;    /* Unused (on KOS) */
+	__INT8_TYPE__   _rw_rwelision; /* Unused (on KOS) */
+	__UINT8_TYPE__  _rw_pad1;      /* ... */
+	__INT32_TYPE__   rw_writer;    /* PID of the writing thread */
+#else /* __USE_PTHREAD_INTERNALS */
+	__UINT8_TYPE__  __flags;
+	__UINT8_TYPE__  __shared;
+	__INT8_TYPE__   __rwelision;
+	__UINT8_TYPE__  __pad1;
+	__INT32_TYPE__  __writer;
+#endif /* !__USE_PTHREAD_INTERNALS */
+#endif /* __OFFSET_PTHREAD_RWLOCK_WRITER != __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED + 4 */
+};
+
+#ifdef __USE_PTHREAD_INTERNALS
+#define __PTHREAD_RWLOCK_INITIALIZER_EX(flags) __PTHREAD_RWLOCK_S_INITIALIZER_EX(flags)
+typedef struct __pthread_rwlock_s __pthread_rwlock_t;
+#else /* __USE_PTHREAD_INTERNALS */
+#define __PTHREAD_RWLOCK_INITIALIZER_EX(flags) \
+	{ __PTHREAD_RWLOCK_S_INITIALIZER_EX(flags) }
+typedef union __pthread_rwlock {
+	struct __pthread_rwlock_s __data;
+	__BYTE_TYPE__             __size[__SIZEOF_PTHREAD_RWLOCK_T];
+	__INTPTR_TYPE__           __align;
+} __pthread_rwlock_t;
+#endif /* !__USE_PTHREAD_INTERNALS */
+
+/* Static pthread_rwlock_t initializers. */
+#define __PTHREAD_RWLOCK_INITIALIZER \
+	__PTHREAD_RWLOCK_INITIALIZER_EX(0)
+#define __PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER \
+	__PTHREAD_RWLOCK_INITIALIZER_EX(__PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE)
+#endif /* __CC__ */
+
+
+
+/************************************************************************/
+/* pthread_spinlock_t                                                   */
+/************************************************************************/
+#ifdef __CC__
+typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_SPINLOCK_T) volatile __pthread_spinlock_t;
+#endif /* __CC__ */
+
+
+
+/************************************************************************/
+/* pthread_marrier_t                                                    */
+/************************************************************************/
+#ifdef __USE_PTHREAD_INTERNALS
+#define __OFFSET_PTHREAD_BARRIERATTR_SHARED 0
+#ifdef __CC__
+typedef struct __pthread_barrierattr_s {
+	__UINT32_TYPE__ ba_shared; /* Non-zero if shared */
+} __pthread_barrierattr_t;
+#endif /* __CC__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
 typedef union __pthread_barrierattr {
-	__BYTE_TYPE__ __size[__SIZEOF_PTHREAD_BARRIERATTR_T];
+	__BYTE_TYPE__  __size[__SIZEOF_PTHREAD_BARRIERATTR_T];
 	__INT32_TYPE__ __align;
 } __pthread_barrierattr_t;
 #endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
 
-__SYSDECL_END
+#ifdef __USE_PTHREAD_INTERNALS
+#define __OFFSET_PTHREAD_BARRIER_IN            0
+#define __OFFSET_PTHREAD_BARRIER_CURRENT_ROUND 4
+#define __OFFSET_PTHREAD_BARRIER_COUNT         8
+#define __OFFSET_PTHREAD_BARRIER_SHARED        12
+#define __OFFSET_PTHREAD_BARRIER_OUT           16
+#ifdef __CC__
+typedef struct __pthread_barrier_s {
+	__UINT32_TYPE__ b_in;            /* ??? */
+	__UINT32_TYPE__ b_current_round; /* ??? */
+	__UINT32_TYPE__ b_count;         /* ??? */
+	__UINT32_TYPE__ b_shared;        /* Non-zero if shared */
+	__UINT32_TYPE__ b_out;           /* ??? */
+} __pthread_barrier_t;
+#endif /* __CC__ */
+#else /* __USE_PTHREAD_INTERNALS */
+#ifdef __CC__
+typedef union __pthread_barrier {
+	__BYTE_TYPE__   __size[__SIZEOF_PTHREAD_BARRIER_T];
+	__INTPTR_TYPE__ __align;
+} __pthread_barrier_t;
+#endif /* __CC__ */
+#endif /* !__USE_PTHREAD_INTERNALS */
+
+__DECL_END
 
 #endif /* !_BITS_CRT_PTHREADTYPES_H */

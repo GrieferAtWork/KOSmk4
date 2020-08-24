@@ -30,11 +30,11 @@
 #include <kos/exec/idata.h>
 #include <kos/syscalls.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "../libc/pthread.h"
 #include "signal.h"
 #include "string.h"
 
