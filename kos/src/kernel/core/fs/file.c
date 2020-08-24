@@ -267,7 +267,7 @@ handle_file_ioctl(struct file *__restrict self,
 	return inode_ioctl(self->f_node, cmd, arg, mode);
 }
 
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 handle_file_mmap(struct file *__restrict self,
                  pos_t *__restrict UNUSED(pminoffset),
                  pos_t *__restrict UNUSED(pnumbytes),

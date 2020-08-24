@@ -67,7 +67,7 @@ PUBLIC struct vm_ramfile elfexec_system_rtld32_file =
 #ifdef __x86_64__
 
 /* Initialize user-space for program execution. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    Elf64_Ehdr const *__restrict ehdr,
                    USER void *peb_address, USER void *ustack_base,
@@ -168,7 +168,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 
 
 /* Initialize user-space for program execution. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      Elf32_Ehdr const *__restrict ehdr,
                      USER void *peb_address, USER void *ustack_base,
@@ -230,7 +230,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 
 
 /* Initialize the RTLD user-space library for runtime linking. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     struct path *__restrict exec_path,
                     struct directory_entry *__restrict exec_dentry,

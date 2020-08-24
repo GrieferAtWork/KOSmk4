@@ -21,7 +21,9 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/arch/compat.h>
+
 #include <compat/config.h>
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H */

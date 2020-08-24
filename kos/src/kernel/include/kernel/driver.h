@@ -443,7 +443,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_state_destroy)(struct driv
 DEFINE_REFCOUNT_FUNCTIONS(struct driver_state, ds_refcnt, driver_state_destroy)
 
 /* Return a snapshot for the current state of loaded drivers. */
-FUNDEF NOBLOCK WUNUSED ATTR_RETNONNULL
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED
 REF struct driver_state *NOTHROW(KCALL driver_get_state)(void);
 
 
@@ -485,7 +485,7 @@ DATDEF ATOMIC_REF(struct driver_library_path_string) driver_library_path;
  * @param: pnew_driver_loaded: When non-NULL, write `true' to this pointer when the returned
  *                             driver was just newly loaded. - Otherwise, write `false'.
  * @return: * :                A reference to the freshly loaded driver. */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct regular_node *__restrict driver_inode,
                    struct path *driver_path,
                    struct directory_entry *driver_dentry,
@@ -493,7 +493,7 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
                    __BOOL *pnew_driver_loaded DFL(__NULLPTR),
                    unsigned int flags DFL(DRIVER_INSMOD_FLAG_NORMAL))
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR);
-FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
                    USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
                    __BOOL *pnew_driver_loaded DFL(__NULLPTR),
@@ -513,7 +513,7 @@ driver_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
  *       was as already done in STEP #3, but this time use the strings as
  *       file names relative to `vfs_kernel'
  */
-FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_insmod(USER CHECKED char const *driver_name,
               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR),
@@ -523,7 +523,7 @@ driver_insmod(USER CHECKED char const *driver_name,
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod(struct regular_node *__restrict driver_inode,
               struct path *__restrict driver_path,
               struct directory_entry *__restrict driver_dentry,
@@ -532,7 +532,7 @@ driver_insmod(struct regular_node *__restrict driver_inode,
               unsigned int flags DFL(DRIVER_INSMOD_FLAG_NORMAL))
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR)
 		ASMNAME("driver_insmod_file");
-FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_insmod(USER CHECKED byte_t *base, size_t num_bytes,
               USER CHECKED char const *driver_cmdline DFL(__NULLPTR),
               __BOOL *pnew_driver_loaded DFL(__NULLPTR),
@@ -607,7 +607,8 @@ driver_initialize(struct driver *__restrict self)
  *       thread doing the finalization to either complete, or abort.
  * @return: true:  Successfully finalized the driver.
  * @return: false: The driver had already been finalized (also a success-case). */
-FUNDEF NONNULL((1)) __BOOL KCALL driver_finalize(struct driver *__restrict self)
+FUNDEF NONNULL((1)) __BOOL KCALL
+driver_finalize(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
@@ -739,6 +740,7 @@ NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
 
 #ifdef __cplusplus
 extern "C++" {
+
 LOCAL WUNUSED NONNULL((1)) __BOOL KCALL
 driver_symbol_ex(struct driver *__restrict self,
                  /*in*/ USER CHECKED char const *name,
@@ -766,7 +768,8 @@ driver_local_symbol(struct driver *__restrict self,
 	                          &hash_elf,
 	                          &hash_gnu);
 }
-}
+
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
@@ -790,15 +793,17 @@ struct unwind_fde_struct;
 /* Lookup the FDE descriptor for a given `absolute_pc', whilst trying to
  * make use of the FDE cache of `self'.
  * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
-FUNDEF NOBLOCK unsigned int
+FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc,
                                struct unwind_fde_struct *__restrict result);
 
 /* Try to clear the FDE cache of the given, or of all loaded drivers.
  * NOTE: Drivers who's caches cannot be locked are skipped.
  * @return: * : The total number of bytes of heap-memory released. */
-FUNDEF NOBLOCK size_t NOTHROW(KCALL driver_clear_fde_cache)(struct driver *__restrict self);
-FUNDEF NOBLOCK size_t NOTHROW(KCALL driver_clear_fde_caches)(void);
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(KCALL driver_clear_fde_cache)(struct driver *__restrict self);
+FUNDEF NOBLOCK size_t
+NOTHROW(KCALL driver_clear_fde_caches)(void);
 
 /* Invoke cache clear callbacks for each and every globally reachable
  * component within the entire kernel.
@@ -852,7 +857,8 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL system_clearcaches)(void);
  * @return: 0 : Nothing was released/freed.
  *              In this case, the caller should indicate failure due to
  *              lack of some necessary resource. */
-FUNDEF NOBLOCK size_t NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion);
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion);
 
 /* Called as part of `system_clearcaches()': Trim standard kernel heaps.
  * @return: * : The total number of trimmed bytes. */
@@ -875,12 +881,13 @@ NOTHROW(FCALL driver_at_address)(void const *static_pointer);
 
 /* Try to lookup a driver with a given `driver_name'.
  * If no such driver exists, return NULL */
-FUNDEF WUNUSED NONNULL((1)) REF struct driver *FCALL
+FUNDEF WUNUSED REF struct driver *FCALL
 driver_with_name(USER CHECKED char const *driver_name) THROWS(E_SEGFAULT);
-FUNDEF WUNUSED NONNULL((1)) REF struct driver *FCALL
+FUNDEF WUNUSED REF struct driver *FCALL
 driver_with_namel(USER CHECKED char const *driver_name, size_t driver_name_len) THROWS(E_SEGFAULT);
-FUNDEF WUNUSED NONNULL((1)) REF struct driver *FCALL
+FUNDEF WUNUSED REF struct driver *FCALL
 driver_with_filename(USER CHECKED char const *driver_filename) THROWS(E_SEGFAULT);
+
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *
 NOTHROW(FCALL driver_with_file)(struct regular_node *__restrict driver_file);
 

@@ -325,7 +325,7 @@ INTDEF NONNULL((1)) int LIBCCALL libdl_dltlsfreeseg(void *ptr);
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
-INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) void *ATTR_FASTCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self);
 
 /* DL-based TLS memory management API.
@@ -464,7 +464,7 @@ INTDEF WUNUSED ATTR_CONST char const *FCALL dlsec_builtin_name(size_t sect_index
  * and must be defined by one of the loaded libraries. - If no such function
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
-INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) void *FCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL
 dl_require_global(char const *__restrict name);
 
 /* Set to true if the sys_debugtrap() system call is disabled. */
@@ -475,7 +475,7 @@ INTDEF bool sys_debugtrap_disabled;
 INTDEF struct dlmodule_format *dl_extensions;
 
 /* Lazily initialize and return the libdl core ops V-table. */
-INTDEF WUNUSED ATTR_RETNONNULL struct dlcore_ops *CC dl_getcoreops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct dlcore_ops *CC dl_getcoreops(void);
 
 
 

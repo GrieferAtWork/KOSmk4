@@ -2451,7 +2451,7 @@ dlsec_builtin(char const *__restrict name) {
  * and must be defined by one of the loaded libraries. - If no such function
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) void *FCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL
 dl_require_global(char const *__restrict name) {
 	void *result;
 	/* Search all globally loaded modules for the symbol. */

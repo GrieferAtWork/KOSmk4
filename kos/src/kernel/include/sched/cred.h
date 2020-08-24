@@ -305,7 +305,7 @@ NOTHROW(FCALL cred_destroy)(struct cred *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct cred, c_refcnt, cred_destroy)
 
 /* Clone the given credentials controller `self' and return the copy */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct cred *FCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *FCALL
 cred_clone(struct cred *__restrict self) THROWS(E_BADALLOC);
 
 /* [1..1] Per-thread filesystem information.

@@ -40,7 +40,7 @@ DECL_BEGIN
 
 /* Declare/define a cache for preallocated/re-use free. */
 #define DECLARE_PREALLOCATION_CACHE(decl, name, T)                                                         \
-	decl ATTR_MALLOC WUNUSED ATTR_RETNONNULL T *(KCALL name##_alloc)(gfp_t alloc_flags)THROWS(E_BADALLOC); \
+	decl ATTR_MALLOC ATTR_RETNONNULL WUNUSED T *(KCALL name##_alloc)(gfp_t alloc_flags)THROWS(E_BADALLOC); \
 	decl NOBLOCK void NOTHROW(KCALL name##_free)(T *__restrict p);                                         \
 	decl NOBLOCK size_t NOTHROW(KCALL name##_clear)(void);
 #define DECLARE_PREALLOCATION_CACHE_ALLOC_NX(decl, name, T) \
@@ -50,7 +50,7 @@ DECL_BEGIN
 	decl DEFINE_ATOMIC_RWLOCK(name##_lock);                 \
 	decl size_t name##_freesize = 0;                        \
 	decl T *name##_freelist     = __NULLPTR;                \
-	decl ATTR_MALLOC WUNUSED ATTR_RETNONNULL T *KCALL       \
+	decl ATTR_MALLOC ATTR_RETNONNULL WUNUSED T *KCALL       \
 	name##_alloc(gfp_t alloc_flags) THROWS(E_BADALLOC) {    \
 		T *result = name##_freelist;                        \
 		COMPILER_READ_BARRIER();                            \

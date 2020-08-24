@@ -37,7 +37,7 @@
 
 DECL_BEGIN
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
 MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
                       struct icpustate *__restrict user_state,
                       struct path *__restrict exec_path,

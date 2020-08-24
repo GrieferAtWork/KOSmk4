@@ -1669,7 +1669,7 @@ vm_clone(struct vm *__restrict self,
 FUNDEF void KCALL task_setvm(struct vm *__restrict newvm) THROWS(E_WOULDBLOCK);
 
 /* Return the active VM of the given `thread' */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *KCALL
 task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 
 
@@ -2696,7 +2696,7 @@ struct regular_node;
  * @throw: E_BADALLOC:   Insufficient memory
  * @throw: E_SEGFAULT:   The given `argv', `envp', or one of their pointed-to strings is faulty
  * @throw: E_NOT_EXECUTABLE: The given `exec_node' was not recognized as an acceptable binary. */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
 vm_exec(struct vm *__restrict effective_vm,
         struct icpustate *__restrict user_state,
         struct path *__restrict exec_path,
@@ -2716,7 +2716,7 @@ vm_exec(struct vm *__restrict effective_vm,
 
 #if defined(__ARCH_HAVE_COMPAT) && defined(__cplusplus)
 extern "C++" {
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
 vm_exec(struct vm *__restrict effective_vm,
         struct icpustate *__restrict user_state,
         struct path *__restrict exec_path,
@@ -2732,7 +2732,7 @@ vm_exec(struct vm *__restrict effective_vm,
 }
 }
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
 vm_exec32(struct vm *__restrict effective_vm,
           struct icpustate *__restrict user_state,
           struct path *__restrict exec_path,
@@ -2751,7 +2751,7 @@ vm_exec32(struct vm *__restrict effective_vm,
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
 
 #if __ARCH_COMPAT_SIZEOF_POINTER == 8
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
 vm_exec64(struct vm *__restrict effective_vm,
           struct icpustate *__restrict user_state,
           struct path *__restrict exec_path,

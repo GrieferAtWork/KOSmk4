@@ -588,7 +588,7 @@ ok:
 }
 
 
-PRIVATE WUNUSED ATTR_RETNONNULL ATTR_PURE NONNULL((1, 2)) char *
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_PURE NONNULL((1, 2)) char *
 CC find_rparen(char const *pattern_iter, char const *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {
@@ -614,7 +614,7 @@ CC find_rparen(char const *pattern_iter, char const *pattern_end) {
 	return (char *)pattern_iter;
 }
 
-PRIVATE WUNUSED ATTR_RETNONNULL ATTR_PURE NONNULL((1, 2)) char *
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_PURE NONNULL((1, 2)) char *
 CC find_rparen_escaped(char const *pattern_iter, char const *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {

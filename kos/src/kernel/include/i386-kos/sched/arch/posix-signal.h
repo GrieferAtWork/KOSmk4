@@ -48,6 +48,7 @@ union x86_user_eflags_mask {
 };
 
 DATDEF atomic64_t x86_user_eflags_mask;
+
 /* Same as `x86_user_eflags_mask', but used during exec()
  * May be set by:
  *  - Passing a `exec_eflags_mask=mask,flag' kernel commandline option

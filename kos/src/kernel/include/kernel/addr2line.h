@@ -55,14 +55,15 @@ struct addr2line_buf {
  * >> } while (++level < info.al_levelcnt);
  * @param: module_relative_pc: The return value of `addr2line_begin()'
  */
-FUNDEF addr2line_errno_t
+FUNDEF WUNUSED NONNULL((1, 3)) addr2line_errno_t
 NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level DFL(0));
-FUNDEF WUNUSED uintptr_t
+FUNDEF WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf, uintptr_t abs_pc);
-FUNDEF void NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
+FUNDEF NONNULL((1)) void
+NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
 
 /* Print addr2line information for the given source address:
  * @param: printer:  The printer to which to output data.
@@ -92,10 +93,10 @@ FUNDEF void NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
  * Where `instr_start' and `instr_length' refer to the inlined function for levels > 0
  * Additionally, when no addr2line information is available, the following is printed:
  * >> start_pc+end_pc_minus_start_pc[ : message] */
-FUNDEF ssize_t
+FUNDEF NONNULL((1)) ssize_t
 (VCALL addr2line_printf)(__pformatprinter printer, void *arg, uintptr_t start_pc,
                          uintptr_t end_pc, char const *message_format, ...);
-FUNDEF ssize_t
+FUNDEF NONNULL((1)) ssize_t
 (KCALL addr2line_vprintf)(__pformatprinter printer, void *arg, uintptr_t start_pc,
                           uintptr_t end_pc, char const *message_format,
                           __builtin_va_list args);

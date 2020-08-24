@@ -39,7 +39,7 @@ DECL_BEGIN
 	PRIVATE ATTR_SECTION(".bss" section ".pdyn_" #name) Ptype pdyn_##name           = NULL;  \
 	PRIVATE ATTR_SECTION(".rodata" section ".name_" #name) char const name_##name[] = #name; \
 	INTERN ATTR_SECTION(".text" section ".libc_get_" #name)                                  \
-	WUNUSED ATTR_RETNONNULL Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) {              \
+	ATTR_RETNONNULL WUNUSED Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) {              \
 		if (!pdyn_##name) {                                                                  \
 			Ptype pfun;                                                                      \
 			*(void **)&pfun = dlsym(RTLD_DEFAULT, name_##name);                              \

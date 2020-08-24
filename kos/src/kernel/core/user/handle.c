@@ -463,7 +463,7 @@ PRIVATE struct atomic_rwlock handle_manager_change_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(handle_manager_change_lock);
 
 /* Return the handle manager of the given thread. */
-PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct handle_manager *
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *
 NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread) {
 	REF struct handle_manager *result;
 	while unlikely(!sync_tryread(&handle_manager_change_lock))
@@ -475,7 +475,7 @@ NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread) {
 }
 
 /* Exchange the handle manager of the calling thread. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct handle_manager *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *FCALL
 task_sethandlemanager(struct handle_manager *__restrict newman) THROWS(E_WOULDBLOCK) {
 	pflag_t was;
 	REF struct handle_manager *result;

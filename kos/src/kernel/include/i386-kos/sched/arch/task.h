@@ -40,7 +40,7 @@ DECL_BEGIN
 
 
 #ifdef __CC__
-#define task_pause()    x86_pause()
+#define task_pause() x86_pause()
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
 NOTHROW(KCALL x86_pause)(void) {
 	__asm__ __volatile__("pause");
@@ -127,7 +127,7 @@ NOTHROW(KCALL x86_interrupt_disable)(void) {
 typedef uintptr_t pflag_t;
 
 #ifdef __x86_64__
-LOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK WUNUSED pflag_t
 NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
 	__asm__ __volatile__("pushfq\n\t"
@@ -135,10 +135,10 @@ NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	                     : "=g" (result)
 	                     :
 	                     : "memory");
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
-LOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK WUNUSED pflag_t
 NOTHROW(KCALL x86_interrupt_push)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -148,10 +148,10 @@ NOTHROW(KCALL x86_interrupt_push)(void) {
 	                     :
 	                     : "memory");
 	COMPILER_BARRIER();
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
-LOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK WUNUSED pflag_t
 NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -162,10 +162,10 @@ NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	                     :
 	                     : "memory");
 	COMPILER_BARRIER();
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
-LOCAL NOBLOCK pflag_t
+LOCAL NOBLOCK WUNUSED pflag_t
 NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -176,7 +176,7 @@ NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	                     :
 	                     : "memory");
 	COMPILER_BARRIER();
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
 LOCAL NOBLOCK void
@@ -200,7 +200,7 @@ NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	                     : "=g" (result)
 	                     :
 	                     : "memory");
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
 LOCAL NOBLOCK pflag_t
@@ -213,7 +213,7 @@ NOTHROW(KCALL x86_interrupt_push)(void) {
 	                     :
 	                     : "memory");
 	COMPILER_BARRIER();
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
 LOCAL NOBLOCK pflag_t
@@ -227,7 +227,7 @@ NOTHROW(KCALL x86_interrupt_pushon)(void) {
 	                     :
 	                     : "memory");
 	COMPILER_BARRIER();
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
 LOCAL NOBLOCK pflag_t
@@ -241,7 +241,7 @@ NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	                     :
 	                     : "memory");
 	COMPILER_BARRIER();
-	return result & 0x00000200; /* EFLAGS_IF */
+	return result;
 }
 
 LOCAL NOBLOCK void
@@ -261,7 +261,7 @@ NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 #define PREEMPTION_ENABLE_WAIT_DISABLE() x86_interrupt_enable_wait_disable()
 #define PREEMPTION_ENABLE_P()            x86_interrupt_enable_p()
 #define PREEMPTION_DISABLE()             x86_interrupt_disable()
-#define PREEMPTION_ENABLED()             x86_interrupt_enabled()
+#define PREEMPTION_ENABLED()             (x86_interrupt_enabled() & 0x00000200 /* EFLAGS_IF */)
 #define PREEMPTION_PUSH()                x86_interrupt_push()
 #define PREEMPTION_PUSHON()              x86_interrupt_pushon()
 #define PREEMPTION_PUSHOFF()             x86_interrupt_pushoff()
@@ -394,11 +394,11 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value);
 #else /* __x86_64__ */
 
 /* Check if `self' returns to user-space (but returns `false' if it returns to vm86). */
-FUNDEF NOBLOCK WUNUSED __BOOL
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self);
 
 /* Check if `self' returns to vm86. */
-FUNDEF NOBLOCK WUNUSED __BOOL
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self);
 #endif /* !__x86_64__ */
 

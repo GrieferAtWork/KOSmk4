@@ -108,7 +108,7 @@ get_interrupt_desc(uintptr_t intno, uintptr_t ecode) {
 }
 
 
-INTERN ssize_t LIBREGDUMP_CC
+INTERN NONNULL((1)) ssize_t LIBREGDUMP_CC
 indent_regdump_print_format(struct regdump_printer *__restrict self,
                             unsigned int format_option) {
 	switch (format_option) {

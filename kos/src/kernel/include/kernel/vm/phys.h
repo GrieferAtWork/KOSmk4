@@ -231,7 +231,7 @@ struct vm_ptram {
 	 ? (void)0                                     \
 	 : pagedir_pop_mapone(THIS_TRAMPOLINE_BASE, (self)->pt_pushval))
 
-LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
                                            pageptr_t page, __BOOL writable DFL(true)) {
 	byte_t *tramp;
@@ -251,7 +251,7 @@ NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
 
 /* Return a (possibly temporary) virtual memory mapping of `page' */
 #ifndef NO_PHYS_IDENTITY
-LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage)(struct vm_ptram *__restrict self,
                                 pageptr_t page, __BOOL writable DFL(true)) {
 	if (PHYS_IS_IDENTITY_PAGE(page))
@@ -262,7 +262,7 @@ NOTHROW(KCALL vm_ptram_mappage)(struct vm_ptram *__restrict self,
 #define vm_ptram_mappage vm_ptram_mappage_noidentity
 #endif /* NO_PHYS_IDENTITY */
 
-LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
                             vm_phys_t addr, __BOOL writable DFL(true)) {
 	byte_t *result;
@@ -275,7 +275,7 @@ NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
 	return result;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_map_noidentity)(struct vm_ptram *__restrict self,
                                        vm_phys_t addr, __BOOL writable DFL(true)) {
 	byte_t *result;

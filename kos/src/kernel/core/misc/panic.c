@@ -76,7 +76,7 @@ PUBLIC bool __kernel_poisoned = false;
 #define LOG_STACK_REMAINDER 1
 #endif
 
-LOCAL ATTR_COLDTEXT NOBLOCK void
+LOCAL ATTR_COLDTEXT NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 	if (thread->t_self != thread)
 		thread->t_self = thread; /* Shouldn't happen... */
@@ -151,7 +151,7 @@ NOTHROW(KCALL is_pc)(void *pc) {
 	return (node->vn_prot & VM_PROT_EXEC) != 0;
 }
 
-INTERN ATTR_COLD ATTR_COLDTEXT void KCALL
+INTERN ATTR_COLD ATTR_COLDTEXT NONNULL((1, 3)) void KCALL
 kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate const *__restrict dumpstate) {
 	unsigned int error;

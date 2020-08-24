@@ -114,7 +114,7 @@ NOTHROW(FCALL cpf_ipi)(struct icpustate *__restrict state,
  *                    buffer, unless the buffer wasn't dynamically allocated.
  * @param: bufsize:   Size of `stack_buf'
  * @param: bufalign:  Alignment requirements of `stack_buf' */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) void *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *KCALL
 cpu_private_function_callbuf_ex(struct task *__restrict thread,
                                 cpu_private_function_t func, void *stack_buf,
                                 size_t bufsize, size_t bufalign)

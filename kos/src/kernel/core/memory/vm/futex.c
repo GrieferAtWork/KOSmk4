@@ -183,7 +183,7 @@ NOTHROW(KCALL vm_futex_controller_init)(struct vm_futex_controller *__restrict s
  *              used `vm_paged_datablock_locatepart()' in order to lookup the associated part),
  *              because there always exists the possibility that any data part gets split
  *              into multiple smaller parts. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self, uintptr_t datapart_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct vm_futex *result;
@@ -420,7 +420,7 @@ done_check_oob:
  *          function, however on KOS it is possible to access this function through use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `offset' */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_datablock_getfutex)(struct vm_datablock *__restrict self, pos_t offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct vm_futex *result;
@@ -515,7 +515,7 @@ again:
 
 /* Return the futex object that is associated with the given virtual memory address.
  * In the event that `addr' isn't  */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_getfutex)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	struct vm_node *node;

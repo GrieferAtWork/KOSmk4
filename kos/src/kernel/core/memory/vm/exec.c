@@ -188,7 +188,7 @@ done:
 }
 #endif /* __ARCH_HAVE_COMPAT */
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) struct vm_node *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vm_node *KCALL
 create_bss_overlap_node(struct regular_node *__restrict exec_node,
                         pos_t file_data_offset,
                         size_t bss_start_page_offset,
@@ -282,7 +282,7 @@ DECL_END
 
 DECL_BEGIN
 #else /* !__INTELLISENSE__ */
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
 vm_exec_impl(struct vm *__restrict effective_vm,
              struct icpustate *__restrict user_state,
              struct path *__restrict exec_path,
@@ -304,7 +304,7 @@ vm_exec_impl(struct vm *__restrict effective_vm,
              )
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 #ifdef __ARCH_HAVE_COMPAT
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
 compat_vm_exec_impl(struct vm *__restrict effective_vm,
                     struct icpustate *__restrict user_state,
                     struct path *__restrict exec_path,
@@ -349,7 +349,7 @@ compat_vm_exec_impl(struct vm *__restrict effective_vm,
  * @throw: E_BADALLOC:   Insufficient memory
  * @throw: E_SEGFAULT:   The given `argv', `envp', or one of their pointed-to strings is faulty
  * @throw: E_NOT_EXECUTABLE: The given `exec_node' was not recognized as an acceptable binary. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
 vm_exec(struct vm *__restrict effective_vm,
         struct icpustate *__restrict user_state,
         struct path *__restrict exec_path,

@@ -95,7 +95,7 @@ PRIVATE DEFINE_ATOMIC_RWLOCK(osqh_free_lock);
 PRIVATE struct uhci_ostd *ostd_free = NULL;
 PRIVATE struct uhci_osqh *osqh_free = NULL;
 
-PUBLIC WUNUSED ATTR_RETNONNULL ATTR_MALLOC struct uhci_ostd *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC struct uhci_ostd *FCALL
 uhci_ostd_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct uhci_ostd *result;
 	sync_write(&ostd_free_lock);
@@ -117,7 +117,7 @@ again_read:
 	return result;
 }
 
-PUBLIC WUNUSED ATTR_RETNONNULL ATTR_MALLOC struct uhci_osqh *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC struct uhci_osqh *FCALL
 uhci_osqh_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct uhci_osqh *result;
 	sync_write(&osqh_free_lock);
@@ -2424,7 +2424,7 @@ NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller 
  * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
  * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
  *                                        When set to `0', the device will be polled as often as possible. */
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
 uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
                         PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
                         size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds) {

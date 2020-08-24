@@ -185,26 +185,26 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector, isr_g
 		return hisr_register_greedy_at(vector, func, (void *)ob_pointer, HT);                       \
 	}                                                                                               \
 	LOCAL NOBLOCK bool                                                                              \
-	NOTHROW(KCALL hisr_unregister)(isr_function_t func, T * ob_pointer) {                           \
+	NOTHROW(KCALL hisr_unregister)(isr_function_t func, T *ob_pointer) {                            \
 		return hisr_unregister(func, (void *)ob_pointer, HT);                                       \
 	}                                                                                               \
 	LOCAL NOBLOCK bool                                                                              \
-	NOTHROW(KCALL hisr_unregister)(isr_greedy_function_t func, T * ob_pointer) {                    \
+	NOTHROW(KCALL hisr_unregister)(isr_greedy_function_t func, T *ob_pointer) {                     \
 		return hisr_unregister(func, (void *)ob_pointer, HT);                                       \
 	}                                                                                               \
 	LOCAL NOBLOCK bool                                                                              \
 	NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector,                                          \
-	                                  isr_function_t func, T * ob_pointer) {                        \
+	                                  isr_function_t func, T *ob_pointer) {                         \
 		return hisr_unregister_at(vector, func, (void *)ob_pointer, HT);                            \
 	}                                                                                               \
 	LOCAL NOBLOCK bool                                                                              \
 	NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector,                                          \
-	                                  isr_greedy_function_t func, T * ob_pointer) {                 \
+	                                  isr_greedy_function_t func, T *ob_pointer) {                  \
 		return hisr_unregister_at(vector, func, (void *)ob_pointer, HT);                            \
 	}
 HANDLE_FOREACH_CUSTOMTYPE(DEFINE_HISR_REGISTER_WRAPPER)
 #undef DEFINE_HISR_REGISTER_WRAPPER
-}
+} /* extern "C++" */
 #else /* __cplusplus && !__NO_ASMNAME */
 FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(void *func, void *ob_pointer, uintptr_half_t ob_type);
 FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector, void *func, void *ob_pointer, uintptr_half_t ob_type);

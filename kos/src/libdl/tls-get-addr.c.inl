@@ -29,7 +29,7 @@ DECL_BEGIN
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) void *ATTR_FASTCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self)
 #else /* FAIL_ON_ERROR */
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'

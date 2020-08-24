@@ -179,7 +179,7 @@ PRIVATE struct video_format preferred_video_format;
  * If possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
-INTERN WUNUSED ATTR_RETNONNULL struct video_format const *CC
+INTERN ATTR_RETNONNULL WUNUSED struct video_format const *CC
 libvideo_preferred_format(void) {
 	struct video_format *result;
 	result = &preferred_video_format;

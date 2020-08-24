@@ -172,7 +172,7 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
  * WARNING: Don't free a handle after you already started using it in the context of an AIO parameter.
  * NOTE: `aio_multihandle_allochandle()' calls `aio_multihandle_fail()' upon
  *       error, before returning propagating an error / returning `NULL'. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) struct aio_handle *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct aio_handle *KCALL
 aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		THROWS(E_BADALLOC) {
 	struct aio_handle_multiple *result;
@@ -514,7 +514,28 @@ NOTHROW(FCALL aio_handle_async_func)(struct aio_handle *__restrict self,
 }
 
 
-PUBLIC WUNUSED ATTR_RETNONNULL struct aio_handle *KCALL
+/* Allocate and return a special AIO handle that can be used just like any other,
+ * however will clean-up itself after the usual init+complete+fini cycle of any
+ * given AIO handle. This allows the caller to use this handle to detach themself
+ * from any async-operation such that the operation will either succeed or fail
+ * at an arbitrary point in the future, potentially long after the caller started
+ * the operation. To-be used as follows:
+ * >> void nic_background_send(struct nic_device const *__restrict self,
+ * >>                          struct nic_packet *__restrict packet) {
+ * >>     struct aio_handle *aio;
+ * >>     aio = aio_handle_async_alloc();
+ * >>     TRY {
+ * >>         // This call essentially behaves as `inherit(on_success)' for `aio'
+ * >>         (*self->nd_ops.nd_send)(self, packet, aio);
+ * >>     } EXCEPT {
+ * >>         aio_handle_async_free(aio);
+ * >>         RETHROW();
+ * >>     }
+ * >> }
+ * NOTE: When the AIO operation completes with `AIO_COMPLETION_FAILURE', and
+ *       `func' was NULL, then an error message is written to the system log.
+ * @param: func: [0..1] An optional function that is invoked upon completion. */
+PUBLIC ATTR_RETNONNULL WUNUSED struct aio_handle *KCALL
 aio_handle_async_alloc(aio_completion_t func) THROWS(E_BADALLOC) {
 	struct async_aio_handle *result;
 	result = aio_handle_async_alloc_exising();
@@ -534,7 +555,7 @@ aio_handle_async_alloc(aio_completion_t func) THROWS(E_BADALLOC) {
 	return result;
 }
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_async_free)(struct aio_handle *__restrict self) {
 	kfree(self);
 }

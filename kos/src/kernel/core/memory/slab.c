@@ -730,7 +730,7 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 #endif /* NDEBUG */
 }
 
-PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 #ifndef __INTELLISENSE__
 #define CASE_SLAB_MALLOC(sz, _) \

@@ -375,6 +375,7 @@ NOTHROW(KCALL aio_handle_complete_nopr)(/*inherit(always)*/ struct aio_handle *_
 	                      AIO_HANDLE_NEXT_COMPLETED,
 	                      __ATOMIC_RELEASE);
 }
+
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_complete)(/*inherit(always)*/ struct aio_handle *__restrict self,
                                    unsigned int status) {
@@ -630,7 +631,7 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self);
  * WARNING: Don't free a handle after you already started using it in the context of an AIO parameter.
  * NOTE: `aio_multihandle_allochandle()' calls `aio_multihandle_fail()' upon
  *       error, before returning propagating an error / returning `NULL'. */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) struct aio_handle *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct aio_handle *KCALL
 aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		THROWS(E_BADALLOC);
 FUNDEF WUNUSED NONNULL((1)) struct aio_handle *
@@ -674,12 +675,12 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
  * This is to `aio_multihandle' the same that `aio_handle_generic' is to `aio_handle' */
 struct aio_multihandle_generic
 #ifdef __cplusplus
-	: aio_multihandle
-#endif
+    : aio_multihandle
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	struct aio_multihandle mg_base;   /* The underlying multi-handle. */
-#endif
+#endif /* !__cplusplus */
 	struct sig             mg_signal; /* Signal broadcast upon completion. */
 };
 
@@ -705,7 +706,9 @@ NOTHROW(KCALL aio_multihandle_generic_init)(struct aio_multihandle_generic *__re
 LOCAL NONNULL((1)) void KCALL
 aio_multimultihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	if unlikely((self->am_status & ~(AIO_MULTIHANDLE_STATUS_ALLRUNNING | AIO_MULTIHANDLE_STATUS_FAILED)) == AIO_COMPLETION_FAILURE) {
+	if unlikely((self->am_status & ~(AIO_MULTIHANDLE_STATUS_ALLRUNNING |
+	                                 AIO_MULTIHANDLE_STATUS_FAILED)) ==
+	            AIO_COMPLETION_FAILURE) {
 		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->am_error, sizeof(self->am_error));
 		error_throw_current();
@@ -820,9 +823,11 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
  * NOTE: When the AIO operation completes with `AIO_COMPLETION_FAILURE', and
  *       `func' was NULL, then an error message is written to the system log.
  * @param: func: [0..1] An optional function that is invoked upon completion. */
-FUNDEF WUNUSED ATTR_RETNONNULL struct aio_handle *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED struct aio_handle *KCALL
 aio_handle_async_alloc(aio_completion_t func DFL(__NULLPTR)) THROWS(E_BADALLOC);
-FUNDEF NOBLOCK void NOTHROW(KCALL aio_handle_async_free)(struct aio_handle *__restrict self);
+
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_handle_async_free)(struct aio_handle *__restrict self);
 
 #endif /* __CC__ */
 

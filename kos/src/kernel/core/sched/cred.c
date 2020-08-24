@@ -74,7 +74,7 @@ NOTHROW(FCALL cred_destroy)(struct cred *__restrict self) {
 }
 
 /* Clone the given credentials controller `self' and return the copy */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct cred *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *FCALL
 cred_clone(struct cred *__restrict self) THROWS(E_BADALLOC) {
 	REF struct cred *result;
 	result = (REF struct cred *)kmalloc(sizeof(struct cred),

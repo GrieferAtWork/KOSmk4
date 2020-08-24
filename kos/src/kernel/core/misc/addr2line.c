@@ -39,7 +39,7 @@
 DECL_BEGIN
 
 /* Lookup addr2line information for the given source address. */
-PUBLIC ATTR_COLDTEXT addr2line_errno_t
+PUBLIC ATTR_COLDTEXT NONNULL((1)) addr2line_errno_t
 NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
@@ -51,7 +51,7 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
 	                                DEBUG_ADDR2LINE_FNORMAL);
 }
 
-PUBLIC WUNUSED uintptr_t
+PUBLIC ATTR_COLDTEXT WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
                                uintptr_t abs_pc) {
 	REF struct driver *d;
@@ -67,7 +67,7 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 	return abs_pc;
 }
 
-PUBLIC void
+PUBLIC ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
 	debug_dlunlocksections(&buf->ds_sect);
 }
@@ -102,7 +102,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
  * Where `instr_start' and `instr_length' refer to the inlined function for levels > 0
  * Additionally, when no addr2line information is available, the following is printed:
  * >> start_pc+end_pc_minus_start_pc[ : message] */
-PUBLIC ssize_t VCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1)) ssize_t VCALL
 addr2line_printf(pformatprinter printer, void *arg, uintptr_t start_pc,
                  uintptr_t end_pc, char const *message_format, ...) {
 	va_list args;
@@ -118,7 +118,7 @@ addr2line_printf(pformatprinter printer, void *arg, uintptr_t start_pc,
 	return result;
 }
 
-PRIVATE ssize_t KCALL
+PRIVATE ATTR_COLDTEXT ssize_t KCALL
 do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
                      pformatprinter printer, void *arg, struct driver *d,
                      uintptr_t module_relative_start_pc, uintptr_t start_pc,
@@ -225,7 +225,7 @@ again_printlevel:
 				temp = format_vprintf(printer, arg, message_format, copy);
 				va_end(copy);
 			} else
-#endif
+#endif /* !__i386__ */
 			{
 				temp = format_vprintf(printer, arg, message_format, args);
 			}
@@ -250,7 +250,7 @@ err:
 	return temp;
 }
 
-PUBLIC ssize_t KCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1)) ssize_t KCALL
 addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
                   uintptr_t end_pc, char const *message_format,
                   va_list args) {
@@ -263,15 +263,8 @@ addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
 		memset(&ainfo, 0, sizeof(ainfo));
 		module_relative_pc = start_pc;
 	} else {
-#if 0 /* TODO: Temporary work-around for a dead-lock scenario... */
-		if (d != &kernel_driver) {
+		if (debug_dllocksections(d, &ainfo.ds_info, &ainfo.ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
 			memset(&ainfo, 0, sizeof(ainfo));
-		} else
-#endif
-		{
-			if (debug_dllocksections(d, &ainfo.ds_info, &ainfo.ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
-				memset(&ainfo, 0, sizeof(ainfo));
-		}
 		module_relative_pc = start_pc - d->d_loadaddr;
 	}
 	result = do_addr2line_vprintf(&ainfo,

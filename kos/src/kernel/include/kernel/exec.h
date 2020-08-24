@@ -44,7 +44,7 @@ struct vm_ramfile;
 
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    KERNEL ElfW(Ehdr) const *__restrict ehdr,
                    USER void *peb_address, USER void *ustack_base,
@@ -54,7 +54,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 
 /* Initialize the RTLD user-space library for runtime linking. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_RTLD
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld(struct icpustate *__restrict user_state,
                   struct path *__restrict exec_path,
                   struct directory_entry *__restrict exec_dentry,
@@ -94,7 +94,7 @@ DATDEF struct vm_ramfile elfexec_system_rtld_file;
 #ifdef __ARCH_HAVE_COMPAT
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY
-FUNDEF struct icpustate *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 compat_elfexec_init_entry(struct icpustate *__restrict user_state,
                           KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                           USER void *peb_address, USER void *ustack_base,
@@ -104,7 +104,7 @@ compat_elfexec_init_entry(struct icpustate *__restrict user_state,
 
 /* Initialize the RTLD user-space library for runtime linking. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD
-FUNDEF struct icpustate *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          struct path *__restrict exec_path,
                          struct directory_entry *__restrict exec_dentry,

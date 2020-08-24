@@ -84,7 +84,7 @@ struct task *NOTHROW(KCALL __get_this_task)(void) {
 }
 
 #define PERTASK(x) (*(__typeof__(&(x)))__get_per_task((void *)&(x)))
-FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST WUNUSED
+FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST ATTR_RETNONNULL WUNUSED
 void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
 	__register void *__result;
 #ifdef __X86_SEG_TASK
@@ -139,24 +139,24 @@ extern "C++" {
 #define __pertask_get8 __pertask_get8
 #define __pertask_get16 __pertask_get16
 #define __pertask_get32 __pertask_get32
-template<class __T> __UINT8_TYPE__ (__pertask_get8)(__T const &__x) { __UINT8_TYPE__ __res; __pertask_get8_r(__x, __res); XRETURN __res; }
-template<class __T> __UINT16_TYPE__ (__pertask_get16)(__T const &__x) { __UINT16_TYPE__ __res; __pertask_get16_r(__x, __res); XRETURN __res; }
-template<class __T> __UINT32_TYPE__ (__pertask_get32)(__T const &__x) { __UINT32_TYPE__ __res; __pertask_get32_r(__x, __res); XRETURN __res; }
+template<class __T> WUNUSED __UINT8_TYPE__ (__pertask_get8)(__T const &__x) { __UINT8_TYPE__ __res; __pertask_get8_r(__x, __res); XRETURN __res; }
+template<class __T> WUNUSED __UINT16_TYPE__ (__pertask_get16)(__T const &__x) { __UINT16_TYPE__ __res; __pertask_get16_r(__x, __res); XRETURN __res; }
+template<class __T> WUNUSED __UINT32_TYPE__ (__pertask_get32)(__T const &__x) { __UINT32_TYPE__ __res; __pertask_get32_r(__x, __res); XRETURN __res; }
 #ifdef __pertask_get64_r
 #define __pertask_get64 __pertask_get64
-template<class __T> __UINT64_TYPE__ (__pertask_get64)(__T const &__x) { __UINT64_TYPE__ __res; __pertask_get64_r(__x, __res); XRETURN __res; }
+template<class __T> WUNUSED __UINT64_TYPE__ (__pertask_get64)(__T const &__x) { __UINT64_TYPE__ __res; __pertask_get64_r(__x, __res); XRETURN __res; }
 #endif /* __pertask_get64_r */
 }
 #else /* __cplusplus */
 #define __pertask_get8(x) __pertask_get8(&(x))
 #define __pertask_get16(x) __pertask_get16(&(x))
 #define __pertask_get32(x) __pertask_get32(&(x))
-__UINT8_TYPE__ (__pertask_get8)(void const *__px) { __UINT8_TYPE__ __res; __pertask_get8_r(*(__UINT8_TYPE__ const *), __res); XRETURN __res; }
-__UINT16_TYPE__ (__pertask_get16)(void const &__px) { __UINT16_TYPE__ __res; __pertask_get16_r(*(__UINT16_TYPE__ const *)__px, __res); XRETURN __res; }
-__UINT32_TYPE__ (__pertask_get32)(void const &__px) { __UINT32_TYPE__ __res; __pertask_get32_r(*(__UINT32_TYPE__ const *)__px, __res); XRETURN __res; }
+WUNUSED __UINT8_TYPE__ (__pertask_get8)(void const *__px) { __UINT8_TYPE__ __res; __pertask_get8_r(*(__UINT8_TYPE__ const *), __res); XRETURN __res; }
+WUNUSED __UINT16_TYPE__ (__pertask_get16)(void const &__px) { __UINT16_TYPE__ __res; __pertask_get16_r(*(__UINT16_TYPE__ const *)__px, __res); XRETURN __res; }
+WUNUSED __UINT32_TYPE__ (__pertask_get32)(void const &__px) { __UINT32_TYPE__ __res; __pertask_get32_r(*(__UINT32_TYPE__ const *)__px, __res); XRETURN __res; }
 #ifdef __pertask_get64_r
 #define __pertask_get64(x) __pertask_get64(&(x))
-__UINT64_TYPE__ (__pertask_get64)(void const &__px) { __UINT64_TYPE__ __res; __pertask_get64_r(*(__UINT64_TYPE__ const *)__px, __res); XRETURN __res; }
+WUNUSED __UINT64_TYPE__ (__pertask_get64)(void const &__px) { __UINT64_TYPE__ __res; __pertask_get64_r(*(__UINT64_TYPE__ const *)__px, __res); XRETURN __res; }
 #endif /* __pertask_get64_r */
 #endif /* !__cplusplus */
 

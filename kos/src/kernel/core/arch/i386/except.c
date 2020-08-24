@@ -104,6 +104,7 @@ PRIVATE char const gp32_names[8][4] = {
 	/* [X86_REGISTER_GENERAL_PURPOSE_ESI & 7] = */ "esi",
 	/* [X86_REGISTER_GENERAL_PURPOSE_EDI & 7] = */ "edi",
 };
+
 PRIVATE char const gp16_names[8][3] = {
 	/* [X86_REGISTER_GENERAL_PURPOSE_AX & 7] = */ "ax",
 	/* [X86_REGISTER_GENERAL_PURPOSE_CX & 7] = */ "cx",
@@ -114,6 +115,7 @@ PRIVATE char const gp16_names[8][3] = {
 	/* [X86_REGISTER_GENERAL_PURPOSE_SI & 7] = */ "si",
 	/* [X86_REGISTER_GENERAL_PURPOSE_DI & 7] = */ "di",
 };
+
 PRIVATE char const gp8_names[8][3] = {
 	/* [X86_REGISTER_GENERAL_PURPOSE_AL & 7] = */ "al",
 	/* [X86_REGISTER_GENERAL_PURPOSE_CL & 7] = */ "cl",
@@ -133,6 +135,7 @@ PRIVATE char const seg_names[6][3] = {
 	/* [X86_REGISTER_SEGMENT_FS & 7] = */ "fs",
 	/* [X86_REGISTER_SEGMENT_GS & 7] = */ "gs",
 };
+
 PRIVATE char const cr_names[5][4] = {
 	"cr0",
 	"",
@@ -140,6 +143,7 @@ PRIVATE char const cr_names[5][4] = {
 	"cr3",
 	"cr4",
 };
+
 PRIVATE char const xmm_names[8][5] = {
 	/* [X86_REGISTER_XMM_XMM0 & 7] = */ "xmm0",
 	/* [X86_REGISTER_XMM_XMM1 & 7] = */ "xmm1",
@@ -150,6 +154,7 @@ PRIVATE char const xmm_names[8][5] = {
 	/* [X86_REGISTER_XMM_XMM6 & 7] = */ "xmm6",
 	/* [X86_REGISTER_XMM_XMM7 & 7] = */ "xmm7",
 };
+
 PRIVATE char const st_names[8][6] = {
 	/* [X86_REGISTER_FLOAT_ST0 & 7] = */ "st(0)",
 	/* [X86_REGISTER_FLOAT_ST1 & 7] = */ "st(1)",
@@ -160,6 +165,7 @@ PRIVATE char const st_names[8][6] = {
 	/* [X86_REGISTER_FLOAT_ST6 & 7] = */ "st(6)",
 	/* [X86_REGISTER_FLOAT_ST7 & 7] = */ "st(7)",
 };
+
 PRIVATE char const dr_names[8][4] = {
 	/* [X86_REGISTER_DEBUG_DR0 & 7] = */ "dr0",
 	/* [X86_REGISTER_DEBUG_DR1 & 7] = */ "dr1",
@@ -283,7 +289,7 @@ register_name(uintptr_t id) {
 }
 
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 print_opcode(pformatprinter printer, void *arg, uintptr_t opcode) {
 	uintptr_t opno = E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(opcode);
 	if (opno <= 0xff) {
@@ -299,7 +305,7 @@ print_opcode(pformatprinter printer, void *arg, uintptr_t opcode) {
 	(*printer)(arg, "]", 1);
 }
 
-INTERN void KCALL
+INTERN NONNULL((1, 2)) void KCALL
 print_exception_desc_of(struct exception_data const *__restrict data,
                         pformatprinter printer, void *arg) {
 	switch (data->e_class) {
@@ -387,17 +393,17 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 	}
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 print_exception_desc(pformatprinter printer, void *arg) {
 	print_exception_desc_of(&THIS_EXCEPTION_DATA, printer, arg);
 }
 
-INTDEF ssize_t LIBREGDUMP_CC
+INTDEF NONNULL((1)) ssize_t LIBREGDUMP_CC
 indent_regdump_print_format(struct regdump_printer *__restrict self,
                             unsigned int format_option);
 
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1, 3)) void KCALL
 print_unhandled_exception(pformatprinter printer, void *arg,
                           pformatprinter tb_printer, void *tb_arg,
                           char const *reason, va_list args) {
@@ -458,7 +464,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 
 
 /* Print information about the current exception into `printer' */
-PUBLIC ssize_t
+PUBLIC NONNULL((1)) ssize_t
 NOTHROW(KCALL error_print_into)(pformatprinter printer, void *arg) {
 	va_list empty_args;
 	memset((void *)&empty_args, 0, sizeof(empty_args));
@@ -473,6 +479,7 @@ NOTHROW(KCALL error_vprintf)(char const *__restrict reason, va_list args) {
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          reason, args);
 }
+
 PUBLIC void
 NOTHROW(VCALL error_printf)(char const *__restrict reason, ...) {
 	va_list args;
@@ -563,11 +570,11 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
-INTDEF ATTR_COLD void KCALL
+INTDEF ATTR_COLD NONNULL((1, 3)) void KCALL
 kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate *__restrict state);
 
-INTERN ATTR_COLD void FCALL
+INTERN ATTR_COLD NONNULL((2)) void FCALL
 halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;
@@ -642,7 +649,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 
 
 DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
-INTERN struct kcpustate *
+INTERN NONNULL((1)) struct kcpustate *
 NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	unsigned int error;
 	unwind_fde_t fde;
@@ -838,7 +845,7 @@ err:
 
 
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
-PUBLIC unsigned int
+PUBLIC NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
                                     struct kcpustate *__restrict state,
                                     byte_t *__restrict reader) {
@@ -901,7 +908,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 
 
 
-PUBLIC unsigned int
+PUBLIC NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                           struct kcpustate *__restrict state,
                                           void *lsda) {

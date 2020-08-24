@@ -124,7 +124,7 @@ again:
 /* Lookup the FDE descriptor for a given `absolute_pc', whilst trying to
  * make use of the FDE cache of `self'.
  * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
-PUBLIC NOBLOCK unsigned int
+PUBLIC NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc,
                                unwind_fde_t *__restrict result) {
 	unsigned int error;
@@ -208,7 +208,7 @@ done:
 /* Try to clear the FDE cache of the given, or of all loaded drivers.
  * NOTE: Drivers who's caches cannot be locked are skipped.
  * @return: * : The total number of bytes of heap-memory released. */
-PUBLIC NOBLOCK size_t
+PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL driver_clear_fde_cache)(struct driver *__restrict self) {
 	size_t result = 0;
 	struct driver_fde_cache_node *tree;
@@ -412,7 +412,7 @@ NOTHROW(KCALL driver_state_destroy)(struct driver_state *__restrict self) {
 }
 
 /* Return a snapshot for the current state of loaded drivers. */
-PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED
 REF struct driver_state *NOTHROW(KCALL driver_get_state)(void) {
 	return current_driver_state.get();
 }
@@ -563,7 +563,7 @@ PRIVATE WEAK uintptr_t system_clearcaches_version = 0;
 PRIVATE WEAK size_t system_clearcaches_isinside = 0;
 
 
-PUBLIC NOBLOCK size_t
+PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(KCALL system_clearcaches_s)(uintptr_t *__restrict pversion) {
 	enum { NUM_LASTCHANCE_ATTEMPTS = 32 };
 	size_t inside_counter, result;
@@ -2677,7 +2677,7 @@ done:
 
 /* Try to lookup a driver with a given `driver_name'.
  * If no such driver exists, return NULL */
-PUBLIC WUNUSED NONNULL((1)) REF struct driver *
+PUBLIC WUNUSED REF struct driver *
 (FCALL driver_with_name)(USER CHECKED char const *driver_name) THROWS(E_SEGFAULT) {
 	REF struct driver_state *ds;
 	size_t i;
@@ -2699,7 +2699,7 @@ done:
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct driver *
+PUBLIC WUNUSED REF struct driver *
 (FCALL driver_with_namel)(USER CHECKED char const *driver_name,
                           size_t driver_name_len) THROWS(E_SEGFAULT) {
 	REF struct driver_state *ds;
@@ -2724,7 +2724,7 @@ done:
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((1)) REF struct driver *
+PUBLIC WUNUSED REF struct driver *
 (FCALL driver_with_filename)(USER CHECKED char const *driver_filename) THROWS(E_SEGFAULT) {
 	REF struct driver_state *ds;
 	size_t i;
@@ -3613,7 +3613,7 @@ find_new_candidate_tryhard:
 }
 
 #undef path
-PRIVATE WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_do_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
                       USER CHECKED char const *driver_cmdline,
                       bool *pnew_driver_loaded,
@@ -4115,7 +4115,7 @@ done_dynsym:
  * @param: pnew_driver_loaded: When non-NULL, write `true' to this pointer when the returned
  *                             driver was just newly loaded. - Otherwise, write `false'.
  * @return: * :                A reference to the freshly loaded driver. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct driver *KCALL
 driver_insmod_file(struct regular_node *__restrict driver_inode,
                    struct path *driver_path,
                    struct directory_entry *driver_dentry,
@@ -4179,7 +4179,7 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 	return result;
 }
 
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
                    USER CHECKED char const *driver_cmdline,
                    bool *pnew_driver_loaded,
@@ -4199,7 +4199,7 @@ driver_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
 }
 
 /* Convenience wrapper to load a driver, given its absolute filename. */
-PRIVATE WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_insmod_filename(USER CHECKED char const *driver_filename,
                        USER CHECKED char const *driver_cmdline,
                        bool *pnew_driver_loaded, unsigned int flags)
@@ -4349,7 +4349,7 @@ driver_insmod_loadlib(struct driver_library_path_string *__restrict libpath,
 
 
 /* Load a driver as a dependency of another. */
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct driver *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
 driver_insmod(USER CHECKED char const *driver_name,
               USER CHECKED char const *driver_cmdline,
               bool *pnew_driver_loaded,

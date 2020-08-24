@@ -60,7 +60,7 @@
 
 DECL_BEGIN
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
                                               struct rpc_syscall_info const *__restrict sc_info,
                                               struct exception_data const *__restrict data,
@@ -86,7 +86,7 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 	       negative_errno_value, task_getroottid_s());
 }
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict state,
                                               struct rpc_syscall_info const *__restrict sc_info,
                                               struct exception_data const *__restrict data,
@@ -134,7 +134,7 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
  *                  user-space exception handler once user-space execution
  *                  resumes. */
 #ifdef __x86_64__
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
                            struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
@@ -147,7 +147,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	return result;
 }
 
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_userexcept_callhandler64(struct icpustate *__restrict state,
                              struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
@@ -211,12 +211,12 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	return state;
 }
 
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_userexcept_callhandler32(struct icpustate *__restrict state,
                              struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT)
 #else /* __x86_64__ */
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
                            struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT)
@@ -350,7 +350,7 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(void) {
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space signal handler once user-space execution
  *                  resumes. */
-PUBLIC WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
                            struct rpc_syscall_info const *sc_info,
                            siginfo_t const *__restrict siginfo,
@@ -456,7 +456,7 @@ again_gethand:
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space signal handler once user-space execution
  *                  resumes. */
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
                                           struct rpc_syscall_info const *sc_info) {
 	siginfo_t siginfo;
@@ -485,7 +485,7 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
  * returns a value that would fall into the errno range, such as is the case for some system
  * calls that do timeout-based wait operations and don't want to use a slow exception to indicate
  * the (quite common) case of the timeout having expired. */
-LOCAL NOBLOCK struct icpustate *
+LOCAL NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
                                              struct rpc_syscall_info const *__restrict sc_info) {
 	switch (sc_info->rsi_flags & RPC_SYSCALL_INFO_FMETHOD) {
@@ -513,7 +513,7 @@ NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
 /* Translate the current exception into an errno and set that errno
  * as the return value of the system call described by `sc_info'. */
 #ifdef __x86_64__
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
                         struct rpc_syscall_info const *__restrict sc_info) {
 	struct icpustate *result;
@@ -525,7 +525,7 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
 	return result;
 }
 
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 x86_userexcept_seterrno64(struct icpustate *__restrict state,
                           struct rpc_syscall_info const *__restrict sc_info) {
 	errno_t errval;
@@ -544,11 +544,11 @@ x86_userexcept_seterrno64(struct icpustate *__restrict state,
 	return state;
 }
 
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 x86_userexcept_seterrno32(struct icpustate *__restrict state,
                           struct rpc_syscall_info const *__restrict sc_info)
 #else /* __x86_64__ */
-PUBLIC WUNUSED struct icpustate *FCALL
+PUBLIC WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
                         struct rpc_syscall_info const *__restrict sc_info)
 #endif /* !__x86_64__ */
@@ -575,7 +575,7 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
  * E* error code in the event of a system call with exceptions disabled (on x86, except-
  * enabled is usually controlled by the CF bit, however this function takes that information
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
-PUBLIC WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_userexcept_propagate(struct icpustate *__restrict state,
                          struct rpc_syscall_info const *sc_info) {
 	struct icpustate *result;
@@ -685,11 +685,11 @@ done:
 
 
 /* Serve all user-space redirection RPCs
- * @return: * :   The new CPU state to restore
+ * @return: * : The new CPU state to restore
  * @param: prestart_system_call: If `reason == TASK_RPC_REASON_SYSCALL', whilst an `E_INTERRUPT_USER_RPC'
  *                               exception was handled, when `RPC_KIND_USER_SYNC' RPCs exist that cannot
  *                               be handled in the current context, then set to true. */
-INTDEF struct icpustate *
+INTDEF WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state,
                                               unsigned int reason,
                                               struct rpc_syscall_info const *sc_info,
@@ -702,7 +702,7 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
  * into user-space with the help of `x86_userexcept_propagate()'.
  * Afterwards, load the updated icpustate at the base of the calling thread's stack,
  * and finally fully unwind into user-space by use of `'. */
-PUBLIC ATTR_NORETURN void FCALL
+PUBLIC ATTR_NORETURN NONNULL((1)) void FCALL
 x86_userexcept_unwind(struct ucpustate *__restrict ustate,
                       struct rpc_syscall_info const *sc_info) {
 	struct icpustate *return_state;
@@ -823,7 +823,7 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 
 /* Same as `x86_userexcept_unwind()', however the caller has already done the work
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
-PUBLIC ATTR_NORETURN void FCALL
+PUBLIC ATTR_NORETURN NONNULL((1)) void FCALL
 x86_userexcept_unwind_i(struct icpustate *__restrict state,
                         struct rpc_syscall_info const *sc_info) {
 	/* Service RPCs before returning to user-space. */

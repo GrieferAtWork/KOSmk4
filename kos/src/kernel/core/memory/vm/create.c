@@ -267,7 +267,7 @@ again:
 }
 
 /* Return the active VM of the given `thread' */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *KCALL
 task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct vm *result;
 	struct task *me = THIS_TASK;

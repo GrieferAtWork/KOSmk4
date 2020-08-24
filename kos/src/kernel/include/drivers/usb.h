@@ -312,7 +312,7 @@ struct usb_controller
 	 * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
 	 * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
 	 *                                        When set to `0', the device will be polled as often as possible. */
-	WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *
+	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *
 	(KCALL *uc_interrupt)(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
 	                      PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
 	                      size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds);
@@ -375,7 +375,7 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
  * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
  * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
  *                                        When set to `0', the device will be polled as often as possible. */
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
 usb_controller_interrupt_create(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
                                 PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
                                 size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds DFL(0)) {
@@ -389,7 +389,7 @@ usb_controller_interrupt_create(struct usb_controller *__restrict self, struct u
 
 #ifdef __cplusplus
 extern "C++" {
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
 usb_controller_interrupt_create(struct usb_controller *__restrict self,
                                 struct usb_endpoint *__restrict endp,
                                 PUSB_INTERRUPT_HANDLER_CHR handler,
@@ -406,7 +406,7 @@ usb_controller_interrupt_create(struct usb_controller *__restrict self,
 	return result;
 }
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
 usb_controller_interrupt_create(struct usb_controller *__restrict self,
                                 struct usb_endpoint *__restrict endp,
                                 PUSB_INTERRUPT_HANDLER_BLK handler,

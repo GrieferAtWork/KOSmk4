@@ -1803,7 +1803,7 @@ directory_link(struct directory_node *__restrict target_directory,
  * @throw: E_FSERROR_DISK_FULL:           [...]
  * @throw: E_FSERROR_READONLY:            [...]
  * @throw: E_IOERROR:                     [...] */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 4)) REF struct symlink_node *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) REF struct symlink_node *KCALL
 directory_symlink(struct directory_node *__restrict target_directory,
                   CHECKED USER /*utf-8*/ char const *target_name, u16 target_namelen,
                   CHECKED USER /*utf-8*/ char const *link_text, size_t link_text_size,
@@ -1828,7 +1828,7 @@ directory_symlink(struct directory_node *__restrict target_directory,
  * @throw: E_FSERROR_DISK_FULL:           [...]
  * @throw: E_FSERROR_READONLY:            [...]
  * @throw: E_IOERROR:                     [...] */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct inode *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct inode *KCALL
 directory_mknod(struct directory_node *__restrict target_directory,
                 CHECKED USER /*utf-8*/ char const *__restrict target_name,
                 u16 target_namelen, mode_t mode, uid_t owner,
@@ -1853,7 +1853,7 @@ directory_mknod(struct directory_node *__restrict target_directory,
  * @throw: E_FSERROR_DISK_FULL:           [...]
  * @throw: E_FSERROR_READONLY:            [...]
  * @throw: E_IOERROR:                     [...] */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct directory_node *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct directory_node *KCALL
 directory_mkdir(struct directory_node *__restrict target_directory,
                 CHECKED USER /*utf-8*/ char const *__restrict target_name,
                 u16 target_namelen, mode_t mode, uid_t owner, gid_t group,

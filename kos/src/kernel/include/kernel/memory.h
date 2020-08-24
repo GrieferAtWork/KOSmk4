@@ -193,7 +193,7 @@ struct pmem {
 
 DATDEF struct pmem mzones;
 
-LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL struct pmemzone *
+LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED struct pmemzone *
 NOTHROW(KCALL page_getzone)(pageptr_t ptr) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;

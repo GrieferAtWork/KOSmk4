@@ -268,7 +268,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct basic_block_device, bd_refcnt, block_device_des
  * This function will initialize the following memory to non-zero values:
  *   >> return->bd_max_retry = 2;
  */
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC REF struct block_device *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct block_device *KCALL
 block_device_alloc(size_t sector_size DFL(512),
                    size_t structure_size DFL(sizeof(struct block_device)))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);

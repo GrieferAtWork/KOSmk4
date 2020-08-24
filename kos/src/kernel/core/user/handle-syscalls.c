@@ -1654,7 +1654,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 		result = handle_poll(hnd, what);
 	} EXCEPT {
 		if (was_thrown(E_FSERROR_UNSUPPORTED_OPERATION) &&
-		    error_data()->e_pointers[0] == E_FILESYSTEM_OPERATION_POLL)
+		    PERTASK_GET(this_exception_pointers[0]) == E_FILESYSTEM_OPERATION_POLL)
 			result = POLLHUP; /* Poll is unsupported. */
 		else {
 			/* XXX: Are there other exceptions that should yield POLLERR? */

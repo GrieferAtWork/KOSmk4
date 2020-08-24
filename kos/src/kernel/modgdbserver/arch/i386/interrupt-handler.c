@@ -62,7 +62,7 @@ NOTHROW(FCALL GDB_DelSingleStepIgnoredRange)(void) {
 	GDB_SingleStep_IngoreEnd    = 0;
 }
 
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
 	struct debugtrap_reason reason;
 	uintptr_t dr6 = __rddr6();
@@ -97,7 +97,7 @@ GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
 	return state;
 }
 
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 	/* INT3 - #BP */
 	struct debugtrap_reason reason;

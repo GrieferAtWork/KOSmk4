@@ -374,7 +374,7 @@ NOTHROW(FCALL rtm_memory_fini)(struct rtm_memory *__restrict self) {
 /* Allocate a new entry for a pending system call in `self'
  * The returned entry isn't initialized yet, but is already
  * accounted for in `self->rm_sysc' */
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct rtm_pending_syscall *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct rtm_pending_syscall *FCALL
 rtm_memory_schedule_syscall(struct rtm_memory *__restrict self) {
 	struct rtm_pending_syscall *result;
 	size_t avlsize, reqsize;

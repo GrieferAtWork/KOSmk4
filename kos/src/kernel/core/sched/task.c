@@ -574,7 +574,7 @@ INTDEF pertask_clone_t __kernel_pertask_clone_end[];
 
 /* High-level kernel interface for the clone(2) system call.
  * @param: clone_flags: Set of `TASK_CLONE_*' */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct task *
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct task *
 (KCALL task_clone)(uintptr_t clone_flags)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct task *result;

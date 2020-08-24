@@ -35,7 +35,7 @@ INTERN struct dlmodule_format *dl_extensions = NULL;
 PRIVATE struct dlcore_ops dl_coreops;
 
 /* Lazily initialize and return the libdl core ops V-table. */
-INTERN WUNUSED ATTR_RETNONNULL struct dlcore_ops *CC dl_getcoreops(void) {
+INTERN ATTR_RETNONNULL WUNUSED struct dlcore_ops *CC dl_getcoreops(void) {
 	struct dlcore_ops *result;
 	result = &dl_coreops;
 	if (!result->DlModule_Destroy) {

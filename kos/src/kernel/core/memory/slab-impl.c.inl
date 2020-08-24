@@ -260,7 +260,7 @@ err:
 }
 
 
-PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 FUNC(slab_kmalloc)(gfp_t flags) {
 	/* Try to allocate from slab memory */
 	void *result = FUNC(slab_malloc)(flags);

@@ -1449,7 +1449,7 @@ continue_reading:
 			/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
 			result = NULL;
 		} else if (code == E_FSERROR_UNSUPPORTED_OPERATION &&
-		           error_data()->e_pointers[0] == E_FILESYSTEM_OPERATION_READDIR) {
+		           PERTASK_GET(this_exception_pointers[0]) == E_FILESYSTEM_OPERATION_READDIR) {
 			goto set_unimplemented;
 		} else {
 			RETHROW();
@@ -1579,7 +1579,7 @@ continue_reading:
 			/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
 			result = NULL;
 		} else if (code == E_FSERROR_UNSUPPORTED_OPERATION &&
-		           error_data()->e_pointers[0] == E_FILESYSTEM_OPERATION_READDIR) {
+		           PERTASK_GET(this_exception_pointers[0]) == E_FILESYSTEM_OPERATION_READDIR) {
 			goto set_unimplemented;
 		} else {
 			RETHROW();
@@ -1703,7 +1703,7 @@ directory_getentry(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_GET(this_exception_pointers[0]) != E_FILESYSTEM_OPERATION_READDIR)
 				RETHROW();
 		}
 	}
@@ -1764,7 +1764,7 @@ directory_getcaseentry(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_GET(this_exception_pointers[0]) != E_FILESYSTEM_OPERATION_READDIR)
 				RETHROW();
 		}
 	}
@@ -1850,7 +1850,7 @@ directory_getentry_p(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_GET(this_exception_pointers[0]) != E_FILESYSTEM_OPERATION_READDIR)
 				RETHROW();
 			result = NULL;
 		}
@@ -1915,7 +1915,7 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
 				return NULL;
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
-			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+			    PERTASK_GET(this_exception_pointers[0]) != E_FILESYSTEM_OPERATION_READDIR)
 				RETHROW();
 			result = NULL;
 		}

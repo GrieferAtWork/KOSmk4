@@ -30,13 +30,13 @@ DECL_BEGIN
  * location was somewhere in user-space.
  * On x86, that is `x86_rpc_user_redirection()', found in `/arch/i386/sched32.S' */
 #ifdef RPC_SERVE_ALL
-INTERN struct icpustate *
+INTERN WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state,
                                               unsigned int reason,
                                               struct rpc_syscall_info const *sc_info,
                                               bool *prestart_system_call)
 #else /* RPC_SERVE_ALL */
-INTERN struct icpustate *
+INTERN WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL rpc_serve_async_user_redirection)(struct icpustate *__restrict state)
 #endif /* !RPC_SERVE_ALL */
 {

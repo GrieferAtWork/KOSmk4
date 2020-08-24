@@ -134,7 +134,7 @@ NOTHROW(FCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
 }
 
 /* Return a read-lock descriptor for `lock', or allocate a new one. */
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct read_lock *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct read_lock *FCALL
 rwlock_get_readlock(struct rwlock *__restrict lock) THROWS(E_BADALLOC) {
 	uintptr_t j, perturb;
 	struct read_locks *locks;

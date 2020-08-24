@@ -151,10 +151,10 @@ DECL_BEGIN
  *       be used instead) */
 #ifndef __syscall_emulate_defined
 #define __syscall_emulate_defined 1
-FUNDEF WUNUSED struct icpustate *FCALL
+FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 syscall_emulate(struct icpustate *__restrict state,
                 struct rpc_syscall_info const *__restrict sc_info);
-FUNDEF ATTR_NORETURN void FCALL
+FUNDEF ATTR_NORETURN NONNULL((1, 2)) void FCALL
 syscall_emulate_r(struct icpustate *__restrict state,
                   struct rpc_syscall_info const *__restrict sc_info);
 #endif /* !__syscall_emulate_defined */

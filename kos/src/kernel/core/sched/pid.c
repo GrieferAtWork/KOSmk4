@@ -136,7 +136,7 @@ NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self) {
 }
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct task *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct task *KCALL
 taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED) {
 	REF struct task *result;
 	result = taskpid_gettask(self);
@@ -1248,7 +1248,7 @@ pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
 }
 
 /* Lookup a given `pid' within the specified PID namespace. */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL
 pidns_lookup(struct pidns *__restrict self, upid_t pid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
 	REF struct taskpid *result;
@@ -1275,7 +1275,7 @@ dead:
 	THROW(E_PROCESS_EXITED, pid);
 }
 
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
 pidns_lookup_task(struct pidns *__restrict self, upid_t pid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
 	REF struct task *result;

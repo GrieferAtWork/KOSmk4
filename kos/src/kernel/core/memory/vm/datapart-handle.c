@@ -133,7 +133,7 @@ handle_datapart_pwritev(struct vm_datapart *__restrict self,
 	return vm_datapart_writev(self, src, num_bytes, (size_t)addr);
 }
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_datablock *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm_datablock *KCALL
 vm_datapart_get_datablock(struct vm_datapart *__restrict self) {
 	REF struct vm_datablock *result;
 	sync_read(self);
@@ -167,7 +167,7 @@ handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 	xdecref(vm_datapart_split(self, (size_t)(new_size / PAGESIZE)));
 }
 
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 handle_datapart_mmap(struct vm_datapart *__restrict self,
                      pos_t *__restrict pminoffset,
                      pos_t *__restrict pnumbytes,

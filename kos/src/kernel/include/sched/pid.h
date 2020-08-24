@@ -86,7 +86,7 @@ WUNUSED REF struct task *NOTHROW(KCALL taskpid_gettask)(struct taskpid *__restri
 #endif /* !__INTELLISENSE__ */
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
-FUNDEF WUNUSED ATTR_RETNONNULL REF struct task *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *KCALL
 taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED);
 
 
@@ -273,11 +273,11 @@ FUNDEF size_t KCALL task_detach_children(struct task *__restrict process) THROWS
 
 /* Return a reference to the leader of the process group of the calling/given thread. */
 LOCAL WUNUSED REF struct task *KCALL task_getprocessgroupleader(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL task_getprocessgroupleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK);
+LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL task_getprocessgroupleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK);
 LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getprocessgroupleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL task_getprocessgroupleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL task_getprocessgroupleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL task_getprocessgroupleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL task_getprocessgroupleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 LOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getprocessgroupleader_nx)(void);
 LOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getprocessgroupleaderpid_nx)(void);
 LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessgroupleader_of_nx)(struct task *__restrict thread);
@@ -289,11 +289,11 @@ LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessgrou
  *       and always returns a dead taskpid once either the current session, or the current process
  *       group have exited. */
 LOCAL WUNUSED REF struct task *KCALL task_getsessionleader(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK);
+LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK);
 LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL task_getsessionleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL task_getsessionleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 LOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getsessionleader_nx)(void);
 LOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getsessionleaderpid_nx)(void);
 LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread);
@@ -498,10 +498,10 @@ FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct pidns *
 (KCALL pidns_alloc)(struct pidns *__restrict parent) THROWS(E_BADALLOC);
 
 /* Lookup a given `pid' within the specified PID namespace. */
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *
 (KCALL pidns_lookup)(struct pidns *__restrict self, upid_t pid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *
 (KCALL pidns_lookup_task)(struct pidns *__restrict self, upid_t pid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
 FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *
@@ -736,7 +736,7 @@ NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread) {
 
 
 
-LOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL
 task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK) {
 	REF struct taskpid *result;
 	struct task *proc = task_getprocess();
@@ -746,7 +746,7 @@ task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL
 task_getprocessgroupleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct taskpid *result;
 	struct task *proc = task_getprocess_of(thread);
@@ -788,7 +788,7 @@ task_getprocessgroupleader(void) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-LOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL
 task_getprocessgroupleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
 	REF struct task *result;
 	REF struct taskpid *tpid;
@@ -808,7 +808,7 @@ task_getprocessgroupleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOC
 	return result;
 }
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
 task_getprocessgroupleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
 	REF struct task *result;
 	REF struct taskpid *tpid;
@@ -845,7 +845,7 @@ NOTHROW(KCALL task_getprocessgroupleader_of_nx)(struct task *__restrict thread) 
 
 
 
-LOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL
 task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK) {
 	REF struct taskpid *result;
 	REF struct task *grp;
@@ -861,7 +861,7 @@ task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL
 task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct taskpid *result;
 	REF struct task *grp;

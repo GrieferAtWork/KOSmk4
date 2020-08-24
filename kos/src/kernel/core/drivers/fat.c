@@ -1482,7 +1482,7 @@ NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
  *              When `buffer' is re-returned, `inhert_heap_buffer' is ignored.
  *              Otherwise, the returned buffer is allocated on the heap using
  *              kmalloc(), and must be freed by the caller. */
-PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) FatFile *KCALL
+PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) FatFile *KCALL
 Fat_GenerateFileEntries(FatFile *__restrict buffer,
                         u32 *__restrict pbuffer_length,
                         struct directory_entry *__restrict target_dirent,
@@ -1757,7 +1757,7 @@ NOTHROW(KCALL directory_has_dos83)(struct directory_node *__restrict self,
 /* Same as `Fat_GenerateFileEntries()', but the givne `buffer' must be allocated
  * on the stack, and this function will automatically re-try when an 8.3 variant
  * of a long filename already exists. */
-PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) FatFile *
+PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) FatFile *
 (KCALL Fat_GenerateFileEntriesAuto)(struct directory_node *__restrict target_directory,
                                     FatFile *__restrict buffer,
                                     u32 *__restrict pbuffer_length,
