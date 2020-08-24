@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb171c7bf */
+/* HASH CRC-32:0x9d6fbf2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_waccess_defined
 #define __local_waccess_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfaccessat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wfaccessat)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfaccessat from parts.wchar.unistd */
@@ -37,14 +38,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t 
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __LOCAL_LIBC(waccess) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(waccess))(__WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
-	return __localdep_wfaccessat(__CRT_AT_FDCWD, __file, __type, 0);
+	return __localdep_wfaccessat(__AT_FDCWD, __file, __type, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_waccess_defined
 #define __local___localdep_waccess_defined 1
 #define __localdep_waccess __LIBC_LOCAL_NAME(waccess)
 #endif /* !__local___localdep_waccess_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_wfaccessat */
+#else /* __AT_FDCWD && __CRT_HAVE_wfaccessat */
 #undef __local_waccess_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wfaccessat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_wfaccessat */
 #endif /* !__local_waccess_defined */

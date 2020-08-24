@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab2870cf */
+/* HASH CRC-32:0xf768c09d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_remove_defined
 #define __local_remove_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_removeat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: removeat from stdio */
 #ifndef __local___localdep_removeat_defined
@@ -32,14 +33,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __
 /* Remove a file or directory `FILENAME' */
 __LOCAL_LIBC(remove) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(remove))(char const *__filename) {
-	return __localdep_removeat(__CRT_AT_FDCWD, __filename);
+	return __localdep_removeat(__AT_FDCWD, __filename);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_remove_defined
 #define __local___localdep_remove_defined 1
 #define __localdep_remove __LIBC_LOCAL_NAME(remove)
 #endif /* !__local___localdep_remove_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_removeat */
+#else /* __AT_FDCWD && __CRT_HAVE_removeat */
 #undef __local_remove_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_removeat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_removeat */
 #endif /* !__local_remove_defined */

@@ -642,18 +642,20 @@ int crt_flushall();
 
 @@Remove a file or directory `FILENAME'
 [[cp, std, guard]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(removeat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(removeat))]]
 int remove([[nonnull]] char const *filename) {
-	return removeat(__CRT_AT_FDCWD, filename);
+	return removeat(__AT_FDCWD, filename);
 }
 
 @@Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
 @@that `NEWNAME_OR_PATH' refers to a directory, place the file within.
 [[cp, std, guard]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(renameat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(renameat))]]
 int rename([[nonnull]] char const *oldname,
            [[nonnull]] char const *newname_or_path) {
-	return renameat(__CRT_AT_FDCWD, oldname, __CRT_AT_FDCWD, newname_or_path);
+	return renameat(__AT_FDCWD, oldname, __AT_FDCWD, newname_or_path);
 }
 
 %[default:section(".text.crt{|.dos}.fs.utility")]

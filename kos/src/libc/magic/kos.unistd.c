@@ -125,16 +125,18 @@ $pid_t Fork();
 
 %
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("chown")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(FChownAt))]]
 void Chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
-	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0);
+	FChownAt(__AT_FDCWD, file, owner, group, 0);
 }
 
 %
 [[cp, throws, doc_alias("link")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(LinkAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(LinkAt))]]
 void Link([[nonnull]] char const *from, [[nonnull]] char const *to) {
-	LinkAt(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
+	LinkAt(__AT_FDCWD, from, __AT_FDCWD, to, 0);
 }
 
 %
@@ -231,16 +233,18 @@ char *GetCwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %
 [[cp, throws, doc_alias("unlink")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
 void Unlink([[nonnull]] char const *file) {
-	UnlinkAt(__CRT_AT_FDCWD, file, 0);
+	UnlinkAt(__AT_FDCWD, file, 0);
 }
 
 %
 [[cp, throws, doc_alias("rmdir")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
 void Rmdir([[nonnull]] char const *path) {
-	UnlinkAt(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
+	UnlinkAt(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
 %
@@ -478,9 +482,10 @@ $pid_t GetSid($pid_t pid);
 %
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("lchown"), section(".text.crt{|.dos}.except.fs.modify")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(FChownAt))]]
 void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
-	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
+	FChownAt(__AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
 }
 
 
@@ -573,19 +578,21 @@ void SetEGid($gid_t egid);
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 [[cp, throws, doc_alias("symlink"), section(".text.crt{|.dos}.except.fs.modify")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(SymlinkAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(SymlinkAt))]]
 void Symlink([[nonnull]] char const *link_text,
              [[nonnull]] char const *target_path) {
-	SymlinkAt(link_text, __CRT_AT_FDCWD, target_path);
+	SymlinkAt(link_text, __AT_FDCWD, target_path);
 }
 
 %
 [[cp, doc_alias("readlink"), section(".text.crt{|.dos}.except.fs.property")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(ReadlinkAt))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(ReadlinkAt))]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 size_t Readlink([[nonnull]] char const *__restrict path,
                 [[outp(buflen)]] char *__restrict buf, size_t buflen) {
-	ReadlinkAt(__CRT_AT_FDCWD, path, buf, buflen);
+	ReadlinkAt(__AT_FDCWD, path, buf, buflen);
 }
 
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */

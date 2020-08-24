@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1df03 */
+/* HASH CRC-32:0xe459799d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,11 +60,6 @@ __NAMESPACE_STD_USING(wcstoumax)
 #endif /* __USE_DOS */
 
 __SYSDECL_BEGIN
-
-#ifndef ____gwchar_t_defined
-#define ____gwchar_t_defined 1
-#define __gwchar_t __WCHAR_TYPE__
-#endif /* !____gwchar_t_defined */
 
 /* printf(): (u)int8_t */
 #define PRId8          __PRI1_PREFIX "d" /* I8d */
@@ -359,6 +354,8 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef ____imaxdiv_struct_defined
+#define ____imaxdiv_struct_defined 1
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("quot")
 #pragma push_macro("rem")
@@ -373,6 +370,7 @@ struct __imaxdiv_struct {
 #pragma pop_macro("rem")
 #pragma pop_macro("quot")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !____imaxdiv_struct_defined */
 
 #ifndef __std_imaxdiv_t_defined
 #define __std_imaxdiv_t_defined 1
@@ -423,18 +421,18 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(imaxabs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __INTMAX_TYPE__ __NOTHROW(__LIBCCALL imaxabs)(__INTMAX_TYPE__ __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(imaxabs))(__x); })
 #endif /* !... */
 #ifdef __CRT_HAVE_imaxdiv
-__CDECLARE(__ATTR_CONST,imaxdiv_t,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),(__numer,__denom))
+__CDECLARE(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST,imaxdiv_t,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST,imaxdiv_t,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST,imaxdiv_t,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST,struct __imaxdiv_struct,__NOTHROW,imaxdiv,(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom),lldiv,(__numer,__denom))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <local/inttypes/imaxdiv.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(imaxdiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST imaxdiv_t __NOTHROW(__LIBCCALL imaxdiv)(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(imaxdiv))(__numer, __denom); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(imaxdiv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST struct __imaxdiv_struct __NOTHROW(__LIBCCALL imaxdiv)(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(imaxdiv))(__numer, __denom); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strtoimax
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,strtoimax,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
@@ -834,6 +832,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoumax_l)(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* __USE_DOS */
+
+#ifndef __INTELLISENSE__
+#ifndef ____gwchar_t_defined
+#define ____gwchar_t_defined 1
+#define __gwchar_t __WCHAR_TYPE__
+#endif /* !____gwchar_t_defined */
+#endif /* !__INTELLISENSE__ */
 
 #endif /* __CC__ */
 

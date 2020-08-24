@@ -83,13 +83,13 @@ struct flock /*[PREFIX(l_)]*/ {
 #if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8
 	__UINT32_TYPE__ __l_pad; /* ... */
 #endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__FS_TYPE(pos) l_start;  /* Offset where the lock begins. */
 	__FS_TYPE(pos) l_len;    /* Size of the locked area; zero means until EOF. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__FS_TYPE(off) l_start;  /* Offset where the lock begins. */
 	__FS_TYPE(off) l_len;    /* Size of the locked area; zero means until EOF. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;    /* Process holding the lock. */
 #if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 && __SIZEOF_PID_T__ < 8
 	__UINT32_TYPE__ __l_pad2; /* ... */
@@ -121,13 +121,13 @@ struct __flock64 /*[NAME(flock64)][PREFIX(l_)]*/ {
 #if __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8
 	__UINT32_TYPE__ __l_pad; /* ... */
 #endif /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__pos64_t      l_start;  /* Offset where the lock begins. */
 	__pos64_t      l_len;    /* Size of the locked area; zero means until EOF. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__off64_t      l_start;  /* Offset where the lock begins. */
 	__off64_t      l_len;    /* Size of the locked area; zero means until EOF. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;    /* Process holding the lock. */
 #if __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8
 	__UINT32_TYPE__ __l_pad2; /* ... */
@@ -155,13 +155,13 @@ struct __flock32 /*[NAME(flock32)][PREFIX(l_)]*/ {
 #if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8
 	__UINT32_TYPE__ __l_pad; /* ... */
 #endif /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8 */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__pos32_t      l_start;  /* Offset where the lock begins. */
 	__pos32_t      l_len;    /* Size of the locked area; zero means until EOF. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__off32_t      l_start;  /* Offset where the lock begins. */
 	__off32_t      l_len;    /* Size of the locked area; zero means until EOF. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;    /* Process holding the lock. */
 #if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8 && __SIZEOF_PID_T__ < 8
 	__UINT32_TYPE__ __l_pad2; /* ... */

@@ -487,6 +487,12 @@
 #define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                         void name param;
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                         void name param;
 #define __AIO_REDIRECT(attr,Treturn,nothrow,name,param,args)                                                Treturn name param;
+#define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)                                                   Treturn name param;
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)                                          Treturn name param;
+#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)                                               Treturn name param;
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)                                               Treturn name param;
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 
 #define DEFINE_PRIVATE_ALIAS(new,old) int new() {}
 #define DEFINE_PUBLIC_ALIAS(new,old) int new() {}

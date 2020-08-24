@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdbfbc84 */
+/* HASH CRC-32:0x22063255 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_c16unlink_defined
 #define __local_c16unlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wunlinkat))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wunlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16unlinkat from parts.uchar.unistd */
 #ifndef __local___localdep_c16unlinkat_defined
@@ -48,14 +49,14 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __LOCAL_LIBC(c16unlink) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16unlink))(__CHAR16_TYPE__ const *__file) {
-	return __localdep_c16unlinkat(__CRT_AT_FDCWD, __file, 0);
+	return __localdep_c16unlinkat(__AT_FDCWD, __file, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16unlink_defined
 #define __local___localdep_c16unlink_defined 1
 #define __localdep_c16unlink __LIBC_LOCAL_NAME(c16unlink)
 #endif /* !__local___localdep_c16unlink_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wunlinkat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wunlinkat) */
+#else /* __AT_FDCWD && ((__CRT_HAVE_wunlinkat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wunlinkat) */
 #undef __local_c16unlink_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wunlinkat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wunlinkat) */
+#endif /* !__AT_FDCWD || ((!__CRT_HAVE_wunlinkat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wunlinkat) */
 #endif /* !__local_c16unlink_defined */

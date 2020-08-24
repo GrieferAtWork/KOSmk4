@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4c52837 */
+/* HASH CRC-32:0x1667aec8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Creat64_defined
 #define __local_Creat64_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -32,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
+#elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 __NAMESPACE_LOCAL_END
 #include <local/kos.fcntl/Open64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -53,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_Creat64_defined 1
 #define __localdep_Creat64 __LIBC_LOCAL_NAME(Creat64)
 #endif /* !__local___localdep_Creat64_defined */
-#else /* __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
+#else /* __CRT_HAVE_Open64 || (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
 #undef __local_Creat64_defined
-#endif /* !__CRT_HAVE_Open64 && (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open */
+#endif /* !__CRT_HAVE_Open64 && (!__AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open */
 #endif /* !__local_Creat64_defined */

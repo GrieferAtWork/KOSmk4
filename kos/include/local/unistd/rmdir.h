@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe03e7c24 */
+/* HASH CRC-32:0x384bd181 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_rmdir_defined
 #define __local_rmdir_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: unlinkat from unistd */
 #ifndef __local___localdep_unlinkat_defined
@@ -37,14 +38,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __
  * Remove a directory referred to by `PATH' */
 __LOCAL_LIBC(rmdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rmdir))(char const *__path) {
-	return __localdep_unlinkat(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
+	return __localdep_unlinkat(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_rmdir_defined
 #define __local___localdep_rmdir_defined 1
 #define __localdep_rmdir __LIBC_LOCAL_NAME(rmdir)
 #endif /* !__local___localdep_rmdir_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_unlinkat */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __local_rmdir_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_unlinkat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !__local_rmdir_defined */

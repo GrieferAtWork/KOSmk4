@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd981833 */
+/* HASH CRC-32:0x66166d5f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,29 +202,29 @@ struct ifreq {
 			struct sockaddr     ifr_broadaddr;
 			struct sockaddr     ifr_netmask;
 			struct sockaddr     ifr_hwaddr;
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 			__UINT16_TYPE__     ifr_flags;
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 			__INT16_TYPE__      ifr_flags;
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 			union {
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 				__UINT32_TYPE__ ifr_metric;    /* metric */
 				__UINT32_TYPE__ ifr_ifindex;   /* interface index */
 				__UINT32_TYPE__ ifr_bandwidth; /* link bandwidth */
 				__UINT32_TYPE__ ifr_qlen;      /* Queue length  */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 				__INT32_TYPE__  ifr_metric;    /* metric */
 				__INT32_TYPE__  ifr_ifindex;   /* interface index */
 				__INT32_TYPE__  ifr_bandwidth; /* link bandwidth */
 				__INT32_TYPE__  ifr_qlen;      /* Queue length  */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 			};
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 			__UINT32_TYPE__     ifr_mtu;
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 			__INT32_TYPE__      ifr_mtu;
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 			struct ifmap        ifr_map;
 			char                ifr_slave[IFNAMSIZ]; /* Just fits the size */
 			char                ifr_newname[IFNAMSIZ];
@@ -236,15 +236,15 @@ struct ifreq {
 			struct sockaddr    ifru_broadaddr;
 			struct sockaddr    ifru_netmask;
 			struct sockaddr    ifru_hwaddr;
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 			__UINT16_TYPE__    ifru_flags;
 			__UINT32_TYPE__    ifru_ivalue;
 			__UINT32_TYPE__    ifru_mtu;
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 			__INT16_TYPE__     ifru_flags;
 			__INT32_TYPE__     ifru_ivalue;
 			__INT32_TYPE__     ifru_mtu;
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 			struct ifmap       ifru_map;
 			char               ifru_slave[IFNAMSIZ]; /* Just fits the size */
 			char               ifru_newname[IFNAMSIZ];
@@ -258,15 +258,15 @@ struct ifreq {
 		struct sockaddr    ifru_broadaddr;
 		struct sockaddr    ifru_netmask;
 		struct sockaddr    ifru_hwaddr;
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT16_TYPE__    ifru_flags;
 		__UINT32_TYPE__    ifru_ivalue;
 		__UINT32_TYPE__    ifru_mtu;
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 		__INT16_TYPE__     ifru_flags;
 		__INT32_TYPE__     ifru_ivalue;
 		__INT32_TYPE__     ifru_mtu;
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 		struct ifmap       ifru_map;
 		char               ifru_slave[IFNAMSIZ]; /* Just fits the size */
 		char               ifru_newname[IFNAMSIZ];

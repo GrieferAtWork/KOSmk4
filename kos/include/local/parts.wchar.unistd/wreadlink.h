@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45e18f49 */
+/* HASH CRC-32:0xea373126 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_wreadlink_defined
 #define __local_wreadlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wreadlinkat from parts.wchar.unistd */
 #ifndef __local___localdep_wreadlinkat_defined
@@ -50,14 +51,14 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wread
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(wreadlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wreadlink))(__WCHAR_TYPE__ const *__path, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
-	return __localdep_wreadlinkat(__CRT_AT_FDCWD, __path, __buf, __buflen);
+	return __localdep_wreadlinkat(__AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wreadlink_defined
 #define __local___localdep_wreadlink_defined 1
 #define __localdep_wreadlink __LIBC_LOCAL_NAME(wreadlink)
 #endif /* !__local___localdep_wreadlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_wreadlinkat */
+#else /* __AT_FDCWD && __CRT_HAVE_wreadlinkat */
 #undef __local_wreadlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wreadlinkat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_wreadlinkat */
 #endif /* !__local_wreadlink_defined */

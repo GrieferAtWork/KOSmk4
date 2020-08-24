@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eee492 */
+/* HASH CRC-32:0xba8164d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -775,12 +775,15 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_fchownat)
+#else /* __CRT_HAVE_chown */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchownat)
 #include <local/unistd/chown.h>
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL chown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chown))(__file, __owner, __group); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_fchownat */
+#endif /* !__CRT_HAVE_chown */
 
 #ifdef __CRT_HAVE_pathconf
 /* >> pathconf(2)
@@ -792,7 +795,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 #else /* __CRT_HAVE_pathconf */
 #include <asm/fcntl.h>
-#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
+#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 #include <local/unistd/pathconf.h>
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
@@ -801,19 +804,22 @@ __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char con
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pathconf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL pathconf)(char const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pathconf))(__path, __name); })
-#endif /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__CRT_AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
+#endif /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
 #endif /* !__CRT_HAVE_pathconf */
 
 #ifdef __CRT_HAVE_link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),(__from,__to))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
+#else /* __CRT_HAVE_link */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
 #include <local/unistd/link.h>
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL link)(char const *__from, char const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(link))(__from, __to); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_linkat */
+#endif /* !__CRT_HAVE_link */
 #ifndef __exit_defined
 #define __exit_defined 1
 #ifdef __std_exit_defined
@@ -1042,14 +1048,17 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char con
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_faccessat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <local/unistd/access.h>
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_faccessat */
 #undef __access_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_faccessat */
 #endif /* !... */
 #endif /* !__access_defined */
 
@@ -1093,13 +1102,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__unlink_defined */
 
@@ -1113,13 +1125,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),(__p
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),_rmdir,(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__rmdir_defined */
 
@@ -1141,13 +1156,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,euidaccess,(cha
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #else /* ... */
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
+#if defined(__AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
 #include <local/unistd/euidaccess.h>
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __NAMESPACE_LOCAL_USING_OR_IMPL(euidaccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL euidaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); })
-#endif /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
+#endif /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #endif /* !... */
 
 #ifdef __CRT_HAVE_euidaccess
@@ -1167,13 +1182,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char co
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #else /* ... */
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
+#if defined(__AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
 #include <local/unistd/euidaccess.h>
 /* >> eaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL eaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); }
-#endif /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
+#endif /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #endif /* !... */
 #endif /* __USE_GNU */
 
@@ -1545,13 +1560,16 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),(__pi
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_fchownat)
+#else /* __CRT_HAVE_lchown */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchownat)
 #include <local/unistd/lchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL lchown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lchown))(__file, __owner, __group); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_fchownat */
+#endif /* !__CRT_HAVE_lchown */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
@@ -1572,12 +1590,15 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,truncate,(char const *__file, 
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),(__file,__length))
-#elif defined(__CRT_HAVE_truncate64) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_truncate64) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <local/unistd/truncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL truncate)(char const *__file, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncate))(__file, __length); })
-#endif /* ... */
+#endif /* __CRT_HAVE_truncate64 || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate)) || __CRT_HAVE_truncate || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && ((__CRT_HAVE__chsize && !__USE_FILE_OFFSET64) || (__CRT_HAVE_chsize && !__USE_FILE_OFFSET64) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate)) */
+#endif /* !... */
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_truncate64
@@ -1787,14 +1808,17 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_symlinkat)
+#else /* __CRT_HAVE_symlink */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_symlinkat)
 #include <local/unistd/symlink.h>
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL symlink)(char const *__link_text, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlink))(__link_text, __target_path); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_symlinkat */
+#endif /* !__CRT_HAVE_symlink */
 
 #ifdef __CRT_HAVE_readlink
 /* >> readlink(3)
@@ -1807,7 +1831,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),(__path,__buf,__buflen))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
+#else /* __CRT_HAVE_readlink */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
 #include <local/unistd/readlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -1819,7 +1845,8 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,readlink,(char const *__
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LIBCCALL readlink)(char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlink))(__path, __buf, __buflen); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_readlinkat */
+#endif /* !__CRT_HAVE_readlink */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)

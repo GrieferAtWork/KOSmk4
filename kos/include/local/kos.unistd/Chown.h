@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6d87762 */
+/* HASH CRC-32:0xe2a847b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Chown_defined
 #define __local_Chown_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,14 +37,14 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_FChownAt,(__fd_t __df
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __LOCAL_LIBC(Chown) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Chown))(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) {
-	__localdep_FChownAt(__CRT_AT_FDCWD, __file, __owner, __group, 0);
+	__localdep_FChownAt(__AT_FDCWD, __file, __owner, __group, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Chown_defined
 #define __local___localdep_Chown_defined 1
 #define __localdep_Chown __LIBC_LOCAL_NAME(Chown)
 #endif /* !__local___localdep_Chown_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_FChownAt */
+#else /* __AT_FDCWD && __CRT_HAVE_FChownAt */
 #undef __local_Chown_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_FChownAt */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_FChownAt */
 #endif /* !__local_Chown_defined */

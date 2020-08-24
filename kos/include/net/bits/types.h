@@ -28,7 +28,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #ifndef ____le8_defined
 #define ____le8_defined 1
 #ifdef __INTELLISENSE__
@@ -76,13 +76,13 @@ typedef __be32 __u_net32_t;
 #ifdef __UINT64_TYPE__
 typedef __be64 __u_net64_t;
 #endif /* __UINT64_TYPE__ */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __UINT16_TYPE__ __u_net16_t;
 typedef __UINT32_TYPE__ __u_net32_t;
 #ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ __u_net64_t;
 #endif /* __UINT64_TYPE__ */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -279,7 +279,7 @@ $uint64_t ntohq($uint64_t netquad) {
 %{
 
 
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define htons(x) __hybrid_htobe16(x)
 #define ntohs(x) __hybrid_betoh16(x)
 #define htonl(x) __hybrid_htobe32(x)
@@ -288,7 +288,7 @@ $uint64_t ntohq($uint64_t netquad) {
 #define htonq(x) __hybrid_htobe64(x)
 #define ntohq(x) __hybrid_betoh64(x)
 #endif /* __USE_KOS && __UINT64_TYPE__ */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define htons(x) __CCAST(__uint16_t)__hybrid_htobe16(x)
 #define ntohs(x) __CCAST(__uint16_t)__hybrid_betoh16(x)
 #define htonl(x) __CCAST(__uint32_t)__hybrid_htobe32(x)
@@ -297,7 +297,7 @@ $uint64_t ntohq($uint64_t netquad) {
 #define htonq(x) __CCAST(__uint64_t)__hybrid_htobe64(x)
 #define ntohq(x) __CCAST(__uint64_t)__hybrid_betoh64(x)
 #endif /* __USE_KOS && __UINT64_TYPE__ */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 
 #ifndef __NO_XBLOCK
 #define IN6_IS_ADDR_UNSPECIFIED(a) __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0; })

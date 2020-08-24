@@ -208,11 +208,12 @@ typedef struct __dirstream DIR;
 
 @@Open and return a new directory stream for reading, referring to `name'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(opendirat))]]
 DIR *opendir([[nonnull]] char const *name) {
 	/* TODO: Emulate using DOS's _find* functions */
 	/* TODO: Emulate using fdopendir(open(name, 0)) */
-	return opendirat(__CRT_AT_FDCWD, name);
+	return opendirat(__AT_FDCWD, name);
 }
 
 
@@ -351,14 +352,15 @@ typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
 
 %
 @@Scan a directory `DIR' for all contained directory entries
-[[cp, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat)), no_crt_self_import]]
+[[cp, no_crt_self_import, userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(scandirat))]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir64")]]
 [[decl_include("<features.h>", "<bits/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
 __STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
                               [[nonnull]] struct dirent ***__restrict namelist,
                               __scandir_selector_t selector, __scandir_cmp_t cmp) {
-	return scandirat(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
+	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 
 %
@@ -414,12 +416,13 @@ typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const
 
 @@64-bit variant of `scandir()'
 [[cp, dirent64_variant_of(scandir), decl_include("<features.h>", "<bits/dirent.h>")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat64))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(scandirat64))]]
 [[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T)]]
 __STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
                                 [[nonnull]] struct dirent64 ***__restrict namelist,
                                 __scandir64_selector_t selector, __scandir64_cmp_t cmp) {
-	return scandirat64(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
+	return scandirat64(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 
 @@64-bit variant of `scandirat()'

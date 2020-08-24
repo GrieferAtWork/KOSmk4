@@ -45,7 +45,8 @@ $fd_t Open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 [[cp, throws, guard, wunused, vartypes($mode_t)]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Open64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("Open")]]
-[[userimpl, requires($has_function(Open64) || (defined(__CRT_AT_FDCWD) && $has_function(OpenAt)))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires($has_function(Open64) || (defined(__AT_FDCWD) && $has_function(OpenAt)))]]
 $fd_t Open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
@@ -53,7 +54,7 @@ $fd_t Open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 @@pp_if $has_function(Open64)@@
 	result = Open64(filename, oflags, va_arg(args, mode_t));
 @@pp_else@@
-	result = OpenAt(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
+	result = OpenAt(__AT_FDCWD, filename, oflags, va_arg(args, mode_t));
 @@pp_endif@@
 	va_end(args);
 	return result;
@@ -72,13 +73,14 @@ $fd_t Creat([[nonnull]] char const *filename, $mode_t mode) {
 %#ifdef __USE_LARGEFILE64
 [[cp, throws, vartypes($mode_t), decl_include("<bits/types.h>")]]
 [[wunused, largefile64_variant_of(Open), impl_include("<asm/fcntl.h>")]]
-[[userimpl, requires((defined(__CRT_AT_FDCWD) && $has_function(OpenAt64)) || $has_function(Open32))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(OpenAt64)) || $has_function(Open32))]]
 $fd_t Open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
-@@pp_if defined(__CRT_AT_FDCWD) && $has_function(OpenAt64)@@
-	result = OpenAt64(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
+@@pp_if defined(__AT_FDCWD) && $has_function(OpenAt64)@@
+	result = OpenAt64(__AT_FDCWD, filename, oflags, va_arg(args, mode_t));
 @@pp_else@@
 @@pp_ifdef O_LARGEFILE@@
 	result = Open32(filename, oflags | O_LARGEFILE, va_arg(args, mode_t));

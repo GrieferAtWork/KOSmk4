@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6601462 */
+/* HASH CRC-32:0x9a05bd0e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_weuidaccess_defined 1
 #include <__crt.h>
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_wfaccessat)
+#if defined(__AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_wfaccessat)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfaccessat from parts.wchar.unistd */
@@ -38,14 +38,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t 
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __LOCAL_LIBC(weuidaccess) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(weuidaccess))(__WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
-	return __localdep_wfaccessat(__CRT_AT_FDCWD, __file, __type, __AT_EACCESS);
+	return __localdep_wfaccessat(__AT_FDCWD, __file, __type, __AT_EACCESS);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_weuidaccess_defined
 #define __local___localdep_weuidaccess_defined 1
 #define __localdep_weuidaccess __LIBC_LOCAL_NAME(weuidaccess)
 #endif /* !__local___localdep_weuidaccess_defined */
-#else /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_wfaccessat */
+#else /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_wfaccessat */
 #undef __local_weuidaccess_defined
-#endif /* !__CRT_AT_FDCWD || !__AT_EACCESS || !__CRT_HAVE_wfaccessat */
+#endif /* !__AT_FDCWD || !__AT_EACCESS || !__CRT_HAVE_wfaccessat */
 #endif /* !__local_weuidaccess_defined */

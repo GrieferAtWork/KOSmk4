@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8ecacd5 */
+/* HASH CRC-32:0x132d3267 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_scandir64_defined
 #define __local_scandir64_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
 #include <features.h>
 #include <bits/dirent.h>
 #ifndef ____scandir64_selector_t_defined
@@ -46,14 +47,14 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localde
 /* 64-bit variant of `scandir()' */
 __LOCAL_LIBC(scandir64) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir64))(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp) {
-	return __localdep_scandirat64(__CRT_AT_FDCWD, __dir, __namelist, __selector, __cmp);
+	return __localdep_scandirat64(__AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_scandir64_defined
 #define __local___localdep_scandir64_defined 1
 #define __localdep_scandir64 __LIBC_LOCAL_NAME(scandir64)
 #endif /* !__local___localdep_scandir64_defined */
-#else /* __CRT_AT_FDCWD && (__CRT_HAVE_scandirat64 || (__CRT_HAVE_scandirat && _DIRENT_MATCHES_DIRENT64)) */
+#else /* __AT_FDCWD && (__CRT_HAVE_scandirat64 || (__CRT_HAVE_scandirat && _DIRENT_MATCHES_DIRENT64)) */
 #undef __local_scandir64_defined
-#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_scandirat64 && (!__CRT_HAVE_scandirat || !_DIRENT_MATCHES_DIRENT64)) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_scandirat64 && (!__CRT_HAVE_scandirat || !_DIRENT_MATCHES_DIRENT64)) */
 #endif /* !__local_scandir64_defined */

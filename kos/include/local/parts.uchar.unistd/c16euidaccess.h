@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x711dd5da */
+/* HASH CRC-32:0xc58f0794 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_c16euidaccess_defined 1
 #include <__crt.h>
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfaccessat))
+#if defined(__AT_FDCWD) && defined(__AT_EACCESS) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16faccessat from parts.uchar.unistd */
@@ -47,14 +47,14 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16faccessat,(_
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __LOCAL_LIBC(c16euidaccess) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16euidaccess))(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
-	return __localdep_c16faccessat(__CRT_AT_FDCWD, __file, __type, __AT_EACCESS);
+	return __localdep_c16faccessat(__AT_FDCWD, __file, __type, __AT_EACCESS);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16euidaccess_defined
 #define __local___localdep_c16euidaccess_defined 1
 #define __localdep_c16euidaccess __LIBC_LOCAL_NAME(c16euidaccess)
 #endif /* !__local___localdep_c16euidaccess_defined */
-#else /* __CRT_AT_FDCWD && __AT_EACCESS && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wfaccessat) */
+#else /* __AT_FDCWD && __AT_EACCESS && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wfaccessat) */
 #undef __local_c16euidaccess_defined
-#endif /* !__CRT_AT_FDCWD || !__AT_EACCESS || ((!__CRT_HAVE_wfaccessat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wfaccessat) */
+#endif /* !__AT_FDCWD || !__AT_EACCESS || ((!__CRT_HAVE_wfaccessat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wfaccessat) */
 #endif /* !__local_c16euidaccess_defined */

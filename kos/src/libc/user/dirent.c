@@ -369,7 +369,7 @@ NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
                                    __scandir_cmp_t cmp)
 /*[[[body:libc_scandir]]]*/
 /*AUTO*/{
-	return scandirat(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
+	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 /*[[[end:libc_scandir]]]*/
 

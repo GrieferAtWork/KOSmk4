@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4520ff6b */
+/* HASH CRC-32:0x39061ef5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_c16readlink_defined
 #define __local_c16readlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wreadlinkat))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wreadlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16readlinkat from parts.uchar.unistd */
 #ifndef __local___localdep_c16readlinkat_defined
@@ -67,14 +68,14 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(c16readlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16readlink))(__CHAR16_TYPE__ const *__path, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
-	return __localdep_c16readlinkat(__CRT_AT_FDCWD, __path, __buf, __buflen);
+	return __localdep_c16readlinkat(__AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16readlink_defined
 #define __local___localdep_c16readlink_defined 1
 #define __localdep_c16readlink __LIBC_LOCAL_NAME(c16readlink)
 #endif /* !__local___localdep_c16readlink_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wreadlinkat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wreadlinkat) */
+#else /* __AT_FDCWD && ((__CRT_HAVE_wreadlinkat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wreadlinkat) */
 #undef __local_c16readlink_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wreadlinkat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wreadlinkat) */
+#endif /* !__AT_FDCWD || ((!__CRT_HAVE_wreadlinkat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wreadlinkat) */
 #endif /* !__local_c16readlink_defined */

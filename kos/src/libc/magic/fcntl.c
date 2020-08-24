@@ -152,7 +152,7 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_KOS
 #if !defined(O_ANYTHING) && defined(__O_ANYTHING)
-#define O_ANYTHING   __O_ANYTHING
+#define O_ANYTHING __O_ANYTHING
 #endif /* !O_ANYTHING && __O_ANYTHING */
 #endif /* __USE_KOS */
 
@@ -1239,8 +1239,8 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]
 [[decl_include("<bits/types.h>"), export_as("__open")]]
-[[crt_dos_variant, dos_export_as("DOS$_open")]]
-[[userimpl, requires($has_function(open64) || (defined(__CRT_AT_FDCWD) && $has_function(openat)))]]
+[[crt_dos_variant, dos_export_as("DOS$_open"), requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires($has_function(open64) || (defined(__AT_FDCWD) && $has_function(openat)))]]
 $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
@@ -1248,7 +1248,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 @@pp_if $has_function(open64)@@
 	result = open64(filename, oflags, va_arg(args, mode_t));
 @@pp_else@@
-	result = openat(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
+	result = openat(__AT_FDCWD, filename, oflags, va_arg(args, mode_t));
 @@pp_endif@@
 	va_end(args);
 	return result;

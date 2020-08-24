@@ -39,11 +39,6 @@
 
 __SYSDECL_BEGIN
 
-#ifndef ____gwchar_t_defined
-#define ____gwchar_t_defined 1
-#define __gwchar_t __WCHAR_TYPE__
-#endif /* !____gwchar_t_defined */
-
 /* printf(): (u)int8_t */
 #define PRId8          __PRI1_PREFIX "d" /* I8d */
 #define PRIi8          __PRI1_PREFIX "i" /* I8i */
@@ -337,13 +332,39 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef ____imaxdiv_struct_defined
+#define ____imaxdiv_struct_defined 1
 }%[push_macro @undef { quot rem }]%{
 struct __imaxdiv_struct {
 	__INTMAX_TYPE__ quot; /* Quotient. */
 	__INTMAX_TYPE__ rem;  /* Remainder. */
 };
-}%[pop_macro]
+}%[pop_macro]%{
+#endif /* !____imaxdiv_struct_defined */
+}
+
 %[define_replacement(imaxdiv_t = "struct __imaxdiv_struct")]
+
+%[define(DEFINE_IMAXDIV_STRUCT =
+#ifndef ____imaxdiv_struct_defined
+#define ____imaxdiv_struct_defined 1
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("quot")
+#pragma @push_macro@("rem")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @quot@
+#undef @rem@
+struct __imaxdiv_struct {
+	__INTMAX_TYPE__ @quot@; /* Quotient. */
+	__INTMAX_TYPE__ @rem@;  /* Remainder. */
+};
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("rem")
+#pragma @pop_macro@("quot")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !____imaxdiv_struct_defined */
+)]
+
 %{
 
 #ifndef __std_imaxdiv_t_defined
@@ -384,11 +405,13 @@ $intmax_t imaxabs($intmax_t x) {
 }
 
 [[std, nothrow, ATTR_CONST]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[decl_prefix(DEFINE_IMAXDIV_STRUCT)]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), alias("div")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("ldiv")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("lldiv")]]
 [[section(".text.crt{|.dos}.math.utility")]]
-imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
+$imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 	imaxdiv_t result;
 	result.@quot@ = numer / denom;
 	result.@rem@  = numer % denom;
@@ -543,6 +566,13 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 %#endif /* __USE_DOS */
 
 %{
+
+#ifndef __INTELLISENSE__
+#ifndef ____gwchar_t_defined
+#define ____gwchar_t_defined 1
+#define __gwchar_t __WCHAR_TYPE__
+#endif /* !____gwchar_t_defined */
+#endif /* !__INTELLISENSE__ */
 
 #endif /* __CC__ */
 

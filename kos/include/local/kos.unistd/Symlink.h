@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc51ea42 */
+/* HASH CRC-32:0xd050f1a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Symlink_defined
 #define __local_Symlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: SymlinkAt from kos.unistd */
@@ -41,14 +42,14 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__THROWING,__localdep_SymlinkAt,(char co
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __LOCAL_LIBC(Symlink) __ATTR_NONNULL((1, 2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Symlink))(char const *__link_text, char const *__target_path) __THROWS(...) {
-	__localdep_SymlinkAt(__link_text, __CRT_AT_FDCWD, __target_path);
+	__localdep_SymlinkAt(__link_text, __AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Symlink_defined
 #define __local___localdep_Symlink_defined 1
 #define __localdep_Symlink __LIBC_LOCAL_NAME(Symlink)
 #endif /* !__local___localdep_Symlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_SymlinkAt */
+#else /* __AT_FDCWD && __CRT_HAVE_SymlinkAt */
 #undef __local_Symlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_SymlinkAt */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_SymlinkAt */
 #endif /* !__local_Symlink_defined */

@@ -316,11 +316,11 @@ typedef __CRT_PRIVATE_SINT(__SIZEOF_SIGNO_T__) __signo_t;
 #define __signo_t __signo_t
 
 #undef  __oflag_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_UINT(__SIZEOF_OFLAG_T__) __oflag_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SINT(__SIZEOF_OFLAG_T__) __oflag_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __oflag_t       __oflag_t
 
 #undef  __mode_t
@@ -332,11 +332,11 @@ typedef __CRT_PRIVATE_UINT(__SIZEOF_MODE_T__) __mode_t;
 #define __mode_t        __mode_t
 
 #undef __atflag_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_UINT(__SIZEOF_ATFLAG_T__) __atflag_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SINT(__SIZEOF_ATFLAG_T__) __atflag_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __atflag_t      __atflag_t
 
 #undef  __iomode_t
@@ -394,18 +394,18 @@ typedef __CRT_PRIVATE_SLNG(__SIZEOF_OFF32_T__) __off32_t;
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_OFF64_T__) __off64_t;
 #define __off64_t       __off64_t
 #undef  __blkcnt32_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_ULNG(__SIZEOF_BLKCNT32_T__) __blkcnt32_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_BLKCNT32_T__) __blkcnt32_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __blkcnt32_t    __blkcnt32_t
 #undef  __blkcnt64_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_ULNG(__SIZEOF_BLKCNT64_T__) __blkcnt64_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_BLKCNT64_T__) __blkcnt64_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __blkcnt64_t    __blkcnt64_t
 #undef  __fsblkcnt32_t
 typedef __CRT_PRIVATE_ULNG(__SIZEOF_FSBLKCNT32_T__) __fsblkcnt32_t;
@@ -453,11 +453,11 @@ typedef __CRT_PRIVATE_UINT(__SIZEOF_RLIM64_T__) __rlim64_t;
 
 
 #undef  __blksize_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_ULNG(__SIZEOF_BLKSIZE_T__) __blksize_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_BLKSIZE_T__) __blksize_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __blksize_t  __blksize_t
 
 #undef  __nlink_t
@@ -471,9 +471,9 @@ typedef struct { __INT32_TYPE__ __val[2]; } __fsid_t;
 typedef struct { __INT32_TYPE__ __val[1]; } __fsid_t;
 #elif __SIZEOF_FSID_T__ == 2
 typedef struct { __INT16_TYPE__ __val[1]; } __fsid_t;
-#else
+#else /* __SIZEOF_FSID_T__ == ... */
 typedef struct { __INT8_TYPE__  __val[__SIZEOF_FSID_T__]; } __fsid_t;
-#endif
+#endif /* __SIZEOF_FSID_T__ != ... */
 #define __fsid_t __fsid_t
 
 

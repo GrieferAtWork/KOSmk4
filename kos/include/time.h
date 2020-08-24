@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3aea4369 */
+/* HASH CRC-32:0x8eaaf4f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,13 +120,13 @@ __SYSDECL_BEGIN
 
 
 #ifdef __USE_KOS
-#define MSEC_PER_SEC    1000l
-#define USEC_PER_MSEC   1000l
-#define NSEC_PER_USEC   1000l
-#define NSEC_PER_MSEC   1000000l
-#define USEC_PER_SEC    1000000l
-#define NSEC_PER_SEC    1000000000l
-#define FSEC_PER_SEC    1000000000000000ll
+#define MSEC_PER_SEC  1000l
+#define USEC_PER_MSEC 1000l
+#define NSEC_PER_USEC 1000l
+#define NSEC_PER_MSEC 1000000l
+#define USEC_PER_SEC  1000000l
+#define NSEC_PER_SEC  1000000000l
+#define FSEC_PER_SEC  1000000000000000ll
 #endif /* __USE_KOS */
 
 #ifdef __USE_ISOC11

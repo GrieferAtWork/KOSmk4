@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x991073a6 */
+/* HASH CRC-32:0xb2ce5a02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,12 +67,15 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),rm
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); }
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_unlinkat */
+#endif /* !... */
 #define _getdcwd_nolock _getdcwd
 __CDECLARE_OPT(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
@@ -111,13 +114,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),(__p
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),_rmdir,(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__rmdir_defined */
 #ifdef __CRT_HAVE__mkdir

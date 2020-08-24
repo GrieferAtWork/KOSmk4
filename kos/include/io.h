@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2acb5293 */
+/* HASH CRC-32:0x3ec2c09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,13 +79,13 @@ struct _finddata32i64_t;
 struct _finddata64i32_t;
 
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 
 #ifndef __remove_defined
@@ -96,12 +96,15 @@ __NAMESPACE_STD_USING(remove)
 #elif defined(__CRT_HAVE_remove)
 /* Remove a file or directory `FILENAME' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,remove,(char const *__filename),(__filename))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_removeat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 #include <local/stdio/remove.h>
 /* Remove a file or directory `FILENAME' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL remove)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remove))(__filename); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_removeat */
 #undef __remove_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_removeat */
 #endif /* !... */
 #endif /* !__remove_defined */
 #ifndef __rename_defined
@@ -114,13 +117,16 @@ __NAMESPACE_STD_USING(rename)
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
 #include <local/stdio/rename.h>
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rename))(__oldname, __newname_or_path); })
-#else /* ... */
+#else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat) */
 #undef __rename_defined
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_frenameat) */
 #endif /* !... */
 #endif /* !__rename_defined */
 #ifndef __unlink_defined
@@ -133,13 +139,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__unlink_defined */
 #ifndef __open_defined
@@ -152,15 +161,18 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/fcntl/open.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))(__filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
 #endif /* !__cplusplus */
-#else /* ... */
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __open_defined
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !... */
 #endif /* !__open_defined */
 #ifndef __creat_defined
@@ -177,11 +189,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char c
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <local/fcntl/creat.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); })
-#else /* ... */
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
 #undef __creat_defined
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open */
 #endif /* !... */
 #endif /* !__creat_defined */
 #ifndef __access_defined
@@ -196,14 +211,17 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char con
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_faccessat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <local/unistd/access.h>
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_faccessat */
 #undef __access_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_faccessat */
 #endif /* !... */
 #endif /* !__access_defined */
 #ifndef __chmod_defined
@@ -391,13 +409,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char c
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_faccessat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <local/unistd/access.h>
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); }
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_faccessat */
+#endif /* !... */
 #if defined(__CRT_HAVE_creat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && !defined(__USE_FILE_OFFSET64)
@@ -410,10 +431,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <local/fcntl/creat.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL _creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); }
-#endif /* ... */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
+#endif /* !... */
 #ifdef __CRT_HAVE_chmod
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename, __mode_t __mode),chmod,(__filename,__mode))
 #elif defined(__CRT_HAVE__chmod)
@@ -550,13 +574,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),u
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); }
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef ___unlink_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !___unlink_defined */
 #ifdef __CRT_HAVE_close
@@ -636,10 +663,13 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("_open");
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/fcntl/open.h>
 #define _open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
-#endif /* ... */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
 #ifdef __CRT_HAVE_setmode
 __CREDIRECT(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),setmode,(__fd,__mode))
 #elif defined(__CRT_HAVE__setmode)
@@ -717,27 +747,36 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __find
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
-#elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/io/_sopen_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); })
-#endif /* ... */
+#endif /* __CRT_HAVE_sopen || __CRT_HAVE__sopen || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
 #ifdef __CRT_HAVE__sopen_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
-#elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/io/_sopen_s.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s_nolock)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); }
-#endif /* ... */
+#endif /* __CRT_HAVE_sopen || __CRT_HAVE__sopen || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_mktemp_s,(char *__template_, size_t __size),(__template_,__size))
 #ifdef __CRT_HAVE_sopen
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__sopen)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_sopen");
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/io/sopen.h>
 #define _sopen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))
-#endif /* ... */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
 #ifdef __CRT_HAVE__pipe
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),(__pipedes,__pipesize,__textmode))
 #elif defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)
@@ -884,14 +923,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL locking)(__fd_t __fd
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("sopen");
 #elif defined(__CRT_HAVE__sopen)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/io/sopen.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(sopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))(__filename, __oflags, __sflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
 #define sopen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))
 #endif /* !__cplusplus */
-#endif /* ... */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !... */
 #ifdef __CRT_HAVE__filelength
 __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd),_filelength,(__fd))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)

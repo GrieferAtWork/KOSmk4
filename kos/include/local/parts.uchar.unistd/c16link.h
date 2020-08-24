@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75081c2c */
+/* HASH CRC-32:0xce44f758 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_c16link_defined
 #define __local_c16link_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wlinkat))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16linkat from parts.uchar.unistd */
 #ifndef __local___localdep_c16linkat_defined
@@ -49,14 +50,14 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c16linkat,(_
 __LOCAL_LIBC(c16link) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16link))(__CHAR16_TYPE__ const *__from, __CHAR16_TYPE__ const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
-	return __localdep_c16linkat(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
+	return __localdep_c16linkat(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16link_defined
 #define __local___localdep_c16link_defined 1
 #define __localdep_c16link __LIBC_LOCAL_NAME(c16link)
 #endif /* !__local___localdep_c16link_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wlinkat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wlinkat) */
+#else /* __AT_FDCWD && ((__CRT_HAVE_wlinkat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wlinkat) */
 #undef __local_c16link_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wlinkat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wlinkat) */
+#endif /* !__AT_FDCWD || ((!__CRT_HAVE_wlinkat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wlinkat) */
 #endif /* !__local_c16link_defined */

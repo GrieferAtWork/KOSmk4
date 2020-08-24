@@ -648,10 +648,11 @@ char *getlogin();
 %
 @@>> chown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER'
-[[decl_include("<bits/types.h>")]]
-[[cp, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]]
+[[cp, decl_include("<bits/types.h>")]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
 int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
-	return fchownat(__CRT_AT_FDCWD, file, owner, group, 0);
+	return fchownat(__AT_FDCWD, file, owner, group, 0);
 }
 
 %
@@ -680,11 +681,11 @@ $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 %
 @@>> link(2)
 @@Create a hard link from `FROM', leading to `TO'
-[[cp]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(linkat))]]
+[[cp, userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(linkat))]]
 int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
-	return linkat(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
+	return linkat(__AT_FDCWD, from, __AT_FDCWD, to, 0);
 }
 
 %[default:section(".text.crt{|.dos}.sched.access")]
@@ -834,9 +835,10 @@ int close($fd_t fd);
 @@Test for access to the specified file `FILE', testing for `TYPE'
 [[cp, guard, wunused, decl_include("<features.h>")]]
 [[export_alias("_access"), section(".text.crt{|.dos}.fs.property")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(faccessat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(faccessat))]]
 int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
-	return faccessat(__CRT_AT_FDCWD, file, type, 0);
+	return faccessat(__AT_FDCWD, file, type, 0);
 }
 
 %
@@ -858,18 +860,20 @@ char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `FILE'
 [[cp, guard, export_alias("_unlink")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(unlinkat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int unlink([[nonnull]] char const *file) {
-	return unlinkat(__CRT_AT_FDCWD, file, 0);
+	return unlinkat(__AT_FDCWD, file, 0);
 }
 
 %
 @@>> rmdir(2)
 @@Remove a directory referred to by `PATH'
 [[cp, guard, export_alias("_rmdir")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(unlinkat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int rmdir([[nonnull]] char const *path) {
-	return unlinkat(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
+	return unlinkat(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
 %[default:section(".text.crt{|.dos}.fs.property")];
@@ -882,10 +886,10 @@ int rmdir([[nonnull]] char const *path) {
 [[decl_include("<features.h>")]]
 [[cp, wunused, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
-[[requires_include("<asm/fcntl.h>")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && $has_function(faccessat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && defined(__AT_EACCESS) && $has_function(faccessat))]]
 int euidaccess([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
-	return faccessat(__CRT_AT_FDCWD, file, type, __AT_EACCESS);
+	return faccessat(__AT_FDCWD, file, type, __AT_EACCESS);
 }
 
 %
@@ -1394,9 +1398,10 @@ $pid_t getsid($pid_t pid);
 @@Change the ownership of a given `FILE' to `GROUP:OWNER',
 @@but don't reference it if that file is a symbolic link
 [[cp, section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
 int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
-	return fchownat(__CRT_AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
+	return fchownat(__AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
 }
 
 
@@ -1656,11 +1661,12 @@ int ttyslot();
 @@text, at the filesystem location referred to by `TARGET_PATH'.
 @@Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(symlinkat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(symlinkat))]]
 int symlink([[nonnull]] char const *link_text,
             [[nonnull]] char const *target_path) {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return symlinkat(link_text, __CRT_AT_FDCWD, target_path);
+	return symlinkat(link_text, __AT_FDCWD, target_path);
 }
 
 %
@@ -1674,11 +1680,12 @@ int symlink([[nonnull]] char const *link_text,
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'
 [[cp, section(".text.crt{|.dos}.fs.property")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(readlinkat))]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[requires(defined(__AT_FDCWD) && $has_function(readlinkat))]]
 ssize_t readlink([[nonnull]] char const *path,
                  [[outp(buflen)]] char *buf,
                  size_t buflen) {
-	return readlinkat(__CRT_AT_FDCWD, path, buf, buflen);
+	return readlinkat(__AT_FDCWD, path, buf, buflen);
 }
 
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */

@@ -38,9 +38,9 @@ __DECL_BEGIN
 #define __STATX32_FIELD64(name) name
 #elif defined(__USE_KOS)
 #define __STATX32_FIELD64(name) name##64
-#else
+#else /* ... */
 #define __STATX32_FIELD64(name) __##name##64
-#endif
+#endif /* !... */
 
 #if defined(__KERNEL__) && defined(__KOS__)
 #define __STATX32_TMFIELD64(name) name
@@ -48,9 +48,9 @@ __DECL_BEGIN
 #define __STATX32_TMFIELD64(name) name
 #elif defined(__USE_KOS)
 #define __STATX32_TMFIELD64(name) name##64
-#else
+#else /* ... */
 #define __STATX32_TMFIELD64(name) __##name##64
-#endif
+#endif /* !... */
 
 #if defined(__KERNEL__) && defined(__KOS__)
 #define __STATX32_TMFIELD32(name) __##name##32
@@ -58,9 +58,9 @@ __DECL_BEGIN
 #define __STATX32_TMFIELD32(name) name
 #elif defined(__USE_KOS)
 #define __STATX32_TMFIELD32(name) name##32
-#else
+#else /* ... */
 #define __STATX32_TMFIELD32(name) __##name##32
-#endif
+#endif /* !... */
 
 __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kos_statx32_to_kos_statx64)(struct __kos_statx32 const *__restrict __self,

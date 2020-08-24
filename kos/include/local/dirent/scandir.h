@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa2ff99d */
+/* HASH CRC-32:0x29f75481 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_scandir_defined
 #define __local_scandir_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <features.h>
 #include <bits/dirent.h>
 #ifndef ____scandir_selector_t_defined
@@ -46,14 +47,14 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localde
 /* Scan a directory `DIR' for all contained directory entries */
 __LOCAL_LIBC(scandir) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir))(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) {
-	return __localdep_scandirat(__CRT_AT_FDCWD, __dir, __namelist, __selector, __cmp);
+	return __localdep_scandirat(__AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_scandir_defined
 #define __local___localdep_scandir_defined 1
 #define __localdep_scandir __LIBC_LOCAL_NAME(scandir)
 #endif /* !__local___localdep_scandir_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_scandirat && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64))) */
+#else /* __AT_FDCWD && ((__CRT_HAVE_scandirat && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64))) */
 #undef __local_scandir_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_scandirat || (__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64)) && (!__CRT_HAVE_scandirat64 || (!__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64))) */
+#endif /* !__AT_FDCWD || ((!__CRT_HAVE_scandirat || (__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64)) && (!__CRT_HAVE_scandirat64 || (!__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64))) */
 #endif /* !__local_scandir_defined */

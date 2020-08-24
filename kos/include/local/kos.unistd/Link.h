@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46fc1083 */
+/* HASH CRC-32:0x966d95ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Link_defined
 #define __local_Link_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: LinkAt from kos.unistd */
@@ -38,14 +39,14 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2, 4)),__THROWING,__localdep_LinkAt,(__fd_t __f
  * Create a hard link from `FROM', leading to `TO' */
 __LOCAL_LIBC(Link) __ATTR_NONNULL((1, 2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Link))(char const *__from, char const *__to) __THROWS(...) {
-	__localdep_LinkAt(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
+	__localdep_LinkAt(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Link_defined
 #define __local___localdep_Link_defined 1
 #define __localdep_Link __LIBC_LOCAL_NAME(Link)
 #endif /* !__local___localdep_Link_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_LinkAt */
+#else /* __AT_FDCWD && __CRT_HAVE_LinkAt */
 #undef __local_Link_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_LinkAt */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_LinkAt */
 #endif /* !__local_Link_defined */

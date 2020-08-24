@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cd4a53a */
+/* HASH CRC-32:0xde9eb104 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Creat_defined
 #define __local_Creat_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open) || (defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)))
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open) || (defined(__AT_FDCWD) && ((defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)))
 #include <bits/types.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -51,7 +52,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_Creat_defined 1
 #define __localdep_Creat __LIBC_LOCAL_NAME(Creat)
 #endif /* !__local___localdep_Creat_defined */
-#else /* __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open || (__CRT_AT_FDCWD && ((__CRT_HAVE_Openat64 && __USE_FILE_OFFSET64) || __CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) */
+#else /* __CRT_HAVE_Open64 || (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open || (__AT_FDCWD && ((__CRT_HAVE_Openat64 && __USE_FILE_OFFSET64) || __CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) */
 #undef __local_Creat_defined
-#endif /* !__CRT_HAVE_Open64 && (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open && (!__CRT_AT_FDCWD || ((!__CRT_HAVE_Openat64 || !__USE_FILE_OFFSET64) && !__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) */
+#endif /* !__CRT_HAVE_Open64 && (!__AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open && (!__AT_FDCWD || ((!__CRT_HAVE_Openat64 || !__USE_FILE_OFFSET64) && !__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) */
 #endif /* !__local_Creat_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc096500e */
+/* HASH CRC-32:0x1c5aedbe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,24 @@
 #ifndef __local_imaxdiv_defined
 #define __local_imaxdiv_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
+#ifndef ____imaxdiv_struct_defined
+#define ____imaxdiv_struct_defined 1
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("quot")
+#pragma push_macro("rem")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef quot
+#undef rem
+struct __imaxdiv_struct {
+	__INTMAX_TYPE__ quot; /* Quotient. */
+	__INTMAX_TYPE__ rem;  /* Remainder. */
+};
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("rem")
+#pragma pop_macro("quot")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !____imaxdiv_struct_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(imaxdiv) __ATTR_CONST struct __imaxdiv_struct
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxdiv))(__INTMAX_TYPE__ __numer, __INTMAX_TYPE__ __denom) {

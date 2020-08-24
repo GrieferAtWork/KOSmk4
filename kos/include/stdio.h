@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8530d11 */
+/* HASH CRC-32:0x2e3bd42b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -423,14 +423,19 @@ __NAMESPACE_GLB_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #elif defined(__CRT_HAVE_remove)
 /* Remove a file or directory `FILENAME' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,remove,(char const *__filename),(__filename))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_removeat)
+#else /* ... */
+__NAMESPACE_STD_END
+#include <asm/fcntl.h>
+__NAMESPACE_STD_BEGIN
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 __NAMESPACE_STD_END
 #include <local/stdio/remove.h>
 __NAMESPACE_STD_BEGIN
 /* Remove a file or directory `FILENAME' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL remove)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remove))(__filename); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_removeat */
 #undef __std_remove_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_removeat */
 #endif /* !... */
 #endif /* !__std_remove_defined */
 #ifndef __std_rename_defined
@@ -443,15 +448,20 @@ __NAMESPACE_GLB_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
+#else /* ... */
+__NAMESPACE_STD_END
+#include <asm/fcntl.h>
+__NAMESPACE_STD_BEGIN
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
 __NAMESPACE_STD_END
 #include <local/stdio/rename.h>
 __NAMESPACE_STD_BEGIN
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rename))(__oldname, __newname_or_path); })
-#else /* ... */
+#else /* __AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat) */
 #undef __std_rename_defined
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_frenameat) */
 #endif /* !... */
 #endif /* !__std_rename_defined */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,tmpnam,(char *__buf),(__buf))
@@ -3562,13 +3572,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__unlink_defined */
 #ifndef ___unlink_defined
@@ -3581,13 +3594,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),u
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); }
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef ___unlink_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !___unlink_defined */
 #endif /* !_CRT_DIRECTORY_DEFINED */

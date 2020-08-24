@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a64bec0 */
+/* HASH CRC-32:0xecde29a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,11 +101,11 @@ typedef __ssize_t (__LIBKCALL __io_write_fn)(void *__cookie, const char *__buf, 
  * or the end of the file (if WHENCE is SEEK_END).
  * Set *POS to the new file position.
  * Returns zero if successful, nonzero if not. */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 typedef int (__LIBKCALL __io_seek_fn)(void *__cookie, __pos64_t *__pos, int __whence);
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 typedef int (__LIBKCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __whence);
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 
 /* Close COOKIE. */
 typedef int (__LIBKCALL __io_close_fn)(void *__cookie);

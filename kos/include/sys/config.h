@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33392fe0 */
+/* HASH CRC-32:0xc083e38f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -377,14 +377,15 @@
 #define HAVE_RANDOM 1
 
 #undef HAVE_RENAME
-#if defined(__CRT_HAVE_rename) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)))
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_rename) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)))
 #define HAVE_RENAME 1
-#endif /* __CRT_HAVE_rename || (__CRT_AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat)) */
+#endif /* __CRT_HAVE_rename || (__AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat)) */
 
 #undef HAVE_RMDIR
-#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || (defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#if defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 #define HAVE_RMDIR 1
-#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || (__CRT_AT_FDCWD && __CRT_HAVE_unlinkat) */
+#endif /* __CRT_HAVE_rmdir || __CRT_HAVE__rmdir || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 
 #undef HAVE_SETENV
 #include <local/environ.h>

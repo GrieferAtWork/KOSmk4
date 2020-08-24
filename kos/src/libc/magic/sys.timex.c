@@ -101,6 +101,7 @@ __SYSDECL_BEGIN
 #endif /* __USE_KOS */
 
 }%[push_macro @undef { time maxerror esterror tai }]%{
+/* TODO: Move these into a <bits/...> header! */
 struct ntptimeval {
 	struct timeval       time;            /* current time (ro) */
 	__LONGPTR_TYPE__     maxerror;        /* maximum error (us) (ro) */

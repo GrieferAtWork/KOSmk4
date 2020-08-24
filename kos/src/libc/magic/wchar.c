@@ -2442,7 +2442,7 @@ __SYSDECL_END
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_WCHAR_H)
 #include <parts/uchar/wchar.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_WCHAR_H */
-#endif /* __USE_KOS */
+#endif /* __USE_UTF */
 
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf075eee9 */
+/* HASH CRC-32:0x981ae48e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,6 +105,7 @@ __SYSDECL_BEGIN
 #undef maxerror
 #undef esterror
 #undef tai
+/* TODO: Move these into a <bits/...> header! */
 struct ntptimeval {
 	struct timeval       time;            /* current time (ro) */
 	__LONGPTR_TYPE__     maxerror;        /* maximum error (us) (ro) */

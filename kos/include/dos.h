@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde3e9cff */
+/* HASH CRC-32:0x51bbf954 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,13 +112,16 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !... */
 #endif /* !__unlink_defined */
 

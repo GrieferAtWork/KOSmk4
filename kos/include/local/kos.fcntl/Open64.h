@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8751b514 */
+/* HASH CRC-32:0x3ade0b00 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Open64_defined
 #define __local_Open64_defined 1
 #include <__crt.h>
-#if (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
+#include <asm/fcntl.h>
+#if (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,23 +47,20 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_OpenAt64_defined
 #endif /* !... */
 #endif /* !__local___localdep_OpenAt64_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/fcntl.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 (__VLIBCCALL __LIBC_LOCAL_NAME(Open64))(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) {
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))
-	__result = __localdep_OpenAt64(__CRT_AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#else /* __CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt) */
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))
+	__result = __localdep_OpenAt64(__AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
+#else /* __AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt) */
 #ifdef __O_LARGEFILE
 	__result = __localdep_Open32(__filename, __oflags | __O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
 #else /* __O_LARGEFILE */
 	__result = __localdep_Open32(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #endif /* !__O_LARGEFILE */
-#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt) */
 	__builtin_va_end(__args);
 	return __result;
 }
@@ -71,7 +69,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_Open64_defined 1
 #define __localdep_Open64 __LIBC_LOCAL_NAME(Open64)
 #endif /* !__local___localdep_Open64_defined */
-#else /* (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
+#else /* (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
 #undef __local_Open64_defined
-#endif /* (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open */
+#endif /* (!__AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open */
 #endif /* !__local_Open64_defined */

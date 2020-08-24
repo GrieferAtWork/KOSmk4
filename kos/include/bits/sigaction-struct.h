@@ -51,9 +51,9 @@ typedef void (__LIBKCALL *__sighandler_t)(int __signo);
 #endif /* !____sighandler_t_defined */
 
 #ifdef __USE_POSIX199309
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 struct ucontext;
-#endif /* __USE_KOS */
+#endif /* __USE_KOS_ALTERATIONS */
 #endif /* __USE_POSIX199309 */
 
 /* Structure describing the action to be taken when a signal arrives. */
@@ -63,11 +63,11 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 #ifdef __USE_POSIX199309
 	union {
 		__sighandler_t sa_handler; /* Used if SA_SIGINFO is not set. */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx); /* Used if SA_SIGINFO is set. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, void *__ctx); /* Used if SA_SIGINFO is set. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	};
 #else /* __USE_POSIX199309 */
 	__sighandler_t sa_handler;

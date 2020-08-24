@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75502e59 */
+/* HASH CRC-32:0x79c4c57c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_c32access_defined
 #define __local_c32access_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfaccessat))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32faccessat from parts.uchar.unistd */
@@ -46,14 +47,14 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32faccessat,(_
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __LOCAL_LIBC(c32access) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32access))(__CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
-	return __localdep_c32faccessat(__CRT_AT_FDCWD, __file, __type, 0);
+	return __localdep_c32faccessat(__AT_FDCWD, __file, __type, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32access_defined
 #define __local___localdep_c32access_defined 1
 #define __localdep_c32access __LIBC_LOCAL_NAME(c32access)
 #endif /* !__local___localdep_c32access_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfaccessat) */
+#else /* __AT_FDCWD && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfaccessat) */
 #undef __local_c32access_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfaccessat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wfaccessat) */
+#endif /* !__AT_FDCWD || ((!__CRT_HAVE_wfaccessat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wfaccessat) */
 #endif /* !__local_c32access_defined */

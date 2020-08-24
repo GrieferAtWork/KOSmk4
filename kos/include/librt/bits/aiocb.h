@@ -80,11 +80,11 @@ struct aiocb /*[PREFIX(aio_)]*/ {
 	__INT32_TYPE__    __aio_pad1;       /* ... */
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__FS_TYPE(pos)      aio_offset;     /* File offset. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__FS_TYPE(off)      aio_offset;     /* File offset. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };
 #endif /* !__aiocb_defined */
@@ -126,11 +126,11 @@ struct __aiocb64 /*[NAME(aiocb64)][PREFIX(tv_)]*/ {
 	__INT32_TYPE__    __aio_pad1;       /* ... */
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__pos64_t           aio_offset;     /* File offset. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__off64_t           aio_offset;     /* File offset. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };
 #endif /* (!__USE_FILE_OFFSET64 && !_AIOCB_MATCHES_AIOCB64) || !__USE_STRUCT64_MACRO */
@@ -168,11 +168,11 @@ struct __aiocb32 /*[NAME(aiocb32)][PREFIX(tv_)]*/ {
 	__INT32_TYPE__    __aio_pad1;       /* ... */
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__pos32_t           aio_offset;     /* File offset. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__off32_t           aio_offset;     /* File offset. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };
 #endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */

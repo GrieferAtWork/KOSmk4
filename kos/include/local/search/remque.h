@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29738621 */
+/* HASH CRC-32:0x1ab60a8d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,21 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
+#else /* __CRT_HAVE_link */
+__NAMESPACE_LOCAL_END
+#include <asm/fcntl.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
 __NAMESPACE_LOCAL_END
 #include <local/unistd/link.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 #define __localdep_link __LIBC_LOCAL_NAME(link)
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_linkat */
 #undef __local___localdep_link_defined
-#endif /* !... */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_linkat */
+#endif /* !__CRT_HAVE_link */
 #endif /* !__local___localdep_link_defined */
 /* Unlink ELEM from the doubly-linked list that it is in */
 __LOCAL_LIBC(remque) __ATTR_NONNULL((1)) void

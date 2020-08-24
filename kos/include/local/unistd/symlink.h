@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76f92e56 */
+/* HASH CRC-32:0x94745e5d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_symlink_defined
 #define __local_symlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_symlinkat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_symlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: symlinkat from unistd */
 #ifndef __local___localdep_symlinkat_defined
@@ -41,14 +42,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_symlinkat,(char 
 __LOCAL_LIBC(symlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(symlink))(char const *__link_text, char const *__target_path) {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return __localdep_symlinkat(__link_text, __CRT_AT_FDCWD, __target_path);
+	return __localdep_symlinkat(__link_text, __AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_symlink_defined
 #define __local___localdep_symlink_defined 1
 #define __localdep_symlink __LIBC_LOCAL_NAME(symlink)
 #endif /* !__local___localdep_symlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_symlinkat */
+#else /* __AT_FDCWD && __CRT_HAVE_symlinkat */
 #undef __local_symlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_symlinkat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_symlinkat */
 #endif /* !__local_symlink_defined */

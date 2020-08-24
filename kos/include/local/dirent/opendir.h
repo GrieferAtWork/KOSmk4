@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dd438de */
+/* HASH CRC-32:0xff0aade3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_opendir_defined
 #define __local_opendir_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: opendirat from dirent */
@@ -45,14 +46,14 @@ __LOCAL_LIBC(opendir) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
 	/* TODO: Emulate using DOS's _find* functions */
 	/* TODO: Emulate using fdopendir(open(name, 0)) */
-	return __localdep_opendirat(__CRT_AT_FDCWD, __name);
+	return __localdep_opendirat(__AT_FDCWD, __name);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_opendir_defined
 #define __local___localdep_opendir_defined 1
 #define __localdep_opendir __LIBC_LOCAL_NAME(opendir)
 #endif /* !__local___localdep_opendir_defined */
-#else /* __CRT_AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
+#else /* __AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
 #undef __local_opendir_defined
-#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_opendirat && !__CRT_HAVE_fopendirat && (!__CRT_HAVE_fdopendir || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_opendirat && !__CRT_HAVE_fopendirat && (!__CRT_HAVE_fdopendir || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) */
 #endif /* !__local_opendir_defined */

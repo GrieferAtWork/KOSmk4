@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x231cce5 */
+/* HASH CRC-32:0x5f2aabff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_wsymlink_defined
 #define __local_wsymlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wsymlinkat from parts.wchar.unistd */
 #ifndef __local___localdep_wsymlinkat_defined
@@ -41,14 +42,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WC
 __LOCAL_LIBC(wsymlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wsymlink))(__WCHAR_TYPE__ const *__link_text, __WCHAR_TYPE__ const *__target_path) {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return __localdep_wsymlinkat(__link_text, __CRT_AT_FDCWD, __target_path);
+	return __localdep_wsymlinkat(__link_text, __AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wsymlink_defined
 #define __local___localdep_wsymlink_defined 1
 #define __localdep_wsymlink __LIBC_LOCAL_NAME(wsymlink)
 #endif /* !__local___localdep_wsymlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_wsymlinkat */
+#else /* __AT_FDCWD && __CRT_HAVE_wsymlinkat */
 #undef __local_wsymlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wsymlinkat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_wsymlinkat */
 #endif /* !__local_wsymlink_defined */

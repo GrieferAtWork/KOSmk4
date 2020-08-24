@@ -99,9 +99,9 @@
 
 /* KOS System extensions */
 #ifdef _KOS_SOURCE
-#define __USE_KOS 1 /* Various KOS extensions (e.g. `strend()') */
-#define __USE_STRING_BWLQ 1 /* `memcpy[bwlq]()' */
-#define __USE_STRING_XCHR 1 /* `memxchr()' */
+#define __USE_KOS              1 /* Various KOS extensions (e.g. `strend()') */
+#define __USE_STRING_BWLQ      1 /* `memcpy[bwlq]()' */
+#define __USE_STRING_XCHR      1 /* `memxchr()' */
 #define __USE_STRING_OVERLOADS 1 /* 4-argument `memcpy(dst, src, elem_count, elem_size)' */
 #endif /* _KOS_SOURCE */
 
@@ -150,10 +150,7 @@
  *    - ...
  *    - Changing `int flags'-like arguments to `unsigned int flags'
  *    - Reversing the argument order of `outb()', `outw()', `outl()'
- *      and their `*_p' versions, such that the port comes first.
- * TODO: Go through all uses of __USE_KOS and replace them with this feature
- *       test as appropriate. I'm sure there are places that alter existing
- *       standards when KOS extensions are enabled, but we don't want that! */
+ *      and their `*_p' versions, such that the port comes first. */
 #if (defined(_KOS_ALTERATIONS_SOURCE) || \
      (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
 #define __USE_KOS_ALTERATIONS 1

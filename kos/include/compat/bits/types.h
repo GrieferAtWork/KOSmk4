@@ -242,11 +242,11 @@ typedef __CRT_PRIVATE_SINT(__ARCH_COMPAT_SIZEOF_SIGNO_T) __compat_signo_t;
 #define __compat_signo_t __compat_signo_t
 
 #undef  __compat_oflag_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_UINT(__ARCH_COMPAT_SIZEOF_OFLAG_T) __compat_oflag_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SINT(__ARCH_COMPAT_SIZEOF_OFLAG_T) __compat_oflag_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __compat_oflag_t __compat_oflag_t
 
 #undef __compat_mode_t
@@ -254,11 +254,11 @@ typedef __CRT_PRIVATE_UINT(__ARCH_COMPAT_SIZEOF_MODE_T) __compat_mode_t;
 #define __compat_mode_t __compat_mode_t
 
 #undef __compat_atflag_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_UINT(__ARCH_COMPAT_SIZEOF_ATFLAG_T) __compat_atflag_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SINT(__ARCH_COMPAT_SIZEOF_ATFLAG_T) __compat_atflag_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __compat_atflag_t __compat_atflag_t
 
 #undef  __compat_iomode_t
@@ -313,18 +313,18 @@ typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_OFF32_T) __compat_off32_t;
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_OFF64_T) __compat_off64_t;
 #define __compat_off64_t __compat_off64_t
 #undef  __compat_blkcnt32_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_BLKCNT32_T) __compat_blkcnt32_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_BLKCNT32_T) __compat_blkcnt32_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __compat_blkcnt32_t __compat_blkcnt32_t
 #undef  __compat_blkcnt64_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_BLKCNT64_T) __compat_blkcnt64_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_BLKCNT64_T) __compat_blkcnt64_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __compat_blkcnt64_t __compat_blkcnt64_t
 #undef  __compat_fsblkcnt32_t
 typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_FSBLKCNT32_T) __compat_fsblkcnt32_t;
@@ -372,11 +372,11 @@ typedef __CRT_PRIVATE_UINT(__ARCH_COMPAT_SIZEOF_RLIM64_T) __compat_rlim64_t;
 
 
 #undef  __compat_blksize_t
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_BLKSIZE_T) __compat_blksize_t;
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_BLKSIZE_T) __compat_blksize_t;
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 #define __compat_blksize_t  __compat_blksize_t
 
 #undef  __compat_nlink_t

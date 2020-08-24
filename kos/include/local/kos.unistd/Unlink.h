@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32d7ae31 */
+/* HASH CRC-32:0x3ecd4a59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Unlink_defined
 #define __local_Unlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: UnlinkAt from kos.unistd */
@@ -38,14 +39,14 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UnlinkAt,(__fd_t __df
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __LOCAL_LIBC(Unlink) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Unlink))(char const *__file) __THROWS(...) {
-	__localdep_UnlinkAt(__CRT_AT_FDCWD, __file, 0);
+	__localdep_UnlinkAt(__AT_FDCWD, __file, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Unlink_defined
 #define __local___localdep_Unlink_defined 1
 #define __localdep_Unlink __LIBC_LOCAL_NAME(Unlink)
 #endif /* !__local___localdep_Unlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_UnlinkAt */
+#else /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
 #undef __local_Unlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_UnlinkAt */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_UnlinkAt */
 #endif /* !__local_Unlink_defined */

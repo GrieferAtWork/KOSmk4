@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6709e359 */
+/* HASH CRC-32:0xea1e3a04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_c32rmdir_defined
 #define __local_c32rmdir_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wunlinkat))
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wunlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32unlinkat from parts.uchar.unistd */
 #ifndef __local___localdep_c32unlinkat_defined
@@ -48,14 +49,14 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32unlinkat,(__
  * Remove a directory referred to by `PATH' */
 __LOCAL_LIBC(c32rmdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32rmdir))(__CHAR32_TYPE__ const *__path) {
-	return __localdep_c32unlinkat(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
+	return __localdep_c32unlinkat(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32rmdir_defined
 #define __local___localdep_c32rmdir_defined 1
 #define __localdep_c32rmdir __LIBC_LOCAL_NAME(c32rmdir)
 #endif /* !__local___localdep_c32rmdir_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wunlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wunlinkat) */
+#else /* __AT_FDCWD && ((__CRT_HAVE_wunlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wunlinkat) */
 #undef __local_c32rmdir_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wunlinkat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wunlinkat) */
+#endif /* !__AT_FDCWD || ((!__CRT_HAVE_wunlinkat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wunlinkat) */
 #endif /* !__local_c32rmdir_defined */

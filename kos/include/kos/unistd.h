@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x247e4116 */
+/* HASH CRC-32:0x130e758f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -198,23 +198,29 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
+#else /* __CRT_HAVE_Chown */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <local/kos.unistd/Chown.h>
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Chown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Chown))(__file, __owner, __group); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
+#endif /* !__CRT_HAVE_Chown */
 
 #ifdef __CRT_HAVE_Link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Link,(char const *__from, char const *__to),(__from,__to))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
+#else /* __CRT_HAVE_Link */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
 #include <local/kos.unistd/Link.h>
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Link)(char const *__from, char const *__to) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Link))(__from, __to); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_LinkAt */
+#endif /* !__CRT_HAVE_Link */
 
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
@@ -285,23 +291,29 @@ __CDECLARE_OPT(,char *,__THROWING,GetCwd,(char *__buf, size_t __bufsize),(__buf,
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Unlink,(char const *__file),(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
+#else /* __CRT_HAVE_Unlink */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <local/kos.unistd/Unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Unlink)(char const *__file) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Unlink))(__file); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
+#endif /* !__CRT_HAVE_Unlink */
 
 #ifdef __CRT_HAVE_Rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Rmdir,(char const *__path),(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
+#else /* __CRT_HAVE_Rmdir */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <local/kos.unistd/Rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Rmdir)(char const *__path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Rmdir))(__path); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
+#endif /* !__CRT_HAVE_Rmdir */
 
 #ifdef __USE_ATFILE
 
@@ -510,13 +522,16 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
+#else /* __CRT_HAVE_LChown */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <local/kos.unistd/LChown.h>
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL LChown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LChown))(__file, __owner, __group); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
+#endif /* !__CRT_HAVE_LChown */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
@@ -614,14 +629,17 @@ __CDECLARE_VOID_OPT(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
+#else /* __CRT_HAVE_Symlink */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
 #include <local/kos.unistd/Symlink.h>
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Symlink)(char const *__link_text, char const *__target_path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__link_text, __target_path); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_SymlinkAt */
+#endif /* !__CRT_HAVE_Symlink */
 
 #ifdef __CRT_HAVE_Readlink
 /* >> readlink(3)
@@ -634,7 +652,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__THROWING,Readlink,(char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__path,__buf,__buflen))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
+#else /* __CRT_HAVE_Readlink */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
 #include <local/kos.unistd/Readlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -646,7 +666,8 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__THROWING,Readlink,(char const *__rest
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) size_t (__LIBCCALL Readlink)(char const *__restrict __path, char *__restrict __buf, size_t __buflen) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Readlink))(__path, __buf, __buflen); })
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_ReadlinkAt */
+#endif /* !__CRT_HAVE_Readlink */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)

@@ -61,7 +61,11 @@ struct __dos_bstat {
 #ifdef __USE_FILE_OFFSET64
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT64_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT64_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT64_TYPE__ st_size64;
 		__UINT32_TYPE__ st_size32;
 	};
@@ -71,21 +75,29 @@ struct __dos_bstat {
 #elif defined(__USE_TIME_BITS64)
 	__int32_t    __st_pad1;
 	union { /* binary compatibility to `stat64i32' and `stat64'. */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT32_TYPE__ st_size;
-		__UINT32_TYPE__ st_size32;
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 		__INT32_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
+#ifdef __USE_KOS
+		__UINT32_TYPE__ st_size32;
 #endif /* !__USE_KOS */
 		__INT64_TYPE__ __st_pad2;
 	};
 #elif defined(__USE_KOS)
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT32_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT32_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT32_TYPE__ st_size32;
 	};
+#elif defined(__USE_KOS_ALTERATIONS)
+	__UINT32_TYPE__ st_size;
 #else /* ... */
-	__INT32_TYPE__ st_size;
+	__INT32_TYPE__  st_size;
 #endif /* !... */
 #ifdef __USE_KOS
 #ifdef __USE_TIME_BITS64
@@ -115,13 +127,19 @@ struct __dos_bstat64 {
 	__uint32_t     st_rdev;
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT64_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT64_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT64_TYPE__ st_size64;
 		__UINT32_TYPE__ st_size32;
 	};
-#else /* __USE_KOS */
+#elif defined(__USE_KOS_ALTERATIONS)
+	__UINT64_TYPE__ st_size;
+#else /* ... */
 	__INT64_TYPE__ st_size;
-#endif /* !__USE_KOS */
+#endif /* !... */
 #ifdef __USE_KOS
 	union { __TM_TYPE(time) st_atime; __time32_t st_atime32; };
 	union { __TM_TYPE(time) st_mtime; __time32_t st_mtime32; };
@@ -147,14 +165,22 @@ struct __dos_stat32 {
 	__uint32_t     st_rdev;
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT32_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT32_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT32_TYPE__ st_size32;
 	};
 	union { __time32_t st_atime; __time32_t st_atime32; };
 	union { __time32_t st_mtime; __time32_t st_mtime32; };
 	union { __time32_t st_ctime; __time32_t st_ctime32; };
 #else /* __USE_KOS */
-	__INT32_TYPE__    st_size;
+#ifdef __USE_KOS_ALTERATIONS
+	__UINT32_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+	__INT32_TYPE__ st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 	__time32_t     st_atime;
 	__time32_t     st_mtime;
 	__time32_t     st_ctime;
@@ -172,7 +198,11 @@ struct __dos_stat32i64 {
 	__int32_t    __st_pad1;
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT64_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT64_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT32_TYPE__ st_size32;
 		__UINT64_TYPE__ st_size64;
 	};
@@ -180,7 +210,11 @@ struct __dos_stat32i64 {
 	union { __time32_t st_mtime; __time32_t st_mtime32; };
 	union { __time32_t st_ctime; __time32_t st_ctime32; };
 #else /* __USE_KOS */
+#ifdef __USE_KOS_ALTERATIONS
+	__UINT64_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
 	__INT64_TYPE__ st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 	__time32_t     st_atime;
 	__time32_t     st_mtime;
 	__time32_t     st_ctime;
@@ -199,7 +233,11 @@ struct __dos_stat64i32 {
 	__int32_t    __st_pad1;
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT32_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT32_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT32_TYPE__ st_size32;
 		__INT64_TYPE__ __st_pad2; /* This is what DOS silently does to match the
 		                           * binary layout of `stat64i32' with `stat64'. */
@@ -209,7 +247,11 @@ struct __dos_stat64i32 {
 	union { __time64_t st_ctime; __time64_t st_ctime32; __time64_t st_ctime64; };
 #else /* __USE_KOS */
 	union {
+#ifdef __USE_KOS_ALTERATIONS
+		__UINT32_TYPE__  st_size;
+#else /* __USE_KOS_ALTERATIONS */
 		__INT32_TYPE__   st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__INT64_TYPE__ __st_pad2; /* This is what DOS silently does to match the
 		                           * binary layout of `stat64i32' with `stat64'. */
 	};
@@ -230,7 +272,11 @@ struct __dos_stat64 {
 	__int32_t    __st_pad1;
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		__UINT64_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		__INT64_TYPE__  st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		__UINT32_TYPE__ st_size32;
 		__UINT64_TYPE__ st_size64;
 	};
@@ -238,7 +284,11 @@ struct __dos_stat64 {
 	union { __time64_t st_mtime; __time64_t st_mtime32; __time64_t st_mtime64; };
 	union { __time64_t st_ctime; __time64_t st_ctime32; __time64_t st_ctime64; };
 #else /* __USE_KOS */
+#ifdef __USE_KOS_ALTERATIONS
+	__UINT64_TYPE__ st_size;
+#else /* __USE_KOS_ALTERATIONS */
 	__INT64_TYPE__ st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 	__time64_t     st_atime;
 	__time64_t     st_mtime;
 	__time64_t     st_ctime;

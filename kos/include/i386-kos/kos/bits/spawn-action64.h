@@ -149,11 +149,11 @@ struct spawn_actionx64 /*[PREFIX(sa_)]*/ {
 			                                         *       AT_FDROOT / AT_FDCWD here! */
 			__INT32_TYPE__             sa_dfd;      /* Directory FD to which the given filename is relative. */
 			__HYBRID_PTR64(char const) sa_filename; /* [1..1] The name of the file to-be opened. */
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifdef __USE_KOS_ALTERATIONS
 			__UINT32_TYPE__            sa_oflags;   /* Open flags. */
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS_ALTERATIONS */
 			__INT32_TYPE__             sa_oflags;   /* Open flags. */
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS_ALTERATIONS */
 			__UINT32_TYPE__            sa_mode;     /* File creation mode. */
 		} sa_openat; /* SPAWN_ACTION_OPENAT */
 

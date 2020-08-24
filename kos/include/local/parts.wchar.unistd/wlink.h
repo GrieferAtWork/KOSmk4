@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44a8efe1 */
+/* HASH CRC-32:0x634f7fbb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_wlink_defined
 #define __local_wlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wlinkat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wlinkat from parts.wchar.unistd */
 #ifndef __local___localdep_wlinkat_defined
@@ -38,14 +39,14 @@ __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t 
 __LOCAL_LIBC(wlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlink))(__WCHAR_TYPE__ const *__from, __WCHAR_TYPE__ const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
-	return __localdep_wlinkat(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
+	return __localdep_wlinkat(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wlink_defined
 #define __local___localdep_wlink_defined 1
 #define __localdep_wlink __LIBC_LOCAL_NAME(wlink)
 #endif /* !__local___localdep_wlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_wlinkat */
+#else /* __AT_FDCWD && __CRT_HAVE_wlinkat */
 #undef __local_wlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wlinkat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_wlinkat */
 #endif /* !__local_wlink_defined */

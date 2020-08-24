@@ -62,8 +62,8 @@ struct __glc_stat /*[PREFIX(st_)]*/ {
 	/* +8  */ __UINT32_TYPE__ __st_pad0;
 #if defined(__USE_KOS) && !defined(__USE_FILE_OFFSET64)
 	union {
-		/* +12 */ __UINT32_TYPE__   st_ino32;
-		/* +12 */ __UINT32_TYPE__   st_ino;
+		/* +12 */ __UINT32_TYPE__ st_ino32;
+		/* +12 */ __UINT32_TYPE__ st_ino;
 	};
 #elif defined(__USE_KOS)
 	/* +12 */ __UINT32_TYPE__   st_ino32;
@@ -81,15 +81,26 @@ struct __glc_stat /*[PREFIX(st_)]*/ {
 #ifdef __USE_FILE_OFFSET64
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		/* +44 */ __UINT64_TYPE__   st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		/* +44 */ __INT64_TYPE__    st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		/* +44 */ __UINT32_TYPE__   st_size32;
 		/* +44 */ __UINT64_TYPE__   st_size64;
 	};
+#elif defined(__USE_KOS_ALTERATIONS)
+	/* +44 */ __UINT64_TYPE__   st_size;
 #else /* __USE_KOS */
 	/* +44 */ __INT64_TYPE__    st_size;
 #endif /* !__USE_KOS */
+#ifdef __USE_KOS_ALTERATIONS
+	/* +52 */ __UINT32_TYPE__   st_blksize;
+	/* +56 */ __UINT64_TYPE__   st_blocks;
+#else /* __USE_KOS_ALTERATIONS */
 	/* +52 */ __INT32_TYPE__    st_blksize;
 	/* +56 */ __INT64_TYPE__    st_blocks;
+#endif /* !__USE_KOS_ALTERATIONS */
 
 	/* struct __timespec32 st_atimespec32; */
 	/* +64 */ union {
@@ -168,14 +179,25 @@ struct __glc_stat /*[PREFIX(st_)]*/ {
 #else /* __USE_FILE_OFFSET64 */
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
+		/* +44 */ __UINT32_TYPE__   st_size;
+#else /* __USE_KOS_ALTERATIONS */
 		/* +44 */ __INT32_TYPE__    st_size;
-		/* +44 */ __INT32_TYPE__    st_size32;
+#endif /* !__USE_KOS_ALTERATIONS */
+		/* +44 */ __UINT32_TYPE__   st_size32;
 	};
-#else /* __USE_KOS */
+#elif defined(__USE_KOS_ALTERATIONS)
+	/* +44 */ __UINT32_TYPE__   st_size;
+#else /* ... */
 	/* +44 */ __INT32_TYPE__    st_size;
-#endif /* !__USE_KOS */
+#endif /* !... */
+#ifdef __USE_KOS_ALTERATIONS
+	/* +48 */ __UINT32_TYPE__   st_blksize;
+	/* +52 */ __UINT32_TYPE__   st_blocks;
+#else /* __USE_KOS_ALTERATIONS */
 	/* +48 */ __INT32_TYPE__    st_blksize;
 	/* +52 */ __INT32_TYPE__    st_blocks;
+#endif /* !__USE_KOS_ALTERATIONS */
 	/* struct __timespec32 st_atimespec32; */
 	/* +56 */ union {
 #ifdef __USE_KOS
@@ -263,15 +285,26 @@ struct __glc_stat64 /*[PREFIX(st_)]*/ {
 	/* +40 */ __UINT32_TYPE__ __pad1;
 #ifdef __USE_KOS
 	union {
+#ifdef __USE_KOS_ALTERATIONS
 		/* +44 */ __UINT64_TYPE__   st_size;
+#else /* __USE_KOS_ALTERATIONS */
+		/* +44 */ __INT64_TYPE__    st_size;
+#endif /* !__USE_KOS_ALTERATIONS */
 		/* +44 */ __UINT32_TYPE__   st_size32;
 		/* +44 */ __UINT64_TYPE__   st_size64;
 	};
-#else /* __USE_KOS */
+#elif defined(__USE_KOS_ALTERATIONS)
+	/* +44 */ __UINT64_TYPE__   st_size;
+#else /* ... */
 	/* +44 */ __INT64_TYPE__    st_size;
-#endif /* !__USE_KOS */
+#endif /* !... */
+#ifdef __USE_KOS_ALTERATIONS
+	/* +52 */ __UINT32_TYPE__   st_blksize;
+	/* +56 */ __UINT64_TYPE__   st_blocks;
+#else /* __USE_KOS_ALTERATIONS */
 	/* +52 */ __INT32_TYPE__    st_blksize;
 	/* +56 */ __INT64_TYPE__    st_blocks;
+#endif /* !__USE_KOS_ALTERATIONS */
 
 	/* struct __timespec32 st_atimespec32; */
 	/* +64 */ union {

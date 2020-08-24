@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f3959b3 */
+/* HASH CRC-32:0x7cd0ae21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_Readlink_defined
 #define __local_Readlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -52,14 +53,14 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__SIZE_TYPE__,__THROWING,__localdep_ReadlinkA
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(Readlink) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(Readlink))(char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen) __THROWS(...) {
-	__localdep_ReadlinkAt(__CRT_AT_FDCWD, __path, __buf, __buflen);
+	__localdep_ReadlinkAt(__AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Readlink_defined
 #define __local___localdep_Readlink_defined 1
 #define __localdep_Readlink __LIBC_LOCAL_NAME(Readlink)
 #endif /* !__local___localdep_Readlink_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_ReadlinkAt */
+#else /* __AT_FDCWD && __CRT_HAVE_ReadlinkAt */
 #undef __local_Readlink_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_ReadlinkAt */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_ReadlinkAt */
 #endif /* !__local_Readlink_defined */

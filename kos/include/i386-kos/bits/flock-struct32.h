@@ -156,13 +156,13 @@ __DECL_BEGIN
 struct flockx32 /*[PREFIX(l_)]*/ {
 	__INT16_TYPE__   l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__   l_whence; /* Where `l_start' is relative to (like `lseek'). */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__ULONG32_TYPE__ l_start;  /* Offset where the lock begins. */
 	__ULONG32_TYPE__ l_len;    /* Size of the locked area; zero means until EOF. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__LONG32_TYPE__  l_start;  /* Offset where the lock begins. */
 	__LONG32_TYPE__  l_len;    /* Size of the locked area; zero means until EOF. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__INT32_TYPE__   l_pid;    /* Process holding the lock. */
 };
 
@@ -170,13 +170,13 @@ struct flockx32 /*[PREFIX(l_)]*/ {
 struct __ATTR_PACKED __ATTR_ALIGNED(4) flockx32_64 /*[PREFIX(l_)]*/ {
 	__INT16_TYPE__   l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__   l_whence; /* Where `l_start' is relative to (like `lseek'). */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__ULONG64_TYPE__ l_start;  /* Offset where the lock begins. */
 	__ULONG64_TYPE__ l_len;    /* Size of the locked area; zero means until EOF. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__LONG64_TYPE__  l_start;  /* Offset where the lock begins. */
 	__LONG64_TYPE__  l_len;    /* Size of the locked area; zero means until EOF. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__INT32_TYPE__   l_pid;    /* Process holding the lock. */
 };
 
@@ -184,13 +184,13 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) flockx32_64 /*[PREFIX(l_)]*/ {
 struct __ATTR_PACKED __ATTR_ALIGNED(4) __flockx32_64_alt {
 	__INT16_TYPE__   l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__   l_whence; /* Where `l_start' is relative to (like `lseek'). */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 	__ULONG64_TYPE__ l_start;  /* Offset where the lock begins. */
 	__ULONG64_TYPE__ l_len;    /* Size of the locked area; zero means until EOF. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 	__LONG64_TYPE__  l_start;  /* Offset where the lock begins. */
 	__LONG64_TYPE__  l_len;    /* Size of the locked area; zero means until EOF. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__INT32_TYPE__   l_pid;    /* Process holding the lock. */
 };
 #undef __flockx32_64_alt

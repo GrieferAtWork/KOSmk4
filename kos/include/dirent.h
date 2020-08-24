@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe33f18e5 */
+/* HASH CRC-32:0x1ba5468d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,11 +200,14 @@ typedef struct __dirstream DIR;
 #ifdef __CRT_HAVE_opendir
 /* Open and return a new directory stream for reading, referring to `name' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#else /* __CRT_HAVE_opendir */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <local/dirent/opendir.h>
 /* Open and return a new directory stream for reading, referring to `name' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
-#endif /* ... */
+#endif /* __AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
+#endif /* !__CRT_HAVE_opendir */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
 #ifdef __CRT_HAVE_fopendirat
@@ -311,11 +314,14 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(c
 #elif defined(__CRT_HAVE_scandir64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* Scan a directory `DIR' for all contained directory entries */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp),scandir64,(__dir,__namelist,__selector,__cmp))
-#elif defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <local/dirent/scandir.h>
 /* Scan a directory `DIR' for all contained directory entries */
 __NAMESPACE_LOCAL_USING_OR_IMPL(scandir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL scandir)(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir))(__dir, __namelist, __selector, __cmp); })
-#endif /* ... */
+#endif /* __AT_FDCWD && ((__CRT_HAVE_scandirat && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64))) */
+#endif /* !... */
 
 #if defined(__CRT_HAVE_alphasort) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would */
@@ -363,11 +369,14 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,
 #elif defined(__CRT_HAVE_scandir) && defined(_DIRENT_MATCHES_DIRENT64)
 /* 64-bit variant of `scandir()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandir,(__dir,__namelist,__selector,__cmp))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
 #include <local/dirent/scandir64.h>
 /* 64-bit variant of `scandir()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(scandir64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL scandir64)(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir64))(__dir, __namelist, __selector, __cmp); })
-#endif /* ... */
+#endif /* __AT_FDCWD && (__CRT_HAVE_scandirat64 || (__CRT_HAVE_scandirat && _DIRENT_MATCHES_DIRENT64)) */
+#endif /* !... */
 #ifdef __CRT_HAVE_scandirat64
 /* 64-bit variant of `scandirat()' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),(__dirfd,__dir,__namelist,__selector,__cmp))

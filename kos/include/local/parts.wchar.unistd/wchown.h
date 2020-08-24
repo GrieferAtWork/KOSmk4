@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8749fc87 */
+/* HASH CRC-32:0xd4fcdd99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_wchown_defined
 #define __local_wchown_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
+#include <asm/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfchownat from parts.wchar.unistd */
@@ -35,14 +36,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t _
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __LOCAL_LIBC(wchown) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wchown))(__WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group) {
-	return __localdep_wfchownat(__CRT_AT_FDCWD, __file, __owner, __group, 0);
+	return __localdep_wfchownat(__AT_FDCWD, __file, __owner, __group, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wchown_defined
 #define __local___localdep_wchown_defined 1
 #define __localdep_wchown __LIBC_LOCAL_NAME(wchown)
 #endif /* !__local___localdep_wchown_defined */
-#else /* __CRT_AT_FDCWD && __CRT_HAVE_wfchownat */
+#else /* __AT_FDCWD && __CRT_HAVE_wfchownat */
 #undef __local_wchown_defined
-#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wfchownat */
+#endif /* !__AT_FDCWD || !__CRT_HAVE_wfchownat */
 #endif /* !__local_wchown_defined */

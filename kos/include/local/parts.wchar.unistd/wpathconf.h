@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e7c972c */
+/* HASH CRC-32:0x80249843 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_wpathconf_defined 1
 #include <__crt.h>
 #include <asm/fcntl.h>
-#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
+#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: close from unistd */
@@ -121,7 +121,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wpathconf_defined 1
 #define __localdep_wpathconf __LIBC_LOCAL_NAME(wpathconf)
 #endif /* !__local___localdep_wpathconf_defined */
-#else /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__CRT_AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
+#else /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
 #undef __local_wpathconf_defined
-#endif /* !__CRT_HAVE_fpathconf || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__CRT_AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || !__O_RDONLY */
+#endif /* !__CRT_HAVE_fpathconf || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || !__O_RDONLY */
 #endif /* !__local_wpathconf_defined */
