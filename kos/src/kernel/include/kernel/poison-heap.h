@@ -27,7 +27,7 @@
 #include <kernel/malloc-defs.h>
 /**/
 
-/* Config option: When the kernel become poisoned, re-direct all
+/* Config option: When the kernel becomes poisoned, re-direct all
  * of the following functions to use a small, secondary heap system
  * that is designed for simplicity, being as robust as possible
  * against further corruption, whilst ignoring any noticeable illegal
@@ -40,7 +40,7 @@
  * used for allocating memory needed for holding decompressed .debug_info
  * and the like, when not being able to allocate such buffers would
  * normally mean that the kernel would be unable to (safely) display
- * tracebacks after being poisoned.
+ * tracebacks following a crash.
  * List of functions that get overwritten/re-directed:
  *   - heap_alloc
  *   - heap_alloc_untraced

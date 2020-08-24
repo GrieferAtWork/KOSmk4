@@ -314,7 +314,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Release physical memory from minfo that was marked as `PMEMBANK_TYPE_PRESERVE'
 	 * NOTE: This can only be done after bootloader drivers, since drivers provided
 	 *       by the bootloader are themself mapped as preserved memory. */
-	minfo_release_presevations();
+	minfo_release_preservations();
 
 	/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
 	kernel_initialize_null_devices();

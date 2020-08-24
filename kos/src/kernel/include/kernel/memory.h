@@ -119,12 +119,12 @@ INTDEF FREE void NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u
 /* Construct memory zones from memory info. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void);
 
-/* Relocate `minfo', as well as `mzones' data to a more appropriate location after
- * `kernel_initialize_minfo_makezones()' has been called, and the kernel VM has been
- * cleaned from unused memory mappings.
+/* Relocate `minfo', as well as `mzones' data to a more appropriate location
+ * after `kernel_initialize_minfo_makezones()' has been called, and the kernel
+ * VM has been cleaned from unused memory mappings.
  * Before this function is called, all memory information still resides at a
  * location where its physical address is relative to its virtual, just like
- * any other kernel data. However, that since can literally be anywhere in
+ * any other kernel data. However, since that can literally be anywhere in
  * virtual memory, it can easily (and accidentally) interfere with memory
  * layout expectancies of other early-boot systems.
  * Because of this, we try to relocate memory information into higher memory
@@ -139,7 +139,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_relocate)(void);
  * Afterwards, transform memory information for either type of memory
  * bank into `PMEMBANK_TYPE_RAM', and (when possible) merge adjacent
  * banks of identical typing. */
-INTDEF FREE void NOTHROW(KCALL minfo_release_presevations)(void);
+INTDEF FREE void NOTHROW(KCALL minfo_release_preservations)(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
@@ -233,7 +233,7 @@ FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_malloc)(pagecnt_t num_pages)
  *    using up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PAGEPTR_INVALID: The allocation failed. */
-FUNDEF NOBLOCK WUNUSED pageptr_t
+FUNDEF NOBLOCK WUNUSED NONNULL((3)) pageptr_t
 NOTHROW(KCALL page_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
                                 pagecnt_t *__restrict res_pages);
 
@@ -307,7 +307,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result);
 FUNDEF NOBLOCK NONNULL((3)) void
 NOTHROW(KCALL page_stat_between)(pageptr_t base, pagecnt_t num_pages,
-                                  struct pmemstat *__restrict result);
+                                 struct pmemstat *__restrict result);
 
 /* Check if a given `page' is current free.
  * NOTE: Returns `false' when `page_ismapped(page, 1)' is false. */

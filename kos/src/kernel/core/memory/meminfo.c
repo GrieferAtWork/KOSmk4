@@ -733,7 +733,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
  * bank into `PMEMBANK_TYPE_RAM', and (when possible) merge adjacent
  * banks of identical typing. */
 INTERN ATTR_FREETEXT void
-NOTHROW(KCALL minfo_release_presevations)(void) {
+NOTHROW(KCALL minfo_release_preservations)(void) {
 	size_t i, num_banks = 0;
 	pagecnt_t num_released    = 0;
 	pageptr_t freed_pages_end = 0;
