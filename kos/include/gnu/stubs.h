@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4e399b1 */
+/* HASH CRC-32:0xd8e554be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -413,10 +413,6 @@
 #define __stub_pthread_barrier_destroy 1
 #define __stub_pthread_barrier_init 1
 #define __stub_pthread_barrier_wait 1
-#define __stub_pthread_barrierattr_destroy 1
-#define __stub_pthread_barrierattr_getpshared 1
-#define __stub_pthread_barrierattr_init 1
-#define __stub_pthread_barrierattr_setpshared 1
 #define __stub_pthread_cond_broadcast 1
 #define __stub_cnd_destroy 1
 #define __stub_pthread_cond_destroy 1
@@ -425,12 +421,6 @@
 #define __stub_pthread_cond_timedwait 1
 #define __stub_pthread_cond_timedwait64 1
 #define __stub_pthread_cond_wait 1
-#define __stub_pthread_condattr_destroy 1
-#define __stub_pthread_condattr_getclock 1
-#define __stub_pthread_condattr_getpshared 1
-#define __stub_pthread_condattr_init 1
-#define __stub_pthread_condattr_setclock 1
-#define __stub_pthread_condattr_setpshared 1
 #define __stub_pthread_getcpuclockid 1
 #define __stub_tss_get 1
 #define __stub_pthread_getspecific 1
@@ -449,20 +439,6 @@
 #define __stub_pthread_mutex_timedlock64 1
 #define __stub_pthread_mutex_trylock 1
 #define __stub_pthread_mutex_unlock 1
-#define __stub_pthread_mutexattr_destroy 1
-#define __stub_pthread_mutexattr_getprioceiling 1
-#define __stub_pthread_mutexattr_getprotocol 1
-#define __stub_pthread_mutexattr_getpshared 1
-#define __stub_pthread_mutexattr_getrobust_np 1
-#define __stub_pthread_mutexattr_getrobust 1
-#define __stub_pthread_mutexattr_gettype 1
-#define __stub_pthread_mutexattr_init 1
-#define __stub_pthread_mutexattr_setprioceiling 1
-#define __stub_pthread_mutexattr_setprotocol 1
-#define __stub_pthread_mutexattr_setpshared 1
-#define __stub_pthread_mutexattr_setrobust_np 1
-#define __stub_pthread_mutexattr_setrobust 1
-#define __stub_pthread_mutexattr_settype 1
 #define __stub_pthread_rwlock_destroy 1
 #define __stub_pthread_rwlock_init 1
 #define __stub_pthread_rwlock_rdlock 1
@@ -474,12 +450,6 @@
 #define __stub_pthread_rwlock_trywrlock 1
 #define __stub_pthread_rwlock_unlock 1
 #define __stub_pthread_rwlock_wrlock 1
-#define __stub_pthread_rwlockattr_destroy 1
-#define __stub_pthread_rwlockattr_getkind_np 1
-#define __stub_pthread_rwlockattr_getpshared 1
-#define __stub_pthread_rwlockattr_init 1
-#define __stub_pthread_rwlockattr_setkind_np 1
-#define __stub_pthread_rwlockattr_setpshared 1
 #define __stub_pthread_setcancelstate 1
 #define __stub_pthread_setcanceltype 1
 #define __stub_pthread_setspecific 1

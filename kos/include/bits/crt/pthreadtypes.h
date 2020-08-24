@@ -152,10 +152,16 @@ typedef union __pthread_attr {
 /************************************************************************/
 #ifdef __USE_PTHREAD_INTERNALS
 #define __OFFSET_PTHREAD_MUTEXATTR_KIND 0
+#define PTHREAD_MUTEXATTR_KIND_MASK          0x00000fff /* Mask for the mutex kind (one of `PTHREAD_MUTEX_*') */
+#define PTHREAD_MUTEXATTR_PRIO_CEILING_SHIFT 12         /* Shift for `PTHREAD_MUTEXATTR_PRIO_CEILING_MASK' */
+#define PTHREAD_MUTEXATTR_PRIO_CEILING_MASK  0x00fff000 /* Priority ceiling (unused on KOS) */
+#define PTHREAD_MUTEXATTR_PROTOCOL_SHIFT     28         /* Shift for `PTHREAD_MUTEXATTR_PROTOCOL_MASK' */
+#define PTHREAD_MUTEXATTR_PROTOCOL_MASK      0x30000000 /* One of `PTHREAD_PRIO_*' */
+#define PTHREAD_MUTEXATTR_FLAG_ROBUST        0x40000000 /* `pthread_mutexattr_getrobust' / `pthread_mutexattr_setrobust' */
+#define PTHREAD_MUTEXATTR_FLAG_PSHARED       0x80000000 /* `pthread_mutexattr_getpshared' / `pthread_mutexattr_setpshared' */
 #ifdef __CC__
 typedef struct __pthread_mutexattr_s {
-	__UINT32_TYPE__ ma_kind; /* bit#31 is set if the mutex is shared;
-	                          * Rest are for the PTHREAD_MUTEX_* kind. */
+	__UINT32_TYPE__ ma_kind; /* Mutex kind/flags (set of `PTHREAD_MUTEXATTR_*'). */
 } __pthread_mutexattr_t;
 #endif /* __CC__ */
 #else /* __USE_PTHREAD_INTERNALS */
@@ -361,10 +367,12 @@ typedef union __pthread_mutex {
 /************************************************************************/
 #ifdef __USE_PTHREAD_INTERNALS
 #define __OFFSET_PTHREAD_CONDATTR_VALUE 0
+#define PTHREAD_CONDATTR_FLAG_PSHARED  0x0001 /* Cond is shared */
+#define PTHREAD_CONDATTR_CLOCKID_SHIFT 1      /* Shift for `PTHREAD_CONDATTR_CLOCKID_MASK' */
+#define PTHREAD_CONDATTR_CLOCKID_MASK  0xfffe /* The clock id */
 #ifdef __CC__
 typedef struct __pthread_condattr_s {
-	__UINT32_TYPE__ ca_value; /* bit#0 is set if the cond is shared;
-	                           * bit#1 is used to store the clock id; */
+	__UINT32_TYPE__ ca_value; /* Set of `PTHREAD_CONDATTR_*' */
 } __pthread_condattr_t;
 #endif /* __CC__ */
 #else /* __USE_PTHREAD_INTERNALS */
@@ -553,10 +561,10 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_SPINLOCK_T) volatile __pthread_spinlock
 /* pthread_marrier_t                                                    */
 /************************************************************************/
 #ifdef __USE_PTHREAD_INTERNALS
-#define __OFFSET_PTHREAD_BARRIERATTR_SHARED 0
+#define __OFFSET_PTHREAD_BARRIERATTR_PSHARED 0
 #ifdef __CC__
 typedef struct __pthread_barrierattr_s {
-	__UINT32_TYPE__ ba_shared; /* Non-zero if shared */
+	__UINT32_TYPE__ ba_pshared; /* One of `PTHREAD_PROCESS_PRIVATE', `PTHREAD_PROCESS_SHARED' */
 } __pthread_barrierattr_t;
 #endif /* __CC__ */
 #else /* __USE_PTHREAD_INTERNALS */
