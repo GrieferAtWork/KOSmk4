@@ -27,6 +27,7 @@ opt.removeif([](e) -> e.startswith("-O"));
 #define GUARD_LIBVGASTATE_VGASTATE_C 1
 #define _KOS_SOURCE 1
 #define _LARGEFILE64_SOURCE 1
+#define _KOS_ALTERATIONS_SOURCE 1 /* for pread64/pwrite64 with pos64_t */
 
 #include "api.h"
 /**/

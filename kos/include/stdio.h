@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x672179f7 */
+/* HASH CRC-32:0xa8530d11 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3034,13 +3034,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fisatty,(__FILE 
 __NAMESPACE_LOCAL_USING_OR_IMPL(fisatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fisatty)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fisatty))(__stream); })
 #endif /* ... */
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif /* !__USE_KOS */
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 #if defined(__CRT_HAVE_fftruncate_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
 /* >> fftruncate(3)

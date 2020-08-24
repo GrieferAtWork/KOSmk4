@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa2698ff */
+/* HASH CRC-32:0x7594b09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,13 +64,13 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #ifdef __CRT_HAVE_ftruncate64
 __NAMESPACE_LOCAL_END
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(__pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
@@ -79,13 +79,13 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(__pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
@@ -94,13 +94,13 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 #elif defined(__CRT_HAVE__chsize_s)
 __NAMESPACE_LOCAL_END
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(__pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
@@ -139,13 +139,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_open64_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(__pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(__off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* >> truncate64(2)

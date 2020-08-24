@@ -982,25 +982,25 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 %{
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif /* !__USE_KOS */
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 }
 
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 )]
 
@@ -1404,13 +1404,13 @@ int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 %{
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 }
 

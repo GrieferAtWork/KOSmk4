@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd673482 */
+/* HASH CRC-32:0x9eee492 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1243,13 +1243,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __ATTR_ARTIFICIAL __off64_
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif /* !__USE_KOS */
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 
 #if defined(__CRT_HAVE_pread64) && defined(__USE_FILE_OFFSET64)
@@ -1555,13 +1555,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
-#ifdef __USE_KOS
+#ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
 #define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS */
+#else /* __USE_KOS_ALTERATIONS */
 #define __PIO_OFFSET   __FS_TYPE(off)
 #define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 
 #if defined(__CRT_HAVE_truncate64) && defined(__USE_FILE_OFFSET64)
