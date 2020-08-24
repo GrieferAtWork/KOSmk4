@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b561e62 */
+/* HASH CRC-32:0xff0b38dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,12 +32,14 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
-typedef void *(*__pthread_start_routine_t)(void *);
+typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
- * handle is stored in *NEWTHREAD */
+ * handle is stored in *NEWTHREAD
+ * @return: EOK:    Success
+ * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
 #endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END

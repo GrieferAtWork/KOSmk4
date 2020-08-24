@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae943138 */
+/* HASH CRC-32:0x6c78597a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,10 @@
 #include <hybrid/__atomic.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Try to lock spinlock LOCK */
-__LOCAL_LIBC(pthread_spin_trylock) __ATTR_NONNULL((1)) __errno_t
+/* Try to lock spinlock LOCK
+ * @return: EOK:   Success
+ * @return: EBUSY: Lock has already been acquired */
+__LOCAL_LIBC(pthread_spin_trylock) __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_trylock))(__pthread_spinlock_t *__lock) {
 	if (__hybrid_atomic_xch(*__lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;

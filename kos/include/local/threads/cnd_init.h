@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd839bb2 */
+/* HASH CRC-32:0xf6b828fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Initialize condition variable COND using attributes ATTR, or use
- * the default values if later is NULL */
+/* Initialize condition variable COND using attributes
+ * ATTR, or use the default values if later is NULL
+ * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __cond, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__cond,__cond_attr))
 #endif /* !__local___localdep_pthread_cond_init_defined */
 __NAMESPACE_LOCAL_END

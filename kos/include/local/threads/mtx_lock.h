@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2b86486 */
+/* HASH CRC-32:0x2617ee0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Lock a mutex */
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
+/* Lock a mutex
+ * @return: EOK: Success */
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_lock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda280638 */
+/* HASH CRC-32:0x7933ccaf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Compare two thread identifiers */
+/* Compare two thread identifiers
+ * @return: 0 : Given threads are non-equal
+ * @return: * : Given threads are equal */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST int
 NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
                                          pthread_t thr2) {
@@ -43,7 +45,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 /* Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT. */
+ * extern variable initialized to PTHREAD_ONCE_INIT.
+ * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
                              __pthread_once_routine_t init_routine) THROWS(...) {
@@ -77,7 +80,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 }
 #include <hybrid/__atomic.h>
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
- * spinlock can be shared between different processes */
+ * spinlock can be shared between different processes
+ * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
                                              int pshared) {
@@ -85,7 +89,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
 	return 0;
 }
-/* Destroy the spinlock LOCK */
+/* Destroy the spinlock LOCK
+ * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 	COMPILER_IMPURE();
@@ -94,7 +99,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
-/* Wait until spinlock LOCK is retrieved */
+/* Wait until spinlock LOCK is retrieved
+ * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 	while (libc_pthread_spin_trylock(lock) != 0)
@@ -103,8 +109,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 #include <parts/errno.h>
-/* Try to lock spinlock LOCK */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+/* Try to lock spinlock LOCK
+ * @return: EOK:   Success
+ * @return: EBUSY: Lock has already been acquired */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
@@ -119,13 +127,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 #endif /* !... */
 }
 #include <hybrid/__atomic.h>
-/* Release spinlock LOCK */
+/* Release spinlock LOCK
+ * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }
 #include <bits/sched.h>
+/* @return: * : The number of cpus that the calling thread is able to run on */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 	cpu_set_t cset;
@@ -135,6 +145,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 }
 #include <bits/sched.h>
 #include <parts/errno.h>
+/* Restrict the calling thread to only run on the first `n' cpus
+ * @return: EOK:    Success
+ * @return: EINVAL: `n' was specified as less than `1'
+ * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
 	int i, result;

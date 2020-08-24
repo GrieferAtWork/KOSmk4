@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33091c40 */
+/* HASH CRC-32:0xd26f0aba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,8 @@
 #include <bits/types.h>
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Release spinlock LOCK */
+/* Release spinlock LOCK
+ * @return: EOK: Success */
 __LOCAL_LIBC(pthread_spin_unlock) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_unlock))(__pthread_spinlock_t *__lock) {
 	__hybrid_atomic_store(*__lock, 0, __ATOMIC_RELEASE);

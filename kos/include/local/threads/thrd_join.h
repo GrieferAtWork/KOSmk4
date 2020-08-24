@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc8473d3 */
+/* HASH CRC-32:0x69d9923b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
- * is not NULL */
+ * is not NULL
+ * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __NAMESPACE_LOCAL_END

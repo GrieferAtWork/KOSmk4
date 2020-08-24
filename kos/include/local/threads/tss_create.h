@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99cb9cd7 */
+/* HASH CRC-32:0x533929aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,9 @@ __NAMESPACE_LOCAL_BEGIN
  * area. DESTR_FUNCTION, if non-NULL, is called with the value
  * associated to that key when the key is destroyed.
  * DESTR_FUNCTION is not called if the value associated is NULL when
- * the key is destroyed */
+ * the key is destroyed
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
 #endif /* !__local___localdep_pthread_key_create_defined */
 __NAMESPACE_LOCAL_END

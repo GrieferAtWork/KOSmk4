@@ -65,7 +65,9 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 #ifdef __CC__
 struct __cpu_set_struct;
 struct pthread {
-	__pid_t                  pt_tid;        /* [const] Secondary TID (filled in by the kernel as the PTID and CTID) */
+	__pid_t                  pt_tid;        /* Thread TID (filled in by the kernel as the PTID and CTID)
+	                                         * Cleared to ZERO(0) (by the kernel) when the thread terminates.
+	                                         * s.a. `set_tid_address(2)' */
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
 	__byte_t               __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
 #endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */

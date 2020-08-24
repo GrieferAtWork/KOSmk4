@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cb20a77 */
+/* HASH CRC-32:0x2c42faec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_spin_trylock_defined
 #define __local___localdep_pthread_spin_trylock_defined 1
 #ifdef __CRT_HAVE_pthread_spin_trylock
-/* Try to lock spinlock LOCK */
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
+/* Try to lock spinlock LOCK
+ * @return: EOK:   Success
+ * @return: EBUSY: Lock has already been acquired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
 #else /* __CRT_HAVE_pthread_spin_trylock */
 __NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_spin_trylock.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Try to lock spinlock LOCK */
+/* Try to lock spinlock LOCK
+ * @return: EOK:   Success
+ * @return: EBUSY: Lock has already been acquired */
 #define __localdep_pthread_spin_trylock __LIBC_LOCAL_NAME(pthread_spin_trylock)
 #endif /* !__CRT_HAVE_pthread_spin_trylock */
 #endif /* !__local___localdep_pthread_spin_trylock_defined */
@@ -41,7 +45,8 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait until spinlock LOCK is retrieved */
+/* Wait until spinlock LOCK is retrieved
+ * @return: EOK: Success */
 __LOCAL_LIBC(pthread_spin_lock) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__lock) {
 	while (__localdep_pthread_spin_trylock(__lock) != 0)

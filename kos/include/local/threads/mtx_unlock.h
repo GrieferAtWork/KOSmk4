@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde9a2dc2 */
+/* HASH CRC-32:0xec552daa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Unlock a mutex */
+/* Unlock a mutex
+ * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_unlock_defined */
 __NAMESPACE_LOCAL_END

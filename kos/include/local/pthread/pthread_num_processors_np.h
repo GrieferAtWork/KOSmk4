@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4055cb1 */
+/* HASH CRC-32:0x531c22f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SI
 __NAMESPACE_LOCAL_END
 #include <bits/sched.h>
 __NAMESPACE_LOCAL_BEGIN
+/* @return: * : The number of cpus that the calling thread is able to run on */
 __LOCAL_LIBC(pthread_num_processors_np) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_num_processors_np))(void) {
 	__cpu_set_t __cset;

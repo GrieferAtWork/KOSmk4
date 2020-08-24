@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba8164d0 */
+/* HASH CRC-32:0xd6e746f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2143,7 +2143,9 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
  * PTHREAD_ATFORK can be called several times, in which case the PREPARE
  * handlers are called in LIFO order (last added with PTHREAD_ATFORK,
  * first called before FORK), and the PARENT and CHILD handlers are called
- * in FIFO (first added, first called) */
+ * in FIFO (first added, first called)
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to register callbacks */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
 #else /* __CRT_HAVE_pthread_atfork */
 #undef __pthread_atfork_defined

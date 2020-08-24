@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef29760f */
+/* HASH CRC-32:0x7c4687d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Try locking a mutex */
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_trylock,(__pthread_mutex_t *__mutex),pthread_mutex_trylock,(__mutex))
+/* Try locking a mutex
+ * @return: EOK:   Success
+ * @return: EBUSY: The mutex has already been locked
+ *                 In case of a recursive mutex, another
+ *                 thread was the one to acquire the lock. */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_trylock,(__pthread_mutex_t *__mutex),pthread_mutex_trylock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_trylock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>

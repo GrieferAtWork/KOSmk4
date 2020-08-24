@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b0fd57a */
+/* HASH CRC-32:0x178bf46d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,8 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
- * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */
+ * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it
+ * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pthread),pthread_detach,(__pthread))
 #endif /* !__local___localdep_pthread_detach_defined */
 __NAMESPACE_LOCAL_END

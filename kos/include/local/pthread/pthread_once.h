@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50232e6d */
+/* HASH CRC-32:0xb74e94cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
- * extern variable initialized to PTHREAD_ONCE_INIT. */
+ * extern variable initialized to PTHREAD_ONCE_INIT.
+ * @return: EOK: Success */
 __LOCAL_LIBC(pthread_once) __ATTR_NONNULL((1, 2)) __errno_t
 (__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) {
 	__pthread_once_t __status;

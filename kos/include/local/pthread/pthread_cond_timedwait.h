@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6c508bf */
+/* HASH CRC-32:0xf29dfc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_timedwait32 from pthread */
 #if !defined(__local___localdep_pthread_cond_timedwait32_defined) && defined(__CRT_HAVE_pthread_cond_timedwait)
 #define __local___localdep_pthread_cond_timedwait32_defined 1
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
 #endif /* !__local___localdep_pthread_cond_timedwait32_defined && __CRT_HAVE_pthread_cond_timedwait */
 /* Dependency: pthread_cond_timedwait64 from pthread */
 #ifndef __local___localdep_pthread_cond_timedwait64_defined
@@ -38,14 +45,20 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970). */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait64,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
+ * (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait64,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970). */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait64,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
+ * (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait64,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait)
 __NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_cond_timedwait64.h>
@@ -53,7 +66,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970). */
+ * (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
 #define __localdep_pthread_cond_timedwait64 __LIBC_LOCAL_NAME(pthread_cond_timedwait64)
 #else /* ... */
 #undef __local___localdep_pthread_cond_timedwait64_defined
@@ -62,8 +78,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
- * (00:00:00 GMT, January 1, 1970). */
-__LOCAL_LIBC(pthread_cond_timedwait) __ATTR_NONNULL((1, 2, 3)) __errno_t
+ * (00:00:00 GMT, January 1, 1970).
+ * @return: EOK:       Success
+ * @return: EINVAL:    The given `abstime' is invalid
+ * @return: ETIMEDOUT: The given `abstime' has expired */
+__LOCAL_LIBC(pthread_cond_timedwait) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) {
 #ifdef __CRT_HAVE_pthread_cond_timedwait
 	__errno_t __result;
