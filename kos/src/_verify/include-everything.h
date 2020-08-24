@@ -582,6 +582,7 @@ incdir("", "../../include");
 #if __has_include(<expat_external.h>)
 #include <expat_external.h>
 #endif /* __has_include(<expat_external.h>) */
+#include <fastmath.h>
 #include <fcntl.h>
 #include <features.h>
 #include <fenv.h>
@@ -1577,11 +1578,15 @@ incdir("", "../../include");
 #include <sys/stat.h>
 #include <sys/statfs.h>
 #include <sys/statvfs.h>
+#include <sys/stdarg.h>
+#include <sys/stdbool.h>
+#include <sys/stdint.h>
 #include <sys/stropts.h>
 #include <sys/swap.h>
 #include <sys/syscall-proto.h>
 #include <sys/syscall.h>
 #include <sys/sysinfo.h>
+#include <sys/syslimits.h>
 #include <sys/syslog.h>
 #include <sys/sysmacros.h>
 #include <sys/termio.h>

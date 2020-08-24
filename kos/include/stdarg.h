@@ -64,8 +64,9 @@ __NAMESPACE_STD_USING(va_list)
 /* T va_arg(va_list &ap, typename T); */
 #define va_arg __builtin_va_arg
 
-#if (defined(__USE_ISOC99) || defined(__USE_SOLARIS) || defined(__USE_XOPEN2K) || \
-     (defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0 >= 199900L)) ||          \
+#if (defined(__USE_ISOC99) || defined(__USE_SOLARIS) ||                  \
+     defined(__USE_XOPEN2K) || defined(__USE_NETBSD) ||                  \
+     (defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0 >= 199900L)) || \
      (defined(__cplusplus) && (__cplusplus + 0 >= 201103L)))
 #define va_copy __builtin_va_copy
 #endif /* ... */

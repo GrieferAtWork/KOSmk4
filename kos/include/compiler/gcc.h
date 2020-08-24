@@ -819,6 +819,11 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define __NULLPTR ((void *)0)
 #endif /* !__cplusplus */
 
+#if __GCC_VERSION_NUM < 40402
+#undef __builtin_va_start
+#define __builtin_va_start __builtin_stdarg_start
+#endif /* __GCC_VERSION_NUM < 40402 */
+
 #ifdef __cplusplus
 /* `__builtin_choose_expr()' is only available in C, but not in C++ */
 #undef __builtin_choose_expr

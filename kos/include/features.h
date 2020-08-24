@@ -238,6 +238,14 @@
 #endif
 
 
+#ifdef _NETBSD_SOURCE
+#define __USE_NETBSD 1
+#undef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#undef _POSIX_SOURCE
+#define _POSIX_SOURCE 1
+#endif /* _NETBSD_SOURCE */
+
 /* Make available some BSD-specific extensions such as `cfmakesane()' */
 #ifdef _BSD_SOURCE
 #define __USE_BSD 1
@@ -260,10 +268,6 @@
 #endif /* __EXTENSIONS__ */
 
 
-
-#ifdef _NETBSD_SOURCE
-#define __USE_NETBSD 1
-#endif /* _NETBSD_SOURCE */
 
 #if ((defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
      !defined(_DEFAULT_SOURCE))
@@ -362,9 +366,9 @@
 #if !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
 #define __USE_POSIX_IMPLICITLY 1
 #endif /* !_POSIX_SOURCE && !_POSIX_C_SOURCE */
-#undef  _POSIX_SOURCE
+#undef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
-#undef  _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #endif /* _DEFAULT_SOURCE && !__USE_ISOC_PURE */
 
@@ -387,7 +391,7 @@
 
 #if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE)
 #define __USE_POSIX 1
-#endif
+#endif /* _POSIX_SOURCE || _POSIX_C_SOURCE || _XOPEN_SOURCE */
 
 #if (defined(_XOPEN_SOURCE) || \
      (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 2))

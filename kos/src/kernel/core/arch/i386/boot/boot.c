@@ -457,6 +457,28 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       wasn't built with support for -mno-red-zone.
 	 * >> https://wiki.osdev.org/Libgcc_without_red_zone */
 
+	/* TODO: Refactor <parts/xxx/errno.h> to use <asm/...>
+	 *       Similarly, <errno.h> should define errno codes using the usual
+	 *       #ifdef __<NAME>
+	 *       #define <NAME> __<NAME>
+	 *       #endif
+	 *       formula.
+	 * Macro names such as __DOS_EPERM will be removed, and where libc uses
+	 * these names at the moment, they should be replaced with `deemon -F`
+	 * scripts that scan the <asm/xxx.h> headers for the appropriate values
+	 *
+	 * <parts/errno.h> should become <libc/errno.h>, and the __errno macro
+	 * should be related with a new macro `__libc_errno' that behaves identical.
+	 *
+	 * -> There is no reason to break the usual escape-formula for <errno.h>
+	 *    Everything that it does can also be encoded via (now) conventional
+	 *    means.
+	 */
+
+	/* TODO: Various X components directly include a file <asm/page.h> that seems to
+	 *       have been apart of older installments of GLibc. - KOS should emulate that
+	 *       header. */
+
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Current Blocker:

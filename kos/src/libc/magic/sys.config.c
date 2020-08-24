@@ -33,8 +33,8 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <bits/types.h>
 #include <asm/limits.h>
+#include <bits/types.h>
 
 #undef STDC_HEADERS
 #define STDC_HEADERS 1
@@ -523,11 +523,10 @@
 
 #undef RETSIGTYPE
 #define RETSIGTYPE void /* Return type of `sighandler_t' callbacks */
+#endif /* __KOS_SYSTEM_HEADERS__ */
 
 #undef HAVE_SIZE_T
 #define HAVE_SIZE_T 1 /* There's always `__SIZE_TYPE__' from `<hybrid/typecore.h>' */
-
-#endif /* __KOS_SYSTEM_HEADERS__ */
 
 #undef HAVE_LONG_DOUBLE
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -572,7 +571,7 @@
      defined(_WIN32) || defined(WIN32) || defined(_WIN64) ||         \
      defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
      defined(_WIN32_WCE) || defined(WIN32_WCE))
-#define NULL_DEVICE "nul"
+#define NULL_DEVICE "NUL"
 #else /* ... */
 #define NULL_DEVICE "/dev/null"
 #endif /* !... */
@@ -585,8 +584,8 @@
 
 
 
-/* Cygwin also has a header of the same name, so where
- * is an approximation of what it's placed into it. */
+/* Cygwin also has a header of the same name, so here is
+ * an approximation of its contents (adjusted for KOS). */
 #undef __DYNAMIC_REENT__
 #undef __LINUX_ERRNO_EXTENSIONS__
 #define __DYNAMIC_REENT__ 1
