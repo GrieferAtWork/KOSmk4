@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b59709c */
+/* HASH CRC-32:0xd65b5612 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2371,6 +2371,7 @@
 #define __NR32ATR3_setsockopt              SC_REPR_SOCKOPT_OPTVAL                                               /* optval */ 
 #define __NR32ATL3_setsockopt              4                                                                    /* optval -> optlen */ 
 #define __NR32ATR4_setsockopt              SC_REPR_SOCKLEN_T                                                    /* optlen */ 
+#define __NR32ATL4_setsockopt              2                                                                    /* optlen -> optname */ 
 #define __NR32RTR_setsockopt               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getsockname             SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_getsockname             SC_REPR_POINTER                                                      /* addr */ 

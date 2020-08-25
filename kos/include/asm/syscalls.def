@@ -1648,7 +1648,7 @@ setsockopt:(fd_t sockfd,
             [tostr(SOCKOPT_LEVEL)] syscall_ulong_t level,
             [tostr(SOCKOPT_OPTNAME:level)] syscall_ulong_t optname,
             [tostr(SOCKOPT_OPTVAL:optlen)] void const *optval,
-            socklen_t optlen) -> errno_t;
+            [tostr(SOCKLEN_T:optname)] socklen_t optlen) -> errno_t;
 
 getsockname:(fd_t sockfd,
              [tostr(out:STRUCT_SOCKADDR:*addr_len)] struct sockaddr *addr,

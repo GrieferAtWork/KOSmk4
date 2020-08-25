@@ -430,6 +430,14 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_msg_flags
 #endif /* ... */
 
+#ifdef HAVE_SC_REPR_SOCKOPT_LEVEL
+#define NEED_print_sockopt_level
+#endif /* HAVE_SC_REPR_SOCKOPT_LEVEL */
+
+#ifdef HAVE_SC_REPR_SOCKOPT_OPTNAME
+#define NEED_print_sockopt_optname
+#endif /* HAVE_SC_REPR_SOCKOPT_OPTNAME */
+
 
 
 
@@ -2738,6 +2746,116 @@ err:
 
 
 
+#if defined(NEED_print_sockopt_level) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__SOL_");
+printStrendNDatabase("SOL", typ);
+]]]*/
+#define GETBASE_SOL(result, index) \
+	(((index) <= 0x1) ? ((result) = repr_SOL_0h, true) : \
+	 ((index) >= 0xff && (index) <= 0x10a) ? ((index) -= 0xff, (result) = repr_SOL_ffh, true) : false)
+PRIVATE char const repr_SOL_0h[] =
+"\0SOCKET";
+PRIVATE char const repr_SOL_ffh[] =
+"RAW\0\0\0\0\0\0DECNET\0X25\0PACKET\0ATM\0AAL\0IRDA";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_sol_name(syscall_ulong_t level) {
+	char const *result = NULL;
+	if (!GETBASE_SOL(result, level))
+		goto done;
+	for (; level; --level)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_sockopt_level(pformatprinter printer, void *arg,
+                    syscall_ulong_t level) {
+	char const *name;
+	name = get_sol_name(level);
+	if (name)
+		return format_printf(printer, arg, "SOL_%s", name);
+	return format_printf(printer, arg,
+	                     "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__),
+	                     level);
+}
+#endif /* NEED_print_sockopt_level */
+
+
+
+
+
+#if defined(NEED_print_sockopt_optname) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__SO_");
+printStrendNDatabase("SOCKET_SO", typ);
+]]]*/
+#define GETBASE_SOCKET_SO(result, index) \
+	(((index) <= 0x32) ? ((result) = repr_SOCKET_SO_0h, true) : \
+	 ((index) >= 0x400 && (index) <= 0x401) ? ((index) -= 0x400, (result) = repr_SOCKET_SO_400h, true) : false)
+PRIVATE char const repr_SOCKET_SO_0h[] =
+"\0DEBUG\0REUSEADDR\0TYPE\0ERROR\0DONTROUTE\0BROADCAST\0SNDBUF\0RCVBUF\0KE"
+"EPALIVE\0OOBINLINE\0NO_CHECK\0PRIORITY\0LINGER\0BSDCOMPAT\0REUSEPORT\0P"
+"ASSCRED\0PEERCRED\0RCVLOWAT\0SNDLOWAT\0RCVTIMEO\0SNDTIMEO\0SECURITY_AU"
+"THENTICATION\0SECURITY_ENCRYPTION_TRANSPORT\0SECURITY_ENCRYPTION_N"
+"ETWORK\0BINDTODEVICE\0ATTACH_FILTER\0DETACH_FILTER\0PEERNAME\0TIMESTA"
+"MP\0ACCEPTCONN\0PEERSEC\0SNDBUFFORCE\0RCVBUFFORCE\0PASSSEC\0TIMESTAMPN"
+"S\0MARK\0TIMESTAMPING\0PROTOCOL\0DOMAIN\0RXQ_OVFL\0WIFI_STATUS\0PEEK_OF"
+"F\0NOFCS\0LOCK_FILTER\0SELECT_ERR_QUEUE\0BUSY_POLL\0MAX_PACING_RATE\0B"
+"PF_EXTENSIONS\0INCOMING_CPU\0ATTACH_BPF";
+PRIVATE char const repr_SOCKET_SO_400h[] =
+"NOSIGPIPE\0DONTWAIT";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_socket_so_name(syscall_ulong_t name) {
+	char const *result = NULL;
+	if (!GETBASE_SOCKET_SO(result, name))
+		goto done;
+	for (; name; --name)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_sockopt_optname(pformatprinter printer, void *arg,
+                      syscall_ulong_t level,
+                      syscall_ulong_t optname) {
+	char const *name;
+	switch (level) {
+
+	case SOL_SOCKET:
+		name = get_socket_so_name(optname);
+		break;
+
+	default:
+		name = NULL;
+		break;
+	}
+	if (name)
+		return format_printf(printer, arg, "SO_%s", name);
+	return format_printf(printer, arg,
+	                     "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__),
+	                     optname);
+}
+#endif /* NEED_print_sockopt_optname */
+
+
+
+
+
 
 
 
@@ -2806,8 +2924,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_ARGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_CALL 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_SHUTDOWN_HOW 1
-	// TODO: #define HAVE_SC_REPR_SOCKOPT_LEVEL 1
-	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTNAME 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTVAL 1
 	// TODO: #define HAVE_SC_REPR_SPLICE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_DEBUGTRAP_REASON32 1
@@ -2873,6 +2989,31 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#ifdef HAVE_SC_REPR_SOCKOPT_LEVEL
+	case SC_REPR_SOCKOPT_LEVEL:
+		result = print_sockopt_level(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SOCKOPT_LEVEL */
+
+#ifdef HAVE_SC_REPR_SOCKOPT_OPTNAME
+	case SC_REPR_SOCKOPT_OPTNAME:
+		if unlikely(!link) {
+#if __SIZEOF_SYSCALL_LONG_T__ == 4
+			goto do_uint32_t;
+#define NEED_do_uint32_t
+#elif __SIZEOF_SYSCALL_LONG_T__ == 8
+			goto do_uint64_t;
+#define NEED_do_uint64_t
+#else /* __SIZEOF_SYSCALL_LONG_T__ == ... */
+#error "Unsupported __SIZEOF_SYSCALL_LONG_T__"
+#endif /* __SIZEOF_SYSCALL_LONG_T__ != ... */
+		}
+		result = print_sockopt_optname(printer, arg,
+		                               (syscall_ulong_t)link->sa_value.sv_u64,
+		                               (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SOCKOPT_OPTNAME */
 
 
 #ifdef HAVE_SC_REPR_SOCKET_SENDMSG_FLAGS

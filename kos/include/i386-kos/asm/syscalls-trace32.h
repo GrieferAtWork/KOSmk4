@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd2f23 */
+/* HASH CRC-32:0x952c5ef2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2371,6 +2371,7 @@
 #define __NRATR3_setsockopt              SC_REPR_SOCKOPT_OPTVAL                                               /* optval */ 
 #define __NRATL3_setsockopt              4                                                                    /* optval -> optlen */ 
 #define __NRATR4_setsockopt              SC_REPR_SOCKLEN_T                                                    /* optlen */ 
+#define __NRATL4_setsockopt              2                                                                    /* optlen -> optname */ 
 #define __NRRTR_setsockopt               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getsockname             SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NRATR1_getsockname             SC_REPR_POINTER                                                      /* addr */ 
