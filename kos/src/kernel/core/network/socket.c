@@ -922,6 +922,9 @@ again_receive:
 			                                      msg_flags,
 			                                      timeout);
 		} else {
+			assertf(self->sk_ops->so_recvfromv,
+			        "At least one of `so_recvv' or `so_recvfromv' "
+			        "has to be implemented by every socket type");
 			/* Vectored receive buffer. */
 			result = (*self->sk_ops->so_recvfromv)(self,
 			                                       buf,

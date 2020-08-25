@@ -24,6 +24,7 @@
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
+#include <hybrid/__overflow.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/types.h>
@@ -44,13 +45,16 @@
 #include <hybrid/__atomic.h>
 #endif /* !__INTELLISENSE__ */
 
+#ifndef __CEIL_ALIGN
+#define __CEIL_ALIGN(x, align) (((x) + ((align)-1)) & ~((align)-1))
+#endif /* !__CEIL_ALIGN */
+
 /* Implementation of the general-purpose packet-buffer
  * used to implement kernel-space socket queues. */
 
 
 /* Min alignment of all packet buffer data. */
 #define PACKET_BUFFER_ALIGNMENT __SIZEOF_POINTER__
-
 
 
 #define PB_PACKET_STATE_UNDEF    0 /* Undefined packet state (cannot happen) */
@@ -94,6 +98,11 @@ struct pb_packet {
 	/* OFFSET_FROM_BASE == PB_PACKET_NEXTLINK_SIZE */
 };
 
+/* The max possible packet payload size. */
+#define PB_PACKET_MAX_PAYLOAD                           \
+	((0xffff - __CEIL_ALIGN(PB_PACKET_HEADER_SIZE,      \
+	                        PACKET_BUFFER_ALIGNMENT)) & \
+	 ~(PACKET_BUFFER_ALIGNMENT - 1))
 
 
 /* Return a pointer to the payload of `self'
@@ -518,6 +527,36 @@ __NOTHROW(pb_buffer_closed)(struct pb_buffer const *__restrict self);
 
 
 
+#define pb_packet_get_totalsize_s(payload_size, ancillary_size)                 \
+	(__CEIL_ALIGN(__CCAST(__size_t)(payload_size), PACKET_BUFFER_ALIGNMENT) +   \
+	 __CEIL_ALIGN(__CCAST(__size_t)(ancillary_size), PACKET_BUFFER_ALIGNMENT) + \
+	 __CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT))
+
+
+/* Calculate the required total size of a packet, and check for overflow.
+ * @return: true:  Success
+ * @return: false: Overflow */
+__LOCAL __NOBLOCK __ATTR_WUNUSED __BOOL
+__NOTHROW(pb_packet_get_totalsize)(__size_t payload_size,
+                                   __size_t ancillary_size,
+                                   __uint16_t *__restrict ptotal_size) {
+	__size_t total;
+	total = pb_packet_get_totalsize_s(payload_size, ancillary_size);
+	*ptotal_size = (__uint16_t)total;
+	return total <= 0xffff;
+}
+
+
+#define PB_BUFFER_STARTWRITE_TOOLARGE ((struct pb_packet *)-1) /* Packet is _always_ too large */
+#define PB_BUFFER_STARTWRITE_READSOME ((struct pb_packet *)-2) /* Must read some packets before this one can be written. */
+#ifdef __KERNEL__
+#define PB_BUFFER_STARTWRITE_ISOK(x) ((uintptr_t)(x) < (uintptr_t)-2)
+#else /* __KERNEL__ */
+#define PB_BUFFER_STARTWRITE_BADALLOC ((struct pb_packet *)-3) /* Failed to allocate more memory. */
+#define PB_BUFFER_STARTWRITE_ISOK(x) ((uintptr_t)(x) < (uintptr_t)-3)
+#endif /* !__KERNEL__ */
+
+
 /* Begin construction of a new packet to-be appended to `self'
  * NOTES:
  *   - All of the packet's struct fields will have already been filled in by this function.
@@ -537,33 +576,34 @@ __NOTHROW(pb_buffer_closed)(struct pb_buffer const *__restrict self);
  *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
  *                    >> void *pb_packet_payload(struct pb_packet *);
  *                    >> void *pb_packet_ancillary(struct pb_packet *);
- * @return: NULL: [kernel || errno == UNCHANGED] Packet too large (`pb_limt' would be exceeded)
- * @return: NULL: [!kernel && errno == ENOMEM]   Failed to allocate more buffer memory
- * @throw: E_BADALLOC: [kernel]                  Failed to allocate more buffer memory */
+ * @return: PB_BUFFER_STARTWRITE_TOOLARGE: [...]
+ * @return: PB_BUFFER_STARTWRITE_READSOME: [...]
+ * @return: PB_BUFFER_STARTWRITE_BADALLOC: [...] (user-space only)
+ * @throw: E_BADALLOC: Failed to allocate more buffer memory (kernel only) */
 #ifdef __KERNEL__
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
 (LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
-                                      __uint16_t payload_size,
-                                      __uint16_t ancillary_size)
+                                      __size_t payload_size,
+                                      __size_t ancillary_size)
 		/*__THROWS(E_BADALLOC)*/;
 #else /* __KERNEL__ */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
 /*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
-                                                    __uint16_t payload_size,
-                                                    __uint16_t ancillary_size);
+                                                    __size_t payload_size,
+                                                    __size_t ancillary_size);
 #endif /* !__KERNEL__ */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 #ifdef __KERNEL__
 LIBBUFFER_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *LIBBUFFER_CC
 pb_buffer_startwrite(struct pb_buffer *__restrict self,
-                     __uint16_t payload_size,
-                     __uint16_t ancillary_size)
+                     __size_t payload_size,
+                     __size_t ancillary_size)
 		__THROWS(E_BADALLOC);
 #else /* __KERNEL__ */
 LIBBUFFER_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
 __NOTHROW(LIBBUFFER_CC pb_buffer_startwrite)(struct pb_buffer *__restrict self,
-                                             __uint16_t payload_size,
-                                             __uint16_t ancillary_size);
+                                             __size_t payload_size,
+                                             __size_t ancillary_size);
 #endif /* !__KERNEL__ */
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
@@ -712,16 +752,16 @@ typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 		/*__THROWS(E_WOULDBLOCK)*/;
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 (LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
-                                    __uint16_t payload_size,
-                                    __uint16_t ancillary_size)
+                                    __size_t payload_size,
+                                    __size_t ancillary_size)
 		/*__THROWS(E_WOULDBLOCK)*/;
 #else /* __KERNEL__ */
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 /*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_CANREAD)(struct pb_buffer *__restrict self);
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 /*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
-                                                  __uint16_t payload_size,
-                                                  __uint16_t ancillary_size);
+                                                  __size_t payload_size,
+                                                  __size_t ancillary_size);
 #endif /* !__KERNEL__ */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 #ifdef __KERNEL__
@@ -730,16 +770,16 @@ LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 		__THROWS(E_WOULDBLOCK);
 LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 (LIBBUFFER_CC pb_buffer_canwrite)(struct pb_buffer *__restrict self,
-                                  __uint16_t payload_size,
-                                  __uint16_t ancillary_size)
+                                  __size_t payload_size,
+                                  __size_t ancillary_size)
 		__THROWS(E_WOULDBLOCK);
 #else /* __KERNEL__ */
 LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(LIBBUFFER_CC pb_buffer_canread)(struct pb_buffer *__restrict self);
 LIBBUFFER_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(LIBBUFFER_CC pb_buffer_canwrite)(struct pb_buffer *__restrict self,
-                                           __uint16_t payload_size,
-                                           __uint16_t ancillary_size);
+                                           __size_t payload_size,
+                                           __size_t ancillary_size);
 #endif /* !__KERNEL__ */
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 

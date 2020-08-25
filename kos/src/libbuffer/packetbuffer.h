@@ -52,20 +52,21 @@ DECL_BEGIN
  *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
  *                    >> void *pb_packet_payload(struct pb_packet *);
  *                    >> void *pb_packet_ancillary(struct pb_packet *);
- * @return: NULL: [kernel || errno == UNCHANGED] Packet too large (`pb_limt' would be exceeded)
- * @return: NULL: [!kernel && errno == ENOMEM]   Failed to allocate more buffer memory
- * @throw: E_BADALLOC: [kernel]                  Failed to allocate more buffer memory */
+ * @return: PB_BUFFER_STARTWRITE_TOOLARGE: [...]
+ * @return: PB_BUFFER_STARTWRITE_READSOME: [...]
+ * @return: PB_BUFFER_STARTWRITE_BADALLOC: [...] (user-space only)
+ * @throw: E_BADALLOC: Failed to allocate more buffer memory (kernel only) */
 #ifdef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) struct pb_packet *CC
 lib_pb_buffer_startwrite(struct pb_buffer *__restrict self,
-                         uint16_t payload_size,
-                         uint16_t ancillary_size)
+                         size_t payload_size,
+                         size_t ancillary_size)
 		__THROWS(E_BADALLOC);
 #else /* __KERNEL__ */
 INTDEF WUNUSED NONNULL((1)) struct pb_packet *
 NOTHROW(CC lib_pb_buffer_startwrite)(struct pb_buffer *__restrict self,
-                                     uint16_t payload_size,
-                                     uint16_t ancillary_size);
+                                     size_t payload_size,
+                                     size_t ancillary_size);
 #endif /* !__KERNEL__ */
 
 
@@ -163,16 +164,16 @@ INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 		__THROWS(E_WOULDBLOCK);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 (CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
-                            uint16_t payload_size,
-                            uint16_t ancillary_size)
+                            size_t payload_size,
+                            size_t ancillary_size)
 		__THROWS(E_WOULDBLOCK);
 #else /* __KERNEL__ */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(CC lib_pb_buffer_canread)(struct pb_buffer *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
-                                   uint16_t payload_size,
-                                   uint16_t ancillary_size);
+                                   size_t payload_size,
+                                   size_t ancillary_size);
 #endif /* !__KERNEL__ */
 
 

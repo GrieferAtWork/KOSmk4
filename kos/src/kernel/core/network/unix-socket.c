@@ -36,6 +36,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 #include <kernel/malloc.h>
 #include <sched/async.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
@@ -45,13 +46,42 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 #include <sys/un.h> /* sockaddr_un  */
 
 #include <assert.h>
+#include <limits.h>
 #include <stdalign.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN
 
 typedef struct unix_socket UnixSocket;
+
+/************************************************************************/
+/* ANCILLARY DATA ENCODE FUNCTIONS                                      */
+/************************************************************************/
+
+PRIVATE NONNULL((1)) size_t FCALL
+unix_ancillary_data_size(struct ancillary_message const *__restrict message
+                         ANCILLARY_MESSAGE_PARAM__msg_flags) {
+	/* TODO */
+	(void)message;
+	(void)(ANCILLARY_MESSAGE_ARG_msg_flags + 0);
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+PRIVATE NONNULL((1, 2)) void FCALL
+unix_ancillary_data_encode(struct ancillary_message const *__restrict message,
+                           struct pb_packet *__restrict packet
+                           ANCILLARY_MESSAGE_PARAM__msg_flags) {
+	/* TODO */
+	(void)packet;
+	(void)message;
+	(void)(ANCILLARY_MESSAGE_ARG_msg_flags + 0);
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+
+
 
 /* Destroy a given Unix domain socket client descriptor. */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -864,7 +894,7 @@ socket_is_not_bound:
 	/* Allocate the new unix socket now, so-as to not have to deal with allocation
 	 * errors after already having taken one client from the waiting-client set. */
 	result = (REF UnixSocket *)kmalloc(sizeof(UnixSocket), GFP_CALLOC);
-	socket_cinit(result, &unix_socket_ops, SOCK_STREAM, PF_UNIX);
+	socket_cinit(result, &unix_socket_ops, self->sk_type, PF_UNIX);
 
 	TRY {
 		/* Wait for a client that we can accept. */
@@ -1010,6 +1040,362 @@ UnixSocket_Poll(struct socket *__restrict self,
 }
 
 
+/* Try to send a SOCK_STREAM-style packet containing the first
+ * N bytes of data, starting at buf+offset, but write at most
+ * `bufsize' bytes in total. No ancillary data will be included.
+ * @throw: E_NET_SHUTDOWN: The buffer was closed.
+ * @return: 0 : Cannot send data without blocking at this time.
+ * @return: * : The actual number of sent bytes. */
+PRIVATE NONNULL((1, 2)) size_t KCALL
+PbBuffer_Stream_Sendv_NoBlock(struct pb_buffer *__restrict self,
+                              struct aio_buffer const *__restrict buf,
+                              uintptr_t offset, size_t bufsize)
+		THROWS(E_NET_SHUTDOWN) {
+	size_t used, limt, avail;
+	struct pb_packet *packet;
+again:
+	used = ATOMIC_READ(self->pb_used);
+	limt = ATOMIC_READ(self->pb_limt);
+	if unlikely(!limt)
+		THROW(E_NET_SHUTDOWN); /* Connection was closed. */
+	if (used >= limt)
+		return 0; /* All available buffer space is already in use. */
+	avail = limt - used;
+	if (avail <= CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT))
+		return 0; /* Insufficient space to create any more packets. */
+	avail -= CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT);
+	/* Limit how much we're actually going to send. */
+	if (avail > bufsize)
+		avail = bufsize;
+	/* Limit what is actually possible. */
+	if (avail > PB_PACKET_MAX_PAYLOAD)
+		avail = PB_PACKET_MAX_PAYLOAD;
+	/* Try to start the packet. */
+	packet = pb_buffer_startwrite(self, avail, 0);
+	if unlikely(!PB_BUFFER_STARTWRITE_ISOK(packet))
+		goto again; /* Race condition: Something changed in the mean time. */
+	/* Fill in packet data. */
+	TRY {
+		aio_buffer_copytomem(buf,
+		                     pb_packet_payload(packet),
+		                     offset, avail);
+	} EXCEPT {
+		pb_buffer_endwrite_abort(self, packet);
+		RETHROW();
+	}
+	pb_buffer_endwrite_commit(self, packet);
+	return avail;
+}
+
+
+
+
+
+struct async_send_job {
+	REF UnixSocket          *as_socket;         /* [1..1][const] The socket to which to send data. */
+	struct ancillary_message as_ancillary;      /* [valid_if(as_ancillary_size)] Ancillary message data */
+	size_t                   as_ancillary_size; /* Encoded ancillary data size. */
+	struct aio_buffer        as_payload;        /* [owned(.ab_entv)] The actual payload the should be sent. */
+	uintptr_t                as_payload_offset; /* Offset into `as_payload', to the start of unsent data. */
+	size_t                   as_payload_size;   /* # of payload bytes that have yet to be sent, starting at `as_payload_offset'. */
+#ifdef ANCILLARY_MESSAGE_NEED_MSG_FLAGS
+	syscall_ulong_t          as_msg_flags;      /* Message flags. */
+#endif /* ANCILLARY_MESSAGE_NEED_MSG_FLAGS */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(ASYNC_CALLBACK_CC async_send_fini)(async_job_t self) {
+	struct async_send_job *me;
+	me = (struct async_send_job *)self;
+	kfree((void *)me->as_payload.ab_entv);
+	decref_unlikely(me->as_socket);
+}
+
+PRIVATE NONNULL((1)) bool FCALL
+async_send_test(struct async_send_job *__restrict me) {
+	size_t used, limt, avail;
+	struct pb_buffer *pbuf;
+	pbuf = me->as_socket->us_sendbuf;
+	used = ATOMIC_READ(pbuf->pb_used);
+	limt = ATOMIC_READ(pbuf->pb_limt);
+	if unlikely(!limt)
+		THROW(E_NET_SHUTDOWN); /* Connection was closed. */
+	if (used >= limt)
+		goto nope; /* All available buffer space is already in use. */
+	avail = limt - used;
+	if (avail <= CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT))
+		goto nope; /* Insufficient space to create any more packets. */
+	if (me->as_socket->sk_type == SOCK_STREAM)
+		return true; /* Can send data now! */
+	/* Check if there is enough space for the entire packet, now. */
+	used = pb_packet_get_totalsize_s(me->as_payload_size,
+	                                 me->as_ancillary_size);
+	return used <= avail;
+nope:
+	if (me->as_socket->sk_type != SOCK_STREAM) {
+		/* Make sure that sending the packet is still even possible.
+		 * After all: The limit may have been lowered... */
+		used = pb_packet_get_totalsize_s(me->as_payload_size,
+		                                 me->as_ancillary_size);
+		if unlikely(used > limt)
+			THROW(E_NET_MESSAGE_TOO_LONG, used, limt);
+	}
+	return false;
+}
+
+PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
+async_send_poll(async_job_t self,
+                /*out*/ struct timespec *__restrict UNUSED(timeout)) {
+	struct async_send_job *me;
+	me = (struct async_send_job *)self;
+	if (async_send_test(me))
+		return ASYNC_JOB_POLL_AVAILABLE;;
+	task_connect(&me->as_socket->us_sendbuf->pb_psta);
+	if (async_send_test(me))
+		return ASYNC_JOB_POLL_AVAILABLE;;
+	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
+}
+
+PRIVATE NONNULL((1)) unsigned int ASYNC_CALLBACK_CC
+async_send_work(async_job_t self) {
+	struct async_send_job *me;
+	struct pb_packet *packet;
+	struct pb_buffer *pbuf;
+	me   = (struct async_send_job *)self;
+	pbuf = me->as_socket->us_sendbuf;
+again_start_packet:
+	packet = pb_buffer_startwrite(pbuf,
+	                              me->as_payload_size,
+	                              me->as_ancillary_size);
+	if unlikely(!PB_BUFFER_STARTWRITE_ISOK(packet)) {
+		if (packet == PB_BUFFER_STARTWRITE_TOOLARGE) {
+			if (me->as_socket->sk_type == SOCK_STREAM) {
+				/* Try to split the message into multiple, smaller packets. */
+				size_t part;
+				part = PbBuffer_Stream_Sendv_NoBlock(pbuf,
+				                                     &me->as_payload,
+				                                     me->as_payload_offset,
+				                                     me->as_payload_size);
+				if (part) {
+					me->as_payload_offset += part;
+					me->as_payload_size -= part;
+					goto again_start_packet;
+				}
+				/* Nothing can be sent at this time.
+				 * -> Must blocking-wait for someone to receive data first. */
+			} else {
+				size_t limit, total;
+				total = pb_packet_get_totalsize_s(me->as_payload_size,
+				                                  me->as_ancillary_size);
+				limit = ATOMIC_READ(pbuf->pb_limt);
+				if (limit > UINT16_MAX)
+					limit = UINT16_MAX;
+				/* Check for race condition: The limit was raised in the mean time. */
+				if unlikely(total <= limit)
+					goto again_start_packet;
+				THROW(E_NET_MESSAGE_TOO_LONG, total, limit);
+			}
+		} else {
+			assert(packet == PB_BUFFER_STARTWRITE_READSOME);
+		}
+		return ASYNC_JOB_WORK_AGAIN;
+	}
+	/* Populate the packet */
+	TRY {
+		/* Copy over the payload */
+		aio_buffer_copytomem(&me->as_payload,
+		                     pb_packet_payload(packet),
+		                     me->as_payload_offset,
+		                     me->as_payload_size);
+		if (me->as_ancillary_size) {
+			unix_ancillary_data_encode(&me->as_ancillary,
+			                           packet
+			                           ANCILLARY_MESSAGE_ARG__value(me->as_msg_flags));
+		}
+	} EXCEPT {
+		/* Discard the packet if initialization failed. */
+		pb_buffer_endwrite_abort(pbuf, packet);
+		RETHROW();
+	}
+	/* Commit the packet. */
+	pb_buffer_endwrite_commit(pbuf, packet);
+	return ASYNC_JOB_WORK_COMPLETE;
+}
+
+
+
+/* Async job for sending a UNIX domain datagram. */
+PRIVATE struct async_job_callbacks const async_send = {
+	/* .jc_jobsize  = */ sizeof(struct async_send_job),
+	/* .jc_jobalign = */ alignof(struct async_send_job),
+	/* .jc_driver   = */ &drv_self,
+	/* .jc_fini     = */ &async_send_fini,
+	/* .jc_poll     = */ &async_send_poll,
+	/* .jc_work     = */ &async_send_work,
+	/* .jc_time     = */ NULL,
+	/* .jc_cancel   = */ NULL
+};
+
+
+
+
+
+PRIVATE NONNULL((1, 2, 6)) void KCALL
+UnixSocket_Sendv(struct socket *__restrict self,
+                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
+                 /*out*/ struct aio_handle *__restrict aio)
+		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
+	UnixSocket *me;
+	struct pb_buffer *pbuf;
+	struct pb_packet *packet;
+	size_t ancillary_size;
+	uintptr_t offset;
+	(void)msg_flags;
+	me = (UnixSocket *)self;
+	{
+		struct socket_node *node;
+		node = ATOMIC_READ(me->us_node);
+		/* make sure we're actually connected. */
+		if unlikely(node == NULL || node == (struct socket_node *)-1) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED);
+		}
+		/* make sure that this one's a client-socket. */
+		if unlikely(!me->us_client) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED);
+		}
+	}
+	/* At this point, we can send data via `me->us_sendbuf' */
+	pbuf = me->us_sendbuf;
+	assert(pbuf);
+
+	/* Ancillary data! */
+	ancillary_size = 0;
+	if (msg_control) {
+		ancillary_size = unix_ancillary_data_size(msg_control
+		                                          ANCILLARY_MESSAGE_ARG__msg_flags);
+	}
+
+	offset = 0;
+	/* Try to initiate a new packet. */
+again_start_packet:
+	packet = pb_buffer_startwrite(pbuf, bufsize, ancillary_size);
+	if unlikely(!PB_BUFFER_STARTWRITE_ISOK(packet)) {
+		if (packet == PB_BUFFER_STARTWRITE_TOOLARGE) {
+			if (me->sk_type == SOCK_STREAM) {
+				/* Try to split the message into multiple, smaller packets. */
+				size_t part;
+				part = PbBuffer_Stream_Sendv_NoBlock(pbuf, buf, offset, bufsize);
+				if (part) {
+					offset += part;
+					bufsize -= part;
+					goto again_start_packet;
+				}
+				/* Nothing can be sent at this time.
+				 * -> Must blocking-wait for someone to receive data first. */
+			} else {
+				size_t limit, total;
+				total = pb_packet_get_totalsize_s(bufsize, ancillary_size);
+				limit = ATOMIC_READ(pbuf->pb_limt);
+				if (limit > UINT16_MAX)
+					limit = UINT16_MAX;
+				/* Check for race condition: The limit was raised in the mean time. */
+				if unlikely(total <= limit)
+					goto again_start_packet;
+				THROW(E_NET_MESSAGE_TOO_LONG, total, limit);
+			}
+		} else {
+			assert(packet == PB_BUFFER_STARTWRITE_READSOME);
+		}
+		{
+			/* Must enqueue an async job to send data once some packets were read. */
+			REF async_job_t aj;
+			struct async_send_job *job;
+			aj  = async_job_alloc(&async_send);
+			job = (struct async_send_job *)aj;
+			TRY {
+				job->as_payload.ab_entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
+				                                                             sizeof(struct aio_buffer_entry),
+				                                                             GFP_NORMAL);
+			} EXCEPT {
+				async_job_free(aj);
+				RETHROW();
+			}
+			/* Fill in data members of the async job. */
+			job->as_socket = (REF UnixSocket *)incref(me);
+			job->as_ancillary_size = ancillary_size;
+			if (ancillary_size)
+				memcpy(&job->as_ancillary, msg_control, sizeof(*msg_control));
+			job->as_payload.ab_entc = buf->ab_entc;
+			job->as_payload.ab_head = buf->ab_head;
+			job->as_payload.ab_last = buf->ab_last;
+			memcpy((void *)job->as_payload.ab_entv, buf->ab_entv,
+			       buf->ab_entc, sizeof(struct aio_buffer_entry));
+			job->as_payload_offset = offset;
+			job->as_payload_size   = bufsize;
+#ifdef ANCILLARY_MESSAGE_NEED_MSG_FLAGS
+			job->as_msg_flags = msg_flags;
+#endif /* ANCILLARY_MESSAGE_NEED_MSG_FLAGS */
+			/* Start the job, and connect it the given `aio' */
+			decref(async_job_start(aj, aio));
+			return;
+		}
+	}
+	TRY {
+		/* Copy over the payload */
+		aio_buffer_copytomem(buf, pb_packet_payload(packet),
+		                     offset, bufsize);
+		if (ancillary_size) {
+			unix_ancillary_data_encode(msg_control,
+			                           packet
+			                           ANCILLARY_MESSAGE_ARG__msg_flags);
+		}
+	} EXCEPT {
+		/* Discard the packet if initialization failed. */
+		pb_buffer_endwrite_abort(pbuf, packet);
+		RETHROW();
+	}
+	/* Commit the packet. */
+	pb_buffer_endwrite_commit(pbuf, packet);
+
+	/* Setup AIO to indicate that we're already done. */
+	aio_handle_init(aio, &aio_noop_type);
+	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
+}
+
+
+
+PRIVATE NONNULL((1)) void KCALL
+UnixSocket_Shutdown(struct socket *__restrict self,
+                    syscall_ulong_t how)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
+	UnixSocket *me;
+	me = (UnixSocket *)self;
+	{
+		struct socket_node *node;
+		node = ATOMIC_READ(me->us_node);
+		/* make sure we're actually connected. */
+		if unlikely(node == NULL || node == (struct socket_node *)-1) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
+		}
+		/* make sure that this one's a client-socket. */
+		if unlikely(!me->us_client) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
+		}
+	}
+	/* Simply close the specified buffers. */
+	if (SHUT_ISRD(how))
+		pb_buffer_close(me->us_recvbuf);
+	if (SHUT_ISWR(how))
+		pb_buffer_close(me->us_sendbuf);
+}
+
+
 
 
 /* Socket operators for UDP sockets. */
@@ -1022,7 +1408,7 @@ PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_bind        = */ &UnixSocket_Bind,
 	/* .so_connect     = */ &UnixSocket_Connect,
 	/* .so_send        = */ NULL,
-	/* .so_sendv       = */ NULL, /* TODO */
+	/* .so_sendv       = */ &UnixSocket_Sendv,
 	/* .so_sendto      = */ NULL,
 	/* .so_sendtov     = */ NULL,
 	/* .so_recv        = */ NULL,
@@ -1031,10 +1417,10 @@ PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_recvfromv   = */ NULL,
 	/* .so_listen      = */ &UnixSocket_Listen,
 	/* .so_accept      = */ &UnixSocket_Accept,
-	/* .so_shutdown    = */ NULL, /* TODO: Close client read/write packet buffers */
-	/* .so_getsockopt  = */ NULL, /* TODO? */
-	/* .so_setsockopt  = */ NULL, /* TODO? */
-	/* .so_ioctl       = */ NULL, /* TODO? */
+	/* .so_shutdown    = */ &UnixSocket_Shutdown,
+	/* .so_getsockopt  = */ NULL, /* XXX: Implement me? */
+	/* .so_setsockopt  = */ NULL, /* XXX: Implement me? */
+	/* .so_ioctl       = */ NULL, /* XXX: Implement me? */
 	/* .so_free        = */ NULL,
 };
 

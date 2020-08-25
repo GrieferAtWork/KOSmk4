@@ -482,15 +482,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Current Blocker:
-	 *     /kos/src/kernel/core/network/socket.c(375) : socket_asendtov_peer_impl : self->sk_ops->so_sendtov
-	 *     At least one of `so_sendv' or `so_sendtov' has to be implemented by every socket type
-	 *     /kos/src/kernel/core/network/socket.c(375,2) : socket_asendtov_peer_impl+25 : C02602E4+5 : Caused here [sp=EAFF7E40]
-	 *     /kos/src/kernel/core/network/socket.c(398,37) : socket_asendtov_peer+28 : C01BA229+5 : Called here [sp=EAFF7E78]
-	 *     /kos/src/kernel/core/network/socket.c(422,23) : socket_asendv+141 : C01BA20D+41 : Called here [sp=EAFF7E78]
-	 *     /kos/src/kernel/core/network/socket.c(489,16) : socket_sendv+90 : C01BA42A+5 : Called here [sp=EAFF7EB4]
-	 *     /kos/src/kernel/core/network/socket-handle.c(89,21) : ???+22 : C01B8FB6+5 : Called here [sp=EAFF7F40]
-	 *     /kos/src/kernel/core/user/handle-syscalls.c(856,14) : sys_writev+269 : C0294AFD+2 : Called here [sp=EAFF7F5C]
-	 *     /kos/src/kernel/core/arch/i386/syscall/wrappers32.S(23085) : ???+0 : C029D777+5 : Called here [sp=EAFF7FD4]
+	 *     /kos/src/kernel/core/network/socket.c(925) : socket_recvfrom_peer : self->sk_ops->so_recvfromv
+	 *     At least one of `so_recvv' or `so_recvfromv' has to be implemented by every socket type
+	 *     /kos/src/kernel/core/network/socket.c(925,4) : socket_recvfrom_peer+121 : C02610E1+5 : Caused here [sp=EAFF7DE8]
+	 *     /kos/src/kernel/core/network/socket.c(1005,33) : socket_recv+178 : C01BAB22+5 : Called here [sp=EAFF7F30]
+	 *     /kos/src/kernel/core/network/socket-syscall.c(998,24) : sys_recvfrom+167 : C028E6C7+5 : Called here [sp=EAFF7F7C]
+	 *     /kos/src/kernel/core/arch/i386/syscall/wrappers32.S(31594) : ???+0 : C02A06F6+5 : Called here [sp=EAFF7FC8]
 	 * Solution:
 	 *     - Finish implementing support for unix domain sockets
 	 *

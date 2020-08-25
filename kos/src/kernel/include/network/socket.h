@@ -52,6 +52,7 @@ struct timespec;
 struct ancillary_message {
 	size_t am_controllen; /* [!0] Available ancillary data buffer size. */
 #ifdef __ARCH_HAVE_COMPAT
+#define ANCILLARY_MESSAGE_NEED_MSG_FLAGS 1
 	union {
 		USER CHECKED struct cmsghdr        *am_control;        /* [?..am_controllen] Ancillary data buffer. */
 		USER CHECKED struct compat_cmsghdr *am_control_compat; /* [?..am_controllen] Same as `am_control'. */
@@ -60,6 +61,29 @@ struct ancillary_message {
 	USER CHECKED struct cmsghdr *am_control;     /* [?..am_controllen] Ancillary data buffer. */
 #endif /* !__ARCH_HAVE_COMPAT */
 };
+
+#ifdef ANCILLARY_MESSAGE_NEED_MSG_FLAGS
+#define ANCILLARY_MESSAGE_PARAM_msg_flags   syscall_ulong_t msg_flags
+#define ANCILLARY_MESSAGE_PARAM__msg_flags  , syscall_ulong_t msg_flags
+#define ANCILLARY_MESSAGE_PARAM_msg_flags_  syscall_ulong_t msg_flags,
+#define ANCILLARY_MESSAGE_ARG_msg_flags     msg_flags
+#define ANCILLARY_MESSAGE_ARG__msg_flags    , msg_flags
+#define ANCILLARY_MESSAGE_ARG_msg_flags_    msg_flags,
+#define ANCILLARY_MESSAGE_ARG_value(value)  value
+#define ANCILLARY_MESSAGE_ARG__value(value) , value
+#define ANCILLARY_MESSAGE_ARG_value_(value) value,
+#else /* ANCILLARY_MESSAGE_NEED_MSG_FLAGS */
+#define ANCILLARY_MESSAGE_PARAM_msg_flags   void
+#define ANCILLARY_MESSAGE_PARAM__msg_flags  /* nothing */
+#define ANCILLARY_MESSAGE_PARAM_msg_flags_  /* nothing */
+#define ANCILLARY_MESSAGE_ARG_msg_flags     /* nothing */
+#define ANCILLARY_MESSAGE_ARG__msg_flags    /* nothing */
+#define ANCILLARY_MESSAGE_ARG_msg_flags_    /* nothing */
+#define ANCILLARY_MESSAGE_ARG_value(value)  /* nothing */
+#define ANCILLARY_MESSAGE_ARG__value(value) /* nothing */
+#define ANCILLARY_MESSAGE_ARG_value_(value) /* nothing */
+#endif /* !ANCILLARY_MESSAGE_NEED_MSG_FLAGS */
+
 
 struct ancillary_rmessage {
 	size_t am_controllen; /* [!0] Available ancillary data buffer size. */

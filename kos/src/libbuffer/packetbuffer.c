@@ -149,27 +149,30 @@ NOTHROW(CC are_packets_from_the_current_buffer_in_use)(struct pb_buffer const *_
  *              NOTE: The payload and ancillary data blobs of the packet should be accessed with:
  *                    >> void *pb_packet_payload(struct pb_packet *);
  *                    >> void *pb_packet_ancillary(struct pb_packet *);
- * @return: NULL: [kernel || errno == UNCHANGED] Packet too large (`pb_limt' would be exceeded)
- * @return: NULL: [!kernel && errno == ENOMEM]   Failed to allocate more buffer memory
- * @throw: E_BADALLOC: [kernel]                  Failed to allocate more buffer memory */
+ * @return: PB_BUFFER_STARTWRITE_TOOLARGE: [...]
+ * @return: PB_BUFFER_STARTWRITE_READSOME: [...]
+ * @return: PB_BUFFER_STARTWRITE_BADALLOC: [...] (user-space only)
+ * @throw: E_BADALLOC: Failed to allocate more buffer memory (kernel only) */
 #ifdef __KERNEL__
 INTERN WUNUSED NONNULL((1)) struct pb_packet *CC
 lib_pb_buffer_startwrite(struct pb_buffer *__restrict self,
-                         uint16_t payload_size,
-                         uint16_t ancillary_size)
+                         size_t payload_size,
+                         size_t ancillary_size)
 		__THROWS(E_BADALLOC)
 #else  /* __KERNEL__ */
 INTERN WUNUSED NONNULL((1)) struct pb_packet *
 NOTHROW(CC lib_pb_buffer_startwrite)(struct pb_buffer *__restrict self,
-                                     uint16_t payload_size,
-                                     uint16_t ancillary_size)
+                                     size_t payload_size,
+                                     size_t ancillary_size)
 #endif /* !__KERNEL__ */
 {
 	size_t avail;
 	uint16_t total_size;
-	total_size = CEIL_ALIGN(payload_size, PACKET_BUFFER_ALIGNMENT) +
-	             CEIL_ALIGN(ancillary_size, PACKET_BUFFER_ALIGNMENT) +
-	             CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT);
+	/* Calculate the total required size for the packet. */
+	if (!pb_packet_get_totalsize(payload_size,
+	                             ancillary_size,
+	                             &total_size))
+		return PB_BUFFER_STARTWRITE_TOOLARGE; /* Packet is _always_ too large! */
 again:
 	lock();
 again_locked:
@@ -179,18 +182,19 @@ again_locked:
 	                  (struct pb_packet *)self->pb_bbas))
 		self->pb_wptr = (struct pb_packet *)self->pb_bbas;
 	avail = (size_t)(self->pb_bend - (byte_t *)self->pb_wptr);
-	if (avail <= (size_t)total_size + PB_PACKET_NEXTLINK_SIZE) {
+	if (avail >= (size_t)total_size + PB_PACKET_NEXTLINK_SIZE) {
 		struct pb_packet *packet;
 		if unlikely(!self->pb_limt) {
 			/* Special case: The buffer was closed */
+unlock_and_return_too_large:
 			unlock();
-			return NULL;
+			return PB_BUFFER_STARTWRITE_TOOLARGE;
 		}
 		packet              = self->pb_wptr;
 		packet->p_total     = total_size;
 		packet->p_payoff    = PB_PACKET_HEADER_SIZE;
-		packet->p_payload   = payload_size;
-		packet->p_ancillary = ancillary_size;
+		packet->p_payload   = (uint16_t)payload_size;
+		packet->p_ancillary = (uint16_t)ancillary_size;
 		packet->p_state     = PB_PACKET_STATE_INIT;
 		self->pb_wptr += total_size;
 		ATOMIC_FETCHADD(self->pb_used, total_size);
@@ -199,8 +203,10 @@ again_locked:
 	}
 	/* Check if the buffer size limit allows for a packet of this size to be added. */
 	if unlikely(self->pb_used + total_size >= self->pb_limt) {
+		if (!self->pb_limt)
+			goto unlock_and_return_too_large;
 		unlock();
-		return NULL;
+		return PB_BUFFER_STARTWRITE_READSOME;
 	}
 	if (are_packets_from_the_current_buffer_in_use(self)) {
 		/* We can't realloc() the current buffer!
@@ -232,7 +238,7 @@ allocate_buffer_extension:
 			buf = HEAP_MALLOC_UNX(total_size + PB_PACKET_NEXTLINK_SIZE);
 #ifndef __KERNEL__
 			if (!HEAPPTR_ISOK(buf))
-				return NULL;
+				return PB_BUFFER_STARTWRITE_BADALLOC;
 #endif /* !__KERNEL__ */
 			lock();
 			/* Check if something changed while we weren't holding the lock. */
@@ -356,7 +362,7 @@ allocate_buffer_extension:
 #else /* __KERNEL__ */
 			newbuf = HEAP_REALLOC_UNX(oldbuf, oldsiz, total_size + PB_PACKET_NEXTLINK_SIZE);
 			if unlikely(!HEAPPTR_ISOK(newbuf))
-#define PROPAGATE_BADALLOC return NULL
+#define PROPAGATE_BADALLOC return PB_BUFFER_STARTWRITE_BADALLOC
 #endif /* !__KERNEL__ */
 			{
 				if (trylock()) {
@@ -692,22 +698,23 @@ unlock_and_return_false:
 #ifdef __KERNEL__
 INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 (CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
-                            uint16_t payload_size,
-                            uint16_t ancillary_size)
+                            size_t payload_size,
+                            size_t ancillary_size)
 		__THROWS(E_WOULDBLOCK)
 #else /* __KERNEL__ */
 INTERN NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(CC lib_pb_buffer_canwrite)(struct pb_buffer *__restrict self,
-                                   uint16_t payload_size,
-                                   uint16_t ancillary_size)
+                                   size_t payload_size,
+                                   size_t ancillary_size)
 #endif /* !__KERNEL__ */
 {
 	bool result;
 	uint16_t total_size;
 	/* Calculate the total required size for the packet. */
-	total_size = CEIL_ALIGN(payload_size, PACKET_BUFFER_ALIGNMENT) +
-	             CEIL_ALIGN(ancillary_size, PACKET_BUFFER_ALIGNMENT) +
-	             CEIL_ALIGN(PB_PACKET_HEADER_SIZE, PACKET_BUFFER_ALIGNMENT);
+	if (!pb_packet_get_totalsize(payload_size,
+	                             ancillary_size,
+	                             &total_size))
+		return false; /* Packet is _always_ too large! */
 	rlock();
 	/* Check if the buffer size limit allows for a packet of this size to be added. */
 	if unlikely(self->pb_used + total_size >= self->pb_limt) {

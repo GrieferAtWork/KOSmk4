@@ -97,6 +97,8 @@
 #define __SHUT_RD   0 /* Don't receive any more data (already-received data can still be read, though). */
 #define __SHUT_WR   1 /* Don't allow any more data to be sent. */
 #define __SHUT_RDWR 2 /* Combination of `SHUT_RD' and `SHUT_WR'. */
+#define __SHUT_ISRD(x) ((x) != __SHUT_WR)
+#define __SHUT_ISWR(x) ((x) != __SHUT_RD)
 
 #define __SCM_RIGHTS      0x01 /* Transfer file descriptors. */
 #define __SCM_CREDENTIALS 0x02 /* Credentials passing. */

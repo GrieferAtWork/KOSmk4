@@ -727,6 +727,36 @@ struct linger {
 #define SHUT_RDWR __SHUT_RDWR /* Combination of `SHUT_RD' and `SHUT_WR'. */
 #endif /* __SHUT_RDWR */
 
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifndef __SHUT_ISRD
+#if defined(__SHUT_RD) && defined(__SHUT_RDWR)
+#define __SHUT_ISRD(x) ((x) == __SHUT_RD || (x) == __SHUT_RDWR)
+#elif defined(__SHUT_RD)
+#define __SHUT_ISRD(x) ((x) == __SHUT_RD)
+#elif defined(__SHUT_RDWR)
+#define __SHUT_ISRD(x) ((x) == __SHUT_RDWR)
+#else /* ... */
+#define __SHUT_ISRD(x) 0
+#endif /* !... */
+#endif /* !__SHUT_ISRD */
+
+#ifndef __SHUT_ISWR
+#if defined(__SHUT_WR) && defined(__SHUT_RDWR)
+#define __SHUT_ISWR(x) ((x) == __SHUT_WR || (x) == __SHUT_RDWR)
+#elif defined(__SHUT_WR)
+#define __SHUT_ISWR(x) ((x) == __SHUT_WR)
+#elif defined(__SHUT_RDWR)
+#define __SHUT_ISWR(x) ((x) == __SHUT_RDWR)
+#else /* ... */
+#define __SHUT_ISWR(x) 0
+#endif /* !... */
+#endif /* !__SHUT_ISWR */
+
+/* Test if the given shutdown(2):how argument indicates read/write */
+#define SHUT_ISRD __SHUT_ISRD
+#define SHUT_ISWR __SHUT_ISWR
+#endif /* __USE_KOS || __USE_KOS_KERNEL */
+
 
 #ifdef __CC__
 
