@@ -112,10 +112,10 @@ struct pb_packet {
 
 /* Return a pointer to ancillary data stored within `self'
  * The returned pointer points to a data-blob of `self->p_ancillary' bytes. */
-#define pb_packet_ancillary(self)                                      \
-	((__byte_t *)(self) + ((self)->p_payoff + (self)->p_payload + \
-	                       (PACKET_BUFFER_ALIGNMENT - 1)) &            \
-	 ~(PACKET_BUFFER_ALIGNMENT - 1))
+#define pb_packet_ancillary(self)                                  \
+	((__byte_t *)(self) + (((self)->p_payoff + (self)->p_payload + \
+	                        (PACKET_BUFFER_ALIGNMENT - 1)) &       \
+	                       ~(PACKET_BUFFER_ALIGNMENT - 1)))
 
 
 /* Return the base address/size of the containing buffer for buffer control packet.
@@ -468,11 +468,11 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 #else /* NDEBUG */
 #define __pb_buffer_fini_debug(self) __libc_memset(self, 0xcc, sizeof(struct pb_buffer))
 #endif /* !NDEBUG */
-#define __pb_buffer_cb_fini_ancillary_noop(p, len) (void)0
+#define __pb_buffer_cb_fini_ancillary_noop(packet) (void)0
 
 
 /* Finalize the given packet-buffer.
- * If given, `cb_fini_ancillary(void *ptr, u16 len)' is invoked
+ * If given, `cb_fini_ancillary(struct pb_packet *packet)' is invoked
  * for the ancillary data blob of any packet that was never read. */
 #define pb_buffer_fini(self) pb_buffer_fini_ex(self, __pb_buffer_cb_fini_ancillary_noop)
 #define pb_buffer_fini_ex(self, cb_fini_ancillary)                     \
@@ -491,8 +491,7 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 				_rptr = _cptr;                                         \
 				continue;                                              \
 			}                                                          \
-			cb_fini_ancillary(pb_packet_ancillary(_rptr),              \
-			                  _rptr->p_ancillary);                     \
+			cb_fini_ancillary(_rptr);                                  \
 			_rptr = (struct pb_packet *)((__byte_t *)_rptr +           \
 			                             _rptr->p_total);              \
 		}                                                              \
@@ -614,8 +613,9 @@ __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW(pb_buffer_endwrite_commit)(struct pb_buffer *__restrict self,
                                      struct pb_packet *__restrict packet);
 #else /* __INTELLISENSE__ */
-#define pb_buffer_endwrite_commit(self, packet) \
-	__hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE)
+#define pb_buffer_endwrite_commit(self, packet)                                            \
+	(__hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE), \
+	 pb_buffer_broadcast_psta(self))
 #endif /* !__INTELLISENSE__ */
 
 /* Abort writing/discard the given `packet' from the packet stream. */

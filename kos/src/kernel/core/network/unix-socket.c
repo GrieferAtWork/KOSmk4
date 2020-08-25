@@ -80,6 +80,34 @@ unix_ancillary_data_encode(struct ancillary_message const *__restrict message,
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
+/* @return: * : Set of `0 | MSG_CTRUNC' */
+PRIVATE NONNULL((1, 2)) u32 FCALL
+unix_ancillary_data_decode(struct ancillary_rmessage const *__restrict message,
+                           struct pb_packet *__restrict packet,
+                           syscall_ulong_t msg_flags) {
+	/* TODO */
+	(void)packet;
+	(void)message;
+	(void)msg_flags;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+/* Returns the required user-space buffer size needed to
+ * represent the given packet's ancillary data in its decoded form.
+ * s.a. `ancillary_rmessage::am_controllen' */
+PRIVATE NONNULL((1)) size_t FCALL
+unix_ancillary_data_decode_size(struct pb_packet *__restrict packet) {
+	/* TODO */
+	(void)packet;
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL unix_ancillary_data_fini)(struct pb_packet *__restrict packet) {
+	/* TODO */
+	(void)packet;
+}
+
 
 
 
@@ -89,9 +117,8 @@ NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self) {
 	unsigned int i;
 	/* Finalize data buffers. */
 	for (i = 0; i < COMPILER_LENOF(self->uc_bufs); ++i) {
-		/* TODO: Use `pb_buffer_fini_ex()' to decref() file
-		 *       descriptors from ancillary data blobs. */
-		pb_buffer_fini(&self->uc_bufs[i]);
+		pb_buffer_fini_ex(&self->uc_bufs[i],
+		                  unix_ancillary_data_fini);
 	}
 	sig_broadcast(&self->uc_status_sig); /* In case someone was still connected... */
 	kfree(self);
@@ -1056,8 +1083,13 @@ PbBuffer_Stream_Sendv_NoBlock(struct pb_buffer *__restrict self,
 again:
 	used = ATOMIC_READ(self->pb_used);
 	limt = ATOMIC_READ(self->pb_limt);
-	if unlikely(!limt)
-		THROW(E_NET_SHUTDOWN); /* Connection was closed. */
+	if unlikely(!limt) {
+		/* Connection was closed. */
+		/* TODO: if (!MSG_NOSIGNAL) raise(SIGPIPE);
+		 * REMINDER: You're running from an async-worker, so don't get
+		 *           the idea of sending the SIGPIPE to THIS_TASK! */
+		THROW(E_NET_SHUTDOWN);
+	}
 	if (used >= limt)
 		return 0; /* All available buffer space is already in use. */
 	avail = limt - used;
@@ -1118,8 +1150,13 @@ async_send_test(struct async_send_job *__restrict me) {
 	pbuf = me->as_socket->us_sendbuf;
 	used = ATOMIC_READ(pbuf->pb_used);
 	limt = ATOMIC_READ(pbuf->pb_limt);
-	if unlikely(!limt)
-		THROW(E_NET_SHUTDOWN); /* Connection was closed. */
+	if unlikely(!limt) {
+		/* Connection was closed. */
+		/* TODO: if (!MSG_NOSIGNAL) raise(SIGPIPE);
+		 * REMINDER: You're running from an async-worker, so don't get
+		 *           the idea of sending the SIGPIPE to THIS_TASK! */
+		THROW(E_NET_SHUTDOWN);
+	}
 	if (used >= limt)
 		goto nope; /* All available buffer space is already in use. */
 	avail = limt - used;
@@ -1368,6 +1405,216 @@ again_start_packet:
 
 
 
+PRIVATE NONNULL((1, 2)) size_t KCALL
+UnixSocket_Recvv(struct socket *__restrict self,
+                 struct aio_buffer const *__restrict buf, size_t bufsize,
+                 /*0..1*/ USER CHECKED u32 *presult_flags,
+                 struct ancillary_rmessage const *msg_control,
+                 syscall_ulong_t msg_flags,
+                 struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		       E_NET_TIMEOUT, E_WOULDBLOCK) {
+	size_t result;
+	UnixSocket *me;
+	struct pb_buffer *pbuf;
+	struct pb_packet *packet;
+	assert(!task_isconnected());
+	me = (UnixSocket *)self;
+	{
+		struct socket_node *node;
+		node = ATOMIC_READ(me->us_node);
+		/* make sure we're actually connected. */
+		if unlikely(node == NULL || node == (struct socket_node *)-1) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED);
+		}
+		/* make sure that this one's a client-socket. */
+		if unlikely(!me->us_client) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED);
+		}
+	}
+	/* At this point, we can receive data via `me->us_recvbuf' */
+	pbuf = me->us_recvbuf;
+	result = 0;
+	assert(pbuf);
+again_read_packet:
+	while ((packet = pb_buffer_startread(pbuf)) == NULL) {
+		if (msg_flags & MSG_DONTWAIT) {
+			if (result)
+				goto done;
+			THROW(E_WOULDBLOCK);
+		}
+		if (ATOMIC_READ(pbuf->pb_limt) == 0)
+			goto done; /* EOF */
+		task_connect(&pbuf->pb_psta);
+		packet = pb_buffer_startread(pbuf);
+		if unlikely(packet) {
+			task_disconnectall();
+			break;
+		}
+		if unlikely(ATOMIC_READ(pbuf->pb_limt) == 0) {
+			task_disconnectall();
+			goto done; /* EOF */
+		}
+		/* Wait for a packet to become available. */
+		if (!task_waitfor(timeout))
+			THROW(E_NET_TIMEOUT);
+	}
+	TRY {
+		size_t payload;
+		payload = packet->p_payload;
+		if (me->sk_type == SOCK_STREAM) {
+			if (presult_flags)
+				*presult_flags = 0;
+			if (msg_flags & MSG_PEEK) {
+				/* Don't remove the packet, but peek its data. */
+				if (payload > bufsize)
+					payload = bufsize;
+				aio_buffer_copyfrommem(buf, result,
+				                       pb_packet_payload(packet),
+				                       bufsize);
+				result += bufsize;
+				if (packet->p_ancillary && presult_flags) {
+					/* Check if the user-space ancillary data buffer might be too small. */
+					if (!msg_control) {
+						*presult_flags = MSG_CTRUNC;
+					} else {
+						size_t required_size;
+						required_size = unix_ancillary_data_decode_size(packet);
+						if (required_size > msg_control->am_controllen)
+							*presult_flags = MSG_CTRUNC;
+						/* Don't actually decode ancillary data for user-space.
+						 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
+						ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
+					}
+				}
+				pb_buffer_endread_restore(pbuf, packet);
+				goto done;
+			}
+			if (payload > bufsize) {
+				/* Can only read part of the packet. */
+				aio_buffer_copyfrommem(buf, result,
+				                       pb_packet_payload(packet),
+				                       bufsize);
+				result += bufsize;
+				packet = pb_buffer_truncate_packet(pbuf, packet, (u16)bufsize);
+				pb_buffer_endread_restore(pbuf, packet);
+				goto done;
+			}
+			/* Read the whole packet. */
+			aio_buffer_copyfrommem(buf, result,
+			                       pb_packet_payload(packet),
+			                       payload);
+			result += payload;
+			bufsize -= payload;
+			if (packet->p_ancillary) {
+				/* Packet contains ancillary data. */
+				u32 result_flags;
+				if (msg_control) {
+					result_flags = unix_ancillary_data_decode(msg_control,
+					                                          packet,
+					                                          msg_flags);
+				} else {
+					result_flags = MSG_CTRUNC;
+				}
+				if (presult_flags)
+					*presult_flags = result_flags;
+				/*BEGIN:NOTHROW*/
+				unix_ancillary_data_fini(packet);
+				/* Special handling here, as required by POSIX:
+				 * Ancillary data in UNIX domain socket datagrams form
+				 * a sort-of barrier between packets, in that reading
+				 * will stop prematurely at the end of the packet that
+				 * contained the ancillary data.
+				 *
+				 * -> As such, always stop receiving data if we've
+				 *    encountered a datagram that ends with ancillary
+				 *    data. */
+				pb_buffer_endread_consume(pbuf, packet);
+				goto done;
+				/*END:NOTHROW*/
+			}
+			/* Consume the packet, since it's now empty. */
+			pb_buffer_endread_consume(pbuf, packet);
+			/* If we've still got some space left, then try to read more. */
+			if (bufsize)
+				goto again_read_packet;
+		} else {
+			u32 result_flags;
+			result_flags = 0;
+			/* Packet-mode. */
+			if (payload > bufsize) {
+				/* Packet is longer than the amount of space we've been given. */
+				payload = bufsize;
+				result_flags |= MSG_TRUNC;
+			}
+			if (msg_flags & MSG_PEEK) {
+				/* Copy payload memory for which there is enough space. */
+				aio_buffer_copyfrommem(buf, result,
+				                       pb_packet_payload(packet),
+				                       payload);
+				result += payload;
+				if (packet->p_ancillary && presult_flags) {
+					/* Check if the user-space ancillary data buffer might be too small. */
+					if (!msg_control) {
+						result_flags |= MSG_CTRUNC;
+					} else {
+						size_t required_size;
+						required_size = unix_ancillary_data_decode_size(packet);
+						if (required_size > msg_control->am_controllen)
+							result_flags |= MSG_CTRUNC;
+						/* Don't actually decode ancillary data for user-space.
+						 * UNIX socket ancillary data cannot be MSG_PEEK'd. */
+						ancillary_rmessage_setcontrolused(msg_control, 0, msg_flags);
+					}
+				}
+				if (presult_flags)
+					*presult_flags = result_flags;
+				pb_buffer_endread_restore(pbuf, packet);
+				goto done;
+			}
+			/* Read the whole packet. */
+			aio_buffer_copyfrommem(buf, result,
+			                       pb_packet_payload(packet),
+			                       payload);
+			result += payload;
+			bufsize -= payload;
+			if (packet->p_ancillary) {
+				/* Packet contains ancillary data. */
+				u32 result_flags;
+				if (msg_control) {
+					result_flags = unix_ancillary_data_decode(msg_control,
+					                                          packet,
+					                                          msg_flags);
+				} else {
+					result_flags = MSG_CTRUNC;
+				}
+				if (presult_flags)
+					*presult_flags = result_flags;
+				/*BEGIN:NOTHROW*/
+				unix_ancillary_data_fini(packet);
+				pb_buffer_endread_consume(pbuf, packet);
+				goto done;
+				/*END:NOTHROW*/
+			}
+			/* Consume the packet, since it's now empty. */
+			pb_buffer_endread_consume(pbuf, packet);
+			if (presult_flags)
+				*presult_flags = result_flags;
+			/* Don't ever read more than a single packet at once! */
+		}
+	} EXCEPT {
+		pb_buffer_endread_restore(pbuf, packet);
+		RETHROW();
+	}
+done:
+	return result;
+}
+
+
+
+
 PRIVATE NONNULL((1)) void KCALL
 UnixSocket_Shutdown(struct socket *__restrict self,
                     syscall_ulong_t how)
@@ -1412,7 +1659,7 @@ PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_sendto      = */ NULL,
 	/* .so_sendtov     = */ NULL,
 	/* .so_recv        = */ NULL,
-	/* .so_recvv       = */ NULL, /* TODO */
+	/* .so_recvv       = */ &UnixSocket_Recvv,
 	/* .so_recvfrom    = */ NULL,
 	/* .so_recvfromv   = */ NULL,
 	/* .so_listen      = */ &UnixSocket_Listen,
