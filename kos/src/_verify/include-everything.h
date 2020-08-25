@@ -242,6 +242,7 @@ incdir("", "../../include");
 #include <asm/mman.h>
 #include <asm/mount.h>
 #include <asm/oflags.h>
+#include <asm/page.h>
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
 #include <asm/poll.h>
@@ -300,6 +301,7 @@ incdir("", "../../include");
 #include <bits/crt/math-vector.h>
 #include <bits/crt/posix_spawn.h>
 #include <bits/crt/pthreadtypes.h>
+#include <bits/crt/pthreadtypesizes.h>
 #include <bits/crt/semaphore.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/crt/threads.h>

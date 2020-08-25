@@ -475,10 +475,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *    means.
 	 */
 
-	/* TODO: Various X components directly include a file <asm/page.h> that seems to
-	 *       have been apart of older installments of GLibc. - KOS should emulate that
-	 *       header. */
-
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Run x as (from inside KOS):
