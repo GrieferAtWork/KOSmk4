@@ -482,16 +482,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Current Blocker:
-	 *     /kos/src/kernel/core/network/socket.c(925) : socket_recvfrom_peer : self->sk_ops->so_recvfromv
-	 *     At least one of `so_recvv' or `so_recvfromv' has to be implemented by every socket type
-	 *     /kos/src/kernel/core/network/socket.c(925,4) : socket_recvfrom_peer+121 : C02610E1+5 : Caused here [sp=EAFF7DE8]
-	 *     /kos/src/kernel/core/network/socket.c(1005,33) : socket_recv+178 : C01BAB22+5 : Called here [sp=EAFF7F30]
-	 *     /kos/src/kernel/core/network/socket-syscall.c(998,24) : sys_recvfrom+167 : C028E6C7+5 : Called here [sp=EAFF7F7C]
-	 *     /kos/src/kernel/core/arch/i386/syscall/wrappers32.S(31594) : ???+0 : C02A06F6+5 : Called here [sp=EAFF7FC8]
-	 * Solution:
-	 *     - Finish implementing support for unix domain sockets
+	 *     task[3].sys_execve(path: "/bin//bin/twm", argv: ["/bin/twm"], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin", "PWD=/", "DISPLAY=:0", "WINDOWPATH=0"])
+	 *     task[3].sys_execve(path: "/bin/sh", argv: ["sh", "/bin/twm"], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin", "PWD=/", "DISPLAY=:0", "WINDOWPATH=0"])
+	 *     xinit: Unable to run program \"/bin/twm\": No such file or directory
+	 *     Specify a program on the command line or make sure that /bin [...]
 	 *
 	 * TODO:
+	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions
 	 *     - Patch Xorg-server to not try to make use of "/dev/ptmx"
 	 *       KOS has an `sys_openpty(2)' system call for this purpose

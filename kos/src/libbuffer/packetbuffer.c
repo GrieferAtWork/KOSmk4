@@ -196,7 +196,7 @@ unlock_and_return_too_large:
 		packet->p_payload   = (uint16_t)payload_size;
 		packet->p_ancillary = (uint16_t)ancillary_size;
 		packet->p_state     = PB_PACKET_STATE_INIT;
-		self->pb_wptr += total_size;
+		self->pb_wptr = (struct pb_packet *)((byte_t *)self->pb_wptr + total_size);
 		ATOMIC_FETCHADD(self->pb_used, total_size);
 		unlock();
 		return packet;
@@ -215,7 +215,7 @@ unlock_and_return_too_large:
 #ifdef HEAP_NONBLOCK_REALLOC_IN_PLACE_NX
 		{
 			size_t minsize, newsize;
-			minsize = ((byte_t *)self->pb_wptr - (byte_t *)self->pb_bbas) +
+			minsize = (size_t)((byte_t *)self->pb_wptr - (byte_t *)self->pb_bbas) +
 			          total_size + PB_PACKET_NEXTLINK_SIZE;
 			newsize = HEAP_NONBLOCK_REALLOC_IN_PLACE_NX(self->pb_bbas,
 			                                            (size_t)(self->pb_bend -
@@ -307,7 +307,7 @@ allocate_buffer_extension:
 		/* Try to shift unread packets downwards,
 		 * so-as to reclaim buffer space near the top. */
 		size_t reclaim, used;
-		reclaim       = (byte_t *)self->pb_rptr - (byte_t *)self->pb_bbas;
+		reclaim       = (size_t)((byte_t *)self->pb_rptr - (byte_t *)self->pb_bbas);
 		used          = (size_t)((byte_t *)self->pb_wptr - (byte_t *)self->pb_rptr);
 		self->pb_rptr = (struct pb_packet *)memmovedown(self->pb_bbas, self->pb_rptr, used);
 		self->pb_wptr = (struct pb_packet *)((byte_t *)self->pb_wptr - reclaim);
@@ -514,7 +514,8 @@ again_locked:
 		if (packet->p_state == PB_PACKET_STATE_DISCARD) {
 			/* Skip packets that were discarded */
 			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
-			self->pb_rptr += packet->p_total;
+			self->pb_rptr = (struct pb_packet *)((byte_t *)self->pb_rptr +
+			                                     packet->p_total);
 			goto again_locked;
 		}
 unlock_and_return_NULL:
@@ -681,7 +682,8 @@ again_locked:
 		if (packet->p_state == PB_PACKET_STATE_DISCARD) {
 			/* Skip packets that were discarded */
 			ATOMIC_FETCHSUB(self->pb_used, packet->p_total);
-			self->pb_rptr += packet->p_total;
+			self->pb_rptr = (struct pb_packet *)((byte_t *)self->pb_rptr +
+			                                     packet->p_total);
 			goto again_locked;
 		}
 unlock_and_return_false:

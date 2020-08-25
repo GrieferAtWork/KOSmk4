@@ -1754,9 +1754,12 @@ again:
 		if (i == nfds_words - 1)
 			maxbits = nfds % BITS_PER_FDS_WORD;
 		rbits = wbits = ebits = 0;
-		if (readfds)   rbits = ((fds_word_t *)readfds)[i];
-		if (writefds)  wbits = ((fds_word_t *)writefds)[i];
-		if (exceptfds) ebits = ((fds_word_t *)exceptfds)[i];
+		if (readfds)
+			rbits = ((fds_word_t *)readfds)[i];
+		if (writefds)
+			wbits = ((fds_word_t *)writefds)[i];
+		if (exceptfds)
+			ebits = ((fds_word_t *)exceptfds)[i];
 		if (!(rbits | wbits | ebits))
 			continue;
 		new_rbits = new_wbits = new_ebits = 0;
@@ -1811,9 +1814,12 @@ again:
 		}
 		if (result) {
 			/* Update the fd-set words of all signaled FDs */
-			if (readfds)   ((fds_word_t *)readfds)[i] = new_rbits;
-			if (writefds)  ((fds_word_t *)writefds)[i] = new_wbits;
-			if (exceptfds) ((fds_word_t *)exceptfds)[i] = new_ebits;
+			if (readfds)
+				((fds_word_t *)readfds)[i] = new_rbits;
+			if (writefds)
+				((fds_word_t *)writefds)[i] = new_wbits;
+			if (exceptfds)
+				((fds_word_t *)exceptfds)[i] = new_ebits;
 		}
 	}
 	/* Check if any of the specified operations would block.

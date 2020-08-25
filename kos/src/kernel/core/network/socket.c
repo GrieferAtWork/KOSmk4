@@ -116,7 +116,8 @@ socket_isconnected(struct socket *__restrict self) {
 	} EXCEPT {
 		task_popconnections(&cons);
 		if (was_thrown(E_INVALID_ARGUMENT_BAD_STATE) &&
-		    PERTASK_GET(this_exception_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED)
+		    PERTASK_GET(this_exception_pointers[0]) ==
+		    E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED)
 			return false; /* Not connected. */
 		RETHROW();
 	}
