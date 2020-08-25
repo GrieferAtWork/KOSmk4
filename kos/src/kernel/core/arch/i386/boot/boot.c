@@ -488,8 +488,78 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     twm exists, saying it's lost the server connection once a key is pressed
 	 *     following its startup, after which one gets dropped back to the text-mode
 	 *     shell.
+	 *     Looking at the logs, this seems to be the result of an X client timeout,
+	 *     following the server ending up in a loop:
+	 *     [2020-08-25T17:51:34.191668670:trace ] task[4].sys_sigprocmask(how: 00000001, set: 3EBB4B50, oset: NULL)
+	 *     [2020-08-25T17:51:34.191864155:trace ] task[4].sys_gettimeofday(tv: 0x3ebb4cd8, tz: NULL)
+	 *     [2020-08-25T17:51:34.192020225:trace ] task[4].sys_gettimeofday(tv: 0x3ebb4cd8, tz: NULL)
+	 *     [2020-08-25T17:51:34.192173205:trace ] task[4].sys_select(nfds: 256, readfds: [16, 24, 29, 30], writefds: NULL, exceptfds: NULL, timeout: {tv_sec:588,tv_usec:689000})
+	 *     [2020-08-25T17:51:34.192572138:trace ] task[4].sys_sigprocmask(how: 00000000, set: 3EBB4B5C, oset: 0x3ebb4adc)
+	 *     [2020-08-25T17:51:34.192825751:trace ] task[4].sys_read(fd: 24, buf: 0x3ebb4b84, bufsize: 64)
+	 *     [2020-08-25T17:51:34.193069713:info  ][tty:"console"] Background process group E120B55C [tid=4], thread E1A105BC [tid=4] tried to read
+	 *     With the obvious problem that the server can't read from the terminal
+	 *     input device, whilst being part of a background process group...
+	 *     Problem here is that I don't really know what's wrong here. - POSIX
+	 *     says that I'm not supposed to let background processes read from a
+	 *     terminal, and X obviously tries to do exactly that (KOS implements
+	 *     all of the standardized interfaces to change process groups, as well
+	 *     as the groups bound to some TTY...)
+	 *
+	 * Additionally, the following happens (which is probably the actual cause):
+[...]
+[2020-08-25T17:51:23.384328892:trace ] task[3].sys_open(filename: "/lib/libX11.so.6", oflags: O_RDONLY|O_CLOEXEC)
+[2020-08-25T17:51:23.384706517:trace ] task[3].sys_frealpath4(fd: 4, resolved: 0x1508b300, buflen: 256, flags: AT_REMOVEDIR|AT_READLINK_REQSIZE)
+[2020-08-25T17:51:23.384984815:trace ] task[3].sys_pread64(fd: 4, buf: 0x7f7779c8, bufsize: 52, offset: 0)
+[2020-08-25T17:51:23.385220018:trace ] task[3].sys_pread64(fd: 4, buf: 0x1508b3d0, bufsize: 96, offset: 52)
+[2020-08-25T17:51:23.385430330:trace ] task[3].sys_maplibrary(addr: NULL, flags: 00000000, fd: 4, hdrv: 1508B3D0, hdrc: 3)
+[2020-08-25T17:51:23.385750639:debug ][vm] Map 0DB16000...0DC4EFFF against 2 data parts
+[2020-08-25T17:51:23.386458828:debug ][vm] Map 0DC4F000...0DC52FFF against 4 data parts
+[...]
+[2020-08-25T17:51:32.156885360:debug ][segfault] Fault at 100366AC (page 10036000) [pc=0DBB0890,0DBB0892] [ecode=0x6] [tid=3]
+[2020-08-25T17:51:32.157267460:trace ][except] Propagate exception 0xff0e:0x1[0x100366ac,0x7] hand:[pc=DDFC2CD,sp=7F777C88] orig:[pc=DBB0892,sp=7F777CD8] fault:[pc=DBB0890] [mode=0x4003,tid=3]
+[...]
+[2020-08-25T17:51:34.127421459:trace ] task[3].sys_coredump(curr_state: 7F777924, orig_state: 7F777964, traceback_vector: 1508C044, traceback_length: 1, exception: 1508C088, unwind_error: 00000001)
+[2020-08-25T17:51:34.129723581:error ][coredump] Creating coredump...
+[2020-08-25T17:51:34.129851287:error ] exception 0xff0e:0x1 [E_SEGFAULT_UNMAPPED] [cr2=100366AC] [fwu-]
+[2020-08-25T17:51:34.130122912:error ] 	pointer[0] = 100366AC
+[2020-08-25T17:51:34.130228323:error ] 	pointer[1] = 00000007
+[2020-08-25T17:51:34.130337412:error ] signal 11
+[2020-08-25T17:51:34.130450881:error ] 	code:  1
+DBB0890 [???:0,0:???] faultaddr
+DBB0892 [???:0,0:???] orig_ustate
+[2020-08-25T17:51:34.133526376:trace ][sched] Exiting thread E1A2A504 [tid=3]
+	 *
+	 * $ addr2line -ife bin/i386-kos-OD/lib/libX11.so 9A890
+	 * _XkbReadCopyKeySyms
+	 * /binutils/src/x/libX11-1.5.0/src/xkb/XKBRdBuf.c:84
+	 *
 	 *
 	 * TODO:
+	 *     - Implement user-space unwind/debug-info integration in the builtin
+	 *       debugger, so it become much easier to inspect a crashed user-space
+	 *       application!
+	 *       addr2line can be reverse engineered using:
+	 *        addr -> page -> vm_node
+	 *                         |
+	 *                         +-> vn_prot & VM_PROT_EXEC -> ISPC-test
+	 *                         |
+	 *                         +-> vm_datapart            -> SEGMENT_FILE_OFFSET
+	 *                         |
+	 *                         +-> vn_block               -> BINARY_ELF_FILE
+	 *                         |
+	 *                         +-> vn_fspath+vn_fsname    -> BINARY_IMAGE_NAME   (additional info)
+	 *
+	 *       phdr               = BINARY_ELF_FILE.find_phdr(containing_file_offset: SEGMENT_FILE_OFFSET);
+	 *       OFFSET_IN_SEGMENT  = SEGMENT_FILE_OFFSET - phdr.p_offset;
+	 *       SEGMENT_ADDRESS    = vm_node_getstart(vm_node) - OFFSET_IN_SEGMENT;
+	 *       LOADADDR           = SEGMENT_ADDRESS - phdr.p_vaddr;
+	 *       MODULE_RELATIVE_PC = addr - LOADADDR;
+	 *
+	 *       >> debug_dllocksections(BINARY_ELF_FILE, SECTIONS);
+	 *       >> debug_sections_addr2line(SECTIONS, INFO, MODULE_RELATIVE_PC);
+	 *       >> printk("%s:%d\n", INFO.al_srcfile, INFO.al_srcline);
+	 *     - Once this works, also get rid of `set_library_listdef(2)'
+	 *
 	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions
 	 *     - Patch Xorg-server to not try to make use of "/dev/ptmx"
