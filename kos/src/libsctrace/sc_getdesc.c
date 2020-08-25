@@ -162,6 +162,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 DECL_BEGIN
 
 #define ARG_PLACEHOLDER_   ,
+#define ARG_PLACEHOLDER_0  ,
 #define ARG_PLACEHOLDER_1  ,
 #define ARG_PLACEHOLDER_2  ,
 #define ARG_PLACEHOLDER_3  ,

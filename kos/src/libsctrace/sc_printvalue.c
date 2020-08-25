@@ -38,6 +38,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/compiler.h>
 
 #include <hybrid/__va_size.h>
+#include <hybrid/align.h>
 #include <hybrid/typecore.h>
 
 #include <arpa/inet.h>
@@ -64,6 +65,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/filio.h>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
+#include <sys/param.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -119,8 +121,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define LIMIT_STRLEN       64 /* Max # of bytes to print from user-supplied strings. */
 #define LIMIT_POLLFDS      16 /* Max # of `struct pollfd' structures to print from a vector. */
 #define LIMIT_IOVEC        16 /* Max # of `struct iovec' structures to print from a vector. */
+#define LIMIT_NFDS         16 /* Max # of fds to print from a `fd_set'. */
 #define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
-
 
 
 /* Figure out what we actually need to define. */
@@ -417,6 +419,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_iovecx64
 #endif /* HAVE_SC_REPR_STRUCT_IOVECX64 || HAVE_SC_REPR_STRUCT_IOVECX64_C */
 
+#ifdef HAVE_SC_REPR_STRUCT_FDSET
+#define NEED_print_fdset
+#endif /* HAVE_SC_REPR_STRUCT_FDSET */
+
 
 
 
@@ -491,6 +497,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_string_with_len
 #define NEED_print_string
 #endif /* NEED_print_string_with_len */
+
+#ifdef NEED_print_fdset
+#define NEED_print_fd_t
+#endif /* NEED_print_fdset */
 
 
 
@@ -2571,7 +2581,7 @@ print_iovec_n(pformatprinter printer, void *arg, bool print_content,
 		goto done;
 	TRY {
 		size_t i;
-		for (i = 0; i < count; ++i) {
+		for (i = 0; i < used_count; ++i) {
 			void *iov_base;
 			size_t iov_len;
 			if (i != 0)
@@ -2596,6 +2606,58 @@ print_iovec_n(pformatprinter printer, void *arg, bool print_content,
 		PRINT("<segfault>");
 	}
 	if (used_count < count)
+		PRINT("," SYNSPACE2 "...");
+	PRINT("]");
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_iovecx32 || NEED_print_iovecx64 */
+
+
+
+
+
+#ifdef NEED_print_fdset
+PRIVATE ssize_t CC
+print_fdset(pformatprinter printer, void *arg,
+            USER CHECKED fd_set const *set,
+            size_t nfds) {
+	size_t would_print_count = 0;
+	ssize_t temp, result;
+	result = (*printer)(arg, "[", 1);
+	if unlikely(result < 0)
+		goto done;
+	TRY {
+		size_t firstfd;
+		for (firstfd = 0; firstfd < nfds;) {
+			if (!FD_ISSET((fd_t)firstfd, set)) {
+				 ++firstfd;
+				continue;
+			}
+			if (would_print_count < LIMIT_NFDS) {
+				size_t lastfd = firstfd;
+				while (lastfd < nfds && FD_ISSET((fd_t)(lastfd + 1), set))
+					++lastfd;
+				if (would_print_count != 0)
+					PRINT("," SYNSPACE2);
+				if (firstfd == lastfd) {
+					DO(print_fd_t(printer, arg, (fd_t)firstfd));
+				} else {
+					PRINTF("%" PRIuSIZ ".." "%" PRIuSIZ,
+					       firstfd, lastfd);
+				}
+				firstfd = lastfd + 1;
+			}
+			++would_print_count;
+		}
+	} EXCEPT {
+		if (!was_thrown(E_SEGFAULT))
+			RETHROW();
+		PRINT("<segfault>");
+	}
+	if (would_print_count > LIMIT_NFDS)
 		PRINT("," SYNSPACE2 "...");
 	PRINT("]");
 done:
@@ -2690,7 +2752,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_ELF_PHDR64_VECTOR 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_EXCEPTION_DATA32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_EXCEPTION_DATA64 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_FDSET 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FILE_HANDLE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE32 1
@@ -2749,6 +2810,24 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
 
+
+#ifdef HAVE_SC_REPR_STRUCT_FDSET
+	case SC_REPR_STRUCT_FDSET: {
+		USER UNCHECKED fd_set *fdset;
+		size_t nfds;
+		if unlikely(!link)
+			goto do_pointer;
+		fdset = (USER UNCHECKED fd_set *)(uintptr_t)value.sv_u64;
+		if unlikely(!fdset)
+			goto do_pointer;
+		nfds = (size_t)link->sa_value.sv_u64;
+		validate_readable(fdset, CEILDIV(nfds, NBBY));
+		result = print_fdset(printer, arg, fdset, nfds);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_FDSET */
+
+
+
 #if (defined(HAVE_SC_REPR_STRUCT_IOVECX32) ||   \
      defined(HAVE_SC_REPR_STRUCT_IOVECX32_C) || \
      ((defined(HAVE_SC_REPR_STRUCT_IOVEC) ||    \
@@ -2787,9 +2866,11 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	{
 		USER UNCHECKED struct iovecx32 *iov;
 		size_t count;
-		if (!link)
+		if unlikely(!link)
 			goto do_pointer;
-		iov   = (USER UNCHECKED struct iovecx32 *)(uintptr_t)value.sv_u64;
+		iov = (USER UNCHECKED struct iovecx32 *)(uintptr_t)value.sv_u64;
+		if unlikely(!iov)
+			goto do_pointer;
 		count = (size_t)link->sa_value.sv_u64;
 		validate_readablem(iov, count, sizeof(struct iovecx32));
 #if defined(_IS_IOVECX32) && defined(_IS_IOVECX32_C)
@@ -2849,9 +2930,11 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	{
 		USER UNCHECKED struct iovecx64 *iov;
 		size_t count;
-		if (!link)
+		if unlikely(!link)
 			goto do_pointer;
-		iov   = (USER UNCHECKED struct iovecx64 *)(uintptr_t)value.sv_u64;
+		iov = (USER UNCHECKED struct iovecx64 *)(uintptr_t)value.sv_u64;
+		if unlikely(!iov)
+			goto do_pointer;
 		count = (size_t)link->sa_value.sv_u64;
 		validate_readablem(iov, count, sizeof(struct iovecx64));
 #if defined(_IS_IOVECX64) && defined(_IS_IOVECX64_C)
