@@ -286,6 +286,19 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 
 %[default:section(".text.crt{|.dos}.fs.exec.exec")];
 
+%[define(DEFINE_TARGV =
+@@pp_ifndef __TARGV@@
+@@pp_ifdef __USE_DOS@@
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+@@pp_else@@
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+@@pp_endif@@
+@@pp_endif@@
+)]
+
+
 @@>> execv(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
@@ -293,7 +306,7 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
 [[requires_include("<local/environ.h>"), requires($has_function(execve) && defined(__LOCAL_environ))]]
-[[impl_include("<local/environ.h>")]]
+[[impl_include("<local/environ.h>"), decl_prefix(DEFINE_TARGV)]]
 int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return execve(path, ___argv, __LOCAL_environ);
 }
@@ -301,7 +314,7 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 @@>> execve(2)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp)]]
+[[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execve, { return __builtin_execve(path, (char *const *)___argv, (char *const *)___envp); })]]
 int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
@@ -309,7 +322,7 @@ int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnu
 @@>> execvp(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, export_alias("_execvp"), argument_names(file, ___argv)]]
+[[cp, guard, export_alias("_execvp"), argument_names(file, ___argv), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execvp, { return __builtin_execvp(file, (char *const *)___argv); })]]
 [[requires_include("<local/environ.h>"), requires($has_function(execvpe) && defined(__LOCAL_environ))]]
@@ -352,7 +365,7 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 @@Replace the calling process with the application image referred to by `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
 [[cp, guard, export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
-[[requires_include("<hybrid/__alloca.h>")]]
+[[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc), decl_prefix(DEFINE_TARGV)]]
 [[requires($has_function(getenv) && $has_function(execve) && defined(__hybrid_alloca))]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<parts/errno.h>")]]
@@ -1497,7 +1510,7 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 @@>> fexecve(2)
 @@Replace the calling process with the application image referred to by `FD' and
 @@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, argument_names(fd, ___argv, ___envp)]]
+[[cp, guard, argument_names(fd, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 [[decl_include("<bits/types.h>"), section(".text.crt{|.dos}.fs.exec.exec")]]
 int fexecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 

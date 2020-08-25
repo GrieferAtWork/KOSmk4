@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43ea40a4 */
+/* HASH CRC-32:0x45595c0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,15 @@
 #include <local/environ.h>
 #include <hybrid/__alloca.h>
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: execvpe from unistd */
 #ifndef __local___localdep_execvpe_defined

@@ -179,19 +179,19 @@ void _endthreadex($u32 exitcode);
 %[default:section(".text.crt.dos.fs.exec.spawn")]
 %[insert:function(_cwait = cwait)]
 
-[[argument_names(mode, path, ___argv)]]
+[[argument_names(mode, path, ___argv), decl_prefix(DEFINE_TARGV)]]
 intptr_t _spawnv(int mode, [[nonnull]] char const *__restrict path,
                  __TARGV) = spawnv;
 
-[[argument_names(mode, file, ___argv)]]
+[[argument_names(mode, file, ___argv), decl_prefix(DEFINE_TARGV)]]
 intptr_t _spawnvp(int mode, [[nonnull]] char const *__restrict file,
                   __TARGV) = spawnvp;
 
-[[argument_names(mode, path, ___argv, ___envp)]]
+[[argument_names(mode, path, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 intptr_t _spawnve(int mode, [[nonnull]] char const *__restrict path,
                   __TARGV, __TENVP) = spawnve;
 
-[[argument_names(mode, file, ___argv, ___envp)]]
+[[argument_names(mode, file, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 intptr_t _spawnvpe(int mode, [[nonnull]] char const *__restrict file,
                    __TARGV, __TENVP) = spawnvpe;
 
@@ -274,19 +274,19 @@ typedef __intptr_t intptr_t;
 %[insert:function(_wexeclpe = wexeclpe)]
 
 %[default:section(".text.crt{|.dos}.wchar.fs.exec.spawn")]
-[[argument_names(mode, path, ___argv)]]
+[[argument_names(mode, path, ___argv), decl_prefix(DEFINE_TARGV)]]
 intptr_t _wspawnv(int mode, [[nonnull]] wchar_t const *__restrict path,
                   __TWARGV) = wspawnv;
 
-[[argument_names(mode, path, ___argv)]]
+[[argument_names(mode, path, ___argv), decl_prefix(DEFINE_TARGV)]]
 intptr_t _wspawnvp(int mode, [[nonnull]] wchar_t const *__restrict path,
                    __TWARGV) = wspawnvp;
 
-[[argument_names(mode, path, ___argv, ___envp)]]
+[[argument_names(mode, path, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 intptr_t _wspawnve(int mode, [[nonnull]] wchar_t const *__restrict path,
                    __TWARGV, __TWENVP) = wspawnve;
 
-[[argument_names(mode, path, ___argv, ___envp)]]
+[[argument_names(mode, path, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 intptr_t _wspawnvpe(int mode, [[nonnull]] wchar_t const *__restrict path,
                     __TWARGV, __TWENVP) = wspawnvpe;
 
@@ -338,26 +338,26 @@ $pid_t cwait(int *tstat, $pid_t pid, int action) {
 
 %[default:section(".text.crt{|.dos}.fs.exec.spawn")]
 
-[[cp, guard, argument_names(mode, path, ___argv), export_alias("_spawnv")]]
+[[cp, guard, argument_names(mode, path, ___argv), export_alias("_spawnv"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<local/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
 [[impl_include("<local/environ.h>")]]
 $pid_t spawnv(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return spawnve(mode, path, ___argv, __LOCAL_environ);
 }
 
-[[cp, guard, argument_names(mode, file, ___argv), export_alias("_spawnvp")]]
+[[cp, guard, argument_names(mode, file, ___argv), export_alias("_spawnvp"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<local/environ.h>"), requires($has_function(spawnvpe) && defined(__LOCAL_environ))]]
 [[impl_include("<local/environ.h>")]]
 $pid_t spawnvp(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 	return spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }
 
-[[cp, guard, argument_names(mode, path, ___argv, ___envp), export_alias("_spawnve")]]
+[[cp, guard, argument_names(mode, path, ___argv, ___envp), export_alias("_spawnve"), decl_prefix(DEFINE_TARGV)]]
 $pid_t spawnve(int mode,
                [[nonnull]] char const *__restrict path,
                [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
-[[cp, guard, argument_names(mode, file, ___argv, ___envp), export_alias("_spawnvpe")]]
+[[cp, guard, argument_names(mode, file, ___argv, ___envp), export_alias("_spawnvpe"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<hybrid/__alloca.h>")]]
 [[requires($has_function(getenv) && $has_function(spawnve) && defined(__hybrid_alloca))]]
 [[impl_include("<hybrid/typecore.h>")]]

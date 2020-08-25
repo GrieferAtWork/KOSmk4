@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d4f60b9 */
+/* HASH CRC-32:0xb05d5ea9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,15 @@
 #include <hybrid/__alloca.h>
 #include <local/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)) && defined(__hybrid_alloca)
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined

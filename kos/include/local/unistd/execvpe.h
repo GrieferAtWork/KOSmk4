@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9725329 */
+/* HASH CRC-32:0xf8a6ada5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,15 @@
 #include <hybrid/__alloca.h>
 #include <local/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: execve from unistd */
 #ifndef __local___localdep_execve_defined
@@ -61,6 +70,23 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
+/* Dependency: mempcpyc from string */
+#ifndef __local___localdep_mempcpyc_defined
+#define __local___localdep_mempcpyc_defined 1
+#ifdef __CRT_HAVE_mempcpyc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* __CRT_HAVE_mempcpyc */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
+#endif /* !__CRT_HAVE_mempcpyc */
+#endif /* !__local___localdep_mempcpyc_defined */
 /* Dependency: strchr from string */
 #ifndef __local___localdep_strchr_defined
 #define __local___localdep_strchr_defined 1
@@ -128,9 +154,9 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 #endif /* !_WIN32 */
 	__fullpath = (char *)__hybrid_alloca((__path_len + 1 + __file_len + 1) *
 	                                   sizeof(char));
-	__dst = (char *)__mempcpyc(__fullpath, __path, __path_len, sizeof(char));
+	__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__fullpath, __path, __path_len, sizeof(char));
 	*__dst++ = '/';
-	__dst = (char *)__mempcpyc(__dst, __file, __file_len, sizeof(char));
+	__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
 	return (__NAMESPACE_LOCAL_SYM __localdep_execve)(__fullpath, ___argv, ___envp);
 }

@@ -132,7 +132,7 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 @@Before running the process perform the actions described in FILE-ACTIONS.
 @@This function is a possible cancellation point and therefore not marked with __THROW
 [[cp, decl_prefix(DEFINE_TARGV), decl_include("<bits/crt/posix_spawn.h>")]]
-[[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
+[[argument_names(pid, path, file_actions, attrp, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 int posix_spawn([[nonnull]] pid_t *__restrict pid,
                 [[nonnull]] char const *__restrict path,
                 [[nullable]] posix_spawn_file_actions_t const *file_actions,
@@ -143,7 +143,7 @@ int posix_spawn([[nonnull]] pid_t *__restrict pid,
 @@Similar to `posix_spawn' but search for FILE in the PATH.
 @@This function is a possible cancellation point and therefore not marked with __THROW
 [[cp, decl_prefix(DEFINE_TARGV), decl_include("<bits/crt/posix_spawn.h>")]]
-[[argument_names(pid, file, file_actions, attrp, ___argv, ___envp)]]
+[[argument_names(pid, file, file_actions, attrp, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 int posix_spawnp([[nonnull]] pid_t *__restrict pid,
                  [[nonnull]] const char *__restrict file,
                  [[nullable]] posix_spawn_file_actions_t const *file_actions,

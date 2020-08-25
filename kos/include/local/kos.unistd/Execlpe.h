@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5487f29a */
+/* HASH CRC-32:0x1f1d6988 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Execvpe from kos.unistd */
 #ifndef __local___localdep_Execvpe_defined
 #define __local___localdep_Execvpe_defined 1
+__NAMESPACE_LOCAL_END
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
+__NAMESPACE_LOCAL_BEGIN
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */

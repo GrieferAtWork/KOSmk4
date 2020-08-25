@@ -51,11 +51,11 @@ typedef __pos64_t pos64_t; /* File/device position */
 
 %[default:section(".text.crt{|.dos}.except.fs.exec.exec")];
 
-[[cp, throws, ATTR_NORETURN, doc_alias(execv), argument_names(path, ___argv)]]
+[[cp, throws, ATTR_NORETURN, doc_alias(execv), argument_names(path, ___argv), decl_prefix(DEFINE_TARGV)]]
 void Execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
-[[cp, throws, ATTR_NORETURN, doc_alias(execve), argument_names(path, ___argv, ___envp)]]
+[[cp, throws, ATTR_NORETURN, doc_alias(execve), argument_names(path, ___argv, ___envp), decl_prefix(DEFINE_TARGV)]]
 void Execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
-[[cp, throws, ATTR_NORETURN, doc_alias(execvp), argument_names(file, ___argv)]]
+[[cp, throws, ATTR_NORETURN, doc_alias(execvp), argument_names(file, ___argv), decl_prefix(DEFINE_TARGV)]]
 void Execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
 
 [[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execl)]]
@@ -526,15 +526,15 @@ void Truncate64([[nonnull]] char const *file, pos64_t length) {
 %#ifdef __USE_XOPEN2K8
 
 %
-[[guard, ATTR_NORETURN, doc_alias("fexecve")]]
-[[cp, throws, decl_include("<bits/types.h>")]]
+[[guard, ATTR_NORETURN, doc_alias(fexecve)]]
+[[cp, throws, decl_include("<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(fd, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
 void FExecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
 
 %#ifdef __USE_GNU
-[[cp, throws, ATTR_NORETURN, doc_alias("execvpe")]]
+[[cp, throws, ATTR_NORETURN, doc_alias(execvpe), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(file, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
 void Execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 %#endif /* __USE_GNU */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa084aa8d */
+/* HASH CRC-32:0xbab5415b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,30 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wspawnvp_defined
 #define __local___localdep_wspawnvp_defined 1
 #ifdef __CRT_HAVE_wspawnvp
+__NAMESPACE_LOCAL_END
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),wspawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE__wspawnvp)
+__NAMESPACE_LOCAL_END
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),_wspawnvp,(__mode,__file,___argv))
 #else /* ... */
 #undef __local___localdep_wspawnvp_defined

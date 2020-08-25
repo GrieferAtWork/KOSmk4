@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92ead687 */
+/* HASH CRC-32:0x4756ef7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,9 +143,9 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 #endif /* !_WIN32 */
 	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
 	                                   sizeof(char));
-	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	dst = (char *)libc_mempcpyc(fullpath, path, path_len, sizeof(char));
 	*dst++ = '/';
-	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	dst = (char *)libc_mempcpyc(dst, file, file_len, sizeof(char));
 	*dst = '\0';
 	return libc_execve(fullpath, ___argv, ___envp);
 }

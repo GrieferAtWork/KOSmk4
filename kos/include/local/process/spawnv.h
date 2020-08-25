@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x790c0e8e */
+/* HASH CRC-32:0x4c87ed10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,15 @@
 #include <__crt.h>
 #include <local/environ.h>
 #if (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)) && defined(__LOCAL_environ)
+#ifndef __TARGV
+#ifdef __USE_DOS
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: spawnve from process */
 #ifndef __local___localdep_spawnve_defined

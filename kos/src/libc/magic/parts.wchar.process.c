@@ -76,16 +76,16 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt{|.dos}.wchar.fs.exec.exec")]
 
-[[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecv")]]
+[[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecv"), decl_prefix(DEFINE_TARGV)]]
 int wexecv([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecve")]]
+[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecve"), decl_prefix(DEFINE_TARGV)]]
 int wexecve([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
-[[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecvp")]]
+[[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecvp"), decl_prefix(DEFINE_TARGV)]]
 int wexecvp([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecvpe")]]
+[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecvpe"), decl_prefix(DEFINE_TARGV)]]
 int wexecvpe([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
 
@@ -116,16 +116,16 @@ int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ..
 
 %[default:section(".text.crt{|.dos}.wchar.fs.exec.spawn")]
 
-[[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_alias("_wspawnv")]]
+[[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_alias("_wspawnv"), decl_prefix(DEFINE_TARGV)]]
 $pid_t wspawnv(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), dos_export_alias("_wspawnve")]]
+[[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), dos_export_alias("_wspawnve"), decl_prefix(DEFINE_TARGV)]]
 $pid_t wspawnve(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
-[[cp, guard, wchar, argument_names(mode, file, ___argv), dos_export_alias("_wspawnvp")]]
+[[cp, guard, wchar, argument_names(mode, file, ___argv), dos_export_alias("_wspawnvp"), decl_prefix(DEFINE_TARGV)]]
 $pid_t wspawnvp(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_wspawnvpe")]]
+[[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_wspawnvpe"), decl_prefix(DEFINE_TARGV)]]
 $pid_t wspawnvpe(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
