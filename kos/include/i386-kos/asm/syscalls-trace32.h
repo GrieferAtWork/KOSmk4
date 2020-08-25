@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ce2e316 */
+/* HASH CRC-32:0x3cd91fcf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1542,7 +1542,7 @@
 #define __NRATR2_readv                   SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRRTR_readv                    SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_writev                  SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_writev                  SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATR1_writev                  SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NRATL1_writev                  2                                                                    /* iovec -> count */ 
 #define __NRATR2_writev                  SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRRTR_writev                   SC_REPR_SSIZE_T                                                      /* return */
@@ -2147,7 +2147,7 @@
 #define __NRATR3_tee                     SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
 #define __NRRTR_tee                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_vmsplice                SC_REPR_FD_T                                                         /* fdout */ 
-#define __NRATR1_vmsplice                SC_REPR_STRUCT_IOVECX32                                              /* iov */ 
+#define __NRATR1_vmsplice                SC_REPR_STRUCT_IOVECX32_C                                            /* iov */ 
 #define __NRATL1_vmsplice                2                                                                    /* iov -> count */ 
 #define __NRATR2_vmsplice                SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR3_vmsplice                SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
@@ -2221,7 +2221,7 @@
 #define __NRATR3_preadv                  SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NRRTR_preadv                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_pwritev                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_pwritev                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATR1_pwritev                 SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NRATL1_pwritev                 2                                                                    /* iovec -> count */ 
 #define __NRATR2_pwritev                 SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR3_pwritev                 SC_REPR_UINT64_T                                                     /* offset */ 
@@ -2273,19 +2273,19 @@
 #define __NRATR1_setns                   SC_REPR_CLONE_FLAGS_SETNS                                            /* nstype */ 
 #define __NRRTR_setns                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_process_vm_readv        SC_REPR_PID_T                                                        /* pid */ 
-#define __NRATR1_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
+#define __NRATR1_process_vm_readv        SC_REPR_STRUCT_IOVECX32                                              /* local_iov */ 
 #define __NRATL1_process_vm_readv        2                                                                    /* local_iov -> liovcnt */ 
 #define __NRATR2_process_vm_readv        SC_REPR_SIZE_T                                                       /* liovcnt */ 
-#define __NRATR3_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* remote_iov */ 
+#define __NRATR3_process_vm_readv        SC_REPR_STRUCT_IOVECX32                                              /* remote_iov */ 
 #define __NRATL3_process_vm_readv        4                                                                    /* remote_iov -> riovcnt */ 
 #define __NRATR4_process_vm_readv        SC_REPR_SIZE_T                                                       /* riovcnt */ 
 #define __NRATR5_process_vm_readv        SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NRRTR_process_vm_readv         SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_process_vm_writev       SC_REPR_PID_T                                                        /* pid */ 
-#define __NRATR1_process_vm_writev       SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
+#define __NRATR1_process_vm_writev       SC_REPR_STRUCT_IOVECX32_C                                            /* local_iov */ 
 #define __NRATL1_process_vm_writev       2                                                                    /* local_iov -> liovcnt */ 
 #define __NRATR2_process_vm_writev       SC_REPR_SIZE_T                                                       /* liovcnt */ 
-#define __NRATR3_process_vm_writev       SC_REPR_STRUCT_IOVEC                                                 /* remote_iov */ 
+#define __NRATR3_process_vm_writev       SC_REPR_STRUCT_IOVECX32                                              /* remote_iov */ 
 #define __NRATL3_process_vm_writev       4                                                                    /* remote_iov -> riovcnt */ 
 #define __NRATR4_process_vm_writev       SC_REPR_SIZE_T                                                       /* riovcnt */ 
 #define __NRATR5_process_vm_writev       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
@@ -2420,7 +2420,7 @@
 #define __NRATR4_recvmmsg64              SC_REPR_STRUCT_TIMESPECX32_64                                        /* tmo */ 
 #define __NRRTR_recvmmsg64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_pwritevf                SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_pwritevf                SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATR1_pwritevf                SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NRATL1_pwritevf                2                                                                    /* iovec -> count */ 
 #define __NRATR2_pwritevf                SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR3_pwritevf                SC_REPR_UINT64_T                                                     /* offset */ 
@@ -2608,7 +2608,7 @@
 #define __NRATL1_ksysctl                 0                                                                    /* arg -> command */ 
 #define __NRRTR_ksysctl                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_writevf                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_writevf                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NRATR1_writevf                 SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NRATL1_writevf                 2                                                                    /* iovec -> count */ 
 #define __NRATR2_writevf                 SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRATR3_writevf                 SC_REPR_IOMODE_T                                                     /* mode */ 

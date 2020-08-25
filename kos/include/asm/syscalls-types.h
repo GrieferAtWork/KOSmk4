@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb688200 */
+/* HASH CRC-32:0x54f7c8f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,6 +103,7 @@
 #define HAVE_SC_REPR_STRUCT_FILE_HANDLE 1
 #define HAVE_SC_REPR_STRUCT_FPUSTATE 1
 #define HAVE_SC_REPR_STRUCT_IOVEC 1
+#define HAVE_SC_REPR_STRUCT_IOVEC_C 1
 #define HAVE_SC_REPR_STRUCT_ITIMERSPEC 1
 #define HAVE_SC_REPR_STRUCT_ITIMERVAL 1
 #define HAVE_SC_REPR_STRUCT_MMSGHDR 1
@@ -232,6 +233,7 @@ __SYSCALL_REPR(SC_REPR_STRUCT_FDSET)
 __SYSCALL_REPR(SC_REPR_STRUCT_FILE_HANDLE)
 __SYSCALL_REPR(SC_REPR_STRUCT_FPUSTATE)
 __SYSCALL_REPR(SC_REPR_STRUCT_IOVEC)
+__SYSCALL_REPR(SC_REPR_STRUCT_IOVEC_C)
 __SYSCALL_REPR(SC_REPR_STRUCT_ITIMERSPEC)
 __SYSCALL_REPR(SC_REPR_STRUCT_ITIMERVAL)
 __SYSCALL_REPR(SC_REPR_STRUCT_MMSGHDR)

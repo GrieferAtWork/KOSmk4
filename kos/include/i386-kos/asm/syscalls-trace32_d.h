@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf896cc4 */
+/* HASH CRC-32:0x8d0c2c2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1542,7 +1542,7 @@
 #define __NR32ATR2_readv                   SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32RTR_readv                    SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_writev                  SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_writev                  SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NR32ATR1_writev                  SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NR32ATL1_writev                  2                                                                    /* iovec -> count */ 
 #define __NR32ATR2_writev                  SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32RTR_writev                   SC_REPR_SSIZE_T                                                      /* return */
@@ -2147,7 +2147,7 @@
 #define __NR32ATR3_tee                     SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
 #define __NR32RTR_tee                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_vmsplice                SC_REPR_FD_T                                                         /* fdout */ 
-#define __NR32ATR1_vmsplice                SC_REPR_STRUCT_IOVECX32                                              /* iov */ 
+#define __NR32ATR1_vmsplice                SC_REPR_STRUCT_IOVECX32_C                                            /* iov */ 
 #define __NR32ATL1_vmsplice                2                                                                    /* iov -> count */ 
 #define __NR32ATR2_vmsplice                SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR3_vmsplice                SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
@@ -2221,7 +2221,7 @@
 #define __NR32ATR3_preadv                  SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32RTR_preadv                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_pwritev                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_pwritev                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NR32ATR1_pwritev                 SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NR32ATL1_pwritev                 2                                                                    /* iovec -> count */ 
 #define __NR32ATR2_pwritev                 SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR3_pwritev                 SC_REPR_UINT64_T                                                     /* offset */ 
@@ -2273,19 +2273,19 @@
 #define __NR32ATR1_setns                   SC_REPR_CLONE_FLAGS_SETNS                                            /* nstype */ 
 #define __NR32RTR_setns                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_process_vm_readv        SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32ATR1_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
+#define __NR32ATR1_process_vm_readv        SC_REPR_STRUCT_IOVECX32                                              /* local_iov */ 
 #define __NR32ATL1_process_vm_readv        2                                                                    /* local_iov -> liovcnt */ 
 #define __NR32ATR2_process_vm_readv        SC_REPR_SIZE_T                                                       /* liovcnt */ 
-#define __NR32ATR3_process_vm_readv        SC_REPR_STRUCT_IOVEC                                                 /* remote_iov */ 
+#define __NR32ATR3_process_vm_readv        SC_REPR_STRUCT_IOVECX32                                              /* remote_iov */ 
 #define __NR32ATL3_process_vm_readv        4                                                                    /* remote_iov -> riovcnt */ 
 #define __NR32ATR4_process_vm_readv        SC_REPR_SIZE_T                                                       /* riovcnt */ 
 #define __NR32ATR5_process_vm_readv        SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR32RTR_process_vm_readv         SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_process_vm_writev       SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32ATR1_process_vm_writev       SC_REPR_STRUCT_IOVEC                                                 /* local_iov */ 
+#define __NR32ATR1_process_vm_writev       SC_REPR_STRUCT_IOVECX32_C                                            /* local_iov */ 
 #define __NR32ATL1_process_vm_writev       2                                                                    /* local_iov -> liovcnt */ 
 #define __NR32ATR2_process_vm_writev       SC_REPR_SIZE_T                                                       /* liovcnt */ 
-#define __NR32ATR3_process_vm_writev       SC_REPR_STRUCT_IOVEC                                                 /* remote_iov */ 
+#define __NR32ATR3_process_vm_writev       SC_REPR_STRUCT_IOVECX32                                              /* remote_iov */ 
 #define __NR32ATL3_process_vm_writev       4                                                                    /* remote_iov -> riovcnt */ 
 #define __NR32ATR4_process_vm_writev       SC_REPR_SIZE_T                                                       /* riovcnt */ 
 #define __NR32ATR5_process_vm_writev       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
@@ -2420,7 +2420,7 @@
 #define __NR32ATR4_recvmmsg64              SC_REPR_STRUCT_TIMESPECX32_64                                        /* tmo */ 
 #define __NR32RTR_recvmmsg64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_pwritevf                SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_pwritevf                SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NR32ATR1_pwritevf                SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NR32ATL1_pwritevf                2                                                                    /* iovec -> count */ 
 #define __NR32ATR2_pwritevf                SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR3_pwritevf                SC_REPR_UINT64_T                                                     /* offset */ 
@@ -2608,7 +2608,7 @@
 #define __NR32ATL1_ksysctl                 0                                                                    /* arg -> command */ 
 #define __NR32RTR_ksysctl                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_writevf                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_writevf                 SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
+#define __NR32ATR1_writevf                 SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NR32ATL1_writevf                 2                                                                    /* iovec -> count */ 
 #define __NR32ATR2_writevf                 SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR3_writevf                 SC_REPR_IOMODE_T                                                     /* mode */ 

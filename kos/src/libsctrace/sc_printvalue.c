@@ -68,6 +68,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/uio.h>
 
 #include <ctype.h>
 #include <fcntl.h>
@@ -82,6 +83,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include "sctrace.h"
 
 #ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
 #include <compat/bits/itimerval.h>
 #include <compat/bits/timespec.h>
@@ -116,6 +118,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 /* Representation limits before printed data is truncated */
 #define LIMIT_STRLEN       64 /* Max # of bytes to print from user-supplied strings. */
 #define LIMIT_POLLFDS      16 /* Max # of `struct pollfd' structures to print from a vector. */
+#define LIMIT_IOVEC        16 /* Max # of `struct iovec' structures to print from a vector. */
 #define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
 
 
@@ -394,6 +397,26 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_seek_whence
 #endif /* HAVE_SC_REPR_SEEK_WHENCE */
 
+#if defined(HAVE_SC_REPR_STRUCT_IOVEC) || defined(HAVE_SC_REPR_STRUCT_IOVEC_C)
+#if __SIZEOF_IOVEC == 8
+#define iovecx32 iovec
+#define NEED_print_iovecx32
+#elif __SIZEOF_IOVEC == 16
+#define iovecx64 iovec
+#define NEED_print_iovecx64
+#else /* __SIZEOF_IOVEC == ... */
+#error "Unsupported `__SIZEOF_IOVEC'"
+#endif /* __SIZEOF_IOVEC != ... */
+#endif /* HAVE_SC_REPR_STRUCT_IOVEC || HAVE_SC_REPR_STRUCT_IOVEC_C */
+
+#if defined(HAVE_SC_REPR_STRUCT_IOVECX32) || defined(HAVE_SC_REPR_STRUCT_IOVECX32_C)
+#define NEED_print_iovecx32
+#endif /* HAVE_SC_REPR_STRUCT_IOVECX32 || HAVE_SC_REPR_STRUCT_IOVECX32_C */
+
+#if defined(HAVE_SC_REPR_STRUCT_IOVECX64) || defined(HAVE_SC_REPR_STRUCT_IOVECX64_C)
+#define NEED_print_iovecx64
+#endif /* HAVE_SC_REPR_STRUCT_IOVECX64 || HAVE_SC_REPR_STRUCT_IOVECX64_C */
+
 
 
 
@@ -452,6 +475,22 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_f_lock
 #define NEED_print_seek_whence
 #endif /* NEED_print_flock64 */
+
+#ifdef NEED_print_iovecx32
+#define NEED_print_iovec_entry
+#endif /* NEED_print_iovecx32 */
+
+#ifdef NEED_print_iovecx64
+#define NEED_print_iovec_entry
+#endif /* NEED_print_iovecx64 */
+
+#ifdef NEED_print_iovec_entry
+#define NEED_print_string_with_len
+#endif /* NEED_print_iovec_entry */
+
+#ifdef NEED_print_string_with_len
+#define NEED_print_string
+#endif /* NEED_print_string_with_len */
 
 
 
@@ -1077,6 +1116,19 @@ print_string(pformatprinter printer, void *arg,
 	return result;
 }
 #endif /* NEED_print_string */
+
+
+
+#ifdef NEED_print_string_with_len
+PRIVATE ssize_t CC
+print_string_with_len(pformatprinter printer, void *arg,
+                      USER UNCHECKED char const *str,
+                      size_t length) {
+	struct sc_argument length_link;
+	length_link.sa_value.sv_u64 = (u64)length;
+	return print_string(printer, arg, str, &length_link);
+}
+#endif /* NEED_print_string_with_len */
 
 
 
@@ -2452,7 +2504,106 @@ print_fcntl_arg(pformatprinter printer, void *arg,
 	}
 	return result;
 }
-#endif /* NEED_print_fcntl_command */
+#endif /* NEED_print_fcntl_arg */
+
+
+
+
+
+#ifdef NEED_print_iovec_entry
+PRIVATE ssize_t CC
+print_iovec_entry(pformatprinter printer, void *arg,
+                  bool print_content,
+                  USER UNCHECKED void *iov_base,
+                  size_t iov_len) {
+	ssize_t result, temp;
+	result = DOPRINT("{" SYNSPACE SYNFIELD("iov_base"));
+	if unlikely(result < 0)
+		goto done;
+	if (print_content) {
+		validate_readable(iov_base, iov_len);
+		DO(print_string_with_len(printer, arg,
+		                         (USER CHECKED char const *)iov_base,
+		                         iov_len));
+	} else {
+		PRINTF("%#" PRIxPTR, iov_base);
+	}
+	PRINTF("," SYNSPACE SYNFIELD("iov_len") "%" PRIuSIZ SYNSPACE "}",
+	       iov_len);
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_iovec_entry */
+
+
+
+
+
+#if defined(NEED_print_iovecx32) || defined(NEED_print_iovecx64)
+PRIVATE ssize_t CC
+print_iovec_n(pformatprinter printer, void *arg, bool print_content,
+#if defined(NEED_print_iovecx32) && defined(NEED_print_iovecx64)
+#define print_iovecx32(printer, arg, print_content, iov, count) \
+	print_iovec_n(printer, arg, print_content, iov, count, sizeof(struct iovecx32))
+#define print_iovecx64(printer, arg, print_content, iov, count) \
+	print_iovec_n(printer, arg, print_content, iov, count, sizeof(struct iovecx64))
+              USER CHECKED void const *iov,
+              size_t count,
+              size_t iov_ent_size
+#elif defined(NEED_print_iovecx32)
+#define print_iovecx32 print_iovec_n
+              USER CHECKED struct iovecx32 const *iov,
+              size_t count
+#else /* ... */
+#define print_iovecx64 print_iovec_n
+              USER CHECKED struct iovecx64 const *iov,
+              size_t count
+#endif /* !... */
+              ) {
+	size_t used_count = count;
+	ssize_t temp, result;
+	if (used_count > LIMIT_IOVEC)
+		used_count = LIMIT_IOVEC;
+	result = (*printer)(arg, "[", 1);
+	if unlikely(result < 0)
+		goto done;
+	TRY {
+		size_t i;
+		for (i = 0; i < count; ++i) {
+			void *iov_base;
+			size_t iov_len;
+			if (i != 0)
+				PRINT("," SYNSPACE2);
+#if defined(NEED_print_iovecx32) && defined(NEED_print_iovecx64)
+			if (iov_ent_size == sizeof(struct iovecx32)) {
+				iov_base = (void *)((struct iovecx32 *)iov)[i].iov_base;
+				iov_len  = (size_t)((struct iovecx32 *)iov)[i].iov_len;
+			} else {
+				iov_base = (void *)((struct iovecx64 *)iov)[i].iov_base;
+				iov_len  = (size_t)((struct iovecx64 *)iov)[i].iov_len;
+			}
+#else /* NEED_print_iovecx32 && NEED_print_iovecx64 */
+			iov_base = (void *)iov[i].iov_base;
+			iov_len  = (size_t)iov[i].iov_len;
+#endif /* !NEED_print_iovecx32 || !NEED_print_iovecx64 */
+			DO(print_iovec_entry(printer, arg, print_content, iov_base, iov_len));
+		}
+	} EXCEPT {
+		if (!was_thrown(E_SEGFAULT))
+			RETHROW();
+		PRINT("<segfault>");
+	}
+	if (used_count < count)
+		PRINT("," SYNSPACE2 "...");
+	PRINT("]");
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_iovecx32 || NEED_print_iovecx64 */
 
 
 
@@ -2543,9 +2694,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_FILE_HANDLE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE32 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_IOVEC 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_IOVECX32 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_IOVECX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_ITIMERSPECX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_ITIMERSPECX32_64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_ITIMERSPECX64 1
@@ -2600,6 +2748,130 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#if (defined(HAVE_SC_REPR_STRUCT_IOVECX32) ||   \
+     defined(HAVE_SC_REPR_STRUCT_IOVECX32_C) || \
+     ((defined(HAVE_SC_REPR_STRUCT_IOVEC) ||    \
+       defined(HAVE_SC_REPR_STRUCT_IOVEC_C)) && \
+      __SIZEOF_IOVEC == 8))
+#ifdef HAVE_SC_REPR_STRUCT_IOVECX32
+	case SC_REPR_STRUCT_IOVECX32:
+#define _IS_IOVECX32_1() (argtype == SC_REPR_STRUCT_IOVECX32)
+#endif /* HAVE_SC_REPR_STRUCT_IOVECX32 */
+#ifdef HAVE_SC_REPR_STRUCT_IOVECX32_C
+	case SC_REPR_STRUCT_IOVECX32_C:
+#define _IS_IOVECX32_C_1() (argtype == SC_REPR_STRUCT_IOVECX32_C)
+#endif /* HAVE_SC_REPR_STRUCT_IOVECX32_C */
+#if defined(HAVE_SC_REPR_STRUCT_IOVEC) && __SIZEOF_IOVEC == 8
+	case SC_REPR_STRUCT_IOVEC:
+#define _IS_IOVECX32_2() (argtype == SC_REPR_STRUCT_IOVEC)
+#endif /* HAVE_SC_REPR_STRUCT_IOVEC && __SIZEOF_IOVEC == 8 */
+#if defined(HAVE_SC_REPR_STRUCT_IOVEC_C) && __SIZEOF_IOVEC == 8
+	case SC_REPR_STRUCT_IOVEC_C:
+#define _IS_IOVECX32_C_2() (argtype == SC_REPR_STRUCT_IOVEC_C)
+#endif /* HAVE_SC_REPR_STRUCT_IOVEC_C && __SIZEOF_IOVEC == 8 */
+#if defined(_IS_IOVECX32_1) && defined(_IS_IOVECX32_2)
+#define _IS_IOVECX32() (_IS_IOVECX32_1() || _IS_IOVECX32_2())
+#elif defined(_IS_IOVECX32_1)
+#define _IS_IOVECX32 _IS_IOVECX32_1
+#elif defined(_IS_IOVECX32_2)
+#define _IS_IOVECX32 _IS_IOVECX32_2
+#endif /* ... */
+#if defined(_IS_IOVECX32_C_1) && defined(_IS_IOVECX32_C_2)
+#define _IS_IOVECX32_C() (_IS_IOVECX32_C_1() || _IS_IOVECX32_C_2())
+#elif defined(_IS_IOVECX32_C_1)
+#define _IS_IOVECX32_C _IS_IOVECX32_C_1
+#elif defined(_IS_IOVECX32_C_2)
+#define _IS_IOVECX32_C _IS_IOVECX32_C_2
+#endif /* ... */
+	{
+		USER UNCHECKED struct iovecx32 *iov;
+		size_t count;
+		if (!link)
+			goto do_pointer;
+		iov   = (USER UNCHECKED struct iovecx32 *)(uintptr_t)value.sv_u64;
+		count = (size_t)link->sa_value.sv_u64;
+		validate_readablem(iov, count, sizeof(struct iovecx32));
+#if defined(_IS_IOVECX32) && defined(_IS_IOVECX32_C)
+		result = print_iovecx32(printer, arg, _IS_IOVECX32_C(), iov, count);
+#elif defined(_IS_IOVECX32)
+		result = print_iovecx32(printer, arg, false, iov, count);
+#elif defined(_IS_IOVECX32_C)
+		result = print_iovecx32(printer, arg, true, iov, count);
+#else /* ... */
+#error "Bad configuration"
+#endif /* !... */
+#undef _IS_IOVECX32
+#undef _IS_IOVECX32_1
+#undef _IS_IOVECX32_2
+#undef _IS_IOVECX32_C
+#undef _IS_IOVECX32_C_1
+#undef _IS_IOVECX32_C_2
+	}	break;
+#endif /* ... */
+
+
+#if (defined(HAVE_SC_REPR_STRUCT_IOVECX64) ||   \
+     defined(HAVE_SC_REPR_STRUCT_IOVECX64_C) || \
+     ((defined(HAVE_SC_REPR_STRUCT_IOVEC) ||    \
+       defined(HAVE_SC_REPR_STRUCT_IOVEC_C)) && \
+      __SIZEOF_IOVEC == 16))
+#ifdef HAVE_SC_REPR_STRUCT_IOVECX64
+	case SC_REPR_STRUCT_IOVECX64:
+#define _IS_IOVECX64_1() (argtype == SC_REPR_STRUCT_IOVECX64)
+#endif /* HAVE_SC_REPR_STRUCT_IOVECX64 */
+#ifdef HAVE_SC_REPR_STRUCT_IOVECX64_C
+	case SC_REPR_STRUCT_IOVECX64_C:
+#define _IS_IOVECX64_C_1() (argtype == SC_REPR_STRUCT_IOVECX64_C)
+#endif /* HAVE_SC_REPR_STRUCT_IOVECX64_C */
+#if defined(HAVE_SC_REPR_STRUCT_IOVEC) && __SIZEOF_IOVEC == 16
+	case SC_REPR_STRUCT_IOVEC:
+#define _IS_IOVECX64_2() (argtype == SC_REPR_STRUCT_IOVEC)
+#endif /* HAVE_SC_REPR_STRUCT_IOVEC && __SIZEOF_IOVEC == 16 */
+#if defined(HAVE_SC_REPR_STRUCT_IOVEC_C) && __SIZEOF_IOVEC == 16
+	case SC_REPR_STRUCT_IOVEC_C:
+#define _IS_IOVECX64_C_2() (argtype == SC_REPR_STRUCT_IOVEC_C)
+#endif /* HAVE_SC_REPR_STRUCT_IOVEC_C && __SIZEOF_IOVEC == 16 */
+#if defined(_IS_IOVECX64_1) && defined(_IS_IOVECX64_2)
+#define _IS_IOVECX64() (_IS_IOVECX64_1() || _IS_IOVECX64_2())
+#elif defined(_IS_IOVECX64_1)
+#define _IS_IOVECX64 _IS_IOVECX64_1
+#elif defined(_IS_IOVECX64_2)
+#define _IS_IOVECX64 _IS_IOVECX64_2
+#endif /* ... */
+#if defined(_IS_IOVECX64_C_1) && defined(_IS_IOVECX64_C_2)
+#define _IS_IOVECX64_C() (_IS_IOVECX64_C_1() || _IS_IOVECX64_C_2())
+#elif defined(_IS_IOVECX64_C_1)
+#define _IS_IOVECX64_C _IS_IOVECX64_C_1
+#elif defined(_IS_IOVECX64_C_2)
+#define _IS_IOVECX64_C _IS_IOVECX64_C_2
+#endif /* ... */
+	{
+		USER UNCHECKED struct iovecx64 *iov;
+		size_t count;
+		if (!link)
+			goto do_pointer;
+		iov   = (USER UNCHECKED struct iovecx64 *)(uintptr_t)value.sv_u64;
+		count = (size_t)link->sa_value.sv_u64;
+		validate_readablem(iov, count, sizeof(struct iovecx64));
+#if defined(_IS_IOVECX64) && defined(_IS_IOVECX64_C)
+		result = print_iovecx64(printer, arg, _IS_IOVECX64_C(), iov, count);
+#elif defined(_IS_IOVECX64)
+		result = print_iovecx64(printer, arg, false, iov, count);
+#elif defined(_IS_IOVECX64_C)
+		result = print_iovecx64(printer, arg, true, iov, count);
+#else /* ... */
+#error "Bad configuration"
+#endif /* !... */
+#undef _IS_IOVECX64
+#undef _IS_IOVECX64_1
+#undef _IS_IOVECX64_2
+#undef _IS_IOVECX64_C
+#undef _IS_IOVECX64_C_1
+#undef _IS_IOVECX64_C_2
+	}	break;
+#endif /* ... */
+
 
 #ifdef HAVE_SC_REPR_SEEK_WHENCE
 	case SC_REPR_SEEK_WHENCE:

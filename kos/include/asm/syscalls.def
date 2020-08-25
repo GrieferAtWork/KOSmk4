@@ -921,15 +921,15 @@ afs_syscall:(int TODO_PROTOTYPE) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] writev:(fd_t fd, [tostr(STRUCT_IOVEC:count)] struct iovec const *iovec, size_t count) -> ssize_t;
-[cp] writevx32:(fd_t fd, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iovec, size_t count) -> ssize_t;
-[cp] writevx64:(fd_t fd, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iovec, size_t count) -> ssize_t;
+[cp] writev:(fd_t fd, [tostr(STRUCT_IOVEC_C:count)] struct iovec const *iovec, size_t count) -> ssize_t;
+[cp] writevx32:(fd_t fd, [tostr(STRUCT_IOVECX32_C:count)] struct iovecx32 const *iovec, size_t count) -> ssize_t;
+[cp] writevx64:(fd_t fd, [tostr(STRUCT_IOVECX64_C:count)] struct iovecx64 const *iovec, size_t count) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
-[cp] writevf:(fd_t fd, [tostr(STRUCT_IOVEC:count)] struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] writevfx32:(fd_t fd, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] writevfx64:(fd_t fd, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevf:(fd_t fd, [tostr(STRUCT_IOVEC_C:count)] struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevfx32:(fd_t fd, [tostr(STRUCT_IOVECX32_C:count)] struct iovecx32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevfx64:(fd_t fd, [tostr(STRUCT_IOVECX64_C:count)] struct iovecx64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
 %[endgroup]
 
 [restart(must)] getsid:(pid_t pid) -> pid_t;
@@ -1394,9 +1394,9 @@ get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 @@@param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT'
-[cp] vmsplice:(fd_t fdout, [tostr(STRUCT_IOVEC:count)] struct iovec const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
-[doc_alias(vmsplice)][cp] vmsplicex32:(fd_t fdout, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
-[doc_alias(vmsplice)][cp] vmsplicex64:(fd_t fdout, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplice:(fd_t fdout, [tostr(STRUCT_IOVEC_C:count)] struct iovec const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
+[doc_alias(vmsplice)][cp] vmsplicex32:(fd_t fdout, [tostr(STRUCT_IOVECX32_C:count)] struct iovecx32 const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
+[doc_alias(vmsplice)][cp] vmsplicex64:(fd_t fdout, [tostr(STRUCT_IOVECX64_C:count)] struct iovecx64 const *iov, size_t count, [tostr(SPLICE_FLAGS)] syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 @@@param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT'
@@ -1473,12 +1473,12 @@ inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] pwritev:(fd_t fd, [tostr(STRUCT_IOVEC:count)] struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritevx32:(fd_t fd, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritevx64:(fd_t fd, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritevf:(fd_t fd, [tostr(STRUCT_IOVEC:count)] struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwritevfx32:(fd_t fd, [tostr(STRUCT_IOVECX32:count)] struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwritevfx64:(fd_t fd, [tostr(STRUCT_IOVECX64:count)] struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritev:(fd_t fd, [tostr(STRUCT_IOVEC_C:count)] struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevx32:(fd_t fd, [tostr(STRUCT_IOVECX32_C:count)] struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevx64:(fd_t fd, [tostr(STRUCT_IOVECX64_C:count)] struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevf:(fd_t fd, [tostr(STRUCT_IOVEC_C:count)] struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevfx32:(fd_t fd, [tostr(STRUCT_IOVECX32_C:count)] struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevfx64:(fd_t fd, [tostr(STRUCT_IOVECX64_C:count)] struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
@@ -1521,31 +1521,31 @@ process_vm_readv:(pid_t pid,
                   syscall_ulong_t flags) -> ssize_t;
 [doc_alias(process_vm_readv)]
 process_vm_readvx32:(pid_t pid,
-                     [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx32 const *local_iov, size_t liovcnt,
-                     [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx32 const *remote_iov, size_t riovcnt,
+                     [tostr(STRUCT_IOVECX32:liovcnt)] struct iovecx32 const *local_iov, size_t liovcnt,
+                     [tostr(STRUCT_IOVECX32:riovcnt)] struct iovecx32 const *remote_iov, size_t riovcnt,
                      syscall_ulong_t flags) -> ssize_t;
 [doc_alias(process_vm_readv)]
 process_vm_readvx64:(pid_t pid,
-                     [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx64 const *local_iov, size_t liovcnt,
-                     [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx64 const *remote_iov, size_t riovcnt,
+                     [tostr(STRUCT_IOVECX64:liovcnt)] struct iovecx64 const *local_iov, size_t liovcnt,
+                     [tostr(STRUCT_IOVECX64:riovcnt)] struct iovecx64 const *remote_iov, size_t riovcnt,
                      syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: flags: Must be `0'
 process_vm_writev:(pid_t pid,
-                   [tostr(STRUCT_IOVEC:liovcnt)] struct iovec const *local_iov, size_t liovcnt,
+                   [tostr(STRUCT_IOVEC_C:liovcnt)] struct iovec const *local_iov, size_t liovcnt,
                    [tostr(STRUCT_IOVEC:riovcnt)] struct iovec const *remote_iov, size_t riovcnt,
                    syscall_ulong_t flags) -> ssize_t;
 [doc_alias(process_vm_writev)]
 process_vm_writevx32:(pid_t pid,
-                      [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx32 const *local_iov, size_t liovcnt,
-                      [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx32 const *remote_iov, size_t riovcnt,
+                      [tostr(STRUCT_IOVECX32_C:liovcnt)] struct iovecx32 const *local_iov, size_t liovcnt,
+                      [tostr(STRUCT_IOVECX32:riovcnt)] struct iovecx32 const *remote_iov, size_t riovcnt,
                       syscall_ulong_t flags) -> ssize_t;
 [doc_alias(process_vm_writev)]
 process_vm_writevx64:(pid_t pid,
-                      [tostr(STRUCT_IOVEC:liovcnt)] struct iovecx64 const *local_iov, size_t liovcnt,
-                      [tostr(STRUCT_IOVEC:riovcnt)] struct iovecx64 const *remote_iov, size_t riovcnt,
+                      [tostr(STRUCT_IOVECX64_C:liovcnt)] struct iovecx64 const *local_iov, size_t liovcnt,
+                      [tostr(STRUCT_IOVECX64:riovcnt)] struct iovecx64 const *remote_iov, size_t riovcnt,
                       syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
