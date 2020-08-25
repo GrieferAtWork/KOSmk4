@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8e554be */
+/* HASH CRC-32:0x8234a830 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -413,14 +413,6 @@
 #define __stub_pthread_barrier_destroy 1
 #define __stub_pthread_barrier_init 1
 #define __stub_pthread_barrier_wait 1
-#define __stub_pthread_cond_broadcast 1
-#define __stub_cnd_destroy 1
-#define __stub_pthread_cond_destroy 1
-#define __stub_pthread_cond_init 1
-#define __stub_pthread_cond_signal 1
-#define __stub_pthread_cond_timedwait 1
-#define __stub_pthread_cond_timedwait64 1
-#define __stub_pthread_cond_wait 1
 #define __stub_pthread_getcpuclockid 1
 #define __stub_tss_get 1
 #define __stub_pthread_getspecific 1
@@ -429,16 +421,8 @@
 #define __stub_pthread_key_delete 1
 #define __stub_pthread_mutex_consistent_np 1
 #define __stub_pthread_mutex_consistent 1
-#define __stub_mtx_destroy 1
-#define __stub_pthread_mutex_destroy 1
 #define __stub_pthread_mutex_getprioceiling 1
-#define __stub_pthread_mutex_init 1
-#define __stub_pthread_mutex_lock 1
 #define __stub_pthread_mutex_setprioceiling 1
-#define __stub_pthread_mutex_timedlock 1
-#define __stub_pthread_mutex_timedlock64 1
-#define __stub_pthread_mutex_trylock 1
-#define __stub_pthread_mutex_unlock 1
 #define __stub_pthread_rwlock_destroy 1
 #define __stub_pthread_rwlock_init 1
 #define __stub_pthread_rwlock_rdlock 1

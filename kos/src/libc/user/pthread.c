@@ -24,6 +24,7 @@
 /**/
 
 #include <hybrid/atomic.h>
+#include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
@@ -87,7 +88,7 @@ STATIC_ASSERT(offsetof(pthread_mutexattr_t, ma_kind) == __OFFSET_PTHREAD_MUTEXAT
 STATIC_ASSERT(sizeof(pthread_mutex_t) <= __SIZEOF_PTHREAD_MUTEX_T);
 STATIC_ASSERT(offsetof(pthread_mutex_t, m_lock) == __OFFSET_PTHREAD_MUTEX_LOCK);
 STATIC_ASSERT(offsetof(pthread_mutex_t, m_count) == __OFFSET_PTHREAD_MUTEX_COUNT);
-STATIC_ASSERT(offsetof(pthread_mutex_t, m_owner) == __OFFSET_PTHREAD_MUTEX_OWNER);
+STATIC_ASSERT(offsetof(pthread_mutex_t, _m_owner) == __OFFSET_PTHREAD_MUTEX_OWNER);
 STATIC_ASSERT(offsetof(pthread_mutex_t, m_kind) == __OFFSET_PTHREAD_MUTEX_KIND);
 STATIC_ASSERT(offsetof(pthread_mutex_t, _m_nusers) == __OFFSET_PTHREAD_MUTEX_NUSERS);
 STATIC_ASSERT(offsetof(pthread_mutex_t, _m_spins) == __OFFSET_PTHREAD_MUTEX_SPINS);
@@ -104,14 +105,14 @@ STATIC_ASSERT(offsetof(pthread_condattr_t, ca_value) == __OFFSET_PTHREAD_CONDATT
 
 /* pthread_cond_t */
 STATIC_ASSERT(sizeof(pthread_cond_t) <= __SIZEOF_PTHREAD_COND_T);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_lock) == __OFFSET_PTHREAD_COND_LOCK);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_lock) == __OFFSET_PTHREAD_COND_LOCK);
 STATIC_ASSERT(offsetof(pthread_cond_t, c_futex) == __OFFSET_PTHREAD_COND_FUTEX);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_total_seq) == __OFFSET_PTHREAD_COND_TOTAL_SEQ);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_wakeup_seq) == __OFFSET_PTHREAD_COND_WAKEUP_SEQ);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_woken_seq) == __OFFSET_PTHREAD_COND_WOKEN_SEQ);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_mutex) == __OFFSET_PTHREAD_COND_MUTEX);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_nwaiters) == __OFFSET_PTHREAD_COND_NWAITERS);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_broadcast_seq) == __OFFSET_PTHREAD_COND_BROADCAST_SEQ);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_total_seq) == __OFFSET_PTHREAD_COND_TOTAL_SEQ);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_wakeup_seq) == __OFFSET_PTHREAD_COND_WAKEUP_SEQ);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_woken_seq) == __OFFSET_PTHREAD_COND_WOKEN_SEQ);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_mutex) == __OFFSET_PTHREAD_COND_MUTEX);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_nwaiters) == __OFFSET_PTHREAD_COND_NWAITERS);
+STATIC_ASSERT(offsetof(pthread_cond_t, _c_broadcast_seq) == __OFFSET_PTHREAD_COND_BROADCAST_SEQ);
 
 /* pthread_rwlockattr_t */
 STATIC_ASSERT(sizeof(pthread_rwlockattr_t) <= __SIZEOF_PTHREAD_RWLOCKATTR_T);
@@ -2227,11 +2228,19 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex,
                                               pthread_mutexattr_t const *mutexattr)
 /*[[[body:libc_pthread_mutex_init]]]*/
-/*AUTO*/{
-	(void)mutex;
-	(void)mutexattr;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_init(%p, %p)", mutex, mutexattr); /* TODO */
-	return ENOSYS;
+{
+	memset(mutex, 0, sizeof(*mutex));
+#if __PTHREAD_MUTEX_TIMED != 0
+	mutex->m_kind = __PTHREAD_MUTEX_TIMED;
+#endif /* __PTHREAD_MUTEX_TIMED != 0 */
+	if (mutexattr) {
+		mutex->m_kind = mutexattr->ma_kind & PTHREAD_MUTEXATTR_KIND_MASK;
+		/* XXX: mutexattr->ma_kind & PTHREAD_MUTEXATTR_PRIO_CEILING_MASK */
+		/* XXX: mutexattr->ma_kind & PTHREAD_MUTEXATTR_PROTOCOL_MASK */
+		/* XXX: mutexattr->ma_kind & PTHREAD_MUTEXATTR_FLAG_ROBUST */
+		/* XXX: mutexattr->ma_kind & PTHREAD_MUTEXATTR_FLAG_PSHARED */
+	}
+	return EOK;
 }
 /*[[[end:libc_pthread_mutex_init]]]*/
 
@@ -2241,12 +2250,64 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex,
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *mutex)
 /*[[[body:libc_pthread_mutex_destroy]]]*/
-/*AUTO*/{
+{
 	(void)mutex;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_destroy(%p)", mutex); /* TODO */
-	return ENOSYS;
+#ifndef NDEBUG
+	memset(mutex, 0xcc, sizeof(*mutex));
+#endif /* !NDEBUG */
+	return EOK;
 }
 /*[[[end:libc_pthread_mutex_destroy]]]*/
+
+LOCAL ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_NCX(LIBCCALL mutex_trylock)(pthread_mutex_t *__restrict mutex,
+                                    uint32_t *__restrict plock) {
+	uint32_t lock;
+	pid_t mytid = gettid();
+	assert((mytid & ~FUTEX_TID_MASK) == 0);
+	/* Try to acquire the lock. */
+again:
+	lock = ATOMIC_READ(mutex->m_lock);
+	if ((lock & FUTEX_TID_MASK) == 0) {
+		/* Lock not taken. - Try to take it now! */
+		if (!ATOMIC_CMPXCH_WEAK(mutex->m_lock,
+		                        lock,
+		                        (lock & FUTEX_WAITERS) | mytid))
+			goto again;
+		/* Got it! */
+		return EOK;
+	}
+	/* Lock is already taken, but it may be taken by us. */
+	if ((lock & FUTEX_TID_MASK) == (uint32_t)mytid) {
+		/* Check if recursive locks are allowed */
+		if unlikely(mutex->m_kind != PTHREAD_MUTEX_RECURSIVE_NP)
+			return EDEADLK;
+		++mutex->m_count;
+		return EOK;
+	}
+	/* Nope! */
+	*plock = lock;
+	return EBUSY;
+}
+
+LOCAL ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+NOTHROW_NCX(LIBCCALL mutex_trylock_waiters)(pthread_mutex_t *__restrict mutex,
+                                            uint32_t *__restrict plock) {
+	errno_t result;
+again:
+	result = mutex_trylock(mutex, plock);
+	if (result == EBUSY) {
+		/* Set the `FUTEX_WAITERS' bit if it wasn't set already. */
+		if (!(*plock & FUTEX_WAITERS)) {
+			if (!ATOMIC_CMPXCH_WEAK(mutex->m_lock,
+			                        *plock,
+			                        *plock | FUTEX_WAITERS))
+				goto again;
+			*plock |= FUTEX_WAITERS;
+		}
+	}
+	return result;
+}
 
 /*[[[head:libc_pthread_mutex_trylock,hash:CRC-32=0x91485880]]]*/
 /* Try locking a mutex
@@ -2257,10 +2318,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *mutex)
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread_mutex_t *mutex)
 /*[[[body:libc_pthread_mutex_trylock]]]*/
-/*AUTO*/{
-	(void)mutex;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_trylock(%p)", mutex); /* TODO */
-	return ENOSYS;
+{
+	uint32_t lock;
+	return mutex_trylock(mutex, &lock);
 }
 /*[[[end:libc_pthread_mutex_trylock]]]*/
 
@@ -2270,10 +2330,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread_mutex_t *mutex)
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_lock)(pthread_mutex_t *mutex)
 /*[[[body:libc_pthread_mutex_lock]]]*/
-/*AUTO*/{
-	(void)mutex;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_lock(%p)", mutex); /* TODO */
-	return ENOSYS;
+{
+	uint32_t lock;
+	errno_t result;
+again:
+	result = mutex_trylock_waiters(mutex, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked. */
+	sys_futex((uint32_t *)&mutex->m_lock,
+	          FUTEX_WAIT, lock, NULL, NULL, 0);
+	goto again;
 }
 /*[[[end:libc_pthread_mutex_lock]]]*/
 
@@ -2287,12 +2354,47 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict m
                                                    struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_mutex_timedlock]]]*/
 {
-	(void)mutex;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_mutex_timedlock"); /* TODO */
-	return ENOSYS;
+	uint32_t lock;
+	errno_t result;
+again:
+	result = mutex_trylock_waiters(mutex, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked.
+	 * NOTE: Need to use `FUTEX_WAIT_BITSET', since only that one takes
+	 *       an absolute timeout, rather than the relative timeout taken
+	 *       by the regular `FUTEX_WAIT' */
+	result = (errno_t)sys_futex((uint32_t *)&mutex->m_lock,
+	                            FUTEX_WAIT_BITSET, lock, abstime,
+	                            NULL, FUTEX_BITSET_MATCH_ANY);
+	/* Check for timeout. */
+	if (result == -ETIMEDOUT || result == -EINVAL)
+		return -result;
+	goto again;
 }
 /*[[[end:libc_pthread_mutex_timedlock]]]*/
+
+/* With a 64-bit timeout, wait while a 32-bit control word matches
+ * the given value. Note that this function may access up to 8 bytes
+ * starting at the base of the futex control word, through only the
+ * first 4 bytes are actually inspected.
+ * HINT: Waiting for 32-bit control words on 64-bit platforms is
+ *       done by making use of `LFUTEX_WAIT_WHILE_BITMASK' */
+#if __SIZEOF_POINTER__ == 4
+#define sys_lfutex32_waitwhile64(uaddr, val, timeout) \
+	sys_lfutex(uaddr, LFUTEX_WAIT_WHILE, val, timeout, 0)
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define sys_lfutex32_waitwhile64(uaddr, val, timeout)          \
+	sys_lfutex((uint64_t *)(uaddr), LFUTEX_WAIT_WHILE_BITMASK, \
+	           (uint64_t)UINT32_MAX, timeout,                  \
+	           (uint64_t)(uint32_t)(val))
+#else /* ... */
+#define sys_lfutex32_waitwhile64(uaddr, val, timeout)          \
+	sys_lfutex((uint64_t *)(uaddr), LFUTEX_WAIT_WHILE_BITMASK, \
+	           (uint64_t)(UINT32_MAX << 32), timeout,          \
+	           (uint64_t)(uint32_t)(val) << 32)
+#endif /* !... */
+
 
 /*[[[head:libc_pthread_mutex_timedlock64,hash:CRC-32=0x8ea7106f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -2307,10 +2409,19 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict
                                                      struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_mutex_timedlock64]]]*/
 {
-	(void)mutex;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_mutex_timedlock64"); /* TODO */
-	return ENOSYS;
+	uint32_t lock;
+	errno_t result;
+again:
+	result = mutex_trylock_waiters(mutex, &lock);
+	if (result != EBUSY)
+		return result;
+	/* Wait until the mutex is unlocked. */
+	result = (errno_t)sys_lfutex32_waitwhile64((uint32_t *)&mutex->m_lock,
+	                                           lock, abstime);
+	/* Check for timeout. */
+	if (result == -ETIMEDOUT || result == -EINVAL)
+		return -result;
+	goto again;
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_mutex_timedlock64]]]*/
@@ -2321,10 +2432,34 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *mutex)
 /*[[[body:libc_pthread_mutex_unlock]]]*/
-/*AUTO*/{
-	(void)mutex;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_unlock(%p)", mutex); /* TODO */
-	return ENOSYS;
+{
+	uint32_t lock;
+	switch (mutex->m_kind) {
+
+	case PTHREAD_MUTEX_ERRORCHECK: {
+		/* Verify that the caller owns this mutex. */
+		lock = ATOMIC_READ(mutex->m_lock);
+		if ((lock & FUTEX_TID_MASK) != (uint32_t)gettid())
+			return EPERM;
+	}	break;
+
+	case PTHREAD_MUTEX_RECURSIVE: {
+		/* Check if this is a recursive unlock. */
+		if (mutex->m_count != 0) {
+			--mutex->m_count;
+			return EOK;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+	/* Actually unlock the mutex. */
+	lock = ATOMIC_XCH(mutex->m_lock, 0);
+	/* If there were any waiting threads, wake one of them now. */
+	if (lock & FUTEX_WAITERS)
+		sys_futex((uint32_t *)&mutex->m_lock, FUTEX_WAKE, 1, NULL, NULL, 0);
+	return EOK;
 }
 /*[[[end:libc_pthread_mutex_unlock]]]*/
 
@@ -2586,6 +2721,22 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock)
 /************************************************************************/
 /* pthread_cond_t                                                       */
 /************************************************************************/
+/* Reminder (since I had to look this up after not remembering):
+ * >> pthread_cond_wait(cond, mutex) {
+ * >>     task_connect(&cond->c_lock);
+ * >>     pthread_mutex_unlock(mutex);
+ * >>     task_waitfor();
+ * >>     pthread_mutex_lock(mutex);
+ * >> }
+ *
+ * On KOS, we simply implement this by incrementing `c_futex' every
+ * time the condition is signaled, and:
+ *  - implementing `task_connect()' by reading from `c_futex'
+ *  - implementing `task_waitfor()' by doing an interlocked `wait_while(c_futex == old_c_futex)'
+ * Though we also make use of `FUTEX_WAITERS' by only doing a broadcast
+ * when someone is actually listening to the futex.
+ */
+
 
 /*[[[head:libc_pthread_cond_init,hash:CRC-32=0x157549ec]]]*/
 /* Initialize condition variable COND using attributes
@@ -2595,11 +2746,10 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
                                              pthread_condattr_t const *__restrict cond_attr)
 /*[[[body:libc_pthread_cond_init]]]*/
-/*AUTO*/{
-	(void)cond;
+{
+	memset(cond, 0, sizeof(*cond));
 	(void)cond_attr;
-	CRT_UNIMPLEMENTEDF("pthread_cond_init(%p, %p)", cond, cond_attr); /* TODO */
-	return ENOSYS;
+	return EOK;
 }
 /*[[[end:libc_pthread_cond_init]]]*/
 
@@ -2609,12 +2759,61 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond)
 /*[[[body:libc_pthread_cond_destroy]]]*/
-/*AUTO*/{
+{
 	(void)cond;
-	CRT_UNIMPLEMENTEDF("pthread_cond_destroy(%p)", cond); /* TODO */
-	return ENOSYS;
+#ifndef NDEBUG
+	memset(cond, 0xcc, sizeof(*cond));
+#endif /* !NDEBUG */
+	return EOK;
 }
 /*[[[end:libc_pthread_cond_destroy]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_cond_wake)(pthread_cond_t *__restrict cond,
+                                             uint32_t how_many) {
+	uint32_t ctl, newctl;
+again:
+	ctl = ATOMIC_READ(cond->c_futex);
+	newctl = ((ctl & ~FUTEX_WAITERS) + 1) & ~FUTEX_WAITERS;
+	if (how_many != (uint32_t)-1)
+		newctl |= ctl & FUTEX_WAITERS; /* There may still be more waiters afterwards. */
+	if (!ATOMIC_CMPXCH_WEAK(cond->c_futex, ctl, newctl))
+		goto again;
+	if (ctl & FUTEX_WAITERS) {
+		/* Wake up waiting threads. */
+		syscall_slong_t num_woken;
+		num_woken = sys_futex(&cond->c_futex, FUTEX_WAKE,
+		                      how_many, NULL, NULL, 0);
+		if (num_woken == 0 && (newctl & FUTEX_WAITERS)) {
+			/* Failed to wake up anyone, but the new control word
+			 * still contained the `FUTEX_WAITERS' bit set.
+			 *
+			 * This can happen when the caller only ever uses
+			 * `pthread_cond_signal()', which would result in
+			 * the `FUTEX_WAITERS' bit never getting unset.
+			 *
+			 * However, we do actually want to make use of that
+			 * bit, so we don't have to do an expensive system
+			 * call all too often.
+			 *
+			 * So if we notice that we couldn't wake up anyone,
+			 * but the futex control word still indicates that
+			 * there are waiting threads, then we do another wake
+			 * in which we wake up _all_ waiting threads.
+			 *
+			 * In all likelihood, there won't be any of them now,
+			 * since just a moment ago, no-one was waiting for the
+			 * futex, but on the off-chance that more waiters
+			 * appeared between then and now, those threads will
+			 * simply receive a sporadic, but harmless wake-up.
+			 */
+			assert(how_many != (uint32_t)-1);
+			how_many = (uint32_t)-1;
+			goto again;
+		}
+	}
+	return EOK;
+}
 
 /*[[[head:libc_pthread_cond_signal,hash:CRC-32=0x69fb2b65]]]*/
 /* Wake up one thread waiting for condition variable COND
@@ -2622,10 +2821,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond)
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond)
 /*[[[body:libc_pthread_cond_signal]]]*/
-/*AUTO*/{
-	(void)cond;
-	CRT_UNIMPLEMENTEDF("pthread_cond_signal(%p)", cond); /* TODO */
-	return ENOSYS;
+{
+	return libc_pthread_cond_wake(cond, 1);
 }
 /*[[[end:libc_pthread_cond_signal]]]*/
 
@@ -2635,10 +2832,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond)
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *cond)
 /*[[[body:libc_pthread_cond_broadcast]]]*/
-/*AUTO*/{
-	(void)cond;
-	CRT_UNIMPLEMENTEDF("pthread_cond_broadcast(%p)", cond); /* TODO */
-	return ENOSYS;
+{
+	return libc_pthread_cond_wake(cond, (uint32_t)-1);
 }
 /*[[[end:libc_pthread_cond_broadcast]]]*/
 
@@ -2650,11 +2845,23 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
                                              pthread_mutex_t *__restrict mutex)
 /*[[[body:libc_pthread_cond_wait]]]*/
-/*AUTO*/{
-	(void)cond;
-	(void)mutex;
-	CRT_UNIMPLEMENTEDF("pthread_cond_wait(%p, %p)", cond, mutex); /* TODO */
-	return ENOSYS;
+{
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = ATOMIC_READ(cond->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we're released `mutex', else there'd be a race condition! */
+		ATOMIC_FETCHOR(cond->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	sys_futex(&cond->c_futex, FUTEX_WAIT, lock, NULL, NULL, 0);
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return EOK;
 }
 /*[[[end:libc_pthread_cond_wait]]]*/
 
@@ -2672,11 +2879,27 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
                                                   struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_cond_timedwait]]]*/
 {
-	(void)cond;
-	(void)mutex;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_cond_timedwait"); /* TODO */
-	return ENOSYS;
+	errno_t result;
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = ATOMIC_READ(cond->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we're released `mutex', else there'd be a race condition! */
+		ATOMIC_FETCHOR(cond->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	result = (errno_t)-sys_futex(&cond->c_futex, FUTEX_WAIT_BITSET, lock,
+	                             abstime, NULL, FUTEX_BITSET_MATCH_ANY);
+	/* Check for timeout. */
+	if (result != ETIMEDOUT && result != EINVAL)
+		result = EOK;
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return result;
 }
 /*[[[end:libc_pthread_cond_timedwait]]]*/
 
@@ -2697,11 +2920,26 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
                                                     struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_cond_timedwait64]]]*/
 {
-	(void)cond;
-	(void)mutex;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_cond_timedwait64"); /* TODO */
-	return ENOSYS;
+	errno_t result;
+	uint32_t lock;
+	/* Interlocked:begin */
+	lock = ATOMIC_READ(cond->c_futex);
+	/* Interlocked:op */
+	libc_pthread_mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we're released `mutex', else there'd be a race condition! */
+		ATOMIC_FETCHOR(cond->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+	/* Interlocked:wait */
+	result = (errno_t)-sys_lfutex32_waitwhile64(&cond->c_futex, lock, abstime);
+	/* Check for timeout. */
+	if (result != ETIMEDOUT && result != EINVAL)
+		result = EOK;
+	/* Return-path */
+	libc_pthread_mutex_lock(mutex);
+	return result;
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_cond_timedwait64]]]*/

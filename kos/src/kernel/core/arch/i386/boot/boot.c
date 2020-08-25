@@ -482,18 +482,19 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Current Blocker:
-	 *     - Both Xorg and twm manage to start, and twm tries to connect
-	 *     - /binutils/src/x/libxcb-1.8.1/src/xcb_conn.c:283
-	 *       A call to `pthread_mutex_init()' that is made as part of
-	 *       the process of connecting to an X-server fails because
-	 *       that function isn't implemented, yet.
-	 *     - Similarly, further log entires seem to imply that pthread_cond_t
-	 *       will also needed for X to function properly.
+	 *     /kos/src/kernel/core/network/socket.c(375) : socket_asendtov_peer_impl : self->sk_ops->so_sendtov
+	 *     At least one of `so_sendv' or `so_sendtov' has to be implemented by every socket type
+	 *     /kos/src/kernel/core/network/socket.c(375,2) : socket_asendtov_peer_impl+25 : C02602E4+5 : Caused here [sp=EAFF7E40]
+	 *     /kos/src/kernel/core/network/socket.c(398,37) : socket_asendtov_peer+28 : C01BA229+5 : Called here [sp=EAFF7E78]
+	 *     /kos/src/kernel/core/network/socket.c(422,23) : socket_asendv+141 : C01BA20D+41 : Called here [sp=EAFF7E78]
+	 *     /kos/src/kernel/core/network/socket.c(489,16) : socket_sendv+90 : C01BA42A+5 : Called here [sp=EAFF7EB4]
+	 *     /kos/src/kernel/core/network/socket-handle.c(89,21) : ???+22 : C01B8FB6+5 : Called here [sp=EAFF7F40]
+	 *     /kos/src/kernel/core/user/handle-syscalls.c(856,14) : sys_writev+269 : C0294AFD+2 : Called here [sp=EAFF7F5C]
+	 *     /kos/src/kernel/core/arch/i386/syscall/wrappers32.S(23085) : ???+0 : C029D777+5 : Called here [sp=EAFF7FD4]
+	 * Solution:
+	 *     - Finish implementing support for unix domain sockets
 	 *
 	 * TODO:
-	 *     - Implement libc API surrounding `pthread_mutex_t'
-	 *     - Implement libc API surrounding `pthread_cond_t'
-	 *     - Finish implementing support for unix domain sockets
 	 *     - Properly implement libc's regex functions
 	 *     - Patch Xorg-server to not try to make use of "/dev/ptmx"
 	 *       KOS has an `sys_openpty(2)' system call for this purpose

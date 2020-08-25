@@ -228,16 +228,26 @@ struct __pthread_internal_slist __pthread_slist_t;
 #else /* __PTHREAD_MUTEX_HAVE_PREV */
 #define __OFFSET_PTHREAD_MUTEX_LIST_NEXT __OFFSET_PTHREAD_MUTEX_LIST
 #endif /* !__PTHREAD_MUTEX_HAVE_PREV */
+
+/* Internal mutex kind values (for `m_kind').
+ * These are compatible with GLibc */
+#define PTHREAD_MUTEX_KIND_MASK_NP     0x003 /* Mask for `PTHREAD_MUTEX_TIMED', `PTHREAD_MUTEX_RECURSIVE', ... */
+#define PTHREAD_MUTEX_ROBUST_NORMAL_NP 0x010 /* Unused (on KOS) */
+#define PTHREAD_MUTEX_PRIO_INHERIT_NP  0x020 /* Unused (on KOS) */
+#define PTHREAD_MUTEX_PRIO_PROTECT_NP  0x040 /* Unused (on KOS) */
+#define PTHREAD_MUTEX_PSHARED_BIT      0x080 /* Unused (on KOS) */
+#define PTHREAD_MUTEX_ELISION_NP       0x100 /* Unused (on KOS) */
+#define PTHREAD_MUTEX_NO_ELISION_NP    0x200 /* Unused (on KOS) */
 #ifdef __CC__
 struct __pthread_mutex_s {
 #ifdef __USE_PTHREAD_INTERNALS
-	__INT32_TYPE__   m_lock;    /* Futex control word for this mutex. */
-	__UINT32_TYPE__  m_count;   /* [valid_if(PTHREAD_MUTEX_RECURSIVE)] # of recursive locks */
-	__INT32_TYPE__   m_owner;   /* [valid_if(PTHREAD_MUTEX_RECURSIVE)] PID of the owner thread */
+	__INT32_TYPE__   m_lock;    /* Futex control word for this mutex. (set of `FUTEX_WAITERS | FUTEX_OWNER_DIED | FUTEX_TID_MASK') */
+	__UINT32_TYPE__  m_count;   /* [valid_if(PTHREAD_MUTEX_RECURSIVE)] # of (additional) recursive locks */
+	__INT32_TYPE__  _m_owner;   /* Unused (on KOS) */
 #ifdef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
 	__UINT32_TYPE__  _m_nusers; /* Unused (on KOS) */
 #endif /* __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
-	__INT32_TYPE__   m_kind;    /* [const] The kind of this futex (one of `PTHREAD_MUTEX_*'). */
+	__INT32_TYPE__   m_kind;    /* [const] The kind of this futex (set of `PTHREAD_MUTEX_*'; see above). */
 #ifndef __PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND
 	__UINT32_TYPE__  _m_nusers; /* Unused (on KOS) */
 #endif /* !__PTHREAD_MUTEX_HAVE_NUSERS_BEFORE_KIND */
@@ -257,7 +267,7 @@ struct __pthread_mutex_s {
 		struct __pthread_internal_slist _m_list; /* Unused (on KOS) */
 #endif /* !__PTHREAD_MUTEX_HAVE_PREV */
 		struct {
-			__INT16_TYPE__ _m_spins;  /* Unused (on KOS) */
+			__INT16_TYPE__ _m_spins;   /* Unused (on KOS) */
 			__INT16_TYPE__ _m_elision; /* Unused (on KOS) */
 		}
 #ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
@@ -397,14 +407,14 @@ typedef union __pthread_condattr {
 #ifdef __CC__
 struct __pthread_cond_s {
 #ifdef __USE_PTHREAD_INTERNALS
-	__INT32_TYPE__            c_lock;          /* TODO: ??? */
-	__UINT32_TYPE__           c_futex;         /* TODO: ??? */
-	__UINT64_TYPE__           c_total_seq;     /* TODO: ??? */
-	__UINT64_TYPE__           c_wakeup_seq;    /* TODO: ??? */
-	__UINT64_TYPE__           c_woken_seq;     /* TODO: ??? */
-	struct __pthread_mutex_s *c_mutex;         /* TODO: ??? */
-	__UINT32_TYPE__           c_nwaiters;      /* TODO: ??? */
-	__UINT32_TYPE__           c_broadcast_seq; /* TODO: ??? */
+	__INT32_TYPE__            _c_lock;          /* Unused (on KOS) */
+	__UINT32_TYPE__            c_futex;         /* Futex control word & condition-version counter. */
+	__UINT64_TYPE__           _c_total_seq;     /* Unused (on KOS) */
+	__UINT64_TYPE__           _c_wakeup_seq;    /* Unused (on KOS) */
+	__UINT64_TYPE__           _c_woken_seq;     /* Unused (on KOS) */
+	struct __pthread_mutex_s *_c_mutex;         /* Unused (on KOS) */
+	__UINT32_TYPE__           _c_nwaiters;      /* Unused (on KOS) */
+	__UINT32_TYPE__           _c_broadcast_seq; /* Unused (on KOS) */
 #else /* __USE_PTHREAD_INTERNALS */
 	__INT32_TYPE__  __lock;
 	__UINT32_TYPE__ __futex;
