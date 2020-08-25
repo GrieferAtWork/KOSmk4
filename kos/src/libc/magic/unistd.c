@@ -383,9 +383,23 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 )]]
 int execvpe([[nonnull]] char const *__restrict file,
             [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
-	size_t filelen = strlen(file);
-	char *env_path = getenv("PATH");
+	char *env_path;
+	/* [...]
+	 * If the specified filename includes a slash character,
+	 * then $PATH is ignored, and the file at the specified
+	 * pathname is executed.
+	 * [...] */
+@@pp_ifdef _WIN32@@
+	if (strchr(file, '/') || strchr(file, '\\'))
+		return execve(file, ___argv, ___envp);
+@@pp_else@@
+	if (strchr(file, '/'))
+		return execve(file, ___argv, ___envp);
+@@pp_endif@@
+	env_path = getenv("PATH");
 	if (env_path && *env_path) {
+		size_t filelen;
+		filelen = strlen(file);
 		for (;;) {
 			char *path_end;
 @@pp_ifdef _WIN32@@

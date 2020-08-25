@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa82a2c7 */
+/* HASH CRC-32:0x92ead687 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,7 +147,7 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 	*dst++ = '/';
 	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
 	*dst = '\0';
-	return execve(fullpath, ___argv, ___envp);
+	return libc_execve(fullpath, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
 /* >> execvpe(3)
@@ -157,9 +157,23 @@ INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
                                    __TARGV,
                                    __TENVP) {
-	size_t filelen = libc_strlen(file);
-	char *env_path = libc_getenv("PATH");
+	char *env_path;
+	/* [...]
+	 * If the specified filename includes a slash character,
+	 * then $PATH is ignored, and the file at the specified
+	 * pathname is executed.
+	 * [...] */
+#ifdef _WIN32
+	if (libc_strchr(file, '/') || libc_strchr(file, '\\'))
+		return libc_execve(file, ___argv, ___envp);
+#else /* _WIN32 */
+	if (libc_strchr(file, '/'))
+		return libc_execve(file, ___argv, ___envp);
+#endif /* !_WIN32 */
+	env_path = libc_getenv("PATH");
 	if (env_path && *env_path) {
+		size_t filelen;
+		filelen = libc_strlen(file);
 		for (;;) {
 			char *path_end;
 #ifdef _WIN32

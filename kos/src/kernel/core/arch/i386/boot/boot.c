@@ -482,10 +482,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Xorg X-Window server support roadmap.
 	 *
 	 * Current Blocker:
-	 *     task[3].sys_execve(path: "/bin//bin/twm", argv: ["/bin/twm"], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin", "PWD=/", "DISPLAY=:0", "WINDOWPATH=0"])
-	 *     task[3].sys_execve(path: "/bin/sh", argv: ["sh", "/bin/twm"], envp: ["SHLVL=1", "HOME=/", "TERM=xterm", "PATH=/bin", "PWD=/", "DISPLAY=:0", "WINDOWPATH=0"])
-	 *     xinit: Unable to run program \"/bin/twm\": No such file or directory
-	 *     Specify a program on the command line or make sure that /bin [...]
+	 *     xinit manages to start /bin/twm, and twm doesn't crash or anything.
+	 *     However, it also doesn't seem to end up displaying anything...
+	 *     Figure out what's going on by reading the system logs.
+	 *     Just glancing at them, I can already see a bunch of `Translate exception',
+	 *     including as the result of calling unimplemented system calls (oh boy...)
+	 *  -> If twm ends up being too complicated to get running, maybe look into
+	 *     porting yet another display manager...   :/
 	 *
 	 * TODO:
 	 *     - Finish implementing ancillary data support for unix domain sockets
