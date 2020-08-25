@@ -1232,7 +1232,8 @@ sys_recvmmsg_impl(fd_t sockfd,
 	struct socket *me;
 	VALIDATE_FLAGSET(msg_flags,
 	                 MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL,
+	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+	                 MSG_WAITFORONE,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
 	validate_writablem(vmessages, vlen, sizeof(*vmessages));
 	sock = handle_lookup((unsigned int)sockfd);
@@ -1416,7 +1417,8 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 	struct socket *me;
 	VALIDATE_FLAGSET(msg_flags,
 	                 MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL,
+	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+	                 MSG_WAITFORONE,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
 	validate_writablem(vmessages, vlen, sizeof(*vmessages));
 	sock = handle_lookup((unsigned int)sockfd);

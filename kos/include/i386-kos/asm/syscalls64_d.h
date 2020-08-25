@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1afda52 */
+/* HASH CRC-32:0x1ede6119 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -433,7 +433,8 @@
 #define __NR64_perf_event_open        0x12a                          /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 #define __NR64_recvmmsg               0x12b                          /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 #define __NR64_fanotify_init          0x12c                          /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define __NR64_fanotify_mark          0x12d                          /* errno_t fanotify_mark(int TODO_PROTOTYPE) */

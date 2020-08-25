@@ -423,6 +423,13 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_fdset
 #endif /* HAVE_SC_REPR_STRUCT_FDSET */
 
+#if (defined(HAVE_SC_REPR_SOCKET_SENDMSG_FLAGS) ||  \
+     defined(HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS) ||  \
+     defined(HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS2) || \
+     defined(HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS3))
+#define NEED_print_msg_flags
+#endif /* ... */
+
 
 
 
@@ -2665,7 +2672,67 @@ done:
 err:
 	return temp;
 }
-#endif /* NEED_print_iovecx32 || NEED_print_iovecx64 */
+#endif /* NEED_print_fdset */
+
+
+
+
+
+#ifdef NEED_print_msg_flags
+struct msg_flag {
+	uint32_t mf_flag;
+	char     mf_name[12];
+};
+PRIVATE struct msg_flag const msg_flag_names[] = {
+	{ MSG_OOB,          "OOB" },
+	{ MSG_PEEK,         "PEEK" },
+	{ MSG_DONTROUTE,    "DONTROUTE" },
+	{ MSG_CTRUNC,       "CTRUNC" },
+	{ MSG_PROXY,        "PROXY" },
+	{ MSG_TRUNC,        "TRUNC" },
+	{ MSG_DONTWAIT,     "DONTWAIT" },
+	{ MSG_EOR,          "EOR" },
+	{ MSG_WAITALL,      "WAITALL" },
+	{ MSG_FIN,          "FIN" },
+	{ MSG_SYN,          "SYN" },
+	{ MSG_CONFIRM,      "CONFIRM" },
+	{ MSG_RST,          "RST" },
+	{ MSG_ERRQUEUE,     "ERRQUEUE" },
+	{ MSG_NOSIGNAL,     "NOSIGNAL" },
+	{ MSG_MORE,         "MORE" },
+	{ MSG_WAITFORONE,   "WAITFORONE" },
+	{ MSG_FASTOPEN,     "FASTOPEN" },
+	{ MSG_CMSG_CLOEXEC, { 'C', 'M', 'S', 'G', '_', 'C', 'L', 'O', 'E', 'X', 'E', 'C' } },
+	{ MSG_CMSG_CLOFORK, { 'C', 'M', 'S', 'G', '_', 'C', 'L', 'O', 'F', 'O', 'R', 'K' } },
+};
+
+PRIVATE ssize_t CC
+print_msg_flags(pformatprinter printer, void *arg,
+                syscall_ulong_t msg_flags,
+                syscall_ulong_t valid_flags) {
+	ssize_t temp, result = 0;
+	unsigned int i;
+	bool is_first = true;
+	for (i = 0; i < COMPILER_LENOF(msg_flag_names); ++i) {
+		if (!(msg_flags & msg_flag_names[i].mf_flag))
+			continue;
+		if (!(valid_flags & msg_flag_names[i].mf_flag))
+			continue;
+		PRINTF("%s%.12s",
+		       is_first ? "" : PIPESTR,
+		       msg_flag_names[i].mf_name);
+		msg_flags &= ~msg_flag_names[i].mf_flag;
+		is_first = false;
+	}
+	if (msg_flags || is_first) {
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, msg_flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_msg_flags */
 
 
 
@@ -2738,9 +2805,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_SIGPROCMASK_HOW 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_ARGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_CALL 1
-	// TODO: #define HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS2 1
-	// TODO: #define HAVE_SC_REPR_SOCKET_SENDMSG_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKET_SHUTDOWN_HOW 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_LEVEL 1
 	// TODO: #define HAVE_SC_REPR_SOCKOPT_OPTNAME 1
@@ -2809,6 +2873,47 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+
+#ifdef HAVE_SC_REPR_SOCKET_SENDMSG_FLAGS
+	case SC_REPR_SOCKET_SENDMSG_FLAGS:
+		result = print_msg_flags(printer, arg,
+		                         (syscall_ulong_t)value.sv_u64,
+		                         MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+		                         MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_SENDMSG_FLAGS */
+
+#ifdef HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS
+	case SC_REPR_SOCKET_RECVMSG_FLAGS:
+		result = print_msg_flags(printer, arg,
+		                         (syscall_ulong_t)value.sv_u64,
+		                         MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+		                         MSG_PEEK | MSG_TRUNC | MSG_WAITALL);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS */
+
+#ifdef HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS2
+	case SC_REPR_SOCKET_RECVMSG_FLAGS2:
+		result = print_msg_flags(printer, arg,
+		                         (syscall_ulong_t)value.sv_u64,
+		                         MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+		                         MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+		                         MSG_PEEK | MSG_TRUNC | MSG_WAITALL);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS2 */
+
+#ifdef HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS3
+	case SC_REPR_SOCKET_RECVMSG_FLAGS3:
+		result = print_msg_flags(printer, arg,
+		                         (syscall_ulong_t)value.sv_u64,
+		                         MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+		                         MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+		                         MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+		                         MSG_WAITFORONE);
+		break;
+#endif /* HAVE_SC_REPR_SOCKET_RECVMSG_FLAGS3 */
+
 
 
 #ifdef HAVE_SC_REPR_STRUCT_FDSET

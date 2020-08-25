@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25df08b7 */
+/* HASH CRC-32:0x75e82732 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,7 +343,8 @@
 #define __NR_accept4                0xf2  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 #define __NR_recvmmsg               0xf3  /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec const *tmo) */
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */

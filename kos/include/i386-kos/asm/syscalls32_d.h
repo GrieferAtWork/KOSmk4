@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x704ae2d9 */
+/* HASH CRC-32:0x3f64819 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -444,7 +444,8 @@
 #define __NR32_perf_event_open         0x150                  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 #define __NR32_recvmmsg                0x151                  /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 #define __NR32_fanotify_init           0x152                  /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define __NR32_fanotify_mark           0x153                  /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
@@ -530,7 +531,8 @@
 #define __NR32_mlock2                  0x178                  /* errno_t mlock2(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 #define __NR32_recvmmsg64              __UINT32_C(0xfffffeaf) /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 #define __NR32_pwritevf                __UINT32_C(0xfffffeb2) /* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 #define __NR32_preadvf                 __UINT32_C(0xfffffeb3) /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */

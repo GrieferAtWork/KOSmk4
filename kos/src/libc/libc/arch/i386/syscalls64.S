@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59c2e135 */
+/* HASH CRC-32:0x1e563698 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7512,7 +7512,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xperf_event_open, libc_sys_Xperf_event_open)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.crt.syscall.recvmmsg
 INTERN_FUNCTION(libc_sys_recvmmsg)
@@ -7528,7 +7529,8 @@ DEFINE_PUBLIC_ALIAS(sys_recvmmsg, libc_sys_recvmmsg)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg
 INTERN_FUNCTION(libc_sys_Xrecvmmsg)

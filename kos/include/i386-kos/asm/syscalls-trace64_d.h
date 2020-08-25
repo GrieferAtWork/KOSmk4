@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x817cddee */
+/* HASH CRC-32:0xb2f976ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1975,7 +1975,7 @@
 #define __NR64ATR0_recvmmsg               SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR64ATR1_recvmmsg               SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NR64ATR2_recvmmsg               SC_REPR_SIZE_T                                                       /* vlen */ 
-#define __NR64ATR3_recvmmsg               SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* msg_flags */ 
+#define __NR64ATR3_recvmmsg               SC_REPR_SOCKET_RECVMSG_FLAGS3                                        /* msg_flags */ 
 #define __NR64ATR4_recvmmsg               SC_REPR_STRUCT_TIMESPECX64                                           /* tmo */ 
 #define __NR64RTR_recvmmsg                SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_fanotify_init          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd07469c9 */
+/* HASH CRC-32:0x5e16a833 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -748,7 +748,8 @@ __CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufs
 #if __CRT_HAVE_SC(recvmmsg)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct timespec const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg) */
 #if __CRT_HAVE_SC(recvmsg)
@@ -1798,7 +1799,8 @@ __CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __buf
 #if __CRT_HAVE_XSC(recvmmsg)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct timespec const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg) */
 #if __CRT_HAVE_XSC(recvmsg)

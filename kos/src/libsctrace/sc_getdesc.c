@@ -252,9 +252,9 @@ DECL_BEGIN
 
 
 /* Declare a system call database entry. */
-#define SYSCALL_DB_DECL(prefix, name)                    \
-	__uint8_t sc_##name##_head; /* sc_argc + sc_regdw */ \
-	char      sc_##name##_name[sizeof(#name)];           \
+#define SYSCALL_DB_DECL(prefix, name)                  \
+	uint8_t sc_##name##_head; /* sc_argc + sc_regdw */ \
+	char    sc_##name##_name[sizeof(#name)];           \
 	_SYSCALL_DB_DECL_ARGS(prefix, name, prefix##AC_##name)
 
 /* Initialize a system call database entry. */

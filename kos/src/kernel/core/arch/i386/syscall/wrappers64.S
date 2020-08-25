@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x263f6e56 */
+/* HASH CRC-32:0x54b134e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9178,7 +9178,8 @@ END(__x86_asm64_syscall_perf_event_open)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.x86.asm64_syscall.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmmsg)
@@ -22707,7 +22708,8 @@ END(__x86_asm32_int80_perf_event_open)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_int80.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
@@ -24090,7 +24092,8 @@ END(__x86_asm32_int80_mlock2)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_int80.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
@@ -29266,7 +29269,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_perf_event_open, __x86_asm32_int80
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_sysenter.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
@@ -29799,7 +29803,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_sysenter.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
@@ -34840,7 +34845,8 @@ END(__x86_asm32_sysrun32_perf_event_open)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_sysrun32.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg)
@@ -35368,7 +35374,8 @@ END(__x86_asm32_sysrun32_mlock2)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_sysrun32.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)

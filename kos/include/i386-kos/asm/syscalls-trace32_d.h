@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d0c2c2b */
+/* HASH CRC-32:0x1b59709c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2236,7 +2236,7 @@
 #define __NR32ATR0_recvmmsg                SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_recvmmsg                SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NR32ATR2_recvmmsg                SC_REPR_SIZE_T                                                       /* vlen */ 
-#define __NR32ATR3_recvmmsg                SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* msg_flags */ 
+#define __NR32ATR3_recvmmsg                SC_REPR_SOCKET_RECVMSG_FLAGS3                                        /* msg_flags */ 
 #define __NR32ATR4_recvmmsg                SC_REPR_STRUCT_TIMESPECX32                                           /* tmo */ 
 #define __NR32RTR_recvmmsg                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_fanotify_init           SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2416,7 +2416,7 @@
 #define __NR32ATR0_recvmmsg64              SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_recvmmsg64              SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NR32ATR2_recvmmsg64              SC_REPR_SIZE_T                                                       /* vlen */ 
-#define __NR32ATR3_recvmmsg64              SC_REPR_SOCKET_RECVMSG_FLAGS2                                        /* msg_flags */ 
+#define __NR32ATR3_recvmmsg64              SC_REPR_SOCKET_RECVMSG_FLAGS3                                        /* msg_flags */ 
 #define __NR32ATR4_recvmmsg64              SC_REPR_STRUCT_TIMESPECX32_64                                        /* tmo */ 
 #define __NR32RTR_recvmmsg64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_pwritevf                SC_REPR_FD_T                                                         /* fd */ 

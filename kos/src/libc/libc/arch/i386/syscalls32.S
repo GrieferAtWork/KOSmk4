@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3d2deaf */
+/* HASH CRC-32:0xf5ded2e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5980,7 +5980,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xperf_event_open, libc_sys_Xperf_event_open)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.crt.syscall.recvmmsg
 INTERN_FUNCTION(libc_sys_recvmmsg)
@@ -5991,7 +5992,8 @@ DEFINE_PUBLIC_ALIAS(sys_recvmmsg, libc_sys_recvmmsg)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg
 INTERN_FUNCTION(libc_sys_Xrecvmmsg)
@@ -6712,7 +6714,8 @@ DEFINE_PUBLIC_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.crt.syscall.recvmmsg64
 INTERN_FUNCTION(libc_sys_recvmmsg64)
@@ -6723,7 +6726,8 @@ DEFINE_PUBLIC_ALIAS(sys_recvmmsg64, libc_sys_recvmmsg64)
 
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg64
 INTERN_FUNCTION(libc_sys_Xrecvmmsg64)

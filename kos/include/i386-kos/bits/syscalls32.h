@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b697196 */
+/* HASH CRC-32:0x9450b382 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -447,7 +447,8 @@
 #define SYS_perf_event_open         __NR_perf_event_open         /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 #define SYS_recvmmsg                __NR_recvmmsg                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 #define SYS_fanotify_init           __NR_fanotify_init           /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define SYS_fanotify_mark           __NR_fanotify_mark           /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
@@ -533,7 +534,8 @@
 #define SYS_mlock2                  __NR_mlock2                  /* errno_t mlock2(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE' */
 #define SYS_recvmmsg64              __NR_recvmmsg64              /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 #define SYS_pwritevf                __NR_pwritevf                /* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 #define SYS_preadvf                 __NR_preadvf                 /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */

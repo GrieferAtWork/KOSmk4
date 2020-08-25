@@ -1718,13 +1718,14 @@ recvmsgx64:(fd_t sockfd, struct msghdrx64 *message,
 %[startgroup]
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[restart(dont)][cp] recvmmsg:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *tmo) -> ssize_t;
-[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
-[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
-[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *tmo) -> ssize_t;
-[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx32_64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *tmo) -> ssize_t;
-[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS2)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *tmo) -> ssize_t;
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+@@                           MSG_WAITFORONE'
+[restart(dont)][cp] recvmmsg:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx32_64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *tmo) -> ssize_t;
+[doc_alias(recvmmsg)][restart(dont)][cp] recvmmsgx64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *tmo) -> ssize_t;
 %[endgroup]
 
 @@@param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
