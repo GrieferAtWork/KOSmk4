@@ -481,14 +481,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Xorg X-Window server support roadmap.
 	 *
+	 * Run x as (from inside KOS):
+	 *     $ xinit /bin/twm -- -dumbSched
+	 *
 	 * Current Blocker:
-	 *     xinit manages to start /bin/twm, and twm doesn't crash or anything.
-	 *     However, it also doesn't seem to end up displaying anything...
-	 *     Figure out what's going on by reading the system logs.
-	 *     Just glancing at them, I can already see a bunch of `Translate exception',
-	 *     including as the result of calling unimplemented system calls (oh boy...)
-	 *  -> If twm ends up being too complicated to get running, maybe look into
-	 *     porting yet another display manager...   :/
+	 *     twm exists, saying it's lost the server connection once a key is pressed
+	 *     following its startup, after which one gets dropped back to the text-mode
+	 *     shell.
 	 *
 	 * TODO:
 	 *     - Finish implementing ancillary data support for unix domain sockets

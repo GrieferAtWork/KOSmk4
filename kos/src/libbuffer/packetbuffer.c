@@ -581,6 +581,7 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 	 * that the chain of packets pointed-to by `pb_rptr' can be read by anyone that is
 	 * holding a lock to `self->pb_lock' (which is made use of in pb_buffer_startwrite).
 	 */
+	assert(packet == self->pb_rptr);
 	assert(bytes_to_consume < packet->p_payload);
 	/* Truncate the packet's payload size. */
 	packet->p_payload -= bytes_to_consume;
@@ -605,6 +606,21 @@ NOTHROW(CC lib_pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
 
 	/* Account for all of the memory that just became unused. */
 	ATOMIC_FETCHSUB(self->pb_used, new_packet_offset);
+
+	/* Update the current read-pointer to keep on
+	 * pointing at the header of the current packet. */
+#ifdef NDEBUG
+	ATOMIC_WRITE(self->pb_rptr, result);
+#else /* NDEBUG */
+	{
+		struct pb_packet *old_rptr;
+		old_rptr = ATOMIC_XCH(self->pb_rptr, result);
+		assertf(old_rptr == packet,
+		        "old_rptr = %p\n"
+		        "packet   = %p\n",
+		        old_rptr, packet);
+	}
+#endif /* !NDEBUG */
 
 	/* Given the caller the new packet base pointer. */
 	return result;

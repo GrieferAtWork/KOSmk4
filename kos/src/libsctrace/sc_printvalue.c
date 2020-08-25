@@ -2657,11 +2657,12 @@ print_fdset(pformatprinter printer, void *arg,
 					++lastfd;
 				if (would_print_count != 0)
 					PRINT("," SYNSPACE2);
-				if (firstfd == lastfd) {
-					DO(print_fd_t(printer, arg, (fd_t)firstfd));
-				} else {
+				if (lastfd >= firstfd + 2) {
 					PRINTF("%" PRIuSIZ ".." "%" PRIuSIZ,
 					       firstfd, lastfd);
+				} else {
+					DO(print_fd_t(printer, arg, (fd_t)firstfd));
+					lastfd = firstfd;
 				}
 				firstfd = lastfd + 1;
 			}
