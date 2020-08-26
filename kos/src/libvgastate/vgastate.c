@@ -823,7 +823,7 @@ local CP437 = {
 };
 
 import * from deemon;
-import * from ...misc.libtlft.compiler;
+import * from ...misc.libgen.libtlft.compiler;
 
 local tlft;
 with (local fp = File.open("../../misc/fonts/tlft/uni_vga/u_vga16.bdf"))

@@ -1,0 +1,174 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import * from deemon;
+
+class TLFT {
+	this = default;
+	@@Width of a character (in bits)
+	public member chwidth: int;
+	@@Log2(Size of a character (in bytes))
+	public member log2chsize: int;
+	@@Mapping from a unicode character to a
+	@@bitmap of that character's representation
+	public member map: {int: Bytes};
+}
+
+function leWrite16(fp: File, v: int) {
+	fp.write(v.tobytes(2, "little"));
+}
+
+
+@@Link TLFT information into a TLFT file
+function tlftLink(self: TLFT, fp: File) {
+	local minOrd = 0xffffffff;
+	local maxOrd = 0;
+	local chsize = 1 << self.log2chsize;
+	for (local ord, d: self.map) {
+		if (#d != chsize)
+			throw Error("Character {} has invalid data size: {} != {}"
+				.format({ ord, #d, chsize }));
+		if (ord >= 0x20 && ord <= 0x7e)
+			continue;
+		if (minOrd > ord)
+			minOrd = ord;
+		if (maxOrd < ord)
+			maxOrd = ord;
+	}
+	if (maxOrd > 0xffff)
+		throw Error("Ordinal too great: {}".format({ maxOrd }));
+	local ranges = [];
+	local currentRangeMin = minOrd;
+	for (local ord: [minOrd:maxOrd+1]) {
+		if (ord !in self.map || (ord >= 0x20 && ord <= 0x7e)) {
+			if (currentRangeMin !is none) {
+				ranges.append((currentRangeMin, ord - 1));
+				currentRangeMin = none;
+			}
+		} else {
+			if (currentRangeMin is none)
+				currentRangeMin = ord;
+		}
+	}
+	if (currentRangeMin !is none)
+		ranges.append((currentRangeMin, maxOrd));
+	if (#ranges >= 256)
+		throw Error("Too many character ranges");
+	fp.putc(127);
+	fp.write("TlFt");
+	fp.putc(0);               /* TI_VERS */
+	fp.putc(12);              /* h_hdrsize */
+	fp.putc(self.chwidth);    /* h_chwidth */
+	fp.putc(self.log2chsize); /* h_log2chsize */
+	fp.putc(#ranges);         /* h_ngroups */
+	local totalRangeChars = 0;
+	for (local a, b: ranges)
+		totalRangeChars += (b - a) + 1;
+	assert totalRangeChars <= 0xffa1;
+	leWrite16(fp, totalRangeChars); /* h_nchars */
+	/* Output groups. */
+	local charOffset = 0;
+	for (local a, b: ranges) {
+		leWrite16(fp, a);          /* ug_minuni */
+		leWrite16(fp, b);          /* ug_maxuni */
+		leWrite16(fp, charOffset); /* ug_offset */
+		leWrite16(fp, 0);          /* _ug_pad */
+		charOffset += (b - a) + 1;
+	}
+	/* Output ascii characters */
+	for (local ord: [0x20:0x7e+1]) {
+		local b = self.map.get(ord);
+		if (b !is none) {
+			fp.write(b);
+		} else {
+			for (local none: [:chsize])
+				fp.putc(0);
+		}
+	}
+	for (local a, b: ranges) {
+		/* Output groups characters */
+		for (local ord: [a: b + 1])
+			fp.write(self.map[ord]);
+	}
+}
+
+
+
+@@Parse a BDF file and return the TLFT data
+function tlftParseBDF(fp: File): TLFT {
+	local map = Dict();
+	for (;;) {
+		local l = fp.readline();
+		if (!l)
+			break;
+		l = l.strip();
+		if (!l.startswith("STARTCHAR"))
+			continue;
+		do l = fp.readline().strip();
+		while (!l.startswith("ENCODING"));
+		local ord = int(l[#"ENCODING":].lstrip());
+		do l = fp.readline().strip();
+		while (l != "BITMAP");
+		local bytes = [];
+		for (;;) {
+			l = fp.readline().strip();
+			if (l == "ENDCHAR")
+				break;
+			/*  */
+			bytes.append(int(l, 16));
+		}
+		map[ord] = Bytes(bytes);
+	}
+	return TLFT(
+		chwidth:    8, /* XXX: Make this dynamic? */
+		log2chsize: 4, /* XXX: Make this dynamic? */
+		map: map);
+}
+
+function tlftCompileAndLinkBDF(bdfFilename: string, tlftFilename: string) {
+	local tlft: TLFT;
+	with (local fp = File.open(bdfFilename, "rb"))
+		tlft = tlftParseBDF(fp);
+	try {
+		with (local fp = File.open(tlftFilename, "wb"))
+			tlftLink(tlft, fp);
+	} catch (...) {
+		try fs.unlink(tlftFilename); catch (...);
+		throw;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

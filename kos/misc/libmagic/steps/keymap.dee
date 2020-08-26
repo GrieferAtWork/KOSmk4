@@ -24,7 +24,7 @@ import fs;
 import * from deemon;
 import * from ..libmagic;
 import OPT_LINK_OUTPUT from .c;
-import ...libkeymap.compiler as libkeymap_compiler;
+import ...libgen.libkeymap.compiler as libkeymap_compiler;
 
 @@Option: string
 @@Keymap definitions source filename

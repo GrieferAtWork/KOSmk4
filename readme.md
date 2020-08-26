@@ -256,8 +256,8 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Branch profiling support
 		- Using preprocessor magic, every `if`-statement and every use of `likely` / `unlikely` within any kernel source file keeps track of which of its branches got taken what number of times
 		- Allows for easy detection of *hot* zones within the kernel, as well as finding `likely` / `unlikely` annotations that are just plainly wrong
-	- Build-in bootloader
-		- If you flatten the kernel binary, you can directly `dd` it onto some bootable storage device, and have it boot
+	- Built-in bootloader
+		- If you flatten the kernel binary, you can directly `dd` it onto some bootable storage device, and have it boot (or in the case of an emulator: mount that flattened binary as a raw, bootable disk image)
 		- s.a. `/kos/src/kernel/core/arch/i386/boot/_boot0.S`
 		- Hint: This bootloader is used for booting KOS in Bochs and VBox
 - Drivers

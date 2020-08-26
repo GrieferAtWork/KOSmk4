@@ -30,7 +30,7 @@ __DECL_BEGIN
 /* KMP File format.
  * NOTE: KMP files are the compiled versions of keymap definition files
  *       An API for invoking a compiler to create these files is provided via the
- *      `compileKeymap()' function found in `/kos/misc/libkeymap/compiler.dee'
+ *      `compileKeymap()' function found in `/kos/misc/libgen/libkeymap/compiler.dee'
  * Keymap source files can be found in `/kos/src/misc/keymaps/*'
  */
 
