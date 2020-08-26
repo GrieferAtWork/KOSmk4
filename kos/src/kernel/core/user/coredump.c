@@ -19,10 +19,11 @@
  */
 #ifndef GUARD_KERNEL_SRC_USER_COREDUMP_C
 #define GUARD_KERNEL_SRC_USER_COREDUMP_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <debugger/entry.h>
+#include <debugger/config.h>
 #include <kernel/coredump.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -34,11 +35,22 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
 
 #include <libunwind/unwind.h>
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/debugger.h>
+#include <fs/node.h>
+#include <fs/vfs.h>
+#include <kernel/vm/exec.h>
+#include <sched/pid.h>
+
+#include <libinstrlen/instrlen.h>
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_BEGIN
 
@@ -46,6 +58,151 @@ DECL_BEGIN
 INTDEF char const *NOTHROW(FCALL get_exception_name)(error_code_t code);
 INTDEF void NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict data,
                                                    pformatprinter printer, void *arg);
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE NONNULL((3)) void KCALL
+dbg_coredump(void const *const *traceback_vector,
+             size_t traceback_length,
+             struct ucpustate const *orig_ustate,
+             void const *const *ktraceback_vector,
+             size_t ktraceback_length,
+             struct kcpustate const *orig_kstate,
+             struct exception_data const *reason_error,
+             struct __siginfo_struct const *reason_signal,
+             uintptr_t unwind_error) {
+	size_t tbi;
+	instrlen_isa_t userspace_isa;
+	uintptr_t current_pc;
+	/* We are now in debugger-mode. */
+	dbg_savecolor();
+	{
+		struct vm_execinfo_struct *execinfo;
+		execinfo = &FORVM(dbg_current->t_vm, thisvm_execinfo);
+		dbg_setcolor(ANSITTY_CL_RED, ANSITTY_CL_GREY);
+		dbg_print(DBGSTR("Coredump "));
+		if (execinfo->ei_path && execinfo->ei_dent) {
+			path_printent(execinfo->ei_path,
+			              execinfo->ei_dent->de_name,
+			              execinfo->ei_dent->de_namelen,
+			              &dbg_printer,
+			              NULL);
+			dbg_putc(' ');
+		}
+	}
+	{
+		pid_t tid, pid;
+		tid = task_gettid_of_s(dbg_current);
+		dbg_printf(DBGSTR("tid:%u"), tid);
+		pid = task_getpid_of_s(dbg_current);
+		if (pid != tid)
+			dbg_printf(DBGSTR(" pid:%u"), pid);
+	}
+	dbg_loadcolor();
+	dbg_putc('\n');
+
+	if (reason_error) {
+		unsigned int i;
+		char const *name;
+		dbg_printf(DBGSTR("exception %#x:%#x"),
+		           reason_error->e_class,
+		           reason_error->e_subclass);
+		name = get_exception_name(reason_error->e_code);
+		if (name)
+			dbg_printf(DBGSTR(" [%s]"), name);
+		print_exception_desc_of(reason_error,
+		                        &dbg_printer,
+		                        NULL);
+		dbg_putc('\n');
+		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
+			if (!reason_error->e_pointers[i])
+				continue;
+			dbg_printf(DBGSTR("\tpointer[%u] = %p\n"),
+			           i, reason_error->e_pointers[i]);
+		}
+	}
+	if (reason_signal) {
+		dbg_printf(DBGSTR("signal %u\n"), reason_signal->si_signo);
+		if (reason_signal->si_code != 0)
+			dbg_printf(DBGSTR("\tcode:  %u\n"), reason_signal->si_code);
+		if (reason_signal->si_errno != 0)
+			dbg_printf(DBGSTR("\terrno: %u\n"), reason_signal->si_errno);
+	}
+#define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
+	if (reason_error) {
+		dbg_addr2line_printf((uintptr_t)reason_error->e_faultaddr,
+		                     (uintptr_t)instruction_trysucc((void *)reason_error->e_faultaddr,
+		                                                    instrlen_isa_from_kcpustate(orig_ustate)),
+		                     "faultaddr");
+	}
+	if (orig_kstate) {
+		dbg_addr2line_printf((uintptr_t)kcpustate_getpc(orig_kstate),
+		                     (uintptr_t)instruction_trysucc((void *)kcpustate_getpc(orig_kstate),
+		                                                    instrlen_isa_from_kcpustate(orig_kstate)),
+		                     "orig_kstate");
+	}
+	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
+		dbg_addr2line_printf((uintptr_t)ktraceback_vector[tbi],
+		                     (uintptr_t)instruction_trysucc(ktraceback_vector[tbi],
+		                                                    INSTRLEN_ISA_DEFAULT),
+		                     "ktraceback_vector[%" PRIuSIZ "]\n", tbi);
+	}
+	userspace_isa = instrlen_isa_from_ucpustate(orig_ustate);
+	dbg_addr2line_printf((uintptr_t)ucpustate_getpc(orig_ustate),
+	                     (uintptr_t)instruction_trysucc((void *)ucpustate_getpc(orig_ustate),
+	                                                    userspace_isa),
+	                     "orig_ustate");
+	for (tbi = 0; tbi < traceback_length; ++tbi) {
+		dbg_addr2line_printf((uintptr_t)traceback_vector[tbi],
+		                     (uintptr_t)instruction_trysucc(traceback_vector[tbi],
+		                                                    userspace_isa),
+		                     "traceback_vector[%" PRIuSIZ "]\n", tbi);
+	}
+	current_pc = dbg_getpcreg(DBG_REGLEVEL_TRAP);
+	if (current_pc != ucpustate_getpc(orig_ustate) &&
+	    (traceback_length == 0 ||
+	     current_pc != (uintptr_t)traceback_vector[traceback_length - 1])) {
+		dbg_addr2line_printf(current_pc,
+		                     (uintptr_t)instruction_trysucc((void *)current_pc,
+		                                                    dbg_instrlen_isa(DBG_REGLEVEL_TRAP)),
+		                     "curr_ustate");
+	}
+
+	(void)unwind_error;
+
+	/* Switch over to the debugger CLI */
+	dbg_main(0);
+}
+
+PRIVATE NONNULL((1, 4)) struct ucpustate const *KCALL
+do_dbg_coredump(struct ucpustate const *curr_ustate,
+                void const *const *traceback_vector,
+                size_t traceback_length,
+                struct ucpustate const *orig_ustate,
+                void const *const *ktraceback_vector,
+                size_t ktraceback_length,
+                struct kcpustate const *orig_kstate,
+                struct exception_data const *reason_error,
+                struct __siginfo_struct const *reason_signal,
+                unsigned int unwind_error) {
+	STRUCT_DBG_ENTRY_INFO(9) entry;
+	entry.ei_argc    = 9;
+	entry.ei_argv[0] = (void *)(uintptr_t)traceback_vector;
+	entry.ei_argv[1] = (void *)(uintptr_t)traceback_length;
+	entry.ei_argv[2] = (void *)(uintptr_t)orig_ustate;
+	entry.ei_argv[3] = (void *)(uintptr_t)ktraceback_vector;
+	entry.ei_argv[4] = (void *)(uintptr_t)ktraceback_length;
+	entry.ei_argv[5] = (void *)(uintptr_t)orig_kstate;
+	entry.ei_argv[6] = (void *)(uintptr_t)reason_error;
+	entry.ei_argv[7] = (void *)(uintptr_t)reason_signal;
+	entry.ei_argv[8] = (void *)(uintptr_t)unwind_error;
+	entry.ei_entry   = (dbg_entry_t)&dbg_coredump;
+	/* Enter the debugger. */
+	curr_ustate = dbg_enter_r((struct dbg_entry_info *)&entry,
+	                          (struct ucpustate *)curr_ustate);
+	return curr_ustate;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 /* Main entry point for creating coredumps of the calling process.
@@ -190,12 +347,23 @@ coredump_create(struct ucpustate const *curr_ustate,
 		/* Trigger a debugger trap at last valid text location. */
 		curr_ustate = kernel_debugtrap_r((struct ucpustate *)curr_ustate, siginfo.si_signo);
 #endif
+	} else {
+#ifdef CONFIG_HAVE_DEBUGGER
+		/* Check if we should enter the builtin debugger. */
+		if (kernel_debug_on & KERNEL_DEBUG_ON_COREDUMP) {
+			orig_ustate = do_dbg_coredump(curr_ustate,
+			                              traceback_vector,
+			                              traceback_length,
+			                              orig_ustate,
+			                              ktraceback_vector,
+			                              ktraceback_length,
+			                              orig_kstate,
+			                              reason_error,
+			                              reason_signal,
+			                              unwind_error);
+		}
+#endif /* CONFIG_HAVE_DEBUGGER */
 	}
-
-#if 0
-	orig_ustate = dbg_enter_r((struct dbg_entry_info const *)NULL,
-	                          (struct ucpustate *)orig_ustate);
-#endif
 
 	/* TODO */
 	(void)unwind_error;

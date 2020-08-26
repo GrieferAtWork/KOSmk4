@@ -172,8 +172,26 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct icpustate *FCALL dbg_en
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct scpustate *__restrict state) ASMNAME("dbg_enter_scpustate_cr");
 }
 #endif /* __cplusplus */
+#endif /* __CC__ */
 
 
+/* Extended set of conditions for which the kernel should switch to debugger-mode.
+ * NOTE: Where these overlap with `KERNEL_DEBUGTRAP_ON_*', debug traps
+ *       will be triggered instead of the builtin debugger being entered.
+ * e.g.: When both `KERNEL_DEBUGTRAP_ON_COREDUMP' and `KERNEL_DEBUG_ON_COREDUMP'
+ *       are enabled, only a debug trap will be generated upon a coredump, but
+ *       the builtin debugger will only be entered when `KERNEL_DEBUGTRAP_ON_COREDUMP'
+ *       isn't set, or `kernel_debugtrap_enabled() == false'
+ * Also note that certain conditions _always_ core the builtin debugger to be entered,
+ * possibly even if a debug trap was generated before then. Such conditions include
+ * assertion checks/failures, stack segment faults, unhandled exceptions, and of course,
+ * calls to `kernel_panic()' */
+#define KERNEL_DEBUG_ON_COREDUMP 0x0008
+#define KERNEL_DEBUG_ON_DEFAULT  (KERNEL_DEBUG_ON_COREDUMP)
+
+#ifdef __CC__
+/* Set of `KERNEL_DEBUGTRAP_ON_*', specifying events for which to trigger traps. */
+DATDEF uintptr_t volatile kernel_debug_on;
 #endif /* __CC__ */
 
 DECL_END

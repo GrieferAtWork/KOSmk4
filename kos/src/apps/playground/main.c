@@ -679,6 +679,17 @@ int main_rtm(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_fault(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	/* Just a simple program that will cause a SIGSEGV */
+	*(int volatile *)0x123 = 321;
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -707,6 +718,7 @@ PRIVATE DEF defs[] = {
 	{ "yield", &main_yield },
 	{ "vio", &main_vio },
 	{ "rtm", &main_rtm },
+	{ "fault", &main_fault },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

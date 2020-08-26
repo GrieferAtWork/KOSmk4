@@ -31,6 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
 #include <kernel/vm.h>
@@ -40,6 +41,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <string.h>
 
 DECL_BEGIN
+
+PUBLIC uintptr_t volatile kernel_debug_on = KERNEL_DEBUG_ON_DEFAULT;
 
 /* The stack from which debug code is executed. */
 PUBLIC ATTR_DBGBSS byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE] = {};
