@@ -49,7 +49,7 @@ struct usermod_section {
 	uintptr_t     us_link;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t     us_info;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t     us_flags;   /* [const] ELF section flags (set of `SHF_*') */
-	void        *_us_pad1[1];  /* ... */
+	void        *_us_pad1[1]; /* ... */
 	USER void    *us_udata;   /* [?..?][valid_if(us_flags & SHF_ALLOC)] User-space section location (if applicable; else: `NULL'). */
 	u16          _us_pad2;    /* ... */
 	u16           us_index;   /* [const] Index of this section. */
@@ -123,10 +123,10 @@ struct usermod {
 	REF struct inode           *um_file;      /* [1..1][const] The backing file of the executable. */
 	REF struct path            *um_fspath;    /* [0..1][const] Optional mapping path */
 	REF struct directory_entry *um_fsname;    /* [0..1][const] Optional mapping name */
-	uintptr_t                   um_modtype;   /* [const] Module type (one of `USERMOD_TYPE_*') */
 	struct vm                  *um_vm;        /* [1..1][const] The associated VM. Warning: not a reference!
 	                                           * If the VM is destroyed, this pointer will be dangling! */
 	REF struct usermod         *um_next;      /* [0..1][lock(INTERNAL(um_vm))] Next usermod object. */
+	uintptr_t                   um_modtype;   /* [const] Module type (one of `USERMOD_TYPE_*') */
 	union {
 		struct usermod_elf um_elf; /* [valid_if(USERMOD_TYPE_ISELF(um_modtype))] ELF module. */
 	};
@@ -193,7 +193,7 @@ vm_getusermod_above(struct vm *__restrict self,
 
 /* Return the first usermod object that has a starting load start address greater than `prev'
  * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (USER void *)0)'.
- * If no module exists that matches this critera, return `NULL' instead. */
+ * If no module exists that matches this criteria, return `NULL' instead. */
 FUNDEF REF struct usermod *FCALL
 vm_getusermod_next(struct vm *__restrict self,
                    struct usermod *prev)

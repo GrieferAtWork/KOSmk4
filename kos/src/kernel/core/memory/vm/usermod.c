@@ -484,6 +484,7 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 			if (!VM_NODE_HASPREV(lhs_iter, self->vn_vm))
 				break;
 			next = VM_NODE_PREV(lhs_iter);
+			/* Verify continuity. */
 			if (vm_node_getmaxpageid(next) + 1 !=
 			    vm_node_getminpageid(lhs_iter))
 				break;
@@ -499,6 +500,7 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 			if (!VM_NODE_HASNEXT(rhs_iter, self->vn_vm))
 				break;
 			next = VM_NODE_NEXT(rhs_iter);
+			/* Verify continuity. */
 			if (vm_node_getminpageid(next) !=
 			    vm_node_getmaxpageid(rhs_iter) + 1)
 				break;
@@ -510,8 +512,8 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 }
 
 /* @param: map_inode:        [1..1] The INode that is being mapped.
- * @param: map_inode_path:   [0..1][const] Optional mapping path
- * @param: map_inode_name:   [0..1][const] Optional mapping name
+ * @param: map_inode_path:   [0..1][const] Optional mapping path.
+ * @param: map_inode_name:   [0..1][const] Optional mapping name.
  * @param: map_inode_offset: File-offset where `map_inode_addr' exists.
  * @param: map_inode_addr:   Starting address of `map_inode_offset'. */
 PRIVATE WUNUSED NONNULL((1, 2)) REF struct usermod *FCALL
@@ -686,8 +688,8 @@ vm_create_usermod(struct vm *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
 	REF struct inode /*     */ *map_inode;        /* [1..1] The INode that is being mapped. */
-	REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path */
-	REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name */
+	REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path. */
+	REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name. */
 	pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
 	USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
 	struct vm_node *node;
@@ -899,6 +901,7 @@ vm_getusermod_above(struct vm *__restrict self,
 	vm_nodetree_minmax_t minmax;
 	pageid_t minpage;
 	pageid_t maxpage;
+	REF struct usermod *result;
 	/* Special case: the kernel VM can never house user-space modules */
 	if (self == &vm_kernel)
 		return NULL;
@@ -917,23 +920,27 @@ vm_getusermod_above(struct vm *__restrict self,
 	maxpage = __ARCH_PAGEID_MAX;
 #endif /* !KERNELSPACE_HIGHMEM */
 
+	result = NULL;
 again:
 	sync_read(self);
-
 	/* Search the cache of `self'. */
 	{
 		REF struct usermod *chain;
 		chain = FORVM(self, usermod_cache).uc_first.get();
 		if (chain) {
-			REF struct usermod *result;
 			result = chain;
 			do {
-				if (result->um_loadstart >= (uintptr_t)addr) {
-					/* Found it! */
+				/* NOTE: Search for overlapping, rather than located-above,
+				 *       so that we can still check for more libraries between
+				 *       `addr' and the next already-known library. */
+				uintptr_t load_startpage;
+				load_startpage = FLOOR_ALIGN(result->um_loadstart, PAGESIZE);
+				if (load_startpage >= (uintptr_t)addr) {
+					/* Found a library to which the given criteria applies. */
 					incref(result);
-					xdecref_unlikely(chain);
-					sync_endread(self);
-					return result;
+					/* Only search for libraries that may be mapped _before_ `result' */
+					maxpage = PAGEID_ENCODE(load_startpage);
+					break;
 				}
 			} while ((result = result->um_next) != NULL);
 			decref_unlikely(chain);
@@ -961,10 +968,10 @@ again:
 			    node->vn_block && node->vn_part &&
 			    vm_datablock_isinode(node->vn_block)) {
 				/* Found a candidate. */
-				REF struct usermod *result;
+				REF struct usermod *new_result;
 				REF struct inode /*     */ *map_inode;        /* [1..1] The INode that is being mapped. */
-				REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path */
-				REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name */
+				REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path. */
+				REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name. */
 				pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
 				USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
 				minpage   = vm_node_getendpageid(node);
@@ -975,23 +982,24 @@ again:
 				map_inode_addr   = vm_node_getstart(node);
 				sync_endread(self);
 				/* Try to construct a usermod from the mapping we've found. */
-				result = usermod_create_from_mapping(self,
-				                                     map_inode,
-				                                     map_inode_path,
-				                                     map_inode_name,
-				                                     map_inode_offset,
-				                                     map_inode_addr);
-				if (result) {
+				new_result = usermod_create_from_mapping(self,
+				                                         map_inode,
+				                                         map_inode_path,
+				                                         map_inode_name,
+				                                         map_inode_offset,
+				                                         map_inode_addr);
+				if (new_result) {
+					xdecref_unlikely(result);
 					/* Insert the new usermod object into the vm's cache. */
 					TRY {
 						sync_write(self);
 					} EXCEPT {
-						decref_likely(result);
+						decref_likely(new_result);
 						RETHROW();
 					}
-					result = vm_usermod_cache_insert_and_unify_and_unlock(self,
-					                                                      result);
-					return result;
+					new_result = vm_usermod_cache_insert_and_unify_and_unlock(self,
+					                                                          new_result);
+					return new_result;
 				}
 				addr = PAGEID_DECODE(minpage);
 				goto again;
@@ -1002,11 +1010,11 @@ again:
 		}
 	}
 	sync_endread(self);
-	return NULL;
+	return result;
 }
 
 /* Return the first usermod object that has a starting load start address greater than `prev'
- * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (void *)0)'.
+ * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (USER void *)0)'.
  * If no module exists that matches this criteria, return `NULL' instead. */
 PUBLIC REF struct usermod *FCALL
 vm_getusermod_next(struct vm *__restrict self,
@@ -1213,8 +1221,8 @@ PUBLIC NONNULL((2, 4)) unsigned int LIBUNWIND_CC
 unwind_for_debug(void *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
-	/* For non-userspace addresses, use the regular, old unwind() function! */
 	unsigned int result;
+	/* For non-userspace addresses, use the regular, old unwind() function! */
 	if (!ADDR_ISUSER(absolute_pc)) {
 		result = unwind(absolute_pc,
 		                reg_getter, reg_getter_arg,

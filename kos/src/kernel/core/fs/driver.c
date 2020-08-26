@@ -3347,8 +3347,8 @@ again:
 			 * driver finalizer callbacks to still be executed.
 			 * After all: There may be more than one initializer, and it may
 			 *            not be the first callback which threw the error, so
-			 *            to make thinks simple: Always invoke _all_ finalizers
-			 *           (which have to be written such that they work properly,
+			 *            to make things simple: Always invoke _all_ finalizers
+			 *            (which have to be written such that they work properly,
 			 *            even when their accompanying initializer has never been
 			 *            called), so-as to ensure that we don't skip one that
 			 *            turned out to be important for freeing some resource
