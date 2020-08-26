@@ -259,7 +259,7 @@ NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
 	result = libil_instruction_pred_nx(pc, isa);
 	if unlikely(!result)
-		result = (byte_t *)pc + 1;
+		result = (byte_t *)pc - 1;
 	return result;
 }
 #endif /* !ARCH_HAVE_INSTRUCTION_TRYPRED */
