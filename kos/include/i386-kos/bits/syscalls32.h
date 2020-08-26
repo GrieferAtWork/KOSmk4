@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9450b382 */
+/* HASH CRC-32:0xad0d454d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -801,8 +801,6 @@
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 #define SYS_debugtrap               __NR_debugtrap               /* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-#define SYS_set_library_listdef     __NR_set_library_listdef     /* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'

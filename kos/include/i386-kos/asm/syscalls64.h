@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a08815a */
+/* HASH CRC-32:0x3727f225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -687,8 +687,6 @@
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 #define __NR_debugtrap              __UINT64_C(0xffffffffffffffea) /* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-#define __NR_set_library_listdef    __UINT64_C(0xffffffffffffffeb) /* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
 #define __NR_writevf                __UINT64_C(0xffffffffffffffec) /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 #define __NR_readvf                 __UINT64_C(0xffffffffffffffed) /* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 #define __NR_pwrite64f              __UINT64_C(0xffffffffffffffee) /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
@@ -1250,7 +1248,6 @@
 #define __NRRM_lfutex                 1
 #define __NRRM_rpc_service            1
 #define __NRRM_debugtrap              0
-#define __NRRM_set_library_listdef    2
 #define __NRRM_writevf                0
 #define __NRRM_readvf                 0
 #define __NRRM_pwrite64f              0
@@ -1790,7 +1787,6 @@
 #define __NRRC_lfutex                 5
 #define __NRRC_rpc_service            0
 #define __NRRC_debugtrap              2
-#define __NRRC_set_library_listdef    1
 #define __NRRC_writevf                4
 #define __NRRC_readvf                 4
 #define __NRRC_pwrite64f              5

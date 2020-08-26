@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5251b7bf */
+/* HASH CRC-32:0xba7db73a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -308,7 +308,6 @@
 #define __CRT_HAVE_sys_sendmsg 1
 #define __CRT_HAVE_sys_sendto 1
 #define __CRT_HAVE_sys_set_exception_handler 1
-#define __CRT_HAVE_sys_set_library_listdef 1
 #define __CRT_HAVE_sys_set_mempolicy 1
 #define __CRT_HAVE_sys_set_robust_list 1
 #define __CRT_HAVE_sys_set_thread_area 1
@@ -682,7 +681,6 @@
 #define __CRT_HAVE_sys_Xsendmsg 1
 #define __CRT_HAVE_sys_Xsendto 1
 #define __CRT_HAVE_sys_Xset_exception_handler 1
-#define __CRT_HAVE_sys_Xset_library_listdef 1
 #define __CRT_HAVE_sys_Xset_mempolicy 1
 #define __CRT_HAVE_sys_Xset_robust_list 1
 #define __CRT_HAVE_sys_Xset_thread_area 1

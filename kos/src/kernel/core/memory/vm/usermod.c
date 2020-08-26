@@ -735,6 +735,32 @@ NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 }
 
 
+
+/* Enumerate all user-space modules that may be mapped within `self'
+ * Modules are (generally) enumerated in ascending order, based on
+ * their `um_loadstart' values. Note though that while you may optimize
+ * for this case, do not rely on this actually being the case!
+ * @param: cb:     Callback to-be invoked for every user-module found.
+ * @param: cookie: Argument that should be passed to `cb'
+ * @return: >= 0:  The sum of all return values of `cb'
+ * @return: < 0:   The first negative value returned by `cb' */
+PUBLIC ssize_t FCALL
+vm_enumusermod(struct vm *__restrict self,
+               vm_enumusermod_callback_t cb,
+               void *cookie)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	/* Special case: the kernel VM can never house user-space modules */
+	if (self == &vm_kernel)
+		return 0;
+	/* TODO */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)cb;
+	(void)cookie;
+	return 0;
+}
+
+
 #ifdef CONFIG_HAVE_DEBUGGER
 PUBLIC REF struct usermod *FCALL
 getusermod(USER CHECKED void *addr,

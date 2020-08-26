@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde107553 */
+/* HASH CRC-32:0xe55e210 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -858,7 +858,6 @@
 #define __NR64AN4_lfutex                 val2
 #define __NR64AN0_debugtrap              state
 #define __NR64AN1_debugtrap              reason
-#define __NR64AN0_set_library_listdef    listdef
 #define __NR64AN0_writevf                fd
 #define __NR64AN1_writevf                iovec
 #define __NR64AN2_writevf                count
@@ -2221,8 +2220,6 @@
 #define __NR64ATR0_debugtrap              SC_REPR_STRUCT_UCPUSTATE64                                           /* state */ 
 #define __NR64ATR1_debugtrap              SC_REPR_STRUCT_DEBUGTRAP_REASON64                                    /* reason */ 
 #define __NR64RTR_debugtrap               SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_set_library_listdef    SC_REPR_STRUCT_LIBRARY_LISTDEF64                                     /* listdef */ 
-#define __NR64RTR_set_library_listdef     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_writevf                SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_writevf                SC_REPR_STRUCT_IOVECX64_C                                            /* iovec */ 
 #define __NR64ATL1_writevf                2                                                                    /* iovec -> count */ 

@@ -221,10 +221,10 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_movq_rax_Pcx)(); /* movq %rax, (%rc
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL readb_nopf)(USER CHECKED void const *addr,
                           u8 *presult) {
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movb_Pax_al"
 	                     : "=a" (*presult)
 	                     , "=@ccc" (error)
@@ -235,10 +235,10 @@ NOTHROW(KCALL readb_nopf)(USER CHECKED void const *addr,
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL readw_nopf)(USER CHECKED void const *addr,
                           u16 *presult) {
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movw_Pax_ax"
 	                     : "=a" (*presult)
 	                     , "=@ccc" (error)
@@ -249,10 +249,10 @@ NOTHROW(KCALL readw_nopf)(USER CHECKED void const *addr,
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL readl_nopf)(USER CHECKED void const *addr,
                           u32 *presult) {
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movl_Pax_eax"
 	                     : "=a" (*presult)
 	                     , "=@ccc" (error)
@@ -263,11 +263,11 @@ NOTHROW(KCALL readl_nopf)(USER CHECKED void const *addr,
 
 /* Try to read from a possibly faulty `addr' into `*presult'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL readq_nopf)(USER CHECKED void const *addr,
                           u64 *presult) {
 #ifdef __x86_64__
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movq_Pax_rax"
 	                     : "=a" (*presult)
 	                     , "=@ccc" (error)
@@ -282,10 +282,10 @@ NOTHROW(KCALL readq_nopf)(USER CHECKED void const *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr,
                            u8 value) {
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movb_al_Pcx"
 	                     : "=@ccc" (error)
 	                     : "c" (addr)
@@ -296,10 +296,10 @@ NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr,
                            u16 value) {
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movw_ax_Pcx"
 	                     : "=@ccc" (error)
 	                     : "c" (addr)
@@ -310,10 +310,10 @@ NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr,
                            u32 value) {
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movl_eax_Pcx"
 	                     : "=@ccc" (error)
 	                     : "c" (addr)
@@ -324,11 +324,11 @@ NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr,
 
 /* Try to write `value' into a possibly faulty `addr'
  * Return `true' on success, `false' on error */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED bool
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED __BOOL
 NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr,
                            u64 value) {
 #ifdef __x86_64__
-	bool error;
+	__BOOL error;
 	__asm__ __volatile__("call x86_nopf_movq_rax_Pcx"
 	                     : "=@ccc" (error)
 	                     : "c" (addr)

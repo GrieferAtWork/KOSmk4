@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x952c5ef2 */
+/* HASH CRC-32:0xd4d9034f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1075,7 +1075,6 @@
 #define __NRAN4_lfutex                  val2
 #define __NRAN0_debugtrap               state
 #define __NRAN1_debugtrap               reason
-#define __NRAN0_set_library_listdef     listdef
 #define __NRAN0_get_exception_handler   pmode
 #define __NRAN1_get_exception_handler   phandler
 #define __NRAN2_get_exception_handler   phandler_sp
@@ -2737,8 +2736,6 @@
 #define __NRATR0_debugtrap               SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
 #define __NRATR1_debugtrap               SC_REPR_STRUCT_DEBUGTRAP_REASON32                                    /* reason */ 
 #define __NRRTR_debugtrap                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_set_library_listdef     SC_REPR_STRUCT_LIBRARY_LISTDEF32                                     /* listdef */ 
-#define __NRRTR_set_library_listdef      SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_get_exception_handler   SC_REPR_POINTER                                                      /* pmode */ 
 #define __NRATR1_get_exception_handler   SC_REPR_POINTER                                                      /* phandler */ 
 #define __NRATR2_get_exception_handler   SC_REPR_POINTER                                                      /* phandler_sp */ 

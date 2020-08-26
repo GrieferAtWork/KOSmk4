@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54b134e8 */
+/* HASH CRC-32:0xbb857fb4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11052,37 +11052,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_debugtrap)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_debugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-.section .text.x86.asm64_syscall.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_library_listdef)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffffffffffeb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_set_library_listdef)
-	call   sys_set_library_listdef
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_set_library_listdef)
 
 /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm64_syscall.writevf
@@ -26589,38 +26558,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 	.cfi_endproc
 END(__x86_asm32_int80_debugtrap)
 
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.x86.asm32_syscall_int80.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_library_listdef)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffff0
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_set_library_listdef)
-	call   sys32_set_library_listdef
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_set_library_listdef)
-
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
@@ -30950,10 +30887,6 @@ END(__x86_asm32_sysenter_lfutex)
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 /* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_debugtrap, __x86_asm32_int80_debugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_library_listdef, __x86_asm32_int80_set_library_listdef)
 
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -36398,17 +36331,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_debugtrap)
 	jmp    sys32_debugtrap
 	.cfi_endproc
 END(__x86_asm32_sysrun32_debugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.x86.asm32_syscall_sysrun32.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_library_listdef)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_set_library_listdef)
-	jmp    sys32_set_library_listdef
-	.cfi_endproc
-END(__x86_asm32_sysrun32_set_library_listdef)
 
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:

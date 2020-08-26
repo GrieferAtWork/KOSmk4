@@ -408,7 +408,6 @@ local files = {
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
 	"../../include/kos/bits/spawn-action.h",
-	"../../include/kos/exec/bits/library-listdef.h",
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/hop/api.h",
@@ -462,6 +461,7 @@ static_assert(offsetof(struct cmsghdr, cmsg_data) == __OFFSET_CMSGHDR_DATA);
 static_assert(offsetof(struct cmsghdr, cmsg_len) == __OFFSET_CMSGHDR_LEN);
 static_assert(offsetof(struct cmsghdr, cmsg_level) == __OFFSET_CMSGHDR_LEVEL);
 static_assert(offsetof(struct cmsghdr, cmsg_type) == __OFFSET_CMSGHDR_TYPE);
+static_assert(alignof(struct cmsghdr) == __ALIGNOF_CMSGHDR);
 
 
 
@@ -1428,25 +1428,6 @@ static_assert(offsetof(struct spawn_action, sa_umask.sa_mask) == __OFFSET_SPAWN_
 
 /* struct spawn_actions */
 /* ... */
-
-
-
-
-
-#include <kos/exec/bits/library-listdef.h>
-
-/* struct library_listdef */
-static_assert(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
-static_assert(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
-static_assert(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
-static_assert(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
-static_assert(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
-static_assert(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
-static_assert(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
-static_assert(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
-static_assert(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
-static_assert(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
-static_assert(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
 
 
 

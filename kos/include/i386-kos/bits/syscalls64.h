@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdc25b8e */
+/* HASH CRC-32:0xfcf3f98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -690,8 +690,6 @@
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 #define SYS_debugtrap              __NR_debugtrap              /* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-#define SYS_set_library_listdef    __NR_set_library_listdef    /* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
 #define SYS_writevf                __NR_writevf                /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 #define SYS_readvf                 __NR_readvf                 /* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 #define SYS_pwrite64f              __NR_pwrite64f              /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */

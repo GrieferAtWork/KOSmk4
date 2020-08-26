@@ -334,16 +334,6 @@ err_overlap:
 			                                        /* application_loadaddr: */ (void *)0,
 			                                        /* linker_loadaddr:      */ linker_base);
 		}
-		{
-			/* Initialize the library definitions list to use the PEB
-			 * NOTE: When libdl was linked into the mix (see line above), then
-			 *       it will override this fairly early on with its own version. */
-			struct library_listdef *lld = &FORVM(effective_vm, thisvm_library_listdef);
-			memcpy(lld, &peb_based_library_list, sizeof(struct library_listdef));
-			lld->lld_first                     = peb_base;
-			lld->lld_module_offsetof_loadstart = loadstart;
-			/* TODO: Somehow include the RTLD in the initial library list! */
-		}
 	} EXCEPT {
 		freea(phdr_vector);
 		RETHROW();

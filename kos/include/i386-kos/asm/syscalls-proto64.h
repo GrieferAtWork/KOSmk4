@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b298943 */
+/* HASH CRC-32:0x13888ae5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,7 +392,6 @@
 #define __NRAC_lfutex                 5
 #define __NRAC_rpc_service            0
 #define __NRAC_debugtrap              2
-#define __NRAC_set_library_listdef    1
 #define __NRAC_writevf                4
 #define __NRAC_readvf                 4
 #define __NRAC_pwrite64f              5
@@ -777,7 +776,6 @@
 #define __NRRT_lfutex                 (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_rpc_service            (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_debugtrap              (errno_t, __errno_t)
-#define __NRRT_set_library_listdef    (errno_t, __errno_t)
 #define __NRRT_writevf                (ssize_t, __ssize_t)
 #define __NRRT_readvf                 (ssize_t, __ssize_t)
 #define __NRRT_pwrite64f              (ssize_t, __ssize_t)
@@ -1640,7 +1638,6 @@
 #define __NRAT4_lfutex                 (uint64_t, __uint64_t)
 #define __NRAT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
-#define __NRAT0_set_library_listdef    (struct library_listdef64 const *, struct library_listdef64 const *)
 #define __NRAT0_writevf                (fd_t, __fd_t)
 #define __NRAT1_writevf                (struct iovecx64 const *, struct __iovecx64 const *)
 #define __NRAT2_writevf                (size_t, __size_t)
@@ -2073,7 +2070,6 @@
 #define __NRAM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
 #define __NRAM_rpc_service(a, b, c, d, e, f)            /* nothing */
 #define __NRAM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
-#define __NRAM_set_library_listdef(a, b, c, d, e, f)    (struct library_listdef64 const *)a
 #define __NRAM_writevf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_readvf(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_pwrite64f(a, b, c, d, e, f)              (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
@@ -2458,7 +2454,6 @@
 #define __NRAP_lfutex(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_rpc_service()                            /* nothing */
 #define __NRAP_debugtrap(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_set_library_listdef(a)                   (__syscall_ulong_t)a
 #define __NRAP_writevf(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_readvf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_pwrite64f(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

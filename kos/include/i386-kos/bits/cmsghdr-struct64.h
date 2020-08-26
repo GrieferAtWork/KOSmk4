@@ -51,10 +51,7 @@ __DECL_BEGIN
 #endif /* __USE_KOS_KERNEL */
 
 /* Structure used for storage of ancillary data object information. */
-#if __ALIGNOF_INT64__ < 8
-__ATTR_ALIGNED(8)
-#endif /* __ALIGNOF_INT64__ < 8 */
-struct __cmsghdrx64 /*[NAME(cmsghdrx64)][PREFIX(cmsg_)]*/ {
+struct __ATTR_ALIGNED(8) __cmsghdrx64 /*[NAME(cmsghdrx64)][PREFIX(cmsg_)]*/ {
 	__UINT64_TYPE__  cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. */
 	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */
 	__INT32_TYPE__   cmsg_type;    /* Protocol specific type (One of `SCM_*'). */

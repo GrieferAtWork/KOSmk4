@@ -118,8 +118,6 @@ local files = {
 	"../../../../include/i386-kos/kos/bits/spawn-action64.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
-	"../../../../include/i386-kos/kos/exec/bits/library-listdef32.h",
-	"../../../../include/i386-kos/kos/exec/bits/library-listdef64.h",
 	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
 	"../../../../include/i386-kos/kos/exec/bits/peb64.h",
 	"../../../../include/i386-kos/kos/kernel/cpu-state32.h",
@@ -218,6 +216,7 @@ static_assert(offsetof(struct __cmsghdrx32, cmsg_data) == __OFFSET_CMSGHDRX32_DA
 static_assert(offsetof(struct __cmsghdrx32, cmsg_len) == __OFFSET_CMSGHDRX32_LEN);
 static_assert(offsetof(struct __cmsghdrx32, cmsg_level) == __OFFSET_CMSGHDRX32_LEVEL);
 static_assert(offsetof(struct __cmsghdrx32, cmsg_type) == __OFFSET_CMSGHDRX32_TYPE);
+static_assert(alignof(struct __cmsghdrx32) == __ALIGNOF_CMSGHDRX32);
 
 
 
@@ -230,6 +229,7 @@ static_assert(offsetof(struct __cmsghdrx64, cmsg_data) == __OFFSET_CMSGHDRX64_DA
 static_assert(offsetof(struct __cmsghdrx64, cmsg_len) == __OFFSET_CMSGHDRX64_LEN);
 static_assert(offsetof(struct __cmsghdrx64, cmsg_level) == __OFFSET_CMSGHDRX64_LEVEL);
 static_assert(offsetof(struct __cmsghdrx64, cmsg_type) == __OFFSET_CMSGHDRX64_TYPE);
+static_assert(alignof(struct __cmsghdrx64) == __ALIGNOF_CMSGHDRX64);
 
 
 
@@ -1694,44 +1694,6 @@ static_assert(offsetof(struct spawn_actionx64, sa_umask.sa_mask) == __OFFSET_SPA
 
 
 #include <kos/exec/asm/elf64.h>
-
-
-
-
-
-#include <kos/exec/bits/library-listdef32.h>
-
-/* struct library_listdef32 */
-static_assert(offsetof(struct library_listdef32, lld_count) == __OFFSET_LIBRARY_LISTDEF32_COUNT);
-static_assert(offsetof(struct library_listdef32, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF32_ENTRY_OFFSETOF_MODULE);
-static_assert(offsetof(struct library_listdef32, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF32_ENTRY_OFFSETOF_NEXT);
-static_assert(offsetof(struct library_listdef32, lld_first) == __OFFSET_LIBRARY_LISTDEF32_FIRST);
-static_assert(offsetof(struct library_listdef32, lld_flags) == __OFFSET_LIBRARY_LISTDEF32_FLAGS);
-static_assert(offsetof(struct library_listdef32, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_FILENAME);
-static_assert(offsetof(struct library_listdef32, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_LOADADDR);
-static_assert(offsetof(struct library_listdef32, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_LOADSTART);
-static_assert(offsetof(struct library_listdef32, lld_size) == __OFFSET_LIBRARY_LISTDEF32_SIZE);
-static_assert(offsetof(struct library_listdef32, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF32_SIZEOF_POINTER);
-static_assert(sizeof(struct library_listdef32) == __SIZEOF_LIBRARY_LISTDEF32);
-
-
-
-
-
-#include <kos/exec/bits/library-listdef64.h>
-
-/* struct library_listdef64 */
-static_assert(offsetof(struct library_listdef64, lld_count) == __OFFSET_LIBRARY_LISTDEF64_COUNT);
-static_assert(offsetof(struct library_listdef64, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF64_ENTRY_OFFSETOF_MODULE);
-static_assert(offsetof(struct library_listdef64, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF64_ENTRY_OFFSETOF_NEXT);
-static_assert(offsetof(struct library_listdef64, lld_first) == __OFFSET_LIBRARY_LISTDEF64_FIRST);
-static_assert(offsetof(struct library_listdef64, lld_flags) == __OFFSET_LIBRARY_LISTDEF64_FLAGS);
-static_assert(offsetof(struct library_listdef64, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_FILENAME);
-static_assert(offsetof(struct library_listdef64, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_LOADADDR);
-static_assert(offsetof(struct library_listdef64, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_LOADSTART);
-static_assert(offsetof(struct library_listdef64, lld_size) == __OFFSET_LIBRARY_LISTDEF64_SIZE);
-static_assert(offsetof(struct library_listdef64, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF64_SIZEOF_POINTER);
-static_assert(sizeof(struct library_listdef64) == __SIZEOF_LIBRARY_LISTDEF64);
 
 
 

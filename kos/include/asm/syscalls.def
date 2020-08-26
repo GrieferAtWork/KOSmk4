@@ -221,9 +221,6 @@
 %[typeorg(<bits/ucontext.h>: ucontext)]
 %[typeorg(<bits/ucontext32.h>: __ucontextx32)]
 %[typeorg(<bits/ucontext64.h>: __ucontextx64)]
-%[typeorg(<kos/exec/bits/library-listdef.h>: library_listdef)]
-%[typeorg(<kos/exec/bits/library-listdef32.h>: library_listdef32)]
-%[typeorg(<kos/exec/bits/library-listdef64.h>: library_listdef64)]
 %[typeorg(<kos/bits/futex-expr.h>: lfutexexpr)]
 %[typeorg(<kos/bits/futex-expr32.h>: lfutexexprx32)]
 %[typeorg(<kos/bits/futex-expr64.h>: lfutexexprx64)]
@@ -1929,13 +1926,6 @@ get_exception_handlerx32:([tostr(out:EXCEPTION_HANDLER_MODE32)] __ULONG32_TYPE__
 get_exception_handlerx64:([tostr(out:EXCEPTION_HANDLER_MODE64)] __ULONG64_TYPE__ *pmode,
                           [tostr(out:EXCEPT_HANDLER64_T)] __except_handler64_t *phandler,
                           [tostr(out:POINTER64)] __HYBRID_PTR64(void) *phandler_sp) -> errno_t;
-%[endgroup]
-
-%[startgroup]
-@@Set per-vm meta-data for allowing the kernel to enumerate loaded code modules
-[restart(must)] set_library_listdef:([tostr(STRUCT_LIBRARY_LISTDEF)] struct library_listdef const *listdef) -> errno_t;
-[restart(must)][doc_alias(set_library_listdef)] set_library_listdefx32:([tostr(STRUCT_LIBRARY_LISTDEF32)] struct library_listdef32 const *listdef) -> errno_t;
-[restart(must)][doc_alias(set_library_listdef)] set_library_listdefx64:([tostr(STRUCT_LIBRARY_LISTDEF64)] struct library_listdef64 const *listdef) -> errno_t;
 %[endgroup]
 
 %[startgroup]

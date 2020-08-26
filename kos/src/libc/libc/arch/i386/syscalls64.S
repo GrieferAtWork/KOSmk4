@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e563698 */
+/* HASH CRC-32:0x4fe4028c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9283,32 +9283,6 @@ INTERN_FUNCTION(libc_sys_Xdebugtrap)
 	.cfi_endproc
 END(libc_sys_Xdebugtrap)
 DEFINE_PUBLIC_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-.section .text.crt.syscall.set_library_listdef
-INTERN_FUNCTION(libc_sys_set_library_listdef)
-	.cfi_startproc
-	movq   $(0xffffffffffffffeb), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_set_library_listdef)
-DEFINE_PUBLIC_ALIAS(sys_set_library_listdef, libc_sys_set_library_listdef)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-.section .text.crt.syscall.Xset_library_listdef
-INTERN_FUNCTION(libc_sys_Xset_library_listdef)
-	.cfi_startproc
-	movq   $(0xffffffffffffffeb), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xset_library_listdef)
-DEFINE_PUBLIC_ALIAS(sys_Xset_library_listdef, libc_sys_Xset_library_listdef)
 
 /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.writevf

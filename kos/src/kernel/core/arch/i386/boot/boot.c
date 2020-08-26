@@ -531,7 +531,6 @@ DBB0892 [???:0,0:???] orig_ustate
 	 *
 	 *
 	 * TODO:
-	 *     - Get rid of `set_library_listdef(2)'
 	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions
 	 *     - Patch Xorg-server to not try to make use of "/dev/ptmx"

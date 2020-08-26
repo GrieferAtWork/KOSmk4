@@ -709,14 +709,12 @@ incdir("", "../../include");
 #include <kos/except.h>
 #include <kos/exec/asm/elf.h>
 #include <kos/exec/asm/rtld.h>
-#include <kos/exec/bits/library-listdef.h>
 #include <kos/exec/bits/library.h>
 #include <kos/exec/bits/peb.h>
 #include <kos/exec/elf-rel.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/exec/lazybind.h>
-#include <kos/exec/library-listdef.h>
 #include <kos/exec/library.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h>

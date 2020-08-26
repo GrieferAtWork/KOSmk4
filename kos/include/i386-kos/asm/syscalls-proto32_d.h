@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d93ba6c */
+/* HASH CRC-32:0xe5fb172f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -478,7 +478,6 @@
 #define __NR32AC_lseek64                 3
 #define __NR32AC_lfutex                  5
 #define __NR32AC_debugtrap               2
-#define __NR32AC_set_library_listdef     1
 #define __NR32AC_get_exception_handler   3
 #define __NR32AC_set_exception_handler   3
 #define __NR32AC_time64                  1
@@ -943,7 +942,6 @@
 #define __NR32RT_lseek64                 (int64_t, __int64_t)
 #define __NR32RT_lfutex                  (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_debugtrap               (errno_t, __errno_t)
-#define __NR32RT_set_library_listdef     (errno_t, __errno_t)
 #define __NR32RT_get_exception_handler   (errno_t, __errno_t)
 #define __NR32RT_set_exception_handler   (errno_t, __errno_t)
 #define __NR32RT_time64                  (int64_t, __int64_t)
@@ -2017,7 +2015,6 @@
 #define __NR32AT4_lfutex                  (uint32_t, __uint32_t)
 #define __NR32AT0_debugtrap               (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NR32AT1_debugtrap               (struct debugtrap_reason32 const *, struct debugtrap_reason32 const *)
-#define __NR32AT0_set_library_listdef     (struct library_listdef32 const *, struct library_listdef32 const *)
 #define __NR32AT0_get_exception_handler   (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
 #define __NR32AT1_get_exception_handler   (__except_handler32_t *, __except_handler32_t *)
 #define __NR32AT2_get_exception_handler   (__HYBRID_PTR32(void) *, __HYBRID_PTR32(void) *)
@@ -2512,7 +2509,6 @@
 #define __NR32AM_lseek64(a, b, c, d, e, f)                 (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
 #define __NR32AM_lfutex(a, b, c, d, e, f)                  (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx32_64 const *)d, (__uint32_t)e
 #define __NR32AM_debugtrap(a, b, c, d, e, f)               (struct ucpustate32 const *)a, (struct debugtrap_reason32 const *)b
-#define __NR32AM_set_library_listdef(a, b, c, d, e, f)     (struct library_listdef32 const *)a
 #define __NR32AM_get_exception_handler(a, b, c, d, e, f)   (__ULONG32_TYPE__ *)a, (__except_handler32_t *)b, (__HYBRID_PTR32(void) *)c
 #define __NR32AM_set_exception_handler(a, b, c, d, e, f)   (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NR32AM_time64(a, b, c, d, e, f)                  (__int64_t *)a
@@ -2977,7 +2973,6 @@
 #define __NR32AP_lseek64(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c
 #define __NR32AP_lfutex(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_debugtrap(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_set_library_listdef(a)                    (__syscall_ulong_t)a
 #define __NR32AP_get_exception_handler(a, b, c)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_set_exception_handler(a, b, c)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_time64(a)                                 (__syscall_ulong_t)a

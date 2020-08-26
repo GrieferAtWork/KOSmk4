@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f6d88b6 */
+/* HASH CRC-32:0x267c8c84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,6 @@
 #include <kos/bits/futex-expr32.h>
 #include <kos/bits/spawn-action32.h>
 #include <kos/compat/linux-stat.h>
-#include <kos/exec/bits/library-listdef32.h>
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/fpu-state32.h>
 #include <kos/rtm.h>
@@ -126,7 +125,6 @@ struct file_handle;
 struct fpustate32;
 struct getcpu_cache;
 struct lfutexexprx32;
-struct library_listdef32;
 struct linux_dirent;
 struct linux_dirent64;
 struct linux_oldolduname;
@@ -1541,10 +1539,6 @@ __CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __
  * @return: -1:EINVAL: The given MODE is invalid */
 __CDECLARE_SC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_SC(set_exception_handler) */
-#if __CRT_HAVE_SC(set_library_listdef)
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-__CDECLARE_SC(,__errno_t,set_library_listdef,(struct library_listdef32 const *__listdef),(__listdef))
-#endif /* __CRT_HAVE_SC(set_library_listdef) */
 #if __CRT_HAVE_SC(set_mempolicy)
 __CDECLARE_SC(,__errno_t,set_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(set_mempolicy) */
@@ -3366,10 +3360,6 @@ __CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t _
  * @return: -1:EINVAL: The given MODE is invalid */
 __CDECLARE_XSC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_XSC(set_exception_handler) */
-#if __CRT_HAVE_XSC(set_library_listdef)
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-__CDECLARE_XSC(,__errno_t,set_library_listdef,(struct library_listdef32 const *__listdef),(__listdef))
-#endif /* __CRT_HAVE_XSC(set_library_listdef) */
 #if __CRT_HAVE_XSC(set_mempolicy)
 __CDECLARE_XSC(,__errno_t,set_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(set_mempolicy) */

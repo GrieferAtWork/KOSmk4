@@ -37,7 +37,6 @@
 #include <asm/pagesize.h>
 #include <kos/debugtrap.h>
 #include <kos/exec/elf.h>
-#include <kos/exec/library-listdef.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h>
 #include <kos/syscalls.h>
@@ -127,26 +126,6 @@ INTERN struct process_peb *root_peb = NULL;
 /* Set to true if the sys_debugtrap() system call is disabled. */
 INTERN bool sys_debugtrap_disabled = false;
 
-/* Kernel meta-information: Library listing. */
-PRIVATE struct library_listdef dl_library_layout = {
-	.lld_size                      = sizeof(struct library_listdef),
-	.lld_sizeof_pointer            = sizeof(void *),
-	.lld_flags                     = LIBRARY_LISTDEF_FPFIRST | LIBRARY_LISTDEF_FLINKLST,
-	.lld_first                     = NULL, /* Filled in below */
-	.lld_count                     = NULL, /* Not used. */
-	.lld_module_offsetof_filename  = offsetof(DlModule, dm_filename),
-	.lld_module_offsetof_loadaddr  = offsetof(DlModule, dm_loadaddr),
-	.lld_module_offsetof_loadstart = offsetof(DlModule, dm_loadstart),
-	.lld_entry_offsetof_next       = offsetof(DlModule, dm_modules_next),
-	.lld_entry_offsetof_module     = 0, /* Unused */
-};
-
-
-INTDEF byte_t __rtld_eh_frame_start[];
-INTDEF byte_t __rtld_eh_frame_end[];
-INTDEF byte_t __rtld_gcc_except_table_start[];
-INTDEF byte_t __rtld_gcc_except_table_end[];
-
 INTDEF byte_t __rtld_end[];
 INTDEF byte_t __rtld_start[];
 
@@ -170,10 +149,6 @@ linker_main(struct elfexec_info *__restrict info,
 	dl_rtld_module.dm_elf.de_phdr[0].p_filesz = (ElfW(Word))rtld_size;
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
 	DlModule_AllList = &dl_rtld_module;
-
-	/* Tell the kernel how it can enumerate loaded libraries in user-space. */
-	dl_library_layout.lld_first = &DlModule_AllList;
-	sys_set_library_listdef(&dl_library_layout);
 
 	/* Return a pointer to `&info->ed_entry' */
 	filename = elfexec_info_getfilename(info);

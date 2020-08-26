@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd65b5612 */
+/* HASH CRC-32:0x607734f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1075,7 +1075,6 @@
 #define __NR32AN4_lfutex                  val2
 #define __NR32AN0_debugtrap               state
 #define __NR32AN1_debugtrap               reason
-#define __NR32AN0_set_library_listdef     listdef
 #define __NR32AN0_get_exception_handler   pmode
 #define __NR32AN1_get_exception_handler   phandler
 #define __NR32AN2_get_exception_handler   phandler_sp
@@ -2737,8 +2736,6 @@
 #define __NR32ATR0_debugtrap               SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
 #define __NR32ATR1_debugtrap               SC_REPR_STRUCT_DEBUGTRAP_REASON32                                    /* reason */ 
 #define __NR32RTR_debugtrap                SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_set_library_listdef     SC_REPR_STRUCT_LIBRARY_LISTDEF32                                     /* listdef */ 
-#define __NR32RTR_set_library_listdef      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_get_exception_handler   SC_REPR_POINTER                                                      /* pmode */ 
 #define __NR32ATR1_get_exception_handler   SC_REPR_POINTER                                                      /* phandler */ 
 #define __NR32ATR2_get_exception_handler   SC_REPR_POINTER                                                      /* phandler_sp */ 

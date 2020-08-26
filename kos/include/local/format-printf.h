@@ -1180,7 +1180,7 @@ __check_string_error_and_print_tail:
 #else /* !__KERNEL__ || !__KOS__ */
 				struct addr2line_buf __dl_debug_sections;
 				__UINTPTR_TYPE__ __rel;
-				__rel = addr2line_begin(&__dl_debug_sections, (__UINTPTR_TYPE__)__p);
+				__rel = addr2line_begin(&__dl_debug_sections, (__UINTPTR_TYPE__)__p, __NULLPTR);
 				__modrel = (__UINTPTR_TYPE__)__p - __rel;
 				addr2line(&__dl_debug_sections, __rel, &__info, DEBUG_ADDR2LINE_LEVEL_SOURCE);
 #endif /* __KERNEL__ && __KOS__ */

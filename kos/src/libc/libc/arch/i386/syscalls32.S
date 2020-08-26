@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5ded2e6 */
+/* HASH CRC-32:0x5bd6476c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8187,24 +8187,6 @@ INTERN_FUNCTION(libc_sys_Xdebugtrap)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xdebugtrap)
 DEFINE_PUBLIC_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.crt.syscall.set_library_listdef
-INTERN_FUNCTION(libc_sys_set_library_listdef)
-	movl   $(0xfffffff0), %eax
-	jmp    libc_x86_exec_syscall1
-END(libc_sys_set_library_listdef)
-DEFINE_PUBLIC_ALIAS(sys_set_library_listdef, libc_sys_set_library_listdef)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.crt.syscall.Xset_library_listdef
-INTERN_FUNCTION(libc_sys_Xset_library_listdef)
-	movl   $(0xfffffff0), %eax
-	jmp    libc_x86_exec_Xsyscall1
-END(libc_sys_Xset_library_listdef)
-DEFINE_PUBLIC_ALIAS(sys_Xset_library_listdef, libc_sys_Xset_library_listdef)
 
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:

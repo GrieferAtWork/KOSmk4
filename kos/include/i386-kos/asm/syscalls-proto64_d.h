@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb573fe48 */
+/* HASH CRC-32:0xb8844378 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,7 +392,6 @@
 #define __NR64AC_lfutex                 5
 #define __NR64AC_rpc_service            0
 #define __NR64AC_debugtrap              2
-#define __NR64AC_set_library_listdef    1
 #define __NR64AC_writevf                4
 #define __NR64AC_readvf                 4
 #define __NR64AC_pwrite64f              5
@@ -777,7 +776,6 @@
 #define __NR64RT_lfutex                 (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_rpc_service            (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_debugtrap              (errno_t, __errno_t)
-#define __NR64RT_set_library_listdef    (errno_t, __errno_t)
 #define __NR64RT_writevf                (ssize_t, __ssize_t)
 #define __NR64RT_readvf                 (ssize_t, __ssize_t)
 #define __NR64RT_pwrite64f              (ssize_t, __ssize_t)
@@ -1640,7 +1638,6 @@
 #define __NR64AT4_lfutex                 (uint64_t, __uint64_t)
 #define __NR64AT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
-#define __NR64AT0_set_library_listdef    (struct library_listdef64 const *, struct library_listdef64 const *)
 #define __NR64AT0_writevf                (fd_t, __fd_t)
 #define __NR64AT1_writevf                (struct iovecx64 const *, struct __iovecx64 const *)
 #define __NR64AT2_writevf                (size_t, __size_t)
@@ -2073,7 +2070,6 @@
 #define __NR64AM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
 #define __NR64AM_rpc_service(a, b, c, d, e, f)            /* nothing */
 #define __NR64AM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
-#define __NR64AM_set_library_listdef(a, b, c, d, e, f)    (struct library_listdef64 const *)a
 #define __NR64AM_writevf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__iomode_t)d
 #define __NR64AM_readvf(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__iomode_t)d
 #define __NR64AM_pwrite64f(a, b, c, d, e, f)              (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
@@ -2458,7 +2454,6 @@
 #define __NR64AP_lfutex(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_rpc_service()                            /* nothing */
 #define __NR64AP_debugtrap(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_set_library_listdef(a)                   (__syscall_ulong_t)a
 #define __NR64AP_writevf(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_readvf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_pwrite64f(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

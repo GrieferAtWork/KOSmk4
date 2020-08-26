@@ -32,7 +32,6 @@
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/exec.h>
-#include <kernel/vm/library.h>
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
@@ -42,7 +41,6 @@
 #include <kos/except/fs.h>
 #include <kos/except/noexec.h>
 #include <kos/exec/elf.h>
-#include <kos/exec/library-listdef.h>
 #include <kos/exec/peb.h>
 
 #include <assert.h>
@@ -85,29 +83,6 @@ PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
  * These are called alongside stuff like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_VM', and is never `&vm_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
-
-/* Library listing definition, using a process's PEB as data source.
- * For this we set up the list definition to later load the filename
- * from using an expression equal to `PEB.pp_argv[0]', allowing the
- * name to be overwritten as one of:
- *   - PEB.pp_argv    = POINTER_TO_POINTER_TO_NAME;
- *   - PEB.pp_argv[0] = POINTER_TO_NAME;
- */
-PRIVATE struct library_listdef const peb_based_library_list = {
-	.lld_size                      = sizeof(struct library_listdef),
-	.lld_sizeof_pointer            = sizeof(void *),
-	.lld_flags                     = LIBRARY_LISTDEF_FPELEMENT |
-	                                 LIBRARY_LISTDEF_FRELFILENAME |
-	                                 LIBRARY_LISTDEF_FSINGLE,
-	.lld_first                     = 0, /* Filled below */
-	.lld_count                     = NULL, /* Unused */
-	.lld_module_offsetof_filename  = 0, /* Always use argv[0] */
-	.lld_module_offsetof_loadaddr  = 0, /* Always ZERO */
-	.lld_module_offsetof_loadstart = 0, /* Filled below */
-	.lld_entry_offsetof_next       = 0, /* Unused */
-	.lld_entry_offsetof_module     = offsetof(struct process_peb, pp_argv)
-};
-
 
 
 LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t

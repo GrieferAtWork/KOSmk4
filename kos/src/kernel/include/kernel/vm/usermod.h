@@ -202,8 +202,26 @@ FUNDEF NOBLOCK size_t
 NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self);
 
 
-struct unwind_fde_struct;
+/* Callback prototype for `vm_enumusermod()'
+ * @param: cookie: Same as the `cookie' argument passed to `vm_enumusermod()'
+ * @param: um:     The usermod object that is being enumerated.
+ * @return: >= 0:  Add the this value to the total sum to-be returned by `vm_enumusermod()'
+ * @return: < 0:   Stop enumeration and have `vm_enumusermod()' immediatly re-return this value. */
+typedef ssize_t (KCALL *vm_enumusermod_callback_t)(void *cookie, struct usermod *__restrict um);
 
+/* Enumerate all user-space modules that may be mapped within `self'
+ * Modules are (generally) enumerated in ascending order, based on
+ * their `um_loadstart' values. Note though that while you may optimize
+ * for this case, do not rely on this actually being the case!
+ * @param: cb:     Callback to-be invoked for every user-module found.
+ * @param: cookie: Argument that should be passed to `cb'
+ * @return: >= 0:  The sum of all return values of `cb'
+ * @return: < 0:   The first negative value returned by `cb' */
+FUNDEF ssize_t FCALL
+vm_enumusermod(struct vm *__restrict self,
+               vm_enumusermod_callback_t cb,
+               void *cookie)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 #endif /* __CC__ */
 

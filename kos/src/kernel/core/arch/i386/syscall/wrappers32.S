@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x914fbef4 */
+/* HASH CRC-32:0x7e9edbf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16922,44 +16922,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_debugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.x86.asm32_syscall_int80.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_library_listdef)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffff0
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_set_library_listdef)
-	call   sys_set_library_listdef
-	popl_cfi_r %ebx
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_set_library_listdef)
 
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -34640,44 +34602,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_debugtrap)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_debugtrap)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.x86.asm32_syscall_sysenter.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_library_listdef)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffff0
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_set_library_listdef)
-	call   sys_set_library_listdef
-	popl_cfi_r %ebx
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_set_library_listdef)
 
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:

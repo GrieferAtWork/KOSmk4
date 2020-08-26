@@ -169,7 +169,6 @@ lfutexexpr = lfutexexprx32_64;
 lfutexlockexpr = lfutexlockexprx32_64;
 lfutex = lfutexx32_64;
 debugtrap = debugtrapx32;
-set_library_listdef = set_library_listdefx32;
 get_exception_handler = get_exception_handlerx32;
 rpc_schedule = rpc_schedulex32;
 readv = readvx32;
@@ -607,7 +606,7 @@ rt_sigreturn = sigreturn;
 -0x0000000d:time64
 -0x0000000e:set_exception_handler
 -0x0000000f:get_exception_handler
--0x00000010:set_library_listdef
+/*x00000010:...*/
 -0x00000011:debugtrap
 -0x00000012:lfutex
 -0x00000013:lseek64

@@ -32,7 +32,7 @@
 #include <kernel/uname.h>
 #include <kernel/vm.h>
 #include <kernel/vm/exec.h>
-#include <kernel/vm/library.h>
+#include <kernel/vm/usermod.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -59,6 +59,7 @@ DECL_BEGIN
 #define print(p, len) DO((*printer)(arg, p, len))
 #define PRINT(str)    DO((*printer)(arg, str, COMPILER_STRLEN(str)))
 #define PRINTF(...)   DO(format_printf(printer, arg, __VA_ARGS__))
+#define PRINTO(printer, arg, str)  (*printer)(arg, str, COMPILER_STRLEN(str))
 
 
 /* NOTE: All of the following functions return negative ERRNO values on failure. */
@@ -198,58 +199,48 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 }
 
 
-PRIVATE NONNULL((1, 3)) ssize_t KCALL
-GDB_PrintRemoteVMString(pformatprinter printer, void *arg,
-                        struct vm *__restrict effective_vm,
-                        USER CHECKED char const *string,
-                        bool print_repr) {
-	char buf[256];
-	ssize_t temp, result = 0;
-	for (;;) {
-		size_t partlen, maxread;
-		/* Stay within the same page when reading memory. */
-		maxread = PAGESIZE - ((uintptr_t)string & PAGEMASK);
-		if (maxread > sizeof(buf))
-			maxread = sizeof(buf);
-		vm_read(effective_vm, string, buf, maxread, true);
-		partlen = strnlen(buf, maxread);
-		assert(partlen <= maxread);
-		DO(print_repr ? format_escape(printer, arg, buf, partlen, FORMAT_ESCAPE_FPRINTRAW)
-		              : (*printer)(arg, buf, partlen));
-		if (partlen < maxread)
-			break;
-		string += maxread;
-	}
-	return result;
-err:
-	return temp;
-}
-
 typedef struct {
 	pformatprinter ll_printer; /* Printer. */
 	void          *ll_arg;     /* Printer argument. */
 } GDB_LibraryListPrinterData;
 
+PRIVATE ssize_t FORMATPRINTER_CC
+format_escape_printer(void *arg,
+                      /*utf-8*/ char const *__restrict data,
+                      size_t datalen) {
+	GDB_LibraryListPrinterData *cookie;
+	cookie = (GDB_LibraryListPrinterData *)arg;
+	return format_escape(cookie->ll_printer,
+	                     cookie->ll_arg,
+	                     data,
+	                     datalen,
+	                     FORMAT_ESCAPE_FPRINTRAW);
+}
+
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
-GDB_LibraryListPrinter(void *closure,
-                       struct vm *__restrict effective_vm,
-                       USER CHECKED char const *filename,
-                       USER UNCHECKED void *UNUSED(loadaddr),
-                       USER UNCHECKED void *loadstart,
-                       bool UNUSED(filename_may_be_relative)) {
+GDB_LibraryListPrinter(void *cookie,
+                       struct usermod *__restrict um) {
 	ssize_t temp, result = 0;
-	pformatprinter printer; void *arg;
-	printer = ((GDB_LibraryListPrinterData *)closure)->ll_printer;
-	arg     = ((GDB_LibraryListPrinterData *)closure)->ll_arg;
-	PRINT("<library name=\"");
-	TRY {
-		DO(GDB_PrintRemoteVMString(printer, arg, effective_vm, filename, true));
-	} EXCEPT {
+	GDB_LibraryListPrinterData *data;
+	data = (GDB_LibraryListPrinterData *)cookie;
+	if likely(um->um_fspath && um->um_fsname) {
+		result = (*data->ll_printer)(data->ll_arg,
+		                             "<library name=\"",
+		                             COMPILER_STRLEN("<library name=\""));
+		if likely(result >= 0) {
+			DO(path_printent(um->um_fspath,
+			                 um->um_fsname->de_name,
+			                 um->um_fsname->de_namelen,
+			                 &format_escape_printer,
+			                 data));
+			DO(format_printf(data->ll_printer,
+			                 data->ll_arg,
+			                 "\">"
+			                 "<segment address=\"%#" PRIxPTR "\"/>"
+			                 "</library>",
+			                 um->um_loadstart));
+		}
 	}
-	PRINTF("\">"
-	           "<segment address=\"%#" PRIxPTR "\"/>"
-	       "</library>",
-	       loadstart);
 	return result;
 err:
 	return temp;
@@ -345,7 +336,9 @@ NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
 	/* Print user-space library listings. */
 	if (effective_vm != &vm_kernel) {
 		TRY {
-			DO(vm_library_enumerate(effective_vm, &GDB_LibraryListPrinter, &data));
+			DO(vm_enumusermod(effective_vm,
+			                  &GDB_LibraryListPrinter,
+			                  &data));
 		} EXCEPT {
 		}
 	}
@@ -742,27 +735,32 @@ err:
 }
 
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
-GDB_UserLibraryListPrinter(void *closure,
-                           struct vm *__restrict effective_vm,
-                           USER CHECKED char const *filename,
-                           USER UNCHECKED void *loadaddr,
-                           USER UNCHECKED void *loadstart,
-                           bool UNUSED(filename_may_be_relative)) {
+GDB_UserLibraryListPrinter(void *cookie,
+                           struct usermod *__restrict um) {
 	ssize_t temp, result = 0;
-	pformatprinter printer; void *arg;
-	printer = ((GDB_LibraryListPrinterData *)closure)->ll_printer;
-	arg     = ((GDB_LibraryListPrinterData *)closure)->ll_arg;
-	PRINTF("<item>"
-	       "<column name=\"loadaddr\">%p</column>"
-	       "<column name=\"loadstart\">%p</column>"
-	       "<column name=\"name\">",
-	       loadaddr, loadstart);
-	TRY {
-		DO(GDB_PrintRemoteVMString(printer, arg, effective_vm, filename, true));
-	} EXCEPT {
+	GDB_LibraryListPrinterData *data;
+	data = (GDB_LibraryListPrinterData *)cookie;
+	if likely(um->um_fspath && um->um_fsname) {
+		result = format_printf(data->ll_printer,
+		                       data->ll_arg,
+		                       "<item>"
+		                       "<column name=\"loadaddr\">%p</column>"
+		                       "<column name=\"loadstart\">%p</column>"
+		                       "<column name=\"name\">",
+		                       um->um_loadaddr,
+		                       um->um_loadstart);
+		if likely(result >= 0) {
+			DO(path_printent(um->um_fspath,
+			                 um->um_fsname->de_name,
+			                 um->um_fsname->de_namelen,
+			                 &format_escape_printer,
+			                 data));
+			DO(PRINTO(data->ll_printer,
+			          data->ll_arg,
+			          "</column>"
+			          "</item>"));
+		}
 	}
-	PRINT("</column>"
-	      "</item>");
 	return result;
 err:
 	return temp;
@@ -779,7 +777,7 @@ NOTHROW(FCALL GDBInfo_PrintUserLibraryListWithVM)(pformatprinter printer, void *
 	/* Print user-space library listings. */
 	if (effective_vm != &vm_kernel) {
 		TRY {
-			DO(vm_library_enumerate(effective_vm, &GDB_UserLibraryListPrinter, &data));
+			DO(vm_enumusermod(effective_vm, &GDB_UserLibraryListPrinter, &data));
 		} EXCEPT {
 		}
 	}

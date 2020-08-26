@@ -122,7 +122,6 @@ lfutexexpr = lfutexexprx64;
 lfutexlockexpr = lfutexlockexprx64;
 lfutex = lfutexx64;
 debugtrap = debugtrapx64;
-set_library_listdef = set_library_listdefx64;
 get_exception_handler = get_exception_handlerx64;
 rpc_schedule = rpc_schedulex64;
 readv = readvx64;
@@ -500,7 +499,7 @@ mq_timedreceive = mq_timedreceivex64;
 -0x0000000000000012:pwrite64f
 -0x0000000000000013:readvf
 -0x0000000000000014:writevf
--0x0000000000000015:set_library_listdef
+/*x0000000000000015:...*/
 -0x0000000000000016:debugtrap
 -0x0000000000000017:rpc_service
 -0x0000000000000018:lfutex

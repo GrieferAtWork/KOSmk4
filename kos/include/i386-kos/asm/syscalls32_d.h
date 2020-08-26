@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f64819 */
+/* HASH CRC-32:0xf8020092 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -798,8 +798,6 @@
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 #define __NR32_debugtrap               __UINT32_C(0xffffffef) /* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-#define __NR32_set_library_listdef     __UINT32_C(0xfffffff0) /* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
@@ -1442,7 +1440,6 @@
 #define __NR32RM_lseek64                 0
 #define __NR32RM_lfutex                  1
 #define __NR32RM_debugtrap               0
-#define __NR32RM_set_library_listdef     2
 #define __NR32RM_get_exception_handler   2
 #define __NR32RM_set_exception_handler   2
 #define __NR32RM_time64                  0
@@ -2089,7 +2086,6 @@
 #define __NR32RC_lseek64                 4 /* __NR32AC_lseek64 + 1 */
 #define __NR32RC_lfutex                  5
 #define __NR32RC_debugtrap               2
-#define __NR32RC_set_library_listdef     1
 #define __NR32RC_get_exception_handler   3
 #define __NR32RC_set_exception_handler   3
 #define __NR32RC_time64                  1
