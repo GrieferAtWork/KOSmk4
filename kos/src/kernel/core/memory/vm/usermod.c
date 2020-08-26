@@ -35,6 +35,7 @@
 #include <kernel/panic.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <misc/atomic-ref.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -45,6 +46,8 @@
 #include <string.h>
 
 #include <libunwind/unwind.h>
+
+#include "vm-nodeapi.h"
 
 DECL_BEGIN
 
@@ -109,6 +112,7 @@ NOTHROW(FCALL usermod_destroy)(struct usermod *__restrict self) {
 	decref(self->um_file);
 	xdecref(self->um_fspath);
 	xdecref(self->um_fsname);
+	xdecref(self->um_next);
 	kfree(self);
 }
 
@@ -499,43 +503,20 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 	return NULL;
 }
 
-
-/* Create a new user module for the given `addr'
- * @return: NULL: No module exists at the given `addr' */
-PRIVATE REF struct usermod *FCALL
-vm_create_usermod(struct vm *__restrict self,
-                  USER CHECKED void *addr,
-                  bool addr_must_be_executable)
+/* @param: map_inode:        [1..1] The INode that is being mapped.
+ * @param: map_inode_path:   [0..1][const] Optional mapping path
+ * @param: map_inode_name:   [0..1][const] Optional mapping name
+ * @param: map_inode_offset: File-offset where `map_inode_addr' exists.
+ * @param: map_inode_addr:   Starting address of `map_inode_offset'. */
+PRIVATE WUNUSED NONNULL((1, 2)) REF struct usermod *FCALL
+usermod_create_from_mapping(struct vm *__restrict self,
+                            /*inherit(always)*/ REF struct inode *__restrict map_inode,
+                            /*inherit(always)*/ REF struct path *map_inode_path,
+                            /*inherit(always)*/ REF struct directory_entry *map_inode_name,
+                            pos_t map_inode_offset, USER void *map_inode_addr)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
-	REF struct inode /*     */ *map_inode;        /* [1..1] The INode that is being mapped. */
-	REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path */
-	REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name */
-	pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
-	USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
 	uintptr_t modtype;
-	struct vm_node *node;
-	sync_read(self);
-	node = vm_getnodeofaddress(self, addr);
-	if (!node) {
-unlock_and_nope:
-		sync_endread(self);
-		return NULL;
-	}
-	if (addr_must_be_executable && !(node->vn_prot & VM_PROT_EXEC))
-		goto unlock_and_nope;
-	node = vm_node_find_inode_mapping(node);
-	if (!node)
-		goto unlock_and_nope; /* Nope... */
-	assert(vm_datablock_isinode(node->vn_block));
-	/* Alright! We've found a node we can use!
-	 * Garther all of the information we need and release the VM lock. */
-	map_inode        = (REF struct inode *)incref(node->vn_block);
-	map_inode_path   = xincref(node->vn_fspath);
-	map_inode_name   = xincref(node->vn_fsname);
-	map_inode_offset = vm_datapart_startbyte(node->vn_part);
-	map_inode_addr   = vm_node_getstart(node);
-	sync_endread(self);
 	TRY {
 		ElfV_Ehdr ehdr;
 		/* Load the executable header, and verify that this is a supported ELF binary. */
@@ -622,7 +603,7 @@ free_phdrv_and_decref_and_nope:
 				{
 					size_t offset_in_segment;
 					USER void *segment_address;
-					USER CHECKED uintptr_t loadaddr;
+					USER uintptr_t loadaddr;
 found_correct_phdr:
 					offset_in_segment = (size_t)(map_inode_offset - aligned_phdr_file_offset);
 					segment_address   = (byte_t *)map_inode_addr - offset_in_segment;
@@ -686,8 +667,149 @@ free_result_and_free_phdrv_and_decref_and_nope:
 	result->um_fsname  = map_inode_name; /* Inherit reference */
 	result->um_modtype = modtype;
 	result->um_vm      = self;
+	result->um_next    = NULL;
 	return result;
 }
+
+/* Create a new user module for the given `addr'
+ * @return: NULL: No module exists at the given `addr' */
+PRIVATE REF struct usermod *FCALL
+vm_create_usermod(struct vm *__restrict self,
+                  USER void *addr,
+                  bool addr_must_be_executable)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	REF struct usermod *result;
+	REF struct inode /*     */ *map_inode;        /* [1..1] The INode that is being mapped. */
+	REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path */
+	REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name */
+	pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
+	USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
+	struct vm_node *node;
+	sync_read(self);
+	node = vm_getnodeofaddress(self, addr);
+	if (!node) {
+unlock_and_nope:
+		sync_endread(self);
+		return NULL;
+	}
+	if (addr_must_be_executable && !(node->vn_prot & VM_PROT_EXEC))
+		goto unlock_and_nope;
+	node = vm_node_find_inode_mapping(node);
+	if (!node)
+		goto unlock_and_nope; /* Nope... */
+	assert(vm_datablock_isinode(node->vn_block));
+	/* Alright! We've found a node we can use!
+	 * Gather all of the information we need and release the VM lock. */
+	map_inode        = (REF struct inode *)incref(node->vn_block);
+	map_inode_path   = xincref(node->vn_fspath);
+	map_inode_name   = xincref(node->vn_fsname);
+	map_inode_offset = vm_datapart_startbyte(node->vn_part);
+	map_inode_addr   = vm_node_getstart(node);
+	sync_endread(self);
+	/* Construct the usermod object. */
+	result = usermod_create_from_mapping(self,
+	                                     map_inode,
+	                                     map_inode_path,
+	                                     map_inode_name,
+	                                     map_inode_offset,
+	                                     map_inode_addr);
+	return result;
+}
+
+
+struct vm_usermod_cache {
+	XATOMIC_REF(struct usermod) uc_first; /* [0..1][lock(THIS_VM)]
+	                                       * Sorted (via `um_loadstart') chain of
+	                                       * cached user-space modules. */
+};
+
+PRIVATE ATTR_PERVM struct vm_usermod_cache usermod_cache = { XATOMIC_REF_INIT(NULL) };
+
+/* Clear out all unused usermod objects from `self' and
+ * return non-zero if the cache wasn't already empty. */
+PUBLIC NOBLOCK size_t
+NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
+	REF struct usermod *chain;
+	chain = FORVM(self, usermod_cache).uc_first.exchange_inherit_new(NULL);
+	if (!chain)
+		return 0;
+	/* This will recursively delete usermod objects that aren't in use anymore. */
+	decref_likely(chain);
+	return 1;
+}
+
+
+/* Clear the usermod cache during exec() */
+DEFINE_PERVM_ONEXEC(usermod_onexec);
+PRIVATE ATTR_USED void KCALL usermod_onexec(void) {
+	vm_clear_usermod(THIS_VM);
+}
+
+
+/* Insert the given `um' into the usermod cache of `self'
+ * If another usermod object already exists in `self' that has the
+ * same `um_loadstart', then this function will decref(um), and
+ * return a reference to the pre-existing usermod object instead.
+ * Otherwise, `um' will be inserted at an appropriate location,
+ * and this function will simply re-return it.
+ * In every case, this function will also `sync_endwrite(self)'
+ * before returning. */
+PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED REF struct usermod *
+NOTHROW(FCALL vm_usermod_cache_insert_and_unify_and_unlock)(struct vm *__restrict self,
+                                                            /*inherit(always)*/ REF struct usermod *__restrict um) {
+	struct vm_usermod_cache *uc;
+	REF struct usermod *head;
+	assert(sync_writing(self));
+	uc = (struct vm_usermod_cache *)&FORVM(self, usermod_cache);
+again:
+	head = uc->uc_first.get();
+	if (!head) {
+		um->um_next = NULL;
+		if (!uc->uc_first.cmpxch(NULL, um))
+			goto again;
+		sync_endwrite(self);
+	} else if (um->um_loadstart < head->um_loadstart) {
+		/* Must insert before `head' */
+		um->um_next = head; /* Inherit reference */
+		if (!uc->uc_first.cmpxch(head, um)) {
+			decref(head);
+			goto again;
+		}
+		sync_endwrite(self);
+	} else {
+		/* Must insert somewhere else along the chain described by `head' */
+		struct usermod *prev, *next;
+		prev = head;
+		next = prev->um_next;
+		while (next && um->um_loadstart > next->um_loadstart) {
+			prev = next;
+			next = prev->um_next;
+		}
+		if (next && next->um_loadstart == um->um_loadstart) {
+			prev = next;
+			goto duplicate_with_prev;
+		}
+		if (prev->um_loadstart == um->um_loadstart) {
+duplicate_with_prev:
+			/* `um' is a duplicate of `prev' */
+			incref(prev);
+			sync_endwrite(self);
+			um->um_next = NULL; /* Needed for the destructor */
+			decref_unlikely(head);
+			decref_likely(um);
+			return prev;
+		}
+		/* Insert after `prev', but before `next' */
+		um->um_next   = next;
+		prev->um_next = incref(um);
+		sync_endwrite(self);
+		/* Drop the reference to the head that we've acquired above. */
+		decref_unlikely(head);
+	}
+	return um; /* Inherit reference */
+}
+
+
 
 
 /* Find the user-space module that resides at the given address.
@@ -705,7 +827,7 @@ free_result_and_free_phdrv_and_decref_and_nope:
  * @return: NULL: No executable object exists at the given location. */
 PUBLIC REF struct usermod *FCALL
 vm_getusermod(struct vm *__restrict self,
-              USER CHECKED void *addr,
+              USER void *addr,
               bool addr_must_be_executable)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
@@ -714,24 +836,189 @@ vm_getusermod(struct vm *__restrict self,
 	if unlikely(self == &vm_kernel)
 		return NULL;
 
-	/* TODO: Search the cache of `self'. */
+	/* Search the cache of `self'. */
+	{
+		REF struct usermod *chain;
+		result = NULL;
+		sync_read(self);
+		chain = FORVM(self, usermod_cache).uc_first.get();
+		if (chain) {
+			result = chain;
+			do {
+				if ((uintptr_t)addr >= result->um_loadstart &&
+				    (uintptr_t)addr < result->um_loadend) {
+					/* Found it! */
+					incref(result);
+					break;
+				}
+			} while ((result = result->um_next) != NULL);
+		}
+		sync_endread(self);
+		xdecref_unlikely(chain);
+		if (result)
+			return result;
+	}
+
+	/* Don't load new usermod objects following a kernel poisoning. */
 	if (kernel_poisoned())
 		return NULL;
 
-	result = vm_create_usermod(self, addr, addr_must_be_executable);
+	/* Create a new  */
+	result = vm_create_usermod(self,
+	                           addr,
+	                           addr_must_be_executable);
 
-	/* TODO: (try to) add to the cache of `self'. */
+	/* Add `result' to the cache of `self'.
+	 * Also: If the cache now contains an overlapping entry
+	 *       for `addr', return that one instead, and destroy
+	 *       the newly created descriptor. */
+	TRY {
+		sync_write(self);
+	} EXCEPT {
+		decref_likely(result);
+		RETHROW();
+	}
+	result = vm_usermod_cache_insert_and_unify_and_unlock(self, result);
 	return result;
 }
 
-/* Clear out all unused usermod objects from `self' and return the
- * amount of memory that became available as the result of this. */
-PUBLIC NOBLOCK size_t
-NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
-	/* TODO: Clear the cache for `self' */
-	COMPILER_IMPURE();
-	(void)self;
-	return 0;
+/* Find the first usermod object that maps some page containing a pointer `>= addr'
+ * If no module fulfills this requirement, return NULL instead. */
+PUBLIC REF struct usermod *FCALL
+vm_getusermod_above(struct vm *__restrict self,
+                    USER void *addr)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	vm_nodetree_minmax_t minmax;
+	pageid_t minpage;
+	pageid_t maxpage;
+	/* Special case: the kernel VM can never house user-space modules */
+	if (self == &vm_kernel)
+		return NULL;
+	if unlikely(!ADDR_ISUSER(addr)) {
+#ifdef KERNELSPACE_HIGHMEM
+		return NULL;
+#else /* KERNELSPACE_HIGHMEM */
+		addr = (USER void *)USERSPACE_BASE;
+#endif /* !KERNELSPACE_HIGHMEM */
+	}
+
+	minpage = PAGEID_ENCODE(addr);
+#ifdef KERNELSPACE_HIGHMEM
+	maxpage = PAGEID_ENCODE(USERSPACE_END - 1);
+#else /* KERNELSPACE_HIGHMEM */
+	maxpage = __ARCH_PAGEID_MAX;
+#endif /* !KERNELSPACE_HIGHMEM */
+
+again:
+	sync_read(self);
+
+	/* Search the cache of `self'. */
+	{
+		REF struct usermod *chain;
+		chain = FORVM(self, usermod_cache).uc_first.get();
+		if (chain) {
+			REF struct usermod *result;
+			result = chain;
+			do {
+				if ((uintptr_t)addr >= result->um_loadstart) {
+					/* Found it! */
+					incref(result);
+					xdecref_unlikely(chain);
+					sync_endread(self);
+					return result;
+				}
+			} while ((result = result->um_next) != NULL);
+			decref_unlikely(chain);
+		}
+	}
+
+	/* Don't load new usermod objects following a kernel poisoning. */
+	if (kernel_poisoned()) {
+		sync_endread(self);
+		return NULL;
+	}
+
+	/* Find the first mapped memory location above the given address. */
+	minmax.mm_min = minmax.mm_max = NULL;
+	vm_nodetree_minmaxlocate(self->v_tree,
+	                         minpage,
+	                         maxpage,
+	                         &minmax);
+	assert((minmax.mm_min != NULL) == (minmax.mm_max != NULL));
+	if (minmax.mm_min) {
+		struct vm_node *node;
+		node = minmax.mm_min;
+		for (;;) {
+			if ((node->vn_prot & VM_PROT_EXEC) &&
+			    node->vn_block && node->vn_part &&
+			    vm_datablock_isinode(node->vn_block)) {
+				/* Found a candidate. */
+				REF struct usermod *result;
+				REF struct inode /*     */ *map_inode;        /* [1..1] The INode that is being mapped. */
+				REF struct path /*      */ *map_inode_path;   /* [0..1][const] Optional mapping path */
+				REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name */
+				pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
+				USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
+				minpage   = vm_node_getendpageid(node);
+				map_inode        = (REF struct inode *)incref(node->vn_block);
+				map_inode_path   = xincref(node->vn_fspath);
+				map_inode_name   = xincref(node->vn_fsname);
+				map_inode_offset = vm_datapart_startbyte(node->vn_part);
+				map_inode_addr   = vm_node_getstart(node);
+				sync_endread(self);
+				/* Try to construct a usermod from the mapping we've found. */
+				result = usermod_create_from_mapping(self,
+				                                     map_inode,
+				                                     map_inode_path,
+				                                     map_inode_name,
+				                                     map_inode_offset,
+				                                     map_inode_addr);
+				if (result) {
+					/* Insert the new usermod object into the vm's cache. */
+					TRY {
+						sync_write(self);
+					} EXCEPT {
+						decref_likely(result);
+						RETHROW();
+					}
+					result = vm_usermod_cache_insert_and_unify_and_unlock(self,
+					                                                      result);
+					return result;
+				}
+				addr = PAGEID_DECODE(minpage);
+				goto again;
+			}
+			if (node == minmax.mm_max)
+				break;
+			node = node->vn_byaddr.ln_next;
+		}
+	}
+	sync_endread(self);
+	return NULL;
+}
+
+/* Return the first usermod object that has a starting load start address greater than `prev'
+ * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (void *)0)'.
+ * If no module exists that matches this criteria, return `NULL' instead. */
+PUBLIC REF struct usermod *FCALL
+vm_getusermod_next(struct vm *__restrict self,
+                   struct usermod *prev)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	REF struct usermod *result;
+	void *above_addr;
+	if (!prev)
+		return vm_getusermod_above(self, (USER void *)0);
+	above_addr = (void *)(FLOOR_ALIGN(prev->um_loadend, PAGESIZE) + PAGESIZE);
+	for (;;) {
+		result = vm_getusermod_above(self, above_addr);
+		if (!result)
+			break;
+		if (result->um_loadstart > prev->um_loadstart)
+			break;
+		decref_unlikely(result);
+		above_addr = (byte_t *)above_addr + PAGESIZE;
+	}
+	return result;
 }
 
 
@@ -749,21 +1036,39 @@ vm_enumusermod(struct vm *__restrict self,
                vm_enumusermod_callback_t cb,
                void *cookie)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	/* Special case: the kernel VM can never house user-space modules */
-	if (self == &vm_kernel)
-		return 0;
-	/* TODO */
-	COMPILER_IMPURE();
-	(void)self;
-	(void)cb;
-	(void)cookie;
-	return 0;
+	REF struct usermod *prev;
+	REF struct usermod *next;
+	ssize_t temp, result = 0;
+	prev = NULL;
+	TRY {
+		for (;;) {
+			next = vm_getusermod_next(self, prev);
+			if (!next)
+				break;
+			decref_unlikely(prev);
+			prev = next;
+			/* Invoke the given callback. */
+			temp = (*cb)(cookie, prev);
+			/* Propagate errors. */
+			if unlikely(temp < 0) {
+				result = temp;
+				break;
+			}
+			/* Account for results. */
+			result += temp;
+		}
+	} EXCEPT {
+		xdecref(prev);
+		RETHROW();
+	}
+	xdecref(prev);
+	return result;
 }
 
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PUBLIC REF struct usermod *FCALL
-getusermod(USER CHECKED void *addr,
+getusermod(USER void *addr,
            bool addr_must_be_executable)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
@@ -895,7 +1200,8 @@ restore_except:
 	goto done;
 }
 
-LIBUNWIND_DECL NONNULL((2, 4)) unsigned int LIBUNWIND_CC
+
+PUBLIC NONNULL((2, 4)) unsigned int LIBUNWIND_CC
 unwind_for_debug(void *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {

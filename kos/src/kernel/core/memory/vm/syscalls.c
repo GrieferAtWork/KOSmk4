@@ -30,6 +30,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/vm/usermod.h>
 #include <sched/cred.h>
 
 #include <hybrid/align.h>
@@ -96,11 +97,15 @@ DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
 	addr   = (void *)((uintptr_t)addr & ~PAGEMASK);
 	if (OVERFLOW_UADD(length, offset, &length))
 		length = (size_t)-1;
-	vm_unmap(THIS_VM,
-	         addr,
-	         CEIL_ALIGN(length, PAGESIZE),
-	         VM_UNMAP_ANYTHING |
-	         VM_UNMAP_NOKERNPART);
+	if (vm_unmap(THIS_VM,
+	             addr,
+	             CEIL_ALIGN(length, PAGESIZE),
+	             VM_UNMAP_ANYTHING |
+	             VM_UNMAP_NOKERNPART)) {
+#ifdef CONFIG_HAVE_USERMOD
+		vm_clear_usermod(THIS_VM);
+#endif /* CONFIG_HAVE_USERMOD */
+	}
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_MUNMAP */
@@ -304,10 +309,16 @@ again_mapat:
 					             result,
 					             num_bytes + guard,
 					             VM_UNMAP_ANYTHING |
-					             VM_UNMAP_NOKERNPART) ||
-					    /* Check if the given range overlaps with KERNEL-SPACE */
-					    !PAGEIDRANGE_ISKERN_PARTIAL(result, num_bytes + guard))
-						goto again_mapat; /* Try again, now that the existing mapping was deleted. */
+					             VM_UNMAP_NOKERNPART)) {
+#ifdef CONFIG_HAVE_USERMOD
+						vm_clear_usermod(THIS_VM);
+#endif /* CONFIG_HAVE_USERMOD */
+						/* Try again, now that the existing mapping was deleted. */
+						goto again_mapat;
+					}
+					/* Check if the given range overlaps with KERNEL-SPACE */
+					if (!PAGEIDRANGE_ISKERN_PARTIAL(result, num_bytes + guard))
+						goto again_mapat;
 				}
 			}
 			if unlikely(isused)

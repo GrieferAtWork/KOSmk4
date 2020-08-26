@@ -1135,7 +1135,7 @@ datapage_t VM_DATABLOCK_PAGEID2DATAPAGE(struct vm_datablock const *__restrict se
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datablock_destroy)(struct vm_datablock *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct vm_datablock,db_refcnt,vm_datablock_destroy);
+DEFINE_REFCOUNT_FUNCTIONS(struct vm_datablock, db_refcnt, vm_datablock_destroy);
 
 DATDEF struct vm_datablock __devfs_datablock ASMNAME("devfs");
 

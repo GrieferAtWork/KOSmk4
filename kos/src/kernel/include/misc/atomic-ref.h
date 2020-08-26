@@ -354,8 +354,8 @@ template<class T> struct xatomic_ref {
 
 	/* Atomic compare-exchange */
 	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED())
-	bool KCALL cmpxch(T *__restrict old_pointer,
-	                  T *__restrict new_pointer) __CXX_NOEXCEPT {
+	bool KCALL cmpxch(T *old_pointer,
+	                  T *new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
 		pflag_t was;
 #endif /* CONFIG_NO_SMP */
@@ -389,8 +389,8 @@ template<class T> struct xatomic_ref {
 
 	/* Atomic compare-exchange */
 	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED())
-	bool KCALL cmpxch_inherit_new(T *__restrict old_pointer,
-	                              /*inherit(on_success)*/ REF T *__restrict new_pointer) __CXX_NOEXCEPT {
+	bool KCALL cmpxch_inherit_new(T *old_pointer,
+	                              /*inherit(on_success)*/ REF T *new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
 		pflag_t was = PREEMPTION_PUSHOFF();
 #endif /* CONFIG_NO_SMP */

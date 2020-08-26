@@ -117,14 +117,16 @@ struct path;
 struct directory_entry;
 struct usermod {
 	WEAK refcnt_t               um_refcnt;    /* Reference counter. */
-	USER CHECKED uintptr_t      um_loadaddr;  /* [const] Load address of the module. */
-	USER CHECKED uintptr_t      um_loadstart; /* [const] Lowest address mapped by this module (already adjusted for `um_loadaddr'). */
-	USER CHECKED uintptr_t      um_loadend;   /* [const] Greatest address mapped by this module (already adjusted for `um_loadaddr'). */
+	USER uintptr_t              um_loadaddr;  /* [const] Load address of the module. */
+	USER uintptr_t              um_loadstart; /* [const] Lowest address mapped by this module (already adjusted for `um_loadaddr'). */
+	USER uintptr_t              um_loadend;   /* [const] Greatest address mapped by this module (already adjusted for `um_loadaddr'). */
 	REF struct inode           *um_file;      /* [1..1][const] The backing file of the executable. */
 	REF struct path            *um_fspath;    /* [0..1][const] Optional mapping path */
 	REF struct directory_entry *um_fsname;    /* [0..1][const] Optional mapping name */
 	uintptr_t                   um_modtype;   /* [const] Module type (one of `USERMOD_TYPE_*') */
-	struct vm                  *um_vm;        /* [1..1][const] The associated VM */
+	struct vm                  *um_vm;        /* [1..1][const] The associated VM. Warning: not a reference!
+	                                           * If the VM is destroyed, this pointer will be dangling! */
+	REF struct usermod         *um_next;      /* [0..1][lock(INTERNAL(um_vm))] Next usermod object. */
 	union {
 		struct usermod_elf um_elf; /* [valid_if(USERMOD_TYPE_ISELF(um_modtype))] ELF module. */
 	};
@@ -178,8 +180,23 @@ usermod_section_lock(struct usermod *__restrict self,
  * @return: NULL: No executable object exists at the given location. */
 FUNDEF REF struct usermod *FCALL
 vm_getusermod(struct vm *__restrict self,
-              USER CHECKED void *addr,
+              USER void *addr,
               __BOOL addr_must_be_executable DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Find the first usermod object that maps some page containing a pointer `>= addr'
+ * If no module fulfills this requirement, return NULL instead. */
+FUNDEF REF struct usermod *FCALL
+vm_getusermod_above(struct vm *__restrict self,
+                    USER void *addr)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Return the first usermod object that has a starting load start address greater than `prev'
+ * When `prev' is NULL, behave the same as `vm_getusermod_above(self, (USER void *)0)'.
+ * If no module exists that matches this critera, return `NULL' instead. */
+FUNDEF REF struct usermod *FCALL
+vm_getusermod_next(struct vm *__restrict self,
+                   struct usermod *prev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Same as `vm_getusermod()', but automatically determine the VM to which `addr' belongs.
@@ -188,7 +205,7 @@ vm_getusermod(struct vm *__restrict self,
  * Otherwise, `THIS_VM' will always searched for `addr' instead. */
 #ifdef CONFIG_HAVE_DEBUGGER
 FUNDEF REF struct usermod *FCALL
-getusermod(USER CHECKED void *addr,
+getusermod(USER void *addr,
            __BOOL addr_must_be_executable DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 #else /* CONFIG_HAVE_DEBUGGER */
@@ -196,8 +213,8 @@ getusermod(USER CHECKED void *addr,
 	vm_getusermod(THIS_VM, addr, addr_must_be_executable)
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
-/* Clear out all unused usermod objects from `self' and return the
- * amount of memory that became available as the result of this. */
+/* Clear out all unused usermod objects from `self' and
+ * return non-zero if the cache wasn't already empty. */
 FUNDEF NOBLOCK size_t
 NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self);
 

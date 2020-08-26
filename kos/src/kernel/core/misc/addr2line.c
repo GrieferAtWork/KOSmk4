@@ -230,11 +230,13 @@ NOTHROW(KCALL addr2line_begin_user)(struct addr2line_buf *__restrict buf,
                                     struct addr2line_modinfo *modinfo) {
 	uintptr_t result;
 	struct exception_info exinfo;
+	/* Clear out modinfo fields beforehand.
+	 * If we end up getting something interesting, we'll fill it in then. */
+	if (modinfo)
+		memset(modinfo, 0, sizeof(*modinfo));
 	/* Make sure that we're actually dealing with user-space here! */
 	if (!ADDR_ISUSER(abs_pc))
 		goto nope;
-	if (modinfo)
-		memset(modinfo, 0, sizeof(*modinfo));
 	/* Preserve exception information. */
 	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
 	TRY {
