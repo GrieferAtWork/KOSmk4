@@ -20,5 +20,5 @@
 # Build and install KOS graphics mode fonts
 cd "$KOS_ROOT"
 rundeemon "kos/misc/fonts/tlft/build_u_vga16.dee"
-install_file /lib/fonts/u_vga16 "$KOS_MISC/fonts/tlft/u_vga16"
+install_file /lib/fonts/u_vga16 "$KOS_MISC/fonts/tlft/u_vga16.tlft"
 
