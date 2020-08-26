@@ -94,6 +94,13 @@ FUNDEF bool NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uint
 #define dbg_getspreg(level)        dbg_getregp(level, CFI_UNWIND_REGISTER_SP)
 #define dbg_setspreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_SP, value)
 
+/* Return the fault program counter position
+ * That is: the address of the last-executed instruction */
+#define dbg_getfaultpcreg(level)                     \
+	instruction_trypred((void *)dbg_getpcreg(level), \
+	                    dbg_instrlen_isa(level))
+
+
 LOCAL uintptr_t
 NOTHROW(KCALL dbg_getregp)(unsigned int level, uintptr_half_t cfi_regno) {
 	uintptr_t result;

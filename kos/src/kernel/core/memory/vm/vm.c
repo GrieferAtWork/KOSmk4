@@ -2822,6 +2822,7 @@ vm_datablock_locatepart(struct vm_datablock *__restrict self,
                         PAGEDIR_PAGEALIGNED size_t num_bytes_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct vm_datapart *result;
+	assert(!task_isconnected());
 	if (ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS) {
 		result = vm_datablock_createpart(self,
 		                                 start_offset,
@@ -2852,6 +2853,7 @@ vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
 	size_t max_pages;
 	assert((start_offset & PAGEMASK) == 0);
 	assert((max_num_bytes & PAGEMASK) == 0);
+	assert(!task_isconnected());
 	/* Check for special case: anonymous data block tree. */
 	if (ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS) {
 		result = vm_datablock_createpart(self,

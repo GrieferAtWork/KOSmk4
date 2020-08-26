@@ -129,6 +129,9 @@ done:
 
 
 DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
+
+/* TODO: unwind_for_debug() should also exist in user-space, where it
+ *       should scan the .debug_frame section in addition to .eh_frame! */
 #ifdef __KERNEL__
 #ifndef CONFIG_HAVE_USERMOD
 DEFINE_PUBLIC_ALIAS(unwind_for_debug, linuw_unwind);

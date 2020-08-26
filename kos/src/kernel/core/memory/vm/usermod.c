@@ -1130,6 +1130,9 @@ unwind_userspace(void *absolute_pc,
 		}
 		/* Search for the `.eh_frame' section. */
 		TRY {
+			/* TODO: If the program doesn't have a .eh_frame section, then we
+			 *       must check for a `.debug_frame' section that should contain
+			 *       the same kind of information. */
 			eh_frame = usermod_section_lock(um, ".eh_frame",
 			                                DRIVER_SECTION_LOCK_FNODATA);
 		} EXCEPT {

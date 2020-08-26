@@ -54,6 +54,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <ctype.h>
 #include <string.h>
 
+#include <libinstrlen/instrlen.h>
+
 DECL_BEGIN
 
 #define HD_REGION_ADDR  0 /* Address column is selected. */
@@ -925,10 +927,11 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 
 
 DBG_COMMAND(h,
-            "h [ADDR=pc]\n"
+            "h [ADDR=faultpc]\n"
             "\tOpen an interactive hex editor at ADDR\n",
             argc, argv) {
-	void *addr = (void *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	void *addr;
+	addr = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;

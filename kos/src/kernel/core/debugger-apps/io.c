@@ -293,10 +293,8 @@ DBG_COMMAND(disasm,
             argc, argv) {
 	uintptr_t addr, current_pc, count;
 	struct disassembler da;
-	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc,
-	                                            dbg_instrlen_isa(DBG_REGLEVEL_VIEW));
-	addr = current_pc;
+	current_pc = (uintptr_t)dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	addr       = current_pc;
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], &addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;
@@ -321,10 +319,8 @@ DBG_COMMAND(instrlen,
             "\tPrint the length of the specified instruction\n",
             argc, argv) {
 	uintptr_t addr, current_pc, length;
-	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc,
-	                                            dbg_instrlen_isa(DBG_REGLEVEL_VIEW));
-	addr = current_pc;
+	current_pc = (uintptr_t)dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	addr       = current_pc;
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], &addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;

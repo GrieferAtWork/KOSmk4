@@ -465,6 +465,21 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the functionality of the `lsthread', `thread', `trace', `l' and `r'
 	 *       commands. */
 
+	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
+	 *      the instruction stream to figure out how to unwind the stack.
+	 *      This unwinder should assume the default calling convention for every
+	 *      possible case, and should indicate unwind success once a ret-like
+	 *      instruction is encountered: `ret', `lret' or `iret'
+	 *
+	 *      Conditional branch instruction should be unwound by remembering the
+	 *      current CPU state, and recursively unwinding on both ends of the
+	 *      jump. Only if both ends end up with a successful unwind, and only
+	 *      if both ends result in all-identical callee-preserve registers is
+	 *      the unwind to-be considered successful.
+	 */
+
+	/* TODO: Add support for `.debug_frame' to `unwind_for_debug()' (both user- and kernel-space) */
+
 	/* TODO: Refactor <parts/xxx/errno.h> to use <asm/...>
 	 *       Similarly, <errno.h> should define errno codes using the usual
 	 *       #ifdef __<NAME>

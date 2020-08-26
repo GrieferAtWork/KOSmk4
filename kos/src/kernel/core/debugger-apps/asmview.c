@@ -52,6 +52,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/debug_info.h>
 #include <libdisasm/disassembler.h>
 #include <libdisasm/format.h>
+#include <libinstrlen/instrlen.h>
 
 
 #undef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
@@ -714,10 +715,10 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 
 
 DBG_COMMAND(a,
-            "a [ADDR=pc]\n"
+            "a [ADDR=faultpc]\n"
             "\tOpen an interactive assembly view at ADDR\n",
             argc, argv) {
-	void *addr = (void *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	void *addr = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;
