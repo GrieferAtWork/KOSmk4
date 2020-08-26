@@ -210,12 +210,14 @@ NOTHROW(KCALL get_dbg_current_kernel_gs_base)(u64 *__restrict presult) {
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
 		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
-		ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
-		assert(ammend);
-		assert(ammend->dca_cpu == dbg_current->t_cpu);
-		assert(ammend->dca_thread == dbg_current);
-		*presult = ammend->dca_kgsbase;
-		return true;
+		if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
+			ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
+			assert(ammend);
+			assert(ammend->dca_cpu == dbg_current->t_cpu);
+			assert(ammend->dca_thread == dbg_current);
+			*presult = ammend->dca_kgsbase;
+			return true;
+		}
 	}
 #endif /* !CONFIG_NO_SMP */
 	return false;
@@ -238,12 +240,14 @@ NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
 		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
-		ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
-		assert(ammend);
-		assert(ammend->dca_cpu == dbg_current->t_cpu);
-		assert(ammend->dca_thread == dbg_current);
-		ammend->dca_kgsbase = value;
-		return true;
+		if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
+			ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
+			assert(ammend);
+			assert(ammend->dca_cpu == dbg_current->t_cpu);
+			assert(ammend->dca_thread == dbg_current);
+			ammend->dca_kgsbase = value;
+			return true;
+		}
 	}
 #endif /* !CONFIG_NO_SMP */
 	return false;
@@ -276,9 +280,10 @@ NOTHROW(KCALL saveorig)(void) {
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
 		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
-		ist    = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
+		ist = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
+		if (!ist) /* The CPU wasn't suspended, because it wasn't online */
+			goto do_normal_unscheduled_thread;
 		ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
-		assert(ist);
 		assert(ammend);
 		assert(ammend->dca_cpu == dbg_current->t_cpu);
 		assert(ammend->dca_thread == dbg_current);
@@ -309,6 +314,9 @@ NOTHROW(KCALL saveorig)(void) {
 	} else {
 		/* Some different thread that is not being scheduled at the moment. */
 		struct scpustate *sst;
+#ifndef CONFIG_NO_SMP
+do_normal_unscheduled_thread:
+#endif /* !CONFIG_NO_SMP */
 		/* Re-construct the thread's scheduler CPU state. */
 		sst = dbg_current->t_sched.s_state;
 		if (sst) {
@@ -387,9 +395,10 @@ NOTHROW(KCALL loadview)(void) {
 			/* The current thread of a different CPU. */
 			cpuid  = dbg_current->t_cpu->c_id;
 			assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
-			ist    = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
+			ist = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
+			if (!ist) /* The CPU wasn't suspended, because it wasn't online */
+				goto do_normal_unscheduled_thread;
 			ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
-			assert(ist);
 			assert(ammend);
 			assert(ammend->dca_cpu == dbg_current->t_cpu);
 			assert(ammend->dca_thread == dbg_current);
@@ -457,6 +466,9 @@ NOTHROW(KCALL loadview)(void) {
 #endif /* !__x86_64__ */
 #endif /* !CONFIG_NO_SMP */
 		} else {
+#ifndef CONFIG_NO_SMP
+do_normal_unscheduled_thread:
+#endif /* !CONFIG_NO_SMP */
 			/* Some different thread that is not being scheduled at the moment. */
 			if (dbg_current->t_sched.s_state) {
 				fcpustate_assign_scpustate(&x86_dbg_origstate,

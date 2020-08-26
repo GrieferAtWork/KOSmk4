@@ -34,8 +34,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/addr2line.h>
 #include <kernel/vm.h>
+#include <kernel/vm/exec.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
@@ -62,42 +65,87 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 enum_thread(struct task *__restrict thread, unsigned int state) {
+	ssize_t len;
+	struct task *old_current;
+	pid_t pid, tid;
 	dbg_savecolor();
-	if (thread == dbg_current)
-		dbg_setfgcolor(ANSITTY_CL_GREEN);
-	dbg_printf(DBGSTR("%p "), thread);
-	dbg_loadcolor();
-	dbg_printf(DBGSTR("%u\t%s\t%u\t"),
-	           task_getroottid_of_s(thread),
-	           state == THREAD_STATE_RUNNING
-	           ? DBGSTR("running")
-	           : state == THREAD_STATE_SLEEPING
-	           ? DBGSTR("sleeping")
-	           : state == THREAD_STATE_OTHER
-	           ? DBGSTR("other")
-#ifndef CONFIG_NO_SMP
-	           : state == THREAD_STATE_IDLING
-	             ? DBGSTR("idling")
-	             : DBGSTR("pending")
-#else /* !CONFIG_NO_SMP */
-	           : DBGSTR("idling")
-#endif /* CONFIG_NO_SMP */
-	           ,
-	           (unsigned int)thread->t_cpu->c_id);
-	dbg_printf(DBGSTR("%[vinfo:%n(%p)]\t%p"),
-	           thread == THIS_TASK ? dbg_getpcreg(DBG_REGLEVEL_EXIT)
-	                               : scpustate_getpc(thread->t_sched.s_state),
-	           thread == THIS_TASK ? dbg_getspreg(DBG_REGLEVEL_EXIT)
-	                               : scpustate_getsp(thread->t_sched.s_state));
-	if (thread == &_boottask)
-		dbg_print(DBGSTR("\t_boottask"));
-	else if (thread == &_bootidle)
-		dbg_print(DBGSTR("\t_bootidle"));
-	else if (thread == &_asyncwork)
-		dbg_print(DBGSTR("\t_asyncwork"));
-	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle)) {
-		dbg_printf(DBGSTR("\t_idle[%u]"), (unsigned int)thread->t_cpu->c_id);
+	if (thread == dbg_current) {
+		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
+		dbg_hline(0, dbg_getcur_y(), dbg_screen_width, ' ');
 	}
+	dbg_savecolor();
+	if (task_getprocess_of(thread) == task_getprocess_of(dbg_current))
+		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
+	{
+		struct vm_execinfo_struct *execinfo;
+		execinfo = &FORVM(thread->t_vm, thisvm_execinfo);
+		if (execinfo->ei_dent) {
+			len = dbg_printer(NULL,
+			                  execinfo->ei_dent->de_name,
+			                  execinfo->ei_dent->de_namelen);
+		} else if (thread->t_flags & TASK_FKERNTHREAD) {
+			len = dbg_print(DBGSTR("kernel"));
+		} else {
+			len = dbg_print(DBGSTR("??" /**/ "?"));
+		}
+		while (len < 10) {
+			dbg_putc(' ');
+			++len;
+		}
+	}
+	pid = task_getrootpid_of_s(thread);
+	len = dbg_printf(DBGSTR(" %u"), pid);
+	dbg_loadcolor();
+	while (len < 4) {
+		dbg_putc(' ');
+		++len;
+	}
+	tid = task_getroottid_of_s(thread);
+	len = pid == tid ? 0 : dbg_printf(DBGSTR(" %u"), tid);
+	while (len < 5) {
+		dbg_putc(' ');
+		++len;
+	}
+	{
+		char const *status_indicator;
+		switch (state) {
+
+		case THREAD_STATE_RUNNING:
+			status_indicator = DBGSTR(AC_FG_GREEN "R" AC_FGDEF);
+			break;
+
+		case THREAD_STATE_SLEEPING:
+			status_indicator = DBGSTR(AC_FG_YELLOW "S" AC_FGDEF);
+			break;
+
+		case THREAD_STATE_IDLING:
+			status_indicator = DBGSTR(AC_FG_AQUA "I" AC_FGDEF);
+			break;
+
+#ifndef CONFIG_NO_SMP
+		case THREAD_STATE_PENDING:
+			status_indicator = DBGSTR(AC_FG_DARK_GRAY "P" AC_FGDEF);
+			break;
+#endif /* !CONFIG_NO_SMP */
+
+		default:
+			status_indicator = DBGSTR(AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY) "?" AC_DEFCOLOR);
+			break;
+		}
+		dbg_print(status_indicator);
+	}
+	dbg_printf(" #%-2u", thread->t_cpu->c_id);
+
+	/* When the thread is sleeping, it's current program location will
+	 * always be in `task_sleep()', so there's no need to print this info. */
+	if (state != THREAD_STATE_SLEEPING) {
+		old_current = dbg_current;
+		dbg_current = thread;
+		dbg_printf(DBGSTR(" %[vinfo:%Rf:%l:%n]"),
+		           dbg_getpcreg(DBG_REGLEVEL_EXIT));
+		dbg_current = old_current;
+	}
+	dbg_loadcolor();
 	dbg_putc('\n');
 }
 
@@ -161,7 +209,7 @@ DBG_COMMAND(lsthread,
             "lsthread\n"
             "\tList all threads running on the system\n") {
 	cpuid_t cpuid;
-	dbg_printf("ID       pid\tstate\tcpu\tpc\tsp\tname\n");
+	dbg_print(DBGSTR("program    pid tid S cpu location\n"));
 	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
 		struct task *iter;
 		struct cpu *c = cpu_vector[cpuid];
@@ -207,8 +255,9 @@ DBG_COMMAND(lsthread,
 				continue;
 			if (!pid->tp_thread.m_pointer ||
 			    wasdestroyed(pid->tp_thread.m_pointer)) {
-				dbg_printf(DBGSTR("%p %u\tdead\t?\t?\t?\n"),
-				           pid->tp_thread.m_pointer,
+				dbg_printf(DBGSTR("<DEAD>     %u      " AC_WITHCOLOR(ANSITTY_CL_MAROON,
+				                                                     ANSITTY_CL_LIGHT_GRAY,
+				                                                     "D") "\n"),
 				           pid->tp_pids[0]);
 				continue;
 			}

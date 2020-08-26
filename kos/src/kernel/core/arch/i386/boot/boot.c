@@ -457,6 +457,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       wasn't built with support for -mno-red-zone.
 	 * >> https://wiki.osdev.org/Libgcc_without_red_zone */
 
+	/* TODO: The builtin debugger's disassembler should show the values of
+	 *       registers used in the current instruction, as well as the contents
+	 *       of memory operands. */
+
+	/* TODO: The builtin debugger should contain a graphical applet that combines
+	 *       the functionality of the `lsthread', `thread', `trace', `l' and `r'
+	 *       commands. */
+
 	/* TODO: Refactor <parts/xxx/errno.h> to use <asm/...>
 	 *       Similarly, <errno.h> should define errno codes using the usual
 	 *       #ifdef __<NAME>

@@ -92,9 +92,9 @@ dbg_coredump(void const *const *traceback_vector,
 	}
 	{
 		pid_t tid, pid;
-		tid = task_gettid_of_s(dbg_current);
+		tid = task_getroottid_of_s(dbg_current);
 		dbg_printf(DBGSTR("tid:%u"), tid);
-		pid = task_getpid_of_s(dbg_current);
+		pid = task_getrootpid_of_s(dbg_current);
 		if (pid != tid)
 			dbg_printf(DBGSTR(" pid:%u"), pid);
 	}
