@@ -20,29 +20,50 @@
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_ADDR2LINE_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_ADDR2LINE_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/types.h>
-
 #include <features.h>
-#include <libdebuginfo/addr2line.h>
+#include <kernel/compiler.h>
+
+#include <kernel/types.h>
+#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
+
 #include <bits/format-printer.h>
 
-DECL_BEGIN
+#include <libdebuginfo/addr2line.h>
 
-#ifdef __CC__
-typedef unsigned int addr2line_errno_t; /* One of `ADDR2LINE_ERROR_*' */
-#endif /* __CC__ */
+DECL_BEGIN
 
 
 #ifdef __CC__
 struct addr2line_buf {
 	di_debug_sections_t    ds_info; /* Section pointers */
 	di_dl_debug_sections_t ds_sect; /* Section references */
+#ifdef CONFIG_HAVE_USERMOD
+	REF struct usermod    *ds_user; /* [0..1] When non-NULL, do user-space addr2line */
+#endif /* CONFIG_HAVE_USERMOD */
 };
+
+struct inode;
+struct path;
+struct directory_entry;
+struct addr2line_modinfo {
+	REF struct inode           *ami_fsfile;   /* [0..1] Backing filesystem node. */
+	REF struct path            *ami_fspath;   /* [0..1] Backing filesystem path. */
+	REF struct directory_entry *ami_fsname;   /* [0..1] Backing filesystem name. */
+	char const                 *ami_name;     /* [0..1] Backing name. */
+	char const                 *ami_filename; /* [0..1] Backing file name. */
+};
+
+#define addr2line_modinfo_fini(self)     \
+	(xdecref_unlikely((self)->ami_fsfile), \
+	 xdecref_unlikely((self)->ami_fspath), \
+	 xdecref_unlikely((self)->ami_fsname))
+
+
+
 
 /* Lookup addr2line information for the given source address.
  * >> di_debug_addr2line_t info;
- * >> addr2line_errno_t error;
+ * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
  * >>     error = addr2line((uintptr_t)ptr, &info, level);
@@ -55,13 +76,15 @@ struct addr2line_buf {
  * >> } while (++level < info.al_levelcnt);
  * @param: module_relative_pc: The return value of `addr2line_begin()'
  */
-FUNDEF WUNUSED NONNULL((1, 3)) addr2line_errno_t
+FUNDEF WUNUSED NONNULL((1, 3)) unsigned int
 NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level DFL(0));
 FUNDEF WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf, uintptr_t abs_pc);
+NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
+                               uintptr_t abs_pc,
+                               struct addr2line_modinfo *modinfo DFL(__NULLPTR));
 FUNDEF NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
 

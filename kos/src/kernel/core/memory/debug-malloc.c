@@ -90,6 +90,9 @@ NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t 
 	TRY {
 		struct lcpustate oldstate;
 		oldstate = *state;
+		/* NOTE: Despite this being for debugging purposes, _DONT_ use `unwind_for_debug()' here,
+		 *       since that one has to make use of the kernel heap (and consequently us) in order
+		 *       to be able to construct user-space program/section descriptors, etc... */
 		while (unwind((void *)(lcpustate_getpc(&oldstate) - 1),
 		              &unwind_getreg_lcpustate, &oldstate,
 		              &unwind_setreg_lcpustate, state) == UNWIND_SUCCESS) {

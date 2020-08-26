@@ -37,6 +37,8 @@
 
 #ifndef __KERNEL__
 #include <dlfcn.h>
+#else /* !__KERNEL__ */
+#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 #endif /* __KERNEL__ */
 
 DECL_BEGIN
@@ -127,6 +129,12 @@ done:
 
 
 DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
+#ifdef __KERNEL__
+#ifndef CONFIG_HAVE_USERMOD
+DEFINE_PUBLIC_ALIAS(unwind_for_debug, linuw_unwind);
+#endif /* !CONFIG_HAVE_USERMOD */
+#endif /* __KERNEL__ */
+
 
 DECL_END
 

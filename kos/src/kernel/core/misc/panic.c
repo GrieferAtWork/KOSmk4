@@ -181,9 +181,9 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 		struct ucpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct ucpustate));
 		TRY {
-			error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
-			               &unwind_getreg_ucpustate, &old_state,
-			               &unwind_setreg_ucpustate, &state);
+			error = unwind_for_debug((void *)(ucpustate_getpc(&old_state) - 1),
+			                         &unwind_getreg_ucpustate, &old_state,
+			                         &unwind_setreg_ucpustate, &state);
 		} EXCEPT {
 			error = UNWIND_SEGFAULT;
 		}

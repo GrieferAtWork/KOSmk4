@@ -974,8 +974,12 @@ PUBLIC void __cxa_end_catch(void) {
 	 * its end, and we delete the exception if it wasn't re-thrown. */
 	uintptr_t flags;
 	flags = PERTASK_GET(this_exception_flags);
-	if (!(flags & EXCEPT_FRETHROW))
+	if (!(flags & EXCEPT_FRETHROW)) {
+		/* TODO: If `this_exception_code' is an RT-level exception, then we
+		 *       must set some kind of thread-local flag to have it be re-thrown
+		 *       the next time the a call to `task_serve()' is made! */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+	}
 	PERTASK_SET(this_exception_flags, flags & ~EXCEPT_FRETHROW);
 }
 

@@ -114,9 +114,9 @@ do_print_traceback(pformatprinter printer, void *arg,
 	}
 	for (;;) {
 		memcpy(old_state, state, state_size);
-		error = unwind((byte_t *)pc - 1,
-		               reg_getter, old_state,
-		               reg_setter, state);
+		error = unwind_for_debug((byte_t *)pc - 1,
+		                         reg_getter, old_state,
+		                         reg_setter, state);
 		if (error != UNWIND_SUCCESS)
 			break;
 		(*reg_getter)(state, CFI_UNWIND_REGISTER_PC, &pc);

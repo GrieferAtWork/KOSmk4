@@ -1503,7 +1503,7 @@ wait_a_bit:
 	me->t_sched.s_running.sr_runprv = NULL;
 	me->t_sched.s_running.sr_runnxt = NULL;
 	assert(me->t_flags & TASK_FRUNNING);
-	ATOMIC_FETCHAND(me->t_flags, ~TASK_FRUNNING);
+	ATOMIC_FETCHAND(me->t_flags, ~(TASK_FRUNNING | TASK_FTIMEOUT));
 
 	/* Register the calling task as a sleeper within the CPU. */
 	cpu_addsleepingtask_nopr(me);
@@ -1516,8 +1516,10 @@ wait_a_bit:
 	cpu_assert_running(me);
 
 	/* Check if we got timed out. */
-	if (ATOMIC_FETCHAND(me->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT)
+	if (ATOMIC_FETCHAND(me->t_flags, ~TASK_FTIMEOUT) & TASK_FTIMEOUT) {
+		assertf(abs_timeout, "TASK_FTIMEOUT set, but no timeout given?");
 		return false; /* Timeout... */
+	}
 
 	return true;
 }

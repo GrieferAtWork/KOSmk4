@@ -554,7 +554,7 @@ err_corrupt:
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
  * >> di_debug_addr2line_t info;
- * >> addr2line_errno_t error;
+ * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
  * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
@@ -806,7 +806,9 @@ NOTHROW_NCX(CC libdi_debug_dllocksections)(void *dl_handle,
 	memset(sections, 0, sizeof(*sections));
 	if unlikely(!dl_handle)
 		goto err_no_data;
-#define LOCK_SECTION(name) library_locksection((library_handle_t)dl_handle, name, LIBRARY_LOCKSECTION_FNORMAL)
+#define LOCK_SECTION(name)                                 \
+	library_locksection((library_handle_t)dl_handle, name, \
+	                    LIBRARY_LOCKSECTION_FNORMAL)
 	dl_sections->dl_debug_line = LOCK_SECTION(secname_debug_line);
 	if (!dl_sections->dl_debug_line) {
 		/* No debug information sections */

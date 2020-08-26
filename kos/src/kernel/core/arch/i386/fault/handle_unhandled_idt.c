@@ -159,11 +159,11 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	for (;;) {
 		struct ucpustate old_state;
 		old_state = *ustate;
-		error = unwind((void *)(is_first
-		                        ? ucpustate_getpc(&old_state)
-		                        : ucpustate_getpc(&old_state) - 1),
-		               &unwind_getreg_ucpustate, &old_state,
-		               &unwind_setreg_ucpustate, ustate);
+		error = unwind_for_debug((void *)(is_first
+		                                  ? ucpustate_getpc(&old_state)
+		                                  : ucpustate_getpc(&old_state) - 1),
+		                         &unwind_getreg_ucpustate, &old_state,
+		                         &unwind_setreg_ucpustate, ustate);
 		if (error != UNWIND_SUCCESS)
 			break;
 		is_first = false;

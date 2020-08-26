@@ -34,7 +34,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/util.h>
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/addr2line.h>
+#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 
 #include <kos/keyboard.h>
 
@@ -64,20 +67,46 @@ NOTHROW(VCALL dbg_addr2line_printf)(uintptr_t start_pc, uintptr_t end_pc,
 
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict ainfo,
+                                        struct addr2line_modinfo const *__restrict modinfo,
                                         uintptr_t module_relative_start_pc,
                                         uintptr_t start_pc, uintptr_t end_pc,
                                         char const *message_format, va_list args) {
 	di_debug_addr2line_t info;
-	addr2line_errno_t error;
+	unsigned int error;
+	u8 normal_fgcolor = ANSITTY_CL_WHITE;
+	u8 inline_fgcolor = ANSITTY_CL_AQUA;
+#ifdef CONFIG_HAVE_USERMOD
+	if (ainfo->ds_user) {
+		normal_fgcolor = ANSITTY_CL_OLIVE;
+		inline_fgcolor = ANSITTY_CL_TEAL;
+	}
+#endif /* CONFIG_HAVE_USERMOD */
 	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
-		dbg_printf(DBGSTR(AC_FG(ANSITTY_CL_WHITE) "%p" AC_FGDEF "+"
-		                  AC_FG(ANSITTY_CL_WHITE) "%-4Iu" AC_FGDEF),
-		           start_pc, (size_t)(end_pc - start_pc));
+		dbg_savecolor();
+		dbg_setfgcolor(normal_fgcolor);
+		dbg_printf(DBGSTR("%p"), start_pc);
+		dbg_loadcolor();
+		dbg_putc('+');
+		dbg_savecolor();
+		dbg_setfgcolor(normal_fgcolor);
+		dbg_printf(DBGSTR("%-4Iu"), (size_t)(end_pc - start_pc));
+		dbg_loadcolor();
+		if (modinfo->ami_name) {
+			dbg_putc('[');
+			dbg_savecolor();
+			dbg_setfgcolor(normal_fgcolor);
+			dbg_print(modinfo->ami_name);
+			dbg_loadcolor();
+			dbg_putc(']');
+		}
 		if (message_format) {
-			dbg_print(DBGSTR("[" AC_FG(ANSITTY_CL_WHITE)));
+			dbg_putc('[');
+			dbg_savecolor();
+			dbg_setfgcolor(normal_fgcolor);
 			dbg_vprintf(message_format, args);
-			dbg_print(DBGSTR(AC_FGDEF "]"));
+			dbg_loadcolor();
+			dbg_putc(']');
 		}
 		dbg_putc('\n');
 	} else {
@@ -89,8 +118,8 @@ again_printlevel:
 		if (!info.al_rawname)
 			info.al_rawname = (char *)DBGSTR("??" "?");
 		fgcolor = level < info.al_levelcnt - 1
-		        ? ANSITTY_CL_AQUA
-		        : ANSITTY_CL_WHITE;
+		        ? inline_fgcolor
+		        : normal_fgcolor;
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%p"),
@@ -105,6 +134,14 @@ again_printlevel:
 		           level == 0 ? (size_t)(end_pc - start_pc)
 		                      : (size_t)(info.al_lineend - info.al_linestart));
 		dbg_loadcolor();
+		if (modinfo->ami_name) {
+			dbg_putc('[');
+			dbg_savecolor();
+			dbg_setfgcolor(fgcolor);
+			dbg_print(modinfo->ami_name);
+			dbg_loadcolor();
+			dbg_putc(']');
+		}
 		dbg_putc('[');
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
@@ -183,14 +220,17 @@ PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
                                      char const *message_format, va_list args) {
 	struct addr2line_buf ainfo;
+	struct addr2line_modinfo modinfo;
 	uintptr_t module_relative_start_pc;
-	module_relative_start_pc = addr2line_begin(&ainfo, start_pc);
+	module_relative_start_pc = addr2line_begin(&ainfo, start_pc, &modinfo);
 	do_dbg_addr2line_vprintf(&ainfo,
+	                         &modinfo,
 	                         module_relative_start_pc,
 	                         start_pc,
 	                         end_pc,
 	                         message_format,
 	                         args);
+	addr2line_modinfo_fini(&modinfo);
 	addr2line_end(&ainfo);
 }
 

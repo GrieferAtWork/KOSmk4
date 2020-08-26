@@ -356,22 +356,25 @@ DBG_COMMAND(trace,
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
+#if 0
+#define SP_ARGS  DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state)
+#else
+#define SP_ARGS  NULL
+#endif
 	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
 	                                                    instrlen_isa_from_fcpustate(&state)),
-	                     (uintptr_t)fcpustate_getpc(&state),
-	                     DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state));
+	                     (uintptr_t)fcpustate_getpc(&state), SP_ARGS);
 	for (;;) {
 		struct fcpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct fcpustate));
-		error = unwind((void *)(fcpustate_getpc(&old_state) - 1),
-		               &unwind_getreg_fcpustate, &old_state,
-		               &unwind_setreg_fcpustate, &state);
+		error = unwind_for_debug((void *)(fcpustate_getpc(&old_state) - 1),
+		                         &unwind_getreg_fcpustate, &old_state,
+		                         &unwind_setreg_fcpustate, &state);
 		if (error != UNWIND_SUCCESS)
 			break;
 		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
 		                                                    instrlen_isa_from_fcpustate(&state)),
-		                     (uintptr_t)fcpustate_getpc(&state), DBGSTR("sp=%p"),
-		                     (void *)fcpustate_getsp(&state));
+		                     (uintptr_t)fcpustate_getpc(&state), SP_ARGS);
 #ifdef LOG_STACK_REMAINDER
 		last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -417,6 +420,7 @@ DBG_COMMAND(trace,
 		}
 	}
 #endif /* LOG_STACK_REMAINDER */
+#undef SP_ARGS
 	return 0;
 }
 
@@ -428,9 +432,9 @@ DBG_COMMAND(u,
 	void *final_pc;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &oldstate);
 	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
-	error = unwind((void *)(fcpustate_getpc(&oldstate) - 1),
-	               &unwind_getreg_fcpustate, &oldstate,
-	               &unwind_setreg_fcpustate, &newstate);
+	error = unwind_for_debug((void *)(fcpustate_getpc(&oldstate) - 1),
+	                         &unwind_getreg_fcpustate, &oldstate,
+	                         &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {
 		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
 		memcpy(&newstate, &oldstate, sizeof(struct fcpustate));

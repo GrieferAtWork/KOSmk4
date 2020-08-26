@@ -47,7 +47,7 @@ DECL_BEGIN
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
  * >> di_debug_addr2line_t info;
- * >> addr2line_errno_t error;
+ * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
  * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);

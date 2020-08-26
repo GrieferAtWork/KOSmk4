@@ -531,31 +531,7 @@ DBB0892 [???:0,0:???] orig_ustate
 	 *
 	 *
 	 * TODO:
-	 *     - Implement user-space unwind/debug-info integration in the builtin
-	 *       debugger, so it become much easier to inspect a crashed user-space
-	 *       application!
-	 *       addr2line can be reverse engineered using:
-	 *        addr -> page -> vm_node
-	 *                         |
-	 *                         +-> vn_prot & VM_PROT_EXEC -> ISPC-test
-	 *                         |
-	 *                         +-> vm_datapart            -> SEGMENT_FILE_OFFSET
-	 *                         |
-	 *                         +-> vn_block               -> BINARY_ELF_FILE
-	 *                         |
-	 *                         +-> vn_fspath+vn_fsname    -> BINARY_IMAGE_NAME   (additional info)
-	 *
-	 *       phdr               = BINARY_ELF_FILE.find_phdr(containing_file_offset: SEGMENT_FILE_OFFSET);
-	 *       OFFSET_IN_SEGMENT  = SEGMENT_FILE_OFFSET - phdr.p_offset;
-	 *       SEGMENT_ADDRESS    = vm_node_getstart(vm_node) - OFFSET_IN_SEGMENT;
-	 *       LOADADDR           = SEGMENT_ADDRESS - phdr.p_vaddr;
-	 *       MODULE_RELATIVE_PC = addr - LOADADDR;
-	 *
-	 *       >> debug_dllocksections(BINARY_ELF_FILE, SECTIONS);
-	 *       >> debug_sections_addr2line(SECTIONS, INFO, MODULE_RELATIVE_PC);
-	 *       >> printk("%s:%d\n", INFO.al_srcfile, INFO.al_srcline);
-	 *     - Once this works, also get rid of `set_library_listdef(2)'
-	 *
+	 *     - Get rid of `set_library_listdef(2)'
 	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions
 	 *     - Patch Xorg-server to not try to make use of "/dev/ptmx"
