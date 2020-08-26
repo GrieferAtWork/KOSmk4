@@ -26,7 +26,7 @@
 #include <kernel/vm/usermod.h>
 
 #ifdef CONFIG_HAVE_USERMOD
-#include <debugger/rt.h>
+#include <debugger/config.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/driver.h>
@@ -35,6 +35,7 @@
 #include <kernel/panic.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/vm/exec.h>
 #include <misc/atomic-ref.h>
 
 #include <hybrid/align.h>
@@ -42,12 +43,17 @@
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <string.h>
 
 #include <libunwind/unwind.h>
 
 #include "vm-nodeapi.h"
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/debugger.h>
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_BEGIN
 
@@ -730,6 +736,8 @@ PRIVATE ATTR_PERVM struct vm_usermod_cache usermod_cache = { XATOMIC_REF_INIT(NU
 PUBLIC NOBLOCK size_t
 NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self) {
 	REF struct usermod *chain;
+	/* TODO: Run this function for every VM in existence
+	 *       when `system_clearcaches()' is called. */
 	chain = FORVM(self, usermod_cache).uc_first.exchange_inherit_new(NULL);
 	if (!chain)
 		return 0;
@@ -920,7 +928,7 @@ again:
 			REF struct usermod *result;
 			result = chain;
 			do {
-				if ((uintptr_t)addr >= result->um_loadstart) {
+				if (result->um_loadstart >= (uintptr_t)addr) {
 					/* Found it! */
 					incref(result);
 					xdecref_unlikely(chain);
@@ -1045,7 +1053,7 @@ vm_enumusermod(struct vm *__restrict self,
 			next = vm_getusermod_next(self, prev);
 			if (!next)
 				break;
-			decref_unlikely(prev);
+			xdecref_unlikely(prev);
 			prev = next;
 			/* Invoke the given callback. */
 			temp = (*cb)(cookie, prev);
@@ -1058,10 +1066,10 @@ vm_enumusermod(struct vm *__restrict self,
 			result += temp;
 		}
 	} EXCEPT {
-		xdecref(prev);
+		xdecref_unlikely(prev);
 		RETHROW();
 	}
-	xdecref(prev);
+	xdecref_unlikely(prev);
 	return result;
 }
 
@@ -1218,6 +1226,58 @@ unwind_for_debug(void *absolute_pc,
 	}
 	return result;
 }
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ssize_t KCALL
+lslib_enum_cb(void *exec_file,
+              struct usermod *__restrict um) {
+	ssize_t len;
+	char const *name = "?";
+	u16 namelen = 1;
+	dbg_savecolor();
+	if (um->um_file == exec_file) {
+		/* Highlight the main executable. */
+		dbg_setcolor(ANSITTY_CL_WHITE,
+		             ANSITTY_CL_DARK_GRAY);
+	}
+	if (um->um_fsname) {
+		name    = um->um_fsname->de_name;
+		namelen = um->um_fsname->de_namelen;
+	}
+	if (um->um_fspath) {
+		len = path_printent(um->um_fspath,
+		                    name,
+		                    namelen,
+		                    &dbg_printer,
+		                    NULL);
+	} else {
+		len = dbg_printer(NULL, name, namelen);
+	}
+	while (len < 31) {
+		dbg_putc(' ');
+		++len;
+	}
+	dbg_printf(DBGSTR(" %.8" PRIxPTR " %.8" PRIxPTR " %.8" PRIxPTR "\n"),
+	           um->um_loadaddr, um->um_loadstart, um->um_loadend);
+	dbg_loadcolor();
+	return 0;
+}
+
+
+DBG_COMMAND(lslib,
+            "lslib\n"
+            "\tEnumerate user-space libraries\n",
+            argc, argv) {
+	(void)argv;
+	if (argc != 1)
+		return DBG_STATUS_INVALID_ARGUMENTS;
+	dbg_print(DBGSTR("name                            loadaddr minaddr  maxaddr\n"));
+	vm_enumusermod(dbg_current->t_vm, &lslib_enum_cb,
+	               FORVM(dbg_current->t_vm, thisvm_execinfo).ei_node);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 
