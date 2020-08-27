@@ -133,6 +133,10 @@ BEGIN
 		"--eh-frame-hdr",
 		"--gc-sections",
 
+		/* This right here is _needed_, else ld will remove ~unused~
+		 * symbols that are exported from the kernel core. */
+		"--gc-keep-exported",
+
 		/* This following flag allows us to overlay sections,
 		 * which is required for PERXXX templates and offsets. */
 		"--no-check-sections",

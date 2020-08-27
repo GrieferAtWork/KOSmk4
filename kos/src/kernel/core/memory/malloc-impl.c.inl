@@ -199,8 +199,13 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 	struct heap *heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
-	if (!ptr)
+	if (!ptr) {
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
 		return FUNC(kmalloc_noslab)(n_bytes, flags);
+#else /* CONFIG_USE_SLAB_ALLOCATORS */
+		return FUNC(kmalloc)(n_bytes, flags);
+#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+	}
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		void *resptr;

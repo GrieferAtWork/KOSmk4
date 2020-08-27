@@ -104,7 +104,6 @@ video_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd
 		COMPILER_READ_BARRIER();
 		validate_writablem(data.vp_pal, VIDEO_CODEC_PALSIZ(data.vp_codec), sizeof(vd_color_t));
 		(*me->vd_ops.vdf_getpal)(me, data.vp_codec, data.vp_pal);
-		asm("nop");
 	}	break;
 
 	case VIDEOIO_SETPAL: {

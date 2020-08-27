@@ -152,6 +152,11 @@
 #define __PH_IF_USE_SLAB_ALLOCATORS_FOREACH2(i, _) /* nothing */
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 
+#ifndef SLAB_FOREACH_SIZE
+#define SLAB_FOREACH_SIZE(func, _) /* nothing */
+#endif /* !SLAB_FOREACH_SIZE */
+
+
  /* Enumerate poison binding overrides:
  * >> bind_func(SymbolName heap_symbol, SymbolName ph_heap_symbol)
  * >> bind_void(SymbolName heap_symbol, SymbolName ph_heap_symbol, uint argc)
