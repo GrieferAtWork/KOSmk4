@@ -2390,14 +2390,14 @@ again:
 					TRY {
 						result = DIRECTORY_REMOVE_STATUS_RMDIR;
 						if (dir->i_filenlink == (nlink_t)1) {
-							vm_datablock_anonymize(self);
+							vm_datablock_anonymize(dir);
 							TRY {
 								/* Use the rmdir() operator. */
 								if unlikely(!self->i_type->it_directory.d_rmdir)
 									THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_RMDIR);
 								(*self->i_type->it_directory.d_rmdir)(self, entry, dir);
 							} EXCEPT {
-								vm_datablock_deanonymize(self);
+								vm_datablock_deanonymize(dir);
 								RETHROW();
 							}
 							assert(dir->i_filenlink == 0);
@@ -2469,12 +2469,12 @@ again:
 					/* Do the actual unlink. */
 					result = DIRECTORY_REMOVE_STATUS_UNLINK;
 					if (node->i_filenlink == (nlink_t)1) {
-						vm_datablock_anonymize(self);
+						vm_datablock_anonymize(node);
 						TRY {
 							(*self->i_type->it_directory.d_unlink)(self, entry, node);
 							assert(node->i_filenlink == 0);
 						} EXCEPT {
-							vm_datablock_deanonymize(self);
+							vm_datablock_deanonymize(node);
 							RETHROW();
 						}
 						/* Mark the INode as having been deleted. */
