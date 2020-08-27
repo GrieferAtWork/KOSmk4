@@ -2499,6 +2499,7 @@ again:
 			xdecref(oneshot_entry);
 			RETHROW();
 		}
+		xdecref(oneshot_entry);
 	} EXCEPT {
 		if (rwlock_endread(&self->db_lock))
 			goto again;
