@@ -73,7 +73,7 @@
 
 #include "corebase.h"
 
-#if 0
+#if 1
 #define PRINT_LEAKS_SEARCH_PHASE(...) printk(KERN_INFO __VA_ARGS__)
 #else
 #define PRINT_LEAKS_SEARCH_PHASE(...) (void)0
@@ -1027,6 +1027,8 @@ INTDEF byte_t __debug_malloc_tracked_size[];
 PRIVATE struct icpustate *mall_other_cpu_states[CONFIG_MAX_CPU_COUNT];
 #endif /* !CONFIG_NO_SMP */
 
+INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
+
 PRIVATE NOBLOCK void
 NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	cpuid_t i;
@@ -1135,6 +1137,32 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 			mall_reachable_data((byte_t *)iter->cp_parts, sizeof(iter->cp_parts));
 	}
 
+	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
+	{
+		struct driver_state *drivers;
+		size_t i;
+		drivers = current_driver_state.m_pointer;
+		for (i = 0; i < drivers->ds_count; ++i) {
+			struct driver *d = drivers->ds_drivers[i];
+			uint16_t j;
+			for (j = 0; j < d->d_phnum; ++j) {
+				uintptr_t progaddr;
+				size_t progsize;
+				if (d->d_phdr[j].p_type != PT_LOAD)
+					continue;
+				if (!(d->d_phdr[j].p_flags & PF_W))
+					continue;
+				progaddr = (uintptr_t)(d->d_loadaddr + d->d_phdr[j].p_vaddr);
+				progsize = d->d_phdr[j].p_memsz;
+				progsize += progaddr & PAGEMASK;
+				progaddr &= ~PAGEMASK;
+				mall_reachable_data((byte_t *)progaddr,
+				                    CEIL_ALIGN(progsize, PAGESIZE));
+			}
+		}
+	}
+
+
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	/* TODO: Data of any slab pointer that was reached must be scanned
 	 *       recursively alongside for memory leaks. Finally, any slab
@@ -1146,14 +1174,14 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 
-	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Recursively scan reached pointers\n");
+	PRINT_LEAKS_SEARCH_PHASE("Phase #5: Recursively scan reached pointers\n");
 	if (mall_tree) {
 		size_t num_found;
 		/* With all data collected, recursively scan the data blocks of all reachable nodes.
 		 * The recursion takes place because we keep scanning until nothing new shows up. */
 		do {
 			num_found = scan_reachable(mall_tree);
-			PRINT_LEAKS_SEARCH_PHASE("Phase #4: Reached %Iu pointers\n", num_found);
+			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %Iu pointers\n", num_found);
 		} while (num_found);
 	}
 }
@@ -1370,6 +1398,8 @@ again:
 			goto again;
 		}
 #endif /* !CONFIG_NO_SMP */
+		vm_kernel_treelock_endwrite();
+		mall_release();
 		/* At this point we've got all the locks we need! */
 
 		++mall_leak_version;
@@ -1392,9 +1422,6 @@ again:
 			ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
 		PREEMPTION_POP(was);
 	}
-
-	vm_kernel_treelock_endwrite();
-	mall_release();
 	return result;
 }
 
@@ -1552,7 +1579,7 @@ struct mallnode *KCALL mallnode_alloc(gfp_t gfp) {
 	result->m_size  = ptr.hp_siz;
 	result->m_flags = MALLNODE_FNORMAL;
 	result->m_visit = 0;
-	result->m_reach = 0;
+	result->m_reach = mall_leak_version;
 	return result;
 }
 
@@ -1570,7 +1597,7 @@ NOTHROW(KCALL mallnode_alloc_nx)(gfp_t gfp) {
 	result->m_size  = ptr.hp_siz;
 	result->m_flags = MALLNODE_FNORMAL;
 	result->m_visit = 0;
-	result->m_reach = 0;
+	result->m_reach = mall_leak_version;
 	return result;
 }
 

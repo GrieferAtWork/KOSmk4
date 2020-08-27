@@ -343,7 +343,7 @@ NOTHROW(FCALL uhci_osqh_append)(struct uhci_controller *__restrict self,
 		HW_WRITE(last->qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
 	} else {
 		assert(self->uc_qhstart.qh_next == NULL);
-		/* We're the first QUEU head to appear. */
+		/* We're the first QUEUE head to appear. */
 		self->uc_qhstart.qh_next = osqh;
 		/* Either point back to `uc_qhstart', or to the first interrupt. */
 		osqh->qh_hp = self->uc_intreg ? self->uc_intreg->ui_td0_phys
@@ -2054,7 +2054,8 @@ uhci_transfer(struct usb_controller *__restrict self,
 	qh   = uhci_osqh_alloc();
 	aio_handle_init(aio, &uhci_aio_type);
 	TRY {
-		qh->qh_refcnt = 2; /* +1: aio->ah_data->ud_osqh; +1: me->uc_qhstart.qh_next */
+		qh->qh_refcnt = 2; /* +1: aio->ah_data->ud_osqh;
+		                    * +1: me->uc_qhstart.qh_next */
 		qh->qh_aio    = aio;
 		data->ud_flags      = UHCI_AIO_FNORMAL;
 		data->ud_dmalockvec = NULL;
@@ -2153,7 +2154,7 @@ do_configure_simple_empty:
 				lasttd = *piter;
 				if (piter != &qh->qh_tds)
 					uhci_ostd_free(container_of(piter, struct uhci_ostd, td_next));
-				piter  = &lasttd->td_next;
+				piter = &lasttd->td_next;
 			}
 			RETHROW();
 		}
@@ -2173,8 +2174,9 @@ cleanup_configured_and_do_syncio:
 			lasttd = *piter;
 			if (piter != &qh->qh_tds)
 				uhci_ostd_free(container_of(piter, struct uhci_ostd, td_next));
-			piter  = &lasttd->td_next;
+			piter = &lasttd->td_next;
 		}
+		uhci_osqh_free(qh);
 	}
 	/* Allocate physical memory buffers for all TX packets
 	 * and copy data from input packets inside, then perform

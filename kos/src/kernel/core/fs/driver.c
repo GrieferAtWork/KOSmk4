@@ -394,12 +394,9 @@ PUBLIC struct callback_list_struct callback_list_empty = {
  * This needs to be implemented as an atomic_ref pointer, so-as to allow for NOBLOCK+NOEXCEPT
  * enumeration of loaded drivers for the purpose of both discovering, as well as locking of
  * the driver associated with some given static data pointer. */
-#ifndef CONFIG_VBOXGDB
-PRIVATE atomic_ref<struct driver_state>
-current_driver_state = ATOMIC_REF_INIT(&empty_driver_state);
-#else /* !CONFIG_VBOXGDB */
 INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
 INTERN atomic_ref<struct driver_state> current_driver_state = ATOMIC_REF_INIT(&empty_driver_state);
+#ifdef CONFIG_VBOXGDB
 DEFINE_PUBLIC_ALIAS(_vboxgdb_kos_driver_state, current_driver_state);
 #endif /* CONFIG_VBOXGDB */
 
