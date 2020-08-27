@@ -174,7 +174,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 {
 #ifdef DEFINE_IO_ASYNC
 	TRY {
-		struct vm_datapart *part;
+		REF struct vm_datapart *part;
 		size_t max_io_bytes;
 #ifdef DEFINE_IO_VECTOR
 		uintptr_t buf_offset;

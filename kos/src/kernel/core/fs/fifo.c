@@ -396,6 +396,7 @@ NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
 	decref(fifo);
 	xdecref(self->fu_dirent);
 	xdecref(self->fu_path);
+	kfree(self);
 }
 
 
@@ -473,6 +474,8 @@ fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
 	result->fu_refcnt  = 1;
 	result->fu_fifo    = (REF struct fifo_node *)incref(self);
 	result->fu_accmode = iomode & IO_ACCMODE;
+	result->fu_path    = NULL;
+	result->fu_dirent  = NULL;
 	return result;
 }
 
