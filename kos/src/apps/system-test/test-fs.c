@@ -131,11 +131,16 @@ checkTestFiles_impl(char const *path,
 	        line);
 }
 
-PRIVATE void testPath(char const *path, bool testHardLink) {
+PRIVATE void testPath(char const *path) {
 	ssize_t temp;
 	fd_t fd;
 	fd_t dfd = open(path, O_PATH | O_CLOEXEC);
 	int error;
+	bool testHardLink;
+	/* Only test hardlinks if supported by the underlying filesystem. */
+	testHardLink = fpathconf(dfd, _PC_LINK_MAX) > 1;
+	ctest_substatf("path: %s%s\n", path, testHardLink ? " (w/ hardlink)" : "");
+
 	assertf(dfd != -1, "%s", strerror(errno));
 	/* Cleanup artifacts from possibly failed prior tests... */
 	unlinkat(dfd, "test", 0);
@@ -311,18 +316,15 @@ PRIVATE void testPath(char const *path, bool testHardLink) {
 
 DEFINE_TEST(fs) {
 
-	ctest_substatf("path: /tmp\n");
-	testPath("/tmp", true);
+	testPath("/tmp");
 
 	if (mkdir("/var", 755) == -1)
 		assertf(errno == EEXIST, "%s", strerror(errno));
-	ctest_substatf("path: /var\n");
-	testPath("/var", false); /* The real hard-drive may not support hard-links (as in the case of FAT...) */
+	testPath("/var");
 
 	/* /dev is a slightly different filesystem type when compared to /tmp
 	 * As such, also run filesystem tests for it! */
-	ctest_substatf("path: /dev\n");
-	testPath("/dev", true);
+	testPath("/dev");
 
 	/* Make sure the kernel doesn't crash if we try to
 	 * sync any potential modifications made above. */
