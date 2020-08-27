@@ -2201,6 +2201,8 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
 		error = inode_try_remove_from_superblock_changed(self);
 		if (error != INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED)
 			return;
+		ATOMIC_FETCHAND(self->i_flags, ~(INODE_FCHANGED | INODE_FATTRCHANGED));
+		decref_nokill(self); /* The reference contained in the changed-inode list. */
 	}
 	if (superblock_nodeslock_trywrite(super)) {
 		struct inode *delnode;
