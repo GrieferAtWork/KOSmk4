@@ -3211,7 +3211,11 @@ again:
 	TRY {
 		while (chain) {
 			next = chain->i_changed_next;
-			inode_sync(chain, INODE_FCHANGED | INODE_FATTRCHANGED);
+			inode_sync(chain,
+			           INODE_FCHANGED |
+			           INODE_FATTRCHANGED);
+			/* Drop the reference stolen from the s_changed list. */
+			decref(chain);
 			chain = next;
 		}
 	} EXCEPT {
@@ -3223,18 +3227,21 @@ again:
 		do {
 			pend = ATOMIC_READ(self->s_changed);
 			next->i_changed_next = pend;
-		} while (!ATOMIC_CMPXCH_WEAK(self->s_changed, pend, chain));
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(self->s_changed,
+		                             pend, chain));
 		RETHROW();
 	}
-	/* Syncing one node may have caused some other node to become marked as changed. */
-	if (ATOMIC_READ(self->s_changed) != NULL)
-		goto again;
 	/* Invoke the superblock's own synchronization function. */
 	if (self->s_type->st_functions.f_sync)
 		(*self->s_type->st_functions.f_sync)(self);
 	/* Synchronize the underlying block device. */
 	if (sync_device && self->s_device)
 		block_device_sync(self->s_device);
+	/* Syncing one thing may have caused some
+	 * other thing to become marked as changed. */
+	if (ATOMIC_READ(self->s_changed) != NULL)
+		goto again;
 }
 
 
