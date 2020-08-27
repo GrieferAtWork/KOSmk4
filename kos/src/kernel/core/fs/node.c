@@ -1216,7 +1216,7 @@ again_do_remove_from_super_for_delete:
 			if (unlikely(delnode != self) && delnode)
 				inode_tree_insert(&super->s_nodes, delnode);
 			superblock_nodeslock_endwrite(super);
-			if (delnode == self && self->i_flags & INODE_FPERSISTENT)
+			if (delnode == self && (self->i_flags & INODE_FPERSISTENT))
 				decref_nokill(self); /* The reference previously stored in the file tree. */
 		} else {
 			struct inode *next;
@@ -2208,7 +2208,7 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
 		if (unlikely(delnode != self) && delnode)
 			inode_tree_insert(&super->s_nodes, delnode);
 		superblock_nodeslock_endwrite(super);
-		if (delnode == self && self->i_flags & INODE_FPERSISTENT)
+		if (delnode == self && (self->i_flags & INODE_FPERSISTENT))
 			decref_nokill(self); /* The reference previously stored in the file tree. */
 	} else {
 		struct inode *next;
@@ -2606,7 +2606,7 @@ acquire_sourcedir_writelock:
 		}
 		TRY {
 			REF struct directory_entry *source_oneshot = NULL;
-			struct directory_entry *source_entry;
+			struct directory_entry *source_entry; /* NOTE: Becomes a [0..1]-REF upon successful completion. */
 			struct directory_entry **psource_entry;
 
 			/* Check if the source or target directories have been deleted. */
@@ -2752,7 +2752,7 @@ acquire_sourcedir_writelock:
 								delnode = inode_tree_remove(&super->s_nodes, source_inode->i_fileino);
 								if (unlikely(delnode != source_inode) && delnode)
 									inode_tree_insert(&super->s_nodes, delnode);
-								if (delnode == source_inode && source_inode->i_flags & INODE_FPERSISTENT)
+								if (delnode == source_inode && (source_inode->i_flags & INODE_FPERSISTENT))
 									decref_nokill(source_inode); /* The reference previously stored in the file tree. */
 								/* Now insert the new INode
 								 * NOTE: Because we've been holding a lock to the source INode, as well as
@@ -2923,8 +2923,9 @@ acquire_sourcedir_writelock:
 								sync_endwrite(removed_path);
 								if (premoved_path)
 									*premoved_path = removed_path;
-								else
+								else {
 									decref(removed_path);
+								}
 							}
 							sync_endwrite(source_path);
 						}
@@ -2942,8 +2943,10 @@ acquire_sourcedir_writelock:
 						*psource_inode = (REF struct inode *)incref(source_inode);
 
 					/* Update the source and target directories. */
+					assert(*psource_entry == source_entry);
 					if (psource_entry != &source_oneshot) {
 						*psource_entry = source_entry->de_next; /* Unlink from the map */
+						/* NOTE: inherit_ref(source_entry) */
 						assert(source_directory->d_size >= 1);
 						--source_directory->d_size;
 						/* Remove the entry from the by-position chain. */
@@ -2952,6 +2955,10 @@ acquire_sourcedir_writelock:
 							assert(source_directory->d_mask != 0);
 							directory_rehash_smaller_nx(source_directory);
 						}
+					} else {
+						assert(source_entry == source_oneshot);
+						/* Prevent the decref() of `source_entry' below. */
+						source_entry = NULL;
 					}
 					/* Must add the new entry _after_ removing the old one, since the act
 					 * of adding new entires may realloc() the d_map vector, which the
@@ -2979,6 +2986,9 @@ after_directories_updated:
 				RETHROW();
 			}
 			xdecref(source_oneshot);
+			/* This is the reference stolen from the directory d_map of the source directory.
+			 * s.a. `inherit_ref(source_entry)' above! */
+			xdecref(source_entry);
 		} EXCEPT {
 			sync_endwrite(target_directory);
 			sync_endwrite(source_directory);
