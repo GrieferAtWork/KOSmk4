@@ -139,6 +139,12 @@
 #define __PH_IF_DEBUG_HEAP(x) /* nothing */
 #endif /* !CONFIG_DEBUG_HEAP */
 
+#ifdef CONFIG_DEBUG_MALLOC
+#define __PH_IF_DEBUG_MALLOC(x) x
+#else /* CONFIG_DEBUG_MALLOC */
+#define __PH_IF_DEBUG_MALLOC(x) /* nothing */
+#endif /* !CONFIG_DEBUG_MALLOC */
+
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 #define __PH_IF_USE_SLAB_ALLOCATORS(x) x
 #define __PH_IF_USE_SLAB_ALLOCATORS_FOREACH1(sz, _) \
@@ -165,78 +171,78 @@
  * `bind_void' should do the same, or have `heap_symbol' return immediately whilst
  * potentially adjust the stack for `argc' arguments, and `bind_zero' should also
  * do the same, but also have the function return `0' or `NULL' */
-#define KERNEL_POISON_HEAP_ENUMERATE_BINDINGS(bind_func, bind_void, bind_zero)  \
-	bind_func(heap_alloc, /*              */ ph_heap_alloc)                     \
-	bind_func(heap_alloc_untraced, /*     */ ph_heap_alloc)                     \
-	bind_func(heap_alloc_nx, /*           */ ph_heap_alloc_nx)                  \
-	bind_func(heap_alloc_untraced_nx, /*  */ ph_heap_alloc_nx)                  \
-	bind_func(heap_align, /*              */ ph_heap_align)                     \
-	bind_func(heap_align_untraced, /*     */ ph_heap_align)                     \
-	bind_func(heap_align_nx, /*           */ ph_heap_align_nx)                  \
-	bind_func(heap_align_untraced_nx, /*  */ ph_heap_align_nx)                  \
-	bind_zero(heap_allat, /*              */ ph_heap_allat, 4)                  \
-	bind_zero(heap_allat_untraced, /*     */ ph_heap_allat, 4)                  \
-	bind_zero(heap_allat_nx, /*           */ ph_heap_allat_nx, 4)               \
-	bind_zero(heap_allat_untraced_nx, /*  */ ph_heap_allat_nx, 4)               \
-	bind_func(heap_realloc, /*            */ ph_heap_realloc)                   \
-	bind_func(heap_realloc_untraced, /*   */ ph_heap_realloc)                   \
-	bind_func(heap_realloc_nx, /*         */ ph_heap_realloc_nx)                \
-	bind_func(heap_realloc_untraced_nx, /**/ ph_heap_realloc_nx)                \
-	bind_func(heap_realign, /*            */ ph_heap_realign)                   \
-	bind_func(heap_realign_untraced, /*   */ ph_heap_realign)                   \
-	bind_func(heap_realign_nx, /*         */ ph_heap_realign_nx)                \
-	bind_func(heap_realign_untraced_nx, /**/ ph_heap_realign_nx)                \
-	bind_void(heap_free, /*               */ ph_heap_free, 4)                   \
-	bind_void(heap_free_untraced, /*      */ ph_heap_free, 4)                   \
-	bind_zero(heap_truncate, /*           */ ph_heap_truncate, 5)               \
-	bind_zero(heap_truncate_untraced, /*  */ ph_heap_truncate, 5)               \
-	bind_zero(heap_trim, /*               */ ph_heap_trim, 2)                   \
-	__PH_IF_DEBUG_HEAP(bind_void(heap_validate, ph_heap_validate, 1))           \
-	__PH_IF_DEBUG_HEAP(bind_void(heap_validate_all, ph_heap_validate_all, 0))   \
-	SLAB_FOREACH_SIZE(__PH_IF_USE_SLAB_ALLOCATORS_FOREACH1, bind_zero)          \
-	SLAB_FOREACH_SIZE(__PH_IF_USE_SLAB_ALLOCATORS_FOREACH2, bind_func)          \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_void(slab_free, /*      */ ph_kfree, 1))   \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_void(slab_ffree, /*     */ ph_kffree, 2))  \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_malloc, /*    */ ph_kmalloc_nx)) \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_kmalloc, /*   */ ph_kmalloc))    \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_kmalloc_nx, /**/ ph_kmalloc_nx)) \
-	bind_func(vpage_alloc, /*              */ ph_vpage_alloc)                   \
-	bind_func(vpage_alloc_untraced, /*     */ ph_vpage_alloc)                   \
-	bind_func(vpage_alloc_nx, /*           */ ph_vpage_alloc_nx)                \
-	bind_func(vpage_alloc_untraced_nx, /*  */ ph_vpage_alloc_nx)                \
-	bind_func(vpage_realloc, /*            */ ph_vpage_realloc)                 \
-	bind_func(vpage_realloc_untraced, /*   */ ph_vpage_realloc)                 \
-	bind_func(vpage_realloc_nx, /*         */ ph_vpage_realloc_nx)              \
-	bind_func(vpage_realloc_untraced_nx, /**/ ph_vpage_realloc_nx)              \
-	bind_void(vpage_free, /*               */ ph_vpage_free, 2)                 \
-	bind_void(vpage_ffree, /*              */ ph_vpage_ffree, 3)                \
-	bind_void(vpage_free_untraced, /*      */ ph_vpage_free, 2)                 \
-	bind_void(vpage_ffree_untraced, /*     */ ph_vpage_ffree, 3)                \
-	bind_func(kmalloc, /*                  */ ph_kmalloc)                       \
-	bind_func(kmalloc_nx, /*               */ ph_kmalloc_nx)                    \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(kmalloc_noslab, ph_kmalloc))          \
-	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(kmalloc_noslab_nx, ph_kmalloc_nx))    \
-	bind_func(kmemalign, /*            */ ph_kmemalign)                         \
-	bind_func(kmemalign_nx, /*         */ ph_kmemalign_nx)                      \
-	bind_func(kmemalign_offset, /*     */ ph_kmemalign_offset)                  \
-	bind_func(kmemalign_offset_nx, /*  */ ph_kmemalign_offset_nx)               \
-	bind_func(krealloc, /*             */ ph_krealloc)                          \
-	bind_func(krealloc_nx, /*          */ ph_krealloc_nx)                       \
-	bind_func(krealign, /*             */ ph_krealign)                          \
-	bind_func(krealign_nx, /*          */ ph_krealign_nx)                       \
-	bind_func(krealign_offset, /*      */ ph_krealign_offset)                   \
-	bind_func(krealign_offset_nx, /*   */ ph_krealign_offset_nx)                \
-	bind_func(krealloc_in_place, /*    */ ph_krealloc_in_place)                 \
-	bind_func(krealloc_in_place_nx, /* */ ph_krealloc_in_place)                 \
-	bind_func(kmalloc_usable_size, /*  */ ph_kmalloc_usable_size)               \
-	bind_void(kfree, /*                */ ph_kfree, 1)                          \
-	bind_void(kffree, /*               */ ph_kffree, 2)                         \
-	bind_zero(mall_dump_leaks, /*      */ ph_mall_dump_leaks, 1)                \
-	bind_func(mall_trace, /*           */ ph_mall_trace)                        \
-	bind_void(mall_validate_padding, /**/ ph_mall_validate_padding, 0)          \
-	bind_void(mall_print_traceback, /* */ ph_mall_print_traceback, 2)           \
-	bind_void(mall_untrace, /*         */ ph_mall_untrace, 2)                   \
-	bind_void(mall_untrace_n, /*       */ ph_mall_untrace_n, 3)
+#define KERNEL_POISON_HEAP_ENUMERATE_BINDINGS(bind_func, bind_void, bind_zero)               \
+	bind_func(heap_alloc, /*              */ ph_heap_alloc)                                  \
+	bind_func(heap_alloc_untraced, /*     */ ph_heap_alloc)                                  \
+	bind_func(heap_alloc_nx, /*           */ ph_heap_alloc_nx)                               \
+	bind_func(heap_alloc_untraced_nx, /*  */ ph_heap_alloc_nx)                               \
+	bind_func(heap_align, /*              */ ph_heap_align)                                  \
+	bind_func(heap_align_untraced, /*     */ ph_heap_align)                                  \
+	bind_func(heap_align_nx, /*           */ ph_heap_align_nx)                               \
+	bind_func(heap_align_untraced_nx, /*  */ ph_heap_align_nx)                               \
+	bind_zero(heap_allat, /*              */ ph_heap_allat, 4)                               \
+	bind_zero(heap_allat_untraced, /*     */ ph_heap_allat, 4)                               \
+	bind_zero(heap_allat_nx, /*           */ ph_heap_allat_nx, 4)                            \
+	bind_zero(heap_allat_untraced_nx, /*  */ ph_heap_allat_nx, 4)                            \
+	bind_func(heap_realloc, /*            */ ph_heap_realloc)                                \
+	bind_func(heap_realloc_untraced, /*   */ ph_heap_realloc)                                \
+	bind_func(heap_realloc_nx, /*         */ ph_heap_realloc_nx)                             \
+	bind_func(heap_realloc_untraced_nx, /**/ ph_heap_realloc_nx)                             \
+	bind_func(heap_realign, /*            */ ph_heap_realign)                                \
+	bind_func(heap_realign_untraced, /*   */ ph_heap_realign)                                \
+	bind_func(heap_realign_nx, /*         */ ph_heap_realign_nx)                             \
+	bind_func(heap_realign_untraced_nx, /**/ ph_heap_realign_nx)                             \
+	bind_void(heap_free, /*               */ ph_heap_free, 4)                                \
+	bind_void(heap_free_untraced, /*      */ ph_heap_free, 4)                                \
+	bind_zero(heap_truncate, /*           */ ph_heap_truncate, 5)                            \
+	bind_zero(heap_truncate_untraced, /*  */ ph_heap_truncate, 5)                            \
+	bind_zero(heap_trim, /*               */ ph_heap_trim, 2)                                \
+	__PH_IF_DEBUG_HEAP(bind_void(heap_validate, ph_heap_validate, 1))                        \
+	__PH_IF_DEBUG_HEAP(bind_void(heap_validate_all, ph_heap_validate_all, 0))                \
+	SLAB_FOREACH_SIZE(__PH_IF_USE_SLAB_ALLOCATORS_FOREACH1, bind_zero)                       \
+	SLAB_FOREACH_SIZE(__PH_IF_USE_SLAB_ALLOCATORS_FOREACH2, bind_func)                       \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_void(slab_free, /*      */ ph_kfree, 1))                \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_void(slab_ffree, /*     */ ph_kffree, 2))               \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_malloc, /*    */ ph_kmalloc_nx))              \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_kmalloc, /*   */ ph_kmalloc))                 \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(slab_kmalloc_nx, /**/ ph_kmalloc_nx))              \
+	bind_func(vpage_alloc, /*              */ ph_vpage_alloc)                                \
+	bind_func(vpage_alloc_untraced, /*     */ ph_vpage_alloc)                                \
+	bind_func(vpage_alloc_nx, /*           */ ph_vpage_alloc_nx)                             \
+	bind_func(vpage_alloc_untraced_nx, /*  */ ph_vpage_alloc_nx)                             \
+	bind_func(vpage_realloc, /*            */ ph_vpage_realloc)                              \
+	bind_func(vpage_realloc_untraced, /*   */ ph_vpage_realloc)                              \
+	bind_func(vpage_realloc_nx, /*         */ ph_vpage_realloc_nx)                           \
+	bind_func(vpage_realloc_untraced_nx, /**/ ph_vpage_realloc_nx)                           \
+	bind_void(vpage_free, /*               */ ph_vpage_free, 2)                              \
+	bind_void(vpage_ffree, /*              */ ph_vpage_ffree, 3)                             \
+	bind_void(vpage_free_untraced, /*      */ ph_vpage_free, 2)                              \
+	bind_void(vpage_ffree_untraced, /*     */ ph_vpage_ffree, 3)                             \
+	bind_func(kmalloc, /*                  */ ph_kmalloc)                                    \
+	bind_func(kmalloc_nx, /*               */ ph_kmalloc_nx)                                 \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(kmalloc_noslab, ph_kmalloc))                       \
+	__PH_IF_USE_SLAB_ALLOCATORS(bind_func(kmalloc_noslab_nx, ph_kmalloc_nx))                 \
+	bind_func(kmemalign, /*            */ ph_kmemalign)                                      \
+	bind_func(kmemalign_nx, /*         */ ph_kmemalign_nx)                                   \
+	bind_func(kmemalign_offset, /*     */ ph_kmemalign_offset)                               \
+	bind_func(kmemalign_offset_nx, /*  */ ph_kmemalign_offset_nx)                            \
+	bind_func(krealloc, /*             */ ph_krealloc)                                       \
+	bind_func(krealloc_nx, /*          */ ph_krealloc_nx)                                    \
+	bind_func(krealign, /*             */ ph_krealign)                                       \
+	bind_func(krealign_nx, /*          */ ph_krealign_nx)                                    \
+	bind_func(krealign_offset, /*      */ ph_krealign_offset)                                \
+	bind_func(krealign_offset_nx, /*   */ ph_krealign_offset_nx)                             \
+	bind_func(krealloc_in_place, /*    */ ph_krealloc_in_place)                              \
+	bind_func(krealloc_in_place_nx, /* */ ph_krealloc_in_place)                              \
+	bind_func(kmalloc_usable_size, /*  */ ph_kmalloc_usable_size)                            \
+	bind_void(kfree, /*                */ ph_kfree, 1)                                       \
+	bind_void(kffree, /*               */ ph_kffree, 2)                                      \
+	__PH_IF_DEBUG_MALLOC(bind_zero(mall_dump_leaks, /*      */ ph_mall_dump_leaks, 1))       \
+	__PH_IF_DEBUG_MALLOC(bind_func(mall_trace, /*           */ ph_mall_trace))               \
+	__PH_IF_DEBUG_MALLOC(bind_void(mall_validate_padding, /**/ ph_mall_validate_padding, 0)) \
+	__PH_IF_DEBUG_MALLOC(bind_void(mall_print_traceback, /* */ ph_mall_print_traceback, 2))  \
+	__PH_IF_DEBUG_MALLOC(bind_void(mall_untrace, /*         */ ph_mall_untrace, 2))          \
+	__PH_IF_DEBUG_MALLOC(bind_void(mall_untrace_n, /*       */ ph_mall_untrace_n, 3))
 
 #ifdef __CC__
 #ifdef CONFIG_BUILDING_KERNEL_CORE

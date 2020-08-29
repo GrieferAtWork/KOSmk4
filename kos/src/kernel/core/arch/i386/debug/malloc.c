@@ -63,7 +63,7 @@ NOTHROW(KCALL noop_generate_traceback)(void **__restrict buffer, size_t buflen,
 }
 
 
-INTERN ATTR_FREETEXT void KCALL
+PRIVATE ATTR_USED ATTR_FREETEXT void KCALL
 kernel_disable_debug_malloc(void) {
 
 	/* `heap_validate_all()' takes up quite a bit of execution time, since

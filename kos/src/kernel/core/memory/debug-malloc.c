@@ -861,14 +861,183 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 
 /* The current version number used when searching for memory leaks.
  * This value is used to identity pointers that haven't been reached/search yet. */
-PRIVATE mall_ver_t mall_leak_version = 0;
+PRIVATE ATTR_COLDBSS mall_ver_t mall_leak_version = 0;
 
 /* Analyze a pointer, or data block for reachable pointers,
  * returning the number of reachable mall pointers. */
-PRIVATE NOBLOCK size_t
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes);
 
-PRIVATE NOBLOCK size_t
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#define DECLARE_SLAB_DESCRIPTOR(size, _) \
+	INTDEF struct slab_descriptor slab_desc##size;
+SLAB_FOREACH_SIZE(DECLARE_SLAB_DESCRIPTOR, _)
+#undef DECLARE_SLAB_DESCRIPTOR
+
+/* Vector of pointers to all existing slab descriptors. */
+PRIVATE ATTR_COLDRODATA struct slab_descriptor *const slab_descs[] = {
+#define DECLARE_SLAB_DESCRIPTOR(size, _) \
+	&slab_desc##size,
+	SLAB_FOREACH_SIZE(DECLARE_SLAB_DESCRIPTOR, _)
+#undef DECLARE_SLAB_DESCRIPTOR
+};
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL slab_reset_reach_slab)(struct slab *__restrict self) {
+#if (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) != 0
+	size_t i, count;
+	uintptr_t *bits;
+	bits = (uintptr_t *)(self + 1);
+	bits  = (uintptr_t *)(self + 1);
+	count = SLAB_LENGTHOF_BITSET(self->s_size);
+	for (i = 0; i < count; ++i)
+		bits[i] &= _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC);
+#else /* (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) != 0 */
+#error Not implemented
+#endif /* (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) == 0 */
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL slab_reset_reach_slab_chain)(struct slab *self) {
+	for (; self; self = self->s_next)
+		slab_reset_reach_slab(self);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
+NOTHROW(KCALL slab_reset_reach_desc)(struct slab_descriptor *__restrict self) {
+	slab_reset_reach_slab_chain(self->sd_free);
+	slab_reset_reach_slab_chain(self->sd_used);
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL slab_reset_reach)(void) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(slab_descs); ++i)
+		slab_reset_reach_desc(slab_descs[i]);
+}
+
+PRIVATE ATTR_COLDBSS bool slab_leak_did_notify_noslab_boot_option = false;
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) size_t
+NOTHROW(KCALL slab_unreachable_segment)(void *base, size_t num_bytes) {
+	/* Slab allocations are way too light-weight to be able to support tracebacks.
+	 * As such, we _are_ able to detect slab memory leaks, but we aren't able to
+	 * tell the user where/how the leaking memory was allocated.
+	 * However, since slab allocators are always allowed to either:
+	 *
+	 *   - Allocate regular kmalloc()-style memory (as a matter of fact, most calls
+	 *     to slab allocators actually use compile-time dispatching from inside of
+	 *     a FORCELOCAL kmalloc() wrapper)
+	 *     Booting with `noslab' will modify the text of these functions to directly
+	 *     call forward to the regular heap functions, which are then able to generate
+	 *     proper tracebacks.
+	 *
+	 *   - Simply return `NULL'. This might come as a surprise, but because all kernel
+	 *     slab memory _must_ be continuous, there is a chance that some conflicting
+	 *     memory mapping will simply prevent us from expanding slab space any further.
+	 *     Due to this case, pure slab allocators (i.e. slab allocator function that
+	 *     will never return conventional heap memory) are always allowed to simply
+	 *     return true, which is indicating of their inability to allocate additional
+	 *     slab memory.
+	 */
+	if (!slab_leak_did_notify_noslab_boot_option) {
+		slab_leak_did_notify_noslab_boot_option = true;
+		printk(KERN_RAW "slab: Slab memory leaks don't include tracebacks.\n"
+		                "slab: Consider rebooting with `noslab'\n");
+	}
+	printk(KERN_RAW "slab: Leaked %Iu bytes of heap-memory at %p...%p\n",
+	       num_bytes, base, (byte_t *)base + num_bytes - 1);
+	return 1;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) size_t
+NOTHROW(KCALL slab_unreachable_slab)(struct slab *__restrict self) {
+	/* Search for slabs with a status of `SLAB_SEGMENT_STATUS_ALLOC' */
+	uintptr_t *bits;
+	size_t i, count;
+	size_t result = 0;
+	bits  = (uintptr_t *)(self + 1);
+	count = SLAB_SEGMENT_COUNT(self->s_size);
+	for (i = 0; i < count; ++i) {
+		unsigned int status;
+		status = (bits[_SLAB_SEGMENT_STATUS_WORD(i)] >>
+		          _SLAB_SEGMENT_STATUS_SHFT(i)) &
+		         SLAB_SEGMENT_STATUS_MASK;
+		if likely(status != SLAB_SEGMENT_STATUS_ALLOC)
+			continue;
+		/* Well... It's a leak :( */
+		result += slab_unreachable_segment((byte_t *)self +
+		                                   SLAB_SEGMENT_OFFSET(self->s_size) +
+		                                   i * self->s_size,
+		                                   self->s_size);
+	}
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL slab_unreachable_slab_chain)(struct slab *self) {
+	size_t result = 0;
+	for (; self; self = self->s_next)
+		result += slab_unreachable_slab(self);
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) size_t
+NOTHROW(KCALL slab_unreachable_desc)(struct slab_descriptor *__restrict self) {
+	size_t result;
+	result = slab_unreachable_slab_chain(self->sd_free);
+	result += slab_unreachable_slab_chain(self->sd_used);
+	return result;
+}
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL slab_unreachable)(void) {
+	size_t result = 0;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(slab_descs); ++i)
+		result += slab_unreachable_desc(slab_descs[i]);
+	return result;
+}
+
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
+NOTHROW(KCALL mall_reachable_slab_pointer)(void *ptr) {
+	struct slab *s;
+	byte_t *slab_segments_start;
+	uintptr_t index, word, value;
+	uintptr_t *bits;
+	size_t result;
+	unsigned int shift;
+	s                   = SLAB_GET(ptr);
+	slab_segments_start = (byte_t *)s + SLAB_SEGMENT_OFFSET(s->s_size);
+	index               = (uintptr_t)((byte_t *)ptr - slab_segments_start) / s->s_size;
+	if unlikely(index >= (size_t)SLAB_SEGMENT_COUNT(s->s_size))
+		return 0; /* Not a valid slab user-segment pointer. */
+	bits = (uintptr_t *)(s + 1);
+	/* Check if `ptr' is actually allocated inside of `s', and wasn't already reached. */
+	word  = _SLAB_SEGMENT_STATUS_WORD(index);
+	shift = _SLAB_SEGMENT_STATUS_SHFT(index);
+	value = bits[word];
+	if (((value >> shift) & SLAB_SEGMENT_STATUS_MASK) != SLAB_SEGMENT_STATUS_ALLOC)
+		return 0;
+	/* Alright! So we've got a reachable slab-pointer!
+	 * -> Mark it as such! */
+#if (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) != 0
+	bits[word] = value | ((uintptr_t)SLAB_SEGMENT_STATUS_REACH << shift);
+#else /* (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) != 0 */
+	bits[word] = (value & ~((uintptr_t)SLAB_SEGMENT_STATUS_ALLOC << shift)) |
+	             /*     */ ((uintptr_t)SLAB_SEGMENT_STATUS_REACH << shift);
+#endif /* (SLAB_SEGMENT_STATUS_REACH & SLAB_SEGMENT_STATUS_ALLOC) == 0 */
+	/* Recursively scan the memory pointed-to by the segment. */
+	result = mall_reachable_data(slab_segments_start +
+	                             index * s->s_size,
+	                             s->s_size);
+	return result + 1;
+}
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 	struct mallnode *node;
 	/* Check if NULL is part of kernel-space. */
@@ -896,6 +1065,11 @@ NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 	if ((uintptr_t)ptr == 0xcccccccc)
 		return 0; /* Optimization: Stack pre-initialization. */
 #endif /* __SIZEOF_POINTER__ == 4 */
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+	/* Special handling for slab pointers. */
+	if (KERNEL_SLAB_CHECKPTR(ptr))
+		return mall_reachable_slab_pointer(ptr);
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	node = mallnode_tree_locate(mall_tree, (uintptr_t)ptr);
 	if (!node)
 		return 0;
@@ -905,7 +1079,7 @@ NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 	return 1;
 }
 
-PRIVATE NOBLOCK size_t
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes) {
 	size_t result = 0;
 	if unlikely((uintptr_t)base & (sizeof(void *) - 1)) {
@@ -946,7 +1120,7 @@ done:
 }
 
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_task_scpustate)(struct task *__restrict thread,
                                           struct scpustate *__restrict context) {
 	/* Search the registers of this thread. */
@@ -979,7 +1153,7 @@ NOTHROW(KCALL mall_search_task_scpustate)(struct task *__restrict thread,
 }
 
 #ifndef CONFIG_NO_SMP
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
                                           struct icpustate *__restrict context) {
 	/* Search the registers of this thread. */
@@ -993,7 +1167,11 @@ NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
 			mall_reachable_pointer(((void **)&context->ics_gpregs)[i]);
 		stack_min = vm_node_getmin(&FORTASK(thread, this_kernel_stacknode));
 		stack_end = vm_node_getend(&FORTASK(thread, this_kernel_stacknode));
-		sp = (void *)irregs_getkernelpsp(&context->ics_irregs);
+#ifdef icpustate_getkernelpsp
+		sp = (void *)icpustate_getkernelpsp(context);
+#else /* icpustate_getkernelpsp */
+		sp = (void *)icpustate_getsp(context);
+#endif /* !icpustate_getkernelpsp */
 		if (sp > stack_min && sp <= stack_end) {
 			/* Search the used portion of the kernel stack. */
 			mall_reachable_data((byte_t *)sp,
@@ -1008,7 +1186,7 @@ NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
 }
 #endif /* !CONFIG_NO_SMP */
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_this_task)(void) {
 	unsigned int i;
 	void *sp, *stack_min, *stack_end;
@@ -1040,7 +1218,7 @@ do_search_kernel_stack:
 	}
 }
 
-PRIVATE NOBLOCK size_t
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL scan_reachable)(struct mallnode *__restrict node) {
 	size_t result = 0;
 again:
@@ -1082,12 +1260,12 @@ INTDEF byte_t __debug_malloc_tracked_end[];
 INTDEF byte_t __debug_malloc_tracked_size[];
 
 #ifndef CONFIG_NO_SMP
-PRIVATE struct icpustate *mall_other_cpu_states[CONFIG_MAX_CPU_COUNT];
+PRIVATE ATTR_COLDBSS struct icpustate *mall_other_cpu_states[CONFIG_MAX_CPU_COUNT];
 #endif /* !CONFIG_NO_SMP */
 
 INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	cpuid_t i;
 	/* Search for memory leaks.
@@ -1220,18 +1398,6 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		}
 	}
 
-
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	/* TODO: Data of any slab pointer that was reached must be scanned
-	 *       recursively alongside for memory leaks. Finally, any slab
-	 *       pointer that wasn't reached should also be considered a
-	 *       memory leak!
-	 * -> Otherwise, heap-pointer stored in slab-allocated memory blocks
-	 *    would not be reachable and would be considered as memory leaks...
-	 */
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
-
-
 	PRINT_LEAKS_SEARCH_PHASE("Phase #5: Recursively scan reached pointers\n");
 	if (mall_tree) {
 		size_t num_found;
@@ -1246,7 +1412,7 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 
 
 
-PRIVATE NOBLOCK size_t
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL print_unreachable)(struct mallnode *__restrict node) {
 	size_t result = 0;
 again:
@@ -1300,9 +1466,14 @@ again:
 	return result;
 }
 
-PRIVATE NOBLOCK size_t
+PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL mall_print_leaks_impl)(void) {
-	size_t result = 0;
+	size_t result;
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+	result = slab_unreachable();
+#else /* CONFIG_USE_SLAB_ALLOCATORS */
+	result = 0;
+#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 	if (mall_tree)
 		result += print_unreachable(mall_tree);
 	return result;
@@ -1310,11 +1481,11 @@ NOTHROW(KCALL mall_print_leaks_impl)(void) {
 
 
 #ifndef CONFIG_NO_SMP
-PRIVATE WEAK cpuid_t mall_suspended_cpu_count = 0;
-PRIVATE WEAK struct task *mall_suspended_locked = NULL;
-PRIVATE struct sig mall_suspended_unlock = SIG_INIT;
+PRIVATE ATTR_COLDBSS WEAK cpuid_t mall_suspended_cpu_count = 0;
+PRIVATE ATTR_COLDBSS WEAK struct task *mall_suspended_locked = NULL;
+PRIVATE ATTR_COLDBSS struct sig mall_suspended_unlock = SIG_INIT;
 
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
 	uintptr_t old_flags;
@@ -1372,7 +1543,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 }
 
 
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK ATTR_COLDTEXT bool
 NOTHROW(KCALL mall_enter_singlecore_mode)(void) {
 	cpuid_t num_suspended;
 	struct task *old_thread;
@@ -1398,7 +1569,7 @@ NOTHROW(KCALL mall_enter_singlecore_mode)(void) {
 	return true;
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_leave_singlecore_mode)(void) {
 	/* Unlock singlecore mode */
 	ATOMIC_WRITE(mall_suspended_locked, NULL);
@@ -1418,7 +1589,7 @@ NOTHROW(KCALL mall_leave_singlecore_mode)(void) {
  *  - `vm_kernel.v_treelock'
  *  - `vm_corepage_lock'
  */
-PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) size_t KCALL
+PUBLIC ATTR_COLDTEXT NOBLOCK_IF(flags & GFP_ATOMIC) size_t KCALL
 mall_dump_leaks(gfp_t flags) THROWS(E_WOULDBLOCK) {
 	size_t result;
 	/* Acquire a lock to the kernel VM and to the MALL heap */
@@ -1464,7 +1635,6 @@ again:
 #endif /* !CONFIG_NO_SMP */
 		vm_kernel_treelock_endwrite();
 		mall_release();
-		was = PREEMPTION_PUSHOFF();
 		/* At this point we've got all the locks we need! */
 
 		++mall_leak_version;
@@ -1474,7 +1644,13 @@ again:
 		mall_search_leaks_impl();
 		/* Print all found leaks. */
 		result = mall_print_leaks_impl();
-		PREEMPTION_POP(was);
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+		/* Clear the is-reachable bits from all of
+		 * the different slabs that could be reached. */
+		slab_reset_reach();
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 
 #ifndef CONFIG_NO_SMP
 		/* Allow other CPUs to resume execution. */
@@ -1491,7 +1667,7 @@ again:
 	return result;
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
                                         pformatprinter printer,
                                         void *arg) {
@@ -1509,7 +1685,7 @@ NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
 }
 
 /* Assert that the header and tail are properly initialized. */
-PRIVATE NOBLOCK NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) bool
 NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 	u32 *base;
 	unsigned int i;
@@ -1600,7 +1776,7 @@ fail:
 	return false;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) bool
 NOTHROW(KCALL mall_validate_padding_impl)(struct mallnode *__restrict self) {
 again:
 	if (!(self->m_flags & MALLNODE_FUSERNODE) &&
@@ -1621,7 +1797,7 @@ again:
 	return false;
 }
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_validate_padding)(void) {
 again:
 	if (!sync_tryread(&mall_lock))

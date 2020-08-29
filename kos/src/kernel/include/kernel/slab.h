@@ -26,6 +26,11 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 
+#include <hybrid/typecore.h>
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+#include <hybrid/sync/atomic-rwlock.h>
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
 #include "malloc-defs.h"
 #include "malloc.h"
 
@@ -60,24 +65,27 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct slab {
-	struct slab **s_pself; /* [1..1][0..1] Self pointer (set to NULL when the page has been fully allocated) */
+	struct slab **s_pself; /* [1..1][?..1] Self pointer. */
 	struct slab  *s_next;  /* [0..1] Next slab (either next in-use, or next free) */
 #define SLAB_FNORMAL 0x00  /* Normal slab flags. */
 #define SLAB_FLOCKED 0x01  /* The slab kernel page is locked into memory. */
 #define SLAB_FCALLOC 0x04  /* Slab memory (of unused slabs) is zero-initialized. */
 #if __SIZEOF_POINTER__ >= 8
-	u16          s_flags; /* Slab flags (Set of `SLAB_F*'). */
-	u16          s_size;  /* [const] Slab segment size (in bytes) */
-	WEAK u32     s_free;  /* Amount of free segments in this slab. */
+	u16           s_flags; /* Slab flags (Set of `SLAB_F*'). */
+	u16           s_size;  /* [const] Slab segment size (in bytes) */
+	WEAK u32      s_free;  /* Amount of free segments in this slab. */
 #else /* __SIZEOF_POINTER__ >= 8 */
-	u8           s_flags; /* Slab flags (Set of `SLAB_F*'). */
-	u8           s_size;  /* [const] Slab segment size (in bytes) */
-	WEAK u16     s_free;  /* Amount of free segments in this slab. */
+	u8            s_flags; /* Slab flags (Set of `SLAB_F*'). */
+	u8            s_size;  /* [const] Slab segment size (in bytes) */
+	WEAK u16      s_free;  /* Amount of free segments in this slab. */
 #endif /* __SIZEOF_POINTER__ < 8 */
-	/* A bitset of allocated segments goes here (1-bits indicate allocated segments)
+	/* A bitset of allocated segments goes here (every segment has `SLAB_SEGMENT_STATUS_BITS'
+	 * consecutive status bits in within this bitset, that form an integer that is one of
+	 * `SLAB_SEGMENT_STATUS_*').
 	 * Note that the bitset works with whole words (uintptr_t),
 	 * so-as to ensure that the following segment vector is
 	 * pointer-aligned. */
+
 	/* When `HEAP_ALIGNMENT > __SIZEOF_POINTER__', there exists some
 	 * unused padding here to ensure that the vector is properly aligned. */
 	/* Actual segment data goes here, following the initialization rules of
@@ -86,18 +94,75 @@ struct slab {
 
 #define SLAB_GET(ptr) ((struct slab *)((uintptr_t)(ptr) & ~PAGEMASK))
 
-
 #define PRIVATE_SLAB_SEGMENT_COUNT(segment_size) \
 	((PAGESIZE - 4 * __SIZEOF_POINTER__) / (segment_size))
 
-/* Return the length (in words) of the in-use bitset of a given slab. */
-#define SLAB_LENGTHOF_BITSET(segment_size) ((PRIVATE_SLAB_SEGMENT_COUNT(segment_size) + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
-#define SLAB_SIZEOF_BITSET(segment_size)   (SLAB_LENGTHOF_BITSET(segment_size) * __SIZEOF_POINTER__)
+#ifdef CONFIG_DEBUG_MALLOC
+#define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
+#define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
+#define SLAB_SEGMENT_STATUS_REACH 3 /* Segment is reachable. */
+#define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
+#define SLAB_SEGMENT_STATUS_BITS  2 /* # of status bits per slab. */
+#else /* CONFIG_DEBUG_MALLOC */
+#define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
+#define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
+#define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
+#define SLAB_SEGMENT_STATUS_BITS  1 /* # of status bits per slab. */
+#endif /* !CONFIG_DEBUG_MALLOC */
+
+/* Return a base-pointer to the status-bitset of `self' */
+#define _SLAB_SEGMENT_STATUS_BITSET(self) ((uintptr_t *)((struct slab *)(self) + 1))
+
+/* Return the word(index), mask, and shift for the
+ * index'th segment within the status bitset. */
+#define _SLAB_SEGMENT_STATUS_MASK(index) ((uintptr_t)SLAB_SEGMENT_STATUS_MASK << _SLAB_SEGMENT_STATUS_SHFT(index))
+#if SLAB_SEGMENT_STATUS_BITS == 2
+#define _SLAB_SEGMENT_STATUS_WORD(index) ((index) / (__SIZEOF_POINTER__ * 4))
+#define _SLAB_SEGMENT_STATUS_SHFT(index) (((index) % (__SIZEOF_POINTER__ * 4)) * 2)
+#elif SLAB_SEGMENT_STATUS_BITS == 1
+#define _SLAB_SEGMENT_STATUS_WORD(index) ((index) / (__SIZEOF_POINTER__ * 8))
+#define _SLAB_SEGMENT_STATUS_SHFT(index) ((index) % (__SIZEOF_POINTER__ * 8))
+#else /* SLAB_SEGMENT_STATUS_BITS == ... */
+#define _SLAB_SEGMENT_STATUS_WORD(index) ((index) / (__SIZEOF_POINTER__ * (8 / SLAB_SEGMENT_STATUS_BITS)))
+#define _SLAB_SEGMENT_STATUS_SHFT(index) (((index) % (__SIZEOF_POINTER__ * (8 / SLAB_SEGMENT_STATUS_BITS))) * SLAB_SEGMENT_STATUS_BITS)
+#endif /* SLAB_SEGMENT_STATUS_BITS != ... */
+
+#define SLAB_SEGMENT_STATUS_ALLOC_N(index) ((uintptr_t)SLAB_SEGMENT_STATUS_ALLOC << _SLAB_SEGMENT_STATUS_SHFT(index))
+#define SLAB_SEGMENT_STATUS_MASK_N(index)  ((uintptr_t)SLAB_SEGMENT_STATUS_MASK << _SLAB_SEGMENT_STATUS_SHFT(index))
+
+#if SLAB_SEGMENT_STATUS_BITS == 2
+#if __SIZEOF_POINTER__ == 4
+#define _SLAB_SEGMENT_STATUS_WORDMASK(status) (__UINT32_C(0x55555555) * (status))
+#elif __SIZEOF_POINTER__ == 8
+#define _SLAB_SEGMENT_STATUS_WORDMASK(status) (__UINT64_C(0x5555555555555555) * (status))
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported sizeof(void *)"
+#endif /* __SIZEOF_POINTER__ != ... */
+#elif SLAB_SEGMENT_STATUS_BITS == 1
+#if __SIZEOF_POINTER__ == 4
+#define _SLAB_SEGMENT_STATUS_WORDMASK(status) (__UINT32_C(0xffffffff) * (status))
+#elif __SIZEOF_POINTER__ == 8
+#define _SLAB_SEGMENT_STATUS_WORDMASK(status) (__UINT64_C(0xffffffffffffffff) * (status))
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported sizeof(void *)"
+#endif /* __SIZEOF_POINTER__ != ... */
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported SLAB_SEGMENT_STATUS_BITS"
+#endif /* __SIZEOF_POINTER__ != ... */
+
+
+/* Return the length (in words) of the status bitset of a given slab. */
+#define SLAB_LENGTHOF_BITSET(segment_size)                                    \
+	(((PRIVATE_SLAB_SEGMENT_COUNT(segment_size) * SLAB_SEGMENT_STATUS_BITS) + \
+	  (BITS_PER_POINTER - 1)) /                                               \
+	 BITS_PER_POINTER)
+#define SLAB_SIZEOF_BITSET(segment_size) \
+	(SLAB_LENGTHOF_BITSET(segment_size) * __SIZEOF_POINTER__)
 
 #if HEAP_ALIGNMENT > __SIZEOF_POINTER__
 #define SLAB_SEGMENT_OFFSET(segment_size) ((((3 + SLAB_LENGTHOF_BITSET(segment_size)) * __SIZEOF_POINTER__) + (HEAP_ALIGNMENT - 1)) & ~(HEAP_ALIGNMENT - 1))
 #else /* HEAP_ALIGNMENT > __SIZEOF_POINTER__ */
-#define SLAB_SEGMENT_OFFSET(segment_size)   ((3 + SLAB_LENGTHOF_BITSET(segment_size)) * __SIZEOF_POINTER__)
+#define SLAB_SEGMENT_OFFSET(segment_size) ((3 + SLAB_LENGTHOF_BITSET(segment_size)) * __SIZEOF_POINTER__)
 #endif /* HEAP_ALIGNMENT <= __SIZEOF_POINTER__ */
 
 /* Return the number of segments available per page, when each has a size of `segment_size' */
@@ -154,6 +219,21 @@ DATDEF void *kernel_slab_break;
 #define KERNEL_SLAB_CHECKPTR(x) \
 	((x) >= KERNEL_SLAB_START && (x) < KERNEL_SLAB_END)
 
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+struct slab_pending_free {
+	struct slab_pending_free *spf_next; /* [0..1] Next pending free. */
+};
+struct slab_descriptor {
+	/* Data descriptor for some fixed-length-segment slab. */
+	struct atomic_rwlock           sd_lock; /* Lock for this slab descriptor. */
+	struct slab                   *sd_free; /* [0..1][lock(sd_lock)] Chain of partially free slab pages. */
+#ifdef CONFIG_DEBUG_MALLOC
+	struct slab                   *sd_used; /* [0..1][lock(sd_lock)] Chain of fully allocated slab pages. */
+#endif /* CONFIG_DEBUG_MALLOC */
+	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
+};
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */

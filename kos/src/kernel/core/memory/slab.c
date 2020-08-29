@@ -24,6 +24,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
+#if defined(CONFIG_USE_SLAB_ALLOCATORS) || defined(__DEEMON__)
+
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -42,13 +45,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(CONFIG_USE_SLAB_ALLOCATORS) || defined(__DEEMON__)
-
 #include "corebase.h"
 
 DECL_BEGIN
-
-/* TODO: debug_malloc integration! */
 
 struct slab_pool {
 	/* Descriptor for the pool of free slab pages. */
@@ -60,7 +59,10 @@ struct slab_pool {
 };
 
 
+#ifndef SLAB_POOL_DEFAULT_LIMIT
 #define SLAB_POOL_DEFAULT_LIMIT 3
+#endif /* !SLAB_POOL_DEFAULT_LIMIT */
+
 
 PRIVATE struct slab_pool slab_freepool[2] = {
 	{   /* SLAB_FNORMAL / GFP_NORMAL */
@@ -175,17 +177,6 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
  *       ever extended in one direction, based on the slab growth
  *       direction. */
 PUBLIC void *kernel_slab_break = KERNEL_SLAB_INITIAL;
-
-struct slab_pending_free {
-	struct slab_pending_free *spf_next; /* [0..1] Next pending free. */
-};
-
-struct slab_descriptor {
-	/* Data descriptor for some fixed-length-segment slab. */
-	struct atomic_rwlock           sd_lock; /* Lock for this slab descriptor. */
-	struct slab                   *sd_free; /* [0..1][lock(sd_lock)] Chain of partially free slab pages. */
-	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
-};
 
 PRIVATE WUNUSED VIRT struct slab *
 NOTHROW(KCALL slab_alloc_page)(gfp_t flags) {
@@ -310,10 +301,6 @@ again_lock_vm:
 			{
 				uintptr_t version;
 				vm_kernel_treelock_endwrite();
-#ifndef __OPTIMIZE_SIZE__
-				if (system_clearcaches())
-					goto again_lock_vm;
-#endif /* !__OPTIMIZE_SIZE__ */
 				version = 0;
 again_next_slab_page_tryhard:
 				if unlikely(!vm_kernel_treelock_writef_nx(flags))
@@ -411,253 +398,253 @@ for (local align: [4, 8, 16]) {
 	is_first = false;
 	print "#if KERNEL_SLAB_COUNT >=", limit + 1;
 	print "#error Extend me";
-	print "#endif";
-	for (local x: [1:limit, -1]) {
+	print "#endif /" "* KERNEL_SLAB_COUNT >=", limit + 1, " *" "/";
+	for (local x: [limit-1:0,-1]) {
 		print "#if KERNEL_SLAB_COUNT >=", x;
 		print "#define SEGMENT_SIZE", x * align;
 		print "#include \"slab-impl.c.inl\"";
 		if (x > 1)
 			print "#define NEXT_SEGMENT_SIZE", x * align;
-		print "#endif";
+		print "#endif /" "* KERNEL_SLAB_COUNT >=", x, " *" "/";
 	}
 }
-print "#endif";
+print "#endif /" "* HEAP_ALIGNMENT == ... *" "/";
 ]]]*/
 #if HEAP_ALIGNMENT == 4
 #if KERNEL_SLAB_COUNT >= 17
 #error Extend me
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 17  */
 #if KERNEL_SLAB_COUNT >= 15
 #define SEGMENT_SIZE 60
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 60
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 15  */
 #if KERNEL_SLAB_COUNT >= 14
 #define SEGMENT_SIZE 56
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 56
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 14  */
 #if KERNEL_SLAB_COUNT >= 13
 #define SEGMENT_SIZE 52
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 52
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 13  */
 #if KERNEL_SLAB_COUNT >= 12
 #define SEGMENT_SIZE 48
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 48
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 12  */
 #if KERNEL_SLAB_COUNT >= 11
 #define SEGMENT_SIZE 44
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 44
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 11  */
 #if KERNEL_SLAB_COUNT >= 10
 #define SEGMENT_SIZE 40
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 40
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 10  */
 #if KERNEL_SLAB_COUNT >= 9
 #define SEGMENT_SIZE 36
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 36
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 9  */
 #if KERNEL_SLAB_COUNT >= 8
 #define SEGMENT_SIZE 32
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 32
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 8  */
 #if KERNEL_SLAB_COUNT >= 7
 #define SEGMENT_SIZE 28
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 28
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 7  */
 #if KERNEL_SLAB_COUNT >= 6
 #define SEGMENT_SIZE 24
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 24
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 6  */
 #if KERNEL_SLAB_COUNT >= 5
 #define SEGMENT_SIZE 20
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 20
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 5  */
 #if KERNEL_SLAB_COUNT >= 4
 #define SEGMENT_SIZE 16
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 16
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 4  */
 #if KERNEL_SLAB_COUNT >= 3
 #define SEGMENT_SIZE 12
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 12
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 3  */
 #if KERNEL_SLAB_COUNT >= 2
 #define SEGMENT_SIZE 8
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 8
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 2  */
 #if KERNEL_SLAB_COUNT >= 1
 #define SEGMENT_SIZE 4
 #include "slab-impl.c.inl"
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 1  */
 #elif HEAP_ALIGNMENT == 8
 #if KERNEL_SLAB_COUNT >= 17
 #error Extend me
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 17  */
 #if KERNEL_SLAB_COUNT >= 15
 #define SEGMENT_SIZE 120
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 120
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 15  */
 #if KERNEL_SLAB_COUNT >= 14
 #define SEGMENT_SIZE 112
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 112
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 14  */
 #if KERNEL_SLAB_COUNT >= 13
 #define SEGMENT_SIZE 104
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 104
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 13  */
 #if KERNEL_SLAB_COUNT >= 12
 #define SEGMENT_SIZE 96
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 96
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 12  */
 #if KERNEL_SLAB_COUNT >= 11
 #define SEGMENT_SIZE 88
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 88
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 11  */
 #if KERNEL_SLAB_COUNT >= 10
 #define SEGMENT_SIZE 80
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 80
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 10  */
 #if KERNEL_SLAB_COUNT >= 9
 #define SEGMENT_SIZE 72
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 72
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 9  */
 #if KERNEL_SLAB_COUNT >= 8
 #define SEGMENT_SIZE 64
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 64
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 8  */
 #if KERNEL_SLAB_COUNT >= 7
 #define SEGMENT_SIZE 56
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 56
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 7  */
 #if KERNEL_SLAB_COUNT >= 6
 #define SEGMENT_SIZE 48
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 48
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 6  */
 #if KERNEL_SLAB_COUNT >= 5
 #define SEGMENT_SIZE 40
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 40
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 5  */
 #if KERNEL_SLAB_COUNT >= 4
 #define SEGMENT_SIZE 32
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 32
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 4  */
 #if KERNEL_SLAB_COUNT >= 3
 #define SEGMENT_SIZE 24
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 24
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 3  */
 #if KERNEL_SLAB_COUNT >= 2
 #define SEGMENT_SIZE 16
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 16
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 2  */
 #if KERNEL_SLAB_COUNT >= 1
 #define SEGMENT_SIZE 8
 #include "slab-impl.c.inl"
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 1  */
 #elif HEAP_ALIGNMENT == 16
 #if KERNEL_SLAB_COUNT >= 17
 #error Extend me
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 17  */
 #if KERNEL_SLAB_COUNT >= 15
 #define SEGMENT_SIZE 240
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 240
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 15  */
 #if KERNEL_SLAB_COUNT >= 14
 #define SEGMENT_SIZE 224
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 224
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 14  */
 #if KERNEL_SLAB_COUNT >= 13
 #define SEGMENT_SIZE 208
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 208
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 13  */
 #if KERNEL_SLAB_COUNT >= 12
 #define SEGMENT_SIZE 192
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 192
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 12  */
 #if KERNEL_SLAB_COUNT >= 11
 #define SEGMENT_SIZE 176
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 176
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 11  */
 #if KERNEL_SLAB_COUNT >= 10
 #define SEGMENT_SIZE 160
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 160
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 10  */
 #if KERNEL_SLAB_COUNT >= 9
 #define SEGMENT_SIZE 144
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 144
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 9  */
 #if KERNEL_SLAB_COUNT >= 8
 #define SEGMENT_SIZE 128
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 128
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 8  */
 #if KERNEL_SLAB_COUNT >= 7
 #define SEGMENT_SIZE 112
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 112
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 7  */
 #if KERNEL_SLAB_COUNT >= 6
 #define SEGMENT_SIZE 96
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 96
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 6  */
 #if KERNEL_SLAB_COUNT >= 5
 #define SEGMENT_SIZE 80
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 80
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 5  */
 #if KERNEL_SLAB_COUNT >= 4
 #define SEGMENT_SIZE 64
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 64
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 4  */
 #if KERNEL_SLAB_COUNT >= 3
 #define SEGMENT_SIZE 48
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 48
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 3  */
 #if KERNEL_SLAB_COUNT >= 2
 #define SEGMENT_SIZE 32
 #include "slab-impl.c.inl"
 #define NEXT_SEGMENT_SIZE 32
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 2  */
 #if KERNEL_SLAB_COUNT >= 1
 #define SEGMENT_SIZE 16
 #include "slab-impl.c.inl"
-#endif
-#endif
+#endif /* KERNEL_SLAB_COUNT >= 1  */
+#endif /* HEAP_ALIGNMENT == ... */
 //[[[end]]]
 #endif /* !__INTELLISENSE__ */
 

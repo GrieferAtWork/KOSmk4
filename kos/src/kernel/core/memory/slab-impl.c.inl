@@ -33,19 +33,22 @@
 
 DECL_BEGIN
 
-PRIVATE struct slab_descriptor FUNC(desc) = {
-	.sd_lock = ATOMIC_RWLOCK_INIT,
-	.sd_free = NULL,
-	.sd_pend = NULL
+#define DESC        FUNC(slab_desc)
+#define BITSET(s)   ((uintptr_t *)((struct slab *)(s) + 1))
+#define SEGMENTS(s) ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
+
+INTERN struct slab_descriptor DESC = {
+	/* .sd_lock = */ ATOMIC_RWLOCK_INIT,
+	/* .sd_free = */ NULL,
+#ifdef CONFIG_DEBUG_MALLOC
+	/* .sd_used = */ NULL,
+#endif /* CONFIG_DEBUG_MALLOC */
+	/* .sd_pend = */ NULL
 };
 
 struct FUNC(segment) {
 	byte_t s_data[SEGMENT_SIZE];
 };
-
-#define DESC        FUNC(desc)
-#define BITSET(s)   ((uintptr_t *)((struct slab *)(s) + 1))
-#define SEGMENTS(s) ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
 
 LOCAL NONNULL((1, 2)) void
 NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
@@ -59,15 +62,15 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 	index = (((uintptr_t)ptr & PAGEMASK) - SEGMENT_OFFSET) / SEGMENT_SIZE;
 	assert(index < SEGMENT_COUNT);
 	assert(index == (size_t)((struct FUNC(segment) *)ptr - SEGMENTS(self)));
-	assertf(BITSET(self)[index / BITS_PER_POINTER] & (uintptr_t)1 << (index % BITS_PER_POINTER),
+	assertf(BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)] & SLAB_SEGMENT_STATUS_ALLOC_N(index),
 	        "Double free of %Iu-byte segment at %p, in page at %p\n"
 	        "index        = %Iu\n"
 	        "self->s_free = %Iu\n",
-	        (size_t)SEGMENT_SIZE, ptr, self, index, (size_t)self->s_free);
+	        (size_t)SEGMENT_SIZE, ptr, self, index,
+	        (size_t)self->s_free);
 	assert(self->s_free < SEGMENT_COUNT);
 	/* Clear the is-allocated bit. */
-	BITSET(self)
-	[index / BITS_PER_POINTER] &= ~((uintptr_t)1 << (index % BITS_PER_POINTER));
+	(BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)]) &= ~SLAB_SEGMENT_STATUS_ALLOC_N(index);
 	++self->s_free;
 	assert(self->s_free <= SEGMENT_COUNT);
 	if (self->s_free == SEGMENT_COUNT) {
@@ -75,6 +78,20 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 		if ((*self->s_pself = self->s_next) != NULL)
 			self->s_next->s_pself = self->s_pself;
 		slab_freepage(self);
+	} else if (self->s_free == 1) {
+		/* Slab was fully allocated, but became partially allocated. */
+#ifdef CONFIG_DEBUG_MALLOC
+		/* Unlink from `sd_used' */
+		if ((*self->s_pself = self->s_next) != NULL)
+			self->s_next->s_pself = self->s_pself;
+#endif /* CONFIG_DEBUG_MALLOC */
+		/* Insert into `DESC.sd_free' */
+		if ((self->s_next = DESC.sd_free) != NULL) {
+			assert(DESC.sd_free->s_pself == &DESC.sd_free);
+			DESC.sd_free->s_pself = &self->s_next;
+		}
+		self->s_pself = &DESC.sd_free;
+		DESC.sd_free  = self;
 	}
 }
 
@@ -167,26 +184,35 @@ again:
 			assertf(i < LENGTHOF_BITSET, "i = %u, LENGTHOF_BITSET = %u",
 			        i, (unsigned int)LENGTHOF_BITSET);
 			word = BITSET(result_page)[i];
-			if (word == (uintptr_t)-1)
+			if (word == _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC))
 				continue; /* Fully allocated */
 			/* Search for the first unallocated segment in this word. */
-			for (j = 0, mask = 1; (word & mask) != 0; ++j, mask <<= 1)
+			for (j = 0, mask = SLAB_SEGMENT_STATUS_ALLOC;
+			     (word & mask) != 0;
+			     ++j, mask <<= SLAB_SEGMENT_STATUS_BITS)
 				;
-			assert(j < BITS_PER_POINTER);
-			assert(mask == (uintptr_t)1 << j);
+			assert(j < (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS));
+			assert(mask == (uintptr_t)SLAB_SEGMENT_STATUS_ALLOC << (j * SLAB_SEGMENT_STATUS_BITS));
 			/* Add our new allocation mask to mark our new segment as allocated. */
-			BITSET(result_page)[i] = word | mask;
+			(BITSET(result_page)[i]) = word | mask;
 			page_flags = result_page->s_flags;
 			COMPILER_READ_BARRIER();
-			result = &SEGMENTS(result_page)[j + i * BITS_PER_POINTER];
+			result = &SEGMENTS(result_page)[j + i * (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS)];
 			if (--result_page->s_free == 0) {
 				DESC.sd_free = result_page->s_next;
 				if (DESC.sd_free)
 					DESC.sd_free->s_pself = &DESC.sd_free;
+#ifdef CONFIG_DEBUG_MALLOC
+				if ((result_page->s_next = DESC.sd_used) != NULL)
+					DESC.sd_used->s_pself = &result_page->s_next;
+				result_page->s_pself = &DESC.sd_used;
+				DESC.sd_used         = result_page;
+#else /* CONFIG_DEBUG_MALLOC */
 				result_page->s_pself = NULL;
 #ifndef NDEBUG
 				memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
 #endif /* !NDEBUG */
+#endif /* !CONFIG_DEBUG_MALLOC */
 			}
 			FUNC(slab_endwrite)();
 #ifdef CONFIG_DEBUG_HEAP
@@ -225,8 +251,8 @@ again:
 	result_page->s_pself = &DESC.sd_free;
 	result_page->s_next  = NULL;
 	if (!(flags & GFP_CALLOC))
-		memset(&BITSET(result_page)[0], 0, SIZEOF_BITSET - sizeof(uintptr_t));
-	BITSET(result_page)[0] = 1;
+		memset(&BITSET(result_page)[1], 0, SIZEOF_BITSET - sizeof(uintptr_t));
+	(BITSET(result_page)[0]) = SLAB_SEGMENT_STATUS_ALLOC;
 	result = &SEGMENTS(result_page)[0];
 
 	if unlikely(!sync_trywrite(&DESC.sd_lock)) {

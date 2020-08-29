@@ -292,7 +292,7 @@ typedef unsigned int gfp_t;
 
 
 #undef CONFIG_USE_SLAB_ALLOCATORS
-#if 0
+#if 1
 #define CONFIG_USE_SLAB_ALLOCATORS 1
 #endif
 
