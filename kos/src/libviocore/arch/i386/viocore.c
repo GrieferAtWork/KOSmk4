@@ -1880,7 +1880,7 @@ PRIVATE u8 const CS_reg_offsets[X86_GPREGCOUNT] = {
 #ifdef __x86_64__
 #define EMU86_GETREGB(regno, op_flags) \
 	CS_getregb(self->vea_args.va_state, regno, op_flags)
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) u8
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u8
 NOTHROW(CC CS_getregb)(vio_cpustate_t const *__restrict state,
                        u8 regno, emu86_opflags_t op_flags) {
 	regno &= (X86_GPREGCOUNT - 1);

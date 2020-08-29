@@ -117,7 +117,7 @@ DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kern
 INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
 /* Check if preemptive interrupts are enabled on the calling CPU */
-PRIVATE NOBLOCK ATTR_DBGTEXT WUNUSED ATTR_PURE bool
+PRIVATE NOBLOCK ATTR_DBGTEXT ATTR_PURE WUNUSED bool
 NOTHROW(KCALL are_preemptive_interrupts_enabled)(struct cpu *__restrict me) {
 	return !FORCPU(me, arch_cpu_preemptive_interrupts_disabled);
 }

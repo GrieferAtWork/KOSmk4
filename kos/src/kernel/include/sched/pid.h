@@ -91,21 +91,21 @@ taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED);
 
 
 /* Return the PID of `self' within the given PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self,
                               struct pidns const *__restrict ns);
-FORCELOCAL ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
                                 struct pidns const *__restrict ns);
 
 /* Return the PID of `self' within its own PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self);
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self);
 
 /* Return the PID of `self' within the root PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
 
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
@@ -256,9 +256,9 @@ LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessparent_
 LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread);
 
 /* Check if the given task was orphaned (no longer has a parent process) */
-LOCAL WUNUSED ATTR_PURE bool NOTHROW(KCALL task_isorphan)(void);
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread);
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self);
+LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_isorphan)(void);
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread);
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self);
 
 /* Detach the given `thread' from its parent
  * @return: true:  Successfully detached the given `thread'.
@@ -304,12 +304,12 @@ LOCAL WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isprocessleader)(void);
 LOCAL WUNUSED ATTR_CONST NONNULL((1)) bool NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread);
 
 /* Returns true if the calling/given thread is a process group leader */
-LOCAL WUNUSED ATTR_PURE bool NOTHROW(KCALL task_isprocessgroupleader)(void);
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread);
+LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_isprocessgroupleader)(void);
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread);
 
 /* Returns true if the calling/given thread is a session group leader */
-LOCAL WUNUSED ATTR_PURE bool NOTHROW(KCALL task_issessionleader)(void);
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread);
+LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_issessionleader)(void);
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread);
 
 
 /* Return the TID (thread id) / PID (process id /
@@ -317,14 +317,14 @@ LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(
  * The returned IDS are either relative to the task's own
  * PID namespace, or to the ROOT pid namespace.
  * NOTE: The `*_S' variants can also be used by kernel threads, where they evaluate to `0' */
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_gettid)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_gettid_s)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getroottid)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getroottid_s)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getpid)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getpid_s)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getrootpid)(void);
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getrootpid_s)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_gettid)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_gettid_s)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getroottid)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getroottid_s)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getpid)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getpid_s)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getrootpid)(void);
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getrootpid_s)(void);
 
 /* Same as the functions above, but return the values for a given thread, rather than the calling.
  * NOTE: The non-root variants of these functions will still return the thread's proper IDs in
@@ -344,18 +344,18 @@ LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getrootpid_s)(void);
  *   - FORTASK(thread, _this_group.tg_process) == NULL                        (`thread' is a kernel thread)
  *   - FORTASK(FORTASK(thread, _this_group.tg_process), this_taskpid) == NULL (The process leader of `thread' is a kernel thread)
  */
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread);
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread);
 
 
 
@@ -571,11 +571,11 @@ FUNDEF ATTR_RETNONNULL NONNULL((1)) struct task *
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self) {
 	return taskpid_getpid(self, THIS_PIDNS);
 }
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self) {
 	return taskpid_getpid_s(self, THIS_PIDNS);
 }
@@ -585,14 +585,14 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self) {
 #ifndef __INTELLISENSE__
 
 /* Return the PID of `self' within the given PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self,
                               struct pidns const *__restrict ns) {
 	__hybrid_assert(self->tp_pidns->pn_indirection >= ns->pn_indirection);
 	return self->tp_pids[ns->pn_indirection];
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
                                 struct pidns const *__restrict ns) {
 	if likely(self->tp_pidns->pn_indirection >= ns->pn_indirection)
@@ -600,37 +600,37 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
 	return 0;
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self) {
 	return taskpid_getpid(self, self->tp_pidns);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self) {
 	return taskpid_getpid_s(self, self->tp_pidns);
 }
 
 
 /* Return the PID of `self' within the root PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self) {
 	return self->tp_pids[0];
 }
 
 /* Check if the given task was orphaned (no longer has a parent process) */
-LOCAL WUNUSED ATTR_PURE bool
+LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL task_isorphan)(void) {
 	struct taskpid *proc = task_getprocesspid();
 	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread) {
 	struct taskpid *proc = task_getprocesspid_of(thread);
 	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self) {
 	return __hybrid_atomic_load(self->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
 }
@@ -992,63 +992,63 @@ NOTHROW(KCALL task_isprocessleader)(void) {
 	return PERTASK_GET(this_taskgroup.tg_process) == THIS_TASK;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread) {
 	return FORTASK(thread, this_taskgroup.tg_process) == thread;
 }
 
 
-LOCAL WUNUSED ATTR_PURE bool
+LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL task_isprocessgroupleader)(void) {
 	return PERTASK_GET(this_taskgroup.tg_proc_group) == THIS_TASKPID;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread) {
 	return __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_proc_group), __ATOMIC_ACQUIRE) ==
 	       FORTASK(thread, this_taskpid);
 }
 
-LOCAL WUNUSED ATTR_PURE bool
+LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL task_issessionleader)(void) {
 	return task_isprocessgroupleader() &&
 	       PERTASK_GET(this_taskgroup.tg_pgrp_session) == THIS_TASKPID;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread) {
 	return task_isprocessgroupleader_p(thread) &&
 	       __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_pgrp_session), __ATOMIC_ACQUIRE) ==
 	       FORTASK(thread, this_taskpid);
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_gettid)(void) {
 	struct taskpid *pid = THIS_TASKPID;
 	__hybrid_assertf(pid, "task_gettid() called by a kernel thread");
 	return pid->tp_pids[pid->tp_pidns->pn_indirection];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_gettid_s)(void) {
 	struct taskpid *pid = THIS_TASKPID;
 	return likely(pid) ? pid->tp_pids[pid->tp_pidns->pn_indirection] : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_getroottid)(void) {
 	struct taskpid *pid = THIS_TASKPID;
 	__hybrid_assertf(pid, "task_getroottid() called by a kernel thread");
 	return pid->tp_pids[0];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_getroottid_s)(void) {
 	struct taskpid *pid = THIS_TASKPID;
 	return likely(pid) ? pid->tp_pids[0] : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_getpid)(void) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess();
@@ -1058,7 +1058,7 @@ NOTHROW(KCALL task_getpid)(void) {
 	return pid->tp_pids[pid->tp_pidns->pn_indirection];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_getpid_s)(void) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess();
@@ -1068,7 +1068,7 @@ NOTHROW(KCALL task_getpid_s)(void) {
 	return likely(pid) ? pid->tp_pids[pid->tp_pidns->pn_indirection] : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_getrootpid)(void) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess();
@@ -1078,7 +1078,7 @@ NOTHROW(KCALL task_getrootpid)(void) {
 	return pid->tp_pids[0];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
 NOTHROW(KCALL task_getrootpid_s)(void) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess();
@@ -1088,7 +1088,7 @@ NOTHROW(KCALL task_getrootpid_s)(void) {
 	return likely(pid) ? pid->tp_pids[0] : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid   = FORTASK(thread, this_taskpid);
 	struct taskpid *mypid = THIS_TASKPID;
@@ -1099,7 +1099,7 @@ NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread) {
 	return pid->tp_pids[mypid->tp_pidns->pn_indirection];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	__hybrid_assertf(pid, "task_getselftid_of(%p) is a kernel thread", thread);
@@ -1108,7 +1108,7 @@ NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread) {
 	return pid->tp_pids[pid->tp_pidns->pn_indirection];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid   = FORTASK(thread, this_taskpid);
 	struct taskpid *mypid = THIS_TASKPID;
@@ -1117,7 +1117,7 @@ NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread) {
 	       : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid && pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
@@ -1125,20 +1125,20 @@ NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread) {
 	       : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	__hybrid_assertf(pid, "task_getroottid_of(%p) is a kernel thread", thread);
 	return pid->tp_pids[0];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid) ? pid->tp_pids[0] : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct taskpid *mypid = THIS_TASKPID;
@@ -1152,7 +1152,7 @@ NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread) {
 	return pid->tp_pids[mypid->tp_pidns->pn_indirection];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess_of(thread);
@@ -1164,7 +1164,7 @@ NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread) {
 	return pid->tp_pids[pid->tp_pidns->pn_indirection];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader   = task_getprocess_of(thread);
@@ -1177,7 +1177,7 @@ NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread) {
 	       : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess_of(thread);
@@ -1189,7 +1189,7 @@ NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread) {
 	       : 0;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess_of(thread);
@@ -1199,7 +1199,7 @@ NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread) {
 	return pid->tp_pids[0];
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess_of(thread);

@@ -181,7 +181,7 @@ PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 
 
 
-PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL get_stack_avail)(void) {
 	void *start, *end, *sp = __rdsp();
 #ifndef __x86_64__
@@ -207,7 +207,7 @@ NOTHROW(KCALL get_stack_avail)(void) {
 	return 8096;
 }
 
-PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL get_stack_inuse)(void) {
 	void *start, *end, *sp = __rdsp();
 #ifndef __x86_64__

@@ -41,7 +41,7 @@ DECL_BEGIN
 /* Safely get/set the values of saved registers that may be modified by RPC redirection. */
 
 /* Check if `self' returns to user-space. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	uintptr_t pip;
 	u16 cs = ATOMIC_READ(self->ir_cs16);
@@ -64,7 +64,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 }
 
 /* get:`self->ir_pip' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = ATOMIC_READ(self->ir_pip);
 	if unlikely(result == (uintptr_t)&x86_rpc_user_redirection)
@@ -73,7 +73,7 @@ NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 }
 
 /* get:`self->ir_cs16' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) u16
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_cs16);
 	if (result == SEGMENT_KERNEL_CODE) {
@@ -85,7 +85,7 @@ NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 }
 
 /* get:`self->ir_pflags' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = ATOMIC_READ(self->ir_pflags);
 	if unlikely(result == 0) {
@@ -97,7 +97,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 }
 
 /* get:`self->ir_rsp' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 #ifdef __x86_64__
 	u64 result = ATOMIC_READ(self->ir_rsp);
@@ -193,7 +193,7 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
 #ifdef __x86_64__
 
 /* Check if `self' returns to compatibility-mode. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
 	u16 cs = ATOMIC_READ(self->ir_cs16);
 	if (SEGMENT_IS_VALID_USERCODE32(cs))
@@ -210,7 +210,7 @@ NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
 }
 
 /* get:`self->ir_ss16' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) u16
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	u16 result = ATOMIC_READ(self->ir_ss16);
 	if (result == SEGMENT_KERNEL_DATA0) {
@@ -254,7 +254,7 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 #else /* __x86_64__ */
 
 /* Not guarantied to return `1' for vm86 interrupt registers. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self) {
 	u16 cs;
 	u32 eip;
@@ -267,7 +267,7 @@ NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self)
 	return false;
 }
 
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self) {
 	u32 eip, eflags;
 	eflags = ATOMIC_READ(self->ir_eflags);

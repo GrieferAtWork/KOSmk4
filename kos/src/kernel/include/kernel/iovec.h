@@ -141,7 +141,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copytovphys)(struct a
 /* TODO: This stuff shouldn't get inlined. - These functions are way too big for that!
  * NOTE: Also make it so that `aio_pbuffer_size = aio_buffer_size' if binary compatibility
  *       exists, iow: offsets in `struct aio_buffer' are identical to `struct aio_pbuffer'. */
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) size_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL aio_buffer_size)(struct aio_buffer const *__restrict self) {
 	size_t i, result;
 	result = self->ab_last + self->ab_head.ab_size;
@@ -150,7 +150,7 @@ NOTHROW(KCALL aio_buffer_size)(struct aio_buffer const *__restrict self) {
 	return result;
 }
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) size_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL aio_pbuffer_size)(struct aio_pbuffer const *__restrict self) {
 	size_t i, result;
 	result = self->ab_last + self->ab_head.ab_size;

@@ -229,7 +229,7 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 }
 
 /* Return the value of a register `regno' for the given `state' */
-__LOCAL WUNUSED ATTR_PURE __uint64_t LIBRPC_CC
+__LOCAL ATTR_PURE WUNUSED __uint64_t LIBRPC_CC
 rpc_register_state64_getreg_icpustate(struct icpustate *__restrict state,
                                       unsigned int regno) {
 	__uint64_t result;

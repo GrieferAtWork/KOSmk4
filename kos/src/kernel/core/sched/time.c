@@ -1541,7 +1541,7 @@ wait_a_bit:
  * through `task_quantum_tick()', which returns a thread-local quantum
  * tick representing the # of time spent executing code in the context
  * of that thread. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE struct qtick
+PUBLIC NOBLOCK ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL cpu_quantum_tick)(void) {
 	struct qtick result;
 	pflag_t was;
@@ -1551,7 +1551,7 @@ NOTHROW(KCALL cpu_quantum_tick)(void) {
 	return result;
 }
 
-PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct qtick
+PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL cpu_quantum_tick_nopr)(void) {
 	struct qtick result;
 	struct cpu *me;
@@ -1599,7 +1599,7 @@ NOTHROW(KCALL cpu_account_activity)(struct task *__restrict oldthread,
 
 /* Return the amount of time that has been spent executing code in the
  * context of the calling thread. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE struct qtick
+PUBLIC NOBLOCK ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL task_quantum_tick)(void) {
 	pflag_t was;
 	struct task *mythread;
@@ -1620,7 +1620,7 @@ NOTHROW(KCALL task_quantum_tick)(void) {
 
 /* Return the amount of time that has been spent executing code in the
  * context of the given thread. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE struct qtick
+PUBLIC NOBLOCK ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread) {
 	struct qtick result;
 	if (thread == THIS_TASK) {

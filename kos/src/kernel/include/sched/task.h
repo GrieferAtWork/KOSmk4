@@ -221,8 +221,8 @@ DATDEF ATTR_PERTASK struct vm_datapart const this_kernel_stackpart;
  * to ensure that sufficient memory remains available after the allocation
  * was made. (for example: the max CFI remember-stack size is directly
  * determined by the amount of available stack memory) */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE size_t NOTHROW(KCALL get_stack_avail)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE size_t NOTHROW(KCALL get_stack_inuse)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL get_stack_avail)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL get_stack_inuse)(void);
 
 /* Returns the bounds of the currently used kernel-space stack.
  * @param: pbase: Filled with a pointer to the lowest-address byte that is still apart of the stack.

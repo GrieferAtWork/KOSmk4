@@ -107,7 +107,7 @@ done:
 }
 
 /* Calculate and return the checksum for the given memory block. */
-INTERN WUNUSED ATTR_PURE NONNULL((1)) byte_t
+INTERN ATTR_PURE WUNUSED NONNULL((1)) byte_t
 NOTHROW(KCALL GDBPacket_GetCheckSum)(void const *__restrict buf, size_t buflen) {
 	byte_t result;
 	size_t i;

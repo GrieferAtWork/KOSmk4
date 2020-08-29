@@ -449,8 +449,8 @@ __NAMESPACE_INT_END
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { sync_endread(&(self)->field); }                                     \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { sync_endwrite(&(self)->field); }                                   \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { sync_end(&(self)->field); }                                             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return sync_reading(&(self)->field); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return sync_writing(&(self)->field); }    \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return sync_reading(&(self)->field); }    \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return sync_writing(&(self)->field); }    \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return sync_canread(&(self)->field); }              \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return sync_canwrite(&(self)->field); }            \
 	template<> class sync_methods< T > {                                                                                                                                       \
@@ -503,10 +503,10 @@ __NAMESPACE_INT_END
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _endread(self); }                                     \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _endwrite(self); }                                   \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _end(self); }                                             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _reading(self); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _writing(self); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _canread(self); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _canwrite(self); }  \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _reading(self); }    \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _writing(self); }    \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _canread(self); }    \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _canwrite(self); }  \
 	template<> class sync_methods< T > {                                                                                                                         \
 	public:                                                                                                                                                      \
 		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }         \
@@ -554,10 +554,10 @@ __NAMESPACE_INT_END
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _release(self); }                              \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _release(self); }                             \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _release(self); }                                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _acquired(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _acquired(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _acquired(self); } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _acquired(self); } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
 	template<> class sync_methods< T > {                                                                                                                  \
 	public:                                                                                                                                               \
 		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _acquire(self); } \
@@ -605,10 +605,10 @@ __NAMESPACE_INT_END
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _post(self); }                                 \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _post(self); }                                \
 	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _post(self); }                                     \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict UNUSED(self)) { return true; } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict UNUSED(self)) { return true; } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict UNUSED(self)) { return true; } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict UNUSED(self)) { return true; } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
 	template<> class sync_methods< T > {                                                                                                                  \
 	public:                                                                                                                                               \
 		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _wait(self); }  \

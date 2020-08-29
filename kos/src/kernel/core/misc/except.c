@@ -50,22 +50,22 @@ NOTHROW_NCX(__LIBCCALL libc_error_register_state)(void) {
 	return &THIS_EXCEPTION_STATE;
 }
 
-INTERN WUNUSED ATTR_PURE error_code_t
+INTERN ATTR_PURE WUNUSED error_code_t
 NOTHROW_NCX(__LIBCCALL libc_error_code)(void) {
 	return PERTASK_GET(this_exception_code);
 }
 
-INTERN WUNUSED ATTR_PURE bool
+INTERN ATTR_PURE WUNUSED bool
 NOTHROW_NCX(__LIBCCALL libc_error_active)(void) {
 	return PERTASK_GET(this_exception_code) != E_OK;
 }
 
-INTERN WUNUSED ATTR_PURE error_class_t
+INTERN ATTR_PURE WUNUSED error_class_t
 NOTHROW_NCX(__LIBCCALL libc_error_class)(void) {
 	return PERTASK_GET(this_exception_class);
 }
 
-INTERN WUNUSED ATTR_PURE error_subclass_t
+INTERN ATTR_PURE WUNUSED error_subclass_t
 NOTHROW_NCX(__LIBCCALL libc_error_subclass)(void) {
 	return PERTASK_GET(this_exception_subclass);
 }

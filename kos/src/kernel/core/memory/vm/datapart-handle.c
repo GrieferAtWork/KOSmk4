@@ -98,7 +98,7 @@ handle_datapart_pread(struct vm_datapart *__restrict self,
 	return vm_datapart_read(self, dst, num_bytes, (size_t)addr);
 }
 
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+INTERN NONNULL((1)) size_t KCALL
 handle_datapart_pwrite(struct vm_datapart *__restrict self,
                        USER CHECKED void const *src, size_t num_bytes,
                        pos_t addr, iomode_t UNUSED(mode)) {
@@ -121,7 +121,7 @@ handle_datapart_preadv(struct vm_datapart *__restrict self,
 	return vm_datapart_readv(self, dst, (size_t)addr);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+INTERN NONNULL((1, 2)) size_t KCALL
 handle_datapart_pwritev(struct vm_datapart *__restrict self,
                         struct aio_buffer *__restrict src,
                         size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {

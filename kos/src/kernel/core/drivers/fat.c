@@ -63,15 +63,15 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self);
 
 /* The fat get/set implementation for different table sizes. */
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat16_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat32_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL Fat16_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL Fat32_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index) THROWS(...);
 PRIVATE void KCALL Fat16_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target) THROWS(...);
 PRIVATE void KCALL Fat12_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target) THROWS(...);
 PRIVATE void KCALL Fat32_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target) THROWS(...);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat12_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat16_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat32_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL Fat12_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL Fat16_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL Fat32_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id) THROWS(...);
 
 INTDEF struct inode_type Fat_FileNodeOperators;
 INTDEF struct inode_type Fat_DirectoryNodeOperators;
@@ -1455,7 +1455,7 @@ Fat_RemoveDirectoryFromParentDirectory(struct directory_node *__restrict contain
 
 
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) u8
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) u8
 NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
 	unsigned int i;
 	u8 result = 0;
@@ -1739,7 +1739,7 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 }
 
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) bool
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL directory_has_dos83)(struct directory_node *__restrict self,
                                    char *__restrict name) {
 	size_t i;
@@ -2280,25 +2280,25 @@ INTERN struct inode_type Fat32_RootDirectoryNodeOperators = {
 
 
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL
 Fat12_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
 	return (id + (id / 2)) / self->f_sectorsize;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL
 Fat16_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
 	return (id * 2) / self->f_sectorsize;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatSectorIndex KCALL
 Fat32_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
 	return (id * 4) / self->f_sectorsize;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat12_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	u16 val;
@@ -2328,7 +2328,7 @@ Fat12_SetFatIndirection(FatSuperblock *__restrict self,
 		*pval |= indirection_target & 0xfff;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat16_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	assertf(index < self->f_fat_length,
@@ -2347,7 +2347,7 @@ Fat16_SetFatIndirection(FatSuperblock *__restrict self,
 	((u16 *)self->f_fat_table)[index] = (u16)indirection_target;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat32_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	assertf(index < self->f_fat_length,
@@ -2366,7 +2366,7 @@ Fat32_SetFatIndirection(FatSuperblock *__restrict self,
 	((u32 *)self->f_fat_table)[index] = indirection_target;
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+INTERN ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFatIndirection(FatSuperblock *__restrict self,
                       FatClusterIndex index) {
 	FatSectorIndex table_sector;
@@ -2379,7 +2379,8 @@ Fat_GetFatIndirection(FatSuperblock *__restrict self,
 		SCOPED_WRITELOCK(&self->f_fat_lock);
 		/* Lazily load the fat table sector that hasn't been loaded yet. */
 		block_device_read(self->s_device,
-		                  (void *)((uintptr_t)self->f_fat_table + (table_sector * self->f_sectorsize)),
+		                  (byte_t *)self->f_fat_table + (table_sector *
+		                                                 self->f_sectorsize),
 		                  self->f_sectorsize,
 		                  FAT_SECTORADDR(self, self->f_fat_start + table_sector));
 		FAT_META_STLOAD(self, table_sector);
@@ -2402,7 +2403,8 @@ Fat_SetFatIndirection(FatSuperblock *__restrict self,
 	if (!FAT_META_GTLOAD(self, table_sector)) {
 		/* Must load missing table sectors. */
 		block_device_read(self->s_device,
-		                  (void *)((uintptr_t)self->f_fat_table + (table_sector * self->f_sectorsize)),
+		                  (byte_t *)self->f_fat_table + (table_sector *
+		                                                 self->f_sectorsize),
 		                  self->f_sectorsize,
 		                  FAT_SECTORADDR(self, self->f_fat_start + table_sector));
 		FAT_META_STLOAD(self, table_sector);
@@ -2729,7 +2731,8 @@ Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
 	assertf(fat_sector_index + num_sectors <= self->f_sec4fat,
 	        "Out-of-bounds FAT sector index: %I32u+%I32u(%I32u) > %I32u",
 	        fat_sector_index, num_sectors, fat_sector_index + num_sectors, self->f_sec4fat);
-	sector_buffer = (void *)((uintptr_t)self->f_fat_table + (fat_sector_index * self->f_sectorsize));
+	sector_buffer = (byte_t *)self->f_fat_table + (fat_sector_index *
+	                                               self->f_sectorsize);
 	sector_bytes  = (size_t)(num_sectors * self->f_sectorsize);
 	sector_start  = self->f_fat_start + fat_sector_index;
 	printk(KERN_INFO "[fat] Saving modified meta-sectors %I32u..%I32u of 0..%I32u (%I32u..%I32u)\n",

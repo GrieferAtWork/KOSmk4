@@ -82,7 +82,7 @@ NOTHROW(FCALL GDBBreak_SwMinFree_SetLower)(size_t newval) {
  * NOTE: The caller must be the GDB host thread.
  * @return: true:  An entry already exists.
  * @return: false: No matching entry exists. */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL GDBBreak_SwExists)(struct vm const *effective_vm,
                                  byte_t *addr) {
 	size_t i;

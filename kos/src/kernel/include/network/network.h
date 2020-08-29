@@ -76,7 +76,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct net_peeraddrs, nps_refcnt, net_peeraddrs_destro
 
 /* Lookup a peer address descriptor for `ip' and return its pointer.
  * If no such descriptor exists, return `NULL' instead. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct net_peeraddr *
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct net_peeraddr *
 NOTHROW(KCALL net_peeraddrs_lookup_ip)(struct net_peeraddrs *__restrict self, be32 ip);
 
 /* Empty network peer address list. */

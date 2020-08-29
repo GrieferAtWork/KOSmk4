@@ -167,7 +167,7 @@ struct vm_swpblock {
  * @param: num_bytes: The number of bytes found within the range.
  * @param: lock:      The lock used to lock the associated DMA range. */
 typedef bool /*NOTHROW*/ (KCALL *vm_dmarangefunc_t)(void *arg, vm_phys_t paddr, size_t num_bytes,
-                                                   struct vm_dmalock *__restrict lock);
+                                                    struct vm_dmalock *__restrict lock);
 typedef void /*NOTHROW*/ (KCALL *vm_dmaresetfunc_t)(void *arg);
 #endif /* __CC__ */
 
@@ -1645,7 +1645,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vm, v_refcnt, vm_destroy);
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct vm, v_weakrefcnt, vm_free);
 
 /* Allocate and initialize a new, empty VM for user-space. */
-FUNDEF ATTR_RETNONNULL REF struct vm *KCALL vm_alloc(void) THROWS(E_BADALLOC, ...);
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct vm *KCALL
+vm_alloc(void) THROWS(E_BADALLOC, ...);
 
 /* Clone the given VM `self'
  * NOTE: The clone operation is performed atomically, meaning that
@@ -1655,9 +1656,8 @@ FUNDEF ATTR_RETNONNULL REF struct vm *KCALL vm_alloc(void) THROWS(E_BADALLOC, ..
  *       contained within `self' are being changed.
  * @param: keep_loose_mappings: When false (default), don't clone mappings marked as `VM_PROT_LOOSE'
  * @return: * : A reference to the newly cloned VM (with a reference counter of `1'). */
-FUNDEF ATTR_RETNONNULL REF struct vm *KCALL
-vm_clone(struct vm *__restrict self,
-         bool keep_loose_mappings DFL(false))
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *KCALL
+vm_clone(struct vm *__restrict self, bool keep_loose_mappings DFL(false))
 		THROWS(E_BADALLOC, ...);
 
 
@@ -1666,7 +1666,8 @@ vm_clone(struct vm *__restrict self,
  * returning.
  * NOTE: The caller must NOT be holding a lock to either
  *       the old or new VM's list of tasks. */
-FUNDEF void KCALL task_setvm(struct vm *__restrict newvm) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1)) void KCALL
+task_setvm(struct vm *__restrict newvm) THROWS(E_WOULDBLOCK);
 
 /* Return the active VM of the given `thread' */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *KCALL

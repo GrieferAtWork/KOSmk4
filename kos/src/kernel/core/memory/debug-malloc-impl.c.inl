@@ -23,38 +23,46 @@
 #endif
 
 #ifdef MALLOC_NX
-#define IFELSE_NX(if_nx,if_x)    if_nx
-#define FUNC(x)                  x##_nx
-#define NOTHROW_NX               NOTHROW
+#define IFELSE_NX(if_nx, if_x) if_nx
+#define FUNC(x)                x##_nx
+#define NOTHROW_NX             NOTHROW
 #else /* MALLOC_NX */
-#define IFELSE_NX(if_nx,if_x)    if_x
-#define FUNC(x)                  x
-#define NOTHROW_NX               /* nothing */
+#define IFELSE_NX(if_nx, if_x) if_x
+#define FUNC(x)                x
+#define NOTHROW_NX             /* nothing */
 #endif /* !MALLOC_NX */
 
 DECL_BEGIN
 
 
 #ifdef MALLOC_NX
-#define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure)                \
-	assert(!(flags & MALLNODE_FUSERNODE));                                                        \
-	if unlikely((result_ptr).hp_siz == 0) {                                                       \
-		nx_on_failure                                                                             \
-	} else if unlikely(!FUNC(mall_trace_impl)((result_ptr).hp_ptr, (result_ptr).hp_siz,           \
-	                                          (flags & (GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT)) | \
-	                                          MALLNODE_FUSERNODE, context)) {                     \
-		heap_free_untraced(self, (result_ptr).hp_ptr, (result_ptr).hp_siz, flags);                \
-		nx_on_failure                                                                             \
+#define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure)      \
+	assert(!(flags & MALLNODE_FUSERNODE));                                              \
+	if unlikely((result_ptr).hp_siz == 0) {                                             \
+		nx_on_failure                                                                   \
+	} else if unlikely(!FUNC(mall_trace_impl)((result_ptr).hp_ptr, (result_ptr).hp_siz, \
+	                                          (flags & (GFP_NOLEAK | GFP_NOWALK |       \
+	                                                    GFP_INHERIT)) |                 \
+	                                          MALLNODE_FUSERNODE,                       \
+	                                          context)) {                               \
+		heap_free_untraced(self, (result_ptr).hp_ptr, (result_ptr).hp_siz, flags);      \
+		nx_on_failure                                                                   \
 	}
 #else /* MALLOC_NX */
-#define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure)                              \
-	assert(!(flags & MALLNODE_FUSERNODE));                                                                      \
-	TRY {                                                                                                       \
-		FUNC(mall_trace_impl)((result_ptr).hp_ptr, (result_ptr).hp_siz,                                         \
-		                      (flags & (GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT)) | MALLNODE_FUSERNODE, context); \
-	} EXCEPT {                                                                                                  \
-		heap_free_untraced(self, (result_ptr).hp_ptr, (result_ptr).hp_siz, flags);                              \
-		RETHROW();                                                                                              \
+#define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure) \
+	assert(!(flags & MALLNODE_FUSERNODE));                                         \
+	TRY {                                                                          \
+		FUNC(mall_trace_impl)                                                      \
+		((result_ptr).hp_ptr, (result_ptr).hp_siz,                                 \
+		 (flags & (GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT)) |                       \
+		 MALLNODE_FUSERNODE,                                                       \
+		 context);                                                                 \
+	} EXCEPT {                                                                     \
+		heap_free_untraced(self,                                                   \
+		                   (result_ptr).hp_ptr,                                    \
+		                   (result_ptr).hp_siz,                                    \
+		                   flags);                                                 \
+		RETHROW();                                                                 \
 	}
 #endif /* !MALLOC_NX */
 
@@ -80,7 +88,9 @@ NOTHROW_NX(KCALL FUNC(heap_align))(struct heap *__restrict self,
                                    size_t num_bytes, gfp_t flags) {
 	struct heapptr result;
 	LOAD_CALLER_CONTEXT
-	result = FUNC(heap_align_untraced)(self, min_alignment, offset, num_bytes, flags);
+	result = FUNC(heap_align_untraced)(self, min_alignment,
+	                                   offset, num_bytes,
+	                                   flags);
 	TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result, flags, {
 		result.hp_ptr = NULL;
 		result.hp_siz = 0;
@@ -109,8 +119,10 @@ NOTHROW_NX(KCALL FUNC(heap_realloc))(struct heap *__restrict self,
 		TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result, alloc_flags, goto err;)
 		return result;
 	}
-	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
+	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes)) {
+		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		                          new_bytes - (HEAP_ALIGNMENT - 1)));
+	}
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(new_bytes < HEAP_MINSIZE)
 		new_bytes     = HEAP_MINSIZE;
@@ -121,34 +133,44 @@ NOTHROW_NX(KCALL FUNC(heap_realloc))(struct heap *__restrict self,
 		/* Free trailing memory. */
 		free_bytes = old_bytes - new_bytes;
 		if (free_bytes >= HEAP_MINSIZE) {
-			heap_free(self, (void *)((uintptr_t)old_ptr + new_bytes),
-			          free_bytes, free_flags);
+			heap_free(self,
+			          (byte_t *)old_ptr + new_bytes,
+			          free_bytes,
+			          free_flags);
 			result.hp_siz = new_bytes;
 		}
 		return result;
 	}
 	missing_bytes = new_bytes - old_bytes;
-	missing_bytes = FUNC(heap_allat_untraced)(self, (void *)((uintptr_t)old_ptr + old_bytes),
-	                                          missing_bytes, alloc_flags);
+	missing_bytes = FUNC(heap_allat_untraced)(self,
+	                                          (byte_t *)old_ptr + old_bytes,
+	                                          missing_bytes,
+	                                          alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
 		result.hp_siz += missing_bytes;
 #ifdef MALLOC_NX
-		if unlikely(!mall_trace_impl_nx((void *)((uintptr_t)old_ptr + old_bytes),
-		                                missing_bytes, alloc_flags | MALLNODE_FUSERNODE,
+		if unlikely(!mall_trace_impl_nx((byte_t *)old_ptr + old_bytes,
+		                                missing_bytes,
+		                                alloc_flags | MALLNODE_FUSERNODE,
 		                                context)) {
-			heap_free_untraced(self, (void *)((uintptr_t)old_ptr + old_bytes),
-			                   missing_bytes, alloc_flags);
+			heap_free_untraced(self,
+			                   (byte_t *)old_ptr + old_bytes,
+			                   missing_bytes,
+			                   alloc_flags);
 			goto err;
 		}
 #else /* MALLOC_NX */
 		TRY {
-			mall_trace_impl((void *)((uintptr_t)old_ptr + old_bytes),
-			                missing_bytes, alloc_flags | MALLNODE_FUSERNODE,
+			mall_trace_impl((byte_t *)old_ptr + old_bytes,
+			                missing_bytes,
+			                alloc_flags | MALLNODE_FUSERNODE,
 			                context);
 		} EXCEPT {
-			heap_free_untraced(self, (void *)((uintptr_t)old_ptr + old_bytes),
-			                   missing_bytes, alloc_flags);
+			heap_free_untraced(self,
+			                   (byte_t *)old_ptr + old_bytes,
+			                   missing_bytes,
+			                   alloc_flags);
 			RETHROW();
 		}
 #endif /* !MALLOC_NX */
@@ -201,12 +223,15 @@ NOTHROW_NX(KCALL FUNC(heap_realign))(struct heap *__restrict self,
 		if unlikely(alloc_flags & GFP_NOMOVE)
 			goto err;
 		/* Special case: initial allocation */
-		result = FUNC(heap_align_untraced)(self, min_alignment, offset, new_bytes, alloc_flags);
+		result = FUNC(heap_align_untraced)(self, min_alignment, offset,
+		                                   new_bytes, alloc_flags);
 		TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result, alloc_flags, goto err;)
 		return result;
 	}
-	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
+	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes)) {
+		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		                          new_bytes - (HEAP_ALIGNMENT - 1)));
+	}
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	result.hp_ptr = old_ptr;
 	result.hp_siz = old_bytes;
@@ -217,34 +242,42 @@ NOTHROW_NX(KCALL FUNC(heap_realign))(struct heap *__restrict self,
 		/* Free trailing memory. */
 		free_bytes = old_bytes - new_bytes;
 		if (free_bytes >= HEAP_MINSIZE) {
-			heap_free(self, (void *)((uintptr_t)old_ptr + new_bytes),
+			heap_free(self, (byte_t *)old_ptr + new_bytes,
 			          free_bytes, free_flags);
 			result.hp_siz = new_bytes;
 		}
 		return result;
 	}
 	missing_bytes = new_bytes - old_bytes;
-	missing_bytes = FUNC(heap_allat_untraced)(self, (void *)((uintptr_t)old_ptr + old_bytes),
-	                                          missing_bytes, alloc_flags);
+	missing_bytes = FUNC(heap_allat_untraced)(self,
+	                                          (byte_t *)old_ptr + old_bytes,
+	                                          missing_bytes,
+	                                          alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
 		result.hp_siz += missing_bytes;
 #ifdef MALLOC_NX
-		if unlikely(!mall_trace_impl_nx((void *)((uintptr_t)old_ptr + old_bytes),
-		                                missing_bytes, alloc_flags | MALLNODE_FUSERNODE,
+		if unlikely(!mall_trace_impl_nx((byte_t *)old_ptr + old_bytes,
+		                                missing_bytes,
+		                                 alloc_flags | MALLNODE_FUSERNODE,
 		                                context)) {
-			heap_free_untraced(self, (void *)((uintptr_t)old_ptr + old_bytes),
-			                   missing_bytes, alloc_flags);
+			heap_free_untraced(self,
+			                   (byte_t *)old_ptr + old_bytes,
+			                   missing_bytes,
+			                   alloc_flags);
 			goto err;
 		}
 #else /* MALLOC_NX */
 		TRY {
-			mall_trace_impl((void *)((uintptr_t)old_ptr + old_bytes),
-			                missing_bytes, alloc_flags | MALLNODE_FUSERNODE,
+			mall_trace_impl((byte_t *)old_ptr + old_bytes,
+			                missing_bytes,
+			                alloc_flags | MALLNODE_FUSERNODE,
 			                context);
 		} EXCEPT {
-			heap_free_untraced(self, (void *)((uintptr_t)old_ptr + old_bytes),
-			                   missing_bytes, alloc_flags);
+			heap_free_untraced(self,
+			                   (byte_t *)old_ptr + old_bytes,
+			                   missing_bytes,
+			                   alloc_flags);
 			RETHROW();
 		}
 #endif /* !MALLOC_NX */
@@ -330,19 +363,22 @@ NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 	LOAD_CALLER_CONTEXT
 	assert(!(flags & MALLNODE_FUSERNODE));
 	result = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + n_bytes +
+	                                   CONFIG_MALL_PREFIX_SIZE +
+	                                   CONFIG_MALL_HEAD_SIZE + n_bytes +
 	                                   CONFIG_MALL_TAIL_SIZE,
 	                                   flags);
 	IFELSE_NX(if unlikely(result.hp_ptr == NULL) goto err;, )
 	INITIALIZE_USER_POINTER(result.hp_ptr, result.hp_siz);
 #ifdef MALLOC_NX
 	if unlikely(!FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
-	                                   flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
+	                                   flags & (__GFP_HEAPMASK | GFP_NOLEAK |
+	                                             GFP_NOWALK | GFP_INHERIT),
 	                                   context))
 #else /* MALLOC_NX */
 	TRY {
 		FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
-		                      flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
+		                      flags & (__GFP_HEAPMASK | GFP_NOLEAK |
+		                               GFP_NOWALK | GFP_INHERIT),
 		                      context);
 	} EXCEPT
 #endif /* !MALLOC_NX */
@@ -351,7 +387,9 @@ NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 		                   result.hp_ptr, result.hp_siz, flags);
 		IFELSE_NX(goto err, RETHROW());
 	}
-	return (byte_t *)result.hp_ptr + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE;
+	return (byte_t *)result.hp_ptr +
+	       CONFIG_MALL_PREFIX_SIZE +
+	       CONFIG_MALL_HEAD_SIZE;
 IFELSE_NX(err: return NULL;, )
 }
 
@@ -362,7 +400,8 @@ NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
 	LOAD_CALLER_CONTEXT
 	assert(!(flags & MALLNODE_FUSERNODE));
 	result = FUNC(heap_align_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                                   min_alignment, CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE,
+	                                   min_alignment,
+	                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE,
 	                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + n_bytes +
 	                                   CONFIG_MALL_TAIL_SIZE,
 	                                   flags);
@@ -370,14 +409,16 @@ NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
 	INITIALIZE_USER_POINTER(result.hp_ptr, result.hp_siz);
 #ifdef MALLOC_NX
 	if unlikely(!FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
-	                                   flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
+	                                   flags & (__GFP_HEAPMASK | GFP_NOLEAK |
+	                                             GFP_NOWALK | GFP_INHERIT),
 	                                   context))
 #else /* MALLOC_NX */
 	TRY {
-		FUNC(mall_trace_impl)
-		(result.hp_ptr, result.hp_siz,
-		 flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
-		 context);
+		FUNC(mall_trace_impl)(result.hp_ptr,
+		                      result.hp_siz,
+		                      flags & (__GFP_HEAPMASK | GFP_NOLEAK |
+		                               GFP_NOWALK | GFP_INHERIT),
+		                      context);
 	} EXCEPT
 #endif /* !MALLOC_NX */
 	{
@@ -385,7 +426,9 @@ NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
 		                   result.hp_ptr, result.hp_siz, flags);
 		IFELSE_NX(goto err, RETHROW());
 	}
-	return (byte_t *)result.hp_ptr + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE;
+	return (byte_t *)result.hp_ptr +
+	       CONFIG_MALL_PREFIX_SIZE +
+	       CONFIG_MALL_HEAD_SIZE;
 IFELSE_NX(err: return NULL;, )
 }
 
@@ -396,21 +439,24 @@ NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
 	LOAD_CALLER_CONTEXT
 	assert(!(flags & MALLNODE_FUSERNODE));
 	result = FUNC(heap_align_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                                   min_alignment, offset + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE,
+	                                   min_alignment,
+	                                   offset +
+	                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE,
 	                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + n_bytes +
 	                                   CONFIG_MALL_TAIL_SIZE,
 	                                   flags);
 	IFELSE_NX(if unlikely(result.hp_ptr == NULL) goto err;, )
 #ifdef MALLOC_NX
 	if unlikely(!FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
-	                                   flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
+	                                   flags & (__GFP_HEAPMASK | GFP_NOLEAK |
+	                                             GFP_NOWALK | GFP_INHERIT),
 	                                   context))
 #else /* MALLOC_NX */
 	TRY {
-		FUNC(mall_trace_impl)
-		(result.hp_ptr, result.hp_siz,
-		 flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
-		 context);
+		FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
+		                      flags & (__GFP_HEAPMASK | GFP_NOLEAK |
+		                               GFP_NOWALK | GFP_INHERIT),
+		                      context);
 	} EXCEPT
 #endif /* !MALLOC_NX */
 	{
@@ -419,17 +465,11 @@ NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
 		IFELSE_NX(goto err, RETHROW());
 	}
 	INITIALIZE_USER_POINTER(result.hp_ptr, result.hp_siz);
-	return (byte_t *)result.hp_ptr + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE;
+	return (byte_t *)result.hp_ptr +
+	       CONFIG_MALL_PREFIX_SIZE +
+	       CONFIG_MALL_HEAD_SIZE;
 IFELSE_NX(err: return NULL;, )
 }
-
-
-//TODO:FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *(KCALL vpage_alloc)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-//TODO:FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-//TODO:FUNDEF ATTR_RETNONNULL WUNUSED ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *(KCALL vpage_realloc)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-//TODO:FUNDEF ATTR_RETNONNULL WUNUSED ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_realloc_nx)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-//TODO:FUNDEF NOBLOCK void NOTHROW(KCALL vpage_free)(VIRT /*page-aligned*/ void *base, size_t num_pages);
-//TODO:FUNDEF NOBLOCK void NOTHROW(KCALL vpage_ffree)(VIRT /*page-aligned*/ void *base, size_t num_pages, gfp_t flags);
 
 DECL_END
 

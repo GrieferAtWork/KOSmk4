@@ -2008,7 +2008,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL uhci_aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
 }
 
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) size_t
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL uhci_aio_sync_retsize)(struct aio_handle *__restrict self) {
 	return (size_t)self->ah_data[0];
 }

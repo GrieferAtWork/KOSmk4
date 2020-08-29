@@ -170,12 +170,12 @@ FUNDEF void NOTHROW(FCALL dbg_endshowscreen)(void);
 /* Get/Set the current on-screen cursor position.
  * NOTE: Out-of-bounds coords are clamped to their valid ranges. */
 FUNDEF u32 NOTHROW(FCALL dbg_setcur)(int x, int y);
-FUNDEF WUNUSED ATTR_PURE u32 NOTHROW(FCALL dbg_getcur)(void);
+FUNDEF ATTR_PURE WUNUSED u32 NOTHROW(FCALL dbg_getcur)(void);
 #define DBG_GETCUR_X(val) ((unsigned int)((val)&0xffff))
 #define DBG_GETCUR_Y(val) ((unsigned int)((val) >> 16))
 #define DBG_MAKECUR(x, y) ((u32)(x) | ((u32)(y) << 16))
-LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(FCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
-LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(FCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
+LOCAL ATTR_PURE WUNUSED unsigned int NOTHROW(FCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
+LOCAL ATTR_PURE WUNUSED unsigned int NOTHROW(FCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
 LOCAL u32 NOTHROW(FCALL dbg_setcur_x)(int x) { return dbg_setcur(x, dbg_getcur_y()); }
 LOCAL u32 NOTHROW(FCALL dbg_setcur_y)(int y) { return dbg_setcur(dbg_getcur_x(), y); }
 

@@ -99,7 +99,7 @@ NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self) {
 	 VM_DATABLOCK_PAGESHIFT((self)->dp_block))
 
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vmb_do_delete_whole_nodes)(struct vmb *__restrict self,
                                          pageid_t minpage,
                                          pageid_t maxpage) {
@@ -236,7 +236,7 @@ again:
  *                 Set to 0 if the mapping should include a guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-FUNDEF WUNUSED NONNULL((1, 4)) bool KCALL
+PUBLIC WUNUSED NONNULL((1, 4)) bool KCALL
 vmb_paged_mapat(struct vmb *__restrict self,
                 pageid_t page_index, size_t num_pages,
                 struct vm_datablock *__restrict data,
@@ -277,7 +277,7 @@ err:
 
 /* Find the first node with `vm_node_getminpageid(return) >= min_page_index'
  * If no such node exists, return `NULL' instead. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb const *__restrict self,
                                                  pageid_t min_page_index) {
 	struct vm_node *result;
@@ -291,7 +291,7 @@ NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb const *__restrict se
 
 /* Find the last node with `vm_node_getmaxpageid(return) <= max_page_index'
  * If no such node exists, return `NULL' instead. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb const *__restrict self,
                                               pageid_t max_page_index) {
 	struct vm_node *result = NULL;
@@ -315,7 +315,7 @@ DECL_END
 #include "vm-getfree-impl.c.inl"
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* A combination of `vmb_paged_getfree' + `vmb_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
@@ -425,7 +425,7 @@ NOTHROW(FCALL vmb_paged_isused)(struct vmb const *__restrict self,
 }
 
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1)) void KCALL
 pointer_set_unlock_vm_dataparts(struct pointer_set *__restrict self) {
 	struct vm_datapart *part;
 	POINTER_SET_FOREACH(part, self) {
@@ -433,7 +433,7 @@ pointer_set_unlock_vm_dataparts(struct pointer_set *__restrict self) {
 	}
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1, 2)) void KCALL
 pointer_set_unlock_vm_dataparts_except(struct pointer_set *__restrict self,
                                        struct vm_datapart *__restrict not_this_one) {
 	struct vm_datapart *part;
@@ -443,20 +443,20 @@ pointer_set_unlock_vm_dataparts_except(struct pointer_set *__restrict self,
 	}
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1)) void KCALL
 pointer_set_unlock_vm_dataparts_and_clear(struct pointer_set *__restrict self) {
 	pointer_set_unlock_vm_dataparts(self);
 	pointer_set_clear(self);
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1, 2)) void KCALL
 pointer_set_unlock_vm_dataparts_and_clear_except(struct pointer_set *__restrict self,
                                                  struct vm_datapart *__restrict not_this_one) {
 	pointer_set_unlock_vm_dataparts_except(self, not_this_one);
 	pointer_set_clear(self);
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1)) void KCALL
 rpc_free_chain(struct rpc_entry *self) {
 	struct rpc_entry *next;
 	while (self) {
@@ -466,7 +466,7 @@ rpc_free_chain(struct rpc_entry *self) {
 	}
 }
 
-PRIVATE NOBLOCK WUNUSED ATTR_PURE size_t KCALL
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t KCALL
 rpc_count_chain(struct rpc_entry const *self) {
 	size_t result;
 	for (result = 0; self; self = self->re_next)
@@ -780,7 +780,9 @@ handle_remove_write_error:
 			alloc_count = rpc_count_chain(task_terminate_rpcs);
 			for (thread = target->v_tasks; thread;
 			     thread = thread->t_vm_tasks.ln_next) {
-				if (!(ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) && thread != THIS_TASK)
+				if (!(ATOMIC_READ(thread->t_flags) &
+				      (TASK_FTERMINATING | TASK_FTERMINATED)) &&
+				    thread != THIS_TASK)
 					++thread_count;
 			}
 			/* Check if we need to allocate more RPC descriptors. */
@@ -837,7 +839,7 @@ handle_remove_write_error:
 			error = task_deliver_rpc(thread,
 			                         task_terminate_rpcs,
 			                         /* Low priority: We don't care when the thread actually gets terminated,
-			                          *               so we instruction the scheduler that our termination RPC
+			                          *               so we instruct the scheduler that our termination RPC
 			                          *               is allowed to be serviced at a later point in time. */
 			                         TASK_RPC_FLOWPRIO |
 			                         /* Wait for IPI: If the thread is hosted by a different CPU, we need to wait

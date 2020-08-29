@@ -878,7 +878,7 @@ x86_emulate_rtm_instruction_int(struct rtm_machstate *__restrict self,
 
 /* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
 #define EMU86_EMULATE_RDPID() emulate_rdpid()
-PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_rdpid(void) {
+PRIVATE ATTR_PURE WUNUSED u32 KCALL emulate_rdpid(void) {
 	return THIS_CPU->c_id;
 }
 

@@ -624,7 +624,7 @@ ansitty_setstate_text(struct ansitty *__restrict self) {
 	                 : (self->at_codepage == CP_UTF8 ? STATE_TEXT_UTF8 : STATE_TEXT);
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((2)) char32_t FCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((2)) char32_t FCALL
 cp_decode(uint8_t ch, struct ansitty *__restrict self) {
 	char32_t result;
 	switch (self->at_codepage) {

@@ -35,11 +35,11 @@
 
 
 #undef SIZEOF_UNWIND_ORDER_INDEX_T
-#if ((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xffff) || \
-    ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xffff)
+#if (((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xffff) || \
+     ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xffff))
 #define SIZEOF_UNWIND_ORDER_INDEX_T 4
-#elif ((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xff) || \
-      ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xff)
+#elif (((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xff) || \
+       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xff))
 #define SIZEOF_UNWIND_ORDER_INDEX_T 2
 #else /* ... */
 #define SIZEOF_UNWIND_ORDER_INDEX_T 1
@@ -90,7 +90,7 @@ typedef struct unwind_fde_struct {
 
 
 /* Load the next eh_frame function descriptor from `*PEH_FRAME_READER', which
- * must either be a pointer to the start of the `.eh_frame' section, to be the
+ * must either be a pointer to the start of the `.eh_frame' section, or be the
  * value written back to `*PEH_FRAME_READER' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */

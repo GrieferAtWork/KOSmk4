@@ -54,7 +54,7 @@ SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 
 
 /* Slab allocators for dynamic sizes.
- * NOTE: The caller is required to ensure that `num_bytes < HEAP_MINSIZE' */
+ * NOTE: The caller is required to ensure that `num_bytes < SLAB_MAXSIZE' */
 FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) ASMNAME("slab_malloc");
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_slab_kmalloc(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc");
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc_nx");
@@ -435,17 +435,17 @@ FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace)(void *ptr
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace_n)(void *ptr, size_t num_bytes, gfp_t flags);
 
 #endif /* __CC__ */
-#define ATTR_MALL_UNTRACKED  ATTR_SECTION(".bss.mall.untracked")
+#define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss.mall.untracked")
 #else /* CONFIG_DEBUG_MALLOC */
 #ifdef __CC__
-#define mall_dump_leaks(flags)                    0
+#define mall_dump_leaks(flags)              0
 #define mall_validate_padding()             (void)0
 #define mall_trace(base, num_bytes, flags)  (base)
 #define mall_print_traceback(ptr, flags)    (void)0
 #define mall_untrace(ptr, flags)            (void)0
 #define mall_untrace_n(ptr, n_bytes, flags) (void)0
 #endif /* __CC__ */
-#define ATTR_MALL_UNTRACKED  ATTR_SECTION(".bss")
+#define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
 #endif /* !CONFIG_DEBUG_MALLOC */
 
 

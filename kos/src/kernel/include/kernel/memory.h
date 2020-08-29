@@ -333,7 +333,7 @@ FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_iszero)(pageptr_t page);
 
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages);
 #endif /* __CC__ */
 

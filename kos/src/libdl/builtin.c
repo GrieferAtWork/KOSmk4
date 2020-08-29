@@ -1963,7 +1963,7 @@ PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
  *      to make use of `.wordrel' for encoding function pointers! */
 
 /* Return the address of a builtin function (e.g. `dlopen()') */
-INTERN WUNUSED ATTR_PURE NONNULL((1)) void *FCALL
+INTERN ATTR_PURE WUNUSED NONNULL((1)) void *FCALL
 dlsym_builtin(char const *__restrict name) {
 	void *result = NULL;
 /*[[[deemon
@@ -2432,7 +2432,7 @@ dlsec_builtin_name(size_t sect_index) {
 }
 
 
-INTERN WUNUSED ATTR_PURE NONNULL((1)) DlSection *FCALL
+INTERN ATTR_PURE WUNUSED NONNULL((1)) DlSection *FCALL
 dlsec_builtin(char const *__restrict name) {
 	size_t sect_index;
 	char const *sect_name;

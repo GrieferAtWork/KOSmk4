@@ -455,7 +455,7 @@ NOTHROW(FCALL dbg_endupdate)(bool force) {
 	vga_disable_offscreen_buffer();
 }
 
-PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE u32
+PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED u32
 NOTHROW(FCALL dbg_getcur)(void) {
 	unsigned int pos;
 	pos = (unsigned int)(vga_terminal_cur -

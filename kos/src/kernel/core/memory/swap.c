@@ -37,7 +37,7 @@ DECL_BEGIN
 /* Allocate SWAP memory.
  * @return: * :              The base address for the allocated swap segment.
  * @return: SWAPPTR_INVALID: Failed to allocate swap memory. */
-PUBLIC swapptr_t
+PUBLIC WUNUSED swapptr_t
 NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages) {
 	pagecnt_t res_pages;
 	swapptr_t result;
@@ -49,7 +49,7 @@ NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages) {
 	return result;
 }
 
-PUBLIC NONNULL((3)) swapptr_t
+PUBLIC WUNUSED NONNULL((3)) swapptr_t
 NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
                                 pagecnt_t *__restrict res_pages) {
 	(void)min_pages;

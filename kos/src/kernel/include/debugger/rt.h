@@ -146,7 +146,7 @@ FUNDEF void NOTHROW(KCALL dbg_setallregs)(unsigned int level, struct fcpustate c
 
 /* Return the ISA code for use with libinstrlen */
 #ifndef ARCH_DEBUGGER_RT_HAVE_DBG_INSTRLEN_ISA
-LOCAL WUNUSED ATTR_PURE instrlen_isa_t
+LOCAL ATTR_PURE WUNUSED instrlen_isa_t
 NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
 	instrlen_isa_t result;
 	struct fcpustate cs;

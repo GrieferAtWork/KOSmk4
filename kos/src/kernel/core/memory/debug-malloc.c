@@ -249,16 +249,18 @@ struct mallnode {
 	                                                   * interactions such as reading its size.
 	                                                   * Note that this only applies to nodes with the `MALLNODE_FUSERNODE' flag set! */
 	upid_t                                m_tracetid; /* Traceback thread id (in the root namespace). */
-	COMPILER_FLEXIBLE_ARRAY(void *, m_trace);         /* [1..1][0..MALLNODE_TRACESZ(self)]
+	COMPILER_FLEXIBLE_ARRAY(void *,       m_trace);   /* [1..1][0..MALLNODE_TRACESZ(self)]
 	                                                   * Traceback of where the pointer was originally allocated. */
 };
-#define MALLNODE_MIN(x)        ((x)->m_tree.a_vmin)
-#define MALLNODE_MAX(x)        ((x)->m_tree.a_vmax)
-#define MALLNODE_BEGIN(x)      ((x)->m_tree.a_vmin)
-#define MALLNODE_END(x)        ((x)->m_tree.a_vmax + 1)
-#define MALLNODE_SIZE(x)      (((x)->m_tree.a_vmax - (x)->m_tree.a_vmin) + 1)
-#define MALLNODE_TRACESZ(x)   (((x)->m_size - offsetof(struct mallnode,m_trace)) / sizeof(void *))
-#define MALLNODE_ISVALID(x)  (!((x)->m_flags & MALLNODE_FUSERNODE) || (x)->m_userver <= mall_valid_user_node_version_number)
+#define MALLNODE_MIN(x)     ((x)->m_tree.a_vmin)
+#define MALLNODE_MAX(x)     ((x)->m_tree.a_vmax)
+#define MALLNODE_BEGIN(x)   ((x)->m_tree.a_vmin)
+#define MALLNODE_END(x)     ((x)->m_tree.a_vmax + 1)
+#define MALLNODE_SIZE(x)    (((x)->m_tree.a_vmax - (x)->m_tree.a_vmin) + 1)
+#define MALLNODE_TRACESZ(x) (((x)->m_size - offsetof(struct mallnode, m_trace)) / sizeof(void *))
+#define MALLNODE_ISVALID(x)                  \
+	(!((x)->m_flags & MALLNODE_FUSERNODE) || \
+	 (x)->m_userver <= mall_valid_user_node_version_number)
 
 
 /* The global descriptor table of known MALL nodes. */
@@ -288,16 +290,32 @@ DECL_BEGIN
 
 #define CONFIG_MAX_PENDING_UNTRACE_COUNT 128
 struct pending_untrace {
-	void    *pu_base; /* Base address of the pending untrace. */
-	size_t   pu_size; /* Size of the pending untrace (or 0 if merely containing node should be untraced) */
+	void  *pu_base; /* Base address of the pending untrace. */
+	size_t pu_size; /* Size of the pending untrace (or 0 if merely
+	                 * containing node should be untraced) */
 };
 
-PRIVATE WEAK ATTR_MALL_UNTRACKED u16 mall_valid_user_node_version_number = 0;
+PRIVATE WEAK ATTR_MALL_UNTRACKED u16
+mall_valid_user_node_version_number = 0;
 
-PRIVATE WEAK ATTR_MALL_UNTRACKED size_t mall_pending_untrace_count = 0; /* Amount of used untrace slots. */
-PRIVATE WEAK ATTR_MALL_UNTRACKED struct pending_untrace mall_pending_untrace[CONFIG_MAX_PENDING_UNTRACE_COUNT];
-PRIVATE WEAK ATTR_MALL_UNTRACKED uintptr_t mall_pending_inuse[(CONFIG_MAX_PENDING_UNTRACE_COUNT + (BITSOF(uintptr_t) - 1)) / BITSOF(uintptr_t)]; /* Bitset of untrace slots currently in use. */
-PRIVATE WEAK ATTR_MALL_UNTRACKED uintptr_t mall_pending_isval[(CONFIG_MAX_PENDING_UNTRACE_COUNT + (BITSOF(uintptr_t) - 1)) / BITSOF(uintptr_t)]; /* Bitset of valid untrace slots. */
+/* Amount of used untrace slots. */
+PRIVATE WEAK ATTR_MALL_UNTRACKED size_t
+mall_pending_untrace_count = 0;
+
+PRIVATE WEAK ATTR_MALL_UNTRACKED struct pending_untrace
+mall_pending_untrace[CONFIG_MAX_PENDING_UNTRACE_COUNT];
+
+/* Bitset of untrace slots currently in use. */
+PRIVATE WEAK ATTR_MALL_UNTRACKED uintptr_t
+mall_pending_inuse[(CONFIG_MAX_PENDING_UNTRACE_COUNT +
+                    (BITSOF(uintptr_t) - 1)) /
+                   BITSOF(uintptr_t)];
+
+/* Bitset of valid untrace slots. */
+PRIVATE WEAK ATTR_MALL_UNTRACKED uintptr_t
+mall_pending_isval[(CONFIG_MAX_PENDING_UNTRACE_COUNT +
+                    (BITSOF(uintptr_t) - 1)) /
+                   BITSOF(uintptr_t)];
 
 
 PRIVATE ATTR_COLD NOBLOCK void
@@ -307,13 +325,18 @@ NOTHROW(KCALL mall_pending_untrace_overflow)(void *__restrict ptr, size_t num_by
 	 * without question, acting like any currently existing user-nodes are part of
 	 * a flux state between traced and untraced. */
 	if (num_bytes) {
-		printk(KERN_ERR "Invalidating all MALL user-nodes after failing to untrace %p...%p\n",
+		printk(KERN_ERR "Invalidating all MALL user-nodes "
+		                "after failing to untrace %p...%p\n",
 		       ptr, (uintptr_t)ptr + num_bytes - 1);
 	} else {
-		printk(KERN_ERR "Invalidating all MALL user-nodes after failing to untrace %p\n", ptr);
+		printk(KERN_ERR "Invalidating all MALL user-nodes "
+		                "after failing to untrace %p\n",
+		       ptr);
 	}
-	if unlikely(ATOMIC_FETCHINC(mall_valid_user_node_version_number) == (u16)-1)
-		kernel_panic("Too many failed MALL untrace pending attempts - Can no longer keep up\n");
+	if unlikely(ATOMIC_FETCHINC(mall_valid_user_node_version_number) == (u16)-1) {
+		kernel_panic("Too many failed MALL untrace pending "
+		             "attempts - Can no longer keep up\n");
+	}
 }
 
 
@@ -337,7 +360,8 @@ again:
 				alloc_mask <<= 1, ++j;
 			assert(alloc_mask);
 			/* Atomically allocate the entry we decided on acquiring. */
-			if (!ATOMIC_CMPXCH_WEAK(mall_pending_inuse[i], word, word | alloc_mask))
+			if (!ATOMIC_CMPXCH_WEAK(mall_pending_inuse[i], word,
+			                        word | alloc_mask))
 				goto again;
 			j += i * BITSOF(uintptr_t);
 			/* Fill in our untrace entry. */
@@ -366,8 +390,7 @@ struct pending_malloc_free {
  * header values. - To deal with such nodes, serve pending mall commands.
  * NOTE: This field actually represents the number of elements apart of
  *       the `mall_pending_mallocfree' linked list (including elements
- *       that are still being added)
- */
+ *       that are still being added) */
 PRIVATE WEAK ATTR_MALL_UNTRACKED size_t mall_inconsistent_head_exist = 0;
 PRIVATE WEAK ATTR_MALL_UNTRACKED struct pending_malloc_free *mall_pending_mallocfree = NULL;
 
@@ -376,8 +399,8 @@ PRIVATE WEAK ATTR_MALL_UNTRACKED struct pending_malloc_free *mall_pending_malloc
 	 ATOMIC_READ(mall_pending_untrace_count) != 0)
 
 
-PRIVATE NOBLOCK void NOTHROW(KCALL mall_do_free)(void *__restrict ptr, gfp_t flags, bool should_unlock);
-PRIVATE NOBLOCK void NOTHROW(KCALL mallnode_free)(struct mallnode *__restrict self);
+PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL mall_do_free)(void *__restrict ptr, gfp_t flags, bool should_unlock);
+PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL mallnode_free)(struct mallnode *__restrict self);
 PRIVATE ATTR_MALLOC NOBLOCK_IF(flags & GFP_ATOMIC) struct mallnode *NOTHROW(KCALL mallnode_alloc_nx)(gfp_t gfp);
 PRIVATE NOBLOCK bool NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags);
 
@@ -446,8 +469,11 @@ NOTHROW(KCALL mall_untrace_n_impl)(void *ptr, size_t num_bytes, gfp_t flags) {
 		node = mallnode_tree_remove(&mall_tree, (uintptr_t)ptr);
 generic_handle_node:
 		if unlikely(!node) {
-			if (mall_valid_user_node_version_number)
-				return true; /* Because of the possibility of a failed split in `mall_insert_tree()' */
+			if (mall_valid_user_node_version_number) {
+				/* Because of the possibility of a failed
+				 * split in `mall_insert_tree()' */
+				return true;
+			}
 			sync_endwrite(&mall_lock);
 			PANIC_INVALID_MALL_POINTER_WITH_CALLER_TRACEBACK(ptr);
 		}
@@ -541,8 +567,10 @@ again:
 	    (node->m_userver < old_max_version))
 		node->m_userver = 0;
 	if (node->m_tree.a_min) {
-		if (node->m_tree.a_max)
-			mall_restore_invalid_version_number(node->m_tree.a_max, old_max_version);
+		if (node->m_tree.a_max) {
+			mall_restore_invalid_version_number(node->m_tree.a_max,
+			                                    old_max_version);
+		}
 		node = node->m_tree.a_min;
 		goto again;
 	} else if (node->m_tree.a_max) {
@@ -559,7 +587,7 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 	{
 		struct pending_malloc_free *pend, *next;
 		pend = ATOMIC_XCH(mall_pending_mallocfree, NULL);
-		while unlikely(pend) {
+		while (unlikely(pend)) {
 			gfp_t flags = pend->mf_gfp;
 #define PREFIX_OVERFLOW (CONFIG_MALL_PREFIX_SIZE - __SIZEOF_SIZE_T__)
 #if PREFIX_OVERFLOW >= (__SIZEOF_POINTER__ + __SIZEOF_GFP_T__)
@@ -568,12 +596,16 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 #if ((((__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) - PREFIX_OVERFLOW) + 3) / 4) <= CONFIG_MALL_HEAD_SIZE
 			memsetl((byte_t *)pend + CONFIG_MALL_PREFIX_SIZE,
 			        CONFIG_MALL_HEAD_PATTERN,
-			        (((__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) - PREFIX_OVERFLOW) + 3) / 4);
-#else
+			        (((__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) -
+			          PREFIX_OVERFLOW) +
+			         3) /
+			        4);
+#else /* ... */
 			mempatl((byte_t *)pend + CONFIG_MALL_PREFIX_SIZE,
 			        CONFIG_MALL_HEAD_PATTERN,
-			        (__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) - PREFIX_OVERFLOW);
-#endif
+			        (__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) -
+			        PREFIX_OVERFLOW);
+#endif /* !... */
 #else /* Only header */
 #define MALLOC_INCONSISTENT_HEADERS_AFFECT_TAILS 1
 #if CONFIG_MALL_HEAD_SIZE != 0
@@ -587,14 +619,20 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 			        CONFIG_MALL_HEAD_SIZE);
 #endif /* (CONFIG_MALL_HEAD_SIZE & 3) != 0 */
 #endif /* CONFIG_MALL_HEAD_SIZE != 0 */
-#define REMAIN_RESET ((__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) - (PREFIX_OVERFLOW + CONFIG_MALL_HEAD_SIZE))
+#define REMAIN_RESET                           \
+	((__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) - \
+	 (PREFIX_OVERFLOW + CONFIG_MALL_HEAD_SIZE))
 			{
 				size_t block_size;
 				block_size = pend->mf_usersize;
 				if (block_size < REMAIN_RESET) {
 					/* Must restore the tail */
-					mempatl((byte_t *)pend + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + block_size,
-					        CONFIG_MALL_TAIL_PATTERN, REMAIN_RESET - block_size);
+					mempatl((byte_t *)pend +
+					        CONFIG_MALL_PREFIX_SIZE +
+					        CONFIG_MALL_HEAD_SIZE +
+					        block_size,
+					        CONFIG_MALL_TAIL_PATTERN,
+					        REMAIN_RESET - block_size);
 				}
 			}
 #undef REMAIN_RESET
@@ -603,7 +641,8 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 			ATOMIC_FETCHDEC(mall_inconsistent_head_exist);
 			next = pend->mf_next;
 			mall_do_free((byte_t *)pend +
-			             (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE),
+			             (CONFIG_MALL_PREFIX_SIZE +
+			              CONFIG_MALL_HEAD_SIZE),
 			             flags,
 			             false);
 			pend = next;
@@ -626,8 +665,10 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 			                        invalid_version_number, 1))
 				continue;
 			/* Update all invalidated user-nodes to fall back on using version #0 */
-			if (mall_tree)
-				mall_restore_invalid_version_number(mall_tree, invalid_version_number);
+			if (mall_tree) {
+				mall_restore_invalid_version_number(mall_tree,
+				                                    invalid_version_number);
+			}
 		}
 		for (i = 0; i < COMPILER_LENOF(mall_pending_isval); ++i) {
 			unsigned int j;
@@ -653,8 +694,11 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 					node = mallnode_tree_remove(&mall_tree, (uintptr_t)pend.pu_base);
 					if unlikely(!node) {
 						COMPILER_READ_BARRIER();
-						if (ATOMIC_READ(mall_valid_user_node_version_number))
-							goto continue_scanning_pending_untrace; /* Because of the possibility of a failed split in `mall_insert_tree()' */
+						if (ATOMIC_READ(mall_valid_user_node_version_number)) {
+							/* Because of the possibility of a failed
+							 * split in `mall_insert_tree()' */
+							goto continue_scanning_pending_untrace;
+						}
 						sync_endwrite(&mall_lock);
 						PANIC_INVALID_MALL_POINTER(pend.pu_base);
 					}
@@ -668,7 +712,8 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 						return false;
 				}
 continue_scanning_pending_untrace:
-				/* Quick check: are there still more untrace commands left to be performed? */
+				/* Quick check: are there still more untrace
+				 *              commands left to be performed? */
 				if (!ATOMIC_READ(mall_pending_untrace_count))
 					goto done_pending_untrace;
 			}
@@ -682,14 +727,18 @@ done_pending_untrace:
 
 
 
-PRIVATE bool NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self);
-PRIVATE void NOTHROW(KCALL mallnode_free)(struct mallnode *__restrict self);
+PRIVATE NONNULL((1)) bool
+NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self);
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mallnode_free)(struct mallnode *__restrict self);
 
 
 /* The internal implementation for `kfree()'
  * When this function is called, the caller is already holding a lock to `mall_lock' */
-PRIVATE NOBLOCK void
-NOTHROW(KCALL mall_do_free)(void *__restrict ptr, gfp_t flags, bool should_unlock) {
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL mall_do_free)(void *__restrict ptr,
+                            gfp_t flags,
+                            bool should_unlock) {
 	struct mallnode *node;
 	struct heapptr fullblock;
 
@@ -747,12 +796,15 @@ NOTHROW(KCALL mall_do_free)(void *__restrict ptr, gfp_t flags, bool should_unloc
 }
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL mall_add_pending_free)(void *__restrict ptr, gfp_t flags) {
+NOTHROW(KCALL mall_add_pending_free)(void *__restrict ptr,
+                                     gfp_t flags) {
 	struct pending_malloc_free *pend, *next;
 	/* Failed to acquire the MALL lock. - We can't validate the pointer, and
 	 * we must use the user-data block as part of a linked list of pending
 	 * free data blocks. */
-	pend = (struct pending_malloc_free *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE));
+	pend = (struct pending_malloc_free *)((byte_t *)ptr -
+	                                      (CONFIG_MALL_PREFIX_SIZE +
+	                                       CONFIG_MALL_HEAD_SIZE));
 	/* Indicate that headers are about to become inconsistent (at least for a while) */
 	ATOMIC_FETCHINC(mall_inconsistent_head_exist);
 	COMPILER_WRITE_BARRIER();
@@ -760,7 +812,8 @@ NOTHROW(KCALL mall_add_pending_free)(void *__restrict ptr, gfp_t flags) {
 	do {
 		next = ATOMIC_READ(mall_pending_mallocfree);
 		pend->mf_next = next;
-	} while (!ATOMIC_CMPXCH_WEAK(mall_pending_mallocfree, next, pend));
+	} while (!ATOMIC_CMPXCH_WEAK(mall_pending_mallocfree,
+	                             next, pend));
 }
 
 
@@ -812,26 +865,27 @@ PRIVATE mall_ver_t mall_leak_version = 0;
 
 /* Analyze a pointer, or data block for reachable pointers,
  * returning the number of reachable mall pointers. */
-PRIVATE NOBLOCK size_t NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes);
+PRIVATE NOBLOCK size_t
+NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes);
 
 PRIVATE NOBLOCK size_t
 NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 	struct mallnode *node;
-	if (!ptr)
+	/* Check if NULL is part of kernel-space. */
+#if (defined(KERNELSPACE_LOWMEM) || \
+     (defined(KERNELSPACE_HIGHMEM) && 0 >= KERNELSPACE_BASE))
+	if (ptr == NULL)
 		return 0; /* Optimization: NULL pointer */
+#endif /* ADDR_ISKERN(NULL) */
+	/* If the pointer doesn't belong to kernel-space, we ignore it. */
+	if (!ADDR_ISKERN(ptr))
+		return 0;
 #ifdef X86_PAGING_ISNONCANON
 	if (X86_PAGING_ISNONCANON((uintptr_t)ptr))
 		return 0;
 #endif /* X86_PAGING_ISNONCANON */
 	if (((uintptr_t)ptr & (sizeof(void *) - 1)) != 0)
 		return 0; /* Unaligned pointer -> not a heap pointer */
-#ifdef KERNELSPACE_HIGHMEM
-	if ((uintptr_t)ptr < KERNELSPACE_BASE)
-		return 0;
-#elif defined(KERNELSPACE_LOWMEM)
-	if ((uintptr_t)ptr >= KERNEL_CEILING)
-		return 0;
-#endif
 #if __SIZEOF_POINTER__ == 4
 #ifdef CONFIG_DEBUG_HEAP
 	if ((uintptr_t)ptr == DEBUGHEAP_NO_MANS_LAND)
@@ -998,9 +1052,13 @@ again:
 			result += mall_reachable_data((byte_t *)node->m_tree.a_vmin,
 			                              (node->m_tree.a_vmax - node->m_tree.a_vmin) + 1);
 		} else {
-			result += mall_reachable_data((byte_t *)(node->m_tree.a_vmin + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE),
+			result += mall_reachable_data((byte_t *)(node->m_tree.a_vmin +
+			                                         CONFIG_MALL_PREFIX_SIZE +
+			                                         CONFIG_MALL_HEAD_SIZE),
 			                              ((node->m_tree.a_vmax - node->m_tree.a_vmin) + 1) -
-			                              (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE));
+			                              (CONFIG_MALL_PREFIX_SIZE +
+			                               CONFIG_MALL_HEAD_SIZE +
+			                               CONFIG_MALL_TAIL_SIZE));
 		}
 		node->m_visit = mall_leak_version;
 	}
@@ -1198,17 +1256,22 @@ again:
 		/* This node wasn't reached. */
 		if (node->m_flags & MALLNODE_FUSERNODE) {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[0], INSTRLEN_ISA_DEFAULT),
+			                 (uintptr_t)instruction_trypred(node->m_trace[0],
+			                                                INSTRLEN_ISA_DEFAULT),
 			                 (uintptr_t)node->m_trace[0],
 			                 "Leaked %Iu bytes of heap-memory at %p...%p",
 			                 MALLNODE_SIZE(node), MALLNODE_MIN(node), MALLNODE_MAX(node));
 		} else {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[0], INSTRLEN_ISA_DEFAULT),
+			                 (uintptr_t)instruction_trypred(node->m_trace[0],
+			                                                INSTRLEN_ISA_DEFAULT),
 			                 (uintptr_t)node->m_trace[0],
 			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p",
-			                 MALLNODE_SIZE(node) - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE),
-			                 MALLNODE_MIN(node) + (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE),
+			                 MALLNODE_SIZE(node) - (CONFIG_MALL_PREFIX_SIZE +
+			                                        CONFIG_MALL_HEAD_SIZE +
+			                                        CONFIG_MALL_TAIL_SIZE),
+			                 MALLNODE_MIN(node) + (CONFIG_MALL_PREFIX_SIZE +
+			                                       CONFIG_MALL_HEAD_SIZE),
 			                 MALLNODE_MAX(node) - CONFIG_MALL_TAIL_SIZE);
 		}
 		trace_size = MALLNODE_TRACESZ(node);
@@ -1216,7 +1279,8 @@ again:
 			if (!node->m_trace[i])
 				break;
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[i], INSTRLEN_ISA_DEFAULT),
+			                 (uintptr_t)instruction_trypred(node->m_trace[i],
+			                                                INSTRLEN_ISA_DEFAULT),
 			                 (uintptr_t)node->m_trace[i],
 			                 "Called here");
 		}
@@ -1400,6 +1464,7 @@ again:
 #endif /* !CONFIG_NO_SMP */
 		vm_kernel_treelock_endwrite();
 		mall_release();
+		was = PREEMPTION_PUSHOFF();
 		/* At this point we've got all the locks we need! */
 
 		++mall_leak_version;
@@ -1409,6 +1474,7 @@ again:
 		mall_search_leaks_impl();
 		/* Print all found leaks. */
 		result = mall_print_leaks_impl();
+		PREEMPTION_POP(was);
 
 #ifndef CONFIG_NO_SMP
 		/* Allow other CPUs to resume execution. */
@@ -1436,13 +1502,14 @@ NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
 		if (!pc)
 			break;
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)pc, INSTRLEN_ISA_DEFAULT),
+		                 (uintptr_t)instruction_trypred((void const *)pc,
+		                                                INSTRLEN_ISA_DEFAULT),
 		                 pc, i ? "Called here" : "Allocated from here");
 	}
 }
 
 /* Assert that the header and tail are properly initialized. */
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 	u32 *base;
 	unsigned int i;
@@ -1450,14 +1517,18 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 	base      = (u32 *)self->m_tree.a_vmin;
 	user_size = *(size_t *)base;
 	if (user_size != ((self->m_tree.a_vmax - self->m_tree.a_vmin) + 1) -
-	                 (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE)) {
+	                 (CONFIG_MALL_PREFIX_SIZE +
+	                  CONFIG_MALL_HEAD_SIZE +
+	                  CONFIG_MALL_TAIL_SIZE)) {
 		printk(KERN_CRIT
 		       "\n\nCorrupted MALL header in at %p (offset %Id from %p...%p) (expected %Iu as user-size, but got %Iu)\n",
 		       base, -(ssize_t)(CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE),
 		       self->m_tree.a_vmin + CONFIG_MALL_HEAD_SIZE,
 		       self->m_tree.a_vmax + 1 - CONFIG_MALL_TAIL_SIZE,
 		       ((self->m_tree.a_vmax - self->m_tree.a_vmin) + 1) -
-		       (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE),
+		       (CONFIG_MALL_PREFIX_SIZE +
+		        CONFIG_MALL_HEAD_SIZE +
+		        CONFIG_MALL_TAIL_SIZE),
 		       user_size);
 		goto fail;
 	}
@@ -1474,8 +1545,12 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 				++*(uintptr_t *)&base;
 			printk(KERN_CRIT
 			       "\n\nCorrupted MALL header in at %p (offset %Id from %p...%p)\n",
-			       base, (uintptr_t)base - (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE)),
-			       self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE),
+			       base,
+			       (uintptr_t)base -
+			       (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE +
+			                               CONFIG_MALL_PREFIX_SIZE)),
+			       self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE +
+			                              CONFIG_MALL_PREFIX_SIZE),
 			       self->m_tree.a_vmax + 1 - CONFIG_MALL_TAIL_SIZE);
 			goto fail;
 		}
@@ -1496,26 +1571,36 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 				base = (u32 *)((byte_t *)base + 1);
 			printk(KERN_CRIT
 			       "\n\nCorrupted MALL tail in at %p (offset %Id from %p...%p; offset %Iu from end of usable memory)\n",
-			       base, (uintptr_t)base - (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE)),
-			       self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE),
+			       base,
+			       (uintptr_t)base -
+			       (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE +
+			                               CONFIG_MALL_PREFIX_SIZE)),
+			       self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE +
+			                              CONFIG_MALL_PREFIX_SIZE),
 			       self->m_tree.a_vmax + 1 - CONFIG_MALL_TAIL_SIZE,
-			       (uintptr_t)base - (self->m_tree.a_vmax + 1 - CONFIG_MALL_TAIL_SIZE));
+			       (uintptr_t)base - (self->m_tree.a_vmax + 1 -
+			                          CONFIG_MALL_TAIL_SIZE));
 			goto fail;
 		}
 	}
 #endif /* CONFIG_MALL_TAIL_SIZE */
 	return false;
 fail:
-	format_hexdump(&syslog_printer, SYSLOG_LEVEL_CRIT,
+	format_hexdump(&syslog_printer,
+	               SYSLOG_LEVEL_CRIT,
 	               (void *)MALLNODE_BEGIN(self),
-	               MALLNODE_SIZE(self), 16, FORMAT_HEXDUMP_FNORMAL);
+	               MALLNODE_SIZE(self),
+	               16,
+	               FORMAT_HEXDUMP_FNORMAL);
 	printk(KERN_CRIT "\n");
-	mallnode_print_traceback(self, &syslog_printer, SYSLOG_LEVEL_RAW);
+	mallnode_print_traceback(self,
+	                         &syslog_printer,
+	                         SYSLOG_LEVEL_RAW);
 	kernel_panic("Corrupt MALL header or tail");
 	return false;
 }
 
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL mall_validate_padding_impl)(struct mallnode *__restrict self) {
 again:
 	if (!(self->m_flags & MALLNODE_FUSERNODE) &&
@@ -1601,7 +1686,7 @@ NOTHROW(KCALL mallnode_alloc_nx)(gfp_t gfp) {
 	return result;
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mallnode_free)(struct mallnode *__restrict self) {
 	heap_free_untraced(&mall_heap,
 	                   self,
@@ -1629,7 +1714,9 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 		assert(existing_node);
 		if (MALLNODE_ISVALID(existing_node)) {
 			printk(KERN_CRIT "Traceback of existing node:\n");
-			mallnode_print_traceback(existing_node, &syslog_printer, SYSLOG_LEVEL_CRIT);
+			mallnode_print_traceback(existing_node,
+			                         &syslog_printer,
+			                         SYSLOG_LEVEL_CRIT);
 			kernel_panic("Attempted to trace memory at %p...%p, which "
 			             "overlaps with an existing tracing of %p...%p",
 			             node->m_tree.a_vmin,
@@ -1751,7 +1838,8 @@ PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL
 mall_trace(void *base, size_t num_bytes, gfp_t flags) {
 	LOAD_CALLER_CONTEXT
 	assert(!(flags & MALLNODE_FUSERNODE));
-	return mall_trace_impl(base, num_bytes,
+	return mall_trace_impl(base,
+	                       num_bytes,
 	                       (flags & (GFP_NOLEAK | GFP_NOWALK)) |
 	                       MALLNODE_FUSERNODE,
 	                       context);
@@ -1761,7 +1849,8 @@ PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void *
 NOTHROW(KCALL mall_trace_nx)(void *base, size_t num_bytes, gfp_t flags) {
 	LOAD_CALLER_CONTEXT
 	assert(!(flags & MALLNODE_FUSERNODE));
-	return mall_trace_impl_nx(base, num_bytes,
+	return mall_trace_impl_nx(base,
+	                          num_bytes,
 	                          (flags & (GFP_NOLEAK | GFP_NOWALK)) |
 	                          MALLNODE_FUSERNODE,
 	                          context);
@@ -1777,14 +1866,17 @@ NOTHROW(KCALL mall_print_traceback)(void *ptr, gfp_t flags) {
 			return; /* Cannot print like this. */
 		sync_read(&mall_lock);
 	}
-	node = mall_tree ? mallnode_tree_locate(mall_tree, (uintptr_t)ptr) : NULL;
+	node = mall_tree ? mallnode_tree_locate(mall_tree, (uintptr_t)ptr)
+	                 : NULL;
 	if unlikely(!node) {
 		sync_endread(&mall_lock);
 		PANIC_INVALID_MALL_POINTER_WITH_CALLER_TRACEBACK(ptr);
 	}
 	/* TODO: Copy the traceback vector onto a local variable, so
 	 *       it can be dumped after having released `&mall_lock' */
-	mallnode_print_traceback(node, &syslog_printer, SYSLOG_LEVEL_DEBUG);
+	mallnode_print_traceback(node,
+	                         &syslog_printer,
+	                         SYSLOG_LEVEL_DEBUG);
 	sync_endread(&mall_lock);
 }
 
@@ -1839,9 +1931,15 @@ PUBLIC WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_truncate)(struct heap *__restrict self, void *base,
                              size_t old_size, size_t new_size, gfp_t free_flags) {
 	size_t free_bytes;
-	assertf(!old_size || old_size >= HEAP_MINSIZE, "Invalid heap_truncate(): Too few bytes (%Iu < %Iu)", old_size, HEAP_MINSIZE);
-	assertf(!old_size || IS_ALIGNED((uintptr_t)base, HEAP_ALIGNMENT), "Invalid heap_truncate(): Unaligned base pointer %p", base);
-	assertf(IS_ALIGNED(old_size, HEAP_ALIGNMENT), "Invalid heap_truncate(): Unaligned old_size size %Iu (%#Ix)", old_size, old_size);
+	assertf(!old_size || old_size >= HEAP_MINSIZE,
+	        "Invalid heap_truncate(): Too few bytes (%Iu < %Iu)",
+	        old_size, HEAP_MINSIZE);
+	assertf(!old_size || IS_ALIGNED((uintptr_t)base, HEAP_ALIGNMENT),
+	        "Invalid heap_truncate(): Unaligned base pointer %p",
+	        base);
+	assertf(IS_ALIGNED(old_size, HEAP_ALIGNMENT),
+	        "Invalid heap_truncate(): Unaligned old_size size %Iu (%#Ix)",
+	        old_size, old_size);
 	if unlikely(OVERFLOW_UADD(new_size, (size_t)(HEAP_ALIGNMENT - 1), &new_size))
 		goto return_old_size;
 	new_size &= ~(HEAP_ALIGNMENT - 1);
@@ -1876,9 +1974,11 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	if unlikely(!sync_tryread(&mall_lock)) {
 		/* We can't validate the pointer, so all we can do is return its saved size field. */
-		return *(size_t *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE));
+		return *(size_t *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE +
+		                                    CONFIG_MALL_HEAD_SIZE));
 	}
-	node = mall_tree ? mallnode_tree_locate(mall_tree, (uintptr_t)ptr) : NULL;
+	node = mall_tree ? mallnode_tree_locate(mall_tree, (uintptr_t)ptr)
+	                 : NULL;
 	if unlikely(!node) {
 		sync_endread(&mall_lock);
 		PANIC_INVALID_MALL_POINTER_WITH_CALLER_TRACEBACK(ptr);
@@ -1895,9 +1995,11 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 		PANIC_SIZEOF_NOT_NODE_BASE_ADDRESS_WITH_CALLER_TRACEBACK(node, ptr);
 	}
 	/* Look in both places where the node's size is stored, and compare them. */
-	result  = *(size_t *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE));
+	result = *(size_t *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE +
+	                                      CONFIG_MALL_HEAD_SIZE));
 	result2 = ((node->m_tree.a_vmax - node->m_tree.a_vmin) + 1) -
-	          (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE);
+	          (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE +
+	           CONFIG_MALL_TAIL_SIZE);
 	if unlikely(result != result2) {
 		mallnode_tree_remove(&mall_tree, (uintptr_t)ptr);
 		sync_endread(&mall_lock);

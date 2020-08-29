@@ -325,13 +325,13 @@ NOTHROW(FCALL vmb_paged_isused)(struct vmb const *__restrict self,
 
 /* Find the first node with `vm_node_getminpageid(return) >= min_page_index'
  * If no such node exists, return `NULL' instead. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb const *__restrict self,
                                                  pageid_t min_page_index);
 
 /* Find the last node with `vm_node_getmaxpageid(return) <= max_page_index'
  * If no such node exists, return `NULL' instead. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb const *__restrict self,
                                               pageid_t max_page_index);
 

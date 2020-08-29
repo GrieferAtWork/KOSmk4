@@ -425,7 +425,7 @@ nope:
  * The node that this function is on the look-out for must be
  * backed by an INode mapping, as well as share the same prot
  * characteristics as `self'. */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
 NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 	struct vm_node *lhs_iter;
 	struct vm_node *rhs_iter;

@@ -26,10 +26,10 @@
 #define FUNC2(x, y) FUNC3(x, y)
 #define FUNC(x)     FUNC2(x, SEGMENT_SIZE)
 
-#define SEGMENT_OFFSET   SLAB_SEGMENT_OFFSET(SEGMENT_SIZE)
-#define SEGMENT_COUNT    SLAB_SEGMENT_COUNT(SEGMENT_SIZE)
-#define SIZEOF_BITSET    SLAB_SIZEOF_BITSET(SEGMENT_SIZE)
-#define LENGTHOF_BITSET  SLAB_LENGTHOF_BITSET(SEGMENT_SIZE)
+#define SEGMENT_OFFSET  SLAB_SEGMENT_OFFSET(SEGMENT_SIZE)
+#define SEGMENT_COUNT   SLAB_SEGMENT_COUNT(SEGMENT_SIZE)
+#define SIZEOF_BITSET   SLAB_SIZEOF_BITSET(SEGMENT_SIZE)
+#define LENGTHOF_BITSET SLAB_LENGTHOF_BITSET(SEGMENT_SIZE)
 
 DECL_BEGIN
 
@@ -47,7 +47,7 @@ struct FUNC(segment) {
 #define BITSET(s)   ((uintptr_t *)((struct slab *)(s) + 1))
 #define SEGMENTS(s) ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
 
-LOCAL void
+LOCAL NONNULL((1, 2)) void
 NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
                                     void *__restrict ptr,
                                     gfp_t flags) {
@@ -92,7 +92,7 @@ NOTHROW(KCALL FUNC(slab_service_pending))(void) {
 	}
 }
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
                                   void *__restrict ptr,
                                   gfp_t flags) {
@@ -213,13 +213,13 @@ again:
 	/* Initialize the new page. */
 #if GFP_LOCKED == SLAB_FLOCKED && GFP_CALLOC == SLAB_FCALLOC
 	result_page->s_flags = flags & (GFP_LOCKED | GFP_CALLOC);
-#else
+#else /* GFP_LOCKED == SLAB_FLOCKED && GFP_CALLOC == SLAB_FCALLOC */
 	result_page->s_flags = 0;
 	if (flags & GFP_LOCKED)
 		result_page->s_flags |= SLAB_FLOCKED;
 	if (flags & GFP_CALLOC)
 		result_page->s_flags |= SLAB_FCALLOC;
-#endif
+#endif /* GFP_LOCKED != SLAB_FLOCKED || GFP_CALLOC != SLAB_FCALLOC */
 	result_page->s_free  = SEGMENT_COUNT - 1; /* One of the segments gets returned to the caller */
 	result_page->s_size  = SEGMENT_SIZE;
 	result_page->s_pself = &DESC.sd_free;
@@ -263,21 +263,27 @@ err:
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 FUNC(slab_kmalloc)(gfp_t flags) {
 	/* Try to allocate from slab memory */
-	void *result = FUNC(slab_malloc)(flags);
+	void *result;
+	result = FUNC(slab_malloc)(flags);
 	if likely(result)
 		return result;
 	/* Fall back to allocating without the slab engine */
-	return __os_malloc_noslab(CEIL_ALIGN(SEGMENT_SIZE, HEAP_ALIGNMENT), flags);
+	return __os_malloc_noslab(CEIL_ALIGN(SEGMENT_SIZE,
+	                                     HEAP_ALIGNMENT),
+	                          flags);
 }
 
 PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL FUNC(slab_kmalloc_nx))(gfp_t flags) {
 	/* Try to allocate from slab memory */
-	void *result = FUNC(slab_malloc)(flags);
+	void *result;
+	result = FUNC(slab_malloc)(flags);
 	if likely(result)
 		return result;
 	/* Fall back to allocating without the slab engine */
-	return __os_malloc_noslab_nx(CEIL_ALIGN(SEGMENT_SIZE, HEAP_ALIGNMENT), flags);
+	return __os_malloc_noslab_nx(CEIL_ALIGN(SEGMENT_SIZE,
+	                                        HEAP_ALIGNMENT),
+	                             flags);
 }
 
 

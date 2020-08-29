@@ -473,7 +473,7 @@ PUBLIC_CONST struct vio_operators const uvio_operators = {
 
 
 /* Perform a volatile check for requests with the given `status' */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict self,
                                                    u8 status) {
 	unsigned int i;

@@ -106,7 +106,7 @@ PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL debugtrap_reason_isenabled)(struct debugtrap_reason const *__restrict self) {
 	switch (self->dtr_reason) {
 

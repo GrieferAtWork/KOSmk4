@@ -45,10 +45,10 @@ struct ATTR_PACKED mptr {
 	uintptr_t mp_data; /* Size and heap of the mptr. */
 };
 STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
-#define MPTR_HEAP_SHIFT    ((__SIZEOF_SIZE_T__ * 8) - 1)
-#define MPTR_HEAP_MASK      ((uintptr_t)1 << MPTR_HEAP_SHIFT)
-#define MPTR_SIZE_MASK     (((uintptr_t)1 << MPTR_HEAP_SHIFT)-1)
-#define MPTR_IS_SINGLE_WORD  1
+#define MPTR_HEAP_SHIFT ((__SIZEOF_SIZE_T__ * 8) - 1)
+#define MPTR_HEAP_MASK  ((uintptr_t)1 << MPTR_HEAP_SHIFT)
+#define MPTR_SIZE_MASK  (((uintptr_t)1 << MPTR_HEAP_SHIFT) - 1)
+#define MPTR_IS_SINGLE_WORD 1
 
 #define mptr_init(x, size, heap) ((x)->mp_data = (size) | ((uintptr_t)(heap) << MPTR_HEAP_SHIFT))
 #define mptr_size(x)             ((x)->mp_data & MPTR_SIZE_MASK)
@@ -72,9 +72,9 @@ struct ATTR_PACKED mptr {
 STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 
 #define mptr_init(x, size, heap) ((x)->mp_size = (size), (x)->mp_heap = (heap))
-#define mptr_size(x)              (x)->mp_size
+#define mptr_size(x)             (x)->mp_size
 #define mptr_setsize(x, size)    ((x)->mp_size = (size))
-#define mptr_heap(x)              (x)->mp_heap
+#define mptr_heap(x)             (x)->mp_heap
 #define mptr_assert(x)                                 \
 	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
@@ -104,7 +104,7 @@ PUBLIC ATTR_WEAK void
 NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	struct mptr *mblock;
 	gfp_t heap;
-	if unlikely(!ptr)
+	if (!ptr)
 		return; /* Ignore NULL-pointers. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
@@ -125,7 +125,7 @@ PUBLIC ATTR_WEAK void
 NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	struct mptr *mblock;
 	gfp_t heap;
-	if unlikely(!ptr)
+	if (!ptr)
 		return; /* Ignore NULL-pointers. */
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {

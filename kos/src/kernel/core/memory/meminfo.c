@@ -54,18 +54,18 @@ DECL_BEGIN
 /* Mask of bits that are tested to determine if a page is free. */
 #if PMEMZONE_ISFREEBIT == 0
 #if __SIZEOF_POINTER__ == 4
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0x55555555)
+#define PMEMBITSET_FREEMASK __UINTPTR_C(0x55555555)
 #else /* __SIZEOF_POINTER__ == 4 */
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0x5555555555555555)
+#define PMEMBITSET_FREEMASK __UINTPTR_C(0x5555555555555555)
 #endif /* __SIZEOF_POINTER__ != 4 */
 #else /* PMEMZONE_ISFREEBIT == 0 */
 #if __SIZEOF_POINTER__ == 4
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0xAAAAAAAA)
+#define PMEMBITSET_FREEMASK __UINTPTR_C(0xAAAAAAAA)
 #else /* __SIZEOF_POINTER__ == 4 */
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0xAAAAAAAAAAAAAAAA)
+#define PMEMBITSET_FREEMASK __UINTPTR_C(0xAAAAAAAAAAAAAAAA)
 #endif /* __SIZEOF_POINTER__ != 4 */
 #endif /* PMEMZONE_ISFREEBIT != 0 */
-#define PMEMBITSET_UNDFMASK   (~PMEMBITSET_FREEMASK)
+#define PMEMBITSET_UNDFMASK (~PMEMBITSET_FREEMASK)
 STATIC_ASSERT_MSG(PMEMZONE_BITSPERPAGE == 2,"Must re-do the logic above");
 STATIC_ASSERT((BITSOF(uintptr_t) % PMEMZONE_BITSPERPAGE) == 0);
 
@@ -297,7 +297,7 @@ minfo_allocate_part_pagedata(size_t num_bytes) {
 #if defined(__i386__) || defined(__x86_64__)
 	bool allow_beneath_kernel = false;
 again:
-#endif
+#endif /* __i386__ || __x86_64__ */
 	assert(minfo.mb_banks == kernel_membanks_initial);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		vm_phys_t bytes_avail;
@@ -426,7 +426,8 @@ again:
 
 
 /* Construct memory zones from memory info. */
-INTERN ATTR_FREETEXT void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* This function is quite the nuisance, and doing it right is quite difficult.
 	 *  - We need to (dynamically) create some very large bitsets to hold information
 	 *    about what physical memory has been allocated.

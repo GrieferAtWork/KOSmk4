@@ -64,7 +64,7 @@ handle_datablock_read(struct vm_datablock *__restrict self,
 	return result;
 }
 
-INTERN WUNUSED NONNULL((1)) size_t KCALL
+INTERN NONNULL((1)) size_t KCALL
 handle_datablock_write(struct vm_datablock *__restrict self,
                        USER CHECKED void const *src,
                        size_t num_bytes, iomode_t mode) THROWS(...) {
@@ -77,7 +77,7 @@ handle_datablock_write(struct vm_datablock *__restrict self,
 	return result;
 }
 
-INTERN size_t KCALL
+INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datablock_pread(struct vm_datablock *__restrict self,
                        USER CHECKED void *dst,
                        size_t num_bytes, pos_t addr, iomode_t mode) {
@@ -90,7 +90,7 @@ handle_datablock_pread(struct vm_datablock *__restrict self,
 	return num_bytes;
 }
 
-INTERN size_t KCALL
+INTERN NONNULL((1)) size_t KCALL
 handle_datablock_pwrite(struct vm_datablock *__restrict self,
                         USER CHECKED void const *src,
                         size_t num_bytes, pos_t addr, iomode_t mode) {
@@ -104,7 +104,7 @@ handle_datablock_pwrite(struct vm_datablock *__restrict self,
 	return num_bytes;
 }
 
-INTERN size_t KCALL
+INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datablock_preadv(struct vm_datablock *__restrict self,
                         struct aio_buffer *__restrict dst, size_t num_bytes,
                         pos_t addr, iomode_t mode) {
@@ -117,7 +117,7 @@ handle_datablock_preadv(struct vm_datablock *__restrict self,
 	return num_bytes;
 }
 
-INTERN size_t KCALL
+INTERN NONNULL((1)) size_t KCALL
 handle_datablock_pwritev(struct vm_datablock *__restrict self,
                          struct aio_buffer *__restrict src, size_t num_bytes,
                          pos_t addr, iomode_t mode) {
@@ -133,7 +133,7 @@ handle_datablock_pwritev(struct vm_datablock *__restrict self,
 
 
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_datablock_truncate(struct vm_datablock *__restrict self,
                           pos_t new_size) {
 	if (vm_datablock_isinode(self)) {
@@ -144,11 +144,12 @@ handle_datablock_truncate(struct vm_datablock *__restrict self,
 }
 
 /* TODO */
-INTERN pos_t KCALL
-handle_datablock_allocate(struct vm_datablock *__restrict self, fallocate_mode_t mode,
+INTERN NONNULL((1)) pos_t KCALL
+handle_datablock_allocate(struct vm_datablock *__restrict self,
+                          fallocate_mode_t mode,
                           pos_t start, pos_t length);
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_datablock_sync(struct vm_datablock *__restrict self) {
 	if (vm_datablock_isinode(self))
 		inode_sync((struct inode *)self);
@@ -157,13 +158,14 @@ handle_datablock_sync(struct vm_datablock *__restrict self) {
 	}
 }
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_datablock_datasync(struct vm_datablock *__restrict self) {
 	vm_datablock_sync(self);
 }
 
-INTERN poll_mode_t KCALL
-handle_datablock_poll(struct vm_datablock *__restrict self, poll_mode_t what) {
+INTERN NONNULL((1)) poll_mode_t KCALL
+handle_datablock_poll(struct vm_datablock *__restrict self,
+                      poll_mode_t what) {
 	poll_mode_t result;
 	if (self->db_type->dt_handle_poll) {
 		result = (*self->db_type->dt_handle_poll)(self, what);
@@ -181,7 +183,7 @@ handle_datablock_poll(struct vm_datablock *__restrict self, poll_mode_t what) {
 }
 
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL datablock_stat_parts)(struct vm_datapart *__restrict self,
                                     struct hop_datablock_stat *__restrict st) {
 	u64 i, num_dpages;
@@ -266,7 +268,7 @@ do_track_ramblocks:
 	}
 }
 
-INTERN syscall_slong_t KCALL
+INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_datablock_ioctl(struct vm_datablock *__restrict self,
                        syscall_ulong_t cmd,
                        USER UNCHECKED void *arg,
@@ -278,7 +280,7 @@ handle_datablock_ioctl(struct vm_datablock *__restrict self,
 	      cmd);
 }
 
-INTERN syscall_slong_t KCALL
+INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_datablock_hop(struct vm_datablock *__restrict self,
                      syscall_ulong_t cmd,
                      USER UNCHECKED void *arg,
@@ -1256,7 +1258,7 @@ again:
 	return result;
 }
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_datablock_stat(struct vm_datablock *__restrict self,
                       USER CHECKED struct stat *result) {
 	if (vm_datablock_isinode(self)) {

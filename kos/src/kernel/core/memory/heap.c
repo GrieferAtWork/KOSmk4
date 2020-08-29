@@ -71,8 +71,8 @@ DECL_BEGIN
 STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 
 #if defined(NDEBUG) || 0
-#define heap_validate(heap)    (void)0
-#define heap_validate_all()    (void)0
+#define heap_validate(heap) (void)0
+#define heap_validate_all() (void)0
 #endif /* NDEBUG */
 
 #if defined(NDEBUG) || 1 /* Pedantic heap validation enable/disable */
@@ -143,13 +143,13 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 
 #if 0
 #define DEFAULT_OVERALLOC  (PAGESIZE)
-#define DEFAULT_FREETHRESH (PAGESIZE*2)
-#elif PAGESIZE*16 > 65536
-#define DEFAULT_OVERALLOC  (PAGESIZE*16)
-#define DEFAULT_FREETHRESH (PAGESIZE*32)
+#define DEFAULT_FREETHRESH (PAGESIZE * 2)
+#elif PAGESIZE * 16 > 65536
+#define DEFAULT_OVERALLOC  (PAGESIZE * 16)
+#define DEFAULT_FREETHRESH (PAGESIZE * 32)
 #else
-#define DEFAULT_OVERALLOC  (PAGESIZE*32)
-#define DEFAULT_FREETHRESH (PAGESIZE*64)
+#define DEFAULT_OVERALLOC  (PAGESIZE * 32)
+#define DEFAULT_FREETHRESH (PAGESIZE * 64)
 #endif
 
 
@@ -162,7 +162,8 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 PRIVATE void
 NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
                                   datapage_t UNUSED(start),
-                                  vm_phys_t buffer, size_t num_data_pages) {
+                                  vm_phys_t buffer,
+                                  size_t num_data_pages) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	HEAP_ASSERT((buffer & PAGEMASK) == 0);
@@ -247,10 +248,10 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 					pagedir_unsetchanged(start);
 					break;
 				}
-#else
+#else /* ARCH_PAGEDIR_HAVE_CHANGED */
 				if (pagedir_ismapped(start))
 					break;
-#endif
+#endif /* !ARCH_PAGEDIR_HAVE_CHANGED */
 				if (num_bytes <= PAGESIZE)
 					return NULL;
 				start += PAGESIZE;
@@ -278,7 +279,7 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 	return NULL;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) u8
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u8
 NOTHROW(KCALL mfree_get_checksum)(struct mfree *__restrict self) {
 	u8 sum = 0, *iter, *end;
 	end = (iter = (u8 *)&self->mf_size) + sizeof(self->mf_size);
@@ -477,9 +478,9 @@ do_remainder:
 
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
-                                          struct mfree *__restrict node) {
+                                         struct mfree *__restrict node) {
 	struct mfree **pslot, *slot;
 	size_t num_bytes = node->mf_size;
 	HEAP_ASSERTF(node->mf_size, "Empty node at %p", node);
@@ -501,17 +502,17 @@ NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
 /* Acquire a lock to the heap, while also serving any pending free operations.
  * @return: true:  Successfully acquired a lock. (Always returned by `heap_acquirelock' when `GFP_ATOMIC' isn't set)
  * @return: false: Failed to acquire a lock (`GFP_ATOMIC' was set, and the operation would have blocked) */
-LOCAL bool KCALL heap_acquirelock(struct heap *__restrict self, gfp_t flags);
-LOCAL WUNUSED bool NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags);
-LOCAL NOBLOCK bool NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self);
+LOCAL NONNULL((1)) bool KCALL heap_acquirelock(struct heap *__restrict self, gfp_t flags);
+LOCAL WUNUSED NONNULL((1)) bool NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags);
+LOCAL NOBLOCK NONNULL((1)) bool NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self);
 
 
 /* Same as `heap_free_raw_lock_and_maybe_unlock_impl()',
  * but always unlock the heap afterwards. */
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
-                              VIRT void *ptr, size_t num_bytes,
-                              gfp_t flags);
+                             VIRT void *ptr, size_t num_bytes,
+                             gfp_t flags);
 
 /* Upon entry, the heap must not be locked.
  * This function then tries to acquire a lock to the heap without blocking.
@@ -519,18 +520,18 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
  * If it doesn't, it will instead track the given memory block as a pending free.
  * @return: true:  The heap remains locked (the caller inherits the lock). 
  * @return: false: The heap was unlocked before returning.*/
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict self,
-                                                         VIRT void *ptr, size_t num_bytes,
-                                                         gfp_t flags);
+                                                        VIRT void *ptr, size_t num_bytes,
+                                                        gfp_t flags);
 
 /* Upon entry, the heap must be locked.
  * @return: true:  The heap remains locked. 
  * @return: false: The heap was unlocked.*/
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
-                                              VIRT void *ptr, size_t num_bytes,
-                                              gfp_t flags);
+                                             VIRT void *ptr, size_t num_bytes,
+                                             gfp_t flags);
 
 
 /* @return: true:  Successfully served all pending free operations,
@@ -538,10 +539,10 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
  * @return: false: Successfully served all pending free operations,
  *                 but the heap lock was lost and could not be re-
  *                 acquired. */
-PRIVATE bool
+PRIVATE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
-                                   struct heap_pending_free *__restrict pend,
-                                   gfp_t flags) {
+                                  struct heap_pending_free *__restrict pend,
+                                  gfp_t flags) {
 	struct heap_pending_free *next;
 	for (;;) {
 		bool still_locked;
@@ -596,7 +597,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 /* Acquire a lock to the heap, while also serving any pending free operations.
  * @return: true:  Successfully acquired a lock.
  * @return: false: Failed to acquire a lock (`GFP_ATOMIC' was set, and the operation would have blocked) */
-LOCAL bool KCALL
+LOCAL WUNUSED NONNULL((1)) bool KCALL
 heap_acquirelock(struct heap *__restrict self, gfp_t flags) {
 	struct heap_pending_free *pend;
 	if (!sync_trywrite(&self->h_lock)) {
@@ -611,7 +612,7 @@ heap_acquirelock(struct heap *__restrict self, gfp_t flags) {
 	return true;
 }
 
-LOCAL WUNUSED bool
+LOCAL WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags) {
 	struct heap_pending_free *pend;
 	if (!sync_trywrite(&self->h_lock)) {
@@ -627,7 +628,7 @@ NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags) {
 	return true;
 }
 
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self) {
 	struct heap_pending_free *pend;
 	if (!sync_trywrite(&self->h_lock))
@@ -648,7 +649,7 @@ NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self) {
  * If it doesn't, it will instead track the given memory block as a pending free.
  * @return: true:  The heap remains locked (the caller inherits the lock). 
  * @return: false: The heap was unlocked before returning.*/
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict self,
                                                         VIRT void *ptr, size_t num_bytes,
                                                         gfp_t flags) {
@@ -670,10 +671,10 @@ NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict 
 }
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
-                              VIRT void *ptr, size_t num_bytes,
-                              gfp_t flags) {
+                             VIRT void *ptr, size_t num_bytes,
+                             gfp_t flags) {
 	bool still_locked;
 	still_locked = heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
 	if (still_locked) {
@@ -688,10 +689,10 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
 /* Upon entry, the heap must be locked.
  * @return: true:  The heap remains locked. 
  * @return: false: The heap was unlocked.*/
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
-                                              VIRT void *ptr, size_t num_bytes,
-                                              gfp_t flags) {
+                                             VIRT void *ptr, size_t num_bytes,
+                                             gfp_t flags) {
 	ATREE_SEMI_T(uintptr_t)
 	addr_semi;
 	ATREE_LEVEL_T addr_level;
@@ -1002,7 +1003,7 @@ do_load_new_slot:
 
 
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
                                   VIRT void *ptr, size_t num_bytes,
                                   gfp_t flags) {
@@ -1025,10 +1026,12 @@ NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
 }
 
 PUBLIC WUNUSED NONNULL((1)) size_t
-NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self, void *base,
-                                      size_t old_size, size_t new_size, gfp_t free_flags) {
+NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self,
+                                      void *base, size_t old_size,
+                                      size_t new_size, gfp_t free_flags) {
 	size_t free_bytes;
-	TRACE("heap_truncate_untraced(%p,%p,%Iu,%Iu,%#x)\n", self, base, old_size, new_size, flags);
+	TRACE("heap_truncate_untraced(%p,%p,%Iu,%Iu,%#x)\n",
+	      self, base, old_size, new_size, flags);
 	HEAP_ASSERTF(!old_size || old_size >= HEAP_MINSIZE,
 	             "Invalid heap_truncate(): Too few bytes (%Iu < %Iu)",
 	             old_size, HEAP_MINSIZE);
@@ -1065,7 +1068,7 @@ return_old_size:
  * to invoke this function manually, as all it really does is slow down
  * future calls to allocating heap functions.
  * @return: * : The total number of bytes released back to the core (a multiple of PAGESIZE) */
-PUBLIC size_t
+PUBLIC NONNULL((1)) size_t
 NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold) {
 	size_t result = 0;
 	struct mfree **iter, **end;
@@ -1158,7 +1161,7 @@ again:
 #ifdef CONFIG_DEBUG_HEAP
 #define IS_FRESH_MEMORY(p) (*(u32 *)(p) == 0 || *(u32 *)(p) == DEBUGHEAP_FRESH_MEMORY)
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
                                         void *overallocation_base,
                                         size_t num_free_bytes,
@@ -1243,7 +1246,7 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 	              num_free_bytes, flags);
 }
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
                                          void *underallocation_base,
                                          size_t num_free_bytes,

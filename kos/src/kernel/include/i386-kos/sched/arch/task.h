@@ -338,19 +338,19 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 /* Safely get/set the values of saved registers that may be modified by RPC redirection. */
 
 /* Check if `self' returns to user-space. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self);
 
 /* get:`self->ir_pip' */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self);
 
 /* get:`self->ir_cs16' */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) u16
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self);
 
 /* get:`self->ir_pflags' */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self);
 
 /* set:`self->ir_pip' */
@@ -371,17 +371,17 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
                                uintptr_t mask, uintptr_t flags);
 
 /* get:`self->ir_psp' (with accounting for kernel-space return-sp on i386) */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self);
 
 
 #ifdef __x86_64__
 /* Check if `self' returns to compatibility-mode. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self);
 
 /* get:`self->ir_ss16' */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) u16
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self);
 
 /* set:`self->ir_rsp' */

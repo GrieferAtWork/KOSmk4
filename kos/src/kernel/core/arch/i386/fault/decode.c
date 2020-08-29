@@ -86,7 +86,7 @@ PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
 #endif /* !__x86_64__ */
 
 
-INTERN WUNUSED ATTR_PURE NONNULL((1)) u16
+INTERN ATTR_PURE WUNUSED NONNULL((1)) u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
@@ -95,7 +95,7 @@ NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno)
 	return *(u16 *)&ACCESS_GPREG(state, regno);
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1)) u32
+INTERN ATTR_PURE WUNUSED NONNULL((1)) u32
 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == EMU86_R_ESP)
@@ -106,7 +106,7 @@ NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno)
 
 
 #ifdef __x86_64__
-INTERN WUNUSED ATTR_PURE NONNULL((1)) u64
+INTERN ATTR_PURE WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno) {
 	return ACCESS_GPREG(state, regno);
 }

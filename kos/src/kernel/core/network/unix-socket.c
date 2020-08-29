@@ -976,7 +976,7 @@ again_wait_for_client:
 
 /* Check if clients to-be accept(2)-ed are available
  * NOTE: Also returns true if the server was shut down. */
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) bool
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL unix_server_can_accept)(struct unix_server const *__restrict self) {
 	struct unix_client *clients;
 	clients = ATOMIC_READ(self->us_acceptme);

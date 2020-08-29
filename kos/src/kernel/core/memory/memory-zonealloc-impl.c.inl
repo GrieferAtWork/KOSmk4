@@ -42,14 +42,14 @@ NOTHROW(KCALL zone_malloc_part_between)(struct pmemzone *__restrict self,
                                         pagecnt_t max_pages,
                                         pagecnt_t *__restrict res_pages,
                                         bool out_of_bounds_is_ok)
-#else
+#else /* ... */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
 NOTHROW(KCALL zone_malloc_between)(struct pmemzone *__restrict self,
                                    pageptr_t zone_relative_min,
                                    pageptr_t zone_relative_max,
                                    pagecnt_t num_pages,
                                    bool out_of_bounds_is_ok)
-#endif
+#endif /* !... */
 #else /* ALLOC_BETWEEN */
 #ifdef ALLOC_SINGLE
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
@@ -62,12 +62,12 @@ NOTHROW(KCALL zone_malloc_part_before)(struct pmemzone *__restrict self,
                                        pagecnt_t min_pages,
                                        pagecnt_t max_pages,
                                        pagecnt_t *__restrict res_pages)
-#else
+#else /* ... */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
 NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
                                   pageptr_t zone_relative_max,
                                   pagecnt_t num_pages)
-#endif
+#endif /* !... */
 #endif /* !ALLOC_BETWEEN */
 {
 	uintptr_t word;

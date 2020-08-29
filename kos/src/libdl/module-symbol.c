@@ -36,7 +36,7 @@
 
 DECL_BEGIN
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) u32 CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32 CC
 gnu_symhash(char const *__restrict name) {
 	u32 h = 5381;
 	for (; *name; ++name) {
@@ -45,7 +45,7 @@ gnu_symhash(char const *__restrict name) {
 	return h;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) u32 CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32 CC
 elf_symhash(char const *__restrict name) {
 	u32 h = 0;
 	for (; *name; ++name) {

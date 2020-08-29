@@ -276,7 +276,7 @@ badfd:
 	return false;
 }
 
-LOCAL WUNUSED ATTR_PURE bool
+LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL GDBFs_HasMountedFileSystem)(void) {
 	if unlikely(!GDBFs.fi_fs)
 		return false; /* No filesystem loaded. */

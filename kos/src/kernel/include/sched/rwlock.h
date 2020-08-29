@@ -162,15 +162,15 @@ struct rwlock {
 	       (x)->rw_state  = __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))
 
 /* Check if the caller is holding a read- or write-lock on `self' */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_reading)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_writing)(struct rwlock const *__restrict self);
 
 /* Same as above, but return the effective access recursion */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL rwlock_reading_r)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(FCALL rwlock_writing_r)(struct rwlock const *__restrict self);
 
 #ifndef __INTELLISENSE__
@@ -182,7 +182,7 @@ NOTHROW(FCALL rwlock_writing_r)(struct rwlock const *__restrict self);
 #endif /* !__INTELLISENSE__ */
 
 /* Return the total number of hold read-locks (or 0 if this is not tracked by the implementation) */
-FUNDEF WUNUSED ATTR_PURE uintptr_t NOTHROW(FCALL rwlock_reading_any)(void);
+FUNDEF ATTR_PURE WUNUSED uintptr_t NOTHROW(FCALL rwlock_reading_any)(void);
 
 #ifndef CONFIG_TASK_STATIC_READLOCKS
 #define CONFIG_TASK_STATIC_READLOCKS 4 /* NOTE: Must be a power-of-2 (2, 4, 8, 16, etc...) */

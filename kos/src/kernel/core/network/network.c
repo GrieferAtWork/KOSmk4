@@ -47,7 +47,7 @@ PUBLIC struct net_peeraddrs net_peeraddrs_empty = {
 
 /* Lookup a peer address descriptor for `ip' and return its pointer.
  * If no such descriptor exists, return `NULL' instead. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct net_peeraddr *
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct net_peeraddr *
 NOTHROW(KCALL net_peeraddrs_lookup_ip)(struct net_peeraddrs *__restrict self, be32 ip) {
 	size_t index;
 	BSEARCH(index, self->nps_addrs, self->nps_count, ->_npa_hip, (u32)ip) {

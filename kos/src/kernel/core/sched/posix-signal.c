@@ -1817,13 +1817,13 @@ DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SSETMASK */
 
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) size_t KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t KCALL
 get_pid_indirection(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid) ? pid->tp_pidns->pn_indirection : 0;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) upid_t KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) upid_t KCALL
 taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
 	if likely(ind <= self->tp_pidns->pn_indirection)
 		return self->tp_pids[ind];

@@ -85,7 +85,7 @@ PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
 
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) const *__restrict ehdr) {
 	uintptr_t result;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;

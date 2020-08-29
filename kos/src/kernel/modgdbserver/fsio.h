@@ -136,7 +136,7 @@ INTDEF struct fsio_struct GDBFs;
 
 /* Lookup and return a pointer to the given GDB `fdno'
  * if no such handle exists, return `NULL' instead. */
-LOCAL NOBLOCK WUNUSED ATTR_PURE struct handle *
+LOCAL NOBLOCK ATTR_PURE WUNUSED struct handle *
 NOTHROW(KCALL GDBFs_LookupHandle)(fd_t fdno) {
 	if ((unsigned int)fdno >= GDBFs.fi_halloc)
 		return __NULLPTR;

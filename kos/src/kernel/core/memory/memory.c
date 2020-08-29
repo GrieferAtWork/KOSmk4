@@ -1115,7 +1115,7 @@ NOTHROW(KCALL page_iszero)(pageptr_t page) {
 }
 
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE bool
+PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	pageptr_t page_max;

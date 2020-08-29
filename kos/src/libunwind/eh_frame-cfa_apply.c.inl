@@ -271,8 +271,8 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 		{
 			dw_regno = cfi_unwind_local_register_uncommon2dw(max_index);
 			DOTRACE("Uncommon register used: %u (%u)\n",
-			      (unsigned int)dw_regno,
-			      (unsigned int)max_index);
+			        (unsigned int)dw_regno,
+			        (unsigned int)max_index);
 			self->cs_uncorder[max_index] = 0;
 			rule = &uncommon_rule;
 			result = libuw_unwind_fde_rule(fde, &uncommon_rule,
@@ -407,15 +407,15 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 		 *   - GDB will _NOT_ working properly unless every function has a CFA rule defined.
 		 *     For this purpose, you can usually use `.cfi_def_cfa %esp, 0', however be warned
 		 *     that the value of this expression is used as the FRAME-ID which GDB uses to
-		 *     identify frames, so try to keep its value unique I guess...
+		 *     identify frames, so try to keep its value unique, I guess...
 		 *   - With all of this in mind, a custom register restore function would look like this:
 		 * >>     .cfi_startproc simple
 		 * >>     .cfi_def_cfa %esp, 0
 		 * >>     .cfi_signal_frame
 		 * >> #define DEFINE_REGISTER_ADDRESS(reg) \
-		 * >>     .cfi_escape DW_CFA_expression; \
-		 * >>     .cfi_escape reg; \
-		 * >>     .cfi_escape ...; \
+		 * >>     .cfi_escape DW_CFA_expression;   \
+		 * >>     .cfi_escape reg;                 \
+		 * >>     .cfi_escape ...;                 \
 		 * >>     ...;
 		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_EDI)
 		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_ESI)

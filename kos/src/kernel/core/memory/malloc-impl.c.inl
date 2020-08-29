@@ -23,13 +23,13 @@
 #endif /* __INTELLISENSE__ */
 
 #ifdef MALLOC_NX
-#define IFELSE_NX(if_nx,if_x)    if_nx
-#define FUNC(x)                  x##_nx
-#define NOTHROW_NX               NOTHROW
+#define IFELSE_NX(if_nx, if_x) if_nx
+#define FUNC(x)                x##_nx
+#define NOTHROW_NX             NOTHROW
 #else /* MALLOC_NX */
-#define IFELSE_NX(if_nx,if_x)    if_x
-#define FUNC(x)                  x
-#define NOTHROW_NX               /* nothing */
+#define IFELSE_NX(if_nx, if_x) if_x
+#define FUNC(x)                x
+#define NOTHROW_NX             /* nothing */
 #endif /* !MALLOC_NX */
 
 DECL_BEGIN
@@ -54,9 +54,9 @@ IFELSE_NX(err:, err_overflow:)
 }
 #elif defined(MALLOC_NX)
 #define kmalloc_no_slab_nx kmalloc_nx
-#else
+#else /* ... */
 #define kmalloc_noslab     kmalloc
-#endif
+#endif /* !... */
 
 PUBLIC WUNUSED ATTR_MALLOC ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
@@ -86,7 +86,8 @@ IFELSE_NX(err:, err_overflow:)
 
 PUBLIC WUNUSED ATTR_MALLOC ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
-                                  size_t n_bytes, gfp_t flags) {
+                                  size_t n_bytes,
+                                  gfp_t flags) {
 	struct heapptr hptr;
 	struct mptr *result;
 	size_t alloc_size;
@@ -193,7 +194,8 @@ err:
 
 PUBLIC ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
-                                 size_t n_bytes, gfp_t flags) {
+                                 size_t n_bytes,
+                                 gfp_t flags) {
 	struct heapptr hptr;
 	struct mptr *result;
 	struct heap *heap;
@@ -413,7 +415,8 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 	/* Overlap with another pointer. - Allocate a new block. */
 	hptr = FUNC(heap_align_untraced)(heap, min_alignment,
 	                                 sizeof(struct mptr) + offset,
-	                                 sizeof(struct mptr) + n_bytes, flags);
+	                                 sizeof(struct mptr) + n_bytes,
+	                                 flags);
 	IFELSE_NX(if unlikely(!hptr.hp_siz) goto err;, )
 	memcpy(hptr.hp_ptr, result, mptr_size(result));
 	/* Free the old pointer. */

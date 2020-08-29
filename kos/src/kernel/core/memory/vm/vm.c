@@ -589,7 +589,7 @@ NOTHROW(KCALL vm_set_lockendwrite_all)(struct pointer_set *__restrict self) {
 
 
 
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL pprop_getbit)(uintptr_t const *__restrict base,
                             size_t index) {
 	uintptr_t result;
@@ -2219,7 +2219,6 @@ again_lock_datapart:
 		void (KCALL *dt_savepart)(struct vm_datablock *__restrict,
 		                          datapage_t, vm_phys_t, size_t);
 		size_t vms_count;
-		struct vm_node *node;
 		vm_datapart_lockread_setcore(self);
 		assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 		       self->dp_state == VM_DATAPART_STATE_LOCKED);
@@ -2296,7 +2295,8 @@ again_lock_datapart:
 			goto again_lock_datapart;
 		}
 		{
-			REF struct vm *myvm = THIS_VM;
+			struct vm *myvm = THIS_VM;
+			struct vm_node *node;
 			for (node = self->dp_srefs; node; node = node->vn_link.ln_next) {
 				struct vm *v;
 				u16 perm;
@@ -2366,7 +2366,7 @@ again_lock_datapart:
 				                        count);
 				/* Go through and change all of the associated pages from CHANGED to INITIALIZED.
 				 * NOTE: Some of them may have already changed in this manner, in case some other
-				 *       thread is/has also synced our part. */
+				 *       thread is/has also synced our part. (after all: we only have a read-lock) */
 				for (; count--; ++i) {
 					if (vm_datapart_cmpxchstate(self, i,
 					                            VM_DATAPART_PPP_HASCHANGED,
@@ -2534,7 +2534,10 @@ vm_datablock_createpart(struct vm_datablock *__restrict self,
 		/* Need to allocate a page property bitset as part of the heap! */
 		uintptr_t *ppp;
 		size_t ppp_size;
-		ppp_size = CEILDIV(num_dpages, BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * sizeof(uintptr_t);
+		ppp_size = CEILDIV(num_dpages,
+		                   BITSOF(uintptr_t) /
+		                   VM_DATAPART_PPP_BITS) *
+		           sizeof(uintptr_t);
 		TRY {
 			ppp = (uintptr_t *)kmalloc(ppp_size,
 			                           GFP_CALLOC | GFP_LOCKED |

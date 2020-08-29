@@ -42,7 +42,7 @@
 
 DECL_BEGIN
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL vd_format_istext)(struct vd_format const *__restrict self) {
 	return self->vdf_codec == VIDEO_CODEC_NONE;
 }

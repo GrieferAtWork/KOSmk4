@@ -224,19 +224,19 @@ struct qtick {
  * through `task_quantum_tick()', which returns a thread-local quantum
  * tick representing the # of time spent executing code in the context
  * of that thread. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE struct qtick
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL cpu_quantum_tick)(void);
-FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct qtick
+FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL cpu_quantum_tick_nopr)(void);
 
 /* Return the amount of time that has been spent executing code in the
  * context of the calling thread. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE struct qtick
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL task_quantum_tick)(void);
 
 /* Return the amount of time that has been spent executing code in the
  * context of the given thread. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE struct qtick
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct qtick
 NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread);
 
 

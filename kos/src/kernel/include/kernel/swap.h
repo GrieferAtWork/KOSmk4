@@ -32,18 +32,21 @@ DECL_BEGIN
 #ifndef CONFIG_NO_SWAP
 
 typedef vm_spage_t swapptr_t;
-#define SWAPPTR_INVALID   ((swapptr_t)-1)
+#define SWAPPTR_INVALID ((swapptr_t)-1)
 
 /* Allocate SWAP memory.
  * @return: * :              The base address for the allocated swap segment.
  * @return: SWAPPTR_INVALID: Failed to allocate swap memory. */
-FUNDEF swapptr_t NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages);
-FUNDEF NONNULL((3)) swapptr_t
+FUNDEF WUNUSED swapptr_t
+NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages);
+
+FUNDEF WUNUSED NONNULL((3)) swapptr_t
 NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
                                 pagecnt_t *__restrict res_pages);
 
 /* Free SWAP memory. */
-FUNDEF NOBLOCK void NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages);
+FUNDEF NOBLOCK void
+NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages);
 
 /* Issue asynchronous comments to read/write physical memory to/from SWAP.
  * NOTE: By default, swap reads/writes are performed using DMA, which

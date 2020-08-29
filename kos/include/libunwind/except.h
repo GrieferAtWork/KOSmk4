@@ -46,7 +46,7 @@
  * >>                              _UA_CLEANUP_PHASE | _UA_FORCE_UNWIND,
  * >>                              _UEC_KERNKOS,
  * >>                              KOS_EXCEPTION,
- * >>                             &context);
+ * >>                              &context);
  * >>     if (reason == _URC_INSTALL_CONTEXT)
  * >>         RETURN_TO(context.uc_state);
  * >>     if (reason != _URC_CONTINUE_UNWIND)
@@ -198,6 +198,8 @@ typedef __ATTR_NONNULL((4, 5)) _Unwind_Reason_Code
                                      _Unwind_Exception_Class __exception_class,
                                      struct _Unwind_Exception *__restrict __ue_header,
                                      struct _Unwind_Context *__restrict __context);
+
+/* TODO: Declare these functions as __LIBKCALL, rather than __LIBCCALL! */
 
 /* Exception ABI functions exported by libc.so */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_RaiseException)

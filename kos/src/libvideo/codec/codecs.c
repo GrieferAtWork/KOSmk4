@@ -96,7 +96,7 @@ union color_data {
 
 
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_inbyte_lsb(byte_t const *__restrict byte,
                      unsigned int shift) {
 	assert(shift < 8);
@@ -115,7 +115,7 @@ setpixel1_inbyte_lsb(byte_t *__restrict byte,
 	*byte = newbyte;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_inbyte_msb(byte_t const *__restrict byte,
                      unsigned int shift) {
 	assert(shift < 8);
@@ -131,14 +131,14 @@ setpixel1_inbyte_msb(byte_t *__restrict byte,
 }
 
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel2_inbyte_lsb(byte_t const *__restrict byte,
                      unsigned int shift) {
 	assert(shift < 4);
 	return (*byte >> (shift * 2)) & 3;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel2_inbyte_msb(byte_t const *__restrict byte,
                      unsigned int shift) {
 	assert(shift < 4);
@@ -171,14 +171,14 @@ setpixel2_inbyte_msb(byte_t *__restrict byte,
 	*byte = newbyte;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel4_inbyte_lsb(byte_t const *__restrict byte,
                      unsigned int shift) {
 	assert(shift < 2);
 	return (*byte >> (shift * 4)) & 7;
 }
 
-LOCAL WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel4_inbyte_msb(byte_t const *__restrict byte,
                      unsigned int shift) {
 	assert(shift < 2);
@@ -214,12 +214,12 @@ setpixel4_inbyte_msb(byte_t *__restrict byte,
 
 
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_lsb(byte_t const *__restrict line, uintptr_t x) {
 	return getpixel1_inbyte_lsb(line + (x / 8), (unsigned int)(x % 8));
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel1_msb(byte_t const *__restrict line, uintptr_t x) {
 	return getpixel1_inbyte_msb(line + (x / 8), (unsigned int)(x % 8));
 }
@@ -234,12 +234,12 @@ setpixel1_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	setpixel1_inbyte_msb(line + (x / 8), (unsigned int)(x % 8), pixel);
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel2_lsb(byte_t const *__restrict line, uintptr_t x) {
 	return getpixel2_inbyte_lsb(line + (x / 4), x % 4);
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel2_msb(byte_t const *__restrict line, uintptr_t x) {
 	return getpixel2_inbyte_msb(line + (x / 4), x % 4);
 }
@@ -254,12 +254,12 @@ setpixel2_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	setpixel2_inbyte_msb(line + (x / 4), x % 4, pixel);
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel4_lsb(byte_t const *__restrict line, uintptr_t x) {
 	return getpixel4_inbyte_lsb(line + (x / 2), x % 2);
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel4_msb(byte_t const *__restrict line, uintptr_t x) {
 	return getpixel4_inbyte_msb(line + (x / 2), x % 2);
 }
@@ -277,7 +277,7 @@ setpixel4_msb(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 
 
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel8(byte_t const *__restrict line, uintptr_t x) {
 	return ((u8 *)line)[x];
 }
@@ -287,7 +287,7 @@ setpixel8(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	((u8 *)line)[x] = (u8)pixel;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel16(byte_t const *__restrict line, uintptr_t x) {
 	return ((u16 *)line)[x];
 }
@@ -297,7 +297,7 @@ setpixel16(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	((u16 *)line)[x] = (u16)pixel;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel24(byte_t const *__restrict line, uintptr_t x) {
 	union pixel24 result;
 	line += x * 3;
@@ -317,7 +317,7 @@ setpixel24(byte_t *__restrict line, uintptr_t x, video_pixel_t pixel) {
 	line[2] = data.bytes[2];
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 getpixel32(byte_t const *__restrict line, uintptr_t x) {
 	return ((u32 *)line)[x];
 }
@@ -1237,7 +1237,7 @@ DEFINE_FORMAT_CONVERTER_RGB(bgr565, u16, {
 
 
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_color_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_color_t CC
 pal_pixel2color(struct video_format const *__restrict format,
                 video_pixel_t pixel) {
 	struct video_palette *pal;
@@ -1249,7 +1249,7 @@ pal_pixel2color(struct video_format const *__restrict format,
 	return pal->vp_pal.vdp_pal[pixel];
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) video_pixel_t CC
 pal_color2pixel(struct video_format const *__restrict format,
                 video_color_t color) {
 	struct video_palette *pal;

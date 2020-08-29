@@ -46,7 +46,7 @@ DECL_BEGIN
 
 
 #ifndef NDEBUG
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1)) void KCALL
 pointer_set_assert_writing_vm_dataparts(struct pointer_set *__restrict self) {
 	struct vm_datapart *part;
 	POINTER_SET_FOREACH(part, self) {
@@ -57,7 +57,7 @@ pointer_set_assert_writing_vm_dataparts(struct pointer_set *__restrict self) {
 #define pointer_set_assert_writing_vm_dataparts(self) (void)0
 #endif /* NDEBUG */
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1)) void KCALL
 pointer_set_unlock_vm_dataparts(struct pointer_set *__restrict self) {
 	struct vm_datapart *part;
 	POINTER_SET_FOREACH(part, self) {
@@ -65,7 +65,7 @@ pointer_set_unlock_vm_dataparts(struct pointer_set *__restrict self) {
 	}
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1, 2)) void KCALL
 pointer_set_unlock_vm_dataparts_except(struct pointer_set *__restrict self,
                                        struct vm_datapart *__restrict not_this_one) {
 	struct vm_datapart *part;
@@ -75,13 +75,13 @@ pointer_set_unlock_vm_dataparts_except(struct pointer_set *__restrict self,
 	}
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1)) void KCALL
 pointer_set_unlock_vm_dataparts_and_clear(struct pointer_set *__restrict self) {
 	pointer_set_unlock_vm_dataparts(self);
 	pointer_set_clear(self);
 }
 
-PRIVATE NOBLOCK void KCALL
+PRIVATE NOBLOCK NONNULL((1, 2)) void KCALL
 pointer_set_unlock_vm_dataparts_and_clear_except(struct pointer_set *__restrict self,
                                                  struct vm_datapart *__restrict not_this_one) {
 	pointer_set_unlock_vm_dataparts_except(self, not_this_one);
@@ -99,12 +99,14 @@ free_nodes_chain(struct vm_node *chain) {
 }
 
 
-typedef void (KCALL *pervm_clone_t)(struct vm *__restrict newvm,
-                                    struct vm *__restrict oldvm)
+typedef NONNULL((1, 2)) void
+(KCALL *pervm_clone_t)(struct vm *__restrict newvm,
+                       struct vm *__restrict oldvm)
 		/*THROWS(...)*/;
 INTDEF pervm_clone_t __kernel_pervm_clone_start[];
 INTDEF pervm_clone_t __kernel_pervm_clone_end[];
-PUBLIC CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/)) vm_onclone_callbacks = CALLBACK_LIST_INIT;
+PUBLIC CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/))
+vm_onclone_callbacks = CALLBACK_LIST_INIT;
 
 /* Clone the given VM `self'
  * NOTE: The clone operation is performed atomically, meaning that
@@ -114,9 +116,8 @@ PUBLIC CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/)) v
  *       contained within `self' are being changed.
  * @param: keep_loose_mappings: When false (default), don't clone mappings marked as `VM_PROT_LOOSE'
  * @return: * : A reference to the newly cloned VM (with a reference counter of `1'). */
-PUBLIC ATTR_RETNONNULL REF struct vm *KCALL
-vm_clone(struct vm *__restrict self,
-         bool keep_loose_mappings)
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct vm *KCALL
+vm_clone(struct vm *__restrict self, bool keep_loose_mappings)
 		THROWS(E_BADALLOC, ...) {
 	REF struct vm *result;
 	size_t node_alloc_count;

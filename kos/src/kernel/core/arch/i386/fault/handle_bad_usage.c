@@ -770,7 +770,7 @@ throw_unsupported_instruction(struct icpustate *__restrict state,
 
 /* Return the OS-specific ID for the current CPU (same as the `IA32_TSC_AUX' MSR) */
 #define EMU86_EMULATE_RDPID() emulate_rdpid()
-PRIVATE WUNUSED ATTR_PURE u32 KCALL emulate_rdpid(void) {
+PRIVATE ATTR_PURE WUNUSED u32 KCALL emulate_rdpid(void) {
 	/* TODO: KOS currently doesn't program the `IA32_TSC_AUX' MSR during CPU initialization.
 	 *       We really need to do this, though (programming should always be done when cpuid
 	 *       bit `CPUID_80000001D_RDTSCP' is enabled, in which case `rdtscp' exists, and should

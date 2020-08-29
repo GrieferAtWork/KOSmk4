@@ -155,7 +155,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 /* Find and return the stop event for `thread'
  * If the thread hasn't been stopped, or has a pending
  * async stop notification, return NULL instead. */
-INTDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) GDBThreadStopEvent *
+INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) GDBThreadStopEvent *
 NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread);
 
 /* Same as `GDBThread_FindStopEvent()', but unlink the event

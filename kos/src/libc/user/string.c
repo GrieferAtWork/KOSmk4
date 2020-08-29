@@ -46,7 +46,7 @@ DECL_BEGIN
 /* TODO: Declare these functions through magic
  * -> Simply use the [[ignore]] annotation to hide these from headers! */
 DEFINE_PUBLIC_ALIAS(memcasemem0_l, libc_memcasemem0_l);
-INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.memcasemem0_l") void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem0_l)(void const *haystack, size_t haystacklen,
                                          void const *needle, size_t needlelen,
@@ -76,7 +76,7 @@ got_candidate:
 }
 
 DEFINE_PUBLIC_ALIAS(memcasemem0, libc_memcasemem0);
-INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.memcasemem0") void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem0)(void const *haystack, size_t haystacklen,
                                        void const *needle, size_t needlelen) {
@@ -105,7 +105,7 @@ got_candidate:
 }
 
 DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
-INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmem0") void *
 NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
                                    void const *needle, size_t needlelen) {
@@ -125,7 +125,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
 }
 
 DEFINE_PUBLIC_ALIAS(memrmem0, libc_memrmem0);
-INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrmem0") void *
 NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
                                     void const *needle, size_t needlelen) {

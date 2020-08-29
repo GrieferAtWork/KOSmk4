@@ -39,8 +39,8 @@
 
 DECL_BEGIN
 
-typedef void (KCALL *pervm_init_t)(struct vm *__restrict self) /*THROWS(...)*/;
-typedef NOBLOCK /*ATTR_NOTHROW*/ void (KCALL *pervm_fini_t)(struct vm *__restrict self);
+typedef NONNULL((1)) void (KCALL *pervm_init_t)(struct vm *__restrict self) /*THROWS(...)*/;
+typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *pervm_fini_t)(struct vm *__restrict self);
 INTDEF pervm_init_t __kernel_pervm_init_start[];
 INTDEF pervm_init_t __kernel_pervm_init_end[];
 INTDEF pervm_fini_t __kernel_pervm_fini_start[];
@@ -53,7 +53,7 @@ INTDEF byte_t __kernel_pervm_start[];
 INTDEF byte_t __kernel_pervm_size[];
 
 /* Allocate and initialize a new, empty VM for user-space. */
-PUBLIC ATTR_RETNONNULL REF struct vm *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct vm *KCALL
 vm_alloc(void) THROWS(E_BADALLOC) {
 	REF struct vm *result;
 	struct heapptr resptr;
@@ -209,8 +209,11 @@ PRIVATE struct atomic_rwlock change_vm_lock = ATOMIC_RWLOCK_INIT;
 
 /* Set the VM active within the calling thread, as well as
  * change page directories to make use of the new VM before
- * returning. */
-PUBLIC void KCALL task_setvm(struct vm *__restrict newvm)
+ * returning.
+ * NOTE: The caller must NOT be holding a lock to either
+ *       the old or new VM's list of tasks. */
+PUBLIC NONNULL((1)) void KCALL
+task_setvm(struct vm *__restrict newvm)
 		THROWS(E_WOULDBLOCK) {
 	/* TODO: This function needs to become NOBLOCK+NOTHROW!
 	 *       There are certain places where kernel threads need

@@ -41,8 +41,8 @@
 
 DECL_BEGIN
 
-#define CORE_PAGE_MALLOC_ERROR  ((void *)-1)
-#define CORE_PAGE_MALLOC_AUTO   ((void *)-1)
+#define CORE_PAGE_MALLOC_ERROR ((void *)-1)
+#define CORE_PAGE_MALLOC_AUTO  ((void *)-1)
 /* @param: mapping_target: The target page number where memory should be mapped.
  *                         When `CORE_PAGE_MALLOC_AUTO', automatically search
  *                         for a suitable location, otherwise _always_ return
@@ -57,7 +57,7 @@ DECL_BEGIN
  * @param: num_bytes:      The number of bytes to allocate.
  * @param: min_alignment:  The minimum alignment required from automatic mapping_target
  *                         detection. */
-PRIVATE VIRT void *
+PRIVATE NONNULL((1)) VIRT void *
 NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
                                         PAGEDIR_PAGEALIGNED void *mapping_target,
                                         PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -227,11 +227,17 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			while (block0_size < (num_bytes / PAGESIZE)) {
 				pagecnt_t new_block_size;
 				if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
-					new_blocks = (struct vm_ramblock *)krealloc_nx(blocks, (blockc * 2) * sizeof(struct vm_ramblock),
-					                                               CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
+					new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
+					                                               (blockc * 2) *
+					                                               sizeof(struct vm_ramblock),
+					                                               CORE_ALLOC_FLAGS |
+					                                               (flags & GFP_INHERIT));
 					if unlikely(!new_blocks) {
-						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks, (blockc + 1) * sizeof(struct vm_ramblock),
-						                                               CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
+						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
+						                                               (blockc + 1) *
+						                                               sizeof(struct vm_ramblock),
+						                                               CORE_ALLOC_FLAGS |
+						                                               (flags & GFP_INHERIT));
 						if unlikely(!new_blocks) {
 err_blocks:
 							/* Free all blocks that had already been allocated. */
@@ -271,7 +277,8 @@ err_blocks:
 			TRY {
 				TRY {
 					blocks = (struct vm_ramblock *)kmalloc(2 * sizeof(struct vm_ramblock),
-					                                       CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
+					                                       CORE_ALLOC_FLAGS |
+					                                       (flags & GFP_INHERIT));
 				} EXCEPT {
 					page_ccfree(block0_addr, block0_size);
 					RETHROW();
@@ -282,12 +289,18 @@ err_blocks:
 				while (block0_size < (num_bytes / PAGESIZE)) {
 					pagecnt_t new_block_size;
 					if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
-						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks, (blockc * 2) * sizeof(struct vm_ramblock),
-						                                               CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
+						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
+						                                               (blockc * 2) *
+						                                               sizeof(struct vm_ramblock),
+						                                               CORE_ALLOC_FLAGS |
+						                                               (flags & GFP_INHERIT));
 						if unlikely(!new_blocks) {
 							TRY {
-								new_blocks = (struct vm_ramblock *)krealloc(blocks, (blockc + 1) * sizeof(struct vm_ramblock),
-								                                            CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
+								new_blocks = (struct vm_ramblock *)krealloc(blocks,
+								                                            (blockc + 1) *
+								                                            sizeof(struct vm_ramblock),
+								                                            CORE_ALLOC_FLAGS |
+								                                            (flags & GFP_INHERIT));
 							} EXCEPT {
 								/* Free all blocks that had already been allocated. */
 								while (blockc--) {
@@ -302,7 +315,8 @@ err_blocks:
 					}
 					/* Allocate the next part. */
 					block0_addr = page_malloc_part(1,
-					                               (num_bytes / PAGESIZE) - block0_size,
+					                               (num_bytes / PAGESIZE) -
+					                               block0_size,
 					                               &new_block_size);
 					if unlikely(block0_addr == PAGEPTR_INVALID) {
 						while (blockc--) {
@@ -388,7 +402,8 @@ again_tryhard_mapping_target:
 			/* Update the hint for the next allocation to be adjacent to this one. */
 			ATOMIC_CMPXCH(self->h_hintaddr, mapping_hint,
 			              mapping_mode & VM_GETFREE_BELOW ? ((byte_t *)mapping_target)
-			                                              : ((byte_t *)mapping_target + num_bytes));
+			                                              : ((byte_t *)mapping_target +
+			                                                 num_bytes));
 		} else {
 			/* Check if there is already a mapping at the specified target address. */
 			if (vm_isused(&vm_kernel, mapping_target, num_bytes)) {
@@ -465,7 +480,8 @@ again_tryhard_mapping_target:
 							pageptr_t ppage = blocks[i].rb_start + j;
 							if (!page_iszero(ppage)) {
 								void *pageaddr;
-								pageaddr = (byte_t *)mapping_target + mapping_offset + j * PAGESIZE;
+								pageaddr = (byte_t *)mapping_target +
+								           mapping_offset + j * PAGESIZE;
 								memset(pageaddr, 0, PAGESIZE);
 #ifdef ARCH_PAGEDIR_HAVE_CHANGED
 								pagedir_unsetchanged(pageaddr);
@@ -479,7 +495,8 @@ again_tryhard_mapping_target:
 						pagecnt_t j;
 						for (j = 0; j < blocks[i].rb_size; ++j) {
 							void *pageaddr;
-							pageaddr = (byte_t *)mapping_target + mapping_offset + j * PAGESIZE;
+							pageaddr = (byte_t *)mapping_target +
+							           mapping_offset + j * PAGESIZE;
 							mempatl(pageaddr,
 							        DEBUGHEAP_FRESH_MEMORY,
 							        PAGESIZE);
@@ -557,7 +574,7 @@ err:
 }
 
 
-PRIVATE VIRT void *
+PRIVATE NONNULL((1)) VIRT void *
 NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
                                                    PAGEDIR_PAGEALIGNED void *mapping_target,
                                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -592,7 +609,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
 
 
 
-PUBLIC struct heapptr
+PUBLIC WUNUSED NONNULL((1)) struct heapptr
 NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	struct heapptr result;
@@ -849,7 +866,7 @@ err:
 
 
 
-PRIVATE size_t
+PRIVATE WUNUSED NONNULL((1)) size_t
 NOTHROW_NX(KCALL FUNC(heap_allat_partial))(struct heap *__restrict self,
                                            VIRT void *__restrict ptr,
                                            gfp_t flags) {
@@ -1009,7 +1026,7 @@ again:
 }
 
 
-PUBLIC size_t
+PUBLIC WUNUSED NONNULL((1)) size_t
 NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
                                             VIRT void *__restrict ptr,
                                             size_t num_bytes, gfp_t flags) {
@@ -1062,7 +1079,7 @@ err:
 }
 
 
-PUBLIC struct heapptr
+PUBLIC WUNUSED NONNULL((1)) struct heapptr
 NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
                                             size_t min_alignment, ptrdiff_t offset,
                                             size_t num_bytes, gfp_t flags) {
@@ -1296,7 +1313,7 @@ err:
 }
 
 
-PUBLIC struct heapptr
+PUBLIC WUNUSED NONNULL((1)) struct heapptr
 NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
                                               VIRT void *old_ptr, size_t old_bytes,
                                               size_t new_bytes, gfp_t alloc_flags,
@@ -1368,7 +1385,7 @@ err:
 	return result;
 }
 
-PUBLIC struct heapptr
+PUBLIC WUNUSED NONNULL((1)) struct heapptr
 NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
                                               VIRT void *old_ptr, size_t old_bytes,
                                               size_t min_alignment, ptrdiff_t offset,

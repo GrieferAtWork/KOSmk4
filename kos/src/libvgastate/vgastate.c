@@ -481,7 +481,7 @@ NOTHROW(CC vga_vm86_state_fini)(vga_vm86_state_t *__restrict self) {
 }
 
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) void *LIBVM86_TRANSLATE_CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void *LIBVM86_TRANSLATE_CC
 vm86_translate(vga_vm86_state_t *__restrict self, void *ptr) {
 	return self->vv_biosbase + (uintptr_t)ptr;
 }

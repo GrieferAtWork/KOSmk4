@@ -160,7 +160,7 @@ handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong
 
 
 
-PUBLIC WUNUSED ATTR_PURE NONNULL((1)) uintptr_t KCALL
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) uintptr_t KCALL
 directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name,
                      u16 namelen) THROWS(E_SEGFAULT) {
 	size_t const *iter, *end;
@@ -737,33 +737,12 @@ inode_stat(struct inode *__restrict self,
 	result->st_size    = (__FS_TYPE(pos))self->i_filesize;
 	result->st_blksize = (__blksize_t)VM_DATABLOCK_PAGESIZE(self);
 	result->st_blocks  = (__FS_TYPE(blkcnt))CEILDIV(result->st_size, VM_DATABLOCK_PAGESIZE(self)); /* XXX: Add an operator for this? */
-#ifdef __TIMESPEC64_HAVE_TV_PAD
-	/* Don't accidentally leak kernel data! */
-	{
-		struct timespec temp;
-		temp.tv_sec   = self->i_fileatime.tv_sec;
-		temp.tv_nsec  = self->i_fileatime.tv_nsec;
-		temp.__tv_pad = 0;
-		COMPILER_WRITE_BARRIER();
-		result->st_atimespec = temp;
-
-		temp.tv_sec   = self->i_filemtime.tv_sec;
-		temp.tv_nsec  = self->i_filemtime.tv_nsec;
-		temp.__tv_pad = 0;
-		COMPILER_WRITE_BARRIER();
-		result->st_mtimespec = temp;
-
-		temp.tv_sec   = self->i_filectime.tv_sec;
-		temp.tv_nsec  = self->i_filectime.tv_nsec;
-		temp.__tv_pad = 0;
-		COMPILER_WRITE_BARRIER();
-		result->st_ctimespec = temp;
-	}
-#else /* __TIMESPEC64_HAVE_TV_PAD */
-	result->st_atimespec = self->i_fileatime;
-	result->st_mtimespec = self->i_filemtime;
-	result->st_ctimespec = self->i_filectime;
-#endif /* !__TIMESPEC64_HAVE_TV_PAD */
+	result->st_atimespec.tv_sec  = self->i_fileatime.tv_sec;
+	result->st_atimespec.tv_nsec = self->i_fileatime.tv_nsec;
+	result->st_mtimespec.tv_sec  = self->i_filemtime.tv_sec;
+	result->st_mtimespec.tv_nsec = self->i_filemtime.tv_nsec;
+	result->st_ctimespec.tv_sec  = self->i_filectime.tv_sec;
+	result->st_ctimespec.tv_nsec = self->i_filectime.tv_nsec;
 }
 
 
@@ -787,14 +766,18 @@ NOTHROW(KCALL inode_changed)(struct inode *__restrict self, uintptr_t what) {
 		old_flags = ATOMIC_READ(self->i_flags);
 		if (old_flags & INODE_FDELETED)
 			return false;
-	} while (!ATOMIC_CMPXCH_WEAK(self->i_flags, old_flags, old_flags | what));
+	} while (!ATOMIC_CMPXCH_WEAK(self->i_flags,
+	                             old_flags,
+	                             old_flags | what));
 	if (!(old_flags & (INODE_FCHANGED | INODE_FATTRCHANGED))) {
 		struct inode *next;
 		/* Schedule as pending-changed */
 		do {
 			next = ATOMIC_READ(self->i_super->s_changed);
 			self->i_changed_next = next;
-		} while (!ATOMIC_CMPXCH_WEAK(self->i_super->s_changed, next, self));
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(self->i_super->s_changed,
+		                             next, self));
 		incref(self);
 	}
 	return true;
@@ -1136,7 +1119,7 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
 	if (!sync_trywrite(&super->s_changed_lock))
 		return INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED;
 	result = INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_NOTFOUND;
-	/* NOTE: There is a change that we may not find ourself apart of the changed
+	/* NOTE: There is a chance that we may not find ourself apart of the changed
 	 *       list. - This can happen when the superblock itself is also performing
 	 *       a synchronization pass at the moment, in which case we don't actually
 	 *       need to do anything, though should still perform the sync beforehand,
@@ -1151,7 +1134,7 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
 			result = INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED;
 #ifndef NDEBUG
 			memset(&self->i_changed_next, 0xcc, sizeof(void *));
-#endif
+#endif /* !NDEBUG */
 			break;
 		}
 		piter = &last->i_changed_next;
@@ -1166,7 +1149,9 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
 		do {
 			next = ATOMIC_READ(super->s_changed);
 			last->i_changed_next = next;
-		} while (!ATOMIC_CMPXCH_WEAK(super->s_changed, next, last));
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(super->s_changed,
+		                             next, last));
 	}
 	sync_endwrite(&super->s_changed_lock);
 	return result;
@@ -1224,7 +1209,9 @@ again_do_remove_from_super_for_delete:
 			do {
 				next = ATOMIC_READ(super->s_unlinknodes);
 				self->i_changed_next = next;
-			} while (!ATOMIC_CMPXCH_WEAK(super->s_unlinknodes, next, self));
+				COMPILER_WRITE_BARRIER();
+			} while (!ATOMIC_CMPXCH_WEAK(super->s_unlinknodes,
+			                             next, self));
 			superblock_nodeslock_tryservice(super);
 		}
 		goto done;
@@ -1255,7 +1242,8 @@ done_data_sync:
 			RETHROW();
 		}
 	}
-	if (!(ATOMIC_FETCHAND(self->i_flags, ~modified) & (INODE_FCHANGED | INODE_FATTRCHANGED))) {
+	if (!(ATOMIC_FETCHAND(self->i_flags, ~modified) &
+	      (INODE_FCHANGED | INODE_FATTRCHANGED))) {
 		/* No more changes (remove the node from the superblock's changed list) */
 		unsigned int error;
 again_do_remove_from_super:
@@ -2218,6 +2206,7 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
 		do {
 			next = ATOMIC_READ(super->s_unlinknodes);
 			self->i_changed_next = next;
+			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(super->s_unlinknodes, next, self));
 		superblock_nodeslock_tryservice(super);
 	}
@@ -3298,13 +3287,15 @@ PUBLIC void KCALL superblock_syncall(void) THROWS(E_IOERROR, ...) {
 		/* Highly unlikely: there are a sh$t-ton of filesystems loaded. */
 		REF struct superblock **pbuf;
 		size_t new_req_length;
-		pbuf = (REF struct superblock **)kmalloc(req_length * sizeof(REF struct superblock *),
+		pbuf = (REF struct superblock **)kmalloc(req_length *
+		                                         sizeof(REF struct superblock *),
 		                                         GFP_NORMAL);
 		TRY {
 			new_req_length = fs_filesystems_loadall(pbuf, req_length);
 			while (new_req_length > req_length) {
 				pbuf = (REF struct superblock **)krealloc(pbuf,
-				                                          new_req_length * sizeof(REF struct superblock *),
+				                                          new_req_length *
+				                                          sizeof(REF struct superblock *),
 				                                          GFP_NORMAL);
 				new_req_length = fs_filesystems_loadall(pbuf, req_length);
 			}
@@ -3338,7 +3329,8 @@ NOTHROW(KCALL inode_set_closed)(struct inode *__restrict self) {
 			return; /* Node has already been deleted. */
 		assert(!(old_flags & INODE_FSUPERDEL));
 	} while (!ATOMIC_CMPXCH_WEAK(self->i_flags, old_flags,
-	                             old_flags | (INODE_FDELETED | INODE_FSUPERDEL)));
+	                             old_flags | (INODE_FDELETED |
+	                                          INODE_FSUPERDEL)));
 	/* Trigger some signals to wake up blocking operations
 	 * that may still be in progress on this node.
 	 * Any piece of code that won't understand this part will
@@ -3357,7 +3349,8 @@ NOTHROW(KCALL inode_unset_closed)(struct inode *__restrict self) {
 			return; /* Node was not deleted by the superblock. */
 		assert(old_flags & INODE_FDELETED);
 	} while (!ATOMIC_CMPXCH_WEAK(self->i_flags, old_flags,
-	                             old_flags & ~(INODE_FDELETED | INODE_FSUPERDEL)));
+	                             old_flags & ~(INODE_FDELETED |
+	                                           INODE_FSUPERDEL)));
 }
 
 PRIVATE NONNULL((1)) void KCALL
@@ -4593,6 +4586,7 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 			do {
 				next = ATOMIC_READ(fs_filesystems_delblocks);
 				*(struct superblock **)me = next;
+				COMPILER_WRITE_BARRIER();
 			} while (!ATOMIC_CMPXCH_WEAK(fs_filesystems_delblocks, next, me));
 			return;
 		}
@@ -4612,9 +4606,11 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 			/* Remove the INode from the file tree of the associated superblock. */
 			struct inode *next;
 			if (!superblock_nodeslock_trywrite(super)) {
-				do
-					self->i_changed_next = next = ATOMIC_READ(super->s_delnodes);
-				while (!ATOMIC_CMPXCH_WEAK(super->s_delnodes, next, self));
+				do {
+					next = ATOMIC_READ(super->s_delnodes);
+					self->i_changed_next = next;
+					COMPILER_WRITE_BARRIER();
+				} while (!ATOMIC_CMPXCH_WEAK(super->s_delnodes, next, self));
 				superblock_nodeslock_tryservice(super);
 				decref(super);
 				return;

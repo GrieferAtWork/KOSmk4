@@ -55,19 +55,19 @@ FUNDEF NOBLOCK bool NOTHROW(FCALL dbg_ungetc)(/*utf-8*/ char ch);
 FUNDEF NOBLOCK bool NOTHROW(FCALL dbg_ungetuni)(/*utf-32*/ char32_t ch);
 
 /* Check if there are pending unicode characters. (s.a. `dbg_getuni()') */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_hasuni)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_hasuni)(void);
 
 /* Check if there are pending utf-8 characters. (s.a. `dbg_getc()') */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_haschar)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_haschar)(void);
 
 /* Purge pending unicode characters. */
 FUNDEF NOBLOCK void NOTHROW(FCALL dbg_purgeuni)(void);
 
 /* Check if a given modifier key is being held down. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_ctrl)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_shift)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_alt)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(FCALL dbg_isholding_altgr)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_ctrl)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_shift)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_alt)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_altgr)(void);
 
 #endif /* __CC__ */
 

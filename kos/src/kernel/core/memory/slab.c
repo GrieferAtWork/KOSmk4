@@ -79,7 +79,7 @@ PRIVATE struct slab_pool slab_freepool[2] = {
 };
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL pool_do_free)(struct slab_pool *__restrict self,
                             struct slab *__restrict page) {
 	if (self->sp_count < self->sp_limit) {
@@ -92,7 +92,7 @@ NOTHROW(KCALL pool_do_free)(struct slab_pool *__restrict self,
 	vm_unmap_kernel_ram(page, PAGESIZE, false);
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pool_clear_pending)(struct slab_pool *__restrict self) {
 	struct slab *pend, *next;
 	pend = ATOMIC_XCH(self->sp_pend, NULL);
@@ -103,7 +103,7 @@ NOTHROW(KCALL pool_clear_pending)(struct slab_pool *__restrict self) {
 	}
 }
 
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL pool_lock_trywrite)(struct slab_pool *__restrict self) {
 	if (!sync_trywrite(&self->sp_lock))
 		return false;
@@ -111,7 +111,7 @@ NOTHROW(KCALL pool_lock_trywrite)(struct slab_pool *__restrict self) {
 	return true;
 }
 
-PRIVATE bool
+PRIVATE NONNULL((1)) bool
 NOTHROW(KCALL pool_lock_write)(struct slab_pool *__restrict self) {
 	if (!sync_write_nx(&self->sp_lock))
 		return false;
@@ -119,7 +119,7 @@ NOTHROW(KCALL pool_lock_write)(struct slab_pool *__restrict self) {
 	return true;
 }
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pool_lock_endwrite)(struct slab_pool *__restrict self) {
 again:
 	sync_endwrite(&self->sp_lock);
@@ -132,7 +132,7 @@ again:
 }
 
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 	struct slab_pool *pool;
 #if SLAB_FLOCKED == 1
@@ -187,7 +187,7 @@ struct slab_descriptor {
 	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
 };
 
-PRIVATE VIRT struct slab *
+PRIVATE WUNUSED VIRT struct slab *
 NOTHROW(KCALL slab_alloc_page)(gfp_t flags) {
 	struct slab_pool *pool;
 	struct slab *result;
