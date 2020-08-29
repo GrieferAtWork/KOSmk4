@@ -755,6 +755,13 @@ PRIVATE ATTR_USED void KCALL usermod_onexec(void) {
 	vm_clear_usermod(THIS_VM);
 }
 
+/* Also clear the chain when finalizing the VM */
+DEFINE_PERVM_FINI(usermod_fini);
+PRIVATE NOBLOCK ATTR_USED void
+NOTHROW(KCALL usermod_fini)(struct vm *__restrict self) {
+	vm_clear_usermod(self);
+}
+
 
 /* Insert the given `um' into the usermod cache of `self'
  * If another usermod object already exists in `self' that has the
