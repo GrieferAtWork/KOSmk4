@@ -694,7 +694,9 @@ int main_fault(int argc, char *argv[], char *envp[]) {
 int main_leak(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* Just check for leaks in kernel-space. */
-	KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
+	size_t count;
+	count = KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
+	assertf(count == 0, "Leaks: %Iu", count);
 	KSysctl(KSYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING);
 	return 0;
 }

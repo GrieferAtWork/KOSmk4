@@ -290,6 +290,9 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 FUNC(slab_kmalloc)(gfp_t flags) {
 	/* Try to allocate from slab memory */
 	void *result;
+#ifdef CONFIG_DEBUG_MALLOC
+	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
+#endif /* !CONFIG_DEBUG_MALLOC */
 	result = FUNC(slab_malloc)(flags);
 	if likely(result)
 		return result;
@@ -303,6 +306,9 @@ PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL FUNC(slab_kmalloc_nx))(gfp_t flags) {
 	/* Try to allocate from slab memory */
 	void *result;
+#ifdef CONFIG_DEBUG_MALLOC
+	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
+#endif /* !CONFIG_DEBUG_MALLOC */
 	result = FUNC(slab_malloc)(flags);
 	if likely(result)
 		return result;

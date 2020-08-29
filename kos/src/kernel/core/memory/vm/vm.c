@@ -1907,25 +1907,25 @@ again:
 PUBLIC NOBLOCK NONNULL((1)) struct vm_datapart *
 NOTHROW(KCALL vm_datablock_lock_trywrite_parts)(struct vm_datapart *__restrict self) {
 	struct vm_datapart *result;
-	if (!sync_trywrite(self))
+	if unlikely(!sync_trywrite(self))
 		return self;
 	if (self->dp_tree.a_min) {
-		result = vm_datablock_lock_trywrite_parts(self->dp_tree.a_max);
-		if (result) {
-			sync_endwrite(self);
-			return result; /* Propagate faulting part. */
-		}
+		result = vm_datablock_lock_trywrite_parts(self->dp_tree.a_min);
+		if unlikely(result)
+			goto err_self;
 	}
 	if (self->dp_tree.a_max) {
 		result = vm_datablock_lock_trywrite_parts(self->dp_tree.a_max);
-		if (result) {
+		if unlikely(result) {
 			if (self->dp_tree.a_min)
 				vm_datablock_lock_endwrite_parts(self->dp_tree.a_min);
-			sync_endwrite(self);
-			return result; /* Propagate faulting part. */
+			goto err_self;
 		}
 	}
 	return NULL;
+err_self:
+	sync_endwrite(self);
+	return result; /* Propagate faulting part. */
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
