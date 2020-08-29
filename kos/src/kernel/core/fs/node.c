@@ -1151,7 +1151,7 @@ NOTHROW(KCALL inode_try_remove_from_superblock_changed)(struct inode *__restrict
 			last->i_changed_next = next;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(super->s_changed,
-		                             next, last));
+		                             next, first));
 	}
 	sync_endwrite(&super->s_changed_lock);
 	return result;
@@ -1242,7 +1242,7 @@ done_data_sync:
 			RETHROW();
 		}
 	}
-	if (!(ATOMIC_FETCHAND(self->i_flags, ~modified) &
+	if (!(ATOMIC_ANDFETCH(self->i_flags, ~modified) &
 	      (INODE_FCHANGED | INODE_FATTRCHANGED))) {
 		/* No more changes (remove the node from the superblock's changed list) */
 		unsigned int error;

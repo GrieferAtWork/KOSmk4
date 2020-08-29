@@ -23,14 +23,16 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/ksysctl.h>
 #include <kos/types.h>
 #include <sys/syslog.h>
 #include <system-test/ctest.h>
 
+#include <assert.h>
 #include <format-printer.h>
-#include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -114,6 +116,11 @@ int main(int argc, char *argv[], char *envp[]) {
 	(void)envp;
 
 	run_all_tests();
+
+	/* Make sure that we didn't end up with any memory leaks. */
+	assertf(KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS) == 0,
+	        "Memory leaks detected (see system log)");
+
 	printf("All tests OK" EL "\n");
 	return 0;
 }
