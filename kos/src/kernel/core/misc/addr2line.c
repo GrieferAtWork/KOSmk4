@@ -316,6 +316,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
 #ifdef CONFIG_HAVE_USERMOD
 	if (buf->ds_user) {
 		usermod_debug_dlunlocksections(&buf->ds_sect);
+		decref_unlikely(buf->ds_user);
 	} else
 #endif /* CONFIG_HAVE_USERMOD */
 	{
