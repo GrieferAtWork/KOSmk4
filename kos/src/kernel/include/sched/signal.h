@@ -270,7 +270,7 @@ NOTHROW(KCALL task_disconnect)(struct sig *__restrict target);
 FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_disconnectall)(void);
 
 /* Check if the calling thread is connected to any signal. */
-FUNDEF NOBLOCK WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isconnected)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL task_isconnected)(void);
 
 /* Check if there is a signal to was delivered, disconnecting
  * all other connected signals if this was the case.
