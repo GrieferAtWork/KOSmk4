@@ -73,7 +73,7 @@
 
 #include "corebase.h"
 
-#if 1
+#if 0
 #define PRINT_LEAKS_SEARCH_PHASE(...) printk(KERN_INFO __VA_ARGS__)
 #else
 #define PRINT_LEAKS_SEARCH_PHASE(...) (void)0

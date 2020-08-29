@@ -26,7 +26,7 @@
 #include <hybrid/compiler.h>
 
 #include <kos/fcntl.h>     /* Open() */
-#include <kos/ksysctl.h>   /* sysctl() */
+#include <kos/ksysctl.h>   /* ksysctl_insmod() */
 #include <kos/sys/ioctl.h> /* Ioctl() */
 #include <kos/sys/stat.h>  /* Mkdir() */
 #include <kos/syscalls.h>  /* sys_Xmktty() */
@@ -36,7 +36,6 @@
 #include <sys/syslog.h>    /* syslog() */
 #include <sys/wait.h>      /* waitpid() */
 
-//#include <assert.h>  /* assert() */
 #include <errno.h>   /* errno */
 #include <fcntl.h>   /* AT_FDDRIVE_ROOT() */
 #include <sched.h>   /* sched_yield() */
@@ -49,10 +48,6 @@
 
 #include <libansitty/ansitty.h>
 #include <libansitty/ctl.h>
-
-#define NDEBUG 1    /* FIXME: Integrate leak detection support for kernel slab allocators! */
-#include <assert.h> /* assert() */
-#undef NDEBUG
 
 DECL_BEGIN
 
@@ -89,9 +84,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	(void)envp;
 	syslog(LOG_NOTICE, "[init] Init started\n");
 
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
-
 	/* Enable system call tracing by loading the sctrace driver. */
 	ksysctl_insmod("sctrace", NULL);
 
@@ -107,9 +99,6 @@ int main(int argc, char *argv[], char *envp[]) {
 		       strerror(errno));
 	}
 done_devfs:
-
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
 	/* Mount the /proc filesystem (but do this optionally). */
 	if (ksysctl_insmod("procfs", NULL) >= 0) {
@@ -141,15 +130,9 @@ done_procfs:
 done_tmpfs:
 
 
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
-
 	/* Load some additional drivers that we need for the I/O console. */
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
 	KSysctlInsmod("vga", NULL); /* Display */
-
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
@@ -157,9 +140,6 @@ done_tmpfs:
 	 *       As it stands right now, PS/2 will still create device files,
 	 *       even when the devices stem from USB emulation. */
 	ksysctl_insmod("usb-hid", NULL);
-
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
 	/* Setup a couple of signals to-be ignored */
 	signal(SIGHUP, SIG_IGN);
@@ -181,9 +161,6 @@ done_tmpfs:
 		close(display);
 		Symlink("console", "/dev/tty0");
 
-		/* Make sure there aren't any memory leaks. */
-		assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
-
 		/* Set /dev/console as the controlling TTY of the our process. */
 		Ioctl(console, TIOCSCTTY, NULL);
 
@@ -203,9 +180,6 @@ done_tmpfs:
 			close(console);
 	}
 
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
-
 	/* Construct the recommended symlinks for devfs.
 	 * Don't do any error checking, since their absence
 	 * shouldn't hinder minimal operability of the system. */
@@ -213,9 +187,6 @@ done_tmpfs:
 	symlink("/proc/self/fd/0", "/dev/stdin");
 	symlink("/proc/self/fd/1", "/dev/stdout");
 	symlink("/proc/self/fd/2", "/dev/stderr");
-
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
 	/* Setup dos drives. */
 	{
@@ -225,9 +196,6 @@ done_tmpfs:
 			close(rfd);
 		}
 	}
-
-	/* Make sure there aren't any memory leaks. */
-	assert(!KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS));
 
 	for (;;) {
 		pid_t cpid;
