@@ -1464,7 +1464,7 @@ wait_a_bit:
 			/* Wait for the next interrupt. */
 			PREEMPTION_ENABLE_WAIT();
 			/* Indicate a sporadic wake-up. */
-			return false;
+			return true;
 		}
 		/* End the current quantum prematurely. */
 		cpu_quantum_end_nopr(me, idle);
