@@ -145,7 +145,7 @@ again:
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (status != 0)
 			break;
-		task_connect(&probe_data[portno].pd_avail);
+		task_connect_for_poll(&probe_data[portno].pd_avail);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (status != 0) {
 			task_disconnectall();
@@ -180,7 +180,7 @@ again:
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
 			break;
-		task_connect(&probe_data[portno].pd_avail);
+		task_connect_for_poll(&probe_data[portno].pd_avail);
 		state  = ATOMIC_READ(probe_data[portno].pd_state);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND)) {
@@ -223,7 +223,7 @@ again:
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
 			break;
-		task_connect(&probe_data[portno].pd_avail);
+		task_connect_for_poll(&probe_data[portno].pd_avail);
 		state  = ATOMIC_READ(probe_data[portno].pd_state);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND)) {

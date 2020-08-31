@@ -243,7 +243,7 @@ do_print_message_in_nonstop_mode:
 			sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
 again_waitfor_resume:
 		/* Wait until we're supposed to resume execution. */
-		task_connect(&stop_event.tse_sigresume);
+		task_connect_for_poll(&stop_event.tse_sigresume);
 		/* Do an interlocked check if we can become the GDB
 		 * main thread, or if we should resume our execution. */
 		{
@@ -255,7 +255,7 @@ again_waitfor_resume:
 				goto done;
 			}
 		}
-		task_connect(&GDBServer_HostUnlocked);
+		task_connect_for_poll(&GDBServer_HostUnlocked);
 		if (ATOMIC_CMPXCH(GDBServer_Host, NULL, stop_event.tse_thread)) {
 			uintptr_half_t resume_state;
 			/* Now we're the GDB host thread. */
@@ -358,7 +358,7 @@ INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 			 * triggered as often as the DATA lock, meaning that we take up
 			 * less CPU cycles if we wait for it, instead. */
 			if (ATOMIC_READ(GDBServer_Host) != NULL) {
-				task_connect(&GDBServer_HostUnlocked);
+				task_connect_for_poll(&GDBServer_HostUnlocked);
 				if likely(ATOMIC_READ(GDBServer_Host) != NULL) {
 					task_waitfor();
 					continue;
@@ -366,7 +366,7 @@ INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 				task_disconnectall();
 			}
 			/* Wait for the GDB remote to send data. */
-			task_connect(&GDBServer_RemoteDataAvailable);
+			task_connect_for_poll(&GDBServer_RemoteDataAvailable);
 			if (!GDBRemote_HasPendingBytes()) {
 				task_waitfor();
 				continue;

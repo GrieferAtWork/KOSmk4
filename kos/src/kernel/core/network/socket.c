@@ -203,7 +203,7 @@ again:
 			goto do_blocking_connect;
 		}
 		TRY {
-			task_connect(&nc->sca_aio.hg_signal);
+			task_connect_for_poll(&nc->sca_aio.hg_signal);
 		} EXCEPT {
 			decref_unlikely(nc);
 			RETHROW();

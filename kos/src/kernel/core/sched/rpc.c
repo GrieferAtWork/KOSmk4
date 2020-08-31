@@ -952,7 +952,7 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 	}
 	if (flags & RPC_SCHEDULE_FLAG_WAITFORSTART) {
 		TRY {
-			task_connect(&args_packet->rpc_completed);
+			task_connect_for_poll(&args_packet->rpc_completed);
 		} EXCEPT {
 			destroy(args_packet);
 			RETHROW();

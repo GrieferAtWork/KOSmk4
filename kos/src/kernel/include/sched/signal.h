@@ -46,7 +46,7 @@ DECL_BEGIN
  * >> bool pollread(MyType *self) {
  * >>     if (sync_canread(self))
  * >>         return true;
- * >>     task_connect_ghost(&self->m_signal);
+ * >>     task_connect_for_poll(&self->m_signal);
  * >>     return unlikely(sync_canread(self)); // Re-check to prevent race condition
  * >> }
  */
@@ -256,7 +256,7 @@ NOTHROW(FCALL task_popconnections)(struct task_connections *__restrict cons);
  * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
  *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 FUNDEF NONNULL((1)) void FCALL task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
-FUNDEF NONNULL((1)) void FCALL task_connect_ghost(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+FUNDEF NONNULL((1)) void FCALL task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
 
 /* Disconnect from a specific signal `target'
  * No-op if the caller isn't actually connected to `target'

@@ -164,7 +164,7 @@
  * case of an empty haystack is handled _before_ making use
  * of said instruction.
  * This macro expands to an instruction that will ensure that
- * the above implication holds true immediatly after returning.
+ * the above implication holds true immediately after returning.
  *
  * Current implementation:
  *   >> cmpb   $(1), %cl

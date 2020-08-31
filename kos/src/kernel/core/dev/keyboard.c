@@ -920,7 +920,7 @@ keyboard_device_poll(struct character_device *__restrict self,
 	if (what & POLLIN) {
 		if (keyboard_device_canread(me))
 			return POLLIN;
-		task_connect(&me->kd_buf.kb_avail);
+		task_connect_for_poll(&me->kd_buf.kb_avail);
 		if (keyboard_device_canread(me))
 			return POLLIN;
 	}

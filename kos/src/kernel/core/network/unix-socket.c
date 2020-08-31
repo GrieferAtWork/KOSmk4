@@ -632,7 +632,7 @@ UnixSocket_WaitForAccept_Poll(async_job_t self,
 	if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_PENDING)
 		return ASYNC_JOB_POLL_AVAILABLE;
 	/* Connect to the status-changed signal */
-	task_connect(&client->uc_status_sig);
+	task_connect_for_poll(&client->uc_status_sig);
 	/* Check if we're still pending (in interlocked mode). */
 	if (ATOMIC_READ(client->uc_status) != UNIX_CLIENT_STATUS_PENDING)
 		return ASYNC_JOB_POLL_AVAILABLE;
@@ -993,7 +993,7 @@ unix_server_poll_accept(struct unix_server *__restrict self) {
 	result = unix_server_can_accept(self);
 	if (!result) {
 		/* Connect to the clients-became-available signal. */
-		task_connect(&self->us_acceptme_sig);
+		task_connect_for_poll(&self->us_acceptme_sig);
 		/* Interlocked test. */
 		result = unix_server_can_accept(self);
 	}
@@ -1013,7 +1013,7 @@ PRIVATE WUNUSED NONNULL((1)) bool FCALL
 unix_client_poll_hup(struct unix_client *__restrict self) {
 	if (unix_client_test_hup(self))
 		return true;
-	task_connect(&self->uc_status_sig);
+	task_connect_for_poll(&self->uc_status_sig);
 	return unix_client_test_hup(self);
 }
 
@@ -1051,7 +1051,7 @@ UnixSocket_Poll(struct socket *__restrict self,
 			else if (!(what & POLLIN)) {
 				/* When POLLIN was tested, then we're already
 				 * connected to `me->us_recvbuf->pb_psta' */
-				task_connect(&me->us_recvbuf->pb_psta);
+				task_connect_for_poll(&me->us_recvbuf->pb_psta);
 				if (pb_buffer_closed(me->us_recvbuf))
 					result |= POLLRDHUP;
 			}
@@ -1187,7 +1187,7 @@ async_send_poll(async_job_t self,
 	me = (struct async_send_job *)self;
 	if (async_send_test(me))
 		return ASYNC_JOB_POLL_AVAILABLE;;
-	task_connect(&me->as_socket->us_sendbuf->pb_psta);
+	task_connect_for_poll(&me->as_socket->us_sendbuf->pb_psta);
 	if (async_send_test(me))
 		return ASYNC_JOB_POLL_AVAILABLE;;
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;

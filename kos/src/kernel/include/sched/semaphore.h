@@ -177,7 +177,7 @@ LOCAL WUNUSED NONNULL((1)) bool
 	count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
 	if (count)
 		return true;
-	task_connect_ghost(&self->s_avail);
+	task_connect_for_poll(&self->s_avail);
 	/* Must check again, now that we're connected. */
 	count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
 	if unlikely(count)

@@ -2075,7 +2075,7 @@ posix_waitfor(idtype_t which,
 				 * and reap all zombies created in the mean time.
 				 * Then, fail with -ECHILD. */
 reapall_again:
-				task_connect(&mygroup.tg_proc_threads_change);
+				task_connect_for_poll(&mygroup.tg_proc_threads_change);
 reapall_check:
 				TRY {
 					sync_read(&mygroup.tg_proc_threads_lock);
@@ -2129,7 +2129,7 @@ reapall_check_already_locked:
 		size_t num_candidates;
 again_connect_enum_children:
 		/* Connect to the child-changed signal. */
-		task_connect(&mygroup.tg_proc_threads_change);
+		task_connect_for_poll(&mygroup.tg_proc_threads_change);
 		TRY {
 			size_t my_indirection;
 			my_indirection = THIS_TASKPID->tp_pidns->pn_indirection;

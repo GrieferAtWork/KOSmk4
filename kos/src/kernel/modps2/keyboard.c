@@ -361,7 +361,7 @@ again:
 	ps2_write_data(self->pk_portno, command_byte);
 	while ((errors = ATOMIC_READ(self->pk_errors)) == 0) {
 		struct timespec tmo;
-		task_connect(&self->pk_errors_sig);
+		task_connect_for_poll(&self->pk_errors_sig);
 		errors = ATOMIC_READ(self->pk_errors);
 		if unlikely(errors != 0) {
 			task_disconnectall();

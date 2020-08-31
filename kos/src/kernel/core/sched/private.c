@@ -160,7 +160,7 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 		TRY {
 			/* Now wait for the function to be serviced. */
 			while (!ATOMIC_READ(rt->cpf_finish)) {
-				task_connect(&rt->cpf_done);
+				task_connect_for_poll(&rt->cpf_done);
 				/* Do the interlocked check */
 				if unlikely(ATOMIC_READ(rt->cpf_finish)) {
 					task_disconnectall();

@@ -2859,7 +2859,7 @@ uhci_powerctl_poll(void *__restrict arg,
 	flags = ATOMIC_READ(uc->uc_flags);
 	if unlikely(flags & UHCI_CONTROLLER_FLAG_RESDECT)
 		goto yes;
-	task_connect(&uc->uc_resdec);
+	task_connect_for_poll(&uc->uc_resdec);
 
 	/* Check if a resume event was detected. */
 	flags = ATOMIC_READ(uc->uc_flags);

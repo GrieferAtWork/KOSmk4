@@ -36,7 +36,7 @@ DECL_BEGIN
  * >> bool pollread(MyType *self) {
  * >>     if (sync_canread(self))
  * >>         return true;
- * >>     task_connect_ghost(&self->m_signal);
+ * >>     task_connect_for_poll(&self->m_signal);
  * >>     return unlikely(sync_canread(self)); // Re-check to prevent race condition
  * >> }
  */
@@ -141,13 +141,19 @@ NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                                            * NOTE: THIS STATUS WILL NEVER APPEAR IN SIGNAL CONNECTION CHAINS! */
 #define TASK_CONNECTION_STAT_CHECK(x)     ((uintptr_t)(x) >= (uintptr_t)-2)
 
+/* For use when `!TASK_CONNECTION_STAT_CHECK(x)': check for poll-connections. */
+#define TASK_CONNECTION_STAT_GETCONS(x)   ((struct task_connections *)((uintptr_t)(x) & ~1))
+#define TASK_CONNECTION_STAT_ISNORM(x)    (((uintptr_t)(x) & 1) == 0)
+#define TASK_CONNECTION_STAT_ISPOLL(x)    (((uintptr_t)(x) & 1) != 0)
+
 struct task_connection {
 	struct sig                  *tc_sig;     /* [1..1][const] The connected signal. */
 	struct task_connection      *tc_connext; /* [0..1][lock(THIS_TASK)] Next connection established by the caller. */
 	struct task_connection      *tc_signext; /* [0..1][lock(!PREEMPTION_ENABLED() && IF_SMP(SMP_LOCK(tc_sig)))]
 	                                          * Next connection for the same signal. */
 	union {
-		struct task_connections *tc_cons; /* [1..1] Attached connection set/connection status. */
+		struct task_connections *tc_cons; /* [1..1] Attached connection set/connection status.
+		                                   * The least significant bit is set in case of a poll-connection. */
 		WEAK uintptr_t           tc_stat; /* Connection status (one of `TASK_CONNECTION_STAT_*'). */
 	};
 };
@@ -239,7 +245,42 @@ NOTHROW(FCALL task_popconnections)(void);
  *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 FUNDEF NONNULL((1)) void FCALL
 task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
-#define task_connect_ghost task_connect /* TODO: Remove me! */
+
+/* Exactly the same as `task_connect()', however must be used when the connection
+ * is made for a poll-based operation that only wishes to wait for some event to
+ * be triggered, but does not wish to act upon this event by acquiring some kind
+ * of lock with the intend to release it eventually, where the act of releasing
+ * said lock includes a call to `sig_send()'.
+ *
+ * This connect() function is only required for signals that may be delivered via
+ * `sig_send()', meaning that only a single thread would be informed of the signal
+ * event having taken place. If in this scenario, the recipient thread (i.e the
+ * thread that called `task_connect()') then decides not to act upon the signal
+ * in question, but rather to do something else, the original intend of `sig_send()'
+ * will become lost, that intend being for some (single) thread to try to acquire
+ * an accompanying lock (for an example of this, see kernel header <sched/mutex.h>)
+ *
+ * As far as semantics go, a signal connection established with this function will
+ * never satisfy a call to `sig_send()', and will instead be skipped if encountered
+ * during its search for a recipient (such that by default, poll-connections will
+ * only be acted upon when `sig_broadcast()' is used). However, if a call to
+ * `sig_send()' is unable to find any non-poll-based connections, it will proceed
+ * to act like a call to `sig_broadcast()' and wake all polling thread, though will
+ * still end up returning `false', indicative of not having woken any (properly)
+ * waiting thread.
+ *
+ * With all of this in mind, this function can also be though of as a sort-of
+ * low-priority task connection, that will only be triggered after other connections
+ * have already been served, and will only be woken by `sig_send()', when no other
+ * connections exist.
+ *
+ * In practice, this function must be used whenever it is unknown what will eventually
+ * happen after `task_waitfor()', or if what happens afterwards doesn't include the
+ * acquisition of some kind of lock, whose release includes the sending of `target'.
+ *
+ * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
+FUNDEF NONNULL((1)) void FCALL
+task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
 
 
 /* Disconnect from a specific signal `target'

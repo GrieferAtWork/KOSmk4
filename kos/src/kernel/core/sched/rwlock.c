@@ -1600,7 +1600,7 @@ PUBLIC WUNUSED NONNULL((1)) bool
 	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING ||
 	    self->rw_xowner == THIS_TASK)
 		return true;
-	task_connect_ghost(&self->rw_chmode);
+	task_connect_for_poll(&self->rw_chmode);
 	COMPILER_READ_BARRIER();
 	state = ATOMIC_READ(self->rw_state);
 	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING)
@@ -1620,7 +1620,7 @@ PUBLIC WUNUSED NONNULL((1)) bool
 		/* Caller is holding the write-lock. */
 		return true;
 	}
-	task_connect_ghost(&self->rw_chmode);
+	task_connect_for_poll(&self->rw_chmode);
 	COMPILER_READ_BARRIER();
 	state = ATOMIC_READ(self->rw_state);
 	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {

@@ -243,6 +243,75 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 }
 
 
+/* Exactly the same as `task_connect()', however must be used when the connection
+ * is made for a poll-based operation that only wishes to wait for some event to
+ * be triggered, but does not wish to act upon this event by acquiring some kind
+ * of lock with the intend to release it eventually, where the act of releasing
+ * said lock includes a call to `sig_send()'.
+ *
+ * This connect() function is only required for signals that may be delivered via
+ * `sig_send()', meaning that only a single thread would be informed of the signal
+ * event having taken place. If in this scenario, the recipient thread (i.e the
+ * thread that called `task_connect()') then decides not to act upon the signal
+ * in question, but rather to do something else, the original intend of `sig_send()'
+ * will become lost, that intend being for some (single) thread to try to acquire
+ * an accompanying lock (for an example of this, see kernel header <sched/mutex.h>)
+ *
+ * As far as semantics go, a signal connection established with this function will
+ * never satisfy a call to `sig_send()', and will instead be skipped if encountered
+ * during its search for a recipient (such that by default, poll-connections will
+ * only be acted upon when `sig_broadcast()' is used). However, if a call to
+ * `sig_send()' is unable to find any non-poll-based connections, it will proceed
+ * to act like a call to `sig_broadcast()' and wake all polling thread, though will
+ * still end up returning `false', indicative of not having woken any (properly)
+ * waiting thread.
+ *
+ * With all of this in mind, this function can also be though of as a sort-of
+ * low-priority task connection, that will only be triggered after other connections
+ * have already been served, and will only be woken by `sig_send()', when no other
+ * connections exist.
+ *
+ * In practice, this function must be used whenever it is unknown what will eventually
+ * happen after `task_waitfor()', or if what happens afterwards doesn't include the
+ * acquisition of some kind of lock, whose release includes the sending of `target'.
+ *
+ * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
+PUBLIC NONNULL((1)) void FCALL
+task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
+	struct task_connection *con, *next;
+	struct task_connections *cons;
+	cons = THIS_CONNECTIONS;
+
+	/* When a signal was already delivered, `task_connect()' becomes a no-op */
+	if unlikely(ATOMIC_READ(cons->tcs_dlvr) != NULL)
+		return;
+
+	/* Allocate a new connection for `cons' */
+	con = task_connection_alloc(cons);
+
+	/* Fill in the new connection. */
+	con->tc_sig     = target;
+	con->tc_connext = cons->tcs_con;
+	cons->tcs_con   = con;
+	con->tc_cons    = (struct task_connections *)((uintptr_t)cons | 1);
+
+	/* Now insert the connection onto the stack used by `target'
+	 * NOTE: `sig_send()' will always traverse the chain to the last
+	 *       thread, meaning that we can (and have to) insert ourselves
+	 *       at the front of the chain.
+	 * Also note that inserting a new connection can be done without
+	 * having to tinker with the signal's SMP-lock, so this part is
+	 * actually surprisingly simple. */
+	do {
+		next = ATOMIC_READ(target->s_con);
+		con->tc_signext = SIG_SMPLOCK_CLR(next);
+		COMPILER_WRITE_BARRIER();
+	} while (!ATOMIC_CMPXCH_WEAK(target->s_con, next,
+	                             SIG_SMPLOCK_CPY(con, next)));
+}
+
+
+
 
 
 /* Remove `con' from the linked list of active connections of `self'. */
@@ -329,6 +398,7 @@ again:
 PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE ATTR_COLD NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      struct sig *sender) {
+	bool is_broadcasting_poll = false;
 	uintptr_t clt;
 	struct task_connections *target_cons;
 	struct task_connection *receiver;
@@ -359,21 +429,27 @@ no_cons:
 	 * one of them all.
 	 * NOTE: Since we're holding the SMP-lock at the moment, we are safe to
 	 *       do this. */
-	receiver  = NULL;
+	receiver = NULL;
 	/* Find the first connection that is able to accept the signal. */
 	for (;;) {
 		uintptr_t status;
 		status = ATOMIC_READ(con->tc_stat);
 		assert(status != TASK_CONNECTION_STAT_BROADCAST);
-		if (!TASK_CONNECTION_STAT_CHECK(status))
-			receiver  = con; /* This connection is still in alive. */
+		if (!TASK_CONNECTION_STAT_CHECK(status)) {
+			if (is_broadcasting_poll || TASK_CONNECTION_STAT_ISNORM(status))
+				receiver = con; /* This connection is still in alive. */
+		}
 		assert(status == TASK_CONNECTION_STAT_SENT);
 		con = con->tc_signext;
 		if (!con)
 			break;
 	}
-	if unlikely(!receiver)
-		goto no_cons;
+	if unlikely(!receiver) {
+		if (is_broadcasting_poll)
+			goto no_cons;
+		is_broadcasting_poll = true;
+		goto again;
+	}
 	/* Try to switch the connection from `!TASK_CONNECTION_STAT_CHECK'
 	 * to `TASK_CONNECTION_STAT_SENT'. */
 	target_cons = ATOMIC_READ(receiver->tc_cons);
@@ -382,6 +458,20 @@ no_cons:
 	if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
 	                        (struct task_connections *)TASK_CONNECTION_STAT_SENT))
 		goto again;
+	if unlikely(TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
+		/* Deal with poll-based connections. */
+		bool did_deliver;
+		target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
+		did_deliver = ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, sender);
+		task_connection_unlink_from_sig(self, receiver);
+		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+		if (did_deliver) {
+			target_thread = ATOMIC_READ(target_cons->tcs_thread);
+			if likely(target_thread)
+				task_wake(target_thread);
+		}
+		goto again;
+	}
 	/* Try to set our signal as the one delivered to `target_cons'.
 	 * If that part fails, change signal state to BROADCAST (even though
 	 * that's not entirely correct), so we can get rid of the connection. */
@@ -423,6 +513,7 @@ again:
 	/* Make sure that our state hasn't changed. */
 	if unlikely(ATOMIC_READ(self->tc_stat) != old_state) {
 		sig_smp_lock_break(target);
+		task_pause();
 		goto again;
 	}
 #ifdef TASK_CONNECTION_UNLINK_FROM_SIG_AND_UNLOCK_IS_TASK_CONNECTION_UNLINK_FROM_SIG
@@ -468,8 +559,15 @@ NOTHROW(FCALL task_disconnect)(struct sig *__restrict target) {
 			break; /* Found it! */
 		pcon = &con->tc_connext;
 	}
-	/* Delete this connection, but don't forward already-sent signals. */
-	task_disconnect_connection(con, self, false);
+	/* Delete this connection, and also forward an already-sent signal,
+	 * even though in the event of the signal needing to be forwarded,
+	 * the calling thread will have already received said signal, there
+	 * is a good chance that once the caller notices that they've received
+	 * a signal from which they've previously disconnected, they will
+	 * choose to ignore that signal, though at that point we'll already
+	 * no longer be able to forward it.
+	 * So better be safe than sorry, and immediately forward it! */
+	task_disconnect_connection(con, self, true);
 
 	/* Unlink the connection from the thread-local active chain. */
 	*pcon = con->tc_connext;
@@ -744,7 +842,7 @@ initialize_con:
 }
 
 PUBLIC NONNULL((1)) void FCALL
-task_connect_ghost(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
+task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 	struct task_connection *con, *chain;
 	struct task_connections *mycons;
 	unsigned int i;

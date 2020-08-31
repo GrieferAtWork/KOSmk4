@@ -1516,7 +1516,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	PREEMPTION_ENABLE();
 	while (ATOMIC_READ(mall_suspended_locked) != NULL) {
 		/* Wait for `mall_suspended_unlock' */
-		task_connect(&mall_suspended_unlock);
+		task_connect_for_poll(&mall_suspended_unlock);
 		if unlikely(ATOMIC_READ(mall_suspended_locked) == NULL) {
 			task_disconnectall();
 			break;

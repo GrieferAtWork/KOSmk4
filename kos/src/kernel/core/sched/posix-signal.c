@@ -464,7 +464,7 @@ PUBLIC void KCALL task_sigstop(int stop_code)
 	/* #4: Wait for the SUSPENDED flag to go away */
 	TRY {
 		do {
-			task_connect(&pid->tp_changed);
+			task_connect_for_poll(&pid->tp_changed);
 			if unlikely(!(ATOMIC_READ(THIS_TASK->t_flags) & TASK_FSUSPENDED)) {
 				/* Race condition: we were already re-awoken. */
 				task_disconnectall();

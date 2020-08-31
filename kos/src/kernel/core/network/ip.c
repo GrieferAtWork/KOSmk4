@@ -689,7 +689,7 @@ ip_arp_and_datagram_poll(async_job_t self, struct timespec *__restrict timeout) 
 	/* Wait for the peer's MAC to become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
 		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
-	task_connect(&me->adj_dev->nd_net.n_addravl);
+	task_connect_for_poll(&me->adj_dev->nd_net.n_addravl);
 	COMPILER_READ_BARRIER();
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
 		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
@@ -941,7 +941,7 @@ ip_arp_and_datagrams_poll(async_job_t self, struct timespec *__restrict timeout)
 	/* Wait for the peer's MAC to become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
 		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
-	task_connect(&me->adj_dev->nd_net.n_addravl);
+	task_connect_for_poll(&me->adj_dev->nd_net.n_addravl);
 	COMPILER_READ_BARRIER();
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
 		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */

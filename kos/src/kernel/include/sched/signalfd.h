@@ -41,8 +41,8 @@
  *            return information about signals queued to the child.
  *            ```
  *            So in other words: It always polls your own pending signals!
- * poll(): >> task_connect(PROCESS->SIGQUEUE->AVAIL);
- *         >> task_connect(THREAD->SIGQUEUE->AVAIL);
+ * poll(): >> task_connect_for_poll(PROCESS->SIGQUEUE->AVAIL);
+ *         >> task_connect_for_poll(THREAD->SIGQUEUE->AVAIL);
  */
 
 DECL_BEGIN

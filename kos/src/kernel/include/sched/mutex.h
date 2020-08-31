@@ -214,7 +214,7 @@ LOCAL WUNUSED NONNULL((1)) bool
 	old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
 	if (!old_task || old_task == THIS_TASK)
 		return true;
-	task_connect_ghost(&self->m_unlock);
+	task_connect_for_poll(&self->m_unlock);
 	old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
 	if unlikely(!old_task)
 		return true;

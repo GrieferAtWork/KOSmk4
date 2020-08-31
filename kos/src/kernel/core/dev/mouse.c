@@ -820,7 +820,7 @@ mouse_device_poll(struct character_device *__restrict self,
 	if (what & POLLIN) {
 		if (mouse_device_canread(me))
 			return POLLIN;
-		task_connect(&me->md_buf.mb_avail);
+		task_connect_for_poll(&me->md_buf.mb_avail);
 		if (mouse_device_canread(me))
 			return POLLIN;
 	}

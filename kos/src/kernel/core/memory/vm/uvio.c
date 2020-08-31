@@ -97,7 +97,7 @@ uvio_request_impl(struct uvio *__restrict self,
 		if (status == KERNEL_UVIO_REQUEST_STATUS_COMPLETE ||
 		    status == KERNEL_UVIO_REQUEST_STATUS_EXCEPT)
 			break; /* Request has completed (either successfully, or with an exception) */
-		task_connect(&self->uv_reqdone);
+		task_connect_for_poll(&self->uv_reqdone);
 		status = ATOMIC_READ(slot->kur_status);
 		if (status == KERNEL_UVIO_REQUEST_STATUS_COMPLETE ||
 		    status == KERNEL_UVIO_REQUEST_STATUS_EXCEPT) {
@@ -928,7 +928,7 @@ uvio_server_poll(struct vm_datablock *__restrict self,
 		if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING))
 			result |= POLLIN;
 		else {
-			task_connect(&me->uv_reqmore);
+			task_connect_for_poll(&me->uv_reqmore);
 			if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING))
 				result |= POLLIN;
 		}
@@ -938,7 +938,7 @@ uvio_server_poll(struct vm_datablock *__restrict self,
 		if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_DELIVERED))
 			result |= POLLOUT;
 		else {
-			task_connect(&me->uv_reqmore);
+			task_connect_for_poll(&me->uv_reqmore);
 			if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_DELIVERED))
 				result |= POLLOUT;
 		}

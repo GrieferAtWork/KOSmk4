@@ -193,7 +193,7 @@ switch_to_normal_stop:
 				COMPILER_BARRIER();
 				goto do_normal_stop;
 			}
-			task_connect(&stop_event.e.tse_sigresume);
+			task_connect_for_poll(&stop_event.e.tse_sigresume);
 			if (!ATOMIC_READ(stop_event.e.tse_isacpu)) {
 				task_disconnectall();
 				goto switch_to_normal_stop;
@@ -243,9 +243,9 @@ do_normal_stop:
 					GDBThread_StopRPC_BecomeGDBHostImpl(&stop_event.e);
 					continue;
 				}
-				task_connect(&GDBServer_HostUnlocked);
+				task_connect_for_poll(&GDBServer_HostUnlocked);
 			}
-			task_connect(&stop_event.e.tse_sigresume);
+			task_connect_for_poll(&stop_event.e.tse_sigresume);
 			if (ATOMIC_READ(stop_event.e.tse_isacpu)) {
 				task_disconnectall();
 				goto do_cpu_stop;
@@ -665,7 +665,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 
 		/* Wait until the target thread has been explicitly stopped. */
 		while (!GDBThread_IsStoppedExplicitly(thread)) {
-			task_connect(&GDBThread_StopWithAsyncNotificationIPI_Done);
+			task_connect_for_poll(&GDBThread_StopWithAsyncNotificationIPI_Done);
 			if (GDBThread_IsStoppedExplicitly(thread)) {
 				task_disconnectall();
 				break;
@@ -717,7 +717,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 		task_start(thread);
 	/* Until until `GDBThread_StoppedAdded' has fully stopped. */
 	while (!GDBThread_IsStopped(thread)) {
-		task_connect(&GDBThread_StoppedAdded);
+		task_connect_for_poll(&GDBThread_StoppedAdded);
 		if (GDBThread_IsStopped(thread)) {
 			task_disconnectall();
 			break;

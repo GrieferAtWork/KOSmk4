@@ -166,6 +166,15 @@ LOCAL void KCALL connect_to_my_signal_queues(void) {
 	task_connect(&tqueue->sq_newsig);
 }
 
+/* Connect to the signal queue signals of the calling thread and process. */
+LOCAL void KCALL connect_to_my_signal_queues_for_poll(void) {
+	struct sigqueue *pqueue, *tqueue;
+	pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
+	tqueue = &THIS_SIGQUEUE;
+	task_connect_for_poll(&pqueue->sq_newsig);
+	task_connect_for_poll(&tqueue->sq_newsig);
+}
+
 
 
 INTERN size_t KCALL
@@ -244,7 +253,7 @@ handle_signalfd_poll(struct signalfd *__restrict self,
 	if (what & POLLIN) {
 		if (signalfd_try_read(self, NULL))
 			return POLLIN;
-		connect_to_my_signal_queues();
+		connect_to_my_signal_queues_for_poll();
 		if (signalfd_try_read(self, NULL))
 			return POLLIN;
 	}

@@ -100,7 +100,7 @@ DECL_BEGIN
  *   │                                                                                             │ │ │
  *   v                                        ┌────> [async_poll(device)]                          │ │ │
  * [ASYNC_WORKER(device)]                     │      >> if (async_test(device)) return true;       │ │ │
- * >> struct async_worker_callbacks = {       │      >> task_connect(&device->d_aio_avail);        │ │ │
+ * >> struct async_worker_callbacks = {       │      >> task_connect_for_poll(&device->d_aio_avail)│ │ │
  * >>     .awc_poll = &async_poll, ───────────┘      >> return async_test(device);                 │ │ │
  * >>     .awc_work = &async_work, ───────┐                                                        │ │ │
  * >>     .awc_test = &async_test  ───────│────────> [async_test(device)]                          │ │ │
@@ -473,13 +473,7 @@ aio_handle_generic_checkerror(struct aio_handle_generic *__restrict self)
 LOCAL NONNULL((1)) void KCALL
 aio_handle_generic_connect(struct aio_handle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
-	task_connect(&self->hg_signal);
-}
-
-LOCAL NONNULL((1)) void KCALL
-aio_handle_generic_connect_ghost(struct aio_handle_generic *__restrict self)
-		THROWS(E_BADALLOC) {
-	task_connect_ghost(&self->hg_signal);
+	task_connect_for_poll(&self->hg_signal);
 }
 
 LOCAL NONNULL((1)) bool KCALL
@@ -487,7 +481,7 @@ aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
 		THROWS(...) {
 	if (aio_handle_generic_hascompleted(self))
 		return true;
-	task_connect(&self->hg_signal);
+	aio_handle_generic_connect(self);
 	return aio_handle_generic_hascompleted(self);
 }
 
@@ -496,7 +490,7 @@ aio_handle_generic_poll_err(struct aio_handle_generic *__restrict self)
 		THROWS(...) {
 	if (aio_handle_generic_hascompleted(self))
 		goto check_error_and_return_true;
-	task_connect(&self->hg_signal);
+	aio_handle_generic_connect(self);
 	if (aio_handle_generic_hascompleted(self))
 		goto check_error_and_return_true;
 	return false;
@@ -513,7 +507,7 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 	__hybrid_assert(!task_isconnected());
 	while (!aio_handle_generic_hascompleted(self)) {
 		TRY {
-			task_connect(&self->hg_signal);
+			aio_handle_generic_connect(self);
 			if unlikely(aio_handle_generic_hascompleted(self)) {
 				task_disconnectall();
 				break;
@@ -707,13 +701,7 @@ aio_multimultihandle_generic_checkerror(struct aio_multihandle_generic *__restri
 LOCAL NONNULL((1)) void KCALL
 aio_multihandle_generic_connect(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
-	task_connect(&self->mg_signal);
-}
-
-LOCAL NONNULL((1)) void KCALL
-aio_multihandle_generic_connect_ghost(struct aio_multihandle_generic *__restrict self)
-		THROWS(E_BADALLOC) {
-	task_connect_ghost(&self->mg_signal);
+	task_connect_for_poll(&self->mg_signal);
 }
 
 /* Check if the AIO operation failed, and propagate the error if it did. */
@@ -732,7 +720,7 @@ aio_multihandle_generic_poll(struct aio_multihandle_generic *__restrict self)
 		THROWS(...) {
 	if (aio_multihandle_generic_hascompleted(self))
 		return true;
-	task_connect(&self->mg_signal);
+	aio_multihandle_generic_connect(self);
 	return aio_multihandle_generic_hascompleted(self);
 }
 
@@ -741,7 +729,7 @@ aio_multihandle_generic_poll_err(struct aio_multihandle_generic *__restrict self
 		THROWS(...) {
 	if (aio_multihandle_generic_hascompleted(self))
 		goto check_error_and_return_true;
-	task_connect(&self->mg_signal);
+	aio_multihandle_generic_connect(self);
 	if (aio_multihandle_generic_hascompleted(self))
 		goto check_error_and_return_true;
 	return false;
@@ -758,7 +746,7 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
 	__hybrid_assert(!task_isconnected());
 	while (!aio_multihandle_generic_hascompleted(self)) {
 		TRY {
-			task_connect(&self->mg_signal);
+			aio_multihandle_generic_connect(self);
 			if unlikely(aio_multihandle_generic_hascompleted(self)) {
 				task_disconnectall();
 				break;

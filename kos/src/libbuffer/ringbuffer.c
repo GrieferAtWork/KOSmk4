@@ -991,7 +991,7 @@ libringbuffer_poll(struct ringbuffer *__restrict self,
 		    ATOMIC_READ(self->rb_limit) == 0)
 			result |= POLLIN;
 		else {
-			task_connect(&self->rb_nempty);
+			task_connect_for_poll(&self->rb_nempty);
 			if (ATOMIC_READ(self->rb_avail) != 0 ||
 			    ATOMIC_READ(self->rb_limit) == 0)
 				result |= POLLIN;
@@ -1009,7 +1009,7 @@ libringbuffer_poll(struct ringbuffer *__restrict self,
 				atomic_rwlock_endread(&self->rb_lock);
 			} else {
 				atomic_rwlock_endread(&self->rb_lock);
-				task_connect(&self->rb_nempty);
+				task_connect_for_poll(&self->rb_nempty);
 				atomic_rwlock_read(&self->rb_lock);
 				limit = ATOMIC_READ(self->rb_limit);
 				if (self->rb_avail < limit || limit == 0)

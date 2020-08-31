@@ -424,7 +424,7 @@ fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
 				/* Opening a fifo as non-blocking for reading always succeeds. */
 				if (iomode & IO_NONBLOCK)
 					break;
-				task_connect(&self->f_fifo.ff_buffer.rb_nempty);
+				task_connect_for_poll(&self->f_fifo.ff_buffer.rb_nempty);
 				if (ATOMIC_READ(self->f_fifo.ff_wrcnt) != 0) {
 					task_disconnectall();
 					break;
@@ -447,7 +447,7 @@ fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
 					THROW(E_INVALID_ARGUMENT_BAD_STATE,
 					      E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS);
 				}
-				task_connect(&self->f_fifo.ff_buffer.rb_nfull);
+				task_connect_for_poll(&self->f_fifo.ff_buffer.rb_nfull);
 				if (ATOMIC_READ(self->f_fifo.ff_rdcnt) != 0) {
 					task_disconnectall();
 					break;

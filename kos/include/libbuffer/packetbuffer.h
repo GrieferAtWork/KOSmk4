@@ -789,21 +789,21 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_canwrite)(struct pb_buffer *__restrict self,
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 #ifdef __KERNEL__
 /* Poll for the packet buffer to become readable. */
-#define pb_buffer_pollread(self)      \
-	(pb_buffer_canread(self) ||       \
-	 (task_connect(&(self)->pb_psta), \
+#define pb_buffer_pollread(self)               \
+	(pb_buffer_canread(self) ||                \
+	 (task_connect_for_poll(&(self)->pb_psta), \
 	  pb_buffer_canread(self)))
 
 /* Poll for the packet buffer to become writable. */
 #define pb_buffer_pollwrite(self, payload_size, ancillary_size) \
 	(pb_buffer_canwrite(self, payload_size, ancillary_size) ||  \
-	 (task_connect(&(self)->pb_psta),                           \
+	 (task_connect_for_poll(&(self)->pb_psta),                  \
 	  pb_buffer_canwrite(self, payload_size, ancillary_size)))
 
 /* Poll for the packet buffer to become closed. */
 #define pb_buffer_pollwrite(self, payload_size, ancillary_size) \
 	(pb_buffer_canwrite(self, payload_size, ancillary_size) ||  \
-	 (task_connect(&(self)->pb_psta),                           \
+	 (task_connect_for_poll(&(self)->pb_psta),                  \
 	  pb_buffer_canwrite(self, payload_size, ancillary_size)))
 #endif /* __KERNEL__ */
 #endif /* LIBBUFFER_WANT_PROTOTYPES */

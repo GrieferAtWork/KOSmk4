@@ -223,7 +223,7 @@ NOTHROW(FCALL vm_clear_usermod)(struct vm *__restrict self);
  * @param: cookie: Same as the `cookie' argument passed to `vm_enumusermod()'
  * @param: um:     The usermod object that is being enumerated.
  * @return: >= 0:  Add the this value to the total sum to-be returned by `vm_enumusermod()'
- * @return: < 0:   Stop enumeration and have `vm_enumusermod()' immediatly re-return this value. */
+ * @return: < 0:   Stop enumeration and have `vm_enumusermod()' immediately re-return this value. */
 typedef ssize_t (KCALL *vm_enumusermod_callback_t)(void *cookie, struct usermod *__restrict um);
 
 /* Enumerate all user-space modules that may be mapped within `self'

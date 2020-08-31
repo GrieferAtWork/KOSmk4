@@ -198,7 +198,7 @@ handle_eventfd_fence_poll(struct eventfd *__restrict self,
 	if (!result) {
 		/* If none of the masked operations are
 		 * available, connect to the signal. */
-		task_connect(&self->ef_signal);
+		task_connect_for_poll(&self->ef_signal);
 		/* Check for available operations one more time. */
 		result = evenfd_getavail(self);
 		result &= what;

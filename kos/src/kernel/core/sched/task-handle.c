@@ -68,7 +68,7 @@ handle_task_poll(struct taskpid *__restrict self, poll_mode_t what) {
 		if (WIFEXITED(self->tp_status))
 			result |= POLLIN;
 		else {
-			task_connect(&self->tp_changed);
+			task_connect_for_poll(&self->tp_changed);
 			COMPILER_READ_BARRIER();
 			if (WIFEXITED(self->tp_status))
 				result |= POLLIN;
@@ -104,7 +104,7 @@ handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
 				ptimeout = &timeout;
 			}
 again_waitfor:
-			task_connect(&self->tp_changed);
+			task_connect_for_poll(&self->tp_changed);
 			COMPILER_READ_BARRIER();
 			if (WIFEXITED(self->tp_status)) {
 				task_disconnectall();

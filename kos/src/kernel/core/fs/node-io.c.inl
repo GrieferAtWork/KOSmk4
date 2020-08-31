@@ -727,7 +727,7 @@ again_check_size:
 wait_for_data:
 	rwlock_endread(&self->db_lock);
 	for (;;) {
-		task_connect(&self->db_lock.rw_chmode);
+		task_connect_for_poll(&self->db_lock.rw_chmode);
 		COMPILER_READ_BARRIER();
 		if (file_position < self->i_filesize) {
 			COMPILER_READ_BARRIER();

@@ -583,7 +583,7 @@ Ne2k_AsyncPoll(void *__restrict arg,
 	if (state.ns_state == NE2K_STATE_TX_UPLOAD ||
 	    state.ns_state == NE2K_STATE_RX_DNLOAD)
 		return true;
-	task_connect(&me->nk_stpkld);
+	task_connect_for_poll(&me->nk_stpkld);
 	state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
 	if (state.ns_state == NE2K_STATE_TX_UPLOAD ||
 	    state.ns_state == NE2K_STATE_RX_DNLOAD)

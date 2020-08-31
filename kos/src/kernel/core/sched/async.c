@@ -384,7 +384,7 @@ again:
 			struct sig *received_signal;
 			/* Also wait for async workers to have changed. */
 			TRY {
-				task_connect(&awork_changed);
+				task_connect_for_poll(&awork_changed);
 				received_signal = task_waitfor(asyncmain_timeout_p);
 			} EXCEPT {
 				error_printf("_asyncmain:task_waitfor()");

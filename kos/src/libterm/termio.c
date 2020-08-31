@@ -1630,7 +1630,7 @@ libterminal_poll_iwrite(struct terminal *__restrict self)
 	if (ATOMIC_READ(self->t_ios.c_iflag) & __IIOFF) {
 		if (ATOMIC_READ(self->t_ipend.lb_line.lc_size) < ATOMIC_READ(self->t_ipend.lb_limt))
 			return TERMINAL_POLL_NONBLOCK;
-		task_connect(&self->t_ipend.lb_nful);
+		task_connect_for_poll(&self->t_ipend.lb_nful);
 		if unlikely(ATOMIC_READ(self->t_ipend.lb_line.lc_size) < ATOMIC_READ(self->t_ipend.lb_limt))
 			return TERMINAL_POLL_NONBLOCK;
 		if likely(ATOMIC_READ(self->t_ios.c_iflag) & __IIOFF)
@@ -1639,7 +1639,7 @@ libterminal_poll_iwrite(struct terminal *__restrict self)
 	if (ATOMIC_READ(self->t_ios.c_lflag) & ICANON) {
 		if (ATOMIC_READ(self->t_canon.lb_line.lc_size) < ATOMIC_READ(self->t_canon.lb_limt))
 			return TERMINAL_POLL_NONBLOCK;
-		task_connect(&self->t_canon.lb_nful);
+		task_connect_for_poll(&self->t_canon.lb_nful);
 		if unlikely(ATOMIC_READ(self->t_canon.lb_line.lc_size) < ATOMIC_READ(self->t_canon.lb_limt))
 			return TERMINAL_POLL_NONBLOCK;
 		if likely(ATOMIC_READ(self->t_ios.c_lflag) & ICANON)
@@ -1658,7 +1658,7 @@ libterminal_poll_owrite(struct terminal *__restrict self)
 	if (ATOMIC_READ(self->t_ios.c_iflag) & IXOFF) {
 		if (ATOMIC_READ(self->t_opend.lb_line.lc_size) < ATOMIC_READ(self->t_opend.lb_limt))
 			return TERMINAL_POLL_NONBLOCK;
-		task_connect(&self->t_opend.lb_nful);
+		task_connect_for_poll(&self->t_opend.lb_nful);
 		if unlikely(ATOMIC_READ(self->t_opend.lb_line.lc_size) < ATOMIC_READ(self->t_opend.lb_limt))
 			return TERMINAL_POLL_NONBLOCK;
 		if likely(ATOMIC_READ(self->t_ios.c_iflag) & IXOFF)

@@ -112,7 +112,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		 * unlocked until the `GDB_SERVER_FEATURE_ATTACHED' feature
 		 * becomes set. */
 		while (!(ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_ATTACHED)) {
-			task_connect(&GDBServer_HostUnlocked);
+			task_connect_for_poll(&GDBServer_HostUnlocked);
 			if (ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_ATTACHED) {
 				task_disconnectall();
 				break;

@@ -351,7 +351,7 @@ LOCAL WUNUSED NONNULL((1)) __BOOL
 		THROWS(E_BADALLOC) {
 	if (shared_rwlock_canread(self))
 		return true;
-	task_connect_ghost(&self->sl_ulck);
+	task_connect_for_poll(&self->sl_ulck);
 	return shared_rwlock_canread(self);
 }
 
@@ -360,7 +360,7 @@ LOCAL WUNUSED NONNULL((1)) __BOOL
 		THROWS(E_BADALLOC) {
 	if (shared_rwlock_canwrite(self))
 		return true;
-	task_connect_ghost(&self->sl_ulck);
+	task_connect_for_poll(&self->sl_ulck);
 	return shared_rwlock_canwrite(self);
 }
 

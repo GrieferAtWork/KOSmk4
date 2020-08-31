@@ -42,7 +42,7 @@ struct fifo {
 	 *                 break;
 	 *             if (mode & O_NONBLOCK)
 	 *                 break;
-	 *             task_connect(&ff_buffer.rb_nempty);
+	 *             task_connect_for_poll(&ff_buffer.rb_nempty);
 	 *             if (ff_wrcnt != 0)
 	 *                 break;
 	 *             task_waitfor();
@@ -56,7 +56,7 @@ struct fifo {
 	 *                 break;
 	 *             if (mode & O_NONBLOCK)
 	 *                 THROW(ERROR_FOR(ENXIO));
-	 *             task_connect(&ff_buffer.rb_nfull);
+	 *             task_connect_for_poll(&ff_buffer.rb_nfull);
 	 *             if (ff_rdcnt != 0)
 	 *                 break;
 	 *             task_waitfor();
