@@ -111,28 +111,30 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		switch (state) {
 
 		case THREAD_STATE_RUNNING:
-			status_indicator = DBGSTR(AC_FG_GREEN "R" AC_FGDEF);
+			status_indicator = DBGSTR(AC_FG_GREEN "R");
 			break;
 
 		case THREAD_STATE_SLEEPING:
-			status_indicator = DBGSTR(AC_FG_YELLOW "S" AC_FGDEF);
+			status_indicator = DBGSTR(AC_FG_YELLOW "S");
 			break;
 
 		case THREAD_STATE_IDLING:
-			status_indicator = DBGSTR(AC_FG_AQUA "I" AC_FGDEF);
+			status_indicator = DBGSTR(AC_FG_AQUA "I");
 			break;
 
 #ifndef CONFIG_NO_SMP
 		case THREAD_STATE_PENDING:
-			status_indicator = DBGSTR(AC_FG_DARK_GRAY "P" AC_FGDEF);
+			status_indicator = DBGSTR(AC_FG_DARK_GRAY "P");
 			break;
 #endif /* !CONFIG_NO_SMP */
 
 		default:
-			status_indicator = DBGSTR(AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY) "?" AC_DEFCOLOR);
+			status_indicator = DBGSTR(AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY) "?");
 			break;
 		}
+		dbg_savecolor();
 		dbg_print(status_indicator);
+		dbg_loadcolor();
 	}
 	dbg_printf(" #%-2u", thread->t_cpu->c_id);
 
@@ -249,7 +251,7 @@ DBG_COMMAND(lsthread,
 			struct taskpid *pid;
 			pid = pidns_root.pn_list[i].pe_pid;
 			if (pid == NULL ||
-				pid == PIDNS_ENTRY_DELETED)
+			    pid == PIDNS_ENTRY_DELETED)
 				continue;
 			if (wasdestroyed(pid))
 				continue;

@@ -880,22 +880,23 @@ vm_getusermod(struct vm *__restrict self,
 	if (kernel_poisoned())
 		return NULL;
 
-	/* Create a new  */
+	/* Create the new usermod object. */
 	result = vm_create_usermod(self,
 	                           addr,
 	                           addr_must_be_executable);
-
-	/* Add `result' to the cache of `self'.
-	 * Also: If the cache now contains an overlapping entry
-	 *       for `addr', return that one instead, and destroy
-	 *       the newly created descriptor. */
-	TRY {
-		sync_write(self);
-	} EXCEPT {
-		decref_likely(result);
-		RETHROW();
+	if (result) {
+		/* Add `result' to the cache of `self'.
+		 * Also: If the cache now contains an overlapping entry
+		 *       for `addr', return that one instead, and destroy
+		 *       the newly created descriptor. */
+		TRY {
+			sync_write(self);
+		} EXCEPT {
+			decref_likely(result);
+			RETHROW();
+		}
+		result = vm_usermod_cache_insert_and_unify_and_unlock(self, result);
 	}
-	result = vm_usermod_cache_insert_and_unify_and_unlock(self, result);
 	return result;
 }
 
@@ -1137,9 +1138,6 @@ unwind_userspace(void *absolute_pc,
 		}
 		/* Search for the `.eh_frame' section. */
 		TRY {
-			/* TODO: If the program doesn't have a .eh_frame section, then we
-			 *       must check for a `.debug_frame' section that should contain
-			 *       the same kind of information. */
 			eh_frame = usermod_section_lock(um, ".eh_frame",
 			                                DRIVER_SECTION_LOCK_FNODATA);
 		} EXCEPT {
@@ -1218,6 +1216,16 @@ unwind_userspace(void *absolute_pc,
 done_um_eh_frame:
 	decref_unlikely(eh_frame);
 done_um:
+	if (result == UNWIND_NO_FRAME) {
+		/* If the program doesn't have a .eh_frame section, then we
+		 * must check for a `.debug_frame' section that should contain
+		 * the same kind of information.
+		 *
+		 * Also do this if .eh_frame wasn't enough. - Some programs can
+		 * end up having both an .eh_frame, _and_ a .debug_frame section,
+		 * but only .debug_frame actually contains what we need! */
+		/* TODO */
+	}
 	decref_unlikely(um);
 done:
 	return result;
