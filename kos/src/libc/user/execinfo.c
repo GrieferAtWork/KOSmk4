@@ -35,6 +35,7 @@
 #include <unistd.h>
 
 #include <libdebuginfo/addr2line.h>
+#include <libdebuginfo/unwind.h>
 #include <libunwind/unwind.h>
 
 #include "../libc/dl.h"
@@ -49,7 +50,6 @@ DECL_BEGIN
 INTDEF void *pdyn_libunwind; /* From `../libc/except.c' */
 INTDEF void LIBCCALL initialize_libunwind(void); /* From `../libc/except.c' */
 
-PRIVATE SECTION_DEBUG_BSS("pdyn_unwind") PUNWIND pdyn_unwind = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_getreg_lcpustate") PUNWIND_GETREG_LCPUSTATE pdyn_unwind_getreg_lcpustate = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_setreg_lcpustate") PUNWIND_SETREG_LCPUSTATE pdyn_unwind_setreg_lcpustate = NULL;
 PRIVATE SECTION_DEBUG_STRING("name_unwind") char const name_unwind[] = "unwind";
@@ -61,7 +61,6 @@ PRIVATE bool LIBCCALL initialize_libunwind_debug(void) {
 #define BIND(func, name)                                                 \
 	if unlikely((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
 		goto err_init_failed
-	BIND(pdyn_unwind, name_unwind);
 	BIND(pdyn_unwind_getreg_lcpustate, name_unwind_getreg_lcpustate);
 	BIND(pdyn_unwind_setreg_lcpustate, name_unwind_setreg_lcpustate);
 #undef BIND
@@ -70,19 +69,20 @@ err_init_failed:
 	return false;
 }
 
-#define unwind                   (*pdyn_unwind)
-#define unwind_getreg_lcpustate  (*pdyn_unwind_getreg_lcpustate)
-#define unwind_setreg_lcpustate  (*pdyn_unwind_setreg_lcpustate)
+#define unwind_getreg_lcpustate (*pdyn_unwind_getreg_lcpustate)
+#define unwind_setreg_lcpustate (*pdyn_unwind_setreg_lcpustate)
 
 #define ENSURE_LIBUNWIND_LOADED() \
-	(ATOMIC_READ(pdyn_unwind) != NULL || initialize_libunwind_debug())
+	(ATOMIC_READ(pdyn_unwind_setreg_lcpustate) != NULL || initialize_libunwind_debug())
 
 
 PRIVATE SECTION_DEBUG_BSS("pdyn_libdebuginfo") void *pdyn_libdebuginfo = NULL;
+PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_for_debug")         PUNWIND_FOR_DEBUG         pdyn_unwind_for_debug         = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_debug_dllocksections")     PDEBUG_DLLOCKSECTIONS     pdyn_debug_dllocksections     = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_debug_dlunlocksections")   PDEBUG_DLUNLOCKSECTIONS   pdyn_debug_dlunlocksections   = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_debug_sections_addr2line") PDEBUG_SECTIONS_ADDR2LINE pdyn_debug_sections_addr2line = NULL;
 
+#define unwind_for_debug         (*pdyn_unwind_for_debug)
 #define debug_dllocksections     (*pdyn_debug_dllocksections)
 #define debug_dlunlocksections   (*pdyn_debug_dlunlocksections)
 #define debug_sections_addr2line (*pdyn_debug_sections_addr2line)
@@ -114,6 +114,9 @@ bool LIBCCALL init_libdebuginfo(void) {
 		return true;
 	lib = get_libdebuginfo();
 	if (!lib)
+		return false;
+	*(void **)&pdyn_unwind_for_debug = dlsym(lib, "unwind_for_debug");
+	if unlikely(!pdyn_unwind_for_debug)
 		return false;
 	*(void **)&pdyn_debug_sections_addr2line = dlsym(lib, "debug_sections_addr2line");
 	if unlikely(!pdyn_debug_sections_addr2line)
@@ -147,21 +150,17 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 {
 	unsigned int result;
 	struct lcpustate ost, st;
-	if unlikely((int)size < 0) {
-		libc_seterrno(EINVAL);
-		return -1;
-	}
-	if (!ENSURE_LIBUNWIND_LOADED()) {
-		libc_seterrno(ENOENT);
-		return -1;
-	}
+	if unlikely((int)size < 0)
+		return libc_seterrno(EINVAL);
+	if (!ENSURE_LIBUNWIND_LOADED() || !init_libdebuginfo())
+		return libc_seterrno(ENOENT);
 	lcpustate_current(&st);
 	for (result = 0; result < size; ++result) {
 		unsigned int error;
 		memcpy(&ost, &st, sizeof(struct lcpustate));
-		error = unwind((void *)lcpustate_getpc(&ost),
-		               &unwind_getreg_lcpustate, &ost,
-		               &unwind_setreg_lcpustate, &st);
+		error = unwind_for_debug((void *)lcpustate_getpc(&ost),
+		                         &unwind_getreg_lcpustate, &ost,
+		                         &unwind_setreg_lcpustate, &st);
 		if (error != UNWIND_SUCCESS)
 			break;
 		array[result] = (void *)lcpustate_getpc(&st);
@@ -236,11 +235,11 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
 	struct format_aprintf_data data;
 	if unlikely((int)size < 0) {
 		libc_seterrno(EINVAL);
-		return NULL;
+		goto err_nodata;
 	}
 	if (!init_libdebuginfo()) {
 		libc_seterrno(ENOENT);
-		return NULL;
+		goto err_nodata;
 	}
 	format_aprintf_data_init(&data);
 	/* Make space for the string array itself. */
@@ -265,6 +264,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
 	return result;
 err:
 	format_aprintf_data_fini(&data);
+err_nodata:
 	return NULL;
 }
 /*[[[end:libc_backtrace_symbols]]]*/

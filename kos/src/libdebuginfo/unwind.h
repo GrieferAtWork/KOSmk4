@@ -17,45 +17,43 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_UNWIND_H
-#define GUARD_LIBUNWIND_UNWIND_H 1
+#ifndef GUARD_LIBDEBUGINFO_UNWIND_H
+#define GUARD_LIBDEBUGINFO_UNWIND_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
-#include <stdbool.h>
-
-#include <libunwind/unwind.h>
+#include <libdebuginfo/unwind.h>
 
 DECL_BEGIN
 
-/* Lookup FDE information associated with a given program counter position.
- * Using integration with KOS's DL extension APIs, this function automatically
- * accesses the `.eh_frame' sections of the module associated with the given
- * address, as well as keep track of a lazily allocated address-tree of FDE
- * caches for quick (O(1)) repeated access to an FDE located within a known
- * function. */
-INTDEF NONNULL((2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_find)(void *absolute_pc,
-                                      unwind_fde_t *__restrict result);
-
-
-/* Top-level function for unwinding the specific register state, automatically
- * locating the associated FDE entry, before using it to unwind the specified
- * register state.
- * NOTE: The given `ABSOLUTE_PC' should point _to_ or _into_ the instruction that
- *       should be unwound; Not after it. - i.e. range checking is done as:
- *       `absolute_pc >= start && absolute_pc < end'
+/* Same as the regular unwind(3) (from libunwind.so), however (if configured),
+ * this one also handles the case where `ABSOLUTE_PC' points into user-space,
+ * allowing user-space text locations to be correctly unwound.
+ * NOTE: This function should only be used when printing tracebacks for
+ *       debugging purposes, but _NEVER_ for the purpose of something
+ *       like exception unwinding!
+ * To improve the success-rate of unwinding, this function does a number of things:
+ *   - Try to make use of the regular, old `unwind(3)' from `libunwind.so'
+ *   - Make use of DWARF `.debug_frame' debug information (if present)
+ *   - Inspect/emulate the underlying program text to detect patterns
+ *     that lead to known return instructions. Though this is only done
+ *     if implemented and supported for the hosting architecture.
+ * Also note that in kernel-space, once the kernel has been poisoned, no
+ * additional user-space module information can be loaded, and unwinding
+ * for user-space location for which the kernel doesn't already know how
+ * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTDEF NONNULL((2, 4)) unsigned int CC
-linuw_unwind(void *absolute_pc,
-             unwind_getreg_t reg_getter, void const *reg_getter_arg,
-             unwind_setreg_t reg_setter, void *reg_setter_arg);
+libdi_unwind_for_debug(void *absolute_pc,
+                       unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                       unwind_setreg_t reg_setter, void *reg_setter_arg);
 
 
 DECL_END
 
-#endif /* !GUARD_LIBUNWIND_UNWIND_H */
+#endif /* !GUARD_LIBDEBUGINFO_UNWIND_H */

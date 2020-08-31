@@ -102,32 +102,10 @@ typedef __ATTR_NONNULL((2, 4)) unsigned int
                         unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind)(void *__absolute_pc,
-                                   unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
-                                   unwind_setreg_t __reg_setter, void *__reg_setter_arg);
+(LIBUNWIND_CC unwind)(void *__absolute_pc,
+                      unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
+                      unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
-
-#ifdef __KERNEL__
-/* Same as the regular unwind, however (if configured), this one also handles
- * the case where `ABSOLUTE_PC' points into user-space, allowing user-space
- * text locations to be correctly unwound.
- * NOTE: This function should only be used when printing tracebacks for debugging
- *       purposes, but _NEVER_ for the purpose of something like exception unwinding!
- * Also note that once the kernel has been poisoned, no additional user-space module
- * information can be loaded, and unwinding for user-space location for which the
- * kernel doesn't already know how to unwind them will fail with `UNWIND_NO_FRAME'.
- * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-typedef __ATTR_NONNULL((2, 4)) unsigned int
-(LIBUNWIND_CC *PUNWIND_FOR_DEBUG)(void *__absolute_pc,
-                                  unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
-                                  unwind_setreg_t __reg_setter, void *__reg_setter_arg);
-#ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind_for_debug)(void *__absolute_pc,
-                                             unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
-                                             unwind_setreg_t __reg_setter, void *__reg_setter_arg);
-#endif /* LIBUNWIND_WANT_PROTOTYPES */
-#endif /* __KERNEL__ */
 
 __DECL_END
 #endif /* __CC__ */

@@ -31,6 +31,7 @@
 
 #include <stdbool.h>
 
+#include <libdebuginfo/api.h> /* LIBDEBUGINFO_CC_IS_LIBUNWIND_CC */
 #include <libunwind/unwind.h>
 
 #include "eh_frame.h"
@@ -106,10 +107,10 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
  *       should be unwound; Not after it. - i.e. range checking is done as:
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-INTERN NONNULL((2, 4)) unsigned int
-NOTHROW_NCX(CC linuw_unwind)(void *absolute_pc,
-                             unwind_getreg_t reg_getter, void const *reg_getter_arg,
-                             unwind_setreg_t reg_setter, void *reg_setter_arg) {
+INTERN NONNULL((2, 4)) unsigned int CC
+linuw_unwind(void *absolute_pc,
+             unwind_getreg_t reg_getter, void const *reg_getter_arg,
+             unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;
 	unwind_fde_t fde;
 	unwind_cfa_state_t cfa;
@@ -130,14 +131,12 @@ done:
 
 DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
 
-/* TODO: unwind_for_debug() should also exist in user-space, where it
- *       should scan the .debug_frame section in addition to .eh_frame!
- *       Note though, that the user-space version of this function should
- *       be exported from libdebuginfo.so, rather than libunwind.so! */
+/* In certain configurations, the kernel's `unwind_for_debug(3)'
+ * is identical to its regular, old `unwind(3)' function. */
 #ifdef __KERNEL__
-#ifndef CONFIG_HAVE_USERMOD
+#if !defined(CONFIG_HAVE_USERMOD) && defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
 DEFINE_PUBLIC_ALIAS(unwind_for_debug, linuw_unwind);
-#endif /* !CONFIG_HAVE_USERMOD */
+#endif /* !CONFIG_HAVE_USERMOD && LIBDEBUGINFO_CC_IS_LIBUNWIND_CC */
 #endif /* __KERNEL__ */
 
 

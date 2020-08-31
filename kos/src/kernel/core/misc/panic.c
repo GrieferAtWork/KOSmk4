@@ -59,6 +59,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stddef.h>
 #include <string.h>
 
+#include <libdebuginfo/unwind.h>
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
 

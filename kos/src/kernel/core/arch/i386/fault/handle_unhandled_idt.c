@@ -48,6 +48,7 @@
 
 #include <libinstrlen/instrlen.h>
 #include <libregdump/cpu-state.h>
+#include <libdebuginfo/unwind.h>
 #include <libregdump/x86.h>
 #include <libunwind/unwind.h>
 

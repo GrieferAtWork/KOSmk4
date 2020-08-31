@@ -30,6 +30,10 @@
 
 DECL_BEGIN
 
+#ifndef FCALL
+#define FCALL __FCALL
+#endif /* !FCALL */
+
 struct assert_args {
 	va_list          aa_args;    /* Variable arguments for `aa_format' */
 	struct kcpustate aa_state;   /* CPU state pointing after the call to an assertion handler function */
@@ -41,11 +45,11 @@ struct assert_args {
 };
 
 /* Core undefined-behavior handlers. (called from assembly) */
-INTDEF ATTR_NOINLINE ATTR_NORETURN void __FCALL libc_assertion_failure_core(struct assert_args *__restrict args);
-INTDEF ATTR_NOINLINE ATTR_NORETURN void __FCALL libc_stack_failure_core(struct kcpustate *__restrict state);
-INTDEF ATTR_NOINLINE ATTR_NORETURN void __FCALL libc_abort_failure_core(struct kcpustate *__restrict state);
+INTDEF ATTR_NOINLINE ATTR_NORETURN void FCALL libc_assertion_failure_core(struct assert_args *__restrict args);
+INTDEF ATTR_NOINLINE ATTR_NORETURN void FCALL libc_stack_failure_core(struct kcpustate *__restrict state);
+INTDEF ATTR_NOINLINE ATTR_NORETURN void FCALL libc_abort_failure_core(struct kcpustate *__restrict state);
 #ifdef __KERNEL__
-INTDEF ATTR_NOINLINE struct kcpustate *__FCALL libc_assertion_check_core(struct assert_args *__restrict args);
+INTDEF ATTR_NOINLINE struct kcpustate *FCALL libc_assertion_check_core(struct assert_args *__restrict args);
 #endif /* __KERNEL__ */
 
 

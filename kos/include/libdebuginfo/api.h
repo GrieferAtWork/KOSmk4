@@ -29,6 +29,9 @@
 #define LIBDEBUGINFO_CC /* nothing */
 #endif
 
+/* Feature test macro: `LIBUNWIND_CC' and `LIBDEBUGINFO_CC' are the same. */
+#define LIBDEBUGINFO_CC_IS_LIBUNWIND_CC 1
+
 #if !defined(LIBDEBUGINFO_WANT_PROTOTYPES) && \
      defined(__KOS__) && defined(__KERNEL__)
 #define LIBDEBUGINFO_WANT_PROTOTYPES 1
