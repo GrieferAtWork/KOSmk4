@@ -150,8 +150,17 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 {
 	unsigned int result;
 	struct lcpustate ost, st;
-	if unlikely((int)size < 0)
-		return libc_seterrno(EINVAL);
+	if ((int)size <= 1) {
+		if unlikely((int)size < 0)
+			return libc_seterrno(EINVAL);
+		if (!size)
+			return 0; /* Nothing to do here :) */
+		if (size == 1) {
+			/* Simple: Just use `__builtin_return_address()' */
+			array[0] = __builtin_return_address(0);
+			return 1;
+		}
+	}
 	if (!ENSURE_LIBUNWIND_LOADED() || !init_libdebuginfo())
 		return libc_seterrno(ENOENT);
 	lcpustate_current(&st);
