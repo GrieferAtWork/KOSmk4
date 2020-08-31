@@ -73,7 +73,10 @@ ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
 			thread = pidns_trylookup_task(THIS_PIDNS, pid);
 			if likely(thread) {
 				REF struct handle_manager *hman;
-				hman = task_gethandlemanager(thread);
+				{
+					FINALLY_DECREF_UNLIKELY(thread);
+					hman = task_gethandlemanager(thread);
+				}
 				FINALLY_DECREF_UNLIKELY(hman);
 				if (handle_existsin(fdno, hman)) {
 					REF struct directory_entry *result;
@@ -124,60 +127,64 @@ ProcFS_PerProc_Fd_Enum(struct directory_node *__restrict self,
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		return;
-	FINALLY_DECREF_UNLIKELY(thread);
-	hman = task_gethandlemanager(thread);
-	FINALLY_DECREF_UNLIKELY(hman);
-	sync_read(&hman->hm_lock);
-	if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
-		unsigned int i;
-		for (i = 0; i < hman->hm_linear.hm_alloc; ++i) {
-			if (hman->hm_linear.hm_vector[i].h_type == HANDLE_TYPE_UNDEFINED)
-				continue;
-			if (buflen >= COMPILER_LENOF(buf)) {
-				sync_endread(&hman->hm_lock);
-				while (buflen) {
-					--buflen;
-					enum_fd(callback, arg, pid, buf[buflen]);
-				}
-				enum_fd(callback, arg, pid, i);
-				buflen = 0;
-				sync_read(&hman->hm_lock);
-				COMPILER_READ_BARRIER();
-				if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR)
-					continue;
-				break;
-			}
-			buf[buflen] = i;
-			++buflen;
-		}
-	} else {
-		unsigned int i;
-		for (i = 0; i <= hman->hm_hashvector.hm_hashmsk; ++i) {
-			unsigned int fd;
-			fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
-			if (fd == HANDLE_HASHENT_SENTINEL_ID)
-				continue; /* Unused / Sentinel */
-			if (hman->hm_hashvector.hm_hashvec[i].hh_vector_index == (unsigned int)-1)
-				continue; /* Deleted */
-			if (buflen >= COMPILER_LENOF(buf)) {
-				sync_endread(&hman->hm_lock);
-				while (buflen) {
-					--buflen;
-					enum_fd(callback, arg, pid, buf[buflen]);
-				}
-				enum_fd(callback, arg, pid, fd);
-				buflen = 0;
-				sync_read(&hman->hm_lock);
-				COMPILER_READ_BARRIER();
-				if (hman->hm_mode != HANDLE_MANAGER_MODE_LINEAR)
-					continue;
-				break;
-			}
-			buf[buflen] = fd;
-			++buflen;
-		}
+	{
+		FINALLY_DECREF_UNLIKELY(thread);
+		hman = task_gethandlemanager(thread);
 	}
-	sync_endread(&hman->hm_lock);
+	{
+		FINALLY_DECREF_UNLIKELY(hman);
+		sync_read(&hman->hm_lock);
+		if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+			unsigned int i;
+			for (i = 0; i < hman->hm_linear.hm_alloc; ++i) {
+				if (hman->hm_linear.hm_vector[i].h_type == HANDLE_TYPE_UNDEFINED)
+					continue;
+				if (buflen >= COMPILER_LENOF(buf)) {
+					sync_endread(&hman->hm_lock);
+					while (buflen) {
+						--buflen;
+						enum_fd(callback, arg, pid, buf[buflen]);
+					}
+					enum_fd(callback, arg, pid, i);
+					buflen = 0;
+					sync_read(&hman->hm_lock);
+					COMPILER_READ_BARRIER();
+					if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR)
+						continue;
+					break;
+				}
+				buf[buflen] = i;
+				++buflen;
+			}
+		} else {
+			unsigned int i;
+			for (i = 0; i <= hman->hm_hashvector.hm_hashmsk; ++i) {
+				unsigned int fd;
+				fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
+				if (fd == HANDLE_HASHENT_SENTINEL_ID)
+					continue; /* Unused / Sentinel */
+				if (hman->hm_hashvector.hm_hashvec[i].hh_vector_index == (unsigned int)-1)
+					continue; /* Deleted */
+				if (buflen >= COMPILER_LENOF(buf)) {
+					sync_endread(&hman->hm_lock);
+					while (buflen) {
+						--buflen;
+						enum_fd(callback, arg, pid, buf[buflen]);
+					}
+					enum_fd(callback, arg, pid, fd);
+					buflen = 0;
+					sync_read(&hman->hm_lock);
+					COMPILER_READ_BARRIER();
+					if (hman->hm_mode != HANDLE_MANAGER_MODE_LINEAR)
+						continue;
+					break;
+				}
+				buf[buflen] = fd;
+				++buflen;
+			}
+		}
+		sync_endread(&hman->hm_lock);
+	}
 	while (buflen) {
 		--buflen;
 		enum_fd(callback, arg, pid, buf[buflen]);
@@ -214,6 +221,7 @@ ProcFS_PerProc_Fd_Entry_Readlink(struct symlink_node *__restrict self,
 	upid_t pid;
 	unsigned int fdno;
 	REF struct task *thread;
+	REF struct handle_manager *hman;
 	REF struct handle hnd;
 	pid  = (upid_t)(self->i_fileino & PROCFS_INOTYPE_FD_PIDMASK);
 	fdno = (unsigned int)((self->i_fileino & PROCFS_INOTYPE_FD_FDMASK) >> PROCFS_INOTYPE_FD_FDSHIFT);
@@ -222,25 +230,24 @@ ProcFS_PerProc_Fd_Entry_Readlink(struct symlink_node *__restrict self,
 		goto err;
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		{
-			REF struct handle_manager *hman;
-			hman = task_gethandlemanager(thread);
-			FINALLY_DECREF_UNLIKELY(hman);
-			hnd = handle_lookupin(fdno, hman);
-		}
-		TRY {
-			struct format_snprintf_data data;
-			data.sd_buffer = buf;
-			data.sd_bufsiz = bufsize;
-			result = (size_t)handle_print(&hnd,
-			                              &format_snprintf_printer,
-			                              &data);
-		} EXCEPT {
-			decref_unlikely(hnd);
-			RETHROW();
-		}
-		decref_unlikely(hnd);
+		hman = task_gethandlemanager(thread);
 	}
+	{
+		FINALLY_DECREF_UNLIKELY(hman);
+		hnd = handle_lookupin(fdno, hman);
+	}
+	TRY {
+		struct format_snprintf_data data;
+		data.sd_buffer = buf;
+		data.sd_bufsiz = bufsize;
+		result = (size_t)handle_print(&hnd,
+		                              &format_snprintf_printer,
+		                              &data);
+	} EXCEPT {
+		decref_unlikely(hnd);
+		RETHROW();
+	}
+	decref_unlikely(hnd);
 	return result;
 err:
 	return snprintf(buf, bufsize, "anon_inode:[?]");
@@ -263,10 +270,14 @@ ProcFS_PerProc_Fd_Entry_Open(struct inode *__restrict self,
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		THROW(E_NO_SUCH_PROCESS, pid);
-	FINALLY_DECREF_UNLIKELY(thread);
-	hman = task_gethandlemanager(thread);
-	FINALLY_DECREF_UNLIKELY(hman);
-	result = handle_lookupin(fdno, hman);
+	{
+		FINALLY_DECREF_UNLIKELY(thread);
+		hman = task_gethandlemanager(thread);
+	}
+	{
+		FINALLY_DECREF_UNLIKELY(hman);
+		result = handle_lookupin(fdno, hman);
+	}
 	return result;
 }
 
