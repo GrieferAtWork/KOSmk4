@@ -443,7 +443,6 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 		cpu_assert_integrity();
 		mine->vkpo_exec = (vm_kernel_pending_cb_t)&task_destroy_raw_impl;
 		cpu_assert_integrity();
-		task_destroy_raw_impl;
 		do {
 			next = ATOMIC_READ(vm_kernel_pending_operations);
 			mine->vkpo_next = next;

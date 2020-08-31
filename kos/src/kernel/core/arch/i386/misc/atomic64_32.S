@@ -134,11 +134,11 @@ END(__i386_atomic64_write)
 PUBLIC_FUNCTION(__i386_atomic64_cmpxch)
 	/* >> __i386_atomic64_cmpxch
 	 * IN:      %edi = (atomic64_t *)self
-	 *          %eax = (u32)(oldval & 0xffffffff)
+	 *          %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
-	 *          %ebx = (u32)(newval & 0xffffffff)
+	 *          %ebx = (u32)(newval & 0x00000000ffffffff)
 	 *          %ecx = (u32)(newval & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0xffffffff)
+	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0x00000000ffffffff)
 	 *          %edx = (u32)(REAL_OLD_VALUE & 0xffffffff00000000) >> 32
 	 *          %eflags.ZF = (REAL_OLD_VALUE == oldval) ? 1 : 0
 	 * CLOBBER: %eflags\ZF */
@@ -188,7 +188,7 @@ PUBLIC_FUNCTION(__i386_atomic64_xch)
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(value & 0xffffffff)
 	 *          %ecx = (u32)(value & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags */
 	LOCK(%eax)
@@ -206,7 +206,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchadd)
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	LOCK(%eax)
@@ -229,7 +229,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchand)
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	LOCK(%eax)
@@ -252,7 +252,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchor)
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	LOCK(%eax)
@@ -275,7 +275,7 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchxor)
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	LOCK(%eax)
@@ -293,6 +293,40 @@ PUBLIC_FUNCTION(__i386_atomic64_fetchxor)
 END(__i386_atomic64_fetchxor)
 
 .cfi_endproc
+
+
+.section .text.cold
+/* Because gcc refuses to properly compile the inline-assembly wrappers
+ * when not building with __OPTIMIZE__, we need to provide a C-ABI compatible
+ * wrapper. (ugh...) */
+.cfi_startproc
+/* Atomically compare-exchange a 64-bit data word from `self' */
+PUBLIC_FUNCTION(atomic64_cmpxch_val)
+	/* >> __i386_atomic64_cmpxch
+	 * IN:       4(%esp) = self
+	 *           8(%esp) = (oldval & 0x00000000ffffffff)
+	 *          12(%esp) = (oldval & 0xffffffff00000000) >> 32
+	 *          16(%esp) = (newval & 0x00000000ffffffff)
+	 *          20(%esp) = (newval & 0xffffffff00000000) >> 32
+	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0x00000000ffffffff)
+	 *          %edx = (u32)(REAL_OLD_VALUE & 0xffffffff00000000) >> 32
+	 *          %eflags.ZF = (REAL_OLD_VALUE == oldval) ? 1 : 0
+	 * CLOBBER: %ecx, %eflags\ZF */
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebx
+	movl   (8 +  4)(%esp), %edi /* (atomic64_t *)self */
+	movl   (8 +  8)(%esp), %eax /* (oldval & 0x00000000ffffffff) */
+	movl   (8 + 12)(%esp), %edx /* (oldval & 0xffffffff00000000) >> 32 */
+	movl   (8 + 16)(%esp), %ebx /* (newval & 0x00000000ffffffff) */
+	movl   (8 + 20)(%esp), %ecx /* (newval & 0xffffffff00000000) >> 32 */
+	EXTERN(__i386_atomic64_cmpxch)
+	call   __i386_atomic64_cmpxch
+	popl_cfi_r %ebx
+	popl_cfi_r %edi
+	ret    $(20)
+END(atomic64_cmpxch_val)
+.cfi_endproc
+
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_ATOMIC64_32_S */

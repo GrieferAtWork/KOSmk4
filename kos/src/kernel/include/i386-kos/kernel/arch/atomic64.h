@@ -65,7 +65,7 @@ typedef u64 atomic64_t;
 
 /* Atomically read a 64-bit data word from `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u64
-NOTHROW(FCALL atomic64_read)(atomic64_t const *__restrict self) {
+NOTHROW(atomic64_read)(atomic64_t const *__restrict self) {
 	__register u64 __eax_edx;
 	__register u32 __ecx, __ebx;
 	/* >> __i386_atomic64_read
@@ -85,7 +85,7 @@ NOTHROW(FCALL atomic64_read)(atomic64_t const *__restrict self) {
 
 /* Atomically write a 64-bit data word to `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) void
-NOTHROW(FCALL atomic64_write)(atomic64_t *__restrict self, u64 value) {
+NOTHROW(atomic64_write)(atomic64_t *__restrict self, u64 value) {
 	__register u32 __eax;
 	__register u32 __edx;
 	/* >> __i386_atomic64_write
@@ -105,44 +105,17 @@ NOTHROW(FCALL atomic64_write)(atomic64_t *__restrict self, u64 value) {
 }
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
-NOTHROW(FCALL atomic64_cmpxch)(atomic64_t *__restrict self,
-                               u64 oldval, u64 newval) {
-	/* >> __i386_atomic64_cmpxch
-	 * IN:      %edi = (atomic64_t *)self
-	 *          %eax = (u32)(oldval & 0xffffffff)
-	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
-	 *          %ebx = (u32)(newval & 0xffffffff)
-	 *          %ecx = (u32)(newval & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0xffffffff)
-	 *          %edx = (u32)(REAL_OLD_VALUE & 0xffffffff00000000) >> 32
-	 *          %eflags.ZF = (REAL_OLD_VALUE == oldval) ? 1 : 0
-	 * CLOBBER: %eflags\ZF */
-	__register u64 __eax_edx;
-	__BOOL __res;
-	__asm__("call __i386_atomic64_cmpxch"
-	        : "=A" (__eax_edx)
-	        , "=@cce" (__res)
-	        , "+m" (__atomic64_val(*self))
-	        : "D" (self)
-	        , "0" (oldval)
-	        , "b" ((u32)(newval))
-	        , "c" ((u32)(newval >> 32))
-	        : "cc");
-	return __res;
-}
-
-/* Atomically compare-exchange a 64-bit data word from `self' */
+#ifdef __OPTIMIZE__
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_cmpxch_val)(atomic64_t *__restrict self,
-                                   u64 oldval, u64 newval) {
+NOTHROW(atomic64_cmpxch_val)(atomic64_t *__restrict self,
+                             u64 oldval, u64 newval) {
 	/* >> __i386_atomic64_cmpxch
 	 * IN:      %edi = (atomic64_t *)self
-	 *          %eax = (u32)(oldval & 0xffffffff)
+	 *          %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
-	 *          %ebx = (u32)(newval & 0xffffffff)
+	 *          %ebx = (u32)(newval & 0x00000000ffffffff)
 	 *          %ecx = (u32)(newval & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0xffffffff)
+	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0x00000000ffffffff)
 	 *          %edx = (u32)(REAL_OLD_VALUE & 0xffffffff00000000) >> 32
 	 *          %eflags.ZF = (REAL_OLD_VALUE == oldval) ? 1 : 0
 	 * CLOBBER: %eflags\ZF */
@@ -157,18 +130,58 @@ NOTHROW(FCALL atomic64_cmpxch_val)(atomic64_t *__restrict self,
 	        : "cc");
 	return __eax_edx;
 }
+#else /* __OPTIMIZE__ */
+/* Because gcc refuses to properly compile the inline-assembly wrappers
+ * when not building with __OPTIMIZE__, we need to link a C-ABI
+ * compatible wrapper instead. (ugh...) */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+NOTHROW(KCALL atomic64_cmpxch_val)(atomic64_t *__restrict self,
+                                   u64 oldval, u64 newval);
+#endif /* !__OPTIMIZE__ */
 
+/* Atomically compare-exchange a 64-bit data word from `self' */
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) __BOOL
+NOTHROW(atomic64_cmpxch)(atomic64_t *__restrict self,
+                         u64 oldval, u64 newval) {
+	/* >> __i386_atomic64_cmpxch
+	 * IN:      %edi = (atomic64_t *)self
+	 *          %eax = (u32)(oldval & 0x00000000ffffffff)
+	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
+	 *          %ebx = (u32)(newval & 0x00000000ffffffff)
+	 *          %ecx = (u32)(newval & 0xffffffff00000000) >> 32
+	 * OUT:     %eax = (u32)(REAL_OLD_VALUE & 0x00000000ffffffff)
+	 *          %edx = (u32)(REAL_OLD_VALUE & 0xffffffff00000000) >> 32
+	 *          %eflags.ZF = (REAL_OLD_VALUE == oldval) ? 1 : 0
+	 * CLOBBER: %eflags\ZF */
+	__register u64 __eax_edx;
+	__BOOL __res;
+#ifdef __OPTIMIZE__
+	__asm__("call __i386_atomic64_cmpxch"
+	        : "=A" (__eax_edx)
+	        , "=@cce" (__res)
+	        , "+m" (__atomic64_val(*self))
+	        : "D" (self)
+	        , "0" (oldval)
+	        , "b" ((u32)(newval))
+	        , "c" ((u32)(newval >> 32))
+	        : "cc");
+#else /* __OPTIMIZE__ */
+	__eax_edx = atomic64_cmpxch_val(self, oldval, newval);
+	__res     = __eax_edx == oldval;
+#endif /* !__OPTIMIZE__ */
+	return __res;
+}
 
 /* Atomically exchange a 64-bit data word from `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_xch)(atomic64_t *__restrict self,
-                            u64 addend) {
+NOTHROW(atomic64_xch)(atomic64_t *__restrict self,
+                      u64 addend) {
 	__register u64 __eax_edx;
 	/* >> __i386_atomic64_xch
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags */
 	__asm__("call __i386_atomic64_xch"
@@ -183,8 +196,8 @@ NOTHROW(FCALL atomic64_xch)(atomic64_t *__restrict self,
 
 /* Atomically fetch-and-add a 64-bit data word from `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchadd)(atomic64_t *__restrict self,
-                                 u64 addend) {
+NOTHROW(atomic64_fetchadd)(atomic64_t *__restrict self,
+                           u64 addend) {
 	__register u64 __eax_edx;
 	__register u32 __ebx;
 	__register u32 __ecx;
@@ -192,7 +205,7 @@ NOTHROW(FCALL atomic64_fetchadd)(atomic64_t *__restrict self,
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	__asm__("call __i386_atomic64_fetchadd"
@@ -209,8 +222,8 @@ NOTHROW(FCALL atomic64_fetchadd)(atomic64_t *__restrict self,
 
 /* Atomically fetch-and-and a 64-bit data word from `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchand)(atomic64_t *__restrict self,
-                                 u64 addend) {
+NOTHROW(atomic64_fetchand)(atomic64_t *__restrict self,
+                           u64 addend) {
 	__register u64 __eax_edx;
 	__register u32 __ebx;
 	__register u32 __ecx;
@@ -218,7 +231,7 @@ NOTHROW(FCALL atomic64_fetchand)(atomic64_t *__restrict self,
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	__asm__("call __i386_atomic64_fetchand"
@@ -235,8 +248,8 @@ NOTHROW(FCALL atomic64_fetchand)(atomic64_t *__restrict self,
 
 /* Atomically fetch-and-or a 64-bit data word from `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchor)(atomic64_t *__restrict self,
-                                u64 addend) {
+NOTHROW(atomic64_fetchor)(atomic64_t *__restrict self,
+                          u64 addend) {
 	__register u64 __eax_edx;
 	__register u32 __ebx;
 	__register u32 __ecx;
@@ -244,7 +257,7 @@ NOTHROW(FCALL atomic64_fetchor)(atomic64_t *__restrict self,
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	__asm__("call __i386_atomic64_fetchor"
@@ -261,8 +274,8 @@ NOTHROW(FCALL atomic64_fetchor)(atomic64_t *__restrict self,
 
 /* Atomically fetch-and-xor a 64-bit data word from `self' */
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_LEAF NONNULL((1)) u64
-NOTHROW(FCALL atomic64_fetchxor)(atomic64_t *__restrict self,
-                                 u64 addend) {
+NOTHROW(atomic64_fetchxor)(atomic64_t *__restrict self,
+                           u64 addend) {
 	__register u64 __eax_edx;
 	__register u32 __ebx;
 	__register u32 __ecx;
@@ -270,7 +283,7 @@ NOTHROW(FCALL atomic64_fetchxor)(atomic64_t *__restrict self,
 	 * IN:      %edi = (atomic64_t *)self
 	 *          %ebx = (u32)(addend & 0xffffffff)
 	 *          %ecx = (u32)(addend & 0xffffffff00000000) >> 32
-	 * OUT:     %eax = (u32)(oldval & 0xffffffff)
+	 * OUT:     %eax = (u32)(oldval & 0x00000000ffffffff)
 	 *          %edx = (u32)(oldval & 0xffffffff00000000) >> 32
 	 * CLOBBER: %eflags, %ebx, %ecx */
 	__asm__("call __i386_atomic64_fetchxor"
