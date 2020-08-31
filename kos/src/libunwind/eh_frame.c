@@ -47,6 +47,12 @@
 #include <dlfcn.h>
 #endif /* !__KERNEL__ */
 
+/* Relaxed CFA rules aren't currently needed (and as
+ * a matter of fact: aren't anything that you'll find
+ * apart of any standard. - I only though this is how
+ * CFA was supposed to work at one point...) */
+#undef CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES
+
 DECL_BEGIN
 
 #undef CONFIG_NO_CFA_SIGFRAME_STATE
@@ -57,9 +63,11 @@ DECL_BEGIN
 
 
 #ifndef __INTELLISENSE__
+#undef DEBUG_FRAME /* Build the .eh_frame parser! */
 DECL_END
 #define FIND_SPECIFIC_ADDRESS
 #include "eh_frame-find_fde.c.inl"
+/**/
 #include "eh_frame-find_fde.c.inl"
 
 #define EH_FRAME_FDE_EXEC_CFA_STATE 1

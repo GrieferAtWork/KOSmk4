@@ -47,6 +47,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <libdebuginfo/debug_frame.h> /* unwind_fde_scan_df() */
 #include <libunwind/unwind.h>
 
 #include "vm-nodeapi.h"
@@ -1127,6 +1128,75 @@ getusermod(USER void *addr,
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
 
+LOCAL NONNULL((1, 5, 7)) unsigned int LIBUNWIND_CC
+unwind_userspace_with_section(struct usermod *__restrict um, void *absolute_pc,
+                              void *eh_frame_data, size_t eh_frame_size,
+                              unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                              unwind_setreg_t reg_setter, void *reg_setter_arg,
+                              bool is_debug_frame) {
+	unsigned int result;
+	REF struct vm *oldvm;
+	oldvm = incref(THIS_VM);
+	TRY {
+		/* Must switch VM to the one of `um' in order to get user-space memory
+		 * into the expected state for the unwind handler to do its thing. */
+		if (oldvm != um->um_vm)
+			task_setvm(um->um_vm);
+		TRY {
+			unwind_fde_t fde;
+			/* NOTE: We use the user-space's mapping of the .eh_frame section here,
+			 *       since `.eh_frame' often uses pointer encodings that are relative
+			 *       to the .eh_frame-section itself, meaning that in order to properly
+			 *       decode the contained information, its mapping must be placed at
+			 *       the correct location.
+			 * Another alternative to fixing this would be to add a load-offset argument
+			 * to `dwarf_decode_pointer()', as well as recursively all of the eh_frame-
+			 * related functions that somehow make use of it, where this argument then
+			 * describes the offset from the .eh_frame that was loaded, towards the one
+			 * that would actually exist for user-space.
+			 * However the added complexity it's worth it for this one special case, and
+			 * since we already have to switch VM to the user-space's one in order to
+			 * restore registers that were spilled onto the stack, we might as well also
+			 * make use of the actual `.eh_frame' section (assuming that it is where it
+			 * should be) */
+			if (is_debug_frame) {
+				result = unwind_fde_scan_df((byte_t *)eh_frame_data,
+				                            (byte_t *)eh_frame_data + eh_frame_size,
+				                            absolute_pc,
+				                            &fde,
+				                            usermod_sizeof_pointer(um));
+			} else {
+				result = unwind_fde_scan((byte_t *)eh_frame_data,
+				                         (byte_t *)eh_frame_data + eh_frame_size,
+				                         absolute_pc,
+				                         &fde,
+				                         usermod_sizeof_pointer(um));
+			}
+			if (result == UNWIND_SUCCESS) {
+				/* Found the FDE. - Now to execute it's program! */
+				unwind_cfa_state_t cfa;
+				result = unwind_fde_exec(&fde, &cfa, absolute_pc);
+				if unlikely(result == UNWIND_SUCCESS) {
+					/* And finally: Apply register modifications. */
+					result = unwind_cfa_apply(&cfa, &fde, absolute_pc,
+					                          reg_getter, reg_getter_arg,
+					                          reg_setter, reg_setter_arg);
+				}
+			}
+		} EXCEPT {
+			if (oldvm != um->um_vm)
+				task_setvm(oldvm);
+			RETHROW();
+		}
+		if (oldvm != um->um_vm)
+			task_setvm(oldvm);
+	} EXCEPT {
+		decref_unlikely(oldvm);
+		RETHROW();
+	}
+	decref_unlikely(oldvm);
+	return result;
+}
 
 PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unsigned int LIBUNWIND_CC
 unwind_userspace(void *absolute_pc,
@@ -1170,58 +1240,12 @@ unwind_userspace(void *absolute_pc,
 	 * those thrown by the callback's we've been given) must be propagated
 	 * normally. */
 	TRY {
-		REF struct vm *oldvm;
-		oldvm = incref(THIS_VM);
-		TRY {
-			/* Must switch VM to the one of `um' in order to get user-space memory
-			 * into the expected state for the unwind handler to do its thing. */
-			if (oldvm != um->um_vm)
-				task_setvm(um->um_vm);
-			TRY {
-				unwind_fde_t fde;
-				/* NOTE: We use the user-space's mapping of the .eh_frame section here,
-				 *       since `.eh_frame' often uses pointer encodings that are relative
-				 *       to the .eh_frame-section itself, meaning that in order to properly
-				 *       decode the contained information, its mapping must be placed at
-				 *       the correct location.
-				 * Another alternative to fixing this would be to add a load-offset argument
-				 * to `dwarf_decode_pointer()', as well as recursively all of the eh_frame-
-				 * related functions that somehow make use of it, where this argument then
-				 * describes the offset from the .eh_frame that was loaded, towards the one
-				 * that would actually exist for user-space.
-				 * However the added complexity it's worth it for this one special case, and
-				 * since we already have to switch VM to the user-space's one in order to
-				 * restore registers that were spilled onto the stack, we might as well also
-				 * make use of the actual `.eh_frame' section (assuming that it is where it
-				 * should be) */
-				result = unwind_fde_scan((byte_t *)eh_frame->us_udata,
-				                         (byte_t *)eh_frame->us_udata + eh_frame->us_size,
-				                         absolute_pc,
-				                         &fde,
-				                         usermod_sizeof_pointer(um));
-				if (result == UNWIND_SUCCESS) {
-					/* Found the FDE. - Now to execute it's program! */
-					unwind_cfa_state_t cfa;
-					result = unwind_fde_exec(&fde, &cfa, absolute_pc);
-					if unlikely(result == UNWIND_SUCCESS) {
-						/* And finally: Apply register modifications. */
-						result = unwind_cfa_apply(&cfa, &fde, absolute_pc,
-						                          reg_getter, reg_getter_arg,
-						                          reg_setter, reg_setter_arg);
-					}
-				}
-			} EXCEPT {
-				if (oldvm != um->um_vm)
-					task_setvm(oldvm);
-				RETHROW();
-			}
-			if (oldvm != um->um_vm)
-				task_setvm(oldvm);
-		} EXCEPT {
-			decref_unlikely(oldvm);
-			RETHROW();
-		}
-		decref_unlikely(oldvm);
+		result = unwind_userspace_with_section(um, absolute_pc,
+		                                       eh_frame->us_udata,
+		                                       eh_frame->us_size,
+		                                       reg_getter, reg_getter_arg,
+		                                       reg_setter, reg_setter_arg,
+		                                       false);
 	} EXCEPT {
 		decref_unlikely(eh_frame);
 		decref_unlikely(um);
@@ -1238,7 +1262,23 @@ done_um:
 		 * Also do this if .eh_frame wasn't enough. - Some programs can
 		 * end up having both an .eh_frame, _and_ a .debug_frame section,
 		 * but only .debug_frame actually contains what we need! */
-		/* TODO */
+		TRY {
+			eh_frame = usermod_section_lock(um, ".debug_frame",
+			                                DRIVER_SECTION_LOCK_FNORMAL);
+		} EXCEPT {
+			decref_unlikely(um);
+			goto restore_except;
+		}
+		if (eh_frame) {
+			void *cdata;
+			FINALLY_DECREF_UNLIKELY(eh_frame);
+			cdata  = usermod_section_cdata(eh_frame);
+			result = unwind_userspace_with_section(um, absolute_pc, cdata,
+			                                       eh_frame->us_csize,
+			                                       reg_getter, reg_getter_arg,
+			                                       reg_setter, reg_setter_arg,
+			                                       true);
+		}
 	}
 	decref_unlikely(um);
 done:

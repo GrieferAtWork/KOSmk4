@@ -478,8 +478,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      the unwind to-be considered successful.
 	 */
 
-	/* TODO: Add support for `.debug_frame' to `unwind_for_debug()' (both user- and kernel-space) */
-
 	/* TODO: Refactor <parts/xxx/errno.h> to use <asm/...>
 	 *       Similarly, <errno.h> should define errno codes using the usual
 	 *       #ifdef __<NAME>

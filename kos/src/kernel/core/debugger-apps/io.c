@@ -353,10 +353,14 @@ DBG_COMMAND(trace,
 	last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
 #if 0
-#define SP_ARGS  DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state)
+#define SP_ARGS DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state)
 #else
-#define SP_ARGS  NULL
+#define SP_ARGS NULL
 #endif
+	/* TODO: `instruction_trypred()' must be executed in the context of the VM
+	 *        of the currently selected thread! As such, these should be a special,
+	 *        dbg_*-specific version of this function (and it's friends), that
+	 *        loads its memory using `dbg_readmemory()'! */
 	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
 	                                                    instrlen_isa_from_fcpustate(&state)),
 	                     (uintptr_t)fcpustate_getpc(&state), SP_ARGS);

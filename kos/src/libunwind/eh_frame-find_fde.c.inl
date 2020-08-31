@@ -20,11 +20,17 @@
 #ifdef __INTELLISENSE__
 #include "eh_frame.c"
 #define FIND_SPECIFIC_ADDRESS 1
-#endif
+#endif /* !__INTELLISENSE__ */
 
-#include <string.h>
-#include <kos/kernel/types.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
+
+#include <kos/kernel/types.h>
+
+#include <stdint.h>
+#include <string.h>
+
+#include <libdebuginfo/dwarf.h>
 
 DECL_BEGIN
 
@@ -35,8 +41,15 @@ DECL_BEGIN
  * value written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
+#ifdef DEBUG_FRAME
+INTERN NONNULL((1, 2, 3, 4)) unsigned int
+#else /* DEBUG_FRAME */
 INTERN NONNULL((1, 2, 3)) unsigned int
+#endif /* !DEBUG_FRAME */
 NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
+#ifdef DEBUG_FRAME
+                                      byte_t *__restrict eh_frame_start,
+#endif /* DEBUG_FRAME */
                                       byte_t *__restrict eh_frame_end,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address)
@@ -54,16 +67,24 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict reader,
 #endif /* FIND_SPECIFIC_ADDRESS */
 {
 #ifndef FIND_SPECIFIC_ADDRESS
-	byte_t *eh_frame_start = *peh_frame_reader;
-	byte_t *reader         = eh_frame_start;
+	byte_t *reader = *peh_frame_reader;
+#ifndef DEBUG_FRAME
+	byte_t *eh_frame_start = reader;
+#endif /* DEBUG_FRAME */
 #else /* !FIND_SPECIFIC_ADDRESS */
 	byte_t *eh_frame_start = reader;
 #endif /* !FIND_SPECIFIC_ADDRESS */
 	byte_t *next_chunk;
 	byte_t *cie_reader, *fde_reader;
 	size_t length;
+#ifdef DEBUG_FRAME
+	uintptr_t cie_offset;
+#else /* DEBUG_FRAME */
 	uint32_t cie_offset;
+#endif /* !DEBUG_FRAME */
 	uint8_t enclsda;
+	uint8_t version;
+	uint8_t used_sizeof_address;
 	char *cie_augstr;
 	struct CIE *cie;
 again:
@@ -82,11 +103,31 @@ again:
 	if unlikely(!length)
 		ERROR(err_noframe);
 	next_chunk = reader + length;
+#ifdef DEBUG_FRAME
+#if __SIZEOF_POINTER__ >= 8
+	if (sizeof_address == 8) {
+		cie_offset = *(uint64_t *)reader; /* f_cieptr */
+		if (cie_offset == UINT64_C(0xffffffffffffffff))
+			goto do_next_chunk; /* This is a CIE, not an FDE */
+		fde_reader = reader + 8;
+	} else
+#endif /* __SIZEOF_POINTER__ >= 8 */
+	if (sizeof_address == 4) {
+		cie_offset = *(uint32_t *)reader; /* f_cieptr */
+		if (cie_offset == UINT32_C(0xffffffff))
+			goto do_next_chunk; /* This is a CIE, not an FDE */
+		fde_reader = reader + 4;
+	} else {
+		goto err_noframe;
+	}
+	cie = (struct CIE *)(eh_frame_start + cie_offset);
+#else /* DEBUG_FRAME */
 	cie_offset = *(uint32_t *)reader; /* f_cieptr */
 	if (cie_offset == 0)
 		goto do_next_chunk; /* This is a CIE, not an FDE */
-	cie        = (struct CIE *)(reader - cie_offset);
+	cie = (struct CIE *)(reader - cie_offset);
 	fde_reader = reader + 4;
+#endif /* !DEBUG_FRAME */
 	if unlikely(!((byte_t *)cie >= eh_frame_start &&
 	              (byte_t *)cie < eh_frame_end))
 		ERRORF(err_noframe, "cie=%p, eh_frame_start=%p, eh_frame_end=%p",
@@ -102,13 +143,27 @@ again:
 #endif /* __SIZEOF_POINTER__ <= 4 */
 	}
 	cie_reader += 4; /* c_cieid */
+	version = *(uint8_t *)cie_reader;
 	cie_reader += 1; /* c_version */
 	cie_augstr = (char *)cie_reader;
 	cie_reader = (byte_t *)strend(cie_augstr) + 1;
+	used_sizeof_address = sizeof_address;
+	if unlikely(version >= 4) {
+		/* uint8_t address_size; */
+		used_sizeof_address = *(uint8_t *)cie_reader;
+		cie_reader += 1;
+		/* uint8_t segment_selector_size; */
+		cie_reader += 1;
+	}
 	/* Read code and data alignments. */
 	result->f_codealign = dwarf_decode_uleb128(&cie_reader); /* c_codealignfac */
 	result->f_dataalign = dwarf_decode_sleb128(&cie_reader); /* c_dataalignfac */
-	result->f_retreg    = (unwind_regno_t)dwarf_decode_uleb128(&cie_reader); /* c_returnreg */
+	if unlikely(version == 1) {
+		result->f_retreg = *(uint8_t *)cie_reader;
+		cie_reader += 1;
+	} else {
+		result->f_retreg = (unwind_regno_t)dwarf_decode_uleb128(&cie_reader); /* c_returnreg */
+	}
 	/* Pointer encodings default to ZERO(0). */
 	result->f_encptr   = 0;
 	enclsda            = 0;
@@ -136,7 +191,7 @@ again:
 				encperso = *cie_reader++;
 				result->f_persofun = (void *)dwarf_decode_pointer(&cie_reader,
 				                                                  encperso,
-				                                                  sizeof_address,
+				                                                  used_sizeof_address,
 				                                                  0,
 				                                                  0,
 				                                                  0);
@@ -151,13 +206,13 @@ again:
 	}
 	result->f_pcstart = (void *)dwarf_decode_pointer(&fde_reader,
 	                                                 result->f_encptr,
-	                                                 sizeof_address,
+	                                                 used_sizeof_address,
 	                                                 0,
 	                                                 0,
 	                                                 0);
 	result->f_pcend = (void *)dwarf_decode_pointer(&fde_reader,
 	                                               result->f_encptr & 0xf,
-	                                               sizeof_address,
+	                                               used_sizeof_address,
 	                                               0,
 	                                               0,
 	                                               (uintptr_t)result->f_pcstart);
@@ -199,7 +254,7 @@ again:
 					break;
 				result->f_lsdaaddr = (void *)dwarf_decode_pointer(&fde_reader,
 				                                                  enclsda,
-				                                                  sizeof_address,
+				                                                  used_sizeof_address,
 				                                                  0,
 				                                                  0,
 				                                                  (uintptr_t)result->f_pcstart);
@@ -211,7 +266,7 @@ again:
 	}
 	result->f_evaltext    = fde_reader;
 	result->f_evaltextend = next_chunk;
-	result->f_addrsize    = sizeof_address;
+	result->f_addrsize    = used_sizeof_address;
 #ifndef FIND_SPECIFIC_ADDRESS
 	*peh_frame_reader = next_chunk;
 #endif /* FIND_SPECIFIC_ADDRESS */

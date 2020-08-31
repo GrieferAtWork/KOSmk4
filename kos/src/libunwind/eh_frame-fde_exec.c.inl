@@ -743,8 +743,16 @@ skip_expression:
 			CASE(DW_CFA_def_cfa_register) {
 				uintptr_t reg;
 				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER) {
-					/* Only allowed when using a register. */
-					ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+					/* Only allowed when using a register [, or not already set]. */
+#ifdef CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES
+					if (RESULT_CFA.cv_type == UNWIND_CFA_VALUE_UNSET) {
+						RESULT_CFA.cv_type  = UNWIND_CFA_VALUE_REGISTER;
+						RESULT_CFA.cv_value = 0;
+					} else
+#endif /* CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES */
+					{
+						ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+					}
 				}
 				reg = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
@@ -755,16 +763,32 @@ skip_expression:
 
 			CASE(DW_CFA_def_cfa_offset)
 				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER) {
-					/* Only allowed when using a register. */
-					ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+					/* Only allowed when using a register, or not already set. */
+#ifdef CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES
+					if (RESULT_CFA.cv_type == UNWIND_CFA_VALUE_UNSET) {
+						RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
+						RESULT_CFA.cv_reg  = CFI_UNWIND_REGISTER_SP;
+					} else
+#endif /* CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES */
+					{
+						ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+					}
 				}
 				RESULT_CFA.cv_value = (intptr_t)dwarf_decode_uleb128((byte_t **)&reader);
 				break;
 
 			CASE(DW_CFA_def_cfa_offset_sf)
 				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER) {
-					/* Only allowed when using a register. */
-					ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+					/* Only allowed when using a register, or not already set. */
+#ifdef CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES
+					if (RESULT_CFA.cv_type == UNWIND_CFA_VALUE_UNSET) {
+						RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
+						RESULT_CFA.cv_reg  = CFI_UNWIND_REGISTER_SP;
+					} else
+#endif /* CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES */
+					{
+						ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+					}
 				}
 				RESULT_CFA.cv_value = (intptr_t)(dwarf_decode_sleb128((byte_t **)&reader) * self->f_dataalign);
 				break;
