@@ -1072,15 +1072,6 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_node_fini)(struct inode *__restrict self);
 
 
-
-
-/* The data block type used to identify INodes. */
-DATDEF struct vm_datablock_type inode_datablock_type;
-
-/* Check if a given `struct vm_datablock *x' is an INode. */
-#define vm_datablock_isinode(x) ((x)->db_type == &inode_datablock_type)
-
-
 /* Indicate that `self' has been used recently, allowing the INode to be cached
  * such that it will remain allocated for a while, even when not referenced elsewhere. */
 FUNDEF NOBLOCK NONNULL((1)) void

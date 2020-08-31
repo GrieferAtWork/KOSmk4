@@ -118,11 +118,11 @@ enum {
 	E_FILESYSTEM_OPERATION_WRATTR,   /* The object does not support changes to attributes being written to disk */
 	E_FILESYSTEM_OPERATION_SEEK,     /* The object does not support seeking in file stream */
 	E_FILESYSTEM_OPERATION_MMAP,     /* The object does not support mapping data into memory */
-	E_FILESYSTEM_OPERATION_SYNC,     /* The object does not the fsync() operator */
-	E_FILESYSTEM_OPERATION_DATASYNC, /* The object does not the fdatasync() operator */
-	E_FILESYSTEM_OPERATION_STAT,     /* The object does not the fstat() operator */
-	E_FILESYSTEM_OPERATION_POLL,     /* The object does not the poll() operator */
-	E_FILESYSTEM_OPERATION_ALLOCATE  /* The object does not the fallocate() operator */
+	E_FILESYSTEM_OPERATION_SYNC,     /* The object does not support the fsync() operator */
+	E_FILESYSTEM_OPERATION_DATASYNC, /* The object does not support the fdatasync() operator */
+	E_FILESYSTEM_OPERATION_STAT,     /* The object does not support the fstat() operator */
+	E_FILESYSTEM_OPERATION_POLL,     /* The object does not support the poll() operator */
+	E_FILESYSTEM_OPERATION_ALLOCATE  /* The object does not support the fallocate() operator */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -144,11 +144,11 @@ enum {
 #define E_FILESYSTEM_OPERATION_WRATTR   E_FILESYSTEM_OPERATION_WRATTR   /* The object does not support changes to attributes being written to disk */
 #define E_FILESYSTEM_OPERATION_SEEK     E_FILESYSTEM_OPERATION_SEEK     /* The object does not support seeking in file stream */
 #define E_FILESYSTEM_OPERATION_MMAP     E_FILESYSTEM_OPERATION_MMAP     /* The object does not support mapping data into memory */
-#define E_FILESYSTEM_OPERATION_SYNC     E_FILESYSTEM_OPERATION_SYNC     /* The object does not the fsync() operator */
-#define E_FILESYSTEM_OPERATION_DATASYNC E_FILESYSTEM_OPERATION_DATASYNC /* The object does not the fdatasync() operator */
-#define E_FILESYSTEM_OPERATION_STAT     E_FILESYSTEM_OPERATION_STAT     /* The object does not the fstat() operator */
-#define E_FILESYSTEM_OPERATION_POLL     E_FILESYSTEM_OPERATION_POLL     /* The object does not the poll() operator */
-#define E_FILESYSTEM_OPERATION_ALLOCATE E_FILESYSTEM_OPERATION_ALLOCATE /* The object does not the fallocate() operator */
+#define E_FILESYSTEM_OPERATION_SYNC     E_FILESYSTEM_OPERATION_SYNC     /* The object does not support the fsync() operator */
+#define E_FILESYSTEM_OPERATION_DATASYNC E_FILESYSTEM_OPERATION_DATASYNC /* The object does not support the fdatasync() operator */
+#define E_FILESYSTEM_OPERATION_STAT     E_FILESYSTEM_OPERATION_STAT     /* The object does not support the fstat() operator */
+#define E_FILESYSTEM_OPERATION_POLL     E_FILESYSTEM_OPERATION_POLL     /* The object does not support the poll() operator */
+#define E_FILESYSTEM_OPERATION_ALLOCATE E_FILESYSTEM_OPERATION_ALLOCATE /* The object does not support the fallocate() operator */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_FILESYSTEM_OPERATION_GENERIC  0  /* Generic file-system operation */
 #define E_FILESYSTEM_OPERATION_READ     1  /* The object does not support reading */
@@ -167,11 +167,11 @@ enum {
 #define E_FILESYSTEM_OPERATION_WRATTR   14 /* The object does not support changes to attributes being written to disk */
 #define E_FILESYSTEM_OPERATION_SEEK     15 /* The object does not support seeking in file stream */
 #define E_FILESYSTEM_OPERATION_MMAP     16 /* The object does not support mapping data into memory */
-#define E_FILESYSTEM_OPERATION_SYNC     17 /* The object does not the fsync() operator */
-#define E_FILESYSTEM_OPERATION_DATASYNC 18 /* The object does not the fdatasync() operator */
-#define E_FILESYSTEM_OPERATION_STAT     19 /* The object does not the fstat() operator */
-#define E_FILESYSTEM_OPERATION_POLL     20 /* The object does not the poll() operator */
-#define E_FILESYSTEM_OPERATION_ALLOCATE 21 /* The object does not the fallocate() operator */
+#define E_FILESYSTEM_OPERATION_SYNC     17 /* The object does not support the fsync() operator */
+#define E_FILESYSTEM_OPERATION_DATASYNC 18 /* The object does not support the fdatasync() operator */
+#define E_FILESYSTEM_OPERATION_STAT     19 /* The object does not support the fstat() operator */
+#define E_FILESYSTEM_OPERATION_POLL     20 /* The object does not support the poll() operator */
+#define E_FILESYSTEM_OPERATION_ALLOCATE 21 /* The object does not support the fallocate() operator */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

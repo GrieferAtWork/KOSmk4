@@ -1199,6 +1199,12 @@ __DEFINE_SYNC_POLL(struct vm_datablock,
                    vm_datablock_lock_pollwrite)
 
 
+/* The data block type used to identify INodes. */
+DATDEF struct vm_datablock_type inode_datablock_type;
+
+/* Check if a given `struct vm_datablock *x' is an INode. */
+#define vm_datablock_isinode(x) ((x)->db_type == &inode_datablock_type)
+
 
 /* Anonymize the given data block `self' (tearing down its part tree, and
  * changing all of the nodes to be bound to `vm_datablock_anonymous_zero_vec[*]',
@@ -1227,15 +1233,32 @@ vm_datablock_anonymize(struct vm_datablock *__restrict self)
  *        INode is truncated. */
 
 
-/* Undo the effects of `vm_datablock_anonymize()',
- * once again allowing `self' to carry data parts. */
+/* Allow the use of `vm_datablock_deanonymize()' on the given `self'
+ * Currently, only inode-based datablocks can be deanonymized.
+ * Note that for any class of datablock to support non-anonymous dataparts,
+ * they must be able to deal with the reference loop that is formed from
+ * the use of non-anonymous dataparts (vm_datablock->db_parts->dp_block),
+ * in a way that makes sense and doesn't result in memory leaks.
+ *
+ * For Inodes, this loop is actually intentional, and is what keeps
+ * pre-loaded files cached in main memory, such that the files are
+ * only unloaded once they are deleted, the associated superblock
+ * is unmounted, or the system is low on memory. */
+#define vm_datablock_allow_deanonymize(self) \
+	vm_datablock_isinode(self)
+
+
+/* Undo the effects of `vm_datablock_anonymize()', once again
+ * allowing `self' to carry data parts.
+ * The caller must ensure `vm_datablock_allow_deanonymize(self)' */
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
 #else /* __INTELLISENSE__ */
-#define vm_datablock_deanonymize(self)                               \
-	__hybrid_atomic_cmpxch((self)->db_parts, VM_DATABLOCK_ANONPARTS, \
-	                       NULL, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+#define vm_datablock_deanonymize(self)                                \
+	(__hybrid_assert(vm_datablock_allow_deanonymize(self)),           \
+	 __hybrid_atomic_cmpxch((self)->db_parts, VM_DATABLOCK_ANONPARTS, \
+	                        NULL, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #endif /* !__INTELLISENSE__ */
 
 /* Check if `self' is an anonymous datablock */

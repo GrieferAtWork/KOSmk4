@@ -970,7 +970,7 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	rwlock_init(&result->db_lock);
 	result->db_type      = &uvio_datablock_type;
 	result->db_vio       = &uvio_operators;
-	result->db_parts     = NULL; /* Lazily allocated */
+	result->db_parts     = VM_DATABLOCK_ANONPARTS;
 	result->db_pageshift = 0;
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 	result->db_addrshift = PAGESHIFT;

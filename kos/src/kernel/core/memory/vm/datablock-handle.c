@@ -378,6 +378,9 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 	case HOP_DATABLOCK_DEANONYMIZE:
 		require(CAP_DATABLOCK_DEANONYMIZE);
 		validate_writable(arg, sizeof(int));
+		/* Ensure that the given datablock allows for being deanonymized. */
+		if (!vm_datablock_allow_deanonymize(self))
+			THROW(E_INVALID_CONTEXT);
 		*(int *)arg = vm_datablock_deanonymize(self) ? 1 : 0;
 		break;
 

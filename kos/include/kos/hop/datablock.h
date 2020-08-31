@@ -645,6 +645,7 @@ struct hop_superblock_features /*[PREFIX(sbf_)]*/ {
                                                               *  - 0: The data block had already been anonymized.
                                                               *  - 1: The data block is now anonymized, but wasn't before. */
 #define HOP_DATABLOCK_DEANONYMIZE                 0x00010006 /* [int *result] Deanonymize this datablock, allowing parts to be tracked once again.
+                                                              * @throw: E_INVALID_CONTEXT: The given datablock must remain anonymous.
                                                               * Write 0/1 to *result, indicative of:
                                                               *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
                                                               *  - 1: The data block has been deanonymized. */
