@@ -2083,7 +2083,7 @@ reapall_check_already_locked:
 					child = mygroup.tg_proc_threads;
 					if (!child) {
 						sync_end(&mygroup.tg_proc_threads_lock);
-						if (task_disconnectall())
+						if (task_receiveall())
 							goto reapall_again;
 						return -ECHILD;
 					}
@@ -2112,7 +2112,7 @@ reapall_check_already_locked:
 					RETHROW();
 				}
 				if (options & WNOHANG) {
-					if (task_disconnectall())
+					if (task_receiveall())
 						goto reapall_again;
 					return -ECHILD; /* I feel like this should be EAGAIN, but POSIX
 					                 * says that wait() doesn't return that error... */
@@ -2276,7 +2276,7 @@ next_candidate:
 		 * Now we must either fail (when `WNOHANG' was set), or
 		 * wait for the signal that we've connected to above. */
 		if ((options & WNOHANG) || !num_candidates) {
-			if (task_disconnectall())
+			if (task_receiveall())
 				goto again_connect_enum_children; /* Try again, because doing so won't ~hang~ (block) */
 #if 1
 			/* Indicate that we may have succeeded without `WNOHANG' */

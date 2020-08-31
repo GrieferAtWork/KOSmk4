@@ -1312,7 +1312,7 @@ do_compat_hdio_getgeo:
 					u8 status;
 					status = inb(bus->b_ctrlio);
 					if (status == 0) {
-						signal = task_disconnectall();
+						signal = task_receiveall();
 						if unlikely(signal)
 							goto got_identify_signal;
 						/* While not actually a timeout, this should be treated just like a timeout! */
@@ -1505,7 +1505,7 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 					u8 status;
 					status = inb(bus->b_ctrlio);
 					if (status == 0) {
-						signal = task_disconnectall();
+						signal = task_receiveall();
 						if unlikely(signal)
 							goto got_identify_signal;
 						/* Drive doesn't exist (graceful exit) */

@@ -685,9 +685,16 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	pertask_readlocks_init(mythread);
 
 	/* Make sure that the signal connections sub-system is initialized. */
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+	if (!FORTASK(mythread, this_connections) ||
+	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
+		pertask_init_task_connections(mythread);
+#else /* CONFIG_USE_NEW_SIGNAL_API */
 	if (!FORTASK(mythread, this_connections).tc_static_v ||
 	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
 		pertask_init_task_connections(mythread);
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
+
 	/* Push active connections. */
 	if (!(initok & INITOK_CONNECTIONS)) {
 		/* NOTE: Also guard against attempts to re-push the same connection
@@ -698,7 +705,12 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		 * Technically, this should already be prevented by `initok & INITOK_CONNECTIONS',
 		 * however given that this is all about making this code be robust against broken
 		 * code elsewhere within the kernel, double-checking isn't a problem here! */
-		if (FORTASK(mythread, this_connections).tc_static_v != x86_dbg_hostbackup.dhs_signals.tc_static) {
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+		if (FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals)
+#else /* CONFIG_USE_NEW_SIGNAL_API */
+		if (FORTASK(mythread, this_connections).tc_static_v != x86_dbg_hostbackup.dhs_signals.tc_static)
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
+		{
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 			initok |= INITOK_CONNECTIONS;
 		}
@@ -856,10 +868,22 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	x86_init_psp0(mycpu, mythread);
 	pertask_readlocks_init(mythread);
 
+	/* TODO: When the debugger is reset after a prior call to `task_pushconnections()',
+	 *       then we must take special care to pop the pushed set of connections.
+	 *       This case can be detected by looking at connection set pointers, and
+	 *       checking if they are apart of the debugger stack (if they are, then
+	 *       the debugger was reset with at least one set of pushed connections) */
+
 	/* Make sure that the signal connections sub-system is (still) initialized. */
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+	if (!FORTASK(mythread, this_connections) ||
+	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
+		pertask_init_task_connections(mythread);
+#else /* CONFIG_USE_NEW_SIGNAL_API */
 	if (!FORTASK(mythread, this_connections).tc_static_v ||
 	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
 		pertask_init_task_connections(mythread);
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 	/* Set our own thread as the current thread. */
 	dbg_current        = mythread;

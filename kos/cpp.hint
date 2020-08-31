@@ -160,6 +160,7 @@
 #define LIBZLIB_CC
 #define LIBZLIB_DECL
 
+#define __BOOL      bool
 #define __LONGLONG  long long
 #define __ULONGLONG unsigned long long
 

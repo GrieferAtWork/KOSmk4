@@ -26,6 +26,7 @@
 #include <sched/pertask.h>
 #include <sched/signal.h>
 
+#ifndef CONFIG_USE_NEW_SIGNAL_API
 DECL_BEGIN
 
 #ifdef __CC__
@@ -42,5 +43,6 @@ INTDEF NOBLOCK void NOTHROW(KCALL pertask_init_task_connections)(struct task *__
 #endif /* __CC__ */
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H */

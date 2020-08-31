@@ -23,6 +23,16 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 
+#undef CONFIG_USE_NEW_SIGNAL_API
+#if 1
+#define CONFIG_USE_NEW_SIGNAL_API 1
+#endif
+
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_NEWSIGNAL_H
+#include <sched/newsignal.h>
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_NEWSIGNAL_H */
+#else /* CONFIG_USE_NEW_SIGNAL_API */
 #include <sched/pertask.h>
 
 #include <hybrid/__assert.h>
@@ -132,12 +142,12 @@ struct sig {
  * @return: true:  The signal was delivered to at least 1 non-ghost connection.
  * @return: false: No non-ghost connections could be reached. */
 FUNDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL sig_send)(struct sig *__restrict self);
+NOTHROW(FCALL sig_send)(struct sig *__restrict self);
 
 /* Send signal to all connected threads
  * @return: true: The actual number of threads notified, not counting ghosts. */
 FUNDEF NOBLOCK NONNULL((1)) size_t
-NOTHROW(KCALL sig_broadcast)(struct sig *__restrict self);
+NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self);
 
 /* Alternative signal sender functions:
  *  - Operate the same way as their regular counterparts
@@ -165,9 +175,9 @@ NOTHROW(KCALL sig_broadcast)(struct sig *__restrict self);
  *    interpreted as the thread's inability to serve further
  *    user-space RPCs. */
 FUNDEF NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL sig_altsend)(struct sig *__restrict self, struct sig *sender);
+NOTHROW(FCALL sig_altsend)(struct sig *__restrict self, struct sig *sender);
 FUNDEF NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(KCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender);
+NOTHROW(FCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender);
 
 
 
@@ -222,9 +232,9 @@ struct task_connections {
  *       all connections made were disconnected again.
  *    -> Signals delivered in the mean time will then immediately be available. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL task_pushconnections)(struct task_connections *__restrict cons);
+NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons);
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons);
+NOTHROW(FCALL task_popconnections)(struct task_connections *__restrict cons);
 
 
 /* NOTE: It is valid to destroy a signal after it was broadcast, even before it
@@ -245,17 +255,8 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons);
 /* Connect the calling thread to a given signal.
  * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
  *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
-FUNDEF NONNULL((1)) void KCALL task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
-FUNDEF NONNULL((1)) void KCALL task_connect_ghost(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
-FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL task_connect_c)(struct task_connection *__restrict con, struct sig *__restrict target);
-FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL task_connect_ghost_c)(struct task_connection *__restrict con, struct sig *__restrict target);
-
-/* Disconnect a given connection
- * WARNING: If the connected signal was already sent, causing the calling
- *          thread to enter a signaled state, that state will not be
- *          reverted by this call! */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con);
+FUNDEF NONNULL((1)) void FCALL task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+FUNDEF NONNULL((1)) void FCALL task_connect_ghost(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
 
 /* Disconnect from a specific signal `target'
  * No-op if the caller isn't actually connected to `target'
@@ -263,24 +264,25 @@ NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con);
  *          thread to enter a signaled state, that state will not be
  *          reverted by this call! */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL task_disconnect)(struct sig *__restrict target);
+NOTHROW(FCALL task_disconnect)(struct sig *__restrict target);
 
 /* Remove all active signals.
  * In case one of them got delivered, return the signal that got. Otherwise, return `NULL' */
-FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_disconnectall)(void);
+FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_disconnectall)(void);
+#define task_receiveall task_disconnectall
 
 /* Check if the calling thread is connected to any signal. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL task_isconnected)(void);
+FUNDEF NOBLOCK WUNUSED bool NOTHROW(FCALL task_isconnected)(void);
 
 /* Check if there is a signal to was delivered, disconnecting
  * all other connected signals if this was the case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
-FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void);
+FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
 
 struct timespec;
 
-/* Wait for the first signal to be delivered,
+/* Wait for the first signal to be delivered, unconditionally
  * disconnecting all connected signals thereafter.
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
  * @param: abs_timeout:  The `realtime()' timeout for the wait.
@@ -476,5 +478,6 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_H */

@@ -500,8 +500,8 @@ PUBLIC NONNULL((1)) bool
 			assert(self->rw_scnt != 0);
 #if 0 /* Thread that already have a read-lock can still acquire \
        * more, even if the rw-lock is in upgrade mode. */
-		if (self->rw_mode == RWLOCK_MODE_FUPGRADING)
-			return false;
+			if (self->rw_mode == RWLOCK_MODE_FUPGRADING)
+				return false;
 #endif
 			++desc->rl_recursion;
 			return true;

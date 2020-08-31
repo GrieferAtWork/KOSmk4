@@ -247,7 +247,7 @@ struct ata_bus {
 	struct sig          b_sigready;  /* A signal that is broadcast after the bus switches its state to `ATA_BUS_STATE_READY'
 	                                  * Using this signal, a thread may wait until it becomes possible  */
 	struct sig          b_piointr;   /* Signal broadcast upon interrupt whilst in `ATA_BUS_STATE_INPIO'-mode */
-#define ATA_PIOINTR_ALT_ENCODE(status) ((struct sig *)((uintptr_t)0x100|(uintptr_t)(u8)(status)))
+#define ATA_PIOINTR_ALT_ENCODE(status) ((struct sig *)((uintptr_t)0x100 | (uintptr_t)(u8)(status)))
 #define ATA_PIOINTR_ALT_DECODE(resp)   ((u8)((uintptr_t)(resp) & 0xff))
 	port_t              b_busio;     /* [const] I/O port for the ATA bus. */
 	port_t              b_ctrlio;    /* [const] Device control register/Alternate status ports. */

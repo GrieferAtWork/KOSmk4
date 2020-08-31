@@ -381,11 +381,10 @@ again:
 			goto again;
 		}
 		{
-			struct task_connection awork_changed_con;
 			struct sig *received_signal;
 			/* Also wait for async workers to have changed. */
-			task_connect_c(&awork_changed_con, &awork_changed);
 			TRY {
+				task_connect(&awork_changed);
 				received_signal = task_waitfor(asyncmain_timeout_p);
 			} EXCEPT {
 				error_printf("_asyncmain:task_waitfor()");

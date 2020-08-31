@@ -27,16 +27,16 @@ DECL_BEGIN
 
 #if defined(DEFINE_SINGLE) && defined(DEFINE_ALTERNATE)
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL sig_altsend)(struct sig *__restrict self, struct sig *sender)
+NOTHROW(FCALL sig_altsend)(struct sig *__restrict self, struct sig *sender)
 #elif defined(DEFINE_SINGLE)
 PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL sig_send)(struct sig *__restrict self)
+NOTHROW(FCALL sig_send)(struct sig *__restrict self)
 #elif defined(DEFINE_ALTERNATE)
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(KCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender)
+NOTHROW(FCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender)
 #else
 PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(KCALL sig_broadcast)(struct sig *__restrict self)
+NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 #endif
 {
 #ifndef DEFINE_SINGLE
