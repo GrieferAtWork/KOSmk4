@@ -339,6 +339,7 @@ again:
 		struct task_connection **pchain;
 		/* Since the caller has acquired the SMP-lock of `self' for us,
 		 * we are able to access all of the attached connections! */
+		chain  = SIG_SMPLOCK_CLR(chain);
 		pchain = &chain->tc_signext;
 		assert(chain->tc_sig == self);
 		for (;;) {
@@ -384,6 +385,7 @@ again:
 		struct task_connection **pchain;
 		/* Since the caller has acquired the SMP-lock of `self' for us,
 		 * we are able to access all of the attached connections! */
+		chain  = SIG_SMPLOCK_CLR(chain);
 		pchain = &chain->tc_signext;
 		assert(chain->tc_sig == self);
 		for (;;) {
