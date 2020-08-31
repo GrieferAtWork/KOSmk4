@@ -27,6 +27,7 @@
 
 #ifdef CONFIG_USE_NEW_SIGNAL_API
 #include <kernel/except.h>
+#include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -220,6 +221,7 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 
 	/* Allocate a new connection for `cons' */
 	con = task_connection_alloc(cons);
+	assert(!SIG_SMPLOCK_TST(con));
 
 	/* Fill in the new connection. */
 	con->tc_sig     = target;
@@ -288,6 +290,7 @@ task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 
 	/* Allocate a new connection for `cons' */
 	con = task_connection_alloc(cons);
+	assert(!SIG_SMPLOCK_TST(con));
 
 	/* Fill in the new connection. */
 	con->tc_sig     = target;
@@ -321,6 +324,7 @@ NOTHROW(FCALL task_connection_unlink_from_sig)(struct sig *__restrict self,
 	struct task_connection *chain;
 again:
 	assert(!SIG_SMPLOCK_TST(con->tc_signext));
+	assert(!con->tc_signext || ADDR_ISKERN(con->tc_signext));
 	chain = ATOMIC_READ(self->s_con);
 	if (SIG_SMPLOCK_CLR(chain) == con) {
 		/* The first entry already is the connection we're trying to unlink!
@@ -336,9 +340,12 @@ again:
 		/* Since the caller has acquired the SMP-lock of `self' for us,
 		 * we are able to access all of the attached connections! */
 		pchain = &chain->tc_signext;
+		assert(chain->tc_sig == self);
 		for (;;) {
 			chain = *pchain;
-			assert(chain);
+			assert(!SIG_SMPLOCK_TST(chain));
+			assert(chain && ADDR_ISKERN(chain));
+			assert(chain->tc_sig == self);
 			if (chain == con)
 				break; /* Found the entry! */
 			pchain = &chain->tc_signext;
@@ -362,6 +369,7 @@ NOTHROW(FCALL task_connection_unlink_from_sig_and_unlock)(struct sig *__restrict
 	struct task_connection *chain;
 again:
 	assert(!SIG_SMPLOCK_TST(con->tc_signext));
+	assert(!con->tc_signext || ADDR_ISKERN(con->tc_signext));
 	chain = ATOMIC_READ(self->s_con);
 	if (SIG_SMPLOCK_CLR(chain) == con) {
 		/* The first entry already is the connection we're trying to unlink!
@@ -377,15 +385,19 @@ again:
 		/* Since the caller has acquired the SMP-lock of `self' for us,
 		 * we are able to access all of the attached connections! */
 		pchain = &chain->tc_signext;
+		assert(chain->tc_sig == self);
 		for (;;) {
 			chain = *pchain;
-			assert(chain);
+			assert(!SIG_SMPLOCK_TST(chain));
+			assert(chain && ADDR_ISKERN(chain));
+			assert(chain->tc_sig == self);
 			if (chain == con)
 				break; /* Found the entry! */
 			pchain = &chain->tc_signext;
 		}
 		/* Unlink the element. */
 		*pchain = chain->tc_signext;
+		COMPILER_WRITE_BARRIER();
 		/* Clear the SMP-lock bit. */
 		ATOMIC_FETCHAND(self->s_ctl, ~SIG_SMPLOCK_BIT);
 	}
@@ -395,7 +407,7 @@ again:
 
 /* Try to send the signal to a single, other thread, for the purpose
  * of forwarding. Additionally, release the SMP-lock of `self' */
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE ATTR_COLD NONNULL((1, 2)) bool
+PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      struct sig *sender) {
 	bool is_broadcasting_poll = false;

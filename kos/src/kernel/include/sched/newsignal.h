@@ -135,7 +135,7 @@ NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                                            *                                     on the attached signal. */
 #define TASK_CONNECTION_STAT_BROADCAST    ((uintptr_t)-2) /* Signal was broadcast (forwarding is unnecessary if ignored)
                                                            * In this state, `tc_sig' must be considered to be `[valid_if(false)]', and the
-                                                           * thread that originally connected to the signal must directly re-connect.
+                                                           * thread that originally connected to the signal mustn't directly re-connect.
                                                            * When all (past) connections have entered this state, the associated signal is
                                                            * allowed to have it's backing memory be free'd!
                                                            * NOTE: THIS STATUS WILL NEVER APPEAR IN SIGNAL CONNECTION CHAINS! */
@@ -160,15 +160,7 @@ struct task_connection {
 
 
 /* Max number of signal connections guarantied to not invoke `kmalloc()'
- * and potentially throw exceptions, or serve RPC functions.
- * A value of ONE(1) would suffice, but a static buffer is mandatory
- * due to the fact that allocating a dynamic buffer (using `kmalloc()')
- * may need to acquire its own locks in case that new memory must be
- * vm_paged_map()-ed. In this case, when locking needs to be done, a logic
- * recursion can only be prevented if it is possible to use at least
- * one signal slot that is allocated statically (`task_connect()' uses
- * `task_push_connections()' to free up that static slot before calling
- * `kmalloc()'). */
+ * and potentially throw exceptions, or serve RPC functions. */
 #ifndef CONFIG_TASK_STATIC_CONNECTIONS
 #define CONFIG_TASK_STATIC_CONNECTIONS 3
 #endif /* !CONFIG_TASK_STATIC_CONNECTIONS */

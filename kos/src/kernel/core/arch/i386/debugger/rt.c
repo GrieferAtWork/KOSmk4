@@ -528,6 +528,36 @@ x86_dbg_initialize_segments(struct cpu *mycpu, struct task *mythread) {
 }
 
 
+
+/* Verify the integrity of a given set of task connections. */
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(KCALL verify_task_connections)(struct task_connections *self) {
+	TRY {
+		struct task_connection *con;
+		if (!ADDR_ISKERN(self))
+			goto nope;
+		if (self->tcs_thread && !ADDR_ISKERN(self->tcs_thread))
+			goto nope;
+		if (self->tsc_prev && !ADDR_ISKERN(self->tsc_prev))
+			goto nope;
+		for (con = self->tcs_con; con; con = con->tc_connext) {
+			if (!ADDR_ISKERN(con))
+				goto nope;
+			if (!ADDR_ISKERN(con->tc_sig))
+				goto nope;
+		}
+		return true;
+	} EXCEPT {
+	}
+nope:
+	return false;
+}
+
+#endif /* CONFIG_USE_NEW_SIGNAL_API */
+
+
+
 INTDEF void NOTHROW(KCALL x86_initialize_pic)(void);
 
 INTDEF void KCALL dbg_initialize_tty(void);
@@ -706,14 +736,30 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		 * however given that this is all about making this code be robust against broken
 		 * code elsewhere within the kernel, double-checking isn't a problem here! */
 #ifdef CONFIG_USE_NEW_SIGNAL_API
-		if (FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals)
+		if unlikely(!verify_task_connections(FORTASK(mythread, this_connections))) {
+			/* Connections are all f'ed up. - Fully reset them, so
+			 * we can at least get ~some~ kind of working state... */
+fully_reset_task_connections:
+			memset(&FORTASK(mythread, this_root_connections), 0, sizeof(this_root_connections));
+			pertask_init_task_connections(mythread);
+			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
+		} else if likely(FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
+			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
+		} else {
+			/* Already set??? */
+			if (verify_task_connections(&x86_dbg_hostbackup.dhs_signals)) {
+				task_disconnectall();
+			} else {
+				goto fully_reset_task_connections;
+			}
+		}
+		initok |= INITOK_CONNECTIONS;
 #else /* CONFIG_USE_NEW_SIGNAL_API */
-		if (FORTASK(mythread, this_connections).tc_static_v != x86_dbg_hostbackup.dhs_signals.tc_static)
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
-		{
+		if (FORTASK(mythread, this_connections).tc_static_v != x86_dbg_hostbackup.dhs_signals.tc_static) {
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 			initok |= INITOK_CONNECTIONS;
 		}
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 	}
 	if (!(initok & INITOK_PREEMPTIVE_INTERRUPTS)) {
 		x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled(mycpu);
@@ -847,6 +893,72 @@ reset_pdir(struct task *mythread) {
 	pagedir_set(myvm->v_pdir_phys_ptr);
 }
 
+
+/* Called to perform reset operations that must be performed before
+ * the debugger stack is reset as part of the debugger resetting itself.
+ * This function should perform any reset that interacts with data
+ * structures which may be located on the debugger stack. */
+INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
+	struct cpu *mycpu;
+	struct task *mythread;
+	/* Figure out which one's our own CPU. */
+	mycpu    = x86_dbg_get_hostcpu();
+	dbg_cpu_ = mycpu;
+
+	mythread = mycpu->c_current;
+	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
+		mythread = &FORCPU(mycpu, thiscpu_idle);
+
+	/* Set segment base values */
+	x86_dbg_initialize_segments(mycpu, mythread);
+
+	/* Make sure that the signal connections sub-system is (still) initialized. */
+	if (!FORTASK(mythread, this_connections) ||
+	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
+		pertask_init_task_connections(mythread);
+
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+	/* When the debugger is reset after a prior call to `task_pushconnections()',
+	 * then we must take special care to pop the pushed set of connections.
+	 * This case can be detected by looking at connection set pointers, and
+	 * checking if they are apart of the debugger stack (if they are, then
+	 * the debugger was reset with at least one set of pushed connections) */
+	if (likely(initok & INITOK_CONNECTIONS) &&
+	    likely(&FORTASK(mythread, this_connections) == &PERTASK(this_connections))) {
+		if unlikely(FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
+			struct task_connections *chain;
+			chain = FORTASK(mythread, this_connections);
+			/* Validate the chain of pushed connections. If we're able to detect
+			 * any faults, then we will not actually disconnect from them properly.
+			 * Otherwise, we essentially pop connections until we reach the one
+			 * we've been expecting to find. */
+			TRY {
+				struct task_connections *iter;
+				if unlikely(!verify_task_connections(&x86_dbg_hostbackup.dhs_signals))
+					goto reset_all_connections; /* Something is insanely broken here. */
+				for (iter = chain; iter != &x86_dbg_hostbackup.dhs_signals;
+				     iter = iter->tsc_prev) {
+					if unlikely(!verify_task_connections(iter))
+						goto dont_pop_connections;
+				}
+				/* Everything looks good. - Pop connections until we reach `x86_dbg_hostbackup.dhs_signals' */
+				while (FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals)
+					task_popconnections();
+			} EXCEPT {
+			}
+dont_pop_connections:
+			FORTASK(mythread, this_connections) = &x86_dbg_hostbackup.dhs_signals;
+		}
+	} else if unlikely(!verify_task_connections(FORTASK(mythread, this_connections))){
+reset_all_connections:
+		memset(&FORTASK(mythread, this_root_connections), 0, sizeof(this_root_connections));
+		pertask_init_task_connections(mythread);
+		if (initok & INITOK_CONNECTIONS)
+			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
+	}
+#endif /* CONFIG_USE_NEW_SIGNAL_API */
+}
+
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
@@ -868,17 +980,17 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	x86_init_psp0(mycpu, mythread);
 	pertask_readlocks_init(mythread);
 
-	/* TODO: When the debugger is reset after a prior call to `task_pushconnections()',
-	 *       then we must take special care to pop the pushed set of connections.
-	 *       This case can be detected by looking at connection set pointers, and
-	 *       checking if they are apart of the debugger stack (if they are, then
-	 *       the debugger was reset with at least one set of pushed connections) */
-
 	/* Make sure that the signal connections sub-system is (still) initialized. */
 #ifdef CONFIG_USE_NEW_SIGNAL_API
 	if (!FORTASK(mythread, this_connections) ||
 	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
 		pertask_init_task_connections(mythread);
+	if (FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
+		if (initok & INITOK_CONNECTIONS)
+			FORTASK(mythread, this_connections) = x86_dbg_hostbackup.dhs_signals.tsc_prev;
+		task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
+		initok |= INITOK_CONNECTIONS;
+	}
 #else /* CONFIG_USE_NEW_SIGNAL_API */
 	if (!FORTASK(mythread, this_connections).tc_static_v ||
 	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
@@ -971,8 +1083,14 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		       &x86_dbg_hostbackup.dhs_readlocks,
 		       sizeof(struct read_locks));
 	}
-	if (initok & INITOK_CONNECTIONS)
+	if (initok & INITOK_CONNECTIONS) {
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+		if (FORTASK(mythread, this_connections) == &x86_dbg_hostbackup.dhs_signals)
+			task_popconnections();
+#else /* CONFIG_USE_NEW_SIGNAL_API */
 		task_popconnections(&x86_dbg_hostbackup.dhs_signals);
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
+	}
 	if (initok & INITOK_PREEMPTIVE_INTERRUPTS) {
 		if (x86_dbg_hostbackup.dhs_pint)
 			cpu_enable_preemptive_interrupts_nopr();

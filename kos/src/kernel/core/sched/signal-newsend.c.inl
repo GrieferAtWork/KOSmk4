@@ -98,23 +98,25 @@ preemption_pop_and_lock:
 
 	if (con) {
 #ifdef HAVE_BROADCAST
+		struct task_connection *next;
 		struct task_connections *target_cons;
+		assert(con->tc_sig == self);
 		target_cons = (struct task_connections *)ATOMIC_XCH(con->tc_stat,
 		                                                    TASK_CONNECTION_STAT_SENT);
 		assert((uintptr_t)target_cons != TASK_CONNECTION_STAT_BROADCAST);
 		if (TASK_CONNECTION_STAT_CHECK(target_cons)) {
 			/* Signal was already sent in the past.
 			 * -> Change it's disposition to BROADCAST, and unlink it. */
-			struct task_connection *next;
 			assert((uintptr_t)target_cons == TASK_CONNECTION_STAT_SENT);
 			next = con->tc_signext;
 			COMPILER_BARRIER();
 			ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			assert(!next || ADDR_ISKERN(next));
+			assert(!SIG_SMPLOCK_TST(next));
 			ATOMIC_WRITE(self->s_con, next);
 			PREEMPTION_POP(was);
 		} else {
 			REF struct task *target_thread = NULL;
-			struct task_connection *next;
 			target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
 			/* Set the delivered signal, and capture
 			 * the target_thread thread, if there is one */
@@ -123,6 +125,8 @@ preemption_pop_and_lock:
 			next = con->tc_signext;
 			COMPILER_BARRIER();
 			ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			assert(!next || ADDR_ISKERN(next));
+			assert(!SIG_SMPLOCK_TST(next));
 			ATOMIC_WRITE(self->s_con, next);
 			PREEMPTION_POP(was);
 			if (target_thread) {
@@ -132,7 +136,12 @@ preemption_pop_and_lock:
 			++result;
 		}
 		/* Try to wake up the remaining threads. */
+#ifdef __OPTIMIZE_SIZE__
 		goto again;
+#else /* __OPTIMIZE_SIZE__ */
+		if (next)
+			goto again;
+#endif /* !__OPTIMIZE_SIZE__ */
 #else /* HAVE_BROADCAST */
 		struct task_connections *target_cons;
 		struct task_connection *receiver;
@@ -141,6 +150,7 @@ start_find_receiver:
 		receiver = NULL;
 		for (;;) {
 			uintptr_t status;
+			assert(con->tc_sig == self);
 			status = ATOMIC_READ(con->tc_stat);
 			assert(status != TASK_CONNECTION_STAT_BROADCAST);
 			if (!TASK_CONNECTION_STAT_CHECK(status)) {
@@ -184,12 +194,14 @@ again_find_receiver:
 			}
 			return true;
 		} else {
+			struct task_connection *next;
 			/* No regular connections, but there might be poll-based ones.
 			 * If there are any, we must broadcast to all of them! */
 			con = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
 			assertf(con, "We've holding the SMP-lock, and we already know that there "
 			             "connections from above. So more could have only been added "
 			             "in the mean time, but none could have been removed!");
+			assert(con->tc_sig == self);
 			/* Simply do a broadcast to _all_ connections. */
 			target_cons = (struct task_connections *)ATOMIC_XCH(con->tc_stat,
 			                                                    TASK_CONNECTION_STAT_SENT);
@@ -197,16 +209,16 @@ again_find_receiver:
 			if (TASK_CONNECTION_STAT_CHECK(target_cons)) {
 				/* Signal was already sent in the past.
 				 * -> Change it's disposition to BROADCAST, and unlink it. */
-				struct task_connection *next;
 				assert((uintptr_t)target_cons == TASK_CONNECTION_STAT_SENT);
 				next = con->tc_signext;
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+				assert(!next || ADDR_ISKERN(next));
+				assert(!SIG_SMPLOCK_TST(next));
 				ATOMIC_WRITE(self->s_con, next);
 				PREEMPTION_POP(was);
 			} else {
 				REF struct task *target_thread = NULL;
-				struct task_connection *next;
 				target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
 				/* Set the delivered signal, and capture
 				 * the target_thread thread, if there is one */
@@ -215,6 +227,8 @@ again_find_receiver:
 				next = con->tc_signext;
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+				assert(!next || ADDR_ISKERN(next));
+				assert(!SIG_SMPLOCK_TST(next));
 				ATOMIC_WRITE(self->s_con, next);
 				PREEMPTION_POP(was);
 				if (target_thread) {
@@ -223,7 +237,12 @@ again_find_receiver:
 				}
 			}
 			/* Try to wake up the remaining threads. */
+#ifdef __OPTIMIZE_SIZE__
 			goto again;
+#else /* __OPTIMIZE_SIZE__ */
+			if (next)
+				goto again;
+#endif /* !__OPTIMIZE_SIZE__ */
 		}
 #endif /* !HAVE_BROADCAST */
 	}

@@ -381,6 +381,21 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * executing /bin/init (or whatever was passed as `init=...') */
 	state = kernel_initialize_exec_init(state);
 
+	{
+		struct sig s1 = SIG_INIT;
+		struct sig s2 = SIG_INIT;
+		struct sig s3 = SIG_INIT;
+		struct sig s4 = SIG_INIT;
+		task_connect(&s1);
+		task_connect(&s2);
+		task_connect(&s3);
+		task_connect(&s4);
+
+		sig_broadcast(&s1);
+		task_waitfor();
+	}
+
+
 	printk(FREESTR(KERN_INFO "Initial jump to user-space [pc=%p] [sp=%p]\n"),
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));

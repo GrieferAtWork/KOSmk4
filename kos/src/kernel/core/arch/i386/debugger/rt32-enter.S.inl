@@ -321,6 +321,18 @@ L(.Lalready_active):
 	movw   $(SEGMENT_CPU_LDT), %ax
 	lldtw  %ax  /* %ldtr = SEGMENT_CPU_LDT */
 
+	EXTERN(dbg_active)
+	cmpb   $(0), dbg_active
+	jne    L(.Ldont_reset_dbg_stack)
+	/* Check if we're actually running from the debugger stack. */
+	cmpl   $(dbg_stack), %esp
+	jb     L(.Ldont_reset_dbg_stack) /* if (%esp < dbg_stack) goto L(.Ldont_reset_dbg_stack); */
+	cmpl   $(dbg_stack + KERNEL_DEBUG_STACKSIZE - 768), %esp
+	jae    L(.Ldont_reset_dbg_stack) /* if (%esp >= dbg_stack + KERNEL_DEBUG_STACKSIZE - 768) goto L(.Ldont_reset_dbg_stack); */
+	EXTERN(x86_dbg_reset_dbg_stack)
+	call   x86_dbg_reset_dbg_stack
+L(.Ldont_reset_dbg_stack):
+
 	/* Load the debugger stack. */
 	EXTERN(dbg_stack)
 	movl   $(dbg_stack + KERNEL_DEBUG_STACKSIZE), %esp

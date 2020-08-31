@@ -320,6 +320,27 @@ L(.Lalready_active):
 	movw   %ax, %fs
 	movw   %ax, %gs
 
+
+	EXTERN(dbg_active)
+	cmpb   $(0), dbg_active
+	jne    L(.Ldont_reset_dbg_stack)
+	/* Check if we're actually running from the debugger stack. */
+	cmpq   $(dbg_stack), %rsp
+	jb     L(.Ldont_reset_dbg_stack) /* if (%rsp < dbg_stack) goto L(.Ldont_reset_dbg_stack); */
+	cmpq   $(dbg_stack + KERNEL_DEBUG_STACKSIZE - 1024), %rsp
+	jae    L(.Ldont_reset_dbg_stack) /* if (%rsp >= dbg_stack + KERNEL_DEBUG_STACKSIZE - 1024) goto L(.Ldont_reset_dbg_stack); */
+	/* Load %ss and %cs */
+	movq   %rsp, %rax
+	pushq  $(SEGMENT_KERNEL_DATA0) /* %ss */
+	pushq  %rax                    /* %rsp */
+	pushfq                         /* %rflags */
+	pushq  $(SEGMENT_KERNEL_CODE)  /* %cs */
+	pushq  $(1f)                   /* %rip */
+	iretq
+1:	EXTERN(x86_dbg_reset_dbg_stack)
+	call   x86_dbg_reset_dbg_stack
+L(.Ldont_reset_dbg_stack):
+
 	/* Load the debugger stack. */
 	EXTERN(dbg_stack)
 	movq   $(dbg_stack + KERNEL_DEBUG_STACKSIZE), %rsp
