@@ -294,8 +294,10 @@ copy_faulting_byte:
 			next_byte     = self->rb_data[self->rb_rptr];
 			next_byte_pos = self->rb_rdtot;
 			ringbuffer_trimbuf_and_endwrite(self);
-			if (was_full)
-				sig_broadcast(&self->rb_nfull);
+			if (was_full) {
+				/* Use `sig_send()', because only 1 thread could ever do the write! */
+				sig_send(&self->rb_nfull);
+			}
 			/* Try to copy `next_byte' into the user-supplied buffer */
 			COMPILER_WRITE_BARRIER();
 			((byte_t *)dst)[result] = next_byte; /* CAUTION: SEGFAULT */

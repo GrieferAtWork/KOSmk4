@@ -417,11 +417,15 @@ struct pb_buffer {
  *       since other code uses the value of the signal itself for inter-locking
  *       with the monitoring of changes made to components affected by the signal. */
 #ifdef __KERNEL__
-#define pb_buffer_broadcast_psta(self) sig_broadcast(&(self)->pb_psta)
+#define pb_buffer_psta_broadcast(self) sig_broadcast(&(self)->pb_psta)
+#define pb_buffer_psta_send(self)      sig_send(&(self)->pb_psta)
 #else /* __KERNEL__ */
-#define pb_buffer_broadcast_psta(self)                            \
+#define pb_buffer_psta_broadcast(self)                            \
 	(__hybrid_atomic_fetchinc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_broadcast(&(self)->pb_psta))
+#define pb_buffer_psta_send(self)                                 \
+	(__hybrid_atomic_fetchinc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+	 sched_signal_send(&(self)->pb_psta))
 #endif /* !__KERNEL__ */
 
 
@@ -511,7 +515,7 @@ __NOTHROW(pb_buffer_close)(struct pb_buffer *__restrict self);
 #else /* __INTELLISENSE__ */
 #define pb_buffer_close(self)                                     \
 	(__hybrid_atomic_store((self)->pb_limt, 0, __ATOMIC_RELEASE), \
-	 pb_buffer_broadcast_psta(self))
+	 pb_buffer_psta_broadcast(self))
 #endif /* !__INTELLISENSE__ */
 
 
@@ -615,7 +619,7 @@ __NOTHROW(pb_buffer_endwrite_commit)(struct pb_buffer *__restrict self,
 #else /* __INTELLISENSE__ */
 #define pb_buffer_endwrite_commit(self, packet)                                            \
 	(__hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE), \
-	 pb_buffer_broadcast_psta(self))
+	 pb_buffer_psta_send(self))
 #endif /* !__INTELLISENSE__ */
 
 /* Abort writing/discard the given `packet' from the packet stream. */
@@ -740,7 +744,7 @@ __NOTHROW_NCX(pb_buffer_endread_restore)(struct pb_buffer *__restrict self,
 	(__hybrid_assertf((packet) == (self)->pb_rptr, "%p != %p", (packet), (self)->pb_rptr),      \
 	 __hybrid_assertf((packet)->p_state == PB_PACKET_STATE_READING, "%I8u", (packet)->p_state), \
 	 __hybrid_atomic_store((packet)->p_state, PB_PACKET_STATE_READABLE, __ATOMIC_RELEASE),      \
-	 pb_buffer_broadcast_psta(self))
+	 pb_buffer_psta_broadcast(self))
 #endif /* !__INTELLISENSE__ */
 
 

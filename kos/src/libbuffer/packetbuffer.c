@@ -662,7 +662,7 @@ NOTHROW(CC lib_pb_buffer_endread_consume)(struct pb_buffer *__restrict self,
 	 * have to broadcast the state-changed signal. However, we do so anyways since we
 	 * have no way of reading from `pb_wptr' without introducing a race condition, and
 	 * as with all signals, no harm is done by sending spurious signals. */
-	pb_buffer_broadcast_psta(self);
+	pb_buffer_psta_broadcast(self);
 }
 
 

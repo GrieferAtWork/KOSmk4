@@ -88,8 +88,8 @@ uvio_request_impl(struct uvio *__restrict self,
 	/* Unlock the slot. */
 	sync_endwrite(&slot->kur_lock);
 
-	/* Broadcast that a new request has become available. */
-	sig_broadcast(&self->uv_reqmore);
+	/* Signal that a new request has become available. */
+	sig_send(&self->uv_reqmore);
 
 	/* Wait for our request to complete. */
 	for (;;) {
@@ -157,7 +157,7 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
 	sync_endwrite(&slot->kur_lock);
 
 	/* Signal that a free slot became available */
-	sig_broadcast(&self->uv_reqfree);
+	sig_send(&self->uv_reqfree);
 }
 
 

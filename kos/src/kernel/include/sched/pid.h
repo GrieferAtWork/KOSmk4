@@ -122,7 +122,7 @@ struct sigqueue {
 	 * NOTE: Locking of this also depends on the context, where per-process
 	 *       locking uses an atomic r/w-lock, while per-thread locking uses
 	 *       atomic append operations. */
-	struct sig             sq_newsig; /* Signal used to broadcast addition of new signals. */
+	struct sig             sq_newsig; /* Signal send once for every signal that is added to `sq_queue'. */
 	struct sigqueue_entry *sq_queue;  /* [0..1][owned][lock(sq_lock)] List of queued signals.
 	                                   * Set to `SIGQUEUE_SQ_QUEUE_TERMINATED' when the
 	                                   * thread/process has terminated. */

@@ -786,7 +786,8 @@ again:
 		            "because of suspend request (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio);
 		ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_READY);
-		sig_broadcast(&self->b_sigready);
+		/* Only one thread can hold the `ATA_BUS_STATE_INPIO'-lock, so use `sig_send()'! */
+		sig_send(&self->b_sigready);
 		return;
 	}
 	/* Check for further pending DMA handles. */
@@ -829,7 +830,8 @@ again:
 	            "there are no more DMA commands (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
 	            self->b_busio, self->b_ctrlio, self->b_dmaio);
 	ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_READY);
-	sig_broadcast(&self->b_sigready);
+	/* Only one thread can hold the `ATA_BUS_STATE_INPIO'-lock, so use `sig_send()'! */
+	sig_send(&self->b_sigready);
 	/* NOTE: Because new jobs may have been scheduled before
 	 *       we switched to READY mode, we must check if there
 	 *       are new jobs, and switch back to DMA mode if we've
@@ -1221,7 +1223,8 @@ NOTHROW(KCALL AtaBus_UnlockPIO)(struct ata_bus *__restrict self) {
 	if (newstate.b_state == ATA_BUS_STATE_INDMA_SWITCH)
 		ata_check_suspended_and_load_future(self);
 	else {
-		sig_broadcast(&self->b_sigready);
+		/* Only one thread can hold the `ATA_BUS_STATE_INPIO'-lock, so use `sig_send()'! */
+		sig_send(&self->b_sigready);
 	}
 }
 

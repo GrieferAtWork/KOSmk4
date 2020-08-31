@@ -33,7 +33,7 @@ DECL_BEGIN
 
 struct eventfd {
 	WEAK refcnt_t ef_refcnt; /* Reference counter. */
-	struct sig    ef_signal; /* Signal broadcast when reading or writing becomes non-blocking. */
+	struct sig    ef_signal; /* Signal send when reading or writing becomes non-blocking. */
 	atomic64_t    ef_value;  /* Eventfd value. */
 };
 

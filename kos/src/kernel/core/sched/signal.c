@@ -72,8 +72,8 @@ NOTHROW(FCALL _sig_smp_lock_acquire)(struct sig *__restrict self) {
 #define _sig_smp_lock_release(self) (void)0
 #endif /* SIG_SMPLOCK_BIT == 0 */
 
-#define sig_smp_lock_acquire_nosmp(self)         \
-	do {                                         \
+#define sig_smp_lock_acquire_nosmp(self) \
+	do {                                 \
 		pflag_t _ssl_was = PREEMPTION_PUSHOFF()
 #define sig_smp_lock_acquire(self)        \
 		sig_smp_lock_acquire_nosmp(self); \

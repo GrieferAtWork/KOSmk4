@@ -104,7 +104,8 @@ task_raisesignalthread(struct task *__restrict target,
 				entry->sqe_next = next;
 				COMPILER_WRITE_BARRIER();
 			} while (!ATOMIC_CMPXCH_WEAK(pending->sq_queue, next, entry));
-			sig_broadcast(&pending->sq_newsig);
+			/* Only one thread can ever handle the signal, so use `sig_send()' */
+			sig_send(&pending->sq_newsig);
 			/* Check if the signal is still being masked. - If it isn't, it may have gotten
 			 * unmasked before we inserted our new signal into the queue, in which case the
 			 * target thread may not know about it. - Because of this, send an RPC to have
@@ -338,8 +339,9 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 		                             next, info));
 	}
 	sync_endwrite(procqueue);
-	/* Broadcast the arrival of a new pending signal. */
-	sig_broadcast(&procqueue->psq_queue.sq_newsig);
+	/* Signal the arrival of a new pending signal.
+	 * Only one thread can ever handle the signal, so use `sig_send()' */
+	sig_send(&procqueue->psq_queue.sq_newsig);
 again_find_late_target:
 	/* Check for a potential target thread one more time. */
 	if unlikely(ATOMIC_READ(process_leader->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))

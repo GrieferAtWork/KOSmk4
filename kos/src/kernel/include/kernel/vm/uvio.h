@@ -296,10 +296,10 @@ struct uvio
 #ifndef __cplusplus
 	struct vm_datablock        uv_datablock; /* The underlying datablock */
 #endif /* __cplusplus */
-	struct sig                 uv_reqmore; /* Signal broadcast when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_PENDING'. */
+	struct sig                 uv_reqmore; /* Signal send when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_PENDING'. */
 	struct sig                 uv_reqdlvr; /* Signal broadcast when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_DELIVERED'. */
 	struct sig                 uv_reqdone; /* Signal broadcast when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_COMPLETE' or `KERNEL_UVIO_REQUEST_STATUS_EXCEPT'. */
-	struct sig                 uv_reqfree; /* Signal broadcast when a request slot is freed. */
+	struct sig                 uv_reqfree; /* Signal send when a request slot is freed. */
 	struct kernel_uvio_request uv_req[CONFIG_UVIO_MAX_PARALLEL_REQUESTS]; /* Vector of UVIO requests. */
 };
 

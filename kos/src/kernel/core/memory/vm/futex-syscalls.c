@@ -126,13 +126,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 			if (val == (uint32_t)-1) {
 				result = sig_broadcast(&f->f_signal);
 			} else {
-				/* Only signal at most `count' connected threads.
-				 * TODO: Make sure that when a already received signal connection is discarded
-				 *      (such as is the case when `task_popconnections()' appears in an except-
-				 *       path), the already delivered signal gets broadcast, thus ensuring that
-				 *       sending a signal to a single thread (like we do here), don't end up
-				 *       being ignored because the thread that was chosen ended up terminating!
-				 */
+				/* Only signal at most `count' connected threads. */
 				while (val) {
 					if (!sig_send(&f->f_signal))
 						break;

@@ -95,7 +95,7 @@ again:
 #ifdef CONFIG_YIELD_BEFORE_CONNECT
 do_exchange:
 		;
-#endif
+#endif /* CONFIG_YIELD_BEFORE_CONNECT */
 	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
 	                                      __ATOMIC_SEQ_CST,
 	                                      __ATOMIC_SEQ_CST));
@@ -133,7 +133,7 @@ again:
 #ifdef CONFIG_YIELD_BEFORE_CONNECT
 do_exchange:
 		;
-#endif
+#endif /* CONFIG_YIELD_BEFORE_CONNECT */
 	} while (!__hybrid_atomic_cmpxch_weak(self->s_count, count, count - 1,
 	                                      __ATOMIC_SEQ_CST,
 	                                      __ATOMIC_SEQ_CST));
@@ -150,23 +150,6 @@ NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
 		return sig_send(&self->s_avail); /* Signal a single thread when the first ticket gets added. */
 	return false;
 }
-LOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL semaphore_altpost)(struct semaphore *__restrict self, struct sig *sender) {
-	if (__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST) == 0)
-		return sig_altsend(&self->s_avail, sender); /* Signal a single thread when the first ticket gets added. */
-	return false;
-}
-LOCAL NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL semaphore_postb)(struct semaphore *__restrict self) {
-	__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST);
-	return sig_broadcast(&self->s_avail); /* Signal all waiting threads. */
-}
-LOCAL NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL semaphore_altpostb)(struct semaphore *__restrict self, struct sig *sender) {
-	__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST);
-	return sig_altbroadcast(&self->s_avail, sender); /* Signal all waiting threads. */
-}
-
 
 /* Poll the given semaphore for being available, returning `true'
  * if it is, or `false' after connecting to the signal used to

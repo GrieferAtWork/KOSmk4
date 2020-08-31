@@ -748,7 +748,8 @@ task_signal_rpc_handler(void *arg,
 					info->sqe_next = next;
 					COMPILER_WRITE_BARRIER();
 				} while (!ATOMIC_CMPXCH_WEAK(pertask_pending->sq_queue, next, info));
-				sig_broadcast(&pertask_pending->sq_newsig);
+				/* Only one thread can ever handle the signal, so use `sig_send()' */
+				sig_send(&pertask_pending->sq_newsig);
 				/* Restart the interrupted system call without letting userspace know. */
 				if (reason == TASK_RPC_REASON_SYSCALL)
 					return TASK_RPC_RESTART_SYSCALL;
@@ -805,7 +806,8 @@ task_signal_rpc_handler_after_syscall(void *arg,
 					info->sqe_next = next;
 					COMPILER_WRITE_BARRIER();
 				} while (!ATOMIC_CMPXCH_WEAK(pertask_pending->sq_queue, next, info));
-				sig_broadcast(&pertask_pending->sq_newsig);
+				/* Only one thread can ever handle the signal, so use `sig_send()' */
+				sig_send(&pertask_pending->sq_newsig);
 				/* Restart the interrupted system call without letting userspace know. */
 				if (reason == TASK_RPC_REASON_SYSCALL)
 					return TASK_RPC_RESTART_SYSCALL;

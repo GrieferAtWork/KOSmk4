@@ -127,13 +127,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			if (count == (size_t)-1) {
 				result = sig_broadcast(&f->f_signal);
 			} else {
-				/* Only signal at most `count' connected threads.
-				 * TODO: Make sure that when a already received signal connection is discarded
-				 *      (such as is the case when `task_popconnections()' appears in an except-
-				 *       path), the already delivered signal gets broadcast, thus ensuring that
-				 *       sending a signal to a single thread (like we do here), don't end up
-				 *       being ignored because the thread that was chosen ended up terminating!
-				 */
+				/* Only signal at most `count' connected threads. */
 				while (count) {
 					if (!sig_send(&f->f_signal))
 						break;
@@ -209,13 +203,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 				APPLY_MASK();
 				result = sig_broadcast(&f->f_signal);
 			} else {
-				/* Only signal at most `count' connected threads.
-				 * TODO: Make sure that when a already received signal connection is discarded
-				 *      (such as is the case when `task_popconnections()' appears in an except-
-				 *       path), the already delivered signal gets broadcast, thus ensuring that
-				 *       sending a signal to a single thread (like we do here), don't end up
-				 *       being ignored because the thread that was chosen ended up terminating!
-				 */
+				/* Only signal at most `count' connected threads. */
 				while (count) {
 					if (!sig_send(&f->f_signal)) {
 						size_t temp;

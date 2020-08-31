@@ -166,7 +166,9 @@ again:
 PRIVATE NOBLOCK void NOTHROW(KCALL usb_probe_unknown_release)(void) {
 	assert(usb_probe_unknown_lock == THIS_TASK);
 	ATOMIC_WRITE(usb_probe_unknown_lock, NULL);
-	sig_broadcast(&usb_probe_unknown_unlock);
+	/* Only one thread can be holding `usb_probe_unknown_lock',
+	 * so only wake up a single thread by using `sig_send()' */
+	sig_send(&usb_probe_unknown_unlock);
 }
 
 LOCAL bool KCALL

@@ -86,9 +86,9 @@ again:
 		}
 		task_disconnectall();
 	}
-	/* If writing has just become available, broadcast the signal. */
+	/* If writing has just become available, send the signal. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
-		sig_broadcast(&self->ef_signal);
+		sig_send(&self->ef_signal);
 	UNALIGNED_SET64((u64 *)dst, val);
 	return 8;
 }
@@ -124,9 +124,9 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 		if (atomic64_cmpxch(&self->ef_value, val, val - 1))
 			break;
 	}
-	/* If writing has just become available, broadcast the signal. */
+	/* If writing has just become available, send the signal. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
-		sig_broadcast(&self->ef_signal);
+		sig_send(&self->ef_signal);
 	UNALIGNED_SET64((u64 *)dst, val);
 	return 8;
 }
@@ -165,9 +165,9 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 		}
 		if (!atomic64_cmpxch(&self->ef_value, oldval, newval))
 			continue;
-		/* If reading just became available, broadcast the signal. */
+		/* If reading just became available, send the signal. */
 		if (oldval == 0)
-			sig_broadcast(&self->ef_signal);
+			sig_send(&self->ef_signal);
 	}
 	return 8;
 }

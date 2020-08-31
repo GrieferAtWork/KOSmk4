@@ -97,6 +97,9 @@ struct sig {
 
 
 /* Send signal `self' to exactly 1 connected thread
+ *  - The receiver is the thread who's connection has been pending the longest.
+ *  - Note the special interaction of this function with poll-based connections.
+ *    For more information on this subject, see `task_connect_for_poll()'.
  * @return: true:  A waiting thread was signaled.
  * @return: false: The given signal didn't have any active connections. */
 FUNDEF NOBLOCK NONNULL((1)) __BOOL
@@ -105,8 +108,9 @@ FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender);
 
-/* Send signal to all connected threads
- * @return: * : The actual number of threads notified, not counting ghosts. */
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self);
 FUNDEF NOBLOCK NONNULL((1, 2)) size_t

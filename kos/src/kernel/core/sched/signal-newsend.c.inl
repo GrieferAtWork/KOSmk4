@@ -34,6 +34,9 @@ DECL_BEGIN
 
 #ifdef DEFINE_sig_send
 /* Send signal `self' to exactly 1 connected thread
+ *  - The receiver is the thread who's connection has been pending the longest.
+ *  - Note the special interaction of this function with poll-based connections.
+ *    For more information on this subject, see `task_connect_for_poll()'.
  * @return: true:  A waiting thread was signaled.
  * @return: false: The given signal didn't have any active connections. */
 PUBLIC NOBLOCK NONNULL((1)) __BOOL
@@ -45,8 +48,9 @@ NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender)
 #elif defined(DEFINE_sig_broadcast)
 #define HAVE_BROADCAST 1
-/* Send signal to all connected threads
- * @return: * : The actual number of threads notified, not counting ghosts. */
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast)
@@ -159,8 +163,9 @@ start_find_receiver:
 			if (!TASK_CONNECTION_STAT_CHECK(status)) {
 				if (TASK_CONNECTION_STAT_ISNORM(status))
 					receiver = con; /* This connection is still in alive. */
+			} else {
+				assert(status == TASK_CONNECTION_STAT_SENT);
 			}
-			assert(status == TASK_CONNECTION_STAT_SENT);
 			con = con->tc_signext;
 			if (!con)
 				break;

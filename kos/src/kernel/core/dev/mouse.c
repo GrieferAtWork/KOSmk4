@@ -78,8 +78,10 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
 		}
 #endif /* !NDEBUG */
 	}
-	if (oldstate.bs_state.s_used == 0)
-		sig_broadcast(&self->mb_avail);
+	if (oldstate.bs_state.s_used == 0) {
+		/* Only one thread can read input, so use `sig_send()'! */
+		sig_send(&self->mb_avail);
+	}
 	return true;
 }
 
@@ -135,8 +137,10 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mouse_buffer *__restrict self
 #endif /* !NDEBUG */
 		}
 	}
-	if (oldstate.bs_state.s_used == 0)
-		sig_broadcast(&self->mb_avail);
+	if (oldstate.bs_state.s_used == 0) {
+		/* Only one thread can read input, so use `sig_send()'! */
+		sig_send(&self->mb_avail);
+	}
 	return true;
 }
 
