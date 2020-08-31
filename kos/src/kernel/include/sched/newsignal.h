@@ -54,6 +54,7 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct sig;
+struct task;
 struct task_connection;
 struct task_connections;
 
@@ -112,6 +113,15 @@ FUNDEF NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                 struct sig *sender);
 
+/* Check if the given signal has viable recipients.
+ * This includes poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self);
+
+/* Count the # of viable recipients of the given signal.
+ * This includes poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
 
 
 

@@ -675,6 +675,60 @@ PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {
 }
 
 
+
+/* Check if the given signal has viable recipients.
+ * This includes poll-based connections. */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self) {
+	bool result = false;
+	struct task_connection *cons;
+	/* Quick check: Are there any established connections? */
+	cons = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
+	if (cons) {
+		/* Acquire the SMP-lock for `self', so we can inspect
+		 * the chain of established connections more closely. */
+		sig_smp_lock_acquire(self);
+		for (cons = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
+		     cons; cons = cons->tc_signext) {
+			uintptr_t status;
+			status = ATOMIC_READ(cons->tc_stat);
+			if (!TASK_CONNECTION_STAT_CHECK(status)) {
+				/* Found an alive, normal connection! */
+				result = true;
+				break;
+			}
+		}
+		sig_smp_lock_release(self);
+	}
+	return result;
+}
+
+/* Count the # of viable recipients of the given signal.
+ * This includes poll-based connections. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
+	size_t result = 0;
+	struct task_connection *cons;
+	/* Quick check: Are there any established connections? */
+	cons = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
+	if (cons) {
+		/* Acquire the SMP-lock for `self', so we can inspect
+		 * the chain of established connections more closely. */
+		sig_smp_lock_acquire(self);
+		for (cons = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
+		     cons; cons = cons->tc_signext) {
+			uintptr_t status;
+			status = ATOMIC_READ(cons->tc_stat);
+			if (!TASK_CONNECTION_STAT_CHECK(status))
+				++result; /* Found an alive, normal connection! */
+		}
+		sig_smp_lock_release(self);
+	}
+	return result;
+}
+
+
+
 DECL_END
 
 #ifndef __INTELLISENSE__

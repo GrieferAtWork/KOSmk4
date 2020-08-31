@@ -117,11 +117,12 @@ preemption_pop_and_lock:
 			PREEMPTION_POP(was);
 		} else {
 			REF struct task *target_thread = NULL;
-			target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
+			struct task_connections *real_target_cons;
+			real_target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
 			/* Set the delivered signal, and capture
 			 * the target_thread thread, if there is one */
-			if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, SIG_SENDER))
-				target_thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+			if (ATOMIC_CMPXCH(real_target_cons->tcs_dlvr, NULL, SIG_SENDER))
+				target_thread = xincref(ATOMIC_READ(real_target_cons->tcs_thread));
 			next = con->tc_signext;
 			COMPILER_BARRIER();
 			ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
@@ -133,7 +134,9 @@ preemption_pop_and_lock:
 				task_wake(target_thread);
 				decref_unlikely(target_thread);
 			}
-			++result;
+			/* Only normal connections count towards the returned # of threads. */
+			if (TASK_CONNECTION_STAT_ISNORM(target_cons))
+				++result;
 		}
 		/* Try to wake up the remaining threads. */
 #ifdef __OPTIMIZE_SIZE__
