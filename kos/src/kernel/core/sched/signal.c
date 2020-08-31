@@ -728,6 +728,44 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 }
 
 
+/* Same as `sig_send()', but repeat the operation up to `maxcount' times,
+ * and return the # of times that `sig_send()' would have returned `true'
+ * Equivalent to:
+ * >> size_t result = 0;
+ * >> while (maxcount) {
+ * >>     if (!sig_send(self))
+ * >>         break;
+ * >>     --maxcount;
+ * >>     ++result;
+ * >> }
+ * >> return result; */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self,
+                            size_t maxcount) {
+	size_t result = 0;
+	while (maxcount) {
+		if (!sig_send(self))
+			break;
+		--maxcount;
+		++result;
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altsendmany)(struct sig *self,
+                               struct sig *sender,
+                               size_t maxcount) {
+	size_t result = 0;
+	while (maxcount) {
+		if (!sig_altsend(self, sender))
+			break;
+		--maxcount;
+		++result;
+	}
+	return result;
+}
+
 
 DECL_END
 

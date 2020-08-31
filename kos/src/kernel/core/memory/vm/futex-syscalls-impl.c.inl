@@ -127,13 +127,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			if (count == (size_t)-1) {
 				result = sig_broadcast(&f->f_signal);
 			} else {
-				/* Only signal at most `count' connected threads. */
-				while (count) {
-					if (!sig_send(&f->f_signal))
-						break;
-					++result;
-					--count;
-				}
+				result = sig_sendmany(&f->f_signal, count);
 			}
 			decref_unlikely(f);
 		}

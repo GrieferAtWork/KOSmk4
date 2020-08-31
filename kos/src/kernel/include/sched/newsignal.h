@@ -108,6 +108,25 @@ FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender);
 
+/* Same as `sig_send()', but repeat the operation up to `maxcount' times,
+ * and return the # of times that `sig_send()' would have returned `true'
+ * Equivalent to:
+ * >> size_t result = 0;
+ * >> while (maxcount) {
+ * >>     if (!sig_send(self))
+ * >>         break;
+ * >>     --maxcount;
+ * >>     ++result;
+ * >> }
+ * >> return result; */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self,
+                            size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altsendmany)(struct sig *self,
+                               struct sig *sender,
+                               size_t maxcount);
+
 /* Send signal to all connected threads.
  * @return: * : The actual number of threads notified,
  *              not counting poll-based connections. */

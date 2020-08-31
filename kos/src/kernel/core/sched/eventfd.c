@@ -50,7 +50,7 @@ REF struct eventfd *KCALL eventfd_create(u64 value) THROWS(E_BADALLOC) {
 	result = (struct eventfd *)kmalloc(sizeof(struct eventfd), GFP_NORMAL);
 	result->ef_refcnt = 1;
 	sig_init(&result->ef_signal);
-	result->ef_value = value;
+	atomic64_init(&result->ef_value, value);
 	return result;
 }
 
@@ -86,9 +86,9 @@ again:
 		}
 		task_disconnectall();
 	}
-	/* If writing has just become available, send the signal. */
+	/* If writing has just become available, wake up writers. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
-		sig_send(&self->ef_signal);
+		sig_broadcast(&self->ef_signal);
 	UNALIGNED_SET64((u64 *)dst, val);
 	return 8;
 }
@@ -124,9 +124,9 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 		if (atomic64_cmpxch(&self->ef_value, val, val - 1))
 			break;
 	}
-	/* If writing has just become available, send the signal. */
+	/* If writing has just become available, wake up writers. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
-		sig_send(&self->ef_signal);
+		sig_broadcast(&self->ef_signal);
 	UNALIGNED_SET64((u64 *)dst, val);
 	return 8;
 }
@@ -165,9 +165,8 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 		}
 		if (!atomic64_cmpxch(&self->ef_value, oldval, newval))
 			continue;
-		/* If reading just became available, send the signal. */
-		if (oldval == 0)
-			sig_send(&self->ef_signal);
+		/* Wake up a single reader. */
+		sig_send(&self->ef_signal);
 	}
 	return 8;
 }
@@ -186,7 +185,12 @@ evenfd_getavail(struct eventfd *__restrict self) {
 }
 
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_write, handle_eventfd_fence_write);
+
+/* TODO: handle_eventfd_fence_readv */
+/* TODO: handle_eventfd_fence_writev */
+/* TODO: handle_eventfd_sema_readv */
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_writev, handle_eventfd_fence_writev);
+
 
 INTERN poll_mode_t KCALL
 handle_eventfd_fence_poll(struct eventfd *__restrict self,

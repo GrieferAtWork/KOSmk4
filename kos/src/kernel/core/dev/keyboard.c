@@ -129,10 +129,8 @@ NOTHROW(KCALL keyboard_buffer_putkey_nopr)(struct keyboard_buffer *__restrict se
 		}
 #endif /* !NDEBUG */
 	}
-	if (oldstate.bs_state.s_used == 0) {
-		/* Only one thread can read input, so use `sig_send()'! */
-		sig_send(&self->kb_avail);
-	}
+	/* Send the signal for every key enqueued. */
+	sig_send(&self->kb_avail);
 	return true;
 }
 
@@ -1255,10 +1253,9 @@ continue_copy_keymap:
 		memcpy(&me->kd_pend[me->kd_pendsz], new_buf, avail);
 		me->kd_pendsz += avail;
 		sync_endwrite(&me->kd_map_lock);
-		if (avail) {
-			/* Only one thread can read input, so use `sig_send()'! */
-			sig_send(&me->kd_buf.kb_avail);
-		}
+		/* Wake up one thread for every added key. */
+		if (avail)
+			sig_sendmany(&me->kd_buf.kb_avail, avail);
 		return avail;
 	}	break;
 

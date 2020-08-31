@@ -295,8 +295,8 @@ copy_faulting_byte:
 			next_byte_pos = self->rb_rdtot;
 			ringbuffer_trimbuf_and_endwrite(self);
 			if (was_full) {
-				/* Use `sig_send()', because only 1 thread could ever do the write! */
-				sig_send(&self->rb_nfull);
+				/* Broadcast, since there may be multiple writers. */
+				sig_broadcast(&self->rb_nfull);
 			}
 			/* Try to copy `next_byte' into the user-supplied buffer */
 			COMPILER_WRITE_BARRIER();

@@ -1852,7 +1852,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	info.si_signo = signo;
 	info.si_errno = 0;
 	info.si_code  = SI_USER;
-	info.si_uid   = cred_geteuid();
+	info.si_uid   = (typeof(info.si_uid))cred_geteuid();
 	mypid         = THIS_TASKPID;
 	if (pid > 0) {
 		/* Kill the thread matching `pid'. */
@@ -1912,7 +1912,7 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		info.si_signo = signo;
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
-		info.si_uid   = cred_geteuid();
+		info.si_uid   = (typeof(info.si_uid))cred_geteuid();
 		info.si_pid   = taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
@@ -1939,7 +1939,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, signo_t, signo) {
 		info.si_signo = signo;
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
-		info.si_uid   = cred_geteuid();
+		info.si_uid   = (typeof(info.si_uid))cred_geteuid();
 		info.si_pid   = taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));

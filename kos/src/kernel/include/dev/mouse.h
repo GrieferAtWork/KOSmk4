@@ -54,7 +54,7 @@ union mouse_buffer_state {
 struct mouse_buffer {
 	union mouse_buffer_state mb_bufstate; /* Buffer state */
 	WEAK mouse_packet_t      mb_buffer[CONFIG_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
-	struct sig               mb_avail;    /* Signal broadcast when the buffer becomes non-empty. */
+	struct sig               mb_avail;    /* Signal send for every packet added to the buffer. */
 };
 
 struct mouse_state {

@@ -60,7 +60,7 @@ union keyboard_buffer_state {
 struct keyboard_buffer {
 	union keyboard_buffer_state kb_bufstate; /* Buffer state */
 	WEAK u16                    kb_buffer[CONFIG_KEYBOARD_BUFFER_SIZE]; /* Buffer of unread keyboard inputs. */
-	struct sig                  kb_avail;    /* Signal broadcast when the buffer becomes non-empty. */
+	struct sig                  kb_avail;    /* Signal send for every key added to the buffer. */
 };
 
 

@@ -126,13 +126,8 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 			if (val == (uint32_t)-1) {
 				result = sig_broadcast(&f->f_signal);
 			} else {
-				/* Only signal at most `count' connected threads. */
-				while (val) {
-					if (!sig_send(&f->f_signal))
-						break;
-					++result;
-					--val;
-				}
+				/* Only signal at most `val' connected threads. */
+				result = sig_sendmany(&f->f_signal, (size_t)val);
 			}
 			decref_unlikely(f);
 		}

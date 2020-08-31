@@ -62,12 +62,16 @@ __SIZE_TYPE__ sched_signal_broadcast(sched_signal_t *__self);
 /* Wake a single thread waiting on the given signal. */
 __BOOL sched_signal_send(sched_signal_t *__self);
 
+/* Wake a single thread waiting on the given signal. */
+__SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_count);
+
 #elif defined(__KERNEL__)
 
 #define sched_signal_init        sig_init
 #define sched_signal_cinit       sig_cinit
 #define sched_signal_broadcast   sig_broadcast
 #define sched_signal_send        sig_send
+#define sched_signal_sendmany    sig_sendmany
 
 #else /* __KERNEL__ */
 
@@ -81,9 +85,11 @@ __BOOL sched_signal_send(sched_signal_t *__self);
 #endif /* !__CRT_HAVE_futexlock_wakeall */
 
 #ifdef __CRT_HAVE_futexlock_wake
-#define sched_signal_send(self) futexlock_wake(self, 1)
+#define sched_signal_send(self)                futexlock_wake(self, 1)
+#define sched_signal_sendmany(self, max_count) futexlock_wake(self, max_count)
 #else /* __CRT_HAVE_futexlock_wake */
-#define sched_signal_send(self) __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wake")
+#define sched_signal_send(self)                __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wake")
+#define sched_signal_sendmany(self, max_count) __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wake")
 #endif /* !__CRT_HAVE_futexlock_wake */
 
 #endif /* !__KERNEL__ */
