@@ -64,7 +64,7 @@ struct heapptr {
 
 
 
-LOCAL __NOBLOCK NONNULL((1)) void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 	if (self->rb_rptr != 0) {
 		size_t lo, hi;
@@ -122,7 +122,7 @@ NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 	}
 }
 
-PRIVATE __NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(CC ringbuffer_trimbuf_and_endwrite)(struct ringbuffer *__restrict self) {
 	size_t limit, thresh, unused_bytes;
 	if likely(self->rb_size) {

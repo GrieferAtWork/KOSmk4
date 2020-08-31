@@ -32,7 +32,7 @@
 DECL_BEGIN
 
 /* Initialize/Finalize the given terminal controller. */
-INTDEF __NOBLOCK NONNULL((1, 2)) void
+INTDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
                                  pterminal_oprinter_t oprinter,
                                  pterminal_raise_t raisefunc,

@@ -27,4 +27,9 @@
 
 #define CC LIBZLIB_CC
 
+#ifndef NOBLOCK
+#include <kos/anno.h>
+#define NOBLOCK __NOBLOCK
+#endif /* !NOBLOCK */
+
 #endif /* !GUARD_LIBZLIB_API_H */

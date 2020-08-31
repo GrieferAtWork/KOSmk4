@@ -73,7 +73,7 @@ linebuffer_writef(struct linebuffer *__restrict self,
 
 
 /* Initialize/Finalize the given terminal controller. */
-INTERN __NOBLOCK NONNULL((1, 2)) void
+INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
                                  pterminal_oprinter_t oprinter,
                                  pterminal_raise_t raisefunc,

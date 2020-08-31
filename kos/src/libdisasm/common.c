@@ -45,7 +45,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/addr2line.h>
 
 #include "common.h"
+
+#if (defined(DISASSEMBLER_TARGET_8086) || \
+     defined(DISASSEMBLER_TARGET_I386) || \
+     defined(DISASSEMBLER_TARGET_X86_64))
 #include "x86.h"
+#endif /* X86... */
 
 #ifndef __KERNEL__
 #include <dlfcn.h>
@@ -59,13 +64,7 @@ DECL_BEGIN
 /* Quick and simple function for disassembling text into a given printer.
  * This is equivalent to:
  * >> struct disassembler da;
- * >> disasm_init(&da,
- * >>              printer,
- * >>              arg,
- * >>              pc,
- * >>              target,
- * >>              flags,
- * >>              0);
+ * >> disasm_init(&da, printer, arg, pc, target, flags, 0);
  * >> return disasm_print_until(&da, (byte_t *)pc + num_bytes);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
@@ -73,13 +72,7 @@ INTERN NONNULL((1)) ssize_t CC
 libda_disasm(pformatprinter printer, void *arg, void *pc, size_t num_bytes,
              uintptr_half_t target, uintptr_half_t flags) {
 	struct disassembler da;
-	disasm_init(&da,
-	            printer,
-	            arg,
-	            pc,
-	            target,
-	            flags,
-	            0);
+	disasm_init(&da, printer, arg, pc, target, flags, 0);
 	return libda_disasm_print_until(&da,
 	                                (byte_t *)pc + num_bytes);
 }
@@ -88,13 +81,7 @@ libda_disasm(pformatprinter printer, void *arg, void *pc, size_t num_bytes,
 /* Quick and simple function for disassembling a single instruction.
  * This is equivalent to:
  * >> struct disassembler da;
- * >> disasm_init(&da,
- * >>              printer,
- * >>              arg,
- * >>              pc,
- * >>              target,
- * >>              flags,
- * >>              0);
+ * >> disasm_init(&da, printer, arg, pc, target, flags, 0);
  * >> return disasm_print_instruction(&da);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
@@ -102,13 +89,7 @@ INTERN NONNULL((1)) ssize_t CC
 libda_disasm_single(pformatprinter printer, void *arg, void *pc,
                     uintptr_half_t target, uintptr_half_t flags) {
 	struct disassembler da;
-	disasm_init(&da,
-	            printer,
-	            arg,
-	            pc,
-	            target,
-	            flags,
-	            0);
+	disasm_init(&da, printer, arg, pc, target, flags, 0);
 	return libda_disasm_print_instruction(&da);
 }
 
@@ -197,11 +178,21 @@ INTERN NONNULL((1)) ssize_t CC
 libda_disasm_print_instruction(struct disassembler *__restrict self) {
 	switch (self->d_target) {
 
+#if (defined(DISASSEMBLER_TARGET_8086) || \
+     defined(DISASSEMBLER_TARGET_I386) || \
+     defined(DISASSEMBLER_TARGET_X86_64))
+#ifdef DISASSEMBLER_TARGET_8086
 	case DISASSEMBLER_TARGET_8086:
+#endif /* DISASSEMBLER_TARGET_8086 */
+#ifdef DISASSEMBLER_TARGET_I386
 	case DISASSEMBLER_TARGET_I386:
+#endif /* DISASSEMBLER_TARGET_I386 */
+#ifdef DISASSEMBLER_TARGET_X86_64
 	case DISASSEMBLER_TARGET_X86_64:
+#endif /* DISASSEMBLER_TARGET_X86_64 */
 		libda_single_x86(self);
 		break;
+#endif /* X86... */
 
 	default:
 		libda_single_generic(self);
@@ -286,14 +277,20 @@ PRIVATE WUNUSED ATTR_CONST unsigned int CC
 address_width(uintptr_half_t target) {
 	switch (target) {
 
+#ifdef DISASSEMBLER_TARGET_8086
 	case DISASSEMBLER_TARGET_8086:
 		return 4;
+#endif /* DISASSEMBLER_TARGET_8086 */
 
+#ifdef DISASSEMBLER_TARGET_I386
 	case DISASSEMBLER_TARGET_I386:
 		return 8;
+#endif /* DISASSEMBLER_TARGET_I386 */
 
+#ifdef DISASSEMBLER_TARGET_X86_64
 	case DISASSEMBLER_TARGET_X86_64:
 		return 16;
+#endif /* DISASSEMBLER_TARGET_X86_64 */
 
 	default:
 		break;
@@ -460,11 +457,21 @@ libda_disasm_default_maxbytes(uintptr_half_t target) {
 	uintptr_half_t result;
 	switch (target) {
 
+#if (defined(DISASSEMBLER_TARGET_8086) || \
+     defined(DISASSEMBLER_TARGET_I386) || \
+     defined(DISASSEMBLER_TARGET_X86_64))
+#ifdef DISASSEMBLER_TARGET_8086
 	case DISASSEMBLER_TARGET_8086:
+#endif /* DISASSEMBLER_TARGET_8086 */
+#ifdef DISASSEMBLER_TARGET_I386
 	case DISASSEMBLER_TARGET_I386:
+#endif /* DISASSEMBLER_TARGET_I386 */
+#ifdef DISASSEMBLER_TARGET_X86_64
 	case DISASSEMBLER_TARGET_X86_64:
+#endif /* DISASSEMBLER_TARGET_X86_64 */
 		result = 5;
 		break;
+#endif /* X86... */
 
 	default:
 		result = 4;

@@ -56,7 +56,7 @@ BEGIN
 		SOURCE({ "arch/" + XARCH + "/*.c", "./*.c" })
 	END
 	BEGIN GROUP("libs.libdl") { COMPILE };
-		/* Arch-specific files, as well as system call implementations */
+		/* Arch-specific files */
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({ "arch/" + XARCH_ASMFILES })
 	END

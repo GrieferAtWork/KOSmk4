@@ -27,6 +27,11 @@
 
 #define CC LIBANSITTY_CC
 
+#ifndef NOBLOCK
+#include <kos/anno.h>
+#define NOBLOCK __NOBLOCK
+#endif /* !NOBLOCK */
+
 #include <__crt.h>
 #if !defined(NDEBUG) && 1
 #ifdef __KERNEL__

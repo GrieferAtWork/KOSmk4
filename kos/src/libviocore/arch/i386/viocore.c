@@ -104,7 +104,7 @@ INTDEF void CC libviocore_emulate(struct vio_emulate_args *__restrict self);
 #endif /* !__KERNEL__ */
 
 /* Fill in missing exception pointer. */
-PRIVATE ATTR_NORETURN __NOBLOCK void CC
+PRIVATE ATTR_NORETURN NOBLOCK void CC
 libviocore_complete_except(struct vio_emulate_args *__restrict self,
                            uintptr_t opcode, emu86_opflags_t op_flags) {
 	struct exception_data *data;

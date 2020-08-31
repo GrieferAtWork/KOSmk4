@@ -30,4 +30,9 @@
 
 #define CC LIBVIOCORE_CC
 
+#ifndef NOBLOCK
+#include <kos/anno.h>
+#define NOBLOCK __NOBLOCK
+#endif /* !NOBLOCK */
+
 #endif /* !GUARD_LIBVIOCORE_API_H */

@@ -193,13 +193,7 @@ disasm_print_format(struct disassembler *__restrict self,
 /* Quick and simple function for disassembling text into a given printer.
  * This is equivalent to:
  * >> struct disassembler da;
- * >> disasm_init(&da,
- * >>              printer,
- * >>              arg,
- * >>              pc,
- * >>              target,
- * >>              flags,
- * >>              0);
+ * >> disasm_init(&da, printer, arg, pc, target, flags, 0);
  * >> return disasm_print_until(&da,(byte_t *)pc + num_bytes);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
@@ -218,13 +212,7 @@ disasm(__pformatprinter printer, void *arg, void *pc, __size_t num_bytes,
 /* Quick and simple function for disassembling a single instruction.
  * This is equivalent to:
  * >> struct disassembler da;
- * >> disasm_init(&da,
- * >>              printer,
- * >>              arg,
- * >>              pc,
- * >>              target,
- * >>              flags,
- * >>              0);
+ * >> disasm_init(&da, printer, arg, pc, target, flags, 0);
  * >> return disasm_print_instruction(&da);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */

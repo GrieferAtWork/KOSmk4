@@ -56,6 +56,13 @@
 #include <debugger/debugger.h>
 #endif /* CONFIG_HAVE_DEBUGGER */
 
+/* TODO: Add support for libdl.so to usermod objects.
+ *    -> Because libdl is loaded as a static binary into user-space,
+ *       and is hard-coded into the kernel, it's not backed by a regular
+ *       INode, and the usermod scanner won't recognize it as a potential
+ *       user-space library! */
+
+
 DECL_BEGIN
 
 /* Assert binary compatibility between USERMOD_SECTION and DRIVER_SECTION */

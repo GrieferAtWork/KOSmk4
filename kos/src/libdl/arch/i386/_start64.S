@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBDL_ARCH_I386__START64_S
 #define GUARD_LIBDL_ARCH_I386__START64_S 1
+#define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 

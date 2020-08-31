@@ -26,9 +26,6 @@
 #include <__crt.h>
 #include <hybrid/compiler.h>
 
-#include <kos/anno.h>
-
-
 #define CC LIBBUFFER_CC
 
 #ifdef __KERNEL__
@@ -42,6 +39,7 @@
 #endif /* !__KERNEL__ */
 
 #ifndef NOBLOCK
+#include <kos/anno.h>
 #define NOBLOCK __NOBLOCK
 #endif /* !NOBLOCK */
 

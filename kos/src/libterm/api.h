@@ -27,6 +27,11 @@
 
 #include <hybrid/compiler.h>
 
+#ifndef NOBLOCK
+#include <kos/anno.h>
+#define NOBLOCK __NOBLOCK
+#endif /* !NOBLOCK */
+
 #define CC LIBTERM_CC
 
 #ifdef __KERNEL__

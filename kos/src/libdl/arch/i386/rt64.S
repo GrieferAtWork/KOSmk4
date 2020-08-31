@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBDL_ARCH_I386_RT64_S
 #define GUARD_LIBDL_ARCH_I386_RT64_S 1
+#define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 #include <asm/cfi.h>
@@ -123,8 +124,8 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 
 	pushfq_cfi_r
 
-	movq   80(%rsp), %rdi /* MODULE */
-	movq   88(%rsp), %rsi /* JMPREL_offset */
+	movq   (80 + 0)(%rsp), %rdi /* MODULE */
+	movq   (80 + 8)(%rsp), %rsi /* JMPREL_offset */
 
 	/* Patch the relocation. */
 	INTERN(dl_bind_lazy_relocation)

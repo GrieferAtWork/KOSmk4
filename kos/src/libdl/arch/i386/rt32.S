@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBDL_ARCH_I386_RT32_S
 #define GUARD_LIBDL_ARCH_I386_RT32_S 1
+#define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 #include <asm/cfi.h>
@@ -150,7 +151,7 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 *    that the next call to `dlsym@plt' will immediately jump to the linked
 	 *    symbol, rather than having to jump through all of the hoops to get here.
 	 *
-	 * So on other words, when we get here, our
+	 * So in other words, when we get here, our
 	 * register/stack state looks like this:
 	 *  - 0(%esp)      == MODULE
 	 *  - 4(%esp)      == 0x20   (Offset added to `self->dm_elf.de_jmprel' for the associated jump relocation)
@@ -159,7 +160,7 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 *  - %ebx         == MODULE->dm_elf.de_pltgot   (Though this detail is unimportant)
 	 *
 	 * Also note that since we don't know anything about the calling convention
-	 * within which the user intends to invoke the lazily linked function, we must
+	 * with which the user intends to invoke the lazily linked function, we must
 	 * make sure that we don't clobber any of their registers!
 	 *
 	 * HINT: In glibc, this function's equivalent is called `_dl_runtime_resolve'
@@ -174,8 +175,8 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 
 	pushfl_cfi_r
 
-	movl   16(%esp), %ecx /* MODULE */
-	movl   20(%esp), %edx /* JMPREL_offset */
+	movl   (16 + 0)(%esp), %ecx /* MODULE */
+	movl   (16 + 4)(%esp), %edx /* JMPREL_offset */
 
 	/* Patch the relocation. */
 	INTERN(dl_bind_lazy_relocation)

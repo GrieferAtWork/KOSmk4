@@ -27,7 +27,6 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/wordbits.h>
 
-#include <kos/anno.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
@@ -205,7 +204,7 @@ enum{ _zl_startid = __COUNTER__ };
 
 #define MAX_BITS 15 /* max # of compressed bits for any literal */
 
-PRIVATE __NOBLOCK NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree,
                                           struct zlib_cache *__restrict cache) {
 	u16 i;
@@ -224,7 +223,7 @@ NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree,
 	}
 }
 
-PRIVATE __NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
 	u16 i, code, bits, minbits, maxbits;
 	u16 next_code[MAX_BITS + 2];
@@ -276,7 +275,7 @@ NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
  * given `compressed_bits' doesn't exceed `tree->zr_maxlen'), or give up once
  * the max number of addressible bits has been reached. (in which case a data
  * error should be reported) */
-PRIVATE __NOBLOCK WUNUSED NONNULL((1)) struct zlib_treeent *
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct zlib_treeent *
 NOTHROW_NCX(CC zlib_tree_find_slow)(struct zlib_tree *__restrict tree,
                                     u16 compressed_code,
                                     u8 compressed_bits) {
