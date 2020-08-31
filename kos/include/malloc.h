@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x249f60c8 */
+/* HASH CRC-32:0x78fa6993 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,9 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <asm/crt/malloc.h>
+#include <bits/types.h>
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #ifndef __cplusplus

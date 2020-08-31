@@ -26,7 +26,9 @@
 
 %{
 #include <features.h>
+
 #include <asm/crt/malloc.h>
+#include <bits/types.h>
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #ifndef __cplusplus
