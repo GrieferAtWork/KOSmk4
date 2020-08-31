@@ -81,27 +81,40 @@ STATIC_ASSERT(USERMOD_SECTION_LOCK_FNODATA == DRIVER_SECTION_LOCK_FNODATA);
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL usermod_section_unmap_and_free)(struct usermod_section *__restrict self) {
+	/* Must unmap sections data. */
+	uintptr_t sect_base;
+	size_t sect_size;
+	sect_base = (uintptr_t)self->us_cdata;
+	sect_size = self->us_size;
+	sect_size += sect_base & PAGEMASK;
+	sect_base &= ~PAGEMASK;
+	vm_unmap_kernel_mapping_locked((void *)sect_base,
+	                               (size_t)CEIL_ALIGN(sect_size,
+	                                                  PAGESIZE));
+	kfree(self);
+}
+
 /* Destroy the given usermod section. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) {
-	if (self->us_data != (void *)-1) {
-		/* Must unmap sections data. */
-		uintptr_t sect_base;
-		size_t sect_size;
-		sect_base = (uintptr_t)self->us_data;
-		if (sect_base != (uintptr_t)-1) {
-			sect_size = self->us_size;
-			sect_size += sect_base & PAGEMASK;
-			sect_base &= ~PAGEMASK;
-			vm_unmap(&vm_kernel,
-			         (void *)sect_base,
-			         (size_t)CEIL_ALIGN(sect_size, PAGESIZE));
-		}
-	}
 	/* Free compressed section data. */
 	if (self->us_cdata != (void *)-1 && self->us_cdata != self->us_data)
 		vpage_free(self->us_cdata, (size_t)CEILDIV(self->us_csize, PAGESIZE));
-	kfree(self);
+	if (self->us_data == (void *)-1) {
+		kfree(self);
+		return;
+	}
+	/* Must unmap sections data.
+	 * NOTE: Must write `us_data' elsewhere, since the first 2 pointers of the
+	 *       section object will be clobbered by `vm_kernel_locked_operation()' */
+	{
+		STATIC_ASSERT(offsetof(struct usermod_section, us_cdata) >=
+		              sizeof(struct vm_kernel_pending_operation));
+		self->us_cdata = self->us_data;
+		vm_kernel_locked_operation(self, &usermod_section_unmap_and_free);
+	}
 }
 
 
@@ -279,12 +292,13 @@ usermod_section_map_into_kernel(struct usermod_section *__restrict self,
 	                 /* fsname:            */ um->um_fsname,
 	                 /* data_start_offset: */ aligned_file_offset,
 	                 /* prot:              */ VM_PROT_READ,
-	                 /* flag:              */ VM_NODE_FLAG_NOMERGE,
+	                 /* flag:              */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
 	                 /* guard:             */ 0);
 	/* Store the actual base address of the file mapping. */
 	real_mapaddr = (byte_t *)mapaddr + map_offset;
 	if unlikely(!ATOMIC_CMPXCH(self->us_data, (void *)-1, real_mapaddr)) {
 		/* Race condition: Another thread already did the load in the mean time. */
+		/* FIXME: Unhandled exception when this throws! */
 		vm_unmap(&vm_kernel, mapaddr, aligned_file_size);
 	}
 }
@@ -393,7 +407,7 @@ return_existing_result:
 					                 /* fsname:            */ self->um_fsname,
 					                 /* data_start_offset: */ aligned_file_offset,
 					                 /* prot:              */ VM_PROT_READ,
-					                 /* flag:              */ VM_NODE_FLAG_NOMERGE,
+					                 /* flag:              */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
 					                 /* guard:             */ 0);
 					/* Store the actual base address of the file mapping. */
 					result->us_data = (byte_t *)mapaddr + map_offset;

@@ -335,7 +335,8 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
 
-INTERN NOBLOCK void
+/* Called with a lock to the kernel VM's treelock held. */
+PRIVATE NOBLOCK void
 NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	struct vm_node *node;
 	void *addr;
@@ -421,10 +422,6 @@ do_free_self:
 }
 
 
-/* Chain of tasks that are pending destruction.
- * Linked via `t_sched.s_running.sr_runnxt' */
-INTERN ATTR_READMOSTLY WEAK struct task *vm_pending_destroy_tasks = NULL;
-
 typedef void (KCALL *pertask_fini_t)(struct task *__restrict self);
 INTDEF pertask_fini_t __kernel_pertask_fini_start[];
 INTDEF pertask_fini_t __kernel_pertask_fini_end[];
@@ -440,13 +437,19 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 		task_destroy_raw_impl(self);
 		vm_kernel_treelock_endwrite();
 	} else {
-		struct task *next;
+		struct vm_kernel_pending_operation *mine, *next;
 		/* Schedule the task to-be destroyed later. */
+		mine = (struct vm_kernel_pending_operation *)self;
 		cpu_assert_integrity();
+		mine->vkpo_exec = (vm_kernel_pending_cb_t)&task_destroy_raw_impl;
+		cpu_assert_integrity();
+		task_destroy_raw_impl;
 		do {
-			next = ATOMIC_READ(vm_pending_destroy_tasks);
-			self->t_sched.s_running.sr_runnxt = next;
-		} while (!ATOMIC_CMPXCH_WEAK(vm_pending_destroy_tasks, next, self));
+			next = ATOMIC_READ(vm_kernel_pending_operations);
+			mine->vkpo_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(vm_kernel_pending_operations,
+		                             next, mine));
 		cpu_assert_integrity();
 		vm_kernel_treelock_tryservice();
 	}

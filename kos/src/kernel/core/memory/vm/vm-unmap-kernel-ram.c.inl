@@ -53,15 +53,46 @@ struct pending_unmap_ram {
 PRIVATE ATTR_READMOSTLY WEAK
 struct pending_unmap_ram *vm_pending_unmap_kernel_ram = NULL;
 
-/* Chain of tasks that are pending destruction.
- * Linked via `t_sched.s_running.sr_runnxt' */
-INTDEF ATTR_READMOSTLY WEAK struct task *vm_pending_destroy_tasks;
+/* [0..1][lock(ATOMIC)] Chain of pending operations to-be performed
+ * the next time a lock to the kernel VM could be acquired. */
+PUBLIC ATTR_READMOSTLY WEAK struct vm_kernel_pending_operation *
+vm_kernel_pending_operations = NULL;
 
-INTDEF NOBLOCK void NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self);
+
+
+/* Run `op->vkpo_exec' in the context of holding a lock to the kernel VM at some
+ * point in the future. The given `op->vkpo_exec' is responsible for freeing the
+ * backing memory of `op' during its invocation. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vm_kernel_locked_operation)(struct vm_kernel_pending_operation *__restrict op) {
+	if (vm_kernel_treelock_trywrite()) {
+		vm_kernel_pending_cb_t cb;
+		/* Invoke the callback immediately. */
+		cb = op->vkpo_exec;
+		COMPILER_BARRIER();
+#ifndef NDEBUG
+		memset(op, 0xcc, sizeof(*op));
+#endif /* !NDEBUG */
+		(*cb)(op);
+		vm_kernel_treelock_endwrite();
+	} else {
+		struct vm_kernel_pending_operation *next;
+		/* Schedule the callback as pending. */
+		do {
+			next = ATOMIC_READ(vm_kernel_pending_operations);
+			op->vkpo_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(vm_kernel_pending_operations,
+		                             next, op));
+		/* Try to service pending callbacks. */
+		vm_kernel_treelock_tryservice();
+	}
+}
+
 
 
 #define vm_kernel_treelock_mustservice() \
-	(ATOMIC_READ(vm_pending_destroy_tasks) || ATOMIC_READ(vm_pending_unmap_kernel_ram))
+	(ATOMIC_READ(vm_kernel_pending_operations) || ATOMIC_READ(vm_pending_unmap_kernel_ram))
 
 PRIVATE NOBLOCK_IF(flags & GFP_ATOMIC) void
 NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags);
@@ -934,14 +965,22 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 			}
 		}
 	}
-	if (ATOMIC_READ(vm_pending_destroy_tasks) != NULL) {
-		struct task *pend, *next;
-		pend = ATOMIC_XCH(vm_pending_destroy_tasks, NULL);
+	if (ATOMIC_READ(vm_kernel_pending_operations) != NULL) {
+		struct vm_kernel_pending_operation *pend, *next;
+		pend = ATOMIC_XCH(vm_kernel_pending_operations, NULL);
 		while (pend) {
-			next = pend->t_sched.s_running.sr_runnxt;
+			vm_kernel_pending_cb_t cb;
+			next = pend->vkpo_next;
+			cb   = pend->vkpo_exec;
+			COMPILER_BARRIER();
+#ifndef NDEBUG
+			memset(pend, 0xcc, sizeof(*pend));
+#endif /* !NDEBUG */
 			cpu_assert_integrity();
-			task_destroy_raw_impl(pend);
+			/* Invoke the callback. */
+			(*cb)(pend);
 			cpu_assert_integrity();
+			COMPILER_BARRIER();
 			pend = next;
 		}
 	}

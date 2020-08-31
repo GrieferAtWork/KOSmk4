@@ -143,7 +143,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	if (state != THREAD_STATE_SLEEPING) {
 		old_current = dbg_current;
 		dbg_current = thread;
-		dbg_printf(DBGSTR(" %[vinfo:%Rf:%l:%n]"),
+		dbg_printf(DBGSTR(" %[vinfo:%p:%Rf:%l:%n]"),
 		           dbg_getpcreg(DBG_REGLEVEL_EXIT));
 		dbg_current = old_current;
 	}
@@ -251,15 +251,15 @@ DBG_COMMAND(lsthread,
 			struct taskpid *pid;
 			pid = pidns_root.pn_list[i].pe_pid;
 			if (pid == NULL ||
-			    pid == PIDNS_ENTRY_DELETED)
+				pid == PIDNS_ENTRY_DELETED)
 				continue;
 			if (wasdestroyed(pid))
 				continue;
 			if (!pid->tp_thread.m_pointer ||
 			    wasdestroyed(pid->tp_thread.m_pointer)) {
-				dbg_printf(DBGSTR("<DEAD>     %u      " AC_WITHCOLOR(ANSITTY_CL_MAROON,
-				                                                     ANSITTY_CL_LIGHT_GRAY,
-				                                                     "D") "\n"),
+				dbg_printf(DBGSTR("<DEAD>     %u       " AC_WITHCOLOR(ANSITTY_CL_MAROON,
+				                                                      ANSITTY_CL_LIGHT_GRAY,
+				                                                      "D") "\n"),
 				           pid->tp_pids[0]);
 				continue;
 			}

@@ -474,7 +474,7 @@ vm_mapat(struct vm *__restrict self,
 		node->vn_node.a_vmin = pageid;
 		node->vn_node.a_vmax = pageid + part_pages - 1;
 		node->vn_prot        = prot;
-		node->vn_flags       = flag & VM_NODE_FLAG_PREPARED;
+		node->vn_flags       = flag & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE);
 		node->vn_vm          = self;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
@@ -671,7 +671,7 @@ again:
 		node->vn_node.a_vmin = offset_pageid;
 		node->vn_node.a_vmax = offset_pageid + part_pages - 1;
 		node->vn_prot        = prot;
-		node->vn_flags       = flag & VM_NODE_FLAG_PREPARED;
+		node->vn_flags       = flag & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE);
 		node->vn_vm          = self;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
@@ -912,7 +912,7 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 		node->vn_node.a_vmin = node_minpage;
 		node->vn_node.a_vmax = node_minpage + part_vpages - 1;
 		node->vn_prot        = prot;
-		node->vn_flags       = flag & VM_NODE_FLAG_PREPARED;
+		node->vn_flags       = flag & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE);
 		node->vn_vm          = effective_vm;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
@@ -947,7 +947,7 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 		node->vn_node.a_vmin = node_minpage;
 		node->vn_node.a_vmax = node_minpage + num_zerovpages - 1;
 		node->vn_prot        = prot;
-		node->vn_flags       = flag & VM_NODE_FLAG_PREPARED;
+		node->vn_flags       = flag & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE);
 		node->vn_vm          = effective_vm;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(&vm_datablock_anonymous_zero);

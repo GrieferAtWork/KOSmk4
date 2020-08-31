@@ -2146,6 +2146,15 @@ NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
 	                    is_zero);
 }
 
+/* Unmap a kernel-space memory mapping (that was created using `VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED')
+ * from kernel-space, where the caller must be holding a lock to `vm_kernel_treelock_write()'
+ * HINT: In order to do this entirely non-blocking, you should make use
+ *       of `vm_kernel_pending_operations'! */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL vm_unmap_kernel_mapping_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                              PAGEDIR_PAGEALIGNED size_t num_bytes);
+
+
 
 /* Get the node associated with the given `page'
  * NOTE: The caller must be holding a read-lock on `self'. */
@@ -2841,6 +2850,35 @@ vm_enum(struct vm *__restrict self, vm_enum_callback_t cb, void *arg,
 
 
 
+struct vm_kernel_pending_operation;
+typedef NOBLOCK void /*NOTHROW*/ (KCALL *vm_kernel_pending_cb_t)(struct vm_kernel_pending_operation *__restrict self);
+struct vm_kernel_pending_operation {
+	struct vm_kernel_pending_operation *vkpo_next; /* [0..1][const] Next pending operation. */
+	vm_kernel_pending_cb_t              vkpo_exec; /* [1..1][const] The operation to-be performed. */
+};
+
+/* [0..1][lock(ATOMIC)] Chain of pending operations to-be performed
+ * the next time a lock to the kernel VM could be acquired. */
+DATDEF WEAK struct vm_kernel_pending_operation *vm_kernel_pending_operations;
+
+/* Run `op->vkpo_exec' in the context of holding a lock to the kernel VM at some
+ * point in the future. The given `op->vkpo_exec' is responsible for freeing the
+ * backing memory of `op' during its invocation. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL vm_kernel_locked_operation)(struct vm_kernel_pending_operation *__restrict op);
+
+#ifdef __cplusplus
+extern "C++" {
+template<class T> FORCELOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(vm_kernel_locked_operation)(T *__restrict obj,
+                                    NOBLOCK void /*NOTHROW*/ (KCALL *cb)(T *__restrict self)) {
+	struct vm_kernel_pending_operation *pend;
+	pend = (struct vm_kernel_pending_operation *)obj;
+	pend->vkpo_exec = (vm_kernel_pending_cb_t)cb;
+	vm_kernel_locked_operation(pend);
+}
+} /* extern "C++" */
+#endif /* __cplusplus */
 
 
 /* List of callbacks that should be invoked after vm_exec()
