@@ -788,6 +788,11 @@ driver_section_lock(struct driver *__restrict self,
                     USER CHECKED char const *name,
                     unsigned int flags DFL(DRIVER_SECTION_LOCK_FNORMAL))
 		THROWS(E_SEGFAULT, E_BADALLOC);
+/* Same as `driver_section_lock()', but return NULL, rather than throwing an exception. */
+FUNDEF WUNUSED NONNULL((1)) REF struct driver_section *
+NOTHROW(KCALL driver_section_lock_nx)(struct driver *__restrict self,
+                                      USER CHECKED char const *name,
+                                      unsigned int flags DFL(DRIVER_SECTION_LOCK_FNORMAL));
 
 struct unwind_fde_struct;
 /* Lookup the FDE descriptor for a given `absolute_pc', whilst trying to

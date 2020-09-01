@@ -30,89 +30,58 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#if defined(__KERNEL__) && defined(__KOS__)
-#define __STATX32_FIELD64(name) name
-#elif defined(__USE_FILE_OFFSET64) && defined(__USE_KOS)
-#define __STATX32_FIELD64(name) name##64
-#elif defined(__USE_FILE_OFFSET64)
-#define __STATX32_FIELD64(name) name
-#elif defined(__USE_KOS)
-#define __STATX32_FIELD64(name) name##64
-#else /* ... */
-#define __STATX32_FIELD64(name) __##name##64
-#endif /* !... */
-
-#if defined(__KERNEL__) && defined(__KOS__)
-#define __STATX32_TMFIELD64(name) name
-#elif defined(__USE_TIME_BITS64)
-#define __STATX32_TMFIELD64(name) name
-#elif defined(__USE_KOS)
-#define __STATX32_TMFIELD64(name) name##64
-#else /* ... */
-#define __STATX32_TMFIELD64(name) __##name##64
-#endif /* !... */
-
-#if defined(__KERNEL__) && defined(__KOS__)
-#define __STATX32_TMFIELD32(name) __##name##32
-#elif !defined(__USE_TIME_BITS64)
-#define __STATX32_TMFIELD32(name) name
-#elif defined(__USE_KOS)
-#define __STATX32_TMFIELD32(name) name##32
-#else /* ... */
-#define __STATX32_TMFIELD32(name) __##name##32
-#endif /* !... */
+#define __SETFIELD(ResultType, resultOffset, SelfType, selfOffset) \
+	*(ResultType *)((__BYTE_TYPE__ *)__result + resultOffset) =    \
+	*(SelfType *)((__BYTE_TYPE__ *)__self + selfOffset)
 
 __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kos_statx32_to_kos_statx64)(struct __kos_statx32 const *__restrict __self,
                                           struct __kos_statx64 *__restrict __result) {
-	__result->st_dev       = __self->st_dev;
-	__result->st_ino       = __self->__STATX32_FIELD64(st_ino);
-	__result->st_mode      = __self->st_mode;
-	__result->st_nlink     = __self->st_nlink;
-	__result->st_uid       = __self->st_uid;
-	__result->st_gid       = __self->st_gid;
-	__result->st_rdev      = __self->st_rdev;
-	__result->st_size      = __self->__STATX32_FIELD64(st_size);
-	__result->st_blksize   = (__UINT64_TYPE__)__self->st_blksize;
-	__result->st_blocks    = __self->__STATX32_FIELD64(st_blocks);
-	__result->st_atime     = __self->__STATX32_TMFIELD64(st_atime);
-	__result->st_atimensec = (__UINT64_TYPE__)__self->__STATX32_TMFIELD64(st_atimensec);
-	__result->st_mtime     = __self->__STATX32_TMFIELD64(st_mtime);
-	__result->st_mtimensec = (__UINT64_TYPE__)__self->__STATX32_TMFIELD64(st_mtimensec);
-	__result->st_ctime     = __self->__STATX32_TMFIELD64(st_ctime);
-	__result->st_ctimensec = (__UINT64_TYPE__)__self->__STATX32_TMFIELD64(st_ctimensec);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_DEV, __UINT64_TYPE__, __OFFSET_KOS_STATX32_DEV);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_INO, __UINT64_TYPE__, __OFFSET_KOS_STATX32_INO);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX64_MODE, __UINT32_TYPE__, __OFFSET_KOS_STATX32_MODE);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX64_NLINK, __UINT32_TYPE__, __OFFSET_KOS_STATX32_NLINK);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX64_UID, __UINT32_TYPE__, __OFFSET_KOS_STATX32_UID);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX64_GID, __UINT32_TYPE__, __OFFSET_KOS_STATX32_GID);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_RDEV, __UINT64_TYPE__, __OFFSET_KOS_STATX32_RDEV);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_SIZE, __UINT64_TYPE__, __OFFSET_KOS_STATX32_SIZE);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_BLKSIZE, __UINT64_TYPE__, __OFFSET_KOS_STATX32_BLKSIZE);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_BLOCKS, __UINT64_TYPE__, __OFFSET_KOS_STATX32_BLOCKS);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_ATIME, __UINT64_TYPE__, __OFFSET_KOS_STATX32_ATIME64);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_ATIMENSEC, __UINT32_TYPE__, __OFFSET_KOS_STATX32_ATIMENSEC64);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_MTIME, __UINT64_TYPE__, __OFFSET_KOS_STATX32_MTIME64);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_MTIMENSEC, __UINT32_TYPE__, __OFFSET_KOS_STATX32_MTIMENSEC64);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_CTIME, __UINT64_TYPE__, __OFFSET_KOS_STATX32_CTIME64);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX64_CTIMENSEC, __UINT32_TYPE__, __OFFSET_KOS_STATX32_CTIMENSEC64);
 }
 
 __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(kos_statx64_to_kos_statx32)(struct __kos_statx64 const *__restrict __self,
                                           struct __kos_statx32 *__restrict __result) {
-	__result->st_dev                                    = __self->st_dev;
-	__result->__STATX32_FIELD64(st_ino)                 = __self->st_ino;
-	__result->st_mode                                   = __self->st_mode;
-	__result->st_nlink                                  = __self->st_nlink;
-	__result->st_uid                                    = __self->st_uid;
-	__result->st_gid                                    = __self->st_gid;
-	__result->st_rdev                                   = __self->st_rdev;
-	__result->__STATX32_FIELD64(st_size)                = __self->st_size;
-	__result->st_blksize                                = (__UINT32_TYPE__)__self->st_blksize;
-	__result->__STATX32_FIELD64(st_blocks)              = __self->st_blocks;
-	__result->__STATX32_TMFIELD32(st_atimespec).tv_sec  = (__INT32_TYPE__)__self->st_atime;
-	__result->__STATX32_TMFIELD32(st_atimespec).tv_nsec = (__UINT32_TYPE__)__self->st_atimensec;
-	__result->__STATX32_TMFIELD32(st_mtimespec).tv_sec  = (__INT32_TYPE__)__self->st_mtime;
-	__result->__STATX32_TMFIELD32(st_mtimespec).tv_nsec = (__UINT32_TYPE__)__self->st_mtimensec;
-	__result->__STATX32_TMFIELD32(st_ctimespec).tv_sec  = (__INT32_TYPE__)__self->st_ctime;
-	__result->__STATX32_TMFIELD32(st_ctimespec).tv_nsec = (__UINT32_TYPE__)__self->st_ctimensec;
-	__result->__STATX32_TMFIELD64(st_atime)             = __self->st_atime;
-	__result->__STATX32_TMFIELD64(st_atimensec)         = (__UINT32_TYPE__)__self->st_atimensec;
-	__result->__STATX32_TMFIELD64(st_mtime)             = __self->st_mtime;
-	__result->__STATX32_TMFIELD64(st_mtimensec)         = (__UINT32_TYPE__)__self->st_mtimensec;
-	__result->__STATX32_TMFIELD64(st_ctime)             = __self->st_ctime;
-	__result->__STATX32_TMFIELD64(st_ctimensec)         = (__UINT32_TYPE__)__self->st_ctimensec;
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_DEV, __UINT64_TYPE__, __OFFSET_KOS_STATX64_DEV);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_INO, __UINT64_TYPE__, __OFFSET_KOS_STATX64_INO);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_MODE, __UINT32_TYPE__, __OFFSET_KOS_STATX64_MODE);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_NLINK, __UINT32_TYPE__, __OFFSET_KOS_STATX64_NLINK);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_UID, __UINT32_TYPE__, __OFFSET_KOS_STATX64_UID);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_GID, __UINT32_TYPE__, __OFFSET_KOS_STATX64_GID);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_RDEV, __UINT64_TYPE__, __OFFSET_KOS_STATX64_RDEV);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_SIZE, __UINT64_TYPE__, __OFFSET_KOS_STATX64_SIZE);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_BLKSIZE, __UINT64_TYPE__, __OFFSET_KOS_STATX64_BLKSIZE);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_BLOCKS, __UINT64_TYPE__, __OFFSET_KOS_STATX64_BLOCKS);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_ATIME32, __UINT64_TYPE__, __OFFSET_KOS_STATX64_ATIME);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_ATIMENSEC32, __UINT64_TYPE__, __OFFSET_KOS_STATX64_ATIMENSEC);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_MTIME32, __UINT64_TYPE__, __OFFSET_KOS_STATX64_MTIME);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_MTIMENSEC32, __UINT64_TYPE__, __OFFSET_KOS_STATX64_MTIMENSEC);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_CTIME32, __UINT64_TYPE__, __OFFSET_KOS_STATX64_CTIME);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_CTIMENSEC32, __UINT64_TYPE__, __OFFSET_KOS_STATX64_CTIMENSEC);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_ATIME64, __UINT64_TYPE__, __OFFSET_KOS_STATX64_ATIME);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_ATIMENSEC64, __UINT64_TYPE__, __OFFSET_KOS_STATX64_ATIMENSEC);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_MTIME64, __UINT64_TYPE__, __OFFSET_KOS_STATX64_MTIME);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_MTIMENSEC64, __UINT64_TYPE__, __OFFSET_KOS_STATX64_MTIMENSEC);
+	__SETFIELD(__UINT64_TYPE__, __OFFSET_KOS_STATX32_CTIME64, __UINT64_TYPE__, __OFFSET_KOS_STATX64_CTIME);
+	__SETFIELD(__UINT32_TYPE__, __OFFSET_KOS_STATX32_CTIMENSEC64, __UINT64_TYPE__, __OFFSET_KOS_STATX64_CTIMENSEC);
 }
-
-#undef __STATX32_FIELD64
-#undef __STATX32_TMFIELD32
-#undef __STATX32_TMFIELD64
+#undef __SETFIELD
 
 __DECL_END
 #endif /* __CC__ */

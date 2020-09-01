@@ -39,6 +39,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vboxgdb.h>
+#include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 #include <misc/atomic-ref.h>
 #include <sched/task.h>
 
@@ -731,88 +732,154 @@ NOTHROW(KCALL decompress_section_data)(void *dst, size_t dst_size,
 	return ZLIB_ERROR_OK;
 }
 
+#if (defined(CONFIG_HAVE_USERMOD) && !defined(CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA))
+#define ElfV_NEED_MODDTYPE
+#if !(defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64))
+#error "Bad configuration"
+#endif /* !(USERMOD_TYPE_ELF32 && USERMOD_TYPE_ELF64) */
+typedef union {
+	Elf32_Chdr e32;
+	Elf64_Chdr e64;
+} ElfV_Chdr;
+#define ElfV_field(self, um_modtype, name) (USERMOD_TYPE_ISELF32(um_modtype) ? (self).e32.name : (self).e64.name)
+#define ElfV_sizeof(self, um_modtype)      (USERMOD_TYPE_ISELF32(um_modtype) ? sizeof((self).e32) : sizeof((self).e64))
+#else /* !CONFIG_HAVE_USERMOD && !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+typedef ElfW(Chdr) ElfV_Chdr;
+#define ElfV_field(self, um_modtype, name) (self).name
+#define ElfV_sizeof(self, um_modtype)      sizeof(self)
+#endif /* CONFIG_HAVE_USERMOD || CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+
 /* Return a pointer to the decompressed data blob for `self'.
  * If data could not be decompressed, an `E_INVALID_ARGUMENT' exception is thrown.
  * NOTE: The caller must ensure that raw section data of `self' has been loaded,
  *       as in `self->ds_data != (void *)-1'!
  * @return: * : A blob of `self->ds_csize' (after the caller) bytes of memory,
  *              representing the section's decompressed memory contents. */
+#ifdef ElfV_NEED_MODDTYPE
+INTERN ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
+driver_section_cdata_impl(struct driver_section *__restrict self,
+                          gfp_t gfp, uintptr_t modtype)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT)
+#else /* ElfV_NEED_MODDTYPE */
 PUBLIC ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
 driver_section_cdata(struct driver_section *__restrict self, gfp_t gfp)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT) {
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT)
+#endif /* !ElfV_NEED_MODDTYPE */
+{
 	void *result, *new_result;
-	ElfW(Chdr) *chdr;
+	size_t sizeof_chdr, ch_size, ch_pages;
+	ElfV_Chdr *chdr;
 	/* Test for already-loaded data. */
 	result = driver_section_cdata_test(self);
 	if (result != (void *)-1)
 		return result;
 	/* Must load data */
-	chdr = (ElfW(Chdr) *)self->ds_data;
+	chdr = (ElfV_Chdr *)self->ds_data;
 	/* Verify the compressed-section header. */
-	if unlikely(self->ds_size < sizeof(*chdr))
+	sizeof_chdr = ElfV_sizeof(*chdr, modtype);
+	if unlikely(self->ds_size < sizeof_chdr)
 		THROW(E_INVALID_ARGUMENT);
-	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
+	if unlikely(ElfV_field(*chdr, modtype, ch_type) != ELFCOMPRESS_ZLIB)
 		THROW(E_INVALID_ARGUMENT);
+	ch_size  = ElfV_field(*chdr, modtype, ch_size);
+	ch_pages = CEILDIV(ch_size, PAGESIZE);
+
 	/* Allocate a blob for decompressed section data. */
-	result = vpage_alloc(CEILDIV(chdr->ch_size, PAGESIZE), 1,
-	                     gfp | GFP_PREFLT);
-	if unlikely(decompress_section_data(result, chdr->ch_size, chdr + 1,
-	                                    self->ds_size - sizeof(*chdr)) != ZLIB_ERROR_OK) {
+	result = vpage_alloc(ch_pages, 1, gfp | GFP_PREFLT);
+	if unlikely(decompress_section_data(result, ch_size,
+	                                    (byte_t *)chdr + sizeof_chdr,
+	                                    self->ds_size - sizeof_chdr) !=
+	            ZLIB_ERROR_OK) {
 		/* Inflate error. */
-		vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+		vpage_free(result, ch_pages);
 		THROW(E_INVALID_ARGUMENT);
 	}
 	/* Save the results. */
-	ATOMIC_STORE(self->ds_csize, chdr->ch_size); /* This must be written first! */
+	ATOMIC_STORE(self->ds_csize, ch_size); /* This must be written first! */
 	/* Account for other thread that may have been performing
 	 * the inflate alongside us. */
 	new_result = ATOMIC_CMPXCH_VAL(self->ds_cdata, (void *)-1, result);
 	if likely(new_result == (void *)-1)
 		return result;
 	/* Race condition: Some other thread already did the thing! */
-	vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+	vpage_free(result, ch_pages);
 	return new_result;
 }
 
+/* @return: NULL: Failed to acquire compressed data. */
+#ifdef ElfV_NEED_MODDTYPE
+INTERN NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL driver_section_cdata_nx_impl)(struct driver_section *__restrict self,
+                                            gfp_t gfp, uintptr_t modtype)
+#else /* ElfV_NEED_MODDTYPE */
 PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
-NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self, gfp_t gfp) {
+NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self, gfp_t gfp)
+#endif /* !ElfV_NEED_MODDTYPE */
+{
 	void *result, *new_result;
-	ElfW(Chdr) *chdr;
+	size_t sizeof_chdr, ch_size, ch_pages;
+	ElfV_Chdr *chdr;
 	/* Test for already-loaded data. */
 	result = driver_section_cdata_test(self);
 	if (result != (void *)-1)
 		return result;
 	/* Must load data */
-	chdr = (ElfW(Chdr) *)self->ds_data;
+	chdr = (ElfV_Chdr *)self->ds_data;
 	/* Verify the compressed-section header. */
-	if unlikely(self->ds_size < sizeof(*chdr))
+	sizeof_chdr = ElfV_sizeof(*chdr, modtype);
+	if unlikely(self->ds_size < sizeof_chdr)
 		goto err;
-	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
+	if unlikely(ElfV_field(*chdr, modtype, ch_type) != ELFCOMPRESS_ZLIB)
 		goto err;
+	ch_size  = ElfV_field(*chdr, modtype, ch_size);
+	ch_pages = CEILDIV(ch_size, PAGESIZE);
+
 	/* Allocate a blob for decompressed section data. */
-	result = vpage_alloc_nx(CEILDIV(chdr->ch_size, PAGESIZE), 1,
-	                        gfp | GFP_PREFLT);
+	result = vpage_alloc_nx(ch_pages, 1, gfp | GFP_PREFLT);
 	if unlikely(!result)
 		goto err;
-	if unlikely(decompress_section_data(result, chdr->ch_size, chdr + 1,
-	                                    self->ds_size - sizeof(*chdr)) != ZLIB_ERROR_OK) {
+	if unlikely(decompress_section_data(result, ch_size,
+	                                    (byte_t *)chdr + sizeof_chdr,
+	                                    self->ds_size - sizeof_chdr) !=
+	            ZLIB_ERROR_OK) {
 		/* Inflate error. */
-		vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+		vpage_free(result, ch_pages);
 		goto err;
 	}
 	/* Save the results. */
-	ATOMIC_STORE(self->ds_csize, chdr->ch_size); /* This must be written first! */
+	ATOMIC_STORE(self->ds_csize, ch_size); /* This must be written first! */
 	/* Account for other thread that may have been performing
 	 * the inflate alongside us. */
 	new_result = ATOMIC_CMPXCH_VAL(self->ds_cdata, (void *)-1, result);
 	if likely(new_result == (void *)-1)
 		return result;
 	/* Race condition: Some other thread already did the thing! */
-	vpage_free(result, CEILDIV(chdr->ch_size, PAGESIZE));
+	vpage_free(result, ch_pages);
 	return new_result;
 err:
 	return NULL;
 }
+
+/* Define the native, driver-level wrappers. */
+#ifdef ElfV_NEED_MODDTYPE
+#if ELF_ARCH_CLASS == ELFCLASS32
+#define ElfV_NATIVE_MODDTYPE USERMOD_TYPE_ELF32
+#elif ELF_ARCH_CLASS == ELFCLASS64
+#define ElfV_NATIVE_MODDTYPE USERMOD_TYPE_ELF64
+#endif /* ELF_ARCH_CLASS == ... */
+
+PUBLIC ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
+driver_section_cdata(struct driver_section *__restrict self, gfp_t gfp)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT) {
+	return driver_section_cdata_impl(self, gfp, ElfV_NATIVE_MODDTYPE);
+}
+
+PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self, gfp_t gfp) {
+	return driver_section_cdata_nx_impl(self, gfp, ElfV_NATIVE_MODDTYPE);
+}
+#endif /* ElfV_NEED_MODDTYPE */
+
 
 
 
@@ -2627,6 +2694,26 @@ again_lock_sections_after_free_result:
 err:
 	return NULL;
 }
+
+/* Same as `driver_section_lock()', but return NULL, rather than throwing an exception. */
+PUBLIC WUNUSED NONNULL((1)) REF struct driver_section *
+NOTHROW(KCALL driver_section_lock_nx)(struct driver *__restrict self,
+                                      USER CHECKED char const *name,
+                                      unsigned int flags) {
+	struct exception_info exinfo;
+	REF struct driver_section *result;
+	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
+	TRY {
+		result = driver_section_lock(self, name, flags);
+	} EXCEPT {
+		goto restore_except;
+	}
+	return result;
+restore_except:
+	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
+	return NULL;
+}
+
 
 
 

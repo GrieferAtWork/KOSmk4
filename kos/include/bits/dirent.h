@@ -63,6 +63,8 @@ struct dirent {
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #else /* __USE_KOS */
 #ifdef _DIRENT_HAVE_D_FILENO
+#undef d_ino
+#undef d_fileno
 	union {
 		__FS_TYPE(ino) d_ino;
 		__FS_TYPE(ino) d_fileno;
@@ -71,9 +73,7 @@ struct dirent {
 	;
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	__u_d_ino;
-#ifdef _DIRENT_HAVE_D_FILENO
 #define d_fileno     __u_d_ino.d_fileno
-#endif /* _DIRENT_HAVE_D_FILENO */
 #define d_ino        __u_d_ino.d_ino
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #else /* _DIRENT_HAVE_D_FILENO */
@@ -130,6 +130,8 @@ struct dirent64 {
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #else /* __USE_KOS */
 #ifdef _DIRENT_HAVE_D_FILENO
+#undef d_ino
+#undef d_fileno
 	union {
 		__ino64_t      d_ino;
 		__ino64_t      d_fileno;
@@ -138,9 +140,7 @@ struct dirent64 {
 	;
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	__u_d_ino;
-#ifdef _DIRENT_HAVE_D_FILENO
 #define d_fileno     __u_d_ino.d_fileno
-#endif /* _DIRENT_HAVE_D_FILENO */
 #define d_ino        __u_d_ino.d_ino
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #else /* _DIRENT_HAVE_D_FILENO */

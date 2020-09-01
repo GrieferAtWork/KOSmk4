@@ -143,16 +143,10 @@ handle_missing_symbol_tables:
 		}
 	}
 #undef LOCK_SECTION
-#ifdef __KERNEL__
 	/* Support for compressed sections. */
-#define LOAD_SECTION(sect, lv_start, lv_end)               \
-	((lv_start) = (byte_t *)driver_section_cdata_nx(sect), \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                            \
+	((lv_start) = (byte_t *)usermod_section_cdata_nx((struct usermod_section *)(sect)), \
 	 (lv_end)   = (byte_t *)(lv_start) + (sect)->ds_csize)
-#else /* __KERNEL__ */
-#define LOAD_SECTION(sect, lv_start, lv_end) \
-	((lv_start) = (byte_t *)(sect)->ds_data, \
-	 (lv_end)   = (byte_t *)(sect)->ds_data + (sect)->ds_size)
-#endif /* !__KERNEL__ */
 	/* Fill in section mapping information. */
 	if (dl_sections->dl_debug_line) {
 		LOAD_SECTION(dl_sections->dl_debug_line,

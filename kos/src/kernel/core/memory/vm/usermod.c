@@ -77,10 +77,52 @@ STATIC_ASSERT(offsetof(struct usermod_section, us_index) == offsetof(struct driv
 STATIC_ASSERT(offsetof(struct usermod_section, us_cdata) == offsetof(struct driver_section, ds_cdata));
 STATIC_ASSERT(offsetof(struct usermod_section, us_csize) == offsetof(struct driver_section, ds_csize));
 
+STATIC_ASSERT(offsetof(struct usermod, um_refcnt) == offsetof(struct driver, d_refcnt));
+
 STATIC_ASSERT(USERMOD_SECTION_LOCK_FNORMAL == DRIVER_SECTION_LOCK_FNORMAL);
 STATIC_ASSERT(USERMOD_SECTION_LOCK_FINDEX == DRIVER_SECTION_LOCK_FINDEX);
 STATIC_ASSERT(USERMOD_SECTION_LOCK_FNODATA == DRIVER_SECTION_LOCK_FNODATA);
 /**/
+
+typedef union {
+#ifdef USERMOD_TYPE_ELF32
+	Elf32_Shdr e32;
+#endif /* USERMOD_TYPE_ELF32 */
+#ifdef USERMOD_TYPE_ELF64
+	Elf64_Shdr e64;
+#endif /* USERMOD_TYPE_ELF64 */
+} ElfV_Shdr;
+
+typedef union {
+#ifdef USERMOD_TYPE_ELF32
+	Elf32_Ehdr e32;
+#endif /* USERMOD_TYPE_ELF32 */
+#ifdef USERMOD_TYPE_ELF64
+	Elf64_Ehdr e64;
+#endif /* USERMOD_TYPE_ELF64 */
+} ElfV_Ehdr;
+
+
+typedef union {
+#ifdef USERMOD_TYPE_ELF32
+	Elf32_Phdr e32;
+#endif /* USERMOD_TYPE_ELF32 */
+#ifdef USERMOD_TYPE_ELF64
+	Elf64_Phdr e64;
+#endif /* USERMOD_TYPE_ELF64 */
+} ElfV_Phdr;
+
+
+#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
+#define ElfV_field(self, um_modtype, name) (USERMOD_TYPE_ISELF32(um_modtype) ? (self).e32.name : (self).e64.name)
+#elif defined(USERMOD_TYPE_ELF32)
+#define ElfV_field(self, um_modtype, name) ((self).e32.name)
+#elif defined(USERMOD_TYPE_ELF64)
+#define ElfV_field(self, um_modtype, name) ((self).e64.name)
+#endif /* ... */
+
+
+
 
 
 
@@ -124,6 +166,38 @@ NOTHROW(FCALL usermod_section_destroy)(struct usermod_section *__restrict self) 
 		vm_kernel_locked_operation(self, &usermod_section_unmap_and_free);
 	}
 }
+
+#ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+INTDEF ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
+driver_section_cdata_impl(struct driver_section *__restrict self,
+                          gfp_t gfp, uintptr_t modtype)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT);
+INTDEF NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL driver_section_cdata_nx_impl)(struct driver_section *__restrict self,
+                                            gfp_t gfp, uintptr_t modtype);
+
+/* Return a pointer to the decompressed data blob for `self'.
+ * If data could not be decompressed, an `E_INVALID_ARGUMENT' exception is thrown.
+ * NOTE: The caller must ensure that raw section data of `self' has been loaded,
+ *       as in `self->us_data != (void *)-1'!
+ * @return: * : A blob of `self->us_csize' (after the caller) bytes of memory,
+ *              representing the section's decompressed memory contents. */
+PUBLIC ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
+usermod_section_cdata(struct usermod_section *__restrict self, gfp_t gfp)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT) {
+	return driver_section_cdata_impl((struct driver_section *)self,
+	                                 gfp, self->us_modtype);
+
+}
+
+/* @return: NULL: Failed to acquire compressed data. */
+PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
+NOTHROW(KCALL usermod_section_cdata_nx)(struct usermod_section *__restrict self, gfp_t gfp) {
+	return driver_section_cdata_nx_impl((struct driver_section *)self,
+	                                    gfp, self->us_modtype);
+}
+#endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+
 
 
 /* Destroy the given usermod object. */
@@ -176,45 +250,6 @@ usermod_load_elf_shdr(struct usermod *__restrict self) {
 		kfree(shdrs);
 	}
 }
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Shdr e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Shdr e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Shdr;
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Ehdr e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Ehdr e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Ehdr;
-
-
-typedef union {
-#ifdef USERMOD_TYPE_ELF32
-	Elf32_Phdr e32;
-#endif /* USERMOD_TYPE_ELF32 */
-#ifdef USERMOD_TYPE_ELF64
-	Elf64_Phdr e64;
-#endif /* USERMOD_TYPE_ELF64 */
-} ElfV_Phdr;
-
-
-#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
-#define ElfV_field(self, um_modtype, name) (USERMOD_TYPE_ISELF32(um_modtype) ? (self).e32.name : (self).e64.name)
-#elif defined(USERMOD_TYPE_ELF32)
-#define ElfV_field(self, um_modtype, name) ((self).e32.name)
-#elif defined(USERMOD_TYPE_ELF64)
-#define ElfV_field(self, um_modtype, name) ((self).e64.name)
-#endif /* ... */
-
-
 
 /* Lazily load section headers. */
 PRIVATE NONNULL((1)) void KCALL
@@ -378,6 +413,9 @@ return_existing_result:
 				result->us_info    = ElfV_field(*shdr, self->um_modtype, sh_info);
 				result->us_flags   = ElfV_field(*shdr, self->um_modtype, sh_flags);
 				result->us_index   = section_index;
+#ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+				result->us_modtype = self->um_modtype;
+#endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
 				COMPILER_READ_BARRIER();
 				result->us_data  = (void *)-1; /* Lazily initialized. */
 				result->us_cdata = (void *)-1; /* Lazily initialized. */
@@ -436,6 +474,26 @@ return_existing_result:
 		}
 	}
 nope:
+	return NULL;
+}
+
+
+/* Same as `usermod_section_lock()', but return NULL, rather than throwing an exception. */
+PUBLIC WUNUSED NONNULL((1)) REF struct usermod_section *
+NOTHROW(KCALL usermod_section_lock_nx)(struct usermod *__restrict self,
+                                       USER CHECKED char const *name,
+                                       unsigned int flags) {
+	struct exception_info exinfo;
+	REF struct usermod_section *result;
+	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
+	TRY {
+		result = usermod_section_lock(self, name, flags);
+	} EXCEPT {
+		goto restore_except;
+	}
+	return result;
+restore_except:
+	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
 	return NULL;
 }
 

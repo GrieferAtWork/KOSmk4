@@ -39,6 +39,19 @@
 
 DECL_BEGIN
 
+#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
+/* Elf32_Chdr and Elf64_Chdr aren't the same, and `driver_section_cdata()',
+ * which we're currently using to implement `usermod_section_cdata()' only
+ * uses native-sized compressed section headers!
+ * -> In a configuration where both would be needed, the above 2 functions need
+ *    custom implementations, and we can't just re-use the implementation used
+ *    for driver sections! */
+#undef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+#else /* USERMOD_TYPE_ELF32 && USERMOD_TYPE_ELF64 */
+#define CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA 1
+#endif /* !USERMOD_TYPE_ELF32 || !USERMOD_TYPE_ELF64 */
+
+
 #ifdef __CC__
 struct usermod_section {
 	/* HINT: This structure shares (some) binary compatibility with `struct driver_section' */
@@ -49,7 +62,11 @@ struct usermod_section {
 	uintptr_t     us_link;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t     us_info;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t     us_flags;   /* [const] ELF section flags (set of `SHF_*') */
-	void        *_us_pad1[1]; /* ... */
+#ifdef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+	uintptr_t    _us_pad1;    /* ... */
+#else /* CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+	uintptr_t     us_modtype; /* [const] Same as `um_modtype' of the associated `struct usermod' */
+#endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
 	USER void    *us_udata;   /* [?..?][valid_if(us_flags & SHF_ALLOC)] User-space section location (if applicable; else: `NULL'). */
 	u16          _us_pad2;    /* ... */
 	u16           us_index;   /* [const] Index of this section. */
@@ -80,20 +97,18 @@ FUNDEF ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *KCALL
 usermod_section_cdata(struct usermod_section *__restrict self,
                       gfp_t gfp DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT)
-		ASMNAME("driver_section_cdata");
+#ifdef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+		ASMNAME("driver_section_cdata")
+#endif /* CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+		;
 /* @return: NULL: Failed to acquire compressed data. */
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
 NOTHROW(KCALL usermod_section_cdata_nx)(struct usermod_section *__restrict self,
                                         gfp_t gfp DFL(GFP_NORMAL))
-		ASMNAME("driver_section_cdata_nx");
-#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
-/* TODO: Elf32_Chdr and Elf64_Chdr aren't the same, and `driver_section_cdata()',
- *       which we're currently using to implement `usermod_section_cdata()' only
- *       uses native-sized compressed section headers!
- * -> In a configuration where both would be needed, the above 2 functions need
- *    custom implementations, and we can't just re-use the implementation used
- *    for driver sections! */
-#endif /* USERMOD_TYPE_ELF32 && USERMOD_TYPE_ELF64 */
+#ifdef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+		ASMNAME("driver_section_cdata_nx")
+#endif /* CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+		;
 
 
 
@@ -172,6 +187,11 @@ usermod_section_lock(struct usermod *__restrict self,
                      USER CHECKED char const *name,
                      unsigned int flags DFL(USERMOD_SECTION_LOCK_FNORMAL))
 		THROWS(E_SEGFAULT, E_BADALLOC);
+/* Same as `usermod_section_lock()', but return NULL, rather than throwing an exception. */
+FUNDEF WUNUSED NONNULL((1)) REF struct usermod_section *
+NOTHROW(KCALL usermod_section_lock_nx)(struct usermod *__restrict self,
+                                       USER CHECKED char const *name,
+                                       unsigned int flags);
 
 
 /* Find the user-space module that resides at the given address.
