@@ -80,10 +80,9 @@ dbg_coredump(void const *const *traceback_vector,
 	/* If the kernel hasn't been poisoned, tell the user that they are
 	 * free to CTRL+D the debugger to resume normal system operations. */
 	if (!kernel_poisoned()) {
-		PRIVATE ATTR_DBGSTRINGS char const nonfatal_msg[] = "non-fatal!";
+		PRIVATE ATTR_DBGSTRINGS char const nonfatal_msg[] = "Non-fatal! (press CTRL+D to resume)";
 		dbg_setcolor(ANSITTY_CL_LIME, ANSITTY_CL_DARK_GRAY);
-		dbg_pprint(dbg_screen_width - COMPILER_STRLEN(nonfatal_msg), 0,
-		           nonfatal_msg);
+		dbg_pprint(0, dbg_screen_height - 1, nonfatal_msg);
 	}
 	{
 		struct vm_execinfo_struct *execinfo;
@@ -373,7 +372,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 #endif /* CONFIG_HAVE_DEBUGGER */
 	}
 
-	/* TODO */
+	/* TODO: Generate an ELF core file for use with gdb. */
 	(void)unwind_error;
 }
 
