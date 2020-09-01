@@ -405,9 +405,9 @@ INTDEF struct driver_section kernel_section_shstrtab;
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_section_destroy)(struct driver_section *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_destroy)(struct driver *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_free)(struct driver *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL driver_destroy)(struct driver *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL driver_free)(struct driver *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct driver_section, ds_refcnt, driver_section_destroy)
 DEFINE_REFCOUNT_FUNCTIONS(struct driver, d_refcnt, driver_destroy)
 DEFINE_WEAKREFCOUNT_FUNCTIONS(struct driver, d_weakrefcnt, driver_free)

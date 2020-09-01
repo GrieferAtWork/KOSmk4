@@ -32,6 +32,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/module.h>
 #include <kernel/panic.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
@@ -763,7 +764,7 @@ free_result_and_free_phdrv_and_decref_and_nope:
  * @return: NULL: No module exists at the given `addr' */
 PRIVATE REF struct usermod *FCALL
 vm_create_usermod(struct vm *__restrict self,
-                  USER void *addr,
+                  USER void const *addr,
                   bool addr_must_be_executable)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
@@ -924,7 +925,7 @@ duplicate_with_prev:
  * @return: NULL: No executable object exists at the given location. */
 PUBLIC REF struct usermod *FCALL
 vm_getusermod(struct vm *__restrict self,
-              USER void *addr,
+              USER void const *addr,
               bool addr_must_be_executable)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
@@ -979,6 +980,27 @@ vm_getusermod(struct vm *__restrict self,
 	}
 	return result;
 }
+
+/* Same as `vm_getusermod()', but return `NULL', rather than throwing an exception. */
+PUBLIC REF struct usermod *
+NOTHROW(FCALL vm_getusermod_nx)(struct vm *__restrict self,
+                                USER void const *addr,
+                                bool addr_must_be_executable) {
+	struct exception_info exinfo;
+	REF struct usermod *result;
+	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
+	TRY {
+		result = vm_getusermod(self, addr, addr_must_be_executable);
+	} EXCEPT {
+		goto restore_except;
+	}
+	return result;
+restore_except:
+	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
+	return NULL;
+}
+
+
 
 /* Find the first usermod object that maps some page containing a pointer `>= addr'
  * If no module fulfills this requirement, return NULL instead. */
@@ -1172,23 +1194,33 @@ vm_enumusermod(struct vm *__restrict self,
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PUBLIC REF struct usermod *FCALL
-getusermod(USER void *addr,
+getusermod(USER void const *addr,
            bool addr_must_be_executable)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct usermod *result;
-	REF struct vm *current_vm;
 	if (!dbg_active) {
 		/* Use the current VM */
 		return vm_getusermod(THIS_VM, addr, addr_must_be_executable);
 	}
 	/* Use the VM of the thread currently selected by the debugger. */
-	current_vm = task_getvm(dbg_current);
-	{
-		FINALLY_DECREF_UNLIKELY(current_vm);
-		result = vm_getusermod(current_vm,
-		                       addr,
-		                       addr_must_be_executable);
+	result = vm_getusermod(dbg_current->t_vm,
+	                       addr,
+	                       addr_must_be_executable);
+	return result;
+}
+
+PUBLIC REF struct usermod *
+NOTHROW(FCALL getusermod_nx)(USER void const *addr,
+                             bool addr_must_be_executable) {
+	REF struct usermod *result;
+	if (!dbg_active) {
+		/* Use the current VM */
+		return vm_getusermod_nx(THIS_VM, addr, addr_must_be_executable);
 	}
+	/* Use the VM of the thread currently selected by the debugger. */
+	result = vm_getusermod_nx(dbg_current->t_vm,
+	                          addr,
+	                          addr_must_be_executable);
 	return result;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -1371,6 +1403,94 @@ unwind_for_debug(void *absolute_pc,
 	}
 	return result;
 }
+
+
+
+/* Implement the hybrid usermod/driver ABI */
+PUBLIC_CONST struct module_abi_struct const module_abi = {
+	.ma_section_destroy = {
+		[MODULE_TYPE_DRIVER] = (void (FCALL *)(module_section_t *__restrict))&driver_section_destroy,
+		[MODULE_TYPE_USRMOD] = (void (FCALL *)(module_section_t *__restrict))&usermod_section_destroy,
+	},
+#ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
+	.ma_section_cdata = {
+		[MODULE_TYPE_DRIVER] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t) THROWS(...))&driver_section_cdata,
+		[MODULE_TYPE_USRMOD] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t) THROWS(...))&usermod_section_cdata,
+	},
+	.ma_section_cdata_nx = {
+		[MODULE_TYPE_DRIVER] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t))&driver_section_cdata_nx,
+		[MODULE_TYPE_USRMOD] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t))&usermod_section_cdata_nx,
+	},
+#endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
+	.ma_section_lock = {
+		[MODULE_TYPE_DRIVER] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&driver_section_lock,
+		[MODULE_TYPE_USRMOD] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&usermod_section_lock,
+	},
+	.ma_section_lock_nx = {
+		[MODULE_TYPE_DRIVER] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&driver_section_lock_nx,
+		[MODULE_TYPE_USRMOD] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&usermod_section_lock_nx,
+	},
+	.ma_module_destroy = {
+		[MODULE_TYPE_DRIVER] = (void (FCALL *)(module_t *__restrict))&driver_destroy,
+		[MODULE_TYPE_USRMOD] = (void (FCALL *)(module_t *__restrict))&usermod_destroy,
+	},
+	.ma_module_offsetof_loadaddr = {
+		[MODULE_TYPE_DRIVER] = offsetof(struct driver, d_loadaddr),
+		[MODULE_TYPE_USRMOD] = offsetof(struct usermod, um_loadaddr),
+	},
+	.ma_module_offsetof_loadstart = {
+		[MODULE_TYPE_DRIVER] = offsetof(struct driver, d_loadstart),
+		[MODULE_TYPE_USRMOD] = offsetof(struct usermod, um_loadstart),
+	},
+	.ma_module_offsetof_loadend = {
+		[MODULE_TYPE_DRIVER] = offsetof(struct driver, d_loadend),
+		[MODULE_TYPE_USRMOD] = offsetof(struct usermod, um_loadend),
+	},
+};
+
+FUNDEF WUNUSED NONNULL((2)) REF module_t *FCALL
+_module_ataddr(void const *addr,
+                     module_type_t *__restrict result_typ)
+		THROWS(E_WOULDBLOCK, E_BADALLOC)
+		ASMNAME("module_ataddr");
+FUNDEF WUNUSED NONNULL((2)) REF module_t *
+NOTHROW(FCALL _module_ataddr_nx)(void const *addr,
+                                 module_type_t *__restrict result_typ)
+		ASMNAME("module_ataddr_nx");
+
+PUBLIC WUNUSED NONNULL((2)) REF module_t *FCALL
+_module_ataddr(void const *addr,
+               module_type_t *__restrict result_typ)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	REF module_t *result;
+	if (ADDR_ISUSER(addr)) {
+		*result_typ = MODULE_TYPE_USRMOD;
+		result = (REF module_t *)getusermod(addr);
+	} else {
+		*result_typ = MODULE_TYPE_DRIVER;
+		result = (REF module_t *)driver_at_address(addr);
+	}
+	return result;
+}
+
+PUBLIC WUNUSED NONNULL((2)) REF module_t *
+NOTHROW(FCALL _module_ataddr_nx)(void const *addr,
+                                 module_type_t *__restrict result_typ) {
+	REF module_t *result;
+	if (ADDR_ISUSER(addr)) {
+		*result_typ = MODULE_TYPE_USRMOD;
+		result = (REF module_t *)getusermod_nx(addr);
+	} else {
+		*result_typ = MODULE_TYPE_DRIVER;
+		result = (REF module_t *)driver_at_address(addr);
+	}
+	return result;
+}
+
+
+
+
+
 
 
 #ifdef CONFIG_HAVE_DEBUGGER

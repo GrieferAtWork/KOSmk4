@@ -209,9 +209,14 @@ NOTHROW(KCALL usermod_section_lock_nx)(struct usermod *__restrict self,
  * @return: NULL: No executable object exists at the given location. */
 FUNDEF REF struct usermod *FCALL
 vm_getusermod(struct vm *__restrict self,
-              USER void *addr,
+              USER void const *addr,
               __BOOL addr_must_be_executable DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+/* Same as `vm_getusermod()', but return `NULL', rather than throwing an exception. */
+FUNDEF REF struct usermod *
+NOTHROW(FCALL vm_getusermod_nx)(struct vm *__restrict self,
+                                USER void const *addr,
+                                __BOOL addr_must_be_executable DFL(0));
 
 /* Find the first usermod object that maps some page containing a pointer `>= addr'
  * If no module fulfills this requirement, return NULL instead. */
@@ -234,12 +239,17 @@ vm_getusermod_next(struct vm *__restrict self,
  * Otherwise, `THIS_VM' will always searched for `addr' instead. */
 #ifdef CONFIG_HAVE_DEBUGGER
 FUNDEF REF struct usermod *FCALL
-getusermod(USER void *addr,
+getusermod(USER void const *addr,
            __BOOL addr_must_be_executable DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF REF struct usermod *
+NOTHROW(FCALL getusermod_nx)(USER void const *addr,
+                             __BOOL addr_must_be_executable DFL(0));
 #else /* CONFIG_HAVE_DEBUGGER */
 #define getusermod(addr, addr_must_be_executable) \
 	vm_getusermod(THIS_VM, addr, addr_must_be_executable)
+#define getusermod_nx(addr, addr_must_be_executable) \
+	vm_getusermod_nx(THIS_VM, addr, addr_must_be_executable)
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
 /* Clear out all unused usermod objects from `self' and

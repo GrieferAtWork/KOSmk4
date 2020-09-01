@@ -303,7 +303,7 @@ INTDEF NONNULL((1)) int DLFCN_CC libdl_dlunlocksection(REF DlSection *sect);
 INTDEF NONNULL((1)) char const *DLFCN_CC libdl_dlsectionname(DlSection *sect);
 INTDEF NONNULL((1)) size_t DLFCN_CC libdl_dlsectionindex(DlSection *sect);
 INTDEF NONNULL((1)) DlModule *DLFCN_CC libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
-INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC libdl_dlsectioninflate(DlSection *sect, size_t *psize);
+INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC libdl_dlinflatesection(DlSection *sect, size_t *psize);
 INTDEF int DLFCN_CC libdl_dlclearcaches(void);
 INTDEF void *DLFCN_CC libdl_dlauxctrl(DlModule *self, unsigned int type, ...);
 INTDEF void *LIBCCALL libdl____tls_get_addr(void);

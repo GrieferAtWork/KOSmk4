@@ -135,7 +135,7 @@ unwind_through_debug_frame(void *absolute_pc,
 			void *debug_frame_data;
 			size_t debug_frame_size;
 			/* Support for a compressed .debug_frame! */
-			debug_frame_data = dlsectioninflate(sect, &debug_frame_size);
+			debug_frame_data = dlinflatesection(sect, &debug_frame_size);
 			if (debug_frame_data) {
 				unwind_fde_t fde;
 				/* Scan the .debug_frame section for an FDE matching `absolute_pc' */

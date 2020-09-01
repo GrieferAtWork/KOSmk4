@@ -1507,7 +1507,7 @@ err:
 
 
 INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
-libdl_dlsectioninflate(DlSection *sect, size_t *psize) {
+libdl_dlinflatesection(DlSection *sect, size_t *psize) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
 	/* Check for simple case: Was inflated data already loaded? */
@@ -2064,7 +2064,7 @@ DEFINE_PUBLIC_ALIAS(dlunlocksection, libdl_dlunlocksection);
 DEFINE_PUBLIC_ALIAS(dlsectionname, libdl_dlsectionname);
 DEFINE_PUBLIC_ALIAS(dlsectionindex, libdl_dlsectionindex);
 DEFINE_PUBLIC_ALIAS(dlsectionmodule, libdl_dlsectionmodule);
-DEFINE_PUBLIC_ALIAS(dlsectioninflate, libdl_dlsectioninflate);
+DEFINE_PUBLIC_ALIAS(dlinflatesection, libdl_dlinflatesection);
 DEFINE_PUBLIC_ALIAS(dlclearcaches, libdl_dlclearcaches);
 DEFINE_PUBLIC_ALIAS(dlauxctrl, libdl_dlauxctrl);
 DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
@@ -2095,7 +2095,7 @@ DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
 		"dlsectionname"   : "result = (void *)&libdl_dlsectionname;",     \
 		"dlsectionindex"  : "result = (void *)&libdl_dlsectionindex;",    \
 		"dlsectionmodule" : "result = (void *)&libdl_dlsectionmodule;",   \
-		"dlsectioninflate" : "result = (void *)&libdl_dlsectioninflate;", \
+		"dlinflatesection" : "result = (void *)&libdl_dlinflatesection;", \
 		"dlclearcaches"   : "result = (void *)&libdl_dlclearcaches;",     \
 		"___tls_get_addr" : {                                             \
 			"result = (void *)&libdl____tls_get_addr;",                   \
@@ -2342,6 +2342,17 @@ stringSwitch("name",
 				}
 				break;
 
+			case 'i':
+				if (name[3] == 'n' && name[4] == 'f' && name[5] == 'l' &&
+				    name[6] == 'a' && name[7] == 't' && name[8] == 'e' &&
+				    name[9] == 's' && name[10] == 'e' && name[11] == 'c' &&
+				    name[12] == 't' && name[13] == 'i' && name[14] == 'o' &&
+				    name[15] == 'n' && name[16] == '\0') {
+					/* case "dlinflatesection": ... */
+					result = (void *)&libdl_dlinflatesection;
+				}
+				break;
+
 			case 'l':
 				if (name[3] == 'o' && name[4] == 'c' && name[5] == 'k' &&
 				    name[6] == 's' && name[7] == 'e' && name[8] == 'c' &&
@@ -2399,19 +2410,10 @@ stringSwitch("name",
 								if (name[7] == 'o') {
 									if (name[8] == 'n') {
 										if (name[9] == 'i') {
-											if (name[10] == 'n') {
-												if (name[11] == 'd') {
-													if (name[12] == 'e' && name[13] == 'x' && name[14] == '\0') {
-														/* case "dlsectionindex": ... */
-														result = (void *)&libdl_dlsectionindex;
-													}
-												} else if (name[11] == 'f') {
-													if (name[12] == 'l' && name[13] == 'a' && name[14] == 't' &&
-													    name[15] == 'e' && name[16] == '\0') {
-														/* case "dlsectioninflate": ... */
-														result = (void *)&libdl_dlsectioninflate;
-													}
-												}
+											if (name[10] == 'n' && name[11] == 'd' && name[12] == 'e' &&
+											    name[13] == 'x' && name[14] == '\0') {
+												/* case "dlsectionindex": ... */
+												result = (void *)&libdl_dlsectionindex;
 											}
 										} else if (name[9] == 'm') {
 											if (name[10] == 'o' && name[11] == 'd' && name[12] == 'u' &&

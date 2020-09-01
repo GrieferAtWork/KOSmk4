@@ -2186,7 +2186,7 @@ NOTHROW(FCALL vm_getnodeofpageid)(struct vm *__restrict self,
                                   __ARCH_PAGEID_TYPE page);
 LOCAL NOBLOCK WUNUSED struct vm_node *
 NOTHROW(FCALL vm_getnodeofaddress)(struct vm *__restrict self,
-                                   UNCHECKED void *addr) {
+                                   UNCHECKED void const *addr) {
 	return vm_getnodeofpageid(self, PAGEID_ENCODE(addr));
 }
 

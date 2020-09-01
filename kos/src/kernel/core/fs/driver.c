@@ -949,7 +949,7 @@ NOTHROW(KCALL driver_do_clear_dang_sections)(struct driver *__restrict self) {
 
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
+NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	ElfW(Half) i;
 	assert(wasdestroyed(self));
 	assertf(self->d_flags & DRIVER_FLAG_FINALIZED,
@@ -998,7 +998,7 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL driver_free)(struct driver *__restrict self) {
+NOTHROW(FCALL driver_free)(struct driver *__restrict self) {
 	kfree(self);
 }
 
@@ -1334,7 +1334,7 @@ NOTHROW(KCALL kernel_initialize_commandline_options_late)(void) {
 
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL driver_section_destroy)(struct driver_section *__restrict self) {
+NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self) {
 	REF struct driver *drv;
 	drv = self->ds_module;
 	/* Try to turn the section into a dangling one. */

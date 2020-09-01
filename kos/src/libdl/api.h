@@ -79,7 +79,7 @@
 #define __CRT_HAVE_dlsectionname 1
 #define __CRT_HAVE_dlsectionindex 1
 #define __CRT_HAVE_dlsectionmodule 1
-#define __CRT_HAVE_dlsectioninflate 1
+#define __CRT_HAVE_dlinflatesection 1
 #define __CRT_HAVE_dlclearcaches 1
 #define __CRT_HAVE_dltlsallocseg 1
 #define __CRT_HAVE_dltlsfreeseg 1

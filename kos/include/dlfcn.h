@@ -373,19 +373,26 @@ __NOTHROW_NCX(__DLFCN_CC dlexceptaware)(void *__handle);
 
 #if (defined(__CRT_HAVE_dlgethandle) || defined(__CRT_HAVE_dlgetmodule) || \
      defined(__CRT_HAVE_dlsectionmodule))
+#ifndef DLGETHANDLE_FNORMAL
 #define DLGETHANDLE_FNORMAL 0x0000 /* Return weak pointer to a module handle */
 #define DLGETHANDLE_FINCREF 0x0001 /* Return a new reference, that must be closed by `dlclose(return)' */
+#endif /* !DLGETHANDLE_FNORMAL */
 #ifdef __CRT_HAVE_dlgetmodule
+#ifndef DLGETHANDLE_FNOCASE
 #define DLGETHANDLE_FNOCASE 0x0002 /* For `dlgetmodule()': Ignore casing when comparing module names. */
+#endif /* !DLGETHANDLE_FNOCASE */
 #endif /* __CRT_HAVE_dlgetmodule */
 #endif /* ... */
 
 /* Return the handle of an already loaded library, given a static data/text pointer
  * @param: FLAGS: Set of `DLGETHANDLE_F*' */
 #ifdef __CRT_HAVE_dlgethandle
+#ifndef __dlgethandle_defined
+#define __dlgethandle_defined 1
 __IMPDEF __ATTR_WUNUSED void *
 __NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
                                       unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+#endif /* !__dlgethandle_defined */
 #endif /* __CRT_HAVE_dlgethandle */
 
 /* Return the handle of an already loaded library, given its name
@@ -444,15 +451,18 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulename)(void *__handle);
  * @return: * :    The load address / module base for the given `HANDLE'.
  * @return: NULL:  Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlmodulebase
+#ifndef __dlmodulebase_defined
+#define __dlmodulebase_defined 1
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
+#endif /* !__dlmodulebase_defined */
 #endif /* __CRT_HAVE_dlmodulebase */
 
 
 
 #if (defined(__CRT_HAVE_dllocksection) || defined(__CRT_HAVE_dlunlocksection) || \
      defined(__CRT_HAVE_dlsectionname) || defined(__CRT_HAVE_dlsectionindex) ||  \
-     defined(__CRT_HAVE_dlsectionmodule) || defined(__CRT_HAVE_dlsectioninflate))
+     defined(__CRT_HAVE_dlsectionmodule) || defined(__CRT_HAVE_dlinflatesection))
 #ifndef __dl_section_defined
 #define __dl_section_defined 1
 struct dl_section {
@@ -467,10 +477,12 @@ struct dl_section {
 
 
 #ifdef __CRT_HAVE_dllocksection
+#ifndef DLLOCKSECTION_FNORMAL
 #define DLLOCKSECTION_FNORMAL   0x0000 /* Normal section locking flags. */
 #define DLLOCKSECTION_FINDEX    0x0001 /* The given `NAME' is actually the `(uintptr_t)NAME' index of the section */
 #define DLLOCKSECTION_FNODATA   0x0002 /* Do not lock section data into memory, though if the section had already
                                         * been loaded, then this flag is simply ignored. */
+#endif /* !DLLOCKSECTION_FNORMAL */
 
 /* Lock a named section of a given dynamic library into memory.
  * @param: HANDLE: Handle for the library who's section `NAME' should be locked & loaded.
@@ -479,10 +491,13 @@ struct dl_section {
  *                 and allows the user to access the contents of the section, as it is loaded in memory.
  *                 Note however that the actual section data is usually mapped as read-only!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
+#ifndef __dllocksection_defined
+#define __dllocksection_defined 1
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) /*REF*/ struct dl_section *
 __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
                                         char const *__restrict __name,
                                         unsigned int __flags __DFL(DLLOCKSECTION_FNORMAL));
+#endif /* !__dllocksection_defined */
 #endif /* __CRT_HAVE_dllocksection */
 
 /* Unlock a locked section, as previously returned by `dllocksection()'
@@ -491,8 +506,11 @@ __NOTHROW_NCX(__DLFCN_CC dllocksection)(void *__handle,
  * @return: 0 : Successfully unlocked the given section `SECT'
  * @return: * : Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlunlocksection
+#ifndef __dlunlocksection_defined
+#define __dlunlocksection_defined 1
 __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
+#endif /* !__dlunlocksection_defined */
 #endif /* __CRT_HAVE_dlunlocksection */
 
 /* Return the name of a given section, or NULL on error
@@ -553,11 +571,14 @@ __NOTHROW_NCX(__DLFCN_CC dlsectionmodule)(struct dl_section *__sect,
  *                When `SECT' isn't compressed, this function will simply
  *                return the section's normal data blob, that is `SECT->ds_data'
  * @return: NULL: Error (s.a. `dlerror()') */
-#ifdef __CRT_HAVE_dlsectioninflate
+#ifdef __CRT_HAVE_dlinflatesection
+#ifndef __dlinflatesection_defined
+#define __dlinflatesection_defined 1
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__DLFCN_CC dlsectioninflate)(struct dl_section *__sect,
+__NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
                                            __size_t *__psize);
-#endif /* __CRT_HAVE_dlsectioninflate */
+#endif /* !__dlinflatesection_defined */
+#endif /* __CRT_HAVE_dlinflatesection */
 #endif /* ... */
 
 
