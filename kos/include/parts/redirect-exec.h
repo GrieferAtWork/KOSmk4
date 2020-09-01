@@ -96,6 +96,7 @@
 		for (__execargi = 1; __execargi < __execargc; ++__execargi)                              \
 			out_argv[__execargi] = __builtin_va_arg(va_list_args, T __PRIVATE_ARGV_CONST *);     \
 		out_argv[__execargc] = __NULLPTR;                                                        \
+		__builtin_va_arg(va_list_args, T __PRIVATE_ARGV_CONST *); /* NULL */                     \
 	} else {                                                                                     \
 		out_argv = (T __PRIVATE_ARGV_CONST **)__hybrid_alloca(sizeof(T __PRIVATE_ARGV_CONST *)); \
 		out_argv[0] = __NULLPTR;                                                                 \
@@ -141,11 +142,12 @@
 			++__execargc;                                                                        \
 		__builtin_va_end(va_list_args);                                                          \
 		if __unlikely(__execargc > __EXEC_ARGC_MAX)                                              \
-			return __PRIVATE_EXEC_CAPTURE_SETERRNO_2BIG();                                       \
+			return_2big;                                                                         \
 		__builtin_va_start(va_list_args, first_arg);                                             \
 		for (__execargi = 1; __execargi < __execargc; ++__execargi)                              \
 			out_argv[__execargi] = __builtin_va_arg(va_list_args, T __PRIVATE_ARGV_CONST *);     \
 		out_argv[__execargc] = __NULLPTR;                                                        \
+		__builtin_va_arg(va_list_args, T __PRIVATE_ARGV_CONST *); /* NULL */                     \
 	}
 #endif /* !__hybrid_alloca */
 
