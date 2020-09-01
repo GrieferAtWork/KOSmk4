@@ -166,15 +166,15 @@ DECL_BEGIN
 DATDEF struct driver drv_self; /* Self-pointer to the current driver's descriptor */
 #endif /* !__drv_self_defined */
 
-DATDEF byte_t               drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.d_loadaddr) */
-DATDEF byte_t               drv_start[];       /* Absolute starting address of the driver program (== drv_self.d_loadstart) */
-DATDEF byte_t               drv_end[];         /* Absolute end address of the driver program (== drv_self.d_loadend) */
-DATDEF char                 drv_name[];        /* Name of the driver (== drv_self.d_name) */
-DATDEF char                *drv_filename;      /* [0..1] Filename of the driver (== &drv_self.d_filename) */
+DATDEF byte_t /*         */ drv_loadaddr[];    /* Absolute load-address of the driver (== drv_self.d_loadaddr) */
+DATDEF byte_t /*         */ drv_start[];       /* Absolute starting address of the driver program (== drv_self.d_loadstart) */
+DATDEF byte_t /*         */ drv_end[];         /* Absolute end address of the driver program (== drv_self.d_loadend) */
+DATDEF char /*           */ drv_name[];        /* Name of the driver (== drv_self.d_name) */
+DATDEF char /*          */ *drv_filename;      /* [0..1] Filename of the driver (== &drv_self.d_filename) */
 DATDEF struct regular_node *drv_file;          /* [0..1] Inode of the of the driver (== drv_self.d_file) */
-DATDEF char                 drv_commandline[]; /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
-DATDEF size_t               drv_argc;          /* Driver argument count (== &drv_self.d_argc) */
-DATDEF char                *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
+DATDEF char /*           */ drv_commandline[]; /* Driver commandline as a \0\0-terminated, \0-seperated string (== drv_self.d_cmdline) */
+DATDEF size_t /*         */ drv_argc;          /* Driver argument count (== &drv_self.d_argc) */
+DATDEF char /*          */ *drv_argv[];        /* [1..1][drv_argc] Driver argument vector (== drv_self.d_argv) */
 
 
 /* NOTE: This function may be implemented by individual drivers!

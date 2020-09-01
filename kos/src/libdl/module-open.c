@@ -175,7 +175,7 @@ again_old_flags:
 
 DEFINE_INTERN_ALIAS(libdl_dlfopen, DlModule_OpenFd);
 DEFINE_PUBLIC_ALIAS(dlfopen, libdl_dlfopen);
-INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *LIBCCALL
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
 DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode) {
 	REF DlModule *result;
 	char *rp = realpath_malloc(fd);

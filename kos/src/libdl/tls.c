@@ -283,7 +283,7 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) {
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTERN WUNUSED ATTR_MALLOC void *LIBCCALL
+INTERN WUNUSED ATTR_MALLOC void *DLFCN_CC
 libdl_dltlsallocseg(void) {
 	struct tls_segment *result;
 	result = (struct tls_segment *)memalign(static_tls_align,
@@ -356,7 +356,7 @@ clear_extension_table(struct tls_segment *__restrict self) {
 }
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
-INTERN NONNULL((1)) int LIBCCALL
+INTERN NONNULL((1)) int DLFCN_CC
 libdl_dltlsfreeseg(void *ptr) {
 	struct tls_segment *seg;
 	if unlikely(!ptr)
@@ -440,11 +440,11 @@ err_badptr:
  *                         segment to delete it and optionally invoke finalizer callbacks) by
  *                         passing it to `dltlsfree()'
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
-INTERN WUNUSED DlModule *LIBCCALL
+INTERN WUNUSED DlModule *DLFCN_CC
 libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void const *template_data, size_t template_size,
-                 void (LIBCCALL *perthread_init)(void *arg, void *base),
-                 void (LIBCCALL *perthread_fini)(void *arg, void *base),
+                 void (DLFCN_CC *perthread_init)(void *arg, void *base),
+                 void (DLFCN_CC *perthread_fini)(void *arg, void *base),
                  void *perthread_callback_arg) {
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {
@@ -497,7 +497,7 @@ err:
 
 
 /* Free a TLS segment previously allocated with `dltlsalloc()' */
-INTERN WUNUSED NONNULL((1)) int LIBCCALL
+INTERN WUNUSED NONNULL((1)) int DLFCN_CC
 libdl_dltlsfree(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;

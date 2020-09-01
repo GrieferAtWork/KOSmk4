@@ -43,6 +43,9 @@
 #include <string.h>
 #include <syslog.h>
 
+#include <libzlib/error.h>
+#include <libzlib/inflate.h>
+
 DECL_BEGIN
 
 INTERN NONNULL((2)) ssize_t
@@ -140,7 +143,7 @@ __afailf(char const *expr, char const *file,
 /* DL error handling. */
 INTERN char dl_error_buffer[128];
 INTERN char *dl_error_message = NULL;
-INTERN char *LIBCCALL libdl_dlerror(void) {
+INTERN char *DLFCN_CC libdl_dlerror(void) {
 	return ATOMIC_XCH(dl_error_message, NULL);
 }
 
@@ -217,8 +220,8 @@ again_old_flags:
 }
 
 
-INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
-LIBCCALL libdl_dlopen(char const *filename, int mode) {
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
+libdl_dlopen(char const *filename, int mode) {
 	REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *result;
 	if unlikely(!filename) {
 		/* ... If filename is NULL, then the returned handle is for the main program... */
@@ -274,7 +277,7 @@ again:
 	atomic_owner_rwlock_endwrite(&DlModule_LoadLock);
 	return result;
 }
-INTERN NONNULL((1)) int LIBCCALL
+INTERN NONNULL((1)) int DLFCN_CC
 libdl_dlclose(REF DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -287,7 +290,7 @@ err_bad_module:
 }
 
 
-INTERN NONNULL((1)) int LIBCCALL
+INTERN NONNULL((1)) int DLFCN_CC
 libdl_dlexceptaware(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -308,7 +311,7 @@ struct dl_symbol {
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE 2
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_ERROR     3
-PRIVATE NONNULL((2)) unsigned int LIBCCALL
+PRIVATE NONNULL((2)) unsigned int CC
 dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
                                        char const *__restrict name,
                                        uintptr_t *__restrict phash_elf,
@@ -408,7 +411,7 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 	return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND;
 }
 
-INTERN NONNULL((2)) void *LIBCCALL
+INTERN NONNULL((2)) void *DLFCN_CC
 libdl_dlsym(DlModule *self, char const *__restrict name) {
 	ElfW(Addr) result;
 	uintptr_t hash_elf, hash_gnu;
@@ -700,9 +703,9 @@ err_bad_module:
 
 
 
-INTERN WUNUSED
-REF_IF(!(return->dm_flags & RTLD_NODELETE) &&
-       (flags & DLGETHANDLE_FINCREF)) DlModule *LIBCCALL
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) &&
+                      (flags & DLGETHANDLE_FINCREF))
+DlModule *DLFCN_CC
 libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
 	DlModule *result;
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF)) {
@@ -750,8 +753,10 @@ got_result:
 	return result;
 }
 
-INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF))
-DlModule *LIBCCALL libdl_dlgetmodule(char const *name, unsigned int flags) {
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) &&
+                      (flags & DLGETHANDLE_FINCREF))
+DlModule *DLFCN_CC
+libdl_dlgetmodule(char const *name, unsigned int flags) {
 	DlModule *result;
 	if (!name) {
 		result = libdl_dlgethandle(__builtin_return_address(0), flags);
@@ -865,7 +870,7 @@ got_result:
 }
 
 
-INTERN NONNULL((2)) int LIBCCALL
+INTERN NONNULL((2)) int DLFCN_CC
 libdl_dladdr(void const *address, Dl_info *info) {
 	REF DlModule *mod;
 	mod = libdl_dlgethandle(address, DLGETHANDLE_FINCREF);
@@ -920,7 +925,7 @@ err:
 	return -1;
 }
 
-INTERN WUNUSED NONNULL((1)) fd_t LIBCCALL
+INTERN WUNUSED NONNULL((1)) fd_t DLFCN_CC
 libdl_dlmodulefd(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -929,7 +934,7 @@ err_bad_module:
 	return dl_seterror_badmodule(self);
 }
 
-INTERN WUNUSED NONNULL((1)) char const *LIBCCALL
+INTERN WUNUSED NONNULL((1)) char const *DLFCN_CC
 libdl_dlmodulename(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -939,7 +944,7 @@ err_bad_module:
 	return NULL;
 }
 
-INTERN WUNUSED NONNULL((1)) void *LIBCCALL
+INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
 libdl_dlmodulebase(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -953,8 +958,12 @@ err_bad_module:
 INTERN NONNULL((1)) void CC
 DlSection_Destroy(DlSection *__restrict self) {
 	DlModule *mod;
+	/* Unmap section data. */
 	if ((self->ds_flags & DLSECTION_FLAG_OWNED) && (self->ds_data != (void *)-1))
 		sys_munmap(self->ds_data, self->ds_size);
+	/* Unmap decompressed section data. */
+	if (self->ds_cdata != (void *)-1 && self->ds_cdata != self->ds_data)
+		sys_munmap(self->ds_cdata, self->ds_csize);
 again:
 	atomic_rwlock_write(&self->ds_module_lock);
 	mod = self->ds_module;
@@ -984,7 +993,7 @@ again:
 	free(self);
 }
 
-INTERN WUNUSED REF DlSection *LIBCCALL
+INTERN WUNUSED REF DlSection *DLFCN_CC
 libdl_dllocksection(DlModule *self,
                     char const *__restrict name,
                     unsigned int flags) {
@@ -1071,6 +1080,7 @@ again_read_section:
 			result->ds_module   = self;
 			result->ds_index    = index;
 			result->ds_dangling = (REF DlSection *)-1;
+			result->ds_cdata    = (void *)-1;
 			atomic_rwlock_init(&result->ds_module_lock);
 			if (info.dsi_addr) {
 				/* Section is already allocated in member. */
@@ -1186,6 +1196,7 @@ again_read_elf_section:
 			result->ds_module   = self;
 			result->ds_index    = index;
 			result->ds_dangling = (REF DlSection *)-1;
+			result->ds_cdata    = (void *)-1;
 			atomic_rwlock_init(&result->ds_module_lock);
 			if (sect->sh_flags & SHF_ALLOC) {
 				/* Section is already allocated in member. */
@@ -1248,7 +1259,7 @@ err_bad_flags:
 }
 
 
-INTERN NONNULL((1)) int LIBCCALL
+INTERN NONNULL((1)) int DLFCN_CC
 libdl_dlunlocksection(REF DlSection *sect) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
@@ -1290,11 +1301,11 @@ err_bad_section:
 	return dl_seterror_badsection(sect);
 }
 
-INTERN NONNULL((1)) char const *LIBCCALL
+INTERN NONNULL((1)) char const *DLFCN_CC
 libdl_dlsectionname(DlSection *sect) {
 	char const *result;
 	REF DlModule *mod;
-	if unlikely(!sect)
+	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
 	atomic_rwlock_read(&sect->ds_module_lock);
 	mod = sect->ds_module;
@@ -1336,7 +1347,7 @@ err:
 	return NULL;
 }
 
-INTERN NONNULL((1)) size_t LIBCCALL
+INTERN NONNULL((1)) size_t DLFCN_CC
 libdl_dlsectionindex(DlSection *sect) {
 	size_t result;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
@@ -1349,7 +1360,7 @@ err_bad_section:
 }
 
 
-INTERN NONNULL((1)) DlModule *LIBCCALL
+INTERN NONNULL((1)) DlModule *DLFCN_CC
 libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
 	DlModule *mod;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
@@ -1375,6 +1386,179 @@ err:
 	return NULL;
 }
 
+
+
+
+
+
+/* Lazlily linked function pointers from libzlib.so */
+PRIVATE PZLIB_READER_INIT pdyn_zlib_reader_init = NULL;
+PRIVATE PZLIB_READER_READ pdyn_zlib_reader_read = NULL;
+PRIVATE PZLIB_READER_FINI pdyn_zlib_reader_fini = NULL;
+#define zlib_reader_init (*pdyn_zlib_reader_init)
+#define zlib_reader_read (*pdyn_zlib_reader_read)
+#define zlib_reader_fini (*pdyn_zlib_reader_fini)
+
+
+LOCAL bool CC init_zlib(void) {
+	if (!pdyn_zlib_reader_init) {
+		REF DlModule *libzlib;
+		libzlib = libdl_dlopen(LIBZLIB_LIBRARY_NAME,
+		                       RTLD_LOCAL);
+		if unlikely(!libzlib)
+			goto err;
+		if ((*(void **)&pdyn_zlib_reader_fini = libdl_dlsym(libzlib, "zlib_reader_fini")) == NULL)
+			goto err;
+		if ((*(void **)&pdyn_zlib_reader_read = libdl_dlsym(libzlib, "zlib_reader_read")) == NULL)
+			goto err;
+		COMPILER_BARRIER();
+		if ((*(void **)&pdyn_zlib_reader_init = libdl_dlsym(libzlib, "zlib_reader_init")) == NULL)
+			goto err;
+		COMPILER_BARRIER();
+	}
+	return true;
+err:
+	return false;
+}
+
+/* Decompress section data.
+ * @return: * : One of `ZLIB_ERROR_*' */
+PRIVATE ATTR_NOINLINE int
+NOTHROW(CC decompress_section_data)(void *dst, size_t dst_size,
+                                    void const *src, size_t src_size) {
+	ssize_t error;
+	struct zlib_reader reader;
+	zlib_reader_init(&reader, src, src_size);
+	error = zlib_reader_read(&reader, dst, dst_size);
+#if 0 /* Can't be enabled at the moment */
+	if (error >= 0 && !zlib_reader_eof(&reader))
+		error = ZLIB_ERROR_BAD_LENGTH; /* More data exists after the stream... */
+#endif
+	zlib_reader_fini(&reader);
+	if unlikely(error < 0)
+		return (int)error; /* Inflate error. */
+	/* clear all trailing data that could not be read. */
+	if ((size_t)error < dst_size)
+		memset((byte_t *)dst + (size_t)error, 0, dst_size - error);
+	return ZLIB_ERROR_OK;
+}
+
+
+LOCAL WUNUSED NONNULL((1, 2, 4)) void *CC
+inflate_compressed_section(DlSection *sect,
+                           void const *section_data,
+                           size_t section_size,
+                           size_t *psection_csize) {
+	ElfW(Chdr) *chdr;
+	void *result;
+	chdr = (ElfW(Chdr) *)section_data;
+	/* Verify the compressed-section header. */
+	if unlikely(section_size < sizeof(*chdr))
+		goto err_bad_section_size;
+	if unlikely(chdr->ch_type != ELFCOMPRESS_ZLIB)
+		goto err_wrong_chdr_type;
+	/* Allocate memory for the compressed section. */
+	*psection_csize = ATOMIC_READ(chdr->ch_size);
+	result = sys_mmap(NULL, *psection_csize,
+	                  PROT_READ | PROT_WRITE,
+	                  MAP_PRIVATE | MAP_ANON,
+	                  -1, 0);
+	if unlikely(E_ISERR(result))
+		goto err_mmap_failed;
+	/* Lazily load libzlib.so */
+	if unlikely(!init_zlib())
+		goto err_munmap;
+	{
+		unsigned int inflate_error;
+		/* Decompress section data. */
+		inflate_error = decompress_section_data(result, *psection_csize, chdr + 1,
+		                                        section_size - sizeof(*chdr));
+		if unlikely(inflate_error != ZLIB_ERROR_OK) {
+			/* Inflate error. */
+			dl_seterrorf("Failed to inflate compressed section %s:%s (error: %u)",
+			             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
+			             libdl_dlsectionname(sect), inflate_error);
+			goto err_munmap;
+		}
+	}
+	/* Success! */
+	return result;
+err_mmap_failed:
+	dl_seterrorf("Failed to allocate decompressed buffer for compressed section %s:%s",
+	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
+	             libdl_dlsectionname(sect));
+	goto err;
+err_wrong_chdr_type:
+	dl_seterrorf("Compressed section %s:%s uses an unknown compression scheme %u",
+	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
+	             libdl_dlsectionname(sect),
+	             (unsigned int)chdr->ch_type);
+	goto err;
+err_bad_section_size:
+	dl_seterrorf("Compressed section %s:%s is too small to be compressed",
+	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
+	             libdl_dlsectionname(sect));
+	goto err;
+err_munmap:
+	sys_munmap(result, *psection_csize);
+err:
+	return (void *)-1;
+}
+
+
+INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
+libdl_dlsectioninflate(DlSection *sect, size_t *psize) {
+	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
+		goto err_bad_section;
+	/* Check for simple case: Was inflated data already loaded? */
+	if (sect->ds_cdata == (void *)-1) {
+		/* Verify that section data has been loaded. */
+		if unlikely(sect->ds_data == (void *)-1)
+			goto err_no_section_data;
+		/* Check for simple case: The section isn't actually compressed. */
+		if (!(sect->ds_elfflags & SHF_COMPRESSED)) {
+			sect->ds_csize = sect->ds_size;
+			COMPILER_WRITE_BARRIER();
+			sect->ds_cdata = sect->ds_data;
+			COMPILER_WRITE_BARRIER();
+		} else {
+			/* Must actually inflate data. */
+			void *cdata;
+			size_t csize;
+			cdata = inflate_compressed_section(sect,
+			                                   sect->ds_data,
+			                                   sect->ds_size,
+			                                   &csize);
+			if unlikely(cdata == (void *)-1)
+				goto err;
+			/* Save the results. */
+			ATOMIC_STORE(sect->ds_csize, csize); /* This must be written first! */
+			if unlikely(!ATOMIC_CMPXCH(sect->ds_cdata, (void *)-1, cdata)) {
+				/* Race condition: Some other thread also did the inflate,
+				 * and now we've got the inflated data twice. - Fix this by
+				 * simply deleting our duplicate and using the version that's
+				 * already stored in the section descriptor. */
+				sys_munmap(cdata, csize);
+			}
+		}
+	}
+	if (psize)
+		*psize = sect->ds_csize;
+	return sect->ds_cdata;
+err_no_section_data:
+	dl_seterrorf("Section data not loaded for %s:%s",
+	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
+	             libdl_dlsectionname(sect));
+	goto err;
+err_bad_section:
+	dl_seterror_badsection(sect);
+err:
+	if (psize)
+		*psize = 0;
+	return NULL;
+}
+
+
 PRIVATE NONNULL((1)) int CC
 DlModule_InvokeDlCacheFunctions(DlModule *__restrict self) {
 	int result = 0;
@@ -1399,7 +1583,7 @@ done:
 	return result;
 }
 
-INTERN int LIBCCALL libdl_dlclearcaches(void) {
+INTERN int DLFCN_CC libdl_dlclearcaches(void) {
 	int result = 0;
 	/* TODO: Guard against recursive calls:
 	 *  - Within the same thread:
@@ -1479,7 +1663,7 @@ again_lock_global:
 }
 
 
-PRIVATE void LIBCCALL
+PRIVATE void DLFCN_CC
 DlModule_RunAllModuleFinalizers(void) {
 	DlModule *mod;
 again:
@@ -1556,7 +1740,7 @@ decref_module_and_continue:
 
 
 
-INTERN void *LIBCCALL
+INTERN void *DLFCN_CC
 libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 	void *result;
 	va_list args;
@@ -1819,7 +2003,7 @@ DlModule_IteratePhdr(DlModule *__restrict self,
  * Enumeration stops when `*CALLBACK' returns a non-zero value, which
  * will then also be returned by this function. Otherwise, `0' will
  * be returned after all modules have been enumerated. */
-INTERN int LIBCCALL
+INTERN int DLFCN_CC
 libdl_iterate_phdr(__dl_iterator_callback callback, void *arg) {
 	int result = 0;
 	REF DlModule *current, *next;
@@ -1880,6 +2064,7 @@ DEFINE_PUBLIC_ALIAS(dlunlocksection, libdl_dlunlocksection);
 DEFINE_PUBLIC_ALIAS(dlsectionname, libdl_dlsectionname);
 DEFINE_PUBLIC_ALIAS(dlsectionindex, libdl_dlsectionindex);
 DEFINE_PUBLIC_ALIAS(dlsectionmodule, libdl_dlsectionmodule);
+DEFINE_PUBLIC_ALIAS(dlsectioninflate, libdl_dlsectioninflate);
 DEFINE_PUBLIC_ALIAS(dlclearcaches, libdl_dlclearcaches);
 DEFINE_PUBLIC_ALIAS(dlauxctrl, libdl_dlauxctrl);
 DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
@@ -1910,6 +2095,7 @@ DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
 		"dlsectionname"   : "result = (void *)&libdl_dlsectionname;",     \
 		"dlsectionindex"  : "result = (void *)&libdl_dlsectionindex;",    \
 		"dlsectionmodule" : "result = (void *)&libdl_dlsectionmodule;",   \
+		"dlsectioninflate" : "result = (void *)&libdl_dlsectioninflate;", \
 		"dlclearcaches"   : "result = (void *)&libdl_dlclearcaches;",     \
 		"___tls_get_addr" : {                                             \
 			"result = (void *)&libdl____tls_get_addr;",                   \
@@ -1989,15 +2175,15 @@ stringSwitch("name",
 			if (name[2] == 'a') {
 				if (name[3] == 'r') {
 					if (name[4] == 'g') {
-						if (name[5] == 'v') {
-							if (name[6] == '\0') {
-								/* case "__argv": ... */
-								result = (void *)&root_peb->pp_argv;
-							}
-						} else if (name[5] == 'c') {
+						if (name[5] == 'c') {
 							if (name[6] == '\0') {
 								/* case "__argc": ... */
 								result = (void *)&root_peb->pp_argc;
+							}
+						} else if (name[5] == 'v') {
+							if (name[6] == '\0') {
+								/* case "__argv": ... */
+								result = (void *)&root_peb->pp_argv;
 							}
 						}
 					}
@@ -2010,33 +2196,33 @@ stringSwitch("name",
 					result = (void *)&root_peb->pp_envp;
 				}
 			} else if (name[2] == 'p') {
-				if (name[3] == 'r') {
+				if (name[3] == 'e') {
+					if (name[4] == 'b' && name[5] == '\0') {
+						/* case "__peb": ... */
+						result = (void *)root_peb;
+					}
+				} else if (name[3] == 'r') {
 					if (name[4] == 'o') {
 						if (name[5] == 'g') {
 							if (name[6] == 'n') {
 								if (name[7] == 'a') {
 									if (name[8] == 'm') {
 										if (name[9] == 'e') {
-											if (name[10] == '_') {
+											if (name[10] == '\0') {
+												/* case "__progname": ... */
+												result = (void *)dlget_p_program_invocation_short_name();
+											} else if (name[10] == '_') {
 												if (name[11] == 'f' && name[12] == 'u' && name[13] == 'l' &&
 												    name[14] == 'l' && name[15] == '\0') {
 													/* case "__progname_full": ... */
 													result = (void *)&root_peb->pp_argv[0];
 												}
-											} else if (name[10] == '\0') {
-												/* case "__progname": ... */
-												result = (void *)dlget_p_program_invocation_short_name();
 											}
 										}
 									}
 								}
 							}
 						}
-					}
-				} else if (name[3] == 'e') {
-					if (name[4] == 'b' && name[5] == '\0') {
-						/* case "__peb": ... */
-						result = (void *)root_peb;
 					}
 				}
 			} else if (name[2] == 't') {
@@ -2078,52 +2264,52 @@ stringSwitch("name",
 				break;
 
 			case 'a':
-				if (name[3] == 'u') {
+				if (name[3] == 'd') {
+					if (name[4] == 'd' && name[5] == 'r' && name[6] == '\0') {
+						/* case "dladdr": ... */
+						result = (void *)&libdl_dladdr;
+					}
+				} else if (name[3] == 'u') {
 					if (name[4] == 'x' && name[5] == 'c' && name[6] == 't' &&
 					    name[7] == 'r' && name[8] == 'l' && name[9] == '\0') {
 						/* case "dlauxctrl": ... */
 						result = (void *)&libdl_dlauxctrl;
-					}
-				} else if (name[3] == 'd') {
-					if (name[4] == 'd' && name[5] == 'r' && name[6] == '\0') {
-						/* case "dladdr": ... */
-						result = (void *)&libdl_dladdr;
 					}
 				}
 				break;
 
 			case 'c':
 				if (name[3] == 'l') {
-					if (name[4] == 'o') {
-						if (name[5] == 's' && name[6] == 'e' && name[7] == '\0') {
-							/* case "dlclose": ... */
-							result = (void *)&libdl_dlclose;
-						}
-					} else if (name[4] == 'e') {
+					if (name[4] == 'e') {
 						if (name[5] == 'a' && name[6] == 'r' && name[7] == 'c' &&
 						    name[8] == 'a' && name[9] == 'c' && name[10] == 'h' &&
 						    name[11] == 'e' && name[12] == 's' && name[13] == '\0') {
 							/* case "dlclearcaches": ... */
 							result = (void *)&libdl_dlclearcaches;
 						}
+					} else if (name[4] == 'o') {
+						if (name[5] == 's' && name[6] == 'e' && name[7] == '\0') {
+							/* case "dlclose": ... */
+							result = (void *)&libdl_dlclose;
+						}
 					}
 				}
 				break;
 
 			case 'e':
-				if (name[3] == 'x') {
+				if (name[3] == 'r') {
+					if (name[4] == 'r' && name[5] == 'o' && name[6] == 'r' &&
+					    name[7] == '\0') {
+						/* case "dlerror": ... */
+						result = (void *)&libdl_dlerror;
+					}
+				} else if (name[3] == 'x') {
 					if (name[4] == 'c' && name[5] == 'e' && name[6] == 'p' &&
 					    name[7] == 't' && name[8] == 'a' && name[9] == 'w' &&
 					    name[10] == 'a' && name[11] == 'r' && name[12] == 'e' &&
 					    name[13] == '\0') {
 						/* case "dlexceptaware": ... */
 						result = (void *)&libdl_dlexceptaware;
-					}
-				} else if (name[3] == 'r') {
-					if (name[4] == 'r' && name[5] == 'o' && name[6] == 'r' &&
-					    name[7] == '\0') {
-						/* case "dlerror": ... */
-						result = (void *)&libdl_dlerror;
 					}
 				}
 				break;
@@ -2139,17 +2325,17 @@ stringSwitch("name",
 			case 'g':
 				if (name[3] == 'e') {
 					if (name[4] == 't') {
-						if (name[5] == 'm') {
-							if (name[6] == 'o' && name[7] == 'd' && name[8] == 'u' &&
-							    name[9] == 'l' && name[10] == 'e' && name[11] == '\0') {
-								/* case "dlgetmodule": ... */
-								result = (void *)&libdl_dlgetmodule;
-							}
-						} else if (name[5] == 'h') {
+						if (name[5] == 'h') {
 							if (name[6] == 'a' && name[7] == 'n' && name[8] == 'd' &&
 							    name[9] == 'l' && name[10] == 'e' && name[11] == '\0') {
 								/* case "dlgethandle": ... */
 								result = (void *)&libdl_dlgethandle;
+							}
+						} else if (name[5] == 'm') {
+							if (name[6] == 'o' && name[7] == 'd' && name[8] == 'u' &&
+							    name[9] == 'l' && name[10] == 'e' && name[11] == '\0') {
+								/* case "dlgetmodule": ... */
+								result = (void *)&libdl_dlgetmodule;
 							}
 						}
 					}
@@ -2206,22 +2392,26 @@ stringSwitch("name",
 				break;
 
 			case 's':
-				if (name[3] == 'y') {
-					if (name[4] == 'm' && name[5] == '\0') {
-						/* case "dlsym": ... */
-						result = (void *)&libdl_dlsym;
-					}
-				} else if (name[3] == 'e') {
+				if (name[3] == 'e') {
 					if (name[4] == 'c') {
 						if (name[5] == 't') {
 							if (name[6] == 'i') {
 								if (name[7] == 'o') {
 									if (name[8] == 'n') {
 										if (name[9] == 'i') {
-											if (name[10] == 'n' && name[11] == 'd' && name[12] == 'e' &&
-											    name[13] == 'x' && name[14] == '\0') {
-												/* case "dlsectionindex": ... */
-												result = (void *)&libdl_dlsectionindex;
+											if (name[10] == 'n') {
+												if (name[11] == 'd') {
+													if (name[12] == 'e' && name[13] == 'x' && name[14] == '\0') {
+														/* case "dlsectionindex": ... */
+														result = (void *)&libdl_dlsectionindex;
+													}
+												} else if (name[11] == 'f') {
+													if (name[12] == 'l' && name[13] == 'a' && name[14] == 't' &&
+													    name[15] == 'e' && name[16] == '\0') {
+														/* case "dlsectioninflate": ... */
+														result = (void *)&libdl_dlsectioninflate;
+													}
+												}
 											}
 										} else if (name[9] == 'm') {
 											if (name[10] == 'o' && name[11] == 'd' && name[12] == 'u' &&
@@ -2241,49 +2431,54 @@ stringSwitch("name",
 							}
 						}
 					}
+				} else if (name[3] == 'y') {
+					if (name[4] == 'm' && name[5] == '\0') {
+						/* case "dlsym": ... */
+						result = (void *)&libdl_dlsym;
+					}
 				}
 				break;
 
 			case 't':
 				if (name[3] == 'l') {
 					if (name[4] == 's') {
-						if (name[5] == 'f') {
-							if (name[6] == 'r') {
-								if (name[7] == 'e') {
-									if (name[8] == 'e') {
-										if (name[9] == 's') {
-											if (name[10] == 'e' && name[11] == 'g' && name[12] == '\0') {
-												/* case "dltlsfreeseg": ... */
-												result = (void *)&libdl_dltlsfreeseg;
-											}
-										} else if (name[9] == '\0') {
-											/* case "dltlsfree": ... */
-											result = (void *)&libdl_dltlsfree;
-										}
-									}
+						if (name[5] == 'a') {
+							if (name[6] == 'd') {
+								if (name[7] == 'd' && name[8] == 'r' && name[9] == '\0') {
+									/* case "dltlsaddr": ... */
+									result = (void *)&libdl_dltlsaddr;
 								}
-							}
-						} else if (name[5] == 'a') {
-							if (name[6] == 'l') {
+							} else if (name[6] == 'l') {
 								if (name[7] == 'l') {
 									if (name[8] == 'o') {
 										if (name[9] == 'c') {
-											if (name[10] == 's') {
+											if (name[10] == '\0') {
+												/* case "dltlsalloc": ... */
+												result = (void *)&libdl_dltlsalloc;
+											} else if (name[10] == 's') {
 												if (name[11] == 'e' && name[12] == 'g' && name[13] == '\0') {
 													/* case "dltlsallocseg": ... */
 													result = (void *)&libdl_dltlsallocseg;
 												}
-											} else if (name[10] == '\0') {
-												/* case "dltlsalloc": ... */
-												result = (void *)&libdl_dltlsalloc;
 											}
 										}
 									}
 								}
-							} else if (name[6] == 'd') {
-								if (name[7] == 'd' && name[8] == 'r' && name[9] == '\0') {
-									/* case "dltlsaddr": ... */
-									result = (void *)&libdl_dltlsaddr;
+							}
+						} else if (name[5] == 'f') {
+							if (name[6] == 'r') {
+								if (name[7] == 'e') {
+									if (name[8] == 'e') {
+										if (name[9] == '\0') {
+											/* case "dltlsfree": ... */
+											result = (void *)&libdl_dltlsfree;
+										} else if (name[9] == 's') {
+											if (name[10] == 'e' && name[11] == 'g' && name[12] == '\0') {
+												/* case "dltlsfreeseg": ... */
+												result = (void *)&libdl_dltlsfreeseg;
+											}
+										}
+									}
 								}
 							}
 						}
@@ -2330,19 +2525,19 @@ stringSwitch("name",
 																	if (name[16] == 'o') {
 																		if (name[17] == 'n') {
 																			if (name[18] == '_') {
-																				if (name[19] == 's') {
+																				if (name[19] == 'n') {
+																					if (name[20] == 'a' && name[21] == 'm' && name[22] == 'e' &&
+																					    name[23] == '\0') {
+																						/* case "program_invocation_name": ... */
+																						result = (void *)&root_peb->pp_argv[0];
+																					}
+																				} else if (name[19] == 's') {
 																					if (name[20] == 'h' && name[21] == 'o' && name[22] == 'r' &&
 																					    name[23] == 't' && name[24] == '_' && name[25] == 'n' &&
 																					    name[26] == 'a' && name[27] == 'm' && name[28] == 'e' &&
 																					    name[29] == '\0') {
 																						/* case "program_invocation_short_name": ... */
 																						result = (void *)dlget_p_program_invocation_short_name();
-																					}
-																				} else if (name[19] == 'n') {
-																					if (name[20] == 'a' && name[21] == 'm' && name[22] == 'e' &&
-																					    name[23] == '\0') {
-																						/* case "program_invocation_name": ... */
-																						result = (void *)&root_peb->pp_argv[0];
 																					}
 																				}
 																			}

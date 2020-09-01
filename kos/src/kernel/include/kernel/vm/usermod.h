@@ -86,6 +86,15 @@ FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) void *
 NOTHROW(KCALL usermod_section_cdata_nx)(struct usermod_section *__restrict self,
                                         gfp_t gfp DFL(GFP_NORMAL))
 		ASMNAME("driver_section_cdata_nx");
+#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
+/* TODO: Elf32_Chdr and Elf64_Chdr aren't the same, and `driver_section_cdata()',
+ *       which we're currently using to implement `usermod_section_cdata()' only
+ *       uses native-sized compressed section headers!
+ * -> In a configuration where both would be needed, the above 2 functions need
+ *    custom implementations, and we can't just re-use the implementation used
+ *    for driver sections! */
+#endif /* USERMOD_TYPE_ELF32 && USERMOD_TYPE_ELF64 */
+
 
 
 

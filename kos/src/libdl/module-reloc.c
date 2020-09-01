@@ -79,7 +79,7 @@ struct dl_symbol {
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND 0
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE 2
-PRIVATE WUNUSED NONNULL((1, 2, 3, 4, 5, 8)) unsigned int LIBCCALL
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4, 5, 8)) unsigned int CC
 dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
                                      char const *__restrict name,
                                      uintptr_t *__restrict phash_elf,

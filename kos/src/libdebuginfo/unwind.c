@@ -134,31 +134,26 @@ unwind_through_debug_frame(void *absolute_pc,
 		if (sect) {
 			void *debug_frame_data;
 			size_t debug_frame_size;
-			unwind_fde_t fde;
-			/* TODO: Support for a compressed .debug_frame!
-			 *       For this purpose, do what the kernel does, and add a new function to libdl.so:
-			 *       `void *dl_section_decompress(struct dl_section *sect, size_t *psize)'
-			 *       For the implementation, libdl.so should lazily load `libzlib.so', and
-			 *       make use of its functionality in the same manner, as the kernel does,
-			 *       too. */
-			debug_frame_data = sect->ds_data;
-			debug_frame_size = sect->ds_size;
-
-			/* Scan the .debug_frame section for an FDE matching `absolute_pc' */
-			result = libdi_unwind_fde_scan_df((byte_t *)debug_frame_data,
-			                                  (byte_t *)debug_frame_data + debug_frame_size,
-			                                  absolute_pc,
-			                                  &fde,
-			                                  sizeof(void *));
-			if (result == UNWIND_SUCCESS) {
-				/* Found the FDE. - Now to execute it's program! */
-				unwind_cfa_state_t cfa;
-				result = unwind_fde_exec(&fde, &cfa, absolute_pc);
-				if unlikely(result == UNWIND_SUCCESS) {
-					/* And finally: Apply register modifications. */
-					result = unwind_cfa_apply(&cfa, &fde, absolute_pc,
-					                          reg_getter, reg_getter_arg,
-					                          reg_setter, reg_setter_arg);
+			/* Support for a compressed .debug_frame! */
+			debug_frame_data = dlsectioninflate(sect, &debug_frame_size);
+			if (debug_frame_data) {
+				unwind_fde_t fde;
+				/* Scan the .debug_frame section for an FDE matching `absolute_pc' */
+				result = libdi_unwind_fde_scan_df((byte_t *)debug_frame_data,
+				                                  (byte_t *)debug_frame_data + debug_frame_size,
+				                                  absolute_pc,
+				                                  &fde,
+				                                  sizeof(void *));
+				if (result == UNWIND_SUCCESS) {
+					/* Found the FDE. - Now to execute it's program! */
+					unwind_cfa_state_t cfa;
+					result = unwind_fde_exec(&fde, &cfa, absolute_pc);
+					if unlikely(result == UNWIND_SUCCESS) {
+						/* And finally: Apply register modifications. */
+						result = unwind_cfa_apply(&cfa, &fde, absolute_pc,
+						                          reg_getter, reg_getter_arg,
+						                          reg_setter, reg_setter_arg);
+					}
 				}
 			}
 			dlunlocksection(sect);

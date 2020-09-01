@@ -43,7 +43,7 @@ libdl_dltlsbase(DlModule *__restrict self)
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
-INTERN WUNUSED NONNULL((1)) void *LIBCCALL
+INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
 libdl_dltlsaddr(DlModule *self)
 #endif /* !FAIL_ON_ERROR */
 {

@@ -68,6 +68,7 @@ __DECL_BEGIN
 #define __CRT_HAVE_dlsectionname 1
 #define __CRT_HAVE_dlsectionindex 1
 #define __CRT_HAVE_dlsectionmodule 1
+#define __CRT_HAVE_dlsectioninflate 1
 #define __CRT_HAVE_dlclearcaches 1
 #define __CRT_HAVE_dltlsallocseg 1
 #define __CRT_HAVE_dltlsfreeseg 1
@@ -211,6 +212,7 @@ __DECL_BEGIN
 #undef __CRT_HAVE_dlsectionname
 #undef __CRT_HAVE_dlsectionindex
 #undef __CRT_HAVE_dlsectionmodule
+#undef __CRT_HAVE_dlsectioninflate
 #undef __CRT_HAVE_dlclearcaches
 #undef __CRT_HAVE_dltlsallocseg
 #undef __CRT_HAVE_dltlsfreeseg

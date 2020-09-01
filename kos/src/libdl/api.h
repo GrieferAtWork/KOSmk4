@@ -158,6 +158,12 @@
 #ifndef VLIBDCALL
 #define VLIBDCALL __VLIBDCALL
 #endif /* !VLIBDCALL */
+#ifndef DLFCN_CC
+#define DLFCN_CC __DLFCN_CC
+#endif /* !DLFCN_CC */
+#ifndef DLFCN_VCC
+#define DLFCN_VCC __DLFCN_VCC
+#endif /* !DLFCN_VCC */
 
 /* Addressable sections of the RTLD driver itself.
  * Of note here are mostly the .eh_frame and .gcc_except_table

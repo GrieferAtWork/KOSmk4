@@ -452,7 +452,7 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 
 #if (defined(__CRT_HAVE_dllocksection) || defined(__CRT_HAVE_dlunlocksection) || \
      defined(__CRT_HAVE_dlsectionname) || defined(__CRT_HAVE_dlsectionindex) ||  \
-     defined(__CRT_HAVE_dlsectionmodule))
+     defined(__CRT_HAVE_dlsectionmodule) || defined(__CRT_HAVE_dlsectioninflate))
 #ifndef __dl_section_defined
 #define __dl_section_defined 1
 struct dl_section {
@@ -529,6 +529,35 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_CC dlsectionmodule)(struct dl_section *__sect,
                                           unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 #endif /* __CRT_HAVE_dlsectionmodule */
+
+/* Try to inflate compressed module sections (`SHF_COMPRESSED'), returning a
+ * pointer to a decompressed data blob that is lazily allocated for `SECT',
+ * and will be freed once the section ends up being unloaded.
+ * The given `SECT' may not have been loaded with `DLLOCKSECTION_FNODATA'.
+ * If the (compressed) data used for backing `SECT' has not been loaded,
+ * this function will fail.
+ * When the given `SECT' isn't actually compressed, this function will simply
+ * return a pointer to `SECT->ds_data', and fill `*PSIZE' (if non-NULL) with
+ * `ds_size'. Otherwise, inflated data and its size are returned.
+ * NOTE: This function requires libdl to lazily load the KOS system library
+ *       `libzlib.so', as found apart of the KOS source tree. Should that
+ *       library not be loaded already, or should loading of said library
+ *       fail for any reason, this function will also fail, and dlerror()
+ *       will reflect what went wrong when trying to load said support library.
+ * NOTE: The backing memory for the deflated data blob is allocated lazily and
+ *       will not be freed before `SECT' is `dlunlocksection()'ed the same #
+ *       of times that it was `dllocksection()'ed.
+ * @param: PSIZE: When non-NULL, store the size of the inflated (decompressed)
+ *                data blob that is returned.
+ * @return: * :   A pointer to the inflated data that is backing `SECT'
+ *                When `SECT' isn't compressed, this function will simply
+ *                return the section's normal data blob, that is `SECT->ds_data'
+ * @return: NULL: Error (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dlsectioninflate
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+__NOTHROW_NCX(__DLFCN_CC dlsectioninflate)(struct dl_section *__sect,
+                                           __size_t *__psize);
+#endif /* __CRT_HAVE_dlsectioninflate */
 #endif /* ... */
 
 

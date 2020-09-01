@@ -74,8 +74,13 @@ struct dlsection {
 	                                      * Pointer to the module (or NULL if section data is owned, and the module was destroyed) */
 	REF DlSection       *ds_dangling;    /* [0..1][lock(ds_module->dm_sections_lock))] Chain of dangling sections.
 	                                      * NOTE: Set to `(REF DlSection *)-1' if the section isn't dangling. */
-	uint16_t             ds_flags;       /* [const] Section flags (Set of `ELF_DLSECTION_FLAG_*') */
-	uint16_t             ds_index;       /* [const] Index of this section. */
+	uintptr_half_t       ds_flags;       /* [const] Section flags (Set of `ELF_DLSECTION_FLAG_*') */
+	uintptr_half_t       ds_index;       /* [const] Index of this section. */
+	void                *ds_cdata;       /* [0..ds_csize][lock(WRITE_ONCE)][owned_if(!= ds_data)]
+	                                      * Decompressed section data. (or same as `ds_data' if section isn't compressed)
+	                                      * NOTE: Set to `(void *)-1' when decompressed section data hasn't been loaded, yet.
+	                                      * NOTE: A section is compressed when `ds_flags & SHF_COMPRESSED' */
+	size_t               ds_csize;       /* [const][lock(WRITE_ONCE)][valid_if(ds_cdata)] Decompressed section size. */
 };
 
 #ifdef __INTELLISENSE__
