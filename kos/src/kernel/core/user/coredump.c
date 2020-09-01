@@ -74,7 +74,7 @@ dbg_coredump(void const *const *traceback_vector,
              uintptr_t unwind_error) {
 	size_t tbi;
 	instrlen_isa_t userspace_isa;
-	uintptr_t current_pc;
+	void const *current_pc;
 	/* We are now in debugger-mode. */
 	dbg_savecolor();
 	/* If the kernel hasn't been poisoned, tell the user that they are
@@ -139,41 +139,40 @@ dbg_coredump(void const *const *traceback_vector,
 	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (reason_error) {
-		dbg_addr2line_printf((uintptr_t)reason_error->e_faultaddr,
-		                     (uintptr_t)instruction_trysucc((void *)reason_error->e_faultaddr,
-		                                                    instrlen_isa_from_kcpustate(orig_ustate)),
+		dbg_addr2line_printf(reason_error->e_faultaddr,
+		                     instruction_trysucc((void *)reason_error->e_faultaddr,
+		                                         instrlen_isa_from_kcpustate(orig_ustate)),
 		                     "faultaddr");
 	}
 	if (orig_kstate) {
-		dbg_addr2line_printf((uintptr_t)kcpustate_getpc(orig_kstate),
-		                     (uintptr_t)instruction_trysucc((void *)kcpustate_getpc(orig_kstate),
-		                                                    instrlen_isa_from_kcpustate(orig_kstate)),
+		dbg_addr2line_printf((void const *)kcpustate_getpc(orig_kstate),
+		                     instruction_trysucc((void *)kcpustate_getpc(orig_kstate),
+		                                         instrlen_isa_from_kcpustate(orig_kstate)),
 		                     "orig_kstate");
 	}
 	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
-		dbg_addr2line_printf((uintptr_t)ktraceback_vector[tbi],
-		                     (uintptr_t)instruction_trysucc(ktraceback_vector[tbi],
-		                                                    INSTRLEN_ISA_DEFAULT),
+		dbg_addr2line_printf(ktraceback_vector[tbi],
+		                     instruction_trysucc(ktraceback_vector[tbi],
+		                                         INSTRLEN_ISA_DEFAULT),
 		                     "ktraceback_vector[%" PRIuSIZ "]\n", tbi);
 	}
 	userspace_isa = instrlen_isa_from_ucpustate(orig_ustate);
-	dbg_addr2line_printf((uintptr_t)ucpustate_getpc(orig_ustate),
-	                     (uintptr_t)instruction_trysucc((void *)ucpustate_getpc(orig_ustate),
-	                                                    userspace_isa),
+	dbg_addr2line_printf((void const *)ucpustate_getpc(orig_ustate),
+	                     instruction_trysucc((void *)ucpustate_getpc(orig_ustate),
+	                                         userspace_isa),
 	                     "orig_ustate");
 	for (tbi = 0; tbi < traceback_length; ++tbi) {
-		dbg_addr2line_printf((uintptr_t)traceback_vector[tbi],
-		                     (uintptr_t)instruction_trysucc(traceback_vector[tbi],
-		                                                    userspace_isa),
+		dbg_addr2line_printf(traceback_vector[tbi],
+		                     instruction_trysucc(traceback_vector[tbi],
+		                                         userspace_isa),
 		                     "traceback_vector[%" PRIuSIZ "]\n", tbi);
 	}
-	current_pc = dbg_getpcreg(DBG_REGLEVEL_TRAP);
-	if (current_pc != ucpustate_getpc(orig_ustate) &&
+	current_pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_TRAP);
+	if (current_pc != (void const *)ucpustate_getpc(orig_ustate) &&
 	    (traceback_length == 0 ||
-	     current_pc != (uintptr_t)traceback_vector[traceback_length - 1])) {
+	     current_pc != traceback_vector[traceback_length - 1])) {
 		dbg_addr2line_printf(current_pc,
-		                     (uintptr_t)instruction_trysucc((void *)current_pc,
-		                                                    dbg_instrlen_isa(DBG_REGLEVEL_TRAP)),
+		                     instruction_trysucc(current_pc, dbg_instrlen_isa(DBG_REGLEVEL_TRAP)),
 		                     "curr_ustate");
 	}
 

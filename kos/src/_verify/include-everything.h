@@ -21,8 +21,6 @@
 #define __NO_WARNINGS 1
 
 
-#include <kos/exec/library.h> /* FIXME: This header cannot be included after <dlfcn.h> */
-
 /* In order to ensure that all of our system headers work nice with each other,
  * try to include every single one at the same time in the following configurations:
  *   - <nothing>
@@ -709,13 +707,12 @@ incdir("", "../../include");
 #include <kos/except.h>
 #include <kos/exec/asm/elf.h>
 #include <kos/exec/asm/rtld.h>
-#include <kos/exec/bits/library.h>
 #include <kos/exec/bits/peb.h>
 #include <kos/exec/elf-rel.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>
 #include <kos/exec/lazybind.h>
-#include <kos/exec/library.h>
+#include <kos/exec/module.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h>
 #include <kos/fcntl.h>
@@ -801,11 +798,13 @@ incdir("", "../../include");
 #include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/api.h>
 #include <libdebuginfo/debug_aranges.h>
+#include <libdebuginfo/debug_frame.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
 #include <libdebuginfo/repr.h>
 #include <libdebuginfo/symtab.h>
+#include <libdebuginfo/unwind.h>
 #include <libdemangle/api.h>
 #include <libdemangle/demangle.h>
 #include <libdemangle/gcc.h>

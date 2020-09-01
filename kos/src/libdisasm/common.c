@@ -36,7 +36,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/typecore.h>
 
 #include <kos/except.h>
-#include <kos/exec/library.h>
+#include <kos/exec/module.h>
 
 #include <format-printer.h>
 #include <stddef.h>
@@ -326,24 +326,28 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 				di_debug_addr2line_t a2l_info;
 				di_debug_sections_t dbg_sect;
 				di_dl_debug_sections_t dl_sect;
-				library_handle_t symbol_module;
-				symbol_module = library_ataddr(symbol_addr);
+				REF module_t *symbol_module;
+				module_type_var(symbol_module_type);
+				symbol_module = module_ataddr_nx(symbol_addr, symbol_module_type);
 				if (!symbol_module)
 					goto generic_print_symbol_addr;
 				TRY {
-					if (debug_dllocksections(symbol_module, &dbg_sect, &dl_sect) != DEBUG_INFO_ERROR_SUCCESS) {
-						library_decref(symbol_module);
+					if (debug_dllocksections(symbol_module, &dbg_sect, &dl_sect
+					                         module_type__arg(symbol_module_type)) !=
+					    DEBUG_INFO_ERROR_SUCCESS) {
+						module_decref(symbol_module, symbol_module_type);
 						goto generic_print_symbol_addr;
 					}
 					TRY {
 						uintptr_t symbol_offset;
 						if (debug_sections_addr2line(&dbg_sect, &a2l_info,
 						                             (uintptr_t)symbol_addr -
-						                             (uintptr_t)library_getbase(symbol_module),
+						                             (uintptr_t)module_getloadaddr(symbol_module,
+						                                                           symbol_module_type),
 						                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
 						                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS) {
-							library_decref(symbol_module);
-							debug_dlunlocksections(&dl_sect);
+							module_decref(symbol_module, symbol_module_type);
+							debug_dlunlocksections(&dl_sect module_type__arg(symbol_module_type));
 							goto generic_print_symbol_addr;
 						}
 						if (!a2l_info.al_rawname)
@@ -363,15 +367,17 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 							disasm_printf(self, "+%#Ix", symbol_offset);
 						disasm_print(self, ">", 1);
 					} EXCEPT {
-						debug_dlunlocksections(&dl_sect);
+						debug_dlunlocksections(&dl_sect module_type__arg(symbol_module_type));
 						RETHROW();
 					}
-					debug_dlunlocksections(&dl_sect);
+					debug_dlunlocksections(&dl_sect module_type__arg(symbol_module_type));
 				} EXCEPT {
-					library_decref(symbol_module);
+					module_decref(symbol_module,
+					              symbol_module_type);
 					RETHROW();
 				}
-				library_decref(symbol_module);
+				module_decref(symbol_module,
+				              symbol_module_type);
 			} else
 generic_print_symbol_addr:
 #endif /* CONFIG_LOOKUP_SYMBOL_NAME */

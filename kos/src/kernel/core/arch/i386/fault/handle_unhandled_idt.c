@@ -151,9 +151,9 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	regdump_cr4(&rd_printer, __rdcr4());
 	printk(KERN_EMERG "    %%cr3 %p\n", (void *)cr3);
 	addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-	                 ucpustate_getpc(ustate),
-	                 (uintptr_t)instruction_trysucc((void const *)ucpustate_getpc(ustate),
-	                                                instrlen_isa_from_ucpustate(ustate)),
+	                 (void const *)ucpustate_getpc(ustate),
+	                 instruction_trysucc((void const *)ucpustate_getpc(ustate),
+	                                     instrlen_isa_from_ucpustate(ustate)),
 	                 "Caused here [sp=%p]",
 	                 ucpustate_getsp(ustate));
 	is_first = true;
@@ -169,9 +169,9 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 			break;
 		is_first = false;
 		addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(ustate),
-		                                                instrlen_isa_from_ucpustate(ustate)),
-		                 ucpustate_getpc(ustate), "Called here [sp=%p]",
+		                 instruction_trypred((void const *)ucpustate_getpc(ustate),
+		                                     instrlen_isa_from_ucpustate(ustate)),
+		                 (void const *)ucpustate_getpc(ustate), "Called here [sp=%p]",
 		                 ucpustate_getsp(ustate));
 	}
 	if (error != UNWIND_NO_FRAME)

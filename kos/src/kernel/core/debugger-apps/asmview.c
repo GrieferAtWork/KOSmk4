@@ -268,7 +268,8 @@ DBG_FINI(finalize_av_symbol_cache) {
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_driver)
 			continue;
-		debug_dlunlocksections(&av_sections_cache[i].sl_dlsect);
+		debug_dlunlocksections(&av_sections_cache[i].sl_dlsect
+		                        module_type__arg(MODULE_TYPE_DRIVER));
 		decref_unlikely(av_sections_cache[i].sl_driver);
 	}
 	memset(av_symbol_cache, 0, sizeof(av_symbol_cache));
@@ -282,9 +283,8 @@ NOTHROW(FCALL av_do_lock_sections)(struct av_sections_lock *__restrict info,
 	symbol_module = driver_at_address((void *)symbol_addr);
 	if (!symbol_module)
 		return false;
-	if (debug_dllocksections(symbol_module,
-	                         &info->sl_dbsect,
-	                         &info->sl_dlsect) != DEBUG_INFO_ERROR_SUCCESS)
+	if (debug_dllocksections((module_t *)symbol_module, &info->sl_dbsect, &info->sl_dlsect
+	                         module_type__arg(MODULE_TYPE_DRIVER)) != DEBUG_INFO_ERROR_SUCCESS)
 		return false;
 	info->sl_driver = symbol_module;
 	return true;
@@ -309,7 +309,8 @@ NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 		return &av_sections_cache[i];
 	}
 	if (!resent) {
-		debug_dlunlocksections(&av_sections_cache[0].sl_dlsect);
+		debug_dlunlocksections(&av_sections_cache[0].sl_dlsect
+		                       module_type__arg(MODULE_TYPE_DRIVER));
 		decref_unlikely(av_sections_cache[0].sl_driver);
 		memmovedown(&av_sections_cache[0], &av_sections_cache[1],
 		            sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));

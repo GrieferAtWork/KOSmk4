@@ -362,9 +362,9 @@ DBG_COMMAND(trace,
 	 *        of the currently selected thread! As such, these should be a special,
 	 *        dbg_*-specific version of this function (and it's friends), that
 	 *        loads its memory using `dbg_readmemory()'! */
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
-	                                                    instrlen_isa_from_fcpustate(&state)),
-	                     (uintptr_t)fcpustate_getpc(&state), SP_ARGS);
+	dbg_addr2line_printf(instruction_trypred((void const *)fcpustate_getpc(&state),
+	                                         instrlen_isa_from_fcpustate(&state)),
+	                     (void const *)fcpustate_getpc(&state), SP_ARGS);
 	for (;;) {
 		struct fcpustate old_state;
 		memcpy(&old_state, &state, sizeof(struct fcpustate));
@@ -373,9 +373,9 @@ DBG_COMMAND(trace,
 		                         &unwind_setreg_fcpustate, &state);
 		if (error != UNWIND_SUCCESS)
 			break;
-		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state),
-		                                                    instrlen_isa_from_fcpustate(&state)),
-		                     (uintptr_t)fcpustate_getpc(&state), SP_ARGS);
+		dbg_addr2line_printf(instruction_trypred((void const *)fcpustate_getpc(&state),
+		                                         instrlen_isa_from_fcpustate(&state)),
+		                     (void const *)fcpustate_getpc(&state), SP_ARGS);
 #ifdef LOG_STACK_REMAINDER
 		last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -414,9 +414,8 @@ DBG_COMMAND(trace,
 					dbg_printf(DBGSTR("Analyzing remainder of stack:\n"));
 					is_first = false;
 				}
-				dbg_addr2line_printf((uintptr_t)instruction_trypred(pc, instrlen_isa_from_fcpustate(&state)),
-				                     (uintptr_t)pc, DBGSTR("pc@%p"),
-				                     iter);
+				dbg_addr2line_printf(instruction_trypred(pc, instrlen_isa_from_fcpustate(&state)),
+				                     pc, DBGSTR("pc@%p"), iter);
 			}
 		}
 	}
@@ -443,10 +442,8 @@ DBG_COMMAND(u,
 		dbg_setallregs(DBG_REGLEVEL_VIEW, &newstate);
 	}
 	final_pc = (void *)fcpustate_getpc(&newstate);
-	dbg_addr2line_printf((uintptr_t)instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
-	                     (uintptr_t)final_pc,
-	                     DBGSTR("sp=%p"),
-	                     (void *)final_pc);
+	dbg_addr2line_printf(instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
+	                     final_pc, DBGSTR("sp=%p"), final_pc);
 	return 0;
 }
 
@@ -470,7 +467,9 @@ again:
 			return DBG_STATUS_INVALID_ARGUMENTS;
 		current_pc = (uintptr_t)instruction_trysucc((void const *)addr, isa);
 	}
-	dbg_addr2line_printf((uintptr_t)addr, (uintptr_t)current_pc, NULL);
+	dbg_addr2line_printf((void const *)addr,
+	                     (void const *)current_pc,
+	                     NULL);
 	if (argc > 1)
 		goto again;
 	return 0;

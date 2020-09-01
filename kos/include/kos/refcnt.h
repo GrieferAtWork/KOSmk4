@@ -66,7 +66,8 @@ class __refcnt_select_tag {};
 class __weakrefcnt_select_tag {};
 __NAMESPACE_INT_END
 
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || \
+     (defined(__KOS__) && defined(__KERNEL__)))
 #define __PRIVATE_REFCNT_NAME(x) x
 template<class __T> class refcnt_methods
 #ifdef __INTELLISENSE__
@@ -196,7 +197,7 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                               \
 	}
 #endif /* __INTELLISENSE__ */
-#else /* __USE_KOS || __USE_KOS_KERNEL */
+#else /* __USE_KOS || __USE_KOS_KERNEL || (__KOS__ && __KERNEL__) */
 #define __PRIVATE_REFCNT_NAME(x) __##x
 template<class __T> class __refcnt_methods
 #ifdef __INTELLISENSE__
@@ -239,7 +240,7 @@ public:
 #define __WEAKREFCNT_METHODS_P(i)      ::__weakrefcnt_methods<decltype(((i), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))>
 #define __WEAKREFCNT_METHODS_BASE(T)                          decltype(((*(T *)0), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))
 #define __WEAKREFCNT_METHODS_BASE_P(i)                        decltype(((i), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))
-#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+#endif /* !__USE_KOS && !__USE_KOS_KERNEL && (!__KOS__ || !__KERNEL__) */
 
 
 #ifndef __DEFINE_REFCNT_FUNCTIONS

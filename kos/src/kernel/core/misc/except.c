@@ -19,54 +19,50 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_EXCEPT_C
 #define GUARD_KERNEL_SRC_MISC_EXCEPT_C 1
-#define _KOS_SOURCE 1
-#define _XOPEN_SOURCE 700
-#define _XOPEN_SOURCE_EXTENDED 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
 #include <kernel/types.h>
-#include <sched/posix-signal.h>
-
-#include <errno.h>
-#include <signal.h>
-#include <string.h>
 
 DECL_BEGIN
 
+#ifndef LIBCCALL
+#define LIBCCALL __LIBCCALL
+#endif /* !LIBCCALL */
+
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *
-NOTHROW_NCX(__LIBCCALL libc_error_info)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_info)(void) {
 	return &THIS_EXCEPTION_INFO;
 }
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_data *
-NOTHROW_NCX(__LIBCCALL libc_error_data)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_data)(void) {
 	return &THIS_EXCEPTION_DATA;
 }
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL error_register_state_t *
-NOTHROW_NCX(__LIBCCALL libc_error_register_state)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_register_state)(void) {
 	return &THIS_EXCEPTION_STATE;
 }
 
 INTERN ATTR_PURE WUNUSED error_code_t
-NOTHROW_NCX(__LIBCCALL libc_error_code)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
 	return PERTASK_GET(this_exception_code);
 }
 
 INTERN ATTR_PURE WUNUSED bool
-NOTHROW_NCX(__LIBCCALL libc_error_active)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
 	return PERTASK_GET(this_exception_code) != E_OK;
 }
 
 INTERN ATTR_PURE WUNUSED error_class_t
-NOTHROW_NCX(__LIBCCALL libc_error_class)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_class)(void) {
 	return PERTASK_GET(this_exception_class);
 }
 
 INTERN ATTR_PURE WUNUSED error_subclass_t
-NOTHROW_NCX(__LIBCCALL libc_error_subclass)(void) {
+NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
 	return PERTASK_GET(this_exception_subclass);
 }
 

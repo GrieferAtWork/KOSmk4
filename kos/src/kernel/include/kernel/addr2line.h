@@ -35,11 +35,10 @@ DECL_BEGIN
 
 #ifdef __CC__
 struct addr2line_buf {
-	di_debug_sections_t    ds_info; /* Section pointers */
-	di_dl_debug_sections_t ds_sect; /* Section references */
-#ifdef CONFIG_HAVE_USERMOD
-	REF struct usermod    *ds_user; /* [0..1] When non-NULL, do user-space addr2line */
-#endif /* CONFIG_HAVE_USERMOD */
+	di_debug_sections_t    ds_info;     /* Section pointers */
+	di_dl_debug_sections_t ds_sect;     /* Section references */
+	REF module_t          *ds_mod;      /* [0..1] The linked module. */
+	module_type_var       (ds_modtype); /* The type of the linked module. */
 };
 
 struct inode;
@@ -53,6 +52,8 @@ struct addr2line_modinfo {
 	char const                 *ami_filename; /* [0..1] Backing file name. */
 };
 
+/* TODO: Generate `struct addr2line_modinfo' from `ds_mod' dynamically!
+ *       Don't generate it as apart of the invocation of `addr2line_begin()'! */
 #define addr2line_modinfo_fini(self)     \
 	(xdecref_unlikely((self)->ami_fsfile), \
 	 xdecref_unlikely((self)->ami_fspath), \
@@ -83,10 +84,11 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t level DFL(0));
 FUNDEF WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
-                               uintptr_t abs_pc,
+                               void const *abs_pc,
                                struct addr2line_modinfo *modinfo DFL(__NULLPTR));
 FUNDEF NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
+
 
 /* Print addr2line information for the given source address:
  * @param: printer:  The printer to which to output data.
@@ -117,11 +119,11 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
  * Additionally, when no addr2line information is available, the following is printed:
  * >> start_pc+end_pc_minus_start_pc[ : message] */
 FUNDEF NONNULL((1)) ssize_t
-(VCALL addr2line_printf)(__pformatprinter printer, void *arg, uintptr_t start_pc,
-                         uintptr_t end_pc, char const *message_format, ...);
+(VCALL addr2line_printf)(__pformatprinter printer, void *arg, void const *start_pc,
+                         void const *end_pc, char const *message_format, ...);
 FUNDEF NONNULL((1)) ssize_t
-(KCALL addr2line_vprintf)(__pformatprinter printer, void *arg, uintptr_t start_pc,
-                          uintptr_t end_pc, char const *message_format,
+(KCALL addr2line_vprintf)(__pformatprinter printer, void *arg, void const *start_pc,
+                          void const *end_pc, char const *message_format,
                           __builtin_va_list args);
 
 #endif /* __CC__ */

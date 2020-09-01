@@ -177,8 +177,8 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	isa = instrlen_isa_from_ucpustate(&state);
 	TRY {
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state), isa),
-		                 ucpustate_getpc(&state),
+		                 instruction_trypred((void const *)ucpustate_getpc(&state), isa),
+		                 (void const *)ucpustate_getpc(&state),
 		                 "Caused here [sp=%p]",
 		                 (void *)ucpustate_getsp(&state));
 	} EXCEPT {
@@ -198,9 +198,9 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 			break;
 		TRY {
 			addr2line_printf(printer, arg,
-			                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state),
-			                                                instrlen_isa_from_ucpustate(&state)),
-			                 ucpustate_getpc(&state),
+			                 instruction_trypred((void const *)ucpustate_getpc(&state),
+			                                     instrlen_isa_from_ucpustate(&state)),
+			                 (void const *)ucpustate_getpc(&state),
 			                 "Called here [sp=%p]",
 			                 (void *)ucpustate_getsp(&state));
 		} EXCEPT {
@@ -246,8 +246,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 				}
 				TRY {
 					addr2line_printf(printer, arg,
-					                 (uintptr_t)instruction_trypred(pc, isa),
-					                 (uintptr_t)pc,
+					                 instruction_trypred(pc, isa), pc,
 					                 "Return address from [sp=%p]",
 					                 iter);
 				} EXCEPT {

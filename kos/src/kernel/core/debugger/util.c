@@ -57,7 +57,7 @@ DECL_BEGIN
  * split up into multiple lines.
  * Additionally, this function also highlights output using differing colors. */
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(VCALL dbg_addr2line_printf)(uintptr_t start_pc, uintptr_t end_pc,
+NOTHROW(VCALL dbg_addr2line_printf)(void const *start_pc, void const *end_pc,
                                     char const *message_format, ...) {
 	va_list args;
 	va_start(args, message_format);
@@ -69,14 +69,14 @@ PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict ainfo,
                                         struct addr2line_modinfo const *__restrict modinfo,
                                         uintptr_t module_relative_start_pc,
-                                        uintptr_t start_pc, uintptr_t end_pc,
+                                        void const *start_pc, void const *end_pc,
                                         char const *message_format, va_list args) {
 	di_debug_addr2line_t info;
 	unsigned int error;
 	u8 normal_fgcolor = ANSITTY_CL_WHITE;
 	u8 inline_fgcolor = ANSITTY_CL_AQUA;
 #ifdef CONFIG_HAVE_USERMOD
-	if (ainfo->ds_user) {
+	if (ainfo->ds_modtype == MODULE_TYPE_USRMOD) {
 		normal_fgcolor = ANSITTY_CL_OLIVE;
 		inline_fgcolor = ANSITTY_CL_TEAL;
 	}
@@ -90,7 +90,9 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 		dbg_putc('+');
 		dbg_savecolor();
 		dbg_setfgcolor(normal_fgcolor);
-		dbg_printf(DBGSTR("%-4Iu"), (size_t)(end_pc - start_pc));
+		dbg_printf(DBGSTR("%-4Iu"),
+		           (size_t)((byte_t *)end_pc -
+		                    (byte_t *)start_pc));
 		dbg_loadcolor();
 		if (modinfo->ami_name) {
 			dbg_putc('[');
@@ -124,14 +126,14 @@ again_printlevel:
 		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%p"),
 		           level == 0 ? start_pc
-		                      : ((start_pc - module_relative_start_pc) +
+		                      : (((byte_t *)start_pc - module_relative_start_pc) +
 		                         info.al_symstart));
 		dbg_loadcolor();
 		dbg_putc('+');
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%-4Iu"),
-		           level == 0 ? (size_t)(end_pc - start_pc)
+		           level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
 		                      : (size_t)(info.al_lineend - info.al_linestart));
 		dbg_loadcolor();
 		if (modinfo->ami_name) {
@@ -217,7 +219,7 @@ again_printlevel:
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
+NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
                                      char const *message_format, va_list args) {
 	struct addr2line_buf ainfo;
 	struct addr2line_modinfo modinfo;

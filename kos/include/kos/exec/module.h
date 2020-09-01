@@ -43,6 +43,7 @@
 #define MODULE_TYPE_DL    0 /* Handle is related to libdl.so. */
 #define MODULE_TYPE_COUNT 1 /* The # of known usermod types. */
 
+#define module_type_var(name)    /* nothing */
 #define module_type_param(name)  /* nothing */
 #define module_type__param(name) /* nothing */
 #define module_type_param_(name) /* nothing */
@@ -98,9 +99,9 @@ typedef void module_t;
 #define module_section_getcsize(self, typ)  (self)->ds_csize
 #define module_destroy(self, typ)           DlModule_Destroy(self)
 #define _module_refcnt(self, typ)           (self)->dm_refcnt
-#define module_loadaddr(self, typ)          (self)->dm_loadaddr
-#define module_loadstart(self, typ)         (self)->dm_loadstart
-#define module_loadend(self, typ)           (self)->dm_loadend
+#define module_getloadaddr(self, typ)       (self)->dm_loadaddr
+#define module_getloadstart(self, typ)      (self)->dm_loadstart
+#define module_getloadend(self, typ)        (self)->dm_loadend
 #endif /* __BUILDING_LIBDL || DL_EXTENSION_FORMAT */
 
 #define module_section_getdata(self, typ)    (self)->ds_data
@@ -122,20 +123,19 @@ __NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
 #ifdef __dlgethandle_defined
 #define module_ataddr(addr, result_typ)    dlgethandle(addr, DLGETHANDLE_FNORMAL)
 #define module_ataddr_nx(addr, result_typ) dlgethandle(addr, DLGETHANDLE_FNORMAL)
-#define module_ataddr_nouser(addr)         dlgethandle(addr, DLGETHANDLE_FNORMAL)
 #endif /* __dlgethandle_defined */
 
 
-#ifndef module_loadaddr
+#ifndef module_getloadaddr
 #if !defined(__dlmodulebase_defined) && defined(__CRT_HAVE_dlmodulebase)
 #define __dlmodulebase_defined 1
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 #endif /* !__dlmodulebase_defined && __CRT_HAVE_dlmodulebase */
 #ifdef __dlmodulebase_defined
-#define module_loadaddr(self, typ) ((__uintptr_t)dlmodulebase(self))
+#define module_getloadaddr(self, typ) ((__uintptr_t)dlmodulebase(self))
 #endif /* __dlmodulebase_defined */
-#endif /* !module_loadaddr */
+#endif /* !module_getloadaddr */
 
 
 #if !defined(__dllocksection_defined) && defined(__CRT_HAVE_dllocksection)
@@ -246,7 +246,7 @@ __DECL_END
      (defined(module_section_getcdata_nx) && defined(module_section_getcsize)))
 __DECL_BEGIN
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
-__NOTHROW(__module_section_inflate_impl)(module_t *__restrict __self,
+__NOTHROW(__module_section_inflate_impl)(module_section_t *__restrict __self,
                                          __size_t *__restrict __size
                                          module_type__param(__typ)) {
 	void *__result;

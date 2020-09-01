@@ -759,6 +759,14 @@
 #define os_heap_gfppar(v) v
 #define os_heap_gfpvar(v) int v;
 
+#define module_type_var(name)    module_type_t name;
+#define module_type_param(name)  module_type_t name
+#define module_type__param(name) , module_type_t name
+#define module_type_param_(name) module_type_t name,
+#define module_type_arg(name)    name
+#define module_type__arg(name)   , name
+#define module_type_arg_(name)   name,
+
 
 #define BZ_API(f) f
 #define PIXMAN_API

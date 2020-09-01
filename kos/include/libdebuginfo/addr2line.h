@@ -21,10 +21,14 @@
 #define _LIBDEBUGINFO_ADDR2LINE_H 1
 
 #include "api.h"
-#include <bits/types.h>
+/**/
+
 #include <bits/format-printer.h>
+#include <bits/types.h>
+#include <kos/anno.h>
+#include <kos/exec/module.h>
+
 #include <libc/string.h>
-#include <kos/exec/bits/library.h>
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -51,14 +55,14 @@ typedef struct {
 } di_debug_sections_t;
 
 typedef struct {
-	/*REF*/ section_handle_t dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
-	/*REF*/ section_handle_t dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
-	/*REF*/ section_handle_t dl_debug_abbrev;  /* [0..1] Reference to the `.debug_abbrev' section */
-	/*REF*/ section_handle_t dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
-	/*REF*/ section_handle_t dl_debug_str;     /* [0..1] Reference to the `.debug_str' section */
-	/*REF*/ section_handle_t dl_debug_ranges;  /* [0..1] Reference to the `.debug_ranges' section */
-	/*REF*/ section_handle_t dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
-	/*REF*/ section_handle_t dl_strtab;        /* [0..1] Reference to the `.strtab' or `.dynstr' section */
+	__REF module_section_t *dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
+	__REF module_section_t *dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
+	__REF module_section_t *dl_debug_abbrev;  /* [0..1] Reference to the `.debug_abbrev' section */
+	__REF module_section_t *dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
+	__REF module_section_t *dl_debug_str;     /* [0..1] Reference to the `.debug_str' section */
+	__REF module_section_t *dl_debug_ranges;  /* [0..1] Reference to the `.debug_ranges' section */
+	__REF module_section_t *dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
+	__REF module_section_t *dl_strtab;        /* [0..1] Reference to the `.strtab' or `.dynstr' section */
 } di_dl_debug_sections_t;
 
 
@@ -238,18 +242,22 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */
 typedef __ATTR_NONNULL((2, 3)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUG_DLLOCKSECTIONS)(void *dl_handle,
+(LIBDEBUGINFO_CC *PDEBUG_DLLOCKSECTIONS)(module_t *dl_handle,
                                          di_debug_sections_t *__restrict sections,
-                                         di_dl_debug_sections_t *__restrict dl_sections);
+                                         di_dl_debug_sections_t *__restrict dl_sections
+                                         module_type__param(module_type));
 typedef __ATTR_NONNULL((1)) void
-(LIBDEBUGINFO_CC *PDEBUG_DLUNLOCKSECTIONS)(di_dl_debug_sections_t *__restrict dl_sections);
+(LIBDEBUGINFO_CC *PDEBUG_DLUNLOCKSECTIONS)(di_dl_debug_sections_t *__restrict dl_sections
+                                           module_type__param(module_type));
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) unsigned int
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_dllocksections)(void *dl_handle,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_dllocksections)(module_t *dl_handle,
                                                     di_debug_sections_t *__restrict sections,
-                                                    di_dl_debug_sections_t *__restrict dl_sections);
+                                                    di_dl_debug_sections_t *__restrict dl_sections
+                                                    module_type__param(module_type));
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections);
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections
+                                                      module_type__param(module_type));
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 __DECL_END

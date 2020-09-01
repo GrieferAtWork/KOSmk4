@@ -33,7 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/compiler.h>
 
 #include <kos/exec/elf.h>
-#include <kos/exec/library.h>
+#include <kos/exec/module.h>
 
 #include <ctype.h>
 #include <elf.h>
@@ -800,15 +800,15 @@ PRIVATE STRINGSECTION char const secname_dynstr[]        = ".dynstr";
  *    taking the job of locking debug information sections into memory off of
  *    the user. */
 INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debug_dllocksections)(void *dl_handle,
+NOTHROW_NCX(CC libdi_debug_dllocksections)(module_t *dl_handle,
                                            di_debug_sections_t *__restrict sections,
-                                           di_dl_debug_sections_t *__restrict dl_sections) {
+                                           di_dl_debug_sections_t *__restrict dl_sections
+                                           module_type__param(module_type)) {
 	memset(sections, 0, sizeof(*sections));
 	if unlikely(!dl_handle)
 		goto err_no_data;
-#define LOCK_SECTION(name)                                 \
-	library_locksection((library_handle_t)dl_handle, name, \
-	                    LIBRARY_LOCKSECTION_FNORMAL)
+#define LOCK_SECTION(name) \
+	module_locksection(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
 	dl_sections->dl_debug_line = LOCK_SECTION(secname_debug_line);
 	if (!dl_sections->dl_debug_line) {
 		/* No debug information sections */
@@ -826,7 +826,8 @@ set_no_extened_debug_info:
 			goto set_no_extened_debug_info_2;
 		dl_sections->dl_debug_abbrev = LOCK_SECTION(secname_debug_abbrev);
 		if (!dl_sections->dl_debug_abbrev) {
-			library_unlocksection(dl_sections->dl_debug_info);
+			module_section_decref(dl_sections->dl_debug_info,
+			                      module_type);
 			goto set_no_extened_debug_info;
 		}
 		/* All all of the remaining debug information sections (which are optional, though) */
@@ -838,7 +839,8 @@ set_no_extened_debug_info:
 	if (dl_sections->dl_symtab) {
 		dl_sections->dl_strtab = LOCK_SECTION(secname_strtab);
 		if unlikely(!dl_sections->dl_strtab) {
-			library_unlocksection(dl_sections->dl_symtab);
+			module_section_decref(dl_sections->dl_symtab,
+			                      module_type);
 			goto try_load_dynsym;
 		}
 	} else {
@@ -848,7 +850,8 @@ try_load_dynsym:
 		if (dl_sections->dl_symtab) {
 			dl_sections->dl_strtab = LOCK_SECTION(secname_dynstr);
 			if unlikely(!dl_sections->dl_strtab) {
-				library_unlocksection(dl_sections->dl_symtab);
+				module_section_decref(dl_sections->dl_symtab,
+				                      module_type);
 				goto handle_missing_symbol_tables;
 			}
 		} else {
@@ -862,16 +865,15 @@ err_no_data:
 		}
 	}
 #undef LOCK_SECTION
-#ifdef __KERNEL__
 	/* Support for compressed sections. */
-#define LOAD_SECTION(sect, lv_start, lv_end)               \
-	((lv_start) = (byte_t *)driver_section_cdata_nx(sect), \
-	 (lv_end)   = (byte_t *)(lv_start) + (sect)->ds_csize)
-#else /* __KERNEL__ */
-#define LOAD_SECTION(sect, lv_start, lv_end) \
-	((lv_start) = (byte_t *)(sect)->ds_data, \
-	 (lv_end)   = (byte_t *)(sect)->ds_data + (sect)->ds_size)
-#endif /* !__KERNEL__ */
+#define LOAD_SECTION(sect, lv_start, lv_end)                                       \
+	do {                                                                           \
+		size_t size;                                                               \
+		(lv_start) = (byte_t *)module_section_inflate(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                            \
+	}	__WHILE0
+
+
 	/* Fill in section mapping information. */
 	if (dl_sections->dl_debug_line) {
 		LOAD_SECTION(dl_sections->dl_debug_line,
@@ -907,7 +909,8 @@ err_no_data:
 		LOAD_SECTION(dl_sections->dl_symtab,
 		             sections->ds_symtab_start,
 		             sections->ds_symtab_end);
-		sections->ds_symtab_ent = dl_sections->dl_symtab->ds_entsize;
+		sections->ds_symtab_ent = module_section_getentsize(dl_sections->dl_symtab,
+		                                                    module_type);
 		if (!sections->ds_symtab_ent)
 			sections->ds_symtab_ent = sizeof(ElfW(Sym));
 	}
@@ -921,23 +924,24 @@ err_no_data:
 }
 
 INTERN TEXTSECTION NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections) {
+NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections
+                                             module_type__param(module_type)) {
 	if (dl_sections->dl_strtab)
-		library_unlocksection(dl_sections->dl_strtab);
+		module_section_decref(dl_sections->dl_strtab, module_type);
 	if (dl_sections->dl_symtab)
-		library_unlocksection(dl_sections->dl_symtab);
+		module_section_decref(dl_sections->dl_symtab, module_type);
 	if (dl_sections->dl_debug_ranges)
-		library_unlocksection(dl_sections->dl_debug_ranges);
+		module_section_decref(dl_sections->dl_debug_ranges, module_type);
 	if (dl_sections->dl_debug_str)
-		library_unlocksection(dl_sections->dl_debug_str);
+		module_section_decref(dl_sections->dl_debug_str, module_type);
 	if (dl_sections->dl_debug_aranges)
-		library_unlocksection(dl_sections->dl_debug_aranges);
+		module_section_decref(dl_sections->dl_debug_aranges, module_type);
 	if (dl_sections->dl_debug_abbrev)
-		library_unlocksection(dl_sections->dl_debug_abbrev);
+		module_section_decref(dl_sections->dl_debug_abbrev, module_type);
 	if (dl_sections->dl_debug_info)
-		library_unlocksection(dl_sections->dl_debug_info);
+		module_section_decref(dl_sections->dl_debug_info, module_type);
 	if (dl_sections->dl_debug_line)
-		library_unlocksection(dl_sections->dl_debug_line);
+		module_section_decref(dl_sections->dl_debug_line, module_type);
 #ifndef NDEBUG
 	memset(dl_sections, 0xcc, sizeof(*dl_sections));
 #endif /* !NDEBUG */

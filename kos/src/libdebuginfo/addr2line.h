@@ -89,11 +89,13 @@ libdi_debug_print_filename(pformatprinter printer, void *arg,
  *    taking the job of locking debug information sections into memory off of
  *    the user. */
 INTDEF __ATTR_NONNULL((2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debug_dllocksections)(void *dl_handle,
+NOTHROW_NCX(CC libdi_debug_dllocksections)(module_t *dl_handle,
                                            di_debug_sections_t *__restrict sections,
-                                           di_dl_debug_sections_t *__restrict dl_sections);
+                                           di_dl_debug_sections_t *__restrict dl_sections
+                                           module_type__param(module_type));
 INTDEF __ATTR_NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections);
+NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections
+                                             module_type__param(module_type));
 
 
 

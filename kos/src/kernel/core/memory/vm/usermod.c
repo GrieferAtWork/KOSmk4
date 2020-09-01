@@ -1414,21 +1414,21 @@ PUBLIC_CONST struct module_abi_struct const module_abi = {
 	},
 #ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
 	.ma_section_cdata = {
-		[MODULE_TYPE_DRIVER] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t) THROWS(...))&driver_section_cdata,
-		[MODULE_TYPE_USRMOD] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t) THROWS(...))&usermod_section_cdata,
+		[MODULE_TYPE_DRIVER] = (void *(KCALL *)(module_section_t *__restrict, gfp_t) THROWS(...))&driver_section_cdata,
+		[MODULE_TYPE_USRMOD] = (void *(KCALL *)(module_section_t *__restrict, gfp_t) THROWS(...))&usermod_section_cdata,
 	},
 	.ma_section_cdata_nx = {
-		[MODULE_TYPE_DRIVER] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t))&driver_section_cdata_nx,
-		[MODULE_TYPE_USRMOD] = (void *(KCALL *)(struct usermod_section *__restrict, gfp_t))&usermod_section_cdata_nx,
+		[MODULE_TYPE_DRIVER] = (void *(KCALL *)(module_section_t *__restrict, gfp_t))&driver_section_cdata_nx,
+		[MODULE_TYPE_USRMOD] = (void *(KCALL *)(module_section_t *__restrict, gfp_t))&usermod_section_cdata_nx,
 	},
 #endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
 	.ma_section_lock = {
-		[MODULE_TYPE_DRIVER] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&driver_section_lock,
-		[MODULE_TYPE_USRMOD] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&usermod_section_lock,
+		[MODULE_TYPE_DRIVER] = (REF module_section_t *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&driver_section_lock,
+		[MODULE_TYPE_USRMOD] = (REF module_section_t *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&usermod_section_lock,
 	},
 	.ma_section_lock_nx = {
-		[MODULE_TYPE_DRIVER] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&driver_section_lock_nx,
-		[MODULE_TYPE_USRMOD] = (REF struct usermod_section *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&usermod_section_lock_nx,
+		[MODULE_TYPE_DRIVER] = (REF module_section_t *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&driver_section_lock_nx,
+		[MODULE_TYPE_USRMOD] = (REF module_section_t *(KCALL *)(module_t *__restrict, USER CHECKED char const *, unsigned int))&usermod_section_lock_nx,
 	},
 	.ma_module_destroy = {
 		[MODULE_TYPE_DRIVER] = (void (FCALL *)(module_t *__restrict))&driver_destroy,

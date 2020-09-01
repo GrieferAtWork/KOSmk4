@@ -24,6 +24,11 @@
 
 #include <libregdump/api.h>
 
-#define CC    LIBREGDUMP_CC
+#define CC LIBREGDUMP_CC
+
+#ifndef REF
+#include <kos/anno.h>
+#define REF __REF
+#endif /* !REF */
 
 #endif /* !GUARD_LIBREGDUMP_API_H */

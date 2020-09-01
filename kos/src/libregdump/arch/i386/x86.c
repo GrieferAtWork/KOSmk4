@@ -31,7 +31,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/except.h>
-#include <kos/exec/library.h>
+#include <kos/exec/module.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/types.h>
@@ -1233,20 +1233,24 @@ libregdump_ip(struct regdump_printer *__restrict self,
 			PRINT("]");
 		}
 		if (ENSURE_LIBDEBUGINFO()) {
-			library_handle_t ip_module;
-			ip_module = library_ataddr((void const *)ip);
+			REF module_t *ip_module;
+			module_type_var(ip_module_type);
+			ip_module = module_ataddr_nx((void const *)ip,
+			                             ip_module_type);
 			if (ip_module) {
 				di_debug_sections_t sections;
 				di_dl_debug_sections_t dl_sections;
 				temp = 0;
-				if (debug_dllocksections(ip_module, &sections, &dl_sections) == DEBUG_INFO_ERROR_SUCCESS) {
+				if (debug_dllocksections(ip_module, &sections, &dl_sections
+				                         module_type__arg(ip_module_type)) ==
+				    DEBUG_INFO_ERROR_SUCCESS) {
 					di_debug_addr2line_t info;
-					uintptr_t relpc = prev_ip - (uintptr_t)library_getbase(ip_module);
+					uintptr_t relpc = prev_ip - (uintptr_t)module_getloadaddr(ip_module, ip_module_type);
 					if (debug_sections_addr2line(&sections, &info, relpc, 0, 0) == DEBUG_INFO_ERROR_SUCCESS)
 						temp = libregdump_do_ip_addr2line_info(self, &info, relpc, &did_lf_after_eip);
-					debug_dlunlocksections(&dl_sections);
+					debug_dlunlocksections(&dl_sections module_type__arg(ip_module_type));
 				}
-				library_decref(ip_module);
+				module_decref(ip_module, ip_module_type);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;

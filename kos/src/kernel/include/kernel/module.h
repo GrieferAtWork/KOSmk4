@@ -79,11 +79,11 @@ DECL_BEGIN
 struct module_abi_struct {
 	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *ma_section_destroy[MODULE_TYPE_COUNT])(module_section_t *__restrict self);
 #ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
-	void * (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata[MODULE_TYPE_COUNT])(struct usermod_section *__restrict self, gfp_t gfp) THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT);
-	void * /*NOTHROW*/ (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata_nx[MODULE_TYPE_COUNT])(struct usermod_section *__restrict self, gfp_t gfp);
+	void * (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata[MODULE_TYPE_COUNT])(module_section_t *__restrict self, gfp_t gfp) THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT);
+	void * /*NOTHROW*/ (ATTR_RETNONNULL NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) KCALL *ma_section_cdata_nx[MODULE_TYPE_COUNT])(module_section_t *__restrict self, gfp_t gfp);
 #endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
-	REF struct usermod_section *(WUNUSED NONNULL((1)) KCALL *ma_section_lock[MODULE_TYPE_COUNT])(module_t *__restrict self, USER CHECKED char const *name, unsigned int flags);
-	REF struct usermod_section * /*NOTHROW*/ (WUNUSED NONNULL((1)) KCALL *ma_section_lock_nx[MODULE_TYPE_COUNT])(module_t *__restrict self, USER CHECKED char const *name, unsigned int flags);
+	REF module_section_t *(WUNUSED NONNULL((1)) KCALL *ma_section_lock[MODULE_TYPE_COUNT])(module_t *__restrict self, USER CHECKED char const *name, unsigned int flags);
+	REF module_section_t * /*NOTHROW*/ (WUNUSED NONNULL((1)) KCALL *ma_section_lock_nx[MODULE_TYPE_COUNT])(module_t *__restrict self, USER CHECKED char const *name, unsigned int flags);
 	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *ma_module_destroy[MODULE_TYPE_COUNT])(module_t *__restrict self);
 	ptrdiff_t ma_module_offsetof_loadaddr[MODULE_TYPE_COUNT];
 	ptrdiff_t ma_module_offsetof_loadstart[MODULE_TYPE_COUNT];
@@ -175,9 +175,9 @@ NOTHROW(_module_refcnt)(module_t *__restrict self,
                         module_type_t typ);
 
 /* Return the load-offset, lowest mapped byte, and greatest mapped byte. */
-NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_loadaddr)(module_t const *__restrict self, module_type_t typ);
-NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_loadstart)(module_t const *__restrict self, module_type_t typ);
-NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_loadend)(module_t const *__restrict self, module_type_t typ);
+NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_getloadaddr)(module_t const *__restrict self, module_type_t typ);
+NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_getloadstart)(module_t const *__restrict self, module_type_t typ);
+NOBLOCK WUNUSED NONNULL((1)) uintptr_t NOTHROW(module_getloadend)(module_t const *__restrict self, module_type_t typ);
 
 /* Return a pointer to the VM inside of which the module has been loaded. */
 NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) struct vm *
@@ -221,9 +221,9 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_ataddr_nouser(addr)                    ((module_t *)driver_at_address(addr))
 #define module_destroy(self, typ)                     (*module_abi.ma_module_destroy[typ])(self)
 #define _module_refcnt(self, typ)                     (self)->m_driver.d_refcnt /* Binary compatibility! */
-#define module_loadaddr(self, typ)                    ((uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadaddr[typ]))
-#define module_loadstart(self, typ)                   ((uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadstart[typ]))
-#define module_loadend(self, typ)                     ((uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadend[typ]))
+#define module_getloadaddr(self, typ)                 (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadaddr[typ]))
+#define module_getloadstart(self, typ)                (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadstart[typ]))
+#define module_getloadend(self, typ)                  (*(uintptr_t *)((byte_t *)(self) + module_abi.ma_module_offsetof_loadend[typ]))
 #define module_vm(self, typ)                          ((typ) == MODULE_TYPE_DRIVER ? &vm_kernel : (self)->m_usrmod.um_vm)
 #define module_locksection(self, typ, name, flags)    (*module_abi.ma_section_lock[typ])(self, name, flags)
 #define module_locksection_nx(self, typ, name, flags) (*module_abi.ma_section_lock_nx[typ])(self, name, flags)
@@ -246,15 +246,16 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_ataddr_nouser(addr)                    driver_at_address(addr)
 #define module_destroy(self, typ)                     driver_destroy(self)
 #define _module_refcnt(self, typ)                     (self)->d_refcnt
-#define module_loadaddr(self, typ)                    (self)->d_loadaddr
-#define module_loadstart(self, typ)                   (self)->d_loadstart
-#define module_loadend(self, typ)                     (self)->d_loadend
+#define module_getloadaddr(self, typ)                 (self)->d_loadaddr
+#define module_getloadstart(self, typ)                (self)->d_loadstart
+#define module_getloadend(self, typ)                  (self)->d_loadend
 #define module_vm(self, typ)                          (&vm_kernel)
 #define module_locksection(self, typ, name, flags)    driver_section_lock(self, name, flags)
 #define module_locksection_nx(self, typ, name, flags) driver_section_lock_nx(self, name, flags)
 #endif /* !CONFIG_HAVE_USERMOD */
 
 #if MODULE_TYPE_COUNT >= 2
+#define module_type_var(name)    module_type_t name;
 #define module_type_param(name)  module_type_t name __ATTR_UNUSED
 #define module_type__param(name) , module_type_t name __ATTR_UNUSED
 #define module_type_param_(name) module_type_t name __ATTR_UNUSED,
@@ -262,6 +263,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_type__arg(name)   , name
 #define module_type_arg_(name)   name,
 #else /* MODULE_TYPE_COUNT >= 2 */
+#define module_type_var(name)    /* nothing */
 #define module_type_param(name)  /* nothing */
 #define module_type__param(name) /* nothing */
 #define module_type_param_(name) /* nothing */

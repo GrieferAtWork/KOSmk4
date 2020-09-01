@@ -447,17 +447,17 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 		              info->ei_data.e_pointers[i]);
 	}
 	addr2line_printf(tb_printer, tb_arg,
-	                 (uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state),
-	                                                instrlen_isa_from_kcpustate(&info->ei_state)),
-	                 kcpustate_getpc(&info->ei_state), "Thrown here");
+	                 instruction_trypred((void const *)kcpustate_getpc(&info->ei_state),
+	                                     instrlen_isa_from_kcpustate(&info->ei_state)),
+	                 (void const *)kcpustate_getpc(&info->ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
 			break;
 		addr2line_printf(tb_printer, tb_arg,
-		                 (uintptr_t)instruction_trypred(info->ei_trace[i],
-		                                                instrlen_isa_from_kcpustate(&info->ei_state)),
-		                 (uintptr_t)info->ei_trace[i], "Called here");
+		                 instruction_trypred(info->ei_trace[i],
+		                                     instrlen_isa_from_kcpustate(&info->ei_state)),
+		                 info->ei_trace[i], "Called here");
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 }
@@ -522,15 +522,15 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 		           info->ei_data.e_pointers[i]);
 	}
 	isa = instrlen_isa_from_kcpustate(&info->ei_state);
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state), isa),
-	                     kcpustate_getpc(&info->ei_state),
+	dbg_addr2line_printf(instruction_trypred((void const *)kcpustate_getpc(&info->ei_state), isa),
+	                     (void const *)kcpustate_getpc(&info->ei_state),
 	                     DBGSTR("Thrown here"));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
 			break;
-		dbg_addr2line_printf((uintptr_t)instruction_trypred(info->ei_trace[i], isa),
-		                     (uintptr_t)info->ei_trace[i],
+		dbg_addr2line_printf(instruction_trypred(info->ei_trace[i], isa),
+		                     info->ei_trace[i],
 		                     DBGSTR("Called here"));
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -549,8 +549,8 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 		} else if (my_last_pc != prev_last_pc) {
 			dbg_print(DBGSTR("...\n"));
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred((void const *)my_last_pc, isa),
-			                 my_last_pc,
+			                 instruction_trypred((void const *)my_last_pc, isa),
+			                 (void const *)my_last_pc,
 			                 DBGSTR("Traceback ends here"));
 		}
 	}
@@ -604,8 +604,8 @@ halt_unhandled_exception(unsigned int unwind_error,
 		else if (my_last_pc != prev_last_pc) {
 			printk(KERN_RAW "...\n");
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred((void const *)my_last_pc, isa),
-			                 my_last_pc, "Traceback ends here");
+			                 instruction_trypred((void const *)my_last_pc, isa),
+			                 (void const *)my_last_pc, "Traceback ends here");
 		}
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */

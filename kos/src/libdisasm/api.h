@@ -27,4 +27,9 @@
 
 #define CC LIBDISASM_CC
 
+#ifndef REF
+#include <kos/anno.h>
+#define REF __REF
+#endif /* !REF */
+
 #endif /* !GUARD_LIBDISASM_API_H */

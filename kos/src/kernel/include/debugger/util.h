@@ -132,10 +132,10 @@ FUNDEF bool NOTHROW(FCALL dbg_evaladdr)(char const *__restrict expr,
  * split up into multiple lines.
  * Additionally, this function also highlights output using differing colors. */
 FUNDEF void
-NOTHROW(VCALL dbg_addr2line_printf)(uintptr_t start_pc, uintptr_t end_pc,
+NOTHROW(VCALL dbg_addr2line_printf)(void const *start_pc, void const *end_pc,
                                     char const *message_format, ...);
 FUNDEF void
-NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
+NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
                                      char const *message_format, __builtin_va_list args);
 
 #endif /* __CC__ */

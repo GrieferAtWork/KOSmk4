@@ -107,9 +107,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 		instrlen_isa_t isa;
 		isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
 		result = addr2line_printf(printer, arg,
-		                          (uintptr_t)instruction_trypred(pc, isa),
-		                          (uintptr_t)pc,
-		                          "sp=%p", sp);
+		                          instruction_trypred(pc, isa),
+		                          pc, "sp=%p", sp);
 		if unlikely(result < 0)
 			goto done;
 	}
@@ -128,8 +127,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 			instrlen_isa_t isa;
 			isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
 			temp = addr2line_printf(printer, arg,
-			                        (uintptr_t)instruction_trypred(pc, isa),
-			                        (uintptr_t)pc, "sp=%p", sp);
+			                        instruction_trypred(pc, isa),
+			                        pc, "sp=%p", sp);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
@@ -183,8 +182,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 					--n_skip;
 				} else {
 					temp = addr2line_printf(printer, arg,
-					                        (uintptr_t)instruction_trypred(pc, isa),
-					                        (uintptr_t)pc, "pc@%p", iter);
+					                        instruction_trypred(pc, isa),
+					                        pc, "pc@%p", iter);
 					if unlikely(temp < 0)
 						goto err;
 					result += temp;

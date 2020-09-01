@@ -1422,16 +1422,16 @@ again:
 		/* This node wasn't reached. */
 		if (node->m_flags & MALLNODE_FUSERNODE) {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[0],
-			                                                INSTRLEN_ISA_DEFAULT),
-			                 (uintptr_t)node->m_trace[0],
+			                 instruction_trypred(node->m_trace[0],
+			                                     INSTRLEN_ISA_DEFAULT),
+			                 node->m_trace[0],
 			                 "Leaked %Iu bytes of heap-memory at %p...%p",
 			                 MALLNODE_SIZE(node), MALLNODE_MIN(node), MALLNODE_MAX(node));
 		} else {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[0],
-			                                                INSTRLEN_ISA_DEFAULT),
-			                 (uintptr_t)node->m_trace[0],
+			                 instruction_trypred(node->m_trace[0],
+			                                     INSTRLEN_ISA_DEFAULT),
+			                 node->m_trace[0],
 			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p",
 			                 MALLNODE_SIZE(node) - (CONFIG_MALL_PREFIX_SIZE +
 			                                        CONFIG_MALL_HEAD_SIZE +
@@ -1445,9 +1445,9 @@ again:
 			if (!node->m_trace[i])
 				break;
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 (uintptr_t)instruction_trypred(node->m_trace[i],
-			                                                INSTRLEN_ISA_DEFAULT),
-			                 (uintptr_t)node->m_trace[i],
+			                 instruction_trypred(node->m_trace[i],
+			                                     INSTRLEN_ISA_DEFAULT),
+			                 node->m_trace[i],
 			                 "Called here");
 		}
 		printk(KERN_RAW "\n");
@@ -1678,9 +1678,11 @@ NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
 		if (!pc)
 			break;
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)pc,
-		                                                INSTRLEN_ISA_DEFAULT),
-		                 pc, i ? "Called here" : "Allocated from here");
+		                 instruction_trypred((void const *)pc,
+		                                     INSTRLEN_ISA_DEFAULT),
+		                 (void const *)pc,
+		                 i ? "Called here"
+		                   : "Allocated from here");
 	}
 }
 
