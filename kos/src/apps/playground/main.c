@@ -306,6 +306,7 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("program_invocation_name       = %q\n", program_invocation_name);
 	printf("program_invocation_short_name = %q\n", program_invocation_short_name);
+	printf("dlmodulename(dlopen(NULL, 0)) = %q\n", dlmodulename(dlopen(NULL, 0)));
 	return 0;
 }
 /************************************************************************/
