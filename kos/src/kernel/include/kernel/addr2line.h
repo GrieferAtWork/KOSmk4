@@ -54,7 +54,7 @@ struct addr2line_modinfo {
 
 /* TODO: Generate `struct addr2line_modinfo' from `ds_mod' dynamically!
  *       Don't generate it as apart of the invocation of `addr2line_begin()'! */
-#define addr2line_modinfo_fini(self)     \
+#define addr2line_modinfo_fini(self)       \
 	(xdecref_unlikely((self)->ami_fsfile), \
 	 xdecref_unlikely((self)->ami_fspath), \
 	 xdecref_unlikely((self)->ami_fsname))
@@ -109,7 +109,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
  * The format used is:
  *    debug_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
  *    " : " + (al_rawname ? al_rawname : al_name ? al_name : "???") + "+" +
- *            (level == 0 ? (start_pc - al_symstart) : level == 0 ? (al_linestart - al_symstart)) +
+ *            (level == 0 ? (start_pc - al_symstart) : (al_linestart - al_symstart)) +
  *    " : " + (level == 0 ? (start_pc.hex() + "+" + (end_pc - start_pc))
  *                        : (al_symstart.hex() + "+" + (al_symend - al_symstart).hex())) +
  *   (message_format ? (" : " + message_format % args) : "") + "\n";

@@ -104,22 +104,10 @@ again:
 		ERROR(err_noframe);
 	next_chunk = reader + length;
 #ifdef DEBUG_FRAME
-#if __SIZEOF_POINTER__ >= 8
-	if (sizeof_address == 8) {
-		cie_offset = *(uint64_t *)reader; /* f_cieptr */
-		if (cie_offset == UINT64_C(0xffffffffffffffff))
-			goto do_next_chunk; /* This is a CIE, not an FDE */
-		fde_reader = reader + 8;
-	} else
-#endif /* __SIZEOF_POINTER__ >= 8 */
-	if (sizeof_address == 4) {
-		cie_offset = *(uint32_t *)reader; /* f_cieptr */
-		if (cie_offset == UINT32_C(0xffffffff))
-			goto do_next_chunk; /* This is a CIE, not an FDE */
-		fde_reader = reader + 4;
-	} else {
-		goto err_noframe;
-	}
+	cie_offset = *(uint32_t *)reader; /* f_cieptr */
+	if (cie_offset == UINT32_C(0xffffffff))
+		goto do_next_chunk; /* This is a CIE, not an FDE */
+	fde_reader = reader + 4;
 	cie = (struct CIE *)(eh_frame_start + cie_offset);
 #else /* DEBUG_FRAME */
 	cie_offset = *(uint32_t *)reader; /* f_cieptr */

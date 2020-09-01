@@ -266,8 +266,9 @@ __DECL_END
 /* A special source level that always refers to `LEVEL_COUNT - 1' */
 #define DEBUG_ADDR2LINE_LEVEL_SOURCE    (__CCAST(__uintptr_t)-1)
 
-#define DEBUG_ADDR2LINE_FNORMAL   0x0000 /* Normal flags. */
-#define DEBUG_ADDR2LINE_FTRYHARD  0x0001 /* Try really hard to find debug information (takes very long if information _really_ don't exist) */
+#define DEBUG_ADDR2LINE_FNORMAL  0x0000 /* Normal flags. */
+#define DEBUG_ADDR2LINE_FTRYHARD 0x0001 /* Try really hard to find debug information (takes
+                                         * very long if information _really_ doesn't exist) */
 
 
 #endif /* !_LIBDEBUGINFO_ADDR2LINE_H */

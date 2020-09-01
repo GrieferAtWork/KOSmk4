@@ -97,6 +97,8 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 			modinfo->ami_fsname   = xincref(mod->m_usrmod.um_fsname);
 			modinfo->ami_name     = NULL;
 			modinfo->ami_filename = NULL;
+			if (modinfo->ami_fsname)
+				modinfo->ami_name = modinfo->ami_fsname->de_name;
 		} else
 #endif /* CONFIG_HAVE_USERMOD */
 		{
@@ -141,7 +143,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
  * The format used is:
  *    debug_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
  *    " : " + (al_rawname ? al_rawname : al_name ? al_name : "???") + "+" +
- *            (level == 0 ? (start_pc - al_symstart) : level == 0 ? (al_linestart - al_symstart)) +
+ *            (level == 0 ? (start_pc - al_symstart) : (al_linestart - al_symstart)) +
  *    " : " + (level == 0 ? (start_pc.hex() + "+" + (end_pc - start_pc))
  *                        : (al_symstart.hex() + "+" + (al_symend - al_symstart).hex())) +
  *   (message_format ? (" : " + message_format % args) : "");
