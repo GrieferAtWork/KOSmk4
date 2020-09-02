@@ -24,13 +24,12 @@
 #define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
 
 /* NOTE: Don't add any assertion checks to this file!
- *       The syslog is used excessively by all kernel panic/assert/check
+ *       Because the syslog is used excessively by all kernel panic/assert/check
  *       mechanisms, everything in here that may be called by `syslog_printer()'
- *       must be fully re-entrant and non-blocking! */
+ *       must be fully re-entrant, non-blocking, fail-safe and fault-tolerant! */
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
 #include <debugger/hook.h>
 #include <kernel/dmesg.h>
 #include <sched/task.h>
@@ -41,11 +40,6 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
-
-#ifdef CONFIG_HAVE_DEBUGGER
-#include <time.h>
-#include <debugger/io.h>
-#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_BEGIN
 
@@ -473,59 +467,6 @@ dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
 		return -1; /* No such packet. */
 	return (s16)(u16)(error - 1);
 }
-
-
-#ifdef CONFIG_HAVE_DEBUGGER
-PRIVATE ATTR_DBGRODATA char const dbg_dmesg_colors[SYSLOG_LEVEL_COUNT][10] = {
-	/* [(unsigned int)SYSLOG_LEVEL_EMERG  ] */ AC_COLOR(ANSITTY_CL_RED, ANSITTY_CL_WHITE),
-	/* [(unsigned int)SYSLOG_LEVEL_ALERT  ] */ AC_COLOR(ANSITTY_CL_RED, ANSITTY_CL_WHITE),
-	/* [(unsigned int)SYSLOG_LEVEL_CRIT   ] */ AC_COLOR(ANSITTY_CL_RED, ANSITTY_CL_WHITE),
-	/* [(unsigned int)SYSLOG_LEVEL_ERR    ] */ AC_FG(ANSITTY_CL_MAROON),
-	/* [(unsigned int)SYSLOG_LEVEL_WARNING] */ AC_FG(ANSITTY_CL_YELLOW),
-	/* [(unsigned int)SYSLOG_LEVEL_NOTICE ] */ AC_COLOR(ANSITTY_CL_NAVY, ANSITTY_CL_LIGHT_GRAY),
-	/* [(unsigned int)SYSLOG_LEVEL_INFO   ] */ AC_COLOR(ANSITTY_CL_AQUA, ANSITTY_CL_DARK_GRAY),
-	/* [(unsigned int)SYSLOG_LEVEL_TRACE  ] */ AC_FG(ANSITTY_CL_CYAN),
-	/* [(unsigned int)SYSLOG_LEVEL_DEBUG  ] */ AC_FG(ANSITTY_CL_OLIVE),
-	/* [(unsigned int)SYSLOG_LEVEL_DEFAULT] */ "",
-	/* [(unsigned int)SYSLOG_LEVEL_RAW    ] */ "",
-};
-
-PRIVATE ATTR_DBGTEXT void KCALL
-dmesg_print_packet(struct syslog_packet *__restrict packet,
-                   unsigned int level) {
-	struct tm tms;
-	gmtime_r(&packet->sp_time, &tms);
-	dbg_printf(DBGSTR("%.2u:%.2u:%.2u.%.4" PRIu32 " "),
-	           tms.tm_hour, tms.tm_min, tms.tm_sec,
-	           packet->sp_nsec / 100000);
-	dbg_printf(DBGSTR("%s%$s" AC_DEFATTR "\n"),
-	           dbg_dmesg_colors[level],
-	           (size_t)packet->sp_len,
-	           (size_t)packet->sp_msg);
-}
-
-DBG_COMMAND(dmesg,
-            "dmesg\n"
-            "\tEnumerate most recent system log messages\n") {
-	unsigned int nth;
-	struct syslog_packet packet;
-	/* TODO: Options to filter the log, etc... */
-	for (nth = 0;; ++nth) {
-		if (dmesg_getpacket(&packet, NULL, 0, nth) < 0)
-			break;
-	}
-	while (nth) {
-		unsigned int level;
-		--nth;
-		if (dmesg_getpacket(&packet, &level, sizeof(packet.sp_msg), nth) < 0)
-			continue;
-		dmesg_print_packet(&packet, level);
-	}
-	return 0;
-}
-
-#endif /* CONFIG_HAVE_DEBUGGER */
-
 
 DECL_END
 
