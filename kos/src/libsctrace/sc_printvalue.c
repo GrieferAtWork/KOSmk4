@@ -438,6 +438,16 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_sockopt_optname
 #endif /* HAVE_SC_REPR_SOCKOPT_OPTNAME */
 
+#ifdef HAVE_SC_REPR_STRUCT_SIGSET
+#define NEED_print_sigset
+#endif /* HAVE_SC_REPR_STRUCT_SIGSET */
+
+#if (defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN) ||     \
+     defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32) || \
+     defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64))
+#define NEED_print_sigmask_sigset_and_len
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
+
 
 
 
@@ -516,6 +526,14 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_fdset
 #define NEED_print_fd_t
 #endif /* NEED_print_fdset */
+
+#ifdef NEED_print_sigmask_sigset_and_len
+#define NEED_print_sigset
+#endif /* NEED_print_sigmask_sigset_and_len */
+
+#ifdef NEED_print_sigset
+#define NEED_print_signo_t
+#endif /* NEED_print_sigset */
 
 
 
@@ -2857,6 +2875,147 @@ print_sockopt_optname(pformatprinter printer, void *arg,
 
 
 
+#ifdef NEED_print_sigset
+PRIVATE ssize_t CC
+print_sigset(pformatprinter printer, void *arg,
+             USER UNCHECKED sigset_t const *sigset,
+             size_t sigsetsize) {
+	signo_t signo_end;
+	ssize_t temp, result;
+	bool is_first;
+	if (sigsetsize > (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY)
+		sigsetsize = (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY;
+	signo_end = (signo_t)(sigsetsize * NBBY);
+	result = DOPRINT("{" SYNSPACE);
+	if unlikely(result < 0)
+		goto done;
+	is_first = true;
+	TRY {
+		signo_t signo;
+		validate_readable(sigset, sigsetsize);
+		for (signo = 1; signo <= signo_end; ++signo) {
+			if (!sigismember(sigset, signo))
+				continue;
+			if (!is_first)
+				PRINT("," SYNSPACE2);
+			is_first = false;
+			DO(print_signo_t(printer, arg, signo));
+		}
+	} EXCEPT {
+		if (!was_thrown(E_SEGFAULT))
+			RETHROW();
+		if (!is_first)
+			PRINT("," SYNSPACE2);
+		PRINT("<segfault>");
+	}
+	PRINT(SYNSPACE "}");
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_sigset */
+
+
+
+
+
+#ifdef NEED_print_sigmask_sigset_and_len
+#undef NEED_print_sigmask_sigset_and_len_sizearg
+#undef NEED_print_sigmask_sigset_and_len_x32
+#undef NEED_print_sigmask_sigset_and_len_x64
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN
+#if __SIZEOF_POINTER__ == 4
+#define NEED_print_sigmask_sigset_and_len_x32
+#elif __SIZEOF_POINTER__ == 8
+#define NEED_print_sigmask_sigset_and_len_x64
+#else /* __SIZEOF_POINTER__ == ... */
+#define NEED_print_sigmask_sigset_and_len_misc
+#define NEED_print_sigmask_sigset_and_len_sizearg
+#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32
+#define NEED_print_sigmask_sigset_and_len_x32
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32 */
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64
+#define NEED_print_sigmask_sigset_and_len_x64
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64 */
+#if (defined(NEED_print_sigmask_sigset_and_len_x32) && \
+     defined(NEED_print_sigmask_sigset_and_len_x64))
+#define NEED_print_sigmask_sigset_and_len_sizearg
+#endif /* NEED_print_sigmask_sigset_and_len_x32 && NEED_print_sigmask_sigset_and_len_x64 */
+
+#ifdef NEED_print_sigmask_sigset_and_len_sizearg
+PRIVATE ssize_t CC
+print_sigmask_sigset_and_len(pformatprinter printer, void *arg,
+                             USER CHECKED void *ptr,
+                             size_t sizeof_pointer)
+#else /* NEED_print_sigmask_sigset_and_len_sizearg */
+#define print_sigmask_sigset_and_len(printer, arg, ptr, sizeof_pointer) \
+	print_sigmask_sigset_and_len_impl(printer, arg, ptr)
+PRIVATE ssize_t CC
+print_sigmask_sigset_and_len_impl(pformatprinter printer, void *arg,
+                                  USER CHECKED void *ptr)
+#endif /* !NEED_print_sigmask_sigset_and_len_sizearg */
+{
+	ssize_t temp, result;
+	USER UNCHECKED sigset_t const *ss_ptr;
+	size_t ss_len;
+	/* Extract the sigset pointer and length from the user-provided argument extension. */
+#ifdef NEED_print_sigmask_sigset_and_len_sizearg
+#ifdef NEED_print_sigmask_sigset_and_len_x32
+	if (sizeof_pointer == 4) {
+		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)*(uint32_t USER CHECKED const *)((byte_t *)ptr + 0);
+		ss_len = (size_t)*(uint32_t USER CHECKED const *)((byte_t *)ptr + 4);
+	} else
+#endif /* NEED_print_sigmask_sigset_and_len_x32 */
+#ifdef NEED_print_sigmask_sigset_and_len_x64
+#ifdef NEED_print_sigmask_sigset_and_len_misc
+	if (sizeof_pointer == 8)
+#endif /* NEED_print_sigmask_sigset_and_len_misc */
+	{
+		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)*(uint64_t USER CHECKED const *)((byte_t *)ptr + 0);
+		ss_len = (size_t)*(uint64_t USER CHECKED const *)((byte_t *)ptr + 8);
+	}
+#ifdef NEED_print_sigmask_sigset_and_len_misc
+	else
+#endif /* NEED_print_sigmask_sigset_and_len_misc */
+#endif /* NEED_print_sigmask_sigset_and_len_x64 */
+#ifdef NEED_print_sigmask_sigset_and_len_misc
+	{
+		ss_ptr = *(USER UNCHECKED sigset_t const *USER CHECKED const *)((byte_t *)ptr + 0);
+		ss_len = *(size_t USER CHECKED const *)((byte_t *)ptr + sizeof(void *));
+	}
+#endif /* NEED_print_sigmask_sigset_and_len_misc */
+#else /* NEED_print_sigmask_sigset_and_len_sizearg */
+	ss_ptr = *(USER UNCHECKED sigset_t const *USER CHECKED const *)((byte_t *)ptr + 0);
+	ss_len = *(size_t USER CHECKED const *)((byte_t *)ptr + sizeof(void *));
+#endif /* !NEED_print_sigmask_sigset_and_len_sizearg */
+	result = DOPRINT("{" SYNSPACE SYNFIELD("ss_ptr"));
+	if unlikely(result < 0)
+		goto done;
+	/* Print the pointed-to sigset. */
+	if (!ss_ptr) {
+		temp = DOPRINT("NULL");
+	} else {
+		temp = print_sigset(printer, arg, ss_ptr, ss_len);
+	}
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	PRINTF("," SYNSPACE SYNFIELD("ss_len") "%" PRIuSIZ SYNSPACE "}",
+	       ss_len);
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_sigmask_sigset_and_len */
+
+
+
+
+
 
 
 
@@ -2963,8 +3122,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGEVENT 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGINFOX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGINFOX64 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_SIGSET 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SPAWN_ACTIONSX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SPAWN_ACTIONSX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_TERMIOS 1
@@ -2990,6 +3147,53 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGSET
+	case SC_REPR_STRUCT_SIGSET: {
+		USER UNCHECKED sigset_t *sigset;
+		size_t sigsetsize;
+		if unlikely(!link)
+			goto do_pointer;
+		sigset = (USER UNCHECKED sigset_t *)(syscall_ulong_t)value.sv_u64;
+		if (!sigset)
+			goto do_pointer;
+		sigsetsize = (size_t)(syscall_ulong_t)link->sa_value.sv_u64;
+		result = print_sigset(printer, arg, sigset, sigsetsize);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGSET */
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN
+	case SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN: {
+		USER UNCHECKED void *valptr;
+		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
+		if (!valptr)
+			goto do_pointer;
+		validate_readable(valptr, sizeof(void *) + sizeof(size_t));
+		result = print_sigmask_sigset_and_len(printer, arg, valptr, sizeof(void *));
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32
+	case SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32: {
+		USER UNCHECKED void *valptr;
+		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
+		if (!valptr)
+			goto do_pointer;
+		validate_readable(valptr, 2 * 4);
+		result = print_sigmask_sigset_and_len(printer, arg, valptr, 4);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64
+	case SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64: {
+		USER UNCHECKED void *valptr;
+		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
+		if (!valptr)
+			goto do_pointer;
+		validate_readable(valptr, 2 * 8);
+		result = print_sigmask_sigset_and_len(printer, arg, valptr, 8);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64 */
 
 #ifdef HAVE_SC_REPR_SOCKOPT_LEVEL
 	case SC_REPR_SOCKOPT_LEVEL:

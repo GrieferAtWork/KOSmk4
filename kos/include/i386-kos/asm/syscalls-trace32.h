@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4d9034f */
+/* HASH CRC-32:0x3e0bc53e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2112,7 +2112,7 @@
 #define __NRATR3_pselect6                SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NRATL3_pselect6                0                                                                    /* exceptfds -> nfds */ 
 #define __NRATR4_pselect6                SC_REPR_STRUCT_TIMESPECX32                                           /* timeout */ 
-#define __NRATR5_pselect6                SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN                                /* sigmask_sigset_and_len */ 
+#define __NRATR5_pselect6                SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32                            /* sigmask_sigset_and_len */ 
 #define __NRRTR_pselect6                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_ppoll                   SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NRATL0_ppoll                   1                                                                    /* fds -> nfds */ 
@@ -2469,7 +2469,7 @@
 #define __NRATR3_pselect6_64             SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NRATL3_pselect6_64             0                                                                    /* exceptfds -> nfds */ 
 #define __NRATR4_pselect6_64             SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NRATR5_pselect6_64             SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN                                /* sigmask_sigset_and_len */ 
+#define __NRATR5_pselect6_64             SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32                            /* sigmask_sigset_and_len */ 
 #define __NRRTR_pselect6_64              SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_freadlinkat             SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_freadlinkat             SC_REPR_FILENAME                                                     /* path */ 
