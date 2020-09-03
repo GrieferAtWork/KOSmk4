@@ -496,8 +496,8 @@ public:
 	__intellisense_long_double(double) throw();
 	__intellisense_long_double(long double) throw();
 #ifdef __SIZEOF_INT128__
-	__intellisense_long_double(__intellisense_int128) throw();
-	__intellisense_long_double(__intellisense_uint128) throw();
+	__intellisense_long_double(__INT128_TYPE__) throw();
+	__intellisense_long_double(__UINT128_TYPE__) throw();
 #endif /* __SIZEOF_INT128__ */
 	__intellisense_long_double &operator=(__intellisense_long_double const &) throw();
 	__intellisense_long_double &operator=(__intellisense_long_double &&) throw();
@@ -518,8 +518,8 @@ public:
 	__intellisense_long_double &operator=(double) throw();
 	__intellisense_long_double &operator=(long double) throw();
 #ifdef __SIZEOF_INT128__
-	__intellisense_long_double &operator=(__intellisense_int128) throw();
-	__intellisense_long_double &operator=(__intellisense_uint128) throw();
+	__intellisense_long_double &operator=(__INT128_TYPE__) throw();
+	__intellisense_long_double &operator=(__UINT128_TYPE__) throw();
 #endif /* __SIZEOF_INT128__ */
 	__intellisense_long_double operator-() const throw();
 	__intellisense_long_double operator+(__intellisense_long_double const &) const throw();

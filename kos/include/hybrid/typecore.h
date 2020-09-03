@@ -22,6 +22,8 @@
 
 #include "../__stdinc.h"
 
+#ifndef __DEEMON__
+
 /* Autocomplete gcc-style compiler intrinsic predefined macros. */
 #ifndef __CHAR_BIT__
 #define __CHAR_BIT__ 8
@@ -1855,6 +1857,7 @@
 #endif /* ... */
 #endif /* !... */
 #endif /* !__PTRDIFF_TYPE__ */
+#endif /* !__DEEMON__ */
 
 
 #endif /* !__GUARD_HYBRID_TYPECORE_H */
