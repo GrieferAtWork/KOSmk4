@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7673d9b5 */
+/* HASH CRC-32:0x36e3f96c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1, 2)) struct cmsghdr *NOTHROW_NCX(LIBDCALL libd___cmsg_nxthdr)(struct msghdr *mhdr, struct cmsghdr *cmsg);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmsghdr *NOTHROW_NCX(LIBDCALL libd___cmsg_nxthdr)(struct msghdr *mhdr, struct cmsghdr *cmsg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1, 2)) struct cmsghdr *NOTHROW_NCX(LIBCCALL libc___cmsg_nxthdr)(struct msghdr *mhdr, struct cmsghdr *cmsg);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmsghdr *NOTHROW_NCX(LIBCCALL libc___cmsg_nxthdr)(struct msghdr *mhdr, struct cmsghdr *cmsg);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Create a new socket for the given domain/type/protocol triple.

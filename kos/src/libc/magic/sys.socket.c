@@ -813,7 +813,7 @@ struct osockaddr {
 [[decl_include("<bits/msghdr-struct.h>")]]
 [[decl_include("<bits/cmsghdr-struct.h>")]]
 [[impl_include("<bits/types.h>")]]
-[[no_inline_truncate, extern_inline, wunused, nullable]]
+[[no_inline_truncate, extern_inline, ATTR_PURE, wunused, nullable]]
 struct cmsghdr *__cmsg_nxthdr([[nonnull]] struct msghdr *mhdr,
                               [[nonnull]] struct cmsghdr *cmsg) {
 	$byte_t *ctrl_end;

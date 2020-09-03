@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf267675 */
+/* HASH CRC-32:0x9181a3cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/types.h>
-INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED NONNULL((1, 2)) struct cmsghdr *
+INTERN ATTR_SECTION(".text.crt.net.socket") ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmsghdr *
 NOTHROW_NCX(LIBCCALL libc___cmsg_nxthdr)(struct msghdr *mhdr,
                                          struct cmsghdr *cmsg) {
 	byte_t *ctrl_end;

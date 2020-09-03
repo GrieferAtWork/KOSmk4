@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7891acbd */
+/* HASH CRC-32:0x126f7d13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -807,7 +807,7 @@ struct osockaddr {
 /* struct cmsghdr *CMSG_NXTHDR(struct msghdr *mhdr, struct cmsghdr *cmsg) */
 #define CMSG_NXTHDR(mhdr, cmsg) __cmsg_nxthdr(mhdr, cmsg)
 #ifdef __CRT_HAVE___cmsg_nxthdr
-__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct cmsghdr *,__NOTHROW_NCX,__cmsg_nxthdr,(struct msghdr *__mhdr, struct cmsghdr *__cmsg),{
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct cmsghdr *,__NOTHROW_NCX,__cmsg_nxthdr,(struct msghdr *__mhdr, struct cmsghdr *__cmsg),{
 	__BYTE_TYPE__ *__ctrl_end;
 	/* If the current header is incomplete, then there is no next header.
 	 * XXX: This should really never happen, since `CMSG_FIRSTHDR()' already
@@ -828,7 +828,7 @@ __eof:
 	return __NULLPTR;
 })
 #else /* __CRT_HAVE___cmsg_nxthdr */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct cmsghdr *__NOTHROW_NCX(__LIBCCALL __cmsg_nxthdr)(struct msghdr *__mhdr, struct cmsghdr *__cmsg) {
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct cmsghdr *__NOTHROW_NCX(__LIBCCALL __cmsg_nxthdr)(struct msghdr *__mhdr, struct cmsghdr *__cmsg) {
 	__BYTE_TYPE__ *__ctrl_end;
 	/* If the current header is incomplete, then there is no next header.
 	 * XXX: This should really never happen, since `CMSG_FIRSTHDR()' already
