@@ -199,7 +199,9 @@ sigreturn32_impl(struct icpustate *__restrict state,
 	TRY {
 again:
 		validate_readable(restore_cpu, sizeof(*restore_cpu));
-		validate_readable_opt(restore_fpu, MIN(sizeof(struct sfpustate), sizeof(struct xfpustate32)));
+		validate_readable_opt(restore_fpu,
+		                      MIN_C(sizeof(struct sfpustate),
+		                            sizeof(struct xfpustate32)));
 		validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
 		validate_readable_opt(sc_info, sizeof(*sc_info));
 		/* Restore the given signal mask. */
@@ -403,7 +405,9 @@ sigreturn64_impl(struct icpustate *__restrict state,
 	TRY {
 again:
 		validate_readable(restore_cpu, sizeof(*restore_cpu));
-		validate_readable_opt(restore_fpu, MIN(sizeof(struct sfpustate), sizeof(struct xfpustate64)));
+		validate_readable_opt(restore_fpu,
+		                      MIN_C(sizeof(struct sfpustate),
+		                            sizeof(struct xfpustate64)));
 		validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
 		validate_readable_opt(sc_info, sizeof(*sc_info));
 		/* Restore the given signal mask. */

@@ -29,12 +29,12 @@
 #endif /* !__KOS_VERSION__ */
 
 #if __KOS_VERSION__ >= 400
-#include <sched/pertask.h>
+#include <sched/pertask.h> /* THIS_TASK */
 #elif __KOS_VERSION__ >= 300
-#include <sched/task.h>
-#else
-#include <sched/percpu.h>
-#endif
+#include <sched/task.h> /* THIS_TASK */
+#else /* __KOS_VERSION__ >= ... */
+#include <sched/percpu.h> /* THIS_TASK */
+#endif /* __KOS_VERSION__ < ... */
 
 #define __HYBRID_SIZEOF_TID__           __SIZEOF_POINTER__
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1
@@ -59,9 +59,9 @@ __DECL_END
 __DECL_BEGIN
 typedef void *__hybrid_tid_t;
 #ifdef __x86_64__
-#define __hybrid_gettid()   __rdfsptr(0)
+#define __hybrid_gettid() __rdfsptr(0)
 #else /* __x86_64__ */
-#define __hybrid_gettid()   __rdgsptr(0)
+#define __hybrid_gettid() __rdgsptr(0)
 /* TODO: `__hybrid_gettid_iscaller(p) --> cmpl %gs:0, <p>' */
 #endif /* !__x86_64__ */
 __DECL_END
@@ -211,7 +211,8 @@ typedef int __hybrid_tid_t;
 #endif /* !__hybrid_gettid_equal */
 
 #ifndef __hybrid_gettid_iscaller
-#define __hybrid_gettid_iscaller(tid) __hybrid_gettid_equal(__hybrid_gettid(), tid)
+#define __hybrid_gettid_iscaller(tid) \
+	__hybrid_gettid_equal(__hybrid_gettid(), tid)
 #endif /* !__hybrid_gettid_iscaller */
 
 

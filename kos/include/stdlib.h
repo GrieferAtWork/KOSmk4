@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71fb4d5e */
+/* HASH CRC-32:0x5afa360c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2442,6 +2442,10 @@ __SYSDECL_BEGIN
 
 #define __min(a, b) __hybrid_min(a, b)
 #define __max(a, b) __hybrid_max(a, b)
+#ifndef __cplusplus
+#define min(a, b) __hybrid_min(a, b)
+#define max(a, b) __hybrid_max(a, b)
+#endif /* !__cplusplus */
 
 #define _MAX_PATH         __DOS_MAX_PATH
 #define _MAX_DRIVE        __DOS_MAX_DRIVE
@@ -3740,11 +3744,6 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,_sleep,(__UINT32_TYPE__ __duration),sleep,(__dur
  * Sleep for up to `SECONDS' seconds */
 __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL _sleep)(__UINT32_TYPE__ __duration) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sleep))((unsigned int)__duration); }
 #endif /* ... */
-
-#ifndef __cplusplus
-#define min(a, b)   __min(a, b)
-#define max(a, b)   __max(a, b)
-#endif /* !__cplusplus */
 
 #ifndef __environ_defined
 #define __environ_defined 1

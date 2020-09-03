@@ -2135,6 +2135,10 @@ __SYSDECL_BEGIN
 
 #define __min(a, b) __hybrid_min(a, b)
 #define __max(a, b) __hybrid_max(a, b)
+#ifndef __cplusplus
+#define min(a, b) __hybrid_min(a, b)
+#define max(a, b) __hybrid_max(a, b)
+#endif /* !__cplusplus */
 
 #define _MAX_PATH         __DOS_MAX_PATH
 #define _MAX_DRIVE        __DOS_MAX_DRIVE
@@ -3603,15 +3607,6 @@ void _beep(unsigned int freq, unsigned int duration);
 
 %[default:section(".text.crt.dos.system")];
 [[cp]] void _sleep($u32 duration) = sleep;
-
-%
-%{
-#ifndef __cplusplus
-#define min(a, b)   __min(a, b)
-#define max(a, b)   __max(a, b)
-#endif /* !__cplusplus */
-}
-
 
 %
 %{

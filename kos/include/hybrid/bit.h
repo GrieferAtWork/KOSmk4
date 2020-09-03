@@ -20,12 +20,9 @@
 #ifndef __GUARD_HYBRID_BIT_H
 #define __GUARD_HYBRID_BIT_H 1
 
-#include <hybrid/compiler.h>
-#include <hybrid/__bit.h>
+#include "__bit.h"
 
 /* Bit-scanning / bit-manipulation functions. */
-
-DECL_BEGIN
 
 #ifdef __CC__
 
@@ -76,8 +73,5 @@ DECL_BEGIN
 #define PDEP(value, mask) __hybrid_pdep(value, mask)
 
 #endif /* __CC__ */
-
-
-DECL_END
 
 #endif /* !__GUARD_HYBRID_BIT_H */

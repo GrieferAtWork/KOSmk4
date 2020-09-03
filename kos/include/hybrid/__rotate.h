@@ -186,7 +186,7 @@ __NOTHROW_NCX(__hybrid_x86_rorl)(__UINT32_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 }
 #endif /* !__hybrid_ror32_r */
 
-#ifdef __x86_64__
+#if defined(__x86_64__) && defined(__UINT64_TYPE__)
 #ifndef __hybrid_rol64_r
 #define __hybrid_rol64_r(x, shift) \
 	__NAMESPACE_INT_SYM __hybrid_x86_rolq(x, (__UINT8_TYPE__)(shift))
@@ -216,7 +216,7 @@ __NOTHROW_NCX(__hybrid_x86_rorq)(__UINT64_TYPE__ __lhs, __UINT8_TYPE__ __shift) 
 	return __res;
 }
 #endif /* !__hybrid_ror64_r */
-#endif /* __x86_64__ */
+#endif /* __x86_64__ && __UINT64_TYPE__ */
 
 __NAMESPACE_INT_END
 __DECL_END

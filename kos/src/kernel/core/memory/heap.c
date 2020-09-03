@@ -1263,7 +1263,8 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 		 * exists for the area below, meaning that the first page
 		 * will have already been initialized. */
 		if (((uintptr_t)underallocation_base & PAGEMASK) == 0) {
-			/* Must initialize data at underallocation_base...MIN(END_OF_FREE_RANGE,END_OF_PAGE(underallocation_base)) */
+			/* Must initialize data at:
+			 * underallocation_base ... MIN(END_OF_FREE_RANGE, END_OF_PAGE(underallocation_base)) */
 			HEAP_ASSERT(num_free_bytes >= 4);
 			if (IS_FRESH_MEMORY(underallocation_base)) {
 				size_t init_size = num_free_bytes;

@@ -24,8 +24,6 @@
 #include "__atomic.h"
 #include "host.h"
 
-__DECL_BEGIN
-
 #ifdef __CC__
 
 #define OATOMIC_LOAD(x, order)                             __hybrid_atomic_load(x, order)
@@ -85,7 +83,5 @@ __DECL_BEGIN
 #define ATOMIC_WRITE(x, v) OATOMIC_STORE(x, v, __ATOMIC_RELEASE)
 
 #endif /* __CC__ */
-
-__DECL_END
 
 #endif /* !__GUARD_HYBRID_ATOMIC_H */

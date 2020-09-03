@@ -269,8 +269,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 				if (list != (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
 					/* Try to move into the territory of dynamically allocated caches. */
 					size_t initial_cache_size;
-					initial_cache_size = MIN(COMPILER_LENOF(self->dua_stcache) * 2,
-					                         CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE);
+					initial_cache_size = MIN_C(COMPILER_LENOF(self->dua_stcache) * 2,
+					                           CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE);
 					list = (di_debuginfo_cu_abbrev_cache_entry_t *)CACHE_CALLOC(initial_cache_size,
 					                                                            sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
 					if (list) {

@@ -1498,7 +1498,8 @@ PRIVATE void KCALL
 compat_sigaction_to_sigaction(CHECKED USER struct compat_sigaction const *self,
                               struct sigaction *__restrict result) {
 	*(void **)&result->sa_handler  = (void *)self->sa_handler;
-	memcpy(&result->sa_mask, &self->sa_mask, MIN(sizeof(sigset_t), sizeof(compat_sigset_t)));
+	memcpy(&result->sa_mask, &self->sa_mask,
+	       MIN_C(sizeof(sigset_t), sizeof(compat_sigset_t)));
 	__STATIC_IF(sizeof(sigset_t) > sizeof(compat_sigset_t)) {
 		memset((byte_t *)&result->sa_mask + sizeof(compat_sigset_t), 0,
 		       sizeof(sigset_t) - sizeof(compat_sigset_t));
@@ -1512,7 +1513,8 @@ sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
                               CHECKED USER struct compat_sigaction *result) {
 	typedef compat_funptr(void, , compat_sigrestorer_t, (void));
 	result->sa_handler = (compat_sighandler_t)(uintptr_t)(void *)self->sa_handler;
-	memcpy(&result->sa_mask, &self->sa_mask, MIN(sizeof(sigset_t), sizeof(compat_sigset_t)));
+	memcpy(&result->sa_mask, &self->sa_mask,
+	       MIN_C(sizeof(sigset_t), sizeof(compat_sigset_t)));
 	__STATIC_IF(sizeof(compat_sigset_t) > sizeof(sigset_t)) {
 		memset((byte_t *)&result->sa_mask + sizeof(sigset_t), 0,
 		       sizeof(compat_sigset_t) - sizeof(sigset_t));
@@ -1748,7 +1750,8 @@ DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__ */
 	memcpy(&result, &mymask->sm_mask,
-	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
+	       MIN_C(sizeof(mymask->sm_mask),
+	             sizeof(result)));
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_SGETMASK */
@@ -1763,7 +1766,8 @@ DEFINE_COMPAT_SYSCALL0(syscall_ulong_t, sgetmask) {
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
 	memcpy(&result, &mymask->sm_mask,
-	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
+	       MIN_C(sizeof(mymask->sm_mask),
+	             sizeof(result)));
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SGETMASK */
@@ -1777,9 +1781,11 @@ DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__ */
 	memcpy(&result, &mymask->sm_mask,
-	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
+	       MIN_C(sizeof(mymask->sm_mask),
+	             sizeof(result)));
 	memcpy(&mymask->sm_mask, &sigmask,
-	       MIN(sizeof(mymask->sm_mask), sizeof(sigmask)));
+	       MIN_C(sizeof(mymask->sm_mask),
+	             sizeof(sigmask)));
 #if __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__
 	memset((byte_t *)&mymask->sm_mask + sizeof(sigmask),
 	       0, sizeof(mymask->sm_mask) - sizeof(sigmask));
@@ -1803,9 +1809,11 @@ DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
 	memcpy(&result, &mymask->sm_mask,
-	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
+	       MIN_C(sizeof(mymask->sm_mask),
+	             sizeof(result)));
 	memcpy(&mymask->sm_mask, &used_sigmask,
-	       MIN(sizeof(mymask->sm_mask), sizeof(used_sigmask)));
+	       MIN_C(sizeof(mymask->sm_mask),
+	             sizeof(used_sigmask)));
 #if __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
 	memset((byte_t *)&mymask->sm_mask + sizeof(used_sigmask),
 	       0, sizeof(mymask->sm_mask) - sizeof(used_sigmask));

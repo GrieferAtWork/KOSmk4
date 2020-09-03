@@ -471,7 +471,8 @@ INTERN syscall_slong_t
 			sync_endread(&me->bd_parts_lock);
 		}
 		memcpy(st.bs_name, self->bd_name,
-		       MIN(sizeof(st.bs_name), sizeof(self->bd_name)));
+		       MIN_C(sizeof(st.bs_name),
+		             sizeof(self->bd_name)));
 		COMPILER_BARRIER();
 		{
 			USER CHECKED struct hop_blockdevice_stat *data;

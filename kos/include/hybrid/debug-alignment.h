@@ -20,7 +20,6 @@
 #ifndef __GUARD_HYBRID_DEBUG_ALIGNMENT_H
 #define __GUARD_HYBRID_DEBUG_ALIGNMENT_H 1
 
-#include <__stdinc.h>
 #include "__debug-alignment.h"
 
 #ifdef __NO_hybrid_dbg_alignment

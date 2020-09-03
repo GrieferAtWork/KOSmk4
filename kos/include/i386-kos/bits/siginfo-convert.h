@@ -98,8 +98,8 @@ __NOTHROW_NCX(siginfox32_to_siginfox64)(struct __siginfox32_struct const *__rest
 
 	default:
 		__libc_memcpy(__result->_si_data, __self->_si_data,
-		              __hybrid_min(sizeof(__result->_si_data),
-		                           sizeof(__self->_si_data)));
+		              __hybrid_min_c(sizeof(__result->_si_data),
+		                             sizeof(__self->_si_data)));
 		break;
 	}
 }
@@ -144,8 +144,8 @@ __NOTHROW_NCX(siginfox64_to_siginfox32)(struct __siginfox64_struct const *__rest
 
 	default:
 		__libc_memcpy(__result->_si_data, __self->_si_data,
-		              __hybrid_min(sizeof(__result->_si_data),
-		                           sizeof(__self->_si_data)));
+		              __hybrid_min_c(sizeof(__result->_si_data),
+		                             sizeof(__self->_si_data)));
 		break;
 	}
 }

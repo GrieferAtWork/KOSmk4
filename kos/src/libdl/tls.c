@@ -373,30 +373,29 @@ err_badptr:
 }
 
 
-#define SIZEOF_DL_MODULE_FOR_TLS \
-	MAX(offsetafter(DlModule, dm_refcnt),   \
-	MAX(offsetafter(DlModule, dm_tls_arg),  \
-	MAX(offsetafter(DlModule, dm_tls_fini), \
-	MAX(offsetafter(DlModule, dm_tls_init), \
-	MAX(offsetafter(DlModule, dm_tlsstoff), \
-	MAX(offsetafter(DlModule, dm_tlsalign), \
-	MAX(offsetafter(DlModule, dm_tlsmsize), \
-	MAX(offsetafter(DlModule, dm_tlsfsize), \
-	MAX(offsetafter(DlModule, dm_tlsinit),  \
-	    offsetafter(DlModule, dm_tlsoff))))))))))
+#define SIZEOF_DL_MODULE_FOR_TLS              \
+	MAX_C(offsetafter(DlModule, dm_refcnt),   \
+	      offsetafter(DlModule, dm_tls_arg),  \
+	      offsetafter(DlModule, dm_tls_fini), \
+	      offsetafter(DlModule, dm_tls_init), \
+	      offsetafter(DlModule, dm_tlsstoff), \
+	      offsetafter(DlModule, dm_tlsalign), \
+	      offsetafter(DlModule, dm_tlsmsize), \
+	      offsetafter(DlModule, dm_tlsfsize), \
+	      offsetafter(DlModule, dm_tlsinit),  \
+	      offsetafter(DlModule, dm_tlsoff))
 
-#define OFFSETOF_DL_MODULE_FOR_TLS \
-	MIN(offsetof(DlModule, dm_refcnt),   \
-	MIN(offsetof(DlModule, dm_tls_arg),  \
-	MIN(offsetof(DlModule, dm_tls_fini), \
-	MIN(offsetof(DlModule, dm_tls_init), \
-	MIN(offsetof(DlModule, dm_tlsstoff), \
-	MIN(offsetof(DlModule, dm_tlsalign), \
-	MIN(offsetof(DlModule, dm_tlsmsize), \
-	MIN(offsetof(DlModule, dm_tlsfsize), \
-	MIN(offsetof(DlModule, dm_tlsinit),  \
-	    offsetof(DlModule, dm_tlsoff))))))))))
-
+#define OFFSETOF_DL_MODULE_FOR_TLS         \
+	MIN_C(offsetof(DlModule, dm_refcnt),   \
+	      offsetof(DlModule, dm_tls_arg),  \
+	      offsetof(DlModule, dm_tls_fini), \
+	      offsetof(DlModule, dm_tls_init), \
+	      offsetof(DlModule, dm_tlsstoff), \
+	      offsetof(DlModule, dm_tlsalign), \
+	      offsetof(DlModule, dm_tlsmsize), \
+	      offsetof(DlModule, dm_tlsfsize), \
+	      offsetof(DlModule, dm_tlsinit),  \
+	      offsetof(DlModule, dm_tlsoff))
 
 
 /* DL-based TLS memory management API.

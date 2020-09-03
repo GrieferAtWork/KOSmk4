@@ -204,8 +204,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			       : sizeof(struct NAME(xfpustate));
 			user_fpustate = (struct NAME(fpustate) *)usp;
 			validate_writable(user_fpustate,
-			                  MIN(sizeof(struct sfpustate),
-			                      sizeof(struct NAME(xfpustate))));
+			                  MIN_C(sizeof(struct sfpustate),
+			                        sizeof(struct NAME(xfpustate))));
 			COMPILER_WRITE_BARRIER();
 			NAME2(fpustate, _saveinto)(user_fpustate);
 		}

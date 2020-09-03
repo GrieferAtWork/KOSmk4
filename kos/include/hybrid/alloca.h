@@ -23,8 +23,8 @@
 #include "__alloca.h"
 
 #ifdef __hybrid_alloca
-#define __ALLOCA(x)   __hybrid_alloca(x)
-#define ALLOCA(x)     __hybrid_alloca(x)
+#define __ALLOCA(x) __hybrid_alloca(x)
+#define ALLOCA(x)   __hybrid_alloca(x)
 #endif /* __hybrid_alloca */
 
 #endif /* !__GUARD_HYBRID_ALLOCA_H */
