@@ -485,13 +485,13 @@ print("#endif /" "* __UINT64_TYPE__ *" "/");
 	__builtin_choose_expr(sizeof(x) == 2, __hybrid_rol16((__UINT16_TYPE__)(x), shift), \
 	__builtin_choose_expr(sizeof(x) == 4, __hybrid_rol32((__UINT32_TYPE__)(x), shift), \
 	__builtin_choose_expr(sizeof(x) == 8, __hybrid_rol64((__UINT64_TYPE__)(x), shift), \
-	                                      __hybrid_rol128((__UINT128_TYPE__)(x), shift))))
+	                                      __hybrid_rol128((__UINT128_TYPE__)(x), shift)))))
 #define __hybrid_ror(x, shift)                                                         \
 	__builtin_choose_expr(sizeof(x) == 1, __hybrid_ror8((__UINT8_TYPE__)(x), shift),   \
 	__builtin_choose_expr(sizeof(x) == 2, __hybrid_ror16((__UINT16_TYPE__)(x), shift), \
 	__builtin_choose_expr(sizeof(x) == 4, __hybrid_ror32((__UINT32_TYPE__)(x), shift), \
 	__builtin_choose_expr(sizeof(x) == 8, __hybrid_ror64((__UINT64_TYPE__)(x), shift), \
-	                                      __hybrid_ror128((__UINT128_TYPE__)(x), shift))))
+	                                      __hybrid_ror128((__UINT128_TYPE__)(x), shift)))))
 #endif /* ... */
 #else /* !__NO_builtin_choose_expr */
 #if !defined(__UINT64_TYPE__)
