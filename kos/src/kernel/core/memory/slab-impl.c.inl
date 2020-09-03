@@ -184,8 +184,14 @@ again:
 			assertf(i < LENGTHOF_BITSET, "i = %u, LENGTHOF_BITSET = %u",
 			        i, (unsigned int)LENGTHOF_BITSET);
 			word = BITSET(result_page)[i];
+#if _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC) == UINTPTR_MAX
 			if (word == _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC))
 				continue; /* Fully allocated */
+#else /* _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC) == UINTPTR_MAX */
+			if ((word & _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC)) ==
+			    /*   */ _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC))
+				continue; /* Fully allocated */
+#endif /* _SLAB_SEGMENT_STATUS_WORDMASK(SLAB_SEGMENT_STATUS_ALLOC) != UINTPTR_MAX */
 			/* Search for the first unallocated segment in this word. */
 			for (j = 0, mask = SLAB_SEGMENT_STATUS_ALLOC;
 			     (word & mask) != 0;
