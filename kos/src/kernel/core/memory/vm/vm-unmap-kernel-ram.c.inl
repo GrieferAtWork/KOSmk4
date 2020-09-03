@@ -895,9 +895,13 @@ again:
 		if ((uintptr_t)next < (uintptr_t)iter) {
 			if (!next)
 				break;
+			/* Unlink `next' */
+			iter->pur_next = next->pur_next;
+			/* Insert `next' before `iter' */
 			*piter         = next;
 			next->pur_next = iter;
 			piter          = &next->pur_next;
+			/* Mark the chain as changed. */
 			changed        = true;
 		} else {
 			piter = &iter->pur_next;
