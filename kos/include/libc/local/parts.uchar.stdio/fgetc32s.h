@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4adbc2b */
+/* HASH CRC-32:0xf3411e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_unget
 #endif /* !... */
 #endif /* !__local___localdep_ungetc32_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetc32s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR32_TYPE__ *

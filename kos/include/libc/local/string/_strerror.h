@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddf840d9 */
+/* HASH CRC-32:0x69d16f9b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__strerror_defined
 #define __local__strerror_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #if defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _strerror_s from string */

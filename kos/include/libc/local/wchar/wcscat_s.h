@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6955642 */
+/* HASH CRC-32:0xb47e8b5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,22 @@
 #define __local_wcscat_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcscat_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat_s))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, __WCHAR_TYPE__ const *__src) {
 	if (!__dst || !__src)
-		return __EINVAL;
+		return 22;
 	while (__dstsize && *__dst) {
 		++__dst;
 		--__dstsize;
 	}
 	if (!__dstsize)
-		return __EINVAL;
+		return 22;
 	while ((*__dst++ = *__src++) != 0 && --__dstsize)
 		;
 	if (!__dstsize)
-		return __ERANGE;
+		return 34;
 	return 0;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd84e2bc6 */
+/* HASH CRC-32:0x6dee9cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 #ifndef __KERNEL__
 #include <asm/crt/threads.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
@@ -173,7 +173,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Try to lock the mutex pointed by MUTEX without blocking.
  * If the mutex is free the current threads takes control of
  * it, otherwise it returns immediately

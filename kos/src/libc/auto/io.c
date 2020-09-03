@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f839c61 */
+/* HASH CRC-32:0x2d8444e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 		libc_lseek64(fd, oldpos, __SEEK_SET);
 	return result;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
 NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
                                    mode_t *oldmode) {

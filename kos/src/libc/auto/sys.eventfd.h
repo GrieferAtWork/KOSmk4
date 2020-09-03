@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2cad6a4 */
+/* HASH CRC-32:0x8366e7c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,19 @@ DECL_BEGIN
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_eventfd)(__STDC_UINT_AS_SIZE_T count, __STDC_INT_AS_UINT_T flags);
 /* Read event counter and possibly wait for events */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_eventfd_read)(fd_t fd, eventfd_t *value);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Read event counter and possibly wait for events */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd, eventfd_t *value);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Increment event counter */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_eventfd_write)(fd_t fd, eventfd_t value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Increment event counter */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd, eventfd_t value);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

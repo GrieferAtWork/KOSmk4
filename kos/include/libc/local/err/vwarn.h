@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5d21232 */
+/* HASH CRC-32:0x188dd867 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_vwarnc_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 __LOCAL_LIBC(vwarn) __ATTR_LIBC_PRINTF(1, 0) void

@@ -96,7 +96,7 @@ char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len,
 @@will return `NULL', although `envz_entry()' will still return an entry. This is handy
 @@because when merging with another envz, the null entry can override an
 @@entry in the other one. Such entries can be removed with `envz_strip()'
-[[impl_include("<parts/errno.h>"), decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<libc/errno.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires_function(realloc, argz_add)]]
 error_t envz_add([[nonnull]] char **__restrict penvz,
                  [[nonnull]] size_t *__restrict penvz_len,

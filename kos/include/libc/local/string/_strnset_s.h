@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28bc2fc6 */
+/* HASH CRC-32:0xd0b88641 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__strnset_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strnset_s) __errno_t
@@ -32,9 +32,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strnset_s))(char *__restrict __buf, 
 	if (__maxlen == 0 && __buf == __NULLPTR && __buflen == 0)
 		return 0;
 	if (!__buf && __buflen)
-		return __EINVAL;
+		return 22;
 	if (__maxlen >= __buflen)
-		return __ERANGE;
+		return 34;
 	__iter = __buf;
 	__remaining = __buflen;
 	while (*__iter != 0 && __maxlen && --__remaining) {
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strnset_s))(char *__restrict __buf, 
 	}
 	if (!__remaining) {
 		__libc_memsetc(__buf, 0, __buflen, __SIZEOF_CHAR__);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(__iter, 0, __remaining, __SIZEOF_CHAR__);
 	return 0;

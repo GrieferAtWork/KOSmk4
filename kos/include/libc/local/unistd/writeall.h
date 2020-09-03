@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x179f6e43 */
+/* HASH CRC-32:0x8ba16cc4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 #endif /* !... */
 #endif /* !__local___localdep_write_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> writeall(3)
  * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing

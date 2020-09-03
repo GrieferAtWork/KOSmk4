@@ -224,6 +224,7 @@ incdir("", "../../include");
 #include <asm/crt/util.h>
 #include <asm/dirent.h>
 #include <asm/epoll.h>
+#include <asm/errno.h>
 #include <asm/eventfd.h>
 #include <asm/fcntl.h>
 #include <asm/fp_type.h>
@@ -771,6 +772,7 @@ incdir("", "../../include");
 #include <libbuffer/packetbuffer.h>
 #include <libbuffer/ringbuffer.h>
 #include <libc/core/ctype.h>
+#include <libc/core/errno.h>
 #include <libc/core/error.h>
 #include <libc/core/fenv.h>
 #include <libc/core/malloc.h>
@@ -781,6 +783,7 @@ incdir("", "../../include");
 #include <libc/core/unicode.h>
 #include <libc/core/unistd.h>
 #include <libc/ctype.h>
+#include <libc/errno.h>
 #include <libc/error.h>
 #include <libc/fenv.h>
 #include <libc/malloc.h>
@@ -1436,11 +1439,6 @@ incdir("", "../../include");
 #endif /* __has_include(<panel.h>) */
 #include <parts/assert-failed.h>
 #include <parts/assert.h>
-#include <parts/cyg/errno.h>
-#include <parts/dos/errno.h>
-#include <parts/errno.h>
-#include <parts/generic/errno.h>
-#include <parts/glibc/errno.h>
 #include <parts/malloca.h>
 #include <parts/printf-config.h>
 #include <parts/redirect-exec.h>

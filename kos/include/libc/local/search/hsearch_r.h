@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81683da8 */
+/* HASH CRC-32:0x4ff9730c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ typedef struct entry {
 	void *data;
 } ENTRY;
 #endif /* !__ENTRY_defined */
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int

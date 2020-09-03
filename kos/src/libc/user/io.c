@@ -26,7 +26,6 @@
 #include <hybrid/minmax.h>
 
 #include <kos/syscalls.h>
-#include <parts/dos/errno.h>
 #include <sys/stat.h>
 
 #include <alloca.h>
@@ -212,10 +211,8 @@ NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 {
 	struct dfind *f;
 	f = (struct dfind *)(uintptr_t)findfd;
-	if unlikely(f == DFIND_INVALID) {
-		libd_seterrno(__DOS_EINVAL);
-		return -1;
-	}
+	if unlikely(f == DFIND_INVALID)
+		return libd_seterrno(DOS_EINVAL);
 	dfind_close(f);
 	return 0;
 }
@@ -284,10 +281,8 @@ NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd,
 	int result;
 	struct dfind *f;
 	f = (struct dfind *)(uintptr_t)findfd;
-	if unlikely(f == DFIND_INVALID) {
-		libd_seterrno(__DOS_EINVAL);
-		return -1;
-	}
+	if unlikely(f == DFIND_INVALID)
+		return libd_seterrno(DOS_EINVAL);
 	result = dfind_read32(f, finddata);
 	return result;
 }
@@ -302,10 +297,8 @@ NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd,
 	int result;
 	struct dfind *f;
 	f = (struct dfind *)(uintptr_t)findfd;
-	if unlikely(f == DFIND_INVALID) {
-		libd_seterrno(__DOS_EINVAL);
-		return -1;
-	}
+	if unlikely(f == DFIND_INVALID)
+		return libd_seterrno(DOS_EINVAL);
 	result = dfind_read32i64(f, finddata);
 	return result;
 }
@@ -320,10 +313,8 @@ NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
 	int result;
 	struct dfind *f;
 	f = (struct dfind *)(uintptr_t)findfd;
-	if unlikely(f == DFIND_INVALID) {
-		libd_seterrno(__DOS_EINVAL);
-		return -1;
-	}
+	if unlikely(f == DFIND_INVALID)
+		return libd_seterrno(DOS_EINVAL);
 	result = dfind_read64(f, finddata);
 	return result;
 }

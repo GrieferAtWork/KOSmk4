@@ -557,7 +557,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 }
 
 %(std)#ifdef __USE_ISOC11
-[[std, guard, impl_include("<parts/errno.h>")]]
+[[std, guard, impl_include("<libc/errno.h>")]]
 $errno_t asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
                    [[nonnull]] struct tm const *__restrict tp) {
 	if (buflen < 26)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a32294 */
+/* HASH CRC-32:0xd0659514 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN

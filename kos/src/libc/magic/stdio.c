@@ -57,7 +57,6 @@
 %[define_replacement(pos64_t  = __pos64_t)]
 %[define_replacement(cookie_io_functions_t = _IO_cookie_io_functions_t)]
 %[define_replacement(locale_t = __locale_t)]
-%[define_replacement(EOK      = 0)]
 %[define_replacement(rsize_t  = __SIZE_TYPE__)]
 
 /* These are defined in <libc/local/stdstreams.h> */
@@ -780,7 +779,7 @@ int putchar(int ch) {
 @@Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred.
 [[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgets_unlocked")]]
-[[alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<parts/errno.h>")]]
+[[alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
 [[requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]]
 char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
             __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] FILE *__restrict stream) {
@@ -1021,8 +1020,8 @@ int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 @@>>     fprintf(stderr, "%s\n", strerror(errno));
 @@>> }
 [[cp, std, guard]]
-[[requires_include("<__crt.h>", "<parts/errno.h>")]]
-[[impl_include("<libc/local/stdstreams.h>", "<parts/errno.h>")]]
+[[requires_include("<__crt.h>", "<libc/errno.h>")]]
+[[impl_include("<libc/local/stdstreams.h>", "<libc/errno.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) &&
            $has_function(fprintf) && $has_function(strerror))]]
 void perror([[nullable]] char const *message) {
@@ -1873,7 +1872,7 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [[cp_stdio, alias("fgets"), wunused, decl_include("<features.h>")]]
-[[impl_include("<hybrid/typecore.h>", "<asm/crt/stdio.h>", "<parts/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<asm/crt/stdio.h>", "<libc/errno.h>")]]
 [[requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]]
 char *fgets_unlocked([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
                      __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] $FILE *__restrict stream) {
@@ -3418,7 +3417,7 @@ __STDC_INT_AS_SIZE_T _fprintf_p_l([[nonnull]] $FILE *__restrict stream,
 %#ifdef __USE_DOS_SLIB
 [[cp, section(".text.crt.dos.FILE.locked.access")]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[requires_function(fopen64)]]
 errno_t fopen_s([[nonnull]] $FILE **pstream,
                 [[nonnull]] char const *filename,
@@ -3445,7 +3444,7 @@ errno_t fopen_s([[nonnull]] $FILE **pstream,
 
 [[cp, section(".text.crt.dos.FILE.locked.access")]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[requires_function(freopen)]]
 errno_t freopen_s([[nonnull]] $FILE **pstream,
                   [[nonnull]] char const *filename,
@@ -3472,7 +3471,7 @@ errno_t freopen_s([[nonnull]] $FILE **pstream,
 
 [[section(".text.crt.dos.fs.utility")]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[requires_function(tmpnam)]]
 errno_t tmpnam_s([[outp(bufsize)]] char *__restrict buf,
                  rsize_t bufsize) {
@@ -3503,7 +3502,7 @@ errno_t tmpnam_s([[outp(bufsize)]] char *__restrict buf,
 %
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.FILE.locked.utility")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[requires_function(clearerr)]]
 errno_t clearerr_s([[nonnull]] $FILE *__restrict stream) {
 	if (!stream) {
@@ -3518,7 +3517,7 @@ errno_t clearerr_s([[nonnull]] $FILE *__restrict stream) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[cp, impl_include("<parts/errno.h>")]]
+[[cp, impl_include("<libc/errno.h>")]]
 [[requires_function(tmpfile64)]]
 [[section(".text.crt.dos.FILE.locked.access")]]
 errno_t tmpfile_s([[nonnull]] $FILE **pstream) {
@@ -3541,7 +3540,7 @@ errno_t tmpfile_s([[nonnull]] $FILE **pstream) {
 }
 
 [[requires($has_function(fread))]]
-[[cp, wunused, impl_include("<parts/errno.h>", "<hybrid/__overflow.h>")]]
+[[cp, wunused, impl_include("<libc/errno.h>", "<hybrid/__overflow.h>")]]
 [[section(".text.crt.dos.FILE.locked.read.read")]]
 [[decl_include("<hybrid/typecore.h>")]]
 $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] void *__restrict buf,
@@ -3566,7 +3565,7 @@ $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] 
 
 %[default:section(".text.crt.dos.FILE.locked.read.read")];
 [[cp, wunused, requires_include("<__crt.h>")]]
-[[impl_include("<libc/local/stdstreams.h>", "<parts/errno.h>")]]
+[[impl_include("<libc/local/stdstreams.h>", "<libc/errno.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]
 char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_t bufsize) {
@@ -3605,8 +3604,8 @@ __STDC_INT_AS_SIZE_T vsnprintf_s([[outp_opt(min(return, buflen, bufsize))]] char
 %
 [[section(".text.crt.dos.errno.utility")]]
 [[cp_stdio, wchar, ATTR_COLD, guard("_CRT_WPERROR_DEFINED")]]
-[[requires_include("<__crt.h>", "<parts/errno.h>")]]
-[[impl_include("<libc/local/stdstreams.h>", "<parts/errno.h>")]]
+[[requires_include("<__crt.h>", "<libc/errno.h>")]]
+[[impl_include("<libc/local/stdstreams.h>", "<libc/errno.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && $has_function(fprintf) && $has_function(strerror))]]
 [[decl_include("<hybrid/typecore.h>")]]
 void _wperror($wchar_t const *__restrict message) {

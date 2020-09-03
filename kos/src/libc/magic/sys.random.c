@@ -80,7 +80,7 @@ ssize_t getrandom([[outp(num_bytes)]] void *buf,
 @@Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
 @@@return:  0: Success
 @@@return: -1: Error (see `errno')
-[[guard, wunused, impl_include("<parts/errno.h>")]]
+[[guard, wunused, impl_include("<libc/errno.h>")]]
 [[requires_include("<asm/random.h>")]]
 [[userimpl, requires(defined(__GRND_RANDOM) && $has_function(getrandom))]]
 int getentropy([[outp(num_bytes)]] void *buf, size_t num_bytes) {

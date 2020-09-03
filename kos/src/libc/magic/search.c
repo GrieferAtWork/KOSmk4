@@ -285,7 +285,7 @@ struct hsearch_data {
 [[decl_prefix(struct hsearch_data;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 int hsearch_r(ENTRY item, ACTION action,
               [[nonnull]] ENTRY **retval,
               [[nonnull]] struct hsearch_data *htab) {
@@ -352,7 +352,7 @@ int hsearch_r(ENTRY item, ACTION action,
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
 [[requires_function(calloc), doc_alias("hsearch_r")]]
-[[impl_include("<hybrid/limitcore.h>", "<parts/errno.h>")]]
+[[impl_include("<hybrid/limitcore.h>", "<libc/errno.h>")]]
 [[impl_prefix(
 @@push_namespace(local)@@
 /* For the used double hash method the table size has to be a prime. To
@@ -406,7 +406,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 
 [[decl_prefix(struct hsearch_data;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
-[[doc_alias("hsearch_r"), impl_include("<parts/errno.h>")]]
+[[doc_alias("hsearch_r"), impl_include("<libc/errno.h>")]]
 [[requires_function(free)]]
 void hdestroy_r(struct hsearch_data *htab) {
 	if (htab == NULL) {

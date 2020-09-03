@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe60d9170 */
+/* HASH CRC-32:0x1600f9e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -312,7 +312,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 err:
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
  *     0.0.0.0      For net = 0
  *     %u           For net <= 255

@@ -154,7 +154,7 @@ size_t Write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("readall"), section(".text.crt{|.dos}.except.io.read")]]
 [[userimpl, requires_function(Read, lseek)]]
-[[impl_include("<parts/errno.h>", "<kos/except.h>")]]
+[[impl_include("<libc/errno.h>", "<kos/except.h>")]]
 size_t ReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 	size_t result, temp;
 	result = Read(fd, buf, bufsize);

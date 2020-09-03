@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd1c9ec8 */
+/* HASH CRC-32:0xff8762af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__xpg_strerror_r) __ATTR_COLD __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) {
@@ -98,7 +98,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum
 #endif /* !__ERANGE */
 	}
 	__localdep_memcpyc(__buf, __string, __msg_len, sizeof(char));
-	return 0;
+	return __EOK;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___xpg_strerror_r_defined

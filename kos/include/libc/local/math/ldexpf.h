@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5fb0f5 */
+/* HASH CRC-32:0xcb231b46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_ldexp_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN

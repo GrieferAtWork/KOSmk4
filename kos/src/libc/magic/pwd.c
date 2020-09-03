@@ -204,7 +204,7 @@ $errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
 @@@return: 0 : (*result == NULL) No entry for `uid'
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-[[requires_function(fgetpwfiltered_r), impl_include("<parts/errno.h>")]]
+[[requires_function(fgetpwfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetpwuid_r([[nonnull]] $FILE *__restrict stream, $uid_t uid,
                      [[nonnull]] struct passwd *__restrict resultbuf,
                      [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -224,7 +224,7 @@ $errno_t fgetpwuid_r([[nonnull]] $FILE *__restrict stream, $uid_t uid,
 @@@return: 0 : (*result == NULL) No entry for `name'
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-[[requires_function(fgetpwfiltered_r), impl_include("<parts/errno.h>")]]
+[[requires_function(fgetpwfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
                      [[nonnull]] const char *__restrict name,
                      [[nonnull]] struct passwd *__restrict resultbuf,
@@ -251,7 +251,7 @@ $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
 @@                 Note that in this case, `errno' will have also been set to `ERANGE'
 @@@return: * :     Error (one of `E*' from `<errno.h>')
 [[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
-[[impl_include("<parts/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
+[[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
 [[requires_function(fgetpos64, fsetpos64, fparseln)]]
 $errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
                           [[nonnull]] struct passwd *__restrict resultbuf,

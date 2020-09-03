@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b3279b4 */
+/* HASH CRC-32:0x109ddba8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 	libc_vwarn(format, args);
 	va_end(args);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarn)(char const *format,
@@ -166,7 +166,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 	va_start(args, format);
 	libc_verr(status, format, args);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_verr)(int status,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9fc758e */
+/* HASH CRC-32:0x1be9363d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__wcsset_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wcsset_s) __ATTR_NONNULL((1)) __errno_t
@@ -30,14 +30,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsset_s))(__WCHAR_TYPE__ *__dst, __
 	__WCHAR_TYPE__ *__p;
 	__SIZE_TYPE__ __remaining;
 	if (!__dst && __dstsize != 0)
-		return __EINVAL;
+		return 22;
 	__p = __dst;
 	__remaining = __dstsize;
 	while (*__p && --__remaining != 0)
 		*__p++ = (__WCHAR_TYPE__)__ch;
 	if (__remaining == 0) {
 		__libc_memsetc(__dst, 0, __dstsize, __SIZEOF_WCHAR_T__);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(__p, 0, __remaining, __SIZEOF_WCHAR_T__);
 	return 0;

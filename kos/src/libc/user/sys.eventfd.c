@@ -21,16 +21,13 @@
 #define GUARD_LIBC_USER_SYS_EVENTFD_C 1
 
 #include "../api.h"
-#include "sys.eventfd.h"
-#include "unistd.h"
+/**/
 
-#include <parts/errno.h>
 #include <kos/syscalls.h>
 
+#include "sys.eventfd.h"
 
 DECL_BEGIN
-
-/*[[[start:implementation]]]*/
 
 /*[[[head:libc_eventfd,hash:CRC-32=0xd8b0888d]]]*/
 /* Return file descriptor for generic event channel. Set initial value to COUNT */
@@ -46,52 +43,8 @@ NOTHROW_NCX(LIBCCALL libc_eventfd)(__STDC_UINT_AS_SIZE_T count,
 }
 /*[[[end:libc_eventfd]]]*/
 
-/*[[[head:libc_eventfd_read,hash:CRC-32=0xc626fdce]]]*/
-/* Read event counter and possibly wait for events */
-INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
-NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
-                                        eventfd_t *value)
-/*[[[body:libc_eventfd_read]]]*/
-/*AUTO*/{
-	ssize_t error;
-	error = read(fd, value, sizeof(eventfd_t));
-	if (error == sizeof(eventfd_t))
-		return 0;
-#ifdef EINVAL
-	if (error >= 0)
-		__libc_seterrno(EINVAL);
-#endif /* EINVAL */
-	return -1;
-}
-/*[[[end:libc_eventfd_read]]]*/
-
-/*[[[head:libc_eventfd_write,hash:CRC-32=0x4590dd0c]]]*/
-/* Increment event counter */
-INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
-NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
-                                         eventfd_t value)
-/*[[[body:libc_eventfd_write]]]*/
-/*AUTO*/{
-	ssize_t error;
-	error = write(fd, &value, sizeof(eventfd_t));
-	if (error == sizeof(eventfd_t))
-		return 0;
-#ifdef EINVAL
-	if (error >= 0)
-		__libc_seterrno(EINVAL);
-#endif /* EINVAL */
-	return -1;
-}
-/*[[[end:libc_eventfd_write]]]*/
-
-/*[[[end:implementation]]]*/
-
-
-
-/*[[[start:exports,hash:CRC-32=0x4fd87928]]]*/
+/*[[[start:exports,hash:CRC-32=0x375e61b3]]]*/
 DEFINE_PUBLIC_ALIAS(eventfd, libc_eventfd);
-DEFINE_PUBLIC_ALIAS(eventfd_read, libc_eventfd_read);
-DEFINE_PUBLIC_ALIAS(eventfd_write, libc_eventfd_write);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc66ad4 */
+/* HASH CRC-32:0x14c912b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,7 +137,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 (__LIBCCALL __execvpe_impl)(char const *__restrict __path, __SIZE_TYPE__ __path_len,

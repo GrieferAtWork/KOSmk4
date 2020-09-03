@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafc6083e */
+/* HASH CRC-32:0xc6affeee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wsplitpath_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wsplitpath_s))(__WCHAR_TYPE__ const *__restrict __abspath, __WCHAR_TYPE__ *__drive, __SIZE_TYPE__ __drivelen, __WCHAR_TYPE__ *__dir, __SIZE_TYPE__ __dirlen, __WCHAR_TYPE__ *__file, __SIZE_TYPE__ __filelen, __WCHAR_TYPE__ *__ext, __SIZE_TYPE__ __extlen) {

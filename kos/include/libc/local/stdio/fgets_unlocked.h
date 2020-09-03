@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4ebde8d */
+/* HASH CRC-32:0xfc805ef7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(in
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *

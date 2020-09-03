@@ -33,7 +33,7 @@
 #define __RTM_STARTED        ? /* RTM was entered */
 #endif
 
-#include <parts/errno.h>
+#include <asm/errno.h>
 #define __RTM_NOSYS (-__ENOSYS) /* RTM isn't supposed */
 
 #endif /* !_KOS_ASM_RTM_H */

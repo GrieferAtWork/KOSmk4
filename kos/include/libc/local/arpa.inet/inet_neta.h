@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b148bfa */
+/* HASH CRC-32:0xc584741b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
  *     0.0.0.0      For net = 0

@@ -17,6 +17,58 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+
+#ifndef ENDEF
+#define ENDEF(id) /* nothing */
+#define __SYS_ERRLIST_DEFINES_ENDEF 1
+#endif /* !ENDEF */
+
+/* clang-format off */
+/*[[[deemon
+import * from deemon;
+@@Mapping for id -> (kosName, comment)
+local errnoMappings: {int: (string, string)} = Dict();
+
+local inKosContext = false;
+with (local fp = File.open("../../../include/asm/errno.h")) {
+	for (local l: fp) {
+		l = l.strip();
+		if (l == "/" "*[[[begin:kos]]]*" "/") {
+			inKosContext = true;
+			continue;
+		}
+		if (l == "/" "*[[[end:kos]]]*" "/")
+			inKosContext = false;
+		if (!inKosContext)
+			continue;
+		local name, value, comment;
+		try {
+			name, value, comment = l.scanf(" # define __%[^ ] %[^/ ] /" "* %[^]")...;
+		} catch (...) {
+			continue;
+		}
+		comment = comment.partition("*" "/")[0].strip();
+		while (comment.startswith("["))
+			comment = comment.partition("]")[2].lstrip();
+		value = int(value.strip());
+		if (value in errnoMappings)
+			continue;
+		errnoMappings[value] = (name, comment);
+	}
+}
+local emax = errnoMappings.keys > ...;
+local longestErrnoName = errnoMappings.values.each.first.length > ...;
+errnoMappings[0] = ("EOK", "Success");
+for (local i: [:emax + 1]) {
+	local name, comment = errnoMappings.get(i)...;
+	if (name is none) {
+		print("ENDEF(", i, ")");
+		continue;
+	}
+	print("E(", name, ", ", " " * (longestErrnoName - #name),
+		repr(comment), ")");
+}
+]]]*/
 E(EOK,             "Success")
 E(EPERM,           "Operation not permitted")
 E(ENOENT,          "No such file or directory")
@@ -58,7 +110,7 @@ E(ENOLCK,          "No record locks available")
 E(ENOSYS,          "Function not implemented")
 E(ENOTEMPTY,       "Directory not empty")
 E(ELOOP,           "Too many symbolic links encountered")
-E(EWOULDBLOCK,     "Operation would block")
+ENDEF(41)
 E(ENOMSG,          "No message of desired type")
 E(EIDRM,           "Identifier removed")
 E(ECHRNG,          "Channel number out of range")
@@ -75,7 +127,7 @@ E(EXFULL,          "Exchange full")
 E(ENOANO,          "No anode")
 E(EBADRQC,         "Invalid request code")
 E(EBADSLT,         "Invalid slot")
-E(EDEADLOCK,       "Resource deadlock would occur")
+ENDEF(58)
 E(EBFONT,          "Bad font file format")
 E(ENOSTR,          "Device not a stream")
 E(ENODATA,         "No data available")
@@ -133,7 +185,7 @@ E(EHOSTDOWN,       "Host is down")
 E(EHOSTUNREACH,    "No route to host")
 E(EALREADY,        "Operation already in progress")
 E(EINPROGRESS,     "Operation now in progress")
-E(ESTALE,          "Stale NFS file handle")
+E(ESTALE,          "Stale file handle")
 E(EUCLEAN,         "Structure needs cleaning")
 E(ENOTNAM,         "Not a XENIX named type file")
 E(ENAVAIL,         "No XENIX semaphores available")
@@ -142,10 +194,19 @@ E(EREMOTEIO,       "Remote I/O error")
 E(EDQUOT,          "Quota exceeded")
 E(ENOMEDIUM,       "No medium found")
 E(EMEDIUMTYPE,     "Wrong medium type")
-E(ECANCELED,       "Operation Canceled")
+E(ECANCELED,       "Operation canceled")
 E(ENOKEY,          "Required key not available")
 E(EKEYEXPIRED,     "Key has expired")
 E(EKEYREVOKED,     "Key has been revoked")
 E(EKEYREJECTED,    "Key was rejected by service")
 E(EOWNERDEAD,      "Owner died")
 E(ENOTRECOVERABLE, "State not recoverable")
+E(ERFKILL,         "Operation not possible due to RF-kill")
+E(EHWPOISON,       "Memory page has hardware error")
+/*[[[end]]]*/
+/* clang-format on */
+
+#ifdef __SYS_ERRLIST_DEFINES_ENDEF
+#undef __SYS_ERRLIST_DEFINES_ENDEF
+#undef ENDEF
+#endif /* __SYS_ERRLIST_DEFINES_ENDEF */

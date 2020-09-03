@@ -368,7 +368,7 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 [[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc), decl_prefix(DEFINE_TARGV)]]
 [[requires($has_function(getenv) && $has_function(execve) && defined(__hybrid_alloca))]]
 [[impl_include("<hybrid/typecore.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[impl_prefix(
 @@push_namespace(local)@@
 __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
@@ -743,7 +743,7 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 @@If an error occurs before all data could be read, try to use SEEK_CUR to rewind
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
-[[cp, guard, section(".text.crt{|.dos}.io.read"), impl_include("<parts/errno.h>")]]
+[[cp, guard, section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(read, lseek), decl_include("<bits/types.h>")]]
 ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 	ssize_t result, temp;
@@ -778,7 +778,7 @@ ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 @@Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
 @@`writeall()' to immediately return `0') or the entirety of the given buffer has been
 @@written (in which case `bufsize' is returned).
-[[cp, guard, section(".text.crt{|.dos}.io.write"), impl_include("<parts/errno.h>")]]
+[[cp, guard, section(".text.crt{|.dos}.io.write"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires($has_function(write) && $has_function(lseek))]]
 [[decl_include("<bits/types.h>")]]
 ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
@@ -1095,7 +1095,7 @@ ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO
 [[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadall")]]
-[[section(".text.crt{|.dos}.io.read"), impl_include("<parts/errno.h>")]]
+[[section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(preadall64), decl_include("<bits/types.h>")]]
 ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
                  size_t bufsize, __PIO_OFFSET offset) {
@@ -1107,7 +1107,7 @@ ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
 [[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall")]]
-[[impl_include("<parts/errno.h>"), section(".text.crt{|.dos}.io.write")]]
+[[impl_include("<libc/errno.h>"), section(".text.crt{|.dos}.io.write")]]
 [[userimpl, requires_function(pwriteall64), decl_include("<bits/types.h>")]]
 ssize_t pwriteall($fd_t fd, [[inp(bufsize)]] void const *buf,
                   size_t bufsize, __PIO_OFFSET offset) {
@@ -2084,7 +2084,7 @@ int fchroot($fd_t fd) {
 @@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
 @@@return: -1: Error. (s.a. `errno')
 [[requires_include("<asm/fcntl.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[requires($has_function(frealpathat) && defined(__AT_FDCWD))]]
 __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
                                   char *resolved, $size_t buflen) {

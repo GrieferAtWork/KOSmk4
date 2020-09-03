@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf79cb7d */
+/* HASH CRC-32:0xb014be9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <hybrid/__assert.h>
 /* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,
  * as is also passed to main(), and accepted by the exec() family of functions
@@ -81,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
 	*pargz_len = total_len;
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Create an ARGZ string from `string' by splitting that string at each
  * occurance of `sep'. This function behaves the same as the following
  * pseudo-code:
@@ -207,7 +207,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
 		argz[-1] = (char)(unsigned char)(unsigned int)sep;
 	}
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
                                     char const *__restrict str) {
 	return libc_argz_append(pargz, pargz_len, str, libc_strlen(str) + 1);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
@@ -345,7 +345,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
 	             (newlen - (size_t)(entry - *pargz)),
 	             sizeof(char));
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* When `before' is `NULL', do the same as `argz_add(PARGZ, PARGZ_LEN, ENTRY)'
  * Otherwise, `before' should point somewhere into the middle, or to the start
  * of an existing argument entry, who's beginning will first be located, before
@@ -413,7 +413,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	        sizeof(char));
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Replace all matches of `STR' inside of every string or sub-string from `PARGZ...+=PARGZ_LEN'
  * with `WITH', and resize the ARGZ string if necessary. For every replacement that is done,
  * the given `REPLACE_COUNT' is incremented by one (if `REPLACE_COUNT' is non-NULL)

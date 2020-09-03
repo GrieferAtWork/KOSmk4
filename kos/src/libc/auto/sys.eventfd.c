@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc722f82e */
+/* HASH CRC-32:0xfd602e02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,55 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_memcpy_s_defined
-#define __local_memcpy_s_defined 1
-#include <__crt.h>
-#include <bits/types.h>
+#ifndef GUARD_LIBC_AUTO_SYS_EVENTFD_C
+#define GUARD_LIBC_AUTO_SYS_EVENTFD_C 1
+
+#include "../api.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include "../user/sys.eventfd.h"
+#include "../user/unistd.h"
+
+DECL_BEGIN
+
+#ifndef __KERNEL__
 #include <libc/errno.h>
-#include <libc/string.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memcpy_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpy_s))(void *__dst, __SIZE_TYPE__ __dstlength, void const *__src, __SIZE_TYPE__ __srclength) {
-	if (!__srclength)
+/* Read event counter and possibly wait for events */
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
+NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
+                                        eventfd_t *value) {
+	ssize_t error;
+	error = libc_read(fd, value, sizeof(eventfd_t));
+	if (error == sizeof(eventfd_t))
 		return 0;
-	if (__dst == __NULLPTR)
-		return 22;
-	if (!__src || __dstlength < __srclength) {
-		__libc_memsetc(__dst, 0, __dstlength, __SIZEOF_CHAR__);
-		if (!__src)
-			return 22;
-		if (__dstlength < __srclength)
-			return 34;
-		return 22;
-	}
-	__libc_memcpyc(__dst, __src, __srclength, __SIZEOF_CHAR__);
-	return 0;
+#ifdef EINVAL
+	if (error >= 0)
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+	return -1;
 }
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_memcpy_s_defined
-#define __local___localdep_memcpy_s_defined 1
-#define __localdep_memcpy_s __LIBC_LOCAL_NAME(memcpy_s)
-#endif /* !__local___localdep_memcpy_s_defined */
-#endif /* !__local_memcpy_s_defined */
+#include <libc/errno.h>
+/* Increment event counter */
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
+NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
+                                         eventfd_t value) {
+	ssize_t error;
+	error = libc_write(fd, &value, sizeof(eventfd_t));
+	if (error == sizeof(eventfd_t))
+		return 0;
+#ifdef EINVAL
+	if (error >= 0)
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+	return -1;
+}
+#endif /* !__KERNEL__ */
+
+DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(eventfd_read, libc_eventfd_read);
+DEFINE_PUBLIC_ALIAS(eventfd_write, libc_eventfd_write);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_SYS_EVENTFD_C */

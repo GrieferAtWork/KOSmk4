@@ -25,7 +25,6 @@
 
 #include <asm/signum-values-dos.h>
 #include <asm/signum-values-kos.h>
-#include <parts/dos/errno.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -191,9 +190,9 @@ NOTHROW(LIBDCALL libd_strerrorname_s)(errno_t errnum)
 	/* Special handling for a hand full of errno
 	 * values that don't have KOS equivalents. */
 	switch (errnum) {
-	case __DOS_STRUNCATE:
+	case DOS_STRUNCATE:
 		return "STRUNCATE\0" "Truncated";
-	case __DOS_EOTHER:
+	case DOS_EOTHER:
 		return "EOTHER\0" "Other";
 	default:
 		break;

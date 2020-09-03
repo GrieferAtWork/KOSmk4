@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca3cc8a */
+/* HASH CRC-32:0xae084b40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,6 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Return file descriptor for generic event channel. Set initial value to COUNT */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_eventfd)(__STDC_UINT_AS_SIZE_T count, __STDC_INT_AS_UINT_T flags);
-/* Read event counter and possibly wait for events */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd, eventfd_t *value);
-/* Increment event counter */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd, eventfd_t value);
 #endif /* !__KERNEL__ */
 
 DECL_END

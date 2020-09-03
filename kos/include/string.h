@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76f23800 */
+/* HASH CRC-32:0xdc991b1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __NAMESPACE_STD_USING(strsignal)
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 #ifdef __USE_DOS
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
@@ -6670,7 +6670,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2))
 #ifdef __CRT_HAVE__strerror
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,_strerror,(char const *__message),(__message))
 #else /* __CRT_HAVE__strerror */
-#include <parts/errno.h>
+#include <libc/errno.h>
 #if defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
 #include <libc/local/string/_strerror.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_strerror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL _strerror)(char const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strerror))(__message); })
@@ -6679,7 +6679,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_strerror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE__strerror_s
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,_strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),(__buf,__buflen,__message))
 #else /* __CRT_HAVE__strerror_s */
-#include <parts/errno.h>
+#include <libc/errno.h>
 #ifdef __libc_geterrno
 #include <libc/local/string/_strerror_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_strerror_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_RPC(__LIBCCALL _strerror_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strerror_s))(__buf, __buflen, __message); })

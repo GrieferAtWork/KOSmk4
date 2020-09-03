@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a617cc0 */
+/* HASH CRC-32:0x378628a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Create an ARGZ string from `string' by splitting that string at each
  * occurance of `sep'. This function behaves the same as the following

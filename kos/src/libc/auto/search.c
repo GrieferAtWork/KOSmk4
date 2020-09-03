@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e10e25e */
+/* HASH CRC-32:0x54851bde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,7 +149,7 @@ typedef struct entry {
 	void *data;
 } ENTRY;
 #endif /* !__ENTRY_defined */
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3, 4)) int
 NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
@@ -230,7 +230,7 @@ typedef struct entry {
 } ENTRY;
 #endif /* !__ENTRY_defined */
 #include <hybrid/limitcore.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* For the used double hash method the table size has to be a prime. To
  * correct the user given table size we need a prime test.  This trivial
@@ -291,7 +291,7 @@ struct hsearch_data {
 	__UINT32_TYPE__ filled;
 };
 #endif /* !__hsearch_data_defined */
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {

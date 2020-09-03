@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8270154 */
+/* HASH CRC-32:0x7299848c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_wmemcpy_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wmemcpy_s) __ATTR_NONNULL((1, 3)) __errno_t
@@ -30,14 +30,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcpy_s))(__WCHAR_TYPE__ *__dst, __
 	if (!__srclength)
 		return 0;
 	if (__dst == __NULLPTR)
-		return __EINVAL;
+		return 22;
 	if (!__src || __dstlength < __srclength) {
 		__libc_memsetc(__dst, 0, __dstlength, __SIZEOF_WCHAR_T__);
 		if (!__src)
-			return __EINVAL;
+			return 22;
 		if (__dstlength < __srclength)
-			return __ERANGE;
-		return __EINVAL;
+			return 34;
+		return 22;
 	}
 	__libc_memcpyc(__dst, __src, __srclength, __SIZEOF_WCHAR_T__);
 	return 0;

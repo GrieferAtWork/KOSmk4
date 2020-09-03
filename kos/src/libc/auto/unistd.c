@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabea1e4a */
+/* HASH CRC-32:0x4afbcab6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,7 +126,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
 	__REDIRECT_EXECL(char, libc_execvp, file, args)
 }
 #include <hybrid/typecore.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 (__LIBCCALL __execvpe_impl)(char const *__restrict path, size_t path_len,
@@ -268,7 +268,7 @@ NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 		result = 0;
 	return result;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Similar to `frealpathat(2)' (though use the later for more options)
  * Also note that this function appears to have a weird rule (which KOS simply
  * ignores) that is related to this function not writing more than `PATH_MAX'

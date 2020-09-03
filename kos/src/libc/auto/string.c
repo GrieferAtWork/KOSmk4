@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66052cf7 */
+/* HASH CRC-32:0x6ce301c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -730,7 +730,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum,
 fallback:
 	return libc_strerror(errnum);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(errno_t errnum,
                                             char *buf,
@@ -3735,7 +3735,7 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_strrev)(char *__restrict str) {
 	return (char *)libc_memrev(str, libc_strlen(str));
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc__strset_s)(char *dst,
@@ -3744,19 +3744,19 @@ NOTHROW_NCX(LIBCCALL libc__strset_s)(char *dst,
 	char *p;
 	size_t remaining;
 	if (!dst && dstsize != 0)
-		return __EINVAL;
+		return 22;
 	p = dst;
 	remaining = dstsize;
 	while (*p && --remaining != 0)
 		*p++ = (char)ch;
 	if (remaining == 0) {
 		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(p, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_memcpy_s)(void *dst,
@@ -3766,19 +3766,19 @@ NOTHROW_NCX(LIBCCALL libc_memcpy_s)(void *dst,
 	if (!srclength)
 		return 0;
 	if (dst == NULL)
-		return __EINVAL;
+		return 22;
 	if (!src || dstlength < srclength) {
 		__libc_memsetc(dst, 0, dstlength, __SIZEOF_CHAR__);
 		if (!src)
-			return __EINVAL;
+			return 22;
 		if (dstlength < srclength)
-			return __ERANGE;
-		return __EINVAL;
+			return 34;
+		return 22;
 	}
 	__libc_memcpyc(dst, src, srclength, __SIZEOF_CHAR__);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_memmove_s)(void *dst,
@@ -3788,13 +3788,13 @@ NOTHROW_NCX(LIBCCALL libc_memmove_s)(void *dst,
 	if (!srclength)
 		return 0;
 	if (!dst || !src)
-		return __EINVAL;
+		return 22;
 	if (dstlength < srclength)
-		return __ERANGE;
+		return 34;
 	__libc_memmovec(dst, src, srclength, __SIZEOF_CHAR__);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc_strcpy_s)(char *dst,
@@ -3803,38 +3803,38 @@ NOTHROW_NCX(LIBCCALL libc_strcpy_s)(char *dst,
 	char *iter;
 	size_t remaining;
 	if ((!dst && dstsize) || !src)
-		return __EINVAL;
+		return 22;
 	iter = dst;
 	remaining = dstsize;
 	while ((*iter++ = *src++) != 0 && --remaining)
 		;
 	if (!remaining) {
 		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc_strcat_s)(char *dst,
                                     size_t dstsize,
                                     char const *src) {
 	if (!dst || !src)
-		return __EINVAL;
+		return 22;
 	while (dstsize && *dst) {
 		++dst;
 		--dstsize;
 	}
 	if (!dstsize)
-		return __EINVAL;
+		return 22;
 	while ((*dst++ = *src++) != 0 && --dstsize)
 		;
 	if (!dstsize)
-		return __ERANGE;
+		return 34;
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst,
@@ -3846,19 +3846,19 @@ NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst,
 	if (!maxlen && !dst && !dstsize)
 		return 0;
 	if ((!dst && dstsize) || (!src && maxlen))
-		return __EINVAL;
+		return 22;
 	for (iter = dst, remaining = dstsize; remaining && *iter; ++iter, --remaining)
 		;
 	if (!remaining) {
 		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
-		return __EINVAL;
+		return 22;
 	}
 	if (maxlen == (size_t)-1) {
 		while ((*iter++ = *src++) != 0 && --dstsize)
 			;
 	} else {
 		if (maxlen >= remaining)
-			return __ERANGE;
+			return 34;
 		while (maxlen && (*iter++ = *src++) != 0 && --remaining)
 			--maxlen;
 		if (!maxlen)
@@ -3867,15 +3867,15 @@ NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst,
 	if (!remaining) {
 		if (maxlen == (size_t)-1) {
 			dst[dstsize - 1] = 0;
-			return __STRUNCATE;
+			return 80;
 		}
 		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
@@ -3887,7 +3887,7 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
 	if (maxlen == 0 && dst == NULL && dstsize == 0)
 		return 0;
 	if ((!dst && dstsize) || (!src && maxlen))
-		return __EINVAL;
+		return 22;
 	if (!maxlen) {
 		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return 0;
@@ -3899,7 +3899,7 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
 			;
 	} else {
 		if (maxlen >= remaining)
-			return __ERANGE;
+			return 34;
 		while ((*iter++ = *src++) != 0 && --remaining && --maxlen)
 			;
 		if (!maxlen)
@@ -3908,10 +3908,10 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
 	if (!remaining) {
 		if (maxlen == (size_t)-1) {
 			dst[dstsize - 1] = 0;
-			return __STRUNCATE;
+			return 80;
 		}
 		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
@@ -3926,7 +3926,7 @@ NOTHROW_RPC(LIBCCALL libc__strerror)(char const *message) {
 	return strerror_buf;
 }
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc__strerror_s)(char *__restrict buf,
                                        size_t buflen,
@@ -3946,24 +3946,19 @@ NOTHROW_RPC(LIBCCALL libc__strerror_s)(char *__restrict buf,
 	} else {
 		reqlen = libc_snprintf(buf, buflen, "Unknown error %d\n", eno);
 	}
-	if (reqlen > buflen) {
-#ifdef ERANGE
-		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
-	}
+	if (reqlen > buflen)
+		return 34;
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf,
                                      size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_strnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_tolower(ch);
 	return 0;
@@ -3973,9 +3968,9 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf,
                                      size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_strnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_toupper(ch);
 	return 0;
@@ -3986,9 +3981,9 @@ NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf,
                                        locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_strnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_tolower_l(ch, locale);
 	return 0;
@@ -3999,14 +3994,14 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf,
                                        locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_strnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_toupper_l(ch, locale);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
@@ -4018,9 +4013,9 @@ NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
 	if (maxlen == 0 && buf == NULL && buflen == 0)
 		return 0;
 	if (!buf && buflen)
-		return __EINVAL;
+		return 22;
 	if (maxlen >= buflen)
-		return __ERANGE;
+		return 34;
 	iter = buf;
 	remaining = buflen;
 	while (*iter != 0 && maxlen && --remaining) {
@@ -4033,7 +4028,7 @@ NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
 	}
 	if (!remaining) {
 		__libc_memsetc(buf, 0, buflen, __SIZEOF_CHAR__);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;

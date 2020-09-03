@@ -49,7 +49,6 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <parts/errno.h>
 
 #ifdef __USE_DOS
 #define __PRIVATE_ARGV_CONST const
@@ -102,6 +101,8 @@
 		out_argv[0] = __NULLPTR;                                                                 \
 	}
 #else /* __hybrid_alloca */
+#include <libc/errno.h>
+
 #ifdef __E2BIG
 #define __PRIVATE_EXEC_CAPTURE_SETERRNO_2BIG() __libc_seterrno(__E2BIG)
 #elif defined(__EINVAL)

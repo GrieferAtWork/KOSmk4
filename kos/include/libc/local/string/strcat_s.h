@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1de951e1 */
+/* HASH CRC-32:0xbe6cca06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,22 @@
 #define __local_strcat_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strcat_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcat_s))(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src) {
 	if (!__dst || !__src)
-		return __EINVAL;
+		return 22;
 	while (__dstsize && *__dst) {
 		++__dst;
 		--__dstsize;
 	}
 	if (!__dstsize)
-		return __EINVAL;
+		return 22;
 	while ((*__dst++ = *__src++) != 0 && --__dstsize)
 		;
 	if (!__dstsize)
-		return __ERANGE;
+		return 34;
 	return 0;
 }
 __NAMESPACE_LOCAL_END

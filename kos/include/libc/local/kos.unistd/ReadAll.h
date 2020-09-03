@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e388178 */
+/* HASH CRC-32:0x8555f552 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <kos/except.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> readall(3)

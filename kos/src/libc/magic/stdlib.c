@@ -2072,7 +2072,7 @@ typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
 [[decl_prefix(DEFINE_FDWALK_FUNC_T)]]
 [[requires_include("<asm/fcntl.h>")]]
 [[requires($has_function(fcntl) && defined(__F_NEXT))]]
-[[impl_include("<asm/fcntl.h>", "<parts/errno.h>")]]
+[[impl_include("<asm/fcntl.h>", "<libc/errno.h>")]]
 int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 	int result = 0;
 @@pp_ifdef __libc_geterrno@@
@@ -2684,7 +2684,7 @@ errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
 
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa_s")]]
 [[if(__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
 errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
@@ -2727,7 +2727,7 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, "_itoa_s")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_i64toa_s")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	long temp;
@@ -2766,7 +2766,7 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
 errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
@@ -2816,7 +2816,7 @@ char *_ui64toa($u64 val, [[nonnull]] char *buf, int radix) {
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _ltoa_s)]]
 [[alt_variant_of(__SIZEOF_INT__ == 8, _itoa_s)]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	s64 temp;
@@ -2855,7 +2855,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _ultoa_s)]]
 errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
@@ -2960,7 +2960,7 @@ $size_t _mbstowcs_l(wchar_t *dst, char const *src,
 
 
 [[decl_include("<bits/types.h>")]]
-[[wchar, impl_include("<parts/errno.h>")]]
+[[wchar, impl_include("<libc/errno.h>")]]
 errno_t _mbstowcs_s($size_t *presult,
                     wchar_t *dst, $size_t dstsize,
                     char const *src, $size_t dstlen) {
@@ -2981,7 +2981,7 @@ errno_t _mbstowcs_s($size_t *presult,
 }
 
 [[decl_include("<bits/types.h>")]]
-[[wchar, impl_include("<parts/errno.h>")]]
+[[wchar, impl_include("<libc/errno.h>")]]
 errno_t mbstowcs_s($size_t *presult,
                    wchar_t *dst, $size_t dstsize,
                    char const *src, $size_t dstlen) {
@@ -3025,7 +3025,7 @@ errno_t _mbstowcs_s_l($size_t *presult,
 %[default:section(".text.crt.dos.random")]
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 	if (!randval) {
 @@pp_ifdef EINVAL@@
@@ -3069,7 +3069,7 @@ int _wctomb_l(char *buf, wchar_t wc, $locale_t locale) {
 %
 %#ifdef __USE_DOS_SLIB
 [[wchar, decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t wctomb_s([[nonnull]] int *presult,
                  [[nonnull]] char *buf,
                  rsize_t buflen, wchar_t wc) {
@@ -3093,7 +3093,7 @@ errno_t wctomb_s([[nonnull]] int *presult,
 %#endif /* __USE_DOS_SLIB */
 
 [[wchar, decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _wctomb_s_l([[nonnull]] int *presult, [[nonnull]] char *buf,
                     $size_t buflen, wchar_t wc, $locale_t locale) {
 	(void)locale;
@@ -3101,7 +3101,7 @@ errno_t _wctomb_s_l([[nonnull]] int *presult, [[nonnull]] char *buf,
 }
 
 [[wchar, decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _wcstombs_s_l([[nonnull]] $size_t *presult, [[nonnull]] char *buf,
                       $size_t buflen, [[nonnull]] wchar_t const *src,
                       $size_t maxlen, $locale_t locale) {
@@ -3118,7 +3118,7 @@ $size_t _wcstombs_l([[nonnull]] char *dst,
 }
 
 [[wchar, decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t wcstombs_s([[nonnull]] $size_t *presult,
                    [[nonnull]] char *buf, $size_t buflen,
                    [[nonnull]] wchar_t const *src, $size_t maxlen) {
@@ -3269,7 +3269,7 @@ char *_fullpath(char *buf, char const *path, $size_t buflen);
 
 %#ifndef __NO_FPU
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _ecvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit,
                 [[nonnull]] int *__restrict decptr,
@@ -3281,7 +3281,7 @@ errno_t _ecvt_s([[nonnull]] char *buf, $size_t buflen,
 }
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _fcvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit,
                 [[nonnull]] int *__restrict decptr,
@@ -3293,7 +3293,7 @@ errno_t _fcvt_s([[nonnull]] char *buf, $size_t buflen,
 }
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _gcvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit) {
 	int a, b;
@@ -3422,7 +3422,7 @@ unsigned long _lrotr(unsigned long val, int shift) {
 
 %[default:section(".text.crt.dos.fs.environ")];
 [[decl_include("<bits/types.h>")]]
-[[requires_function(setenv), impl_include("<parts/errno.h>")]]
+[[requires_function(setenv), impl_include("<libc/errno.h>")]]
 errno_t _putenv_s(char const *varname, char const *val) {
 	return setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
 }
@@ -3457,7 +3457,7 @@ void _splitpath([[nonnull]] char const *__restrict abspath,
 }
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
                     char const *drive, char const *dir,
                     char const *file, char const *ext) {
@@ -3506,7 +3506,7 @@ err_buflen:
 }
 
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _splitpath_s([[nonnull]] char const *__restrict abspath,
                      [[outp_opt(drivelen)]] char *drive, $size_t drivelen,
                      [[outp_opt(dirlen)]] char *dir, $size_t dirlen,

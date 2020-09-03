@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x914be6f7 */
+/* HASH CRC-32:0x8269b44e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
                                    char const *__restrict str,
@@ -152,7 +152,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 #endif /* EILSEQ */
 	return error;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
                                    char const *__restrict str,
@@ -180,7 +180,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 #endif /* EILSEQ */
 	return error;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
                                    char16_t wc,
@@ -229,7 +229,7 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 	result = (size_t)(endptr - str);
 	return result;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBKCALL libc_wcrtomb)(char *__restrict str,
                                    char32_t wc,
@@ -590,7 +590,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") wint_t
 (LIBKCALL libc_putwchar)(char32_t wc) THROWS(...) {
 	return libc_fputwc(wc, stdout);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws)(char16_t *__restrict buf,
@@ -632,7 +632,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL
 	buf[n] = '\0';
 	return buf;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char32_t *
 (LIBKCALL libc_fgetws)(char32_t *__restrict buf,
@@ -2057,7 +2057,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") wint_t
 	return libc_fputwc_unlocked(wc, stdin);
 }
 #include <asm/crt/stdio.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf,
                                 __STDC_INT_AS_SIZE_T bufsize,
@@ -2099,7 +2099,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 	return buf;
 }
 #include <asm/crt/stdio.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char32_t *
 (LIBKCALL libc_fgetws_unlocked)(char32_t *__restrict buf,
                                 __STDC_INT_AS_SIZE_T bufsize,
@@ -3848,45 +3848,45 @@ next:
 	}
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcscat_s)(char16_t *dst,
                                     size_t dstsize,
                                     char16_t const *src) {
 	if (!dst || !src)
-		return __EINVAL;
+		return 22;
 	while (dstsize && *dst) {
 		++dst;
 		--dstsize;
 	}
 	if (!dstsize)
-		return __EINVAL;
+		return 22;
 	while ((*dst++ = *src++) != 0 && --dstsize)
 		;
 	if (!dstsize)
-		return __ERANGE;
+		return 34;
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcscat_s)(char32_t *dst,
                                     size_t dstsize,
                                     char32_t const *src) {
 	if (!dst || !src)
-		return __EINVAL;
+		return 22;
 	while (dstsize && *dst) {
 		++dst;
 		--dstsize;
 	}
 	if (!dstsize)
-		return __EINVAL;
+		return 22;
 	while ((*dst++ = *src++) != 0 && --dstsize)
 		;
 	if (!dstsize)
-		return __ERANGE;
+		return 34;
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcscpy_s)(char16_t *dst,
@@ -3895,19 +3895,19 @@ NOTHROW_NCX(LIBDCALL libd_wcscpy_s)(char16_t *dst,
 	char16_t *iter;
 	size_t remaining;
 	if ((!dst && dstsize) || !src)
-		return __EINVAL;
+		return 22;
 	iter = dst;
 	remaining = dstsize;
 	while ((*iter++ = *src++) != 0 && --remaining)
 		;
 	if (!remaining) {
 		__libc_memsetc(dst, 0, dstsize, 2);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcscpy_s)(char32_t *dst,
@@ -3916,19 +3916,19 @@ NOTHROW_NCX(LIBKCALL libc_wcscpy_s)(char32_t *dst,
 	char32_t *iter;
 	size_t remaining;
 	if ((!dst && dstsize) || !src)
-		return __EINVAL;
+		return 22;
 	iter = dst;
 	remaining = dstsize;
 	while ((*iter++ = *src++) != 0 && --remaining)
 		;
 	if (!remaining) {
 		__libc_memsetc(dst, 0, dstsize, 4);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst,
@@ -3940,19 +3940,19 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst,
 	if (!maxlen && !dst && !dstsize)
 		return 0;
 	if ((!dst && dstsize) || (!src && maxlen))
-		return __EINVAL;
+		return 22;
 	for (iter = dst, remaining = dstsize; remaining && *iter; ++iter, --remaining)
 		;
 	if (!remaining) {
 		__libc_memsetc(dst, 0, dstsize, 2);
-		return __EINVAL;
+		return 22;
 	}
 	if (maxlen == (size_t)-1) {
 		while ((*iter++ = *src++) != 0 && --dstsize)
 			;
 	} else {
 		if (maxlen >= remaining)
-			return __ERANGE;
+			return 34;
 		while (maxlen && (*iter++ = *src++) != 0 && --remaining)
 			--maxlen;
 		if (!maxlen)
@@ -3961,15 +3961,15 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst,
 	if (!remaining) {
 		if (maxlen == (size_t)-1) {
 			dst[dstsize - 1] = 0;
-			return __STRUNCATE;
+			return 80;
 		}
 		__libc_memsetc(dst, 0, dstsize, 2);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst,
@@ -3981,19 +3981,19 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst,
 	if (!maxlen && !dst && !dstsize)
 		return 0;
 	if ((!dst && dstsize) || (!src && maxlen))
-		return __EINVAL;
+		return 22;
 	for (iter = dst, remaining = dstsize; remaining && *iter; ++iter, --remaining)
 		;
 	if (!remaining) {
 		__libc_memsetc(dst, 0, dstsize, 4);
-		return __EINVAL;
+		return 22;
 	}
 	if (maxlen == (size_t)-1) {
 		while ((*iter++ = *src++) != 0 && --dstsize)
 			;
 	} else {
 		if (maxlen >= remaining)
-			return __ERANGE;
+			return 34;
 		while (maxlen && (*iter++ = *src++) != 0 && --remaining)
 			--maxlen;
 		if (!maxlen)
@@ -4002,15 +4002,15 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst,
 	if (!remaining) {
 		if (maxlen == (size_t)-1) {
 			dst[dstsize - 1] = 0;
-			return __STRUNCATE;
+			return 80;
 		}
 		__libc_memsetc(dst, 0, dstsize, 4);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
@@ -4022,7 +4022,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
 	if (maxlen == 0 && dst == NULL && dstsize == 0)
 		return 0;
 	if ((!dst && dstsize) || (!src && maxlen))
-		return __EINVAL;
+		return 22;
 	if (!maxlen) {
 		__libc_memsetc(dst, 0, dstsize, 2);
 		return 0;
@@ -4034,7 +4034,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
 			;
 	} else {
 		if (maxlen >= remaining)
-			return __ERANGE;
+			return 34;
 		while ((*iter++ = *src++) != 0 && --remaining && --maxlen)
 			;
 		if (!maxlen)
@@ -4043,15 +4043,15 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
 	if (!remaining) {
 		if (maxlen == (size_t)-1) {
 			dst[dstsize - 1] = 0;
-			return __STRUNCATE;
+			return 80;
 		}
 		__libc_memsetc(dst, 0, dstsize, 2);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcsncpy_s)(char32_t *dst,
@@ -4063,7 +4063,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy_s)(char32_t *dst,
 	if (maxlen == 0 && dst == NULL && dstsize == 0)
 		return 0;
 	if ((!dst && dstsize) || (!src && maxlen))
-		return __EINVAL;
+		return 22;
 	if (!maxlen) {
 		__libc_memsetc(dst, 0, dstsize, 4);
 		return 0;
@@ -4075,7 +4075,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy_s)(char32_t *dst,
 			;
 	} else {
 		if (maxlen >= remaining)
-			return __ERANGE;
+			return 34;
 		while ((*iter++ = *src++) != 0 && --remaining && --maxlen)
 			;
 		if (!maxlen)
@@ -4084,15 +4084,15 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy_s)(char32_t *dst,
 	if (!remaining) {
 		if (maxlen == (size_t)-1) {
 			dst[dstsize - 1] = 0;
-			return __STRUNCATE;
+			return 80;
 		}
 		__libc_memsetc(dst, 0, dstsize, 4);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd__wcsnset_s)(char16_t *__restrict buf,
@@ -4104,9 +4104,9 @@ NOTHROW_NCX(LIBDCALL libd__wcsnset_s)(char16_t *__restrict buf,
 	if (maxlen == 0 && buf == NULL && buflen == 0)
 		return 0;
 	if (!buf && buflen)
-		return __EINVAL;
+		return 22;
 	if (maxlen >= buflen)
-		return __ERANGE;
+		return 34;
 	iter = buf;
 	remaining = buflen;
 	while (*iter != 0 && maxlen && --remaining) {
@@ -4119,12 +4119,12 @@ NOTHROW_NCX(LIBDCALL libd__wcsnset_s)(char16_t *__restrict buf,
 	}
 	if (!remaining) {
 		__libc_memsetc(buf, 0, buflen, 2);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc__wcsnset_s)(char32_t *__restrict buf,
@@ -4136,9 +4136,9 @@ NOTHROW_NCX(LIBKCALL libc__wcsnset_s)(char32_t *__restrict buf,
 	if (maxlen == 0 && buf == NULL && buflen == 0)
 		return 0;
 	if (!buf && buflen)
-		return __EINVAL;
+		return 22;
 	if (maxlen >= buflen)
-		return __ERANGE;
+		return 34;
 	iter = buf;
 	remaining = buflen;
 	while (*iter != 0 && maxlen && --remaining) {
@@ -4151,12 +4151,12 @@ NOTHROW_NCX(LIBKCALL libc__wcsnset_s)(char32_t *__restrict buf,
 	}
 	if (!remaining) {
 		__libc_memsetc(buf, 0, buflen, 4);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcsset_s)(char16_t *dst,
@@ -4165,19 +4165,19 @@ NOTHROW_NCX(LIBDCALL libd__wcsset_s)(char16_t *dst,
 	char16_t *p;
 	size_t remaining;
 	if (!dst && dstsize != 0)
-		return __EINVAL;
+		return 22;
 	p = dst;
 	remaining = dstsize;
 	while (*p && --remaining != 0)
 		*p++ = (char16_t)ch;
 	if (remaining == 0) {
 		__libc_memsetc(dst, 0, dstsize, 2);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(p, 0, remaining, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBKCALL libc__wcsset_s)(char32_t *dst,
@@ -4186,40 +4186,40 @@ NOTHROW_NCX(LIBKCALL libc__wcsset_s)(char32_t *dst,
 	char32_t *p;
 	size_t remaining;
 	if (!dst && dstsize != 0)
-		return __EINVAL;
+		return 22;
 	p = dst;
 	remaining = dstsize;
 	while (*p && --remaining != 0)
 		*p++ = (char32_t)ch;
 	if (remaining == 0) {
 		__libc_memsetc(dst, 0, dstsize, 4);
-		return __EINVAL;
+		return 22;
 	}
 	__libc_memsetc(p, 0, remaining, 4);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd__wcslwr_s)(char16_t *buf,
                                      size_t buflen) {
 	char16_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libd_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char16_t)libc_towlower(ch);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc__wcslwr_s)(char32_t *buf,
                                      size_t buflen) {
 	char32_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char32_t)libc_towlower(ch);
 	return 0;
@@ -4229,9 +4229,9 @@ NOTHROW_NCX(LIBDCALL libd__wcsupr_s)(char16_t *buf,
                                      size_t buflen) {
 	char16_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libd_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char16_t)libc_towupper(ch);
 	return 0;
@@ -4241,9 +4241,9 @@ NOTHROW_NCX(LIBKCALL libc__wcsupr_s)(char32_t *buf,
                                      size_t buflen) {
 	char32_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char32_t)libc_towupper(ch);
 	return 0;
@@ -4254,9 +4254,9 @@ NOTHROW_NCX(LIBDCALL libd__wcslwr_s_l)(char16_t *buf,
                                        locale_t locale) {
 	char16_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libd_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char16_t)libc_towlower_l(ch, locale);
 	return 0;
@@ -4267,9 +4267,9 @@ NOTHROW_NCX(LIBKCALL libc__wcslwr_s_l)(char32_t *buf,
                                        locale_t locale) {
 	char32_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char32_t)libc_towlower_l(ch, locale);
 	return 0;
@@ -4280,9 +4280,9 @@ NOTHROW_NCX(LIBDCALL libd__wcsupr_s_l)(char16_t *buf,
                                        locale_t locale) {
 	char16_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libd_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char16_t)libc_towupper_l(ch, locale);
 	return 0;
@@ -4293,14 +4293,14 @@ NOTHROW_NCX(LIBKCALL libc__wcsupr_s_l)(char32_t *buf,
                                        locale_t locale) {
 	char32_t *iter, ch;
 	if (buf == NULL)
-		return __EINVAL;
+		return 22;
 	if (libc_wcsnlen(buf, buflen) >= buflen)
-		return __EINVAL;
+		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
 		*iter = (char32_t)libc_towupper_l(ch, locale);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd_wmemcpy_s)(char16_t *dst,
@@ -4310,19 +4310,19 @@ NOTHROW_NCX(LIBDCALL libd_wmemcpy_s)(char16_t *dst,
 	if (!srclength)
 		return 0;
 	if (dst == NULL)
-		return __EINVAL;
+		return 22;
 	if (!src || dstlength < srclength) {
 		__libc_memsetc(dst, 0, dstlength, 2);
 		if (!src)
-			return __EINVAL;
+			return 22;
 		if (dstlength < srclength)
-			return __ERANGE;
-		return __EINVAL;
+			return 34;
+		return 22;
 	}
 	__libc_memcpyc(dst, src, srclength, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBKCALL libc_wmemcpy_s)(char32_t *dst,
@@ -4332,19 +4332,19 @@ NOTHROW_NCX(LIBKCALL libc_wmemcpy_s)(char32_t *dst,
 	if (!srclength)
 		return 0;
 	if (dst == NULL)
-		return __EINVAL;
+		return 22;
 	if (!src || dstlength < srclength) {
 		__libc_memsetc(dst, 0, dstlength, 4);
 		if (!src)
-			return __EINVAL;
+			return 22;
 		if (dstlength < srclength)
-			return __ERANGE;
-		return __EINVAL;
+			return 34;
+		return 22;
 	}
 	__libc_memcpyc(dst, src, srclength, 4);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd_wmemmove_s)(char16_t *dst,
@@ -4354,13 +4354,13 @@ NOTHROW_NCX(LIBDCALL libd_wmemmove_s)(char16_t *dst,
 	if (!srclength)
 		return 0;
 	if (!dst || !src)
-		return __EINVAL;
+		return 22;
 	if (dstlength < srclength)
-		return __ERANGE;
+		return 34;
 	__libc_memmovec(dst, src, srclength, 2);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBKCALL libc_wmemmove_s)(char32_t *dst,
@@ -4370,9 +4370,9 @@ NOTHROW_NCX(LIBKCALL libc_wmemmove_s)(char32_t *dst,
 	if (!srclength)
 		return 0;
 	if (!dst || !src)
-		return __EINVAL;
+		return 22;
 	if (dstlength < srclength)
-		return __ERANGE;
+		return 34;
 	__libc_memmovec(dst, src, srclength, 4);
 	return 0;
 }

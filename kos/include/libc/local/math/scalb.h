@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71a72f1 */
+/* HASH CRC-32:0x51b5a849 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <libm/finite.h>
 #include <libm/isinf.h>
 #include <libm/matherr.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/scalb.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X times (2 to the Nth power) */

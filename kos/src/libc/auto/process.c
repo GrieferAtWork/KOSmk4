@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3da18934 */
+/* HASH CRC-32:0xf5a76e6e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
 	return libc_spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }
 #include <hybrid/typecore.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) pid_t
 (__LIBCCALL __spawnvpe_impl)(int mode,

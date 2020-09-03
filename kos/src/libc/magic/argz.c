@@ -80,7 +80,7 @@ typedef __errno_t error_t;
 @@@return: ENOMEM: Insufficient heap memory
 [[export_alias("__argz_create"), requires_function(malloc)]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<libc/errno.h>", "<hybrid/__assert.h>")]]
 error_t argz_create([[nonnull]] char *const argv[],
                     [[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len) {
@@ -126,7 +126,7 @@ error_t argz_create([[nonnull]] char *const argv[],
 @@@return: ENOMEM: Insufficient heap memory
 [[requires($has_function(malloc) && $has_function(free))]]
 [[decl_include("<bits/types.h>")]]
-[[export_alias("__argz_create_sep"), impl_include("<parts/errno.h>")]]
+[[export_alias("__argz_create_sep"), impl_include("<libc/errno.h>")]]
 error_t argz_create_sep([[nonnull]] char const *__restrict string, int sep,
                         [[nonnull]] char **__restrict pargz,
                         [[nonnull]] size_t *__restrict pargz_len) {
@@ -253,7 +253,7 @@ void argz_stringify(char *argz, size_t len, int sep) {
 @@Increase allocated memory of `*PARGZ' and append `buf...+=buf_len'
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[export_alias("__argz_create_sep"), impl_include("<parts/errno.h>")]]
+[[export_alias("__argz_create_sep"), impl_include("<libc/errno.h>")]]
 [[requires_function(realloc), decl_include("<bits/types.h>")]]
 error_t argz_append([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,
@@ -299,7 +299,7 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 @@strings will be present in the resulting ARGZ string.
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
-[[export_alias("__argz_add_sep"), impl_include("<parts/errno.h>")]]
+[[export_alias("__argz_add_sep"), impl_include("<libc/errno.h>")]]
 [[requires_function(realloc), decl_include("<bits/types.h>")]]
 error_t argz_add_sep([[nonnull]] char **__restrict pargz,
                      [[nonnull]] size_t *__restrict pargz_len,
@@ -409,7 +409,7 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 @@@return: 0 :     Success
 @@@return: ENOMEM: Insufficient heap memory
 @@@return: EINVAL: The given `before' is either NULL, or apart of the given ARGZ
-[[export_alias("__argz_insert"), impl_include("<parts/errno.h>")]]
+[[export_alias("__argz_insert"), impl_include("<libc/errno.h>")]]
 [[requires_function(realloc, argz_add), decl_include("<bits/types.h>")]]
 error_t argz_insert([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,
@@ -480,7 +480,7 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 @@@return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
 @@                 but note that the GLibc implementation of this function is completely
 @@                 unreadable and may be able to return this for other cases as well...)
-[[export_alias("__argz_replace"), impl_include("<parts/errno.h>")]]
+[[export_alias("__argz_replace"), impl_include("<libc/errno.h>")]]
 [[requires_function(realloc, free), decl_include("<bits/types.h>")]]
 error_t argz_replace([[nonnull]] char **__restrict pargz,
                      [[nonnull]] size_t *__restrict pargz_len,

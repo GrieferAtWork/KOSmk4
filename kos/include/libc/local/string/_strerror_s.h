@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cecf9ab */
+/* HASH CRC-32:0x82d6b246 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__strerror_s_defined
 #define __local__strerror_s_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #ifdef __libc_geterrno
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -85,13 +85,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror_s))(char *__restrict __buf,
 	} else {
 		__reqlen = __localdep_snprintf(__buf, __buflen, "Unknown error %d\n", __eno);
 	}
-	if (__reqlen > __buflen) {
-#ifdef __ERANGE
-		return __ERANGE;
-#else /* __ERANGE */
-		return 1;
-#endif /* !__ERANGE */
-	}
+	if (__reqlen > __buflen)
+		return 34;
 	return 0;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad56746a */
+/* HASH CRC-32:0x6806efc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Construct an ARGZ string from a given NULL-terminated `ARGV'-vector,

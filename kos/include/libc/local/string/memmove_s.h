@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe34a3090 */
+/* HASH CRC-32:0x8187f7fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_memmove_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memmove_s) __ATTR_NONNULL((1, 3)) __errno_t
@@ -30,9 +30,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove_s))(void *__dst, __SIZE_TYPE_
 	if (!__srclength)
 		return 0;
 	if (!__dst || !__src)
-		return __EINVAL;
+		return 22;
 	if (__dstlength < __srclength)
-		return __ERANGE;
+		return 34;
 	__libc_memmovec(__dst, __src, __srclength, __SIZEOF_CHAR__);
 	return 0;
 }

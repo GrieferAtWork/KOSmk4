@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4593e023 */
+/* HASH CRC-32:0x5394f3f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
 	return libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                        result, (uid_t)-1, NULL);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Search for an entry with a matching user ID
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
@@ -89,7 +89,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
 #endif /* ENOENT */
 	return error;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Search for an entry with a matching username
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
@@ -110,7 +110,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
 #endif /* ENOENT */
 	return error;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <hybrid/typecore.h>
 #include <asm/syslog.h>
 /* Filtered read from `stream'

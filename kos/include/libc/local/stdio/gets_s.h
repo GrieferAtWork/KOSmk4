@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafe1ef54 */
+/* HASH CRC-32:0x2133d793 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fgets_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdstreams.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gets_s) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gets_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {

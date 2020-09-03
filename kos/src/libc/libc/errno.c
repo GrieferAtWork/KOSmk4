@@ -26,10 +26,6 @@
 
 #include <hybrid/host.h>
 
-#include <parts/cyg/errno.h>
-#include <parts/dos/errno.h>
-#include <parts/errno.h>
-
 #include <elf.h>
 #include <errno.h>
 #include <signal.h>

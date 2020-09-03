@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe522d39c */
+/* HASH CRC-32:0x865b5f16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,__localdep_freopen,
 #endif /* !... */
 #endif /* !__local___localdep_freopen_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(freopen_s) __ATTR_NONNULL((1, 2, 3, 4)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(freopen_s))(__FILE **__pstream, char const *__filename, char const *__modes, __FILE *__oldstream) {
@@ -73,7 +73,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(freopen_s))(__FILE **__pstream, char 
 #endif /* !__libc_geterrno */
 	}
 	*__pstream = __oldstream;
-	return 0;
+	return __EOK;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_freopen_s_defined

@@ -33,7 +33,6 @@
 
 #include <bits/crt/io-file.h>
 #include <kos/syscalls.h>
-#include <parts/errno.h>
 
 #include <assert.h>
 #include <fcntl.h>

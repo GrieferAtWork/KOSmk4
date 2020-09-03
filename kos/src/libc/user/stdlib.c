@@ -30,8 +30,6 @@
 
 #include <kos/exec/peb.h>
 #include <kos/syscalls.h>
-#include <parts/dos/errno.h>
-#include <parts/errno.h>
 #include <sys/auxv.h>
 #include <sys/wait.h>
 
@@ -1879,7 +1877,7 @@ NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr)
 /*[[[body:libd__get_errno]]]*/
 {
 	if (!perr)
-		return __DOS_EINVAL;
+		return DOS_EINVAL;
 	*perr = libd_geterrno();
 	return EOK;
 }
@@ -1923,7 +1921,7 @@ NOTHROW_NCX(LIBDCALL libd__get_doserrno)(u32 *perr)
 /*[[[body:libd__get_doserrno]]]*/
 {
 	if (!perr)
-		return __DOS_EINVAL;
+		return DOS_EINVAL;
 	*perr = libd_getnterrno();
 	return 0;
 }

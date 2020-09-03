@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8baef378 */
+/* HASH CRC-32:0x6adbb7fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strcpy_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strcpy_s) __errno_t
@@ -30,14 +30,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcpy_s))(char *__dst, __SIZE_TYPE__
 	char *__iter;
 	__SIZE_TYPE__ __remaining;
 	if ((!__dst && __dstsize) || !__src)
-		return __EINVAL;
+		return 22;
 	__iter = __dst;
 	__remaining = __dstsize;
 	while ((*__iter++ = *__src++) != 0 && --__remaining)
 		;
 	if (!__remaining) {
 		__libc_memsetc(__dst, 0, __dstsize, __SIZEOF_CHAR__);
-		return __ERANGE;
+		return 34;
 	}
 	__libc_memsetc(__iter, 0, __remaining, __SIZEOF_CHAR__);
 	return 0;

@@ -361,7 +361,7 @@ $pid_t spawnve(int mode,
 [[requires_include("<hybrid/__alloca.h>")]]
 [[requires($has_function(getenv) && $has_function(spawnve) && defined(__hybrid_alloca))]]
 [[impl_include("<hybrid/typecore.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[impl_prefix(
 @@push_namespace(local)@@
 __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) $pid_t

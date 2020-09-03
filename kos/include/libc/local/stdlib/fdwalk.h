@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e31f68f */
+/* HASH CRC-32:0x9316f2a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 #endif /* !... */
 #endif /* !__local___localdep_fcntl_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
  * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,

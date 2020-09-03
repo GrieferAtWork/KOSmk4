@@ -23,8 +23,6 @@
 #include "../api.h"
 /**/
 
-#include <parts/errno.h>
-
 #include <limits.h>
 #include <stdint.h>
 

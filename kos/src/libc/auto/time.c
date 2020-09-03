@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70741314 */
+/* HASH CRC-32:0x9194794b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,7 +184,7 @@ INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char 
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
 	return libc_asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__restrict buf,
                                      size_t buflen,

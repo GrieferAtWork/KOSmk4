@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10d57021 */
+/* HASH CRC-32:0x7071d08f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
 	return libc_fputc(ch, stdout);
 }
 #include <hybrid/typecore.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
  * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
  * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
@@ -129,7 +129,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT
 	return result;
 }
 #include <libc/local/stdstreams.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
  * >> if (message) {
  * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));
@@ -654,7 +654,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 }
 #include <hybrid/typecore.h>
 #include <asm/crt/stdio.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3)) char *
 (LIBCCALL libc_fgets_unlocked)(char *__restrict buf,
@@ -1966,7 +1966,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
 NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream,
                                    char const *filename,
@@ -1990,7 +1990,7 @@ NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream,
 	*pstream = result;
 	return EOK;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3, 4)) errno_t
 NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream,
                                      char const *filename,
@@ -2014,7 +2014,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream,
 	*pstream = oldstream;
 	return EOK;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
                                     rsize_t bufsize) {
@@ -2041,7 +2041,7 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
 	}
 	return EOK;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream) {
 	if (!stream) {
@@ -2054,7 +2054,7 @@ NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream) {
 	libc_clearerr(stream);
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream) {
 	if (!pstream) {
@@ -2074,7 +2074,7 @@ NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream) {
 	}
 	return 0;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <hybrid/__overflow.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1, 5)) size_t
 NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
@@ -2099,7 +2099,7 @@ NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
 	return libc_fread(buf, elemsize, elemcount, stream);
 }
 #include <libc/local/stdstreams.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
                                   rsize_t bufsize) {
@@ -2120,7 +2120,7 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
 	return libc_vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
 }
 #include <libc/local/stdstreams.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
 	char const *enodesc;
@@ -2137,7 +2137,7 @@ INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 	}
 }
 #include <libc/local/stdstreams.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...) {
 	char const *enodesc;

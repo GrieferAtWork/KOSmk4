@@ -463,6 +463,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the functionality of the `lsthread', `thread', `trace', `l' and `r'
 	 *       commands. */
 
+	/* TODO: Enumeration of local variants within the builtin debugger has only been
+	 *       programmed to work for text associated with the kernel core's binary
+	 *       image. - With the recent advances in usermod/driver integration, this
+	 *       is one of the last places that has yet to start taking advantage of
+	 *       generic module section accesses.
+	 *    -> Make `l' and `locals' work for drivers and usermod objects. */
+
+	/* TODO: Automate files like /kos/src/libc/libc/sys_siglist.def via `deemon -F' */
+
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every
@@ -474,24 +483,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      jump. Only if both ends end up with a successful unwind, and only
 	 *      if both ends result in all-identical callee-preserve registers is
 	 *      the unwind to-be considered successful.
-	 */
-
-	/* TODO: Refactor <parts/xxx/errno.h> to use <asm/...>
-	 *       Similarly, <errno.h> should define errno codes using the usual
-	 *       #ifdef __<NAME>
-	 *       #define <NAME> __<NAME>
-	 *       #endif
-	 *       formula.
-	 * Macro names such as __DOS_EPERM will be removed, and where libc uses
-	 * these names at the moment, they should be replaced with `deemon -F`
-	 * scripts that scan the <asm/xxx.h> headers for the appropriate values
-	 *
-	 * <parts/errno.h> should become <libc/errno.h>, and the __errno macro
-	 * should be related with a new macro `__libc_errno' that behaves identical.
-	 *
-	 * -> There is no reason to break the usual escape-formula for <errno.h>
-	 *    Everything that it does can also be encoded via (now) conventional
-	 *    means.
 	 */
 
 	/* Xorg X-Window server support roadmap.

@@ -1858,7 +1858,7 @@ $errno_t pthread_spin_lock([[nonnull]] pthread_spinlock_t *lock) {
 @@Try to lock spinlock LOCK
 @@@return: EOK:   Success
 @@@return: EBUSY: Lock has already been acquired
-[[impl_include("<hybrid/__atomic.h>", "<parts/errno.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<libc/errno.h>")]]
 [[wunused, decl_include("<bits/types.h>")]]
 $errno_t pthread_spin_trylock([[nonnull]] pthread_spinlock_t *lock) {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
@@ -2040,7 +2040,7 @@ __STDC_INT_AS_SIZE_T pthread_num_processors_np() {
 @@@return: EINVAL: `n' was specified as less than `1'
 @@@return: * :     Same as `errno' after a call to `sched_setaffinity(2)'
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/sched.h>", "<parts/errno.h>")]]
+[[impl_include("<bits/sched.h>", "<libc/errno.h>")]]
 [[requires_function(sched_setaffinity)]]
 $errno_t pthread_set_num_processors_np(int n) {
 	int i, result;

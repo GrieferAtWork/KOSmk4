@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x881be919 */
+/* HASH CRC-32:0x5770ab65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,7 +279,7 @@ NOTHROW_NCX(LIBCCALL libc_frexp)(double x,
 	return (double)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
 #endif /* !... */
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 /* X times (two to the EXP power) */
@@ -358,7 +358,7 @@ NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
 	return (float)libc_frexp((double)x, pexponent);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 /* X times (two to the EXP power) */
@@ -460,7 +460,7 @@ NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
 	return (__LONGDOUBLE)libc_frexp((double)x, pexponent);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/finite.h>
 #include <libm/ldexp.h>
 /* X times (two to the EXP power) */
@@ -2127,7 +2127,7 @@ NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
 #include <libm/finite.h>
 #include <libm/isinf.h>
 #include <libm/matherr.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/scalb.h>
 /* Return X times (2 to the Nth power) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
@@ -2178,7 +2178,7 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 #include <libm/finite.h>
 #include <libm/isinf.h>
 #include <libm/matherr.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/scalb.h>
 /* Return X times (2 to the Nth power) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -2235,7 +2235,7 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 #include <libm/finite.h>
 #include <libm/isinf.h>
 #include <libm/matherr.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <libm/scalb.h>
 /* Return X times (2 to the Nth power) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE

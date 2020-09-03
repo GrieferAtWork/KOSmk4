@@ -24,7 +24,6 @@
 /**/
 
 #include <kos/syscalls.h>
-#include <parts/errno.h>
 
 #include <pthread.h>
 

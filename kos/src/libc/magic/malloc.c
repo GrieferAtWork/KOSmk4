@@ -105,7 +105,7 @@ void *valloc($size_t n_bytes) {
 }
 
 [[guard, crtbuiltin, decl_include("<bits/types.h>")]]
-[[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<parts/errno.h>")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(memalign)]]
 $errno_t posix_memalign([[nonnull]] void **__restrict pp,
                         $size_t alignment, $size_t n_bytes) {

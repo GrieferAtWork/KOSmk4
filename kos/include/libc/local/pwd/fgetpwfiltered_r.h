@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc53cc1c8 */
+/* HASH CRC-32:0x89057d93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -375,7 +375,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_syslog_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <hybrid/typecore.h>
 #include <asm/syslog.h>
 __NAMESPACE_LOCAL_BEGIN

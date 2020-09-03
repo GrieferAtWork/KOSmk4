@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8cdaf18 */
+/* HASH CRC-32:0xe464fa95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ typedef struct entry {
 } ENTRY;
 #endif /* !__ENTRY_defined */
 #include <hybrid/limitcore.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* For the used double hash method the table size has to be a prime. To
  * correct the user given table size we need a prime test.  This trivial

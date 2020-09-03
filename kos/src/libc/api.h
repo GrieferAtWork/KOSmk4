@@ -165,10 +165,6 @@
 #define ATTR_LIBC_WPRINTF_P(a, b) __ATTR_LIBC_WPRINTF_P(a, b)
 #define ATTR_LIBC_WSCANF(a, b)    __ATTR_LIBC_WSCANF(a, b)
 
-#include <parts/dos/errno.h>
-#include <parts/errno.h>
-#include <parts/generic/errno.h>
-
 #include <errno.h>
 
 #define libc_seterrno_syserr(e) \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c78597a */
+/* HASH CRC-32:0xc09cc152 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/types.h>
 #include <hybrid/__atomic.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Try to lock spinlock LOCK
  * @return: EOK:   Success

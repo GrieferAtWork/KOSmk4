@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7933ccaf */
+/* HASH CRC-32:0x5b3962af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 	return 0;
 }
 #include <hybrid/__atomic.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Try to lock spinlock LOCK
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
@@ -144,7 +144,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
 }
 #include <bits/sched.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Restrict the calling thread to only run on the first `n' cpus
  * @return: EOK:    Success
  * @return: EINVAL: `n' was specified as less than `1'

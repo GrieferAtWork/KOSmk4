@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5478af07 */
+/* HASH CRC-32:0x89ad7ab8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strerrorname_s_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerrorname_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(__errno_t __errnum) {
@@ -31,430 +31,430 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(__errno_t __errnum) {
 
 #ifdef __EPERM
 	case __EPERM:           __result = "EPERM"; break;
-#endif /* EPERM */
+#endif /* __EPERM */
 #ifdef __ENOENT
 	case __ENOENT:          __result = "ENOENT"; break;
-#endif /* ENOENT */
+#endif /* __ENOENT */
 #ifdef __ESRCH
 	case __ESRCH:           __result = "ESRCH"; break;
-#endif /* ESRCH */
+#endif /* __ESRCH */
 #ifdef __EINTR
 	case __EINTR:           __result = "EINTR"; break;
-#endif /* EINTR */
+#endif /* __EINTR */
 #ifdef __EIO
 	case __EIO:             __result = "EIO"; break;
-#endif /* EIO */
+#endif /* __EIO */
 #ifdef __ENXIO
 	case __ENXIO:           __result = "ENXIO"; break;
-#endif /* ENXIO */
+#endif /* __ENXIO */
 #ifdef __E2BIG
 	case __E2BIG:           __result = "E2BIG"; break;
-#endif /* E2BIG */
+#endif /* __E2BIG */
 #ifdef __ENOEXEC
 	case __ENOEXEC:         __result = "ENOEXEC"; break;
-#endif /* ENOEXEC */
+#endif /* __ENOEXEC */
 #ifdef __EBADF
 	case __EBADF:           __result = "EBADF"; break;
-#endif /* EBADF */
+#endif /* __EBADF */
 #ifdef __ECHILD
 	case __ECHILD:          __result = "ECHILD"; break;
-#endif /* ECHILD */
+#endif /* __ECHILD */
 #ifdef __EAGAIN
 	case __EAGAIN:          __result = "EAGAIN"; break;
-#endif /* EAGAIN */
+#endif /* __EAGAIN */
 #ifdef __ENOMEM
 	case __ENOMEM:          __result = "ENOMEM"; break;
-#endif /* ENOMEM */
+#endif /* __ENOMEM */
 #ifdef __EACCES
 	case __EACCES:          __result = "EACCES"; break;
-#endif /* EACCES */
+#endif /* __EACCES */
 #ifdef __EFAULT
 	case __EFAULT:          __result = "EFAULT"; break;
-#endif /* EFAULT */
+#endif /* __EFAULT */
 #ifdef __EBUSY
 	case __EBUSY:           __result = "EBUSY"; break;
-#endif /* EBUSY */
+#endif /* __EBUSY */
 #ifdef __EEXIST
 	case __EEXIST:          __result = "EEXIST"; break;
-#endif /* EEXIST */
+#endif /* __EEXIST */
 #ifdef __EXDEV
 	case __EXDEV:           __result = "EXDEV"; break;
-#endif /* EXDEV */
+#endif /* __EXDEV */
 #ifdef __ENODEV
 	case __ENODEV:          __result = "ENODEV"; break;
-#endif /* ENODEV */
+#endif /* __ENODEV */
 #ifdef __ENOTDIR
 	case __ENOTDIR:         __result = "ENOTDIR"; break;
-#endif /* ENOTDIR */
+#endif /* __ENOTDIR */
 #ifdef __EISDIR
 	case __EISDIR:          __result = "EISDIR"; break;
-#endif /* EISDIR */
+#endif /* __EISDIR */
 #ifdef __ENFILE
 	case __ENFILE:          __result = "ENFILE"; break;
-#endif /* ENFILE */
+#endif /* __ENFILE */
 #ifdef __EMFILE
 	case __EMFILE:          __result = "EMFILE"; break;
-#endif /* EMFILE */
+#endif /* __EMFILE */
 #ifdef __ENOTTY
 	case __ENOTTY:          __result = "ENOTTY"; break;
-#endif /* ENOTTY */
+#endif /* __ENOTTY */
 #ifdef __EFBIG
 	case __EFBIG:           __result = "EFBIG"; break;
-#endif /* EFBIG */
+#endif /* __EFBIG */
 #ifdef __ENOSPC
 	case __ENOSPC:          __result = "ENOSPC"; break;
-#endif /* ENOSPC */
+#endif /* __ENOSPC */
 #ifdef __ESPIPE
 	case __ESPIPE:          __result = "ESPIPE"; break;
-#endif /* ESPIPE */
+#endif /* __ESPIPE */
 #ifdef __EROFS
 	case __EROFS:           __result = "EROFS"; break;
-#endif /* EROFS */
+#endif /* __EROFS */
 #ifdef __EMLINK
 	case __EMLINK:          __result = "EMLINK"; break;
-#endif /* EMLINK */
+#endif /* __EMLINK */
 #ifdef __EPIPE
 	case __EPIPE:           __result = "EPIPE"; break;
-#endif /* EPIPE */
+#endif /* __EPIPE */
 #ifdef __EDOM
 	case __EDOM:            __result = "EDOM"; break;
-#endif /* EDOM */
+#endif /* __EDOM */
 #ifdef __ENAMETOOLONG
 	case __ENAMETOOLONG:    __result = "ENAMETOOLONG"; break;
-#endif /* ENAMETOOLONG */
+#endif /* __ENAMETOOLONG */
 #ifdef __ENOLCK
 	case __ENOLCK:          __result = "ENOLCK"; break;
-#endif /* ENOLCK */
+#endif /* __ENOLCK */
 #ifdef __ENOSYS
 	case __ENOSYS:          __result = "ENOSYS"; break;
-#endif /* ENOSYS */
+#endif /* __ENOSYS */
 #ifdef __ENOTEMPTY
 	case __ENOTEMPTY:       __result = "ENOTEMPTY"; break;
-#endif /* ENOTEMPTY */
+#endif /* __ENOTEMPTY */
 #ifdef __EINVAL
 	case __EINVAL:          __result = "EINVAL"; break;
-#endif /* EINVAL */
+#endif /* __EINVAL */
 #ifdef __ERANGE
 	case __ERANGE:          __result = "ERANGE"; break;
-#endif /* ERANGE */
+#endif /* __ERANGE */
 #ifdef __EILSEQ
 	case __EILSEQ:          __result = "EILSEQ"; break;
-#endif /* EILSEQ */
+#endif /* __EILSEQ */
 #ifdef __EDEADLOCK
 	case __EDEADLOCK:       __result = "EDEADLOCK"; break;
-#endif /* EDEADLOCK */
+#endif /* __EDEADLOCK */
 #ifdef __EADDRINUSE
 	case __EADDRINUSE:      __result = "EADDRINUSE"; break;
-#endif /* EADDRINUSE */
+#endif /* __EADDRINUSE */
 #ifdef __EADDRNOTAVAIL
 	case __EADDRNOTAVAIL:   __result = "EADDRNOTAVAIL"; break;
-#endif /* EADDRNOTAVAIL */
+#endif /* __EADDRNOTAVAIL */
 #ifdef __EAFNOSUPPORT
 	case __EAFNOSUPPORT:    __result = "EAFNOSUPPORT"; break;
-#endif /* EAFNOSUPPORT */
+#endif /* __EAFNOSUPPORT */
 #ifdef __EALREADY
 	case __EALREADY:        __result = "EALREADY"; break;
-#endif /* EALREADY */
+#endif /* __EALREADY */
 #ifdef __EBADMSG
 	case __EBADMSG:         __result = "EBADMSG"; break;
-#endif /* EBADMSG */
+#endif /* __EBADMSG */
 #ifdef __ECANCELED
 	case __ECANCELED:       __result = "ECANCELED"; break;
-#endif /* ECANCELED */
+#endif /* __ECANCELED */
 #ifdef __ECONNABORTED
 	case __ECONNABORTED:    __result = "ECONNABORTED"; break;
-#endif /* ECONNABORTED */
+#endif /* __ECONNABORTED */
 #ifdef __ECONNREFUSED
 	case __ECONNREFUSED:    __result = "ECONNREFUSED"; break;
-#endif /* ECONNREFUSED */
+#endif /* __ECONNREFUSED */
 #ifdef __ECONNRESET
 	case __ECONNRESET:      __result = "ECONNRESET"; break;
-#endif /* ECONNRESET */
+#endif /* __ECONNRESET */
 #ifdef __EDESTADDRREQ
 	case __EDESTADDRREQ:    __result = "EDESTADDRREQ"; break;
-#endif /* EDESTADDRREQ */
+#endif /* __EDESTADDRREQ */
 #ifdef __EHOSTUNREACH
 	case __EHOSTUNREACH:    __result = "EHOSTUNREACH"; break;
-#endif /* EHOSTUNREACH */
+#endif /* __EHOSTUNREACH */
 #ifdef __EIDRM
 	case __EIDRM:           __result = "EIDRM"; break;
-#endif /* EIDRM */
+#endif /* __EIDRM */
 #ifdef __EINPROGRESS
 	case __EINPROGRESS:     __result = "EINPROGRESS"; break;
-#endif /* EINPROGRESS */
+#endif /* __EINPROGRESS */
 #ifdef __EISCONN
 	case __EISCONN:         __result = "EISCONN"; break;
-#endif /* EISCONN */
+#endif /* __EISCONN */
 #ifdef __ELOOP
 	case __ELOOP:           __result = "ELOOP"; break;
-#endif /* ELOOP */
+#endif /* __ELOOP */
 #ifdef __EMSGSIZE
 	case __EMSGSIZE:        __result = "EMSGSIZE"; break;
-#endif /* EMSGSIZE */
+#endif /* __EMSGSIZE */
 #ifdef __ENETDOWN
 	case __ENETDOWN:        __result = "ENETDOWN"; break;
-#endif /* ENETDOWN */
+#endif /* __ENETDOWN */
 #ifdef __ENETRESET
 	case __ENETRESET:       __result = "ENETRESET"; break;
-#endif /* ENETRESET */
+#endif /* __ENETRESET */
 #ifdef __ENETUNREACH
 	case __ENETUNREACH:     __result = "ENETUNREACH"; break;
-#endif /* ENETUNREACH */
+#endif /* __ENETUNREACH */
 #ifdef __ENOBUFS
 	case __ENOBUFS:         __result = "ENOBUFS"; break;
-#endif /* ENOBUFS */
+#endif /* __ENOBUFS */
 #ifdef __ENODATA
 	case __ENODATA:         __result = "ENODATA"; break;
-#endif /* ENODATA */
+#endif /* __ENODATA */
 #ifdef __ENOLINK
 	case __ENOLINK:         __result = "ENOLINK"; break;
-#endif /* ENOLINK */
+#endif /* __ENOLINK */
 #ifdef __ENOMSG
 	case __ENOMSG:          __result = "ENOMSG"; break;
-#endif /* ENOMSG */
+#endif /* __ENOMSG */
 #ifdef __ENOPROTOOPT
 	case __ENOPROTOOPT:     __result = "ENOPROTOOPT"; break;
-#endif /* ENOPROTOOPT */
+#endif /* __ENOPROTOOPT */
 #ifdef __ENOSR
 	case __ENOSR:           __result = "ENOSR"; break;
-#endif /* ENOSR */
+#endif /* __ENOSR */
 #ifdef __ENOSTR
 	case __ENOSTR:          __result = "ENOSTR"; break;
-#endif /* ENOSTR */
+#endif /* __ENOSTR */
 #ifdef __ENOTCONN
 	case __ENOTCONN:        __result = "ENOTCONN"; break;
-#endif /* ENOTCONN */
+#endif /* __ENOTCONN */
 #ifdef __ENOTRECOVERABLE
 	case __ENOTRECOVERABLE: __result = "ENOTRECOVERABLE"; break;
-#endif /* ENOTRECOVERABLE */
+#endif /* __ENOTRECOVERABLE */
 #ifdef __ENOTSOCK
 	case __ENOTSOCK:        __result = "ENOTSOCK"; break;
-#endif /* ENOTSOCK */
+#endif /* __ENOTSOCK */
 #ifdef __ENOTSUP
 	case __ENOTSUP:         __result = "ENOTSUP"; break;
-#endif /* ENOTSUP */
+#endif /* __ENOTSUP */
 #ifdef __EOPNOTSUPP
 	case __EOPNOTSUPP:      __result = "EOPNOTSUPP"; break;
-#endif /* EOPNOTSUPP */
+#endif /* __EOPNOTSUPP */
 #ifdef __EOTHER
 	case __EOTHER:          __result = "EOTHER"; break;
-#endif /* EOTHER */
+#endif /* __EOTHER */
 #ifdef __EOVERFLOW
 	case __EOVERFLOW:       __result = "EOVERFLOW"; break;
-#endif /* EOVERFLOW */
+#endif /* __EOVERFLOW */
 #ifdef __EOWNERDEAD
 	case __EOWNERDEAD:      __result = "EOWNERDEAD"; break;
-#endif /* EOWNERDEAD */
+#endif /* __EOWNERDEAD */
 #ifdef __EPROTO
 	case __EPROTO:          __result = "EPROTO"; break;
-#endif /* EPROTO */
+#endif /* __EPROTO */
 #ifdef __EPROTONOSUPPORT
 	case __EPROTONOSUPPORT: __result = "EPROTONOSUPPORT"; break;
-#endif /* EPROTONOSUPPORT */
+#endif /* __EPROTONOSUPPORT */
 #ifdef __EPROTOTYPE
 	case __EPROTOTYPE:      __result = "EPROTOTYPE"; break;
-#endif /* EPROTOTYPE */
+#endif /* __EPROTOTYPE */
 #ifdef __ETIME
 	case __ETIME:           __result = "ETIME"; break;
-#endif /* ETIME */
+#endif /* __ETIME */
 #ifdef __ETIMEDOUT
 	case __ETIMEDOUT:       __result = "ETIMEDOUT"; break;
-#endif /* ETIMEDOUT */
+#endif /* __ETIMEDOUT */
 #ifdef __ETXTBSY
 	case __ETXTBSY:         __result = "ETXTBSY"; break;
-#endif /* ETXTBSY */
+#endif /* __ETXTBSY */
 #ifdef __EFTYPE
 	case __EFTYPE:          __result = "EFTYPE"; break;
-#endif /* EFTYPE */
+#endif /* __EFTYPE */
 #ifdef __ENMFILE
 	case __ENMFILE:         __result = "ENMFILE"; break;
-#endif /* ENMFILE */
+#endif /* __ENMFILE */
 #ifdef __EPFNOSUPPORT
 	case __EPFNOSUPPORT:    __result = "EPFNOSUPPORT"; break;
-#endif /* EPFNOSUPPORT */
+#endif /* __EPFNOSUPPORT */
 #ifdef __EHOSTDOWN
 	case __EHOSTDOWN:       __result = "EHOSTDOWN"; break;
-#endif /* EHOSTDOWN */
+#endif /* __EHOSTDOWN */
 #ifdef __ETOOMANYREFS
 	case __ETOOMANYREFS:    __result = "ETOOMANYREFS"; break;
-#endif /* ETOOMANYREFS */
+#endif /* __ETOOMANYREFS */
 #ifdef __EDQUOT
 	case __EDQUOT:          __result = "EDQUOT"; break;
-#endif /* EDQUOT */
+#endif /* __EDQUOT */
 #ifdef __ESTALE
 	case __ESTALE:          __result = "ESTALE"; break;
-#endif /* ESTALE */
+#endif /* __ESTALE */
 #ifdef __ENOSHARE
 	case __ENOSHARE:        __result = "ENOSHARE"; break;
-#endif /* ENOSHARE */
+#endif /* __ENOSHARE */
 #ifdef __ECASECLASH
 	case __ECASECLASH:      __result = "ECASECLASH"; break;
-#endif /* ECASECLASH */
+#endif /* __ECASECLASH */
 #ifdef __ENOTBLK
 	case __ENOTBLK:         __result = "ENOTBLK"; break;
-#endif /* ENOTBLK */
+#endif /* __ENOTBLK */
 #ifdef __ECHRNG
 	case __ECHRNG:          __result = "ECHRNG"; break;
-#endif /* ECHRNG */
+#endif /* __ECHRNG */
 #ifdef __EL2NSYNC
 	case __EL2NSYNC:        __result = "EL2NSYNC"; break;
-#endif /* EL2NSYNC */
+#endif /* __EL2NSYNC */
 #ifdef __EL3HLT
 	case __EL3HLT:          __result = "EL3HLT"; break;
-#endif /* EL3HLT */
+#endif /* __EL3HLT */
 #ifdef __EL3RST
 	case __EL3RST:          __result = "EL3RST"; break;
-#endif /* EL3RST */
+#endif /* __EL3RST */
 #ifdef __ELNRNG
 	case __ELNRNG:          __result = "ELNRNG"; break;
-#endif /* ELNRNG */
+#endif /* __ELNRNG */
 #ifdef __EUNATCH
 	case __EUNATCH:         __result = "EUNATCH"; break;
-#endif /* EUNATCH */
+#endif /* __EUNATCH */
 #ifdef __ENOCSI
 	case __ENOCSI:          __result = "ENOCSI"; break;
-#endif /* ENOCSI */
+#endif /* __ENOCSI */
 #ifdef __EL2HLT
 	case __EL2HLT:          __result = "EL2HLT"; break;
-#endif /* EL2HLT */
+#endif /* __EL2HLT */
 #ifdef __EBADE
 	case __EBADE:           __result = "EBADE"; break;
-#endif /* EBADE */
+#endif /* __EBADE */
 #ifdef __EBADR
 	case __EBADR:           __result = "EBADR"; break;
-#endif /* EBADR */
+#endif /* __EBADR */
 #ifdef __EXFULL
 	case __EXFULL:          __result = "EXFULL"; break;
-#endif /* EXFULL */
+#endif /* __EXFULL */
 #ifdef __ENOANO
 	case __ENOANO:          __result = "ENOANO"; break;
-#endif /* ENOANO */
+#endif /* __ENOANO */
 #ifdef __EBADRQC
 	case __EBADRQC:         __result = "EBADRQC"; break;
-#endif /* EBADRQC */
+#endif /* __EBADRQC */
 #ifdef __EBADSLT
 	case __EBADSLT:         __result = "EBADSLT"; break;
-#endif /* EBADSLT */
+#endif /* __EBADSLT */
 #ifdef __EBFONT
 	case __EBFONT:          __result = "EBFONT"; break;
-#endif /* EBFONT */
+#endif /* __EBFONT */
 #ifdef __ENONET
 	case __ENONET:          __result = "ENONET"; break;
-#endif /* ENONET */
+#endif /* __ENONET */
 #ifdef __ENOPKG
 	case __ENOPKG:          __result = "ENOPKG"; break;
-#endif /* ENOPKG */
+#endif /* __ENOPKG */
 #ifdef __EREMOTE
 	case __EREMOTE:         __result = "EREMOTE"; break;
-#endif /* EREMOTE */
+#endif /* __EREMOTE */
 #ifdef __EADV
 	case __EADV:            __result = "EADV"; break;
-#endif /* EADV */
+#endif /* __EADV */
 #ifdef __ESRMNT
 	case __ESRMNT:          __result = "ESRMNT"; break;
-#endif /* ESRMNT */
+#endif /* __ESRMNT */
 #ifdef __ECOMM
 	case __ECOMM:           __result = "ECOMM"; break;
-#endif /* ECOMM */
+#endif /* __ECOMM */
 #ifdef __ELBIN
 	case __ELBIN:           __result = "ELBIN)"; break;
-#endif /* ELBIN */
+#endif /* __ELBIN */
 #ifdef __EDOTDOT
 	case __EDOTDOT:         __result = "EDOTDOT)"; break;
-#endif /* EDOTDOT */
+#endif /* __EDOTDOT */
 #ifdef __ENOTUNIQ
 	case __ENOTUNIQ:        __result = "ENOTUNIQ"; break;
-#endif /* ENOTUNIQ */
+#endif /* __ENOTUNIQ */
 #ifdef __EBADFD
 	case __EBADFD:          __result = "EBADFD"; break;
-#endif /* EBADFD */
+#endif /* __EBADFD */
 #ifdef __EREMCHG
 	case __EREMCHG:         __result = "EREMCHG"; break;
-#endif /* EREMCHG */
+#endif /* __EREMCHG */
 #ifdef __ELIBACC
 	case __ELIBACC:         __result = "ELIBACC"; break;
-#endif /* ELIBACC */
+#endif /* __ELIBACC */
 #ifdef __ELIBBAD
 	case __ELIBBAD:         __result = "ELIBBAD"; break;
-#endif /* ELIBBAD */
+#endif /* __ELIBBAD */
 #ifdef __ELIBSCN
 	case __ELIBSCN:         __result = "ELIBSCN"; break;
-#endif /* ELIBSCN */
+#endif /* __ELIBSCN */
 #ifdef __ELIBMAX
 	case __ELIBMAX:         __result = "ELIBMAX"; break;
-#endif /* ELIBMAX */
+#endif /* __ELIBMAX */
 #ifdef __ELIBEXEC
 	case __ELIBEXEC:        __result = "ELIBEXEC"; break;
-#endif /* ELIBEXEC */
+#endif /* __ELIBEXEC */
 #ifdef __ESHUTDOWN
 	case __ESHUTDOWN:       __result = "ESHUTDOWN"; break;
-#endif /* ESHUTDOWN */
+#endif /* __ESHUTDOWN */
 #ifdef __ESOCKTNOSUPPORT
 	case __ESOCKTNOSUPPORT: __result = "ESOCKTNOSUPPORT"; break;
-#endif /* ESOCKTNOSUPPORT */
+#endif /* __ESOCKTNOSUPPORT */
 #ifdef __EPROCLIM
 	case __EPROCLIM:        __result = "EPROCLIM"; break;
-#endif /* EPROCLIM */
+#endif /* __EPROCLIM */
 #ifdef __EUSERS
 	case __EUSERS:          __result = "EUSERS"; break;
-#endif /* EUSERS */
+#endif /* __EUSERS */
 #ifdef __ENOMEDIUM
 	case __ENOMEDIUM:       __result = "ENOMEDIUM)"; break;
-#endif /* ENOMEDIUM */
+#endif /* __ENOMEDIUM */
 #ifdef __ESTRPIPE
 	case __ESTRPIPE:        __result = "ESTRPIPE"; break;
-#endif /* ESTRPIPE */
+#endif /* __ESTRPIPE */
 #ifdef __EMULTIHOP
 	case __EMULTIHOP:       __result = "EMULTIHOP"; break;
-#endif /* EMULTIHOP */
+#endif /* __EMULTIHOP */
 #ifdef __ERESTART
 	case __ERESTART:        __result = "ERESTART"; break;
-#endif /* ERESTART */
+#endif /* __ERESTART */
 #ifdef __EUCLEAN
 	case __EUCLEAN:         __result = "EUCLEAN"; break;
-#endif /* EUCLEAN */
+#endif /* __EUCLEAN */
 #ifdef __ENOTNAM
 	case __ENOTNAM:         __result = "ENOTNAM"; break;
-#endif /* ENOTNAM */
+#endif /* __ENOTNAM */
 #ifdef __ENAVAIL
 	case __ENAVAIL:         __result = "ENAVAIL"; break;
-#endif /* ENAVAIL */
+#endif /* __ENAVAIL */
 #ifdef __EISNAM
 	case __EISNAM:          __result = "EISNAM"; break;
-#endif /* EISNAM */
+#endif /* __EISNAM */
 #ifdef __EREMOTEIO
 	case __EREMOTEIO:       __result = "EREMOTEIO"; break;
-#endif /* EREMOTEIO */
+#endif /* __EREMOTEIO */
 #ifdef __EMEDIUMTYPE
 	case __EMEDIUMTYPE:     __result = "EMEDIUMTYPE"; break;
-#endif /* EMEDIUMTYPE */
+#endif /* __EMEDIUMTYPE */
 #ifdef __ENOKEY
 	case __ENOKEY:          __result = "ENOKEY"; break;
-#endif /* ENOKEY */
+#endif /* __ENOKEY */
 #ifdef __EKEYEXPIRED
 	case __EKEYEXPIRED:     __result = "EKEYEXPIRED"; break;
-#endif /* EKEYEXPIRED */
+#endif /* __EKEYEXPIRED */
 #ifdef __EKEYREVOKED
 	case __EKEYREVOKED:     __result = "EKEYREVOKED"; break;
-#endif /* EKEYREVOKED */
+#endif /* __EKEYREVOKED */
 #ifdef __EKEYREJECTED
 	case __EKEYREJECTED:    __result = "EKEYREJECTED"; break;
-#endif /* EKEYREJECTED */
+#endif /* __EKEYREJECTED */
 #ifdef __ERFKILL
 	case __ERFKILL:         __result = "ERFKILL"; break;
-#endif /* ERFKILL */
+#endif /* __ERFKILL */
 #ifdef __EHWPOISON
 	case __EHWPOISON:       __result = "EHWPOISON"; break;
-#endif /* EHWPOISON */
+#endif /* __EHWPOISON */
 #if defined(__STRUNCATE) && (!defined(__ERANGE) || __STRUNCATE != __ERANGE)
 	case __STRUNCATE:       __result = "STRUNCATE"; break;
-#endif /* STRUNCATE && (!ERANGE || STRUNCATE != ERANGE) */
+#endif /* __STRUNCATE && (!__ERANGE || __STRUNCATE != __ERANGE) */
 #if defined(__EWOULDBLOCK) && (!defined(__EAGAIN) || __EWOULDBLOCK != __EAGAIN)
 	case __EWOULDBLOCK:     __result = "EWOULDBLOCK"; break;
-#endif /* EWOULDBLOCK && (!EAGAIN || EWOULDBLOCK != EAGAIN) */
+#endif /* __EWOULDBLOCK && (!__EAGAIN || __EWOULDBLOCK != __EAGAIN) */
 #if defined(__EDEADLK) && (!defined(__EDEADLOCK) || __EDEADLOCK != __EDEADLK)
 	case __EDEADLK:         __result = "EDEADLK"; break;
-#endif /* EDEADLK && (!EDEADLOCK || EDEADLOCK != EDEADLK) */
+#endif /* __EDEADLK && (!__EDEADLOCK || __EDEADLOCK != __EDEADLK) */
 
 	default:
 		__result = __NULLPTR;

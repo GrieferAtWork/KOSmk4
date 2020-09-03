@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77f097ef */
+/* HASH CRC-32:0x9470f791 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_unget
 #endif /* !__local___localdep_ungetc16_unlocked_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetc16s_unlocked) __ATTR_NONNULL((1, 3)) __CHAR16_TYPE__ *
 (__LIBDCALL __LIBC_LOCAL_NAME(fgetc16s_unlocked))(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {

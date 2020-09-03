@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc719287b */
+/* HASH CRC-32:0x65c883fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz,
 	}
 	return result;
 }
-#include <parts/errno.h>
+#include <libc/errno.h>
 /* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
  * with the same name already exists in `ENVZ', it is removed. If `VALUE' is
  * `NULL', then the new entry will not have a value portion, meaning that `envz_get()'

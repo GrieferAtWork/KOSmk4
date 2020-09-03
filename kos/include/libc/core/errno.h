@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc722f82e */
+/* HASH CRC-32:0x339c420b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_memcpy_s_defined
-#define __local_memcpy_s_defined 1
+#ifndef _LIBC_CORE_ERRNO_H
+#define _LIBC_CORE_ERRNO_H 1
+
+#include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
+#include <hybrid/typecore.h>
+
+__SYSDECL_BEGIN
+
+#ifndef ____libc_core___errno_location_defined
+#define ____libc_core___errno_location_defined 1
+#ifdef __CRT_HAVE___errno_location
 #include <bits/types.h>
-#include <libc/errno.h>
-#include <libc/string.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memcpy_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpy_s))(void *__dst, __SIZE_TYPE__ __dstlength, void const *__src, __SIZE_TYPE__ __srclength) {
-	if (!__srclength)
-		return 0;
-	if (__dst == __NULLPTR)
-		return 22;
-	if (!__src || __dstlength < __srclength) {
-		__libc_memsetc(__dst, 0, __dstlength, __SIZEOF_CHAR__);
-		if (!__src)
-			return 22;
-		if (__dstlength < __srclength)
-			return 34;
-		return 22;
-	}
-	__libc_memcpyc(__dst, __src, __srclength, __SIZEOF_CHAR__);
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_memcpy_s_defined
-#define __local___localdep_memcpy_s_defined 1
-#define __localdep_memcpy_s __LIBC_LOCAL_NAME(memcpy_s)
-#endif /* !__local___localdep_memcpy_s_defined */
-#endif /* !__local_memcpy_s_defined */
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),__errno_location,())
+#elif defined(__CRT_HAVE__errno)
+#include <bits/types.h>
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),_errno,())
+#elif defined(__CRT_HAVE___errno)
+#include <bits/types.h>
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),__errno,())
+#else /* ... */
+#undef ____libc_core___errno_location_defined
+#endif /* !... */
+#endif /* !____libc_core___errno_location_defined */
+
+__SYSDECL_END
+
+#endif /* __CC__ */
+
+#endif /* !_LIBC_CORE_ERRNO_H */

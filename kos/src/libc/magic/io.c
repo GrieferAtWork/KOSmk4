@@ -176,7 +176,7 @@ int _findnext64i32(intptr_t findfd,
 %
 [[cp, export_alias("_sopen_s_nolock")]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(sopen)]]
 errno_t _sopen_s([[nonnull]] $fd_t *fd,
                  [[nonnull]] char const *filename,
@@ -243,7 +243,7 @@ $int64_t _filelengthi64($fd_t fd) {
 
 [[decl_include("<bits/types.h>")]]
 [[requires_function(umask)]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 	if (!oldmode) {
 @@pp_ifdef EINVAL@@

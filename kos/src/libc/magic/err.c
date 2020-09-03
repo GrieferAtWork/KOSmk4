@@ -42,7 +42,7 @@ void warn(char const *format, ...)
 	%{printf("vwarn")}
 
 [[cp_stdio, doc_alias(warn), ATTR_LIBC_PRINTF(1, 0)]]
-[[requires_function(vwarnc), impl_include("<parts/errno.h>")]]
+[[requires_function(vwarnc), impl_include("<libc/errno.h>")]]
 void vwarn(char const *format, $va_list args) {
 	vwarnc(__libc_geterrno_or(0), format, args);
 }
@@ -111,7 +111,7 @@ void err(int status, char const *format, ...)
 	%{printf("verr")}
 
 [[doc_alias("err"), throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 0)]]
-[[requires_function(verrc), impl_include("<parts/errno.h>")]]
+[[requires_function(verrc), impl_include("<libc/errno.h>")]]
 void verr(int status, char const *format, $va_list args) {
 	verrc(status, __libc_geterrno_or(0), format, args);
 }

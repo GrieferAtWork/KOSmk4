@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa934fbf0 */
+/* HASH CRC-32:0x23ba059a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ struct hsearch_data {
 	__UINT32_TYPE__ filled;
 };
 #endif /* !__hsearch_data_defined */
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hdestroy_r) void

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd92d4f54 */
+/* HASH CRC-32:0x3d45600 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,9 +69,9 @@ __LOCAL_LIBC(_wcsupr_s_l) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsupr_s_l))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __locale_t __locale) {
 	__WCHAR_TYPE__ *__iter, __ch;
 	if (__buf == __NULLPTR)
-		return __EINVAL;
+		return 22;
 	if (__localdep_wcsnlen(__buf, __buflen) >= __buflen)
-		return __EINVAL;
+		return 22;
 	for (__iter = __buf; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = (__WCHAR_TYPE__)__localdep_towupper_l(__ch, __locale);
 	return 0;

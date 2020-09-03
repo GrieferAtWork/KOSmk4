@@ -352,7 +352,7 @@ double frexp(double x, [[nonnull]] int *pexponent) {
 
 @@X times (two to the EXP power)
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ldexp")]]
-[[impl_include("<parts/errno.h>", "<libm/finite.h>", "<libm/ldexp.h>")]]
+[[impl_include("<libc/errno.h>", "<libm/finite.h>", "<libm/ldexp.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1523,7 +1523,7 @@ double lgamma_r(double x, int *signgamp); /* TODO */
 @@Return X times (2 to the Nth power)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__scalb", "_scalb")]]
 [[impl_include("<libm/isnan.h>", "<libm/finite.h>", "<libm/isinf.h>")]]
-[[impl_include("<libm/matherr.h>", "<parts/errno.h>", "<libm/scalb.h>")]]
+[[impl_include("<libm/matherr.h>", "<libc/errno.h>", "<libm/scalb.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6dc178c */
+/* HASH CRC-32:0xbf59ad55 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,9 +66,9 @@ __LOCAL_LIBC(_strupr_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strupr_s))(char *__buf, __SIZE_TYPE__ __buflen) {
 	char *__iter, __ch;
 	if (__buf == __NULLPTR)
-		return __EINVAL;
+		return 22;
 	if (__localdep_strnlen(__buf, __buflen) >= __buflen)
-		return __EINVAL;
+		return 22;
 	for (__iter = __buf; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = __localdep_toupper(__ch);
 	return 0;

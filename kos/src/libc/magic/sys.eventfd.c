@@ -111,8 +111,8 @@ $fd_t eventfd(__STDC_UINT_AS_SIZE_T count,
               __STDC_INT_AS_UINT_T flags);
 
 @@Read event counter and possibly wait for events
-[[cp, userimpl, requires_function(read)]]
-[[decl_include("<bits/types.h>"), impl_include("<parts/errno.h>")]]
+[[cp, requires_function(read)]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 int eventfd_read($fd_t fd, eventfd_t *value) {
 	ssize_t error;
 	error = read(fd, value, sizeof(eventfd_t));
@@ -126,8 +126,8 @@ int eventfd_read($fd_t fd, eventfd_t *value) {
 }
 
 @@Increment event counter
-[[cp, userimpl, requires_function(write)]]
-[[decl_include("<bits/types.h>"), impl_include("<parts/errno.h>")]]
+[[cp, requires_function(write)]]
+[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 int eventfd_write($fd_t fd, eventfd_t value) {
 	ssize_t error;
 	error = write(fd, &value, sizeof(eventfd_t));

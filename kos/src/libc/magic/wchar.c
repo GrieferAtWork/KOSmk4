@@ -62,7 +62,7 @@ typedef size_t rsize_t;
 
 #ifdef __USE_DOS
 #include <bits/types.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
 
@@ -252,7 +252,7 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
 [[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("mbrtoc16")]]
 [[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$mbrtoc16")]]
 [[kos_export_as("mbrtoc32")]]
@@ -285,7 +285,7 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 
 [[std, wchar]]
 [[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("c16rtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("c32rtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("c16rtomb")]]
@@ -583,7 +583,7 @@ wint_t fputwc(wchar_t wc, [[nonnull]] FILE *stream);
 [[cp_stdio, std, guard, wchar, wunused, alias("fgetws_unlocked", "_fgetws_nolock")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetws_unlocked", "_fgetws_nolock")]]
 [[requires($has_function(fgetwc) && $has_function(ungetwc) && $has_function(ferror))]]
-[[impl_include("<parts/errno.h>", "<asm/crt/stdio.h>")]]
+[[impl_include("<libc/errno.h>", "<asm/crt/stdio.h>")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
@@ -1143,7 +1143,7 @@ $wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
 [[cp_stdio, wchar, dos_export_alias("_fgetws_nolock"), alias("fgetws")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.read")]]
 [[requires_function(fgetwc_unlocked, ungetwc_unlocked, ferror_unlocked)]]
-[[impl_include("<asm/crt/stdio.h>", "<parts/errno.h>")]]
+[[impl_include("<asm/crt/stdio.h>", "<libc/errno.h>")]]
 wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize,
                          [[nonnull]] $FILE *__restrict stream) {
 	$size_t n;

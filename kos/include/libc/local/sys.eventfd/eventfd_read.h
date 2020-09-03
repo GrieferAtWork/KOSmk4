@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35831519 */
+/* HASH CRC-32:0x826fab1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
 __NAMESPACE_LOCAL_END
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Read event counter and possibly wait for events */
 __LOCAL_LIBC(eventfd_read) int

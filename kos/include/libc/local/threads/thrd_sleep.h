@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7ab5179 */
+/* HASH CRC-32:0x94cfd49c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_thrd_sleep32,(struc
 #endif /* !__local___localdep_thrd_sleep32_defined && __CRT_HAVE_thrd_sleep */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING

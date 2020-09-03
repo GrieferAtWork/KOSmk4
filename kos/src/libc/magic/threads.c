@@ -207,7 +207,7 @@ typedef __cnd_t cnd_t;
 @@Create a new thread executing the function FUNC.  Arguments for FUNC
 @@are passed through ARG. If successful, THR is set to new thread identifier
 [[decl_include("<bits/crt/threads.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<parts/errno.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]
 [[requires_function(pthread_create)]]
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
 	$errno_t error;
@@ -241,7 +241,7 @@ thrd_t thrd_current() = pthread_self;
 [[cp, no_crt_self_import, decl_include("<bits/timespec.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep")]]
-[[impl_include("<asm/crt/threads.h>", "<parts/errno.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]
 [[userimpl, requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]]
 int thrd_sleep([[nonnull]] struct timespec const *time_point,
                [[nullable]] struct timespec *remaining) {
@@ -465,7 +465,7 @@ int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
 @@it, otherwise it returns immediately
 @@s.a. `pthread_mutex_trylock()'
 [[decl_include("<bits/crt/threads.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<parts/errno.h>")]]
+[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<libc/errno.h>")]]
 [[requires_function(pthread_mutex_trylock)]]
 int mtx_trylock([[nonnull]] mtx_t *__restrict mutex) {
 	$errno_t error;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86144830 */
+/* HASH CRC-32:0x7286285f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setaffinity,(__pid_t __pid, __SI
 #endif /* !__local___localdep_sched_setaffinity_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/sched.h>
-#include <parts/errno.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Restrict the calling thread to only run on the first `n' cpus
  * @return: EOK:    Success
