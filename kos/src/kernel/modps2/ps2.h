@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>  /* THROW() */
-#include <kernel/types.h>   /* jtime_t */
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */
 #include <sched/cpu.h>      /* jiffies */
 #include <sched/signal.h>   /* struct sig */

@@ -37,7 +37,6 @@
 
 #include <hybrid/__assert.h>
 
-#include <kos/jiffies.h>
 #include <stdbool.h>
 
 DECL_BEGIN

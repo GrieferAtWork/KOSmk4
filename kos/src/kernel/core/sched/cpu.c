@@ -37,7 +37,6 @@
 #include <hybrid/overflow.h>
 
 #include <bits/timespec.h>
-#include <kos/jiffies.h>
 #include <sys/wait.h>
 
 #include <assert.h>

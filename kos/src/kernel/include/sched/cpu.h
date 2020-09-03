@@ -28,7 +28,6 @@
 #include <hybrid/__bit.h>
 #include <hybrid/typecore.h>
 
-#include <kos/jiffies.h>
 #include <kos/kernel/types.h>
 #include <hybrid/__overflow.h>
 
@@ -89,7 +88,20 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef __jtime_t_defined
+#define __jtime_t_defined 1
+typedef __jtime_t jtime_t;
+#endif /* !__jtime_t_defined */
+
+#ifndef __quantum_diff_t_defined
+#define __quantum_diff_t_defined 1
+typedef __quantum_diff_t quantum_diff_t; /* Sub-quantum quantum_diff difference */
+#endif /* !__quantum_diff_t_defined */
+
+#ifndef __cpuid_t_defined
+#define __cpuid_t_defined 1
 typedef __UINTPTR_TYPE__ cpuid_t;
+#endif /* !__cpuid_t_defined */
 
 struct task;
 struct cpu {
@@ -146,9 +158,6 @@ DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset;
  * that need to pass before `thiscpu_jiffies' is incremented)
  * HINT: On x86, this the LAPIC reload value! */
 DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
-
-/* Returns the cpu-local quantum time. */
-FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void); /* TODO: Remove this function */
 
 
 /* Return the result of `((a * b) + c - 1) / c' */

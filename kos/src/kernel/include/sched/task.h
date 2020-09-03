@@ -28,7 +28,6 @@
 
 #include <hybrid/sequence/list.h>
 
-#include <kos/jiffies.h>
 #ifdef __cplusplus
 #include <asm/wait.h> /* `__W_EXITCODE()' */
 #include <bits/wait.h> /* `union wait' */
@@ -126,6 +125,7 @@ struct task {
 #endif /* !CONFIG_NO_SMP */
 		};
 	}               t_sched;
+	struct timespec t_ctime; /* [valid_if(TASK_FSTARTED)] Absolute `realtime()' of when the task was first started. */
 	/* per-task data goes here. */
 };
 

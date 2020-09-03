@@ -38,7 +38,6 @@
 #include <hybrid/overflow.h>
 #include <hybrid/typecore.h>
 
-#include <kos/jiffies.h>
 #include <sys/param.h> /* HZ */
 
 #include <assert.h>
@@ -1079,8 +1078,9 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 
 /* Add the given `elapsed' to the quantum counter of the calling CPU
  * While doing this, wake up all timeout-sleeping threads that have
- * a timeout greater than a qtime_t that uses `elapsed' as the number
- * of quantum units elapsed since the start of the current quantum.
+ * a timeout greater than a quantum time that uses `elapsed' as the
+ * number of quantum units elapsed since the start of the current
+ * quantum.
  * NOTE: This function does _not_ call `cpu_quantum_elapsed_nopr()'
  *       in order to determine the current time, but uses `elapsed'
  *       instead! */
@@ -1362,34 +1362,6 @@ NOTHROW(KCALL cpu_set_quantum_length)(quantum_diff_t cpu_qsize) {
 	FORCPU(me, thiscpu_last_qtime_q)   = 0;
 	FORCPU(me, thiscpu_jiffi_pending)  = false;
 	COMPILER_BARRIER();
-}
-
-
-
-
-/* Returns the cpu-local quantum time. */
-PUBLIC NOBLOCK WUNUSED qtime_t /* TODO: Remove this function */
-NOTHROW(KCALL cpu_quantum_time)(void) {
-	qtime_t result;
-	struct cpu *me;
-	pflag_t was;
-	quantum_diff_t elapsed;
-	was = PREEMPTION_PUSHOFF();
-	me             = THIS_CPU;
-	result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
-	result.q_qsize = FORCPU(me, thiscpu_quantum_length);
-	elapsed        = cpu_quantum_elapsed_nopr(me, &result.q_jtime);
-	PREEMPTION_POP(was);
-	if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
-		result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
-		result.q_qtime += elapsed;
-		result.q_qtime -= (quantum_diff_t)-1;
-	}
-	if (result.q_qtime >= result.q_qsize) {
-		result.q_jtime += result.q_qtime / result.q_qsize;
-		result.q_qtime = result.q_qtime % result.q_qsize;
-	}
-	return result;
 }
 
 

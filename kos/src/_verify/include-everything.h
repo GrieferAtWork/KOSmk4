@@ -743,7 +743,6 @@ incdir("", "../../include");
 #include <kos/ioctl/mouse.h>
 #include <kos/ioctl/tty.h>
 #include <kos/ioctl/video.h>
-#include <kos/jiffies.h>
 #include <kos/kernel/handle.h>
 #include <kos/kernel/syscalls.h>
 #include <kos/kernel/types.h>

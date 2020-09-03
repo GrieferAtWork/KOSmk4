@@ -45,7 +45,7 @@
 
 /* Check if a given physical address range is identity mapped. */
 #if 1 /* TODO: Add a configuration option for this.
-       * TODO: Must test the x86_64 kernel (once its working) with _and_ without the physical identity mapping! */
+       * TODO: Must test the x86_64 kernel with _and_ without the physical identity mapping! */
 
 /* First first half of the kernel address space is used as identity mapping
  * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
