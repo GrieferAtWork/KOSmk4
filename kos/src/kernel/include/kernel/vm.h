@@ -499,14 +499,14 @@ NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
                                  pagecnt_t num_pages, gfp_t flags);
 /* Free RAM allocated by `vm_do_allocram(_nx)'
  * NOTE: This function assumes that the allocated memory hasn't been used, yet. */
-FUNDEF NONNULL((1, 2)) NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_ccfreeram)(struct vm_ramblock *__restrict pblock0,
                                struct vm_ramblock *__restrict blocks);
-FUNDEF NONNULL((1, 2)) NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_ffreeram)(struct vm_ramblock *__restrict pblock0,
                               struct vm_ramblock *__restrict blocks,
                               bool is_zero);
-FUNDEF NONNULL((1, 2)) NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
                              struct vm_ramblock *__restrict blocks);
 
@@ -2692,7 +2692,7 @@ NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
  * NOTE: The caller must ensure that `lockcnt == return(vm_startdma*())', and
  *       that the specified `lockvec' is either the exact same `lockvec' originally
  *       passed to `vm_startdma*()', or an identical memory copy of it. */
-FUNDEF NONNULL((1)) NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL vm_stopdma)(struct vm_dmalock *__restrict lockvec, size_t lockcnt);
 
 struct path;

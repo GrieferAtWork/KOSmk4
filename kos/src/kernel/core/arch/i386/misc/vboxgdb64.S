@@ -157,7 +157,7 @@ PRIVATE_OBJECT(.Lsuffix)
 PRIVATE_CONST(.Lsuffix_len, . - .Lsuffix)
 END(.Lsuffix)
 
-/* PUBLIC NONNULL((1)) NOBLOCK void
+/* PUBLIC NOBLOCK NONNULL((1)) void
  * NOTHROW(FCALL vboxgdb_trap)(char const *__restrict name) */
 .section .text
 PUBLIC_FUNCTION(vboxgdb_trap)

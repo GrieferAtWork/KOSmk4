@@ -29,25 +29,31 @@
 #include <kernel/aio.h>
 #include <kernel/vm/phys.h>
 
+#include <inttypes.h>
+
 #if !defined(DEFINE_IO_READ) && !defined(DEFINE_IO_WRITE)
 #error "Must #define DEFINE_IO_READ or DEFINE_IO_WRITE"
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_WRITE)
 #error "Must not #define both DEFINE_IO_READ and DEFINE_IO_WRITE"
-#endif
+#endif /* ... */
 
 
 DECL_BEGIN
 
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
-#define DST_MEMSET(offset, byte, num_bytes) aio_pbuffer_memset(buf, offset, byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) \
+	aio_pbuffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_VECTOR)
-#define DST_MEMSET(offset, byte, num_bytes) aio_buffer_memset(buf, offset, byte, num_bytes)
+#define DST_MEMSET(offset, byte, num_bytes) \
+	aio_buffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
-#define DST_MEMSET(offset, byte, num_bytes) vm_memsetphys((buf) + (offset), byte, num_bytes)
-#else
-#define DST_MEMSET(offset, byte, num_bytes) memset((byte_t *)(buf) + (offset), byte, num_bytes)
-#endif
+#define DST_MEMSET(offset, byte, num_bytes) \
+	vm_memsetphys((buf) + (offset), byte, num_bytes)
+#else /* ... */
+#define DST_MEMSET(offset, byte, num_bytes) \
+	memset((byte_t *)(buf) + (offset), byte, num_bytes)
+#endif /* !... */
 #endif /* DEFINE_IO_READ */
 
 
@@ -55,63 +61,71 @@ DECL_BEGIN
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_readv_phys), (*(self)->bd_type.dt_readv_phys)(self, buf, total_sectors, device_lba, aio))
+	(assert((self)->bd_type.dt_readv_phys),                  \
+	 (*(self)->bd_type.dt_readv_phys)(self, buf, total_sectors, device_lba, aio))
 #elif defined(DEFINE_IO_VECTOR)
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_readv), (*(self)->bd_type.dt_readv)(self, buf, total_sectors, device_lba, aio))
+	(assert((self)->bd_type.dt_readv),                       \
+	 (*(self)->bd_type.dt_readv)(self, buf, total_sectors, device_lba, aio))
 #elif defined(DEFINE_IO_PHYS)
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_read_phys), (*(self)->bd_type.dt_read_phys)(self, buf, total_sectors, device_lba, aio))
-#else
+	(assert((self)->bd_type.dt_read_phys),                   \
+	 (*(self)->bd_type.dt_read_phys)(self, buf, total_sectors, device_lba, aio))
+#else /* ... */
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_read), (*(self)->bd_type.dt_read)(self, buf, total_sectors, device_lba, aio))
-#endif
-#else /* DEFINE_IO_READ */
+	(assert((self)->bd_type.dt_read),                        \
+	 (*(self)->bd_type.dt_read)(self, buf, total_sectors, device_lba, aio))
+#endif /* !... */
+#else  /* DEFINE_IO_READ */
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_writev_phys), (*(self)->bd_type.dt_writev_phys)(self, buf, total_sectors, device_lba, aio))
+	(assert((self)->bd_type.dt_writev_phys),                 \
+	 (*(self)->bd_type.dt_writev_phys)(self, buf, total_sectors, device_lba, aio))
 #elif defined(DEFINE_IO_VECTOR)
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_writev), (*(self)->bd_type.dt_writev)(self, buf, total_sectors, device_lba, aio))
+	(assert((self)->bd_type.dt_writev),                      \
+	 (*(self)->bd_type.dt_writev)(self, buf, total_sectors, device_lba, aio))
 #elif defined(DEFINE_IO_PHYS)
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_write_phys), (*(self)->bd_type.dt_write_phys)(self, buf, total_sectors, device_lba, aio))
-#else
+	(assert((self)->bd_type.dt_write_phys),                  \
+	 (*(self)->bd_type.dt_write_phys)(self, buf, total_sectors, device_lba, aio))
+#else /* ... */
 #define INVOKE_IO(self, buf, total_sectors, device_lba, aio) \
-	(assert((self)->bd_type.dt_write), (*(self)->bd_type.dt_write)(self, buf, total_sectors, device_lba, aio))
-#endif
+	(assert((self)->bd_type.dt_write),                       \
+	 (*(self)->bd_type.dt_write)(self, buf, total_sectors, device_lba, aio))
+#endif /* !... */
 #endif /* !DEFINE_IO_READ */
 
 
 #ifdef DEFINE_IO_READ
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_readv_phys(self, dst, num_bytes, device_position)
+	block_device_readv_phys(self, dst, num_bytes, device_position)
 #elif defined(DEFINE_IO_VECTOR)
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_readv(self, dst, num_bytes, device_position)
+	block_device_readv(self, dst, num_bytes, device_position)
 #elif defined(DEFINE_IO_PHYS)
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_read_phys(self, dst, num_bytes, device_position)
-#else
+	block_device_read_phys(self, dst, num_bytes, device_position)
+#else /* ... */
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_read(self, dst, num_bytes, device_position)
-#endif
-#else
+	block_device_read(self, dst, num_bytes, device_position)
+#endif /* !... */
+#else /* DEFINE_IO_READ */
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_writev_phys(self, dst, num_bytes, device_position)
+	block_device_writev_phys(self, dst, num_bytes, device_position)
 #elif defined(DEFINE_IO_VECTOR)
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_writev(self, dst, num_bytes, device_position)
+	block_device_writev(self, dst, num_bytes, device_position)
 #elif defined(DEFINE_IO_PHYS)
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_write_phys(self, dst, num_bytes, device_position)
-#else
+	block_device_write_phys(self, dst, num_bytes, device_position)
+#else /* ... */
 #define INVOKE_BUFFERED_IO(self, dst, num_bytes, device_position) \
-        block_device_write(self, dst, num_bytes, device_position)
-#endif
-#endif
+	block_device_write(self, dst, num_bytes, device_position)
+#endif /* !... */
+#endif /* !DEFINE_IO_READ */
 
 
 
@@ -137,12 +151,12 @@ PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self,
                                                vm_phys_t buf, size_t num_sectors, lba_t addr,
                                                /*out*/ struct aio_handle *__restrict aio)
-#else
+#else /* ... */
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_sector)(struct block_device *__restrict self,
                                           USER CHECKED void *buf, size_t num_sectors,
                                           lba_t addr, /*out*/ struct aio_handle *__restrict aio)
-#endif
+#endif /* !... */
 #else /* DEFINE_IO_SECTOR */
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
@@ -162,13 +176,13 @@ NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self,
                                         vm_phys_t buf, size_t num_bytes,
                                         pos_t device_position,
                                         /*out*/ struct aio_handle *__restrict aio)
-#else
+#else /* ... */
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread)(struct block_device *__restrict self,
                                    USER CHECKED void *buf, size_t num_bytes,
                                    pos_t device_position,
                                    /*out*/ struct aio_handle *__restrict aio)
-#endif
+#endif /* !... */
 #endif /* !DEFINE_IO_SECTOR */
 #elif defined(DEFINE_IO_WRITE)
 #ifdef DEFINE_IO_SECTOR
@@ -189,12 +203,12 @@ PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self,
                                                 vm_phys_t buf, size_t num_sectors,
                                                 lba_t addr, /*out*/ struct aio_handle *__restrict aio)
-#else
+#else /* ... */
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_sector)(struct block_device *__restrict self,
                                            USER CHECKED void const *buf, size_t num_sectors,
                                            lba_t addr, /*out*/ struct aio_handle *__restrict aio)
-#endif
+#endif /* !... */
 #else /* DEFINE_IO_SECTOR */
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
@@ -214,40 +228,46 @@ NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self,
                                          vm_phys_t buf, size_t num_bytes,
                                          pos_t device_position,
                                          /*out*/ struct aio_handle *__restrict aio)
-#else
+#else /* ... */
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
                                     USER CHECKED void const *buf, size_t num_bytes,
                                     pos_t device_position,
                                     /*out*/ struct aio_handle *__restrict aio)
-#endif
+#endif /* !... */
 #endif /* !DEFINE_IO_SECTOR */
-#endif
+#endif /* ... */
 
 #ifdef DEFINE_IO_READ
 		THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...)
 #elif defined(DEFINE_IO_WRITE)
 		THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...)
-#endif
+#endif /* ... */
 {
 #ifdef DEFINE_IO_SECTOR
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 	assertf(aio_pbuffer_size(buf) == num_sectors * self->bd_sector_size,
-	        "aio_pbuffer_size(buf)              = %Iu\n"
-	        "num_sectors                        = %Iu\n"
-	        "self->bd_sector_size               = %Iu\n"
-	        "num_sectors * self->bd_sector_size = %Iu\n",
-	        (size_t)aio_pbuffer_size(buf), (size_t)num_sectors, (size_t)self->bd_sector_size, (size_t)(num_sectors * self->bd_sector_size));
-#else
+	        "aio_pbuffer_size(buf)              = %" PRIuSIZ "\n"
+	        "num_sectors                        = %" PRIuSIZ "\n"
+	        "self->bd_sector_size               = %" PRIuSIZ "\n"
+	        "num_sectors * self->bd_sector_size = %" PRIuSIZ "\n",
+	        (size_t)aio_pbuffer_size(buf),
+	        (size_t)num_sectors,
+	        (size_t)self->bd_sector_size,
+	        (size_t)(num_sectors * self->bd_sector_size));
+#else /* DEFINE_IO_PHYS */
 	assertf(aio_buffer_size(buf) == num_sectors * self->bd_sector_size,
-	        "aio_buffer_size(buf)               = %Iu\n"
-	        "num_sectors                        = %Iu\n"
-	        "self->bd_sector_size               = %Iu\n"
-	        "num_sectors * self->bd_sector_size = %Iu\n",
-	        (size_t)aio_buffer_size(buf), (size_t)num_sectors, (size_t)self->bd_sector_size, (size_t)(num_sectors * self->bd_sector_size));
-#endif
-#endif
+	        "aio_buffer_size(buf)               = %" PRIuSIZ "\n"
+	        "num_sectors                        = %" PRIuSIZ "\n"
+	        "self->bd_sector_size               = %" PRIuSIZ "\n"
+	        "num_sectors * self->bd_sector_size = %" PRIuSIZ "\n",
+	        (size_t)aio_buffer_size(buf),
+	        (size_t)num_sectors,
+	        (size_t)self->bd_sector_size,
+	        (size_t)(num_sectors * self->bd_sector_size));
+#endif /* !DEFINE_IO_PHYS */
+#endif /* DEFINE_IO_VECTOR */
 	{
 		lba_t end_addr;
 		if unlikely(!num_sectors)
@@ -315,13 +335,13 @@ done_success:
 	        "aio_pbuffer_size(buf) = %Iu\n"
 	        "num_bytes             = %Iu\n",
 	        (size_t)aio_pbuffer_size(buf), (size_t)num_bytes);
-#else
+#else /* DEFINE_IO_PHYS */
 	assertf(aio_buffer_size(buf) == num_bytes,
 	        "aio_buffer_size(buf) = %Iu\n"
 	        "num_bytes            = %Iu\n",
 	        (size_t)aio_buffer_size(buf), (size_t)num_bytes);
-#endif
-#endif
+#endif /* !DEFINE_IO_PHYS */
+#endif /* !DEFINE_IO_VECTOR */
 	if unlikely(!num_bytes)
 		goto done_success;
 	TRY {
@@ -370,7 +390,7 @@ done_success:
 			/* Also check the drive master for being read-only. */
 			if unlikely(self->bd_flags & BLOCK_DEVICE_FLAG_READONLY)
 				THROW(E_IOERROR_READONLY, (uintptr_t)E_IOERROR_SUBSYSTEM_HARDDISK);
-#endif
+#endif /* DEFINE_IO_WRITE */
 		}
 		assert(self->bd_type.dt_write);
 		assert(self->bd_type.dt_write_phys);
@@ -392,49 +412,49 @@ done_success:
 #ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
 			aio_pbuffer_init_view_before(&view, buf, unaligned_head);
-#else
+#else /* DEFINE_IO_PHYS */
 			struct aio_buffer view;
 			aio_buffer_init_view_before(&view, buf, unaligned_head);
-#endif
+#endif /* !DEFINE_IO_PHYS */
 			INVOKE_BUFFERED_IO(self, &view, unaligned_head, device_position);
-#else
+#else /* DEFINE_IO_VECTOR */
 			INVOKE_BUFFERED_IO(self, buf, unaligned_head, device_position);
-#endif
+#endif /* !DEFINE_IO_VECTOR */
 		}
 		if (unaligned_tail) {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
 			aio_pbuffer_init_view_after(&view, buf, num_bytes - unaligned_tail);
-#else
+#else /* DEFINE_IO_PHYS */
 			struct aio_buffer view;
 			aio_buffer_init_view_after(&view, buf, num_bytes - unaligned_tail);
-#endif
+#endif /* !DEFINE_IO_PHYS */
 			INVOKE_BUFFERED_IO(self, &view, unaligned_tail,
 			                   (device_position + (pos_t)num_bytes) - (pos_t)unaligned_tail);
 #elif defined(DEFINE_IO_PHYS)
 			INVOKE_BUFFERED_IO(self, buf + num_bytes - unaligned_tail, unaligned_tail,
 			                   (device_position + (pos_t)num_bytes) - (pos_t)unaligned_tail);
-#else
+#else /* ... */
 			INVOKE_BUFFERED_IO(self, (byte_t *)buf + num_bytes - unaligned_tail, unaligned_tail,
 			                   (device_position + (pos_t)num_bytes) - (pos_t)unaligned_tail);
-#endif
+#endif /* !... */
 		}
 		if (total_sectors) {
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
 			aio_pbuffer_init_view(&view, buf, unaligned_head, total_sectors * self->bd_sector_size);
-#else
+#else /* DEFINE_IO_PHYS */
 			struct aio_buffer view;
 			aio_buffer_init_view(&view, buf, unaligned_head, total_sectors * self->bd_sector_size);
-#endif
+#endif /* !DEFINE_IO_PHYS */
 			INVOKE_IO(self, &view, total_sectors, device_lba, aio);
 #elif defined(DEFINE_IO_PHYS)
 			INVOKE_IO(self, buf + unaligned_head, total_sectors, device_lba, aio);
-#else
+#else /* ... */
 			INVOKE_IO(self, (byte_t *)buf + unaligned_head, total_sectors, device_lba, aio);
-#endif
+#endif /* !... */
 		} else {
 			/* All IO had to be performed synchronously. - Signal success to the AIO handle. */
 			goto done_success;
@@ -467,11 +487,11 @@ PUBLIC NONNULL((1)) void
 (KCALL _block_device_read_phys_sync)(struct block_device *__restrict self,
                                      vm_phys_t buf, size_t num_bytes,
                                      pos_t device_position)
-#else
+#else /* ... */
 (KCALL _block_device_read_sync)(struct block_device *__restrict self,
                                 USER CHECKED void *buf, size_t num_bytes,
                                 pos_t device_position)
-#endif
+#endif /* !... */
 #else /* DEFINE_IO_READ */
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 (KCALL _block_device_writev_phys_sync)(struct block_device *__restrict self,
@@ -485,11 +505,11 @@ PUBLIC NONNULL((1)) void
 (KCALL _block_device_write_phys_sync)(struct block_device *__restrict self,
                                       vm_phys_t buf, size_t num_bytes,
                                       pos_t device_position)
-#else
+#else /* ... */
 (KCALL _block_device_write_sync)(struct block_device *__restrict self,
                                  USER CHECKED void const *buf,
                                  size_t num_bytes, pos_t device_position)
-#endif
+#endif /* !... */
 #endif /* !DEFINE_IO_READ */
 #ifdef DEFINE_IO_READ
 #ifdef DEFINE_IO_PHYS
@@ -514,9 +534,9 @@ PUBLIC NONNULL((1)) void
 	_block_device_areadv(self, buf, num_bytes, device_position, &hand);
 #elif defined(DEFINE_IO_PHYS)
 	_block_device_aread_phys(self, buf, num_bytes, device_position, &hand);
-#else
+#else /* ... */
 	_block_device_aread(self, buf, num_bytes, device_position, &hand);
-#endif
+#endif /* !... */
 #else /* DEFINE_IO_READ */
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 	_block_device_awritev_phys(self, buf, num_bytes, device_position, &hand);
@@ -524,9 +544,9 @@ PUBLIC NONNULL((1)) void
 	_block_device_awritev(self, buf, num_bytes, device_position, &hand);
 #elif defined(DEFINE_IO_PHYS)
 	_block_device_awrite_phys(self, buf, num_bytes, device_position, &hand);
-#else
+#else /* ... */
 	_block_device_awrite(self, buf, num_bytes, device_position, &hand);
-#endif
+#endif /* !... */
 #endif /* !DEFINE_IO_READ */
 	TRY {
 		aio_handle_generic_waitfor(&hand);
@@ -537,7 +557,7 @@ PUBLIC NONNULL((1)) void
 	}
 	aio_handle_generic_fini(&hand);
 }
-#endif
+#endif /* !DEFINE_IO_SECTOR */
 
 
 #undef DST_MEMSET

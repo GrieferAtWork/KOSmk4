@@ -161,7 +161,7 @@ PUBLIC struct cred cred_kernel = {
 PUBLIC ATTR_PERTASK REF struct cred *this_cred = NULL;
 
 DEFINE_PERTASK_FINI(fini_this_cred);
-PRIVATE ATTR_USED NONNULL((1)) NOBLOCK void
+PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fini_this_cred)(struct task *__restrict self) {
 	xdecref(FORTASK(self, this_cred));
 }

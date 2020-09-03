@@ -650,7 +650,7 @@ print "#endif /" "* HEAP_ALIGNMENT == ... *" "/";
 
 DECL_BEGIN
 
-PUBLIC NONNULL((1)) NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 	struct slab *self;
 	assert(KERNEL_SLAB_CHECKPTR(ptr));
@@ -675,7 +675,7 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 }
 
 
-PUBLIC NONNULL((1)) NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 	struct slab *self;
 	assert(KERNEL_SLAB_CHECKPTR(ptr));

@@ -54,7 +54,7 @@ DECL_BEGIN
  * execution should be resumed.
  * This function returns once vboxgdb tells it to do so.
  * @param: name: The name of the trap. (one of `VBOXGDB_TRAP_*') */
-FUNDEF NONNULL((1)) NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL vboxgdb_trap)(char const *__restrict name);
 
 #else /* CONFIG_VBOXGDB */

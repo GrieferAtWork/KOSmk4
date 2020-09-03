@@ -29,6 +29,7 @@
 #define __SIZEOF_VM_SPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
 #define __SIZEOF_PAGEPTR_T__    __SIZEOF_POINTER__
 #define __SIZEOF_VM_PHYS_T__    8
+#define __ALIGNOF_VM_PHYS_T__   __ALIGNOF_INT64__
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -952,7 +952,7 @@ DECL_BEGIN
 
 /* Free RAM allocated by `vm_do_allocram(_nx)'
  * NOTE: This function assumes that the allocated memory hasn't been used, yet. */
-PUBLIC NONNULL((1, 2)) NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_ccfreeram)(struct vm_ramblock *__restrict pblock0,
                                struct vm_ramblock *__restrict blocks) {
 	if (blocks == pblock0) {
@@ -968,7 +968,7 @@ NOTHROW(KCALL vm_do_ccfreeram)(struct vm_ramblock *__restrict pblock0,
 	}
 }
 
-PUBLIC NONNULL((1, 2)) NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_ffreeram)(struct vm_ramblock *__restrict pblock0,
                               struct vm_ramblock *__restrict blocks,
                               bool is_zero) {
@@ -987,7 +987,7 @@ NOTHROW(KCALL vm_do_ffreeram)(struct vm_ramblock *__restrict pblock0,
 	}
 }
 
-PUBLIC NONNULL((1, 2)) NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
                              struct vm_ramblock *__restrict blocks) {
 	if (blocks == pblock0) {

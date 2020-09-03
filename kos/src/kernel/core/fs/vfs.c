@@ -2225,7 +2225,7 @@ NOTHROW(KCALL fs_destroy)(struct fs *__restrict self) {
 PUBLIC ATTR_PERTASK REF struct fs *this_fs = NULL;
 
 DEFINE_PERTASK_FINI(fini_this_fs);
-INTERN NONNULL((1)) NOBLOCK void
+INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fini_this_fs)(struct task *__restrict self) {
 	xdecref(FORTASK(self, this_fs));
 }
