@@ -1508,6 +1508,22 @@ template<> struct __hybrid_int128_isunsigned<unsigned long> { enum { __val = tru
 template<> struct __hybrid_int128_issigned<__LONGLONG> { enum { __val = true }; };
 template<> struct __hybrid_int128_isunsigned<__ULONGLONG> { enum { __val = true }; };
 #endif /* __COMPILER_HAVE_LONGLONG */
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+template<> struct __hybrid_int128_issigned<__int8> { enum { __val = true }; };
+template<> struct __hybrid_int128_isunsigned<unsigned __int8> { enum { __val = true }; };
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+template<> struct __hybrid_int128_issigned<__int16> { enum { __val = true }; };
+template<> struct __hybrid_int128_isunsigned<unsigned __int16> { enum { __val = true }; };
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+template<> struct __hybrid_int128_issigned<__int32> { enum { __val = true }; };
+template<> struct __hybrid_int128_isunsigned<unsigned __int32> { enum { __val = true }; };
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+template<> struct __hybrid_int128_issigned<__int64> { enum { __val = true }; };
+template<> struct __hybrid_int128_isunsigned<unsigned __int64> { enum { __val = true }; };
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 template<bool __V, class __T> struct __hybrid_int128_enableif { typedef __T __type; };
 template<class __T> struct __hybrid_int128_enableif<false, __T> {};
 __NAMESPACE_INT_END

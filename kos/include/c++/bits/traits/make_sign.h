@@ -62,6 +62,22 @@ template<> struct __make_signed<char32_t> { typedef __INT_LEAST32_TYPE__ type; }
 template<> struct __make_signed<__ULONGLONG> { typedef __LONGLONG type; };
 template<> struct __make_unsigned<__LONGLONG> { typedef __ULONGLONG type; };
 #endif /* __COMPILER_HAVE_LONGLONG */
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+template<> struct __make_signed<unsigned __int8> { typedef __int8 type; };
+template<> struct __make_unsigned<__int8> { typedef unsigned __int8 type; };
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+template<> struct __make_signed<unsigned __int16> { typedef __int16 type; };
+template<> struct __make_unsigned<__int16> { typedef unsigned __int16 type; };
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+template<> struct __make_signed<unsigned __int32> { typedef __int32 type; };
+template<> struct __make_unsigned<__int32> { typedef unsigned __int32 type; };
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+template<> struct __make_signed<unsigned __int64> { typedef __int64 type; };
+template<> struct __make_unsigned<__int64> { typedef unsigned __int64 type; };
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 template<class __T, bool __IsInt, bool __IsEnum> struct __make_signed_sel {};
 template<class __T, bool __IsInt, bool __IsEnum> struct __make_unsigned_sel {};
 template<class __T> struct __make_signed_sel<__T, true, false>

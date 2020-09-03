@@ -80,10 +80,22 @@ public:
 	__CXX_CLASSMEMBER explicit __hybrid_ptr(long long __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
 	__CXX_CLASSMEMBER explicit __hybrid_ptr(unsigned long long __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
 #endif /* __COMPILER_HAVE_LONGLONG */
-	/* TODO: __COMPILER_INT8_IS_UNIQUE_TYPE */
-	/* TODO: __COMPILER_INT16_IS_UNIQUE_TYPE */
-	/* TODO: __COMPILER_INT32_IS_UNIQUE_TYPE */
-	/* TODO: __COMPILER_INT64_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(__int8 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(unsigned __int8 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(__int16 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(unsigned __int16 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(__int32 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(unsigned __int32 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(__int64 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+	__CXX_CLASSMEMBER explicit __hybrid_ptr(unsigned __int64 __val) __CXX_NOEXCEPT: __m_ptr((__I)__val) {}
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
 	/* Convert to integer (explicit) */
 	__CXX_CLASSMEMBER explicit operator signed char() const __CXX_NOEXCEPT { return (signed char)__m_ptr; }
@@ -98,6 +110,22 @@ public:
 	__CXX_CLASSMEMBER explicit operator long long() const __CXX_NOEXCEPT { return (long long)__m_ptr; }
 	__CXX_CLASSMEMBER explicit operator unsigned long long() const __CXX_NOEXCEPT { return (unsigned long long)__m_ptr; }
 #endif /* __COMPILER_HAVE_LONGLONG */
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit operator __int8() const __CXX_NOEXCEPT { return (__int8)__m_ptr; }
+	__CXX_CLASSMEMBER explicit operator unsigned __int8() const __CXX_NOEXCEPT { return (unsigned __int8)__m_ptr; }
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit operator __int16() const __CXX_NOEXCEPT { return (__int16)__m_ptr; }
+	__CXX_CLASSMEMBER explicit operator unsigned __int16() const __CXX_NOEXCEPT { return (unsigned __int16)__m_ptr; }
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit operator __int32() const __CXX_NOEXCEPT { return (__int32)__m_ptr; }
+	__CXX_CLASSMEMBER explicit operator unsigned __int32() const __CXX_NOEXCEPT { return (unsigned __int32)__m_ptr; }
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+	__CXX_CLASSMEMBER explicit operator __int64() const __CXX_NOEXCEPT { return (__int64)__m_ptr; }
+	__CXX_CLASSMEMBER explicit operator unsigned __int64() const __CXX_NOEXCEPT { return (unsigned __int64)__m_ptr; }
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
 	/* Convert to normal pointer (explicit when casting away const/volatile) */
 	__CXX_CLASSMEMBER operator __PTR_T __POINTER_CXX_CV_QUAL *() const __CXX_NOEXCEPT { return (__PTR_T __POINTER_CXX_CV_QUAL *)(__UINTPTR_TYPE__)__m_ptr; }

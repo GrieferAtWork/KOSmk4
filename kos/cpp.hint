@@ -707,6 +707,10 @@
 #define DLIST_FOREACH_P(elem,l,getpath) for(;;)
 #define DLIST_RFOREACH(elem,l,key) for(;;)
 #define DLIST_RFOREACH_P(elem,l,getpath) for(;;)
+#define AIO_BUFFER_FOREACH(ent,self) for(;;)
+#define AIO_BUFFER_FOREACH_N(ent,self) for(;;)
+#define AIO_PBUFFER_FOREACH(ent,self) for(;;)
+#define AIO_PBUFFER_FOREACH_N(ent,self) for(;;)
 
 #define __SOCKADDR_COMMON(x) sa_family_t x##family
 
