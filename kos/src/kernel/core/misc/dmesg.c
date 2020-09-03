@@ -52,14 +52,21 @@ DECL_BEGIN
  *   [0xc0 | b]            Seconds since `dmesg_secondsbase' + (b << 6)
  *   [0xc0 | c]            Seconds since `dmesg_secondsbase' + (c << 12)
  *   [0xc0 | ...]          Seconds since `dmesg_secondsbase' + (... << (6 * X))
- *    0x80 | x             Seconds since `dmesg_secondsbase' + (x << (6 * Y))
+ *    0x80 | neg*0x20 | x  Seconds since `dmesg_secondsbase' + (x << (6 * Y))
  *    0x80 | nano0         Nano seconds
  *    0x80 | nano1         Nano seconds
  *    0x80 | nano2         Nano seconds
  *    0x80 | nano3         Nano seconds
  *    0x80 | level_nano4   Nano seconds and level
  *    message...           The log message (in ASCII and without trailing line-feeds)
- *    0x00                 NUL packet terminator (you )
+ *    message_chksum       Checksum for `message' (never 0):
+ *                         >> if (message_chksum != 0xff) {
+ *                         >>     ok = (u8)(sum(message.bytes) + message_chksum) == 0;
+ *                         >> } else {
+ *                         >>     u8 temp = (u8)sum(message.bytes);
+ *                         >>     ok = temp == 0 || temp == 1;
+ *                         >> }
+ *    0x00                 NUL packet terminator
  * >> // 30-bit nano second timer
  * >> nano = ((nano0 & 0x7f)) | ((nano1 & 0x7f) << 7) |
  * >>        ((nano2 & 0x7f) << 14) | ((nano3 & 0x7f) << 21) |
@@ -115,7 +122,9 @@ again:
 	offset_from_end     = 0;
 	oldest_packet_start = (size_t)-1;
 	offset_from_start   = total_size;
-#define getb() (++offset_from_end, --offset_from_start, dmesg_buffer[offset_from_start % CONFIG_DMESG_BUFFER_SIZE])
+#define getb()                               \
+	(++offset_from_end, --offset_from_start, \
+	 dmesg_buffer[offset_from_start % CONFIG_DMESG_BUFFER_SIZE])
 	while (offset_from_end < CONFIG_DMESG_BUFFER_SIZE) {
 		byte_t b = getb();
 		if (b != 0)
@@ -354,7 +363,9 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 	}
 	limit += offset;
 	message_end_offset = ATOMIC_READ(dmesg_size);
-#define getb() (++offset_from_end, --message_end_offset, dmesg_buffer[message_end_offset % CONFIG_DMESG_BUFFER_SIZE])
+#define getb()                                \
+	(++offset_from_end, --message_end_offset, \
+	 dmesg_buffer[message_end_offset % CONFIG_DMESG_BUFFER_SIZE])
 	temp = getb(); /* NUL-temrinator */
 	if (temp != 0)
 		goto done; /* Missing NUL packet-terminator. */
@@ -364,7 +375,9 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 			goto done;
 #undef getb
 		packet_start_offset = message_end_offset;
-#define getb() (++offset_from_end, --packet_start_offset, dmesg_buffer[packet_start_offset % CONFIG_DMESG_BUFFER_SIZE])
+#define getb()                                 \
+	(++offset_from_end, --packet_start_offset, \
+	 dmesg_buffer[packet_start_offset % CONFIG_DMESG_BUFFER_SIZE])
 		for (;;) {
 			byte_t b;
 			b = getb();

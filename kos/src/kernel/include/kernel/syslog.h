@@ -63,10 +63,10 @@ DECL_BEGIN
 #endif /* !SYSLOG_SINK_DEFAULT_LEVELS */
 
 
-#define OFFSET_SYSLOG_PACKET_TIME  0
-#define OFFSET_SYSLOG_PACKET_NSEC  8
-#define OFFSET_SYSLOG_PACKET_LEN   12
-#define OFFSET_SYSLOG_PACKET_MSG   14
+#define OFFSET_SYSLOG_PACKET_TIME 0
+#define OFFSET_SYSLOG_PACKET_NSEC 8
+#define OFFSET_SYSLOG_PACKET_LEN  12
+#define OFFSET_SYSLOG_PACKET_MSG  14
 #ifdef __CC__
 
 struct syslog_packet {
@@ -127,12 +127,12 @@ FUNDEF NOBLOCK void
 NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict self,
                                        unsigned int level);
 
-/* pformatprinter-compatible syslog printer, where `level' is `(void *)SYSLOG_LEVEL_*'
+/* pformatprinter-compatible syslog printer, where `level' is `SYSLOG_LEVEL_*'
  * Writing text using this function will append to an internal buffer for the
- * given `level'. If this buffer overflows, it will be broadcast and reset the same
- * way it would be when being committed (using `\n'). The size of said buffer is an
- * implementation detail and should be sufficiently large such that users of this
- * function need not worry about its actual value.
+ * given `level'. If this buffer overflows, it will be broadcast and reset the
+ * same way it would be when being committed (using `\n'). The size of said buffer
+ * is an implementation detail and should be sufficiently large such that users
+ * of this function need not worry about its actual value.
  * Additionally the following control characters are recognized:
  *   - `\r': Clear the internal buffer for `level' (if not immediately followed by `\n')
  *   - `\n': Broadcast the contents of the internal buffer as a syslog

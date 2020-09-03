@@ -502,7 +502,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     $ xinit /bin/twm -- -dumbSched
 	 *
 	 * Current Blocker:
-	 *     twm exists, saying it's lost the server connection once a key is pressed
+	 *     twm exits, saying it's lost the server connection once a key is pressed
 	 *     following its startup, after which one gets dropped back to the text-mode
 	 *     shell.
 	 *     Looking at the logs, this seems to be the result of an X client timeout,

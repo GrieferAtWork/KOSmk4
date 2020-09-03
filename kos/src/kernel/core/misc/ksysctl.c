@@ -147,7 +147,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		unsigned int insmod_flags;
 		STATIC_ASSERT(KSYSCTL_DRIVER_INSMOD_FNORMAL == DRIVER_INSMOD_FLAG_NORMAL);
 		STATIC_ASSERT(KSYSCTL_DRIVER_INSMOD_FNOINIT == DRIVER_INSMOD_FLAG_NOINIT);
-		validate_writable(arg, sizeof(struct ksysctl_driver_insmod));
+		validate_readwrite(arg, sizeof(struct ksysctl_driver_insmod));
 		data        = (struct ksysctl_driver_insmod *)arg;
 		struct_size = ATOMIC_READ(data->im_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_insmod))
@@ -244,7 +244,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_SUCCESS);
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_UNKNOWN);
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_INUSE);
-		validate_writable(arg, sizeof(struct ksysctl_driver_delmod));
+		validate_readwrite(arg, sizeof(struct ksysctl_driver_delmod));
 		data        = (struct ksysctl_driver_delmod *)arg;
 		struct_size = ATOMIC_READ(data->dm_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_delmod))
@@ -287,7 +287,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		size_t struct_size;
 		u16 format;
 		REF struct driver *drv;
-		validate_writable(arg, sizeof(struct ksysctl_driver_getmod));
+		validate_readwrite(arg, sizeof(struct ksysctl_driver_getmod));
 		data        = (struct ksysctl_driver_getmod *)arg;
 		struct_size = ATOMIC_READ(data->gm_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_getmod))
@@ -347,7 +347,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		size_t struct_size, bufsize, reqsize;
 		USER UNCHECKED char *buffer;
 		REF struct driver_library_path_string *libpath;
-		validate_writable(arg, sizeof(struct ksysctl_driver_get_library_path));
+		validate_readwrite(arg, sizeof(struct ksysctl_driver_get_library_path));
 		data        = (struct ksysctl_driver_get_library_path *)arg;
 		struct_size = ATOMIC_READ(data->glp_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_get_library_path))
@@ -390,7 +390,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		USER UNCHECKED char const *oldpath, *newpath;
 		REF struct driver_library_path_string *newpath_string;
 		size_t struct_size;
-		validate_writable(arg, sizeof(struct ksysctl_driver_set_library_path));
+		validate_readwrite(arg, sizeof(struct ksysctl_driver_set_library_path));
 		data        = (struct ksysctl_driver_set_library_path *)arg;
 		struct_size = ATOMIC_READ(data->slp_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_set_library_path))

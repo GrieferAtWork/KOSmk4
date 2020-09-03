@@ -170,7 +170,7 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 	unsigned int result_fd;
 	avail_addr_len = 0;
 	if (addr_len) {
-		validate_writable(addr_len, sizeof(*addr_len));
+		validate_readwrite(addr_len, sizeof(*addr_len));
 		COMPILER_READ_BARRIER();
 		avail_addr_len = *addr_len;
 		COMPILER_READ_BARRIER();
@@ -226,7 +226,7 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 	                 E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS);
 	avail_addr_len = 0;
 	if (addr_len) {
-		validate_writable(addr_len, sizeof(*addr_len));
+		validate_readwrite(addr_len, sizeof(*addr_len));
 		COMPILER_READ_BARRIER();
 		avail_addr_len = *addr_len;
 		COMPILER_READ_BARRIER();
@@ -289,7 +289,7 @@ DEFINE_SYSCALL5(errno_t, getsockopt, fd_t, sockfd,
                 USER UNCHECKED socklen_t *, optlen) {
 	REF struct handle sock;
 	socklen_t avail_optlen, req_optlen;
-	validate_writable(optlen, sizeof(*optlen));
+	validate_readwrite(optlen, sizeof(*optlen));
 	COMPILER_READ_BARRIER();
 	avail_optlen = *optlen;
 	COMPILER_READ_BARRIER();
@@ -356,7 +356,7 @@ DEFINE_SYSCALL3(errno_t, getsockname, fd_t, sockfd,
                 USER UNCHECKED socklen_t *, addr_len) {
 	socklen_t req_addr_len, avail_addr_len;
 	REF struct socket *sock;
-	validate_writable(addr_len, sizeof(*addr_len));
+	validate_readwrite(addr_len, sizeof(*addr_len));
 	COMPILER_READ_BARRIER();
 	avail_addr_len = *addr_len;
 	COMPILER_READ_BARRIER();
@@ -380,7 +380,7 @@ DEFINE_SYSCALL3(errno_t, getpeername, fd_t, sockfd,
                 USER UNCHECKED socklen_t *, addr_len) {
 	socklen_t req_addr_len, avail_addr_len;
 	REF struct socket *sock;
-	validate_writable(addr_len, sizeof(*addr_len));
+	validate_readwrite(addr_len, sizeof(*addr_len));
 	COMPILER_READ_BARRIER();
 	avail_addr_len = *addr_len;
 	COMPILER_READ_BARRIER();
@@ -679,7 +679,7 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 	                 MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 	                 MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB,
 	                 E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS);
-	validate_writablem(vmessages, vlen, sizeof(*vmessages));
+	validate_readwritem(vmessages, vlen, sizeof(*vmessages));
 	sock = handle_lookup((unsigned int)sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
@@ -796,7 +796,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 	                 MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 	                 MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB,
 	                 E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS);
-	compat_validate_writablem(vmessages, vlen, sizeof(*vmessages));
+	compat_validate_readwritem(vmessages, vlen, sizeof(*vmessages));
 	sock = handle_lookup((unsigned int)sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
@@ -963,7 +963,7 @@ DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
 	validate_readable(buf, bufsize);
 	if (addr_len) {
-		validate_writable(addr_len, sizeof(*addr_len));
+		validate_readwrite(addr_len, sizeof(*addr_len));
 		COMPILER_READ_BARRIER();
 		avail_addr_len = *addr_len;
 		COMPILER_READ_BARRIER();
@@ -1019,7 +1019,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 	                 MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
-	validate_writable(message, sizeof(msg));
+	validate_readwrite(message, sizeof(msg));
 	memcpy(&msg, message, sizeof(msg));
 	/* Verify user-space message buffers. */
 	validate_writable_opt(msg.msg_name, msg.msg_namelen);
@@ -1125,7 +1125,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 	                 MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
-	compat_validate_writable(message, sizeof(msg));
+	compat_validate_readwrite(message, sizeof(msg));
 	memcpy(&msg, message, sizeof(msg));
 	/* Verify user-space message buffers. */
 	compat_validate_writable_opt(msg.msg_name, msg.msg_namelen);
@@ -1235,7 +1235,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
 	                 MSG_WAITFORONE,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
-	validate_writablem(vmessages, vlen, sizeof(*vmessages));
+	validate_readwritem(vmessages, vlen, sizeof(*vmessages));
 	sock = handle_lookup((unsigned int)sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
@@ -1420,7 +1420,7 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
 	                 MSG_WAITFORONE,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
-	validate_writablem(vmessages, vlen, sizeof(*vmessages));
+	validate_readwritem(vmessages, vlen, sizeof(*vmessages));
 	sock = handle_lookup((unsigned int)sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;

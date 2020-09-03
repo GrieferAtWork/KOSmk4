@@ -1107,7 +1107,7 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 		struct keyboard_keymap data;
 		size_t mapsize;
 		uint8_t default_encoding;
-		validate_readable(arg, sizeof(struct keyboard_keymap));
+		validate_readwrite(arg, sizeof(struct keyboard_keymap));
 		memcpy(&data, arg, sizeof(struct keyboard_keymap));
 		validate_writable(data.km_maptext, data.km_mapsize);
 		sync_read(&me->kd_map_lock);

@@ -2371,7 +2371,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 	struct handle_manager *man;
 	struct handle used_hnd;
 	man = THIS_HANDLE_MANAGER;
-	validate_writable(data, 1);
+	validate_readwrite(data, sizeof(*data));
 	COMPILER_READ_BARRIER();
 	mode  = data->of_mode;
 	flags = data->of_flags;

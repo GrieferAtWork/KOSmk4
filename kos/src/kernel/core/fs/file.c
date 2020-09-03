@@ -575,7 +575,7 @@ handle_file_hop(struct file *__restrict self,
 		size_t struct_size;
 		struct hop_file_cmpxchg_offset *data;
 		pos_t exppos, newpos, oldpos;
-		validate_writable(arg, sizeof(struct hop_file_cmpxchg_offset));
+		validate_readwrite(arg, sizeof(struct hop_file_cmpxchg_offset));
 		data        = (struct hop_file_cmpxchg_offset *)arg;
 		struct_size = ATOMIC_READ(data->cxo_struct_size);
 		if (struct_size != sizeof(struct hop_file_cmpxchg_offset))

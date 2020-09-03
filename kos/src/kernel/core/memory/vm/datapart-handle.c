@@ -277,7 +277,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		REF struct vm_futex *ftx;
 		struct handle hnd;
 		cred_require_sysadmin(); /* TODO: More finely grained access! */
-		validate_writable(arg, sizeof(struct hop_datablock_open_futex));
+		validate_readwrite(arg, sizeof(struct hop_datablock_open_futex));
 		data        = (struct hop_datablock_open_futex *)arg;
 		struct_size = ATOMIC_READ(data->dof_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
@@ -317,7 +317,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 #ifdef VM_DATAPART_STATE_VIOPRT
 		STATIC_ASSERT(HOP_DATAPART_STAT_STATE_VIOPRT == VM_DATAPART_STATE_VIOPRT);
 #endif /* VM_DATAPART_STATE_VIOPRT */
-		validate_writable(arg, sizeof(struct hop_datapart_stat));
+		validate_readwrite(arg, sizeof(struct hop_datapart_stat));
 		data        = (struct hop_datapart_stat *)arg;
 		struct_size = ATOMIC_READ(data->ds_struct_size);
 		if (struct_size != sizeof(struct hop_datapart_stat))
@@ -361,7 +361,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		struct hop_datablock_haschanged *data;
 		REF struct vm_datablock *block;
 		bool has_changed;
-		validate_writable(arg, sizeof(struct hop_datablock_haschanged));
+		validate_readwrite(arg, sizeof(struct hop_datablock_haschanged));
 		data        = (struct hop_datablock_haschanged *)arg;
 		struct_size = ATOMIC_READ(data->dhc_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_haschanged))

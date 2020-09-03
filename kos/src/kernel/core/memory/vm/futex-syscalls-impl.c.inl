@@ -313,8 +313,8 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, validate_readable, ATOMIC_READ(*uaddr) < val);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, validate_readable, (ATOMIC_READ(*uaddr) & val) == val2);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, validate_readable, (ATOMIC_READ(*uaddr) & val) != val2);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_CMPXCH, validate_writable, ATOMIC_CMPXCH(*uaddr, val, val2));
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_CMPXCH, validate_writable, !ATOMIC_CMPXCH(*uaddr, val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_CMPXCH, validate_readwrite, ATOMIC_CMPXCH(*uaddr, val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_CMPXCH, validate_readwrite, !ATOMIC_CMPXCH(*uaddr, val, val2));
 #undef DEFINE_WAIT_WHILE_OPERATOR
 
 	/* TODO: Futex FD support */

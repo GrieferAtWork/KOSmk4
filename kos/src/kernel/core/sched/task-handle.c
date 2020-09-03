@@ -85,7 +85,7 @@ handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
 	case HOP_TASK_JOIN: {
 		size_t struct_size;
 		USER CHECKED struct hop_task_join *data;
-		validate_writable(arg, sizeof(struct hop_task_join));
+		validate_readwrite(arg, sizeof(struct hop_task_join));
 		data        = (struct hop_task_join *)arg;
 		struct_size = ATOMIC_READ(data->tj_struct_size);
 		if (struct_size != sizeof(struct hop_task_join))
@@ -314,7 +314,7 @@ again_waitfor:
 		STATIC_ASSERT(HOP_TASK_SETPROCESSGROUPLEADER_SUCCESS == TASK_SETPROCESSGROUPLEADER_SUCCESS);
 		STATIC_ASSERT(HOP_TASK_SETPROCESSGROUPLEADER_LEADER == TASK_SETPROCESSGROUPLEADER_LEADER);
 		STATIC_ASSERT(HOP_TASK_SETPROCESSGROUPLEADER_EXITED == TASK_SETPROCESSGROUPLEADER_EXITED);
-		validate_writable(arg, sizeof(struct hop_task_setprocessgroupleader));
+		validate_readwrite(arg, sizeof(struct hop_task_setprocessgroupleader));
 		data        = (struct hop_task_setprocessgroupleader *)arg;
 		struct_size = ATOMIC_READ(data->tspgl_struct_size);
 		if (struct_size != sizeof(struct hop_task_setprocessgroupleader))
@@ -375,7 +375,7 @@ again_waitfor:
 		USER CHECKED struct hop_task_setsessionleader *data;
 		STATIC_ASSERT(HOP_TASK_SETSESSIONLEADER_SUCCESS == TASK_SETSESSIONLEADER_SUCCESS);
 		STATIC_ASSERT(HOP_TASK_SETSESSIONLEADER_LEADER == TASK_SETSESSIONLEADER_LEADER);
-		validate_writable(arg, sizeof(struct hop_task_setsessionleader));
+		validate_readwrite(arg, sizeof(struct hop_task_setsessionleader));
 		data        = (struct hop_task_setsessionleader *)arg;
 		struct_size = ATOMIC_READ(data->tssl_struct_size);
 		if (struct_size != sizeof(struct hop_task_setsessionleader))

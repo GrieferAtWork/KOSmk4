@@ -53,15 +53,6 @@ FUNDEF void KCALL validate_readwrite_opt(UNCHECKED USER void *base, size_t num_b
 FUNDEF void KCALL validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROWS(E_SEGFAULT);
 
-/* TODO: Go through all uses of `validate_writable()' and use `validate_readwrite()' when necessary */
-/* TODO: Go through all uses of `validate_writablem()' and use `validate_readwritem()' when necessary */
-/* TODO: Go through all uses of `validate_writable_opt()' and use `validate_readwrite_opt()' when necessary */
-/* TODO: Go through all uses of `validate_writablem_opt()' and use `validate_readwritem_opt()' when necessary */
-/* TODO: Go through all uses of `compat_validate_writable()' and use `compat_validate_readwrite()' when necessary */
-/* TODO: Go through all uses of `compat_validate_writablem()' and use `compat_validate_readwritem()' when necessary */
-/* TODO: Go through all uses of `compat_validate_writable_opt()' and use `compat_validate_readwrite_opt()' when necessary */
-/* TODO: Go through all uses of `compat_validate_writablem_opt()' and use `compat_validate_readwritem_opt()' when necessary */
-
 /* Same as the regular validate functions, but are allowed to be used for verification
  * of pointers originating from compatibility mode (this allows for an optimization
  * on x86_64 where a 32-bit pointer originating from user-space doesn't need to be

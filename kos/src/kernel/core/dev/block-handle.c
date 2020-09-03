@@ -477,7 +477,7 @@ INTERN syscall_slong_t
 			USER CHECKED struct hop_blockdevice_stat *data;
 			size_t info_size;
 			data = (USER CHECKED struct hop_blockdevice_stat *)arg;
-			validate_writable(data, sizeof(*data));
+			validate_readwrite(data, sizeof(*data));
 			info_size = ATOMIC_READ(data->bs_struct_size);
 			if (info_size != sizeof(*data))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(*data), info_size);
@@ -521,7 +521,7 @@ INTERN syscall_slong_t
 		unsigned int result;
 		USER CHECKED struct hop_blockdevice_openpart *data;
 		data = (USER CHECKED struct hop_blockdevice_openpart *)arg;
-		validate_writable(data, sizeof(*data));
+		validate_readwrite(data, sizeof(*data));
 		if (block_device_ispartition(self))
 			self = ((struct block_device_partition *)self)->bp_master;
 		struct_size = ATOMIC_READ(data->bop_struct_size);

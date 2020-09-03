@@ -847,7 +847,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 				for (i = 0, num_bytes = 0; i < count; ++i) {
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
 					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
 				}
@@ -941,7 +941,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 				for (i = 0, num_bytes = 0; i < count; ++i) {
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					compat_validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
 					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
 				}
@@ -1043,7 +1043,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 				for (i = 0, num_bytes = 0; i < count; ++i) {
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
 					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
 				}
@@ -1139,7 +1139,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 				for (i = 0, num_bytes = 0; i < count; ++i) {
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					compat_validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
 					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
 				}
@@ -1238,7 +1238,7 @@ PRIVATE syscall_slong_t
 		       sizeof(char));
 		COMPILER_BARRIER();
 		info = (USER CHECKED struct hop_handle_stat *)arg;
-		validate_writable(info, sizeof(*info));
+		validate_readwrite(info, sizeof(*info));
 		info_size = ATOMIC_READ(info->hs_struct_size);
 		if (info_size != sizeof(*info))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*info), info_size);
@@ -1938,7 +1938,7 @@ DEFINE_SYSCALL3(ssize_t, poll,
                 USER UNCHECKED struct pollfd *, fds,
                 size_t, nfds, syscall_slong_t, timeout) {
 	size_t result;
-	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (timeout < 0) {
 		result = do_poll(fds, nfds, NULL);
 	} else if (timeout == 0) {
@@ -1965,7 +1965,7 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	validate_readable_opt(sigmask, sizeof(sigset_t));
-	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
@@ -1996,7 +1996,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	validate_readable_opt(sigmask, sizeof(compat_sigset_t));
-	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
@@ -2026,7 +2026,7 @@ DEFINE_SYSCALL5(ssize_t, ppoll64,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	validate_readable_opt(sigmask, sizeof(sigset_t));
-	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
@@ -2057,7 +2057,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
 	validate_readable_opt(sigmask, sizeof(compat_sigset_t));
-	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
@@ -2083,9 +2083,9 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
                 USER UNCHECKED struct timeval32 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	if (timeout) {
 		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
@@ -2118,9 +2118,9 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
                 USER UNCHECKED struct timeval64 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	if (timeout) {
 		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
@@ -2153,9 +2153,9 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
                        USER UNCHECKED struct compat_timeval32 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	if (timeout) {
 		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
@@ -2188,9 +2188,9 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
                        USER UNCHECKED struct compat_timeval64 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	if (timeout) {
 		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
@@ -2230,9 +2230,9 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	COMPILER_READ_BARRIER();
 	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2283,9 +2283,9 @@ DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	COMPILER_READ_BARRIER();
 	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2337,9 +2337,9 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	COMPILER_READ_BARRIER();
 	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2391,9 +2391,9 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_writable_opt(readfds, nfd_size);
-	validate_writable_opt(writefds, nfd_size);
-	validate_writable_opt(exceptfds, nfd_size);
+	validate_readwrite_opt(readfds, nfd_size);
+	validate_readwrite_opt(writefds, nfd_size);
+	validate_readwrite_opt(exceptfds, nfd_size);
 	COMPILER_READ_BARRIER();
 	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();

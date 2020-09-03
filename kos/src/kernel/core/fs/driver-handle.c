@@ -129,7 +129,7 @@ handle_driver_hop(struct driver *__restrict self,
 		size_t struct_size;
 		USER CHECKED struct hop_driver_stat *data;
 		data = (USER CHECKED struct hop_driver_stat *)arg;
-		validate_writable(data, sizeof(*data));
+		validate_readwrite(data, sizeof(*data));
 		struct_size = ATOMIC_READ(data->ds_struct_size);
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
@@ -179,7 +179,7 @@ handle_driver_hop(struct driver *__restrict self,
 		char const *argument_string;
 		USER CHECKED struct hop_driver_string *data;
 		data = (USER CHECKED struct hop_driver_string *)arg;
-		validate_writable(data, sizeof(*data));
+		validate_readwrite(data, sizeof(*data));
 		struct_size = ATOMIC_READ(data->ds_struct_size);
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);

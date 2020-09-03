@@ -321,7 +321,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			struct hop_datablock_stat *info;
 			size_t info_size;
 			info = (struct hop_datablock_stat *)arg;
-			validate_writable(info, sizeof(struct hop_datablock_stat));
+			validate_readwrite(info, sizeof(struct hop_datablock_stat));
 			info_size = ATOMIC_READ(info->ds_struct_size);
 			if (info_size != sizeof(struct hop_datablock_stat))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), info_size);
@@ -342,7 +342,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct hop_datablock_syncpages *range;
 		size_t struct_size;
 		range = (struct hop_datablock_syncpages *)arg;
-		validate_writable(range, sizeof(struct hop_datablock_syncpages));
+		validate_readwrite(range, sizeof(struct hop_datablock_syncpages));
 		struct_size = ATOMIC_READ(range->dsp_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_syncpages))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), struct_size);
@@ -355,7 +355,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct hop_datablock_syncbytes *range;
 		size_t struct_size;
 		range = (struct hop_datablock_syncbytes *)arg;
-		validate_writable(range, sizeof(struct hop_datablock_syncbytes));
+		validate_readwrite(range, sizeof(struct hop_datablock_syncbytes));
 		struct_size = ATOMIC_READ(range->dsb_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_syncbytes))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), struct_size);
@@ -390,7 +390,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct hop_datablock_openpart *data;
 		REF struct vm_datapart *part;
 		struct handle hnd;
-		validate_writable(arg, sizeof(struct hop_datablock_openpart));
+		validate_readwrite(arg, sizeof(struct hop_datablock_openpart));
 		data        = (struct hop_datablock_openpart *)arg;
 		struct_size = ATOMIC_READ(data->dop_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_openpart))
@@ -417,7 +417,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		size_t struct_size;
 		struct hop_datablock_haschanged *data;
 		bool haschanged;
-		validate_writable(arg, sizeof(struct hop_datablock_haschanged));
+		validate_readwrite(arg, sizeof(struct hop_datablock_haschanged));
 		data        = (struct hop_datablock_haschanged *)arg;
 		struct_size = ATOMIC_READ(data->dhc_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_haschanged))
@@ -438,7 +438,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		REF struct vm_futex *ftx;
 		struct handle hnd;
 		/* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address. */
-		validate_writable(arg, sizeof(struct hop_datablock_open_futex));
+		validate_readwrite(arg, sizeof(struct hop_datablock_open_futex));
 		data        = (struct hop_datablock_open_futex *)arg;
 		struct_size = ATOMIC_READ(data->dof_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
@@ -486,7 +486,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
-		validate_writable(arg, sizeof(struct hop_inode_chmod));
+		validate_readwrite(arg, sizeof(struct hop_inode_chmod));
 		data        = (struct hop_inode_chmod *)arg;
 		struct_size = ATOMIC_READ(data->icm_struct_size);
 		if (struct_size != sizeof(struct hop_inode_chmod))
@@ -509,7 +509,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
-		validate_writable(arg, sizeof(struct hop_inode_chown));
+		validate_readwrite(arg, sizeof(struct hop_inode_chown));
 		data        = (struct hop_inode_chown *)arg;
 		struct_size = ATOMIC_READ(data->ico_struct_size);
 		if (struct_size != sizeof(struct hop_inode_chown))
@@ -542,7 +542,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
 		me = (struct directory_node *)self;
-		validate_writable(arg, sizeof(struct hop_directory_opennode));
+		validate_readwrite(arg, sizeof(struct hop_directory_opennode));
 		data        = (struct hop_directory_opennode *)arg;
 		struct_size = ATOMIC_READ(data->don_struct_size);
 		if (struct_size != sizeof(struct hop_directory_opennode))
@@ -608,7 +608,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_creatfile));
+		validate_readwrite(arg, sizeof(struct hop_directory_creatfile));
 		data        = (struct hop_directory_creatfile *)arg;
 		struct_size = ATOMIC_READ(data->dcf_struct_size);
 		if (struct_size != sizeof(struct hop_directory_creatfile))
@@ -690,7 +690,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_remove));
+		validate_readwrite(arg, sizeof(struct hop_directory_remove));
 		data        = (struct hop_directory_remove *)arg;
 		struct_size = ATOMIC_READ(data->drm_struct_size);
 		if (struct_size != sizeof(struct hop_directory_remove))
@@ -770,7 +770,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_rename));
+		validate_readwrite(arg, sizeof(struct hop_directory_rename));
 		data        = (struct hop_directory_rename *)arg;
 		struct_size = ATOMIC_READ(data->drn_struct_size);
 		if (struct_size != sizeof(struct hop_directory_rename))
@@ -865,7 +865,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_link));
+		validate_readwrite(arg, sizeof(struct hop_directory_link));
 		data        = (struct hop_directory_link *)arg;
 		struct_size = ATOMIC_READ(data->dli_struct_size);
 		if (struct_size != sizeof(struct hop_directory_link))
@@ -927,7 +927,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_symlink));
+		validate_readwrite(arg, sizeof(struct hop_directory_symlink));
 		data        = (struct hop_directory_symlink *)arg;
 		struct_size = ATOMIC_READ(data->dsl_struct_size);
 		if (struct_size != sizeof(struct hop_directory_symlink))
@@ -1006,7 +1006,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_mknod));
+		validate_readwrite(arg, sizeof(struct hop_directory_mknod));
 		data        = (struct hop_directory_mknod *)arg;
 		struct_size = ATOMIC_READ(data->dmn_struct_size);
 		if (struct_size != sizeof(struct hop_directory_mknod))
@@ -1090,7 +1090,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY,
 			      0);
-		validate_writable(arg, sizeof(struct hop_directory_mkdir));
+		validate_readwrite(arg, sizeof(struct hop_directory_mkdir));
 		data        = (struct hop_directory_mkdir *)arg;
 		struct_size = ATOMIC_READ(data->dmd_struct_size);
 		if (struct_size != sizeof(struct hop_directory_mkdir))
@@ -1201,7 +1201,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
 		}
-		validate_writable(arg, sizeof(struct hop_superblock_features));
+		validate_readwrite(arg, sizeof(struct hop_superblock_features));
 		data        = (struct hop_superblock_features *)arg;
 		struct_size = ATOMIC_READ(data->sbf_struct_size);
 		if (struct_size != sizeof(struct hop_superblock_features))

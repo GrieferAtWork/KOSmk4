@@ -634,14 +634,14 @@ syslog_packet_append(struct syslog_packet *__restrict self,
 }
 
 
-/* pformatprinter-compatible syslog printer, where `level' is `(void *)SYSLOG_LEVEL_*'
+/* pformatprinter-compatible syslog printer, where `level' is `SYSLOG_LEVEL_*'
  * Writing text using this function will append to an internal buffer for the
- * given `level'. If this buffer overflows, it will be broadcast and reset the same
- * way it would be when being committed (using `\n'). The size of said buffer is an
- * implementation detail and should be sufficiently large such that users of this
- * function need not worry about its actual value.
+ * given `level'. If this buffer overflows, it will be broadcast and reset the
+ * same way it would be when being committed (using `\n'). The size of said buffer
+ * is an implementation detail and should be sufficiently large such that users
+ * of this function need not worry about its actual value.
  * Additionally the following control characters are recognized:
- *   - `\r': Clear the internal buffer for `level'
+ *   - `\r': Clear the internal buffer for `level' (if not immediately followed by `\n')
  *   - `\n': Broadcast the contents of the internal buffer as a syslog
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
  * @except: May only throw exceptions as the result of accessing memory in `*data'

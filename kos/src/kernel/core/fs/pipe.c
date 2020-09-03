@@ -192,7 +192,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t ps_avail;   /* Number of bytes currently available for reading */
 		size_t ps_bufcur;  /* Current buffer size of the pipe */
 		size_t ps_buflim;  /* Max buffer size of the pipe */
-		validate_writable(arg, sizeof(struct hop_pipe_stat));
+		validate_readwrite(arg, sizeof(struct hop_pipe_stat));
 		data        = (struct hop_pipe_stat *)arg;
 		struct_size = ATOMIC_READ(data->ps_struct_size);
 		if (struct_size != sizeof(struct hop_pipe_stat))
@@ -238,7 +238,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t buflen;
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
-		validate_writable(arg, sizeof(struct hop_pipe_writesome));
+		validate_readwrite(arg, sizeof(struct hop_pipe_writesome));
 		data        = (struct hop_pipe_writesome *)arg;
 		struct_size = ATOMIC_READ(data->pws_struct_size);
 		if (struct_size != sizeof(struct hop_pipe_writesome))
@@ -267,7 +267,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t buflen;
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
-		validate_writable(arg, sizeof(struct hop_pipe_vwritesome));
+		validate_readwrite(arg, sizeof(struct hop_pipe_vwritesome));
 		data        = (struct hop_pipe_vwritesome *)arg;
 		struct_size = ATOMIC_READ(data->pvws_struct_size);
 		if (struct_size != sizeof(struct hop_pipe_vwritesome))
@@ -305,7 +305,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t result, new_rdpos;
 		if ((mode & IO_ACCMODE) == IO_WRONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
-		validate_writable(arg, sizeof(struct hop_pipe_skipdata));
+		validate_readwrite(arg, sizeof(struct hop_pipe_skipdata));
 		data        = (struct hop_pipe_skipdata *)arg;
 		struct_size = ATOMIC_READ(data->psd_struct_size);
 		if (struct_size != sizeof(struct hop_pipe_skipdata))
@@ -324,7 +324,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t result, new_rdpos;
 		if ((mode & IO_ACCMODE) == IO_WRONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
-		validate_writable(arg, sizeof(struct hop_pipe_unread));
+		validate_readwrite(arg, sizeof(struct hop_pipe_unread));
 		data        = (struct hop_pipe_unread *)arg;
 		struct_size = ATOMIC_READ(data->pur_struct_size);
 		if (struct_size != sizeof(struct hop_pipe_unread))
@@ -343,7 +343,7 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t result, new_wrpos;
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
-		validate_writable(arg, sizeof(struct hop_pipe_unwrite));
+		validate_readwrite(arg, sizeof(struct hop_pipe_unwrite));
 		data        = (struct hop_pipe_unwrite *)arg;
 		struct_size = ATOMIC_READ(data->puw_struct_size);
 		if (struct_size != sizeof(struct hop_pipe_unwrite))
