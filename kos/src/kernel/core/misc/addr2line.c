@@ -119,7 +119,8 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 PUBLIC ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
 	debug_dlunlocksections(&buf->ds_sect module_type__arg(buf->ds_modtype));
-	module_decref(buf->ds_mod, buf->ds_modtype);
+	if (buf->ds_mod)
+		module_decref(buf->ds_mod, buf->ds_modtype);
 }
 
 
