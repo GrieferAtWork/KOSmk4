@@ -89,7 +89,7 @@ global final GLOBAL_NAMESPACE: Namespace = Namespace(
 		return "__{}_defined".format({ symbolName });
 	});
 
-@@The namespace used to encapsulate <local/...> functions
+@@The namespace used to encapsulate <libc/local/...> functions
 global final LOCAL_NAMESPACE: Namespace = Namespace(
 	name:     "local",
 	enter:    "__NAMESPACE_LOCAL_BEGIN\n",

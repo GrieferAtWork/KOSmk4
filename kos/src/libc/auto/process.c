@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b6c866c */
+/* HASH CRC-32:0x3da18934 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,14 +50,14 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
 	(void)action;
 	return libc_waitpid(pid, tstat, WEXITED);
 }
-#include <local/environ.h>
+#include <libc/local/environ.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode,
                                   char const *__restrict path,
                                   __TARGV) {
 	return libc_spawnve(mode, path, ___argv, __LOCAL_environ);
 }
-#include <local/environ.h>
+#include <libc/local/environ.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
                                    char const *__restrict file,

@@ -58,8 +58,8 @@
 
 %(auto_source){
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
-#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
-#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+#include "../libc/string.h"  /* Dependency of `#include <libc/local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <libc/local/format-scanf.h>' */
 #include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
@@ -848,7 +848,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #define __FORMAT_UNICODE_WRITECHAR unicode_writeutf8
 #define __FORMAT_UNICODE_FORMAT16  format_16to8
 #define __FORMAT_UNICODE_FORMAT32  format_32to8
-#include <local/format-printf.h>
+#include <libc/local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -907,7 +907,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 #define __FORMAT_ARG     arg
 #define __FORMAT_FORMAT  format
 #define __FORMAT_ARGS    args
-#include <local/format-scanf.h>
+#include <libc/local/format-scanf.h>
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -983,7 +983,7 @@ $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ vo
 
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
-[[kernel, ATTR_PURE, impl_include("<local/unicode_utf8seqlen.h>")]]
+[[kernel, ATTR_PURE, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_width(void *arg,

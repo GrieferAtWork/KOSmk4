@@ -41,7 +41,7 @@ fs.chdir(fs.headof(__FILE__) + "/../../");
 final global HASH_FUNCTION = "CRC-32";
 
 @@Macro definition assumptions that may be made
-@@in headers and <local/...> implementation files
+@@in headers and <libc/local/...> implementation files
 final global ppAssumeHeaderFiles: PPAssume = createPPAssume({
 	"__BUILDING_LIBC" : false, /* not defined */
 	"__SIZEOF_CHAR__" : 1,
@@ -881,7 +881,7 @@ try {
 
 	startTask(updateHashedFile, ("include/gnu/stubs.h", doPrint_include_gnu_stubs));
 
-	/* Generate all of the needed <local/...> headers */
+	/* Generate all of the needed <libc/local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();
 	for (;;) {
 		for (local lfun /*: LocalFunction*/: neededLocalFunction) {
@@ -889,7 +889,7 @@ try {
 				continue;
 			printedLocalFunctions.insert(lfun);
 			startTask(updateHashedFile, (
-				"include/local/{}/{}.h".format({
+				"include/libc/local/{}/{}.h".format({
 					lfun.originalSystemHeaderName,
 					lfun.name,
 				}),

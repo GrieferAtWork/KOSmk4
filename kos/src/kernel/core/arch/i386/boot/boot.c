@@ -437,8 +437,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: renameat2() is missing from <stdio.h> */
 
-	/* TODO: Refactor <local/...> to <libc/local/...> */
-
 	/* TODO: Decompressed driver section data should be reference counted, such that (then)
 	 *       unused sections can be lazily unloaded during calls to `system_clearcache()' */
 

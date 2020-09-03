@@ -687,7 +687,7 @@ For this, the KOS system header folder contains crt feature files. These files a
 
 Using this system, KOS system headers will automatically determine the features provided by the linked libc, and fill in the gaps, thus offering a much more complete API experience, regardless of what the underlying libraries actually offer.
 
-Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediatly implemented as an inline/static function in `/kos/include/local/string/memcpy.h`)
+Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediatly implemented as an inline/static function in `/kos/include/libc/local/string/memcpy.h`)
 
 With these substitutions in place, libraries and the kernel can still be built, however will result in below-optimal code being generated, simple due to the rediculous amount of redundancies.
 

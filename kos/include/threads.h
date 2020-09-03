@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e00d9ef */
+/* HASH CRC-32:0x9503e696 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,7 +184,7 @@ typedef __cnd_t cnd_t;
  * are passed through ARG. If successful, THR is set to new thread identifier */
 __CDECLARE(,int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, thrd_start_t __func, void *__arg),(__thr,__func,__arg))
 #elif defined(__CRT_HAVE_pthread_create)
-#include <local/threads/thrd_create.h>
+#include <libc/local/threads/thrd_create.h>
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, thrd_start_t __func, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
@@ -231,7 +231,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec co
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
-#include <local/threads/thrd_sleep.h>
+#include <libc/local/threads/thrd_sleep.h>
 /* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -258,7 +258,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),thrd_sleep,(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
-#include <local/threads/thrd_sleep64.h>
+#include <libc/local/threads/thrd_sleep64.h>
 /* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -274,7 +274,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * s.a. `pthread_exit()' */
 __CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thrd_exit,(int __res),(__res))
 #elif defined(__CRT_HAVE_pthread_exit)
-#include <local/threads/thrd_exit.h>
+#include <libc/local/threads/thrd_exit.h>
 /* Terminate current thread execution, cleaning up any thread local
  * storage and freeing resources. Returns the value specified in RES
  * s.a. `pthread_exit()' */
@@ -286,7 +286,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * s.a. `pthread_detach()' */
 __CDECLARE(,int,__NOTHROW_NCX,thrd_detach,(thrd_t __thr),(__thr))
 #elif defined(__CRT_HAVE_pthread_detach)
-#include <local/threads/thrd_detach.h>
+#include <libc/local/threads/thrd_detach.h>
 /* Detach the thread identified by THR from the current
  * environment (it does not allow join or wait for it)
  * s.a. `pthread_detach()' */
@@ -298,7 +298,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_detach, __FORCELOCAL __ATTR_ARTIFICIAL int 
  * s.a. `pthread_join()' */
 __CDECLARE(,int,__NOTHROW_RPC,thrd_join,(thrd_t __thr, int *__res),(__thr,__res))
 #elif defined(__CRT_HAVE_pthread_join)
-#include <local/threads/thrd_join.h>
+#include <libc/local/threads/thrd_join.h>
 /* Block current thread until execution of THR is complete.
  * In case that RES is not NULL, will store the return value of THR when exiting
  * s.a. `pthread_join()' */
@@ -345,7 +345,7 @@ __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),yield,())
  * s.a. `pthread_mutex_init()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_init,(mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type),(__mutex,__type))
 #elif defined(__CRT_HAVE_pthread_mutex_init)
-#include <local/threads/mtx_init.h>
+#include <libc/local/threads/mtx_init.h>
 /* Creates a new mutex object with type TYPE.
  * If successful the new object is pointed by MUTEX
  * s.a. `pthread_mutex_init()' */
@@ -357,7 +357,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * s.a. `pthread_mutex_lock()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mtx_lock,(mtx_t *__restrict __mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_lock)
-#include <local/threads/mtx_lock.h>
+#include <libc/local/threads/mtx_lock.h>
 /* Block the current thread until the mutex pointed to by MUTEX is
  * unlocked.  In that case current thread will not be blocked
  * s.a. `pthread_mutex_lock()' */
@@ -376,7 +376,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__res
  * s.a. `pthread_mutex_timedlock()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),(__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
-#include <local/threads/mtx_timedlock.h>
+#include <libc/local/threads/mtx_timedlock.h>
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
@@ -397,7 +397,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__re
  * s.a. `pthread_mutex_timedlock()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),mtx_timedlock,(__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
-#include <local/threads/mtx_timedlock64.h>
+#include <libc/local/threads/mtx_timedlock64.h>
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
@@ -412,7 +412,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL 
  * s.a. `pthread_mutex_trylock()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_trylock,(mtx_t *__restrict __mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_trylock)
-#include <local/threads/mtx_trylock.h>
+#include <libc/local/threads/mtx_trylock.h>
 /* Try to lock the mutex pointed by MUTEX without blocking.
  * If the mutex is free the current threads takes control of
  * it, otherwise it returns immediately
@@ -425,7 +425,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * s.a. `pthread_mutex_unlock()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mtx_unlock,(mtx_t *__restrict __mutex),(__mutex))
 #elif defined(__CRT_HAVE_pthread_mutex_unlock)
-#include <local/threads/mtx_unlock.h>
+#include <libc/local/threads/mtx_unlock.h>
 /* Unlock the mutex pointed by MUTEX.
  * It may potentially awake other threads waiting on this mutex
  * s.a. `pthread_mutex_unlock()' */
@@ -451,7 +451,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restr
  * s.a. `pthread_once()' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),(__flag,__func))
 #else /* ... */
-#include <local/pthread/pthread_once.h>
+#include <libc/local/pthread/pthread_once.h>
 /* Call function FUNC exactly once, even if invoked from several threads.
  * All calls must be made with the same FLAG object
  * s.a. `pthread_once()' */
@@ -466,7 +466,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL call_once
  * s.a. `pthread_cond_init()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_init,(cnd_t *__restrict __cond),(__cond))
 #elif defined(__CRT_HAVE_pthread_cond_init)
-#include <local/threads/cnd_init.h>
+#include <libc/local/threads/cnd_init.h>
 /* Initialize new condition variable pointed by COND
  * s.a. `pthread_cond_init()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_init)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_init))(__cond); })
@@ -476,7 +476,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * s.a. `pthread_cond_signal()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_signal,(cnd_t *__restrict __cond),(__cond))
 #elif defined(__CRT_HAVE_pthread_cond_signal)
-#include <local/threads/cnd_signal.h>
+#include <libc/local/threads/cnd_signal.h>
 /* Unblock one thread that currently waits on condition variable pointed by COND
  * s.a. `pthread_cond_signal()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_signal)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_signal))(__cond); })
@@ -486,7 +486,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * s.a. `pthread_cond_broadcast()' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_broadcast,(cnd_t *__restrict __cond),(__cond))
 #elif defined(__CRT_HAVE_pthread_cond_broadcast)
-#include <local/threads/cnd_broadcast.h>
+#include <libc/local/threads/cnd_broadcast.h>
 /* Unblock all threads currently waiting on condition variable pointed by COND
  * s.a. `pthread_cond_broadcast()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_broadcast, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cnd_broadcast)(cnd_t *__restrict __cond) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_broadcast))(__cond); })
@@ -496,7 +496,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_broadcast, __FORCELOCAL __ATTR_ARTIFICIAL __
  * s.a. `pthread_cond_wait()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,cnd_wait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex),(__cond,__mutex))
 #elif defined(__CRT_HAVE_pthread_cond_wait)
-#include <local/threads/cnd_wait.h>
+#include <libc/local/threads/cnd_wait.h>
 /* Block current thread on the condition variable pointed by COND
  * s.a. `pthread_cond_wait()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_wait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL cnd_wait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_wait))(__cond, __mutex); })
@@ -512,7 +512,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__
  * s.a. `pthread_cond_timedwait()' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),(__cond,__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
-#include <local/threads/cnd_timedwait.h>
+#include <libc/local/threads/cnd_timedwait.h>
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
@@ -530,7 +530,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *_
  * s.a. `pthread_cond_timedwait()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),cnd_timedwait,(__cond,__mutex,__time_point))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
-#include <local/threads/cnd_timedwait64.h>
+#include <libc/local/threads/cnd_timedwait64.h>
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
@@ -556,7 +556,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
  * s.a. `pthread_key_create()' */
 __CDECLARE(,int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, tss_dtor_t __destructor),(__tss_id,__destructor))
 #elif defined(__CRT_HAVE_pthread_key_create)
-#include <local/threads/tss_create.h>
+#include <libc/local/threads/tss_create.h>
 /* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
  * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
  * s.a. `pthread_key_create()' */
@@ -579,7 +579,7 @@ __CDECLARE(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),(__tss_id))
  * s.a. `pthread_setspecific()' */
 __CDECLARE(,int,__NOTHROW_NCX,tss_set,(tss_t __tss_id, void *__val),(__tss_id,__val))
 #elif defined(__CRT_HAVE_pthread_setspecific)
-#include <local/threads/tss_set.h>
+#include <libc/local/threads/tss_set.h>
 /* Sets the value of the thread-specific storage
  * identified by TSS_ID for the current thread to VAL
  * s.a. `pthread_setspecific()' */
@@ -606,7 +606,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),(__tss_id))
 #ifdef __CRT_HAVE_thr_min_stack
 __CDECLARE(__ATTR_CONST,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
 #else /* __CRT_HAVE_thr_min_stack */
-#include <local/threads/thr_min_stack.h>
+#include <libc/local/threads/thr_min_stack.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
 #endif /* !__CRT_HAVE_thr_min_stack */
 #ifdef __CRT_HAVE_pthread_main_np
@@ -630,7 +630,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),pthread_main_np,())
  * proper pthread-controller attached. */
 __CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
-#include <local/pthread/pthread_main_np.h>
+#include <libc/local/pthread/pthread_main_np.h>
 /* Another one of these non-restricted, but solaris-specific functions:
  * This one returns 1 if the calling thread is the main() thread (i.e.
  * the thread that was started by the kernel in order to execute the

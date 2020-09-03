@@ -1052,7 +1052,7 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 		 * kos/src/kernel/core/misc/syslog.c(572,28) : syslog_packet_append_impl+13 : C01B2FDB+5 : Called here [sp=EAFF7D20]
 		 * kos/src/kernel/core/misc/syslog.c(628,38) : syslog_packet_append+494 : C01B2FCE+66 : Called here [sp=EAFF7D20]
 		 * kos/src/kernel/core/misc/syslog.c(678,23) : syslog_printer+494 : C01B2FCE+66 : Called here [sp=EAFF7D20]
-		 * kos/include/local/format-printf.h(174,31) : libc_format_vprintf+131 : C020CA53+2 : Called here [sp=EAFF7D74]
+		 * kos/include/libc/local/format-printf.h(174,31) : libc_format_vprintf+131 : C020CA53+2 : Called here [sp=EAFF7D74]
 		 * kos/src/kernel/core/misc/printk.c(64,23) : vprintk+45 : C01B1FFD+5 : Called here [sp=EAFF7EE0]
 		 * kos/src/kernel/core/misc/printk.c(49,18) : printk+9 : C01B2019+5 : Called here [sp=EAFF7EF8]
 		 * D0001414: Called here

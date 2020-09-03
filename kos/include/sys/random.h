@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2816aa8a */
+/* HASH CRC-32:0xc96f89d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void
 #else /* __CRT_HAVE_getentropy */
 #include <asm/random.h>
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
-#include <local/sys.random/getentropy.h>
+#include <libc/local/sys.random/getentropy.h>
 /* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
  * the case where the calling thread is interrupted, causing an
  * less than `NUM_BYTES' of data to be read is handled by reading

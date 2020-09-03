@@ -28,7 +28,7 @@
 DECL_BEGIN
 
 INTERN_CONST u8 const libc_unicode_utf8seqlen[256] =
-#include <local/utf8-seqlen.h>
+#include <libc/local/utf8-seqlen.h>
 ;
 
 DEFINE_PUBLIC_ALIAS(unicode_utf8seqlen, libc_unicode_utf8seqlen);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e722fb4 */
+/* HASH CRC-32:0xc60cb05b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(feclearexcept, __FORCELOCAL __ATTR_ARTIFICIAL int
 __CDECLARE(,int,__NOTHROW,feclearexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/feclearexcept.h>
+#include <libc/local/fenv/feclearexcept.h>
 __NAMESPACE_STD_BEGIN
 /* Clear the supported exceptions represented by EXCEPTS */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feclearexcept, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW(__LIBCCALL feclearexcept)(int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feclearexcept))(__excepts); })
@@ -132,7 +132,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(feraiseexcept, __FORCELOCAL __ATTR_ARTIFICIAL int
 __CDECLARE(,int,__THROWING,feraiseexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/feraiseexcept.h>
+#include <libc/local/fenv/feraiseexcept.h>
 __NAMESPACE_STD_BEGIN
 /* Raise the supported exceptions represented by EXCEPTS */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feraiseexcept, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL feraiseexcept)(int __excepts) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept))(__excepts); })
@@ -147,7 +147,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fegetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL _
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),(__flagp,__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fegetexceptflag.h>
+#include <libc/local/fenv/fegetexceptflag.h>
 __NAMESPACE_STD_BEGIN
 /* Store implementation-defined representation of the exception
  * flags indicated by EXCEPTS in the object pointed to by FLAGP */
@@ -163,7 +163,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fesetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL _
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fesetexceptflag.h>
+#include <libc/local/fenv/fesetexceptflag.h>
 __NAMESPACE_STD_BEGIN
 /* Set complete status for exceptions indicated by EXCEPTS according
  * to the representation in the object pointed to by FLAGP */
@@ -179,7 +179,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fetestexcept, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fetestexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fetestexcept.h>
+#include <libc/local/fenv/fetestexcept.h>
 __NAMESPACE_STD_BEGIN
 /* Determine which of subset of the exceptions
  * specified by EXCEPTS are currently set */
@@ -203,7 +203,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fegetround, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),())
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fegetround.h>
+#include <libc/local/fenv/fegetround.h>
 __NAMESPACE_STD_BEGIN
 /* Get current rounding direction
  * @return: One of...
@@ -231,7 +231,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fesetround, __FORCELOCAL __ATTR_ARTIFICIAL int __
 __CDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),(__rounding_direction))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fesetround.h>
+#include <libc/local/fenv/fesetround.h>
 __NAMESPACE_STD_BEGIN
 /* Establish the rounding direction represented by `rounding_direction'
  * @param: rounding_direction: One of...
@@ -249,7 +249,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fegetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fegetenv.h>
+#include <libc/local/fenv/fegetenv.h>
 __NAMESPACE_STD_BEGIN
 /* Store the current floating-point environment in the object pointed to by ENVP */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetenv))(___envp); })
@@ -264,7 +264,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(feholdexcept, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/feholdexcept.h>
+#include <libc/local/fenv/feholdexcept.h>
 __NAMESPACE_STD_BEGIN
 /* Save the current environment in the object pointed to by ENVP, clear
  * exception flags and install a non-stop mode (if available) for all exceptions */
@@ -278,7 +278,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fesetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/fesetenv.h>
+#include <libc/local/fenv/fesetenv.h>
 __NAMESPACE_STD_BEGIN
 /* Establish the floating-point environment represented by the object pointed to by ENVP */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fesetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetenv))(___envp); })
@@ -295,7 +295,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(feupdateenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/fenv/feupdateenv.h>
+#include <libc/local/fenv/feupdateenv.h>
 __NAMESPACE_STD_BEGIN
 /* Save current exceptions in temporary storage, install environment
  * represented by object pointed to by ENVP and raise exceptions
@@ -329,7 +329,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(feenableexcept, __FORCELOCAL __ATTR_ARTIFICIAL in
  * exceptions are successfully set, otherwise returns -1 */
 __CDECLARE(,int,__NOTHROW,feenableexcept,(int __excepts),(__excepts))
 #else /* ... */
-#include <local/fenv/feenableexcept.h>
+#include <libc/local/fenv/feenableexcept.h>
 /* Enable individual exceptions.  Will not enable more exceptions than
  * EXCEPTS specifies.  Returns the previous enabled exceptions if all
  * exceptions are successfully set, otherwise returns -1 */
@@ -346,7 +346,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fedisableexcept, __FORCELOCAL __ATTR_ARTIFICIAL i
  * exceptions are successfully disabled, otherwise returns -1 */
 __CDECLARE(,int,__NOTHROW,fedisableexcept,(int __excepts),(__excepts))
 #else /* ... */
-#include <local/fenv/fedisableexcept.h>
+#include <libc/local/fenv/fedisableexcept.h>
 /* Disable individual exceptions.  Will not disable more exceptions than
  * EXCEPTS specifies.  Returns the previous enabled exceptions if all
  * exceptions are successfully disabled, otherwise returns -1 */
@@ -359,7 +359,7 @@ __NAMESPACE_FAST_USING_OR_IMPL(fegetexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 /* Return enabled exceptions */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),())
 #else /* ... */
-#include <local/fenv/fegetexcept.h>
+#include <libc/local/fenv/fegetexcept.h>
 /* Return enabled exceptions */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetexcept)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetexcept))(); })
 #endif /* !... */

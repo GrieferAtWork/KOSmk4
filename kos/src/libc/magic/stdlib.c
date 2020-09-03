@@ -540,7 +540,7 @@ struct __div_struct div(int numer, int denom) {
 
 [[impl_include("<hybrid/typecore.h>")]]
 [[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
-[[requires_include("<local/environ.h>")]]
+[[requires_include("<libc/local/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
 char *getenv([[nonnull]] char const *varname) {
 	char *result, **envp;
@@ -1847,7 +1847,7 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 
 [[wunused, section(".text.crt{|.dos}.fs.environ")]]
 [[export_alias("__secure_getenv"), alias("getenv")]]
-[[if($extended_include_prefix("<local/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
+[[if($extended_include_prefix("<libc/local/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
 char *secure_getenv([[nonnull]] char const *varname);
 
 @@Returns the name of the PTY slave (Pseudo TTY slave)
@@ -2041,9 +2041,9 @@ void freezero(void *mallptr, $size_t num_bytes) {
 
 @@Returns the absolute filename of the main executable (s.a. `program_invocation_name')
 [[wunused, ATTR_CONST]]
-[[requires_include("<local/program_invocation_name.h>")]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
-[[impl_include("<local/program_invocation_name.h>")]]
+[[impl_include("<libc/local/program_invocation_name.h>")]]
 char const *getexecname() {
 	return __LOCAL_program_invocation_name;
 }
@@ -2361,8 +2361,8 @@ __LIBC char *__progname_full;
 @@Alias for argv[0], as passed to main()
 [[guard, wunused, ATTR_CONST]]
 [[export_alias("__p_program_invocation_name")]]
-[[impl_include("<local/program_invocation_name.h>")]]
-[[requires_include("<local/program_invocation_name.h>")]]
+[[impl_include("<libc/local/program_invocation_name.h>")]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name_p))]]
 [[nonnull]] char **__p__pgmptr() {
 	return &__LOCAL_program_invocation_name_p;
@@ -2467,8 +2467,8 @@ _invalid_parameter_handler _get_invalid_parameter_handler();
 %
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.application.init")]]
-[[impl_include("<local/program_invocation_name.h>")]]
-[[requires_include("<local/program_invocation_name.h>")]]
+[[impl_include("<libc/local/program_invocation_name.h>")]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
 errno_t _get_pgmptr(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;

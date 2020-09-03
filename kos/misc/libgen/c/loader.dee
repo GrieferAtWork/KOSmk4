@@ -845,7 +845,7 @@ class FunctionFeatures {
 	public member std: bool = false;                                 /* [[std]]                   Expose as part of the std:: namespace */
 	public member namespaces: {string...} = ("",);                   /* [[no_]ignore]           Namespaces from which to import the function */
 	public member libc: bool = false;                                /* [[no_]libc]             Export in <libc/string.h> */
-	public member inline: UserString | string | none = none;         /* [[no_]inline]           Use the associated body for inline implementations, rather than including <local/...> headers */
+	public member inline: UserString | string | none = none;         /* [[no_]inline]           Use the associated body for inline implementations, rather than including <libc/local/...> headers */
 	public member noInlineTruncate: bool = false;                    /* [[no_]inline_truncate]  Truncate spaces and new-lines from inline implementations */
 	public member noExternInline: bool = false;                      /* [[no_]extern_inline]    For use with @inline: Don't convert inline */
 	public member noLocal: bool = false;                             /* [[no_]local]            Prevent the creation of a LocalFunction for */
@@ -986,7 +986,7 @@ class FunctionFeatures {
 
 		case "static":
 			/* static function:
-			 *  - Only exists in libc or <local/...> headers if used
+			 *  - Only exists in libc or <libc/local/...> headers if used
 			 *  - Isn't actually exposed in system headers
 			 *  - Can only be used lazily as a dependency from other functions
 			 *  - HINT: Can be used in conjunction with [[inline]]
@@ -4283,7 +4283,7 @@ got_chkExpr:
 						 * >> #ifdef __CRT_HAVE_wcslen
 						 * >> __CDECLARE(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,wcslen,(wchar_t const *__restrict string),(string))
 						 * >> #else // ...
-						 * >> #include <local/wchar/wcslen.h>
+						 * >> #include <libc/local/wchar/wcslen.h>
 						 * >> __NAMESPACE_LOCAL_USING_OR_IMPL(wcslen, FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL wcslen)(wchar_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))(string); })
 						 * >> #endif // !...
 						 *
@@ -4293,10 +4293,10 @@ got_chkExpr:
 						 * >> #elif defined(__CRT_HAVE_DOS$wcslen)
 						 * >> __CREDIRECT_DOS(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,c16slen,(char16_t const *__restrict string),wcslen,(string))
 						 * >> #elif (__SIZEOF_WCHAR_T__ == 2)
-						 * >> #include <local/wchar/wcslen.h>
+						 * >> #include <libc/local/wchar/wcslen.h>
 						 * >> FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBDCALL c16slen)(char16_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)string); }
 						 * >> #else // ...
-						 * >> #include <local/parts.uchar.string/c16slen.h>
+						 * >> #include <libc/local/parts.uchar.string/c16slen.h>
 						 * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c16slen, FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBDCALL c16slen)(char16_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16slen))(string); })
 						 * >> #endif // !...
 						 *
@@ -4306,10 +4306,10 @@ got_chkExpr:
 						 * >> #elif defined(__CRT_HAVE_KOS$wcslen)
 						 * >> __CREDIRECT_KOS(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,c32slen,(char32_t const *__restrict string),wcslen,(string))
 						 * >> #elif (__SIZEOF_WCHAR_T__ == 4)
-						 * >> #include <local/wchar/wcslen.h>
+						 * >> #include <libc/local/wchar/wcslen.h>
 						 * >> FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBKCALL c32slen)(char32_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)string); }
 						 * >> #else // ...
-						 * >> #include <local/parts.uchar.string/c32slen.h>
+						 * >> #include <libc/local/parts.uchar.string/c32slen.h>
 						 * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c32slen, FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBKCALL c32slen)(char32_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32slen))(string); })
 						 * >> #endif // !...
 						 *

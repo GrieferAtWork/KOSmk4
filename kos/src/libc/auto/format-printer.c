@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6d58f02 */
+/* HASH CRC-32:0x7673fc99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@
 DECL_BEGIN
 
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
-#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
-#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+#include "../libc/string.h"  /* Dependency of `#include <libc/local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <libc/local/format-scanf.h>' */
 #include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
@@ -713,7 +713,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
 #define __FORMAT_UNICODE_WRITECHAR libc_unicode_writeutf8
 #define __FORMAT_UNICODE_FORMAT16  libd_format_wto8
 #define __FORMAT_UNICODE_FORMAT32  libc_format_wto8
-#include <local/format-printf.h>
+#include <libc/local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -955,7 +955,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1,
 #define __FORMAT_ARG     arg
 #define __FORMAT_FORMAT  format
 #define __FORMAT_ARGS    args
-#include <local/format-scanf.h>
+#include <libc/local/format-scanf.h>
 #endif /* !__INTELLISENSE__ */
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1064,7 +1064,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
 	ctrl->sd_bufsiz -= result;
 	return (ssize_t)datalen;
 }
-#include <local/unicode_utf8seqlen.h>
+#include <libc/local/unicode_utf8seqlen.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_PURE NONNULL((2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,

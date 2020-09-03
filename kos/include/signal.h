@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d377e98 */
+/* HASH CRC-32:0x1c41a774 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1195,13 +1195,13 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,kill,(__pid_t __pid, __signo_t __signo),(__pid
 #ifdef __CRT_HAVE_sigemptyset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigemptyset,(struct __sigset_struct *__set),(__set))
 #else /* __CRT_HAVE_sigemptyset */
-#include <local/signal/sigemptyset.h>
+#include <libc/local/signal/sigemptyset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigemptyset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigemptyset)(struct __sigset_struct *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigemptyset))(__set); })
 #endif /* !__CRT_HAVE_sigemptyset */
 #ifdef __CRT_HAVE_sigfillset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigfillset,(struct __sigset_struct *__set),(__set))
 #else /* __CRT_HAVE_sigfillset */
-#include <local/signal/sigfillset.h>
+#include <libc/local/signal/sigfillset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigfillset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigfillset)(struct __sigset_struct *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset))(__set); })
 #endif /* !__CRT_HAVE_sigfillset */
 #ifdef __CRT_HAVE_sigaddset
@@ -1209,7 +1209,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(struct __sigset_stru
 #elif defined(__CRT_HAVE___sigaddset)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,(__set,__signo))
 #else /* ... */
-#include <local/signal/sigaddset.h>
+#include <libc/local/signal/sigaddset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigaddset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdelset
@@ -1217,7 +1217,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(struct __sigset_stru
 #elif defined(__CRT_HAVE___sigdelset)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(struct __sigset_struct *__set, __signo_t __signo),__sigdelset,(__set,__signo))
 #else /* ... */
-#include <local/signal/sigdelset.h>
+#include <libc/local/signal/sigdelset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigismember
@@ -1225,7 +1225,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigi
 #elif defined(__CRT_HAVE___sigismember)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(struct __sigset_struct const *__set, __signo_t __signo),__sigismember,(__set,__signo))
 #else /* ... */
-#include <local/signal/sigismember.h>
+#include <libc/local/signal/sigismember.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
 #endif /* !... */
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -1246,19 +1246,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const 
 #ifdef __CRT_HAVE_sigisemptyset
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(struct __sigset_struct const *__restrict __set),(__set))
 #else /* __CRT_HAVE_sigisemptyset */
-#include <local/signal/sigisemptyset.h>
+#include <libc/local/signal/sigisemptyset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(struct __sigset_struct const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
 #endif /* !__CRT_HAVE_sigisemptyset */
 #ifdef __CRT_HAVE_sigandset
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,sigandset,(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right),(__set,__left,__right))
 #else /* __CRT_HAVE_sigandset */
-#include <local/signal/sigandset.h>
+#include <libc/local/signal/sigandset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigandset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL sigandset)(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigandset))(__set, __left, __right); })
 #endif /* !__CRT_HAVE_sigandset */
 #ifdef __CRT_HAVE_sigorset
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,sigorset,(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right),(__set,__left,__right))
 #else /* __CRT_HAVE_sigorset */
-#include <local/signal/sigorset.h>
+#include <libc/local/signal/sigorset.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigorset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL sigorset)(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigorset))(__set, __left, __right); })
 #endif /* !__CRT_HAVE_sigorset */
 #endif /* __USE_GNU */
@@ -1269,7 +1269,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(struct __sigset_
 #elif defined(__CRT_HAVE_sigtimedwait) && !defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout),(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait)
-#include <local/signal/sigtimedwait.h>
+#include <libc/local/signal/sigtimedwait.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait)(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait))(__set, __info, __timeout); })
 #endif /* ... */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigqueue,(__pid_t __pid, __signo_t __signo, union sigval const __val),(__pid,__signo,__val))
@@ -1279,7 +1279,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait64,(struct __sigset
 #elif defined(__CRT_HAVE_sigtimedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait64,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait,(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait)
-#include <local/signal/sigtimedwait64.h>
+#include <libc/local/signal/sigtimedwait64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait64)(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait64))(__set, __info, __timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
@@ -1318,7 +1318,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_si
 #else /* __CRT_HAVE___libc_current_sigrtmin */
 #include <asm/signum-values.h>
 #ifdef __SIGRTMIN
-#include <local/signal/__libc_current_sigrtmin.h>
+#include <libc/local/signal/__libc_current_sigrtmin.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
 #endif /* __SIGRTMIN */
 #endif /* !__CRT_HAVE___libc_current_sigrtmin */
@@ -1327,7 +1327,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_si
 #else /* __CRT_HAVE___libc_current_sigrtmax */
 #include <asm/signum-values.h>
 #ifdef __SIGRTMAX
-#include <local/signal/__libc_current_sigrtmax.h>
+#include <libc/local/signal/__libc_current_sigrtmax.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
 #endif /* __SIGRTMAX */
 #endif /* !__CRT_HAVE___libc_current_sigrtmax */
@@ -1378,32 +1378,32 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __threadid, __signo_
 #ifdef __CRT_HAVE_sigemptyset
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigemptyset,(struct __sigset_struct *__set),sigemptyset,(__set))
 #else /* __CRT_HAVE_sigemptyset */
-#include <local/signal/sigemptyset.h>
+#include <libc/local/signal/sigemptyset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigemptyset)(struct __sigset_struct *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigemptyset))(__set); }
 #endif /* !__CRT_HAVE_sigemptyset */
 #ifdef __CRT_HAVE_sigfillset
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigfillset,(struct __sigset_struct *__set),sigfillset,(__set))
 #else /* __CRT_HAVE_sigfillset */
-#include <local/signal/sigfillset.h>
+#include <libc/local/signal/sigfillset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigfillset)(struct __sigset_struct *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset))(__set); }
 #endif /* !__CRT_HAVE_sigfillset */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sigisemptyset
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigisemptyset,(struct __sigset_struct const *__restrict __set),sigisemptyset,(__set))
 #else /* __CRT_HAVE_sigisemptyset */
-#include <local/signal/sigisemptyset.h>
+#include <libc/local/signal/sigisemptyset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigisemptyset)(struct __sigset_struct const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); }
 #endif /* !__CRT_HAVE_sigisemptyset */
 #ifdef __CRT_HAVE_sigandset
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,__sigandset,(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right),sigandset,(__set,__left,__right))
 #else /* __CRT_HAVE_sigandset */
-#include <local/signal/sigandset.h>
+#include <libc/local/signal/sigandset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL __sigandset)(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigandset))(__set, __left, __right); }
 #endif /* !__CRT_HAVE_sigandset */
 #ifdef __CRT_HAVE_sigorset
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,__sigorset,(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right),sigorset,(__set,__left,__right))
 #else /* __CRT_HAVE_sigorset */
-#include <local/signal/sigorset.h>
+#include <libc/local/signal/sigorset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL __sigorset)(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigorset))(__set, __left, __right); }
 #endif /* !__CRT_HAVE_sigorset */
 #endif /* __USE_GNU */
@@ -1412,7 +1412,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__s
 #elif defined(__CRT_HAVE___sigismember)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigismember,(struct __sigset_struct const *__set, __signo_t __signo),(__set,__signo))
 #else /* ... */
-#include <local/signal/sigismember.h>
+#include <libc/local/signal/sigismember.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigaddset
@@ -1420,7 +1420,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigaddset,(struct __sigset_s
 #elif defined(__CRT_HAVE___sigaddset)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigaddset,(struct __sigset_struct *__set, __signo_t __signo),(__set,__signo))
 #else /* ... */
-#include <local/signal/sigaddset.h>
+#include <libc/local/signal/sigaddset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdelset
@@ -1428,7 +1428,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_s
 #elif defined(__CRT_HAVE___sigdelset)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_struct *__set, __signo_t __signo),(__set,__signo))
 #else /* ... */
-#include <local/signal/sigdelset.h>
+#include <libc/local/signal/sigdelset.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); }
 #endif /* !... */
 /* These appear in glibc under these names, however these names collide with

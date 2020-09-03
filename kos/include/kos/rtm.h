@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b0bc031 */
+/* HASH CRC-32:0x5fb7d758 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,7 +125,7 @@ __CEIDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),{ return __arch_rtm_begin(
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 __CDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),())
 #elif defined(__arch_rtm_begin)
-#include <local/kos.rtm/rtm_begin.h>
+#include <libc/local/kos.rtm/rtm_begin.h>
 /* Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
@@ -159,7 +159,7 @@ __CEIDECLARE(,void,__NOTHROW,rtm_end,(void),{ __arch_rtm_end(); })
  * If no transaction was in progress, the behavior is undefined */
 __CDECLARE_VOID(,__NOTHROW,rtm_end,(void),())
 #elif defined(__arch_rtm_end)
-#include <local/kos.rtm/rtm_end.h>
+#include <libc/local/kos.rtm/rtm_end.h>
 /* End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
@@ -179,7 +179,7 @@ __COMPILER_EIDECLARE(__LIBC,,void,__NOTHROW__FCALL,,rtm_abort,(unsigned int __co
  * function does not return normally, but returns from the original `rtm_begin()' */
 __LIBC void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) __CASMNAME_SAME("rtm_abort");
 #elif defined(__arch_rtm_abort)
-#include <local/kos.rtm/rtm_abort.h>
+#include <libc/local/kos.rtm/rtm_abort.h>
 /* Abort the current transaction by having `rtm_begin()' return with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op. Otherwise, this
@@ -197,7 +197,7 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,rtm_test,(void),{ return _
  * @return: 1 : An RTM operation is currently in progress */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,rtm_test,(void),())
 #elif defined(__arch_rtm_test)
-#include <local/kos.rtm/rtm_test.h>
+#include <libc/local/kos.rtm/rtm_test.h>
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */

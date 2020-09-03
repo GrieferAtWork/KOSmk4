@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb42c230c */
+/* HASH CRC-32:0xa5a41f53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 
 DECL_BEGIN
 
-#include <local/unicode_utf8seqlen.h>
+#include <libc/local/unicode_utf8seqlen.h>
 /* Read a single Unicode character from a given UTF-8 string */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext) {

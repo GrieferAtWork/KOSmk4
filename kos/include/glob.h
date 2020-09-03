@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x359ba4b1 */
+/* HASH CRC-32:0x8f4da63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,7 +184,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restric
  * Otherwise, `glob' returns zero */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, glob_t *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
 #else /* ... */
-#include <local/glob/glob.h>
+#include <libc/local/glob/glob.h>
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -202,7 +202,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),gl
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),(__pglob))
 #else /* ... */
-#include <local/glob/globfree.h>
+#include <libc/local/glob/globfree.h>
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree)(glob_t *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree))(__pglob); })
 #endif /* !... */
@@ -219,7 +219,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * Otherwise, `glob' returns zero */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob64,(const char *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
 #else /* __CRT_HAVE_glob64 */
-#include <local/glob/glob64.h>
+#include <libc/local/glob/glob64.h>
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -234,7 +234,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree64,(struct __glob64_struct *__pglob),(__pglob))
 #else /* __CRT_HAVE_globfree64 */
-#include <local/glob/globfree64.h>
+#include <libc/local/glob/globfree64.h>
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __NAMESPACE_LOCAL_USING_OR_IMPL(globfree64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree64)(struct __glob64_struct *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree64))(__pglob); })
 #endif /* !__CRT_HAVE_globfree64 */

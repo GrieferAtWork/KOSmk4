@@ -56,7 +56,7 @@ Directives are used to tell the magic generator special information that does no
 | `%[nosys_errno(name)]` | Set the `name` for the `errno` value that is set by the stub-implementations in `/src/libc/user/string.c` of functions not yet implemented.<br>This directive only applies on a per-file-scope, and defaults to `ENOSYS`.<br>If an empty string is assigned `%[nosys_errno()]`, `errno` will not be modified by an unimplemented function.<br>This directive can also be overwritten on a per-function basis using `[nosys_errno(...)]` and `[no_nosys_errno]` |
 | `%[declare_user_export(name[,...])]` | Define additional CRT features that should appear in `/include/crt-features/all.h` as `#define __CRT_HAVE_<name> 1` |
 | `%[define_wchar_replacement(c = w16, w32)]` | Define the replacement for `c` in code blocks for 16-bit (dos) and 32-bit (unix) `wchar_t` mode.<br>Examples for this are:<br>`%[define_wchar_replacement(wchar_t = char16_t, char32_t)]`<br>`%[define_wchar_replacement(__SIZEOF_WCHAR_T__ = 2, 4)]`<br>Note that these definitions are persistent across all magic source files, and are only applied once all files have been parsed |
-| `%[define_replacement(a = b)]` | Define the replacement for `a` to-be applied in `/include/libc/string.h`, `/include/libc/core/string.h`, `/include/local/string/memcpy.h`, as well as `/include/string.h` (though here the replacement only applies to `$a` (the symbol prefixed by a `$`)) |
+| `%[define_replacement(a = b)]` | Define the replacement for `a` to-be applied in `/include/libc/string.h`, `/include/libc/core/string.h`, `/include/libc/local/string/memcpy.h`, as well as `/include/string.h` (though here the replacement only applies to `$a` (the symbol prefixed by a `$`)) |
 | `%[define_str2wcs_replacement(a = b)]` | Define a replacement for `a` when it appears as a word in a piece of code that is used by the `%{copy(str2wcs(foo))}` code generator |
 | `%[push_macro [@opt [@...]] { name [...] }]`<br>`%[push_macro([@opt [@...]] { name [...] })]` | Output code to the `c` location to make use of `#pragma push_macro()` in order to preserve the definitions of every given `name`.<br>This directive should then be followed by another directive `%[pop_macro]` to restore those definitions.<br>When `@undef` is given as an `@opt`, then also ensure that the definitions of all given macros are `#undef`-ed (irregardlessly of the even host-compiler actually supporting `#pragma push_macro(...)`) |
 | `%[pop_macro]` | s.a. `%[push_macro ...]` |
@@ -125,7 +125,7 @@ strchr:(char const *s, int c) -> char *
   ```
   foo:() { do_something(); }
   ```  
-  The given `do_something` will appear in `/include/local/string/memcpy.h` and in `/src/libc/auto/string.c` (if the possible). Otherwise (if the `[same_impl]` tag is given), the same implementation will also appear as the `/*AUTO*/` implementation in `/src/libc/user/string.c`
+  The given `do_something` will appear in `/include/libc/local/string/memcpy.h` and in `/src/libc/auto/string.c` (if the possible). Otherwise (if the `[same_impl]` tag is given), the same implementation will also appear as the `/*AUTO*/` implementation in `/src/libc/user/string.c`
 
 - The implementation uses a generator  
   ```

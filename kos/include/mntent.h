@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b6b5a59 */
+/* HASH CRC-32:0x7dcea225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,7 +122,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__str
  * Returns the address of the substring, or null if none found */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,hasmntopt,(struct mntent const *__mnt, char const *__opt),(__mnt,__opt))
 #else /* __CRT_HAVE_hasmntopt */
-#include <local/mntent/hasmntopt.h>
+#include <libc/local/mntent/hasmntopt.h>
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hasmntopt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL hasmntopt)(struct mntent const *__mnt, char const *__opt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hasmntopt))(__mnt, __opt); })

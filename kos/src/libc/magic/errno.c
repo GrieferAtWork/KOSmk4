@@ -931,7 +931,7 @@ __LIBC char *__progname;
 }
 @@Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main()
 [[guard, wunused, ATTR_CONST, nonnull]]
-[[requires_include("<local/program_invocation_name.h>")]]
+[[requires_include("<libc/local/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_short_name_p))]]
 char **__p_program_invocation_short_name() {
 	return &__LOCAL_program_invocation_short_name_p;

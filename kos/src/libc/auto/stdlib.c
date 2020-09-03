@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8726c674 */
+/* HASH CRC-32:0x2c5dd0ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1155,7 +1155,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	return libc_strtold(nptr, endptr);
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
-#include <local/program_invocation_name.h>
+#include <libc/local/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
@@ -1195,13 +1195,13 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 	}
 	return result;
 }
-#include <local/program_invocation_name.h>
+#include <libc/local/program_invocation_name.h>
 /* Alias for argv[0], as passed to main() */
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
 NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void) {
 	return &__LOCAL_program_invocation_name_p;
 }
-#include <local/program_invocation_name.h>
+#include <libc/local/program_invocation_name.h>
 INTERN ATTR_SECTION(".text.crt.dos.application.init") errno_t
 NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;

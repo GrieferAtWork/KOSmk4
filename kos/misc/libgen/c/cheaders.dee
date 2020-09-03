@@ -1331,17 +1331,17 @@ class FunctionImplementation {
 				/* FIXME: Must currently ignore fast function bindings to prevent dependency loops:
 				 *
 				 *     <stdlib.h>
-				 *     <local/wchar/wcsrtombs.h>
+				 *     <libc/local/wchar/wcsrtombs.h>
 				 *     <optimized/string.h>      (for dependency `mempcpy()'; `__local___localdep_mempcpy_defined' was already defined)
 				 *     <libc/core/string.h>
-				 *     <local/string/mempcpyc.h>
+				 *     <libc/local/string/mempcpyc.h>
 				 *
 				 * The local implementation for `mempcpyc()' now won't pull in `mempcpy()',
 				 * since `__local___localdep_mempcpy_defined' is already defined, even though
 				 * the associated function hasn't been declared, yet.
 				 *
 				 * (Temporary) solution:
-				 *     Break the dependency loop in <local/wchar/wcsrtombs.h> by not including
+				 *     Break the dependency loop in <libc/local/wchar/wcsrtombs.h> by not including
 				 *     <optimized/string.h>, which is done by ignoring fast bindings.
 				 *
 				 * (Better) solution:
@@ -1350,8 +1350,8 @@ class FunctionImplementation {
 				 *     generator script).
 				 *     That way, `mempcpy()' wouldn't have an implicit dependency on `mempcpyc()',
 				 *     as it is this loop that makes it impossible to form a proper tree of
-				 *     dependencies between <local/...> implementations, <libc/core/...> bindings,
-				 *     and <optimized/...> wrappers.
+				 *     dependencies between <libc/local/...> implementations, <libc/core/...>
+				 *     bindings, and <optimized/...> wrappers.
 				 */
 				ignoreFastBindings:        true
 				);
@@ -1538,7 +1538,7 @@ class LocalFunction {
 			fp.ppEndif();
 			fp.ppEndif();
 		} catch (...) {
-			print("... while printing local-header <local/",
+			print("... while printing local-header <libc/local/",
 				originalSystemHeaderName, "/", name, ".h>");
 			throw;
 		}
@@ -1558,7 +1558,7 @@ class LocalFunction {
 		local oldNs = fp.namespace;
 		fp.namespace = GLOBAL_NAMESPACE;
 		/* Include the local-header for this function */
-		fp.ppInclude("<local/{}/{}.h>".format({
+		fp.ppInclude("<libc/local/{}/{}.h>".format({
 			originalSystemHeaderName, name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
@@ -2054,7 +2054,7 @@ class FunctionBinding {
 
 	@@The actual binding provided by this function:
 	@@  - @LocalFunction:    Provide a local function implementation, via inclusion of
-	@@                       <local/@(binding.originalSystemHeaderName)/@(binding.name).h>
+	@@                       <libc/local/@(binding.originalSystemHeaderName)/@(binding.name).h>
 	@@  - @InlineFunction:   Provide an in-line function implementation, possibly alongside
 	@@                       support for @"__EXTERN_INLINE"
 	@@  - @string:           External assembly symbol (bind the function against
@@ -2252,7 +2252,7 @@ do_universal_binding:
 					local oldNs = fp.namespace;
 					fp.namespace = GLOBAL_NAMESPACE;
 					/* Include the local-header for this function */
-					fp.ppInclude("<local/{}/{}.h>".format({
+					fp.ppInclude("<libc/local/{}/{}.h>".format({
 						usedBinding.originalSystemHeaderName,
 						usedBinding.name }));
 					fp.namespace = oldNs;

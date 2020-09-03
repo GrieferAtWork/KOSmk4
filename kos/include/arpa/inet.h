@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa46c9ee */
+/* HASH CRC-32:0x601a3ff7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ typedef __socklen_t socklen_t;
 /* Return the network-number-part of the Internet address `INADDR' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,inet_netof,(struct in_addr __inaddr),(__inaddr))
 #else /* __CRT_HAVE_inet_netof */
-#include <local/arpa.inet/inet_netof.h>
+#include <libc/local/arpa.inet/inet_netof.h>
 /* Return the network-number-part of the Internet address `INADDR' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_netof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_netof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_netof))(__inaddr); })
 #endif /* !__CRT_HAVE_inet_netof */
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_netof, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 /* Return the local-host-address-part of the Internet address `INADDR' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,inet_lnaof,(struct in_addr __inaddr),(__inaddr))
 #else /* __CRT_HAVE_inet_lnaof */
-#include <local/arpa.inet/inet_lnaof.h>
+#include <libc/local/arpa.inet/inet_lnaof.h>
 /* Return the local-host-address-part of the Internet address `INADDR' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_lnaof)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_lnaof))(__inaddr); })
 #endif /* !__CRT_HAVE_inet_lnaof */
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * of `inet_netof(3)' and `inet_lnaof(3)' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW_NCX,inet_makeaddr,(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host),(__net,__host))
 #else /* __CRT_HAVE_inet_makeaddr */
-#include <local/arpa.inet/inet_makeaddr.h>
+#include <libc/local/arpa.inet/inet_makeaddr.h>
 /* Construct an Internet-host-address in network byte order from
  * the combination of its network (`net'), and host (`host') number.
  * The `net' and `host' arguments can later be re-extracted by use
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_ARTIFICIAL __
  *     0123     (oct) */
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),in_addr_t,__NOTHROW_NCX,inet_addr,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_addr */
-#include <local/arpa.inet/inet_addr.h>
+#include <libc/local/arpa.inet/inet_addr.h>
 /* Convert an Internet host address `CP' from its numbers-and-dots
  * notational form into its binary representation in network byte order
  * Accepted notations are:
@@ -106,7 +106,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_addr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,inet_ntoa,(struct in_addr __inaddr),(__inaddr))
 #else /* __CRT_HAVE_inet_ntoa */
-#include <local/arpa.inet/inet_ntoa.h>
+#include <libc/local/arpa.inet/inet_ntoa.h>
 /* Return the conventional numbers-and-dots representation of a
  * given Internet host address `inaddr'. The returned pointer is
  * apart of a static buffer and may change in subsequence (or parallel)
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* Re-entrant version of `inet_ntoa()' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */
-#include <local/arpa.inet/inet_ntoa_r.h>
+#include <libc/local/arpa.inet/inet_ntoa_r.h>
 /* Re-entrant version of `inet_ntoa()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL inet_ntoa_r)(struct in_addr __inaddr, char __buf[16]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa_r))(__inaddr, __buf); })
 #endif /* !__CRT_HAVE_inet_ntoa_r */
@@ -129,7 +129,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * the return value is in host-endian, rather than net-endian */
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,inet_network,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_network */
-#include <local/arpa.inet/inet_network.h>
+#include <libc/local/arpa.inet/inet_network.h>
 /* This function is the same as `inet_addr()', except that
  * the return value is in host-endian, rather than net-endian */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_network)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_network))(__cp); })
@@ -154,7 +154,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: 1: Success */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_aton,(char const *__restrict __cp, struct in_addr *__restrict __inp),(__cp,__inp))
 #else /* __CRT_HAVE_inet_aton */
-#include <local/arpa.inet/inet_aton.h>
+#include <libc/local/arpa.inet/inet_aton.h>
 /* Convert an Internet host address `CP' from its numbers-and-dots
  * notational form into its binary representation in network byte
  * order. The result is then stored in `*INP'
@@ -188,7 +188,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * @return: 1: Success */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),(__pcp,__inp,__network_addr))
 #else /* __CRT_HAVE_inet_paton */
-#include <local/arpa.inet/inet_paton.h>
+#include <libc/local/arpa.inet/inet_paton.h>
 /* Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
@@ -216,7 +216,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_paton, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
 __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_neta,(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len),(__net,__buf,__len))
 #else /* __CRT_HAVE_inet_neta */
-#include <local/arpa.inet/inet_neta.h>
+#include <libc/local/arpa.inet/inet_neta.h>
 /* Similar to `inet_ntoa_r(3)', but use smaller formats if possible:
  *     0.0.0.0      For net = 0
  *     %u           For net <= 255

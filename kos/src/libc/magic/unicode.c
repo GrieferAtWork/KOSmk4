@@ -54,7 +54,7 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
 #else /* __CRT_HAVE_unicode_utf8seqlen */
-#include <local/unicode_utf8seqlen.h>
+#include <libc/local/unicode_utf8seqlen.h>
 #define unicode_utf8seqlen __LOCAL_unicode_utf8seqlen
 #endif /* !__CRT_HAVE_unicode_utf8seqlen */
 #endif /* !__utf8_seqlen_defined */
@@ -128,7 +128,7 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
 
 %
 @@Read a single Unicode character from a given UTF-8 string
-[[libc, kernel, impl_include("<local/unicode_utf8seqlen.h>")]]
+[[libc, kernel, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
 $char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): $char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext): $char32_t]
@@ -303,7 +303,7 @@ $char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict pte
 
 %
 @@Same as `unicode_readutf8()', but don't read past `text_end'
-[[libc, kernel, impl_include("<local/unicode_utf8seqlen.h>")]]
+[[libc, kernel, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
 $char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): $char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): $char32_t]

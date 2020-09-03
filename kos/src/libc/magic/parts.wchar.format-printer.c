@@ -50,8 +50,8 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 
 %(auto_source){
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
-#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
-#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+#include "../libc/string.h"  /* Dependency of `#include <libc/local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <libc/local/format-scanf.h>' */
 #include <bits/math-constants.h>
 
 #include <libdisasm/disassembler.h>
@@ -171,7 +171,7 @@ $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
 #define __FORMAT_UNICODE_FORMAT8    format_8to32
 #define __FORMAT_UNICODE_FORMAT16   format_16to32
 @@pp_endif@@
-#include <local/format-printf.h>
+#include <libc/local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 

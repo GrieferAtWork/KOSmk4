@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79a9df49 */
+/* HASH CRC-32:0xa2169b7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -549,7 +549,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], 
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout),(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
-#include <local/netdb/gai_suspend.h>
+#include <libc/local/netdb/gai_suspend.h>
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
  * longest time the function keeps waiting before returning with an error.
@@ -574,7 +574,7 @@ __CDECLARE(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[],
  * cancellation point */
 __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend)
-#include <local/netdb/gai_suspend64.h>
+#include <libc/local/netdb/gai_suspend64.h>
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
  * longest time the function keeps waiting before returning with an error.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc37331e */
+/* HASH CRC-32:0x8fde393c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,7 +613,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, 
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE_pthread_timedjoin_np)
-#include <local/pthread/pthread_timedjoin_np.h>
+#include <libc/local/pthread/pthread_timedjoin_np.h>
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
@@ -640,7 +640,7 @@ __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread,
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
-#include <local/pthread/pthread_timedjoin64_np.h>
+#include <libc/local/pthread/pthread_timedjoin64_np.h>
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
@@ -909,7 +909,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_onc
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine))
 #else /* ... */
-#include <local/pthread/pthread_once.h>
+#include <libc/local/pthread/pthread_once.h>
 /* Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
@@ -1033,7 +1033,7 @@ public:
  * needed or fall back on the copy which must exist somewhere else */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_cleanup_routine,(struct __pthread_cleanup_frame *__frame),(__frame))
 #else /* __CRT_HAVE___pthread_cleanup_routine */
-#include <local/pthread/__pthread_cleanup_routine.h>
+#include <libc/local/pthread/__pthread_cleanup_routine.h>
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */
@@ -1197,7 +1197,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
-#include <local/pthread/pthread_mutex_timedlock.h>
+#include <libc/local/pthread/pthread_mutex_timedlock.h>
 /* Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1218,7 +1218,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock)
-#include <local/pthread/pthread_mutex_timedlock64.h>
+#include <libc/local/pthread/pthread_mutex_timedlock64.h>
 /* Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1384,7 +1384,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
-#include <local/pthread/pthread_rwlock_timedrdlock.h>
+#include <libc/local/pthread/pthread_rwlock_timedrdlock.h>
 /* Try to acquire read lock for RWLOCK or return after specfied time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1405,7 +1405,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
-#include <local/pthread/pthread_rwlock_timedrdlock64.h>
+#include <libc/local/pthread/pthread_rwlock_timedrdlock64.h>
 /* Try to acquire read lock for RWLOCK or return after specfied time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1436,7 +1436,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
-#include <local/pthread/pthread_rwlock_timedwrlock.h>
+#include <libc/local/pthread/pthread_rwlock_timedwrlock.h>
 /* Try to acquire write lock for RWLOCK or return after specfied time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1457,7 +1457,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
-#include <local/pthread/pthread_rwlock_timedwrlock64.h>
+#include <libc/local/pthread/pthread_rwlock_timedwrlock64.h>
 /* Try to acquire write lock for RWLOCK or return after specfied time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1536,7 +1536,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
-#include <local/pthread/pthread_cond_timedwait.h>
+#include <libc/local/pthread/pthread_cond_timedwait.h>
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
@@ -1566,7 +1566,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait)
-#include <local/pthread/pthread_cond_timedwait64.h>
+#include <libc/local/pthread/pthread_cond_timedwait64.h>
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
@@ -1610,7 +1610,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_setc
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_init,(pthread_spinlock_t *__lock, int __pshared),(__lock,__pshared))
 #else /* __CRT_HAVE_pthread_spin_init */
-#include <local/pthread/pthread_spin_init.h>
+#include <libc/local/pthread/pthread_spin_init.h>
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes
  * @return: EOK: Success */
@@ -1621,7 +1621,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIA
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_destroy,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_destroy */
-#include <local/pthread/pthread_spin_destroy.h>
+#include <libc/local/pthread/pthread_spin_destroy.h>
 /* Destroy the spinlock LOCK
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
@@ -1631,7 +1631,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFI
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_lock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_lock */
-#include <local/pthread/pthread_spin_lock.h>
+#include <libc/local/pthread/pthread_spin_lock.h>
 /* Wait until spinlock LOCK is retrieved
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
@@ -1642,7 +1642,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIA
  * @return: EBUSY: Lock has already been acquired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_trylock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_trylock */
-#include <local/pthread/pthread_spin_trylock.h>
+#include <libc/local/pthread/pthread_spin_trylock.h>
 /* Try to lock spinlock LOCK
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
@@ -1653,7 +1653,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFI
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_unlock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_unlock */
-#include <local/pthread/pthread_spin_unlock.h>
+#include <libc/local/pthread/pthread_spin_unlock.h>
 /* Release spinlock LOCK
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
@@ -1762,7 +1762,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __pr
 /* @return: * : The number of cpus that the calling thread is able to run on */
 __CDECLARE(,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,pthread_num_processors_np,(void),())
 #elif defined(__CRT_HAVE_sched_getaffinity)
-#include <local/pthread/pthread_num_processors_np.h>
+#include <libc/local/pthread/pthread_num_processors_np.h>
 /* @return: * : The number of cpus that the calling thread is able to run on */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
 #endif /* ... */
@@ -1773,7 +1773,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_A
  * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n))
 #elif defined(__CRT_HAVE_sched_setaffinity)
-#include <local/pthread/pthread_set_num_processors_np.h>
+#include <libc/local/pthread/pthread_set_num_processors_np.h>
 /* Restrict the calling thread to only run on the first `n' cpus
  * @return: EOK:    Success
  * @return: EINVAL: `n' was specified as less than `1'
@@ -1796,7 +1796,7 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),())
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),thr_main,())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
-#include <local/pthread/pthread_main_np.h>
+#include <libc/local/pthread/pthread_main_np.h>
 /* Returns 1 if the calling thread is the main() thread (i.e. the
  * thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned

@@ -305,8 +305,8 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 [[cp, guard, export_alias("_execv"), argument_names(path, ___argv)]]
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
-[[requires_include("<local/environ.h>"), requires($has_function(execve) && defined(__LOCAL_environ))]]
-[[impl_include("<local/environ.h>"), decl_prefix(DEFINE_TARGV)]]
+[[requires_include("<libc/local/environ.h>"), requires($has_function(execve) && defined(__LOCAL_environ))]]
+[[impl_include("<libc/local/environ.h>"), decl_prefix(DEFINE_TARGV)]]
 int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return execve(path, ___argv, __LOCAL_environ);
 }
@@ -325,8 +325,8 @@ int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnu
 [[cp, guard, export_alias("_execvp"), argument_names(file, ___argv), decl_prefix(DEFINE_TARGV)]]
 [[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execvp, { return __builtin_execvp(file, (char *const *)___argv); })]]
-[[requires_include("<local/environ.h>"), requires($has_function(execvpe) && defined(__LOCAL_environ))]]
-[[impl_include("<local/environ.h>")]]
+[[requires_include("<libc/local/environ.h>"), requires($has_function(execvpe) && defined(__LOCAL_environ))]]
+[[impl_include("<libc/local/environ.h>")]]
 int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 	return execvpe(file, ___argv, __LOCAL_environ);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4064dc0 */
+/* HASH CRC-32:0xb51b8efd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 /* Return directory part of PATH or "." if none is available */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path))
 #else /* __CRT_HAVE_dirname */
-#include <local/libgen/dirname.h>
+#include <libc/local/libgen/dirname.h>
 /* Return directory part of PATH or "." if none is available */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* !__CRT_HAVE_dirname */
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
  * version available under the real name */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),(__filename))
 #else /* __CRT_HAVE___xpg_basename */
-#include <local/libgen/__xpg_basename.h>
+#include <libc/local/libgen/__xpg_basename.h>
 /* Return final component of PATH.
  * This is the weird XPG version of this function. It sometimes will
  * modify its argument. Therefore we normally use the GNU version (in

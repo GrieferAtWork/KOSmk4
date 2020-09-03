@@ -339,15 +339,15 @@ $pid_t cwait(int *tstat, $pid_t pid, int action) {
 %[default:section(".text.crt{|.dos}.fs.exec.spawn")]
 
 [[cp, guard, argument_names(mode, path, ___argv), export_alias("_spawnv"), decl_prefix(DEFINE_TARGV)]]
-[[requires_include("<local/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
-[[impl_include("<local/environ.h>")]]
+[[requires_include("<libc/local/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
+[[impl_include("<libc/local/environ.h>")]]
 $pid_t spawnv(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return spawnve(mode, path, ___argv, __LOCAL_environ);
 }
 
 [[cp, guard, argument_names(mode, file, ___argv), export_alias("_spawnvp"), decl_prefix(DEFINE_TARGV)]]
-[[requires_include("<local/environ.h>"), requires($has_function(spawnvpe) && defined(__LOCAL_environ))]]
-[[impl_include("<local/environ.h>")]]
+[[requires_include("<libc/local/environ.h>"), requires($has_function(spawnvpe) && defined(__LOCAL_environ))]]
+[[impl_include("<libc/local/environ.h>")]]
 $pid_t spawnvp(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 	return spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }

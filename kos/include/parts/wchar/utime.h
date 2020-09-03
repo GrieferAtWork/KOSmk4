@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0583c7b */
+/* HASH CRC-32:0xf34442b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filena
 #elif defined(__CRT_HAVE__wutime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
-#include <local/parts.wchar.utime/wutime.h>
+#include <libc/local/parts.wchar.utime/wutime.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wutime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wutime)(wchar_t const *__filename, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime))(__filename, __file_times); })
 #endif /* ... */
 
@@ -62,7 +62,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime64,(__WCHAR_TYPE__ const
 #elif defined(__CRT_HAVE__wutime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
-#include <local/parts.wchar.utime/wutime64.h>
+#include <libc/local/parts.wchar.utime/wutime64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wutime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wutime64)(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))(__filename, __file_times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */

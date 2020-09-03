@@ -46,7 +46,7 @@ global allLibraryFunctionsByName: {string: LibraryFunction} = Dict();
 @@e.g.: @allSystemheaders["sys.stat"] for <sys/stat.h>
 global allSystemHeaders: {string: SystemHeader} = Dict();
 
-@@HashSet of all functions for which the <local/header/function.h> file was ever used
+@@HashSet of all functions for which the <libc/local/header/function.h> file was ever used
 global neededLocalFunction: {LocalFunction...} = HashSet();
 
 
