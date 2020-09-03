@@ -796,11 +796,6 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict me,
 	struct task *next;
 	jtime_t /*  */ cpu_jtime; /* J-time */
 	quantum_diff_t cpu_qelps; /* Quantum-elapsed */
-#ifndef NDEBUG
-	struct timespec before;
-	struct timespec after;
-	before = realtime();
-#endif /* !NDEBUG */
 
 	assertf(thread == me->c_current,
 	        "thread        = %p\n"
@@ -844,15 +839,6 @@ do_resync_rtc:
 		}
 		cpu_qelps = arch_cpu_quantum_elapsed_nopr(me);
 	}
-#ifndef NDEBUG
-	after = realtime();
-	assertf(before <= after || kernel_poisoned(),
-	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-	        (s64)(before - after).tv_sec,
-	        (uintptr_t)(before - after).tv_nsec);
-#endif /* !NDEBUG */
 
 	/* Check for a scheduling override */
 	if unlikely((next = me->c_override) != NULL) {
@@ -888,16 +874,6 @@ do_resync_rtc:
 		                     cpu_qtime,
 		                     cpu_qsize);
 	}
-#ifndef NDEBUG
-	before = after;
-	after = realtime();
-	assertf(before <= after || kernel_poisoned(),
-	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-	        (s64)(before - after).tv_sec,
-	        (uintptr_t)(before - after).tv_nsec);
-#endif /* !NDEBUG */
 	return next;
 }
 
