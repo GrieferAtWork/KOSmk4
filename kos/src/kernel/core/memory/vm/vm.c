@@ -438,7 +438,7 @@ NOTHROW(KCALL vm_set_clear)(struct pointer_set *__restrict self) {
  * @return: > vms->ps_size:  Failed to allocate sufficient memory within
  *                           the pointer set to house all vm pointers.
  *                           The caller should unlock `self', then
- *                          `pointer_set_reset_rehash(vms,return)' to
+ *                          `pointer_set_clear_and_rehash(vms,return)' to
  *                           allocate sufficient memory with the given
  *                           buffer, before re-attempting the call. */
 PRIVATE NOBLOCK size_t
@@ -455,13 +455,13 @@ NOTHROW(KCALL vm_set_collect_from_datapart)(struct pointer_set *__restrict vms,
 		     iter; iter = iter->vn_link.ln_next) {
 			int error;
 			REF struct vm *v = iter->vn_vm;
-			assert(i ? (iter->vn_prot & VM_PROT_SHARED)
-			         : !(iter->vn_prot & VM_PROT_SHARED) ||
-			           wasdestroyed(v));
+			assert((i ? (iter->vn_prot & VM_PROT_SHARED)
+			          : !(iter->vn_prot & VM_PROT_SHARED)) ||
+			       wasdestroyed(v));
 			if unlikely(!tryincref(v))
 				continue; /* Dead VM (associated with an node that has become stale.) */
 			error = pointer_set_insert_nx(vms,
-			                              v,
+			                              v, /* Inherit reference */
 			                              GFP_ATOMIC | GFP_LOCKED);
 			if (error != POINTER_SET_INSERT_NX_SUCCESS)
 				decref_unlikely(v);
@@ -569,7 +569,8 @@ NOTHROW(KCALL vm_set_locktrywrite_all)(struct pointer_set *__restrict self) {
 			continue;
 		result = v;
 		/* Release all of the locks that were already acquired. */
-		while (i--) {
+		while (i) {
+			--i;
 			v = (struct vm *)self->ps_list[i];
 			if (v != (struct vm *)POINTER_SET_SENTINAL)
 				sync_endwrite(v);
@@ -2261,7 +2262,7 @@ again_lock_datapart:
 		vms_count = vm_set_collect_from_datapart_srefs_writable(&vms, self);
 		if unlikely(vms_count > vms.ps_size) {
 			sync_endread(self);
-			pointer_set_reset_rehash(&vms, vms_count, GFP_LOCKED);
+			pointer_set_clear_and_rehash(&vms, vms_count, GFP_LOCKED);
 			goto again_lock_datapart;
 		}
 

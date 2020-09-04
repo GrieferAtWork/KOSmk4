@@ -1425,20 +1425,23 @@ again:
 			                 instruction_trypred(node->m_trace[0],
 			                                     INSTRLEN_ISA_DEFAULT),
 			                 node->m_trace[0],
-			                 "Leaked %Iu bytes of heap-memory at %p...%p",
-			                 MALLNODE_SIZE(node), MALLNODE_MIN(node), MALLNODE_MAX(node));
+			                 "Leaked %Iu bytes of heap-memory at %p...%p [tid=%u]",
+			                 MALLNODE_SIZE(node),
+			                 MALLNODE_MIN(node), MALLNODE_MAX(node),
+			                 node->m_tracetid);
 		} else {
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 instruction_trypred(node->m_trace[0],
 			                                     INSTRLEN_ISA_DEFAULT),
 			                 node->m_trace[0],
-			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p",
+			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p [tid=%u]",
 			                 MALLNODE_SIZE(node) - (CONFIG_MALL_PREFIX_SIZE +
 			                                        CONFIG_MALL_HEAD_SIZE +
 			                                        CONFIG_MALL_TAIL_SIZE),
 			                 MALLNODE_MIN(node) + (CONFIG_MALL_PREFIX_SIZE +
 			                                       CONFIG_MALL_HEAD_SIZE),
-			                 MALLNODE_MAX(node) - CONFIG_MALL_TAIL_SIZE);
+			                 MALLNODE_MAX(node) - CONFIG_MALL_TAIL_SIZE,
+			                 node->m_tracetid);
 		}
 		trace_size = MALLNODE_TRACESZ(node);
 		for (i = 1; i < trace_size; ++i) {
@@ -1674,15 +1677,19 @@ NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
 	size_t i, size;
 	size = MALLNODE_TRACESZ(self);
 	for (i = 0; i < size; ++i) {
-		uintptr_t pc = (uintptr_t)self->m_trace[i];
+		void const *prev_pc;
+		void const *pc = self->m_trace[i];
 		if (!pc)
 			break;
-		addr2line_printf(printer, arg,
-		                 instruction_trypred((void const *)pc,
-		                                     INSTRLEN_ISA_DEFAULT),
-		                 (void const *)pc,
-		                 i ? "Called here"
-		                   : "Allocated from here");
+		prev_pc = instruction_trypred(pc, INSTRLEN_ISA_DEFAULT);
+		if (i) {
+			addr2line_printf(printer, arg, prev_pc, pc,
+			                 "Called here");
+		} else {
+			addr2line_printf(printer, arg, prev_pc, pc,
+			                 "Allocated from here [tid=%u]",
+			                 self->m_tracetid);
+		}
 	}
 }
 
@@ -1891,6 +1898,9 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 		existing_node = *p_existing_node;
 		assert(existing_node);
 		if (MALLNODE_ISVALID(existing_node)) {
+			/* Poison the kernel, so we we can print tracebacks
+			 * without having to call `mall_release()' */
+			_kernel_poison();
 			printk(KERN_CRIT "Traceback of existing node:\n");
 			mallnode_print_traceback(existing_node,
 			                         &syslog_printer,
@@ -1977,7 +1987,7 @@ mall_trace_impl(void *base, size_t num_bytes, gfp_t flags, void *context) {
 	node->m_tree.a_vmax = (uintptr_t)base + num_bytes - 1;
 	node->m_flags       = flags;
 	node->m_userver     = mall_valid_user_node_version_number;
-	node->m_tracetid    = task_gettid_s();
+	node->m_tracetid    = task_getroottid_s();
 	/* Insert the new node into the tree of user-defined tracing points. */
 	if (!mall_acquire(flags)) {
 		mallnode_free(node);
@@ -2000,7 +2010,7 @@ NOTHROW(KCALL mall_trace_impl_nx)(void *base, size_t num_bytes, gfp_t flags, voi
 	node->m_tree.a_vmax = (uintptr_t)base + num_bytes - 1;
 	node->m_flags       = flags;
 	node->m_userver     = mall_valid_user_node_version_number;
-	node->m_tracetid    = task_gettid_s();
+	node->m_tracetid    = task_getroottid_s();
 	/* Insert the new node into the tree of user-defined tracing points. */
 	if (!mall_acquire_nx(flags)) {
 		mallnode_free(node);

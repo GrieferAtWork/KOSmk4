@@ -142,12 +142,14 @@ pointer_set_insert(struct pointer_set *__restrict self,
                    void *ptr, gfp_t flags DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	if (((self->ps_size + 1) * 3) / 2 >= self->ps_mask) {
-		uintptr_t new_mask = (self->ps_mask << 1) | 1;
-		uintptr_t *new_map = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
+		uintptr_t new_mask;
+		uintptr_t *new_map;
+		new_mask = (self->ps_mask << 1) | 1;
+		new_map  = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
-		                                             GFP_CALLOC |
+		                                   GFP_CALLOC |
 #endif /* POINTER_SET_SENTINAL == 0 */
-		                                             flags);
+		                                   flags);
 		if likely(new_map) {
 do_rehash_with:
 			pointer_set_rehash_with(self, new_map, new_mask);
@@ -173,12 +175,14 @@ LOCAL NOBLOCK int
 NOTHROW(KCALL pointer_set_insert_nx)(struct pointer_set *__restrict self,
                                      void *ptr, gfp_t flags DFL(GFP_NORMAL)) {
 	if (((self->ps_size + 1) * 3) / 2 >= self->ps_mask) {
-		uintptr_t new_mask = (self->ps_mask << 1) | 1;
-		uintptr_t *new_map = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
+		uintptr_t new_mask;
+		uintptr_t *new_map;
+		new_mask = (self->ps_mask << 1) | 1;
+		new_map  = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
-		                                             GFP_CALLOC |
+		                                   GFP_CALLOC |
 #endif /* POINTER_SET_SENTINAL == 0 */
-		                                             flags);
+		                                   flags);
 		if likely(new_map) {
 			pointer_set_rehash_with(self, new_map, new_mask);
 		} else if (self->ps_size >= self->ps_mask) {
@@ -210,32 +214,35 @@ NOTHROW(KCALL pointer_set_contains)(struct pointer_set const *__restrict self,
 /* Set the given pointer_set and re-hash it to be
  * able to sustain at least `min_allocation' items. */
 LOCAL void KCALL
-pointer_set_reset_rehash(struct pointer_set *__restrict self,
-                         size_t min_allocation,
-                         gfp_t flags DFL(GFP_NORMAL))
+pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
+                             size_t min_allocation,
+                             gfp_t flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	size_t new_mask;
+	uintptr_t *old_map;
 	uintptr_t *new_map;
 	new_mask = 1;
 	while (new_mask <= (min_allocation * 3) / 2)
 		new_mask = (new_mask << 1) | 1;
-	if (self->ps_list != self->ps_buf)
-		kfree(self->ps_list);
-	new_map = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
+	old_map = self->ps_list;
+	if (self->ps_list == self->ps_buf)
+		old_map = NULL;
+	new_map = (uintptr_t *)krealloc_nx(old_map,
+	                                   (new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
-	                                  GFP_CALLOC |
+	                                   GFP_CALLOC |
 #endif /* POINTER_SET_SENTINAL == 0 */
-	                                  flags);
+	                                   flags);
 	if unlikely(!new_map) {
 		new_mask = 1;
-		while (new_mask < min_allocation)
+		while (new_mask <= min_allocation)
 			new_mask = (new_mask << 1) | 1;
-		self->ps_list = self->ps_buf; /* In case of an exception, ensure a consistent state! */
-		new_map = (uintptr_t *)kmalloc((new_mask + 1) * sizeof(uintptr_t),
+		new_map = (uintptr_t *)krealloc(old_map,
+		                                (new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
-		                               GFP_CALLOC |
+		                                GFP_CALLOC |
 #endif /* POINTER_SET_SENTINAL == 0 */
-		                               flags);
+		                                flags);
 	}
 #if POINTER_SET_SENTINAL != 0
 	{
@@ -250,30 +257,35 @@ pointer_set_reset_rehash(struct pointer_set *__restrict self,
 }
 
 LOCAL bool
-NOTHROW(KCALL pointer_set_reset_rehash_nx)(struct pointer_set *__restrict self,
-                                           size_t min_allocation,
-                                           gfp_t flags DFL(GFP_NORMAL)) {
+NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict self,
+                                               size_t min_allocation,
+                                               gfp_t flags DFL(GFP_NORMAL)) {
 	size_t new_mask;
 	uintptr_t *new_map;
+	uintptr_t *old_map;
 	new_mask = 1;
 	while (new_mask <= (min_allocation * 3) / 2)
 		new_mask = (new_mask << 1) | 1;
-	if (self->ps_list != self->ps_buf)
-		kfree(self->ps_list);
-	new_map = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
+	old_map = self->ps_list;
+	if (self->ps_list == self->ps_buf)
+		old_map = NULL;
+	new_map = (uintptr_t *)krealloc_nx(old_map,
+	                                   (new_mask + 1) *
+	                                   sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
-	                                  GFP_CALLOC |
+	                                   GFP_CALLOC |
 #endif /* POINTER_SET_SENTINAL == 0 */
-	                                  flags);
+	                                   flags);
 	if unlikely(!new_map) {
 		new_mask = 1;
-		while (new_mask < min_allocation)
+		while (new_mask <= min_allocation)
 			new_mask = (new_mask << 1) | 1;
-		new_map = (uintptr_t *)kmalloc_nx((new_mask + 1) * sizeof(uintptr_t),
+		new_map = (uintptr_t *)krealloc_nx(old_map,
+		                                   (new_mask + 1) * sizeof(uintptr_t),
 #if POINTER_SET_SENTINAL == 0
-		                                  GFP_CALLOC |
+		                                   GFP_CALLOC |
 #endif /* POINTER_SET_SENTINAL == 0 */
-		                                  flags);
+		                                   flags);
 		if unlikely(!new_map)
 			return false;
 	}

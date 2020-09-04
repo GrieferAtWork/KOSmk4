@@ -329,7 +329,7 @@ again_scan_nodes:
 			vms_count = vm_set_collect_from_datapart_crefs(&vms, self);
 			if unlikely(vms_count > vms.ps_size) {
 				sync_endwrite(self);
-				pointer_set_reset_rehash(&vms, vms_count, GFP_LOCKED);
+				pointer_set_clear_and_rehash(&vms, vms_count, GFP_LOCKED);
 				goto again_lock_datapart;
 			}
 			/* Acquire write-locks to all of the VMs affected. */

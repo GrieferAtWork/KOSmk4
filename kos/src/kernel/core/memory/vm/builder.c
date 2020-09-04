@@ -540,12 +540,12 @@ again_lock_parts:
 			min_parts = locked_parts.ps_size;
 			for (; node; node = node->vn_byaddr.ln_next)
 				++min_parts;
-			/* NOTE: `pointer_set_reset_rehash()' automatically clears the part-set,
+			/* NOTE: `pointer_set_clear_and_rehash()' automatically clears the part-set,
 			 *        as well as frees the old hash-vector in case of an allocation
 			 *        failure. */
-			pointer_set_reset_rehash(&locked_parts,
-			                         min_parts,
-			                         GFP_NORMAL);
+			pointer_set_clear_and_rehash(&locked_parts,
+			                             min_parts,
+			                             GFP_NORMAL);
 			goto again_lock_parts;
 		}
 		if (error != POINTER_SET_INSERT_NX_EXISTS) {

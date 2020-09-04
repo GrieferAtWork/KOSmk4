@@ -331,6 +331,7 @@ again_lock_datapart:
 				vm_node_destroy(vm_node_vector[vm_node_count]);
 			if (vm_node_vector != vm_node_buffer)
 				kfree(vm_node_vector);
+			pointer_set_fini(&vms);
 			return NULL;
 		}
 		/* Allocate a new part if we haven't done so already. */
@@ -360,12 +361,11 @@ again_lock_datapart:
 		vms_count = vm_set_collect_from_datapart(&vms, self);
 		if unlikely(vms_count > vms.ps_size) {
 			sync_endwrite(self);
-			vms.ps_size = 0; /* No need for a full clear, since we're doing a reset-rehash next! */
 #ifdef SPLIT_NX
-			if (!pointer_set_reset_rehash_nx(&vms, vms_count, GFP_LOCKED))
+			if (!pointer_set_clear_and_rehash_nx(&vms, vms_count, GFP_LOCKED))
 				goto err;
 #else /* SPLIT_NX */
-			pointer_set_reset_rehash(&vms, vms_count, GFP_LOCKED);
+			pointer_set_clear_and_rehash(&vms, vms_count, GFP_LOCKED);
 #endif /* !SPLIT_NX */
 			goto again_lock_datapart;
 		}

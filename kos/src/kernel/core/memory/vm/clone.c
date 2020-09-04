@@ -135,6 +135,7 @@ vm_clone(struct vm *__restrict self, bool keep_loose_mappings)
 	TRY {
 		assert(!isshared(result));
 again_lock_vm:
+		assert(locked_parts.ps_size == 0);
 		sync_write(self);
 		/* Figure out how many nodes it'll take to clone the contents of `self' */
 		node_req_count = 0;
@@ -171,12 +172,12 @@ again_lock_vm:
 					for (; node; node = node->vn_byaddr.ln_next)
 						++min_parts;
 					sync_endwrite(self);
-					/* NOTE: `pointer_set_reset_rehash()' automatically clears the part-set,
+					/* NOTE: `pointer_set_clear_and_rehash()' automatically clears the part-set,
 					 *        as well as frees the old hash-vector in case of an allocation
 					 *        failure. */
-					pointer_set_reset_rehash(&locked_parts,
-					                         min_parts,
-					                         GFP_NORMAL);
+					pointer_set_clear_and_rehash(&locked_parts,
+					                             min_parts,
+					                             GFP_NORMAL);
 					pointer_set_assert_writing_vm_dataparts(&locked_parts);
 					goto again_lock_vm;
 				}
