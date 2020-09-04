@@ -110,9 +110,9 @@ DATDEF ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask;
 /* Return a pointer to the signal mask of the calling thread. */
 #ifdef __INTELLISENSE__
 FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL sigmask_getrd(void);
-#else
+#else /* __INTELLISENSE__ */
 #define sigmask_getrd() PERTASK_GET(this_sigmask.m_pointer)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */

@@ -226,8 +226,10 @@ kernel_terminal_raise(struct terminal *__restrict self,
 	fg_pid = ttybase_device_getfproc(term);
 	if (fg_pid) {
 		REF struct task *fg;
-		FINALLY_DECREF_UNLIKELY(fg_pid);
-		fg = taskpid_gettask(fg_pid);
+		{
+			FINALLY_DECREF_UNLIKELY(fg_pid);
+			fg = taskpid_gettask(fg_pid);
+		}
 		if likely(fg) {
 			FINALLY_DECREF_UNLIKELY(fg);
 			task_raisesignalprocessgroup(fg, signo);

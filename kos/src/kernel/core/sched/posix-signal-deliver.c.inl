@@ -157,7 +157,7 @@ task_raisesignalthread(struct task *__restrict target,
 		                                TASK_USER_RPC_FINTR,
 		                                rpc_flags);
 	} EXCEPT {
-		if (error_code() != ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+		if (!was_thrown(E_INTERRUPT_USER_RPC))
 			kfree(entry);
 		RETHROW();
 	}
@@ -299,10 +299,12 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 			                                TASK_USER_RPC_FINTR,
 			                                rpc_flags);
 		} EXCEPT {
-			if (error_code() != ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+			if (!was_thrown(E_INTERRUPT_USER_RPC))
 				kfree(info);
 			RETHROW();
 		}
+		if unlikely(!result)
+			kfree(info);
 		return result;
 	}
 #endif /* !DELIVER_NX */
@@ -418,7 +420,8 @@ NOTHROW_NX(KCALL FUNC(task_raisesignalprocess))(struct task *__restrict target,
 			IFELSE(THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			             E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 			             entry->sqe_info.si_signo),
-				   return TASK_RAISESIGNALTHREAD_NX_BADSIGNO);
+			       kfree(entry);
+			       return TASK_RAISESIGNALTHREAD_NX_BADSIGNO);
 		}
 	} EXCEPT {
 		kfree(entry);
@@ -468,7 +471,7 @@ NOTHROW_NX(KCALL FUNC(task_raisesignalprocessgroup))(struct task *__restrict tar
 		if unlikely(!error)
 			return 0; /* Process group leader cannot receive signals. */
 	} EXCEPT {
-		if (error_code() == ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+		if (was_thrown(E_INTERRUPT_USER_RPC))
 			was_interrupted = true;
 		else {
 			decref_unlikely(pgroup);
@@ -552,7 +555,7 @@ err_during_delivery:
 					TRY {
 						error = task_raisesignalprocess(pgroup, info, rpc_flags);
 					} EXCEPT {
-						if (error_code() != ERROR_CODEOF(E_INTERRUPT_USER_RPC))
+						if (!was_thrown(E_INTERRUPT_USER_RPC))
 							RETHROW();
 						was_interrupted = true;
 					}
