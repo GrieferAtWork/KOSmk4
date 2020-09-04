@@ -52,6 +52,8 @@
 #include <libdl/extension.h>
 #include <libdl/module.h>
 
+#include "builtin.h"
+
 #undef TRY
 #undef EXCEPT
 #undef RETHROW

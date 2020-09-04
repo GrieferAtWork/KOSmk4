@@ -35,6 +35,9 @@
 
 #include <elf.h>
 
+
+#define USERMOD_TYPE_MAX USERMOD_TYPE_ARCHMAX
+
 /* API for interacting with ELF binaries mapped into user-space. */
 
 DECL_BEGIN

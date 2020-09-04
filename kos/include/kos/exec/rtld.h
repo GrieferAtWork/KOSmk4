@@ -26,12 +26,12 @@
 
 /* Absolute path of the libdl driver itself. */
 #ifndef RTLD_LIBDL
-#define RTLD_LIBDL "/lib/libdl.so"
+#define RTLD_LIBDL "/" RTLD_LIB "/libdl.so"
 #endif /* !RTLD_LIBDL */
 
 /* Default for `LD_LIBRARY_PATH' */
 #ifndef RTLD_LIBRARY_PATH
-#define RTLD_LIBRARY_PATH "/usr/lib:/lib"
+#define RTLD_LIBRARY_PATH "/usr/" RTLD_LIB ":/" RTLD_LIB
 #endif /* !RTLD_LIBRARY_PATH */
 
 /* The string to which `$LIB' in library paths is expanded */

@@ -75,7 +75,7 @@ DATDEF byte_t elfexec_system_rtld[];
 DATDEF size_t const elfexec_system_rtld_size;
 #else /* __INTELLISENSE__ */
 DATDEF byte_t elfexec_system_rtld_size[];
-#define elfexec_system_rtld_size  ((size_t)elfexec_system_rtld_size)
+#define elfexec_system_rtld_size ((size_t)elfexec_system_rtld_size)
 #endif /* !__INTELLISENSE__ */
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_SYSTEM_RTLD */
 

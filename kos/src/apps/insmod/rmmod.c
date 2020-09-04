@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	}
 	/* TODO: Temporarily re-direct syslog() for this process to stdout
 	 *      (or capture all syslog() messages written by this process
-	 *       after this call to `KSysctlInsmod()', and then print everything
+	 *       after this call to `KSysctlDelmod()', and then print everything
 	 *       to stdout) */
 	KSysctlDelmod(argv[1]);
 	return EXIT_SUCCESS;

@@ -214,11 +214,14 @@ __LOCAL __ATTR_UNUSED void ATREE_NOTHROW(ATREE_CALL ATREE(minmaxlocate))(T *root
 PRIVATE __ATTR_UNUSED void
 ATREE_NOTHROW(ATREE_CALL ATREE(priv_reinsertall))(T **__restrict proot, T *__restrict insert_root,
                                                   ATREE_SEMI_T(Tkey) addr_semi, ATREE_LEVEL_T addr_level) {
-	if (insert_root->N_NODEPATH.a_min != ATREE_NULL)
-		ATREE(priv_reinsertall)(proot, insert_root->N_NODEPATH.a_min, addr_semi, addr_level);
-	if (insert_root->N_NODEPATH.a_max != ATREE_NULL)
-		ATREE(priv_reinsertall)(proot, insert_root->N_NODEPATH.a_max, addr_semi, addr_level);
+	T *min_node, *max_node;
+	min_node = insert_root->N_NODEPATH.a_min;
+	max_node = insert_root->N_NODEPATH.a_max;
 	ATREE(insert_at)(proot, insert_root, addr_semi, addr_level);
+	if (min_node != ATREE_NULL)
+		ATREE(priv_reinsertall)(proot, min_node, addr_semi, addr_level);
+	if (max_node != ATREE_NULL)
+		ATREE(priv_reinsertall)(proot, max_node, addr_semi, addr_level);
 }
 
 ATREE_IMP __ATTR_UNUSED __BOOL
@@ -228,8 +231,8 @@ ATREE_NOTHROW(ATREE_CALL ATREE(tryinsert_at))(T **__restrict proot, T *__restric
 #ifdef ATREE_SINGLE
 	ATREE_SEMI_T(Tkey) newleaf_addr;
 	newleaf_addr = ATREE_NODE_ADDR(newleaf);
-#define newleaf_min   newleaf_addr
-#define newleaf_max   newleaf_addr
+#define newleaf_min newleaf_addr
+#define newleaf_max newleaf_addr
 #else /* ATREE_SINGLE */
 	ATREE_SEMI_T(Tkey) newleaf_min, newleaf_max;
 	newleaf_min = ATREE_NODE_MIN(newleaf);

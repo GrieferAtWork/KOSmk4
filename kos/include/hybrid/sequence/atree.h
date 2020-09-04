@@ -39,8 +39,8 @@ __DECL_BEGIN
  * isn't allowed, causing either an error, or undefined behavior.
  *
  * An key tree follows strict ordering rules that enforce
- * a min-max mapping for every leaf that can be determined by
- * its associated addrsemi and addrlevel value.
+ * a min-max mapping for every leaf that can be determined
+ * by its associated addrsemi and addrlevel value.
  *
  * addrsemi:
  *   - The center point used as hint to plot the
@@ -50,26 +50,27 @@ __DECL_BEGIN
  *     Only when it wasn't found, continue search as described below.
  *   Assuming 32-bit addresses, a path might be plotted like this:
  *     ADDR: 0x73400000
- *     LEVEL 31; SEMI 0x80000000 >= 0x73400000 -> MIN (unset bit 31; set bit 30)
- *     LEVEL 30; SEMI 0x40000000 <  0x73400000 -> MAX (              set bit 29)
- *     LEVEL 29; SEMI 0x60000000 <  0x73400000 -> MAX (              set bit 28)
- *     LEVEL 28; SEMI 0x70000000 <  0x73400000 -> MAX (              set bit 27)
- *     LEVEL 27; SEMI 0x78000000 >= 0x73400000 -> MIN (unset bit 27; set bit 26)
- *     LEVEL 26; SEMI 0x74000000 >= 0x73400000 -> MIN (unset bit 26; set bit 25)
- *     LEVEL 25; SEMI 0x72000000 <  0x73400000 -> MAX (              set bit 24)
- *     LEVEL 24; SEMI 0x73000000 <  0x73400000 -> MAX (              set bit 23)
- *     LEVEL 23; SEMI 0x73800000 >= 0x73400000 -> MIN (unset bit 23; set bit 22)
- *     LEVEL 22; SEMI 0x73400000 == 0x73400000 -> STOP SEARCH
+ *     LEVEL 31; SEMI 0x80000000 > 0x73400000 -> MIN (unset bit 31; set bit 30)
+ *     LEVEL 30; SEMI 0x40000000 < 0x73400000 -> MAX (              set bit 29)
+ *     LEVEL 29; SEMI 0x60000000 < 0x73400000 -> MAX (              set bit 28)
+ *     LEVEL 28; SEMI 0x70000000 < 0x73400000 -> MAX (              set bit 27)
+ *     LEVEL 27; SEMI 0x78000000 > 0x73400000 -> MIN (unset bit 27; set bit 26)
+ *     LEVEL 26; SEMI 0x74000000 > 0x73400000 -> MIN (unset bit 26; set bit 25)
+ *     LEVEL 25; SEMI 0x72000000 < 0x73400000 -> MAX (              set bit 24)
+ *     LEVEL 24; SEMI 0x73000000 < 0x73400000 -> MAX (              set bit 23)
+ *     LEVEL 23; SEMI 0x73800000 > 0x73400000 -> MIN (unset bit 23; set bit 22)
+ *     LEVEL 22; SEMI 0x73400000 = 0x73400000 -> STOP SEARCH
  *   >> The key `0x73400000' can be mapped to 10 different leafes,
- *      with the worst case (aka. failure) lookup time for this key
+ *      with the worst case (here: failure) lookup time for this key
  *      always being O(10).
- *      Note though that for the lookup time to actually be 10, other mapping
- *      must be available that cover _all_ of the SEMI-values during all levels.
+ *      Note though that for the lookup time to actually be 10, other mappings
+ *      must exist that cover _all_ of the SEMI-values during all levels.
  *
  * addrlevel:
  *   - The index of the bit that was set for the current iteration.
- *   - Technically not required, as it can be calculated from an addrsemi (s.a. CLZ()),
- *     carrying this around still allows the addrtree to run faster.
+ *   - Technically not required, as it can be calculated from addrsemi
+ *     carrying this around still allows the addrtree to run faster:
+ *     >> addrlevel = CTZ(addrsemi)   (CTZ = CountTrailingZeroes)
  *
  */
 
@@ -113,14 +114,14 @@ __DECL_BEGIN
 #define ATREE_WALKMIN(Tkey, semi, level)                        \
 	((semi) = (((semi) & ~((ATREE_SEMI_T(Tkey))1 << (level))) | \
 	           ((ATREE_SEMI_T(Tkey))1 << ((level)-1))),         \
-	 --(level)) /* unset level`th bit; set level`th-1 bit. */
+	 --(level)) /* unset level'th bit; set level-1'th bit. */
 #define ATREE_WALKMAX(Tkey, semi, level) \
-	(--(level), (semi) |= ((ATREE_SEMI_T(Tkey))1 << (level))) /* set level`th-1 bit. */
+	(--(level), (semi) |= ((ATREE_SEMI_T(Tkey))1 << (level))) /* set level-1'th bit. */
 #define ATREE_NEXTMIN(Tkey, semi, level)              \
 	(((semi) & ~((ATREE_SEMI_T(Tkey))1 << (level))) | \
-	 ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* unset level`th bit; set level`th-1 bit. */
+	 ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* unset level'th bit; set level-1'th bit. */
 #define ATREE_NEXTMAX(Tkey, semi, level) \
-	((semi) | ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* set level`th-1 bit. */
+	((semi) | ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* set level-1'th bit. */
 #define ATREE_NEXTLEVEL(level) \
 	((level)-1)
 #define ATREE_SEMILEVEL(semi) \

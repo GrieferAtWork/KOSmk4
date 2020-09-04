@@ -395,19 +395,19 @@ INTERN_FUNCTION(_start)
 	movl   $(V2P(_bootcpu)), %edi
 	movl   $(V2P(__kernel_percpu_start)), %esi
 	movl   $(__kernel_percpu_size), %ecx
-	rep;   movsb
+	rep    movsb
 	/* memcpy(&_bootcpu_x86_tss, __kernel_percpu_tss, SIZEOF_TSS); */
 	movl   $(V2P(_bootcpu_x86_tss)), %edi
 	movl   $(V2P(__kernel_percpu_tss)), %esi
 #if IS_ALIGNED(SIZEOF_TSS, 4)
 	movl   $(SIZEOF_TSS / 4), %ecx
-	rep;   movsl
+	rep    movsl
 #elif IS_ALIGNED(SIZEOF_TSS, 2)
 	movl   $(SIZEOF_TSS / 2), %ecx
-	rep;   movsw
+	rep    movsw
 #else
 	movl   $(SIZEOF_TSS), %ecx
-	rep;   movsb
+	rep    movsb
 #endif
 #endif /* !CONFIG_NO_SMP */
 
@@ -415,28 +415,28 @@ INTERN_FUNCTION(_start)
 	movl   $(V2P(_bootidle)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
-	rep;   movsb
+	rep    movsb
 
 	/* memcpy(&_boottask, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
 	EXTERN(_boottask)
 	movl   $(V2P(_boottask)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
-	rep;   movsb
+	rep    movsb
 
 	/* memcpy(&_asyncwork, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
 	EXTERN(_asyncwork)
 	movl   $(V2P(_asyncwork)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
-	rep;   movsb
+	rep    movsb
 
 	/* memcpy((byte_t *)&vm_kernel + PAGEDIR_SIZE, __kernel_pervm_start, (size_t)__kernel_pervm_size); */
 	EXTERN(vm_kernel)
 	movl   $(V2P(vm_kernel) + PAGEDIR_SIZE), %edi
 	movl   $(V2P(__kernel_pervm_start)), %esi
 	movl   $(__kernel_pervm_size), %ecx
-	rep;   movsb
+	rep    movsb
 
 	/* Set the DIDINIT flag for the boot cpu's feature table. */
 	orl    $(CPU_FEATURE_FDIDINIT), V2P(bootcpu_x86_cpufeatures)
@@ -842,7 +842,7 @@ INTERN_FUNCTION(_start64)
 	movq   %rsp, %rdi
 	xorq   %rax, %rax
 	movq   $(SIZEOF_GPREGSNSP / 8), %rcx
-	rep;   stosq
+	rep    stosq
 
 	movq   %rsp, %rdi
 	EXTERN(__i386_kernel_main)

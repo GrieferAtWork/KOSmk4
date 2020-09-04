@@ -266,10 +266,9 @@ again:
  * Alternatively, the given `name' may also be in the form of `MAJOR:MINOR',
  * an encoding that is always attempted first by attempting to decode the
  * given name using `scanf("%u:%u")'
- * >> // TODO: Use well-known character devices this example!
- * >> character_device_lookup_name("3:64");      // MKDEV(3,64)
- * >> character_device_lookup_name("/dev/hdc1"); // MKDEV(22,0) + 1
- * >> character_device_lookup_name("hda2");      // MKDEV(3,0)  + 2
+ * >> character_device_lookup_name("3:64");      // MKDEV(3, 64)
+ * >> character_device_lookup_name("/dev/hdc1"); // MKDEV(22, 0) + 1
+ * >> character_device_lookup_name("hda2");      // MKDEV(3, 0)  + 2
  * @return: NULL: No device matching `name' exists. */
 PUBLIC WUNUSED REF struct character_device *KCALL
 character_device_lookup_name(USER CHECKED char const *name)

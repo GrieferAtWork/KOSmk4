@@ -46,6 +46,8 @@
 #include <libzlib/error.h>
 #include <libzlib/inflate.h>
 
+#include "builtin.h"
+
 DECL_BEGIN
 
 INTERN NONNULL((2)) ssize_t

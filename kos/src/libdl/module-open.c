@@ -498,8 +498,7 @@ DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restri
                                      struct elfexec_info *__restrict info, uintptr_t loadaddr) {
 	REF DlModule *result;
 	uint16_t pidx;
-	result = (REF DlModule *)calloc(1,
-	                                offsetof(DlModule, dm_elf.de_phdr) +
+	result = (REF DlModule *)calloc(offsetof(DlModule, dm_elf.de_phdr) +
 	                                (info->ei_pnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
@@ -595,8 +594,7 @@ DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
 	REF DlModule *result;
 	if unlikely(DlModule_ElfVerifyEhdr(ehdr, filename, true))
 		goto err;
-	result = (REF DlModule *)calloc(1,
-	                                offsetof(DlModule, dm_elf.de_phdr) +
+	result = (REF DlModule *)calloc(offsetof(DlModule, dm_elf.de_phdr) +
 	                                (ehdr->e_phnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
@@ -643,7 +641,8 @@ DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
 		if (E_ISERR(libbase)) {
 			free(result);
 			dl_seterrorf("%q: Failed to map library into memory: %u",
-			                filename, (unsigned int)(uintptr_t)-(intptr_t)libbase);
+			             filename,
+			             (unsigned int)-(errno_t)(intptr_t)(uintptr_t)libbase);
 			goto err;
 		}
 		result->dm_loadaddr = (uintptr_t)libbase;

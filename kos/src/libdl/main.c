@@ -49,6 +49,8 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#include "builtin.h"
+
 DECL_BEGIN
 
 INTERN DlModule dl_rtld_module = {

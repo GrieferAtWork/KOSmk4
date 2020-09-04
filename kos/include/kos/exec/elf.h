@@ -61,9 +61,9 @@
 #define ELF_ARCH_CLASSNAME "CLASS32"
 #elif ELF_ARCH_CLASS == ELFCLASS64
 #define ELF_ARCH_CLASSNAME "CLASS64"
-#else
+#else /* ELF_ARCH_CLASS == ... */
 #define ELF_ARCH_CLASSNAME PP_STR(ELF_ARCH_CLASS)
-#endif
+#endif /* ELF_ARCH_CLASS != ... */
 #endif /* !ELF_ARCH_CLASSNAME */
 
 #ifndef ELF_ARCH_DATANAME
@@ -71,9 +71,9 @@
 #define ELF_ARCH_DATANAME "DATA2LSB"
 #elif ELF_ARCH_DATA == ELFDATA2MSB
 #define ELF_ARCH_DATANAME "DATA2MSB"
-#else
+#else /* ELF_ARCH_DATA == ... */
 #define ELF_ARCH_DATANAME PP_STR(ELF_ARCH_DATA)
-#endif
+#endif /* ELF_ARCH_DATA != ... */
 #endif /* !ELF_ARCH_DATANAME */
 
 #ifndef ELF_ARCH_MACHINENAME
@@ -223,9 +223,9 @@
 #define ELF_ARCH_MACHINENAME "ARC_A5"
 #elif ELF_ARCH_MACHINE == EM_XTENSA
 #define ELF_ARCH_MACHINENAME "XTENSA"
-#else /* ... */
+#else /* ELF_ARCH_MACHINE == ... */
 #define ELF_ARCH_MACHINENAME PP_STR(ELF_ARCH_MACHINE)
-#endif /* !... */
+#endif /* ELF_ARCH_MACHINE != ... */
 #endif /* !ELF_ARCH_MACHINENAME */
 
 
@@ -247,7 +247,7 @@
 #define elfW(x)          elf64_##x
 #define __OFFSET_ELFW(x) __OFFSET_ELF64_##x
 #define __SIZEOF_ELFW(x) __SIZEOF_ELF64_##x
-#endif
+#endif /* ... */
 #endif /* !ELFW */
 
 

@@ -655,6 +655,8 @@ SC_END_ALL_NOTHROW(rtm_abort)
 /* TODO: clone() */
 /* TODO: raiseat() */
 /* TODO: coredump() */
+/* TODO: sigsuspend() */
+/* TODO: rt_sigsuspend() */
 
 #undef _SYSFAST_R_arg1
 #undef _SYSFAST_R_arg2

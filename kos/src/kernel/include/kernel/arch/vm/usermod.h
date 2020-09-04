@@ -36,7 +36,7 @@
 #else /* ELF_ARCH_CLASS == ... */
 #error "Unsupported `ELF_ARCH_CLASS'"
 #endif /* ELF_ARCH_CLASS != ... */
-#define USERMOD_TYPE_MAX      0
+#define USERMOD_TYPE_ARCHMAX  0
 #define USERMOD_TYPE_ISELF(x) 1
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_VM_USERMOD_H */

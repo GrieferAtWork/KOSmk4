@@ -29,11 +29,11 @@
 #define USERMOD_TYPE_ELF64      1
 #define USERMOD_TYPE_ISELF32(x) ((x) == USERMOD_TYPE_ELF32)
 #define USERMOD_TYPE_ISELF64(x) ((x) == USERMOD_TYPE_ELF64)
-#define USERMOD_TYPE_MAX        1
+#define USERMOD_TYPE_ARCHMAX    1
 #else /* __x86_64__ */
 #define USERMOD_TYPE_ELF32      0
 #define USERMOD_TYPE_ISELF32(x) 1
-#define USERMOD_TYPE_MAX        0
+#define USERMOD_TYPE_ARCHMAX    0
 #endif /* !__x86_64__ */
 #define USERMOD_TYPE_ISELF(x) 1
 

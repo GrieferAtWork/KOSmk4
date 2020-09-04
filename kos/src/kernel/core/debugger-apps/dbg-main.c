@@ -252,7 +252,7 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 			current = DBG_HOOKITERATOR_NEXT_FILTERED(&iter, DBG_HOOK_COMMAND);
 			if (!current)
 				break;
-			/* TODO: It would be nice if we printed commands in alphabetical order here... */
+			/* XXX: It would be nice if we printed commands in alphabetical order here... */
 			dbg_printf(DBGSTR(AC_WHITE("%?-s")), max_name_length, current->dc_name);
 			if ((i % commands_per_line) == (commands_per_line - 1))
 				dbg_putc('\n');

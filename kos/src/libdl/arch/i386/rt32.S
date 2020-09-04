@@ -21,10 +21,15 @@
 #define GUARD_LIBDL_ARCH_I386_RT32_S 1
 #define __ASSEMBLER__ 1
 
+#include "../../api.h"
+/**/
+
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
 
-#include "../../api.h"
+#include "../../builtin.h"
+/**/
 
 INTERN(dl_require_global)
 

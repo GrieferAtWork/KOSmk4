@@ -166,51 +166,6 @@
 #define DLFCN_VCC __DLFCN_VCC
 #endif /* !DLFCN_VCC */
 
-/* Addressable sections of the RTLD driver itself.
- * Of note here are mostly the .eh_frame and .gcc_except_table
- * sections, which are required for allowing exceptions to work
- * properly when being propagated through the callbacks invoked
- * by the RTLD driver.
- * NOTE: Each section has 2 symbols defined by the linker script:
- *       `__rtld_<name>_start' and `__rtld_<name>_end', that are
- *       used to lazily fill in section information as-per the
- *       request of a call to `dllocksection()' when given a handle
- *       for the RTLD core library. */
-#define BUILTIN_SECTIONS_COUNT 6
-#define BUILTIN_SECTIONS_ENUMERATE(cb)                                                    \
-	cb(0, ".text",             text,             SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR) \
-	cb(1, ".rodata",           rodata,           SHT_PROGBITS, SHF_ALLOC)                 \
-	cb(2, ".eh_frame",         eh_frame,         SHT_PROGBITS, SHF_ALLOC)                 \
-	cb(3, ".gcc_except_table", gcc_except_table, SHT_PROGBITS, SHF_ALLOC)                 \
-	cb(4, ".data",             data,             SHT_PROGBITS, SHF_ALLOC | SHF_WRITE)     \
-	cb(5, ".bss",              bss,              SHT_NOBITS,   SHF_ALLOC | SHF_WRITE)
-
-/* For the purpose of being able to safely handle exceptions the same way
- * loaded modules do, a couple of global functions that aren't defined by
- * the RTLD driver itself need to be provided by loaded libraries
- * Note that these functions are only needed when thrown exceptions pass
- * through functions apart of the RTLD core, meaning that when exceptions
- * aren't being used by the hosted application or its libraries, or even
- * if no exception is ever thrown from an __attribute__((constructor)) function,
- * these are never loaded. - However, if they are, then they must be provided
- * by one of the loaded libraries (usually that library simply being `libc.so')
- * If one of these functions is used, but isn't provided by any of the loaded
- * modules, the hosted application gets terminated ungracefully, and an error
- * message is written to the system log.
- * HINT: When required, the functions are searched for the same way
- *       `dlsym(RTLD_DEFAULT, ...)' would search for them, following regular
- *       symbol lookup order throughout all globally visible libraries.
- * NOTE: The behavior of these functions is specified and standardized in different
- *       places. - Search around the project and on the internet to find out what
- *       each of these has to do, and how it has to do exactly that. */
-#define BUILTIN_GLOBALS_ENUMERATE(cb) \
-	cb(__gxx_personality_v0)          \
-	cb(__cxa_begin_catch)             \
-	cb(__cxa_end_catch)               \
-	cb(__cxa_rethrow)                 \
-	cb(_Unwind_Resume)
-
-
 /* TODO: Add a way of extending the RTLD driver with custom executable format
  *       back-ends, such as (once again) allowing PE binaries to be loaded.
  * -> There should be a seperate shared librariy `libdl-pe.so' similar to
@@ -218,6 +173,5 @@
  *    everything that's necessary to implement dynamic linking of PE binaries.
  *    As such, `DlModule' also needs to be given an optional v-table that can
  *    be filled with overrides for functions such as dlsym() or dllocksection(). */
-
 
 #endif /* !GUARD_LIBDL_API_H */

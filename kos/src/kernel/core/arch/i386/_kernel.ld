@@ -43,7 +43,7 @@
 #undef unlikely
 
 #define addr2pageid(ptr)  __ARCH_PAGEID_ENCODE(ptr)
-#define addr2pageptr(ptr) (((ptr) - KERNEL_CORE_BASE) >> 12)
+#define addr2pageptr(ptr) (((ptr) - KERNEL_CORE_BASE) >> PAGESHIFT)
 
 #define IP_ALIGN(x)  . = ALIGN(x)
 #define SECTION(name) \

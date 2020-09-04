@@ -63,6 +63,9 @@
  *       INode, and the usermod scanner won't recognize it as a potential
  *       user-space library! */
 
+#define vm_datablock_isusermod(self) \
+	vm_datablock_isinode(self)
+
 
 DECL_BEGIN
 
@@ -523,7 +526,7 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 			break;
 		}
 		/* Check if `lhs_iter' might be what we're looking for. */
-		if (vm_datablock_isinode(lhs_iter->vn_block))
+		if (vm_datablock_isusermod(lhs_iter->vn_block))
 			return lhs_iter;
 		if (rhs_iter->vn_prot != self->vn_prot ||
 		    !rhs_iter->vn_part || !rhs_iter->vn_block) {
@@ -531,7 +534,7 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 			break;
 		}
 		/* Check if `rhs_iter' might be what we're looking for. */
-		if (vm_datablock_isinode(rhs_iter->vn_block))
+		if (vm_datablock_isusermod(rhs_iter->vn_block))
 			return rhs_iter;
 
 		/* Go to the next node on the left. */
@@ -560,7 +563,7 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 			if (lhs_iter->vn_prot != self->vn_prot ||
 			    !lhs_iter->vn_part || !lhs_iter->vn_block)
 				break;
-			if (vm_datablock_isinode(lhs_iter->vn_block))
+			if (vm_datablock_isusermod(lhs_iter->vn_block))
 				return lhs_iter;
 			if (!VM_NODE_HASPREV(lhs_iter, self->vn_vm))
 				break;
@@ -576,7 +579,7 @@ NOTHROW(FCALL vm_node_find_inode_mapping)(struct vm_node *__restrict self) {
 			if (rhs_iter->vn_prot != self->vn_prot ||
 			    !rhs_iter->vn_part || !rhs_iter->vn_block)
 				break;
-			if (vm_datablock_isinode(rhs_iter->vn_block))
+			if (vm_datablock_isusermod(rhs_iter->vn_block))
 				return rhs_iter;
 			if (!VM_NODE_HASNEXT(rhs_iter, self->vn_vm))
 				break;
@@ -786,7 +789,7 @@ unlock_and_nope:
 	node = vm_node_find_inode_mapping(node);
 	if (!node)
 		goto unlock_and_nope; /* Nope... */
-	assert(vm_datablock_isinode(node->vn_block));
+	assert(vm_datablock_isusermod(node->vn_block));
 	/* Alright! We've found a node we can use!
 	 * Gather all of the information we need and release the VM lock. */
 	map_inode        = (REF struct inode *)incref(node->vn_block);
@@ -1076,7 +1079,7 @@ again:
 		for (;;) {
 			if ((node->vn_prot & VM_PROT_EXEC) &&
 			    node->vn_block && node->vn_part &&
-			    vm_datablock_isinode(node->vn_block)) {
+			    vm_datablock_isusermod(node->vn_block)) {
 				/* Found a candidate. */
 				REF struct usermod *new_result;
 				REF struct inode /*     */ *map_inode;        /* [1..1] The INode that is being mapped. */

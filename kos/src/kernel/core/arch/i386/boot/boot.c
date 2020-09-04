@@ -236,7 +236,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * truly random initial seed.
 	 * So we're just going to read the CMOS RTC state and use
 	 * it to set the initial kernel seed. */
-	x86_initialize_rand_entropy(); /* TODO: Do this portably through use of `realtime()' */
+	x86_initialize_rand_entropy();
 
 	/* Evaluate commandline options defined as `DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_early();

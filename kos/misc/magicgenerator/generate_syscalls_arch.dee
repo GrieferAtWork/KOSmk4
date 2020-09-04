@@ -629,7 +629,6 @@ function x86_64_assignRegister64(
 				regSigned = "s";
 		}
 		switch (regSize) {
-			/* TODO: Use sign-extension if the original C-type was signed! */
 		case 1:
 			fp << "	mov" << regSigned << "bq " << x86_64Reg8NamesOfReg32.get(b, b) << ", " << a;
 			break;

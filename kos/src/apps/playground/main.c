@@ -376,7 +376,7 @@ int main_sleep(int argc, char *argv[], char *envp[]) {
 		 *       running this program (`playground sleep'), and
 		 *       looking at the printed `usec:...' value.
 		 *       Currently, it hovers between 0 and 0.05 seconds,
-		 *       which makes a lot of sense since 0.05 = 20 = HZ,
+		 *       which makes a lot of sense since 0.05 = 1/20 = 1/HZ,
 		 *       with the error being produced by the kernel only
 		 *       checking for wake-ups every time a preemptive
 		 *       interrupt is fired. */

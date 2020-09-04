@@ -27,9 +27,6 @@
 
 DECL_BEGIN
 
-/* TODO: Data structures relating to MBR and EFI/GPT */
-
-
 /* Flags used by pt_bootable */
 #define PART_BOOTABLE_NONE   0x00
 #define PART_BOOTABLE_ACTICE 0x80

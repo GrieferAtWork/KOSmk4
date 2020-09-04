@@ -357,10 +357,6 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	if (ammend.dca_pint)
 		cpu_disable_preemptive_interrupts_nopr();
 
-	/* TODO: Load an alternate IDT that saves all of the interrupts that happened
-	 *       while we're in here, such that once we return from inside here, those
-	 *       interrupts will all get serviced. */
-
 	/* Fill in the host-backup area of our CPU, thus
 	 * ACK-ing the fact that we're now supposed to sleep. */
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
