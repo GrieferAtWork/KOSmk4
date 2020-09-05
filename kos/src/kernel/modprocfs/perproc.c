@@ -213,7 +213,7 @@ ProcFS_PerProc_Directory_Lookup(struct directory_node *__restrict self,
 	result = ProcFS_PerProc_Directory_Locate(self, name, namelen, hash, mode);
 	if (result) /* Create the unique copy */
 		result = ProcFS_PerProc_MakeDirent(self, result);
-	return NULL;
+	return result;
 }
 
 INTERN NONNULL((1, 2)) void KCALL
