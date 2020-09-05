@@ -21,6 +21,7 @@
 #define _I386_KOS_BITS_TIMESPEC32_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
@@ -129,14 +130,14 @@
 /*[[[end]]]*/
 
 
-#define __OFFSET_TIMESPECX32_SEC      0
-#define __OFFSET_TIMESPECX32_NSEC     4
-#define __SIZEOF_TIMESPECX32          8
-#define __ALIGNOF_TIMESPECX32         __ALIGNOF_INT32__
-#define __OFFSET_TIMESPECX32_64_SEC   0
-#define __OFFSET_TIMESPECX32_64_NSEC  8
-#define __SIZEOF_TIMESPECX32_64       16
-#define __ALIGNOF_TIMESPECX32_64      __ALIGNOF_INT64__
+#define __OFFSET_TIMESPECX32_SEC     0
+#define __OFFSET_TIMESPECX32_NSEC    4
+#define __SIZEOF_TIMESPECX32         8
+#define __ALIGNOF_TIMESPECX32        __ALIGNOF_INT32__
+#define __OFFSET_TIMESPECX32_64_SEC  0
+#define __OFFSET_TIMESPECX32_64_NSEC 8
+#define __SIZEOF_TIMESPECX32_64      16
+#define __ALIGNOF_TIMESPECX32_64     __ALIGNOF_INT64__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -145,7 +146,11 @@ __TIMESPEC_CXX_DECL_BEGIN
 /* 32-bit timespec for i386 */
 struct timespecx32 /*[PREFIX(tv_)]*/ {
 	__INT32_TYPE__  tv_sec;   /* Seconds */
+#ifdef __USE_KOS_ALTERATIONS
 	__UINT32_TYPE__ tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__INT32_TYPE__  tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__TIMESPEC_CXX_SUPPORT(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
@@ -153,7 +158,11 @@ __TIMESPEC_CXX_SUPPORT2(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
 /* 64-bit timespec for i386 */
 struct timespecx32_64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__    tv_sec;   /* Seconds */
+#ifdef __USE_KOS_ALTERATIONS
 	__UINT32_TYPE__   tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__INT32_TYPE__    tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 	__TIMESPEC_CXX_SUPPORT(struct timespecx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 };
@@ -162,7 +171,11 @@ __TIMESPEC_CXX_SUPPORT2(struct timespecx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 #ifdef __timespecx32_64_alt
 struct __timespecx32_64_alt {
 	__INT64_TYPE__    tv_sec;   /* Seconds */
+#ifdef __USE_KOS_ALTERATIONS
 	__UINT32_TYPE__   tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__INT32_TYPE__    tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 	__TIMESPEC_CXX_SUPPORT(struct __timespecx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
 };

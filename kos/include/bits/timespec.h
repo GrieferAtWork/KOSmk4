@@ -20,6 +20,22 @@
 #ifndef _BITS_TIMESPEC_H
 #define _BITS_TIMESPEC_H 1
 
+/* File:
+ *    <bits/timespec.h>
+ * 
+ * Definitions:
+ *    struct timespec {
+ *        time_t          tv_sec;
+ *        syscall_slong_t tv_nsec;   // unsigned with __USE_KOS_ALTERATIONS
+ *    };
+ *    #ifdef __USE_TIME64
+ *    struct timespec64 {
+ *        time64_t        tv_sec;
+ *        syscall_slong_t tv_nsec;   // unsigned with __USE_KOS_ALTERATIONS
+ *    };
+ *    #endif // __USE_TIME64
+ */
+
 #include <__stdinc.h>
 #include <features.h>
 
@@ -85,7 +101,11 @@ struct timespec /*[PREFIX(tv_)]*/ {
 #if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+#ifdef __USE_KOS_ALTERATIONS
 	__syscall_ulong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__syscall_slong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 #if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
@@ -117,7 +137,11 @@ struct __timespec64 /*[NAME(timespec64)][PREFIX(tv_)]*/ {
 #if __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+#ifdef __USE_KOS_ALTERATIONS
 	__syscall_ulong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__syscall_slong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 #if __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
@@ -145,7 +169,11 @@ struct __timespec32 /*[NAME(timespec32)][PREFIX(tv_)]*/ {
 #if __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+#ifdef __USE_KOS_ALTERATIONS
 	__syscall_ulong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__syscall_slong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 #if __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */

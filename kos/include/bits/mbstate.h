@@ -20,6 +20,9 @@
 #ifndef _BITS_MBSTATE_H
 #define _BITS_MBSTATE_H 1
 
+/* TODO: This needs to become a CRT-level header, and should also include
+ *       variants for binary compatibility with GLC, DOS and CYG */
+
 #include <__stdinc.h>
 #include <features.h>
 

@@ -21,6 +21,7 @@
 #define _I386_KOS_BITS_TIMEVAL64_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
@@ -80,6 +81,7 @@
 #define __timeval64 timeval
 #endif /* !__USE_TIME64 */
 #define __timeval_defined 1
+#define _STRUCT_TIMEVAL   1
 #endif /* __x86_64__ */
 /*[[[end]]]*/
 
@@ -95,7 +97,11 @@ __TIMEVAL_CXX_DECL_BEGIN
 /* timeval for x86_64 */
 struct timevalx64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__  tv_sec;   /* Seconds */
+#ifdef __USE_KOS_ALTERATIONS
 	__UINT64_TYPE__ tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__INT64_TYPE__  tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__TIMEVAL_CXX_SUPPORT(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 };
 __TIMEVAL_CXX_SUPPORT2(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
@@ -103,7 +109,11 @@ __TIMEVAL_CXX_SUPPORT2(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 #ifdef __timevalx64_alt
 struct __timevalx64_alt {
 	__INT64_TYPE__  tv_sec;   /* Seconds */
+#ifdef __USE_KOS_ALTERATIONS
 	__UINT64_TYPE__ tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+#else /* __USE_KOS_ALTERATIONS */
+	__INT64_TYPE__  tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+#endif /* !__USE_KOS_ALTERATIONS */
 	__TIMEVAL_CXX_SUPPORT(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
 };
 __TIMEVAL_CXX_SUPPORT2(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)

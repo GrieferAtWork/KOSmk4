@@ -21,6 +21,7 @@
 #define _I386_KOS_BITS_TIMEVAL32_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
@@ -125,6 +126,7 @@
 #define __ALIGNOF_TIMEVAL64     __ALIGNOF_TIMEVALX32_64
 
 #define __timeval_defined 1
+#define _STRUCT_TIMEVAL   1
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 
@@ -145,7 +147,7 @@ __TIMEVAL_CXX_DECL_BEGIN
 /* 32-bit timeval for i386 */
 struct timevalx32 /*[PREFIX(tv_)]*/ {
 	__INT32_TYPE__  tv_sec;   /* Seconds */
-	__UINT32_TYPE__ tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+	__INT32_TYPE__  tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 	__TIMEVAL_CXX_SUPPORT(struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
 };
 __TIMEVAL_CXX_SUPPORT2(struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
@@ -153,7 +155,7 @@ __TIMEVAL_CXX_SUPPORT2(struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
 /* 64-bit timeval for i386 */
 struct timevalx32_64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__    tv_sec;   /* Seconds */
-	__UINT32_TYPE__   tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+	__INT32_TYPE__    tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 	__TIMEVAL_CXX_SUPPORT(struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 };
@@ -162,7 +164,7 @@ __TIMEVAL_CXX_SUPPORT2(struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 #ifdef __timevalx32_64_alt
 struct __timevalx32_64_alt {
 	__INT64_TYPE__    tv_sec;   /* Seconds */
-	__UINT32_TYPE__   tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
+	__INT32_TYPE__    tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 	__TIMEVAL_CXX_SUPPORT(struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
 };
