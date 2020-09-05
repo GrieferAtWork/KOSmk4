@@ -70,7 +70,8 @@
 #elif (defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) ||          \
        defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
        defined(_WIN32_WCE) || defined(WIN32_WCE))
-#define __SIZEOF_LONG__ 4
+#elif defined(__alpha__) || (defined(__sparc__) && defined(__arch64__)) || defined(__sparcv9)
+#define __SIZEOF_LONG__ 8
 #else /* ... */
 #define __SIZEOF_LONG__ __SIZEOF_POINTER__
 #endif /* !... */

@@ -54,11 +54,18 @@
 #define LONG_MIN    __LONG_MIN__
 #define LONG_MAX    __LONG_MAX__
 #define ULONG_MAX   __ULONG_MAX__
+
 #ifdef __USE_ISOC99
 #define LLONG_MIN   __LONG_LONG_MIN__
 #define LLONG_MAX   __LONG_LONG_MAX__
 #define ULLONG_MAX  __ULONG_LONG_MAX__
 #endif /* __USE_ISOC99 */
+
+#ifdef __USE_GNU
+#define LONG_LONG_MIN  __LONG_LONG_MIN__
+#define LONG_LONG_MAX  __LONG_LONG_MAX__
+#define ULONG_LONG_MAX __ULONG_LONG_MAX__
+#endif /* __USE_GNU */
 
 #ifdef __USE_DOS
 #define _I8_MIN     __PRIVATE_MIN_S1

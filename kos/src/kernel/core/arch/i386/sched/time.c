@@ -375,7 +375,7 @@ wait_for_interrupt:
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_cmos)(void) {
 	cmos_realtime_clock.cr_stb = cmos_rd(CMOS_STATE_B);
-	//cmos_cent_reg = ...; /* TODO: This can be read from the ACPI descriptor table. */
+	//cmos_realtime_clock.cr_century = ...; /* TODO: This can be read from the ACPI descriptor table. */
 }
 
 DECL_END
