@@ -52,6 +52,29 @@
 
 DECL_BEGIN
 
+#ifdef DEFINE_IO_READ
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
+#define RW_OPERATOR f_preadv
+#elif defined(DEFINE_IO_VECTOR)
+#define RW_OPERATOR f_readv
+#elif defined(DEFINE_IO_PHYS)
+#define RW_OPERATOR f_pread
+#else /* ... */
+#define RW_OPERATOR f_read
+#endif /* !... */
+#else /* DEFINE_IO_READ */
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
+#define RW_OPERATOR f_pwritev
+#elif defined(DEFINE_IO_VECTOR)
+#define RW_OPERATOR f_writev
+#elif defined(DEFINE_IO_PHYS)
+#define RW_OPERATOR f_pwrite
+#else /* ... */
+#define RW_OPERATOR f_write
+#endif /* !... */
+#endif /* !DEFINE_IO_READ */
+
+
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define FUNC0(x) x##v_phys
 #elif defined(DEFINE_IO_PHYS)
@@ -180,20 +203,9 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		uintptr_t buf_offset;
 #endif /* DEFINE_IO_VECTOR */
 #ifndef DEFINE_IO_READ
+		if unlikely(!self->i_type->it_file.RW_OPERATOR)
+			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
-#ifdef DEFINE_IO_PHYS
-		if unlikely(!self->i_type->it_file.f_pwritev)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-#elif defined(DEFINE_IO_VECTOR)
-		if unlikely(!self->i_type->it_file.f_writev)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-#elif defined(DEFINE_IO_PHYS)
-		if unlikely(!self->i_type->it_file.f_pwrite)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-#else
-		if unlikely(!self->i_type->it_file.f_write)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-#endif
 		inode_loadattr(self);
 		{
 			pos_t write_end;
@@ -220,34 +232,12 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS) {
 			/* The INode uses anonymous parts. -> Use read-through / write-through */
 #ifdef DEFINE_IO_READ
-#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-			if (!self->i_type->it_file.f_preadv)
+			if (!self->i_type->it_file.RW_OPERATOR)
 				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
-			(*self->i_type->it_file.f_preadv)(self, buf, num_bytes, file_position, aio);
-#elif defined(DEFINE_IO_VECTOR)
-			if (!self->i_type->it_file.f_readv)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
-			(*self->i_type->it_file.f_readv)(self, buf, num_bytes, file_position, aio);
-#elif defined(DEFINE_IO_PHYS)
-			if (!self->i_type->it_file.f_pread)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
-			(*self->i_type->it_file.f_pread)(self, buf, num_bytes, file_position, aio);
-#else
-			if (!self->i_type->it_file.f_read)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
-			(*self->i_type->it_file.f_read)(self, buf, num_bytes, file_position, aio);
-#endif
+			(*self->i_type->it_file.RW_OPERATOR)(self, buf, num_bytes, file_position, aio);
 #else /* DEFINE_IO_READ */
 			TRY {
-#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-				(*self->i_type->it_file.f_pwritev)(self, buf, num_bytes, file_position, aio);
-#elif defined(DEFINE_IO_VECTOR)
-				(*self->i_type->it_file.f_writev)(self, buf, num_bytes, file_position, aio);
-#elif defined(DEFINE_IO_PHYS)
-				(*self->i_type->it_file.f_pwrite)(self, buf, num_bytes, file_position, aio);
-#else
-				(*self->i_type->it_file.f_write)(self, buf, num_bytes, file_position, aio);
-#endif
+				(*self->i_type->it_file.RW_OPERATOR)(self, buf, num_bytes, file_position, aio);
 			} EXCEPT {
 				if (was_thrown(E_IOERROR_BADBOUNDS))
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
@@ -601,7 +591,7 @@ again_check_size:
 				}
 				if (file_position >= self->i_filesize) {
 					rwlock_endread(&self->db_lock);
-					return 0;
+					goto eof;
 				}
 				num_bytes = (size_t)(self->i_filesize - file_position);
 			}
@@ -628,6 +618,12 @@ again_check_size:
 	}
 	return 0;
 #endif /* DEFINE_IO_ASYNC */
+eof:
+	/* Check if reading would have even been possible.
+	 * Because if it wouldn't have been, then we must still throw an error! */
+	if unlikely(!self->i_type->it_file.RW_OPERATOR)
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+	return 0;
 }
 
 
@@ -749,6 +745,7 @@ wait_for_data:
 #undef FUNC1_READ
 #endif /* DEFINE_IO_READ */
 
+#undef RW_OPERATOR
 
 DECL_END
 
