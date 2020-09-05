@@ -80,7 +80,7 @@ INTERN_FUNCTION(libc___afail)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func */
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 4
+	.cfi_adjust_cfa_offset 4
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
@@ -129,7 +129,7 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func */
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 4
+	.cfi_adjust_cfa_offset 4
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
@@ -222,7 +222,7 @@ INTERN_FUNCTION(libc___assert_func)
 	.cfi_startproc
 	/* char const *file, unsigned int line, char const *func, char const *expr */
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 4
+	.cfi_adjust_cfa_offset 4
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
@@ -262,10 +262,9 @@ INTERN_FUNCTION(libc___assert)
 	.cfi_startproc
 	/* char const *file, unsigned int line, char const *expr */
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 4
-	.cfi_rel_offset %eip, 0
+	.cfi_adjust_cfa_offset 4
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 8
+	.cfi_adjust_cfa_offset 4
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
@@ -295,10 +294,9 @@ INTERN_FUNCTION(libc__assert)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line */
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 4
-	.cfi_rel_offset %eip, 0
+	.cfi_adjust_cfa_offset 4
 	pushl  0(%esp)  /* RETURN_PC */
-	.cfi_def_cfa %esp, 8
+	.cfi_adjust_cfa_offset 4
 	.cfi_rel_offset %eip, 0
 	pushfl_cfi_r
 	pushal_cfi_r
