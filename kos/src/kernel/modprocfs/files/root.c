@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <sched/enum.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
@@ -100,79 +101,50 @@ notapid:
 	return ProcFS_Singleton_Directory_Lookup(self, name, namelen, hash, mode);
 }
 
-PRIVATE NONNULL((1, 2)) void KCALL
-enumpid(directory_enum_callback_t callback,
-        void *arg, upid_t pid) {
+
+typedef struct {
+	directory_enum_callback_t epc_cb;     /* [1..1] The underlying callback */
+	void                     *epc_arg;    /* Argument for `epc_cb' */
+	size_t                    epc_ns_ind; /* PID namespace indirection. */
+} ProcFS_EnumProcessCallback_Data;
+
+PRIVATE ssize_t KCALL
+ProcFS_EnumProcessCallback(void *arg,
+                           struct task *UNUSED(thread),
+                           struct taskpid *tpid) {
+	size_t len;
+	pid_t pid;
 	char namebuf[32];
-	size_t len = sprintf(namebuf, "%u", pid);
-	(*callback)(arg, namebuf, len, DT_DIR,
-	            PROCFS_INOMAKE_PERPROC(pid, PROCFS_PERPROC_ROOT));
+	ProcFS_EnumProcessCallback_Data *data;
+	if unlikely(!tpid)
+		return 0; /* Shouldn't happen... */
+	data = (ProcFS_EnumProcessCallback_Data *)arg;
+	/* Print the process's PID, so it can be enumerated. */
+	pid = tpid->tp_pids[data->epc_ns_ind];
+	len = sprintf(namebuf, "%u", pid);
+	(*data->epc_cb)(data->epc_arg, namebuf, len, DT_DIR,
+	                PROCFS_INOMAKE_PERPROC(pid, PROCFS_PERPROC_ROOT));
+	return 0;
 }
+
 
 PRIVATE NONNULL((1, 2)) void KCALL
 ProcFS_RootDirectory_Enum(struct directory_node *__restrict self,
                           directory_enum_callback_t callback,
                           void *arg)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	ProcFS_EnumProcessCallback_Data data;
+	struct pidns *ns;
 	assert(self->i_fsdata == (struct inode_data *)&ProcFS_RootDirectory_FsData);
+
 	/* Enumerate running process PIDs */
-	{
-		upid_t pidbuf[64];
-		size_t i, pidlen = 0;
-		struct pidns *ns = THIS_PIDNS;
-		sync_read(ns);
-		for (i = 0; i <= ns->pn_mask; ++i) {
-			struct taskpid *tpid;
-			REF struct task *thread;
-			upid_t pid;
-			tpid = ns->pn_list[i].pe_pid;
-			if (tpid == NULL)
-				continue;
-			if (tpid == PIDNS_ENTRY_DELETED)
-				continue;
-			thread = taskpid_gettask(tpid);
-			if (!thread)
-				continue;
-			pid = tpid->tp_pids[ns->pn_indirection];
-			if (!task_isprocessleader_p(thread))
-				pid = 0;
-			{
-				refcnt_t refcnt;
-				do {
-					refcnt = ATOMIC_READ(thread->t_refcnt);
-					if (refcnt == 1)
-						goto unlock_and_flush_pids;
-				} while (!ATOMIC_CMPXCH_WEAK(thread->t_refcnt, refcnt, refcnt - 1));
-			}
-			if (!pid)
-				continue;
-			if (pidlen >= COMPILER_LENOF(pidbuf)) {
-unlock_and_flush_pids:
-				/* Enumerate all cached pids */
-				sync_endread(ns);
-				{
-					FINALLY_DECREF(thread);
-					while (pidlen) {
-						--pidlen;
-						enumpid(callback, arg, pidbuf[pidlen]);
-					}
-					if (pid)
-						enumpid(callback, arg, pid);
-				}
-				pidlen = 0;
-				sync_read(ns);
-				continue;
-			}
-			pidbuf[pidlen] = pid;
-			++pidlen;
-		}
-		sync_endread(ns);
-		/* Enumerate all remaining pids */
-		while (pidlen) {
-			--pidlen;
-			enumpid(callback, arg, pidbuf[pidlen]);
-		}
-	}
+	ns               = THIS_PIDNS;
+	data.epc_cb      = callback;
+	data.epc_arg     = arg;
+	data.epc_ns_ind  = ns->pn_indirection;
+	task_enum_processes(&ProcFS_EnumProcessCallback, &data, ns);
+
+	/* Enumerate always-present files. */
 	ProcFS_Singleton_Directory_Enum(self, callback, arg);
 }
 

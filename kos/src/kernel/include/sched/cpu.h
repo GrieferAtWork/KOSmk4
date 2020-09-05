@@ -737,12 +737,17 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
                                   * This in turns allows you to restrict execution of IPIs to only the
                                   * set of CPUs considered to be on-line, allowing the efficient implementation
                                   * of single-core sub-systems that only need to interrupt CPUs that aren't
-                                  * already off-line. */
+                                  * already off-line.
+                                  * s.a. `cpu_isrunning()' */
 #define CPU_IPI_FNOINTR   0x0002 /* FLAG: The IPI may be executed when preemption is disabled.
                                   *       When this flag is set, sending a non-blocking IPI to
                                   *       one self is allowed. */
 #define CPU_IPI_FWAITFOR  0x1000 /* Wait for the target CPU to acknowledge having received the IPI,
                                   * rather than allowing the IPI to be delivered asynchronously. */
+
+/* Check if `self' is running, and sending an IPI without `CPU_IPI_FWAKEUP' should succeed.
+ * Note however the race condition where a CPU might stop running before/after this check is made. */
+#define cpu_isrunning(self) (__hybrid_atomic_load((self)->c_state, __ATOMIC_ACQUIRE) == CPU_STATE_RUNNING)
 
 
 /* The size of the buffer used to contain pending IPIs. */

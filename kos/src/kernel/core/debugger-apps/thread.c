@@ -41,8 +41,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/vm/exec.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/enum.h>
 #include <sched/pid.h>
 #include <sched/task.h>
+
+#include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -55,13 +58,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-#define THREAD_STATE_RUNNING  0
-#define THREAD_STATE_SLEEPING 1
-#define THREAD_STATE_IDLING   2
-#ifndef CONFIG_NO_SMP
-#define THREAD_STATE_PENDING  3
-#endif /* !CONFIG_NO_SMP */
-#define THREAD_STATE_OTHER    4
+#define THREAD_STATE_RUNNING    0
+#define THREAD_STATE_SLEEPING   1
+#define THREAD_STATE_IDLING     2
+#define THREAD_STATE_TERMINATED 3
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 enum_thread(struct task *__restrict thread, unsigned int state) {
@@ -122,11 +122,9 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 			status_indicator = DBGSTR(AC_FG_AQUA "I");
 			break;
 
-#ifndef CONFIG_NO_SMP
-		case THREAD_STATE_PENDING:
-			status_indicator = DBGSTR(AC_FG_DARK_GRAY "P");
+		case THREAD_STATE_TERMINATED:
+			status_indicator = DBGSTR(AC_FG_RED "T");
 			break;
-#endif /* !CONFIG_NO_SMP */
 
 		default:
 			status_indicator = DBGSTR(AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY) "?");
@@ -153,121 +151,52 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 
 
 
-LOCAL bool KCALL verify_thread_address_nopid(struct task *p) {
-	cpuid_t cpuid;
-	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
-		struct task *iter;
-		struct cpu *c = cpu_vector[cpuid];
-		if (p == &FORCPU(c, thiscpu_idle))
-			return true;
-		iter = c->c_current;
-		do {
-			assert(iter->t_cpu == c);
-			assert(iter->t_flags & TASK_FRUNNING);
-			if (iter == p)
-				return true;
-		} while ((iter = iter->t_sched.s_running.sr_runnxt) != c->c_current);
-		for (iter = c->c_sleeping; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
-			assert(iter->t_cpu == c);
-			assert(!(iter->t_flags & TASK_FRUNNING));
-			if (iter == p)
-				return true;
-		}
-#ifndef CONFIG_NO_SMP
-		for (iter = c->c_pending; iter != CPU_PENDING_ENDOFCHAIN;
-		     iter = iter->t_sched.s_pending.ss_pennxt) {
-			assert(iter->t_cpu == c);
-			assert(iter->t_flags & TASK_FPENDING);
-			assert(!(iter->t_flags & TASK_FRUNNING));
-			if (iter == p)
-				return true;
-		}
-#endif /* !CONFIG_NO_SMP */
-	}
-	return false;
+PRIVATE ATTR_DBGTEXT ssize_t KCALL
+task_enum_eq_cb(void *arg,
+                struct task *thread,
+                struct taskpid *UNUSED(pid)) {
+	return (struct task *)arg == thread ? -1 : 0;
 }
 
 
-LOCAL bool KCALL verify_thread_address(struct task *p) {
-	size_t i;
-	if (verify_thread_address_nopid(p))
-		return true;
-	for (i = 0; i <= pidns_root.pn_mask; ++i) {
-		struct taskpid *pid;
-		pid = pidns_root.pn_list[i].pe_pid;
-		if (pid == NULL ||
-		    pid == PIDNS_ENTRY_DELETED)
-			continue;
-		if (wasdestroyed(pid))
-			continue;
-		if (pid->tp_thread.m_pointer == p)
-			return !wasdestroyed(p);
+PRIVATE ATTR_DBGTEXT bool KCALL
+verify_thread_address(struct task *p) {
+	return task_enum_all(&task_enum_eq_cb, p) < 0;
+}
+
+PRIVATE ATTR_DBGTEXT ssize_t KCALL
+task_enum_print_cb(void *UNUSED(arg),
+                   struct task *thread,
+                   struct taskpid *pid) {
+	if (!thread) {
+		dbg_printf(DBGSTR("<DEAD>     %u       " AC_WITHCOLOR(ANSITTY_CL_MAROON,
+		                                                      ANSITTY_CL_LIGHT_GRAY,
+		                                                      "D") "\n"),
+		           pid->tp_pids[0]);
+	} else {
+		unsigned int state;
+		uintptr_t flags;
+		flags = ATOMIC_READ(thread->t_flags);
+		if (flags & TASK_FRUNNING)
+			state = THREAD_STATE_RUNNING;
+		else if (flags & TASK_FTERMINATING)
+			state = THREAD_STATE_TERMINATED;
+		else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
+			state = THREAD_STATE_IDLING;
+		else  {
+			state = THREAD_STATE_SLEEPING;
+		}
+		enum_thread(thread, state);
 	}
-	return false;
+	return 1;
 }
 
 
 DBG_COMMAND(lsthread,
             "lsthread\n"
             "\tList all threads running on the system\n") {
-	cpuid_t cpuid;
 	dbg_print(DBGSTR("program    pid tid S cpu location\n"));
-	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
-		struct task *iter;
-		struct cpu *c = cpu_vector[cpuid];
-		bool did_idle = false;
-		iter = c->c_current;
-		do {
-			assert(iter->t_cpu == c);
-			assert(iter->t_flags & TASK_FRUNNING);
-			enum_thread(iter, THREAD_STATE_RUNNING);
-			if (iter == &FORCPU(c, thiscpu_idle))
-				did_idle = true;
-		} while ((iter = iter->t_sched.s_running.sr_runnxt) != c->c_current);
-		for (iter = c->c_sleeping; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
-			assert(iter->t_cpu == c);
-			assert(!(iter->t_flags & TASK_FRUNNING));
-			enum_thread(iter, THREAD_STATE_SLEEPING);
-			if (iter == &FORCPU(c, thiscpu_idle))
-				did_idle = true;
-		}
-#ifndef CONFIG_NO_SMP
-		for (iter = c->c_pending; iter != CPU_PENDING_ENDOFCHAIN;
-		     iter = iter->t_sched.s_pending.ss_pennxt) {
-			assert(iter->t_cpu == c);
-			assert(iter->t_flags & TASK_FPENDING);
-			assert(!(iter->t_flags & TASK_FRUNNING));
-			assert(iter != &FORCPU(c, thiscpu_idle));
-			enum_thread(iter, THREAD_STATE_PENDING);
-		}
-#endif /* !CONFIG_NO_SMP */
-		if (!did_idle)
-			enum_thread(&FORCPU(c, thiscpu_idle), THREAD_STATE_IDLING);
-	}
-	/* Also enumerate threads found in PID namespaces. */
-	{
-		size_t i;
-		for (i = 0; i <= pidns_root.pn_mask; ++i) {
-			struct taskpid *pid;
-			pid = pidns_root.pn_list[i].pe_pid;
-			if (pid == NULL ||
-				pid == PIDNS_ENTRY_DELETED)
-				continue;
-			if (wasdestroyed(pid))
-				continue;
-			if (!pid->tp_thread.m_pointer ||
-			    wasdestroyed(pid->tp_thread.m_pointer)) {
-				dbg_printf(DBGSTR("<DEAD>     %u       " AC_WITHCOLOR(ANSITTY_CL_MAROON,
-				                                                      ANSITTY_CL_LIGHT_GRAY,
-				                                                      "D") "\n"),
-				           pid->tp_pids[0]);
-				continue;
-			}
-			if (verify_thread_address_nopid(pid->tp_thread.m_pointer))
-				continue; /* Already enumerated. */
-			enum_thread(pid->tp_thread.m_pointer, THREAD_STATE_OTHER);
-		}
-	}
+	task_enum_all(&task_enum_print_cb, NULL);
 	return 0;
 }
 
