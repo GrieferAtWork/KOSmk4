@@ -702,10 +702,21 @@ again_follow_symlink:
 							                                              sl_node->sl_text,
 							                                              &last_seg,
 							                                              &last_seglen,
-							                                              mode,
+							                                              mode | FS_MODE_FIGNORE_TRAILING_SLASHES,
 							                                              &remaining_symlinks);
 							decref(containing_path);
 							containing_path = new_containing_path;
+							if unlikely(!last_seglen) {
+								/* This can happen when `sl_node->sl_text == "/"', since in this
+								 * case, we'd still end with a trailing path segment of 0-length. */
+								sync_read(containing_path);
+								new_containing_directory = (REF struct directory_node *)incref(containing_path->p_inode);
+								sync_endread(containing_path);
+								result_path = incref(containing_path);
+								decref(containing_directory);
+								containing_directory = new_containing_directory;
+								goto got_result_path;
+							}
 							symlink_hash = directory_entry_hash(last_seg, last_seglen);
 							COMPILER_READ_BARRIER();
 							/* Check for mounting points & cached paths. */
@@ -734,6 +745,15 @@ again_follow_symlink:
 								                                 pcontaining_dirent);
 								if unlikely(!new_result)
 									THROW(E_FSERROR_FILE_NOT_FOUND);
+								if (last_seg[last_seglen] == '/') {
+									/* The symlink _must_ point to a directory!
+									 * s.a. `FS_MODE_FIGNORE_TRAILING_SLASHES' above. */
+									if (!INODE_ISDIR(new_result)) {
+										decref_unlikely(new_result);
+										THROW(E_FSERROR_NOT_A_DIRECTORY,
+										      E_FILESYSTEM_NOT_A_DIRECTORY_WALK);
+									}
+								}
 							} EXCEPT {
 								decref(new_containing_directory);
 								RETHROW();

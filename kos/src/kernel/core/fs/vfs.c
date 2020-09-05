@@ -76,8 +76,6 @@ handle_path_tryas(struct path *__restrict self,
 	}	break;
 
 	case HANDLE_TYPE_DIRECTORYENTRY:
-		if (!self->p_parent)
-			break;
 		return incref(self->p_dirent);
 
 	default:

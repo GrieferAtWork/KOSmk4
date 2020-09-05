@@ -75,7 +75,7 @@ struct path {
 	                                        * NOTE: Query functions such as `path_child()' are allowed
 	                                        *       to assume that this field is always non-NULL. */
 	struct mounted_path        *p_mount;   /* [0..1][lock(p_lock)][owned_if(!= &p_vfs->v_rootmount)] Mounting point data. */
-	REF struct directory_entry *p_dirent;  /* [1..1][const][valid_if(p_parent != NULL)] Name of this directory entry (invalid pointer for VFS root). */
+	REF struct directory_entry *p_dirent;  /* [1..1][const] Name of this directory entry (empty for VFS root). */
 	LLIST_NODE(struct path)     p_dirnext; /* [0..1][lock(p_parent->p_lock)][valid_if(p_parent != NULL)]
 	                                        * Next sibling directory with the same `p_dirent->de_hash' */
 	size_t                      p_cldmask; /* [lock(p_lock)] Mask for the `p_cldlist' hash-map. */

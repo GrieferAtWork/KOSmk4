@@ -87,10 +87,19 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 		                                               reqlen,
 		                                               &last_seg,
 		                                               &last_seglen,
-		                                               mode,
+		                                               mode | FS_MODE_FIGNORE_TRAILING_SLASHES,
 		                                               premaining_symlinks);
 		decref(*pcontaining_path);
 		*pcontaining_path = new_containing_path;
+		if unlikely(!last_seglen) {
+			/* This can happen when `sl_node->sl_text == "/"', since in this
+			 * case, we'd still end with a trailing path segment of 0-length. */
+			sync_read(*pcontaining_path);
+			*pnew_containing_directory = (REF struct directory_node *)incref((*pcontaining_path)->p_inode);
+			sync_endread(*pcontaining_path);
+			*presult_path = incref(*pcontaining_path);
+			goto got_result_path;
+		}
 		hash = directory_entry_hash(last_seg, last_seglen);
 		COMPILER_READ_BARRIER();
 		/* Check for mounting points & cached paths. */
@@ -100,6 +109,7 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 		                : path_getchild_and_parent_inode(*pcontaining_path, last_seg, last_seglen,
 		                                                 hash, pnew_containing_directory);
 		if (*presult_path) {
+got_result_path:
 			freea(buf);
 			return PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH;
 		}
@@ -116,6 +126,17 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 			                                   last_seglen, hash, pcontaining_dirent);
 			if unlikely(!*pnew_result)
 				THROW(E_FSERROR_FILE_NOT_FOUND);
+			if ((last_seg + last_seglen < buf + reqlen) &&
+			    (last_seg[last_seglen] == '/')) {
+				/* The symlink _must_ point to a directory!
+				 * s.a. `FS_MODE_FIGNORE_TRAILING_SLASHES' above. */
+				if (!INODE_ISDIR(*pnew_result)) {
+					decref_unlikely(*pnew_result);
+					*pnew_result = NULL;
+					THROW(E_FSERROR_NOT_A_DIRECTORY,
+					      E_FILESYSTEM_NOT_A_DIRECTORY_WALK);
+				}
+			}
 		} EXCEPT {
 			decref(*pnew_containing_directory);
 			RETHROW();
