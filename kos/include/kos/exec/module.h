@@ -258,6 +258,10 @@ __DECL_END
 #define module_section_inflate(self, typ, size) \
 	__module_section_inflate_impl(self, &(size)module_type__arg(typ))
 #endif /* !module_section_inflate && (module_section_getcdata_nx && module_section_getcsize) */
+
+#if (!defined(module_section_getudata) && defined(module_section_getdata))
+#define module_section_getudata(self, typ) module_section_getdata(self, typ)
+#endif /* !module_section_getudata && module_section_getdata */
 #endif /* __CC__ */
 
 

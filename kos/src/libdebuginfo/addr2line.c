@@ -80,7 +80,7 @@ INTDEF byte_t __kernel_debug_line_start[];
  *   - result->al_symend    (only if `fill_symstart_symend' is true)
  */
 PRIVATE TEXTSECTION NONNULL((1, 2)) void
-NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
+NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections,
                               di_debug_addr2line_t *__restrict result,
                               uintptr_t module_relative_pc,
                               bool fill_symstart_symend) {
@@ -138,7 +138,7 @@ NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
 
 PRIVATE TEXTSECTION NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict cu,
-                                  di_debug_sections_t const *__restrict sections,
+                                  di_addr2line_sections_t const *__restrict sections,
                                   di_debug_addr2line_t *__restrict result,
                                   uintptr_t module_relative_pc,
                                   uintptr_t level) {
@@ -192,7 +192,7 @@ NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict 
 
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC search_cu)(di_debuginfo_cu_parser_t *__restrict self,
-                          di_debug_sections_t const *__restrict sections,
+                          di_addr2line_sections_t const *__restrict sections,
                           di_debug_addr2line_t *__restrict result,
                           uintptr_t module_relative_pc,
                           uintptr_t level,
@@ -557,7 +557,7 @@ err_corrupt:
  * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
+ * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printk("%s(%Iu) : %s : HERE\n",
@@ -574,11 +574,11 @@ err_corrupt:
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
 INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__restrict sections,
-                                               di_debug_addr2line_t *__restrict result,
-                                               uintptr_t module_relative_pc,
-                                               uintptr_t level,
-                                               uintptr_t flags) {
+NOTHROW_NCX(CC libdi_debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
+                                      di_debug_addr2line_t *__restrict result,
+                                      uintptr_t module_relative_pc,
+                                      uintptr_t level,
+                                      uintptr_t flags) {
 	unsigned int error;
 	if unlikely(sections->ds_debug_line_end <= sections->ds_debug_line_start) {
 		/* Scan the symbol tables. */
@@ -725,9 +725,9 @@ PRIVATE STRINGSECTION char const str_backward_slash[] = { '\\' };
 INTDEF STRINGSECTION char const unknown_string[]; /* "???" */
 
 INTERN TEXTSECTION NONNULL((1)) ssize_t CC
-libdi_debug_print_filename(pformatprinter printer, void *arg,
-                           char const *cubase, char const *pathname,
-                           char const *filename) {
+libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
+                                     char const *cubase, char const *pathname,
+                                     char const *filename) {
 	ssize_t temp, result = 0;
 	unsigned int strid;
 	if (pathname && (pathname[0] == '/' ||
@@ -783,16 +783,16 @@ err:
 
 
 
-PRIVATE STRINGSECTION char const secname_debug_line[]    = ".debug_line";
-PRIVATE STRINGSECTION char const secname_debug_info[]    = ".debug_info";
-PRIVATE STRINGSECTION char const secname_debug_abbrev[]  = ".debug_abbrev";
-PRIVATE STRINGSECTION char const secname_debug_aranges[] = ".debug_aranges";
-PRIVATE STRINGSECTION char const secname_debug_str[]     = ".debug_str";
-PRIVATE STRINGSECTION char const secname_debug_ranges[]  = ".debug_ranges";
-PRIVATE STRINGSECTION char const secname_symtab[]        = ".symtab";
-PRIVATE STRINGSECTION char const secname_strtab[]        = ".strtab";
-PRIVATE STRINGSECTION char const secname_dynsym[]        = ".dynsym";
-PRIVATE STRINGSECTION char const secname_dynstr[]        = ".dynstr";
+INTERN_CONST STRINGSECTION char const secname_debug_line[]    = ".debug_line";
+INTERN_CONST STRINGSECTION char const secname_debug_info[]    = ".debug_info";
+INTERN_CONST STRINGSECTION char const secname_debug_abbrev[]  = ".debug_abbrev";
+INTERN_CONST STRINGSECTION char const secname_debug_aranges[] = ".debug_aranges";
+INTERN_CONST STRINGSECTION char const secname_debug_str[]     = ".debug_str";
+INTERN_CONST STRINGSECTION char const secname_debug_ranges[]  = ".debug_ranges";
+INTERN_CONST STRINGSECTION char const secname_symtab[]        = ".symtab";
+INTERN_CONST STRINGSECTION char const secname_strtab[]        = ".strtab";
+INTERN_CONST STRINGSECTION char const secname_dynsym[]        = ".dynsym";
+INTERN_CONST STRINGSECTION char const secname_dynstr[]        = ".dynstr";
 
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
@@ -800,10 +800,10 @@ PRIVATE STRINGSECTION char const secname_dynstr[]        = ".dynstr";
  *    taking the job of locking debug information sections into memory off of
  *    the user. */
 INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debug_dllocksections)(module_t *dl_handle,
-                                           di_debug_sections_t *__restrict sections,
-                                           di_dl_debug_sections_t *__restrict dl_sections
-                                           module_type__param(module_type)) {
+NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
+                                                    di_addr2line_sections_t *__restrict sections,
+                                                    di_addr2line_dl_sections_t *__restrict dl_sections
+                                                    module_type__param(module_type)) {
 	memset(sections, 0, sizeof(*sections));
 	if unlikely(!dl_handle)
 		goto err_no_data;
@@ -866,11 +866,11 @@ err_no_data:
 	}
 #undef LOCK_SECTION
 	/* Support for compressed sections. */
-#define LOAD_SECTION(sect, lv_start, lv_end)                                       \
-	do {                                                                           \
-		size_t size;                                                               \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                    \
+	do {                                                                        \
+		size_t size;                                                            \
 		(lv_start) = (byte_t *)module_section_inflate(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                            \
+		(lv_end)   = (lv_start) + size;                                         \
 	}	__WHILE0
 
 
@@ -924,8 +924,8 @@ err_no_data:
 }
 
 INTERN TEXTSECTION NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections
-                                             module_type__param(module_type)) {
+NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections
+                                                      module_type__param(module_type)) {
 	if (dl_sections->dl_strtab)
 		module_section_decref(dl_sections->dl_strtab, module_type);
 	if (dl_sections->dl_symtab)
@@ -947,10 +947,10 @@ NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict 
 #endif /* !NDEBUG */
 }
 
-DEFINE_PUBLIC_ALIAS(debug_sections_addr2line, libdi_debug_sections_addr2line);
-DEFINE_PUBLIC_ALIAS(debug_print_filename, libdi_debug_print_filename);
-DEFINE_PUBLIC_ALIAS(debug_dllocksections, libdi_debug_dllocksections);
-DEFINE_PUBLIC_ALIAS(debug_dlunlocksections, libdi_debug_dlunlocksections);
+DEFINE_PUBLIC_ALIAS(debug_addr2line, libdi_debug_addr2line);
+DEFINE_PUBLIC_ALIAS(debug_addr2line_print_filename, libdi_debug_addr2line_print_filename);
+DEFINE_PUBLIC_ALIAS(debug_addr2line_sections_lock, libdi_debug_addr2line_sections_lock);
+DEFINE_PUBLIC_ALIAS(debug_addr2line_sections_unlock, libdi_debug_addr2line_sections_unlock);
 
 
 DECL_END

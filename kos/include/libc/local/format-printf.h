@@ -1141,14 +1141,14 @@ __check_string_error_and_print_tail:
 				char const *__xiter, *__xend, *__xflush;
 				__UINTPTR_TYPE__ __val, __modrel;
 #if !defined(__KERNEL__) || !defined(__KOS__)
-				di_debug_sections_t __debug_sections;
-				di_dl_debug_sections_t __dl_debug_sections;
+				di_addr2line_sections_t __debug_sections;
+				di_addr2line_dl_sections_t __dl_debug_sections;
 				/* Load `libdebuginfo.so' to implement addr2line support. */
 				static void *__p_libdebuginfo = __NULLPTR;
-				static PDEBUG_DLLOCKSECTIONS __p_debug_dllocksections;
-				static PDEBUG_DLUNLOCKSECTIONS __p_debug_dlunlocksections;
-				static PDEBUG_SECTIONS_ADDR2LINE __p_debug_sections_addr2line;
-				static PDEBUG_PRINT_FILENAME __p_debug_print_filename;
+				static PDEBUG_ADDR2LINE_SECTIONS_LOCK __p_debug_addr2line_sections_lock;
+				static PDEBUG_ADDR2LINE_SECTIONS_UNLOCK __p_debug_addr2line_sections_unlock;
+				static PDEBUG_ADDR2LINE __p_debug_addr2line;
+				static PDEBUG_ADDR2LINE_PRINT_FILENAME __p_debug_addr2line_print_filename;
 				void *__ptr_module;
 				if (!__p_libdebuginfo) {
 					void *__m = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
@@ -1156,12 +1156,12 @@ __check_string_error_and_print_tail:
 						__p_libdebuginfo = (void *)-1;
 						goto __broken_format;
 					}
-					*(void **)&__p_debug_dllocksections     = dlsym(__m, "debug_dllocksections");
-					*(void **)&__p_debug_dlunlocksections   = dlsym(__m, "debug_dlunlocksections");
-					*(void **)&__p_debug_sections_addr2line = dlsym(__m, "debug_sections_addr2line");
-					*(void **)&__p_debug_print_filename     = dlsym(__m, "debug_print_filename");
-					if (!__p_debug_dllocksections || !__p_debug_dlunlocksections ||
-					    !__p_debug_sections_addr2line || !__p_debug_print_filename) {
+					*(void **)&__p_debug_addr2line_sections_lock   = dlsym(__m, "debug_addr2line_sections_lock");
+					*(void **)&__p_debug_addr2line_sections_unlock = dlsym(__m, "debug_addr2line_sections_unlock");
+					*(void **)&__p_debug_addr2line                 = dlsym(__m, "debug_addr2line");
+					*(void **)&__p_debug_addr2line_print_filename  = dlsym(__m, "debug_addr2line_print_filename");
+					if (!__p_debug_addr2line_sections_lock || !__p_debug_addr2line_sections_unlock ||
+					    !__p_debug_addr2line || !__p_debug_addr2line_print_filename) {
 						__p_libdebuginfo = (void *)-1;
 						goto __broken_format;
 					}
@@ -1172,11 +1172,11 @@ __check_string_error_and_print_tail:
 				}
 				__ptr_module = dlgethandle(__p, DLGETHANDLE_FNORMAL);
 				__modrel = (__UINTPTR_TYPE__)dlmodulebase(__ptr_module);
-				(*__p_debug_dllocksections)(__ptr_module, &__debug_sections, &__dl_debug_sections);
-				(*__p_debug_sections_addr2line)(&__debug_sections, &__info,
-				                                (__UINTPTR_TYPE__)__p - __modrel,
-				                                DEBUG_ADDR2LINE_LEVEL_SOURCE,
-				                                DEBUG_ADDR2LINE_FNORMAL);
+				(*__p_debug_addr2line_sections_lock)(__ptr_module, &__debug_sections, &__dl_debug_sections);
+				(*__p_debug_addr2line)(&__debug_sections, &__info,
+				                       (__UINTPTR_TYPE__)__p - __modrel,
+				                       DEBUG_ADDR2LINE_LEVEL_SOURCE,
+				                       DEBUG_ADDR2LINE_FNORMAL);
 #else /* !__KERNEL__ || !__KOS__ */
 				struct addr2line_buf __dl_debug_sections;
 				__UINTPTR_TYPE__ __rel;
@@ -1320,9 +1320,9 @@ __do_vinfo_decimal:
 
 				case 'f':
 #if !defined(__KERNEL__) || !defined(__KOS__)
-					__temp = (*__p_debug_print_filename)(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_srcpath, __info.al_srcfile);
+					__temp = (*__p_debug_addr2line_print_filename)(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_srcpath, __info.al_srcfile);
 #else /* !__KERNEL__ || !__KOS__ */
-					__temp = debug_print_filename(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_srcpath, __info.al_srcfile);
+					__temp = debug_addr2line_print_filename(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_srcpath, __info.al_srcfile);
 #endif /* __KERNEL__ && __KOS__ */
 					if __unlikely(__temp < 0)
 						goto __err_vinfo;
@@ -1345,9 +1345,9 @@ __do_vinfo_decimal:
 
 					case 'f':
 #if !defined(__KERNEL__) || !defined(__KOS__)
-						__temp = (*__p_debug_print_filename)(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_dclpath, __info.al_dclfile);
+						__temp = (*__p_debug_addr2line_print_filename)(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_dclpath, __info.al_dclfile);
 #else /* !__KERNEL__ || !__KOS__ */
-						__temp = debug_print_filename(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_dclpath, __info.al_dclfile);
+						__temp = debug_addr2line_print_filename(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_dclpath, __info.al_dclfile);
 #endif /* __KERNEL__ && __KOS__ */
 						if __unlikely(__temp < 0)
 							goto __err_vinfo;
@@ -1379,14 +1379,14 @@ __end_vinfo_xiter:
 					__result += __temp;
 				}
 #if !defined(__KERNEL__) || !defined(__KOS__)
-				(*__p_debug_dlunlocksections)(&__dl_debug_sections);
+				(*__p_debug_addr2line_sections_unlock)(&__dl_debug_sections);
 #else /* !__KERNEL__ || !__KOS__ */
 				addr2line_end(&__dl_debug_sections);
 #endif /* __KERNEL__ && __KOS__ */
 				break;
 __err_vinfo:
 #if !defined(__KERNEL__) || !defined(__KOS__)
-				(*__p_debug_dlunlocksections)(&__dl_debug_sections);
+				(*__p_debug_addr2line_sections_unlock)(&__dl_debug_sections);
 #else /* !__KERNEL__ || !__KOS__ */
 				addr2line_end(&__dl_debug_sections);
 #endif /* !__KERNEL__ || !__KOS__ */

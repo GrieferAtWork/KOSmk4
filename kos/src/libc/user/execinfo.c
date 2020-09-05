@@ -78,14 +78,14 @@ err_init_failed:
 
 PRIVATE SECTION_DEBUG_BSS("pdyn_libdebuginfo") void *pdyn_libdebuginfo = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_for_debug")         PUNWIND_FOR_DEBUG         pdyn_unwind_for_debug         = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_debug_dllocksections")     PDEBUG_DLLOCKSECTIONS     pdyn_debug_dllocksections     = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_debug_dlunlocksections")   PDEBUG_DLUNLOCKSECTIONS   pdyn_debug_dlunlocksections   = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_debug_sections_addr2line") PDEBUG_SECTIONS_ADDR2LINE pdyn_debug_sections_addr2line = NULL;
+PRIVATE SECTION_DEBUG_BSS("pdyn_debug_addr2line_sections_lock")     PDEBUG_ADDR2LINE_SECTIONS_LOCK     pdyn_debug_addr2line_sections_lock     = NULL;
+PRIVATE SECTION_DEBUG_BSS("pdyn_debug_addr2line_sections_unlock")   PDEBUG_ADDR2LINE_SECTIONS_UNLOCK   pdyn_debug_addr2line_sections_unlock   = NULL;
+PRIVATE SECTION_DEBUG_BSS("pdyn_debug_addr2line") PDEBUG_ADDR2LINE pdyn_debug_addr2line = NULL;
 
 #define unwind_for_debug         (*pdyn_unwind_for_debug)
-#define debug_dllocksections     (*pdyn_debug_dllocksections)
-#define debug_dlunlocksections   (*pdyn_debug_dlunlocksections)
-#define debug_sections_addr2line (*pdyn_debug_sections_addr2line)
+#define debug_addr2line_sections_lock     (*pdyn_debug_addr2line_sections_lock)
+#define debug_addr2line_sections_unlock   (*pdyn_debug_addr2line_sections_unlock)
+#define debug_addr2line (*pdyn_debug_addr2line)
 
 PRIVATE ATTR_NOINLINE WUNUSED SECTION_DEBUG_TEXT("get_libdebuginfo")
 void *LIBCCALL get_libdebuginfo(void) {
@@ -110,7 +110,7 @@ again:
 PRIVATE ATTR_NOINLINE WUNUSED SECTION_DEBUG_TEXT("init_libdebuginfo")
 bool LIBCCALL init_libdebuginfo(void) {
 	void *lib;
-	if (pdyn_debug_dllocksections)
+	if (pdyn_debug_addr2line_sections_lock)
 		return true;
 	lib = get_libdebuginfo();
 	if (!lib)
@@ -118,15 +118,15 @@ bool LIBCCALL init_libdebuginfo(void) {
 	*(void **)&pdyn_unwind_for_debug = dlsym(lib, "unwind_for_debug");
 	if unlikely(!pdyn_unwind_for_debug)
 		return false;
-	*(void **)&pdyn_debug_sections_addr2line = dlsym(lib, "debug_sections_addr2line");
-	if unlikely(!pdyn_debug_sections_addr2line)
+	*(void **)&pdyn_debug_addr2line = dlsym(lib, "debug_addr2line");
+	if unlikely(!pdyn_debug_addr2line)
 		return false;
-	*(void **)&pdyn_debug_dlunlocksections = dlsym(lib, "debug_dlunlocksections");
-	if unlikely(!pdyn_debug_dlunlocksections)
+	*(void **)&pdyn_debug_addr2line_sections_unlock = dlsym(lib, "debug_addr2line_sections_unlock");
+	if unlikely(!pdyn_debug_addr2line_sections_unlock)
 		return false;
 	COMPILER_WRITE_BARRIER();
-	*(void **)&pdyn_debug_dllocksections = dlsym(lib, "debug_dllocksections");
-	if unlikely(!pdyn_debug_dllocksections)
+	*(void **)&pdyn_debug_addr2line_sections_lock = dlsym(lib, "debug_addr2line_sections_lock");
+	if unlikely(!pdyn_debug_addr2line_sections_lock)
 		return false;
 	return true;
 }
@@ -184,18 +184,18 @@ NOTHROW_NCX(LIBCCALL print_function_name)(void *pc,
                                           void *arg) {
 	void *mod;
 	ssize_t result;
-	di_debug_sections_t sections;
-    di_dl_debug_sections_t dl_sections;
+	di_addr2line_sections_t sections;
+    di_addr2line_dl_sections_t dl_sections;
 	di_debug_addr2line_t a2l;
 	/* Figure out the module mapped at the given program counter. */
 	mod = dlgethandle(pc, DLGETHANDLE_FINCREF);
 	if unlikely(!mod)
 		goto err0;
 	/* Load debug sections for that module. */
-	if (debug_dllocksections(mod, &sections, &dl_sections) != DEBUG_INFO_ERROR_SUCCESS)
+	if (debug_addr2line_sections_lock(mod, &sections, &dl_sections) != DEBUG_INFO_ERROR_SUCCESS)
 		goto err0_handle;
 	/* Try to extract debug information about the given address. */
-	if (debug_sections_addr2line(&sections, &a2l,
+	if (debug_addr2line(&sections, &a2l,
 	                             (uintptr_t)pc - (uintptr_t)dlmodulebase(mod),
 	                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
 	                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS)
@@ -207,11 +207,11 @@ NOTHROW_NCX(LIBCCALL print_function_name)(void *pc,
 	/* Print the function's name. */
 	result = (*printer)(arg, a2l.al_rawname, strlen(a2l.al_rawname));
 	/* Release references to acquired data. */
-	debug_dlunlocksections(&dl_sections);
+	debug_addr2line_sections_unlock(&dl_sections);
 	dlclose(mod);
 	return result;
 err0_sect:
-	debug_dlunlocksections(&dl_sections);
+	debug_addr2line_sections_unlock(&dl_sections);
 err0_handle:
 	dlclose(mod);
 err0:

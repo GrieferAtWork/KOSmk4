@@ -235,30 +235,30 @@ again:
 	return result;
 }
 
-PRIVATE PDEBUG_DLLOCKSECTIONS     pdyn_debug_dllocksections     = NULL;
-PRIVATE PDEBUG_DLUNLOCKSECTIONS   pdyn_debug_dlunlocksections   = NULL;
-PRIVATE PDEBUG_SECTIONS_ADDR2LINE pdyn_debug_sections_addr2line = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK     pdyn_debug_addr2line_sections_lock     = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK   pdyn_debug_addr2line_sections_unlock   = NULL;
+PRIVATE PDEBUG_ADDR2LINE pdyn_debug_addr2line = NULL;
 
-#define debug_dllocksections     (*pdyn_debug_dllocksections)
-#define debug_dlunlocksections   (*pdyn_debug_dlunlocksections)
-#define debug_sections_addr2line (*pdyn_debug_sections_addr2line)
+#define debug_addr2line_sections_lock     (*pdyn_debug_addr2line_sections_lock)
+#define debug_addr2line_sections_unlock   (*pdyn_debug_addr2line_sections_unlock)
+#define debug_addr2line (*pdyn_debug_addr2line)
 
 PRIVATE ATTR_NOINLINE WUNUSED bool CC init_libdebuginfo(void) {
 	void *lib;
-	if (pdyn_debug_dllocksections)
+	if (pdyn_debug_addr2line_sections_lock)
 		return true;
 	lib = get_libdebuginfo();
 	if (!lib)
 		return false;
-	*(void **)&pdyn_debug_sections_addr2line = dlsym(lib, "debug_sections_addr2line");
-	if unlikely(!pdyn_debug_sections_addr2line)
+	*(void **)&pdyn_debug_addr2line = dlsym(lib, "debug_addr2line");
+	if unlikely(!pdyn_debug_addr2line)
 		return false;
-	*(void **)&pdyn_debug_dlunlocksections = dlsym(lib, "debug_dlunlocksections");
-	if unlikely(!pdyn_debug_dlunlocksections)
+	*(void **)&pdyn_debug_addr2line_sections_unlock = dlsym(lib, "debug_addr2line_sections_unlock");
+	if unlikely(!pdyn_debug_addr2line_sections_unlock)
 		return false;
 	COMPILER_WRITE_BARRIER();
-	*(void **)&pdyn_debug_dllocksections = dlsym(lib, "debug_dllocksections");
-	if unlikely(!pdyn_debug_dllocksections)
+	*(void **)&pdyn_debug_addr2line_sections_lock = dlsym(lib, "debug_addr2line_sections_lock");
+	if unlikely(!pdyn_debug_addr2line_sections_lock)
 		return false;
 	return true;
 }
@@ -324,30 +324,30 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 			{
 				/* Use pdyn_libdebuginfo as source for symbol names. */
 				di_debug_addr2line_t a2l_info;
-				di_debug_sections_t dbg_sect;
-				di_dl_debug_sections_t dl_sect;
+				di_addr2line_sections_t dbg_sect;
+				di_addr2line_dl_sections_t dl_sect;
 				REF module_t *symbol_module;
 				module_type_var(symbol_module_type);
 				symbol_module = module_ataddr_nx(symbol_addr, symbol_module_type);
 				if (!symbol_module)
 					goto generic_print_symbol_addr;
 				TRY {
-					if (debug_dllocksections(symbol_module, &dbg_sect, &dl_sect
-					                         module_type__arg(symbol_module_type)) !=
+					if (debug_addr2line_sections_lock(symbol_module, &dbg_sect, &dl_sect
+					                                  module_type__arg(symbol_module_type)) !=
 					    DEBUG_INFO_ERROR_SUCCESS) {
 						module_decref(symbol_module, symbol_module_type);
 						goto generic_print_symbol_addr;
 					}
 					TRY {
 						uintptr_t symbol_offset;
-						if (debug_sections_addr2line(&dbg_sect, &a2l_info,
-						                             (uintptr_t)symbol_addr -
-						                             (uintptr_t)module_getloadaddr(symbol_module,
-						                                                           symbol_module_type),
-						                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
-						                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS) {
+						if (debug_addr2line(&dbg_sect, &a2l_info,
+						                    (uintptr_t)symbol_addr -
+						                    (uintptr_t)module_getloadaddr(symbol_module,
+						                                                  symbol_module_type),
+						                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+						                    DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS) {
 							module_decref(symbol_module, symbol_module_type);
-							debug_dlunlocksections(&dl_sect module_type__arg(symbol_module_type));
+							debug_addr2line_sections_unlock(&dl_sect module_type__arg(symbol_module_type));
 							goto generic_print_symbol_addr;
 						}
 						if (!a2l_info.al_rawname)
@@ -367,10 +367,10 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 							disasm_printf(self, "+%#Ix", symbol_offset);
 						disasm_print(self, ">", 1);
 					} EXCEPT {
-						debug_dlunlocksections(&dl_sect module_type__arg(symbol_module_type));
+						debug_addr2line_sections_unlock(&dl_sect module_type__arg(symbol_module_type));
 						RETHROW();
 					}
-					debug_dlunlocksections(&dl_sect module_type__arg(symbol_module_type));
+					debug_addr2line_sections_unlock(&dl_sect module_type__arg(symbol_module_type));
 				} EXCEPT {
 					module_decref(symbol_module,
 					              symbol_module_type);

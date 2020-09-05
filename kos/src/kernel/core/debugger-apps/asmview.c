@@ -75,6 +75,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 DECL_BEGIN
 
 
+#undef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
+#if 0
+#define CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY 1
+#endif
+
 
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self) {
@@ -255,9 +260,10 @@ struct av_symbol {
 };
 
 struct av_sections_lock {
-	REF struct driver     *sl_driver; /* [1..1] The associated driver. (Set to NULL if entry is used) */
-	di_dl_debug_sections_t sl_dlsect; /* DL sections data */
-	di_debug_sections_t    sl_dbsect; /* Debug sections data */
+	REF module_t              *sl_module;  /* [1..1] The associated module. (Set to NULL if entry is used) */
+	module_type_var           (sl_modtyp); /* Module type. */
+	di_addr2line_dl_sections_t sl_dlsect;  /* DL sections data */
+	di_addr2line_sections_t    sl_dbsect;  /* Debug sections data */
 };
 
 PRIVATE struct av_symbol av_symbol_cache[128];
@@ -266,11 +272,12 @@ PRIVATE struct av_sections_lock av_sections_cache[8];
 DBG_FINI(finalize_av_symbol_cache) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
-		if (!av_sections_cache[i].sl_driver)
+		if (!av_sections_cache[i].sl_module)
 			continue;
-		debug_dlunlocksections(&av_sections_cache[i].sl_dlsect
-		                        module_type__arg(MODULE_TYPE_DRIVER));
-		decref_unlikely(av_sections_cache[i].sl_driver);
+		debug_addr2line_sections_unlock(&av_sections_cache[i].sl_dlsect
+		                                module_type__arg(av_sections_cache[i].sl_modtyp));
+		module_decref(av_sections_cache[i].sl_module,
+		              av_sections_cache[i].sl_modtyp);
 	}
 	memset(av_symbol_cache, 0, sizeof(av_symbol_cache));
 	memset(av_sections_cache, 0, sizeof(av_sections_cache));
@@ -279,14 +286,22 @@ DBG_FINI(finalize_av_symbol_cache) {
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_do_lock_sections)(struct av_sections_lock *__restrict info,
                                    uintptr_t symbol_addr) {
-	REF struct driver *symbol_module;
-	symbol_module = driver_at_address((void *)symbol_addr);
+	unsigned int lock_error;
+	REF module_t *symbol_module;
+	module_type_var(symbol_module_type);
+	symbol_module = module_ataddr_nx((void *)symbol_addr,
+	                                 symbol_module_type);
 	if (!symbol_module)
 		return false;
-	if (debug_dllocksections((module_t *)symbol_module, &info->sl_dbsect, &info->sl_dlsect
-	                         module_type__arg(MODULE_TYPE_DRIVER)) != DEBUG_INFO_ERROR_SUCCESS)
+	lock_error = debug_addr2line_sections_lock(symbol_module,
+	                                           &info->sl_dbsect, &info->sl_dlsect
+	                                           module_type__arg(symbol_module_type));
+	if (lock_error != DEBUG_INFO_ERROR_SUCCESS) {
+		module_decref_unlikely(symbol_module, symbol_module_type);
 		return false;
-	info->sl_driver = symbol_module;
+	}
+	info->sl_module = symbol_module;
+	module_type_arg(info->sl_modtyp = symbol_module_type);
 	return true;
 }
 
@@ -294,32 +309,39 @@ PRIVATE ATTR_DBGTEXT struct av_sections_lock *
 NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 	unsigned int i;
 	struct av_sections_lock *resent = NULL;
+#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
 	if unlikely(!ADDR_ISKERN(symbol_addr))
 		goto done;
+#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
-		if (!av_sections_cache[i].sl_driver) {
+		if (!av_sections_cache[i].sl_module) {
 			if (!resent)
 				resent = &av_sections_cache[i];
 			continue;
 		}
-		if (symbol_addr < av_sections_cache[i].sl_driver->d_loadstart)
+		if (symbol_addr < module_getloadstart(av_sections_cache[i].sl_module,
+		                                      av_sections_cache[i].sl_modtyp))
 			continue;
-		if (symbol_addr >= av_sections_cache[i].sl_driver->d_loadend)
+		if (symbol_addr >= module_getloadend(av_sections_cache[i].sl_module,
+		                                     av_sections_cache[i].sl_modtyp))
 			continue;
 		return &av_sections_cache[i];
 	}
 	if (!resent) {
-		debug_dlunlocksections(&av_sections_cache[0].sl_dlsect
-		                       module_type__arg(MODULE_TYPE_DRIVER));
-		decref_unlikely(av_sections_cache[0].sl_driver);
+		debug_addr2line_sections_unlock(&av_sections_cache[0].sl_dlsect
+		                                module_type__arg(av_sections_cache[0].sl_modtyp));
+		module_decref_unlikely(av_sections_cache[0].sl_module,
+		                       av_sections_cache[0].sl_modtyp);
 		memmovedown(&av_sections_cache[0], &av_sections_cache[1],
 		            sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));
 		resent = COMPILER_ENDOF(av_sections_cache) - 1;
 	}
-	resent->sl_driver = NULL;
+	resent->sl_module = NULL;
 	if (!av_do_lock_sections(resent, symbol_addr))
 		resent = NULL;
+#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
 done:
+#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
 	return resent;
 }
 
@@ -327,14 +349,21 @@ done:
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL av_addr2line)(di_debug_addr2line_t *__restrict info,
                             uintptr_t symbol_addr) {
+	unsigned int addr2line_error;
 	struct av_sections_lock *sections;
+	uintptr_t module_relative_pc;
 	sections = av_lock_sections(symbol_addr);
 	if (!sections)
 		return false;
-	if (debug_sections_addr2line(&sections->sl_dbsect, info,
-	                             (uintptr_t)symbol_addr - (uintptr_t)sections->sl_driver->d_loadaddr,
-	                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
-	                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS)
+	module_relative_pc = symbol_addr -
+	                     module_getloadaddr(sections->sl_module,
+	                                        sections->sl_modtyp);
+	addr2line_error = debug_addr2line(&sections->sl_dbsect,
+	                                  info,
+	                                  module_relative_pc,
+	                                  DEBUG_ADDR2LINE_LEVEL_SOURCE,
+	                                  DEBUG_ADDR2LINE_FNORMAL);
+	if (addr2line_error != DEBUG_INFO_ERROR_SUCCESS)
 		return false;
 	return true;
 }
@@ -359,8 +388,10 @@ PRIVATE ATTR_DBGTEXT struct av_symbol *
 NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 	unsigned int i;
 	struct av_symbol *resent = NULL;
+#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
 	if unlikely(!ADDR_ISKERN(symbol_addr))
 		goto done;
+#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
 	for (i = 0; i < COMPILER_LENOF(av_symbol_cache); ++i) {
 		if (!av_symbol_cache[i].s_name) {
 			if (!resent)
@@ -388,7 +419,9 @@ NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 		resent->s_end   = symbol_addr + 1;
 		resent = NULL;
 	}
+#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
 done:
+#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
 	return resent;
 }
 

@@ -21,12 +21,29 @@
 #define _LIBDEBUGINFO_DEBUG_INFO_H 1
 
 #include "api.h"
-#include "dwarf.h"
-#include <bits/types.h>
-#include <bits/format-printer.h>
-#include <libc/string.h>
-#include <hybrid/typecore.h>
+/**/
+
 #include <hybrid/__unaligned.h>
+#include <hybrid/typecore.h>
+
+#include <bits/format-printer.h>
+#include <bits/types.h>
+#include <kos/anno.h>
+#include <kos/exec/module.h>
+
+#include <libc/string.h>
+
+#include "dwarf.h"
+
+/* Section containers & overlap:
+ *
+ * unwind_emulator_sections_t: .eh_frame, .debug_frame, .debug_addr, .debug_loc, .debug_abbrev, .debug_info
+ * di_addr2line_sections_t:                                                      .debug_abbrev, .debug_info, .debug_str, .debug_aranges, .debug_ranges, .debug_line, .strtab, .symtab
+ * di_enum_locals_sections_t:                           .debug_addr, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_aranges, .debug_ranges
+ * di_debuginfo_cu_parser_sections_t:                                .debug_loc, .debug_abbrev,              .debug_str
+ */
+
+
 
 /* Example program layout:
  * >> int foo(int y) {
@@ -116,17 +133,20 @@ typedef struct di_debuginfo_component_struct {
 } di_debuginfo_component_t;
 
 typedef struct di_debuginfo_cu_parser_sections_struct {
-	__byte_t *cps_debug_abbrev_start; /* [1..1][const] Starting address of `.debug_abbrev' */
-	__byte_t *cps_debug_abbrev_end;   /* [1..1][const] End address of `.debug_abbrev' */
-	__byte_t *cps_debug_loc_start;    /* [0..1][const] Starting address of `.debug_loc'
+	/* NOTE: The order of members in this struct is important!
+	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
+	__byte_t *cps_debug_loc_start;    /* [0..1][const] `.debug_loc' start
 	                                   * NOTE: When set equal to `cps_debug_loc_end', location list expression
 	                                   *       cannot be used and will appear as though they weren't present at
 	                                   *       all. */
-	__byte_t *cps_debug_loc_end;      /* [0..1][const] End address of `.debug_loc' */
-	__byte_t *cps_debug_str_start;    /* [0..1][const] Starting address of `.debug_str'
+	__byte_t *cps_debug_loc_end;      /* [0..1][const] `.debug_loc' end */
+	__byte_t *cps_debug_abbrev_start; /* [1..1][const] `.debug_abbrev' start */
+	__byte_t *cps_debug_abbrev_end;   /* [1..1][const] `.debug_abbrev' end */
+	__byte_t *_cps_pad[2];            /* ... */
+	__byte_t *cps_debug_str_start;    /* [0..1][const] `.debug_str' start
 	                                   * NOTE: When set equal to `cps_debug_str_end', strings referring to
 	                                   *       this section will be returned as `???' (3 question marks) */
-	__byte_t *cps_debug_str_end;      /* [0..1][const] End address of `.debug_str' */
+	__byte_t *cps_debug_str_end;      /* [0..1][const] `.debug_str' end */
 } di_debuginfo_cu_parser_sections_t;
 
 typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
@@ -750,15 +770,27 @@ typedef __ATTR_NONNULL((2)) __ssize_t
  * >>
  * >>     // Load the value of this variable.
  * >>     buffer = malloca(typ.t_sizeof);
- * >>     debug_cfa_getvalue(&REGISTERS, &GET_REGISTER, var.v_location, buffer, typ.t_sizeof);
+ * >>     size_t num_written_bits;
+ * >>     debuginfo_location_getvalue(&var.v_location,
+ * >>                                 SECTIONS,
+ * >>                                 &GET_REGISTER,
+ * >>                                 &REGISTERS,
+ * >>                                 &CU,
+ * >>                                 MODULE_RELATIVE_PC,
+ * >>                                 buffer,
+ * >>                                 typ.t_sizeof,
+ * >>                                 &num_written_bits,
+ * >>                                 &SP->sp_frame_base,
+ * >>                                 NULL,
+ * >>                                 parser->dup_addrsize,
+ * >>                                 parser->dup_ptrsize);
  * >>
  * >>     // Print a representation of the variable, and its data.
  * >>     debuginfo_print_value(PRINTER, ARG, &pp, &type, v.v_name, buffer, typ.t_sizeof);
  * >> }
  * @param: varname: Name of the value (when NULL, print as a cast-like expression;
  *                  otherwise, print as an declaration)
- * @param: flags:   Set of `DEBUGINFO_PRINT_VALUE_F*'
- */
+ * @param: flags:   Set of `DEBUGINFO_PRINT_VALUE_F*' */
 typedef __ATTR_NONNULL((1, 3, 4, 6)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUGINFO_PRINT_VALUE)(__pformatprinter printer, void *arg,
                                           di_debuginfo_cu_parser_t const *__restrict parser,
@@ -796,33 +828,31 @@ debuginfo_print_typename(__pformatprinter printer, void *arg,
 #define DEBUGINFO_PRINT_VALUE_FCASTALL 0x0001 /* Include explicit type casts for all expressions */
 
 
-typedef struct di_enum_locals_sections_struct {
-	/*BEGIN:compat(struct unwind_emulator_sections_struct)*/
-	__byte_t *el_eh_frame_start;      /* [0..1] Starting address of the .eh_frame section. */
-	__byte_t *el_eh_frame_end;        /* [0..1] End address of the .eh_frame section. */
-	__byte_t *el_debug_info_start;    /* [0..1] Starting address of the `.debug_info' section */
-	__byte_t *el_debug_info_end;      /* [0..1] End address of the `.debug_info' section */
-	__byte_t *el_debug_addr_start;    /* [0..1] Starting address of the `.debug_addr' section */
-	__byte_t *el_debug_addr_end;      /* [0..1] End address of the `.debug_addr' section */
-	/*BEGIN:compat(struct di_debuginfo_cu_parser_sections_struct)*/
-	__byte_t *el_debug_abbrev_start;  /* [0..1] Starting address of `.debug_abbrev' */
-	__byte_t *el_debug_abbrev_end;    /* [0..1] End address of `.debug_abbrev' */
-	__byte_t *el_debug_loc_start;     /* [0..1] Starting address of `.debug_loc' */
-	__byte_t *el_debug_loc_end;       /* [0..1] End address of `.debug_loc' */
-	/*END:compat(struct unwind_emulator_sections_struct)*/
-	__byte_t *el_debug_str_start;     /* [0..1] Starting address of `.debug_str' */
-	__byte_t *el_debug_str_end;       /* [0..1] End address of `.debug_str' */
-	/*END:compat(struct di_debuginfo_cu_parser_sections_struct)*/
-	__byte_t *el_debug_aranges_start; /* [0..1] Starting address of the `.debug_aranges' section */
-	__byte_t *el_debug_aranges_end;   /* [0..1] End address of the `.debug_aranges' section */
-	__byte_t *el_debug_ranges_start;  /* [0..1] Starting address of the `.debug_ranges' section */
-	__byte_t *el_debug_ranges_end;    /* [0..1] End address of the `.debug_ranges' section */
-} di_enum_locals_sections_t;
-#define di_enum_locals_sections_as_unwind_emulator_sections(x) \
-	((struct unwind_emulator_sections_struct *)(x))
-#define di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(x) \
-	((struct di_debuginfo_cu_parser_sections_struct *)&(x)->el_debug_abbrev_start)
 
+
+typedef struct di_enum_locals_sections_struct {
+	/* NOTE: The order of members in this struct is important!
+	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
+	__byte_t *el_debug_addr_start;    /* [0..1] `.debug_addr' start */
+	__byte_t *el_debug_addr_end;      /* [0..1] `.debug_addr' end */
+	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t *el_debug_loc_start;     /* [0..1] `.debug_loc' start */
+	__byte_t *el_debug_loc_end;       /* [0..1] `.debug_loc' end */
+	__byte_t *el_debug_abbrev_start;  /* [0..1] `.debug_abbrev' start */
+	__byte_t *el_debug_abbrev_end;    /* [0..1] `.debug_abbrev' end */
+	__byte_t *el_debug_info_start;    /* [0..1] `.debug_info' start */
+	__byte_t *el_debug_info_end;      /* [0..1] `.debug_info' end */
+	__byte_t *el_debug_str_start;     /* [0..1] `.debug_str' start */
+	__byte_t *el_debug_str_end;       /* [0..1] `.debug_str' end */
+	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t *el_debug_aranges_start; /* [0..1] `.debug_aranges' start */
+	__byte_t *el_debug_aranges_end;   /* [0..1] `.debug_aranges' end */
+	__byte_t *el_debug_ranges_start;  /* [0..1] `.debug_ranges' start */
+	__byte_t *el_debug_ranges_end;    /* [0..1] `.debug_ranges' end */
+} di_enum_locals_sections_t;
+
+#define di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(x) \
+	((struct di_debuginfo_cu_parser_sections_struct *)&(x)->el_debug_loc_start)
 
 /* Callback for `debuginfo_enum_locals()' */
 typedef __ATTR_NONNULL((2, 3, 4, 5, 6, 7)) __ssize_t
@@ -848,6 +878,86 @@ debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo,
                       __uintptr_t module_relative_pc,
                       debuginfo_enum_locals_callback_t callback, void *arg);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+
+/* Super-structure containing pointers for _all_ debug-related sections */
+typedef struct di_debug_sections_struct {
+	/*BEGIN:compat(unwind_emulator_sections_t)*/
+	__byte_t *ds_eh_frame_start;      /* [0..1] `.eh_frame' start */
+	__byte_t *ds_eh_frame_end;        /* [0..1] `.eh_frame' end */
+	__byte_t *ds_debug_frame_start;   /* [0..1] `.debug_frame' start */
+	__byte_t *ds_debug_frame_end;     /* [0..1] `.debug_frame' end */
+	/*BEGIN:compat(di_enum_locals_sections_t)*/
+	__byte_t *ds_debug_addr_start;    /* [0..1] `.debug_addr' start */
+	__byte_t *ds_debug_addr_end;      /* [0..1] `.debug_addr' end */
+	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t *ds_debug_loc_start;     /* [0..1] `.debug_loc' start */
+	__byte_t *ds_debug_loc_end;       /* [0..1] `.debug_loc' end */
+	/*BEGIN:compat(di_addr2line_sections_t)*/
+	__byte_t *ds_debug_abbrev_start;  /* [0..1] `.debug_abbrev' start */
+	__byte_t *ds_debug_abbrev_end;    /* [0..1] `.debug_abbrev' end */
+	__byte_t *ds_debug_info_start;    /* [0..1] `.debug_info' start */
+	__byte_t *ds_debug_info_end;      /* [0..1] `.debug_info' end */
+	/*END:compat(unwind_emulator_sections_t)*/
+	__byte_t *ds_debug_str_start;     /* [0..1] `.debug_str' start */
+	__byte_t *ds_debug_str_end;       /* [0..1] `.debug_str' end */
+	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t *ds_debug_aranges_start; /* [0..1] `.debug_aranges' start */
+	__byte_t *ds_debug_aranges_end;   /* [0..1] `.debug_aranges' end */
+	__byte_t *ds_debug_ranges_start;  /* [0..1] `.debug_ranges' start */
+	__byte_t *ds_debug_ranges_end;    /* [0..1] `.debug_ranges' end */
+	/*END:compat(di_enum_locals_sections_t)*/
+	__byte_t *ds_debug_line_start;    /* [0..1] `.debug_line' start */
+	__byte_t *ds_debug_line_end;      /* [0..1] `.debug_line' end */
+	__byte_t *ds_strtab_start;        /* [0..1] `.strtab' / `.dynstr' start */
+	__byte_t *ds_strtab_end;          /* [0..1] `.strtab' / `.dynstr' end */
+	__byte_t *ds_symtab_start;        /* [0..1] `.symtab' / `.dynsym' start */
+	__byte_t *ds_symtab_end;          /* [0..1] `.symtab' / `.dynsym' end */
+	__size_t  ds_symtab_ent;          /* Entity size of `.symtab' / `.dynsym' */
+	/*END:compat(di_addr2line_sections_t)*/
+} di_debug_sections_t;
+
+#define di_debug_sections_as_unwind_emulator_sections(x)        ((unwind_emulator_sections_t *)&(x)->ds_eh_frame_start)
+#define di_debug_sections_as_di_enum_locals_sections(x)         ((di_enum_locals_sections_t *)&(x)->ds_debug_addr_start)
+#define di_debug_sections_as_di_debuginfo_cu_parser_sections(x) ((di_debuginfo_cu_parser_sections_t *)&(x)->ds_debug_loc_start)
+#define di_debug_sections_as_di_addr2line_sections(x)           ((di_addr2line_sections_t *)&(x)->ds_debug_abbrev_start)
+#define di_debug_sections_from_di_enum_locals_sections(x)       __COMPILER_CONTAINER_OF(x, di_debug_sections_t, ds_debug_addr_start)
+
+typedef struct di_debug_dl_sections_struct {
+	__REF module_section_t *ds_eh_frame;      /* [0..1] `.eh_frame' */
+	__REF module_section_t *ds_debug_frame;   /* [0..1] `.debug_frame' */
+	__REF module_section_t *ds_debug_addr;    /* [0..1] `.debug_addr' */
+	__REF module_section_t *ds_debug_loc;     /* [0..1] `.debug_loc' */
+	__REF module_section_t *ds_debug_abbrev;  /* [0..1] `.debug_abbrev' */
+	__REF module_section_t *ds_debug_info;    /* [0..1] `.debug_info' */
+	__REF module_section_t *ds_debug_str;     /* [0..1] `.debug_str' */
+	__REF module_section_t *ds_debug_aranges; /* [0..1] `.debug_aranges' */
+	__REF module_section_t *ds_debug_ranges;  /* [0..1] `.debug_ranges' */
+	__REF module_section_t *ds_debug_line;    /* [0..1] `.debug_line' */
+	__REF module_section_t *ds_strtab;        /* [0..1] `.strtab' / `.dynstr' */
+	__REF module_section_t *ds_symtab;        /* [0..1] `.symtab' / `.dynsym' */
+} di_debug_dl_sections_t;
+
+/* Load debug sections, given a handle to a module, as returned by dlopen() */
+typedef __ATTR_NONNULL((2, 3)) void
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUG_SECTIONS_LOCK)(module_t *dl_handle,
+                                                          di_debug_sections_t *__restrict sections,
+                                                          di_debug_dl_sections_t *__restrict dl_sections
+                                                          module_type__param(module_type));
+typedef __ATTR_NONNULL((1)) void
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUG_SECTIONS_UNLOCK)(di_debug_dl_sections_t *__restrict dl_sections
+                                                            module_type__param(module_type));
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) void
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_lock)(module_t *dl_handle,
+                                                   di_debug_sections_t *__restrict sections,
+                                                   di_debug_dl_sections_t *__restrict dl_sections
+                                                   module_type__param(module_type));
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections
+                                                     module_type__param(module_type));
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
 
 
 __DECL_END

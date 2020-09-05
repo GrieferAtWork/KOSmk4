@@ -50,7 +50,7 @@ DECL_BEGIN
  * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
+ * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printk("%s(%Iu) : %s : HERE\n",
@@ -66,36 +66,36 @@ DECL_BEGIN
  *                                    known at all, or whatever the total number of information
  *                                    levels know is. (all other fields of `*result' are NULL-initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
-INTDEF __ATTR_NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__restrict sections,
-                                               di_debug_addr2line_t *__restrict result,
-                                               uintptr_t module_relative_pc,
-                                               uintptr_t level,
-                                               uintptr_t flags);
+INTDEF NONNULL((1, 2)) unsigned int
+NOTHROW_NCX(CC libdi_debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
+                                      di_debug_addr2line_t *__restrict result,
+                                      uintptr_t module_relative_pc,
+                                      uintptr_t level,
+                                      uintptr_t flags);
 
 /* Print the fully qualified filename for a given string
  * triplet, as extractable from `di_debug_addr2line_t':
- *   - debug_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile); // /home/me/project/c/foo/src/bar.c
- *   - debug_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile); // /home/me/project/c/foo/include/bar.h
+ *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile); // /home/me/project/c/foo/src/bar.c
+ *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile); // /home/me/project/c/foo/include/bar.h
  * NOTE: When `filename' is NULL, print `???' (3 question marks) instead. */
-INTDEF __ATTR_NONNULL((1)) ssize_t CC
-libdi_debug_print_filename(pformatprinter printer, void *arg,
-                           char const *cubase, char const *pathname,
-                           char const *filename);
+INTDEF NONNULL((1)) ssize_t CC
+libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
+                                     char const *cubase, char const *pathname,
+                                     char const *filename);
 
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
  * >> These functions are simply light-weight wrappers around `dllocksection()',
  *    taking the job of locking debug information sections into memory off of
  *    the user. */
-INTDEF __ATTR_NONNULL((2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debug_dllocksections)(module_t *dl_handle,
-                                           di_debug_sections_t *__restrict sections,
-                                           di_dl_debug_sections_t *__restrict dl_sections
-                                           module_type__param(module_type));
-INTDEF __ATTR_NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections
-                                             module_type__param(module_type));
+INTDEF NONNULL((2, 3)) unsigned int
+NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
+                                                    di_addr2line_sections_t *__restrict sections,
+                                                    di_addr2line_dl_sections_t *__restrict dl_sections
+                                                    module_type__param(module_type));
+INTDEF NONNULL((1)) void
+NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections
+                                                      module_type__param(module_type));
 
 
 

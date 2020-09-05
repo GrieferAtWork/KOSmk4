@@ -463,13 +463,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the functionality of the `lsthread', `thread', `trace', `l' and `r'
 	 *       commands. */
 
-	/* TODO: Enumeration of local variants within the builtin debugger has only been
-	 *       programmed to work for text associated with the kernel core's binary
-	 *       image. - With the recent advances in usermod/driver integration, this
-	 *       is one of the last places that has yet to start taking advantage of
-	 *       generic module section accesses.
-	 *    -> Make `l' and `locals' work for drivers and usermod objects. */
-
 	/* TODO: Automate files like /kos/src/libc/libc/sys_siglist.def via `deemon -F' */
 
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect

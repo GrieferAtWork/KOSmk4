@@ -1093,14 +1093,14 @@ DEFINE_LIBRARY_OPEN(open_libdebuginfo, pdyn_libdebuginfo, LIBDEBUGINFO_LIBRARY_N
 DEFINE_LIBRARY_OPEN(open_libdisasm, pdyn_libdisasm, LIBDISASM_LIBRARY_NAME)
 #undef DEFINE_LIBRARY_OPEN
 
-PRIVATE PDEBUG_DLLOCKSECTIONS     pdyn_debug_dllocksections     = NULL;
-PRIVATE PDEBUG_DLUNLOCKSECTIONS   pdyn_debug_dlunlocksections   = NULL;
-PRIVATE PDEBUG_SECTIONS_ADDR2LINE pdyn_debug_sections_addr2line = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK     pdyn_debug_addr2line_sections_lock     = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK   pdyn_debug_addr2line_sections_unlock   = NULL;
+PRIVATE PDEBUG_ADDR2LINE pdyn_debug_addr2line = NULL;
 PRIVATE PINSTRUCTION_PRED_NX      pdyn_instruction_pred_nx      = NULL;
 PRIVATE PDISASM_SINGLE            pdyn_disasm_single            = NULL;
-#define debug_dllocksections     (*pdyn_debug_dllocksections)
-#define debug_dlunlocksections   (*pdyn_debug_dlunlocksections)
-#define debug_sections_addr2line (*pdyn_debug_sections_addr2line)
+#define debug_addr2line_sections_lock     (*pdyn_debug_addr2line_sections_lock)
+#define debug_addr2line_sections_unlock   (*pdyn_debug_addr2line_sections_unlock)
+#define debug_addr2line (*pdyn_debug_addr2line)
 #define instruction_pred_nx      (*pdyn_instruction_pred_nx)
 #define disasm_single            (*pdyn_disasm_single)
 
@@ -1121,21 +1121,21 @@ PRIVATE bool CC ensure_libinstrlen(void) {
 #define ENSURE_LIBDEBUGINFO() ensure_libdebuginfo()
 PRIVATE bool CC ensure_libdebuginfo(void) {
 	void *libdebuginfo;
-	if (pdyn_debug_sections_addr2line)
+	if (pdyn_debug_addr2line)
 		return true;
 	libdebuginfo = open_libdebuginfo();
 	if unlikely(!libdebuginfo)
 		return false;
-	*(void **)&pdyn_debug_dllocksections   = dlsym(libdebuginfo, "debug_dllocksections");
-	if unlikely(!pdyn_debug_dllocksections)
+	*(void **)&pdyn_debug_addr2line_sections_lock   = dlsym(libdebuginfo, "debug_addr2line_sections_lock");
+	if unlikely(!pdyn_debug_addr2line_sections_lock)
 		return false;
-	*(void **)&pdyn_debug_dlunlocksections = dlsym(libdebuginfo, "debug_dlunlocksections");
-	if unlikely(!pdyn_debug_dlunlocksections)
+	*(void **)&pdyn_debug_addr2line_sections_unlock = dlsym(libdebuginfo, "debug_addr2line_sections_unlock");
+	if unlikely(!pdyn_debug_addr2line_sections_unlock)
 		return false;
 	COMPILER_WRITE_BARRIER();
-	*(void **)&pdyn_debug_sections_addr2line = dlsym(libdebuginfo, "debug_sections_addr2line");
+	*(void **)&pdyn_debug_addr2line = dlsym(libdebuginfo, "debug_addr2line");
 	COMPILER_WRITE_BARRIER();
-	return pdyn_debug_sections_addr2line != NULL;
+	return pdyn_debug_addr2line != NULL;
 }
 
 #define ENSURE_LIBDISASM() ensure_libdisasm()
@@ -1238,17 +1238,17 @@ libregdump_ip(struct regdump_printer *__restrict self,
 			ip_module = module_ataddr_nx((void const *)ip,
 			                             ip_module_type);
 			if (ip_module) {
-				di_debug_sections_t sections;
-				di_dl_debug_sections_t dl_sections;
+				di_addr2line_sections_t sections;
+				di_addr2line_dl_sections_t dl_sections;
 				temp = 0;
-				if (debug_dllocksections(ip_module, &sections, &dl_sections
-				                         module_type__arg(ip_module_type)) ==
+				if (debug_addr2line_sections_lock(ip_module, &sections, &dl_sections
+				                                  module_type__arg(ip_module_type)) ==
 				    DEBUG_INFO_ERROR_SUCCESS) {
 					di_debug_addr2line_t info;
 					uintptr_t relpc = prev_ip - (uintptr_t)module_getloadaddr(ip_module, ip_module_type);
-					if (debug_sections_addr2line(&sections, &info, relpc, 0, 0) == DEBUG_INFO_ERROR_SUCCESS)
+					if (debug_addr2line(&sections, &info, relpc, 0, 0) == DEBUG_INFO_ERROR_SUCCESS)
 						temp = libregdump_do_ip_addr2line_info(self, &info, relpc, &did_lf_after_eip);
-					debug_dlunlocksections(&dl_sections module_type__arg(ip_module_type));
+					debug_addr2line_sections_unlock(&dl_sections module_type__arg(ip_module_type));
 				}
 				module_decref(ip_module, ip_module_type);
 				if unlikely(temp < 0)

@@ -398,20 +398,21 @@ typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *_
 typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 
 typedef struct unwind_emulator_sections_struct {
-	__byte_t *ues_eh_frame_start;     /* [0..1][const] Starting address of the .eh_frame section (used for the `DW_OP_call_frame_cfa' instruction).
-	                                   * When set to be equal to `ues_eh_frame_end', consider `DW_OP_call_frame_cfa' as an illegal instruction. */
-	__byte_t *ues_eh_frame_end;       /* [0..1][const] End address of the .eh_frame section. */
-	__byte_t *ues_debug_info_start;   /* [0..1][const] Starting address of the .debug_info section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
-	                                   * When set to be equal to `ues_debug_info_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
-	__byte_t *ues_debug_info_end;     /* [0..1][const] End address of the .debug_info section. */
-	__byte_t *ues_debug_addr_start;   /* [0..1][const] Starting address of the `.debug_addr' section */
-	__byte_t *ues_debug_addr_end;     /* [0..1][const] End address of the `.debug_addr' section
-	                                   * When set to be equal to `ues_debug_addr_start', consider `DW_OP_addrx' / `DW_OP_constx' as illegal instructions. */
-	__byte_t *ues_debug_abbrev_start; /* [0..1][const] Starting address of the .debug_abbrev section (used for the `DW_OP_call2' / `DW_OP_call4' instructions).
-	                                   * When set to be equal to `ues_debug_abbrev_end', consider `DW_OP_call2' / `DW_OP_call4' as illegal instructions. */
-	__byte_t *ues_debug_abbrev_end;   /* [0..1][const] End address of the .debug_abbrev section. */
-	__byte_t *ues_debug_loc_start;    /* [0..1][const] Starting address of the .debug_loc section. */
-	__byte_t *ues_debug_loc_end;      /* [0..1][const] End address of the .debug_loc section. */
+	/* NOTE: When individual sections are empty, the associated instructions become illegal
+	 * NOTE: The order of members in this struct is important!
+	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
+	__byte_t *ues_eh_frame_start;     /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t *ues_eh_frame_end;       /* [0..1][const] `.eh_frame' end */
+	__byte_t *ues_debug_frame_start;  /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t *ues_debug_frame_end;    /* [0..1][const] `.debug_frame' end */
+	__byte_t *ues_debug_addr_start;   /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
+	__byte_t *ues_debug_addr_end;     /* [0..1][const] `.debug_addr' end */
+	__byte_t *ues_debug_loc_start;    /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t *ues_debug_loc_end;      /* [0..1][const] `.debug_loc' end */
+	__byte_t *ues_debug_abbrev_start; /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t *ues_debug_abbrev_end;   /* [0..1][const] `.debug_abbrev' end */
+	__byte_t *ues_debug_info_start;   /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t *ues_debug_info_end;     /* [0..1][const] `.debug_info' end */
 } unwind_emulator_sections_t;
 
 #ifndef __di_debuginfo_location_t_defined

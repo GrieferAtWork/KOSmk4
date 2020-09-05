@@ -70,7 +70,7 @@ struct usermod_section {
 #else /* CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
 	uintptr_t     us_modtype; /* [const] Same as `um_modtype' of the associated `struct usermod' */
 #endif /* !CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA */
-	USER void    *us_udata;   /* [?..?][valid_if(us_flags & SHF_ALLOC)] User-space section location (if applicable; else: `NULL'). */
+	USER void    *us_udata;   /* [0..1][valid_if(us_flags & SHF_ALLOC)] User-space section location (if applicable; else: `(void *)-1'). */
 	u16          _us_pad2;    /* ... */
 	u16           us_index;   /* [const] Index of this section. */
 #if __SIZEOF_POINTER__ > 4

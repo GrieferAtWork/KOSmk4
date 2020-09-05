@@ -35,10 +35,10 @@ DECL_BEGIN
 
 #ifdef __CC__
 struct addr2line_buf {
-	di_debug_sections_t    ds_info;     /* Section pointers */
-	di_dl_debug_sections_t ds_sect;     /* Section references */
-	REF module_t          *ds_mod;      /* [0..1] The linked module. */
-	module_type_var       (ds_modtype); /* The type of the linked module. */
+	di_addr2line_sections_t    ds_info;     /* Section pointers */
+	di_addr2line_dl_sections_t ds_sect;     /* Section references */
+	REF module_t              *ds_mod;      /* [0..1] The linked module. */
+	module_type_var           (ds_modtype); /* The type of the linked module. */
 };
 
 struct inode;
@@ -107,7 +107,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
  * >> /cygdrive/e/c/kls/kos/src/kernel/core/foo/bar.c(9) : my_inline_function+8 : c010783a+4 : Called from here
  * >> /cygdrive/e/c/kls/kos/src/kernel/core/foo/bar.c(42) : my_function+26 : c0107828+38 : Called from here
  * The format used is:
- *    debug_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
+ *    debug_addr2line_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
  *    " : " + (al_rawname ? al_rawname : al_name ? al_name : "???") + "+" +
  *            (level == 0 ? (start_pc - al_symstart) : (al_linestart - al_symstart)) +
  *    " : " + (level == 0 ? (start_pc.hex() + "+" + (end_pc - start_pc))

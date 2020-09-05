@@ -33,6 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
 
@@ -51,28 +52,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
-
-INTDEF byte_t __kernel_eh_frame_start[];
-INTDEF byte_t __kernel_eh_frame_end[];
-PRIVATE ATTR_DBGBSS di_enum_locals_sections_t kernel_enum_locals_sections;
-PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL load_kernel_enum_locals_sections)(void) {
-	if (kernel_enum_locals_sections.el_eh_frame_start)
-		return;
-	kernel_enum_locals_sections.el_eh_frame_start      = __kernel_eh_frame_start;
-	kernel_enum_locals_sections.el_eh_frame_end        = __kernel_eh_frame_end;
-	kernel_enum_locals_sections.el_debug_info_start    = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_info);
-	kernel_enum_locals_sections.el_debug_info_end      = kernel_enum_locals_sections.el_debug_info_start + kernel_section_debug_info.ds_csize;
-	kernel_enum_locals_sections.el_debug_abbrev_start  = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_abbrev);
-	kernel_enum_locals_sections.el_debug_abbrev_end    = kernel_enum_locals_sections.el_debug_abbrev_start + kernel_section_debug_abbrev.ds_csize;
-	kernel_enum_locals_sections.el_debug_loc_start     = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_loc);
-	kernel_enum_locals_sections.el_debug_loc_end       = kernel_enum_locals_sections.el_debug_loc_start + kernel_section_debug_loc.ds_csize;
-	kernel_enum_locals_sections.el_debug_str_start     = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_str);
-	kernel_enum_locals_sections.el_debug_str_end       = kernel_enum_locals_sections.el_debug_str_start + kernel_section_debug_str.ds_csize;
-	kernel_enum_locals_sections.el_debug_aranges_start = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_aranges);
-	kernel_enum_locals_sections.el_debug_aranges_end   = kernel_enum_locals_sections.el_debug_aranges_start + kernel_section_debug_aranges.ds_csize;
-	kernel_enum_locals_sections.el_debug_ranges_start  = (byte_t *)driver_section_cdata_nx(&kernel_section_debug_ranges);
-	kernel_enum_locals_sections.el_debug_ranges_end    = kernel_enum_locals_sections.el_debug_ranges_start + kernel_section_debug_ranges.ds_csize;
-}
 
 
 PRIVATE ATTR_DBGTEXT ssize_t LIBDEBUGINFO_CC
@@ -133,12 +112,14 @@ do_print_local(void *UNUSED(arg),
 	unsigned int error;
 	void *value_buffer;
 	size_t num_bits;
+	di_debug_sections_t const *debug_sections;
 	if (get_stack_avail() < ((256 * sizeof(void *)) + bufsize))
 		return UNWIND_BADALLOC;
-	value_buffer = alloca(bufsize);
+	value_buffer   = alloca(bufsize);
+	debug_sections = di_debug_sections_from_di_enum_locals_sections(sections);
 	/* Read the value of this local variable. */
 	error = debuginfo_location_getvalue(&var->v_location,
-	                                    di_enum_locals_sections_as_unwind_emulator_sections(sections),
+	                                    di_debug_sections_as_unwind_emulator_sections(debug_sections),
 	                                    &dbg_getreg,
 	                                    (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 	                                    cu,
@@ -242,16 +223,86 @@ again:
 }
 
 
+PRIVATE ATTR_DBGTEXT ssize_t KCALL
+enum_locals_at_with_debug_sections_impl(void const *absolute_pc,
+                                        debuginfo_enum_locals_callback_t callback,
+                                        void *arg) {
+	ssize_t result;
+	di_debug_sections_t sections;
+	di_debug_dl_sections_t dl_sections;
+	REF module_t *mod;
+	uintptr_t module_relative_pc;
+	module_type_var(module_type);
+	mod = module_ataddr_nx(absolute_pc, module_type);
+	if unlikely(!mod)
+		return 0; /* Nothing here! */
+	/* Lock debug sections into memory. */
+	debug_sections_lock(mod, &sections, &dl_sections
+	                    module_type__arg(module_type));
+	TRY {
+		module_relative_pc = (uintptr_t)absolute_pc - module_getloadaddr(mod, module_type);
+		/* Enumerate variables with debug sections. */
+		result = debuginfo_enum_locals(di_debug_sections_as_di_enum_locals_sections(&sections),
+		                               module_relative_pc,
+		                               callback, arg);
+	} EXCEPT {
+		debug_sections_unlock(&dl_sections module_type__arg(module_type));
+		module_decref(mod, module_type);
+		RETHROW();
+	}
+	/* Unlock data. */
+	debug_sections_unlock(&dl_sections module_type__arg(module_type));
+	module_decref(mod, module_type);
+	return result;
+}
+
+PRIVATE ATTR_DBGTEXT ssize_t KCALL
+enum_locals_at_with_debug_sections(void const *absolute_pc,
+                                   debuginfo_enum_locals_callback_t callback,
+                                   void *arg) {
+	ssize_t result;
+	struct vm *required_vm = &vm_kernel;
+	if (ADDR_ISUSER(absolute_pc))
+		required_vm = dbg_current->t_vm;
+	if (required_vm == THIS_VM) {
+		result = enum_locals_at_with_debug_sections_impl(absolute_pc,
+		                                                 callback,
+		                                                 arg);
+	} else if (kernel_poisoned()) {
+		/* Don't switch to arbitrary VMs after having been poisoned. */
+		result = 0;
+	} else {
+		/* Switch to the foreign VM, so we can directly access user-space memory. */
+		REF struct vm *oldvm;
+		oldvm = incref(THIS_VM);
+		TRY {
+			task_setvm(required_vm);
+			TRY {
+				result = enum_locals_at_with_debug_sections_impl(absolute_pc,
+				                                                 callback,
+				                                                 arg);
+			} EXCEPT {
+				task_setvm(oldvm);
+				RETHROW();
+			}
+			task_setvm(oldvm);
+		} EXCEPT {
+			decref_unlikely(oldvm);
+			RETHROW();
+		}
+		decref_unlikely(oldvm);
+	}
+	return result;
+}
+
+
 
 DBG_COMMAND(locals,
             "locals\n"
             "List the names, types and values of locally defined C variables at the current source location\n") {
 	/* Enumerate location variables. */
-	load_kernel_enum_locals_sections();
-	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
-	                      &print_local,
-	                      NULL);
+	enum_locals_at_with_debug_sections((void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW),
+	                                   &print_local, NULL);
 	return 0;
 }
 
@@ -281,15 +332,10 @@ DBG_COMMAND(l,
             "first, and are also aligned alongside each other\n") {
 	size_t maxlen = 0;
 	/* Enumerate location variables. */
-	load_kernel_enum_locals_sections();
-	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
-	                      &locals_maxlen,
-	                      &maxlen);
-	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
-	                      &print_local,
-	                      &maxlen);
+	enum_locals_at_with_debug_sections((void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW),
+	                                   &locals_maxlen, &maxlen);
+	enum_locals_at_with_debug_sections((void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW),
+	                                   &print_local, &maxlen);
 	return 0;
 }
 

@@ -88,6 +88,7 @@ struct module_abi_struct {
 	ptrdiff_t ma_module_offsetof_loadaddr[MODULE_TYPE_COUNT];
 	ptrdiff_t ma_module_offsetof_loadstart[MODULE_TYPE_COUNT];
 	ptrdiff_t ma_module_offsetof_loadend[MODULE_TYPE_COUNT];
+	ptrdiff_t ma_section_offsetof_udata[MODULE_TYPE_COUNT];
 };
 
 DATDEF struct module_abi_struct const module_abi;
@@ -201,6 +202,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 #define module_section_destroy(self, typ)             (*module_abi.ma_section_destroy[typ])(self)
 #define _module_section_refcnt(self, typ)             (self)->ms_driver.ds_refcnt  /* Binary compatibility! */
 #define module_section_getdata(self, typ)             (self)->ms_driver.ds_data    /* Binary compatibility! */
+#define module_section_getudata(self, typ)            (*(void USER *const *)((byte_t *)(self) + module_abi.ma_section_offsetof_udata[typ]))
 #define module_section_getsize(self, typ)             (self)->ms_driver.ds_size    /* Binary compatibility! */
 #define module_section_getentsize(self, typ)          (self)->ms_driver.ds_entsize /* Binary compatibility! */
 #define module_section_getlink(self, typ)             (self)->ms_driver.ds_link    /* Binary compatibility! */

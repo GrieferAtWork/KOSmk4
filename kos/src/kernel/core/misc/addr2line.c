@@ -56,7 +56,7 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
 	TRY
 #endif /* CONFIG_HAVE_USERMOD */
 	{
-		return debug_sections_addr2line(&info->ds_info,
+		return debug_addr2line(&info->ds_info,
 		                                result,
 		                                module_relative_pc,
 		                                level,
@@ -86,8 +86,9 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 		return (uintptr_t)abs_pc;
 	}
 	abs_pc = (byte_t *)abs_pc - module_getloadaddr(mod, modtype);
-	if (debug_dllocksections(mod, &buf->ds_info, &buf->ds_sect
-	                         module_type__arg(modtype)) != DEBUG_INFO_ERROR_SUCCESS)
+	if (debug_addr2line_sections_lock(mod, &buf->ds_info, &buf->ds_sect
+	                                  module_type__arg(modtype)) !=
+	    DEBUG_INFO_ERROR_SUCCESS)
 		memset(buf, 0, sizeof(*buf));
 	if (modinfo) {
 #ifdef CONFIG_HAVE_USERMOD
@@ -118,7 +119,7 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 
 PUBLIC ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
-	debug_dlunlocksections(&buf->ds_sect module_type__arg(buf->ds_modtype));
+	debug_addr2line_sections_unlock(&buf->ds_sect module_type__arg(buf->ds_modtype));
 	if (buf->ds_mod)
 		module_decref(buf->ds_mod, buf->ds_modtype);
 }
@@ -142,7 +143,7 @@ NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
  * >> /cygdrive/e/c/kls/kos/src/kernel/core/foo/bar.c(9) : my_inline_function+8 : c010783a+4 : Called from here
  * >> /cygdrive/e/c/kls/kos/src/kernel/core/foo/bar.c(42) : my_function+26 : c0107828+38 : Called from here
  * The format used is:
- *    debug_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
+ *    debug_addr2line_print_filename(SRC) + "(" + al_srcline + (al_srccol ? ("," + al_srccol) : "") + ")" +
  *    " : " + (al_rawname ? al_rawname : al_name ? al_name : "???") + "+" +
  *            (level == 0 ? (start_pc - al_symstart) : (al_linestart - al_symstart)) +
  *    " : " + (level == 0 ? (start_pc.hex() + "+" + (end_pc - start_pc))
@@ -270,7 +271,7 @@ again_printlevel:
 			info.al_rawname = info.al_name;
 		if (!info.al_rawname)
 			info.al_rawname = (char *)"??" "?";
-		result = debug_print_filename(printer, arg, info.al_cubase, info.al_srcpath, info.al_srcfile);
+		result = debug_addr2line_print_filename(printer, arg, info.al_cubase, info.al_srcpath, info.al_srcfile);
 		if unlikely(result < 0)
 			goto done;
 		temp = format_printf(printer, arg, "(%Iu", info.al_srcline);
@@ -345,8 +346,9 @@ addr2line_vprintf(pformatprinter printer, void *arg, void const *start_pc,
 		memset(&ainfo, 0, sizeof(ainfo));
 		module_relative_pc = (uintptr_t)start_pc;
 	} else {
-		if (debug_dllocksections(mod, &ainfo.ds_info, &ainfo.ds_sect
-		                         module_type__arg(modtype)) != DEBUG_INFO_ERROR_SUCCESS)
+		if (debug_addr2line_sections_lock(mod, &ainfo.ds_info, &ainfo.ds_sect
+		                                  module_type__arg(modtype)) !=
+		    DEBUG_INFO_ERROR_SUCCESS)
 			memset(&ainfo, 0, sizeof(ainfo));
 		module_relative_pc = (uintptr_t)start_pc -
 		                     module_getloadaddr(mod, modtype);

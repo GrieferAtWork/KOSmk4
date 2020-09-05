@@ -27,6 +27,11 @@
 
 #define CC LIBDEBUGINFO_CC
 
+#ifndef REF
+#include <kos/anno.h>
+#define REF __REF
+#endif /* !REF */
+
 #ifdef __KERNEL__
 #include <kernel/compiler.h>
 #define TEXTSECTION         ATTR_COLDTEXT

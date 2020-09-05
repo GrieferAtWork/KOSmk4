@@ -33,37 +33,39 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-typedef struct {
-	/* Debug information sections required for implementing addr2line. */
-	__byte_t *ds_debug_line_start;    /* [0..1] Starting address of the `.debug_line' section */
-	__byte_t *ds_debug_line_end;      /* [0..1] End address of the `.debug_line' section */
-	__byte_t *ds_debug_info_start;    /* [0..1] Starting address of the `.debug_info' section */
-	__byte_t *ds_debug_info_end;      /* [0..1] End address of the `.debug_info' section */
-	__byte_t *ds_debug_abbrev_start;  /* [0..1] Starting address of the `.debug_abbrev' section */
-	__byte_t *ds_debug_abbrev_end;    /* [0..1] End address of the `.debug_abbrev' section */
-	__byte_t *ds_debug_aranges_start; /* [0..1] Starting address of the `.debug_aranges' section */
-	__byte_t *ds_debug_aranges_end;   /* [0..1] End address of the `.debug_aranges' section */
-	__byte_t *ds_debug_str_start;     /* [0..1] Starting address of the `.debug_str' section */
-	__byte_t *ds_debug_str_end;       /* [0..1] End address of the `.debug_str' section */
-	__byte_t *ds_debug_ranges_start;  /* [0..1] Starting address of the `.debug_ranges' section */
-	__byte_t *ds_debug_ranges_end;    /* [0..1] End address of the `.debug_ranges' section */
-	__byte_t *ds_symtab_start;        /* [0..1] Starting address of the `.symtab' or `.dynsym' section */
-	__byte_t *ds_symtab_end;          /* [0..1] End address of the `.symtab' or `.dynsym' section */
-	__size_t  ds_symtab_ent;          /* Size of entries found within the `.symtab' or `.dynsym' section */
-	__byte_t *ds_strtab_start;        /* [0..1] Starting address of the `.strtab' or `.dynstr' section */
-	__byte_t *ds_strtab_end;          /* [0..1] End address of the `.strtab' or `.dynstr' section */
-} di_debug_sections_t;
+typedef struct di_addr2line_sections_struct {
+	/* Debug information sections required for implementing addr2line.
+	 * NOTE: The order of members in this struct is important!
+	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
+	__byte_t *ds_debug_abbrev_start;  /* [0..1] `.debug_abbrev' start */
+	__byte_t *ds_debug_abbrev_end;    /* [0..1] `.debug_abbrev' end */
+	__byte_t *ds_debug_info_start;    /* [0..1] `.debug_info' start */
+	__byte_t *ds_debug_info_end;      /* [0..1] `.debug_info' end */
+	__byte_t *ds_debug_str_start;     /* [0..1] `.debug_str' start */
+	__byte_t *ds_debug_str_end;       /* [0..1] `.debug_str' end */
+	__byte_t *ds_debug_aranges_start; /* [0..1] `.debug_aranges' start */
+	__byte_t *ds_debug_aranges_end;   /* [0..1] `.debug_aranges' end */
+	__byte_t *ds_debug_ranges_start;  /* [0..1] `.debug_ranges' start */
+	__byte_t *ds_debug_ranges_end;    /* [0..1] `.debug_ranges' end */
+	__byte_t *ds_debug_line_start;    /* [0..1] `.debug_line' start */
+	__byte_t *ds_debug_line_end;      /* [0..1] `.debug_line' end */
+	__byte_t *ds_strtab_start;        /* [0..1] `.strtab' / `.dynstr' start */
+	__byte_t *ds_strtab_end;          /* [0..1] `.strtab' / `.dynstr' end */
+	__byte_t *ds_symtab_start;        /* [0..1] `.symtab' / `.dynsym' start */
+	__byte_t *ds_symtab_end;          /* [0..1] `.symtab' / `.dynsym' end */
+	__size_t  ds_symtab_ent;          /* Entity size of `.symtab' / `.dynsym' */
+} di_addr2line_sections_t;
 
-typedef struct {
-	__REF module_section_t *dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
-	__REF module_section_t *dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
+typedef struct di_addr2line_dl_sections_struct {
 	__REF module_section_t *dl_debug_abbrev;  /* [0..1] Reference to the `.debug_abbrev' section */
-	__REF module_section_t *dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
+	__REF module_section_t *dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
 	__REF module_section_t *dl_debug_str;     /* [0..1] Reference to the `.debug_str' section */
+	__REF module_section_t *dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
 	__REF module_section_t *dl_debug_ranges;  /* [0..1] Reference to the `.debug_ranges' section */
-	__REF module_section_t *dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
+	__REF module_section_t *dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
 	__REF module_section_t *dl_strtab;        /* [0..1] Reference to the `.strtab' or `.dynstr' section */
-} di_dl_debug_sections_t;
+	__REF module_section_t *dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
+} di_addr2line_dl_sections_t;
 
 
 typedef struct {
@@ -176,7 +178,7 @@ typedef struct {
  * >> unsigned int error;
  * >> uintptr_t level = 0;
  * >> do {
- * >>     error = debug_sections_addr2line((uintptr_t)ptr, &info, level);
+ * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
  * >>     printf("%s(%Iu) : %s : HERE\n",
@@ -202,33 +204,35 @@ typedef struct {
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
 typedef __ATTR_NONNULL((1, 2)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUG_SECTIONS_ADDR2LINE)(di_debug_sections_t const *__restrict sections,
-                                             di_debug_addr2line_t *__restrict result,
-                                             __uintptr_t module_relative_pc,
-                                             __uintptr_t level, __uintptr_t flags);
+(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE)(di_addr2line_sections_t const *__restrict sections,
+                                    di_debug_addr2line_t *__restrict result,
+                                    __uintptr_t module_relative_pc,
+                                    __uintptr_t level, __uintptr_t flags);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) unsigned int
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_sections_addr2line)(di_debug_sections_t const *__restrict sections,
-                                                        di_debug_addr2line_t *__restrict result,
-                                                        __uintptr_t module_relative_pc,
-                                                        __uintptr_t level, __uintptr_t flags);
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
+                                               di_debug_addr2line_t *__restrict result,
+                                               __uintptr_t module_relative_pc,
+                                               __uintptr_t level, __uintptr_t flags);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
 /* Print the fully qualified filename for a given string
  * triplet, as extractable from `di_debug_addr2line_t':
- *   - debug_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile); // /home/me/project/c/foo/src/bar.c
- *   - debug_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile); // /home/me/project/c/foo/include/bar.h
+ *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_srcpath, info.al_srcfile);
+ *     "/home/me/project/c/foo/src/bar.c"
+ *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile);
+ *     "/home/me/project/c/foo/include/bar.h"
  */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBDEBUGINFO_CC *PDEBUG_PRINT_FILENAME)(__pformatprinter printer, void *arg,
-                                         char const *cubase, char const *pathname,
-                                         char const *filename);
+(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_PRINT_FILENAME)(__pformatprinter printer, void *arg,
+                                                   char const *cubase, char const *pathname,
+                                                   char const *filename);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
-(LIBDEBUGINFO_CC debug_print_filename)(__pformatprinter printer, void *arg,
-                                       char const *cubase, char const *pathname,
-                                       char const *filename);
+(LIBDEBUGINFO_CC debug_addr2line_print_filename)(__pformatprinter printer, void *arg,
+                                                 char const *cubase, char const *pathname,
+                                                 char const *filename);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
@@ -242,29 +246,29 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */
 typedef __ATTR_NONNULL((2, 3)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUG_DLLOCKSECTIONS)(module_t *dl_handle,
-                                         di_debug_sections_t *__restrict sections,
-                                         di_dl_debug_sections_t *__restrict dl_sections
-                                         module_type__param(module_type));
+(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_LOCK)(module_t *dl_handle,
+                                                  di_addr2line_sections_t *__restrict sections,
+                                                  di_addr2line_dl_sections_t *__restrict dl_sections
+                                                  module_type__param(module_type));
 typedef __ATTR_NONNULL((1)) void
-(LIBDEBUGINFO_CC *PDEBUG_DLUNLOCKSECTIONS)(di_dl_debug_sections_t *__restrict dl_sections
-                                           module_type__param(module_type));
+(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_UNLOCK)(di_addr2line_dl_sections_t *__restrict dl_sections
+                                                    module_type__param(module_type));
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) unsigned int
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_dllocksections)(module_t *dl_handle,
-                                                    di_debug_sections_t *__restrict sections,
-                                                    di_dl_debug_sections_t *__restrict dl_sections
-                                                    module_type__param(module_type));
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line_sections_lock)(module_t *dl_handle,
+                                                             di_addr2line_sections_t *__restrict sections,
+                                                             di_addr2line_dl_sections_t *__restrict dl_sections
+                                                             module_type__param(module_type));
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections
-                                                      module_type__param(module_type));
+__NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t *__restrict dl_sections
+                                                               module_type__param(module_type));
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 __DECL_END
 #endif /* __CC__ */
 
 /* A special source level that always refers to `LEVEL_COUNT - 1' */
-#define DEBUG_ADDR2LINE_LEVEL_SOURCE    (__CCAST(__uintptr_t)-1)
+#define DEBUG_ADDR2LINE_LEVEL_SOURCE (__CCAST(__uintptr_t)-1)
 
 #define DEBUG_ADDR2LINE_FNORMAL  0x0000 /* Normal flags. */
 #define DEBUG_ADDR2LINE_FTRYHARD 0x0001 /* Try really hard to find debug information (takes

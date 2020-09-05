@@ -423,7 +423,7 @@ return_existing_result:
 				COMPILER_READ_BARRIER();
 				result->us_data  = (void *)-1; /* Lazily initialized. */
 				result->us_cdata = (void *)-1; /* Lazily initialized. */
-				result->us_udata = NULL;
+				result->us_udata = (void *)-1;
 				if (result->us_flags & SHF_ALLOC) {
 					result->us_udata = (USER byte_t *)(self->um_loadaddr +
 					                                   ElfV_field(*shdr, self->um_modtype,
@@ -1087,7 +1087,7 @@ again:
 				REF struct directory_entry *map_inode_name;   /* [0..1][const] Optional mapping name. */
 				pos_t /*                 */ map_inode_offset; /* File-offset where `map_inode_addr' exists. */
 				USER void /*            */ *map_inode_addr;   /* Starting address of `map_inode_offset'. */
-				minpage   = vm_node_getendpageid(node);
+				minpage          = vm_node_getendpageid(node);
 				map_inode        = (REF struct inode *)incref(node->vn_block);
 				map_inode_path   = xincref(node->vn_fspath);
 				map_inode_name   = xincref(node->vn_fsname);
@@ -1448,6 +1448,10 @@ PUBLIC_CONST struct module_abi_struct const module_abi = {
 	.ma_module_offsetof_loadend = {
 		[MODULE_TYPE_DRIVER] = offsetof(struct driver, d_loadend),
 		[MODULE_TYPE_USRMOD] = offsetof(struct usermod, um_loadend),
+	},
+	.ma_section_offsetof_udata = {
+		[MODULE_TYPE_DRIVER] = offsetof(struct driver_section, ds_data),
+		[MODULE_TYPE_USRMOD] = offsetof(struct usermod_section, us_udata),
 	},
 };
 

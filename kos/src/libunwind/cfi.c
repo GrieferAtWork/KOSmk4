@@ -42,6 +42,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libdebuginfo/debug_frame.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
@@ -180,10 +181,12 @@ PRIVATE PDEBUGINFO_CU_ABBREV_FINI     pdyn_debuginfo_cu_abbrev_fini     = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_LOADUNIT pdyn_debuginfo_cu_parser_loadunit = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_SKIPFORM pdyn_debuginfo_cu_parser_skipform = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_GETEXPR  pdyn_debuginfo_cu_parser_getexpr  = NULL;
+PRIVATE PUNWIND_FDE_SCAN_DF           pdyn_unwind_fde_scan_df           = NULL;
 #define debuginfo_cu_abbrev_fini      (*pdyn_debuginfo_cu_abbrev_fini)
 #define debuginfo_cu_parser_loadunit  (*pdyn_debuginfo_cu_parser_loadunit)
 #define debuginfo_cu_parser_skipform  (*pdyn_debuginfo_cu_parser_skipform)
 #define debuginfo_cu_parser_getexpr   (*pdyn_debuginfo_cu_parser_getexpr)
+#define unwind_fde_scan_df            (*pdyn_unwind_fde_scan_df)
 
 PRIVATE __attribute__((__destructor__))
 void libuw_unload_libdebuginfo(void) {
@@ -209,6 +212,9 @@ again:
 		goto err_close;
 	*(void **)&pdyn_debuginfo_cu_parser_loadunit = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_loadunit");
 	if unlikely(!pdyn_debuginfo_cu_parser_loadunit)
+		goto err_close;
+	*(void **)&pdyn_unwind_fde_scan_df = dlsym(pdyn_libdebuginfo, "unwind_fde_scan_df");
+	if unlikely(!pdyn_unwind_fde_scan_df)
 		goto err_close;
 	COMPILER_WRITE_BARRIER();
 	/* This one has to be loaded last, since it's
@@ -378,9 +384,24 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	                              &fde,
 	                              self->ue_addrsize);
 	if unlikely(error != UNWIND_SUCCESS) {
-		if (error == UNWIND_NO_FRAME)
+		if (error != UNWIND_NO_FRAME)
+			goto done;
+		if (self->ue_sectinfo->ues_debug_frame_start >=
+		    self->ue_sectinfo->ues_debug_frame_end)
 			goto err_no_cfa;
-		goto done;
+#ifndef __KERNEL__
+		/* Lazily load pdyn_libdebuginfo.so, so we can parser the .debug_info section */
+		if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
+			goto err_no_cfa;;
+#endif /* !__KERNEL__ */
+		/* Also search the `.debug_frame' section, using `unwind_fde_scan_df()' */
+		error = unwind_fde_scan_df(self->ue_sectinfo->ues_debug_frame_start,
+		                           self->ue_sectinfo->ues_debug_frame_end,
+		                           pc_buf.pc,
+		                           &fde,
+		                           self->ue_addrsize);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto done;
 	}
 	/* Evaluate the FDE program to extract the CFA descriptor. */
 	error = libuw_unwind_fde_exec_cfa(&fde, &cfa, pc_buf.pc);
