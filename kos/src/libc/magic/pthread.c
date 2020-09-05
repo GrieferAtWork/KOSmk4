@@ -74,8 +74,11 @@ __SYSDECL_BEGIN
    <http://www.gnu.org/licenses/>.  */
 
 
-#if defined(__PTHREAD_CREATE_JOINABLE) || defined(__PTHREAD_CREATE_DETACHED)
 /* Detach state. */
+#ifndef __PTHREAD_ENUM_DETACH_STATE_DEFINED
+#define __PTHREAD_ENUM_DETACH_STATE_DEFINED 1
+#if (defined(__PTHREAD_CREATE_JOINABLE) || \
+     defined(__PTHREAD_CREATE_DETACHED))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -104,14 +107,18 @@ enum {
 #endif /* __PTHREAD_CREATE_DETACHED */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-#endif /* ... */
+#endif /* __PTHREAD_CREATE_JOINABLE || __PTHREAD_CREATE_DETACHED */
+#endif /* !__PTHREAD_ENUM_DETACH_STATE_DEFINED */
 
 
+
+/* Mutex types. */
+#ifndef __PTHREAD_ENUM_MUTEX_TYPE_DEFINED
+#define __PTHREAD_ENUM_MUTEX_TYPE_DEFINED 1
 #if (defined(__PTHREAD_MUTEX_TIMED) || defined(__PTHREAD_MUTEX_RECURSIVE) ||     \
      defined(__PTHREAD_MUTEX_ERRORCHECK) || defined(__PTHREAD_MUTEX_ADAPTIVE) || \
      (defined(__USE_XOPEN2K) && (defined(__PTHREAD_MUTEX_STALLED) ||             \
                                  defined(__PTHREAD_MUTEX_ROBUST))))
-/* Mutex types. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -246,12 +253,15 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
+#endif /* !__PTHREAD_ENUM_MUTEX_TYPE_DEFINED */
 
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
+/* Mutex protocols. */
+#ifndef __PTHREAD_ENUM_MUTEX_PRIO_DEFINED
+#define __PTHREAD_ENUM_MUTEX_PRIO_DEFINED 1
 #if (defined(__PTHREAD_PRIO_NONE) || defined(__PTHREAD_PRIO_INHERIT) || \
      defined(__PTHREAD_PRIO_PROTECT))
-/* Mutex protocols. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -290,6 +300,7 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
+#endif /* !__PTHREAD_ENUM_MUTEX_PRIO_DEFINED */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 /* Read-write lock types. */
@@ -346,6 +357,8 @@ enum {
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 /* Scheduler inheritance. */
+#ifndef __PTHREAD_ENUM_SCHED_INHERIT_DEFINED
+#define __PTHREAD_ENUM_SCHED_INHERIT_DEFINED 1
 #if (defined(__PTHREAD_INHERIT_SCHED) || \
      defined(__PTHREAD_EXPLICIT_SCHED))
 /*[[[enum]]]*/
@@ -377,8 +390,11 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
+#endif /* !__PTHREAD_ENUM_SCHED_INHERIT_DEFINED */
 
 /* Scope handling. */
+#ifndef __PTHREAD_ENUM_SCOPE_DEFINED
+#define __PTHREAD_ENUM_SCOPE_DEFINED 1
 #if (defined(__PTHREAD_SCOPE_SYSTEM) || \
      defined(__PTHREAD_SCOPE_PROCESS))
 /*[[[enum]]]*/
@@ -410,8 +426,12 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
+#endif /* !__PTHREAD_ENUM_SCOPE_DEFINED */
+
 
 /* Process shared or private flag. */
+#ifndef __PTHREAD_ENUM_PROCESS_SHARED_DEFINED
+#define __PTHREAD_ENUM_PROCESS_SHARED_DEFINED 1
 #if (defined(__PTHREAD_PROCESS_PRIVATE) || \
      defined(__PTHREAD_PROCESS_SHARED))
 /*[[[enum]]]*/
@@ -442,7 +462,9 @@ enum {
 #endif /* __PTHREAD_PROCESS_SHARED */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-#endif /* ... */
+#endif /* __PTHREAD_PROCESS_PRIVATE || __PTHREAD_PROCESS_SHARED */
+#endif /* !__PTHREAD_ENUM_PROCESS_SHARED_DEFINED */
+
 
 /* Cancellation */
 #if (defined(__PTHREAD_CANCEL_ENABLE) || \
@@ -566,25 +588,61 @@ struct _pthread_cleanup_buffer {
 typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
 
+#ifndef __pthread_t_defined
+#define __pthread_t_defined 1
 typedef __pthread_t pthread_t;
+#endif /* !__pthread_t_defined */
 #ifndef __pthread_attr_t_defined
 #define __pthread_attr_t_defined 1
 typedef __pthread_attr_t pthread_attr_t;
 #endif /* !__pthread_attr_t_defined */
+#ifndef __pthread_mutex_t_defined
+#define __pthread_mutex_t_defined 1
 typedef __pthread_mutex_t pthread_mutex_t;
+#endif /* !__pthread_mutex_t_defined */
+#ifndef __pthread_mutexattr_t_defined
+#define __pthread_mutexattr_t_defined 1
 typedef __pthread_mutexattr_t pthread_mutexattr_t;
+#endif /* !__pthread_mutexattr_t_defined */
+#ifndef __pthread_cond_t_defined
+#define __pthread_cond_t_defined 1
 typedef __pthread_cond_t pthread_cond_t;
+#endif /* !__pthread_cond_t_defined */
+#ifndef __pthread_condattr_t_defined
+#define __pthread_condattr_t_defined 1
 typedef __pthread_condattr_t pthread_condattr_t;
+#endif /* !__pthread_condattr_t_defined */
+#ifndef __pthread_key_t_defined
+#define __pthread_key_t_defined 1
 typedef __pthread_key_t pthread_key_t;
+#endif /* !__pthread_key_t_defined */
+#ifndef __pthread_once_t_defined
+#define __pthread_once_t_defined 1
 typedef __pthread_once_t pthread_once_t;
+#endif /* !__pthread_once_t_defined */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
+#ifndef __pthread_rwlock_t_defined
+#define __pthread_rwlock_t_defined 1
 typedef __pthread_rwlock_t pthread_rwlock_t;
+#endif /* !__pthread_rwlock_t_defined */
+#ifndef __pthread_rwlockattr_t_defined
+#define __pthread_rwlockattr_t_defined 1
 typedef __pthread_rwlockattr_t pthread_rwlockattr_t;
+#endif /* !__pthread_rwlockattr_t_defined */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 #ifdef __USE_XOPEN2K
+#ifndef __pthread_spinlock_t_defined
+#define __pthread_spinlock_t_defined 1
 typedef __pthread_spinlock_t pthread_spinlock_t;
+#endif /* !__pthread_spinlock_t_defined */
+#ifndef __pthread_barrier_t_defined
+#define __pthread_barrier_t_defined 1
 typedef __pthread_barrier_t pthread_barrier_t;
+#endif /* !__pthread_barrier_t_defined */
+#ifndef __pthread_barrierattr_t_defined
+#define __pthread_barrierattr_t_defined 1
 typedef __pthread_barrierattr_t pthread_barrierattr_t;
+#endif /* !__pthread_barrierattr_t_defined */
 #endif /* __USE_XOPEN2K */
 
 

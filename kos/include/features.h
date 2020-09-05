@@ -66,7 +66,7 @@
  */
 #undef _GNU_SOURCE
 #define _GNU_SOURCE 1
-#endif
+#endif /* ... */
 
 
 /* libstdc++ sucks and does stuff like this:
@@ -186,7 +186,7 @@
 #if (__STDC_WANT_SECURE_LIB__ + 0) != 0
 #define __USE_DOS_SLIB 1
 #endif /* (__STDC_WANT_SECURE_LIB__ + 0) != 0 */
-#endif
+#endif /* ... */
 
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038-01-19T03:14:07 this'll
@@ -223,16 +223,16 @@
 #define __USE_TIME_BITS64 1
 #elif (_TIME_T_BITS + 0) == 32
 #undef __USE_TIME_BITS64
-#else
+#else /* _TIME_T_BITS == 32 */
 #error "Must #define _TIME_T_BITS as either 32 or 64"
-#endif
+#endif /* _TIME_T_BITS != 32 */
 #elif defined(_USE_32BIT_TIME_T)
 #undef __USE_TIME_BITS64
 #elif defined(_USE_64BIT_TIME_T)
 #define __USE_TIME_BITS64 1
 #elif defined(__USE_DOS) || defined(__USE_KOS_KERNEL)
 #define __USE_TIME_BITS64 1
-#endif
+#endif /* ... */
 
 
 #ifdef _NETBSD_SOURCE
@@ -249,7 +249,7 @@
 /* BSD name (not used in headers, but may be checked by
  * applications as a sort-of ACK that the system headers
  * have understood the _BSD_SOURCE request) */
-#define __BSD_VISIBLE 1
+#define __BSD_VISIBLE 1 /* API alias (don't use in headers!) */
 #endif /* _BSD_SOURCE */
 
 /* Enable additional extensions present on
@@ -268,9 +268,8 @@
 
 #if ((defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
      !defined(_DEFAULT_SOURCE))
-#undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
-#endif
+#endif /* (_BSD_SOURCE || _SVID_SOURCE) && !_DEFAULT_SOURCE */
 
 #ifdef _GNU_SOURCE
 #undef _ISOC95_SOURCE
@@ -302,51 +301,50 @@
 #if (!defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE) && \
      (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
       !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)))
-#undef  _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
-#endif
+#endif /* ... */
 
 #if (defined(_ISOC11_SOURCE) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
-#define __ISO_C_VISIBLE 2011
+#define __ISO_C_VISIBLE 2011 /* API alias (don't use in headers!) */
 #define __USE_ISOC11 1
-#endif
+#endif /* _ISOC11_SOURCE || __STDC_VERSION__ >= 201112L */
 
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
 #ifndef __ISO_C_VISIBLE
-#define __ISO_C_VISIBLE 1999
+#define __ISO_C_VISIBLE 1999 /* API alias (don't use in headers!) */
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC99 1
-#endif
+#endif /* _ISOC99_SOURCE || _ISOC11_SOURCE || __STDC_VERSION__ >= 199901L */
 
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L))
 #ifndef __ISO_C_VISIBLE
-#define __ISO_C_VISIBLE 1995
+#define __ISO_C_VISIBLE 1995 /* API alias (don't use in headers!) */
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC95 1
-#endif
+#endif /* _ISOC99_SOURCE || _ISOC11_SOURCE || __STDC_VERSION__ >= 199409L */
 
 #if (defined(_ISOCXX11_SOURCE) || defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
      defined(__GXX_EXPERIMENTAL_CXX0X__) || (defined(__cplusplus) && __cplusplus >= 201103L))
 #define __USE_ISOCXX11 1
-#endif
+#endif /* _ISOCXX11_SOURCE || _ISOCXX14_SOURCE || _ISOCXX17_SOURCE || __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus >= 201103L */
 
 #if (defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
      (defined(__cplusplus) && __cplusplus >= 201103L))
 #define __USE_ISOCXX14 1
-#endif
+#endif /* _ISOCXX14_SOURCE || __cplusplus > 201103L */
 
 #if (defined(_ISOCXX17_SOURCE) || \
      (defined(__cplusplus) && __cplusplus >= 201703L))
 #define __USE_ISOCXX17 1
-#endif
+#endif /* _ISOCXX17_SOURCE || __cplusplus > 201703L */
 
 #if (defined(_ISOCXX2A_SOURCE) || \
      (defined(__cplusplus) && __cplusplus > 201703L))
 #define __USE_ISOCXX2A 1
-#endif
+#endif /* _ISOCXX2A_SOURCE || __cplusplus > 201703L */
 
 #if defined(__cplusplus) && (!defined(__GNUC__) || __GCC_VERSION_NUM >= 40400)
 /* Enable proper C++ prototype declarations. */
@@ -357,7 +355,7 @@
 #define __CORRECT_ISO_CPP_UNICODE_H_PROTO   1
 #define __CORRECT_ISO_CPP_MATH_H_PROTO      1
 #define __CORRECT_ISO_CPP11_MATH_H_PROTO_FP 1
-#endif
+#endif /* ... */
 
 #if defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE)
 #if !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
@@ -392,25 +390,25 @@
 
 #if (defined(_XOPEN_SOURCE) || \
      (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 2))
-#define __POSIX_VISIBLE 199209
+#define __POSIX_VISIBLE 199209 /* API alias (don't use in headers!) */
 #define __USE_POSIX2 1
 #endif /* _XOPEN_SOURCE || _POSIX_C_SOURCE >= 2 */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 199309L
 #undef __POSIX_VISIBLE
-#define __POSIX_VISIBLE 199309
+#define __POSIX_VISIBLE 199309 /* API alias (don't use in headers!) */
 #define __USE_POSIX199309 1
 #endif /* _POSIX_C_SOURCE >= 199309L */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 199506L
 #undef __POSIX_VISIBLE
-#define __POSIX_VISIBLE 199506
+#define __POSIX_VISIBLE 199506 /* API alias (don't use in headers!) */
 #define __USE_POSIX199506 1
 #endif /* _POSIX_C_SOURCE >= 199506L */
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 200112L
 #undef __POSIX_VISIBLE
-#define __POSIX_VISIBLE 200112
+#define __POSIX_VISIBLE 200112 /* API alias (don't use in headers!) */
 #define __USE_XOPEN2K 1
 #undef __USE_ISOC95
 #define __USE_ISOC95 1
@@ -420,7 +418,7 @@
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE + 0 >= 200809L
 #undef __POSIX_VISIBLE
-#define __POSIX_VISIBLE 200809
+#define __POSIX_VISIBLE 200809 /* API alias (don't use in headers!) */
 #define __USE_XOPEN2K8 1
 #undef _ATFILE_SOURCE
 #define _ATFILE_SOURCE 1
@@ -435,7 +433,7 @@
 #define _LARGEFILE_SOURCE 1
 #if _XOPEN_SOURCE + 0 >= 600
 #if _XOPEN_SOURCE + 0 >= 700
-#define __XSI_VISIBLE     700
+#define __XSI_VISIBLE     700 /* API alias (don't use in headers!) */
 #define __USE_XOPEN2K8    1
 #define __USE_XOPEN2K8XSI 1
 #else /* _XOPEN_SOURCE >= 700 */
@@ -453,9 +451,9 @@
 #else  /* _XOPEN_SOURCE >= 500 */
 #ifdef _XOPEN_SOURCE_EXTENDED
 #define __USE_XOPEN_EXTENDED 1
-#define __XSI_VISIBLE        4
+#define __XSI_VISIBLE        4 /* API alias (don't use in headers!) */
 #else /* _XOPEN_SOURCE_EXTENDED */
-#define __XSI_VISIBLE 1
+#define __XSI_VISIBLE 1 /* API alias (don't use in headers!) */
 #endif /* !_XOPEN_SOURCE_EXTENDED */
 #endif /* _XOPEN_SOURCE < 500 */
 #endif /* _XOPEN_SOURCE */
@@ -466,6 +464,7 @@
 
 #ifdef _LARGEFILE64_SOURCE
 #define __USE_LARGEFILE64 1
+#define __LARGE64_FILES 1 /* API alias (don't use in headers!) */
 #endif /* _LARGEFILE64_SOURCE */
 
 #ifdef _FILE_OFFSET_BITS
@@ -477,19 +476,19 @@
 #endif /* ... */
 
 #ifdef _DEFAULT_SOURCE
-#define __MISC_VISIBLE 1
-#define __SVID_VISIBLE 1
+#define __MISC_VISIBLE 1 /* API alias (don't use in headers!) */
+#define __SVID_VISIBLE 1 /* API alias (don't use in headers!) */
 #define __USE_MISC 1
 #endif /* _DEFAULT_SOURCE */
 
 #ifdef _ATFILE_SOURCE
 #define __USE_ATFILE 1
-#define __ATFILE_VISIBLE 1
+#define __ATFILE_VISIBLE 1 /* API alias (don't use in headers!) */
 #endif /* _ATFILE_SOURCE */
 
 #ifdef _GNU_SOURCE
 #define __USE_GNU 1
-#define __GNU_VISIBLE 1
+#define __GNU_VISIBLE 1 /* API alias (don't use in headers!) */
 #endif /* _GNU_SOURCE */
 
 #if defined(_REENTRANT) || defined(_THREAD_SAFE)

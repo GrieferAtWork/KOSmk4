@@ -61,6 +61,11 @@
 #define __SCHED_IDLE          0x00000005 /* ... */
 #define __SCHED_RESET_ON_FORK 0x40000000 /* ... */
 
-#endif /* __KOS__ || __linux__ */
+#elif defined(__CRT_CYG_PRIMARY)
+#define __SCHED_OTHER    3
+#define __SCHED_FIFO     1
+#define __SCHED_RR       2
+//#define __SCHED_SPORADIC 4
+#endif /* ... */
 
 #endif /* !_ASM_SCHED_H */

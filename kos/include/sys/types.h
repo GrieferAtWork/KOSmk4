@@ -198,35 +198,49 @@ typedef __SIZE_TYPE__ size_t;
 #define __BIT_TYPES_DEFINED__ 1 /* Keep this macro! Some programs test for it. */
 #ifndef __int8_t_defined
 #define __int8_t_defined 1
-#undef int8_t
-#undef int16_t
-#undef int32_t
-typedef __INT8_TYPE__   int8_t;
-typedef __INT16_TYPE__  int16_t;
-typedef __INT32_TYPE__  int32_t;
+#ifdef __INT8_TYPE__
+typedef __INT8_TYPE__ int8_t;
+#endif /* __INT8_TYPE__ */
+#ifdef __INT16_TYPE__
+typedef __INT16_TYPE__ int16_t;
+#endif /* __INT16_TYPE__ */
+#ifdef __INT32_TYPE__
+typedef __INT32_TYPE__ int32_t;
+#endif /* __INT32_TYPE__ */
 #ifdef __INT64_TYPE__
-#undef int64_t
-typedef __INT64_TYPE__  int64_t;
+typedef __INT64_TYPE__ int64_t;
 #endif /* __INT64_TYPE__ */
 #endif /* __int8_t_defined */
 
 #ifndef __uint8_t_defined
 #define __uint8_t_defined 1
-typedef __UINT8_TYPE__   uint8_t;
-typedef __UINT16_TYPE__  uint16_t;
-typedef __UINT32_TYPE__  uint32_t;
+#ifdef __UINT8_TYPE__
+typedef __UINT8_TYPE__ uint8_t;
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
+typedef __UINT16_TYPE__ uint16_t;
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
+typedef __UINT32_TYPE__ uint32_t;
+#endif /* __UINT32_TYPE__ */
 #ifdef __UINT64_TYPE__
-typedef __UINT64_TYPE__  uint64_t;
+typedef __UINT64_TYPE__ uint64_t;
 #endif /* __UINT64_TYPE__ */
 #endif /* !__uint8_t_defined */
 
 #ifndef __u_int8_t_defined
 #define __u_int8_t_defined 1
-typedef __UINT8_TYPE__   u_int8_t;
-typedef __UINT16_TYPE__  u_int16_t;
-typedef __UINT32_TYPE__  u_int32_t;
+#ifdef __UINT8_TYPE__
+typedef __UINT8_TYPE__ u_int8_t;
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
+typedef __UINT16_TYPE__ u_int16_t;
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
+typedef __UINT32_TYPE__ u_int32_t;
+#endif /* __UINT32_TYPE__ */
 #ifdef __UINT64_TYPE__
-typedef __UINT64_TYPE__  u_int64_t;
+typedef __UINT64_TYPE__ u_int64_t;
 #endif /* __UINT64_TYPE__ */
 #endif /* !__u_int8_t_defined */
 
