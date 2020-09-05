@@ -743,6 +743,9 @@ inode_stat(struct inode *__restrict self,
 	result->st_mtimespec.tv_nsec = self->i_filemtime.tv_nsec;
 	result->st_ctimespec.tv_sec  = self->i_filectime.tv_sec;
 	result->st_ctimespec.tv_nsec = self->i_filectime.tv_nsec;
+	/* Invoke a custom stat() operator (if defined) */
+	if (self->i_type->it_attr.a_stat)
+		(*self->i_type->it_attr.a_stat)(self, result);
 }
 
 

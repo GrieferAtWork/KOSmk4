@@ -270,7 +270,10 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	for (;;) {
 		if (fork() == 0) {
-			printf("child: %u\n", getpid());
+			char buf[64];
+			size_t len;
+			len = sprintf(buf, "child: %u\n", getpid());
+			write(STDOUT_FILENO, buf, len);
 			_Exit(0);
 		}
 		/*sched_yield();*/

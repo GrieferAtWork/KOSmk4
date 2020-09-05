@@ -43,6 +43,14 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifdef CONFIG_NO_CPU_ASSERT_INTEGRITY
+#undef CONFIG_HAVE_CPU_ASSERT_INTEGRITY
+#elif !defined(CONFIG_HAVE_CPU_ASSERT_INTEGRITY)
+#if !defined(NDEBUG) && 1
+#define CONFIG_HAVE_CPU_ASSERT_INTEGRITY 1
+#endif /* ... */
+#endif /* ... */
+
 DECL_BEGIN
 
 
@@ -55,7 +63,7 @@ DECL_BEGIN
 #endif /* !CONFIG_NO_SMP */
 
 
-#ifndef NDEBUG
+#ifdef CONFIG_HAVE_CPU_ASSERT_INTEGRITY
 PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL cpu_validate_pointer)(struct cpu *__restrict self) {
 	cpuid_t i;
@@ -398,7 +406,7 @@ again:
 	}
 	PREEMPTION_POP(was);
 }
-#else /* !NDEBUG */
+#else /* CONFIG_HAVE_CPU_ASSERT_INTEGRITY */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL cpu_assert_integrity)(struct task *UNUSED(ignored_thread)) {
 	/* no-op */
@@ -411,7 +419,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL cpu_assert_sleeping)(struct task *__restrict UNUSED(thread)) {
 	/* no-op */
 }
-#endif /* NDEBUG */
+#endif /* !CONFIG_HAVE_CPU_ASSERT_INTEGRITY */
 
 
 

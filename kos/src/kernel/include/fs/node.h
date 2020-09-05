@@ -114,6 +114,19 @@ struct inode_type {
 		void (KCALL *a_maskattr)(struct inode *__restrict self)
 				/*THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...)*/;
 
+		/* [0..1] Optional callback to implement dynamic handling for stat() on a given INode.
+		 * Before this callback is invoked, the caller will have already filled in _all_ fields
+		 * of `result' with values read from the various member fields of `self'.
+		 * This callback may then overwrite those values however it pleases.
+		 * The intend use of this operator is to lazily calculate dynamic file attribute, such
+		 * as the timestamps of /proc/[pid] files, for which lookup doesn't need to happen when
+		 * the INode is created, since this type of lookup is fairly expensive, meaning it's ok
+		 * if it's only done when it's actually needed. */
+		NONNULL((1))
+		void (KCALL *a_stat)(struct inode *__restrict self,
+		                     USER CHECKED struct stat *result)
+				/*THROWS(E_IOERROR, ...)*/;
+
 		/* [0..1] General-purpose handler for ioctl() requests */
 		NONNULL((1))
 		syscall_slong_t (KCALL *a_ioctl)(struct inode *__restrict self, syscall_ulong_t cmd,

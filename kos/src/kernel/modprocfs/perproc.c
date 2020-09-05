@@ -324,6 +324,8 @@ INTERN struct inode_type ProcFS_PerProc_Directory_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
 		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ { },
 	{
@@ -343,6 +345,8 @@ INTERN struct inode_type ProcFS_PerProc_RegularRo_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
 		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 		/* .f_read     = */ NULL,
@@ -364,6 +368,8 @@ INTERN struct inode_type ProcFS_PerProc_RegularRw_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
 		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 		/* .f_read     = */ NULL,
@@ -386,6 +392,8 @@ INTERN struct inode_type ProcFS_PerProc_DynamicSymlink_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
 		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},
@@ -483,6 +491,8 @@ INTERN struct inode_type ProcFS_PerProcRootDirectory_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
 		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},
@@ -496,6 +506,32 @@ INTERN struct inode_type ProcFS_PerProcRootDirectory_Type = {
 		}
 	}
 };
+
+
+
+/************************************************************************/
+/* Per-process stat() operator for procfs INode objects.                */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+ProcFS_PerProc_StatInode(struct inode *__restrict self,
+                         USER CHECKED struct stat *result)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	REF struct task *thread;
+	upid_t pid;
+	pid = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
+	/* Lookup the associated thread. */
+	thread = pidns_trylookup_task(THIS_PIDNS, pid);
+	if unlikely(!thread)
+		return;
+	FINALLY_DECREF_UNLIKELY(thread);
+	/* Use the thread's creation timestamp for a/m/c-timestamps. */
+	result->st_atimespec.tv_sec  = thread->t_ctime.tv_sec;
+	result->st_atimespec.tv_nsec = thread->t_ctime.tv_nsec;
+	result->st_mtimespec.tv_sec  = thread->t_ctime.tv_sec;
+	result->st_mtimespec.tv_nsec = thread->t_ctime.tv_nsec;
+	result->st_ctimespec.tv_sec  = thread->t_ctime.tv_sec;
+	result->st_ctimespec.tv_nsec = thread->t_ctime.tv_nsec;
+}
 
 
 DECL_END

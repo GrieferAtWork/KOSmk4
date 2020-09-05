@@ -248,6 +248,12 @@ ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
                                 void *arg)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
+/* Per-process stat() operator for procfs INode objects. */
+INTDEF NONNULL((1)) void KCALL
+ProcFS_PerProc_StatInode(struct inode *__restrict self,
+                         USER CHECKED struct stat *result)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
+
 
 INTDEF REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[];
 INTDEF struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData;

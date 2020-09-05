@@ -197,6 +197,8 @@ INTERN struct inode_type ProcFS_PerProc_Fd_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ NULL,
 		/* .a_saveattr = */ NULL,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},
@@ -289,6 +291,7 @@ INTERN struct inode_type ProcFS_PerProc_Fd_Entry_Type = {
 		/* .a_loadattr   = */ NULL,
 		/* .a_saveattr   = */ NULL,
 		/* .a_maskattr   = */ NULL,
+		/* .a_stat       = */ &ProcFS_PerProc_StatInode,
 		/* .a_ioctl      = */ NULL,
 		/* .a_clearcache = */ NULL,
 		/* .a_open       = */ &ProcFS_PerProc_Fd_Entry_Open

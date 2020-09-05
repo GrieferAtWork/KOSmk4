@@ -169,6 +169,8 @@ INTERN struct inode_type ProcFS_PerProc_Kos_Drives_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ NULL,
 		/* .a_saveattr = */ NULL,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},
@@ -188,6 +190,8 @@ INTERN struct inode_type ProcFS_PerProc_Kos_DrivesCwd_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ NULL,
 		/* .a_saveattr = */ NULL,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},
@@ -300,6 +304,8 @@ INTERN struct inode_type ProcFS_PerProc_Kos_Drives_Entry_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ NULL,
 		/* .a_saveattr = */ NULL,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},
@@ -316,6 +322,8 @@ INTERN struct inode_type ProcFS_PerProc_Kos_Dcwd_Entry_Type = {
 	/* .it_attr = */ {
 		/* .a_loadattr = */ NULL,
 		/* .a_saveattr = */ NULL,
+		/* .a_maskattr = */ NULL,
+		/* .a_stat     = */ &ProcFS_PerProc_StatInode,
 	},
 	/* .it_file = */ {
 	},

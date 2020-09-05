@@ -208,6 +208,12 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
 	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys_ptr, offsetof(struct vm, v_pdir_phys_ptr), sizeof(vm_phys_t));
 
+	/* Set kernel boot timestamps.
+	 * These can be used to calculate things such as uptime, etc. */
+	_boottask.t_ctime  = realtime();
+	_bootidle.t_ctime  = _boottask.t_ctime;
+	_asyncwork.t_ctime = _boottask.t_ctime;
+
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);
 	assert(_asyncwork.t_refcnt == 1);

@@ -465,6 +465,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Automate files like /kos/src/libc/libc/sys_siglist.def via `deemon -F' */
 
+	/* TODO: Various signed system call arguments are printed as unsigned by libsctrace
+	 * Example: task[8].sys_waitpid(pid: 4294967295, stat_loc: 0x7bff5da4, options: 00000003)
+	 * The `pid' argument is (correctly so) negative, but printed as unsigned */
+
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every
