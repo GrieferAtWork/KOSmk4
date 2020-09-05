@@ -86,13 +86,34 @@ NOTHROW(KCALL corepage_hasused)(struct vm_corepage const *__restrict self) {
 	return false;
 }
 
+#ifndef NDEBUG
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL corepage_reachable)(struct vm_corepage const *__restrict self) {
+	struct vm_corepage *chain;
+	for (chain = vm_corepage_head; chain;
+	     chain = chain->cp_ctrl.cpc_prev) {
+		if (chain == self)
+			return true;
+	}
+	return false;
+}
+#endif /* !NDEBUG */
+
+
 
 PRIVATE NONNULL((1)) void
 NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	struct vm_corepage *page;
 	unsigned int index, i;
 	uintptr_t mask;
-	page  = VM_COREPAGE_OF(part);
+	assert(vm_corepage_head);
+	page = VM_COREPAGE_OF(part);
+#ifndef NDEBUG
+	/* Verify that `page' is/isn't reachable when it should/shouldn't be. */
+	assertf(corepage_reachable(page) == corepage_hasfree(page),
+	        "Corepage at %p (containing part at %p) isn't reachable",
+	        page, part);
+#endif /* !NDEBUG */
 	index = (union vm_corepart *)part - page->cp_parts;
 	assertf(&page->cp_parts[index] == (union vm_corepart *)part,
 	        "Invalid COREPART pointer: %p", part);
@@ -101,6 +122,13 @@ NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	assertf(page->cp_ctrl.cpc_used[i] & mask,
 	        "COREPART %p (page %p, index %u) is not marked as used",
 	        part, page, index);
+	/* Special case: If the corepage doesn't have any free parts, then we must
+	 *               re-enter it into the chain to the core pages containing
+	 *               free core parts. */
+	if (!corepage_hasfree(page)) {
+		page->cp_ctrl.cpc_prev = vm_corepage_head;
+		vm_corepage_head       = page;
+	}
 	page->cp_ctrl.cpc_used[i] &= ~mask;
 	++vm_corepage_free;
 	if (vm_corepage_free >= (VM_COREPAIRS_PER_PAGE + 4)) {
@@ -125,6 +153,7 @@ NOTHROW(KCALL do_free_part)(void *__restrict part) {
 			vm_unmap_kernel_ram(page, PAGESIZE, false);
 		}
 	}
+	assert(vm_corepage_head);
 }
 
 PRIVATE void NOTHROW(KCALL free_pending_parts)(void) {
@@ -162,6 +191,7 @@ NOTHROW(KCALL corepage_alloc_part)(struct vm_corepage *__restrict self) {
 PRIVATE struct vm_corepair_ptr
 NOTHROW(KCALL vm_corepair_alloc_impl)(void) {
 	struct vm_corepair_ptr result;
+	assert(vm_corepage_head);
 	assert(vm_corepage_free >= 2);
 	result.cp_part = (struct vm_datapart *)corepage_alloc_part(vm_corepage_head);
 	memset(result.cp_part, 0, sizeof(*result.cp_part));
@@ -220,6 +250,7 @@ atomic_failure_nx:
 	if (vm_corepage_free >= 4) {
 allocate_from_corepage:
 		result = vm_corepair_alloc_impl();
+		assert(vm_corepage_head);
 	} else {
 		/* It's our responsibility to allocate a new corepage. */
 		void *mapping_target;
@@ -350,6 +381,7 @@ again_tryhard_mapping_target:
 			memset(&new_page->cp_ctrl, 0, sizeof(new_page->cp_ctrl));
 		new_page->cp_ctrl.cpc_prev = vm_corepage_head;
 		vm_corepage_head           = new_page;
+		assert(vm_corepage_head);
 
 		/* Keep track of all of the new parts that we've just allocated. */
 		vm_corepage_free += VM_COREPAIRS_PER_PAGE;
