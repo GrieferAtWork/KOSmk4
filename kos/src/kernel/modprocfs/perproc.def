@@ -108,6 +108,8 @@ DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
 PERPROC_DIRECTORY_ENTRY("stat", DT_REG, stat)
 MKREG_RO(stat, 0222, ProcFS_PerProc_Stat_Printer)
 
+PERPROC_DIRECTORY_ENTRY("task", DT_DIR, task)
+CUSTOM(task, S_IFDIR | 0555, ProcFS_PerProc_Task_Type)
 
 #undef PERPROC_DIRECTORY_ENTRY
 #undef CUSTOM

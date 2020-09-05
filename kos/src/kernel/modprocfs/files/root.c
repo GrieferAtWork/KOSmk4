@@ -35,12 +35,6 @@
 
 DECL_BEGIN
 
-#undef CONFIG_PROCFS_ALLOW_ROOT_TID
-#ifndef CONFIG_PROCFS_DISALLOW_ROOT_TID
-#define CONFIG_PROCFS_ALLOW_ROOT_TID 1
-#endif /* !CONFIG_PROCFS_DISALLOW_ROOT_TID */
-
-
 PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
 ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
                             CHECKED USER /*utf-8*/ char const *__restrict name,
@@ -52,9 +46,7 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 	if likely(namelen != 0) {
 		char ch = ATOMIC_READ(name[0]);
 		if (ch >= '1' && ch <= '9') {
-#ifndef CONFIG_PROCFS_ALLOW_ROOT_TID
 			REF struct task *thread;
-#endif /* !CONFIG_PROCFS_ALLOW_ROOT_TID */
 			upid_t pidno = (upid_t)(ch - '0');
 			size_t i;
 			for (i = 1; i < namelen; ++i) {
@@ -64,36 +56,26 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 				pidno *= 10;
 				pidno += (upid_t)(ch - '0');
 			}
-#ifndef CONFIG_PROCFS_ALLOW_ROOT_TID
 			thread = pidns_trylookup_task(THIS_PIDNS, pidno);
-			if likely(thread)
-#endif /* !CONFIG_PROCFS_ALLOW_ROOT_TID */
-			{
-#ifndef CONFIG_PROCFS_ALLOW_ROOT_TID
-				bool isproc;
-				isproc = task_isprocessleader_p(thread);
+			if likely(thread) {
+				REF struct directory_entry *result;
 				decref_unlikely(thread);
-				if (isproc)
-#endif /* !CONFIG_PROCFS_ALLOW_ROOT_TID */
-				{
-					REF struct directory_entry *result;
-					result = directory_entry_alloc(namelen);
+				result = directory_entry_alloc(namelen);
 #ifdef NDEBUG
-					sprintf(result->de_name, "%u", (unsigned int)pidno);
+				sprintf(result->de_name, "%u", (unsigned int)pidno);
 #else /* NDEBUG */
-					{
-						size_t temp;
-						temp = sprintf(result->de_name, "%u", (unsigned int)pidno);
-						assert(temp == namelen);
-					}
-#endif /* !NDEBUG */
-					/* NOTE: We can't actually trust user-space that `hash' is valid, since
-					 *       the user may have changed the string in the mean time... */
-					result->de_hash = directory_entry_hash(result->de_name, namelen);
-					result->de_ino  = PROCFS_INOMAKE_PERPROC(pidno, PROCFS_PERPROC_ROOT);
-					result->de_type = DT_DIR;
-					return result;
+				{
+					size_t temp;
+					temp = sprintf(result->de_name, "%u", (unsigned int)pidno);
+					assert(temp == namelen);
 				}
+#endif /* !NDEBUG */
+				/* NOTE: We can't actually trust user-space that `hash' is valid, since
+				 *       the user may have changed the string in the mean time... */
+				result->de_hash = directory_entry_hash(result->de_name, namelen);
+				result->de_ino  = PROCFS_INOMAKE_PERPROC(pidno, PROCFS_PERPROC_ROOT);
+				result->de_type = DT_DIR;
+				return result;
 			}
 		}
 	}
@@ -101,14 +83,7 @@ notapid:
 	return ProcFS_Singleton_Directory_Lookup(self, name, namelen, hash, mode);
 }
 
-
-typedef struct {
-	directory_enum_callback_t epc_cb;     /* [1..1] The underlying callback */
-	void                     *epc_arg;    /* Argument for `epc_cb' */
-	size_t                    epc_ns_ind; /* PID namespace indirection. */
-} ProcFS_EnumProcessCallback_Data;
-
-PRIVATE ssize_t KCALL
+INTERN ssize_t KCALL
 ProcFS_EnumProcessCallback(void *arg,
                            struct task *UNUSED(thread),
                            struct taskpid *tpid) {

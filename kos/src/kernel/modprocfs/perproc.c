@@ -25,6 +25,7 @@
 
 #include <fs/node.h>
 #include <kernel/driver.h>
+#include <sched/pid.h>
 
 #include <kos/except/io.h>
 #include <sys/stat.h>
@@ -168,12 +169,10 @@ ProcFS_PerProc_MakeDirent(struct directory_node *__restrict self,
 	return result;
 }
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
-ProcFS_PerProc_Directory_Lookup(struct directory_node *__restrict self,
+PRIVATE NONNULL((1, 2)) struct directory_entry *KCALL
+ProcFS_PerProc_Directory_Locate(struct directory_node *__restrict self,
                                 CHECKED USER /*utf-8*/ char const *__restrict name,
-                                u16 namelen, uintptr_t hash, fsmode_t mode)
-		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
-		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+                                u16 namelen, uintptr_t hash, fsmode_t mode) {
 	unsigned int i;
 	struct directory_entry **data;
 	struct directory_entry *dent;
@@ -188,7 +187,7 @@ ProcFS_PerProc_Directory_Lookup(struct directory_node *__restrict self,
 		if (memcmp(dent->de_name, name, namelen * sizeof(char)) != 0)
 			continue;
 		/* Found it! */
-		return ProcFS_PerProc_MakeDirent(self, dent);
+		return dent;
 	}
 	if (mode & FS_MODE_FDOSPATH) {
 		/* Do a second pass where we ignore casing. */
@@ -198,9 +197,22 @@ ProcFS_PerProc_Directory_Lookup(struct directory_node *__restrict self,
 			if (memcasecmp(dent->de_name, name, namelen * sizeof(char)) != 0)
 				continue;
 			/* Found it! */
-			return ProcFS_PerProc_MakeDirent(self, dent);
+			return dent;
 		}
 	}
+	return NULL;
+}
+
+INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+ProcFS_PerProc_Directory_Lookup(struct directory_node *__restrict self,
+                                CHECKED USER /*utf-8*/ char const *__restrict name,
+                                u16 namelen, uintptr_t hash, fsmode_t mode)
+		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	REF struct directory_entry *result;
+	result = ProcFS_PerProc_Directory_Locate(self, name, namelen, hash, mode);
+	if (result) /* Create the unique copy */
+		result = ProcFS_PerProc_MakeDirent(self, result);
 	return NULL;
 }
 
@@ -397,6 +409,75 @@ INTERN REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[] = {
 	NULL
 };
 
+PRIVATE WUNUSED bool KCALL
+is_process_leader_pid(upid_t pid) {
+	bool result;
+	REF struct task *thread;
+	/* Lookup the associated thread. */
+	thread = pidns_trylookup_task(THIS_PIDNS, pid);
+	if unlikely(!thread)
+		return false;
+	result = task_isprocessleader_p(thread);
+	decref_unlikely(thread);
+	return result;
+}
+
+PRIVATE NONNULL((1, 2)) struct directory_entry *KCALL
+ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(struct directory_node *__restrict self,
+                                                   struct directory_entry *__restrict ent) {
+	/* Check for special case: Only a process leader has the `task' sub-directory! */
+	if (ent->de_ino == PROCFS_INOMAKE_PERPROC(0, PROCFS_PERPROC_ID_task)) {
+		if (!is_process_leader_pid((upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK)))
+			return NULL;
+	}
+	return ent;
+}
+
+PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+ProcFS_PerProc_RootDirectory_Lookup(struct directory_node *__restrict self,
+                                    CHECKED USER /*utf-8*/ char const *__restrict name,
+                                    u16 namelen, uintptr_t hash, fsmode_t mode)
+		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	REF struct directory_entry *result;
+	result = ProcFS_PerProc_Directory_Locate(self, name, namelen, hash, mode);
+	if (result) {
+		/* Deal with special entires. */
+		result = ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(self, result);
+		if (result) {
+			/* Create the unique copy */
+			result = ProcFS_PerProc_MakeDirent(self, result);
+		}
+	}
+	return result;
+}
+
+PRIVATE NONNULL((1, 2)) void KCALL
+ProcFS_PerProc_RootDirectory_Enum(struct directory_node *__restrict self,
+                                  directory_enum_callback_t callback,
+                                  void *arg)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	unsigned int i;
+	struct directory_entry **data;
+	struct directory_entry *dent;
+	data = (struct directory_entry **)self->i_fsdata;
+	for (i = 0; (dent = data[i]) != NULL; ++i) {
+		/* Deal with special entires. */
+		dent = ProcFS_PerProc_RootDirectory_TranslateSpecialEntry(self, dent);
+		if (dent) {
+			ino_t real_ino;
+			real_ino = dent->de_ino;
+			real_ino |= self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK;
+			(*callback)(arg,
+			            dent->de_name,
+			            dent->de_namelen,
+			            dent->de_type,
+			            real_ino);
+		}
+	}
+}
+
+
 INTERN struct inode_type ProcFS_PerProcRootDirectory_Type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
@@ -409,8 +490,8 @@ INTERN struct inode_type ProcFS_PerProcRootDirectory_Type = {
 		/* .it_directory = */ {
 			/* .d_readdir = */ NULL,
 			/* .d_oneshot = */ {
-				/* .o_lookup = */ &ProcFS_PerProc_Directory_Lookup,
-				/* .o_enum   = */ &ProcFS_PerProc_Directory_Enum,
+				/* .o_lookup = */ &ProcFS_PerProc_RootDirectory_Lookup,
+				/* .o_enum   = */ &ProcFS_PerProc_RootDirectory_Enum,
 			}
 		}
 	}

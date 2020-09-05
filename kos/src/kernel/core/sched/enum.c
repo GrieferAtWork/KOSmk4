@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_ENUM_C
 #define GUARD_KERNEL_SRC_SCHED_ENUM_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -27,6 +28,7 @@
 #include <kernel/malloc.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
@@ -51,9 +53,19 @@ DECL_BEGIN
 			__VA_ARGS__;        \
 		}                       \
 	}	__WHILE0
+#define IF_NOT_DEBUGGER_ACTIVE(...) \
+	do {                            \
+		if (!dbg_active) {          \
+			__VA_ARGS__;            \
+		}                           \
+	}	__WHILE0
 #else /* CONFIG_HAVE_DEBUGGER */
-#define IF_HAVE_DEBUGGER(...) (void)0
+#define IF_HAVE_DEBUGGER(...)       (void)0
+#define IF_NOT_DEBUGGER_ACTIVE(...) __VA_ARGS__
 #endif /* !CONFIG_HAVE_DEBUGGER */
+
+#define sync_read_if_not_dbg(x)    IF_NOT_DEBUGGER_ACTIVE(sync_read(x))
+#define sync_endread_if_not_dbg(x) IF_NOT_DEBUGGER_ACTIVE(sync_endread(x))
 
 
 
@@ -421,6 +433,7 @@ task_enum_filter_user_cb(void *arg,
                          struct taskpid *pid) {
 	struct task_enum_filter_data *data;
 	data = (struct task_enum_filter_data *)arg;
+	/* Filter non-user threads. */
 	if (!thread || (thread->t_flags & TASK_FKERNTHREAD) != 0)
 		return 0;
 	return (*data->ef_cb)(data->ef_arg, thread, pid);
@@ -432,6 +445,7 @@ task_enum_filter_kernel_cb(void *arg,
                            struct taskpid *pid) {
 	struct task_enum_filter_data *data;
 	data = (struct task_enum_filter_data *)arg;
+	/* Filter non-kernel threads. */
 	if (!thread || (thread->t_flags & TASK_FKERNTHREAD) == 0)
 		return 0;
 	return (*data->ef_cb)(data->ef_arg, thread, pid);
@@ -444,6 +458,7 @@ task_enum_user_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK) {
 	struct task_enum_filter_data data;
 	data.ef_cb  = cb;
 	data.ef_arg = arg;
+	/* Enumerate all threads, but filter anything that isn't a user thread. */
 	result = task_enum_all_nb(&task_enum_filter_user_cb, &data);
 	return result;
 }
@@ -455,19 +470,14 @@ task_enum_kernel_nb(task_enum_cb_t cb, void *arg) THROWS(E_WOULDBLOCK) {
 	struct task_enum_filter_data data;
 	data.ef_cb  = cb;
 	data.ef_arg = arg;
+	/* Enumerate all threads, but filter anything that isn't a kernel thread. */
 	result = task_enum_all_nb(&task_enum_filter_kernel_cb, &data);
 	return result;
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
-#define sync_read_if_not_dbg(x)    do { if likely(!dbg_active) sync_read(x); } __WHILE0
-#define sync_endread_if_not_dbg(x) do { if likely(!dbg_active) sync_endread(x); } __WHILE0
-#else /* CONFIG_HAVE_DEBUGGER */
-#define sync_read_if_not_dbg(x)    sync_read(x)
-#define sync_endread_if_not_dbg(x) sync_endread(x)
-#endif /* !CONFIG_HAVE_DEBUGGER */
-
+/* Enumerate all threads apart of the same process as `proc'
+ * If `proc' is a kernel-space thread, same as `task_enum_kernel()' */
 PUBLIC NONNULL((1, 3)) ssize_t KCALL
 task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
                              struct task *__restrict proc)
@@ -497,9 +507,103 @@ task_enum_process_threads_nb(task_enum_cb_t cb, void *arg,
 		for (; threadlist; threadlist = threadlist->tp_siblings.ln_next) {
 			REF struct task *thread;
 			thread = taskpid_gettask(threadlist);
-			ASSERT_POISON(thread != proc);
-			ASSERT_POISON(!thread || task_getprocess_of(thread) == proc);
-			temp   = (*cb)(arg, thread, threadlist);
+			if (!thread)
+				continue;
+			/* Only enumerate threads. - Don't enumerate child processes. */
+			temp = task_getprocess_of(thread) == proc
+			       ? (*cb)(arg, thread, threadlist)
+			       : 0;
+			decref_unlikely(thread);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+	}
+	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
+done:
+	return result;
+err:
+	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
+	return temp;
+}
+
+
+/* Same as `task_enum_process_threads()', but don't enumerate `task_getprocess_of(proc)' */
+PUBLIC NONNULL((1, 3)) ssize_t KCALL
+task_enum_process_worker_threads_nb(task_enum_cb_t cb, void *arg,
+                                    struct task *__restrict proc)
+		THROWS(E_WOULDBLOCK) {
+	ssize_t temp, result = 0;
+	struct taskgroup *group;
+	struct taskpid *threadlist;
+	/* Retrieve the process leader of `proc' */
+	proc = task_getprocess_of(proc);
+
+	/* Check for special case: this is a kernel thread.
+	 * In this case, we must enumerate all system-wide kernel threads. */
+	if unlikely(proc->t_flags & TASK_FKERNTHREAD)
+		return task_enum_kernel_nb(cb, arg);
+
+	/* Lock the process's thread list. */
+	group = &FORTASK(proc, this_taskgroup);
+	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
+	/* Enumerate threads. */
+	threadlist = group->tg_proc_threads;
+	if (threadlist != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
+		for (; threadlist; threadlist = threadlist->tp_siblings.ln_next) {
+			REF struct task *thread;
+			thread = taskpid_gettask(threadlist);
+			if (!thread)
+				continue;
+			/* Only enumerate threads. - Don't enumerate child processes. */
+			temp = task_getprocess_of(thread) == proc
+			       ? (*cb)(arg, thread, threadlist)
+			       : 0;
+			decref_unlikely(thread);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+	}
+	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
+	return result;
+err:
+	sync_endread_if_not_dbg(&group->tg_proc_threads_lock);
+	return temp;
+}
+
+
+/* Enumerate all children of the given `proc'. (i.e. the threads
+ * that `proc' can `wait(2)' for). This also includes threads that
+ * could also be enumerated using `task_enum_process_threads()'
+ * Note however that this function will not enumerate `proc' itself,
+ * and when `proc' is a kernel-thread, nothing will be enumerated.
+ * @throws: E_BADALLOC: Only outside of debugger-mode: Failed to
+ *                      allocate memory for intermediate buffers. */
+PUBLIC NONNULL((1, 3)) ssize_t KCALL
+task_enum_process_children_nb(task_enum_cb_t cb, void *arg,
+                              struct task *__restrict proc)
+		THROWS(E_WOULDBLOCK) {
+	ssize_t temp, result = 0;
+	struct taskgroup *group;
+	struct taskpid *threadlist;
+	/* Retrieve the process leader of `proc' */
+	proc = task_getprocess_of(proc);
+
+	/* Check for special case: this is a kernel thread. */
+	if unlikely(proc->t_flags & TASK_FKERNTHREAD)
+		goto done;
+
+	/* Lock the process's thread list. */
+	group = &FORTASK(proc, this_taskgroup);
+	sync_read_if_not_dbg(&group->tg_proc_threads_lock);
+	/* Enumerate threads. */
+	threadlist = group->tg_proc_threads;
+	if (threadlist != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
+		for (; threadlist; threadlist = threadlist->tp_siblings.ln_next) {
+			REF struct task *thread;
+			thread = taskpid_gettask(threadlist);
+			temp = (*cb)(arg, thread, threadlist);
 			xdecref_unlikely(thread);
 			if unlikely(temp < 0)
 				goto err;
@@ -629,6 +733,27 @@ err:
 }
 
 
+/* Enumerate all threads that are using `v' as their active VM. */
+PUBLIC NONNULL((1, 3)) ssize_t KCALL
+task_enum_vm_nb(task_enum_cb_t cb, void *arg,
+                struct vm *__restrict v)
+		THROWS(E_WOULDBLOCK) {
+	struct task *thread;
+	ssize_t temp, result = 0;
+	IF_NOT_DEBUGGER_ACTIVE(vm_tasklock_read(v));
+	for (thread = v->v_tasks; thread;
+	     thread = thread->t_vm_tasks.ln_next) {
+		/* Enumerate the thread. */
+		CB_THREAD(thread);
+	}
+	IF_NOT_DEBUGGER_ACTIVE(vm_tasklock_endread(v));
+	return result;
+err:
+	IF_NOT_DEBUGGER_ACTIVE(vm_tasklock_endread(v));
+	return temp;
+}
+
+
 
 
 
@@ -643,6 +768,12 @@ DECL_END
 #include "enum-wrapper.c.inl"
 
 #define DEFINE_task_enum_process_threads 1
+#include "enum-wrapper.c.inl"
+
+#define DEFINE_task_enum_process_worker_threads 1
+#include "enum-wrapper.c.inl"
+
+#define DEFINE_task_enum_process_children 1
 #include "enum-wrapper.c.inl"
 
 #define DEFINE_task_enum_procgroup_processes 1

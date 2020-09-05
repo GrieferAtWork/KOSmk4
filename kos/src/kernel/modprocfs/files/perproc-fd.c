@@ -48,7 +48,7 @@ DECL_BEGIN
 
 struct wall_clock;
 
-INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
 ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *__restrict name,
                          u16 namelen, uintptr_t UNUSED(hash), fsmode_t UNUSED(mode))
@@ -113,7 +113,7 @@ enum_fd(directory_enum_callback_t callback,
 	            PROCFS_INOMAKE_FD(pid, fd));
 }
 
-INTERN NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 ProcFS_PerProc_Fd_Enum(struct directory_node *__restrict self,
                        directory_enum_callback_t callback,
                        void *arg)

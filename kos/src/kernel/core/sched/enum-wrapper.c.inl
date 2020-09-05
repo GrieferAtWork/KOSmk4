@@ -19,14 +19,17 @@
  */
 #ifdef __INTELLISENSE__
 #include "enum.c"
-#define DEFINE_task_enum_all 1
+//#define DEFINE_task_enum_all 1
 //#define DEFINE_task_enum_user 1
 //#define DEFINE_task_enum_process_threads 1
+//#define DEFINE_task_enum_process_worker_threads 1
+//#define DEFINE_task_enum_process_children 1
 //#define DEFINE_task_enum_procgroup_processes 1
 //#define DEFINE_task_enum_processes 1
 //#define DEFINE_task_enum_namespace 1
 //#define DEFINE_task_enum_kernel 1
-#define DEFINE_task_enum_cpu 1
+//#define DEFINE_task_enum_cpu 1
+#define DEFINE_task_enum_vm 1
 #endif /* __INTELLISENSE__ */
 
 #if defined(DEFINE_task_enum_all)
@@ -60,6 +63,32 @@
 #define FUNC_task_enum        task_enum_process_threads
 #define FUNC_task_enum_nb     task_enum_process_threads_nb
 #define FUNC_task_list        task_list_process_threads
+#define FUNC_EXTRA__PARAM     , struct task *__restrict proc
+#define FUNC_EXTRA__ARGS      , proc
+
+#elif defined(DEFINE_task_enum_process_worker_threads)
+
+/* Same as `task_enum_process_threads()', but don't enumerate `task_getprocess_of(proc)' */
+#define FUNC_task_enum_onstck task_enum_process_worker_threads_onstck
+#define FUNC_task_enum_onheap task_enum_process_worker_threads_onheap
+#define FUNC_task_enum        task_enum_process_worker_threads
+#define FUNC_task_enum_nb     task_enum_process_worker_threads_nb
+#define FUNC_task_list        task_list_process_worker_threads
+#define FUNC_EXTRA__PARAM     , struct task *__restrict proc
+#define FUNC_EXTRA__ARGS      , proc
+
+#elif defined(DEFINE_task_enum_process_children)
+
+/* Enumerate all children of the given `proc'. (i.e. the threads
+ * that `proc' can `wait(2)' for). This also includes threads that
+ * could also be enumerated using `task_enum_process_threads()'
+ * Note however that this function will not enumerate `proc' itself,
+ * and when `proc' is a kernel-thread, nothing will be enumerated. */
+#define FUNC_task_enum_onstck task_enum_process_children_onstck
+#define FUNC_task_enum_onheap task_enum_process_children_onheap
+#define FUNC_task_enum        task_enum_process_children
+#define FUNC_task_enum_nb     task_enum_process_children_nb
+#define FUNC_task_list        task_list_process_children
 #define FUNC_EXTRA__PARAM     , struct task *__restrict proc
 #define FUNC_EXTRA__ARGS      , proc
 
@@ -123,6 +152,18 @@
 #define FUNC_task_list        task_list_cpu
 #define FUNC_EXTRA__PARAM     , struct cpu *__restrict c
 #define FUNC_EXTRA__ARGS      , c
+
+#elif defined(DEFINE_task_enum_vm)
+#define NO_TASKPID_BUFFER 1
+
+/* Enumerate all threads that are using `v' as their active VM. */
+#define FUNC_task_enum_onstck task_enum_vm_onstck
+#define FUNC_task_enum_onheap task_enum_vm_onheap
+#define FUNC_task_enum        task_enum_vm
+#define FUNC_task_enum_nb     task_enum_vm_nb
+#define FUNC_task_list        task_list_vm
+#define FUNC_EXTRA__PARAM     , struct vm *__restrict v
+#define FUNC_EXTRA__ARGS      , v
 
 #else /* DEFINE_... */
 #error "Bad configuration"
@@ -352,8 +393,11 @@ DECL_END
 #undef DEFINE_task_enum_all
 #undef DEFINE_task_enum_user
 #undef DEFINE_task_enum_process_threads
+#undef DEFINE_task_enum_process_worker_threads
+#undef DEFINE_task_enum_process_children
 #undef DEFINE_task_enum_procgroup_processes
 #undef DEFINE_task_enum_processes
 #undef DEFINE_task_enum_namespace
 #undef DEFINE_task_enum_kernel
 #undef DEFINE_task_enum_cpu
+#undef DEFINE_task_enum_vm

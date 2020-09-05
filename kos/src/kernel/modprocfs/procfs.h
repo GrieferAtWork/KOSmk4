@@ -251,8 +251,9 @@ ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
 
 INTDEF REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[];
 INTDEF struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData;
-INTDEF struct inode_type ProcFS_RootDirectory_Type;
-INTDEF struct inode_type ProcFS_PerProcRootDirectory_Type;
+INTDEF struct inode_type ProcFS_RootDirectory_Type;            /* /proc */
+INTDEF struct inode_type ProcFS_PerProcRootDirectory_Type;     /* /proc/[pid]       (for `PROCFS_PERPROC_ROOT') */
+INTDEF struct inode_type ProcFS_PerProc_Task_Type;             /* /proc/[pid]/task  (for `PROCFS_PERPROC_TASK') */
 INTDEF struct inode_type ProcFS_PerProc_Kos_Drives_Entry_Type; /* For `PROCFS_INOTYPE_DRIVE' */
 INTDEF struct inode_type ProcFS_PerProc_Kos_Dcwd_Entry_Type;   /* For `PROCFS_INOTYPE_DCWD' */
 INTDEF struct inode_type ProcFS_PerProc_MapFiles_Entry_Type;   /* For `PROCFS_INOTYPE_MAPFILES' */
@@ -303,6 +304,19 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 #define CUSTOM(id, mode, type) \
 	INTDEF struct inode_type type;
 #include "perproc.def"
+
+
+/* Helper for wrapping the task_enum_* functions with `directory_enum_callback_t' */
+typedef struct {
+	directory_enum_callback_t epc_cb;     /* [1..1] The underlying callback */
+	void                     *epc_arg;    /* Argument for `epc_cb' */
+	size_t                    epc_ns_ind; /* PID namespace indirection. */
+} ProcFS_EnumProcessCallback_Data;
+
+/* NOTE: This function should be used as a `task_enum_cb_t' */
+INTDEF ssize_t KCALL
+ProcFS_EnumProcessCallback(/*ProcFS_EnumProcessCallback_Data*/ void *arg,
+                           struct task *thread, struct taskpid *tpid);
 
 
 DECL_END
