@@ -196,8 +196,9 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 				num_missing -= part_free;
 			}
 			if (i != 0) {
-				/* Remove leading parts. */
+				/* Remove leading parts that have become empty. */
 				self->dp_ramdata.rd_blockc -= i;
+				assert(self->dp_ramdata.rd_blockc);
 				memmovedown(&self->dp_ramdata.rd_blockv[0],
 				            &self->dp_ramdata.rd_blockv[i],
 				            self->dp_ramdata.rd_blockc,
@@ -240,6 +241,7 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 			if (i != 0) {
 				/* Remove leading parts. */
 				self->dp_swpdata.sd_blockc -= i;
+				assert(self->dp_swpdata.sd_blockc);
 				memmovedown(&self->dp_swpdata.sd_blockv[0],
 				            &self->dp_swpdata.sd_blockv[i],
 				            self->dp_swpdata.sd_blockc,
@@ -279,8 +281,9 @@ NOTHROW(KCALL vm_datapart_truncate_trailing_ramblocks)(struct vm_datapart *__res
 		/* Free the unused portion from this specific block. */
 		page_ffree(self->dp_ramdata.rd_blockv[i].rb_start + num_keep,
 		           part_free - num_keep, is_zero);
-		self->dp_ramdata.rd_blockc            = i;
 		self->dp_ramdata.rd_blockv[i].rb_size = num_keep;
+		++i; /* Make `i' be the new total block count. */
+		self->dp_ramdata.rd_blockc = i;
 
 		/* Free all following parts. */
 		for (j = i; j < self->dp_ramdata.rd_blockc; ++j) {
@@ -313,8 +316,9 @@ NOTHROW(KCALL vm_datapart_truncate_trailing_swpblocks)(struct vm_datapart *__res
 		}
 		/* Free the unused portion from this specific part. */
 		swap_free(self->dp_swpdata.sd_blockv[i].sb_start + num_keep, part_free - num_keep);
-		self->dp_swpdata.sd_blockc            = i;
 		self->dp_swpdata.sd_blockv[i].sb_size = num_keep;
+		++i; /* Make `i' be the new total block count. */
+		self->dp_swpdata.sd_blockc = i;
 
 		/* Free all following parts. */
 		for (j = i; j < self->dp_swpdata.sd_blockc; ++j) {
@@ -593,6 +597,9 @@ again:
 			size_t sizeof_trailing = (size_t)(vm_node_getmaxpageid(node) - unmap_max);       /* SIZEOF(Z) */
 			size_t trailing_offset = (size_t)((unmap_max + 1) - vm_node_getminpageid(node)); /* Offset from the start of `Z' to the start of `X' */
 			uintptr_t *part_pprot_bitset;
+			assert(sizeof_leading);
+			assert(sizeof_truncate);
+			assert(sizeof_trailing);
 			assert(unmap_min > vm_node_getminpageid(node));
 			assert(vm_node_getmaxpageid(node) > unmap_max);
 			corepair.cp_node = (struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
@@ -707,6 +714,7 @@ page_properties_updated:
 						if (trailing_keep == 0) {
 							/* The last part simply gets transferred. */
 							--part->dp_ramdata.rd_blockc;
+							assert(part->dp_ramdata.rd_blockc);
 						} else {
 							/* Keep a portion of the last part. */
 							part->dp_ramdata.rd_blockv[i].rb_size = trailing_keep;
@@ -735,8 +743,13 @@ page_properties_updated:
 						memcpy(&hi_blocks[1],
 						       &part->dp_ramdata.rd_blockv[i + 1],
 						       req_block_trailing - 1, sizeof(struct vm_ramblock));
-						part->dp_ramdata.rd_blockc = i;
 						part->dp_ramdata.rd_blockv[i].rb_size -= num_pages_from_first;
+						part->dp_ramdata.rd_blockc = i + 1;
+						/* Try to reclaim unused memory. */
+						krealloc_in_place_nx(part->dp_ramdata.rd_blockv,
+						                     (i + 1) * sizeof(struct vm_ramblock),
+						                     GFP_ATOMIC | GFP_LOCKED |
+						                     GFP_NOMMAP | GFP_PREFLT);
 					}
 					assert(unmap_min == PAGEID_ENCODE(addr));
 					vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
@@ -785,6 +798,7 @@ page_properties_updated:
 						if (trailing_keep == 0) {
 							/* The last part simply gets transferred. */
 							--part->dp_swpdata.sd_blockc;
+							assert(part->dp_swpdata.sd_blockc);
 						} else {
 							/* Keep a portion of the last part. */
 							part->dp_swpdata.sd_blockv[i].sb_size = trailing_keep;
@@ -813,8 +827,13 @@ page_properties_updated:
 						memcpy(&hi_blocks[1],
 						       &part->dp_swpdata.sd_blockv[i + 1],
 						       req_block_trailing - 1, sizeof(struct vm_swpblock));
-						part->dp_swpdata.sd_blockc = i;
 						part->dp_swpdata.sd_blockv[i].sb_size -= num_pages_from_first;
+						part->dp_swpdata.sd_blockc = i;
+						/* Try to reclaim unused memory. */
+						krealloc_in_place_nx(part->dp_swpdata.sd_blockv,
+						                     (i + 1) * sizeof(struct vm_swpblock),
+						                     GFP_ATOMIC | GFP_LOCKED |
+						                     GFP_NOMMAP | GFP_PREFLT);
 					}
 					assert(unmap_min == PAGEID_ENCODE(addr));
 					vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);

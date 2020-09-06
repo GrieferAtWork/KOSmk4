@@ -369,9 +369,9 @@ again_tryhard_mapping_target:
 		result.cp_part->dp_srefs                      = result.cp_node;
 		result.cp_part->dp_state                      = VM_DATAPART_STATE_LOCKED;
 		result.cp_part->dp_pprop                      = (uintptr_t)-1;
-		result.cp_part->dp_ramdata.rd_blockc          = 1;
 		result.cp_part->dp_ramdata.rd_blockv          = &result.cp_part->dp_ramdata.rd_block0;
 		result.cp_part->dp_ramdata.rd_block0.rb_start = mapping_backend;
+		result.cp_part->dp_ramdata.rd_block0.rb_size  = 1;
 		vm_node_insert(result.cp_node);
 		COMPILER_BARRIER();
 

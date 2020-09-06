@@ -319,6 +319,12 @@ struct vm_datapart {
 	                                            *       and as a matter of fact: _is_ dereferencing this field) */
 };
 
+#define vm_datablock_ramdata_getblockvector(self) (self)->dp_ramdata.rd_blockv
+#define vm_datablock_ramdata_getblockcount(self)                                \
+	(vm_datablock_ramdata_getblockvector(self) == &(self)->dp_ramdata.rd_block0 \
+	 ? 1                                                                        \
+	 : (self)->dp_ramdata.rd_blockc)
+
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_free)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void

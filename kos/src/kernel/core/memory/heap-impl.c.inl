@@ -348,6 +348,7 @@ err_blocks:
 			/* Release unused memory. */
 			krealloc_in_place_nx(blocks, blockc * sizeof(struct vm_ramblock),
 			                     CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
+			HEAP_ASSERT(blockc);
 			/* All right! we've allocated all of the necessary blocks! */
 			corepair.cp_part->dp_ramdata.rd_blockc = blockc;
 			corepair.cp_part->dp_ramdata.rd_blockv = blocks;
@@ -418,10 +419,8 @@ again_tryhard_mapping_target:
 				    corepair.cp_part->dp_state == VM_DATAPART_STATE_LOCKED) {
 					struct vm_ramblock *blocks;
 					size_t blockc, i;
-					blocks = corepair.cp_part->dp_ramdata.rd_blockv;
-					blockc = blocks == &corepair.cp_part->dp_ramdata.rd_block0
-					         ? 1
-					         : corepair.cp_part->dp_ramdata.rd_blockc;
+					blocks = vm_datablock_ramdata_getblockvector(corepair.cp_part);
+					blockc = vm_datablock_ramdata_getblockcount(corepair.cp_part);
 					/* Free all pre-allocated pages. */
 					for (i = 0; i < blockc; ++i)
 						page_free(blocks[i].rb_start, blocks[i].rb_size);
@@ -446,10 +445,8 @@ again_tryhard_mapping_target:
 			struct vm_ramblock *blocks;
 			size_t blockc, i;
 			size_t mapping_offset = 0;
-			blocks = corepair.cp_part->dp_ramdata.rd_blockv;
-			blockc = blocks == &corepair.cp_part->dp_ramdata.rd_block0
-			         ? 1
-			         : corepair.cp_part->dp_ramdata.rd_blockc;
+			blocks = vm_datablock_ramdata_getblockvector(corepair.cp_part);
+			blockc = vm_datablock_ramdata_getblockcount(corepair.cp_part);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Prepare to map all of the new blocks. */
 			for (i = 0; i < blockc; ++i) {
@@ -545,10 +542,8 @@ err_corepair_content:
 		if (VM_DATAPART_STATE_HASRAM(corepair.cp_part->dp_state)) {
 			struct vm_ramblock *blocks;
 			size_t blockc, i;
-			blocks = corepair.cp_part->dp_ramdata.rd_blockv;
-			blockc = blocks == &corepair.cp_part->dp_ramdata.rd_block0
-			         ? 1
-			         : corepair.cp_part->dp_ramdata.rd_blockc;
+			blocks = vm_datablock_ramdata_getblockvector(corepair.cp_part);
+			blockc = vm_datablock_ramdata_getblockcount(corepair.cp_part);
 			/* Free all pre-allocated pages. */
 			for (i = 0; i < blockc; ++i)
 				page_free(blocks[i].rb_start, blocks[i].rb_size);

@@ -322,6 +322,7 @@ realloc_without_locks:
 					kfree(blocks);
 					return VM_DATAPART_ALLOC_CHANGED_RELOCK;
 				}
+				assert(blockc);
 				self->PART_DP_DATA.PART_RD_BLOCKC = blockc;
 				self->PART_DP_DATA.PART_RD_BLOCKV = blocks;
 #ifdef PART_RAM
@@ -412,6 +413,7 @@ err_blocks:
 			blocks = new_blocks;
 		/* All right! we've allocated all of the necessary blocks! */
 		assert(self->dp_state == VM_DATAPART_STATE_ABSENT);
+		assert(blockc);
 		self->PART_DP_DATA.PART_RD_BLOCKC = blockc;
 		self->PART_DP_DATA.PART_RD_BLOCKV = blocks;
 	}

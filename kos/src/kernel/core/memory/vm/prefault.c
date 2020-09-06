@@ -43,9 +43,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL free_partilly_initialized_datapart)(struct vm_datapart *__restrict self) {
 	if (self->dp_ramdata.rd_blockv != NULL) {
 		size_t i, count;
-		count = self->dp_ramdata.rd_blockc;
-		if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0)
-			count = 1;
+		count = vm_datablock_ramdata_getblockcount(self);
 		for (i = 0; i < count; ++i) {
 			page_free(self->dp_ramdata.rd_blockv[i].rb_start,
 			          self->dp_ramdata.rd_blockv[i].rb_size);
@@ -278,7 +276,7 @@ upgrade_and_recheck_vm_for_node:
 					oldvec = newvec = new_part->dp_ramdata.rd_blockv;
 					if (oldvec == &new_part->dp_ramdata.rd_block0)
 						oldvec = NULL; /* Second pass */
-					needed_size = (new_part->dp_ramdata.rd_blockc + 1);
+					needed_size = vm_datablock_ramdata_getblockcount(new_part) + 1;
 					avail_size  = kmalloc_usable_size(oldvec) / sizeof(struct vm_ramblock);
 					if (needed_size > avail_size) {
 						/* Must allocate more memory. */
@@ -307,7 +305,8 @@ upgrade_and_recheck_vm_for_node:
 						}
 					}
 					new_part->dp_ramdata.rd_blockv = newvec;
-					newvec += new_part->dp_ramdata.rd_blockc++;
+					new_part->dp_ramdata.rd_blockc = needed_size;
+					newvec += needed_size;
 					newvec->rb_start = alloc_start;
 					newvec->rb_size  = alloc_count;
 				}

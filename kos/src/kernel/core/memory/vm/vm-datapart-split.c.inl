@@ -808,6 +808,7 @@ again_lock_datapart:
 					                                           GFP_PREFLT | GFP_VCBASE);
 					if likely(blocks)
 						self->dp_ramdata.rd_blockv = blocks;
+					assert(i);
 					self->dp_ramdata.rd_blockc = i;
 				}
 			}
