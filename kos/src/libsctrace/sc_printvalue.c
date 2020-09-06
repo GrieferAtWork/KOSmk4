@@ -4185,17 +4185,17 @@ do_struct_timespecx64:
 #ifdef HAVE_SC_REPR_PID_T
 		case SC_REPR_PID_T:
 #if __SIZEOF_PID_T__ == 1
-#define NEED_do_uint8_t
-		goto do_uint8_t;
+#define NEED_do_int8_t
+		goto do_int8_t;
 #elif __SIZEOF_PID_T__ == 2
-#define NEED_do_uint16_t
-		goto do_uint16_t;
+#define NEED_do_int16_t
+		goto do_int16_t;
 #elif __SIZEOF_PID_T__ == 4
-#define NEED_do_uint32_t
-		goto do_uint32_t;
+#define NEED_do_int32_t
+		goto do_int32_t;
 #elif __SIZEOF_PID_T__ == 8
-#define NEED_do_uint64_t
-		goto do_uint64_t;
+#define NEED_do_int64_t
+		goto do_int64_t;
 #else /* __SIZEOF_PID_T__ == ... */
 #error "Unsupported `__SIZEOF_PID_T__'"
 #endif /* __SIZEOF_PID_T__ != ... */
