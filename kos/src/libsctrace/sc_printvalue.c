@@ -64,6 +64,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <linux/kd.h>
 #include <sys/filio.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/poll.h>
@@ -447,6 +448,14 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
      defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64))
 #define NEED_print_sigmask_sigset_and_len
 #endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
+
+#ifdef HAVE_SC_REPR_MMAP_PROT
+#define NEED_print_mmap_prot
+#endif /* HAVE_SC_REPR_MMAP_PROT */
+
+#ifdef HAVE_SC_REPR_MMAP_FLAGS
+#define NEED_print_mmap_flags
+#endif /* HAVE_SC_REPR_MMAP_FLAGS */
 
 
 
@@ -3016,6 +3025,187 @@ err:
 
 
 
+#ifdef NEED_print_mmap_prot
+#if PROT_MASK <= 0xff
+typedef uint8_t mmap_prot_t;
+#elif PROT_MASK <= 0xffff
+typedef uint16_t mmap_prot_t;
+#elif PROT_MASK <= 0xffffffff
+typedef uint32_t mmap_prot_t;
+#else /* PROT_MASK <= ... */
+typedef uint64_t mmap_prot_t;
+#endif /* PROT_MASK > ... */
+struct mmap_prot_flag {
+	mmap_prot_t mpf_flag;    /* The mmap prot flag */
+	char        mpf_name[7]; /* Flag name. */
+};
+
+PRIVATE struct mmap_prot_flag const mmap_prot_flags[] = {
+#if defined(PROT_NONE) && PROT_NONE != 0
+	{ PROT_NONE,  "NONE" },
+#endif /* PROT_NONE != 0 */
+#if defined(PROT_EXEC) && PROT_EXEC != 0
+	{ PROT_EXEC,  "EXEC" },
+#endif /* PROT_EXEC != 0 */
+#if defined(PROT_WRITE) && PROT_WRITE != 0
+	{ PROT_WRITE, "WRITE" },
+#endif /* PROT_WRITE != 0 */
+#if defined(PROT_READ) && PROT_READ != 0
+	{ PROT_READ,  "READ" },
+#endif /* PROT_READ != 0 */
+#if defined(PROT_SEM) && PROT_SEM != 0
+	{ PROT_SEM,   "SEM" },
+#endif /* PROT_SEM != 0 */
+};
+
+PRIVATE ssize_t CC
+print_mmap_prot(pformatprinter printer, void *arg,
+                syscall_ulong_t prot) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(mmap_prot_flags); ++i) {
+		if (!(prot & mmap_prot_flags[i].mpf_flag))
+			continue;
+		PRINTF("%sPROT_%s",
+		       is_first ? "" : PIPESTR,
+		       mmap_prot_flags[i].mpf_name);
+		prot &= ~mmap_prot_flags[i].mpf_flag;
+		is_first = false;
+	}
+#if defined(PROT_NONE) && PROT_NONE == 0
+	if (is_first) {
+		PRINT("PROT_NONE");
+		is_first = false;
+	}
+#endif /* PROT_NONE && PROT_NONE == 0 */
+	if unlikely(prot) {
+		/* Print unknown flags. */
+#if !defined(PROT_NONE) || PROT_NONE != 0
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, prot);
+#else /* !PROT_NONE || PROT_NONE != 0 */
+		PRINTF(PIPESTR_S "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__), prot);
+#endif /* PROT_NONE && PROT_NONE == 0 */
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_mmap_prot */
+
+
+
+
+
+#ifdef NEED_print_mmap_flags
+struct mmap_flag {
+	uint32_t mf_flag;     /* The mmap prot flag */
+	char     mf_name[16]; /* Flag name. */
+};
+
+PRIVATE struct mmap_flag const mmap_flags[] = {
+#ifdef MAP_SHARED
+	{ MAP_SHARED,        "SHARED" },
+#endif /* MAP_SHARED */
+#ifdef MAP_PRIVATE
+	{ MAP_PRIVATE,       "PRIVATE" },
+#endif /* MAP_PRIVATE */
+#ifdef MAP_FIXED
+	{ MAP_FIXED,         "FIXED" },
+#endif /* MAP_FIXED */
+#ifdef MAP_TYPE
+	{ MAP_TYPE,          "TYPE" },
+#endif /* MAP_TYPE */
+#ifdef MAP_FILE
+	{ MAP_FILE,          "FILE" },
+#endif /* MAP_FILE */
+#ifdef MAP_ANON
+	{ MAP_ANON,          "ANON" },
+#endif /* MAP_ANON */
+#ifdef MAP_32BIT
+	{ MAP_32BIT,         "32BIT" },
+#endif /* MAP_32BIT */
+#ifdef MAP_GROWSDOWN
+	{ MAP_GROWSDOWN,     "GROWSDOWN" },
+#endif /* MAP_GROWSDOWN */
+#ifdef MAP_GROWSUP
+	{ MAP_GROWSUP,       "GROWSUP" },
+#endif /* MAP_GROWSUP */
+#ifdef MAP_DENYWRITE
+	{ MAP_DENYWRITE,     "DENYWRITE" },
+#endif /* MAP_DENYWRITE */
+#ifdef MAP_EXECUTABLE
+	{ MAP_EXECUTABLE,    "EXECUTABLE" },
+#endif /* MAP_EXECUTABLE */
+#ifdef MAP_LOCKED
+	{ MAP_LOCKED,        "LOCKED" },
+#endif /* MAP_LOCKED */
+#ifdef MAP_NORESERVE
+	{ MAP_NORESERVE,     "NORESERVE" },
+#endif /* MAP_NORESERVE */
+#ifdef MAP_POPULATE
+	{ MAP_POPULATE,      "POPULATE" },
+#endif /* MAP_POPULATE */
+#ifdef MAP_NONBLOCK
+	{ MAP_NONBLOCK,      "NONBLOCK" },
+#endif /* MAP_NONBLOCK */
+#ifdef MAP_STACK
+	{ MAP_STACK,         "STACK" },
+#endif /* MAP_STACK */
+#ifdef MAP_SYNC
+	{ MAP_SYNC,          "SYNC" },
+#endif /* MAP_SYNC */
+#ifdef MAP_HUGETLB
+	{ MAP_HUGETLB,       "HUGETLB" },
+#endif /* MAP_HUGETLB */
+#ifdef MAP_UNINITIALIZED
+	{ MAP_UNINITIALIZED, "UNINITIALIZED" },
+#endif /* MAP_UNINITIALIZED */
+};
+
+PRIVATE ssize_t CC
+print_mmap_flags(pformatprinter printer, void *arg,
+                 syscall_ulong_t flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(mmap_flags); ++i) {
+		if (!(flags & mmap_flags[i].mf_flag))
+			continue;
+		PRINTF("%sMAP_%s",
+		       is_first ? "" : PIPESTR,
+		       mmap_flags[i].mf_name);
+		flags &= ~mmap_flags[i].mf_flag;
+		is_first = false;
+	}
+#ifdef MAP_HUGE_MASK
+	if ((flags & ((syscall_ulong_t)MAP_HUGE_MASK << MAP_HUGE_SHIFT)) != 0) {
+		syscall_ulong_t hv;
+		hv = (flags >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK;
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__)
+		       SYNSPACE "<<" SYNSPACE "MAP_HUGE_SHIFT",
+		       is_first ? "" : PIPESTR, hv);
+		is_first = false;
+		flags &= ~((syscall_ulong_t)MAP_HUGE_MASK << MAP_HUGE_SHIFT);
+	}
+#endif /* MAP_HUGE_MASK */
+	if unlikely(flags) {
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_mmap_flags */
+
+
+
+
+
 
 
 
@@ -3068,8 +3258,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_MAPLIBRARY_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MEMFD_CREATE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MLOCKALL_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_MMAP_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_MMAP_PROT 1
 	// TODO: #define HAVE_SC_REPR_MOUNT_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_MREMAP_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_REBOOT_HOW 1
@@ -3103,8 +3291,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_ITIMERVALX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_LFUTEXEXPRX64_VECTOR 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_LIBRARY_LISTDEF32 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_LIBRARY_LISTDEF64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MMSGHDRX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MMSGHDRX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_MQ_ATTR 1
@@ -3147,6 +3333,20 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#ifdef HAVE_SC_REPR_MMAP_PROT
+	case SC_REPR_MMAP_PROT:
+		result = print_mmap_prot(printer, arg,
+		                         (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_MMAP_PROT */
+
+#ifdef HAVE_SC_REPR_MMAP_FLAGS
+	case SC_REPR_MMAP_FLAGS:
+		result = print_mmap_flags(printer, arg,
+		                          (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_MMAP_FLAGS */
 
 #ifdef HAVE_SC_REPR_STRUCT_SIGSET
 	case SC_REPR_STRUCT_SIGSET: {
