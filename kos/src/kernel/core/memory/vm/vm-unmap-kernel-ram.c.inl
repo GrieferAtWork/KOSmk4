@@ -186,7 +186,9 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 				part_free = self->dp_ramdata.rd_blockv[i].rb_size;
 				if (part_free > num_missing)
 					part_free = num_missing;
-				page_ffree(self->dp_ramdata.rd_blockv[i].rb_start, part_free, is_zero);
+				/* Free leading pages from this ram-block */
+				page_ffree(self->dp_ramdata.rd_blockv[i].rb_start,
+				           part_free, is_zero);
 				self->dp_ramdata.rd_blockv[i].rb_start += part_free;
 				self->dp_ramdata.rd_blockv[i].rb_size -= part_free;
 				if (part_free >= num_missing)
@@ -274,7 +276,7 @@ NOTHROW(KCALL vm_datapart_truncate_trailing_ramblocks)(struct vm_datapart *__res
 			num_keep -= part_free;
 			continue;
 		}
-		/* Free the unused portion from this specific part. */
+		/* Free the unused portion from this specific block. */
 		page_ffree(self->dp_ramdata.rd_blockv[i].rb_start + num_keep,
 		           part_free - num_keep, is_zero);
 		self->dp_ramdata.rd_blockc            = i;
@@ -503,8 +505,8 @@ again:
 	        "Data parts must be allocated with offset=0 to be usable as RAM\n"
 	        "part->dp_tree.a_vmin = %I64u(%#I64x)\n"
 	        "part->dp_tree.a_vmax = %I64u(%#I64x)\n",
-	        part->dp_tree.a_vmin, part->dp_tree.a_vmin,
-	        part->dp_tree.a_vmax, part->dp_tree.a_vmax);
+	        (u64)part->dp_tree.a_vmin, (u64)part->dp_tree.a_vmin,
+	        (u64)part->dp_tree.a_vmax, (u64)part->dp_tree.a_vmax);
 
 	if (unmap_max >= vm_node_getmaxpageid(node)) {
 		/* We can either unmap the entire node, or we can just truncate it. */
@@ -683,7 +685,7 @@ page_properties_updated:
 					 * the last `sizeof_trailing' pages of the part.
 					 * If it's more than 1, we must allocate the associated vector
 					 * first, so we can safely handle that allocation failing by
-					 * jump to `restore_node_after_corepair_failure' */
+					 * jumping to `restore_node_after_corepair_failure' */
 					size_t i, req_block_trailing = 1;
 					size_t covered_pages;
 					i             = part->dp_ramdata.rd_blockc - 1;
@@ -722,7 +724,7 @@ page_properties_updated:
 							goto restore_node_after_corepair_failure;
 						corepair.cp_part->dp_ramdata.rd_blockc = req_block_trailing;
 						corepair.cp_part->dp_ramdata.rd_blockv = hi_blocks;
-						num_pages_from_first                   = sizeof_trailing - (covered_pages - part->dp_ramdata.rd_blockv[i].rb_size);
+						num_pages_from_first = sizeof_trailing - (covered_pages - part->dp_ramdata.rd_blockv[i].rb_size);
 						/* Split the first block. */
 						hi_blocks[0].rb_size  = num_pages_from_first;
 						hi_blocks[0].rb_start = part->dp_ramdata.rd_blockv[i].rb_start;
@@ -800,7 +802,7 @@ page_properties_updated:
 							goto restore_node_after_corepair_failure;
 						corepair.cp_part->dp_swpdata.sd_blockc = req_block_trailing;
 						corepair.cp_part->dp_swpdata.sd_blockv = hi_blocks;
-						num_pages_from_first                   = sizeof_trailing - (covered_pages - part->dp_swpdata.sd_blockv[i].sb_size);
+						num_pages_from_first = sizeof_trailing - (covered_pages - part->dp_swpdata.sd_blockv[i].sb_size);
 						/* Split the first block. */
 						hi_blocks[0].sb_size  = num_pages_from_first;
 						hi_blocks[0].sb_start = part->dp_swpdata.sd_blockv[i].sb_start;

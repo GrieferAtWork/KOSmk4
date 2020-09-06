@@ -30,29 +30,29 @@
 DECL_BEGIN
 
 #ifdef PART_RAM
-#define PART_DP_DATA           dp_ramdata
-#define PART_RD_BLOCKV         rd_blockv
-#define PART_RD_BLOCK0         rd_block0
-#define PART_RD_BLOCKC         rd_blockc
-#define PART_RB_START          rb_start
-#define PART_RB_SIZE           rb_size
-#define PART_PAGEPTR_T         pageptr_t
-#define PART_PAGE_MALLOC_PART  page_malloc_part
-#define PART_PAGE_CCFREE       page_ccfree
-#define PART_STRUCT_VM_BLOCK   struct vm_ramblock
-#define IE(ram,swap)           ram
+#define PART_DP_DATA          dp_ramdata
+#define PART_RD_BLOCKV        rd_blockv
+#define PART_RD_BLOCK0        rd_block0
+#define PART_RD_BLOCKC        rd_blockc
+#define PART_RB_START         rb_start
+#define PART_RB_SIZE          rb_size
+#define PART_PAGEPTR_T        pageptr_t
+#define PART_PAGE_MALLOC_PART page_malloc_part
+#define PART_PAGE_CCFREE      page_ccfree
+#define PART_STRUCT_VM_BLOCK  struct vm_ramblock
+#define IE(ram, swap)         ram
 #else /* PART_RAM */
-#define PART_DP_DATA           dp_swpdata
-#define PART_RD_BLOCKV         sd_blockv
-#define PART_RD_BLOCK0         sd_block0
-#define PART_RD_BLOCKC         sd_blockc
-#define PART_RB_START          sb_start
-#define PART_RB_SIZE           sb_size
-#define PART_PAGEPTR_T         swapptr_t
-#define PART_PAGE_MALLOC_PART  swap_malloc_part
-#define PART_PAGE_CCFREE       swap_free
-#define PART_STRUCT_VM_BLOCK   struct vm_swpblock
-#define IE(ram,swap)           swap
+#define PART_DP_DATA          dp_swpdata
+#define PART_RD_BLOCKV        sd_blockv
+#define PART_RD_BLOCK0        sd_block0
+#define PART_RD_BLOCKC        sd_blockc
+#define PART_RB_START         sb_start
+#define PART_RB_SIZE          sb_size
+#define PART_PAGEPTR_T        swapptr_t
+#define PART_PAGE_MALLOC_PART swap_malloc_part
+#define PART_PAGE_CCFREE      swap_free
+#define PART_STRUCT_VM_BLOCK  struct vm_swpblock
+#define IE(ram, swap)         swap
 #endif /* !PART_RAM */
 
 
@@ -449,7 +449,8 @@ NOTHROW(KCALL vm_datapart_freeswap)(struct vm_datapart *__restrict self)
 		size_t blockc;
 		blockc = self->PART_DP_DATA.PART_RD_BLOCKC;
 		blocks = self->PART_DP_DATA.PART_RD_BLOCKV;
-		while (blockc--) {
+		while (blockc) {
+			--blockc;
 			FREE_PART(blocks[blockc].PART_RB_START,
 			          blocks[blockc].PART_RB_SIZE);
 		}

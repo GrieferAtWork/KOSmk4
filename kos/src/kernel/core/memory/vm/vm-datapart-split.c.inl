@@ -420,22 +420,31 @@ again_lock_datapart:
 					struct vm_node **new_node_vector;
 					vm_node_alloc   = vm_node_reqcount;
 					new_node_vector = vm_node_vector == vm_node_buffer
-					                  ? (struct vm_node **)kmalloc_nx(vm_node_reqcount * sizeof(struct vm_node *), GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT | GFP_VCBASE)
-					                  : (struct vm_node **)krealloc_nx(vm_node_vector, vm_node_reqcount * sizeof(struct vm_node *), GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
+					                  ? (struct vm_node **)kmalloc_nx(vm_node_reqcount * sizeof(struct vm_node *),
+					                                                  GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT | GFP_VCBASE)
+					                  : (struct vm_node **)krealloc_nx(vm_node_vector,
+					                                                   vm_node_reqcount * sizeof(struct vm_node *),
+					                                                   GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 					if (!new_node_vector) {
 						vm_set_lockendwrite_all(&vms);
 						sync_endwrite(self);
 						vm_set_clear(&vms);
 #ifdef SPLIT_NX
 						new_node_vector = vm_node_vector == vm_node_buffer
-						                  ? (struct vm_node **)kmalloc_nx(vm_node_reqcount * sizeof(struct vm_node *), GFP_LOCKED | GFP_PREFLT | GFP_VCBASE)
-						                  : (struct vm_node **)krealloc_nx(vm_node_vector, vm_node_reqcount * sizeof(struct vm_node *), GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
+						                  ? (struct vm_node **)kmalloc_nx(vm_node_reqcount * sizeof(struct vm_node *),
+						                                                  GFP_LOCKED | GFP_PREFLT | GFP_VCBASE)
+						                  : (struct vm_node **)krealloc_nx(vm_node_vector,
+						                                                   vm_node_reqcount * sizeof(struct vm_node *),
+						                                                   GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 						if unlikely(!new_node_vector)
 							goto err;
 #else /* SPLIT_NX */
 						new_node_vector = vm_node_vector == vm_node_buffer
-						                  ? (struct vm_node **)kmalloc(vm_node_reqcount * sizeof(struct vm_node *), GFP_LOCKED | GFP_PREFLT | GFP_VCBASE)
-						                  : (struct vm_node **)krealloc(vm_node_vector, vm_node_reqcount * sizeof(struct vm_node *), GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
+						                  ? (struct vm_node **)kmalloc(vm_node_reqcount * sizeof(struct vm_node *),
+						                                               GFP_LOCKED | GFP_PREFLT | GFP_VCBASE)
+						                  : (struct vm_node **)krealloc(vm_node_vector,
+						                                                vm_node_reqcount * sizeof(struct vm_node *),
+						                                                GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 #endif /* !SPLIT_NX */
 						if (vm_node_vector == vm_node_buffer)
 							memcpy(new_node_vector, vm_node_buffer, vm_node_count, sizeof(struct vm_node *));
@@ -773,7 +782,13 @@ again_lock_datapart:
 				        "result->dp_ramdata.rd_blockv[0].rb_size  = %Iup\n"
 				        "vpage_offset                             = %Iu\n"
 				        "total                                    = %Iu\n",
-				        (u64)(blocks[i].rb_start + blocks[i].rb_size), (u64)(result->dp_ramdata.rd_blockv[0].rb_start), (u64)blocks[i].rb_start, (size_t)blocks[i].rb_size, (u64)result->dp_ramdata.rd_blockv[0].rb_start, (size_t)result->dp_ramdata.rd_blockv[0].rb_size, vpage_offset, total);
+				        (u64)(blocks[i].rb_start + blocks[i].rb_size),
+				        (u64)result->dp_ramdata.rd_blockv[0].rb_start,
+				        (u64)blocks[i].rb_start,
+				        (size_t)blocks[i].rb_size,
+				        (u64)result->dp_ramdata.rd_blockv[0].rb_start,
+				        (size_t)result->dp_ramdata.rd_blockv[0].rb_size,
+				        vpage_offset, total);
 				/* Figure out how many blocks the lower part should be left with.
 				 *  -> If the split happened somewhere into the lower part's block,
 				 *     the first half of that block must still be kept. - Otherwise,
@@ -1010,7 +1025,8 @@ again_incref_futexes:
 		/* Remove all affected  */
 		while ((transfer_futex = vm_futextree_rremove_at_not_destroyed(&lofc->fc_tree,
 		                                                               lofc_maxaddr + 1, (uintptr_t)-1,
-		                                                               lofc->fc_semi0, lofc->fc_leve0)) != NULL) {
+		                                                               lofc->fc_semi0,
+		                                                               lofc->fc_leve0)) != NULL) {
 			assert(transfer_futex->f_tree.a_vaddr > lofc_maxaddr);
 			transfer_futex->f_tree.a_vaddr -= lofc_maxaddr + 1;
 			vm_futextree_insert_at(&hifc->fc_tree, transfer_futex,

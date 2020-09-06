@@ -66,7 +66,6 @@
 #define _PATH_DEVDB    "/var/run/dev.db"
 #endif /* __linux__ */
 
-#define _PATH_DEVNULL "/dev/null"
 #define _PATH_BSHELL  "/bin/sh"
 
 #define _PATH_DEV     "/dev/"

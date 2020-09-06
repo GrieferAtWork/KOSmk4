@@ -283,8 +283,10 @@ upgrade_and_recheck_vm_for_node:
 					if (needed_size > avail_size) {
 						/* Must allocate more memory. */
 						newvec = (struct vm_ramblock *)krealloc_nx(oldvec,
-						                                           needed_size * sizeof(struct vm_ramblock),
-						                                           GFP_LOCKED | GFP_ATOMIC | GFP_VCBASE);
+						                                           needed_size *
+						                                           sizeof(struct vm_ramblock),
+						                                           GFP_LOCKED | GFP_ATOMIC |
+						                                           GFP_VCBASE);
 						if unlikely(!newvec) {
 							/* Must allocate more heap memory without holding a lock to `part' */
 							size_t new_part_num_vpages;

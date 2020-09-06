@@ -241,7 +241,8 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 						if unlikely(!new_blocks) {
 err_blocks:
 							/* Free all blocks that had already been allocated. */
-							while (blockc--) {
+							while (blockc) {
+								--blockc;
 								page_ccfree(blocks[blockc].rb_start,
 								            blocks[blockc].rb_size);
 							}
@@ -303,7 +304,8 @@ err_blocks:
 								                                            (flags & GFP_INHERIT));
 							} EXCEPT {
 								/* Free all blocks that had already been allocated. */
-								while (blockc--) {
+								while (blockc) {
+									--blockc;
 									page_ccfree(blocks[blockc].rb_start,
 									            blocks[blockc].rb_size);
 								}
@@ -319,7 +321,8 @@ err_blocks:
 					                               block0_size,
 					                               &new_block_size);
 					if unlikely(block0_addr == PAGEPTR_INVALID) {
-						while (blockc--) {
+						while (blockc) {
+							--blockc;
 							page_ccfree(blocks[blockc].rb_start,
 							            blocks[blockc].rb_size);
 						}
