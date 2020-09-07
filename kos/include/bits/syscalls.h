@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf226d1ab */
+/* HASH CRC-32:0xabff8390 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,9 @@
 #define SYS_vhangup                __NR_vhangup                /* errno_t vhangup(void) */
 #define SYS_pipe2                  __NR_pipe2                  /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
 #define SYS_quotactl               __NR_quotactl               /* errno_t quotactl(int TODO_PROTOTYPE) */
-#define SYS_getdents64             __NR_getdents64             /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define SYS_getdents64             __NR_getdents64             /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -649,7 +651,9 @@
 #define SYS_time                   __NR_time                   /* time32_t time(time32_t *timer) */
 #define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define SYS_creat                  __NR_creat                  /* fd_t creat(char const *filename, mode_t mode) */
-#define SYS_getdents               __NR_getdents               /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define SYS_getdents               __NR_getdents               /* ssize_t getdents(fd_t fd, struct linux_dirent *buf, size_t buflen) */
 #define SYS_futimesat              __NR_futimesat              /* errno_t futimesat(fd_t dirfd, char const *filename, struct timeval const[2] times) */
 #define SYS_select                 __NR_select                 /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval *timeout) */
 #define SYS_poll                   __NR_poll                   /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */

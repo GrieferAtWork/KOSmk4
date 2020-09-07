@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x912f3f10 */
+/* HASH CRC-32:0x11a0bd6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,8 +166,13 @@
 #define __NR32_swapon                  0x57                   /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
 /* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
 #define __NR32_reboot                  0x58                   /* errno_t reboot(syscall_ulong_t how) */
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-#define __NR32_readdir                 0x59                   /* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+#define __NR32_readdir                 0x59                   /* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
@@ -240,7 +245,9 @@
 #define __NR32_setfsuid                0x8a                   /* errno_t setfsuid(uint16_t uid) */
 #define __NR32_setfsgid                0x8b                   /* errno_t setfsgid(uint16_t gid) */
 #define __NR32__llseek                 0x8c                   /* errno_t _llseek(fd_t fd, int64_t offset, uint64_t *result, syscall_ulong_t whence) */
-#define __NR32_getdents                0x8d                   /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define __NR32_getdents                0x8d                   /* ssize_t getdents(fd_t fd, struct linux_direntx32 *buf, size_t buflen) */
 #define __NR32__newselect              0x8e                   /* ssize_t _newselect(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 #define __NR32_flock                   0x8f                   /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 #define __NR32_msync                   0x90                   /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
@@ -374,7 +381,9 @@
 #define __NR32_pivot_root              0xd9                   /* errno_t pivot_root(int TODO_PROTOTYPE) */
 #define __NR32_mincore                 0xda                   /* errno_t mincore(void *start, size_t len, uint8_t *vec) */
 #define __NR32_madvise                 0xdb                   /* errno_t madvise(void *addr, size_t len, syscall_ulong_t advice) */
-#define __NR32_getdents64              0xdc                   /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define __NR32_getdents64              0xdc                   /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 #define __NR32_fcntl64                 0xdd                   /* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
 #define __NR32_gettid                  0xe0                   /* pid_t gettid(void) */
 #define __NR32_readahead               0xe1                   /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
@@ -1773,6 +1782,7 @@
 #define __NR32CP_symlink                 1
 #define __NR32CP_linux_oldlstat          1
 #define __NR32CP_readlink                1
+#define __NR32CP_readdir                 1
 #define __NR32CP_fchmod                  1
 #define __NR32CP_fchown                  1
 #define __NR32CP_syslog                  1
@@ -2013,7 +2023,7 @@
 #define __NR32RC_uselib                  1
 #define __NR32RC_swapon                  2
 #define __NR32RC_reboot                  1
-#define __NR32RC_readdir                 3
+#define __NR32RC_readdir                 2
 #define __NR32RC_mmap                    6
 #define __NR32RC_munmap                  2
 #define __NR32RC_truncate                2

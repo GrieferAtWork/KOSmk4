@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5729cba8 */
+/* HASH CRC-32:0x2ae024f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,8 +155,7 @@
 #define __NRAN1_swapon                  swapflags
 #define __NRAN0_reboot                  how
 #define __NRAN0_readdir                 fd
-#define __NRAN1_readdir                 dirp
-#define __NRAN2_readdir                 count
+#define __NRAN1_readdir                 buf
 #define __NRAN0_mmap                    addr
 #define __NRAN1_mmap                    len
 #define __NRAN2_mmap                    prot
@@ -259,8 +258,8 @@
 #define __NRAN2__llseek                 result
 #define __NRAN3__llseek                 whence
 #define __NRAN0_getdents                fd
-#define __NRAN1_getdents                dirp
-#define __NRAN2_getdents                count
+#define __NRAN1_getdents                buf
+#define __NRAN2_getdents                buflen
 #define __NRAN0__newselect              nfds
 #define __NRAN1__newselect              readfds
 #define __NRAN2__newselect              writefds
@@ -429,8 +428,8 @@
 #define __NRAN1_madvise                 len
 #define __NRAN2_madvise                 advice
 #define __NRAN0_getdents64              fd
-#define __NRAN1_getdents64              dirp
-#define __NRAN2_getdents64              count
+#define __NRAN1_getdents64              buf
+#define __NRAN2_getdents64              buflen
 #define __NRAN0_fcntl64                 fd
 #define __NRAN1_fcntl64                 command
 #define __NRAN2_fcntl64                 arg
@@ -1357,9 +1356,8 @@
 #define __NRATR0_reboot                  SC_REPR_REBOOT_HOW                                                   /* how */ 
 #define __NRRTR_reboot                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_readdir                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_readdir                 SC_REPR_POINTER                                                      /* dirp */ 
-#define __NRATR2_readdir                 SC_REPR_SIZE_T                                                       /* count */ 
-#define __NRRTR_readdir                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR1_readdir                 SC_REPR_POINTER                                                      /* buf */ 
+#define __NRRTR_readdir                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_mmap                    SC_REPR_POINTER                                                      /* addr */ 
 #define __NRATR1_mmap                    SC_REPR_SIZE_T                                                       /* len */ 
 #define __NRATR2_mmap                    SC_REPR_MMAP_PROT                                                    /* prot */ 
@@ -1516,8 +1514,8 @@
 #define __NRATR3__llseek                 SC_REPR_SEEK_WHENCE                                                  /* whence */ 
 #define __NRRTR__llseek                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getdents                SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_getdents                SC_REPR_POINTER                                                      /* dirp */ 
-#define __NRATR2_getdents                SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR1_getdents                SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_getdents                SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NRRTR_getdents                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0__newselect              SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NRATR1__newselect              SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
@@ -1777,8 +1775,8 @@
 #define __NRATR2_madvise                 SC_REPR_SYSCALL_ULONG_T                                              /* advice */ 
 #define __NRRTR_madvise                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getdents64              SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_getdents64              SC_REPR_POINTER                                                      /* dirp */ 
-#define __NRATR2_getdents64              SC_REPR_SIZE_T                                                       /* count */ 
+#define __NRATR1_getdents64              SC_REPR_POINTER                                                      /* buf */ 
+#define __NRATR2_getdents64              SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NRRTR_getdents64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_fcntl64                 SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_fcntl64                 SC_REPR_FCNTL64_COMMAND                                              /* command */ 

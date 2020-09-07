@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58e1396e */
+/* HASH CRC-32:0xf29c2bd4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2038,21 +2038,31 @@ INTERN_FUNCTION(libc_sys_Xreboot)
 END(libc_sys_Xreboot)
 DEFINE_PUBLIC_ALIAS(sys_Xreboot, libc_sys_Xreboot)
 
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-/* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+/* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 .section .text.crt.syscall.readdir
 INTERN_FUNCTION(libc_sys_readdir)
 	movl   $(0x59), %eax
-	jmp    libc_x86_exec_syscall3
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_readdir)
 DEFINE_PUBLIC_ALIAS(sys_readdir, libc_sys_readdir)
 
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-/* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+/* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 .section .text.crt.syscall.Xreaddir
 INTERN_FUNCTION(libc_sys_Xreaddir)
 	movl   $(0x59), %eax
-	jmp    libc_x86_exec_Xsyscall3
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xreaddir)
 DEFINE_PUBLIC_ALIAS(sys_Xreaddir, libc_sys_Xreaddir)
 
@@ -2900,7 +2910,9 @@ INTERN_FUNCTION(libc_sys_X_llseek)
 END(libc_sys_X_llseek)
 DEFINE_PUBLIC_ALIAS(sys_X_llseek, libc_sys_X_llseek)
 
-/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents(fd_t fd, struct linux_direntx32 *buf, size_t buflen) */
 .section .text.crt.syscall.getdents
 INTERN_FUNCTION(libc_sys_getdents)
 	movl   $(0x8d), %eax
@@ -2908,7 +2920,9 @@ INTERN_FUNCTION(libc_sys_getdents)
 END(libc_sys_getdents)
 DEFINE_PUBLIC_ALIAS(sys_getdents, libc_sys_getdents)
 
-/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents(fd_t fd, struct linux_direntx32 *buf, size_t buflen) */
 .section .text.crt.syscall.Xgetdents
 INTERN_FUNCTION(libc_sys_Xgetdents)
 	movl   $(0x8d), %eax
@@ -4260,7 +4274,9 @@ INTERN_FUNCTION(libc_sys_Xmadvise)
 END(libc_sys_Xmadvise)
 DEFINE_PUBLIC_ALIAS(sys_Xmadvise, libc_sys_Xmadvise)
 
-/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 .section .text.crt.syscall.getdents64
 INTERN_FUNCTION(libc_sys_getdents64)
 	movl   $(0xdc), %eax
@@ -4268,7 +4284,9 @@ INTERN_FUNCTION(libc_sys_getdents64)
 END(libc_sys_getdents64)
 DEFINE_PUBLIC_ALIAS(sys_getdents64, libc_sys_getdents64)
 
-/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 .section .text.crt.syscall.Xgetdents64
 INTERN_FUNCTION(libc_sys_Xgetdents64)
 	movl   $(0xdc), %eax

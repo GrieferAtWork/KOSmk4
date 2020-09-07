@@ -54,6 +54,7 @@ struct dirent {
 	;
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	__u_d_ino;
+#define __DIRENT_HAVE_U_D_INO 1
 #ifdef _DIRENT_HAVE_D_FILENO
 #define d_fileno     __u_d_ino.d_fileno
 #endif /* _DIRENT_HAVE_D_FILENO */
@@ -73,6 +74,7 @@ struct dirent {
 	;
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	__u_d_ino;
+#define __DIRENT_HAVE_U_D_INO 1
 #define d_fileno     __u_d_ino.d_fileno
 #define d_ino        __u_d_ino.d_ino
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */

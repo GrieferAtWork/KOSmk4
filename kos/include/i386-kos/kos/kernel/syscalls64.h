@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c8702ba */
+/* HASH CRC-32:0x62b3021d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -425,7 +425,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_GET_EXCEPTION_HANDLER   1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETCPU                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETDENTS                1
-#define __ARCH_WANT_COMPAT_SYSCALL_GETDENTS64              1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETGROUPS               1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETITIMER               1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETITIMER64             1

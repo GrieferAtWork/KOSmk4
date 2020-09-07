@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb24243e */
+/* HASH CRC-32:0xd18afe09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,8 @@
 #include <bits/timeval.h>
 #include <bits/types.h>
 #include <bits/utimbuf.h>
+#include <kos/compat/linux-dirent.h>
+#include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
@@ -405,10 +407,14 @@ __CDECLARE_SC(,__errno_t,getcpu,(__uint32_t *__cpu, __uint32_t *__node, struct g
 __CDECLARE_SC(,__ssize_t,getcwd,(char *__buf, __size_t __size),(__buf,__size))
 #endif /* __CRT_HAVE_SC(getcwd) */
 #if __CRT_HAVE_SC(getdents)
-__CDECLARE_SC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_SC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(getdents) */
 #if __CRT_HAVE_SC(getdents64)
-__CDECLARE_SC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_SC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(getdents64) */
 #if __CRT_HAVE_SC(getegid)
 __CDECLARE_SC(,__gid_t,getegid,(void),())
@@ -1714,10 +1720,14 @@ __CDECLARE_XSC(,__errno_t,getcpu,(__uint32_t *__cpu, __uint32_t *__node, struct 
 __CDECLARE_XSC(,__ssize_t,getcwd,(char *__buf, __size_t __size),(__buf,__size))
 #endif /* __CRT_HAVE_XSC(getcwd) */
 #if __CRT_HAVE_XSC(getdents)
-__CDECLARE_XSC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_XSC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(getdents) */
 #if __CRT_HAVE_XSC(getdents64)
-__CDECLARE_XSC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_XSC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(getdents64) */
 #if __CRT_HAVE_XSC(getegid)
 __CDECLARE_XSC(,__gid_t,getegid,(void),())

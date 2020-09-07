@@ -462,6 +462,10 @@ incdir("", "../../include");
 #include <compat/kos/bits/except-handler.h>
 #include <compat/kos/bits/futex-expr.h>
 #include <compat/kos/bits/futex.h>
+#include <compat/kos/compat/linux-dirent.h>
+#include <compat/kos/compat/linux-olddirent.h>
+#include <compat/kos/compat/linux-oldselect.h>
+#include <compat/kos/compat/linux-stat.h>
 #include <compat/kos/except-handler.h>
 #include <compat/kos/exec/asm/elf.h>
 #include <compat/kos/exec/bits/elf.h>
@@ -697,6 +701,11 @@ incdir("", "../../include");
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
 #include <kos/capability.h>
+#include <kos/compat/linux-dirent.h>
+#include <kos/compat/linux-dirent64.h>
+#include <kos/compat/linux-olddirent.h>
+#include <kos/compat/linux-oldselect.h>
+#include <kos/compat/linux-stat.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
 #include <kos/except/fs.h>
@@ -1521,6 +1530,12 @@ incdir("", "../../include");
 #include <strings.h>
 #include <stropts.h>
 #include <struct.h>
+#include <sys/_intsup.h>
+#include <sys/_pthreadtypes.h>
+#include <sys/_sigset.h>
+#include <sys/_stdint.h>
+#include <sys/_timespec.h>
+#include <sys/_timeval.h>
 #include <sys/_types.h>
 #include <sys/acct.h>
 #include <sys/auxv.h>
@@ -1562,6 +1577,7 @@ incdir("", "../../include");
 #include <sys/random.h>
 #include <sys/reboot.h>
 #include <sys/resource.h>
+#include <sys/sched.h>
 #include <sys/select.h>
 #include <sys/sem.h>
 #include <sys/sendfile.h>

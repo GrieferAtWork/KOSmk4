@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a8ac6c9 */
+/* HASH CRC-32:0x6286a656 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2406,7 +2406,9 @@ INTERN_FUNCTION(libc_sys_Xftruncate)
 END(libc_sys_Xftruncate)
 DEFINE_PUBLIC_ALIAS(sys_Xftruncate, libc_sys_Xftruncate)
 
-/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents(fd_t fd, struct linux_direntx64 *buf, size_t buflen) */
 .section .text.crt.syscall.getdents
 INTERN_FUNCTION(libc_sys_getdents)
 	.cfi_startproc
@@ -2418,7 +2420,9 @@ INTERN_FUNCTION(libc_sys_getdents)
 END(libc_sys_getdents)
 DEFINE_PUBLIC_ALIAS(sys_getdents, libc_sys_getdents)
 
-/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents(fd_t fd, struct linux_direntx64 *buf, size_t buflen) */
 .section .text.crt.syscall.Xgetdents
 INTERN_FUNCTION(libc_sys_Xgetdents)
 	.cfi_startproc
@@ -5804,7 +5808,9 @@ INTERN_FUNCTION(libc_sys_Xremap_file_pages)
 END(libc_sys_Xremap_file_pages)
 DEFINE_PUBLIC_ALIAS(sys_Xremap_file_pages, libc_sys_Xremap_file_pages)
 
-/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 .section .text.crt.syscall.getdents64
 INTERN_FUNCTION(libc_sys_getdents64)
 	.cfi_startproc
@@ -5816,7 +5822,9 @@ INTERN_FUNCTION(libc_sys_getdents64)
 END(libc_sys_getdents64)
 DEFINE_PUBLIC_ALIAS(sys_getdents64, libc_sys_getdents64)
 
-/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 .section .text.crt.syscall.Xgetdents64
 INTERN_FUNCTION(libc_sys_Xgetdents64)
 	.cfi_startproc

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9b749d4 */
+/* HASH CRC-32:0x3c8bf530 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,6 +87,7 @@
 #define __NR3264COMPAT_get_robust_list        1(get_robust_list)
 #define __NR3264COMPAT_get_thread_area        1(get_thread_area)
 #define __NR3264COMPAT_getcwd                 1(getcwd)
+#define __NR3264COMPAT_getdents64             1(getdents64)
 #define __NR3264COMPAT_getdrives              1(getdrives)
 #define __NR3264COMPAT_getegid                2(getegid,getegid32)
 #define __NR3264COMPAT_geteuid                2(geteuid,geteuid32)

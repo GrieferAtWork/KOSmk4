@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34ea40d8 */
+/* HASH CRC-32:0x2a890647 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -357,7 +357,9 @@
 #define SYS_fdatasync              __NR_fdatasync              /* errno_t fdatasync(fd_t fd) */
 #define SYS_truncate               __NR_truncate               /* errno_t truncate(char const *filename, syscall_ulong_t length) */
 #define SYS_ftruncate              __NR_ftruncate              /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
-#define SYS_getdents               __NR_getdents               /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define SYS_getdents               __NR_getdents               /* ssize_t getdents(fd_t fd, struct linux_direntx64 *buf, size_t buflen) */
 #define SYS_getcwd                 __NR_getcwd                 /* ssize_t getcwd(char *buf, size_t size) */
 #define SYS_chdir                  __NR_chdir                  /* errno_t chdir(char const *path) */
 #define SYS_fchdir                 __NR_fchdir                 /* errno_t fchdir(fd_t fd) */
@@ -514,7 +516,9 @@
 #define SYS_epoll_ctl_old          __NR_epoll_ctl_old          /* errno_t epoll_ctl_old(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 #define SYS_epoll_wait_old         __NR_epoll_wait_old         /* errno_t epoll_wait_old(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
 #define SYS_remap_file_pages       __NR_remap_file_pages       /* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
-#define SYS_getdents64             __NR_getdents64             /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define SYS_getdents64             __NR_getdents64             /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 #define SYS_set_tid_address        __NR_set_tid_address        /* pid_t set_tid_address(pid_t *tidptr) */
 #define SYS_restart_syscall        __NR_restart_syscall        /* errno_t restart_syscall(void) */
 #define SYS_semtimedop             __NR_semtimedop             /* errno_t semtimedop(int TODO_PROTOTYPE) */

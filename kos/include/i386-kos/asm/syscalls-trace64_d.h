@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc4225e2 */
+/* HASH CRC-32:0x6229ffe7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,8 +221,8 @@
 #define __NR64AN0_ftruncate              fd
 #define __NR64AN1_ftruncate              length
 #define __NR64AN0_getdents               fd
-#define __NR64AN1_getdents               dirp
-#define __NR64AN2_getdents               count
+#define __NR64AN1_getdents               buf
+#define __NR64AN2_getdents               buflen
 #define __NR64AN0_getcwd                 buf
 #define __NR64AN1_getcwd                 size
 #define __NR64AN0_chdir                  path
@@ -478,8 +478,8 @@
 #define __NR64AN3_remap_file_pages       pgoff
 #define __NR64AN4_remap_file_pages       flags
 #define __NR64AN0_getdents64             fd
-#define __NR64AN1_getdents64             dirp
-#define __NR64AN2_getdents64             count
+#define __NR64AN1_getdents64             buf
+#define __NR64AN2_getdents64             buflen
 #define __NR64AN0_set_tid_address        tidptr
 #define __NR64AN0_semtimedop             TODO_PROTOTYPE
 #define __NR64AN0_fadvise64              TODO_PROTOTYPE
@@ -1241,8 +1241,8 @@
 #define __NR64ATR1_ftruncate              SC_REPR_SYSCALL_ULONG_T                                              /* length */ 
 #define __NR64RTR_ftruncate               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_getdents               SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR1_getdents               SC_REPR_POINTER                                                      /* dirp */ 
-#define __NR64ATR2_getdents               SC_REPR_SIZE_T                                                       /* count */ 
+#define __NR64ATR1_getdents               SC_REPR_POINTER                                                      /* buf */ 
+#define __NR64ATR2_getdents               SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR64RTR_getdents                SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_getcwd                 SC_REPR_POINTER                                                      /* buf */ 
 #define __NR64ATR1_getcwd                 SC_REPR_SIZE_T                                                       /* size */ 
@@ -1649,8 +1649,8 @@
 #define __NR64ATR4_remap_file_pages       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR64RTR_remap_file_pages        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_getdents64             SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR1_getdents64             SC_REPR_POINTER                                                      /* dirp */ 
-#define __NR64ATR2_getdents64             SC_REPR_SIZE_T                                                       /* count */ 
+#define __NR64ATR1_getdents64             SC_REPR_POINTER                                                      /* buf */ 
+#define __NR64ATR2_getdents64             SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR64RTR_getdents64              SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_set_tid_address        SC_REPR_POINTER                                                      /* tidptr */ 
 #define __NR64RTR_set_tid_address         SC_REPR_PID_T                                                        /* return */

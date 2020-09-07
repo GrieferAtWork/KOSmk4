@@ -232,6 +232,11 @@
 %[typeorg(<kos/bits/spawn-action32.h>: spawn_actionx32, spawn_actionsx32, spawn_action_listx32)]
 %[typeorg(<kos/bits/spawn-action64.h>: spawn_actionx64, spawn_actionsx64, spawn_action_listx64)]
 %[typeorg(<kos/compat/linux-oldselect.h>: sel_arg_struct, sel_arg_structx32, sel_arg_structx64)]
+%[typeorg(<kos/compat/linux-olddirent.h>: old_linux_dirent, old_linux_direntx32, old_linux_direntx64)]
+%[typeorg(<kos/compat/linux-dirent.h>: linux_dirent, linux_direntx32, linux_direntx64)]
+%[typeorg(<kos/compat/linux-dirent64.h>: linux_dirent64)]
+
+%[typecompat(*:linux_dirent64 = *:linux_dirent64)]
 
 %[mustundef(timezone, timeb, stat, dirent)]
 
@@ -461,6 +466,7 @@ timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
 %[startgroup]
 [cp] lseek:(fd_t fd, syscall_slong_t offset, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> syscall_slong_t;
 [cp] lseek64:(fd_t fd, [reg64] int64_t offset, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> [reg64] int64_t;
+[cp] _llseek:(fd_t fd, [reg64] int64_t offset, [tostr(out:UINT64_T)] uint64_t *result, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> errno_t;
 %[endgroup]
 
 [restart(must)] getpid:() -> pid_t;
@@ -791,9 +797,6 @@ swapoff:([tostr(FILENAME)] char const *pathname) -> errno_t;
 @@@param: how: One of the `RB_*' constants from <sys/reboot.h>
 reboot:([tostr(REBOOT_HOW)] syscall_ulong_t how) -> errno_t;
 
-@@Returns `0' to indicate end-of-directory; 1 to to indicate success
-readdir:(fd_t fd, [tostr(out:STRUCT_OLD_LINUX_DIRENT:count)] struct old_linux_dirent *dirp, size_t count) -> errno_t;
-
 @@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
 @@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
@@ -946,9 +949,31 @@ sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
 
 [restart(must)] getpgid:(pid_t pid) -> pid_t;
 
-[cp] _llseek:(fd_t fd, [reg64] int64_t offset, [tostr(out:UINT64_T)] uint64_t *result, [tostr(SEEK_WHENCE)] syscall_ulong_t whence) -> errno_t;
-[cp] getdents:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENT:count:return)] struct linux_dirent *dirp, size_t count) -> ssize_t;
-[cp] getdents64:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENT64:count:return)] struct linux_dirent64 *dirp, size_t count) -> ssize_t;
+
+%[startgroup]
+@@Read exactly one directory entry from `fd'
+@@Note that the linux version of this system call has one additional argument `count'.
+@@However, within the linux kernel implementation, that argument is unconditionally
+@@ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+@@@return: 1 : Read on directory entry
+@@@return: 0 : End-of-directory
+[cp] readdir:(fd_t fd, [tostr(out:STRUCT_OLD_LINUX_DIRENT)] struct old_linux_dirent *buf) -> syscall_slong_t;
+[cp][doc_alias(readdir)] readdirx32:(fd_t fd, [tostr(out:STRUCT_OLD_LINUX_DIRENTX32)] struct old_linux_direntx32 *buf) -> syscall_slong_t;
+[cp][doc_alias(readdir)] readdirx64:(fd_t fd, [tostr(out:STRUCT_OLD_LINUX_DIRENTX64)] struct old_linux_direntx64 *buf) -> syscall_slong_t;
+%[endgroup]
+
+%[startgroup]
+@@@return: * : The actual number of read entries
+@@@return: 0 : End-of-directory
+[cp] getdents:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENT:buflen:return)] struct linux_dirent *buf, size_t buflen) -> ssize_t;
+[cp][doc_alias(getdents)] getdentsx32:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENTX32:buflen:return)] struct linux_direntx32 *buf, size_t buflen) -> ssize_t;
+[cp][doc_alias(getdents)] getdentsx64:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENTX64:buflen:return)] struct linux_direntx64 *buf, size_t buflen) -> ssize_t;
+%[endgroup]
+
+@@@return: * : The actual number of read entries
+@@@return: 0 : End-of-directory
+[cp] getdents64:(fd_t fd, [tostr(out:STRUCT_LINUX_DIRENT64:buflen:return)] struct linux_dirent64 *buf, size_t buflen) -> ssize_t;
+
 
 @@@param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
 @@              optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF'

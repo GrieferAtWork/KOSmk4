@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ee9b2bc */
+/* HASH CRC-32:0xfb3cb10c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1001,7 +1001,7 @@
 #define __NRAT0_ftruncate              (fd_t, __fd_t)
 #define __NRAT1_ftruncate              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_getdents               (fd_t, __fd_t)
-#define __NRAT1_getdents               (struct linux_dirent *, struct linux_dirent *)
+#define __NRAT1_getdents               (struct linux_direntx64 *, struct linux_direntx64 *)
 #define __NRAT2_getdents               (size_t, __size_t)
 #define __NRAT0_getcwd                 (char *, char *)
 #define __NRAT1_getcwd                 (size_t, __size_t)
@@ -1800,7 +1800,7 @@
 #define __NRAM_fdatasync(a, b, c, d, e, f)              (__fd_t)a
 #define __NRAM_truncate(a, b, c, d, e, f)               (char const *)a, (__syscall_ulong_t)b
 #define __NRAM_ftruncate(a, b, c, d, e, f)              (__fd_t)a, (__syscall_ulong_t)b
-#define __NRAM_getdents(a, b, c, d, e, f)               (__fd_t)a, (struct linux_dirent *)b, (__size_t)c
+#define __NRAM_getdents(a, b, c, d, e, f)               (__fd_t)a, (struct linux_direntx64 *)b, (__size_t)c
 #define __NRAM_getcwd(a, b, c, d, e, f)                 (char *)a, (__size_t)b
 #define __NRAM_chdir(a, b, c, d, e, f)                  (char const *)a
 #define __NRAM_fchdir(a, b, c, d, e, f)                 (__fd_t)a

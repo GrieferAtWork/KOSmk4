@@ -72,6 +72,7 @@ clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack,
        pid_t *ptid, pid_t *ctid, [tostr(POINTER)] uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+getdents = getdentsx64;
 utime = utimex64;
 sendmsg = sendmsgx64;
 recvmsg = recvmsgx64;

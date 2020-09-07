@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0f3b3cb */
+/* HASH CRC-32:0xc0439d92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,9 @@
 #define __NR_vhangup                0x3a  /* errno_t vhangup(void) */
 #define __NR_pipe2                  0x3b  /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
 #define __NR_quotactl               0x3c  /* errno_t quotactl(int TODO_PROTOTYPE) */
-#define __NR_getdents64             0x3d  /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define __NR_getdents64             0x3d  /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -646,7 +648,9 @@
 #define __NR_time                   0x426 /* time32_t time(time32_t *timer) */
 #define __NR_utime                  0x427 /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define __NR_creat                  0x428 /* fd_t creat(char const *filename, mode_t mode) */
-#define __NR_getdents               0x429 /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define __NR_getdents               0x429 /* ssize_t getdents(fd_t fd, struct linux_dirent *buf, size_t buflen) */
 #define __NR_futimesat              0x42a /* errno_t futimesat(fd_t dirfd, char const *filename, struct timeval const[2] times) */
 #define __NR_select                 0x42b /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval *timeout) */
 #define __NR_poll                   0x42c /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x433138d0 */
+/* HASH CRC-32:0x7237a5d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3340,8 +3340,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_reboot)
 	.cfi_endproc
 END(__x86_asm32_int80_reboot)
 
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-/* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+/* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 .section .text.x86.asm32_syscall_int80.readdir
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	.cfi_startproc simple
@@ -3360,7 +3365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_readdir)
@@ -5304,7 +5309,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	.cfi_endproc
 END(__x86_asm32_int80__llseek)
 
-/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents(fd_t fd, struct linux_direntx32 *buf, size_t buflen) */
 .section .text.x86.asm32_syscall_int80.getdents
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents)
 	.cfi_startproc simple
@@ -8302,7 +8309,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_madvise)
 	.cfi_endproc
 END(__x86_asm32_int80_madvise)
 
-/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 .section .text.x86.asm32_syscall_int80.getdents64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents64)
 	.cfi_startproc simple
@@ -21177,8 +21186,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_reboot)
 	.cfi_endproc
 END(__x86_asm32_sysenter_reboot)
 
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-/* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+/* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 .section .text.x86.asm32_syscall_sysenter.readdir
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readdir)
 	.cfi_startproc simple
@@ -21197,7 +21211,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readdir)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_readdir)
@@ -23149,7 +23163,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	.cfi_endproc
 END(__x86_asm32_sysenter__llseek)
 
-/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents(fd_t fd, struct linux_direntx32 *buf, size_t buflen) */
 .section .text.x86.asm32_syscall_sysenter.getdents
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdents)
 	.cfi_startproc simple
@@ -26159,7 +26175,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_madvise)
 	.cfi_endproc
 END(__x86_asm32_sysenter_madvise)
 
-/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 .section .text.x86.asm32_syscall_sysenter.getdents64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdents64)
 	.cfi_startproc simple

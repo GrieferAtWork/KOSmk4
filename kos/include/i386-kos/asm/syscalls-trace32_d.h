@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f2e0173 */
+/* HASH CRC-32:0xf482e669 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,8 +155,7 @@
 #define __NR32AN1_swapon                  swapflags
 #define __NR32AN0_reboot                  how
 #define __NR32AN0_readdir                 fd
-#define __NR32AN1_readdir                 dirp
-#define __NR32AN2_readdir                 count
+#define __NR32AN1_readdir                 buf
 #define __NR32AN0_mmap                    addr
 #define __NR32AN1_mmap                    len
 #define __NR32AN2_mmap                    prot
@@ -259,8 +258,8 @@
 #define __NR32AN2__llseek                 result
 #define __NR32AN3__llseek                 whence
 #define __NR32AN0_getdents                fd
-#define __NR32AN1_getdents                dirp
-#define __NR32AN2_getdents                count
+#define __NR32AN1_getdents                buf
+#define __NR32AN2_getdents                buflen
 #define __NR32AN0__newselect              nfds
 #define __NR32AN1__newselect              readfds
 #define __NR32AN2__newselect              writefds
@@ -429,8 +428,8 @@
 #define __NR32AN1_madvise                 len
 #define __NR32AN2_madvise                 advice
 #define __NR32AN0_getdents64              fd
-#define __NR32AN1_getdents64              dirp
-#define __NR32AN2_getdents64              count
+#define __NR32AN1_getdents64              buf
+#define __NR32AN2_getdents64              buflen
 #define __NR32AN0_fcntl64                 fd
 #define __NR32AN1_fcntl64                 command
 #define __NR32AN2_fcntl64                 arg
@@ -1357,9 +1356,8 @@
 #define __NR32ATR0_reboot                  SC_REPR_REBOOT_HOW                                                   /* how */ 
 #define __NR32RTR_reboot                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_readdir                 SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_readdir                 SC_REPR_POINTER                                                      /* dirp */ 
-#define __NR32ATR2_readdir                 SC_REPR_SIZE_T                                                       /* count */ 
-#define __NR32RTR_readdir                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR1_readdir                 SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32RTR_readdir                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_mmap                    SC_REPR_POINTER                                                      /* addr */ 
 #define __NR32ATR1_mmap                    SC_REPR_SIZE_T                                                       /* len */ 
 #define __NR32ATR2_mmap                    SC_REPR_MMAP_PROT                                                    /* prot */ 
@@ -1516,8 +1514,8 @@
 #define __NR32ATR3__llseek                 SC_REPR_SEEK_WHENCE                                                  /* whence */ 
 #define __NR32RTR__llseek                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getdents                SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_getdents                SC_REPR_POINTER                                                      /* dirp */ 
-#define __NR32ATR2_getdents                SC_REPR_SIZE_T                                                       /* count */ 
+#define __NR32ATR1_getdents                SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR2_getdents                SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR32RTR_getdents                 SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0__newselect              SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NR32ATR1__newselect              SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
@@ -1777,8 +1775,8 @@
 #define __NR32ATR2_madvise                 SC_REPR_SYSCALL_ULONG_T                                              /* advice */ 
 #define __NR32RTR_madvise                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getdents64              SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_getdents64              SC_REPR_POINTER                                                      /* dirp */ 
-#define __NR32ATR2_getdents64              SC_REPR_SIZE_T                                                       /* count */ 
+#define __NR32ATR1_getdents64              SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR2_getdents64              SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR32RTR_getdents64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_fcntl64                 SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_fcntl64                 SC_REPR_FCNTL64_COMMAND                                              /* command */ 

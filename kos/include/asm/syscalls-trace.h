@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe6f4a2a */
+/* HASH CRC-32:0x5650b71d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,8 +170,8 @@
 #define __NRAN1_pipe2                  flags
 #define __NRAN0_quotactl               TODO_PROTOTYPE
 #define __NRAN0_getdents64             fd
-#define __NRAN1_getdents64             dirp
-#define __NRAN2_getdents64             count
+#define __NRAN1_getdents64             buf
+#define __NRAN2_getdents64             buflen
 #define __NRAN0_read                   fd
 #define __NRAN1_read                   buf
 #define __NRAN2_read                   bufsize
@@ -722,8 +722,8 @@
 #define __NRAN0_creat                  filename
 #define __NRAN1_creat                  mode
 #define __NRAN0_getdents               fd
-#define __NRAN1_getdents               dirp
-#define __NRAN2_getdents               count
+#define __NRAN1_getdents               buf
+#define __NRAN2_getdents               buflen
 #define __NRAN0_futimesat              dirfd
 #define __NRAN1_futimesat              filename
 #define __NRAN2_futimesat              times
@@ -990,8 +990,8 @@
 #define __NRATR0_quotactl               SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_quotactl                SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_getdents64             SC_REPR_FD_T                                            /* fd */ 
-#define __NRATR1_getdents64             SC_REPR_POINTER                                         /* dirp */ 
-#define __NRATR2_getdents64             SC_REPR_SIZE_T                                          /* count */ 
+#define __NRATR1_getdents64             SC_REPR_POINTER                                         /* buf */ 
+#define __NRATR2_getdents64             SC_REPR_SIZE_T                                          /* buflen */ 
 #define __NRRTR_getdents64              SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_read                   SC_REPR_FD_T                                            /* fd */ 
 #define __NRATR1_read                   SC_REPR_POINTER                                         /* buf */ 
@@ -1836,8 +1836,8 @@
 #define __NRATR1_creat                  SC_REPR_MODE_T                                          /* mode */ 
 #define __NRRTR_creat                   SC_REPR_FD_T                                            /* return */
 #define __NRATR0_getdents               SC_REPR_FD_T                                            /* fd */ 
-#define __NRATR1_getdents               SC_REPR_POINTER                                         /* dirp */ 
-#define __NRATR2_getdents               SC_REPR_SIZE_T                                          /* count */ 
+#define __NRATR1_getdents               SC_REPR_POINTER                                         /* buf */ 
+#define __NRATR2_getdents               SC_REPR_SIZE_T                                          /* buflen */ 
 #define __NRRTR_getdents                SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_futimesat              SC_REPR_FD_T                                            /* dirfd */ 
 #define __NRATR1_futimesat              SC_REPR_FILENAME                                        /* filename */ 

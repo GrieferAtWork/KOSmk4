@@ -17,90 +17,54 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LINUX_MSDOS_FS_H
-#define _LINUX_MSDOS_FS_H 1
+#ifndef _KOS_COMPAT_LINUX_OLDDIRENT_H
+#define _KOS_COMPAT_LINUX_OLDDIRENT_H 1
 
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/dirent.h>
 #include <hybrid/typecore.h>
 
-#include <asm/ioctl.h>
-#include <linux/types.h>
-
-__DECL_BEGIN
+#include <bits/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("d_off")
-#pragma push_macro("d_reclen")
+#pragma push_macro("d_offset")
+#pragma push_macro("d_namlen")
 #pragma push_macro("d_name")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
 #undef d_ino
-#undef d_off
-#undef d_reclen
+#undef d_offset
+#undef d_namlen
 #undef d_name
-struct __fat_dirent {
+
+struct old_linux_dirent {
+#ifndef __DIRENT_HAVE_U_D_INO
+	__ULONGPTR_TYPE__               d_ino;    /* File INode number */
+#else /* !__DIRENT_HAVE_U_D_INO */
+	union {
+		__ULONGPTR_TYPE__           d_ino;    /* File INode number */
+	} __u_d_ino;
+#define d_ino __u_d_ino.d_ino
+#endif /* __DIRENT_HAVE_U_D_INO */
 #ifdef __USE_KOS_ALTERATIONS
-#ifndef __DIRENT_HAVE_U_D_INO
-	__ULONGPTR_TYPE__     d_ino;
-#else /* !__DIRENT_HAVE_U_D_INO */
-	union {
-		__ULONGPTR_TYPE__ d_ino;
-	} __u_d_ino;
-#define d_ino __u_d_ino.d_ino
-#endif /* __DIRENT_HAVE_U_D_INO */
-	__ULONGPTR_TYPE__     d_off;
+	__ULONGPTR_TYPE__               d_offset; /* Offset of next directory entry in containing directory. */
 #else /* __USE_KOS_ALTERATIONS */
-#ifndef __DIRENT_HAVE_U_D_INO
-	__LONGPTR_TYPE__      d_ino;
-#else /* !__DIRENT_HAVE_U_D_INO */
-	union {
-		__LONGPTR_TYPE__  d_ino;
-	} __u_d_ino;
-#define d_ino __u_d_ino.d_ino
-#endif /* __DIRENT_HAVE_U_D_INO */
-	__LONGPTR_TYPE__      d_off;
+	__LONGPTR_TYPE__                d_offset; /* Offset of next directory entry in containing directory. */
 #endif /* !__USE_KOS_ALTERATIONS */
-	__UINT16_TYPE__       d_reclen;
-	char                  d_name[256];
+	__UINT16_TYPE__                 d_namlen; /* == strlen(d_name) */
+	__COMPILER_FLEXIBLE_ARRAY(char, d_name);  /* Entry file name. */
 };
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("d_name")
-#pragma pop_macro("d_reclen")
-#pragma pop_macro("d_off")
+#pragma pop_macro("d_namlen")
+#pragma pop_macro("d_offset")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* __CC__ */
-
-#define FATATTR_NONE   0  /* no attribute bits */
-#define FATATTR_RO     1  /* read-only */
-#define FATATTR_HIDDEN 2  /* hidden */
-#define FATATTR_SYS    4  /* system */
-#define FATATTR_VOLUME 8  /* volume label */
-#define FATATTR_DIR    16 /* directory */
-#define FATATTR_ARCH   32 /* archived */
-
-/* Don't intrude on the ATTR_* namespace when using pure system headers! */
-#ifndef __USE_KOS_PURE
-#define ATTR_NONE   FATATTR_NONE   /* no attribute bits */
-#define ATTR_RO     FATATTR_RO     /* read-only */
-#define ATTR_HIDDEN FATATTR_HIDDEN /* hidden */
-#define ATTR_SYS    FATATTR_SYS    /* system */
-#define ATTR_VOLUME FATATTR_VOLUME /* volume label */
-#define ATTR_DIR    FATATTR_DIR    /* directory */
-#define ATTR_ARCH   FATATTR_ARCH   /* archived */
-#endif /* !__USE_KOS_PURE */
-
-/* ioctl commands */
-#define VFAT_IOCTL_READDIR_BOTH  _IOR('r', 1, struct __fat_dirent[2])
-#define VFAT_IOCTL_READDIR_SHORT _IOR('r', 2, struct __fat_dirent[2])
-#define FAT_IOCTL_GET_ATTRIBUTES _IOR('r', 0x10, __u32)
-#define FAT_IOCTL_SET_ATTRIBUTES _IOW('r', 0x11, __u32)
-#define FAT_IOCTL_GET_VOLUME_ID  _IOR('r', 0x13, __u32)
 
 __DECL_END
+#endif /* __CC__ */
 
-
-#endif /* _LINUX_MSDOS_FS_H */
+#endif /* !_KOS_COMPAT_LINUX_OLDDIRENT_H */

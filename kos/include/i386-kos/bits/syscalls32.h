@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fa01875 */
+/* HASH CRC-32:0x598e38c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,8 +169,13 @@
 #define SYS_swapon                  __NR_swapon                  /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
 /* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
 #define SYS_reboot                  __NR_reboot                  /* errno_t reboot(syscall_ulong_t how) */
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-#define SYS_readdir                 __NR_readdir                 /* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+#define SYS_readdir                 __NR_readdir                 /* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
@@ -243,7 +248,9 @@
 #define SYS_setfsuid                __NR_setfsuid                /* errno_t setfsuid(uint16_t uid) */
 #define SYS_setfsgid                __NR_setfsgid                /* errno_t setfsgid(uint16_t gid) */
 #define SYS__llseek                 __NR__llseek                 /* errno_t _llseek(fd_t fd, int64_t offset, uint64_t *result, syscall_ulong_t whence) */
-#define SYS_getdents                __NR_getdents                /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define SYS_getdents                __NR_getdents                /* ssize_t getdents(fd_t fd, struct linux_direntx32 *buf, size_t buflen) */
 #define SYS__newselect              __NR__newselect              /* ssize_t _newselect(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 #define SYS_flock                   __NR_flock                   /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 #define SYS_msync                   __NR_msync                   /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
@@ -377,7 +384,9 @@
 #define SYS_pivot_root              __NR_pivot_root              /* errno_t pivot_root(int TODO_PROTOTYPE) */
 #define SYS_mincore                 __NR_mincore                 /* errno_t mincore(void *start, size_t len, uint8_t *vec) */
 #define SYS_madvise                 __NR_madvise                 /* errno_t madvise(void *addr, size_t len, syscall_ulong_t advice) */
-#define SYS_getdents64              __NR_getdents64              /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+#define SYS_getdents64              __NR_getdents64              /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *buf, size_t buflen) */
 #define SYS_fcntl64                 __NR_fcntl64                 /* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
 #define SYS_gettid                  __NR_gettid                  /* pid_t gettid(void) */
 #define SYS_readahead               __NR_readahead               /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */

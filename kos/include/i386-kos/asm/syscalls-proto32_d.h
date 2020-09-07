@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd680f4f9 */
+/* HASH CRC-32:0xfbe3e710 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,7 @@
 #define __NR32AC_uselib                  1
 #define __NR32AC_swapon                  2
 #define __NR32AC_reboot                  1
-#define __NR32AC_readdir                 3
+#define __NR32AC_readdir                 2
 #define __NR32AC_mmap                    6
 #define __NR32AC_munmap                  2
 #define __NR32AC_truncate                2
@@ -591,7 +591,7 @@
 #define __NR32RT_uselib                  (errno_t, __errno_t)
 #define __NR32RT_swapon                  (errno_t, __errno_t)
 #define __NR32RT_reboot                  (errno_t, __errno_t)
-#define __NR32RT_readdir                 (errno_t, __errno_t)
+#define __NR32RT_readdir                 (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_mmap                    (void *, void *)
 #define __NR32RT_munmap                  (errno_t, __errno_t)
 #define __NR32RT_truncate                (errno_t, __errno_t)
@@ -1095,8 +1095,7 @@
 #define __NR32AT1_swapon                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_reboot                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_readdir                 (fd_t, __fd_t)
-#define __NR32AT1_readdir                 (struct old_linux_dirent *, struct old_linux_dirent *)
-#define __NR32AT2_readdir                 (size_t, __size_t)
+#define __NR32AT1_readdir                 (struct old_linux_direntx32 *, struct old_linux_direntx32 *)
 #define __NR32AT0_mmap                    (void *, void *)
 #define __NR32AT1_mmap                    (size_t, __size_t)
 #define __NR32AT2_mmap                    (syscall_ulong_t, __syscall_ulong_t)
@@ -1199,7 +1198,7 @@
 #define __NR32AT2__llseek                 (uint64_t *, __uint64_t *)
 #define __NR32AT3__llseek                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_getdents                (fd_t, __fd_t)
-#define __NR32AT1_getdents                (struct linux_dirent *, struct linux_dirent *)
+#define __NR32AT1_getdents                (struct linux_direntx32 *, struct linux_direntx32 *)
 #define __NR32AT2_getdents                (size_t, __size_t)
 #define __NR32AT0__newselect              (size_t, __size_t)
 #define __NR32AT1__newselect              (struct __fd_set_struct *, struct __fd_set_struct *)
@@ -2158,7 +2157,7 @@
 #define __NR32AM_uselib(a, b, c, d, e, f)                  (char const *)a
 #define __NR32AM_swapon(a, b, c, d, e, f)                  (char const *)a, (__syscall_ulong_t)b
 #define __NR32AM_reboot(a, b, c, d, e, f)                  (__syscall_ulong_t)a
-#define __NR32AM_readdir(a, b, c, d, e, f)                 (__fd_t)a, (struct old_linux_dirent *)b, (__size_t)c
+#define __NR32AM_readdir(a, b, c, d, e, f)                 (__fd_t)a, (struct old_linux_direntx32 *)b
 #define __NR32AM_mmap(a, b, c, d, e, f)                    (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
 #define __NR32AM_munmap(a, b, c, d, e, f)                  (void *)a, (__size_t)b
 #define __NR32AM_truncate(a, b, c, d, e, f)                (char const *)a, (__syscall_ulong_t)b
@@ -2210,7 +2209,7 @@
 #define __NR32AM_setfsuid(a, b, c, d, e, f)                (__uint16_t)a
 #define __NR32AM_setfsgid(a, b, c, d, e, f)                (__uint16_t)a
 #define __NR32AM__llseek(a, b, c, d, e, f)                 (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__uint64_t *)d, (__syscall_ulong_t)e
-#define __NR32AM_getdents(a, b, c, d, e, f)                (__fd_t)a, (struct linux_dirent *)b, (__size_t)c
+#define __NR32AM_getdents(a, b, c, d, e, f)                (__fd_t)a, (struct linux_direntx32 *)b, (__size_t)c
 #define __NR32AM__newselect(a, b, c, d, e, f)              (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timevalx32 *)e
 #define __NR32AM_flock(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b
 #define __NR32AM_msync(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c
@@ -2622,7 +2621,7 @@
 #define __NR32AP_uselib(a)                                 (__syscall_ulong_t)a
 #define __NR32AP_swapon(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_reboot(a)                                 (__syscall_ulong_t)a
-#define __NR32AP_readdir(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR32AP_readdir(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_mmap(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_munmap(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_truncate(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b

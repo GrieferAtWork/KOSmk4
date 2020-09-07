@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb7f3651 */
+/* HASH CRC-32:0x5446aeb1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,9 @@
 #include <kos/bits/exception_data32.h>
 #include <kos/bits/futex-expr32.h>
 #include <kos/bits/spawn-action32.h>
+#include <kos/compat/linux-dirent.h>
+#include <kos/compat/linux-dirent64.h>
+#include <kos/compat/linux-olddirent.h>
 #include <kos/compat/linux-oldselect.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/kernel/cpu-state32.h>
@@ -126,15 +129,15 @@ struct file_handle;
 struct fpustate32;
 struct getcpu_cache;
 struct lfutexexprx32;
-struct linux_dirent;
 struct linux_dirent64;
+struct linux_direntx32;
 struct linux_oldolduname;
 struct linux_oldstat;
 struct linux_olduname;
 struct linux_statx32;
 struct linux_statx32_64;
 struct mq_attr;
-struct old_linux_dirent;
+struct old_linux_direntx32;
 struct pollfd;
 struct rlimit;
 struct rlimit64;
@@ -679,10 +682,14 @@ __CDECLARE_SC(,__errno_t,getcpu,(__uint32_t *__cpu, __uint32_t *__node, struct g
 __CDECLARE_SC(,__ssize_t,getcwd,(char *__buf, __size_t __size),(__buf,__size))
 #endif /* __CRT_HAVE_SC(getcwd) */
 #if __CRT_HAVE_SC(getdents)
-__CDECLARE_SC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_SC(,__ssize_t,getdents,(__fd_t __fd, struct linux_direntx32 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(getdents) */
 #if __CRT_HAVE_SC(getdents64)
-__CDECLARE_SC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_SC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(getdents64) */
 #if __CRT_HAVE_SC(getdrives)
 /* Returns a bitset of all of the currently mounted dos-drives */
@@ -1429,8 +1436,13 @@ __CDECLARE_SC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__
 __CDECLARE_SC(,__ssize_t,readahead,(__fd_t __fd, __uint64_t __offset, __size_t __count),(__fd,__offset,__count))
 #endif /* __CRT_HAVE_SC(readahead) */
 #if __CRT_HAVE_SC(readdir)
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-__CDECLARE_SC(,__errno_t,readdir,(__fd_t __fd, struct old_linux_dirent *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+__CDECLARE_SC(,__syscall_slong_t,readdir,(__fd_t __fd, struct old_linux_direntx32 *__buf),(__fd,__buf))
 #endif /* __CRT_HAVE_SC(readdir) */
 #if __CRT_HAVE_SC(readf)
 /* Read up to `bufsize' bytes from `fd' into `buf'
@@ -2786,10 +2798,14 @@ __CDECLARE_XSC(,__errno_t,getcpu,(__uint32_t *__cpu, __uint32_t *__node, struct 
 __CDECLARE_XSC(,__ssize_t,getcwd,(char *__buf, __size_t __size),(__buf,__size))
 #endif /* __CRT_HAVE_XSC(getcwd) */
 #if __CRT_HAVE_XSC(getdents)
-__CDECLARE_XSC(,__ssize_t,getdents,(__fd_t __fd, struct linux_dirent *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_XSC(,__ssize_t,getdents,(__fd_t __fd, struct linux_direntx32 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(getdents) */
 #if __CRT_HAVE_XSC(getdents64)
-__CDECLARE_XSC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* @return: * : The actual number of read entries
+ * @return: 0 : End-of-directory */
+__CDECLARE_XSC(,__ssize_t,getdents64,(__fd_t __fd, struct linux_dirent64 *__buf, __size_t __buflen),(__fd,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(getdents64) */
 #if __CRT_HAVE_XSC(getdrives)
 /* Returns a bitset of all of the currently mounted dos-drives */
@@ -3536,8 +3552,13 @@ __CDECLARE_XSC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(_
 __CDECLARE_XSC(,__ssize_t,readahead,(__fd_t __fd, __uint64_t __offset, __size_t __count),(__fd,__offset,__count))
 #endif /* __CRT_HAVE_XSC(readahead) */
 #if __CRT_HAVE_XSC(readdir)
-/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
-__CDECLARE_XSC(,__errno_t,readdir,(__fd_t __fd, struct old_linux_dirent *__dirp, __size_t __count),(__fd,__dirp,__count))
+/* Read exactly one directory entry from `fd'
+ * Note that the linux version of this system call has one additional argument `count'.
+ * However, within the linux kernel implementation, that argument is unconditionally
+ * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * @return: 1 : Read on directory entry
+ * @return: 0 : End-of-directory */
+__CDECLARE_XSC(,__syscall_slong_t,readdir,(__fd_t __fd, struct old_linux_direntx32 *__buf),(__fd,__buf))
 #endif /* __CRT_HAVE_XSC(readdir) */
 #if __CRT_HAVE_XSC(readf)
 /* Read up to `bufsize' bytes from `fd' into `buf'

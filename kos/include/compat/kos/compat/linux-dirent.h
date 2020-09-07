@@ -17,13 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_KOS_COMPAT_LINUX_OLDSELECT_H
-#define _COMPAT_KOS_COMPAT_LINUX_OLDSELECT_H 1
+#ifndef _COMPAT_KOS_COMPAT_LINUX_DIRENT_H
+#define _COMPAT_KOS_COMPAT_LINUX_DIRENT_H 1
 
 #include <compat/config.h>
+
 #ifdef __ARCH_HAVE_COMPAT
-#include <kos/compat/linux-oldselect.h>
-#define compat_sel_arg_struct sel_arg_struct
+#include <kos/compat/linux-dirent.h>
+#define compat_linux_dirent linux_dirent
 #endif /* __ARCH_HAVE_COMPAT */
 
-#endif /* !_COMPAT_KOS_COMPAT_LINUX_OLDSELECT_H */
+#endif /* !_COMPAT_KOS_COMPAT_LINUX_DIRENT_H */
