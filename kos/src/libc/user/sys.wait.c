@@ -35,8 +35,9 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_wait,hash:CRC-32=0x6a0b935e]]]*/
-/* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
+/*[[[head:libc_wait,hash:CRC-32=0xec1f862]]]*/
+/* >> wait(2)
+ * Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 INTERN ATTR_SECTION(".text.crt.sched.wait") pid_t
 NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
 /*[[[body:libc_wait]]]*/
@@ -53,8 +54,9 @@ NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
 }
 /*[[[end:libc_wait]]]*/
 
-/*[[[head:libc_waitpid,hash:CRC-32=0x4d3fea06]]]*/
-/* Wait for a child process:
+/*[[[head:libc_waitpid,hash:CRC-32=0xd530539a]]]*/
+/* >> waitpid(2)
+ * Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
@@ -86,9 +88,11 @@ NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid,
 }
 /*[[[end:libc_waitpid]]]*/
 
-/*[[[head:libc_waitid,hash:CRC-32=0x54d90bb4]]]*/
-/* @param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
- *                 optionally or'd with `WNOHANG | WNOWAIT' */
+/*[[[head:libc_waitid,hash:CRC-32=0xbcfb6386]]]*/
+/* >> waitid(2)
+ * @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 INTERN ATTR_SECTION(".text.crt.sched.wait") int
 NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype,
                                   id_t id,
@@ -170,9 +174,10 @@ NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc,
 #endif /* MAGIC:alias */
 /*[[[end:libc_wait3_64]]]*/
 
-/*[[[head:libc_wait4,hash:CRC-32=0x9821e2a0]]]*/
-/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/*[[[head:libc_wait4,hash:CRC-32=0x18c17da]]]*/
+/* >> wait4(2)
+ * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTERN ATTR_SECTION(".text.crt.sched.wait") pid_t
 NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
                                  __WAIT_STATUS stat_loc,
@@ -199,12 +204,13 @@ NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
 }
 /*[[[end:libc_wait4]]]*/
 
-/*[[[head:libc_wait4_64,hash:CRC-32=0x23997ef8]]]*/
+/*[[[head:libc_wait4_64,hash:CRC-32=0x5ae72d44]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_wait4_64, libc_wait4);
 #else /* MAGIC:alias */
-/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* >> wait4(2)
+ * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTERN ATTR_SECTION(".text.crt.sched.wait") pid_t
 NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid,
                                     __WAIT_STATUS stat_loc,

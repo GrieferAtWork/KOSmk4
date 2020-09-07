@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x666b093 */
+/* HASH CRC-32:0xbfb67428 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1123,49 +1123,58 @@ enum __pid_type {
 #ifdef __CC__
 
 #ifdef __USE_GNU
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 #ifdef __CRT_HAVE_readahead
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,readahead,(__fd_t __fd, __off64_t __offset, __SIZE_TYPE__ __count),(__fd,__offset,__count))
+__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,readahead,(__fd_t __fd, __PIO_OFFSET64 __offset, __SIZE_TYPE__ __count),(__fd,__offset,__count))
 #else /* __CRT_HAVE_readahead */
 #include <libc/local/fcntl/readahead.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(readahead, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL readahead)(__fd_t __fd, __off64_t __offset, __SIZE_TYPE__ __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readahead))(__fd, __offset, __count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(readahead, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL readahead)(__fd_t __fd, __PIO_OFFSET64 __offset, __SIZE_TYPE__ __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readahead))(__fd, __offset, __count); })
 #endif /* !__CRT_HAVE_readahead */
 #ifdef __CRT_HAVE_sync_file_range
-__CDECLARE(,int,__NOTHROW_NCX,sync_file_range,(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags),(__fd,__offset,__count,__flags))
+__CDECLARE(,int,__NOTHROW_NCX,sync_file_range,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __count, unsigned int __flags),(__fd,__offset,__count,__flags))
 #else /* __CRT_HAVE_sync_file_range */
 #include <libc/local/fcntl/sync_file_range.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sync_file_range, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sync_file_range)(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync_file_range))(__fd, __offset, __count, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sync_file_range, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sync_file_range)(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __count, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync_file_range))(__fd, __offset, __count, __flags); })
 #endif /* !__CRT_HAVE_sync_file_range */
 struct iovec;
 __CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,vmsplice,(__fd_t __fdout, struct iovec const *__iov, __SIZE_TYPE__ __count, unsigned int __flags),(__fdout,__iov,__count,__flags))
-__CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,splice,(__fd_t __fdin, __off64_t *__offin, __fd_t __fdout, __off64_t *__offout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
+__CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,splice,(__fd_t __fdin, __PIO_OFFSET64 *__offin, __fd_t __fdout, __PIO_OFFSET64 *__offout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 __CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,tee,(__fd_t __fdin, __fd_t __fdout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__fdout,__length,__flags))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,name_to_handle_at,(__fd_t __dirfd, char const *__name, struct file_handle *__handle, int *__mnt_id, int __flags),(__dirfd,__name,__handle,__mnt_id,__flags))
 __CDECLARE_OPT(,__fd_t,__NOTHROW_RPC,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle *__handle, int __flags),(__mountdirfd,__handle,__flags))
 #if defined(__CRT_HAVE_fallocate64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, int __mode, __FS_TYPE(off) __offset, __FS_TYPE(off) __length),fallocate64,(__fd,__mode,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET __offset, __PIO_OFFSET __length),fallocate64,(__fd,__mode,__offset,__length))
 #elif defined(__CRT_HAVE_fallocate) && !defined(__USE_FILE_OFFSET64)
-__CDECLARE(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, int __mode, __FS_TYPE(off) __offset, __FS_TYPE(off) __length),(__fd,__mode,__offset,__length))
+__CDECLARE(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET __offset, __PIO_OFFSET __length),(__fd,__mode,__offset,__length))
 #else /* ... */
 #include <libc/local/fcntl/fallocate.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fallocate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fallocate)(__fd_t __fd, int __mode, __FS_TYPE(off) __offset, __FS_TYPE(off) __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate))(__fd, __mode, __offset, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fallocate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fallocate)(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET __offset, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate))(__fd, __mode, __offset, __length); })
 #endif /* !... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_fallocate64
-__CDECLARE(,int,__NOTHROW_NCX,fallocate64,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),(__fd,__mode,__offset,__length))
+__CDECLARE(,int,__NOTHROW_NCX,fallocate64,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),(__fd,__mode,__offset,__length))
 #elif defined(__CRT_HAVE_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_NCX,fallocate64,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate,(__fd,__mode,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,fallocate64,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),fallocate,(__fd,__mode,__offset,__length))
 #else /* ... */
 #include <libc/local/fcntl/fallocate64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fallocate64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fallocate64)(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate64))(__fd, __mode, __offset, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fallocate64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fallocate64)(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate64))(__fd, __mode, __offset, __length); })
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
 #ifndef __fcntl_defined
 #define __fcntl_defined 1
 #ifdef __CRT_HAVE_fcntl
-__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL fcntl)(__fd_t __fd, int __cmd, ...) __CASMNAME_SAME("fcntl");
+__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL fcntl)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, ...) __CASMNAME_SAME("fcntl");
 #elif defined(__CRT_HAVE___fcntl)
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* ... */
 #undef __fcntl_defined
 #endif /* !... */
@@ -1173,17 +1182,82 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, int __cmd)
 #ifndef __open_defined
 #define __open_defined 1
 #if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open");
 #elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 #include <asm/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/open.h>
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))(__filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -1197,21 +1271,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #ifndef __creat_defined
 #define __creat_defined 1
 #if defined(__CRT_HAVE_creat64) && defined(__USE_FILE_OFFSET64)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && !defined(__USE_FILE_OFFSET64)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__creat) && !defined(__USE_FILE_OFFSET64)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__creat)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #else /* ... */
 #include <asm/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <libc/local/fcntl/creat.h>
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); })
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
 #undef __creat_defined
@@ -1221,15 +1302,80 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_open64
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open64)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open64");
 #elif defined(__CRT_HAVE___open64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <libc/local/fcntl/open64.h>
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(open64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open64)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open64))(__filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -1239,13 +1385,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(open64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #ifndef __creat64_defined
 #define __creat64_defined 1
 #ifdef __CRT_HAVE_creat64
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
 #elif defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <libc/local/fcntl/creat64.h>
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL creat64)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat64))(__filename, __mode); })
 #else /* ... */
 #undef __creat64_defined
@@ -1257,11 +1407,50 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifndef __openat_defined
 #define __openat_defined 1
 #if defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("openat");
 #elif defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)
 #include <libc/local/fcntl/openat.h>
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(openat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat))(__dirfd, __filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -1275,11 +1464,50 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(openat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #ifndef __openat64_defined
 #define __openat64_defined 1
 #ifdef __CRT_HAVE_openat64
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("openat64");
 #elif defined(__CRT_HAVE_openat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat)
 #include <libc/local/fcntl/openat64.h>
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(openat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat64))(__dirfd, __filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -1294,59 +1522,65 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(openat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_posix_fadvise64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length, int __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
+__CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise) && !defined(__USE_FILE_OFFSET64)
-__CDECLARE(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length, int __advise),(__fd,__offset,__length,__advise))
+__CDECLARE(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length, __STDC_INT_AS_UINT_T __advise),(__fd,__offset,__length,__advise))
 #else /* ... */
 #include <libc/local/fcntl/posix_fadvise.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fadvise, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fadvise)(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length, int __advise) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fadvise))(__fd, __offset, __length, __advise); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fadvise, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fadvise)(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length, __STDC_INT_AS_UINT_T __advise) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fadvise))(__fd, __offset, __length, __advise); })
 #endif /* !... */
 #if defined(__CRT_HAVE_posix_fallocate64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length),posix_fallocate64,(__fd,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length),posix_fallocate64,(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate) && !defined(__USE_FILE_OFFSET64)
-__CDECLARE(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length),(__fd,__offset,__length))
+__CDECLARE(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length),(__fd,__offset,__length))
 #else /* ... */
 #include <libc/local/fcntl/posix_fallocate.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fallocate)(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fallocate))(__fd, __offset, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fallocate)(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fallocate))(__fd, __offset, __length); })
 #endif /* !... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_posix_fadvise64
-__CDECLARE(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),(__fd,__offset,__length,__advise))
+__CDECLARE(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise),(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
+__CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #else /* ... */
 #include <libc/local/fcntl/posix_fadvise64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fadvise64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fadvise64)(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fadvise64))(__fd, __offset, __length, __advise); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fadvise64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fadvise64)(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fadvise64))(__fd, __offset, __length, __advise); })
 #endif /* !... */
 #ifdef __CRT_HAVE_posix_fallocate64
-__CDECLARE(,int,__NOTHROW_NCX,posix_fallocate64,(__fd_t __fd, __off64_t __offset, __off64_t __length),(__fd,__offset,__length))
+__CDECLARE(,int,__NOTHROW_NCX,posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_NCX,posix_fallocate64,(__fd_t __fd, __off64_t __offset, __off64_t __length),posix_fallocate,(__fd,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate,(__fd,__offset,__length))
 #else /* ... */
 #include <libc/local/fcntl/posix_fallocate64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fallocate64)(__fd_t __fd, __off64_t __offset, __off64_t __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fallocate64))(__fd, __offset, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL posix_fallocate64)(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fallocate64))(__fd, __offset, __length); })
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN2K */
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
-#ifndef F_LOCK
-#define F_ULOCK 0 /* Unlock a previously locked region. */
-#define F_LOCK  1 /* Lock a region for exclusive use. */
-#define F_TLOCK 2 /* Test and lock a region for exclusive use. */
-#define F_TEST  3 /* Test a region for other processes locks. */
-#endif /* !F_LOCK */
+#if !defined(F_ULOCK) && defined(__F_ULOCK)
+#define F_ULOCK __F_ULOCK /* Unlock a previously locked region. */
+#endif /* !F_ULOCK && __F_ULOCK */
+#if !defined(F_LOCK) && defined(__F_LOCK)
+#define F_LOCK  __F_LOCK  /* Lock a region for exclusive use. */
+#endif /* !F_LOCK && __F_LOCK */
+#if !defined(F_TLOCK) && defined(__F_TLOCK)
+#define F_TLOCK __F_TLOCK /* Test and lock a region for exclusive use. */
+#endif /* !F_TLOCK && __F_TLOCK */
+#if !defined(F_TEST) && defined(__F_TEST)
+#define F_TEST  __F_TEST  /* Test a region for other processes locks. */
+#endif /* !F_TEST && __F_TEST */
 #ifndef __lockf_defined
 #define __lockf_defined 1
 #if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),lockf64,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && !defined(__USE_FILE_OFFSET64)
-__CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),(__fd,__cmd,__length))
+__CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),_locking,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),_locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf64) || defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 #include <libc/local/fcntl/lockf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf)(__fd_t __fd, int __cmd, __FS_TYPE(off) __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf))(__fd, __cmd, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf))(__fd, __cmd, __length); })
 #else /* ... */
 #undef __lockf_defined
 #endif /* !... */
@@ -1355,12 +1589,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTH
 #ifndef __lockf64_defined
 #define __lockf64_defined 1
 #ifdef __CRT_HAVE_lockf64
-__CDECLARE(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, int __cmd, __off64_t __length),(__fd,__cmd,__length))
+__CDECLARE(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),lockf,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 #include <libc/local/fcntl/lockf64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf64)(__fd_t __fd, int __cmd, __off64_t __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf64))(__fd, __cmd, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf64)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf64))(__fd, __cmd, __length); })
 #else /* ... */
 #undef __lockf64_defined
 #endif /* !... */

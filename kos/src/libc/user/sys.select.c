@@ -21,8 +21,22 @@
 #define GUARD_LIBC_USER_SYS_SELECT_C 1
 
 #include "../api.h"
-#include "sys.select.h"
+/**/
+
 #include <kos/syscalls.h>
+
+#include <syscall.h> /* SYS_* */
+
+#include "sys.select.h"
+
+#ifndef SYS__newselect
+/* Pull in information to figure out what kind of
+ * select() function is exported by the kernel. */
+#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
+#define __WANT_SYSCALL_ARGUMENT_COUNT 1
+#include <asm/syscalls-proto.h>
+#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
+#endif /* !SYS__newselect */
 
 DECL_BEGIN
 
@@ -42,7 +56,22 @@ NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[body:libc_select]]]*/
 {
 	ssize_t result;
+#ifdef SYS__newselect
+	result = sys__newselect(nfds, readfds, writefds, exceptfds, timeout);
+#elif __NRAC_select == 5
 	result = sys_select(nfds, readfds, writefds, exceptfds, timeout);
+#elif __NRAC_select == 1
+	/* Must use `struct sel_arg_struct' */
+	struct sel_arg_struct arg;
+	arg.n    = (ulongptr_t)nfds;
+	arg.inp  = readfds;
+	arg.outp = writefds;
+	arg.exp  = exceptfds;
+	arg.tvp  = timeout;
+	result   = sys_select(&arg);
+#else /* ... */
+#error "Unrecognized sys_select() variant"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_select]]]*/

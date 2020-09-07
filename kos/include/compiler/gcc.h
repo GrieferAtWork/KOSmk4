@@ -248,7 +248,7 @@
 #if (__has_feature(cxx_static_assert) ||                               \
      (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0) || \
      (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
-#if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
+#if (defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411) && !defined(__INTELLISENSE__)
 #define __STATIC_ASSERT       static_assert
 #else /* __cpp_static_assert >= 201411 */
 #define __STATIC_ASSERT(expr) static_assert(expr, #expr)

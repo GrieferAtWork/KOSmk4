@@ -417,8 +417,8 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_MKTTY
 DEFINE_SYSCALL4(fd_t, mktty,
-                fd_t, keyboard, fd_t, display,
                 USER UNCHECKED char const *, name,
+                fd_t, keyboard, fd_t, display,
                 syscall_ulong_t, reserved) {
 	unsigned int result;
 	struct handle hkeyboard;

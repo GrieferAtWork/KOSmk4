@@ -65,6 +65,10 @@
 #include <bits/crt/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
+#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
+#include <asm/fcntl.h> /* __F_ULOCK, __F_LOCK, __F_TLOCK, __F_TEST */
+#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
+
 #ifdef __USE_SOLARIS
 #include <getopt.h>
 #define GF_PATH "/etc/group"
@@ -598,7 +602,6 @@ int setuid($uid_t uid);
 int setgid($gid_t gid);
 
 
-%
 @@>> fork(2)
 @@Clone the calling thread into a second process and return twice, once
 @@in the parent process where this function returns the (non-zero) PID
@@ -606,7 +609,9 @@ int setgid($gid_t gid);
 @@itself, where ZERO(0) is returned.
 @@The child then usually proceeds by calling `exec(2)' to replace its
 @@application image with that of another program that the original
-@@parent can then `wait(2)' for
+@@parent can then `wait(2)' for. (s.a. `vfork(2)')
+@@@return: 0 : You're the new process that was created
+@@@return: * : The `return' value is the pid of your new child process
 [[crtbuiltin, wunused, export_alias("__fork")]]
 [[section(".text.crt{|.dos}.sched.access")]]
 [[decl_include("<bits/types.h>")]]
@@ -615,7 +620,6 @@ $pid_t fork();
 
 %[default:section(".text.crt{|.dos}.system.utility")]
 
-%
 @@>> alarm(2)
 @@@return: 0 : No alarm was scheduled before.
 @@@return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
@@ -623,13 +627,11 @@ $pid_t fork();
 @@You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm
 unsigned int alarm(unsigned int seconds);
 
-%
 @@>> pause(2)
 @@Suspend execution until the delivery of a POSIX_SIGNAL
 [[cp]]
 int pause();
 
-%
 @@>> fpathconf(2)
 @@@param: NAME: One of `_PC_*' from <asm/crt/confname.h>
 @@Return a path configuration value associated with `NAME' for `FD'
@@ -642,7 +644,6 @@ $longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
 
 %[default:section(".text.crt{|.dos}.io.tty")]
 
-%
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
 [[guard, cp, wunused, decl_include("<bits/types.h>")]]
@@ -653,26 +654,22 @@ char *ttyname($fd_t fd);
 [[cp, decl_include("<bits/types.h>")]]
 int ttyname_r($fd_t fd, [[outp(buflen)]] char *buf, size_t buflen);
 
-%
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
 [[wunused, decl_include("<bits/types.h>")]]
 $pid_t tcgetpgrp($fd_t fd);
 
-%
 @@>> tcsetpgrp(2)
 @@Set the foreground process group of a given TTY file descriptor
 [[decl_include("<bits/types.h>")]]
 int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 
-%
 %/* ... */
 [[wunused, guard]]
 char *getlogin();
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
-%
 @@>> chown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER'
 [[cp, decl_include("<bits/types.h>")]]
@@ -682,7 +679,6 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__AT_FDCWD, file, owner, group, 0);
 }
 
-%
 @@>> pathconf(2)
 @@@param: NAME: One of `_PC_*' from <asm/crt/confname.h>
 @@Return a path configuration value associated with `NAME' for `PATH'
@@ -705,7 +701,6 @@ $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 	return result;
 }
 
-%
 @@>> link(2)
 @@Create a hard link from `FROM', leading to `TO'
 [[cp, userimpl, requires_include("<asm/fcntl.h>")]]
@@ -719,17 +714,24 @@ int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 %[insert:extern(exit)]
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
-%
 @@>> read(2)
-@@Read data from a given file descriptor `FD' and return the number of bytes read.
-@@A return value of ZERO(0) is indicative of EOF
+@@Read up to `bufsize' bytes from `fd' into `buf'
+@@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+@@available at the time the call was made, and throw E_WOULDBLOCK if no data
+@@was available at the time.
+@@@return: <= bufsize: The actual amount of read bytes
+@@@return: 0         : EOF
 [[decl_include("<bits/types.h>")]]
 [[cp, guard, export_alias(_read, __read), section(".text.crt{|.dos}.io.read")]]
 ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 
-%
 @@>> write(2)
-@@Write data to a given file descriptor `FD' and return the number of bytes written
+@@Write up to `bufsize' bytes from `buf' into `fd'
+@@When `fd' has the `O_NONBLOCK' flag set, only write as much data
+@@as possible at the time the call was made, and throw E_WOULDBLOCK
+@@if no data could be written at the time.
+@@@return: <= bufsize: The actual amount of written bytes
+@@@return: 0         : No more data can be written
 [[decl_include("<bits/types.h>")]]
 [[cp, guard, export_alias(_write, __write), section(".text.crt{|.dos}.io.write")]]
 ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
@@ -802,13 +804,12 @@ ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 	return result;
 }
 %#endif /* __USE_KOS */
+%
 
-
-[[doc_alias("lseek"), ignore, nocrt, alias("lseek", "_lseek", "__lseek")]]
+[[doc_alias(lseek), ignore, nocrt, alias("lseek", "_lseek", "__lseek")]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 $off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 
-%
 @@>> lseek(2)
 @@Change the position of the file read/write pointer within a file referred to by `FD'
 [[guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
@@ -824,7 +825,6 @@ $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 @@pp_endif@@
 }
 
-%
 @@>> isatty(2)
 @@@return: 1: Is a tty
 @@@return: 0: Not a tty
@@ -833,7 +833,6 @@ $off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 [[section(".text.crt{|.dos}.io.tty"), export_alias("_isatty")]]
 int isatty($fd_t fd);
 
-%
 @@>> dup2(2)
 @@@return: NEWFD: Returns the new handle upon success.
 @@Duplicate a file referred to by `OLDFD' into `NEWFD'
@@ -841,7 +840,6 @@ int isatty($fd_t fd);
 [[section(".text.crt{|.dos}.io.access"), export_alias("_dup2", "__dup2")]]
 $fd_t dup2($fd_t oldfd, $fd_t newfd);
 
-%
 @@>> dup(2)
 @@@return: * : Returns the new handle upon success.
 @@Duplicate a file referred to by `FD' and return its duplicated handle number
@@ -849,14 +847,12 @@ $fd_t dup2($fd_t oldfd, $fd_t newfd);
 [[section(".text.crt{|.dos}.io.access"), export_alias("_dup")]]
 $fd_t dup($fd_t fd);
 
-%
 @@>> close(2)
-@@Close a file handle
+@@Close a given file descriptor/handle `FD'
 [[guard, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.access"), export_alias("_close", "__close")]]
 int close($fd_t fd);
 
-%
 @@>> access(2)
 @@@param: TYPE: Set of `X_OK|W_OK|R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE'
@@ -1038,15 +1034,16 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 
 %
 @@>> pread(2)
-@@Read data from a file at a specific offset
-[[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+@@Read data from a file at a specific `offset', rather than the current R/W position
+@@@return: <= bufsize: The actual amount of read bytes
+[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pread64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pread")]]
 [[section(".text.crt{|.dos}.io.read"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread64) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pread64)@@
-	return pread64(fd, buf, bufsize, (@__PIO_OFFSET64@)offset);
+	return pread64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 @@pp_else@@
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	off_t oldpos;
@@ -1063,8 +1060,9 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSE
 }
 
 @@>> pwrite(2)
-@@Write data to a file at a specific offset
-[[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+@@Write data to a file at a specific `offset', rather than the current R/W position
+@@@return: <= bufsize: The actual amount of written bytes
+[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite")]]
 [[section(".text.crt{|.dos}.io.write"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
@@ -1092,7 +1090,7 @@ ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO
 %#ifdef __USE_KOS
 @@>> preadall(3)
 @@Same as `readall(3)', but using `pread(2)' instead of `read()'
-[[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadall")]]
 [[section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
@@ -1104,7 +1102,7 @@ ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
 
 @@>> pwriteall(3)
 @@Same as `writeall(3)', but using `pwrite(2)' instead of `write()'
-[[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall")]]
 [[impl_include("<libc/errno.h>"), section(".text.crt{|.dos}.io.write")]]
@@ -1132,7 +1130,8 @@ ssize_t pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
 
 @@>> pread64(2)
 @@Read data from a file at a specific offset
-[[cp, decl_prefix(DEFINE_PIO_OFFSET), off64_variant_of(pread), section(".text.crt{|.dos}.io.large.read")]]
+[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[off64_variant_of(pread), section(".text.crt{|.dos}.io.large.read")]]
 [[export_alias("__pread64"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread32) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) {
@@ -1167,7 +1166,8 @@ ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFF
 
 @@>> pwrite64(2)
 @@Write data to a file at a specific offset
-[[cp, decl_prefix(DEFINE_PIO_OFFSET), off64_variant_of(pwrite), section(".text.crt{|.dos}.io.large.write")]]
+[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[off64_variant_of(pwrite), section(".text.crt{|.dos}.io.large.write")]]
 [[export_alias("__pwrite64"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite32) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) {
@@ -1381,8 +1381,31 @@ $useconds_t ualarm($useconds_t value, $useconds_t interval);
 
 %
 @@>> vfork(2)
-@@Same as `fork(2)', but possibly suspend the calling process until the
-@@child process either calls `exit(2)' or one of the many `exec(2)' functions
+@@Same as `fork(2)', but the child process may be executed within in the same VM
+@@as the parent process, with the parent process remaining suspended until the
+@@child process invokes one of the following system calls:
+@@  - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+@@                instead of the regular `exit(2)', since the later would include
+@@                the invocation of `atexit(3)' handlers, which would then run in
+@@                the context of a VM that isn't actually about to be destroyed.
+@@  - `execve(2)' Create a new VM that is populated with the specified process
+@@                image. The parent process will only be resumed in case the
+@@                new program image could be loaded successfully. Otherwise,
+@@                the call to `execve(2)' returns normally in the child.
+@@                Other functions from the exec()-family behave the same
+@@
+@@Care must be taken when using this system call, since you have to make sure that
+@@the child process doesn't clobber any part of its (shared) stack that may be re-
+@@used once execution resumes in the parent process. The same also goes for heap
+@@functions, but generally speaking: you really shouldn't do anything that isn't
+@@reentrant after calling any one of the fork() functions (since anything but would
+@@rely on underlying implementations making proper use of pthread_atfork(3), which
+@@is something that KOS intentionally doesn't do, since I feel like doing so only
+@@adds unnecessary bloat to code that doesn't rely on this)
+@@
+@@Additionally, this system call may be implemented as an alias for `fork(2)', in
+@@which case the parent process will not actually get suspended until the child
+@@process performs any of the actions above.
 [[guard, section(".text.crt{|.dos}.sched.access"), export_alias("__vfork")]]
 [[ATTR_RETURNS_TWICE, wunused, decl_include("<bits/types.h>")]]
 $pid_t vfork();
@@ -1446,7 +1469,7 @@ int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 #endif /* !__PIO_OFFSET */
 }
 
-[[doc_alias("truncate"), ignore, nocrt, alias("truncate")]]
+[[doc_alias(truncate), ignore, nocrt, alias("truncate")]]
 [[decl_include("<bits/types.h>")]]
 int truncate32([[nonnull]] char const *file, $pos32_t length);
 
@@ -1454,14 +1477,15 @@ int truncate32([[nonnull]] char const *file, $pos32_t length);
 %
 @@>> truncate(2)
 @@Truncate the given file `FILE' to a length of `LENGTH'
-[[decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("truncate64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("truncate")]]
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
-[[userimpl, requires($has_function(truncate64) || $has_function(truncate32) || ($has_function(open) && $has_function(ftruncate)))]]
+[[userimpl, requires($has_function(truncate64) || $has_function(truncate32) ||
+                     ($has_function(open) && $has_function(ftruncate)))]]
 int truncate([[nonnull]] char const *file, __PIO_OFFSET length) {
 @@pp_if $has_function(truncate32)@@
-	return truncate32(file, (__pos32_t)length);
+	return truncate32(file, (pos32_t)length);
 @@pp_elif $has_function(truncate64)@@
 	return truncate64(file, (__PIO_OFFSET64)length);
 @@pp_else@@
@@ -1483,7 +1507,7 @@ int truncate([[nonnull]] char const *file, __PIO_OFFSET length) {
 @@>> truncate64(2)
 @@Truncate the given file `FILE' to a length of `LENGTH'
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
-[[off64_variant_of(truncate), impl_prefix(DEFINE_PIO_OFFSET)]]
+[[off64_variant_of(truncate), impl_include("<features.h>"), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[userimpl, requires($has_function(truncate32) || ($has_function(open64) && $has_function(ftruncate64)))]]
 int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 @@pp_if $has_function(truncate32)@@
@@ -1846,16 +1870,17 @@ int ftruncate32($fd_t fd, $pos32_t length);
 
 @@>> ftruncate(2)
 @@Truncate the given file `FD' to a length of `LENGTH'
-[[decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import, decl_include("<bits/types.h>")]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[no_crt_self_import, decl_include("<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate64", "_chsize_s")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate", "_chsize", "chsize")]]
 [[userimpl, requires($has_function(ftruncate32) || $has_function(ftruncate64))]]
 [[export_as("_chsize", "chsize"), section(".text.crt{|.dos}.io.write")]]
 int ftruncate($fd_t fd, __PIO_OFFSET length) {
 @@pp_if $has_function(ftruncate32)@@
-	return ftruncate32(fd, (__pos32_t)length);
+	return ftruncate32(fd, (pos32_t)length);
 @@pp_else@@
-	return ftruncate64(fd, (__pos64_t)length);
+	return ftruncate64(fd, (pos64_t)length);
 @@pp_endif@@
 }
 
@@ -1863,7 +1888,7 @@ int ftruncate($fd_t fd, __PIO_OFFSET length) {
 %#ifdef __USE_LARGEFILE64
 @@>> ftruncate64(2)
 @@Truncate the given file `FD' to a length of `LENGTH'
-[[off64_variant_of(ftruncate), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[off64_variant_of(ftruncate), decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[export_alias("_chsize_s"), section(".text.crt{|.dos}.io.large.write")]]
 [[userimpl, requires_function(ftruncate32), decl_include("<bits/types.h>")]]
 int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
@@ -1977,12 +2002,20 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 %
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
-%#ifndef F_LOCK
-%#define F_ULOCK 0 /* Unlock a previously locked region. */
-%#define F_LOCK  1 /* Lock a region for exclusive use. */
-%#define F_TLOCK 2 /* Test and lock a region for exclusive use. */
-%#define F_TEST  3 /* Test a region for other processes locks. */
-%#endif /* !F_LOCK */
+%{
+#if !defined(F_ULOCK) && defined(__F_ULOCK)
+#define F_ULOCK __F_ULOCK /* Unlock a previously locked region. */
+#endif /* !F_ULOCK && __F_ULOCK */
+#if !defined(F_LOCK) && defined(__F_LOCK)
+#define F_LOCK  __F_LOCK  /* Lock a region for exclusive use. */
+#endif /* !F_LOCK && __F_LOCK */
+#if !defined(F_TLOCK) && defined(__F_TLOCK)
+#define F_TLOCK __F_TLOCK /* Test and lock a region for exclusive use. */
+#endif /* !F_TLOCK && __F_TLOCK */
+#if !defined(F_TEST) && defined(__F_TEST)
+#define F_TEST  __F_TEST  /* Test a region for other processes locks. */
+#endif /* !F_TEST && __F_TEST */
+}
 %[insert:extern(lockf)]
 %#ifdef __USE_LARGEFILE64
 %[insert:extern(lockf64)]

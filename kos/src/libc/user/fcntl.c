@@ -60,7 +60,20 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0xaf141f0a]]]*/
+/*[[[head:libd_open,hash:CRC-32=0x32278851]]]*/
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
                                  oflag_t oflags,
@@ -100,7 +113,20 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0xba1315d6]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x9b69c88a]]]*/
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
                                  oflag_t oflags,
@@ -125,7 +151,8 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 }
 /*[[[end:libc_open]]]*/
 
-/*[[[head:libd_creat,hash:CRC-32=0x7d7ebee8]]]*/
+/*[[[head:libd_creat,hash:CRC-32=0x5f132f7e]]]*/
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
                                  mode_t mode)
@@ -135,7 +162,8 @@ NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
 }
 /*[[[end:libd_creat]]]*/
 
-/*[[[head:libc_creat,hash:CRC-32=0xaaefe2d]]]*/
+/*[[[head:libc_creat,hash:CRC-32=0x3efdeb8]]]*/
+/* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
                                  mode_t mode)
@@ -153,7 +181,20 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0x8e01b37b]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0xf9bbc15e]]]*/
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
                                    char const *filename,
@@ -170,7 +211,20 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0x3cf66674]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0x4ff5eb96]]]*/
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd,
                                    char const *filename,
@@ -207,10 +261,10 @@ DEFINE_INTERN_ALIAS(libd_openat64, libd_openat);
 
 
 
-/*[[[head:libc_readahead,hash:CRC-32=0xb9ac1666]]]*/
+/*[[[head:libc_readahead,hash:CRC-32=0x8181d1ce]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") ssize_t
 NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd,
-                                     off64_t offset,
+                                     __PIO_OFFSET64 offset,
                                      size_t count)
 /*[[[body:libc_readahead]]]*/
 {
@@ -220,11 +274,11 @@ NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd,
 }
 /*[[[end:libc_readahead]]]*/
 
-/*[[[head:libc_sync_file_range,hash:CRC-32=0x42c546a0]]]*/
+/*[[[head:libc_sync_file_range,hash:CRC-32=0xc18c119a]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") int
 NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd,
-                                           off64_t offset,
-                                           off64_t count,
+                                           __PIO_OFFSET64 offset,
+                                           __PIO_OFFSET64 count,
                                            unsigned int flags)
 /*[[[body:libc_sync_file_range]]]*/
 {
@@ -251,12 +305,12 @@ NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout,
 }
 /*[[[end:libc_vmsplice]]]*/
 
-/*[[[head:libc_splice,hash:CRC-32=0x4f6c19da]]]*/
+/*[[[head:libc_splice,hash:CRC-32=0x964f0174]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") ssize_t
 NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin,
-                                  off64_t *offin,
+                                  __PIO_OFFSET64 *offin,
                                   fd_t fdout,
-                                  off64_t *offout,
+                                  __PIO_OFFSET64 *offout,
                                   size_t length,
                                   unsigned int flags)
 /*[[[body:libc_splice]]]*/
@@ -323,12 +377,12 @@ NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
 }
 /*[[[end:libc_open_by_handle_at]]]*/
 
-/*[[[head:libc_fallocate,hash:CRC-32=0xb1b8db98]]]*/
+/*[[[head:libc_fallocate,hash:CRC-32=0x126a7d9c]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") int
 NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd,
-                                     int mode,
-                                     off_t offset,
-                                     off_t length)
+                                     __STDC_INT_AS_UINT_T mode,
+                                     __PIO_OFFSET offset,
+                                     __PIO_OFFSET length)
 /*[[[body:libc_fallocate]]]*/
 {
 	errno_t result;
@@ -340,15 +394,15 @@ NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd,
 }
 /*[[[end:libc_fallocate]]]*/
 
-/*[[[head:libc_fallocate64,hash:CRC-32=0x24d8e4a1]]]*/
+/*[[[head:libc_fallocate64,hash:CRC-32=0xa250b385]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fallocate64, libc_fallocate);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.io.utility") int
 NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
-                                       int mode,
-                                       off64_t offset,
-                                       off64_t length)
+                                       __STDC_INT_AS_UINT_T mode,
+                                       __PIO_OFFSET64 offset,
+                                       __PIO_OFFSET64 length)
 /*[[[body:libc_fallocate64]]]*/
 {
 	errno_t result;
@@ -362,10 +416,10 @@ NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
 /*[[[end:libc_fallocate64]]]*/
 
 
-/*[[[head:libc_fcntl,hash:CRC-32=0x9ee9436b]]]*/
+/*[[[head:libc_fcntl,hash:CRC-32=0xdf511ecc]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
-                                  int cmd,
+                                  __STDC_INT_AS_UINT_T cmd,
                                   ...)
 /*[[[body:libc_fcntl]]]*/
 {
@@ -380,12 +434,12 @@ NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
 }
 /*[[[end:libc_fcntl]]]*/
 
-/*[[[head:libc_posix_fadvise,hash:CRC-32=0xdc94db4e]]]*/
+/*[[[head:libc_posix_fadvise,hash:CRC-32=0x5865caf1]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") int
 NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
-                                         off_t offset,
-                                         off_t length,
-                                         int advise)
+                                         __PIO_OFFSET offset,
+                                         __PIO_OFFSET length,
+                                         __STDC_INT_AS_UINT_T advise)
 /*[[[body:libc_posix_fadvise]]]*/
 {
 	return libc_posix_fadvise64(fd,
@@ -395,11 +449,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
 }
 /*[[[end:libc_posix_fadvise]]]*/
 
-/*[[[head:libc_posix_fallocate,hash:CRC-32=0xa96cf38]]]*/
+/*[[[head:libc_posix_fallocate,hash:CRC-32=0x698a865b]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") int
 NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
-                                           off_t offset,
-                                           off_t length)
+                                           __PIO_OFFSET offset,
+                                           __PIO_OFFSET length)
 /*[[[body:libc_posix_fallocate]]]*/
 {
 	return libc_posix_fallocate64(fd,
@@ -408,15 +462,15 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
 }
 /*[[[end:libc_posix_fallocate]]]*/
 
-/*[[[head:libc_posix_fadvise64,hash:CRC-32=0x2819d435]]]*/
+/*[[[head:libc_posix_fadvise64,hash:CRC-32=0x7405081a]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_posix_fadvise64, libc_posix_fadvise);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.io.large.utility") int
 NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd,
-                                           off64_t offset,
-                                           off64_t length,
-                                           int advise)
+                                           __PIO_OFFSET64 offset,
+                                           __PIO_OFFSET64 length,
+                                           __STDC_INT_AS_UINT_T advise)
 /*[[[body:libc_posix_fadvise64]]]*/
 {
 	(void)fd;
@@ -430,14 +484,14 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_posix_fadvise64]]]*/
 
-/*[[[head:libc_posix_fallocate64,hash:CRC-32=0xf4ed2e86]]]*/
+/*[[[head:libc_posix_fallocate64,hash:CRC-32=0xdb734687]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_posix_fallocate64, libc_posix_fallocate);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.io.large.utility") int
 NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd,
-                                             off64_t offset,
-                                             off64_t length)
+                                             __PIO_OFFSET64 offset,
+                                             __PIO_OFFSET64 length)
 /*[[[body:libc_posix_fallocate64]]]*/
 {
 	(void)fd;
@@ -450,25 +504,25 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_posix_fallocate64]]]*/
 
-/*[[[head:libc_lockf,hash:CRC-32=0xd233a69d]]]*/
+/*[[[head:libc_lockf,hash:CRC-32=0x3f461c5c]]]*/
 INTERN ATTR_SECTION(".text.crt.io.lock") int
 NOTHROW_RPC(LIBCCALL libc_lockf)(fd_t fd,
-                                 int cmd,
-                                 off_t length)
+                                 __STDC_INT_AS_UINT_T cmd,
+                                 __PIO_OFFSET length)
 /*[[[body:libc_lockf]]]*/
 {
 	return libc_lockf64(fd, cmd, (off64_t)length);
 }
 /*[[[end:libc_lockf]]]*/
 
-/*[[[head:libc_lockf64,hash:CRC-32=0xcf2acb7e]]]*/
+/*[[[head:libc_lockf64,hash:CRC-32=0x9b6406bb]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lockf64, libc_lockf);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.io.large.lock") int
 NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
-                                   int cmd,
-                                   off64_t length)
+                                   __STDC_INT_AS_UINT_T cmd,
+                                   __PIO_OFFSET64 length)
 /*[[[body:libc_lockf64]]]*/
 {
 	(void)fd;

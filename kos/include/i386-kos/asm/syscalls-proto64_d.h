@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8844378 */
+/* HASH CRC-32:0x629650ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,9 @@
 #define __NR64AC_msync                  3
 #define __NR64AC_mincore                3
 #define __NR64AC_madvise                3
-#define __NR64AC_shmget                 1
-#define __NR64AC_shmat                  1
-#define __NR64AC_shmctl                 1
+#define __NR64AC_shmget                 3
+#define __NR64AC_shmat                  3
+#define __NR64AC_shmctl                 3
 #define __NR64AC_dup                    1
 #define __NR64AC_dup2                   2
 #define __NR64AC_pause                  0
@@ -887,9 +887,15 @@
 #define __NR64AT0_madvise                (void *, void *)
 #define __NR64AT1_madvise                (size_t, __size_t)
 #define __NR64AT2_madvise                (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_shmget                 (int, int)
-#define __NR64AT0_shmat                  (int, int)
-#define __NR64AT0_shmctl                 (int, int)
+#define __NR64AT0_shmget                 (key_t, __key_t)
+#define __NR64AT1_shmget                 (size_t, __size_t)
+#define __NR64AT2_shmget                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_shmat                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_shmat                  (void const *, void const *)
+#define __NR64AT2_shmat                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_shmctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_shmctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_shmctl                 (struct shmid_ds *, struct shmid_ds *)
 #define __NR64AT0_dup                    (fd_t, __fd_t)
 #define __NR64AT0_dup2                   (fd_t, __fd_t)
 #define __NR64AT1_dup2                   (fd_t, __fd_t)
@@ -978,7 +984,7 @@
 #define __NR64AT0_semget                 (int, int)
 #define __NR64AT0_semop                  (int, int)
 #define __NR64AT0_semctl                 (int, int)
-#define __NR64AT0_shmdt                  (int, int)
+#define __NR64AT0_shmdt                  (void const *, void const *)
 #define __NR64AT0_msgget                 (int, int)
 #define __NR64AT0_msgsnd                 (int, int)
 #define __NR64AT0_msgrcv                 (int, int)
@@ -1616,9 +1622,9 @@
 #define __NR64AT5_coredump               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT1_raiseat                (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
-#define __NR64AT0_mktty                  (fd_t, __fd_t)
+#define __NR64AT0_mktty                  (char const *, char const *)
 #define __NR64AT1_mktty                  (fd_t, __fd_t)
-#define __NR64AT2_mktty                  (char const *, char const *)
+#define __NR64AT2_mktty                  (fd_t, __fd_t)
 #define __NR64AT3_mktty                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
 #define __NR64AT1_lfutexlockexpr         (void *, void *)
@@ -1745,9 +1751,9 @@
 #define __NR64AM_msync(a, b, c, d, e, f)                  (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_mincore(a, b, c, d, e, f)                (void *)a, (__size_t)b, (__uint8_t *)c
 #define __NR64AM_madvise(a, b, c, d, e, f)                (void *)a, (__size_t)b, (__syscall_ulong_t)c
-#define __NR64AM_shmget(a, b, c, d, e, f)                 (int)a
-#define __NR64AM_shmat(a, b, c, d, e, f)                  (int)a
-#define __NR64AM_shmctl(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_shmget(a, b, c, d, e, f)                 (__key_t)a, (__size_t)b, (__syscall_ulong_t)c
+#define __NR64AM_shmat(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void const *)b, (__syscall_ulong_t)c
+#define __NR64AM_shmctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (struct shmid_ds *)c
 #define __NR64AM_dup(a, b, c, d, e, f)                    (__fd_t)a
 #define __NR64AM_dup2(a, b, c, d, e, f)                   (__fd_t)a, (__fd_t)b
 #define __NR64AM_pause(a, b, c, d, e, f)                  /* nothing */
@@ -1783,7 +1789,7 @@
 #define __NR64AM_semget(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_semop(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_semctl(a, b, c, d, e, f)                 (int)a
-#define __NR64AM_shmdt(a, b, c, d, e, f)                  (int)a
+#define __NR64AM_shmdt(a, b, c, d, e, f)                  (void const *)a
 #define __NR64AM_msgget(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_msgsnd(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_msgrcv(a, b, c, d, e, f)                 (int)a
@@ -2064,7 +2070,7 @@
 #define __NR64AM_process_spawnveat(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx64 const *)f
 #define __NR64AM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NR64AM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfox64_struct const *)b
-#define __NR64AM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
+#define __NR64AM_mktty(a, b, c, d, e, f)                  (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NR64AM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
 #define __NR64AM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexprx64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
 #define __NR64AM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
@@ -2129,9 +2135,9 @@
 #define __NR64AP_msync(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_mincore(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_madvise(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_shmget(a)                                (__syscall_ulong_t)a
-#define __NR64AP_shmat(a)                                 (__syscall_ulong_t)a
-#define __NR64AP_shmctl(a)                                (__syscall_ulong_t)a
+#define __NR64AP_shmget(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_shmat(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_shmctl(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_dup(a)                                   (__syscall_ulong_t)a
 #define __NR64AP_dup2(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_pause()                                  /* nothing */

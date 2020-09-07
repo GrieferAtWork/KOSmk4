@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30869ec1 */
+/* HASH CRC-32:0xd9af85cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,7 +111,9 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid);
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_fork)(void);
 /* >> alarm(2)
  * @return: 0 : No alarm was scheduled before.
@@ -156,11 +158,20 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *pa
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -192,7 +203,7 @@ INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd, fd_t newfd);
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd);
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
@@ -248,10 +259,12 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
@@ -285,8 +298,31 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
 INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
 INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
 /* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+ *                 instead of the regular `exit(2)', since the later would include
+ *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 the context of a VM that isn't actually about to be destroyed.
+ *   - `execve(2)' Create a new VM that is populated with the specified process
+ *                 image. The parent process will only be resumed in case the
+ *                 new program image could be loaded successfully. Otherwise,
+ *                 the call to `execve(2)' returns normally in the child.
+ *                 Other functions from the exec()-family behave the same
+ *
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ *
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_vfork)(void);
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */

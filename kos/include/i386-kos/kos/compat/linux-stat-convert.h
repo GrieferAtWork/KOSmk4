@@ -22,6 +22,8 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/host.h>
+
 #include <bits/stat-kos.h>
 #include <kos/compat/linux-stat.h>
 

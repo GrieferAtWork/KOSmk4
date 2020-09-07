@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5fb172f */
+/* HASH CRC-32:0xd680f4f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@
 #define __NR32AC_settimeofday            2
 #define __NR32AC_getgroups               2
 #define __NR32AC_setgroups               2
-#define __NR32AC_select                  5
+#define __NR32AC_select                  1
 #define __NR32AC_symlink                 2
 #define __NR32AC_linux_oldlstat          2
 #define __NR32AC_readlink                3
@@ -180,7 +180,7 @@
 #define __NR32AC_setfsgid                1
 #define __NR32AC__llseek                 4
 #define __NR32AC_getdents                3
-#define __NR32AC__newselect              1
+#define __NR32AC__newselect              5
 #define __NR32AC_flock                   2
 #define __NR32AC_msync                   3
 #define __NR32AC_readv                   3
@@ -644,7 +644,7 @@
 #define __NR32RT_setfsgid                (errno_t, __errno_t)
 #define __NR32RT__llseek                 (errno_t, __errno_t)
 #define __NR32RT_getdents                (ssize_t, __ssize_t)
-#define __NR32RT__newselect              (errno_t, __errno_t)
+#define __NR32RT__newselect              (ssize_t, __ssize_t)
 #define __NR32RT_flock                   (errno_t, __errno_t)
 #define __NR32RT_msync                   (errno_t, __errno_t)
 #define __NR32RT_readv                   (ssize_t, __ssize_t)
@@ -1082,11 +1082,7 @@
 #define __NR32AT1_getgroups               (uint16_t *, __uint16_t *)
 #define __NR32AT0_setgroups               (size_t, __size_t)
 #define __NR32AT1_setgroups               (uint16_t const *, __uint16_t const *)
-#define __NR32AT0_select                  (size_t, __size_t)
-#define __NR32AT1_select                  (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NR32AT2_select                  (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NR32AT3_select                  (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NR32AT4_select                  (struct timevalx32 *, struct __timevalx32 *)
+#define __NR32AT0_select                  (struct sel_arg_structx32 const *, struct sel_arg_structx32 const *)
 #define __NR32AT0_symlink                 (char const *, char const *)
 #define __NR32AT1_symlink                 (char const *, char const *)
 #define __NR32AT0_linux_oldlstat          (char const *, char const *)
@@ -1205,7 +1201,11 @@
 #define __NR32AT0_getdents                (fd_t, __fd_t)
 #define __NR32AT1_getdents                (struct linux_dirent *, struct linux_dirent *)
 #define __NR32AT2_getdents                (size_t, __size_t)
-#define __NR32AT0__newselect              (int, int)
+#define __NR32AT0__newselect              (size_t, __size_t)
+#define __NR32AT1__newselect              (struct __fd_set_struct *, struct __fd_set_struct *)
+#define __NR32AT2__newselect              (struct __fd_set_struct *, struct __fd_set_struct *)
+#define __NR32AT3__newselect              (struct __fd_set_struct *, struct __fd_set_struct *)
+#define __NR32AT4__newselect              (struct timevalx32 *, struct __timevalx32 *)
 #define __NR32AT0_flock                   (fd_t, __fd_t)
 #define __NR32AT1_flock                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_msync                   (void *, void *)
@@ -1990,9 +1990,9 @@
 #define __NR32AT5_coredump                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_raiseat                 (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NR32AT1_raiseat                 (struct __siginfox32_struct const *, struct __siginfox32_struct const *)
-#define __NR32AT0_mktty                   (fd_t, __fd_t)
+#define __NR32AT0_mktty                   (char const *, char const *)
 #define __NR32AT1_mktty                   (fd_t, __fd_t)
-#define __NR32AT2_mktty                   (char const *, char const *)
+#define __NR32AT2_mktty                   (fd_t, __fd_t)
 #define __NR32AT3_mktty                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_lfutexlockexpr          (uint32_t *, __uint32_t *)
 #define __NR32AT1_lfutexlockexpr          (void *, void *)
@@ -2151,7 +2151,7 @@
 #define __NR32AM_settimeofday(a, b, c, d, e, f)            (struct __timevalx32 const *)a, (struct timezone const *)b
 #define __NR32AM_getgroups(a, b, c, d, e, f)               (__size_t)a, (__uint16_t *)b
 #define __NR32AM_setgroups(a, b, c, d, e, f)               (__size_t)a, (__uint16_t const *)b
-#define __NR32AM_select(a, b, c, d, e, f)                  (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timevalx32 *)e
+#define __NR32AM_select(a, b, c, d, e, f)                  (struct sel_arg_structx32 const *)a
 #define __NR32AM_symlink(a, b, c, d, e, f)                 (char const *)a, (char const *)b
 #define __NR32AM_linux_oldlstat(a, b, c, d, e, f)          (char const *)a, (struct linux_oldstat *)b
 #define __NR32AM_readlink(a, b, c, d, e, f)                (char const *)a, (char *)b, (__size_t)c
@@ -2211,7 +2211,7 @@
 #define __NR32AM_setfsgid(a, b, c, d, e, f)                (__uint16_t)a
 #define __NR32AM__llseek(a, b, c, d, e, f)                 (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__uint64_t *)d, (__syscall_ulong_t)e
 #define __NR32AM_getdents(a, b, c, d, e, f)                (__fd_t)a, (struct linux_dirent *)b, (__size_t)c
-#define __NR32AM__newselect(a, b, c, d, e, f)              (int)a
+#define __NR32AM__newselect(a, b, c, d, e, f)              (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timevalx32 *)e
 #define __NR32AM_flock(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b
 #define __NR32AM_msync(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR32AM_readv(a, b, c, d, e, f)                   (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c
@@ -2503,7 +2503,7 @@
 #define __NR32AM_stime64(a, b, c, d, e, f)                 (__time64_t const *)a
 #define __NR32AM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_raiseat(a, b, c, d, e, f)                 (struct ucpustate32 const *)a, (struct __siginfox32_struct const *)b
-#define __NR32AM_mktty(a, b, c, d, e, f)                   (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
+#define __NR32AM_mktty(a, b, c, d, e, f)                   (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NR32AM_lfutexlockexpr(a, b, c, d, e, f)          (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_lfutexexpr(a, b, c, d, e, f)              (void *)a, (__size_t)b, (struct lfutexexprx32 const *)c, (struct __timespecx32_64 const *)d, (__syscall_ulong_t)e
 #define __NR32AM_lseek64(a, b, c, d, e, f)                 (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
@@ -2615,7 +2615,7 @@
 #define __NR32AP_settimeofday(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_getgroups(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_setgroups(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_select(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR32AP_select(a)                                 (__syscall_ulong_t)a
 #define __NR32AP_symlink(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_linux_oldlstat(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_readlink(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -2675,7 +2675,7 @@
 #define __NR32AP_setfsgid(a)                               (__syscall_ulong_t)a
 #define __NR32AP__llseek(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_getdents(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP__newselect(a)                             (__syscall_ulong_t)a
+#define __NR32AP__newselect(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_flock(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_msync(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_readv(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

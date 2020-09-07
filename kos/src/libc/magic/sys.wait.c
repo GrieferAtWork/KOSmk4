@@ -72,10 +72,12 @@ typedef struct __siginfo_struct siginfo_t;
 }
 
 
+@@>> wait(2)
 @@Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);')
 [[cp, export_alias("__wait"), decl_include("<bits/types.h>", "<parts/waitmacros.h>")]]
 $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 
+@@>> waitpid(2)
 @@Wait for a child process:
 @@ - `pid < -1':  Wait for any child process whose process group ID is `-PID'
 @@ - `pid == -1': Wait for any child process
@@ -93,8 +95,10 @@ $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 %#define __id_t_defined 1
 %typedef __id_t id_t;
 %#endif /* !__id_t_defined */
-@@@param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
-@@                optionally or'd with `WNOHANG | WNOWAIT'
+@@>> waitid(2)
+@@@param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+@@@param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+@@                 optionally or'd with `WNOHANG | WNOWAIT'
 [[cp, decl_include("<features.h>")]]
 int waitid(idtype_t idtype, id_t id,
            [[nullable]] siginfo_t *infop,
@@ -107,7 +111,7 @@ int waitid(idtype_t idtype, id_t id,
 
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
-[[cp, doc_alias("wait3"), ignore, nocrt, alias("wait3")]]
+[[cp, doc_alias(wait3), ignore, nocrt, alias("wait3")]]
 $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
@@ -144,7 +148,7 @@ $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>", "<parts/waitmacros.h>")]]
-[[doc_alias("wait3"), time64_variant_of(wait3)]]
+[[doc_alias(wait3), time64_variant_of(wait3)]]
 [[userimpl, requires_function(wait3_32)]]
 $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
@@ -164,13 +168,14 @@ $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
 
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
-[[cp, doc_alias("wait4"), ignore, nocrt, alias("wait4")]]
+[[cp, doc_alias(wait4), ignore, nocrt, alias("wait4")]]
 $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
 
+@@>> wait4(2)
 @@Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
-@@@param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
+@@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, decl_prefix(struct rusage;)]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wait4_64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait4")]]
@@ -198,7 +203,7 @@ $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 
 %#ifdef __USE_TIME64
 %struct rusage64;
-[[doc_alias("wait4"), time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
+[[doc_alias(wait4), time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/rusage-struct.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]

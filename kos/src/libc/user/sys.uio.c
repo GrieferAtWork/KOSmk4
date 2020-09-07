@@ -35,7 +35,11 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_process_vm_readv,hash:CRC-32=0xbf88f348]]]*/
+/*[[[head:libc_process_vm_readv,hash:CRC-32=0x6a2ecd8f]]]*/
+/* >> process_vm_readv(2)
+ * Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
                                             struct iovec const *local_iov,
@@ -54,7 +58,11 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
 }
 /*[[[end:libc_process_vm_readv]]]*/
 
-/*[[[head:libc_process_vm_writev,hash:CRC-32=0xaefa34c0]]]*/
+/*[[[head:libc_process_vm_writev,hash:CRC-32=0x6cf0251c]]]*/
+/* >> process_vm_writev(2)
+ * Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 INTERN ATTR_SECTION(".text.crt.unsorted") ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
                                              struct iovec const *local_iov,
@@ -73,7 +81,16 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
 }
 /*[[[end:libc_process_vm_writev]]]*/
 
-/*[[[head:libc_readv,hash:CRC-32=0x9bdb8e8e]]]*/
+/*[[[head:libc_readv,hash:CRC-32=0x26772af1]]]*/
+/* >> readv(2)
+ * Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
                                  struct iovec const *iov,
@@ -86,7 +103,16 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
 }
 /*[[[end:libc_readv]]]*/
 
-/*[[[head:libc_writev,hash:CRC-32=0x7b5ef56c]]]*/
+/*[[[head:libc_writev,hash:CRC-32=0xcb168fe7]]]*/
+/* >> writev(2)
+ * Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
                                   struct iovec const *iov,
@@ -99,7 +125,11 @@ NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
 }
 /*[[[end:libc_writev]]]*/
 
-/*[[[head:libc_preadv,hash:CRC-32=0xdb25eb35]]]*/
+/*[[[head:libc_preadv,hash:CRC-32=0x1aebd309]]]*/
+/* >> preadv(2)
+ * Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
                                   struct iovec const *iov,
@@ -113,7 +143,11 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
 }
 /*[[[end:libc_preadv]]]*/
 
-/*[[[head:libc_pwritev,hash:CRC-32=0x41cd37eb]]]*/
+/*[[[head:libc_pwritev,hash:CRC-32=0x1e92d8f2]]]*/
+/* >> pwritev(2)
+ * Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
                                    struct iovec const *iov,
@@ -127,10 +161,14 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
 }
 /*[[[end:libc_pwritev]]]*/
 
-/*[[[head:libc_preadv64,hash:CRC-32=0xfb99017]]]*/
+/*[[[head:libc_preadv64,hash:CRC-32=0x833047d0]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_preadv64, libc_preadv);
 #else /* MAGIC:alias */
+/* >> preadv(2)
+ * Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
                                     struct iovec const *iov,
@@ -145,10 +183,14 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_preadv64]]]*/
 
-/*[[[head:libc_pwritev64,hash:CRC-32=0xaa900840]]]*/
+/*[[[head:libc_pwritev64,hash:CRC-32=0xb96dbc32]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwritev64, libc_pwritev);
 #else /* MAGIC:alias */
+/* >> pwritev(2)
+ * Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
                                      struct iovec const *iov,

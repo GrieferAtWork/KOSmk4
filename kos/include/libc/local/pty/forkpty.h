@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8431234e */
+/* HASH CRC-32:0x7127c88b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,15 +68,15 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
@@ -93,7 +93,9 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CEIREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,{ return __builtin_fork(); })
 #elif defined(__CRT_HAVE_fork)
 /* >> fork(2)
@@ -103,7 +105,9 @@ __CEIREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,{
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,())
 #elif defined(__CRT_HAVE___fork)
 /* >> fork(2)
@@ -113,7 +117,9 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),fork,())
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,())
 #else /* ... */
 #undef __local___localdep_fork_defined

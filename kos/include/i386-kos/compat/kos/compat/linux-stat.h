@@ -24,8 +24,8 @@
 
 #ifdef __x86_64__
 #include <kos/compat/linux-stat.h>
-#define compat_linux_stat32     linux_statx32
-#define compat_linux_stat64     linux_statx32_64
+#define compat_linux_stat32 linux_statx32
+#define compat_linux_stat64 linux_statx32_64
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_KOS_COMPAT_LINUX_STAT_H */

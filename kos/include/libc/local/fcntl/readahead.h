@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36f6f8c */
+/* HASH CRC-32:0x87fdd9d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,19 @@
 #define __local_readahead_defined 1
 #include <__crt.h>
 #include <bits/types.h>
+#include <features.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(__pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(__off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(readahead) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readahead))(__fd_t __fd, __off64_t __offset, __SIZE_TYPE__ __count) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readahead))(__fd_t __fd, __PIO_OFFSET64 __offset, __SIZE_TYPE__ __count) {
 	(void)__fd;
 	(void)__offset;
 	return __count;

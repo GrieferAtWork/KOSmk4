@@ -42,7 +42,7 @@ typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
  * exception handler stack, or (by default) on the stack of the thread
  * that caused the exception
  * Other caveats include the fact that the expected behavior of the
- * function by differ based on other flags passed to `set_exception_handler()' */
+ * function may differ based on other flags passed to `set_exception_handler()' */
 typedef /*__ATTR_NORETURN*/ void
 (__EXCEPT_HANDLER_CC *__except_handler_t)(error_register_state_t *__restrict state,
                                           struct exception_data *__restrict error);

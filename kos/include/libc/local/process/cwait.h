@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ca5b79 */
+/* HASH CRC-32:0xb085bf3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,8 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait for a child process:
+/* >> waitpid(2)
+ * Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
@@ -45,7 +46,8 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait for a child process:
+/* >> waitpid(2)
+ * Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller

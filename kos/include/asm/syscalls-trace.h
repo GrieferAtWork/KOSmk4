@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cf13ac5 */
+/* HASH CRC-32:0xfe6f4a2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,7 +213,7 @@
 #define __NRAN4_ppoll                  sigsetsize
 #define __NRAN0_signalfd4              fd
 #define __NRAN1_signalfd4              sigmask
-#define __NRAN2_signalfd4              sigsetsize
+#define __NRAN2_signalfd4              sigmasksize
 #define __NRAN3_signalfd4              flags
 #define __NRAN0_vmsplice               fdout
 #define __NRAN1_vmsplice               iov
@@ -255,7 +255,7 @@
 #define __NRAN0_capget                 TODO_PROTOTYPE
 #define __NRAN0_capset                 TODO_PROTOTYPE
 #define __NRAN0_personality            TODO_PROTOTYPE
-#define __NRAN0_exit                   status
+#define __NRAN0_exit                   exit_code
 #define __NRAN0_exit_group             exit_code
 #define __NRAN0_waitid                 idtype
 #define __NRAN1_waitid                 id
@@ -444,10 +444,16 @@
 #define __NRAN0_semctl                 TODO_PROTOTYPE
 #define __NRAN0_semtimedop             TODO_PROTOTYPE
 #define __NRAN0_semop                  TODO_PROTOTYPE
-#define __NRAN0_shmget                 TODO_PROTOTYPE
-#define __NRAN0_shmctl                 TODO_PROTOTYPE
-#define __NRAN0_shmat                  TODO_PROTOTYPE
-#define __NRAN0_shmdt                  TODO_PROTOTYPE
+#define __NRAN0_shmget                 key
+#define __NRAN1_shmget                 size
+#define __NRAN2_shmget                 shmflg
+#define __NRAN0_shmctl                 shmid
+#define __NRAN1_shmctl                 cmd
+#define __NRAN2_shmctl                 buf
+#define __NRAN0_shmat                  shmid
+#define __NRAN1_shmat                  shmaddr
+#define __NRAN2_shmat                  shmflg
+#define __NRAN0_shmdt                  shmaddr
 #define __NRAN0_socket                 domain
 #define __NRAN1_socket                 type
 #define __NRAN2_socket                 protocol
@@ -673,7 +679,7 @@
 #define __NRAN0_eventfd                initval
 #define __NRAN0_signalfd               fd
 #define __NRAN1_signalfd               sigmask
-#define __NRAN2_signalfd               sigsetsize
+#define __NRAN2_signalfd               sigmasksize
 #define __NRAN0_sendfile               out_fd
 #define __NRAN1_sendfile               in_fd
 #define __NRAN2_sendfile               pin_offset
@@ -1049,8 +1055,8 @@
 #define __NRRTR_ppoll                   SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_signalfd4              SC_REPR_FD_T                                            /* fd */ 
 #define __NRATR1_signalfd4              SC_REPR_STRUCT_SIGSET                                   /* sigmask */ 
-#define __NRATL1_signalfd4              2                                                       /* sigmask -> sigsetsize */ 
-#define __NRATR2_signalfd4              SC_REPR_SIZE_T                                          /* sigsetsize */ 
+#define __NRATL1_signalfd4              2                                                       /* sigmask -> sigmasksize */ 
+#define __NRATR2_signalfd4              SC_REPR_SIZE_T                                          /* sigmasksize */ 
 #define __NRATR3_signalfd4              SC_REPR_SIGNALFD4_FLAGS                                 /* flags */ 
 #define __NRRTR_signalfd4               SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_vmsplice               SC_REPR_FD_T                                            /* fdout */ 
@@ -1113,7 +1119,7 @@
 #define __NRRTR_capset                  SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_personality            SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_personality             SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_exit                   SC_REPR_EXIT_STATUS                                     /* status */ 
+#define __NRATR0_exit                   SC_REPR_EXIT_STATUS                                     /* exit_code */ 
 #define __NRRTR_exit                    SC_REPR_SIGHANDLER_T                                    /* return */
 #define __NRATR0_exit_group             SC_REPR_EXIT_STATUS                                     /* exit_code */ 
 #define __NRRTR_exit_group              SC_REPR_SIGHANDLER_T                                    /* return */
@@ -1416,13 +1422,19 @@
 #define __NRRTR_semtimedop              SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_semop                  SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_semop                   SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_shmget                 SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_shmget                 SC_REPR_SIGHANDLER_T                                    /* key */ 
+#define __NRATR1_shmget                 SC_REPR_SIZE_T                                          /* size */ 
+#define __NRATR2_shmget                 SC_REPR_SYSCALL_ULONG_T                                 /* shmflg */ 
 #define __NRRTR_shmget                  SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_shmctl                 SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_shmctl                 SC_REPR_SYSCALL_ULONG_T                                 /* shmid */ 
+#define __NRATR1_shmctl                 SC_REPR_SYSCALL_ULONG_T                                 /* cmd */ 
+#define __NRATR2_shmctl                 SC_REPR_POINTER                                         /* buf */ 
 #define __NRRTR_shmctl                  SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_shmat                  SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_shmat                  SC_REPR_SYSCALL_ULONG_T                                 /* shmid */ 
+#define __NRATR1_shmat                  SC_REPR_POINTER                                         /* shmaddr */ 
+#define __NRATR2_shmat                  SC_REPR_SYSCALL_ULONG_T                                 /* shmflg */ 
 #define __NRRTR_shmat                   SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_shmdt                  SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_shmdt                  SC_REPR_POINTER                                         /* shmaddr */ 
 #define __NRRTR_shmdt                   SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_socket                 SC_REPR_SOCKET_DOMAIN                                   /* domain */ 
 #define __NRATR1_socket                 SC_REPR_SOCKET_TYPE                                     /* type */ 
@@ -1758,8 +1770,8 @@
 #define __NRRTR_eventfd                 SC_REPR_FD_T                                            /* return */
 #define __NRATR0_signalfd               SC_REPR_FD_T                                            /* fd */ 
 #define __NRATR1_signalfd               SC_REPR_STRUCT_SIGSET                                   /* sigmask */ 
-#define __NRATL1_signalfd               2                                                       /* sigmask -> sigsetsize */ 
-#define __NRATR2_signalfd               SC_REPR_SIZE_T                                          /* sigsetsize */ 
+#define __NRATL1_signalfd               2                                                       /* sigmask -> sigmasksize */ 
+#define __NRATR2_signalfd               SC_REPR_SIZE_T                                          /* sigmasksize */ 
 #define __NRRTR_signalfd                SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_sendfile               SC_REPR_FD_T                                            /* out_fd */ 
 #define __NRATR1_sendfile               SC_REPR_FD_T                                            /* in_fd */ 

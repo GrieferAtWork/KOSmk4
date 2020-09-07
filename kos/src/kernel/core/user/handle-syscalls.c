@@ -46,6 +46,7 @@
 #include <asm/ioctls/block_ex.h>
 #include <asm/ioctls/tty.h>
 #include <bits/iovec-struct.h> /* struct iovec */
+#include <compat/config.h>
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/hop/handle.h>
@@ -70,8 +71,17 @@
 #include <compat/bits/timespec.h>
 #include <compat/bits/timeval.h>
 #include <compat/kos/types.h>
+#include <compat/pointer.h>
 #include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
+
+#if (defined(__ARCH_WANT_SYSCALL_SELECT) && defined(__ARCH_WANT_SYSCALL__NEWSELECT))
+#include <kos/compat/linux-oldselect.h>
+#endif /* __ARCH_WANT_SYSCALL_SELECT && __ARCH_WANT_SYSCALL__NEWSELECT */
+
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) && defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
+#include <compat/kos/compat/linux-oldselect.h>
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT && __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 
 DECL_BEGIN
 
@@ -1995,13 +2005,13 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
-	validate_readable_opt(sigmask, sizeof(compat_sigset_t));
-	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	compat_validate_readable_opt(sigmask, sizeof(compat_sigset_t));
+	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
 		struct timespec tmo;
-		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		compat_validate_readable(timeout_ts, sizeof(*timeout_ts));
 		COMPILER_READ_BARRIER();
 		tmo.tv_sec  = (time_t)timeout_ts->tv_sec;
 		tmo.tv_nsec = timeout_ts->tv_nsec;
@@ -2056,13 +2066,13 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
-	validate_readable_opt(sigmask, sizeof(compat_sigset_t));
-	validate_readwritem(fds, nfds, sizeof(struct pollfd));
+	compat_validate_readable_opt(sigmask, sizeof(compat_sigset_t));
+	compat_validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
 		struct timespec tmo;
-		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		compat_validate_readable(timeout_ts, sizeof(*timeout_ts));
 		COMPILER_READ_BARRIER();
 		tmo.tv_sec  = (time_t)timeout_ts->tv_sec;
 		tmo.tv_nsec = timeout_ts->tv_nsec;
@@ -2075,12 +2085,22 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
 
-#ifdef __ARCH_WANT_SYSCALL_SELECT
+#if (defined(__ARCH_WANT_SYSCALL_SELECT) || \
+     defined(__ARCH_WANT_SYSCALL__NEWSELECT))
+#ifdef __ARCH_WANT_SYSCALL__NEWSELECT
+DEFINE_SYSCALL5(ssize_t, _newselect, size_t, nfds,
+                USER UNCHECKED fd_set *, readfds,
+                USER UNCHECKED fd_set *, writefds,
+                USER UNCHECKED fd_set *, exceptfds,
+                USER UNCHECKED struct timeval32 *, timeout)
+#else /* __ARCH_WANT_SYSCALL__NEWSELECT */
 DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timeval32 *, timeout) {
+                USER UNCHECKED struct timeval32 *, timeout)
+#endif /* !__ARCH_WANT_SYSCALL__NEWSELECT */
+{
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_readwrite_opt(readfds, nfd_size);
@@ -2108,7 +2128,20 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_SELECT */
+
+#if (defined(__ARCH_WANT_SYSCALL_SELECT) && \
+     defined(__ARCH_WANT_SYSCALL__NEWSELECT))
+DEFINE_SYSCALL1(ssize_t, select,
+                USER UNCHECKED struct sel_arg_struct const *, arg) {
+	validate_readable(arg, sizeof(*arg));
+	return sys__newselect(ATOMIC_READ(arg->n),
+	                      ATOMIC_READ(arg->inp),
+	                      ATOMIC_READ(arg->outp),
+	                      ATOMIC_READ(arg->exp),
+	                      ATOMIC_READ(arg->tvp));
+}
+#endif /* __ARCH_WANT_SYSCALL_SELECT && __ARCH_WANT_SYSCALL__NEWSELECT */
+#endif /* __ARCH_WANT_SYSCALL_SELECT || __ARCH_WANT_SYSCALL__NEWSELECT */
 
 #ifdef __ARCH_WANT_SYSCALL_SELECT64
 DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
@@ -2145,20 +2178,22 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 }
 #endif /* __ARCH_WANT_SYSCALL_SELECT64 */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_SELECT
-DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
-                       USER UNCHECKED fd_set *, readfds,
-                       USER UNCHECKED fd_set *, writefds,
-                       USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timeval32 *, timeout) {
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
+PRIVATE ssize_t KCALL
+compat_sys_select_impl(size_t nfds,
+                       USER UNCHECKED fd_set *readfds,
+                       USER UNCHECKED fd_set *writefds,
+                       USER UNCHECKED fd_set *exceptfds,
+                       USER UNCHECKED struct compat_timeval32 *timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readwrite_opt(readfds, nfd_size);
+	compat_validate_readwrite_opt(writefds, nfd_size);
+	compat_validate_readwrite_opt(exceptfds, nfd_size);
 	if (timeout) {
 		struct timespec tmo;
-		validate_readable(timeout, sizeof(*timeout));
+		compat_validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
 		TIMEVAL_TO_TIMESPEC(timeout, &tmo);
 		COMPILER_READ_BARRIER();
@@ -2178,7 +2213,49 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT
+DEFINE_COMPAT_SYSCALL5(ssize_t, _newselect, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timeval32 *, timeout)
+#else /* __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
+DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timeval32 *, timeout)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
+{
+	return compat_sys_select_impl(nfds,
+	                              readfds,
+	                              writefds,
+	                              exceptfds,
+	                              timeout);
+}
+
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) && \
+     defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
+DEFINE_COMPAT_SYSCALL1(ssize_t, select,
+                       USER UNCHECKED struct compat_sel_arg_struct const *, arg) {
+	compat_ulongptr_t n;                     /* nfds argument */
+	compat_ptr(fd_set) inp;                  /* Read fd-set */
+	compat_ptr(fd_set) outp;                 /* Write fd-set */
+	compat_ptr(fd_set) exp;                  /* Except fd-set */
+	compat_ptr(struct compat_timeval32) tvp; /* Timeout argument */
+	compat_validate_readable(arg, sizeof(*arg));
+	COMPILER_READ_BARRIER();
+	n    = arg->n;
+	inp  = arg->inp;
+	outp = arg->outp;
+	exp  = arg->exp;
+	tvp  = arg->tvp;
+	COMPILER_READ_BARRIER();
+	return compat_sys_select_impl(n, inp, outp, exp, tvp);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT && __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT || __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SELECT64
 DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
@@ -2188,12 +2265,12 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
                        USER UNCHECKED struct compat_timeval64 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readwrite_opt(readfds, nfd_size);
+	compat_validate_readwrite_opt(writefds, nfd_size);
+	compat_validate_readwrite_opt(exceptfds, nfd_size);
 	if (timeout) {
 		struct timespec tmo;
-		validate_readable(timeout, sizeof(*timeout));
+		compat_validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
 		TIMEVAL_TO_TIMESPEC(timeout, &tmo);
 		COMPILER_READ_BARRIER();
@@ -2336,10 +2413,10 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	size_t result, nfd_size;
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	compat_validate_readwrite_opt(readfds, nfd_size);
+	compat_validate_readwrite_opt(writefds, nfd_size);
+	compat_validate_readwrite_opt(exceptfds, nfd_size);
 	COMPILER_READ_BARRIER();
 	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2347,10 +2424,10 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      ss.ss_len);
-	validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
+	compat_validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
 	if (timeout) {
 		struct timespec tmo;
-		validate_readable(timeout, sizeof(*timeout));
+		compat_validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
 		tmo.tv_sec  = (time_t)timeout->tv_sec;
 		tmo.tv_nsec = timeout->tv_nsec;
@@ -2390,10 +2467,10 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 	size_t result, nfd_size;
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readable(sigmask_sigset_and_len, sizeof(ss));
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	compat_validate_readwrite_opt(readfds, nfd_size);
+	compat_validate_readwrite_opt(writefds, nfd_size);
+	compat_validate_readwrite_opt(exceptfds, nfd_size);
 	COMPILER_READ_BARRIER();
 	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2401,10 +2478,10 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      ss.ss_len);
-	validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
+	compat_validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
 	if (timeout) {
 		struct timespec tmo;
-		validate_readable(timeout, sizeof(*timeout));
+		compat_validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
 		tmo.tv_sec  = (time_t)timeout->tv_sec;
 		tmo.tv_nsec = timeout->tv_nsec;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4be7ab9f */
+/* HASH CRC-32:0x7cfa1daa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,11 +189,20 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *pa
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, char const *to);
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -225,7 +234,7 @@ INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd, fd_t newfd);
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_dup)(fd_t fd);
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_close)(fd_t fd);
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
@@ -281,10 +290,12 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 INTDEF off64_t NOTHROW_NCX(LIBDCALL libd_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */

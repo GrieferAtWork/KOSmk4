@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad0d454d */
+/* HASH CRC-32:0x3fa01875 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,46 @@
 #endif /* !__NR_restart_syscall */
 
 #define SYS_restart_syscall         __NR_restart_syscall         /* errno_t restart_syscall(void) */
-#define SYS_exit                    __NR_exit                    /* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+#define SYS_exit                    __NR_exit                    /* void exit(syscall_ulong_t exit_code) */
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 #define SYS_fork                    __NR_fork                    /* pid_t fork(void) */
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 #define SYS_read                    __NR_read                    /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 #define SYS_write                   __NR_write                   /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define SYS_open                    __NR_open                    /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 /* Close a given file descriptor/handle `FD' */
 #define SYS_close                   __NR_close                   /* errno_t close(fd_t fd) */
@@ -44,6 +80,8 @@
 #define SYS_creat                   __NR_creat                   /* fd_t creat(char const *filename, mode_t mode) */
 #define SYS_link                    __NR_link                    /* errno_t link(char const *existing_file, char const *link_file) */
 #define SYS_unlink                  __NR_unlink                  /* errno_t unlink(char const *filename) */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 #define SYS_execve                  __NR_execve                  /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 #define SYS_chdir                   __NR_chdir                   /* errno_t chdir(char const *path) */
 #define SYS_time                    __NR_time                    /* int32_t time(int32_t *timer) */
@@ -122,7 +160,7 @@
  * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
 #define SYS_getgroups               __NR_getgroups               /* ssize_t getgroups(size_t count, uint16_t[] list) */
 #define SYS_setgroups               __NR_setgroups               /* errno_t setgroups(size_t count, uint16_t const *groups) */
-#define SYS_select                  __NR_select                  /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
+#define SYS_select                  __NR_select                  /* ssize_t select(struct sel_arg_structx32 const *arg) */
 #define SYS_symlink                 __NR_symlink                 /* errno_t symlink(char const *link_text, char const *target_path) */
 #define SYS_linux_oldlstat          __NR_linux_oldlstat          /* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
 #define SYS_readlink                __NR_readlink                /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
@@ -172,6 +210,8 @@
 #define SYS_swapoff                 __NR_swapoff                 /* errno_t swapoff(char const *pathname) */
 #define SYS_sysinfo                 __NR_sysinfo                 /* errno_t sysinfo(struct sysinfo *info) */
 #define SYS_ipc                     __NR_ipc                     /* errno_t ipc(int TODO_PROTOTYPE) */
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 #define SYS_fsync                   __NR_fsync                   /* errno_t fsync(fd_t fd) */
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system call
@@ -204,12 +244,30 @@
 #define SYS_setfsgid                __NR_setfsgid                /* errno_t setfsgid(uint16_t gid) */
 #define SYS__llseek                 __NR__llseek                 /* errno_t _llseek(fd_t fd, int64_t offset, uint64_t *result, syscall_ulong_t whence) */
 #define SYS_getdents                __NR_getdents                /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
-#define SYS__newselect              __NR__newselect              /* errno_t _newselect(int TODO_PROTOTYPE) */
+#define SYS__newselect              __NR__newselect              /* ssize_t _newselect(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 #define SYS_flock                   __NR_flock                   /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 #define SYS_msync                   __NR_msync                   /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 #define SYS_readv                   __NR_readv                   /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 #define SYS_writev                  __NR_writev                  /* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 #define SYS_getsid                  __NR_getsid                  /* pid_t getsid(pid_t pid) */
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 #define SYS_fdatasync               __NR_fdatasync               /* errno_t fdatasync(fd_t fd) */
 #define SYS__sysctl                 __NR__sysctl                 /* errno_t _sysctl(int TODO_PROTOTYPE) */
 #define SYS_mlock                   __NR_mlock                   /* errno_t mlock(void const *addr, size_t len) */
@@ -263,6 +321,29 @@
 #define SYS_sendfile                __NR_sendfile                /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 #define SYS_getpmsg                 __NR_getpmsg                 /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define SYS_putpmsg                 __NR_putpmsg                 /* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 #define SYS_vfork                   __NR_vfork                   /* pid_t vfork(void) */
 #define SYS_ugetrlimit              __NR_ugetrlimit              /* errno_t ugetrlimit(int TODO_PROTOTYPE) */
 #define SYS_mmap2                   __NR_mmap2                   /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
@@ -329,6 +410,8 @@
 #define SYS_io_submit               __NR_io_submit               /* errno_t io_submit(int TODO_PROTOTYPE) */
 #define SYS_io_cancel               __NR_io_cancel               /* errno_t io_cancel(int TODO_PROTOTYPE) */
 #define SYS_fadvise64               __NR_fadvise64               /* errno_t fadvise64(int TODO_PROTOTYPE) */
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 #define SYS_exit_group              __NR_exit_group              /* void exit_group(syscall_ulong_t exit_code) */
 #define SYS_lookup_dcookie          __NR_lookup_dcookie          /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
 #define SYS_epoll_create            __NR_epoll_create            /* fd_t epoll_create(syscall_ulong_t size) */
@@ -364,7 +447,8 @@
 #define SYS_mq_getsetattr           __NR_mq_getsetattr           /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define SYS_kexec_load              __NR_kexec_load              /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid                  __NR_waitid                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 #define SYS_add_key                 __NR_add_key                 /* errno_t add_key(int TODO_PROTOTYPE) */
 #define SYS_request_key             __NR_request_key             /* errno_t request_key(int TODO_PROTOTYPE) */
@@ -379,6 +463,19 @@
 #define SYS_inotify_add_watch       __NR_inotify_add_watch       /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
 #define SYS_inotify_rm_watch        __NR_inotify_rm_watch        /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
 #define SYS_migrate_pages           __NR_migrate_pages           /* errno_t migrate_pages(int TODO_PROTOTYPE) */
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define SYS_openat                  __NR_openat                  /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 #define SYS_mkdirat                 __NR_mkdirat                 /* errno_t mkdirat(fd_t dirfd, char const *pathname, mode_t mode) */
 #define SYS_mknodat                 __NR_mknodat                 /* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
@@ -418,7 +515,9 @@
 #define SYS_epoll_pwait             __NR_epoll_pwait             /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
-#define SYS_signalfd                __NR_signalfd                /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+#define SYS_signalfd                __NR_signalfd                /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 /* Return file descriptor for new interval timer source
  * @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 #define SYS_timerfd_create          __NR_timerfd_create          /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
@@ -432,8 +531,10 @@
 #define SYS_timerfd_settime         __NR_timerfd_settime         /* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 /* Return the next expiration time of UFD */
 #define SYS_timerfd_gettime         __NR_timerfd_gettime         /* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx32 *otmr) */
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-#define SYS_signalfd4               __NR_signalfd4               /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+#define SYS_signalfd4               __NR_signalfd4               /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 /* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 #define SYS_eventfd2                __NR_eventfd2                /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define SYS_epoll_create1           __NR_epoll_create1           /* fd_t epoll_create1(syscall_ulong_t flags) */
@@ -441,14 +542,24 @@
 #define SYS_dup3                    __NR_dup3                    /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 #define SYS_pipe2                   __NR_pipe2                   /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
 #define SYS_inotify_init1           __NR_inotify_init1           /* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define SYS_preadv                  __NR_preadv                  /* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 #define SYS_pwritev                 __NR_pwritev                 /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 #define SYS_rt_tgsigqueueinfo       __NR_rt_tgsigqueueinfo       /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
 #define SYS_perf_event_open         __NR_perf_event_open         /* errno_t perf_event_open(int TODO_PROTOTYPE) */
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 #define SYS_recvmmsg                __NR_recvmmsg                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 #define SYS_fanotify_init           __NR_fanotify_init           /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define SYS_fanotify_mark           __NR_fanotify_mark           /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
@@ -459,13 +570,21 @@
 #define SYS_open_by_handle_at       __NR_open_by_handle_at       /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */
 #define SYS_clock_adjtime           __NR_clock_adjtime           /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
 #define SYS_syncfs                  __NR_syncfs                  /* errno_t syncfs(fd_t fd) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 #define SYS_sendmmsg                __NR_sendmmsg                /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 #define SYS_setns                   __NR_setns                   /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 #define SYS_process_vm_readv        __NR_process_vm_readv        /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 #define SYS_process_vm_writev       __NR_process_vm_writev       /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 /* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
@@ -481,63 +600,189 @@
 /* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 #define SYS_memfd_create            __NR_memfd_create            /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define SYS_bpf                     __NR_bpf                     /* errno_t bpf(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_execveat                __NR_execveat                /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 #define SYS_socket                  __NR_socket                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 #define SYS_socketpair              __NR_socketpair              /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 #define SYS_bind                    __NR_bind                    /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 #define SYS_connect                 __NR_connect                 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 #define SYS_listen                  __NR_listen                  /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 #define SYS_accept4                 __NR_accept4                 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 #define SYS_getsockopt              __NR_getsockopt              /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 #define SYS_setsockopt              __NR_setsockopt              /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 #define SYS_getsockname             __NR_getsockname             /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 #define SYS_getpeername             __NR_getpeername             /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 #define SYS_sendto                  __NR_sendto                  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 #define SYS_sendmsg                 __NR_sendmsg                 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 #define SYS_recvfrom                __NR_recvfrom                /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 #define SYS_recvmsg                 __NR_recvmsg                 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 #define SYS_shutdown                __NR_shutdown                /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 #define SYS_userfaultfd             __NR_userfaultfd             /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier              __NR_membarrier              /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                  __NR_mlock2                  /* errno_t mlock2(int TODO_PROTOTYPE) */
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 #define SYS_recvmmsg64              __NR_recvmmsg64              /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 #define SYS_pwritevf                __NR_pwritevf                /* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define SYS_preadvf                 __NR_preadvf                 /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 /* Return the next expiration time of UFD */
 #define SYS_timerfd_gettime64       __NR_timerfd_gettime64       /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
@@ -565,7 +810,8 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fmkdirat                __NR_fmkdirat                /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid64                __NR_waitid64                /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 #define SYS_mq_timedreceive64       __NR_mq_timedreceive64       /* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
 #define SYS_mq_timedsend64          __NR_mq_timedsend64          /* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
@@ -590,7 +836,23 @@
 #define SYS_sched_rr_get_interval64 __NR_sched_rr_get_interval64 /* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
 #define SYS_rpc_service             __NR_rpc_service             /* syscall_slong_t rpc_service(void) */
 #define SYS_ksysctl                 __NR_ksysctl                 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 #define SYS_writevf                 __NR_writevf                 /* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 #define SYS_readvf                  __NR_readvf                  /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -656,7 +918,7 @@
 #define SYS_rtm_begin               __NR_rtm_begin               /* rtm_status_t rtm_begin(void) */
 #define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct timebx32_64 *tp) */
 #define SYS_utime64                 __NR_utime64                 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -709,7 +971,7 @@
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-#define SYS_mktty                   __NR_mktty                   /* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+#define SYS_mktty                   __NR_mktty                   /* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -771,18 +1033,18 @@
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -805,10 +1067,10 @@
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -818,7 +1080,9 @@
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -828,7 +1092,8 @@
 #define SYS_time64                  __NR_time64                  /* int64_t time64(int64_t *timer) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fchdirat                __NR_fchdirat                /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 #define SYS_openpty                 __NR_openpty                 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* Schedule an RPC for execution on the specified `target' thread.
  * @param: target:    The targeted thread.
@@ -944,7 +1209,19 @@
  *                              and exited, or that the `PID' is just invalid (which
  *                              would also be the case if it was valid at some point) */
 #define SYS_detach                  __NR_detach                  /* errno_t detach(pid_t pid) */
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 #define SYS_writef                  __NR_writef                  /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 #define SYS_readf                   __NR_readf                   /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 #define SYS_hopf                    __NR_hopf                    /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define SYS_hop                     __NR_hop                     /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */

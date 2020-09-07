@@ -96,7 +96,7 @@
  *        exceptions that are unrelated to sys_X* system calls
  *      - When a system call is invoked by sys_X*, any exception it
  *        may throw is propagated to user-space and re-thrown as a
- *        KOS exception (s.a. <kos/except.h>)
+ *        KOS exception (s.a. <libunwind/except.h>)
  *     Environment:
  *      - Something behaving like this mode is what you will encounter
  *        for most of your travels.
@@ -119,16 +119,16 @@
  *      - This mode is enabled by default if an .exe file (rather than
  *        an ELF) is executed, so-as to allow for simpler integration
  *        with SEH
- *      - Additionally, this mode is often set at the start of main()
- *        in applications that were specifically written to run on KOS
- *        and take full advantage of its feature set, but don't wish to
- *        make use of #4 to prevent any possibility of ambiguity caused
- *        by posix signals not being too specific when it comes to signal
+ *      - Additionally, this mode may be set at the start of main() by
+ *        applications that were specifically written to run on KOS and
+ *        take full advantage of its feature set, but don't wish to make
+ *        use of #4 to prevent any possibility of ambiguity caused by
+ *        posix signals not being too specific when it comes to signal
  *        causes.
  *
  *  #4 Use KOS exceptions only in modules that are `dlexceptaware(3)'
  *     Behavior:
- *      - The mode actually implemented as a sub-set of mode #3, with libc
+ *      - The mode is actually implemented as a sub-set of mode #3, with libc
  *        performing special analysis to determine how an exception should
  *        actually be handled based on the program state when it occurred:
  *         #1:    Check if the `EXCEPT_FINEXCEPT' flag is set
@@ -169,16 +169,20 @@
  *                other types of KOS exceptions.
  *         #SIG:  Restore the KOS exception saved in step #1.
  *                Translate the exception into a signal which is then raised
- *                within the calling thread (s.a. `error_as_signal(3)')
- *                If the exception cannot be translated into a signal,
- *                move on to step #CORE.
- *                NOTE: For this purpose, the `sys_raiseat()' system call exists.
- *         #CORE: Trigger a coredump to terminate the current application.
- *                NOTE: For this purpose, the `sys_coredump()' system call exists.
+ *                within the calling thread (s.a. `error_as_signal(3)' and `sys_raiseat(2)')
+ *                If the exception cannot be translated into a signal, move on to step #CORE.
+ *         #CORE: Trigger a coredump to terminate the current application. (s.a. `sys_coredump(2)')
+ *                If the kernel is configured to allow it, this may also trigger a trap in an
+ *                attached debugger, or switch to the kernel's builtin debugger, allowing you
+ *                to view tracebacks, register states, and the values of local variables,
+ *                assuming that you program was compiled with debug info enabled (gcc -g).
+ *                s.a. `kernel_debug_on & KERNEL_DEBUG_ON_COREDUMP' in
+ *                     `/kos/src/kernel/core/include/debugger/entry.h'
  *     Environment:
  *      - This is the actual mode that you will encounter for most of your travels.
- *      - It is set up during libc initialization and usually remains active
- *        for the entirety of the lifetime of any given application.
+ *      - It is set up during libc initialization (iow. before you're `main()' is
+ *        called) and usually remains active for the entirety of the lifetime of
+ *        any given application.
  *
  * Interaction with fork(2) / exec(2):
  *   - After a call to fork(2) or clone(2), the newly created thread/process
@@ -195,24 +199,24 @@
 
 __SYSDECL_BEGIN
 
-#define EXCEPT_HANDLER_MODE_UNCHANGED   0x0000 /* Don't change the current mode */
-#define EXCEPT_HANDLER_MODE_DISABLED    0x0001 /* MODE: Disable exception handlers (s.a. mode #1) */
-#define EXCEPT_HANDLER_MODE_ENABLED     0x0002 /* MODE: Enable exception handlers for sys_X* system calls (s.a. mode #2)
-                                                * When this flag is set, `set_exception_handler()' will set `HANDLER'
-                                                * as the new exception handler called by the kernel. */
-#define EXCEPT_HANDLER_MODE_SIGHAND     0x0003 /* MODE: Enable exceptions for non-syscall exceptions (s.a. mode #3) */
-#define EXCEPT_HANDLER_MODE_MASK        0x000f /* Mask for the mode */
-#define EXCEPT_HANDLER_FLAG_ONESHOT     0x2000 /* FLAG: Before execution of the handler is started, set the mode to `EXCEPT_HANDLER_MODE_DISABLED' */
-#define EXCEPT_HANDLER_FLAG_SETHANDLER  0x4000 /* FLAG: Set the given `HANDLER' as the new exception handler called by the kernel. */
-#define EXCEPT_HANDLER_FLAG_SETSTACK    0x8000 /* FLAG: Set the given `HANDLER_SP' as the stack used for handling exceptions. */
+#define EXCEPT_HANDLER_MODE_UNCHANGED  0x0000 /* Don't change the current mode */
+#define EXCEPT_HANDLER_MODE_DISABLED   0x0001 /* MODE: Disable exception handlers (s.a. mode #1) */
+#define EXCEPT_HANDLER_MODE_ENABLED    0x0002 /* MODE: Enable exception handlers for sys_X* system calls (s.a. mode #2) */
+#define EXCEPT_HANDLER_MODE_SIGHAND    0x0003 /* MODE: Enable exceptions for non-syscall exceptions (s.a. mode #3) */
+#define EXCEPT_HANDLER_MODE_MASK       0x000f /* Mask for the mode */
+#define EXCEPT_HANDLER_FLAG_ONESHOT    0x2000 /* FLAG: Before execution of the handler is started, set the mode to `EXCEPT_HANDLER_MODE_DISABLED' */
+#define EXCEPT_HANDLER_FLAG_SETHANDLER 0x4000 /* FLAG: Set the given `HANDLER' as the new exception handler called by the kernel. */
+#define EXCEPT_HANDLER_FLAG_SETSTACK   0x8000 /* FLAG: Set the given `HANDLER_SP' as the stack used for handling exceptions. */
 
 
-/* Special value for `__handler_sp': Re-use the previous user-space stack for storing exceptions */
+/* Special value for `HANDLER_SP': Re-use the previous user-space stack for storing
+ *                                 exceptions. (iow.: Don't switch stacks) */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 #define EXCEPT_HANDLER_SP_CURRENT (__CCAST(void *)0)
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
 #define EXCEPT_HANDLER_SP_CURRENT (__CCAST(void *)-1)
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+
 
 #ifdef __CC__
 
@@ -227,7 +231,7 @@ __SYSDECL_BEGIN
  * In either case, it will be that same stack that is set as active when
  * the exception handler itself gets invoked.
  * Other caveats include the fact that the expected behavior of the
- * function by differ based on other flags passed to `set_exception_handler()' */
+ * function may differ based on other flags passed to `set_exception_handler()' */
 typedef __except_handler_t except_handler_t;
 #endif /* !__except_handler_t_defined */
 

@@ -156,7 +156,7 @@ done_tmpfs:
 		if (keyboard < 0)
 			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC, 0);
 		display = Open("/dev/vga", O_WRONLY | O_CLOEXEC, 0);
-		console = sys_Xmktty(keyboard, display, "console", 0);
+		console = sys_Xmktty("console", keyboard, display, 0);
 		close(keyboard);
 		close(display);
 		Symlink("console", "/dev/tty0");

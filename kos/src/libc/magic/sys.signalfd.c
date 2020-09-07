@@ -87,9 +87,11 @@ typedef struct __sigset_struct sigset_t;
 
 }
 
-@@Request notification for delivery of signals in MASK to be performed using descriptor FD
-[[decl_include("<features.h>", "<bits/sigset.h>")]]
-$fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *mask,
+@@Create a poll(2)-able file descriptor which can be used to wait for the
+@@delivery of signals masked by `SIGMASK' to the waiting thread/process.
+@@@param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
+[[wunused, decl_include("<features.h>", "<bits/sigset.h>")]]
+$fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *sigmask,
                __STDC_INT_AS_UINT_T flags);
 
 %{

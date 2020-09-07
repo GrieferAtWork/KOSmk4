@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbb64a37 */
+/* HASH CRC-32:0x328aa225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,22 +30,22 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_readahead)(fd_t fd, off64_t offset, size_t count);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sync_file_range)(fd_t fd, off64_t offset, off64_t count, unsigned int flags);
+INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_readahead)(fd_t fd, __PIO_OFFSET64 offset, size_t count);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sync_file_range)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 count, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_vmsplice)(fd_t fdout, struct iovec const *iov, size_t count, unsigned int flags);
-INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_splice)(fd_t fdin, off64_t *offin, fd_t fdout, off64_t *offout, size_t length, unsigned int flags);
+INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_tee)(fd_t fdin, fd_t fdout, size_t length, unsigned int flags);
 INTDEF int NOTHROW_RPC(LIBDCALL libd_name_to_handle_at)(fd_t dirfd, char const *name, struct file_handle *handle, int *mnt_id, int flags);
 INTDEF fd_t NOTHROW_RPC(LIBDCALL libd_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate)(fd_t fd, int mode, off_t offset, off_t length);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate64)(fd_t fd, int mode, off64_t offset, off64_t length);
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, int cmd, ...);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise)(fd_t fd, off_t offset, off_t length, int advise);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate)(fd_t fd, off_t offset, off_t length);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise64)(fd_t fd, off64_t offset, off64_t length, int advise);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate64)(fd_t fd, off64_t offset, off64_t length);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf)(fd_t fd, int cmd, off_t length);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf64)(fd_t fd, int cmd, off64_t length);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, __STDC_INT_AS_UINT_T cmd, ...);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length, __STDC_INT_AS_UINT_T advise);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length, __STDC_INT_AS_UINT_T advise);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET length);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf64)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET64 length);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

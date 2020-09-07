@@ -874,6 +874,7 @@ typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UN
 }
 
 
+@@>> socket(2)
 @@Create a new socket for the given domain/type/protocol triple.
 @@@param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
 @@@param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
@@ -890,6 +891,7 @@ typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UN
 $fd_t socket(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
              __STDC_INT_AS_UINT_T protocol);
 
+@@>> socketpair(2)
 @@Create pair of connected sockets with the given domain/type/protocol triple
 @@The sockets handles are stroed in `fds[0]' and `fds[1]', are already connected,
 @@and are indistinguishable from each other.
@@ -907,6 +909,7 @@ $fd_t socket(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
                __STDC_INT_AS_UINT_T protocol, [[nonnull]] $fd_t fds[2]);
 
+@@>> bind(2)
 @@Bind the given socket `sockfd' to the specified local address.
 @@@return: 0 : Success
 @@@return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
@@ -917,6 +920,7 @@ int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 int bind($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
          socklen_t addr_len);
 
+@@>> getsockname(2)
 @@Determine the local address (aka. name) for the given socket `sockfd'.
 @@This is usually the same address as was previously set by `bind(2)'
 @@NOTE: Before the socket has actually be bound or connected, the exact
@@ -932,6 +936,7 @@ int bind($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
 int getsockname($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
                 [[nonnull]] socklen_t *__restrict addr_len);
 
+@@>> connect(2)
 @@Connect to the specified address.
 @@If the given `sockfd' isn't connection-oriented, this will set the address
 @@that will implicitly be used as destination by `send(2)' and `write(2)'
@@ -946,18 +951,20 @@ int getsockname($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 int connect($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
             socklen_t addr_len);
 
+@@>> getpeername(2)
 @@Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
 @@@param: addr:     [out] Buffer where to store the sock address.
 @@@param: addr_len: [in]  The amount of available memory starting at `addr'
 @@                  [out] The amount of required memory for the address.
 @@                        This may be more than was given, in which case
 @@                        the address was truncated and may be invalid.
-@@return: 0 : Success
-@@return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
-@@return: -1: Error (s.a. `errno')
+@@@return: 0 : Success
+@@@return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+@@@return: -1: Error (s.a. `errno')
 int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
                 [[nonnull]] socklen_t *__restrict addr_len);
 
+@@>> send(2)
 @@Send the contents of a given buffer over the given socket `sockfd'.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
@@ -970,6 +977,7 @@ int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
+@@>> recv(2)
 @@Receive data over the given socket `sockfd', and store the contents within the given buffer.
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
@@ -980,6 +988,7 @@ ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
+@@>> sendto(2)
 @@Send the contents of a given buffer over this socket to the specified address
 @@@param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
 @@@param: bufsize:   Size of `buf' (in bytes)
@@ -1001,6 +1010,7 @@ ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
                [[inp_opt(addr_len)]] __CONST_SOCKADDR_ARG addr,
                socklen_t addr_len);
 
+@@>> recvfrom(2)
 @@Receive data over this socket, and store the contents within the given buffer.
 @@@param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
 @@@param: bufsize:   Max # of bytes to receive
@@ -1012,12 +1022,17 @@ ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@                   [out]  The amount of required memory for the address.
 @@                          This may be more than was given, in which case
 @@                          the address was truncated and may be invalid.
+@@@return: * : [<= bufsize] The actual # of received bytes
+@@@return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+@@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
+@@@return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
 [[cp, wunused, decl_include("<features.h>")]]
 ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
                  size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                  [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
                  [[nullable]] socklen_t *__restrict addr_len);
 
+@@>> sendmsg(2)
 @@Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
 @@data as well as for data buffers to be represented by an IOV vector.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
@@ -1028,17 +1043,19 @@ ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
 ssize_t sendmsg($fd_t sockfd, [[nonnull]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
+@@>> recvmsg(2)
 @@Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
 @@data as well as for data buffers to be represented by an IOV vector.
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 @@@return: * : [<= bufsize] The actual # of received payload bytes
-@@@return: -1: ... Same as for `recv(2)' and ``recvfrom(2)'
+@@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>")]]
 ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
+@@>> getsockopt(2)
 @@Get the value of the named socket option `level:optname' and store it in `optval'
 @@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
 @@@param: optname: Dependent on `level'
@@ -1053,6 +1070,7 @@ ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
 int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[outp(*optlen)]] void *__restrict optval, [[nonnull]] socklen_t *__restrict optlen);
 
+@@>> setsockopt(2)
 @@Set the value of the named socket option `level:optname' from what is given in `optval'
 @@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
 @@@param: optname: Dependent on `level'
@@ -1065,6 +1083,7 @@ int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[inp(optlen)]] void const *optval, socklen_t optlen);
 
+@@>> listen(2)
 @@Begin to listen for incoming client (aka. peer) connection requests.
 @@@param: max_backlog: The max number of clients pending to be accept(2)-ed, before
 @@                     the kernel will refuse to enqueue additional clients, and will
@@ -1076,6 +1095,7 @@ int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 [[decl_include("<features.h>")]]
 int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 
+@@>> accept(2)
 @@Accept incoming client (aka. peer) connection requests.
 @@@param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
 @@@param: addr_len:  [NULL] Don't fill in the client's peer address
@@ -1085,7 +1105,7 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@                          the address was truncated and may be invalid.
 @@                          If this happens, the caller can still determine
 @@                          the correct address through use of `getpeername()'
-@@@return: 0 : Success
+@@@return: * : A file descriptor for the newly accept(2)-ed connection
 @@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
@@ -1093,6 +1113,7 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 $fd_t accept($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
              socklen_t *__restrict addr_len);
 
+@@>> shutdown(2)
 @@Disallow further reception of data (causing `recv(2)' to return `0' as soon
 @@as all currently queued data has been read), and/or further transmission
 @@of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
@@ -1104,6 +1125,7 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 
 %
 %#ifdef __USE_GNU
+@@>> accept4(2)
 @@Accept incoming client (aka. peer) connection requests.
 @@@param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
 @@@param: addr_len:   [NULL] Don't fill in the client's peer address
@@ -1114,7 +1136,7 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 @@                           If this happens, the caller can still determine
 @@                           the correct address through use of `getpeername()'
 @@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
-@@@return: 0 : Success
+@@@return: * : A file descriptor for the newly accept(2)-ed connection
 @@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
@@ -1122,27 +1144,30 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 $fd_t accept4($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
               socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 
+@@>> sendmmsg(2)
 @@Same as `sendmsg(2)', but may be used to send many
 @@messages (datagrams) with a single system call.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 @@@return: * : The # of datagrams successfully sent.
-@@@return: -1: Error (s.a. `sendmsg(2)')
+@@@return: -1: ... Same as `sendmsg(2)'
 [[cp, export_alias("__sendmmsg"), decl_include("<features.h>")]]
 int sendmmsg($fd_t sockfd, [[nonnull]] struct mmsghdr *vmessages,
              __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 
 [[decl_include("<features.h>")]]
-[[cp, doc_alias("recvmmsg"), ignore, nocrt, alias("recvmmsg")]]
+[[cp, doc_alias(recvmmsg), ignore, nocrt, alias("recvmmsg")]]
 int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
                [[nullable]] struct $timespec32 *tmo);
 
+@@>> recvmmsg(2)
 @@Same as `recvmsg(2)', but may be used to receive many
 @@messages (datagrams) with a single system call.
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+@@                           MSG_WAITFORONE'
 @@@return: * : The # of datagrams successfully received.
 @@@return: -1: Error (s.a. `recvmsg(2)')
 [[cp, no_crt_self_import, decl_include("<features.h>")]]
@@ -1171,7 +1196,7 @@ int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 
 %#ifdef __USE_TIME64
 [[decl_include("<features.h>")]]
-[[cp, doc_alias("recvmmsg"), time64_variant_of(recvmmsg)]]
+[[cp, doc_alias(recvmmsg), time64_variant_of(recvmmsg)]]
 [[userimpl, requires_function(recvmmsg32)]]
 int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
@@ -1188,6 +1213,7 @@ int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 
 %
 %#ifdef __USE_XOPEN2K
+@@>> sockatmark(3)
 @@Check if `sockfd' is at a out-of-band mark
 @@@return: > 0 : The read-pointer is pointing at out-of-band data
 @@@return: == 0: The read-pointer is not pointing at out-of-band data
@@ -1198,6 +1224,7 @@ int sockatmark($fd_t sockfd);
 
 %
 %#ifdef __USE_MISC
+@@>> isfdtype(3)
 @@Check if `fd' matches the given `fdtype'
 @@@param: fdtype: One of `S_IF*' from `<sys/stat.h>'
 @@@return: 1 : `fd' matches the given type

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb857fb4 */
+/* HASH CRC-32:0x2c44fcb8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,12 @@
 
 
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 .section .text.x86.asm64_syscall.read
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_read)
@@ -68,6 +74,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_read)
 	.cfi_endproc
 END(__x86_asm64_syscall_read)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 .section .text.x86.asm64_syscall.write
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_write)
@@ -98,6 +110,19 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_write)
 	.cfi_endproc
 END(__x86_asm64_syscall_write)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm64_syscall.open
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open)
@@ -635,6 +660,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64)
 	.cfi_endproc
 END(__x86_asm64_syscall_pwrite64)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.x86.asm64_syscall.readv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readv)
@@ -665,6 +698,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readv)
 	.cfi_endproc
 END(__x86_asm64_syscall_readv)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writev(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.x86.asm64_syscall.writev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writev)
@@ -939,7 +980,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_madvise)
 	.cfi_endproc
 END(__x86_asm64_syscall_madvise)
 
-/* errno_t shmget(int TODO_PROTOTYPE) */
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
 .section .text.x86.asm64_syscall.shmget
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmget)
 	.cfi_startproc simple
@@ -969,7 +1010,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmget)
 	.cfi_endproc
 END(__x86_asm64_syscall_shmget)
 
-/* errno_t shmat(int TODO_PROTOTYPE) */
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
 .section .text.x86.asm64_syscall.shmat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmat)
 	.cfi_startproc simple
@@ -999,7 +1040,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmat)
 	.cfi_endproc
 END(__x86_asm64_syscall_shmat)
 
-/* errno_t shmctl(int TODO_PROTOTYPE) */
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
 .section .text.x86.asm64_syscall.shmctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmctl)
 	.cfi_startproc simple
@@ -1302,14 +1343,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendfile)
 	.cfi_endproc
 END(__x86_asm64_syscall_sendfile)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.x86.asm64_syscall.socket
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socket)
@@ -1340,6 +1383,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socket)
 	.cfi_endproc
 END(__x86_asm64_syscall_socket)
 
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm64_syscall.connect
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_connect)
@@ -1370,6 +1423,19 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_connect)
 	.cfi_endproc
 END(__x86_asm64_syscall_connect)
 
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] Don't fill in the client's peer address
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ *                           If this happens, the caller can still determine
+ *                           the correct address through use of `getpeername()'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm64_syscall.accept
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept)
@@ -1400,8 +1466,21 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept)
 	.cfi_endproc
 END(__x86_asm64_syscall_accept)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm64_syscall.sendto
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendto)
@@ -1433,8 +1512,21 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendto)
 	.cfi_endproc
 END(__x86_asm64_syscall_sendto)
 
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm64_syscall.recvfrom
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvfrom)
@@ -1466,8 +1558,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvfrom)
 	.cfi_endproc
 END(__x86_asm64_syscall_recvfrom)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx64 const *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm64_syscall.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmsg)
@@ -1498,9 +1594,13 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmsg)
 	.cfi_endproc
 END(__x86_asm64_syscall_sendmsg)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx64 *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm64_syscall.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmsg)
@@ -1531,7 +1631,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmsg)
 	.cfi_endproc
 END(__x86_asm64_syscall_recvmsg)
 
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 .section .text.x86.asm64_syscall.shutdown
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shutdown)
@@ -1562,6 +1667,13 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shutdown)
 	.cfi_endproc
 END(__x86_asm64_syscall_shutdown)
 
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm64_syscall.bind
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bind)
@@ -1592,6 +1704,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bind)
 	.cfi_endproc
 END(__x86_asm64_syscall_bind)
 
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 .section .text.x86.asm64_syscall.listen
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_listen)
@@ -1622,6 +1742,17 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_listen)
 	.cfi_endproc
 END(__x86_asm64_syscall_listen)
 
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm64_syscall.getsockname
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockname)
@@ -1652,6 +1783,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockname)
 	.cfi_endproc
 END(__x86_asm64_syscall_getsockname)
 
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm64_syscall.getpeername
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpeername)
@@ -1682,14 +1821,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpeername)
 	.cfi_endproc
 END(__x86_asm64_syscall_getpeername)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.x86.asm64_syscall.socketpair
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socketpair)
@@ -1721,8 +1862,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socketpair)
 	.cfi_endproc
 END(__x86_asm64_syscall_socketpair)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 .section .text.x86.asm64_syscall.setsockopt
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setsockopt)
@@ -1754,8 +1901,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setsockopt)
 	.cfi_endproc
 END(__x86_asm64_syscall_setsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 .section .text.x86.asm64_syscall.getsockopt
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockopt)
@@ -1818,6 +1973,15 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clone)
 	.cfi_endproc
 END(__x86_asm64_syscall_clone)
 
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 /* pid_t fork(void) */
 .section .text.x86.asm64_syscall.fork
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fork)
@@ -1848,6 +2012,29 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fork)
 	.cfi_endproc
 END(__x86_asm64_syscall_fork)
 
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 /* pid_t vfork(void) */
 .section .text.x86.asm64_syscall.vfork
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vfork)
@@ -1878,6 +2065,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vfork)
 	.cfi_endproc
 END(__x86_asm64_syscall_vfork)
 
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 /* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 .section .text.x86.asm64_syscall.execve
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execve)
@@ -1908,7 +2097,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execve)
 	.cfi_endproc
 END(__x86_asm64_syscall_execve)
 
-/* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+/* void exit(syscall_ulong_t exit_code) */
 .section .text.x86.asm64_syscall.exit
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit)
 	.cfi_startproc simple
@@ -2121,7 +2312,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_semctl)
 
-/* errno_t shmdt(int TODO_PROTOTYPE) */
+/* errno_t shmdt(void const *shmaddr) */
 .section .text.x86.asm64_syscall.shmdt
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmdt)
 	.cfi_startproc simple
@@ -2331,6 +2522,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_flock)
 	.cfi_endproc
 END(__x86_asm64_syscall_flock)
 
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 /* errno_t fsync(fd_t fd) */
 .section .text.x86.asm64_syscall.fsync
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsync)
@@ -2361,6 +2554,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsync)
 	.cfi_endproc
 END(__x86_asm64_syscall_fsync)
 
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 /* errno_t fdatasync(fd_t fd) */
 .section .text.x86.asm64_syscall.fdatasync
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fdatasync)
@@ -7075,6 +7270,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_nanosleep)
 	.cfi_endproc
 END(__x86_asm64_syscall_clock_nanosleep)
 
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 /* void exit_group(syscall_ulong_t exit_code) */
 .section .text.x86.asm64_syscall.exit_group
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit_group)
@@ -7561,7 +7758,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_load)
 END(__x86_asm64_syscall_kexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
 .section .text.x86.asm64_syscall.waitid
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_waitid)
@@ -7867,6 +8065,19 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_migrate_pages)
 	.cfi_endproc
 END(__x86_asm64_syscall_migrate_pages)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm64_syscall.openat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openat)
@@ -8647,7 +8858,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_pwait)
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_pwait)
 
-/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.x86.asm64_syscall.signalfd
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd)
 	.cfi_startproc simple
@@ -8837,7 +9050,20 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_gettime)
 	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_gettime)
 
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.x86.asm64_syscall.accept4
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept4)
@@ -8869,8 +9095,10 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept4)
 	.cfi_endproc
 END(__x86_asm64_syscall_accept4)
 
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.signalfd4
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd4)
 	.cfi_startproc simple
@@ -9053,6 +9281,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init1)
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init1)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadv(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm64_syscall.preadv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv)
@@ -9084,6 +9315,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv)
 	.cfi_endproc
 END(__x86_asm64_syscall_preadv)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritev(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm64_syscall.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev)
@@ -9176,10 +9410,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_perf_event_open)
 	.cfi_endproc
 END(__x86_asm64_syscall_perf_event_open)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.x86.asm64_syscall.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmmsg)
@@ -9425,8 +9663,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_syncfs)
 	.cfi_endproc
 END(__x86_asm64_syscall_syncfs)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.x86.asm64_syscall.sendmmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmmsg)
@@ -9518,7 +9760,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcpu)
 	.cfi_endproc
 END(__x86_asm64_syscall_getcpu)
 
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
@@ -9550,7 +9794,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_readv)
 
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
@@ -9889,7 +10135,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bpf)
 	.cfi_endproc
 END(__x86_asm64_syscall_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm64_syscall.execveat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execveat)
@@ -10011,6 +10259,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	.cfi_endproc
 END(__x86_asm64_syscall_mlock2)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritevf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm64_syscall.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
@@ -10042,6 +10293,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
 	.cfi_endproc
 END(__x86_asm64_syscall_pwritevf)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadvf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm64_syscall.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadvf)
@@ -10613,7 +10867,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rtm_begin)
 	.cfi_endproc
 END(__x86_asm64_syscall_rtm_begin)
 
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -10783,7 +11037,7 @@ END(__x86_asm64_syscall_raiseat)
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 .section .text.x86.asm64_syscall.mktty
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mktty)
 	.cfi_startproc simple
@@ -10934,18 +11188,18 @@ END(__x86_asm64_syscall_lfutexexpr)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -11053,6 +11307,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_debugtrap)
 	.cfi_endproc
 END(__x86_asm64_syscall_debugtrap)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm64_syscall.writevf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
@@ -11084,6 +11346,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
 	.cfi_endproc
 END(__x86_asm64_syscall_writevf)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm64_syscall.readvf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readvf)
@@ -11211,7 +11481,9 @@ END(__x86_asm64_syscall_ioctlf)
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -11251,10 +11523,10 @@ END(__x86_asm64_syscall_set_exception_handler)
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -11290,7 +11562,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
 	.cfi_endproc
 END(__x86_asm64_syscall_get_exception_handler)
 
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 .section .text.x86.asm64_syscall.openpty
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openpty)
@@ -11584,6 +11857,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_detach)
 	.cfi_endproc
 END(__x86_asm64_syscall_detach)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 .section .text.x86.asm64_syscall.readf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
@@ -11766,6 +12045,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
 	.cfi_endproc
 END(__x86_asm64_syscall_hop)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 .section .text.x86.asm64_syscall.writef
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
@@ -11836,7 +12121,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_restart_syscall)
 	.cfi_endproc
 END(__x86_asm32_int80_restart_syscall)
 
-/* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+/* void exit(syscall_ulong_t exit_code) */
 .section .text.x86.asm32_syscall_int80.exit
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit)
 	.cfi_startproc simple
@@ -11867,6 +12154,15 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit)
 	.cfi_endproc
 END(__x86_asm32_int80_exit)
 
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 /* pid_t fork(void) */
 .section .text.x86.asm32_syscall_int80.fork
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fork)
@@ -11897,6 +12193,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fork)
 	.cfi_endproc
 END(__x86_asm32_int80_fork)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 .section .text.x86.asm32_syscall_int80.read
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
@@ -11930,6 +12232,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
 	.cfi_endproc
 END(__x86_asm32_int80_read)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 .section .text.x86.asm32_syscall_int80.write
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
@@ -11963,6 +12271,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
 	.cfi_endproc
 END(__x86_asm32_int80_write)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_int80.open
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
@@ -12162,6 +12483,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	.cfi_endproc
 END(__x86_asm32_int80_unlink)
 
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 .section .text.x86.asm32_syscall_int80.execve
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
@@ -14398,7 +14721,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups)
 	.cfi_endproc
 END(__x86_asm32_int80_setgroups)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
+/* ssize_t select(struct sel_arg_structx32 const *arg) */
 .section .text.x86.asm32_syscall_int80.select
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	.cfi_startproc simple
@@ -14414,11 +14737,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_select)
 	call   sys32_select
@@ -15574,6 +15892,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ipc)
 	.cfi_endproc
 END(__x86_asm32_int80_ipc)
 
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 /* errno_t fsync(fd_t fd) */
 .section .text.x86.asm32_syscall_int80.fsync
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
@@ -16353,7 +16673,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents)
 	.cfi_endproc
 END(__x86_asm32_int80_getdents)
 
-/* errno_t _newselect(int TODO_PROTOTYPE) */
+/* ssize_t _newselect(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 .section .text.x86.asm32_syscall_int80._newselect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	.cfi_startproc simple
@@ -16369,7 +16689,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32__newselect)
 	call   sys32__newselect
 	popq_cfi_r %r11
@@ -16449,6 +16774,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 	.cfi_endproc
 END(__x86_asm32_int80_msync)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_int80.readv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
@@ -16482,6 +16815,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	.cfi_endproc
 END(__x86_asm32_int80_readv)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_int80.writev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_writev)
@@ -16546,6 +16887,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsid)
 	.cfi_endproc
 END(__x86_asm32_int80_getsid)
 
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 /* errno_t fdatasync(fd_t fd) */
 .section .text.x86.asm32_syscall_int80.fdatasync
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fdatasync)
@@ -17924,6 +18267,29 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	.cfi_endproc
 END(__x86_asm32_int80_putpmsg)
 
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 /* pid_t vfork(void) */
 .section .text.x86.asm32_syscall_int80.vfork
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_vfork)
@@ -19854,6 +20220,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64)
 	.cfi_endproc
 END(__x86_asm32_int80_fadvise64)
 
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 /* void exit_group(syscall_ulong_t exit_code) */
 .section .text.x86.asm32_syscall_int80.exit_group
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit_group)
@@ -20896,7 +21264,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 END(__x86_asm32_int80_kexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
@@ -21219,6 +21588,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_migrate_pages)
 	.cfi_endproc
 END(__x86_asm32_int80_migrate_pages)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_int80.openat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
@@ -22130,7 +22512,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 	.cfi_endproc
 END(__x86_asm32_int80_utimensat)
 
-/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.x86.asm32_syscall_int80.signalfd
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
 	.cfi_startproc simple
@@ -22336,8 +22720,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime)
 
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.signalfd4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	.cfi_startproc simple
@@ -22533,6 +22919,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init1)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_int80.preadv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
@@ -22571,6 +22960,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	.cfi_endproc
 END(__x86_asm32_int80_preadv)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_int80.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
@@ -22675,10 +23067,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_perf_event_open)
 	.cfi_endproc
 END(__x86_asm32_int80_perf_event_open)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_int80.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
@@ -22945,8 +23341,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syncfs)
 	.cfi_endproc
 END(__x86_asm32_int80_syncfs)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_int80.sendmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
@@ -23014,7 +23414,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	.cfi_endproc
 END(__x86_asm32_int80_setns)
 
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
@@ -23052,7 +23454,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_readv)
 
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
@@ -23387,7 +23791,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	.cfi_endproc
 END(__x86_asm32_int80_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
@@ -23424,14 +23830,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	.cfi_endproc
 END(__x86_asm32_int80_execveat)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.x86.asm32_syscall_int80.socket
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
@@ -23465,14 +23873,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	.cfi_endproc
 END(__x86_asm32_int80_socket)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.x86.asm32_syscall_int80.socketpair
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
@@ -23508,6 +23918,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
 	.cfi_endproc
 END(__x86_asm32_int80_socketpair)
 
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_int80.bind
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_bind)
@@ -23541,6 +23958,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bind)
 	.cfi_endproc
 END(__x86_asm32_int80_bind)
 
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_int80.connect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_connect)
@@ -23574,6 +24001,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_connect)
 	.cfi_endproc
 END(__x86_asm32_int80_connect)
 
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 .section .text.x86.asm32_syscall_int80.listen
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
@@ -23606,7 +24041,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
 	.cfi_endproc
 END(__x86_asm32_int80_listen)
 
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.x86.asm32_syscall_int80.accept4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
@@ -23642,8 +24090,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
 	.cfi_endproc
 END(__x86_asm32_int80_accept4)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 .section .text.x86.asm32_syscall_int80.getsockopt
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
@@ -23680,8 +24136,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	.cfi_endproc
 END(__x86_asm32_int80_getsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 .section .text.x86.asm32_syscall_int80.setsockopt
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
@@ -23718,6 +24180,17 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	.cfi_endproc
 END(__x86_asm32_int80_setsockopt)
 
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_int80.getsockname
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockname)
@@ -23751,6 +24224,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockname)
 	.cfi_endproc
 END(__x86_asm32_int80_getsockname)
 
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_int80.getpeername
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
@@ -23784,8 +24265,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
 	.cfi_endproc
 END(__x86_asm32_int80_getpeername)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_int80.sendto
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
@@ -23823,8 +24317,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	.cfi_endproc
 END(__x86_asm32_int80_sendto)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_int80.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
@@ -23858,8 +24356,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	.cfi_endproc
 END(__x86_asm32_int80_sendmsg)
 
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_int80.recvfrom
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
@@ -23897,9 +24408,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_int80_recvfrom)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_int80.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
@@ -23933,7 +24448,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	.cfi_endproc
 END(__x86_asm32_int80_recvmsg)
 
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 .section .text.x86.asm32_syscall_int80.shutdown
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
@@ -24059,10 +24579,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_int80.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
@@ -24099,6 +24623,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_int80_recvmmsg64)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
@@ -24138,6 +24665,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	.cfi_endproc
 END(__x86_asm32_int80_pwritevf)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
@@ -24652,7 +25182,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 END(__x86_asm32_int80_fmkdirat)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
@@ -25365,6 +25896,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	.cfi_endproc
 END(__x86_asm32_int80_ksysctl)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.writevf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
@@ -25400,6 +25939,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	.cfi_endproc
 END(__x86_asm32_int80_writevf)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.readvf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
@@ -26040,7 +26587,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -26257,7 +26804,7 @@ END(__x86_asm32_int80_raiseat)
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 .section .text.x86.asm32_syscall_int80.mktty
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	.cfi_startproc simple
@@ -26273,8 +26820,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movslq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movslq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
@@ -26462,18 +27009,18 @@ END(__x86_asm32_int80_lseek64)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -26562,10 +27109,10 @@ END(__x86_asm32_int80_debugtrap)
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -26607,7 +27154,9 @@ END(__x86_asm32_int80_get_exception_handler)
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -26713,7 +27262,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchdirat)
 
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 .section .text.x86.asm32_syscall_int80.openpty
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
@@ -27026,6 +27576,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	.cfi_endproc
 END(__x86_asm32_int80_detach)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.writef
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
@@ -27061,6 +27617,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	.cfi_endproc
 END(__x86_asm32_int80_writef)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.readf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
@@ -27176,18 +27738,54 @@ END(__x86_asm32_int80_hop)
 /* errno_t restart_syscall(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_restart_syscall, __x86_asm32_int80_restart_syscall)
 
-/* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+/* void exit(syscall_ulong_t exit_code) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_exit, __x86_asm32_int80_exit)
 
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 /* pid_t fork(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fork, __x86_asm32_int80_fork)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_read, __x86_asm32_int80_read)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_write, __x86_asm32_int80_write)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_open, __x86_asm32_int80_open)
 
@@ -27213,6 +27811,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_link, __x86_asm32_int80_link)
 /* errno_t unlink(char const *filename) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_unlink, __x86_asm32_int80_unlink)
 
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_execve, __x86_asm32_int80_execve)
 
@@ -27466,41 +28066,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getgroups, __x86_asm32_int80_getgr
 /* errno_t setgroups(size_t count, uint16_t const *groups) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setgroups, __x86_asm32_int80_setgroups)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
-.section .text.x86.asm32_syscall_sysenter.select
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x52
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_select)
-	call   sys32_select
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_select)
+/* ssize_t select(struct sel_arg_structx32 const *arg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_select, __x86_asm32_int80_select)
 
 /* errno_t symlink(char const *link_text, char const *target_path) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_symlink, __x86_asm32_int80_symlink)
@@ -27655,6 +28222,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sysinfo, __x86_asm32_int80_sysinfo
 /* errno_t ipc(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ipc, __x86_asm32_int80_ipc)
 
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 /* errno_t fsync(fd_t fd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsync, __x86_asm32_int80_fsync)
 
@@ -27837,8 +28406,41 @@ END(__x86_asm32_sysenter__llseek)
 /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getdents, __x86_asm32_int80_getdents)
 
-/* errno_t _newselect(int TODO_PROTOTYPE) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter__newselect, __x86_asm32_int80__newselect)
+/* ssize_t _newselect(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
+.section .text.x86.asm32_syscall_sysenter._newselect
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__newselect)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x8e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32__newselect)
+	call   sys32__newselect
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter__newselect)
 
 /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_flock, __x86_asm32_int80_flock)
@@ -27846,15 +28448,33 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_flock, __x86_asm32_int80_flock)
 /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_msync, __x86_asm32_int80_msync)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readv, __x86_asm32_int80_readv)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writev, __x86_asm32_int80_writev)
 
 /* pid_t getsid(pid_t pid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getsid, __x86_asm32_int80_getsid)
 
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 /* errno_t fdatasync(fd_t fd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fdatasync, __x86_asm32_int80_fdatasync)
 
@@ -28129,6 +28749,29 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpmsg, __x86_asm32_int80_getpmsg
 /* errno_t putpmsg(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_putpmsg, __x86_asm32_int80_putpmsg)
 
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 /* pid_t vfork(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vfork, __x86_asm32_int80_vfork)
 
@@ -28480,6 +29123,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_io_cancel, __x86_asm32_int80_io_ca
 /* errno_t fadvise64(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fadvise64, __x86_asm32_int80_fadvise64)
 
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 /* void exit_group(syscall_ulong_t exit_code) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_exit_group, __x86_asm32_int80_exit_group)
 
@@ -28678,7 +29323,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_getsetattr, __x86_asm32_int80_m
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kexec_load, __x86_asm32_int80_kexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
@@ -28746,6 +29392,19 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_rm_watch, __x86_asm32_int8
 /* errno_t migrate_pages(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_migrate_pages, __x86_asm32_int80_migrate_pages)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_openat, __x86_asm32_int80_openat)
 
@@ -29075,7 +29734,9 @@ END(__x86_asm32_sysenter_epoll_pwait)
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat, __x86_asm32_int80_utimensat)
 
-/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd, __x86_asm32_int80_signalfd)
 
 /* Return file descriptor for new interval timer source
@@ -29101,8 +29762,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime, __x86_asm32_int80
 /* errno_t timerfd_gettime(fd_t timerfd, struct itimerspecx32 *otmr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime, __x86_asm32_int80_timerfd_gettime)
 
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd4, __x86_asm32_int80_signalfd4)
 
 /* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
@@ -29122,6 +29785,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pipe2, __x86_asm32_int80_pipe2)
 /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_init1, __x86_asm32_int80_inotify_init1)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysenter.preadv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
@@ -29160,6 +29826,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	.cfi_endproc
 END(__x86_asm32_sysenter_preadv)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysenter.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
@@ -29204,10 +29873,14 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_tgsigqueueinfo, __x86_asm32_int
 /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_perf_event_open, __x86_asm32_int80_perf_event_open)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_sysenter.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
@@ -29300,15 +29973,21 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_adjtime, __x86_asm32_int80_c
 /* errno_t syncfs(fd_t fd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_syncfs, __x86_asm32_int80_syncfs)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendmmsg, __x86_asm32_int80_sendmmsg)
 
 /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setns, __x86_asm32_int80_setns)
 
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
@@ -29346,7 +30025,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_readv)
 
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
@@ -29482,7 +30163,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_memfd_create, __x86_asm32_int80_me
 /* errno_t bpf(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_bpf, __x86_asm32_int80_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
@@ -29519,43 +30202,93 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_execveat)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_socket, __x86_asm32_int80_socket)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_socketpair, __x86_asm32_int80_socketpair)
 
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_bind, __x86_asm32_int80_bind)
 
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_connect, __x86_asm32_int80_connect)
 
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_listen, __x86_asm32_int80_listen)
 
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_accept4, __x86_asm32_int80_accept4)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 .section .text.x86.asm32_syscall_sysenter.getsockopt
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
@@ -29592,8 +30325,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 .section .text.x86.asm32_syscall_sysenter.setsockopt
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
@@ -29630,14 +30369,46 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setsockopt)
 
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getsockname, __x86_asm32_int80_getsockname)
 
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpeername, __x86_asm32_int80_getpeername)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_sysenter.sendto
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
@@ -29675,13 +30446,30 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sendto)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendmsg, __x86_asm32_int80_sendmsg)
 
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_sysenter.recvfrom
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
@@ -29719,13 +30507,22 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvfrom)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_recvmsg, __x86_asm32_int80_recvmsg)
 
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_shutdown, __x86_asm32_int80_shutdown)
 
@@ -29738,10 +30535,14 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_membarrier, __x86_asm32_int80_memb
 /* errno_t mlock2(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_sysenter.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
@@ -29778,6 +30579,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg64)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysenter.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
@@ -29817,6 +30621,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwritevf)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysenter.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
@@ -30112,7 +30919,8 @@ END(__x86_asm32_sysenter_fmknodat)
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fmkdirat, __x86_asm32_int80_fmkdirat)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
@@ -30383,9 +31191,25 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_service, __x86_asm32_int80_rpc
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ksysctl, __x86_asm32_int80_ksysctl)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writevf, __x86_asm32_int80_writevf)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readvf, __x86_asm32_int80_readvf)
 
@@ -30553,7 +31377,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
 
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -30684,7 +31508,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_raiseat, __x86_asm32_int80_raiseat
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mktty, __x86_asm32_int80_mktty)
 
 /* >> lfutexlockexpr(2)
@@ -30821,18 +31645,18 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lseek64, __x86_asm32_int80_lseek64
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -30892,10 +31716,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_debugtrap, __x86_asm32_int80_debug
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -30907,7 +31731,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_get_exception_handler, __x86_asm32
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -30923,7 +31749,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_time64, __x86_asm32_int80_time64)
 /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchdirat, __x86_asm32_int80_fchdirat)
 
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 .section .text.x86.asm32_syscall_sysenter.openpty
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
@@ -31117,9 +31944,21 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getdrives, __x86_asm32_int80_getdr
 /* errno_t detach(pid_t pid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_detach, __x86_asm32_int80_detach)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writef, __x86_asm32_int80_writef)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readf, __x86_asm32_int80_readf)
 
@@ -31141,7 +31980,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hop, __x86_asm32_int80_hop)
 /* errno_t restart_syscall(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_restart_syscall, sys32_restart_syscall); */
 
-/* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+/* void exit(syscall_ulong_t exit_code) */
 .section .text.x86.asm32_syscall_sysrun32.exit
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_exit)
 	.cfi_startproc
@@ -31151,9 +31992,24 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_exit)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_exit)
 
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 /* pid_t fork(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_fork, sys32_fork); */
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 .section .text.x86.asm32_syscall_sysrun32.read
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_read)
@@ -31166,6 +32022,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_read)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_read)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 .section .text.x86.asm32_syscall_sysrun32.write
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_write)
@@ -31178,6 +32040,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_write)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_write)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.open
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_open)
@@ -31251,6 +32126,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_unlink)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_unlink)
 
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 .section .text.x86.asm32_syscall_sysrun32.execve
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_execve)
@@ -31886,14 +32763,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setgroups)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setgroups)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
+/* ssize_t select(struct sel_arg_structx32 const *arg) */
 .section .text.x86.asm32_syscall_sysrun32.select
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_select)
 	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_select)
 	jmp    sys32_select
@@ -32290,6 +33163,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ipc)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ipc)
 
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 /* errno_t fsync(fd_t fd) */
 .section .text.x86.asm32_syscall_sysrun32.fsync
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsync)
@@ -32562,10 +33437,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getdents)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getdents)
 
-/* errno_t _newselect(int TODO_PROTOTYPE) */
+/* ssize_t _newselect(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 .section .text.x86.asm32_syscall_sysrun32._newselect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32__newselect)
 	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32__newselect)
 	jmp    sys32__newselect
@@ -32595,6 +33474,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msync)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_msync)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_sysrun32.readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readv)
@@ -32607,6 +33494,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_readv)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_sysrun32.writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writev)
@@ -32629,6 +33524,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsid)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getsid)
 
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 /* errno_t fdatasync(fd_t fd) */
 .section .text.x86.asm32_syscall_sysrun32.fdatasync
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fdatasync)
@@ -33105,6 +34002,29 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_putpmsg)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_putpmsg)
 
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 /* pid_t vfork(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_vfork, sys32_vfork); */
 
@@ -33750,6 +34670,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fadvise64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fadvise64)
 
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 /* void exit_group(syscall_ulong_t exit_code) */
 .section .text.x86.asm32_syscall_sysrun32.exit_group
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_exit_group)
@@ -34113,7 +35035,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kexec_load)
 END(__x86_asm32_sysrun32_kexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysrun32.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid)
@@ -34225,6 +35148,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_migrate_pages)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_migrate_pages)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.openat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openat)
@@ -34573,7 +35509,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utimensat)
 
-/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.x86.asm32_syscall_sysrun32.signalfd
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd)
 	.cfi_startproc
@@ -34651,8 +35589,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_timerfd_gettime)
 
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.signalfd4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd4)
 	.cfi_startproc
@@ -34721,6 +35661,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init1)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_inotify_init1)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysrun32.preadv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadv)
@@ -34737,6 +35680,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_preadv)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysrun32.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritev)
@@ -34776,10 +35722,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_perf_event_open)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_perf_event_open)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32 const *tmo) */
 .section .text.x86.asm32_syscall_sysrun32.recvmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg)
@@ -34875,8 +35825,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_syncfs)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_syncfs)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_sysrun32.sendmmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmmsg)
@@ -34901,7 +35855,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setns)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setns)
 
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
@@ -34917,7 +35873,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_process_vm_readv)
 
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_writev)
@@ -35039,7 +35997,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bpf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_execveat)
@@ -35054,14 +36014,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_execveat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_execveat)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.x86.asm32_syscall_sysrun32.socket
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socket)
@@ -35074,14 +36036,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socket)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_socket)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.x86.asm32_syscall_sysrun32.socketpair
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socketpair)
@@ -35095,6 +36059,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socketpair)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_socketpair)
 
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_sysrun32.bind
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bind)
@@ -35107,6 +36078,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bind)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_bind)
 
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_sysrun32.connect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_connect)
@@ -35119,6 +36100,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_connect)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_connect)
 
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 .section .text.x86.asm32_syscall_sysrun32.listen
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_listen)
@@ -35130,7 +36119,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_listen)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_listen)
 
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.x86.asm32_syscall_sysrun32.accept4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_accept4)
@@ -35144,8 +36146,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_accept4)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_accept4)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 .section .text.x86.asm32_syscall_sysrun32.getsockopt
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsockopt)
@@ -35160,8 +36170,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsockopt)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 .section .text.x86.asm32_syscall_sysrun32.setsockopt
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setsockopt)
@@ -35176,6 +36192,17 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setsockopt)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setsockopt)
 
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_sysrun32.getsockname
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsockname)
@@ -35188,6 +36215,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsockname)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getsockname)
 
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_sysrun32.getpeername
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpeername)
@@ -35200,8 +36235,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpeername)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getpeername)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_sysrun32.sendto
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendto)
@@ -35217,8 +36265,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendto)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sendto)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_sysrun32.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmsg)
@@ -35231,8 +36283,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmsg)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sendmsg)
 
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_sysrun32.recvfrom
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvfrom)
@@ -35248,9 +36313,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_recvfrom)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_sysrun32.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmsg)
@@ -35263,7 +36332,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmsg)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_recvmsg)
 
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 .section .text.x86.asm32_syscall_sysrun32.shutdown
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shutdown)
@@ -35305,10 +36379,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mlock2)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 .section .text.x86.asm32_syscall_sysrun32.recvmmsg64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
@@ -35323,6 +36401,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_recvmmsg64)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
@@ -35340,6 +36421,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pwritevf)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
@@ -35548,7 +36632,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
 END(__x86_asm32_sysrun32_fmkdirat)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysrun32.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
@@ -35805,6 +36890,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksysctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ksysctl)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.writevf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
@@ -35818,6 +36911,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_writevf)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.readvf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readvf)
@@ -36054,7 +37155,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utime64)
 
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -36164,7 +37265,7 @@ END(__x86_asm32_sysrun32_raiseat)
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 .section .text.x86.asm32_syscall_sysrun32.mktty
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mktty)
 	.cfi_startproc
@@ -36279,18 +37380,18 @@ END(__x86_asm32_sysrun32_lseek64)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -36336,10 +37437,10 @@ END(__x86_asm32_sysrun32_debugtrap)
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -36360,7 +37461,9 @@ END(__x86_asm32_sysrun32_get_exception_handler)
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -36401,7 +37504,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchdirat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fchdirat)
 
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 .section .text.x86.asm32_syscall_sysrun32.openpty
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openpty)
@@ -36578,6 +37682,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_detach)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_detach)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.writef
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writef)
@@ -36591,6 +37701,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writef)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_writef)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.readf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readf)

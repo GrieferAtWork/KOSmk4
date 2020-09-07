@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75e82732 */
+/* HASH CRC-32:0xe0f3b3cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,6 +91,19 @@
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_fchownat               0x36  /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define __NR_fchown                 0x37  /* errno_t fchown(fd_t fd, uid_t owner, gid_t group) */
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define __NR_openat                 0x38  /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 /* Close a given file descriptor/handle `FD' */
 #define __NR_close                  0x39  /* errno_t close(fd_t fd) */
@@ -98,18 +111,54 @@
 #define __NR_pipe2                  0x3b  /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
 #define __NR_quotactl               0x3c  /* errno_t quotactl(int TODO_PROTOTYPE) */
 #define __NR_getdents64             0x3d  /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 #define __NR_read                   0x3f  /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 #define __NR_write                  0x40  /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 #define __NR_readv                  0x41  /* ssize_t readv(fd_t fd, struct iovec const *iovec, size_t count) */
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 #define __NR_writev                 0x42  /* ssize_t writev(fd_t fd, struct iovec const *iovec, size_t count) */
 #define __NR_pread64                0x43  /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR_pwrite64               0x44  /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define __NR_preadv                 0x45  /* ssize_t preadv(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 #define __NR_pwritev                0x46  /* ssize_t pwritev(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
 #define __NR_pselect6               0x48  /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespec const *timeout, void const *sigmask_sigset_and_len) */
 #define __NR_ppoll                  0x49  /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespec const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-#define __NR_signalfd4              0x4a  /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+#define __NR_signalfd4              0x4a  /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 #define __NR_vmsplice               0x4b  /* ssize_t vmsplice(fd_t fdout, struct iovec const *iov, size_t count, syscall_ulong_t flags) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
@@ -118,7 +167,11 @@
 #define __NR_tee                    0x4d  /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 #define __NR_readlinkat             0x4e  /* ssize_t readlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen) */
 #define __NR_sync                   0x51  /* errno_t sync(void) */
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 #define __NR_fsync                  0x52  /* errno_t fsync(fd_t fd) */
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 #define __NR_fdatasync              0x53  /* errno_t fdatasync(fd_t fd) */
 /* @param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER' */
 #define __NR_sync_file_range        0x54  /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
@@ -138,10 +191,15 @@
 #define __NR_capget                 0x5a  /* errno_t capget(int TODO_PROTOTYPE) */
 #define __NR_capset                 0x5b  /* errno_t capset(int TODO_PROTOTYPE) */
 #define __NR_personality            0x5c  /* errno_t personality(int TODO_PROTOTYPE) */
-#define __NR_exit                   0x5d  /* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+#define __NR_exit                   0x5d  /* void exit(syscall_ulong_t exit_code) */
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 #define __NR_exit_group             0x5e  /* void exit_group(syscall_ulong_t exit_code) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid                 0x5f  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
 #define __NR_set_tid_address        0x60  /* pid_t set_tid_address(pid_t *tidptr) */
 /* param flags: Set of `CLONE_*' */
@@ -259,54 +317,168 @@
 #define __NR_semctl                 0xbf  /* errno_t semctl(int TODO_PROTOTYPE) */
 #define __NR_semtimedop             0xc0  /* errno_t semtimedop(int TODO_PROTOTYPE) */
 #define __NR_semop                  0xc1  /* errno_t semop(int TODO_PROTOTYPE) */
-#define __NR_shmget                 0xc2  /* errno_t shmget(int TODO_PROTOTYPE) */
-#define __NR_shmctl                 0xc3  /* errno_t shmctl(int TODO_PROTOTYPE) */
-#define __NR_shmat                  0xc4  /* errno_t shmat(int TODO_PROTOTYPE) */
-#define __NR_shmdt                  0xc5  /* errno_t shmdt(int TODO_PROTOTYPE) */
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+#define __NR_shmget                 0xc2  /* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+#define __NR_shmctl                 0xc3  /* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+#define __NR_shmat                  0xc4  /* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+#define __NR_shmdt                  0xc5  /* errno_t shmdt(void const *shmaddr) */
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 #define __NR_socket                 0xc6  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 #define __NR_socketpair             0xc7  /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 #define __NR_bind                   0xc8  /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 #define __NR_listen                 0xc9  /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] Don't fill in the client's peer address
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ *                           If this happens, the caller can still determine
+ *                           the correct address through use of `getpeername()'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 #define __NR_accept                 0xca  /* fd_t accept(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 #define __NR_connect                0xcb  /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 #define __NR_getsockname            0xcc  /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 #define __NR_getpeername            0xcd  /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 #define __NR_sendto                 0xce  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 #define __NR_recvfrom               0xcf  /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 #define __NR_setsockopt             0xd0  /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 #define __NR_getsockopt             0xd1  /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 #define __NR_shutdown               0xd2  /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 #define __NR_sendmsg                0xd3  /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t msg_flags) */
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 #define __NR_recvmsg                0xd4  /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t msg_flags) */
 #define __NR_readahead              0xd5  /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 #define __NR_brk                    0xd6  /* errno_t brk(void *addr) */
@@ -317,6 +489,8 @@
 #define __NR_request_key            0xda  /* errno_t request_key(int TODO_PROTOTYPE) */
 #define __NR_keyctl                 0xdb  /* errno_t keyctl(int TODO_PROTOTYPE) */
 #define __NR_clone                  0xdc  /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 #define __NR_execve                 0xdd  /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
 #define __NR_swapon                 0xe0  /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
@@ -339,12 +513,29 @@
 #define __NR_move_pages             0xef  /* errno_t move_pages(int TODO_PROTOTYPE) */
 #define __NR_rt_tgsigqueueinfo      0xf0  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfo_struct const *uinfo) */
 #define __NR_perf_event_open        0xf1  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 #define __NR_accept4                0xf2  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 #define __NR_recvmmsg               0xf3  /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec const *tmo) */
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -359,12 +550,20 @@
 #define __NR_clock_adjtime          0x10a /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
 #define __NR_syncfs                 0x10b /* errno_t syncfs(fd_t fd) */
 #define __NR_setns                  0x10c /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 #define __NR_sendmmsg               0x10d /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 #define __NR_process_vm_readv       0x10e /* ssize_t process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 #define __NR_process_vm_writev      0x10f /* ssize_t process_vm_writev(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 /* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
@@ -380,11 +579,26 @@
 /* @param: flags: Set of `MFD_CLOEXEC | MFD_ALLOW_SEALING' */
 #define __NR_memfd_create           0x117 /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define __NR_bpf                    0x118 /* errno_t bpf(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_execveat               0x119 /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
 #define __NR_userfaultfd            0x11a /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier             0x11b /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                 0x11c /* errno_t mlock2(int TODO_PROTOTYPE) */
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define __NR_open                   0x400 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 #define __NR_link                   0x401 /* errno_t link(char const *existing_file, char const *link_file) */
 #define __NR_unlink                 0x402 /* errno_t unlink(char const *filename) */
@@ -405,7 +619,9 @@
 #define __NR_epoll_create           0x412 /* fd_t epoll_create(syscall_ulong_t size) */
 #define __NR_inotify_init           0x413 /* errno_t inotify_init(int TODO_PROTOTYPE) */
 #define __NR_eventfd                0x414 /* fd_t eventfd(syscall_ulong_t initval) */
-#define __NR_signalfd               0x415 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+#define __NR_signalfd               0x415 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 #define __NR_sendfile               0x416 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define __NR_ftruncate              0x417 /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
 #define __NR_truncate               0x418 /* errno_t truncate(char const *filename, syscall_ulong_t length) */
@@ -436,19 +652,61 @@
 #define __NR_poll                   0x42c /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 #define __NR_epoll_wait             0x42d /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
 #define __NR_ustat                  0x42e /* errno_t ustat(dev_t dev, struct ustat *ubuf) */
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 #define __NR_vfork                  0x42f /* pid_t vfork(void) */
 /* @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' */
 #define __NR_oldwait4               0x430 /* pid_t oldwait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over the given socket `sockfd', and store the contents within the given buffer.
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @return: * : [<= bufsize] The actual # of received bytes */
 #define __NR_recv                   0x431 /* ssize_t recv(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags) */
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over the given socket `sockfd'.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @return: * : [<= bufsize] The actual # of send bytes */
 #define __NR_send                   0x432 /* ssize_t send(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags) */
 #define __NR_bdflush                0x433 /* errno_t bdflush(int TODO_PROTOTYPE) */
 #define __NR_umount                 0x434 /* errno_t umount(char const *special_file) */
 #define __NR_uselib                 0x435 /* errno_t uselib(char const *library) */
 #define __NR__sysctl                0x436 /* errno_t _sysctl(int TODO_PROTOTYPE) */
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 #define __NR_fork                   0x437 /* pid_t fork(void) */
 
 
@@ -1133,9 +1391,9 @@
 #define __NRRC_semctl                 1
 #define __NRRC_semtimedop             1
 #define __NRRC_semop                  1
-#define __NRRC_shmget                 1
-#define __NRRC_shmctl                 1
-#define __NRRC_shmat                  1
+#define __NRRC_shmget                 3
+#define __NRRC_shmctl                 3
+#define __NRRC_shmat                  3
 #define __NRRC_shmdt                  1
 #define __NRRC_socket                 3
 #define __NRRC_socketpair             4

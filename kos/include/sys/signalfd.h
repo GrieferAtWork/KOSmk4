@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b80559a */
+/* HASH CRC-32:0xe4900408 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,8 +91,10 @@ enum {
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
-/* Request notification for delivery of signals in MASK to be performed using descriptor FD */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__mask, __STDC_INT_AS_UINT_T __flags),(__fd,__mask,__flags))
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__sigmask, __STDC_INT_AS_UINT_T __flags),(__fd,__sigmask,__flags))
 #endif /* __CC__ */
 
 __SYSDECL_END

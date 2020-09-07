@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd78e0d8e */
+/* HASH CRC-32:0x508c9b34 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,21 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
+/* >> wait(2)
+ * Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_wait)(__WAIT_STATUS stat_loc);
-/* Wait for a child process:
+/* >> waitpid(2)
+ * Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
  *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_waitpid)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options);
-/* @param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
- *                 optionally or'd with `WNOHANG | WNOWAIT' */
+/* >> waitid(2)
+ * @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_waitid)(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options);
 /* Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -48,11 +52,13 @@ INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_wait3)(__WAIT_STATUS stat_loc, __STDC_INT
 /* Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_NCX(LIBDCALL libd_wait3_64)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
-/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* >> wait4(2)
+ * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_wait4)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
-/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* >> wait4(2)
+ * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_NCX(LIBDCALL libd_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that

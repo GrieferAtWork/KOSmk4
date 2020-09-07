@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x741a54ae */
+/* HASH CRC-32:0xfd8be379 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_ftruncate64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_ftruncate
+#include <features.h>
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(__pos)

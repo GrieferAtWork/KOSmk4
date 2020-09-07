@@ -469,9 +469,10 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") char *
 }
 /*[[[end:libc_GetCwd]]]*/
 
-/*[[[head:libc_PRead,hash:CRC-32=0xb3504a36]]]*/
+/*[[[head:libc_PRead,hash:CRC-32=0xf6eff9a6]]]*/
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 (LIBCCALL libc_PRead)(fd_t fd,
                       void *buf,
@@ -483,9 +484,10 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 }
 /*[[[end:libc_PRead]]]*/
 
-/*[[[head:libc_PWrite,hash:CRC-32=0xd6c42a2c]]]*/
+/*[[[head:libc_PWrite,hash:CRC-32=0x59d73efb]]]*/
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.except.io.write") NONNULL((2)) size_t
 (LIBCCALL libc_PWrite)(fd_t fd,
                        void const *buf,

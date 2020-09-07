@@ -29,16 +29,18 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_signalfd,hash:CRC-32=0xc64e0764]]]*/
-/* Request notification for delivery of signals in MASK to be performed using descriptor FD */
-INTERN ATTR_SECTION(".text.crt.sched.signalfd") NONNULL((2)) fd_t
+/*[[[head:libc_signalfd,hash:CRC-32=0xa6aed542]]]*/
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+INTERN ATTR_SECTION(".text.crt.sched.signalfd") WUNUSED NONNULL((2)) fd_t
 NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd,
-                                    sigset_t const *mask,
+                                    sigset_t const *sigmask,
                                     __STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_signalfd]]]*/
 {
 	fd_t result;
-	result = sys_signalfd4(fd, mask, sizeof(sigset_t),
+	result = sys_signalfd4(fd, sigmask, sizeof(sigset_t),
 	                       (syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }

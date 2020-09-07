@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34d5496f */
+/* HASH CRC-32:0x624c8084 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,19 @@
 #define __local_sync_file_range_defined 1
 #include <__crt.h>
 #include <bits/types.h>
+#include <features.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(__pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(__off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sync_file_range) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __count, unsigned int __flags) {
 	(void)__fd;
 	(void)__offset;
 	(void)__count;

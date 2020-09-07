@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3baadd83 */
+/* HASH CRC-32:0xbc4225e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,9 +107,15 @@
 #define __NR64AN0_madvise                addr
 #define __NR64AN1_madvise                len
 #define __NR64AN2_madvise                advice
-#define __NR64AN0_shmget                 TODO_PROTOTYPE
-#define __NR64AN0_shmat                  TODO_PROTOTYPE
-#define __NR64AN0_shmctl                 TODO_PROTOTYPE
+#define __NR64AN0_shmget                 key
+#define __NR64AN1_shmget                 size
+#define __NR64AN2_shmget                 shmflg
+#define __NR64AN0_shmat                  shmid
+#define __NR64AN1_shmat                  shmaddr
+#define __NR64AN2_shmat                  shmflg
+#define __NR64AN0_shmctl                 shmid
+#define __NR64AN1_shmctl                 cmd
+#define __NR64AN2_shmctl                 buf
 #define __NR64AN0_dup                    fd
 #define __NR64AN0_dup2                   oldfd
 #define __NR64AN1_dup2                   newfd
@@ -187,7 +193,7 @@
 #define __NR64AN0_execve                 path
 #define __NR64AN1_execve                 argv
 #define __NR64AN2_execve                 envp
-#define __NR64AN0_exit                   status
+#define __NR64AN0_exit                   exit_code
 #define __NR64AN0_wait4                  pid
 #define __NR64AN1_wait4                  stat_loc
 #define __NR64AN2_wait4                  options
@@ -198,7 +204,7 @@
 #define __NR64AN0_semget                 TODO_PROTOTYPE
 #define __NR64AN0_semop                  TODO_PROTOTYPE
 #define __NR64AN0_semctl                 TODO_PROTOTYPE
-#define __NR64AN0_shmdt                  TODO_PROTOTYPE
+#define __NR64AN0_shmdt                  shmaddr
 #define __NR64AN0_msgget                 TODO_PROTOTYPE
 #define __NR64AN0_msgsnd                 TODO_PROTOTYPE
 #define __NR64AN0_msgrcv                 TODO_PROTOTYPE
@@ -647,7 +653,7 @@
 #define __NR64AN4_epoll_pwait            ss
 #define __NR64AN0_signalfd               fd
 #define __NR64AN1_signalfd               sigmask
-#define __NR64AN2_signalfd               sigsetsize
+#define __NR64AN2_signalfd               sigmasksize
 #define __NR64AN0_timerfd_create         clock_id
 #define __NR64AN1_timerfd_create         flags
 #define __NR64AN0_eventfd                initval
@@ -667,7 +673,7 @@
 #define __NR64AN3_accept4                sock_flags
 #define __NR64AN0_signalfd4              fd
 #define __NR64AN1_signalfd4              sigmask
-#define __NR64AN2_signalfd4              sigsetsize
+#define __NR64AN2_signalfd4              sigmasksize
 #define __NR64AN3_signalfd4              flags
 #define __NR64AN0_eventfd2               initval
 #define __NR64AN1_eventfd2               flags
@@ -836,9 +842,9 @@
 #define __NR64AN5_coredump               unwind_error
 #define __NR64AN0_raiseat                state
 #define __NR64AN1_raiseat                si
-#define __NR64AN0_mktty                  keyboard
-#define __NR64AN1_mktty                  display
-#define __NR64AN2_mktty                  name
+#define __NR64AN0_mktty                  name
+#define __NR64AN1_mktty                  keyboard
+#define __NR64AN2_mktty                  display
 #define __NR64AN3_mktty                  rsvd
 #define __NR64AN0_lfutexlockexpr         ulockaddr
 #define __NR64AN1_lfutexlockexpr         base
@@ -1061,11 +1067,17 @@
 #define __NR64ATR1_madvise                SC_REPR_SIZE_T                                                       /* len */ 
 #define __NR64ATR2_madvise                SC_REPR_SYSCALL_ULONG_T                                              /* advice */ 
 #define __NR64RTR_madvise                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_shmget                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_shmget                 SC_REPR_SIGHANDLER_T                                                 /* key */ 
+#define __NR64ATR1_shmget                 SC_REPR_SIZE_T                                                       /* size */ 
+#define __NR64ATR2_shmget                 SC_REPR_SYSCALL_ULONG_T                                              /* shmflg */ 
 #define __NR64RTR_shmget                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_shmat                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_shmat                  SC_REPR_SYSCALL_ULONG_T                                              /* shmid */ 
+#define __NR64ATR1_shmat                  SC_REPR_POINTER                                                      /* shmaddr */ 
+#define __NR64ATR2_shmat                  SC_REPR_SYSCALL_ULONG_T                                              /* shmflg */ 
 #define __NR64RTR_shmat                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_shmctl                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_shmctl                 SC_REPR_SYSCALL_ULONG_T                                              /* shmid */ 
+#define __NR64ATR1_shmctl                 SC_REPR_SYSCALL_ULONG_T                                              /* cmd */ 
+#define __NR64ATR2_shmctl                 SC_REPR_POINTER                                                      /* buf */ 
 #define __NR64RTR_shmctl                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_dup                    SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64RTR_dup                     SC_REPR_FD_T                                                         /* return */
@@ -1182,7 +1194,7 @@
 #define __NR64ATR1_execve                 SC_REPR_STRING_VECTOR64                                              /* argv */ 
 #define __NR64ATR2_execve                 SC_REPR_STRING_VECTOR64                                              /* envp */ 
 #define __NR64RTR_execve                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_exit                   SC_REPR_EXIT_STATUS                                                  /* status */ 
+#define __NR64ATR0_exit                   SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
 #define __NR64RTR_exit                    SC_REPR_SIGHANDLER_T                                                 /* return */
 #define __NR64ATR0_wait4                  SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_wait4                  SC_REPR_POINTER                                                      /* stat_loc */ 
@@ -1200,7 +1212,7 @@
 #define __NR64RTR_semop                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_semctl                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_semctl                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_shmdt                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_shmdt                  SC_REPR_POINTER                                                      /* shmaddr */ 
 #define __NR64RTR_shmdt                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_msgget                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_msgget                  SC_REPR_ERRNO_T                                                      /* return */
@@ -1907,8 +1919,8 @@
 #define __NR64RTR_epoll_pwait             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_signalfd               SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_signalfd               SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
-#define __NR64ATL1_signalfd               2                                                                    /* sigmask -> sigsetsize */ 
-#define __NR64ATR2_signalfd               SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NR64ATL1_signalfd               2                                                                    /* sigmask -> sigmasksize */ 
+#define __NR64ATR2_signalfd               SC_REPR_SIZE_T                                                       /* sigmasksize */ 
 #define __NR64RTR_signalfd                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_timerfd_create         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
 #define __NR64ATR1_timerfd_create         SC_REPR_TIMERFD_FLAGS                                                /* flags */ 
@@ -1935,8 +1947,8 @@
 #define __NR64RTR_accept4                 SC_REPR_FD_T                                                         /* return */
 #define __NR64ATR0_signalfd4              SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_signalfd4              SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
-#define __NR64ATL1_signalfd4              2                                                                    /* sigmask -> sigsetsize */ 
-#define __NR64ATR2_signalfd4              SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NR64ATL1_signalfd4              2                                                                    /* sigmask -> sigmasksize */ 
+#define __NR64ATR2_signalfd4              SC_REPR_SIZE_T                                                       /* sigmasksize */ 
 #define __NR64ATR3_signalfd4              SC_REPR_SIGNALFD4_FLAGS                                              /* flags */ 
 #define __NR64RTR_signalfd4               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_eventfd2               SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
@@ -2190,9 +2202,9 @@
 #define __NR64ATR0_raiseat                SC_REPR_STRUCT_UCPUSTATE64                                           /* state */ 
 #define __NR64ATR1_raiseat                SC_REPR_STRUCT_SIGINFOX64                                            /* si */ 
 #define __NR64RTR_raiseat                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_mktty                  SC_REPR_FD_T                                                         /* keyboard */ 
-#define __NR64ATR1_mktty                  SC_REPR_FD_T                                                         /* display */ 
-#define __NR64ATR2_mktty                  SC_REPR_STRING                                                       /* name */ 
+#define __NR64ATR0_mktty                  SC_REPR_STRING                                                       /* name */ 
+#define __NR64ATR1_mktty                  SC_REPR_FD_T                                                         /* keyboard */ 
+#define __NR64ATR2_mktty                  SC_REPR_FD_T                                                         /* display */ 
 #define __NR64ATR3_mktty                  SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
 #define __NR64RTR_mktty                   SC_REPR_FD_T                                                         /* return */
 #define __NR64ATR0_lfutexlockexpr         SC_REPR_POINTER                                                      /* ulockaddr */ 

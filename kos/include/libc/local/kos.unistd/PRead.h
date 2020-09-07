@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ae628cb */
+/* HASH CRC-32:0xcc259d8b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_PRead64_defined */
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __LOCAL_LIBC(PRead) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PRead))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __FS_TYPE(pos) __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PRead

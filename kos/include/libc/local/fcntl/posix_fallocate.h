@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f6a5777 */
+/* HASH CRC-32:0x48c77d99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,28 @@
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(__pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(__off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: posix_fallocate32 from fcntl */
 #if !defined(__local___localdep_posix_fallocate32_defined) && defined(__CRT_HAVE_posix_fallocate)
 #define __local___localdep_posix_fallocate32_defined 1
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __off32_t __offset, __off32_t __length),posix_fallocate,(__fd,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
 #endif /* !__local___localdep_posix_fallocate32_defined && __CRT_HAVE_posix_fallocate */
 /* Dependency: posix_fallocate64 from fcntl */
 #ifndef __local___localdep_posix_fallocate64_defined
 #define __local___localdep_posix_fallocate64_defined 1
 #ifdef __CRT_HAVE_posix_fallocate64
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __off64_t __offset, __off64_t __length),posix_fallocate64,(__fd,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate64,(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __off64_t __offset, __off64_t __length),posix_fallocate,(__fd,__offset,__length))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate,(__fd,__offset,__length))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/posix_fallocate64.h>
@@ -44,9 +53,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_posix_fallocate64_defined */
 __LOCAL_LIBC(posix_fallocate) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fallocate))(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fallocate))(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length) {
 
-	return __localdep_posix_fallocate64(__fd, (__off64_t)__offset, (__off64_t)__length);
+	return __localdep_posix_fallocate64(__fd, (__PIO_OFFSET64)__offset, (__PIO_OFFSET64)__length);
 
 
 

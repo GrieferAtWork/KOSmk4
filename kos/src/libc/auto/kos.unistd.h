@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e6f1a3b */
+/* HASH CRC-32:0xfc291b16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,11 +75,20 @@ INTDEF NONNULL((1)) void (LIBDCALL libd_Chown)(char const *file, uid_t owner, gi
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) void (LIBDCALL libd_Link)(char const *from, char const *to) THROWS(...);
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 INTDEF NONNULL((2)) size_t (LIBDCALL libd_Read)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 INTDEF NONNULL((2)) size_t (LIBDCALL libd_Write)(fd_t fd, void const *buf, size_t bufsize) THROWS(...);
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -142,10 +151,12 @@ INTDEF NONNULL((2)) void (LIBDCALL libd_UnlinkAt)(fd_t dfd, char const *name, at
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 INTDEF pos64_t (LIBDCALL libd_LSeek64)(fd_t fd, off64_t offset, int whence) THROWS(...);
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) size_t (LIBDCALL libd_PRead)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) size_t (LIBDCALL libd_PWrite)(fd_t fd, void const *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */

@@ -134,8 +134,6 @@ gettimeofday = gettimeofdayx32;
 gettimeofday64 = gettimeofdayx32_64;
 settimeofday = settimeofdayx32;
 settimeofday64 = settimeofdayx32_64;
-select = selectx32;
-select64 = selectx32_64;
 utimes = utimesx32;
 utimes64 = utimesx32_64;
 futimesat = futimesatx32;
@@ -195,6 +193,13 @@ mq_timedsend64 = mq_timedsendx32_64;
 mq_timedreceive = mq_timedreceivex32;
 mq_timedreceive64 = mq_timedreceivex32_64;
 rt_sigreturn = sigreturn;
+
+/* Deal with the whole new-vs-old select issue. */
+_newselect = selectx32;
+select = _oldselectx32;
+select64 = selectx32_64;
+
+
 
 
 /* Syscall definition syntax

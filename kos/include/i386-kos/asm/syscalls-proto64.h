@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13888ae5 */
+/* HASH CRC-32:0x6ee9b2bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,9 @@
 #define __NRAC_msync                  3
 #define __NRAC_mincore                3
 #define __NRAC_madvise                3
-#define __NRAC_shmget                 1
-#define __NRAC_shmat                  1
-#define __NRAC_shmctl                 1
+#define __NRAC_shmget                 3
+#define __NRAC_shmat                  3
+#define __NRAC_shmctl                 3
 #define __NRAC_dup                    1
 #define __NRAC_dup2                   2
 #define __NRAC_pause                  0
@@ -887,9 +887,15 @@
 #define __NRAT0_madvise                (void *, void *)
 #define __NRAT1_madvise                (size_t, __size_t)
 #define __NRAT2_madvise                (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_shmget                 (int, int)
-#define __NRAT0_shmat                  (int, int)
-#define __NRAT0_shmctl                 (int, int)
+#define __NRAT0_shmget                 (key_t, __key_t)
+#define __NRAT1_shmget                 (size_t, __size_t)
+#define __NRAT2_shmget                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_shmat                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_shmat                  (void const *, void const *)
+#define __NRAT2_shmat                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_shmctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_shmctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_shmctl                 (struct shmid_ds *, struct shmid_ds *)
 #define __NRAT0_dup                    (fd_t, __fd_t)
 #define __NRAT0_dup2                   (fd_t, __fd_t)
 #define __NRAT1_dup2                   (fd_t, __fd_t)
@@ -978,7 +984,7 @@
 #define __NRAT0_semget                 (int, int)
 #define __NRAT0_semop                  (int, int)
 #define __NRAT0_semctl                 (int, int)
-#define __NRAT0_shmdt                  (int, int)
+#define __NRAT0_shmdt                  (void const *, void const *)
 #define __NRAT0_msgget                 (int, int)
 #define __NRAT0_msgsnd                 (int, int)
 #define __NRAT0_msgrcv                 (int, int)
@@ -1616,9 +1622,9 @@
 #define __NRAT5_coredump               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT1_raiseat                (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
-#define __NRAT0_mktty                  (fd_t, __fd_t)
+#define __NRAT0_mktty                  (char const *, char const *)
 #define __NRAT1_mktty                  (fd_t, __fd_t)
-#define __NRAT2_mktty                  (char const *, char const *)
+#define __NRAT2_mktty                  (fd_t, __fd_t)
 #define __NRAT3_mktty                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
 #define __NRAT1_lfutexlockexpr         (void *, void *)
@@ -1745,9 +1751,9 @@
 #define __NRAM_msync(a, b, c, d, e, f)                  (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_mincore(a, b, c, d, e, f)                (void *)a, (__size_t)b, (__uint8_t *)c
 #define __NRAM_madvise(a, b, c, d, e, f)                (void *)a, (__size_t)b, (__syscall_ulong_t)c
-#define __NRAM_shmget(a, b, c, d, e, f)                 (int)a
-#define __NRAM_shmat(a, b, c, d, e, f)                  (int)a
-#define __NRAM_shmctl(a, b, c, d, e, f)                 (int)a
+#define __NRAM_shmget(a, b, c, d, e, f)                 (__key_t)a, (__size_t)b, (__syscall_ulong_t)c
+#define __NRAM_shmat(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void const *)b, (__syscall_ulong_t)c
+#define __NRAM_shmctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (struct shmid_ds *)c
 #define __NRAM_dup(a, b, c, d, e, f)                    (__fd_t)a
 #define __NRAM_dup2(a, b, c, d, e, f)                   (__fd_t)a, (__fd_t)b
 #define __NRAM_pause(a, b, c, d, e, f)                  /* nothing */
@@ -1783,7 +1789,7 @@
 #define __NRAM_semget(a, b, c, d, e, f)                 (int)a
 #define __NRAM_semop(a, b, c, d, e, f)                  (int)a
 #define __NRAM_semctl(a, b, c, d, e, f)                 (int)a
-#define __NRAM_shmdt(a, b, c, d, e, f)                  (int)a
+#define __NRAM_shmdt(a, b, c, d, e, f)                  (void const *)a
 #define __NRAM_msgget(a, b, c, d, e, f)                 (int)a
 #define __NRAM_msgsnd(a, b, c, d, e, f)                 (int)a
 #define __NRAM_msgrcv(a, b, c, d, e, f)                 (int)a
@@ -2064,7 +2070,7 @@
 #define __NRAM_process_spawnveat(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx64 const *)f
 #define __NRAM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfox64_struct const *)b
-#define __NRAM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
+#define __NRAM_mktty(a, b, c, d, e, f)                  (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NRAM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexprx64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
 #define __NRAM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
@@ -2129,9 +2135,9 @@
 #define __NRAP_msync(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_mincore(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_madvise(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_shmget(a)                                (__syscall_ulong_t)a
-#define __NRAP_shmat(a)                                 (__syscall_ulong_t)a
-#define __NRAP_shmctl(a)                                (__syscall_ulong_t)a
+#define __NRAP_shmget(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_shmat(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_shmctl(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_dup(a)                                   (__syscall_ulong_t)a
 #define __NRAP_dup2(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_pause()                                  /* nothing */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cbe3ef6 */
+/* HASH CRC-32:0x1837fc1f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,10 @@
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #include <bits/crt/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
+
+#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
+#include <asm/fcntl.h> /* __F_ULOCK, __F_LOCK, __F_TLOCK, __F_TEST */
+#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
 
 #ifdef __USE_SOLARIS
 #include <getopt.h>
@@ -687,7 +691,6 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setuid,(__uid_t __uid),(__uid))
  * @return: -1: [errno=EINVAL] : The given `GID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),(__gid))
-
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
@@ -696,7 +699,9 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),(__gid))
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CEIDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),{ return __builtin_fork(); })
 #elif defined(__CRT_HAVE_fork)
 /* >> fork(2)
@@ -706,7 +711,9 @@ __CEIDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),{ return __builtin
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),())
 #elif defined(__CRT_HAVE___fork)
 /* >> fork(2)
@@ -716,21 +723,20 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),())
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),__fork,())
 #endif /* ... */
-
 /* >> alarm(2)
  * @return: 0 : No alarm was scheduled before.
  * @return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
  * Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
  * You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm */
 __CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,alarm,(unsigned int __seconds),(__seconds))
-
 /* >> pause(2)
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
-
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
@@ -738,7 +744,6 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
-
 #ifndef __ttyname_defined
 #define __ttyname_defined 1
 #ifdef __CRT_HAVE_ttyname
@@ -752,15 +757,12 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
-
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
-
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
-
 /* ... */
 #ifndef __getlogin_defined
 #define __getlogin_defined 1
@@ -770,7 +772,6 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
 #undef __getlogin_defined
 #endif /* !__CRT_HAVE_getlogin */
 #endif /* !__getlogin_defined */
-
 #ifdef __CRT_HAVE_chown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -784,7 +785,6 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chown,(char const *__file, __ui
 __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL chown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __CRT_HAVE_fchownat */
 #endif /* !__CRT_HAVE_chown */
-
 #ifdef __CRT_HAVE_pathconf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
@@ -806,7 +806,6 @@ __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char con
 __NAMESPACE_LOCAL_USING_OR_IMPL(pathconf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL pathconf)(char const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pathconf))(__path, __name); })
 #endif /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
 #endif /* !__CRT_HAVE_pathconf */
-
 #ifdef __CRT_HAVE_link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
@@ -838,42 +837,67 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status)
 #undef __exit_defined
 #endif /* !... */
 #endif /* !__exit_defined */
-
 #ifndef __read_defined
 #define __read_defined 1
 #ifdef __CRT_HAVE_read
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __read_defined
 #endif /* !... */
 #endif /* !__read_defined */
-
 #ifndef __write_defined
 #define __write_defined 1
 #ifdef __CRT_HAVE_write
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __write_defined
@@ -958,7 +982,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(
 #undef __lseek_defined
 #endif /* !... */
 #endif /* !__lseek_defined */
-
 #ifndef __isatty_defined
 #define __isatty_defined 1
 #ifdef __CRT_HAVE_isatty
@@ -977,7 +1000,6 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd)
 #undef __isatty_defined
 #endif /* !... */
 #endif /* !__isatty_defined */
-
 #ifndef __dup2_defined
 #define __dup2_defined 1
 #ifdef __CRT_HAVE_dup2
@@ -999,7 +1021,6 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(
 #undef __dup2_defined
 #endif /* !... */
 #endif /* !__dup2_defined */
-
 #ifndef __dup_defined
 #define __dup_defined 1
 #ifdef __CRT_HAVE_dup
@@ -1016,26 +1037,24 @@ __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),_dup,(__fd))
 #undef __dup_defined
 #endif /* !... */
 #endif /* !__dup_defined */
-
 #ifndef __close_defined
 #define __close_defined 1
 #ifdef __CRT_HAVE_close
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 __CDECLARE(,int,__NOTHROW_NCX,close,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__close)
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __close_defined
 #endif /* !... */
 #endif /* !__close_defined */
-
 #ifndef __access_defined
 #define __access_defined 1
 #ifdef __CRT_HAVE_access
@@ -1269,35 +1288,41 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __ATTR_ARTIFICIAL __off64_
 
 #if defined(__CRT_HAVE_pread64) && defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),pread64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread) && !defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
 #else /* ... */
 #include <asm/stdio.h>
 #if defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pread.h>
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pread, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pread)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pread))(__fd, __buf, __bufsize, __offset); })
 #endif /* __CRT_HAVE_pread64 || __CRT_HAVE___pread64 || __CRT_HAVE_pread || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && __SEEK_CUR && __SEEK_SET) */
 #endif /* !... */
 #if defined(__CRT_HAVE_pwrite64) && defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite) && !defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
 #else /* ... */
 #include <asm/stdio.h>
 #if defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pwrite.h>
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pwrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pwrite)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwrite))(__fd, __buf, __bufsize, __offset); })
 #endif /* __CRT_HAVE_pwrite64 || __CRT_HAVE___pwrite64 || __CRT_HAVE_pwrite || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && __SEEK_CUR && __SEEK_SET) */
 #endif /* !... */
@@ -1512,13 +1537,59 @@ __CDECLARE_OPT(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useco
 #define __vfork_defined 1
 #ifdef __CRT_HAVE_vfork
 /* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+ *                 instead of the regular `exit(2)', since the later would include
+ *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 the context of a VM that isn't actually about to be destroyed.
+ *   - `execve(2)' Create a new VM that is populated with the specified process
+ *                 image. The parent process will only be resumed in case the
+ *                 new program image could be loaded successfully. Otherwise,
+ *                 the call to `execve(2)' returns normally in the child.
+ *                 Other functions from the exec()-family behave the same
+ *
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ *
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
 #elif defined(__CRT_HAVE___vfork)
 /* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+ *                 instead of the regular `exit(2)', since the later would include
+ *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 the context of a VM that isn't actually about to be destroyed.
+ *   - `execve(2)' Create a new VM that is populated with the specified process
+ *                 image. The parent process will only be resumed in case the
+ *                 new program image could be loaded successfully. Otherwise,
+ *                 the call to `execve(2)' returns normally in the child.
+ *                 Other functions from the exec()-family behave the same
+ *
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ *
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
 #else /* ... */
 #undef __vfork_defined
@@ -2202,23 +2273,29 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS
 
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
-#ifndef F_LOCK
-#define F_ULOCK 0 /* Unlock a previously locked region. */
-#define F_LOCK  1 /* Lock a region for exclusive use. */
-#define F_TLOCK 2 /* Test and lock a region for exclusive use. */
-#define F_TEST  3 /* Test a region for other processes locks. */
-#endif /* !F_LOCK */
+#if !defined(F_ULOCK) && defined(__F_ULOCK)
+#define F_ULOCK __F_ULOCK /* Unlock a previously locked region. */
+#endif /* !F_ULOCK && __F_ULOCK */
+#if !defined(F_LOCK) && defined(__F_LOCK)
+#define F_LOCK  __F_LOCK  /* Lock a region for exclusive use. */
+#endif /* !F_LOCK && __F_LOCK */
+#if !defined(F_TLOCK) && defined(__F_TLOCK)
+#define F_TLOCK __F_TLOCK /* Test and lock a region for exclusive use. */
+#endif /* !F_TLOCK && __F_TLOCK */
+#if !defined(F_TEST) && defined(__F_TEST)
+#define F_TEST  __F_TEST  /* Test a region for other processes locks. */
+#endif /* !F_TEST && __F_TEST */
 #ifndef __lockf_defined
 #define __lockf_defined 1
 #if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),lockf64,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && !defined(__USE_FILE_OFFSET64)
-__CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),(__fd,__cmd,__length))
+__CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),_locking,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length),_locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf64) || defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 #include <libc/local/fcntl/lockf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf)(__fd_t __fd, int __cmd, __FS_TYPE(off) __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf))(__fd, __cmd, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf))(__fd, __cmd, __length); })
 #else /* ... */
 #undef __lockf_defined
 #endif /* !... */
@@ -2227,12 +2304,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTH
 #ifndef __lockf64_defined
 #define __lockf64_defined 1
 #ifdef __CRT_HAVE_lockf64
-__CDECLARE(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, int __cmd, __off64_t __length),(__fd,__cmd,__length))
+__CDECLARE(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),lockf,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 #include <libc/local/fcntl/lockf64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf64)(__fd_t __fd, int __cmd, __off64_t __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf64))(__fd, __cmd, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL lockf64)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf64))(__fd, __cmd, __length); })
 #else /* ... */
 #undef __lockf64_defined
 #endif /* !... */

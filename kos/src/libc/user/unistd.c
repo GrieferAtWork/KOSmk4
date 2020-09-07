@@ -326,7 +326,7 @@ NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid)
 }
 /*[[[end:libc_setgid]]]*/
 
-/*[[[head:libc_fork,hash:CRC-32=0xfd3b7678]]]*/
+/*[[[head:libc_fork,hash:CRC-32=0x2f1aa539]]]*/
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
  * in the parent process where this function returns the (non-zero) PID
@@ -334,7 +334,9 @@ NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid)
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 INTERN ATTR_SECTION(".text.crt.sched.access") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_fork)(void)
 /*[[[body:libc_fork]]]*/
@@ -588,10 +590,14 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
 }
 /*[[[end:libc_link]]]*/
 
-/*[[[head:libc_read,hash:CRC-32=0x47219639]]]*/
+/*[[[head:libc_read,hash:CRC-32=0x760af5fb]]]*/
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 INTERN ATTR_SECTION(".text.crt.io.read") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
                                 void *buf,
@@ -604,9 +610,14 @@ NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
 }
 /*[[[end:libc_read]]]*/
 
-/*[[[head:libc_write,hash:CRC-32=0x8fd97a]]]*/
+/*[[[head:libc_write,hash:CRC-32=0x77a5c27]]]*/
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
                                  void const *buf,
@@ -681,9 +692,9 @@ NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 }
 /*[[[end:libc_dup]]]*/
 
-/*[[[head:libc_close,hash:CRC-32=0x65a66917]]]*/
+/*[[[head:libc_close,hash:CRC-32=0xabf09747]]]*/
 /* >> close(2)
- * Close a file handle */
+ * Close a given file descriptor/handle `FD' */
 INTERN ATTR_SECTION(".text.crt.io.access") int
 NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 /*[[[body:libc_close]]]*/
@@ -978,9 +989,10 @@ NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lseek64]]]*/
 
-/*[[[head:libc_pread,hash:CRC-32=0x49c6d49d]]]*/
+/*[[[head:libc_pread,hash:CRC-32=0x91b7bc1d]]]*/
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.io.read") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
                                  void *buf,
@@ -997,9 +1009,10 @@ NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
 }
 /*[[[end:libc_pread]]]*/
 
-/*[[[head:libc_pwrite,hash:CRC-32=0xad8b5ce3]]]*/
+/*[[[head:libc_pwrite,hash:CRC-32=0x70ec361c]]]*/
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd,
                                   void const *buf,
@@ -1250,10 +1263,33 @@ err:
 }
 /*[[[end:libc_ualarm]]]*/
 
-/*[[[head:libc_vfork,hash:CRC-32=0x108454d0]]]*/
+/*[[[head:libc_vfork,hash:CRC-32=0xfbb0ea69]]]*/
 /* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+ *                 instead of the regular `exit(2)', since the later would include
+ *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 the context of a VM that isn't actually about to be destroyed.
+ *   - `execve(2)' Create a new VM that is populated with the specified process
+ *                 image. The parent process will only be resumed in case the
+ *                 new program image could be loaded successfully. Otherwise,
+ *                 the call to `execve(2)' returns normally in the child.
+ *                 Other functions from the exec()-family behave the same
+ *
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ *
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 INTERN ATTR_SECTION(".text.crt.sched.access") ATTR_RETURNS_TWICE WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_vfork)(void)
 /*[[[body:libc_vfork]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e0bc53e */
+/* HASH CRC-32:0x5729cba8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #ifdef __WANT_SYSCALL_ARGUMENT_NAMES
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
 #define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES 1
-#define __NRAN0_exit                    status
+#define __NRAN0_exit                    exit_code
 #define __NRAN0_read                    fd
 #define __NRAN1_read                    buf
 #define __NRAN2_read                    bufsize
@@ -142,11 +142,7 @@
 #define __NRAN1_getgroups               list
 #define __NRAN0_setgroups               count
 #define __NRAN1_setgroups               groups
-#define __NRAN0_select                  nfds
-#define __NRAN1_select                  readfds
-#define __NRAN2_select                  writefds
-#define __NRAN3_select                  exceptfds
-#define __NRAN4_select                  timeout
+#define __NRAN0_select                  arg
 #define __NRAN0_symlink                 link_text
 #define __NRAN1_symlink                 target_path
 #define __NRAN0_linux_oldlstat          filename
@@ -265,7 +261,11 @@
 #define __NRAN0_getdents                fd
 #define __NRAN1_getdents                dirp
 #define __NRAN2_getdents                count
-#define __NRAN0__newselect              TODO_PROTOTYPE
+#define __NRAN0__newselect              nfds
+#define __NRAN1__newselect              readfds
+#define __NRAN2__newselect              writefds
+#define __NRAN3__newselect              exceptfds
+#define __NRAN4__newselect              timeout
 #define __NRAN0_flock                   fd
 #define __NRAN1_flock                   operation
 #define __NRAN0_msync                   addr
@@ -691,7 +691,7 @@
 #define __NRAN3_utimensat               flags
 #define __NRAN0_signalfd                fd
 #define __NRAN1_signalfd                sigmask
-#define __NRAN2_signalfd                sigsetsize
+#define __NRAN2_signalfd                sigmasksize
 #define __NRAN0_timerfd_create          clock_id
 #define __NRAN1_timerfd_create          flags
 #define __NRAN0_eventfd                 initval
@@ -707,7 +707,7 @@
 #define __NRAN1_timerfd_gettime         otmr
 #define __NRAN0_signalfd4               fd
 #define __NRAN1_signalfd4               sigmask
-#define __NRAN2_signalfd4               sigsetsize
+#define __NRAN2_signalfd4               sigmasksize
 #define __NRAN3_signalfd4               flags
 #define __NRAN0_eventfd2                initval
 #define __NRAN1_eventfd2                flags
@@ -1050,9 +1050,9 @@
 #define __NRAN5_coredump                unwind_error
 #define __NRAN0_raiseat                 state
 #define __NRAN1_raiseat                 si
-#define __NRAN0_mktty                   keyboard
-#define __NRAN1_mktty                   display
-#define __NRAN2_mktty                   name
+#define __NRAN0_mktty                   name
+#define __NRAN1_mktty                   keyboard
+#define __NRAN2_mktty                   display
 #define __NRAN3_mktty                   rsvd
 #define __NRAN0_lfutexlockexpr          ulockaddr
 #define __NRAN1_lfutexlockexpr          base
@@ -1133,7 +1133,7 @@
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
 #define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
 #define __NRRTR_restart_syscall          SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_exit                    SC_REPR_EXIT_STATUS                                                  /* status */ 
+#define __NRATR0_exit                    SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
 #define __NRRTR_exit                     SC_REPR_SIGHANDLER_T                                                 /* return */
 #define __NRRTR_fork                     SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_read                    SC_REPR_FD_T                                                         /* fd */ 
@@ -1337,14 +1337,7 @@
 #define __NRATR1_setgroups               SC_REPR_GID_VECTOR16                                                 /* groups */ 
 #define __NRATL1_setgroups               0                                                                    /* groups -> count */ 
 #define __NRRTR_setgroups                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_select                  SC_REPR_SIZE_T                                                       /* nfds */ 
-#define __NRATR1_select                  SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
-#define __NRATL1_select                  0                                                                    /* readfds -> nfds */ 
-#define __NRATR2_select                  SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
-#define __NRATL2_select                  0                                                                    /* writefds -> nfds */ 
-#define __NRATR3_select                  SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
-#define __NRATL3_select                  0                                                                    /* exceptfds -> nfds */ 
-#define __NRATR4_select                  SC_REPR_STRUCT_TIMEVALX32                                            /* timeout */ 
+#define __NRATR0_select                  SC_REPR_STRUCT_SEL_ARGX32                                            /* arg */ 
 #define __NRRTR_select                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_symlink                 SC_REPR_STRING                                                       /* link_text */ 
 #define __NRATR1_symlink                 SC_REPR_FILENAME                                                     /* target_path */ 
@@ -1526,8 +1519,15 @@
 #define __NRATR1_getdents                SC_REPR_POINTER                                                      /* dirp */ 
 #define __NRATR2_getdents                SC_REPR_SIZE_T                                                       /* count */ 
 #define __NRRTR_getdents                 SC_REPR_SSIZE_T                                                      /* return */
-#define __NRATR0__newselect              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR__newselect               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0__newselect              SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NRATR1__newselect              SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
+#define __NRATL1__newselect              0                                                                    /* readfds -> nfds */ 
+#define __NRATR2__newselect              SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
+#define __NRATL2__newselect              0                                                                    /* writefds -> nfds */ 
+#define __NRATR3__newselect              SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
+#define __NRATL3__newselect              0                                                                    /* exceptfds -> nfds */ 
+#define __NRATR4__newselect              SC_REPR_STRUCT_TIMEVALX32                                            /* timeout */ 
+#define __NRRTR__newselect               SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_flock                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_flock                   SC_REPR_SYSCALL_ULONG_T                                              /* operation */ 
 #define __NRRTR_flock                    SC_REPR_ERRNO_T                                                      /* return */
@@ -2172,8 +2172,8 @@
 #define __NRRTR_utimensat                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_signalfd                SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_signalfd                SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
-#define __NRATL1_signalfd                2                                                                    /* sigmask -> sigsetsize */ 
-#define __NRATR2_signalfd                SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRATL1_signalfd                2                                                                    /* sigmask -> sigmasksize */ 
+#define __NRATR2_signalfd                SC_REPR_SIZE_T                                                       /* sigmasksize */ 
 #define __NRRTR_signalfd                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_timerfd_create          SC_REPR_CLOCKID_T                                                    /* clock_id */ 
 #define __NRATR1_timerfd_create          SC_REPR_TIMERFD_FLAGS                                                /* flags */ 
@@ -2195,8 +2195,8 @@
 #define __NRRTR_timerfd_gettime          SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_signalfd4               SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_signalfd4               SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
-#define __NRATL1_signalfd4               2                                                                    /* sigmask -> sigsetsize */ 
-#define __NRATR2_signalfd4               SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NRATL1_signalfd4               2                                                                    /* sigmask -> sigmasksize */ 
+#define __NRATR2_signalfd4               SC_REPR_SIZE_T                                                       /* sigmasksize */ 
 #define __NRATR3_signalfd4               SC_REPR_SIGNALFD4_FLAGS                                              /* flags */ 
 #define __NRRTR_signalfd4                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_eventfd2                SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
@@ -2685,7 +2685,7 @@
 #define __NRATR0_process_spawnveat       SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_process_spawnveat       SC_REPR_FILENAME                                                     /* pathname */ 
 #define __NRATL1_process_spawnveat       0                                                                    /* pathname -> dirfd */ 
-#define __NRATR2_process_spawnveat       SC_REPR_STRING_VECTOR64                                              /* argv */ 
+#define __NRATR2_process_spawnveat       SC_REPR_STRING_VECTOR32                                              /* argv */ 
 #define __NRATR3_process_spawnveat       SC_REPR_STRING_VECTOR32                                              /* envp */ 
 #define __NRATR4_process_spawnveat       SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
 #define __NRATR5_process_spawnveat       SC_REPR_STRUCT_SPAWN_ACTIONSX32                                      /* actions */ 
@@ -2703,9 +2703,9 @@
 #define __NRATR0_raiseat                 SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
 #define __NRATR1_raiseat                 SC_REPR_STRUCT_SIGINFOX32                                            /* si */ 
 #define __NRRTR_raiseat                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_mktty                   SC_REPR_FD_T                                                         /* keyboard */ 
-#define __NRATR1_mktty                   SC_REPR_FD_T                                                         /* display */ 
-#define __NRATR2_mktty                   SC_REPR_STRING                                                       /* name */ 
+#define __NRATR0_mktty                   SC_REPR_STRING                                                       /* name */ 
+#define __NRATR1_mktty                   SC_REPR_FD_T                                                         /* keyboard */ 
+#define __NRATR2_mktty                   SC_REPR_FD_T                                                         /* display */ 
 #define __NRATR3_mktty                   SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
 #define __NRRTR_mktty                    SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_lfutexlockexpr          SC_REPR_POINTER                                                      /* ulockaddr */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fe4028c */
+/* HASH CRC-32:0x1a8ac6c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,12 @@
 #include <hybrid/compiler.h>
 
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 .section .text.crt.syscall.read
 INTERN_FUNCTION(libc_sys_read)
@@ -36,6 +42,12 @@ INTERN_FUNCTION(libc_sys_read)
 END(libc_sys_read)
 DEFINE_PUBLIC_ALIAS(sys_read, libc_sys_read)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
 .section .text.crt.syscall.Xread
 INTERN_FUNCTION(libc_sys_Xread)
@@ -48,6 +60,12 @@ INTERN_FUNCTION(libc_sys_Xread)
 END(libc_sys_Xread)
 DEFINE_PUBLIC_ALIAS(sys_Xread, libc_sys_Xread)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 .section .text.crt.syscall.write
 INTERN_FUNCTION(libc_sys_write)
@@ -60,6 +78,12 @@ INTERN_FUNCTION(libc_sys_write)
 END(libc_sys_write)
 DEFINE_PUBLIC_ALIAS(sys_write, libc_sys_write)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 .section .text.crt.syscall.Xwrite
 INTERN_FUNCTION(libc_sys_Xwrite)
@@ -72,6 +96,19 @@ INTERN_FUNCTION(libc_sys_Xwrite)
 END(libc_sys_Xwrite)
 DEFINE_PUBLIC_ALIAS(sys_Xwrite, libc_sys_Xwrite)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.open
 INTERN_FUNCTION(libc_sys_open)
@@ -84,6 +121,19 @@ INTERN_FUNCTION(libc_sys_open)
 END(libc_sys_open)
 DEFINE_PUBLIC_ALIAS(sys_open, libc_sys_open)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.Xopen
 INTERN_FUNCTION(libc_sys_Xopen)
@@ -508,6 +558,14 @@ INTERN_FUNCTION(libc_sys_Xpwrite64)
 END(libc_sys_Xpwrite64)
 DEFINE_PUBLIC_ALIAS(sys_Xpwrite64, libc_sys_Xpwrite64)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.crt.syscall.readv
 INTERN_FUNCTION(libc_sys_readv)
@@ -520,6 +578,14 @@ INTERN_FUNCTION(libc_sys_readv)
 END(libc_sys_readv)
 DEFINE_PUBLIC_ALIAS(sys_readv, libc_sys_readv)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readv(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.crt.syscall.Xreadv
 INTERN_FUNCTION(libc_sys_Xreadv)
@@ -532,6 +598,14 @@ INTERN_FUNCTION(libc_sys_Xreadv)
 END(libc_sys_Xreadv)
 DEFINE_PUBLIC_ALIAS(sys_Xreadv, libc_sys_Xreadv)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writev(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.crt.syscall.writev
 INTERN_FUNCTION(libc_sys_writev)
@@ -544,6 +618,14 @@ INTERN_FUNCTION(libc_sys_writev)
 END(libc_sys_writev)
 DEFINE_PUBLIC_ALIAS(sys_writev, libc_sys_writev)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writev(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.crt.syscall.Xwritev
 INTERN_FUNCTION(libc_sys_Xwritev)
@@ -756,7 +838,7 @@ INTERN_FUNCTION(libc_sys_Xmadvise)
 END(libc_sys_Xmadvise)
 DEFINE_PUBLIC_ALIAS(sys_Xmadvise, libc_sys_Xmadvise)
 
-/* errno_t shmget(int TODO_PROTOTYPE) */
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
 .section .text.crt.syscall.shmget
 INTERN_FUNCTION(libc_sys_shmget)
 	.cfi_startproc
@@ -768,7 +850,7 @@ INTERN_FUNCTION(libc_sys_shmget)
 END(libc_sys_shmget)
 DEFINE_PUBLIC_ALIAS(sys_shmget, libc_sys_shmget)
 
-/* errno_t shmget(int TODO_PROTOTYPE) */
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
 .section .text.crt.syscall.Xshmget
 INTERN_FUNCTION(libc_sys_Xshmget)
 	.cfi_startproc
@@ -780,7 +862,7 @@ INTERN_FUNCTION(libc_sys_Xshmget)
 END(libc_sys_Xshmget)
 DEFINE_PUBLIC_ALIAS(sys_Xshmget, libc_sys_Xshmget)
 
-/* errno_t shmat(int TODO_PROTOTYPE) */
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
 .section .text.crt.syscall.shmat
 INTERN_FUNCTION(libc_sys_shmat)
 	.cfi_startproc
@@ -792,7 +874,7 @@ INTERN_FUNCTION(libc_sys_shmat)
 END(libc_sys_shmat)
 DEFINE_PUBLIC_ALIAS(sys_shmat, libc_sys_shmat)
 
-/* errno_t shmat(int TODO_PROTOTYPE) */
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
 .section .text.crt.syscall.Xshmat
 INTERN_FUNCTION(libc_sys_Xshmat)
 	.cfi_startproc
@@ -804,7 +886,7 @@ INTERN_FUNCTION(libc_sys_Xshmat)
 END(libc_sys_Xshmat)
 DEFINE_PUBLIC_ALIAS(sys_Xshmat, libc_sys_Xshmat)
 
-/* errno_t shmctl(int TODO_PROTOTYPE) */
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
 .section .text.crt.syscall.shmctl
 INTERN_FUNCTION(libc_sys_shmctl)
 	.cfi_startproc
@@ -816,7 +898,7 @@ INTERN_FUNCTION(libc_sys_shmctl)
 END(libc_sys_shmctl)
 DEFINE_PUBLIC_ALIAS(sys_shmctl, libc_sys_shmctl)
 
-/* errno_t shmctl(int TODO_PROTOTYPE) */
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
 .section .text.crt.syscall.Xshmctl
 INTERN_FUNCTION(libc_sys_Xshmctl)
 	.cfi_startproc
@@ -1050,14 +1132,16 @@ INTERN_FUNCTION(libc_sys_Xsendfile)
 END(libc_sys_Xsendfile)
 DEFINE_PUBLIC_ALIAS(sys_Xsendfile, libc_sys_Xsendfile)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.crt.syscall.socket
 INTERN_FUNCTION(libc_sys_socket)
@@ -1070,14 +1154,16 @@ INTERN_FUNCTION(libc_sys_socket)
 END(libc_sys_socket)
 DEFINE_PUBLIC_ALIAS(sys_socket, libc_sys_socket)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.crt.syscall.Xsocket
 INTERN_FUNCTION(libc_sys_Xsocket)
@@ -1090,6 +1176,16 @@ INTERN_FUNCTION(libc_sys_Xsocket)
 END(libc_sys_Xsocket)
 DEFINE_PUBLIC_ALIAS(sys_Xsocket, libc_sys_Xsocket)
 
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.connect
 INTERN_FUNCTION(libc_sys_connect)
@@ -1102,6 +1198,16 @@ INTERN_FUNCTION(libc_sys_connect)
 END(libc_sys_connect)
 DEFINE_PUBLIC_ALIAS(sys_connect, libc_sys_connect)
 
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.Xconnect
 INTERN_FUNCTION(libc_sys_Xconnect)
@@ -1114,6 +1220,19 @@ INTERN_FUNCTION(libc_sys_Xconnect)
 END(libc_sys_Xconnect)
 DEFINE_PUBLIC_ALIAS(sys_Xconnect, libc_sys_Xconnect)
 
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] Don't fill in the client's peer address
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ *                           If this happens, the caller can still determine
+ *                           the correct address through use of `getpeername()'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.accept
 INTERN_FUNCTION(libc_sys_accept)
@@ -1126,6 +1245,19 @@ INTERN_FUNCTION(libc_sys_accept)
 END(libc_sys_accept)
 DEFINE_PUBLIC_ALIAS(sys_accept, libc_sys_accept)
 
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] Don't fill in the client's peer address
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ *                           If this happens, the caller can still determine
+ *                           the correct address through use of `getpeername()'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.Xaccept
 INTERN_FUNCTION(libc_sys_Xaccept)
@@ -1138,8 +1270,21 @@ INTERN_FUNCTION(libc_sys_Xaccept)
 END(libc_sys_Xaccept)
 DEFINE_PUBLIC_ALIAS(sys_Xaccept, libc_sys_Xaccept)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.sendto
 INTERN_FUNCTION(libc_sys_sendto)
@@ -1153,8 +1298,21 @@ INTERN_FUNCTION(libc_sys_sendto)
 END(libc_sys_sendto)
 DEFINE_PUBLIC_ALIAS(sys_sendto, libc_sys_sendto)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.Xsendto
 INTERN_FUNCTION(libc_sys_Xsendto)
@@ -1168,8 +1326,21 @@ INTERN_FUNCTION(libc_sys_Xsendto)
 END(libc_sys_Xsendto)
 DEFINE_PUBLIC_ALIAS(sys_Xsendto, libc_sys_Xsendto)
 
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.recvfrom
 INTERN_FUNCTION(libc_sys_recvfrom)
@@ -1183,8 +1354,21 @@ INTERN_FUNCTION(libc_sys_recvfrom)
 END(libc_sys_recvfrom)
 DEFINE_PUBLIC_ALIAS(sys_recvfrom, libc_sys_recvfrom)
 
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.Xrecvfrom
 INTERN_FUNCTION(libc_sys_Xrecvfrom)
@@ -1198,8 +1382,12 @@ INTERN_FUNCTION(libc_sys_Xrecvfrom)
 END(libc_sys_Xrecvfrom)
 DEFINE_PUBLIC_ALIAS(sys_Xrecvfrom, libc_sys_Xrecvfrom)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx64 const *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.sendmsg
 INTERN_FUNCTION(libc_sys_sendmsg)
@@ -1212,8 +1400,12 @@ INTERN_FUNCTION(libc_sys_sendmsg)
 END(libc_sys_sendmsg)
 DEFINE_PUBLIC_ALIAS(sys_sendmsg, libc_sys_sendmsg)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdrx64 const *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xsendmsg
 INTERN_FUNCTION(libc_sys_Xsendmsg)
@@ -1226,9 +1418,13 @@ INTERN_FUNCTION(libc_sys_Xsendmsg)
 END(libc_sys_Xsendmsg)
 DEFINE_PUBLIC_ALIAS(sys_Xsendmsg, libc_sys_Xsendmsg)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx64 *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.recvmsg
 INTERN_FUNCTION(libc_sys_recvmsg)
@@ -1241,9 +1437,13 @@ INTERN_FUNCTION(libc_sys_recvmsg)
 END(libc_sys_recvmsg)
 DEFINE_PUBLIC_ALIAS(sys_recvmsg, libc_sys_recvmsg)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdrx64 *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xrecvmsg
 INTERN_FUNCTION(libc_sys_Xrecvmsg)
@@ -1256,7 +1456,12 @@ INTERN_FUNCTION(libc_sys_Xrecvmsg)
 END(libc_sys_Xrecvmsg)
 DEFINE_PUBLIC_ALIAS(sys_Xrecvmsg, libc_sys_Xrecvmsg)
 
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 .section .text.crt.syscall.shutdown
 INTERN_FUNCTION(libc_sys_shutdown)
@@ -1269,7 +1474,12 @@ INTERN_FUNCTION(libc_sys_shutdown)
 END(libc_sys_shutdown)
 DEFINE_PUBLIC_ALIAS(sys_shutdown, libc_sys_shutdown)
 
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 .section .text.crt.syscall.Xshutdown
 INTERN_FUNCTION(libc_sys_Xshutdown)
@@ -1282,6 +1492,13 @@ INTERN_FUNCTION(libc_sys_Xshutdown)
 END(libc_sys_Xshutdown)
 DEFINE_PUBLIC_ALIAS(sys_Xshutdown, libc_sys_Xshutdown)
 
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.bind
 INTERN_FUNCTION(libc_sys_bind)
@@ -1294,6 +1511,13 @@ INTERN_FUNCTION(libc_sys_bind)
 END(libc_sys_bind)
 DEFINE_PUBLIC_ALIAS(sys_bind, libc_sys_bind)
 
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.Xbind
 INTERN_FUNCTION(libc_sys_Xbind)
@@ -1306,6 +1530,14 @@ INTERN_FUNCTION(libc_sys_Xbind)
 END(libc_sys_Xbind)
 DEFINE_PUBLIC_ALIAS(sys_Xbind, libc_sys_Xbind)
 
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 .section .text.crt.syscall.listen
 INTERN_FUNCTION(libc_sys_listen)
@@ -1318,6 +1550,14 @@ INTERN_FUNCTION(libc_sys_listen)
 END(libc_sys_listen)
 DEFINE_PUBLIC_ALIAS(sys_listen, libc_sys_listen)
 
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
 .section .text.crt.syscall.Xlisten
 INTERN_FUNCTION(libc_sys_Xlisten)
@@ -1330,6 +1570,17 @@ INTERN_FUNCTION(libc_sys_Xlisten)
 END(libc_sys_Xlisten)
 DEFINE_PUBLIC_ALIAS(sys_Xlisten, libc_sys_Xlisten)
 
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.getsockname
 INTERN_FUNCTION(libc_sys_getsockname)
@@ -1342,6 +1593,17 @@ INTERN_FUNCTION(libc_sys_getsockname)
 END(libc_sys_getsockname)
 DEFINE_PUBLIC_ALIAS(sys_getsockname, libc_sys_getsockname)
 
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.Xgetsockname
 INTERN_FUNCTION(libc_sys_Xgetsockname)
@@ -1354,6 +1616,14 @@ INTERN_FUNCTION(libc_sys_Xgetsockname)
 END(libc_sys_Xgetsockname)
 DEFINE_PUBLIC_ALIAS(sys_Xgetsockname, libc_sys_Xgetsockname)
 
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.getpeername
 INTERN_FUNCTION(libc_sys_getpeername)
@@ -1366,6 +1636,14 @@ INTERN_FUNCTION(libc_sys_getpeername)
 END(libc_sys_getpeername)
 DEFINE_PUBLIC_ALIAS(sys_getpeername, libc_sys_getpeername)
 
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.Xgetpeername
 INTERN_FUNCTION(libc_sys_Xgetpeername)
@@ -1378,14 +1656,16 @@ INTERN_FUNCTION(libc_sys_Xgetpeername)
 END(libc_sys_Xgetpeername)
 DEFINE_PUBLIC_ALIAS(sys_Xgetpeername, libc_sys_Xgetpeername)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.crt.syscall.socketpair
 INTERN_FUNCTION(libc_sys_socketpair)
@@ -1399,14 +1679,16 @@ INTERN_FUNCTION(libc_sys_socketpair)
 END(libc_sys_socketpair)
 DEFINE_PUBLIC_ALIAS(sys_socketpair, libc_sys_socketpair)
 
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.crt.syscall.Xsocketpair
 INTERN_FUNCTION(libc_sys_Xsocketpair)
@@ -1420,8 +1702,14 @@ INTERN_FUNCTION(libc_sys_Xsocketpair)
 END(libc_sys_Xsocketpair)
 DEFINE_PUBLIC_ALIAS(sys_Xsocketpair, libc_sys_Xsocketpair)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 .section .text.crt.syscall.setsockopt
 INTERN_FUNCTION(libc_sys_setsockopt)
@@ -1435,8 +1723,14 @@ INTERN_FUNCTION(libc_sys_setsockopt)
 END(libc_sys_setsockopt)
 DEFINE_PUBLIC_ALIAS(sys_setsockopt, libc_sys_setsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 .section .text.crt.syscall.Xsetsockopt
 INTERN_FUNCTION(libc_sys_Xsetsockopt)
@@ -1450,8 +1744,16 @@ INTERN_FUNCTION(libc_sys_Xsetsockopt)
 END(libc_sys_Xsetsockopt)
 DEFINE_PUBLIC_ALIAS(sys_Xsetsockopt, libc_sys_Xsetsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 .section .text.crt.syscall.getsockopt
 INTERN_FUNCTION(libc_sys_getsockopt)
@@ -1465,8 +1767,16 @@ INTERN_FUNCTION(libc_sys_getsockopt)
 END(libc_sys_getsockopt)
 DEFINE_PUBLIC_ALIAS(sys_getsockopt, libc_sys_getsockopt)
 
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 .section .text.crt.syscall.Xgetsockopt
 INTERN_FUNCTION(libc_sys_Xgetsockopt)
@@ -1506,6 +1816,15 @@ INTERN_FUNCTION(libc_sys_Xclone)
 END(libc_sys_Xclone)
 DEFINE_PUBLIC_ALIAS(sys_Xclone, libc_sys_Xclone)
 
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 /* pid_t fork(void) */
 .section .text.crt.syscall.fork
 INTERN_FUNCTION(libc_sys_fork)
@@ -1518,6 +1837,15 @@ INTERN_FUNCTION(libc_sys_fork)
 END(libc_sys_fork)
 DEFINE_PUBLIC_ALIAS(sys_fork, libc_sys_fork)
 
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 /* pid_t fork(void) */
 .section .text.crt.syscall.Xfork
 INTERN_FUNCTION(libc_sys_Xfork)
@@ -1530,6 +1858,29 @@ INTERN_FUNCTION(libc_sys_Xfork)
 END(libc_sys_Xfork)
 DEFINE_PUBLIC_ALIAS(sys_Xfork, libc_sys_Xfork)
 
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 /* pid_t vfork(void) */
 .section .text.crt.syscall.vfork
 INTERN_FUNCTION(libc_sys_vfork)
@@ -1542,6 +1893,29 @@ INTERN_FUNCTION(libc_sys_vfork)
 END(libc_sys_vfork)
 DEFINE_PUBLIC_ALIAS(sys_vfork, libc_sys_vfork)
 
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 /* pid_t vfork(void) */
 .section .text.crt.syscall.Xvfork
 INTERN_FUNCTION(libc_sys_Xvfork)
@@ -1554,6 +1928,8 @@ INTERN_FUNCTION(libc_sys_Xvfork)
 END(libc_sys_Xvfork)
 DEFINE_PUBLIC_ALIAS(sys_Xvfork, libc_sys_Xvfork)
 
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 /* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 .section .text.crt.syscall.execve
 INTERN_FUNCTION(libc_sys_execve)
@@ -1566,6 +1942,8 @@ INTERN_FUNCTION(libc_sys_execve)
 END(libc_sys_execve)
 DEFINE_PUBLIC_ALIAS(sys_execve, libc_sys_execve)
 
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 /* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 .section .text.crt.syscall.Xexecve
 INTERN_FUNCTION(libc_sys_Xexecve)
@@ -1578,7 +1956,9 @@ INTERN_FUNCTION(libc_sys_Xexecve)
 END(libc_sys_Xexecve)
 DEFINE_PUBLIC_ALIAS(sys_Xexecve, libc_sys_Xexecve)
 
-/* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+/* void exit(syscall_ulong_t exit_code) */
 .section .text.crt.syscall.exit
 INTERN_FUNCTION(libc_sys_exit)
 	.cfi_startproc
@@ -1590,7 +1970,9 @@ INTERN_FUNCTION(libc_sys_exit)
 END(libc_sys_exit)
 DEFINE_PUBLIC_ALIAS(sys_exit, libc_sys_exit)
 
-/* void exit(syscall_ulong_t status) */
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+/* void exit(syscall_ulong_t exit_code) */
 .section .text.crt.syscall.Xexit
 INTERN_FUNCTION(libc_sys_Xexit)
 	.cfi_startproc
@@ -1752,7 +2134,7 @@ INTERN_FUNCTION(libc_sys_Xsemctl)
 END(libc_sys_Xsemctl)
 DEFINE_PUBLIC_ALIAS(sys_Xsemctl, libc_sys_Xsemctl)
 
-/* errno_t shmdt(int TODO_PROTOTYPE) */
+/* errno_t shmdt(void const *shmaddr) */
 .section .text.crt.syscall.shmdt
 INTERN_FUNCTION(libc_sys_shmdt)
 	.cfi_startproc
@@ -1764,7 +2146,7 @@ INTERN_FUNCTION(libc_sys_shmdt)
 END(libc_sys_shmdt)
 DEFINE_PUBLIC_ALIAS(sys_shmdt, libc_sys_shmdt)
 
-/* errno_t shmdt(int TODO_PROTOTYPE) */
+/* errno_t shmdt(void const *shmaddr) */
 .section .text.crt.syscall.Xshmdt
 INTERN_FUNCTION(libc_sys_Xshmdt)
 	.cfi_startproc
@@ -1920,6 +2302,8 @@ INTERN_FUNCTION(libc_sys_Xflock)
 END(libc_sys_Xflock)
 DEFINE_PUBLIC_ALIAS(sys_Xflock, libc_sys_Xflock)
 
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 /* errno_t fsync(fd_t fd) */
 .section .text.crt.syscall.fsync
 INTERN_FUNCTION(libc_sys_fsync)
@@ -1932,6 +2316,8 @@ INTERN_FUNCTION(libc_sys_fsync)
 END(libc_sys_fsync)
 DEFINE_PUBLIC_ALIAS(sys_fsync, libc_sys_fsync)
 
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 /* errno_t fsync(fd_t fd) */
 .section .text.crt.syscall.Xfsync
 INTERN_FUNCTION(libc_sys_Xfsync)
@@ -1944,6 +2330,8 @@ INTERN_FUNCTION(libc_sys_Xfsync)
 END(libc_sys_Xfsync)
 DEFINE_PUBLIC_ALIAS(sys_Xfsync, libc_sys_Xfsync)
 
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 /* errno_t fdatasync(fd_t fd) */
 .section .text.crt.syscall.fdatasync
 INTERN_FUNCTION(libc_sys_fdatasync)
@@ -1956,6 +2344,8 @@ INTERN_FUNCTION(libc_sys_fdatasync)
 END(libc_sys_fdatasync)
 DEFINE_PUBLIC_ALIAS(sys_fdatasync, libc_sys_fdatasync)
 
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 /* errno_t fdatasync(fd_t fd) */
 .section .text.crt.syscall.Xfdatasync
 INTERN_FUNCTION(libc_sys_Xfdatasync)
@@ -5756,6 +6146,8 @@ INTERN_FUNCTION(libc_sys_Xclock_nanosleep)
 END(libc_sys_Xclock_nanosleep)
 DEFINE_PUBLIC_ALIAS(sys_Xclock_nanosleep, libc_sys_Xclock_nanosleep)
 
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 /* void exit_group(syscall_ulong_t exit_code) */
 .section .text.crt.syscall.exit_group
 INTERN_FUNCTION(libc_sys_exit_group)
@@ -5768,6 +6160,8 @@ INTERN_FUNCTION(libc_sys_exit_group)
 END(libc_sys_exit_group)
 DEFINE_PUBLIC_ALIAS(sys_exit_group, libc_sys_exit_group)
 
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 /* void exit_group(syscall_ulong_t exit_code) */
 .section .text.crt.syscall.Xexit_group
 INTERN_FUNCTION(libc_sys_Xexit_group)
@@ -6151,7 +6545,8 @@ END(libc_sys_Xkexec_load)
 DEFINE_PUBLIC_ALIAS(sys_Xkexec_load, libc_sys_Xkexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
 .section .text.crt.syscall.waitid
 INTERN_FUNCTION(libc_sys_waitid)
@@ -6166,7 +6561,8 @@ END(libc_sys_waitid)
 DEFINE_PUBLIC_ALIAS(sys_waitid, libc_sys_waitid)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
 .section .text.crt.syscall.Xwaitid
 INTERN_FUNCTION(libc_sys_Xwaitid)
@@ -6404,6 +6800,19 @@ INTERN_FUNCTION(libc_sys_Xmigrate_pages)
 END(libc_sys_Xmigrate_pages)
 DEFINE_PUBLIC_ALIAS(sys_Xmigrate_pages, libc_sys_Xmigrate_pages)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.openat
 INTERN_FUNCTION(libc_sys_openat)
@@ -6417,6 +6826,19 @@ INTERN_FUNCTION(libc_sys_openat)
 END(libc_sys_openat)
 DEFINE_PUBLIC_ALIAS(sys_openat, libc_sys_openat)
 
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.Xopenat
 INTERN_FUNCTION(libc_sys_Xopenat)
@@ -7064,7 +7486,9 @@ INTERN_FUNCTION(libc_sys_Xepoll_pwait)
 END(libc_sys_Xepoll_pwait)
 DEFINE_PUBLIC_ALIAS(sys_Xepoll_pwait, libc_sys_Xepoll_pwait)
 
-/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.crt.syscall.signalfd
 INTERN_FUNCTION(libc_sys_signalfd)
 	.cfi_startproc
@@ -7076,7 +7500,9 @@ INTERN_FUNCTION(libc_sys_signalfd)
 END(libc_sys_signalfd)
 DEFINE_PUBLIC_ALIAS(sys_signalfd, libc_sys_signalfd)
 
-/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
 .section .text.crt.syscall.Xsignalfd
 INTERN_FUNCTION(libc_sys_Xsignalfd)
 	.cfi_startproc
@@ -7228,7 +7654,20 @@ INTERN_FUNCTION(libc_sys_Xtimerfd_gettime)
 END(libc_sys_Xtimerfd_gettime)
 DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_gettime, libc_sys_Xtimerfd_gettime)
 
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.crt.syscall.accept4
 INTERN_FUNCTION(libc_sys_accept4)
@@ -7242,7 +7681,20 @@ INTERN_FUNCTION(libc_sys_accept4)
 END(libc_sys_accept4)
 DEFINE_PUBLIC_ALIAS(sys_accept4, libc_sys_accept4)
 
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.crt.syscall.Xaccept4
 INTERN_FUNCTION(libc_sys_Xaccept4)
@@ -7256,8 +7708,10 @@ INTERN_FUNCTION(libc_sys_Xaccept4)
 END(libc_sys_Xaccept4)
 DEFINE_PUBLIC_ALIAS(sys_Xaccept4, libc_sys_Xaccept4)
 
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.crt.syscall.signalfd4
 INTERN_FUNCTION(libc_sys_signalfd4)
 	.cfi_startproc
@@ -7270,8 +7724,10 @@ INTERN_FUNCTION(libc_sys_signalfd4)
 END(libc_sys_signalfd4)
 DEFINE_PUBLIC_ALIAS(sys_signalfd4, libc_sys_signalfd4)
 
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsignalfd4
 INTERN_FUNCTION(libc_sys_Xsignalfd4)
 	.cfi_startproc
@@ -7408,6 +7864,9 @@ INTERN_FUNCTION(libc_sys_Xinotify_init1)
 END(libc_sys_Xinotify_init1)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_init1, libc_sys_Xinotify_init1)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadv(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.preadv
 INTERN_FUNCTION(libc_sys_preadv)
@@ -7421,6 +7880,9 @@ INTERN_FUNCTION(libc_sys_preadv)
 END(libc_sys_preadv)
 DEFINE_PUBLIC_ALIAS(sys_preadv, libc_sys_preadv)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadv(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.Xpreadv
 INTERN_FUNCTION(libc_sys_Xpreadv)
@@ -7434,6 +7896,9 @@ INTERN_FUNCTION(libc_sys_Xpreadv)
 END(libc_sys_Xpreadv)
 DEFINE_PUBLIC_ALIAS(sys_Xpreadv, libc_sys_Xpreadv)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritev(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.pwritev
 INTERN_FUNCTION(libc_sys_pwritev)
@@ -7447,6 +7912,9 @@ INTERN_FUNCTION(libc_sys_pwritev)
 END(libc_sys_pwritev)
 DEFINE_PUBLIC_ALIAS(sys_pwritev, libc_sys_pwritev)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritev(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.Xpwritev
 INTERN_FUNCTION(libc_sys_Xpwritev)
@@ -7510,10 +7978,14 @@ INTERN_FUNCTION(libc_sys_Xperf_event_open)
 END(libc_sys_Xperf_event_open)
 DEFINE_PUBLIC_ALIAS(sys_Xperf_event_open, libc_sys_Xperf_event_open)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.crt.syscall.recvmmsg
 INTERN_FUNCTION(libc_sys_recvmmsg)
@@ -7527,10 +7999,14 @@ INTERN_FUNCTION(libc_sys_recvmmsg)
 END(libc_sys_recvmmsg)
 DEFINE_PUBLIC_ALIAS(sys_recvmmsg, libc_sys_recvmmsg)
 
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx64 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg
 INTERN_FUNCTION(libc_sys_Xrecvmmsg)
@@ -7720,8 +8196,12 @@ INTERN_FUNCTION(libc_sys_Xsyncfs)
 END(libc_sys_Xsyncfs)
 DEFINE_PUBLIC_ALIAS(sys_Xsyncfs, libc_sys_Xsyncfs)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.sendmmsg
 INTERN_FUNCTION(libc_sys_sendmmsg)
@@ -7735,8 +8215,12 @@ INTERN_FUNCTION(libc_sys_sendmmsg)
 END(libc_sys_sendmmsg)
 DEFINE_PUBLIC_ALIAS(sys_sendmmsg, libc_sys_sendmmsg)
 
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx64 *vmessages, size_t vlen, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xsendmmsg
 INTERN_FUNCTION(libc_sys_Xsendmmsg)
@@ -7798,7 +8282,9 @@ INTERN_FUNCTION(libc_sys_Xgetcpu)
 END(libc_sys_Xgetcpu)
 DEFINE_PUBLIC_ALIAS(sys_Xgetcpu, libc_sys_Xgetcpu)
 
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_readv
 INTERN_FUNCTION(libc_sys_process_vm_readv)
@@ -7812,7 +8298,9 @@ INTERN_FUNCTION(libc_sys_process_vm_readv)
 END(libc_sys_process_vm_readv)
 DEFINE_PUBLIC_ALIAS(sys_process_vm_readv, libc_sys_process_vm_readv)
 
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 /* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_readv
 INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
@@ -7826,7 +8314,9 @@ INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
 END(libc_sys_Xprocess_vm_readv)
 DEFINE_PUBLIC_ALIAS(sys_Xprocess_vm_readv, libc_sys_Xprocess_vm_readv)
 
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_writev
 INTERN_FUNCTION(libc_sys_process_vm_writev)
@@ -7840,7 +8330,9 @@ INTERN_FUNCTION(libc_sys_process_vm_writev)
 END(libc_sys_process_vm_writev)
 DEFINE_PUBLIC_ALIAS(sys_process_vm_writev, libc_sys_process_vm_writev)
 
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 /* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_writev
 INTERN_FUNCTION(libc_sys_Xprocess_vm_writev)
@@ -8108,7 +8600,9 @@ INTERN_FUNCTION(libc_sys_Xbpf)
 END(libc_sys_Xbpf)
 DEFINE_PUBLIC_ALIAS(sys_Xbpf, libc_sys_Xbpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 .section .text.crt.syscall.execveat
 INTERN_FUNCTION(libc_sys_execveat)
@@ -8122,7 +8616,9 @@ INTERN_FUNCTION(libc_sys_execveat)
 END(libc_sys_execveat)
 DEFINE_PUBLIC_ALIAS(sys_execveat, libc_sys_execveat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 .section .text.crt.syscall.Xexecveat
 INTERN_FUNCTION(libc_sys_Xexecveat)
@@ -8208,6 +8704,9 @@ INTERN_FUNCTION(libc_sys_Xmlock2)
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritevf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.pwritevf
 INTERN_FUNCTION(libc_sys_pwritevf)
@@ -8221,6 +8720,9 @@ INTERN_FUNCTION(libc_sys_pwritevf)
 END(libc_sys_pwritevf)
 DEFINE_PUBLIC_ALIAS(sys_pwritevf, libc_sys_pwritevf)
 
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 /* ssize_t pwritevf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.Xpwritevf
 INTERN_FUNCTION(libc_sys_Xpwritevf)
@@ -8234,6 +8736,9 @@ INTERN_FUNCTION(libc_sys_Xpwritevf)
 END(libc_sys_Xpwritevf)
 DEFINE_PUBLIC_ALIAS(sys_Xpwritevf, libc_sys_Xpwritevf)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadvf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.preadvf
 INTERN_FUNCTION(libc_sys_preadvf)
@@ -8247,6 +8752,9 @@ INTERN_FUNCTION(libc_sys_preadvf)
 END(libc_sys_preadvf)
 DEFINE_PUBLIC_ALIAS(sys_preadvf, libc_sys_preadvf)
 
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 /* ssize_t preadvf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.Xpreadvf
 INTERN_FUNCTION(libc_sys_Xpreadvf)
@@ -8764,7 +9272,7 @@ INTERN_FUNCTION(libc_sys_Xrtm_begin)
 END(libc_sys_Xrtm_begin)
 DEFINE_PUBLIC_ALIAS(sys_Xrtm_begin, libc_sys_Xrtm_begin)
 
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -8789,7 +9297,7 @@ INTERN_FUNCTION(libc_sys_userviofd)
 END(libc_sys_userviofd)
 DEFINE_PUBLIC_ALIAS(sys_userviofd, libc_sys_userviofd)
 
-/* Construct a user-fault-fd object supporting mmap(2), with actual
+/* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests
  * to an internal queue that should be read(2) from by a worker thread,
  * which should then service those requests before responding by write(2)ing
@@ -8956,7 +9464,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xraiseat, libc_sys_Xraiseat)
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 .section .text.crt.syscall.mktty
 INTERN_FUNCTION(libc_sys_mktty)
 	.cfi_startproc
@@ -8973,7 +9481,7 @@ DEFINE_PUBLIC_ALIAS(sys_mktty, libc_sys_mktty)
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 .section .text.crt.syscall.Xmktty
 INTERN_FUNCTION(libc_sys_Xmktty)
 	.cfi_startproc
@@ -9150,18 +9658,18 @@ DEFINE_PUBLIC_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -9185,18 +9693,18 @@ DEFINE_PUBLIC_ALIAS(sys_lfutex, libc_sys_lfutex)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
  *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -9284,6 +9792,14 @@ INTERN_FUNCTION(libc_sys_Xdebugtrap)
 END(libc_sys_Xdebugtrap)
 DEFINE_PUBLIC_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.writevf
 INTERN_FUNCTION(libc_sys_writevf)
@@ -9297,6 +9813,14 @@ INTERN_FUNCTION(libc_sys_writevf)
 END(libc_sys_writevf)
 DEFINE_PUBLIC_ALIAS(sys_writevf, libc_sys_writevf)
 
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.Xwritevf
 INTERN_FUNCTION(libc_sys_Xwritevf)
@@ -9310,6 +9834,14 @@ INTERN_FUNCTION(libc_sys_Xwritevf)
 END(libc_sys_Xwritevf)
 DEFINE_PUBLIC_ALIAS(sys_Xwritevf, libc_sys_Xwritevf)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.readvf
 INTERN_FUNCTION(libc_sys_readvf)
@@ -9323,6 +9855,14 @@ INTERN_FUNCTION(libc_sys_readvf)
 END(libc_sys_readvf)
 DEFINE_PUBLIC_ALIAS(sys_readvf, libc_sys_readvf)
 
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 /* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.Xreadvf
 INTERN_FUNCTION(libc_sys_Xreadvf)
@@ -9417,7 +9957,9 @@ DEFINE_PUBLIC_ALIAS(sys_Xioctlf, libc_sys_Xioctlf)
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -9438,7 +9980,9 @@ DEFINE_PUBLIC_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handler)
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER, &kernel_except_handler, NULL)'
+ *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                         &except_handler4, NULL)'
  * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
  * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
@@ -9460,10 +10004,10 @@ DEFINE_PUBLIC_ALIAS(sys_Xset_exception_handler, libc_sys_Xset_exception_handler)
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -9485,10 +10029,10 @@ DEFINE_PUBLIC_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
+ * @param: PHANDLER:    When non-NULL, store the address of the user-space exception handler.
  *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ * @param: PHANDLER_SP: When non-NULL, store the starting address of the user-space exception handler stack.
  *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
@@ -9506,7 +10050,8 @@ INTERN_FUNCTION(libc_sys_Xget_exception_handler)
 END(libc_sys_Xget_exception_handler)
 DEFINE_PUBLIC_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
 
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 .section .text.crt.syscall.openpty
 INTERN_FUNCTION(libc_sys_openpty)
@@ -9520,7 +10065,8 @@ INTERN_FUNCTION(libc_sys_openpty)
 END(libc_sys_openpty)
 DEFINE_PUBLIC_ALIAS(sys_openpty, libc_sys_openpty)
 
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 .section .text.crt.syscall.Xopenpty
 INTERN_FUNCTION(libc_sys_Xopenpty)
@@ -9878,6 +10424,12 @@ INTERN_FUNCTION(libc_sys_Xdetach)
 END(libc_sys_Xdetach)
 DEFINE_PUBLIC_ALIAS(sys_Xdetach, libc_sys_Xdetach)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 .section .text.crt.syscall.readf
 INTERN_FUNCTION(libc_sys_readf)
@@ -9891,6 +10443,12 @@ INTERN_FUNCTION(libc_sys_readf)
 END(libc_sys_readf)
 DEFINE_PUBLIC_ALIAS(sys_readf, libc_sys_readf)
 
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
 .section .text.crt.syscall.Xreadf
 INTERN_FUNCTION(libc_sys_Xreadf)
@@ -10026,6 +10584,12 @@ INTERN_FUNCTION(libc_sys_Xhop)
 END(libc_sys_Xhop)
 DEFINE_PUBLIC_ALIAS(sys_Xhop, libc_sys_Xhop)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 .section .text.crt.syscall.writef
 INTERN_FUNCTION(libc_sys_writef)
@@ -10039,6 +10603,12 @@ INTERN_FUNCTION(libc_sys_writef)
 END(libc_sys_writef)
 DEFINE_PUBLIC_ALIAS(sys_writef, libc_sys_writef)
 
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 .section .text.crt.syscall.Xwritef
 INTERN_FUNCTION(libc_sys_Xwritef)

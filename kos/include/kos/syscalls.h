@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e16a833 */
+/* HASH CRC-32:0xb24243e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,6 +99,7 @@ struct rlimit64;
 struct rpc_syscall_info;
 struct rusage;
 struct sched_param;
+struct shmid_ds;
 struct sigaction;
 struct sigaltstack;
 struct sigevent;
@@ -118,10 +119,36 @@ struct utsname;
 __CDECLARE_SC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(_sysctl) */
 #if __CRT_HAVE_SC(accept)
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] Don't fill in the client's peer address
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ *                           If this happens, the caller can still determine
+ *                           the correct address through use of `getpeername()'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 __CDECLARE_SC(,__fd_t,accept,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(accept) */
 #if __CRT_HAVE_SC(accept4)
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 __CDECLARE_SC(,__fd_t,accept4,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len, __syscall_ulong_t __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
 #endif /* __CRT_HAVE_SC(accept4) */
 #if __CRT_HAVE_SC(access)
@@ -144,6 +171,13 @@ __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds)
 __CDECLARE_SC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(bdflush) */
 #if __CRT_HAVE_SC(bind)
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,bind,(__fd_t __sockfd, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(bind) */
 #if __CRT_HAVE_SC(bpf)
@@ -194,6 +228,16 @@ __CDECLARE_SC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __
 __CDECLARE_SC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(close) */
 #if __CRT_HAVE_SC(connect)
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,connect,(__fd_t __sockfd, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(connect) */
 #if __CRT_HAVE_SC(creat)
@@ -236,16 +280,24 @@ __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CDECLARE_SC(,__errno_t,execve,(char const *__path, char const *const *___argv, char const *const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_SC(execve) */
 #if __CRT_HAVE_SC(execveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, char const *const *___argv, char const *const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
 #endif /* __CRT_HAVE_SC(execveat) */
 #if __CRT_HAVE_SC(exit)
-__CDECLARE_VOID_SC(__ATTR_NORETURN,exit,(__syscall_ulong_t __status),(__status))
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+__CDECLARE_VOID_SC(__ATTR_NORETURN,exit,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_SC(exit) */
 #if __CRT_HAVE_SC(exit_group)
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 __CDECLARE_VOID_SC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_SC(exit_group) */
 #if __CRT_HAVE_SC(faccessat)
@@ -287,6 +339,8 @@ __CDECLARE_SC(,__errno_t,fchownat,(__fd_t __dirfd, char const *__filename, __uid
 __CDECLARE_SC(,__syscall_slong_t,fcntl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(fcntl) */
 #if __CRT_HAVE_SC(fdatasync)
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 __CDECLARE_SC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(fdatasync) */
 #if __CRT_HAVE_SC(fgetxattr)
@@ -302,6 +356,15 @@ __CDECLARE_SC(,__ssize_t,flistxattr,(__fd_t __fd, char *__listbuf, __size_t __li
 __CDECLARE_SC(,__errno_t,flock,(__fd_t __fd, __syscall_ulong_t __operation),(__fd,__operation))
 #endif /* __CRT_HAVE_SC(flock) */
 #if __CRT_HAVE_SC(fork)
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CDECLARE_SC(,__pid_t,fork,(void),())
 #endif /* __CRT_HAVE_SC(fork) */
 #if __CRT_HAVE_SC(fremovexattr)
@@ -315,6 +378,8 @@ __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const 
 __CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs) */
 #if __CRT_HAVE_SC(fsync)
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 __CDECLARE_SC(,__errno_t,fsync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(fsync) */
 #if __CRT_HAVE_SC(ftruncate)
@@ -365,6 +430,14 @@ __CDECLARE_SC(,__ssize_t,getgroups,(__size_t __count, __gid_t *__list),(__count,
 __CDECLARE_SC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct itimerval *__curr_value),(__which,__curr_value))
 #endif /* __CRT_HAVE_SC(getitimer) */
 #if __CRT_HAVE_SC(getpeername)
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(getpeername) */
 #if __CRT_HAVE_SC(getpgid)
@@ -405,11 +478,30 @@ __CDECLARE_SC(,__errno_t,getrusage,(__syscall_slong_t __who, struct rusage *__us
 __CDECLARE_SC(,__pid_t,getsid,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_SC(getsid) */
 #if __CRT_HAVE_SC(getsockname)
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getsockname,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(getsockname) */
 #if __CRT_HAVE_SC(getsockopt)
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void *__optval, __socklen_t *__optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* __CRT_HAVE_SC(getsockopt) */
 #if __CRT_HAVE_SC(gettid)
@@ -507,6 +599,14 @@ __CDECLARE_SC(,__errno_t,linux_newfstatat,(__fd_t __dirfd, char const *__filenam
 __CDECLARE_SC(,__errno_t,linux_stat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(linux_stat) */
 #if __CRT_HAVE_SC(listen)
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,listen,(__fd_t __sockfd, __syscall_ulong_t __max_backlog),(__sockfd,__max_backlog))
 #endif /* __CRT_HAVE_SC(listen) */
 #if __CRT_HAVE_SC(listxattr)
@@ -648,12 +748,38 @@ __CDECLARE_SC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__pid_t,oldwait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_SC(oldwait4) */
 #if __CRT_HAVE_SC(open)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CDECLARE_SC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t __mode),(__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(open) */
 #if __CRT_HAVE_SC(open_by_handle_at)
 __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle const *__handle, __oflag_t __flags),(__mountdirfd,__handle,__flags))
 #endif /* __CRT_HAVE_SC(open_by_handle_at) */
 #if __CRT_HAVE_SC(openat)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CDECLARE_SC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(openat) */
 #if __CRT_HAVE_SC(pause)
@@ -687,6 +813,9 @@ __CDECLARE_SC(,__errno_t,prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
 #endif /* __CRT_HAVE_SC(pread64) */
 #if __CRT_HAVE_SC(preadv)
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_SC(preadv) */
 #if __CRT_HAVE_SC(prlimit64)
@@ -694,11 +823,15 @@ __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct iovec const *__iovec, __siz
 __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
 #if __CRT_HAVE_SC(process_vm_readv)
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 __CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec const *__local_iov, __size_t __liovcnt, struct iovec const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_readv) */
 #if __CRT_HAVE_SC(process_vm_writev)
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 __CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec const *__local_iov, __size_t __liovcnt, struct iovec const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_writev) */
 #if __CRT_HAVE_SC(pselect6)
@@ -711,12 +844,21 @@ __CDECLARE_SC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __
 __CDECLARE_SC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
 #endif /* __CRT_HAVE_SC(pwrite64) */
 #if __CRT_HAVE_SC(pwritev)
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_SC(pwritev) */
 #if __CRT_HAVE_SC(quotactl)
 __CDECLARE_SC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(quotactl) */
 #if __CRT_HAVE_SC(read)
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 __CDECLARE_SC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(read) */
 #if __CRT_HAVE_SC(readahead)
@@ -729,6 +871,14 @@ __CDECLARE_SC(,__ssize_t,readlink,(char const *__path, char *__buf, __size_t __b
 __CDECLARE_SC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *__buf, __size_t __buflen),(__dirfd,__path,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(readlinkat) */
 #if __CRT_HAVE_SC(readv)
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct iovec const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_SC(readv) */
 #if __CRT_HAVE_SC(reboot)
@@ -736,26 +886,51 @@ __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct iovec const *__iovec, __size
 __CDECLARE_SC(,__errno_t,reboot,(__syscall_ulong_t __how),(__how))
 #endif /* __CRT_HAVE_SC(reboot) */
 #if __CRT_HAVE_SC(recv)
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over the given socket `sockfd', and store the contents within the given buffer.
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @return: * : [<= bufsize] The actual # of received bytes */
 __CDECLARE_SC(,__ssize_t,recv,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* __CRT_HAVE_SC(recv) */
 #if __CRT_HAVE_SC(recvfrom)
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 __CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(recvfrom) */
 #if __CRT_HAVE_SC(recvmmsg)
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct timespec const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg) */
 #if __CRT_HAVE_SC(recvmsg)
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 __CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_SC(recvmsg) */
 #if __CRT_HAVE_SC(remap_file_pages)
@@ -865,26 +1040,53 @@ __CDECLARE_SC(,__errno_t,semop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(semtimedop) */
 #if __CRT_HAVE_SC(send)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over the given socket `sockfd'.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @return: * : [<= bufsize] The actual # of send bytes */
 __CDECLARE_SC(,__ssize_t,send,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* __CRT_HAVE_SC(send) */
 #if __CRT_HAVE_SC(sendfile)
 __CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile) */
 #if __CRT_HAVE_SC(sendmmsg)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 __CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags),(__sockfd,__vmessages,__vlen,__msg_flags))
 #endif /* __CRT_HAVE_SC(sendmmsg) */
 #if __CRT_HAVE_SC(sendmsg)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 __CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_SC(sendmsg) */
 #if __CRT_HAVE_SC(sendto)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 __CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(sendto) */
 #if __CRT_HAVE_SC(set_mempolicy)
@@ -948,8 +1150,14 @@ __CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit 
 __CDECLARE_SC(,__pid_t,setsid,(void),())
 #endif /* __CRT_HAVE_SC(setsid) */
 #if __CRT_HAVE_SC(setsockopt)
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,setsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void const *__optval, __socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* __CRT_HAVE_SC(setsockopt) */
 #if __CRT_HAVE_SC(settimeofday)
@@ -963,51 +1171,64 @@ __CDECLARE_SC(,__errno_t,setuid,(__uid_t __uid),(__uid))
 __CDECLARE_SC(,__errno_t,setxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(setxattr) */
 #if __CRT_HAVE_SC(shmat)
-__CDECLARE_SC(,__errno_t,shmat,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,shmat,(__syscall_ulong_t __shmid, void const *__shmaddr, __syscall_ulong_t __shmflg),(__shmid,__shmaddr,__shmflg))
 #endif /* __CRT_HAVE_SC(shmat) */
 #if __CRT_HAVE_SC(shmctl)
-__CDECLARE_SC(,__errno_t,shmctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,shmctl,(__syscall_ulong_t __shmid, __syscall_ulong_t __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
 #endif /* __CRT_HAVE_SC(shmctl) */
 #if __CRT_HAVE_SC(shmdt)
-__CDECLARE_SC(,__errno_t,shmdt,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,shmdt,(void const *__shmaddr),(__shmaddr))
 #endif /* __CRT_HAVE_SC(shmdt) */
 #if __CRT_HAVE_SC(shmget)
-__CDECLARE_SC(,__errno_t,shmget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong_t __shmflg),(__key,__size,__shmflg))
 #endif /* __CRT_HAVE_SC(shmget) */
 #if __CRT_HAVE_SC(shutdown)
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_SC(shutdown) */
 #if __CRT_HAVE_SC(sigaltstack)
 __CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_SC(sigaltstack) */
 #if __CRT_HAVE_SC(signalfd)
-__CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+__CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize),(__fd,__sigmask,__sigmasksize))
 #endif /* __CRT_HAVE_SC(signalfd) */
 #if __CRT_HAVE_SC(signalfd4)
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-__CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+__CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_SC(signalfd4) */
 #if __CRT_HAVE_SC(socket)
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 __CDECLARE_SC(,__fd_t,socket,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol),(__domain,__type,__protocol))
 #endif /* __CRT_HAVE_SC(socket) */
 #if __CRT_HAVE_SC(socketpair)
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 __CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol, __fd_t *__fds),(__domain,__type,__protocol,__fds))
 #endif /* __CRT_HAVE_SC(socketpair) */
 #if __CRT_HAVE_SC(splice)
@@ -1140,6 +1361,29 @@ __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, stru
 __CDECLARE_SC(,__errno_t,utimes,(char const *__filename, struct timeval const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utimes) */
 #if __CRT_HAVE_SC(vfork)
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 __CDECLARE_SC(,__pid_t,vfork,(void),())
 #endif /* __CRT_HAVE_SC(vfork) */
 #if __CRT_HAVE_SC(vhangup)
@@ -1156,23 +1400,64 @@ __CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ul
 #endif /* __CRT_HAVE_SC(wait4) */
 #if __CRT_HAVE_SC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 __CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(write)
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 __CDECLARE_SC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(write) */
 #if __CRT_HAVE_SC(writev)
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 __CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct iovec const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_SC(writev) */
 #if __CRT_HAVE_XSC(_sysctl)
 __CDECLARE_XSC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(_sysctl) */
 #if __CRT_HAVE_XSC(accept)
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] Don't fill in the client's peer address
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ *                           If this happens, the caller can still determine
+ *                           the correct address through use of `getpeername()'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 __CDECLARE_XSC(,__fd_t,accept,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(accept) */
 #if __CRT_HAVE_XSC(accept4)
-/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* Accept incoming client (aka. peer) connection requests.
+ * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:   [NULL] Don't fill in the client's peer address
+ *                     [in]   The amount of available memory starting at `addr'
+ *                     [out]  The amount of required memory for the address.
+ *                            This may be more than was given, in which case
+ *                            the address was truncated and may be invalid.
+ *                            If this happens, the caller can still determine
+ *                            the correct address through use of `getpeername()'
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
+ * @throw: E_NET_CONNECTION_ABORT
+ * @return: * : A file descriptor for the newly accept(2)-ed connection */
 __CDECLARE_XSC(,__fd_t,accept4,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len, __syscall_ulong_t __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
 #endif /* __CRT_HAVE_XSC(accept4) */
 #if __CRT_HAVE_XSC(access)
@@ -1195,6 +1480,13 @@ __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds
 __CDECLARE_XSC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(bdflush) */
 #if __CRT_HAVE_XSC(bind)
+/* Bind the given socket `sockfd' to the specified local address.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,bind,(__fd_t __sockfd, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(bind) */
 #if __CRT_HAVE_XSC(bpf)
@@ -1245,6 +1537,16 @@ __CDECLARE_XSC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, _
 __CDECLARE_XSC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(close) */
 #if __CRT_HAVE_XSC(connect)
+/* Connect to the specified address.
+ * If the given `sockfd' isn't connection-oriented, this will set the address
+ * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_NET_ADDRESS_NOT_AVAILABLE
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,connect,(__fd_t __sockfd, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(connect) */
 #if __CRT_HAVE_XSC(creat)
@@ -1287,16 +1589,24 @@ __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CDECLARE_XSC(,__errno_t,execve,(char const *__path, char const *const *___argv, char const *const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_XSC(execve) */
 #if __CRT_HAVE_XSC(execveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
+ * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, char const *const *___argv, char const *const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
 #endif /* __CRT_HAVE_XSC(execveat) */
 #if __CRT_HAVE_XSC(exit)
-__CDECLARE_VOID_XSC(__ATTR_NORETURN,exit,(__syscall_ulong_t __status),(__status))
+/* Terminate the calling thread (_NOT_ process!)
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
+__CDECLARE_VOID_XSC(__ATTR_NORETURN,exit,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_XSC(exit) */
 #if __CRT_HAVE_XSC(exit_group)
+/* Terminate the calling process
+ * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_XSC(exit_group) */
 #if __CRT_HAVE_XSC(faccessat)
@@ -1338,6 +1648,8 @@ __CDECLARE_XSC(,__errno_t,fchownat,(__fd_t __dirfd, char const *__filename, __ui
 __CDECLARE_XSC(,__syscall_slong_t,fcntl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(fcntl) */
 #if __CRT_HAVE_XSC(fdatasync)
+/* Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 __CDECLARE_XSC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(fdatasync) */
 #if __CRT_HAVE_XSC(fgetxattr)
@@ -1353,6 +1665,15 @@ __CDECLARE_XSC(,__ssize_t,flistxattr,(__fd_t __fd, char *__listbuf, __size_t __l
 __CDECLARE_XSC(,__errno_t,flock,(__fd_t __fd, __syscall_ulong_t __operation),(__fd,__operation))
 #endif /* __CRT_HAVE_XSC(flock) */
 #if __CRT_HAVE_XSC(fork)
+/* Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CDECLARE_XSC(,__pid_t,fork,(void),())
 #endif /* __CRT_HAVE_XSC(fork) */
 #if __CRT_HAVE_XSC(fremovexattr)
@@ -1366,6 +1687,8 @@ __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const
 __CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs) */
 #if __CRT_HAVE_XSC(fsync)
+/* Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
 __CDECLARE_XSC(,__errno_t,fsync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(fsync) */
 #if __CRT_HAVE_XSC(ftruncate)
@@ -1416,6 +1739,14 @@ __CDECLARE_XSC(,__ssize_t,getgroups,(__size_t __count, __gid_t *__list),(__count
 __CDECLARE_XSC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct itimerval *__curr_value),(__which,__curr_value))
 #endif /* __CRT_HAVE_XSC(getitimer) */
 #if __CRT_HAVE_XSC(getpeername)
+/* Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(getpeername) */
 #if __CRT_HAVE_XSC(getpgid)
@@ -1456,11 +1787,30 @@ __CDECLARE_XSC(,__errno_t,getrusage,(__syscall_slong_t __who, struct rusage *__u
 __CDECLARE_XSC(,__pid_t,getsid,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_XSC(getsid) */
 #if __CRT_HAVE_XSC(getsockname)
+/* Determine the local address (aka. name) for the given socket `sockfd'.
+ * This is usually the same address as was previously set by `bind(2)'
+ * NOTE: Before the socket has actually be bound or connected, the exact
+ *       address that is returned by this function is weakly undefined.
+ *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
+ * @param: addr:     [out] Buffer where to store the sock address.
+ * @param: addr_len: [in]  The amount of available memory starting at `addr'
+ *                   [out] The amount of required memory for the address.
+ *                         This may be more than was given, in which case
+ *                         the address was truncated and may be invalid.
+ * return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getsockname,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(getsockname) */
 #if __CRT_HAVE_XSC(getsockopt)
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Get the value of the named socket option `level:optname' and store it in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  [in]  The amount of available memory starting at `optval'
+ *                  [out] The amount of required memory for the option value.
+ *                        This may be more than was given, in which case
+ *                        the contents of `optval' are undefined.
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void *__optval, __socklen_t *__optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* __CRT_HAVE_XSC(getsockopt) */
 #if __CRT_HAVE_XSC(gettid)
@@ -1558,6 +1908,14 @@ __CDECLARE_XSC(,__errno_t,linux_newfstatat,(__fd_t __dirfd, char const *__filena
 __CDECLARE_XSC(,__errno_t,linux_stat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(linux_stat) */
 #if __CRT_HAVE_XSC(listen)
+/* Begin to listen for incoming client (aka. peer) connection requests.
+ * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ *                      the kernel will refuse to enqueue additional clients, and will
+ *                      instead automatically refuse any further requests until the
+ *                      less than `max_backlog' clients are still pending.
+ * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
+ * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,listen,(__fd_t __sockfd, __syscall_ulong_t __max_backlog),(__sockfd,__max_backlog))
 #endif /* __CRT_HAVE_XSC(listen) */
 #if __CRT_HAVE_XSC(listxattr)
@@ -1699,12 +2057,38 @@ __CDECLARE_XSC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__pid_t,oldwait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_XSC(oldwait4) */
 #if __CRT_HAVE_XSC(open)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t __mode),(__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(open) */
 #if __CRT_HAVE_XSC(open_by_handle_at)
 __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle const *__handle, __oflag_t __flags),(__mountdirfd,__handle,__flags))
 #endif /* __CRT_HAVE_XSC(open_by_handle_at) */
 #if __CRT_HAVE_XSC(openat)
+/* Open a new file handle to the file specified by `FILENAME'
+ * When `oflags & O_CREAT', then `mode' specifies the initial
+ * file access permissions with which the file should be opened.
+ * On KOS, the returned handle can be anything, but is usually one of:
+ *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
+ *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
+ *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
+ *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
+ *   - HANDLE_TYPE_DATABLOCK:              For `S_IFLNK' files (only when `O_SYMLINK' was given)
+ *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
+ *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
+ *   - *:                                  Certain filesystem names can literally return anything, such
+ *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(openat) */
 #if __CRT_HAVE_XSC(pause)
@@ -1738,6 +2122,9 @@ __CDECLARE_XSC(,__errno_t,prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
 #endif /* __CRT_HAVE_XSC(pread64) */
 #if __CRT_HAVE_XSC(preadv)
+/* Same as `readv(2)', but read data from a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_XSC(preadv) */
 #if __CRT_HAVE_XSC(prlimit64)
@@ -1745,11 +2132,15 @@ __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct iovec const *__iovec, __si
 __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
 #if __CRT_HAVE_XSC(process_vm_readv)
-/* @param: flags: Must be `0' */
+/* Read memory from another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of read bytes */
 __CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec const *__local_iov, __size_t __liovcnt, struct iovec const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_readv) */
 #if __CRT_HAVE_XSC(process_vm_writev)
-/* @param: flags: Must be `0' */
+/* Write memory to another process's VM
+ * @param: flags: Must be `0'
+ * @return: * :   The actual number of written bytes */
 __CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec const *__local_iov, __size_t __liovcnt, struct iovec const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_writev) */
 #if __CRT_HAVE_XSC(pselect6)
@@ -1762,12 +2153,21 @@ __CDECLARE_XSC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t _
 __CDECLARE_XSC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
 #endif /* __CRT_HAVE_XSC(pwrite64) */
 #if __CRT_HAVE_XSC(pwritev)
+/* Same as `writev(2)', but write data to a file at a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_XSC(pwritev) */
 #if __CRT_HAVE_XSC(quotactl)
 __CDECLARE_XSC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(quotactl) */
 #if __CRT_HAVE_XSC(read)
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 __CDECLARE_XSC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(read) */
 #if __CRT_HAVE_XSC(readahead)
@@ -1780,6 +2180,14 @@ __CDECLARE_XSC(,__ssize_t,readlink,(char const *__path, char *__buf, __size_t __
 __CDECLARE_XSC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *__buf, __size_t __buflen),(__dirfd,__path,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(readlinkat) */
 #if __CRT_HAVE_XSC(readv)
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read data into `count' seperate buffers, though still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
 __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct iovec const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_XSC(readv) */
 #if __CRT_HAVE_XSC(reboot)
@@ -1787,26 +2195,51 @@ __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct iovec const *__iovec, __siz
 __CDECLARE_XSC(,__errno_t,reboot,(__syscall_ulong_t __how),(__how))
 #endif /* __CRT_HAVE_XSC(reboot) */
 #if __CRT_HAVE_XSC(recv)
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over the given socket `sockfd', and store the contents within the given buffer.
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @return: * : [<= bufsize] The actual # of received bytes */
 __CDECLARE_XSC(,__ssize_t,recv,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* __CRT_HAVE_XSC(recv) */
 #if __CRT_HAVE_XSC(recvfrom)
-/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* Receive data over this socket, and store the contents within the given buffer.
+ * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
+ * @param: bufsize:   Max # of bytes to receive
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
+ * @param: addr_len:  [NULL] behave as an alias for `recv(sockfd, buf, bufsize, msg_flags)'
+ *                    [in]   The amount of available memory starting at `addr'
+ *                    [out]  The amount of required memory for the address.
+ *                           This may be more than was given, in which case
+ *                           the address was truncated and may be invalid.
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_NET_CONNECTION_REFUSED
+ * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
+ * @return: * : [<= bufsize] The actual # of received bytes */
 __CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(recvfrom) */
 #if __CRT_HAVE_XSC(recvmmsg)
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE' */
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
 __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct timespec const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg) */
 #if __CRT_HAVE_XSC(recvmsg)
-/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+/* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
+ * @return: * : [<= bufsize] The actual # of received payload bytes */
 __CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_XSC(recvmsg) */
 #if __CRT_HAVE_XSC(remap_file_pages)
@@ -1913,26 +2346,53 @@ __CDECLARE_XSC(,__errno_t,semop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(semtimedop) */
 #if __CRT_HAVE_XSC(send)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over the given socket `sockfd'.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @return: * : [<= bufsize] The actual # of send bytes */
 __CDECLARE_XSC(,__ssize_t,send,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* __CRT_HAVE_XSC(send) */
 #if __CRT_HAVE_XSC(sendfile)
 __CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile) */
 #if __CRT_HAVE_XSC(sendmmsg)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `sendmsg(2)', but may be used to send many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as `sendmsg(2)'
+ * @return: * : The # of datagrams successfully sent. */
 __CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags),(__sockfd,__vmessages,__vlen,__msg_flags))
 #endif /* __CRT_HAVE_XSC(sendmmsg) */
 #if __CRT_HAVE_XSC(sendmsg)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
+ * data as well as for data buffers to be represented by an IOV vector.
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @throw: ... Same as for `send(2)' and `sendto(2)'
+ * @return: * : [<= bufsize] The actual # of send payload bytes */
 __CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_XSC(sendmsg) */
 #if __CRT_HAVE_XSC(sendto)
-/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* Send the contents of a given buffer over this socket to the specified address
+ * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
+ * @param: bufsize:   Size of `buf' (in bytes)
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+ * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
+ * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
+ *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_NET_MESSAGE_TOO_LONG
+ * @throw: E_NET_CONNECTION_RESET
+ * @throw: E_NET_SHUTDOWN
+ * @throw: E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
+ * @return: * : [<= bufsize] The actual # of send bytes */
 __CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(sendto) */
 #if __CRT_HAVE_XSC(set_mempolicy)
@@ -1996,8 +2456,14 @@ __CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit
 __CDECLARE_XSC(,__pid_t,setsid,(void),())
 #endif /* __CRT_HAVE_XSC(setsid) */
 #if __CRT_HAVE_XSC(setsockopt)
-/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level' */
+/* Set the value of the named socket option `level:optname' from what is given in `optval'
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level'
+ * @param: optval:  Buffer for where to write the value of the socket option.
+ * @param: optlen:  The amount of available memory starting at `optval'
+ * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
+ * @throw: E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,setsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void const *__optval, __socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* __CRT_HAVE_XSC(setsockopt) */
 #if __CRT_HAVE_XSC(settimeofday)
@@ -2011,51 +2477,64 @@ __CDECLARE_XSC(,__errno_t,setuid,(__uid_t __uid),(__uid))
 __CDECLARE_XSC(,__errno_t,setxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(setxattr) */
 #if __CRT_HAVE_XSC(shmat)
-__CDECLARE_XSC(,__errno_t,shmat,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,shmat,(__syscall_ulong_t __shmid, void const *__shmaddr, __syscall_ulong_t __shmflg),(__shmid,__shmaddr,__shmflg))
 #endif /* __CRT_HAVE_XSC(shmat) */
 #if __CRT_HAVE_XSC(shmctl)
-__CDECLARE_XSC(,__errno_t,shmctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,shmctl,(__syscall_ulong_t __shmid, __syscall_ulong_t __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
 #endif /* __CRT_HAVE_XSC(shmctl) */
 #if __CRT_HAVE_XSC(shmdt)
-__CDECLARE_XSC(,__errno_t,shmdt,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,shmdt,(void const *__shmaddr),(__shmaddr))
 #endif /* __CRT_HAVE_XSC(shmdt) */
 #if __CRT_HAVE_XSC(shmget)
-__CDECLARE_XSC(,__errno_t,shmget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong_t __shmflg),(__key,__size,__shmflg))
 #endif /* __CRT_HAVE_XSC(shmget) */
 #if __CRT_HAVE_XSC(shutdown)
-/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* Disallow further reception of data (causing `recv(2)' to return `0' as soon
+ * as all currently queued data has been read), and/or further transmission
+ * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
+ * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_XSC(shutdown) */
 #if __CRT_HAVE_XSC(sigaltstack)
 __CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
 #if __CRT_HAVE_XSC(signalfd)
-__CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process. */
+__CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize),(__fd,__sigmask,__sigmasksize))
 #endif /* __CRT_HAVE_XSC(signalfd) */
 #if __CRT_HAVE_XSC(signalfd4)
-/* @param: flags: Set of `SFD_NONBLOCK | SFD_CLOEXEC' */
-__CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
+/* Create a poll(2)-able file descriptor which can be used to wait for the
+ * delivery of signals masked by `SIGMASK' to the waiting thread/process.
+ * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
+__CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_XSC(signalfd4) */
 #if __CRT_HAVE_XSC(socket)
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 __CDECLARE_XSC(,__fd_t,socket,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol),(__domain,__type,__protocol))
 #endif /* __CRT_HAVE_XSC(socket) */
 #if __CRT_HAVE_XSC(socketpair)
-/* @param: family:   Socket address family (one of `AF_*' from `<sys/socket.h>')
+/* Create a new socket for the given domain/type/protocol triple.
+ * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
- *                   depend on the selected `family', and may be further specialized by the
+ *                   depend on the selected `domain', and may be further specialized by the
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
- *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+ * @return: * : A file descriptor for the newly created socket. */
 __CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol, __fd_t *__fds),(__domain,__type,__protocol,__fds))
 #endif /* __CRT_HAVE_XSC(socketpair) */
 #if __CRT_HAVE_XSC(splice)
@@ -2188,6 +2667,29 @@ __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, str
 __CDECLARE_XSC(,__errno_t,utimes,(char const *__filename, struct timeval const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utimes) */
 #if __CRT_HAVE_XSC(vfork)
+/* Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `exit(2)'       Terminate the child process
+ *   - `exit_group(2)' Terminate the child process
+ *   - `execve(2)'     Create a new VM that is populated with the specified process
+ *                     image. The parent process will only be resumed in case the
+ *                     new program image could be loaded successfully. Otherwise,
+ *                     the call to `execve(2)' returns normally in the child.
+ *                     Other functions from the exec()-family behave the same
+ * 
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ * 
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 __CDECLARE_XSC(,__pid_t,vfork,(void),())
 #endif /* __CRT_HAVE_XSC(vfork) */
 #if __CRT_HAVE_XSC(vhangup)
@@ -2204,13 +2706,28 @@ __CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_u
 #endif /* __CRT_HAVE_XSC(wait4) */
 #if __CRT_HAVE_XSC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
+ *                  optionally or'd with `WNOHANG | WNOWAIT' */
 __CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(write)
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 __CDECLARE_XSC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(write) */
 #if __CRT_HAVE_XSC(writev)
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write data from `count' seperate buffers, though still return the actual
+ * number of written bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
 __CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct iovec const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_XSC(writev) */
 

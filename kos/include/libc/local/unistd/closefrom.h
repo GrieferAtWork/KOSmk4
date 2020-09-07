@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa82fbf98 */
+/* HASH CRC-32:0xfa309f87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,13 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___fcntl)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* ... */
 #undef __local___localdep_fcntl_defined
 #endif /* !... */

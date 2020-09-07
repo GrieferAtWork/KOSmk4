@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a15e65a */
+/* HASH CRC-32:0x5fd5863a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,23 @@
 #if defined(__CRT_HAVE_lockf64) || defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 #include <features.h>
 #include <bits/types.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(__pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(__off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_locking from fcntl */
 #ifndef __local___localdep_crt_locking_defined
 #define __local___localdep_crt_locking_defined 1
 #ifdef __CRT_HAVE_locking
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, int __cmd, __off32_t __length),locking,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE__locking)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, int __cmd, __off32_t __length),_locking,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),_locking,(__fd,__cmd,__length))
 #else /* ... */
 #undef __local___localdep_crt_locking_defined
 #endif /* !... */
@@ -39,15 +48,15 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, int __cmd, _
 /* Dependency: lockf32 from fcntl */
 #if !defined(__local___localdep_lockf32_defined) && defined(__CRT_HAVE_lockf)
 #define __local___localdep_lockf32_defined 1
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, int __cmd, __off32_t __length),lockf,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),lockf,(__fd,__cmd,__length))
 #endif /* !__local___localdep_lockf32_defined && __CRT_HAVE_lockf */
 /* Dependency: lockf64 from fcntl */
 #ifndef __local___localdep_lockf64_defined
 #define __local___localdep_lockf64_defined 1
 #ifdef __CRT_HAVE_lockf64
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf64,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf,(__fd,__cmd,__length))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length),lockf,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE_locking) || defined(__CRT_HAVE__locking)
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/lockf64.h>
@@ -58,9 +67,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lockf64_defined */
 __LOCAL_LIBC(lockf) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf))(__fd_t __fd, int __cmd, __FS_TYPE(off) __length) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf))(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length) {
 
-	return __localdep_lockf64(__fd, __cmd, (__off64_t)__length);
+	return __localdep_lockf64(__fd, __cmd, (__PIO_OFFSET64)__length);
 
 
 

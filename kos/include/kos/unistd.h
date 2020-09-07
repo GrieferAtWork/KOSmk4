@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f675c3c */
+/* HASH CRC-32:0x176b4d65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,7 +191,9 @@ __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
- * parent can then `wait(2)' for */
+ * parent can then `wait(2)' for. (s.a. `vfork(2)')
+ * @return: 0 : You're the new process that was created
+ * @return: * : The `return' value is the pid of your new child process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
 
 #ifdef __CRT_HAVE_Chown
@@ -223,12 +225,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #endif /* !__CRT_HAVE_Link */
 
 /* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
+ * Read up to `bufsize' bytes from `fd' into `buf'
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw E_WOULDBLOCK if no data
+ * was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 
 /* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
+ * Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * as possible at the time the call was made, and throw E_WOULDBLOCK
+ * if no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 
 #ifdef __USE_KOS
@@ -375,30 +386,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __pos64_
 
 #if defined(__CRT_HAVE_PRead64) && defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead) && !defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PRead.h>
 /* >> pread(2)
- * Read data from a file at a specific offset */
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PRead, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PRead)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_PWrite64) && defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite) && !defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <libc/local/kos.unistd/PWrite.h>
 /* >> pwrite(2)
- * Write data to a file at a specific offset */
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PWrite)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 
@@ -492,8 +509,31 @@ __CDECLARE_VOID_OPT(,__THROWING,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
      defined(__USE_MISC)
 /* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
+ * Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the parent process remaining suspended until the
+ * child process invokes one of the following system calls:
+ *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+ *                 instead of the regular `exit(2)', since the later would include
+ *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 the context of a VM that isn't actually about to be destroyed.
+ *   - `execve(2)' Create a new VM that is populated with the specified process
+ *                 image. The parent process will only be resumed in case the
+ *                 new program image could be loaded successfully. Otherwise,
+ *                 the call to `execve(2)' returns normally in the child.
+ *                 Other functions from the exec()-family behave the same
+ *
+ * Care must be taken when using this system call, since you have to make sure that
+ * the child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in the parent process. The same also goes for heap
+ * functions, but generally speaking: you really shouldn't do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3), which
+ * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ *
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which case the parent process will not actually get suspended until the child
+ * process performs any of the actions above. */
 __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(void),())
 #endif
 

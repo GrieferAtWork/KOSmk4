@@ -22,6 +22,7 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #ifdef __x86_64__

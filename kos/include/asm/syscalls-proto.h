@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x592958be */
+/* HASH CRC-32:0x8e4758a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -223,9 +223,9 @@
 #define __NRAC_semctl                 1
 #define __NRAC_semtimedop             1
 #define __NRAC_semop                  1
-#define __NRAC_shmget                 1
-#define __NRAC_shmctl                 1
-#define __NRAC_shmat                  1
+#define __NRAC_shmget                 3
+#define __NRAC_shmctl                 3
+#define __NRAC_shmat                  3
 #define __NRAC_shmdt                  1
 #define __NRAC_socket                 3
 #define __NRAC_socketpair             4
@@ -1100,10 +1100,16 @@
 #define __NRAT0_semctl                 (int, int)
 #define __NRAT0_semtimedop             (int, int)
 #define __NRAT0_semop                  (int, int)
-#define __NRAT0_shmget                 (int, int)
-#define __NRAT0_shmctl                 (int, int)
-#define __NRAT0_shmat                  (int, int)
-#define __NRAT0_shmdt                  (int, int)
+#define __NRAT0_shmget                 (key_t, __key_t)
+#define __NRAT1_shmget                 (size_t, __size_t)
+#define __NRAT2_shmget                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_shmctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_shmctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_shmctl                 (struct shmid_ds *, struct shmid_ds *)
+#define __NRAT0_shmat                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_shmat                  (void const *, void const *)
+#define __NRAT2_shmat                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_shmdt                  (void const *, void const *)
 #define __NRAT0_socket                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_socket                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_socket                 (syscall_ulong_t, __syscall_ulong_t)
@@ -1602,10 +1608,10 @@
 #define __NRAM_semctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
 #define __NRAM_semtimedop(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_semop(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (int)a
-#define __NRAM_shmget(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
-#define __NRAM_shmctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
-#define __NRAM_shmat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (int)a
-#define __NRAM_shmdt(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (int)a
+#define __NRAM_shmget(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__key_t)a, (__size_t)b, (__syscall_ulong_t)c
+#define __NRAM_shmctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (struct shmid_ds *)c
+#define __NRAM_shmat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__syscall_ulong_t)a, (void const *)b, (__syscall_ulong_t)c
+#define __NRAM_shmdt(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (void const *)a
 #define __NRAM_socket(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_socketpair(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__fd_t *)d
 #define __NRAM_bind(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
@@ -1924,9 +1930,9 @@
 #define __NRAP_semctl(a)                                                                                            (__syscall_ulong_t)a
 #define __NRAP_semtimedop(a)                                                                                        (__syscall_ulong_t)a
 #define __NRAP_semop(a)                                                                                             (__syscall_ulong_t)a
-#define __NRAP_shmget(a)                                                                                            (__syscall_ulong_t)a
-#define __NRAP_shmctl(a)                                                                                            (__syscall_ulong_t)a
-#define __NRAP_shmat(a)                                                                                             (__syscall_ulong_t)a
+#define __NRAP_shmget(a, b, c)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_shmctl(a, b, c)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_shmat(a, b, c)                                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_shmdt(a)                                                                                             (__syscall_ulong_t)a
 #define __NRAP_socket(a, b, c)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_socketpair(a, b, c, d)                                                                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
