@@ -100,8 +100,8 @@ struct handle_types {
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: * : The required buffer size for the current entry */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED struct dirent *buf,
-	                                                                  size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
+	size_t (NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED struct dirent *buf,
+	                                                          size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 			/*THROWS(...)*/;
 
 	/* Seek within the data stream. */
