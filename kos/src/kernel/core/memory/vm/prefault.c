@@ -407,8 +407,8 @@ upgrade_and_recheck_vm_for_node:
 			if (pdid_unshare)
 				*pdid_unshare = true;
 
-			printk(KERN_TRACE "[vm] Unshared page at %p (%p) (RW) [tid=%u]\n",
-			       pageaddr, addr, task_getroottid_s());
+			printk(KERN_TRACE "[vm] Unshared page at %p (%p) (RW)\n",
+			       pageaddr, addr);
 			*ppart = new_part;
 			decref_unlikely(part);
 			assert(sync_reading(new_part));

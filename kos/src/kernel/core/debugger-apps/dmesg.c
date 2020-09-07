@@ -29,7 +29,11 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 
 #include <debugger/debugger.h>
+#include <fs/vfs.h>
 #include <kernel/dmesg.h>
+#include <kernel/panic.h>
+#include <kernel/vm/exec.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -37,6 +41,7 @@
 #include <kos/keyboard.h>
 
 #include <alloca.h>
+#include <format-printer.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
@@ -147,11 +152,49 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 		/* Print the packet timestamp within the status bar,
 		 * alongside the F1:help information message. */
 		dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
-		dbg_pprintf(0, dbg_screen_height - 1,
-		            DBGSTR("F1:help %.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32),
-		            tms.tm_year + 1900, tms.tm_mon + 1, tms.tm_mday,
-		            tms.tm_hour, tms.tm_min, tms.tm_sec,
-		            packet->sp_nsec);
+		{
+			dbg_pprinter_arg_t printer = DBG_PPRINTER_ARG_INIT(0, (int)dbg_screen_height - 1);
+			format_printf(&dbg_pprinter, &printer,
+			              DBGSTR("F1:help %.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 "/%u"),
+			              tms.tm_year + 1900, tms.tm_mon + 1, tms.tm_mday,
+			              tms.tm_hour, tms.tm_min, tms.tm_sec,
+			              packet->sp_nsec, packet->sp_tid);
+			if (!kernel_poisoned()) {
+				/* Include the name of the main executable associated
+				 * with the process of the packet writer's tid.
+				 *
+				 * Of course, there is the race condition where the writer
+				 * has since terminated, and a different process has taken
+				 * its place, so this information should be taken with a
+				 * grain of salt.
+				 *
+				 * XXX: If the later happened, maybe be could extract this
+				 *      information from the system log? (maybe add some
+				 *      out-of-band meta-data to the dmesg backlog that
+				 *      can be used to determine at which point some tid
+				 *      was deleted) */
+				REF struct task *sender;
+				TRY {
+					sender = pidns_trylookup_task(&pidns_root,
+					                              packet->sp_tid);
+				} EXCEPT {
+				}
+				if (sender) {
+					struct vm_execinfo_struct *ei;
+					ei = &FORVM(sender->t_vm, thisvm_execinfo);
+					if (ei->ei_path && ei->ei_dent) {
+						dbg_pprinter(&printer, DBGSTR(":"), 1);
+						path_printentex(ei->ei_path,
+						                ei->ei_dent->de_name,
+						                ei->ei_dent->de_namelen,
+						                &dbg_pprinter, &printer,
+						                PATH_PRINT_MODE_NORMAL,
+						                &vfs_kernel);
+					}
+					decref_unlikely(sender);
+				}
+			}
+		}
 	}
 	return 0;
 }

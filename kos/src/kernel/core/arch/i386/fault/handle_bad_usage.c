@@ -611,8 +611,8 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 		 * Also: we don't know if it was a write that caused the problem, so we just
 		 *       always act like it was an unspecific access to an unmapped page. */
 		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_GFP && BAD_USAGE_ECODE(usage) == 0) {
-			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,opcode=%#Ix,opflags=%#I32x] [tid=%u]\n",
-			       (void *)icpustate_getpc(state), opcode, op_flags, (unsigned int)task_getroottid_s());
+			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,opcode=%#Ix,opflags=%#I32x]\n",
+			       (void *)icpustate_getpc(state), opcode, op_flags);
 			throw_exception(state,
 			                ERROR_CODEOF(E_SEGFAULT_UNMAPPED),
 			                X86_64_ADDRBUS_NONCANON_MIN,
@@ -1099,8 +1099,8 @@ set_noncanon_pc_exception:
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		icpustate_setpc(state, callsite_pc);
-		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF] [tid=%u]\n",
-		       pc, callsite_pc, (unsigned int)task_getroottid_s());
+		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF]\n",
+		       pc, callsite_pc);
 		unwind(state);
 	}
 }
@@ -1123,10 +1123,9 @@ assert_canonical_address(struct icpustate *__restrict state,
 			/* longjmp() to the custom piece of fault handling code. */
 			cpu_apply_icpustate(state);
 		}
-		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%s] [#GPF] [tid=%u]\n",
+		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%s] [#GPF]\n",
 		       addr, icpustate_getpc(state),
-		       reading && writing ? "rw" : reading ? "ro" : "wo",
-		       (unsigned int)task_getroottid_s());
+		       reading && writing ? "rw" : reading ? "ro" : "wo");
 		/* NOTE: When reading+writing, then the read always comes first, so even
 		 *       though the instruction would have also performed a write, the
 		 *       read happening first means that we mustn't set the WRITING flag. */

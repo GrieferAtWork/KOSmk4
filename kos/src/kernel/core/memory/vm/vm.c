@@ -3069,9 +3069,8 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 
 
 LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
-	printk(KERN_DEBUG "[vm] Update access rights of %p-%p [tid=%u]\n",
-	       vm_node_getmin(self), vm_node_getmax(self),
-	       task_getroottid_s());
+	printk(KERN_DEBUG "[vm] Update access rights of %p-%p\n",
+	       vm_node_getmin(self), vm_node_getmax(self));
 }
 
 

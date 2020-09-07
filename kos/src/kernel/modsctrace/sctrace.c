@@ -82,14 +82,17 @@ sctrace(struct driver *__restrict UNUSED(self),
         struct rpc_syscall_info const *__restrict info) {
 	struct sc_desc desc;
 	unsigned int i;
+#if 0
+	printk(KERN_TRACE "[RC=%Iu]", PERTASK_GET(this_task.t_refcnt));
+#endif
 #ifdef __ARCH_HAVE_COMPAT
 	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(info->rsi_flags)) {
 		if (SCTRACE_COMPAT_IGNORE(info->rsi_sysno))
 			return;
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
-		printk(KERN_TRACE "task[%u].sys32_", task_getroottid_s());
+		printk(KERN_TRACE "sys32_");
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
-		printk(KERN_TRACE "task[%u].sys64_", task_getroottid_s());
+		printk(KERN_TRACE "sys64_");
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
 #error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
@@ -98,13 +101,7 @@ sctrace(struct driver *__restrict UNUSED(self),
 	{
 		if (SCTRACE_IGNORE(info->rsi_sysno))
 			return;
-#if 0
-		printk(KERN_TRACE "task[%u:%Iu].sys_",
-		       task_getroottid_s(),
-		       PERTASK_GET(this_task.t_refcnt));
-#else
-		printk(KERN_TRACE "task[%u].sys_", task_getroottid_s());
-#endif
+		printk(KERN_TRACE "sys_");
 	}
 	sc_getdesc(info, &desc);
 	if (info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT)

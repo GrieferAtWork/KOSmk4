@@ -48,6 +48,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -138,10 +139,9 @@ do_try_override_fproc:
 
 		/* 11.1.4 -- Terminal Access Control */
 		if (is_SIGTTOU) {
-			printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to write\n",
+			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
 			       term->cd_name, my_leader_pid->tp_thread.m_pointer,
-			       (unsigned int)taskpid_getrootpid(my_leader_pid),
-			       THIS_TASK, task_getroottid_s());
+			       taskpid_getrootpid(my_leader_pid));
 			/* ... Attempts by a process in a background process group to write to its controlling
 			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
 			 * following special cases applies:
@@ -176,9 +176,9 @@ do_throw_ttou:
 			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
 			 * -> As described by POSIX, allow the process to write in this szenario. */
 		} else {
-			printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to read\n",
-			       term->cd_name, my_leader_pid, (unsigned int)taskpid_getrootpid(my_leader_pid),
-			       THIS_TASK, task_getroottid_s());
+			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
+			       term->cd_name, my_leader_pid,
+			       taskpid_getrootpid(my_leader_pid));
 			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
 			 * the process group of the reading process isorphaned, the read() shall return
 			 * -1, with errno set to [EIO] and no signal shall be sent. */
@@ -526,8 +526,8 @@ do_TCSETA: {
 			FINALLY_DECREF_UNLIKELY(newthread);
 			newpid = task_getprocessgroupleaderpid_of(newthread);
 		}
-		printk(KERN_TRACE "[tty:%q] Set foreground process group to [tid=%u]\n",
-		       me->cd_name, (unsigned int)taskpid_getrootpid(newpid));
+		printk(KERN_TRACE "[tty:%q] Set foreground process group to [pgid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
+		       me->cd_name, taskpid_getrootpid(newpid));
 		oldpid = me->t_fproc.exchange_inherit_new(newpid);
 		xdecref(oldpid);
 	}	break;

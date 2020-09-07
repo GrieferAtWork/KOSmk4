@@ -43,6 +43,7 @@
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
 #include <sched/cpu.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -572,6 +573,22 @@ set_timestamp_and_write_data:
 		now           = realtime();
 		self->sp_time = (u64)now.tv_sec;
 		self->sp_nsec = now.tv_nsec;
+		/* Be _extremely_ careful about accessing TLS memory here!
+		 * We get called from sooo many places, and we must do our
+		 * best to be as fault-tolerant as possible. */
+		{
+			struct taskpid *mypid = THIS_TASKPID;
+#ifdef KERNELSPACE_HIGHMEM
+			if likely(ADDR_ISKERN(mypid))
+#else /* KERNELSPACE_HIGHMEM */
+			if likely(ADDR_ISKERN(mypid) && mypid != NULL)
+#endif /* !KERNELSPACE_HIGHMEM */
+			{
+				self->sp_tid = (s32)(u32)mypid->tp_pids[0];
+			} else {
+				self->sp_tid = 0;
+			}
+		}
 	}
 	dst = self->sp_msg + offset;
 	for (;;) {
@@ -629,7 +646,7 @@ syslog_packet_append(struct syslog_packet *__restrict self,
 		datalen -= written;
 		if likely(!datalen)
 			break;
-		data    += written;
+		data += written;
 	}
 }
 

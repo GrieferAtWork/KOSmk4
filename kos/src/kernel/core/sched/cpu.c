@@ -471,8 +471,7 @@ NOTHROW(FCALL task_decref_for_exit)(void *arg,
 PRIVATE ATTR_KERNEL_PANIC_NORETURN ATTR_COLD ATTR_NOINLINE void
 NOTHROW(FCALL panic_critical_thread_exited)(void) {
 	struct task *me = THIS_TASK;
-	kernel_panic("Critical thread %p [tid=%u] has exited",
-	             me, task_getroottid_of_s(me));
+	kernel_panic("Critical thread at %p has exited", me);
 }
 
 /* Terminate the calling thread immediately.
@@ -507,8 +506,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	/* Set the bit to indicate that we've started termination. */
 	if (!(ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING) & TASK_FTERMINATING)) {
 		pertask_onexit_t *iter;
-		printk(KERN_TRACE "[sched] Exiting thread %p [tid=%u]\n",
-		       caller, task_getroottid_of_s(caller));
+		printk(KERN_TRACE "[sched] Exiting thread %p\n", caller);
 
 		/* Trigger the appropriate debug trap associated with thread/process exits.
 		 * This is required because otherwise GDB will sooner or later hang itself

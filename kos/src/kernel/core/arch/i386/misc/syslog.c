@@ -57,16 +57,16 @@ INTERN port_t x86_syslog_port = (port_t)0x80;
 	outsb(x86_syslog_port, ptr, num_bytes)
 
 PRIVATE ATTR_ALIGNED(1) char const level_prefix[][9] = {
-	/* [SYSLOG_LEVEL_EMERG  ] = */ "emerg ] ",
-	/* [SYSLOG_LEVEL_ALERT  ] = */ "alert ] ",
-	/* [SYSLOG_LEVEL_CRIT   ] = */ "crit  ] ",
-	/* [SYSLOG_LEVEL_ERR    ] = */ "error ] ",
-	/* [SYSLOG_LEVEL_WARNING] = */ "warn  ] ",
-	/* [SYSLOG_LEVEL_NOTICE ] = */ "notice] ",
-	/* [SYSLOG_LEVEL_INFO   ] = */ "info  ] ",
-	/* [SYSLOG_LEVEL_TRACE  ] = */ "trace ] ",
-	/* [SYSLOG_LEVEL_DEBUG  ] = */ "debug ] ",
-	/* [SYSLOG_LEVEL_DEFAULT] = */ "output] "
+	/* [SYSLOG_LEVEL_EMERG  ] = */ "emerg ][",
+	/* [SYSLOG_LEVEL_ALERT  ] = */ "alert ][",
+	/* [SYSLOG_LEVEL_CRIT   ] = */ "crit  ][",
+	/* [SYSLOG_LEVEL_ERR    ] = */ "error ][",
+	/* [SYSLOG_LEVEL_WARNING] = */ "warn  ][",
+	/* [SYSLOG_LEVEL_NOTICE ] = */ "notice][",
+	/* [SYSLOG_LEVEL_INFO   ] = */ "info  ][",
+	/* [SYSLOG_LEVEL_TRACE  ] = */ "trace ][",
+	/* [SYSLOG_LEVEL_DEBUG  ] = */ "debug ][",
+	/* [SYSLOG_LEVEL_DEFAULT] = */ "output]["
 };
 
 
@@ -81,7 +81,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
                                     unsigned int level) {
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
-		char ch, buf[64];
+		char buf[64];
 		struct tm t;
 		size_t len;
 		localtime_r(&packet->sp_time, &t);
@@ -102,13 +102,14 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 #endif /* DBG_MONITOR_MEMORY */
 
 		/* Use ISO-8601-derived format (without the timezone; plus nanoseconds) */
-		len = sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 ":",
+		len = sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9" PRIu32 "%s%u] ",
 		              t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
 		              t.tm_hour, t.tm_min, t.tm_sec,
-		              packet->sp_nsec);
+		              packet->sp_nsec, level_prefix[level],
+		              packet->sp_tid);
+		if (packet->sp_msg[0] == '[')
+			--len;
 		log_write(buf, len);
-		ch = packet->sp_msg[0];
-		log_write(level_prefix[level], ch == '[' ? 7 : 8);
 	}
 	log_write(packet->sp_msg, packet->sp_len);
 }

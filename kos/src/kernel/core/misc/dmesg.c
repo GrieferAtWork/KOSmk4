@@ -58,6 +58,11 @@ DECL_BEGIN
  *    0x80 | nano2         Nano seconds
  *    0x80 | nano3         Nano seconds
  *    0x80 | level_nano4   Nano seconds and level
+ *    0xc0 | tid.0         (tid >> 0) & 0x3f
+ *    0xc0 | tid.1         (tid >> 6) & 0x3f
+ *    0xc0 | tid.2         (tid >> 12) & 0x3f
+ *    0xc0 | tid.n         (tid >> (n * 6)) & 0x3f
+ *    0x80 | tid.n-1       (tid >> ((n-1) * 6)) & 0x3f
  *    message...           The log message (in ASCII and without trailing line-feeds)
  *    message_chksum       Checksum for `message' (never 0):
  *                         >> if (message_chksum != 0xff) {
@@ -190,6 +195,7 @@ NOTHROW(FCALL dmesg_post)(struct syslog_packet const *__restrict packet,
 	s64 rel_seconds;
 	u8 rel_seconds_neg;
 	u8 checksum;
+	u32 tid;
 	u32 nano;
 	size_t offset = dmesg_size;
 	u16 i, len;
@@ -233,6 +239,13 @@ again_header:
 	putb(0x80 | ((nano >> 14) & 0x7f));
 	putb(0x80 | ((nano >> 21) & 0x7f));
 	putb(0x80 | ((nano >> 28) & 0x3) | ((level << 2) & 0x7c));
+	/* Encode the sender TID */
+	tid = (u32)packet->sp_tid;
+	while (tid > 0x3f) {
+		putb(0xc0 | (tid & 0x3f));
+		tid >>= 6;
+	}
+	putb(0x80 | tid);
 	checksum = 0;
 	for (; i < len; ++i) {
 		char ch = packet->sp_msg[i];
@@ -408,6 +421,19 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 		                 ((u32)(nano[4] & 0x3) << 28);
 		if unlikely(packet.sp_nsec >= 1000000000)
 			goto done; /* Invalid nano seconds timestamp. */
+		/* Decode the sender TID of the packet. */
+		{
+			u32 tid = 0;
+			unsigned int i = 0;
+			for (;; i += 6) {
+				uint8_t b;
+				b = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+				tid |= (u32)(b & 0x3f) << i;
+				if ((b & 0xc0) != 0xc0)
+					break;
+			}
+			packet.sp_tid = tid;
+		}
 		message_length = message_end_offset - message_start_offset;
 		if unlikely(message_length > CONFIG_SYSLOG_LINEMAX)
 			goto done; /* Message too long */
