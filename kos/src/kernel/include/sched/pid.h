@@ -439,7 +439,20 @@ struct pidns {
 	                                      * Hash-vector of PIDs. */
 	WEAK struct taskpid *pn_dead;        /* [0..1] Chain of dead task PIDs that are pending removal.
 	                                      * NOTE: Chained via `tp_siblings.ln_next' */
+	upid_t               pn_nextpid;     /* [lock(pn_lock)] Next PID to hand out. */
 };
+
+#define PIDNS_FIRST_NONRESERVED_PID 2 /* First PID that isn't reserved. */
+
+/* When `pn_nextpid' >= this value, start recycling PIDs.
+ * This value can be controlled via `/proc/sys/kernel/pid_max' */
+DATDEF upid_t pid_recycle_threshold;
+
+/* Default value for `pid_recycle_threshold' */
+#ifndef PID_RECYCLE_THRESHOLD_DEFAULT
+#define PID_RECYCLE_THRESHOLD_DEFAULT 32768 /* 2^16 */
+#endif /* !PID_RECYCLE_THRESHOLD_DEFAULT */
+
 
 #define PIDNS_HASHNXT(i, perturb) \
 	((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
@@ -522,9 +535,9 @@ NOTHROW(KCALL pidns_trylookup_task_locked)(struct pidns *__restrict self, upid_t
  * This function should be called after `task_alloc()', but before `task_start()'
  * WARNING: This function may only be called _ONCE_ for each task!
  * @param: ns_pid: The PID to try to assign to `self' within the namespace.
- *                 When ZERO(0), or already in use, randomly generate IDs
+ *                 When ZERO(0), or already in use, sequentially generate IDs
  *                 Also note that this PID is only set for `self' in `ns'.
- *                 All underlying namespaces _always_ have their PIDs randomly
+ *                 All underlying namespaces _always_ have their PIDs sequentially
  *                 generated.
  * @return: * : Always re-returns `self' */
 FUNDEF ATTR_RETNONNULL NONNULL((1, 2)) struct task *

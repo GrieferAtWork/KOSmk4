@@ -80,6 +80,14 @@ ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval DFL(0),
 #define ProcFS_PrintUInt ProcFS_PrintU32
 #endif /* __SIZEOF_INT__ < 8 */
 
+#if __SIZEOF_PID_T__ >= 8
+#define ProcFS_ParseUPid ProcFS_ParseU64
+#define ProcFS_PrintUPid ProcFS_PrintU64
+#else /* __SIZEOF_PID_T__ >= 8 */
+#define ProcFS_ParseUPid ProcFS_ParseU32
+#define ProcFS_PrintUPid ProcFS_PrintU32
+#endif /* __SIZEOF_PID_T__ < 8 */
+
 
 DECL_END
 

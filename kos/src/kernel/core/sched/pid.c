@@ -30,7 +30,6 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
-#include <kernel/rand.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -993,6 +992,9 @@ again_set_self:
 
 
 
+/* When `pn_nextpid' >= this value, start recycling PIDs.
+ * This value can be controlled via `/proc/sys/kernel/pid_max' */
+PUBLIC upid_t pid_recycle_threshold = PID_RECYCLE_THRESHOLD_DEFAULT;
 
 
 /* PIDNS */
@@ -1010,7 +1012,8 @@ PUBLIC struct pidns pidns_root = {
 	/* .pn_size        = */ 0,
 	/* .pn_mask        = */ 0,
 	/* .pn_list        = */ empty_pidns_list,
-	/* .pn_dead        = */ NULL
+	/* .pn_dead        = */ NULL,
+	/* .pn_nextpid     = */ PIDNS_FIRST_NONRESERVED_PID
 };
 
 
@@ -1240,10 +1243,11 @@ pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
 	result->pn_indirection = parent->pn_indirection + 1;
 	result->pn_parent      = incref(parent);
 	atomic_rwlock_init(&result->pn_lock);
-	result->pn_used = 0;
-	result->pn_size = 0;
-	result->pn_mask = 0;
-	result->pn_list = empty_pidns_list;
+	result->pn_used    = 0;
+	result->pn_size    = 0;
+	result->pn_mask    = 0;
+	result->pn_list    = empty_pidns_list;
+	result->pn_nextpid = PIDNS_FIRST_NONRESERVED_PID;
 	return result;
 }
 
@@ -1451,6 +1455,24 @@ pidns_prepare_for_insert(struct pidns *__restrict self)
 }
 
 
+/* Allocate and return the next PID from `self' */
+LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) upid_t
+NOTHROW(FCALL pidns_nextpid)(struct pidns *__restrict self,
+                             upid_t *__restrict pminpid) {
+	upid_t result;
+	result = self->pn_nextpid++;
+	if unlikely(result >= pid_recycle_threshold) {
+		/* Recycle PIDs */
+		result           = *pminpid;
+		self->pn_nextpid = *pminpid + 1;
+		/* This prevents us from getting stuck in an infinite loop
+		 * when some genius set the value in /proc/sys/kernel/pid_max
+		 * too low. */
+		++*pminpid;
+	}
+	return result;
+}
+
 
 /* Allocate a `struct taskpid' for `self' (which must not have been
  * started yet, or have its taskpid already allocated), and register
@@ -1458,9 +1480,9 @@ pidns_prepare_for_insert(struct pidns *__restrict self)
  * This function should be called after `task_alloc()', but before `task_start()'
  * WARNING: This function may only be called _ONCE_ for each task!
  * @param: ns_pid: The PID to try to assign to `self' within the namespace.
- *                 When ZERO(0), or already in use, randomly generate IDs
+ *                 When ZERO(0), or already in use, sequentially generate IDs
  *                 Also note that this PID is only set for `self' in `ns'.
- *                 All underlying namespaces _always_ have their PIDs randomly
+ *                 All underlying namespaces _always_ have their PIDs sequentially
  *                 generated.
  * @return: * : Always re-returns `self' */
 PUBLIC ATTR_RETNONNULL NONNULL((1, 2)) struct task *KCALL
@@ -1468,6 +1490,7 @@ task_setpid(struct task *__restrict self,
             struct pidns *__restrict ns,
             upid_t ns_pid)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	upid_t minpid = PIDNS_FIRST_NONRESERVED_PID;
 	REF struct taskpid *pid;
 	struct pidns *ns_iter, *ns_altiter;
 	assert(!FORTASK(self, this_taskpid));
@@ -1502,16 +1525,15 @@ restart_acquire_locks:
 	/* register the new taskpid structure within the namespaces. */
 	ns_iter = ns;
 	do {
-		upid_t pidcount = ns_iter->pn_mask;
 		struct pidns_entry *ent, *candidate;
 		uintptr_t i, perturb;
 		assert(ns_iter->pn_parent
 		       ? ns_iter->pn_parent->pn_indirection == ns_iter->pn_indirection - 1
 		       : ns_iter->pn_indirection == 0 && ns_iter == &pidns_root);
 		if (ns_pid == 0) {
-next_random_pid:
-			/* Generate a random PID */
-			ns_pid = (KRAND(pid_t) % pidcount) + 1; /* +1, so we never use PID#0 */
+next_pid:
+			/* Generate the next sequential PID */
+			ns_pid = pidns_nextpid(ns_iter, &minpid);
 		}
 		/* Try to install the taskpid structure under this PID */
 		assert(ns_iter->pn_mask > 0);
@@ -1526,17 +1548,8 @@ next_random_pid:
 					candidate = ent;
 				continue;
 			}
-			if (ent->pe_pid->tp_pids[ns_iter->pn_indirection] == ns_pid) {
-				upid_t addend;
-				/* Increase the pidmask used to generate random PIDs */
-				addend = pidcount >> 3;
-				if (!addend)
-					addend = 1;
-				if (OVERFLOW_SADD((pid_t)pidcount, (pid_t)addend, (pid_t *)&pidcount))
-					pidcount = INT_MAX;
-				pidcount %= (0x3fffffff + 1); /* Required for futex-lock support */
-				goto next_random_pid;         /* Already in use... */
-			}
+			if (ent->pe_pid->tp_pids[ns_iter->pn_indirection] == ns_pid)
+				goto next_pid; /* Already in use... */
 		}
 		if (candidate) {
 			ent = candidate;
@@ -1548,8 +1561,8 @@ next_random_pid:
 		assert(ns_iter->pn_size <= ns_iter->pn_mask);
 		/* Initialize the PID binding within this namespace. */
 		pid->tp_pids[ns_iter->pn_indirection] = ns_pid;
-		ent->pe_pid                           = pid;
-		ns_pid                                = 0; /* Use a random PID during the next pass. */
+		ent->pe_pid = pid;
+		ns_pid = 0; /* Use a sequential PID during the next pass. */
 	} while ((ns_iter = ns_iter->pn_parent) != NULL);
 
 	/* Install the `struct taskpid' to be apart of the given thread. */

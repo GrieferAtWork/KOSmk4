@@ -165,14 +165,27 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 				 *
 				 * Of course, there is the race condition where the writer
 				 * has since terminated, and a different process has taken
-				 * its place, so this information should be taken with a
-				 * grain of salt.
+				 * its place, but that could only happen if the system had
+				 * to recycle PIDs since then, and we're already back to
+				 * where we were before in terms of allocated PIDs.
 				 *
-				 * XXX: If the later happened, maybe be could extract this
-				 *      information from the system log? (maybe add some
-				 *      out-of-band meta-data to the dmesg backlog that
-				 *      can be used to determine at which point some tid
-				 *      was deleted) */
+				 * Admittedly, this could (fairly easily) happen when someone
+				 * sets the value in /proc/sys/kernel/pid_max too low, but
+				 * in this case I want to point out that we're within the
+				 * debugger here, and any sane person probably wouldn't want
+				 * to make their life pointlessly harder, so they'd have to
+				 * intentionally lower the pid_max value, at which point they
+				 * (at the very least) should be aware of its possible side-
+				 * effects.
+				 *
+				 * And aside from forcing the kernel to recycle PIDs early on,
+				 * the only other way is to somehow keep on allocating PIDs
+				 * without causing any writes to the system log, because the
+				 * dmesg buffer most definitely couldn't hold
+				 * `PID_RECYCLE_THRESHOLD_DEFAULT' individual packets without
+				 * having to wrap around and overwrite earlier ones at least
+				 * once (at which point this whole problem would also go away)
+				 */
 				REF struct task *sender;
 				TRY {
 					sender = pidns_trylookup_task(&pidns_root,

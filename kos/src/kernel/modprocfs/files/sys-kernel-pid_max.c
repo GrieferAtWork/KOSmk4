@@ -23,9 +23,10 @@
 
 #include <kernel/compiler.h>
 
-#include <fs/pipe.h>
+#include <sched/pid.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/limitcore.h>
 
 #include "../procfs.h"
 #include "../util.h"
@@ -33,20 +34,27 @@
 DECL_BEGIN
 
 INTERN NONNULL((1)) ssize_t KCALL
-ProcFS_Sys_Fs_PipeMaxSize_Print(struct regular_node *__restrict UNUSED(self),
-                                pformatprinter printer, void *arg) {
-	return ProcFS_PrintSize(printer, arg, ATOMIC_READ(pipe_max_bufsize_unprivileged));
+ProcFS_Sys_Kernel_PidMax_Print(struct regular_node *__restrict UNUSED(self),
+                               pformatprinter printer, void *arg) {
+	return ProcFS_PrintUPid(printer, arg, ATOMIC_READ(pid_recycle_threshold));
 }
 
 INTERN NONNULL((1)) void KCALL
-ProcFS_Sys_Fs_PipeMaxSize_Write(struct regular_node *__restrict UNUSED(self),
-                                USER CHECKED void const *buf,
-                                size_t bufsize) {
-	size_t newsize;
-	/* Setting it lower than the default limit can't be done, since the default
-	 * limit is set regardless of what `pipe_max_bufsize_unprivileged' is set to. */
-	newsize = ProcFS_ParseSize(buf, bufsize, RINGBUFFER_DEFAULT_LIMIT, (size_t)-1);
-	ATOMIC_WRITE(pipe_max_bufsize_unprivileged, newsize);
+ProcFS_Sys_Kernel_PidMax_Write(struct regular_node *__restrict UNUSED(self),
+                               USER CHECKED void const *buf,
+                               size_t bufsize) {
+	upid_t newvalue;
+	/* Don't allow the value to become larger than the max possible
+	 * positive, signed PID. While the kernel could deal with going
+	 * up to the max unsigned PID internally, various system calls
+	 * that accept pid values have special behavior when the given
+	 * pid becomes negative, such as for example `kill(2)'
+	 *
+	 * As such, don't raise the limit such that we'd end up with
+	 * the kernel generating negative PIDs! */
+	newvalue = ProcFS_ParseUPid(buf, bufsize, PIDNS_FIRST_NONRESERVED_PID + 1,
+	                            (upid_t)__PRIVATE_MAX_S(__SIZEOF_PID_T__) + 1);
+	ATOMIC_WRITE(pid_recycle_threshold, newvalue);
 }
 
 
