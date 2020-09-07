@@ -18,6 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+#ifndef _PROCFS_SINGLETON_HEADERS_INCLUDED
+#define _PROCFS_SINGLETON_HEADERS_INCLUDED 1
+#include <kos/capability.h>
+#include <kernel/uname.h>
+#endif /* !_PROCFS_SINGLETON_HEADERS_INCLUDED */
+
+#ifdef __COMPILER_PREFERR_ENUMS
+#error "This breaks some of the `MKREG_TXT()' special files"
+#endif /* __COMPILER_PREFERR_ENUMS */
 
 
 
@@ -33,6 +42,14 @@
 #ifndef MKREG_RO
 #define MKREG_RO(id, mode, printer)
 #endif /* !MKREG_RO */
+
+#ifndef MKREG_TXT
+#define MKREG_TXT(id, mode, text)
+#endif /* !MKREG_TXT */
+
+#ifndef MKREG_EXT
+#define MKREG_EXT(id, mode, string_pointer)
+#endif /* !MKREG_EXT */
 
 #ifndef MKREG_RW
 #define MKREG_RW(id, mode, reader, writer)
@@ -119,16 +136,22 @@ MKDIR(sys_fs, 0555,
 MKREG_RW(sys_fs_pipe_max_size, 0622, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys_Fs_PipeMaxSize_Write)
 
 MKDIR(sys_kernel, 0555,
+      F(sys_kernel, "cap_last_cap", DT_REG, sys_kernel_cap_last_cap)
       F(sys_kernel, "hostname", DT_REG, sys_kernel_hostname)
       F(sys_kernel, "domainname", DT_REG, sys_kernel_domainname)
+      F(sys_kernel, "osrelease", DT_REG, sys_kernel_osrelease)
+      F(sys_kernel, "ostype", DT_REG, sys_kernel_ostype)
       F(sys_kernel, "pid_max", DT_REG, sys_kernel_pid_max)
       F(sys_kernel, "randomize_va_space", DT_REG, sys_kernel_randomize_va_space)
       F(sys_kernel, "sched_child_runs_first", DT_REG, sys_kernel_sched_child_runs_first)
       ARCH_ENUMERATE_PROC_SYS_KERNEL
       F_END)
+MKREG_TXT(sys_kernel_cap_last_cap, 0222, PP_STR(CAP_LAST_CAP) "\n")
 MKREG_RW(sys_kernel_hostname, 0622, ProcFS_Sys_Kernel_Hostname_Print, ProcFS_Sys_Kernel_Hostname_Write)
 MKREG_RW(sys_kernel_domainname, 0622, ProcFS_Sys_Kernel_Domainname_Print, ProcFS_Sys_Kernel_Domainname_Write)
 MKREG_RW(sys_kernel_pid_max, 0622, ProcFS_Sys_Kernel_PidMax_Print, ProcFS_Sys_Kernel_PidMax_Write)
+MKREG_EXT(sys_kernel_osrelease, 0222, kernel_uname.release)
+MKREG_EXT(sys_kernel_ostype, 0222, kernel_uname.sysname)
 MKREG_RW(sys_kernel_randomize_va_space, 0622, ProcFS_Sys_Kernel_RandomizeVaSpace_Print, ProcFS_Sys_Kernel_RandomizeVaSpace_Write)
 MKREG_RW(sys_kernel_sched_child_runs_first, 0622, ProcFS_Sys_Kernel_SchedChildRunsFirst_Print, ProcFS_Sys_Kernel_SchedChildRunsFirst_Write)
 
@@ -138,3 +161,5 @@ MKREG_RW(sys_kernel_sched_child_runs_first, 0622, ProcFS_Sys_Kernel_SchedChildRu
 #undef MKREG_RW
 #undef MKREG_RO
 #undef MKDIR
+#undef MKREG_TXT
+#undef MKREG_EXT

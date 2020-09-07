@@ -92,6 +92,14 @@ function autoFormatEnumsInFile(filename: string) {
 			fp.write("\n");
 		@@List of (Name, Value, Prefix, Doc)
 		local knownEnums: {(string, string, string, string)...} = List();
+		function getKnownEnumValue(name: string): string {
+			print("getKnownEnumValue(", repr name, ")");
+			for (local knownName, knownValue, none, none: knownEnums) {
+				if (knownName == name)
+					return knownValue;
+			}
+			return name;
+		}
 		local iter = input.find("enum");
 		if (iter < 0)
 			err("Missing `enum' keyword in " + repr(input));
@@ -156,14 +164,8 @@ continue_parsing_enum_value:
 					     enumValue.findmatch("(", ")", 1) < 0))
 						enumValue = "({})".format({ enumValue });
 					/* Check if `knownEnums' is the name of another enum that is already known. */
-					if (enumValue.issymbol()) {
-						for (local otherName, otherValue, none, none: knownEnums) {
-							if (enumValue == otherName) {
-								enumValue = otherValue;
-								break;
-							}
-						}
-					}
+					if (enumValue.issymbol())
+						enumValue = getKnownEnumValue(enumValue);
 				}
 				if (enumValue is none) {
 					if (previousEnumValue is none)
@@ -177,17 +179,35 @@ continue_parsing_enum_value:
 								previousEnumValue.endswith(")") &&
 								previousEnumValue.findmatch("(", ")", 1) == #previousEnumValue - 1)
 								previousEnumValue = previousEnumValue[1:-1].strip();
-							local temp = previousEnumValue.rfind("+");
-							if (temp >= 0) {
-								local addendStr = previousEnumValue[temp+1:].lstrip();
-								local addend = try int(addendStr) catch (...) none;
-								if (addend !is none) {
-									addend = addend + 1;
-									addend = ("0x" in addendStr || "0X" in addendStr)
-										? addend.hex()
-										: str(addend);
-									enumValue = "({} + {})".format({
-										previousEnumValue[:temp].rstrip(), addend });
+							for (local op: { "+", "-" }) {
+								local temp = previousEnumValue.rfind(op);
+								if (temp >= 0) {
+									local addendStr = getKnownEnumValue(previousEnumValue[temp+1:].lstrip());
+									local addend = try int(addendStr) catch (...) none;
+									if (addend !is none) {
+										local baseVal = getKnownEnumValue(
+											previousEnumValue[:temp].rstrip());
+										addend = addend + { "+" : 1, "-" : -1 }[op];
+										enumValue = baseVal;
+										if (addend) {
+											local baseIntVal = try int(baseVal) catch (...) none;
+											if (baseIntVal !is none) {
+												baseIntVal = op == "+"
+													? baseIntVal + addend
+													: baseIntVal - addend;
+												enumValue = (
+													"0x" in baseVal || "0X" in addendStr ||
+													"0x" in baseVal || "0X" in addendStr)
+													? baseIntVal.hex()
+													: str(baseIntVal);
+											} else {
+												addend = ("0x" in addendStr || "0X" in addendStr)
+													? addend.hex()
+													: str(addend);
+												enumValue = "({} {} {})".format({ baseVal, op, addend });
+											}
+										}
+									}
 								}
 							}
 							if (enumValue is none)
@@ -300,10 +320,17 @@ again_with_eol_on_directive_line:
 			suffix = suffix + "\n";
 		local longestEnumName = 0;
 		local longestEnumValue = 0;
+		function fixEnumValue(val: string): string {
+			if (val.startswith("-"))
+				return "({})".format({ val });
+			return val;
+		}
+		
 		for (local name, value, none, none: knownEnums) {
 			local temp = #name;
 			if (longestEnumName < temp)
 				longestEnumName = temp;
+			value = fixEnumValue(value);
 			local temp = #value;
 			if (longestEnumValue < temp)
 				longestEnumValue = temp;
@@ -326,6 +353,7 @@ again_with_eol_on_directive_line:
 		fp << suffix;
 		fp << "#else /* __COMPILER_PREFERR_ENUMS */\n";
 		for (local name, value, prefix, doc: knownEnums) {
+			value = fixEnumValue(value);
 			name = name.ljust(longestEnumName);
 			fp << prefix;
 			fp << "#define " << name << " ";

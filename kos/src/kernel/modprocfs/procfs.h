@@ -27,6 +27,9 @@
 #include <format-printer.h>
 #include <stdint.h>
 
+/* Declare statics / include headers */
+#include "singleton.def"
+
 DECL_BEGIN
 
 /* Mask and shift for the type of some given INode.
@@ -128,6 +131,39 @@ struct procfs_singleton_reg_ro_data {
 	PROCFS_REG_PRINTER psr_printer; /* [1..1][const] Printer for generating the contents of the file. */
 };
 
+
+#define STRUCT_PROCFS_SINGLETON_REG_TXT_DATA(textlen)                                                     \
+	struct {                                                                                              \
+		PROCFS_SINGLETON_DATA_FIELDS                                                                      \
+		PROCFS_REG_PRINTER            psr_printer; /* [1..1][const][== &ProcFs_RegTxtDataPrinter] */      \
+		size_t                        psr_textlen; /* [const] Length of `psr_text' (in bytes) */          \
+		char                          psr_text[textlen];   /* [const] The text that should be printed. */ \
+	}
+
+struct procfs_singleton_reg_txt_data {
+	PROCFS_SINGLETON_DATA_FIELDS
+	PROCFS_REG_PRINTER            psr_printer; /* [1..1][const][== &ProcFs_RegTxtDataPrinter]. */
+	size_t                        psr_textlen; /* [const] Length of `psr_text' (in bytes) */
+	COMPILER_FLEXIBLE_ARRAY(char, psr_text);   /* [const] The text that should be printed. */
+};
+
+struct procfs_singleton_reg_ext_data {
+	PROCFS_SINGLETON_DATA_FIELDS
+	PROCFS_REG_PRINTER psr_printer; /* [1..1][const][== &ProcFs_RegTxtDataPrinter]. */
+	char const        *psr_string;  /* [0..1] External string pointer. (A line-feed will be appended to this) */
+};
+
+/* Printer for `struct procfs_singleton_reg_txt_data'-style INodes */
+INTDEF NONNULL((1, 2)) ssize_t KCALL
+ProcFs_RegTxtDataPrinter(struct regular_node *__restrict self,
+                         pformatprinter printer, void *arg);
+
+/* Printer for `struct procfs_singleton_reg_ext_data'-style INodes */
+INTDEF NONNULL((1, 2)) ssize_t KCALL
+ProcFs_RegExtDataPrinter(struct regular_node *__restrict self,
+                         pformatprinter printer, void *arg);
+
+
 struct procfs_singleton_reg_rw_data {
 	PROCFS_SINGLETON_DATA_FIELDS
 	PROCFS_REG_PRINTER psr_printer; /* [1..1][const] Printer for generating the contents of the file. */
@@ -158,7 +194,9 @@ enum {
 #include "singleton.def"
 	PROCFS_SINGLETON_START_REG_RO,
 	__PROCFS_SINGLETON_START_REG_RO = PROCFS_SINGLETON_START_REG_RO - 1,
-#define MKREG_RO(id, mode, printer) PROCFS_SINGLETON_ID_##id,
+#define MKREG_RO(id, mode, printer)  PROCFS_SINGLETON_ID_##id,
+#define MKREG_TXT(id, mode, printer) PROCFS_SINGLETON_ID_##id,
+#define MKREG_EXT(id, mode, printer) PROCFS_SINGLETON_ID_##id,
 #include "singleton.def"
 	PROCFS_SINGLETON_START_REG_RW,
 	__PROCFS_SINGLETON_START_REG_RW = PROCFS_SINGLETON_START_REG_RW - 1,

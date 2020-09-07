@@ -75,28 +75,28 @@ enum {
 #else /* __KOS__ */
 	CAP_FIRST_CAP = 0, /* Lowest capability in use */
 #endif /* !__KOS__ */
-	CAP_CHOWN           = 0,       /* chown() is allowed, no matter what the file's previous user/group was. */
-	CAP_DAC_OVERRIDE    = 1,       /* Skip checks for read, write or execute on files */
-	CAP_DAC_READ_SEARCH = 2,       /* Skip checks for read and execute on directories */
-	CAP_FOWNER          = 3,       /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
-	                                * `chmod()', `utime()', etc. on files not owned by the calling thread.
-	                                * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
-	                                * are not affected by this. */
-	CAP_FSETID          = 4,       /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
-	CAP_KILL            = 5,       /* Skip checks done by `kill(2)' */
-	CAP_SETGID          = 6,       /* Allow setting groups ids (`setgid(2)', `setfsgid(2)', `setgroups(2)', ...) */
-	CAP_SETUID          = 7,       /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
-	CAP_SETPCAP         = 8,       /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
-	CAP_LINUX_IMMUTABLE = 9,       /* TODO: For now, only here as placeholder for fsuid-root transitions */
-	CAP_SYS_MODULE      = 16,      /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
-	CAP_SYS_RAWIO       = 17,      /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
-	CAP_SYS_ADMIN       = 21,      /* A _lot_ of things */
-	CAP_SYS_RESOURCE    = 24,      /* Override and set resource limits. */
-	CAP_SYS_TIME        = 25,      /* Change the system time. */
-	CAP_MKNOD           = 27,      /* TODO: For now, only here as placeholder for fsuid-root transitions */
-	CAP_MAC_OVERRIDE    = 32,      /* TODO: For now, only here as placeholder for fsuid-root transitions */
-	_CAP_COUNT,                    /* Greatest positive capability, plus 1 */
-	CAP_LAST_CAP = _CAP_COUNT - 1, /* Greatest positive capability */
+	CAP_CHOWN           = 0,                /* chown() is allowed, no matter what the file's previous user/group was. */
+	CAP_DAC_OVERRIDE    = 1,                /* Skip checks for read, write or execute on files */
+	CAP_DAC_READ_SEARCH = 2,                /* Skip checks for read and execute on directories */
+	CAP_FOWNER          = 3,                /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
+	                                         * `chmod()', `utime()', etc. on files not owned by the calling thread.
+	                                         * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
+	                                         * are not affected by this. */
+	CAP_FSETID          = 4,                /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
+	CAP_KILL            = 5,                /* Skip checks done by `kill(2)' */
+	CAP_SETGID          = 6,                /* Allow setting groups ids (`setgid(2)', `setfsgid(2)', `setgroups(2)', ...) */
+	CAP_SETUID          = 7,                /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
+	CAP_SETPCAP         = 8,                /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
+	CAP_LINUX_IMMUTABLE = 9,                /* TODO: For now, only here as placeholder for fsuid-root transitions */
+	CAP_SYS_MODULE      = 16,               /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
+	CAP_SYS_RAWIO       = 17,               /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
+	CAP_SYS_ADMIN       = 21,               /* A _lot_ of things */
+	CAP_SYS_RESOURCE    = 24,               /* Override and set resource limits. */
+	CAP_SYS_TIME        = 25,               /* Change the system time. */
+	CAP_MKNOD           = 27,               /* TODO: For now, only here as placeholder for fsuid-root transitions */
+	CAP_MAC_OVERRIDE    = 32,               /* TODO: For now, only here as placeholder for fsuid-root transitions */
+	CAP_LAST_CAP        = CAP_MAC_OVERRIDE, /* Greatest positive capability */
+	_CAP_COUNT                              /* Greatest positive capability, plus 1 */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -133,43 +133,43 @@ enum {
 #define CAP_SYS_TIME           CAP_SYS_TIME           /* Change the system time. */
 #define CAP_MKNOD              CAP_MKNOD              /* TODO: For now, only here as placeholder for fsuid-root transitions */
 #define CAP_MAC_OVERRIDE       CAP_MAC_OVERRIDE       /* TODO: For now, only here as placeholder for fsuid-root transitions */
-#define _CAP_COUNT             _CAP_COUNT             /* Greatest positive capability, plus 1 */
 #define CAP_LAST_CAP           CAP_LAST_CAP           /* Greatest positive capability */
+#define _CAP_COUNT             _CAP_COUNT             /* Greatest positive capability, plus 1 */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __KOS__
-#define CAP_FIRST_CAP          -2               /* Lowest capability in use */
-#define CAP_DEBUGTRAP          -2               /* Allowed to trigger `debugtrap(2)' for the following reasons:
-                                                 *    DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
-                                                 *    DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
-                                                 *    DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
-                                                 *    DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
-                                                 *    DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
-#define CAP_MMAP_UNINITIALIZED -1               /* Allowed to use `MAP_UNINITIALIZED' (when not allowed, that flag is silently ignored) */
+#define CAP_FIRST_CAP          (-2) /* Lowest capability in use */
+#define CAP_DEBUGTRAP          (-2) /* Allowed to trigger `debugtrap(2)' for the following reasons:
+                                     *    DEBUGTRAP_REASON_FORK, DEBUGTRAP_REASON_VFORK
+                                     *    DEBUGTRAP_REASON_TEXITED, DEBUGTRAP_REASON_PEXITED
+                                     *    DEBUGTRAP_REASON_VFORKDONE DEBUGTRAP_REASON_SC_ENTRY
+                                     *    DEBUGTRAP_REASON_SC_EXIT DEBUGTRAP_REASON_CLONE
+                                     *    DEBUGTRAP_REASON_SWBREAK DEBUGTRAP_REASON_HWBREAK */
+#define CAP_MMAP_UNINITIALIZED (-1) /* Allowed to use `MAP_UNINITIALIZED' (when not allowed, that flag is silently ignored) */
 #else /* __KOS__ */
-#define CAP_FIRST_CAP          0                /* Lowest capability in use */
+#define CAP_FIRST_CAP          0    /* Lowest capability in use */
 #endif /* !__KOS__ */
-#define CAP_CHOWN              0                /* chown() is allowed, no matter what the file's previous user/group was. */
-#define CAP_DAC_OVERRIDE       1                /* Skip checks for read, write or execute on files */
-#define CAP_DAC_READ_SEARCH    2                /* Skip checks for read and execute on directories */
-#define CAP_FOWNER             3                /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
-                                                 * `chmod()', `utime()', etc. on files not owned by the calling thread.
-                                                 * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
-                                                 * are not affected by this. */
-#define CAP_FSETID             4                /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
-#define CAP_KILL               5                /* Skip checks done by `kill(2)' */
-#define CAP_SETGID             6                /* Allow setting groups ids (`setgid(2)', `setfsgid(2)', `setgroups(2)', ...) */
-#define CAP_SETUID             7                /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
-#define CAP_SETPCAP            8                /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
-#define CAP_LINUX_IMMUTABLE    9                /* TODO: For now, only here as placeholder for fsuid-root transitions */
-#define CAP_SYS_MODULE         16               /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
-#define CAP_SYS_RAWIO          17               /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
-#define CAP_SYS_ADMIN          21               /* A _lot_ of things */
-#define CAP_SYS_RESOURCE       24               /* Override and set resource limits. */
-#define CAP_SYS_TIME           25               /* Change the system time. */
-#define CAP_MKNOD              27               /* TODO: For now, only here as placeholder for fsuid-root transitions */
-#define CAP_MAC_OVERRIDE       32               /* TODO: For now, only here as placeholder for fsuid-root transitions */
-#define _CAP_COUNT             33               /* Greatest positive capability, plus 1 */
-#define CAP_LAST_CAP           (_CAP_COUNT - 1) /* Greatest positive capability */
+#define CAP_CHOWN              0    /* chown() is allowed, no matter what the file's previous user/group was. */
+#define CAP_DAC_OVERRIDE       1    /* Skip checks for read, write or execute on files */
+#define CAP_DAC_READ_SEARCH    2    /* Skip checks for read and execute on directories */
+#define CAP_FOWNER             3    /* Ignore filesystem-uid checks (s.a. `sys_getfsuid()'), allowing
+                                     * `chmod()', `utime()', etc. on files not owned by the calling thread.
+                                     * Checks controlled by `CAP_DAC_OVERRIDE' and `CAP_DAC_READ_SEARCH'
+                                     * are not affected by this. */
+#define CAP_FSETID             4    /* Don't clear `S_ISUID|S_ISGID' when a file is modified */
+#define CAP_KILL               5    /* Skip checks done by `kill(2)' */
+#define CAP_SETGID             6    /* Allow setting groups ids (`setgid(2)', `setfsgid(2)', `setgroups(2)', ...) */
+#define CAP_SETUID             7    /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
+#define CAP_SETPCAP            8    /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
+#define CAP_LINUX_IMMUTABLE    9    /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_SYS_MODULE         16   /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
+#define CAP_SYS_RAWIO          17   /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
+#define CAP_SYS_ADMIN          21   /* A _lot_ of things */
+#define CAP_SYS_RESOURCE       24   /* Override and set resource limits. */
+#define CAP_SYS_TIME           25   /* Change the system time. */
+#define CAP_MKNOD              27   /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_MAC_OVERRIDE       32   /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_LAST_CAP           32   /* Greatest positive capability */
+#define _CAP_COUNT             33   /* Greatest positive capability, plus 1 */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

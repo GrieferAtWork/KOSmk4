@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
 #include <kernel/except.h>
 
 #include <hybrid/atomic.h>
@@ -40,7 +41,30 @@
 #include <string.h>
 #include <unicode.h>
 
+#include "procfs.h"
+
 DECL_BEGIN
+
+/* Printer for `struct procfs_singleton_reg_txt_data'-style INodes */
+INTERN NONNULL((1, 2)) ssize_t KCALL
+ProcFs_RegTxtDataPrinter(struct regular_node *__restrict self,
+                         pformatprinter printer, void *arg) {
+	struct procfs_singleton_reg_txt_data *fsdata;
+	fsdata = (struct procfs_singleton_reg_txt_data *)self->i_fsdata;
+	return (*printer)(arg, fsdata->psr_text, fsdata->psr_textlen);
+}
+
+/* Printer for `struct procfs_singleton_reg_ext_data'-style INodes */
+INTERN NONNULL((1, 2)) ssize_t KCALL
+ProcFs_RegExtDataPrinter(struct regular_node *__restrict self,
+                         pformatprinter printer, void *arg) {
+	struct procfs_singleton_reg_ext_data *fsdata;
+	fsdata = (struct procfs_singleton_reg_ext_data *)self->i_fsdata;
+	return format_printf(printer, arg, "%s\n", fsdata->psr_string);
+}
+
+
+
 
 INTERN WUNUSED NONNULL((1, 2)) ssize_t
 NOTHROW(KCALL ProcFS_SubStringPrinter)(void *arg,

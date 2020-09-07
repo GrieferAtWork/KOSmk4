@@ -80,7 +80,7 @@ DECL_BEGIN
 		/* .psd_mode  = */ S_IFDIR | (mode),                         \
 		/* .psd_uid   = */ 0,                                        \
 		/* .psd_gid   = */ 0,                                        \
-		/* .pdd_ents  = */ { files },                                \
+		/* .pdd_ents  = */ { files }                                 \
 	};
 #define F(parent_id, name, type, id) &srd_dent_##parent_id##_ent_##id,
 #define F_END NULL /* Sentinel */
@@ -92,7 +92,33 @@ DECL_BEGIN
 		/* .psd_mode    = */ S_IFREG | (mode),                             \
 		/* .psd_uid     = */ 0,                                            \
 		/* .psd_gid     = */ 0,                                            \
-		/* .psr_printer = */ &printer,                                     \
+		/* .psr_printer = */ &printer                                      \
+	};
+#define MKREG_TXT(id, mode, text)                               \
+	PRIVATE STRUCT_PROCFS_SINGLETON_REG_TXT_DATA(sizeof(text) / \
+	                                             sizeof(char))  \
+	srd_fsdata_reg_txt_##id = {                                 \
+		/* .psd_atime   = */ { 0, 0 },                          \
+		/* .psd_mtime   = */ { 0, 0 },                          \
+		/* .psd_ctime   = */ { 0, 0 },                          \
+		/* .psd_mode    = */ S_IFREG | (mode),                  \
+		/* .psd_uid     = */ 0,                                 \
+		/* .psd_gid     = */ 0,                                 \
+		/* .psr_printer = */ &ProcFs_RegTxtDataPrinter,         \
+		/* .psr_textlen = */ COMPILER_STRLEN(text),             \
+		/* .psr_text    = */ text                               \
+	};
+#define MKREG_EXT(id, mode, string_pointer)             \
+	PRIVATE struct procfs_singleton_reg_ext_data        \
+	srd_fsdata_reg_ext_##id = {                         \
+		/* .psd_atime   = */ { 0, 0 },                  \
+		/* .psd_mtime   = */ { 0, 0 },                  \
+		/* .psd_ctime   = */ { 0, 0 },                  \
+		/* .psd_mode    = */ S_IFREG | (mode),          \
+		/* .psd_uid     = */ 0,                         \
+		/* .psd_gid     = */ 0,                         \
+		/* .psr_printer = */ &ProcFs_RegExtDataPrinter, \
+		/* .psr_string  = */ string_pointer             \
 	};
 #define MKREG_RW(id, mode, reader, writer)                                 \
 	PRIVATE struct procfs_singleton_reg_rw_data srd_fsdata_reg_rw_##id = { \
@@ -103,7 +129,7 @@ DECL_BEGIN
 		/* .psd_uid     = */ 0,                                            \
 		/* .psd_gid     = */ 0,                                            \
 		/* .psr_printer = */ &reader,                                      \
-		/* .psr_writer  = */ &writer,                                      \
+		/* .psr_writer  = */ &writer                                       \
 	};
 #define DYNAMIC_SYMLINK(id, mode, readlink)                                          \
 	PRIVATE struct procfs_singleton_dynamic_symlink_data srd_fsdata_symlink_##id = { \
@@ -113,7 +139,7 @@ DECL_BEGIN
 		/* .psd_mode     = */ S_IFLNK | (mode),                                      \
 		/* .psd_uid      = */ 0,                                                     \
 		/* .psd_gid      = */ 0,                                                     \
-		/* .pss_readlink = */ &readlink,                                             \
+		/* .pss_readlink = */ &readlink                                              \
 	};
 #include "singleton.def"
 #undef F_END
@@ -135,6 +161,10 @@ ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT] = {
 #include "singleton.def"
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_ro_##id,
+#define MKREG_TXT(id, mode, printer) \
+	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_txt_##id,
+#define MKREG_EXT(id, mode, printer) \
+	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_ext_##id,
 #include "singleton.def"
 #define MKREG_RW(id, mode, reader, writer) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_rw_##id,
