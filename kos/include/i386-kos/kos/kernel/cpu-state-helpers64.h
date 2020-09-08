@@ -338,15 +338,17 @@ __NOTHROW_NCX(kcpustate64_to_ucpustate64_ex)(struct kcpustate64 const *__restric
                                              __u16 __v_ds, __u16 __v_cs, __u16 __v_ss) {
 	__result->ucs_sgbase.sg_gsbase = __v_sg_gsbase;
 	__result->ucs_sgbase.sg_fsbase = __v_sg_fsbase;
-	__result->ucs_gpregs           = __self->kcs_gpregs;
-	__result->ucs_sgregs.sg_gs     = __v_gs;
-	__result->ucs_sgregs.sg_fs     = __v_fs;
-	__result->ucs_sgregs.sg_es     = __v_es;
-	__result->ucs_sgregs.sg_ds     = __v_ds;
-	__result->ucs_cs               = __v_cs;
-	__result->ucs_ss               = __v_ss;
-	__result->ucs_rflags           = __self->kcs_rflags;
-	__result->ucs_rip              = __self->kcs_rip;
+	__libc_memcpy(&__result->ucs_gpregs,
+	              &__self->kcs_gpregs,
+	              sizeof(struct gpregs64));
+	__result->ucs_sgregs.sg_gs = __v_gs;
+	__result->ucs_sgregs.sg_fs = __v_fs;
+	__result->ucs_sgregs.sg_es = __v_es;
+	__result->ucs_sgregs.sg_ds = __v_ds;
+	__result->ucs_cs           = __v_cs;
+	__result->ucs_ss           = __v_ss;
+	__result->ucs_rflags       = __self->kcs_rflags;
+	__result->ucs_rip          = __self->kcs_rip;
 }
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(kcpustate64_to_ucpustate64)(struct kcpustate64 const *__restrict __self,
@@ -560,7 +562,9 @@ __NOTHROW_NCX(icpustate64_to_scpustate64_p_ex)(struct icpustate64 const *__restr
 	__result->scs_sgregs.sg_fs     = __v_fs;
 	__result->scs_sgregs.sg_es     = __v_es;
 	__result->scs_sgregs.sg_ds     = __v_ds;
-	__result->scs_gpregs           = __self->ics_gpregs;
+	__libc_memcpy(&__result->scs_gpregs,
+	              &__self->ics_gpregs,
+	              sizeof(struct gpregsnsp64));
 	__result->scs_irregs.ir_rip    = icpustate64_getrip(__self);
 	__result->scs_irregs.ir_cs     = icpustate64_getcs(__self);
 	__result->scs_irregs.ir_rflags = icpustate64_getrflags(__self);
@@ -638,7 +642,9 @@ __NOTHROW_NCX(scpustate64_to_ucpustate64)(struct scpustate64 const *__restrict _
 	gpregsnsp64_to_gpregs64(&__self->scs_gpregs,
 	                        &__result->ucs_gpregs,
 	                        scpustate64_getrsp(__self));
-	__result->ucs_sgregs = __self->scs_sgregs;
+	__libc_memcpy(&__result->ucs_sgregs,
+	              &__self->scs_sgregs,
+	              sizeof(struct sgregs64));
 	__result->ucs_rip    = irregs64_getrip(&__self->scs_irregs);
 	__result->ucs_rflags = irregs64_getrflags(&__self->scs_irregs);
 	__result->ucs_cs     = irregs64_getcs(&__self->scs_irregs);
@@ -662,8 +668,12 @@ __NOTHROW_NCX(scpustate64_to_icpustate64_p)(struct scpustate64 const *__restrict
                                             void *__restrict __kernel_rsp) {
 	struct icpustate64 *__result;
 	__result = (struct icpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_ICPUSTATE64);
-	__result->ics_gpregs = __self->scs_gpregs;
-	__result->ics_irregs = __self->scs_irregs;
+	__libc_memcpy(&__result->ics_gpregs,
+	              &__self->scs_gpregs,
+	              sizeof(struct gpregsnsp64));
+	__libc_memcpy(&__result->ics_irregs,
+	              &__self->scs_irregs,
+	              sizeof(struct irregs64));
 	return __result;
 }
 #define scpustate64_user_to_icpustate64_p scpustate64_to_icpustate64_p
@@ -781,8 +791,12 @@ __NOTHROW_NCX(ucpustate64_to_scpustate64_p)(struct ucpustate64 const *__restrict
 	struct scpustate64 *__result;
 	__result = (struct scpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_SCPUSTATE64);
 	gpregs64_to_gpregsnsp64(&__self->ucs_gpregs, &__result->scs_gpregs);
-	__result->scs_sgbase           = __self->ucs_sgbase;
-	__result->scs_sgregs           = __self->ucs_sgregs;
+	__libc_memcpy(&__result->scs_sgbase,
+	              &__self->ucs_sgbase,
+	              sizeof(struct sgbase64));
+	__libc_memcpy(&__result->scs_sgregs,
+	              &__self->ucs_sgregs,
+	              sizeof(struct sgregs64));
 	__result->scs_irregs.ir_rip    = __self->ucs_rip;
 	__result->scs_irregs.ir_cs     = __self->ucs_cs16;
 	__result->scs_irregs.ir_rflags = __self->ucs_rflags;
@@ -828,15 +842,21 @@ __NOTHROW_NCX(fcpustate64_to_lcpustate64)(struct fcpustate64 const *__restrict _
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_to_kcpustate64)(struct fcpustate64 const *__restrict __self,
                                           struct kcpustate64 *__restrict __result) {
-	__result->kcs_gpregs = __self->fcs_gpregs;
+	__libc_memcpy(&__result->kcs_gpregs,
+	              &__self->fcs_gpregs,
+	              sizeof(struct gpregs64));
 	__result->kcs_rip    = __self->fcs_rip;
 	__result->kcs_rflags = __self->fcs_rflags;
 }
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_to_ucpustate64)(struct fcpustate64 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
-	__result->ucs_sgbase       = __self->fcs_sgbase;
-	__result->ucs_gpregs       = __self->fcs_gpregs;
+	__libc_memcpy(&__result->ucs_sgbase,
+	              &__self->fcs_sgbase,
+	              sizeof(struct sgbase64));
+	__libc_memcpy(&__result->ucs_gpregs,
+	              &__self->fcs_gpregs,
+	              sizeof(struct gpregs64));
 	__result->ucs_rip          = __self->fcs_rip;
 	__result->ucs_rflags       = __self->fcs_rflags;
 	__result->ucs_sgregs.sg_gs = __self->fcs_sgregs.sg_gs;
@@ -850,8 +870,12 @@ __NOTHROW_NCX(fcpustate64_to_ucpustate64)(struct fcpustate64 const *__restrict _
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_ucpustate64)(struct fcpustate64 *__restrict __self,
                                               struct ucpustate64 const *__restrict __data) {
-	__self->fcs_sgbase       = __data->ucs_sgbase;
-	__self->fcs_gpregs       = __data->ucs_gpregs;
+	__libc_memcpy(&__self->fcs_sgbase,
+	              &__data->ucs_sgbase,
+	              sizeof(struct sgbase64));
+	__libc_memcpy(&__self->fcs_gpregs,
+	              &__data->ucs_gpregs,
+	              sizeof(struct gpregs64));
 	__self->fcs_rip          = __data->ucs_rip;
 	__self->fcs_rflags       = __data->ucs_rflags;
 	__self->fcs_sgregs.sg_gs = __data->ucs_sgregs.sg_gs;
@@ -876,9 +900,11 @@ __NOTHROW_NCX(fcpustate64_assign_lcpustate64)(struct fcpustate64 *__restrict __s
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_kcpustate64)(struct fcpustate64 *__restrict __self,
                                               struct kcpustate64 const *__restrict __data) {
-	__self->fcs_gpregs       = __data->kcs_gpregs;
-	__self->fcs_rflags       = __data->kcs_rflags;
-	__self->fcs_rip          = __data->kcs_rip;
+	__libc_memcpy(&__self->fcs_gpregs,
+	              &__data->kcs_gpregs,
+	              sizeof(struct gpregs64));
+	__self->fcs_rflags = __data->kcs_rflags;
+	__self->fcs_rip    = __data->kcs_rip;
 }
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_scpustate64)(struct fcpustate64 *__restrict __self,
@@ -893,7 +919,9 @@ __NOTHROW_NCX(fcpustate64_assign_scpustate64)(struct fcpustate64 *__restrict __s
 	__self->fcs_sgregs.sg_fs = __data->scs_sgregs.sg_fs16;
 	__self->fcs_sgregs.sg_es = __data->scs_sgregs.sg_es16;
 	__self->fcs_sgregs.sg_ds = __data->scs_sgregs.sg_ds16;
-	__self->fcs_sgbase       = __data->scs_sgbase;
+	__libc_memcpy(&__self->fcs_sgbase,
+	              &__data->scs_sgbase,
+	              sizeof(struct sgbase64));
 }
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_icpustate64_ex)(struct fcpustate64 *__restrict __self,
@@ -943,7 +971,9 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
                                             void *__kernel_rsp) {
 	struct scpustate64 *__result;
 	__result = (struct scpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_SCPUSTATE64);
-	__result->scs_sgbase = __self->fcs_sgbase;
+	__libc_memcpy(&__result->scs_sgbase,
+	              &__self->fcs_sgbase,
+	              sizeof(struct sgbase64));
 	__result->scs_sgregs.sg_gs = __self->fcs_sgregs.sg_gs;
 	__result->scs_sgregs.sg_fs = __self->fcs_sgregs.sg_fs;
 	__result->scs_sgregs.sg_es = __self->fcs_sgregs.sg_es;
