@@ -1398,6 +1398,17 @@ $fd_t openat64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 %#endif /* __USE_ATFILE */
 %
 %#ifdef __USE_XOPEN2K
+%{
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
+}
 
 [[ignore, nocrt, alias("posix_fadvise")]]
 [[decl_include("<bits/types.h>", "<features.h>"), doc_alias(posix_fadvise)]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfb67428 */
+/* HASH CRC-32:0xbe360179 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1521,6 +1521,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(openat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_XOPEN2K
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 #if defined(__CRT_HAVE_posix_fadvise64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __PIO_OFFSET __offset, __PIO_OFFSET __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise) && !defined(__USE_FILE_OFFSET64)
