@@ -698,13 +698,13 @@ void setbuf([[nonnull]] FILE *__restrict stream, [[nullable]] char *buf) {
 
 @@Set the buffer and buffer-mode to-be used by the given `STREAM'
 @@@param modes: One of `_IOFBF', `_IOLBF' or `_IONBF'
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_setvbuf...)]]
 [[if(defined(__USE_STDIO_UNLOCKED)), alias(CNL_setvbuf_unlocked...)]]
 [[                                   alias(CNL_setvbuf...)]]
 [[                                   alias(CNL_setvbuf_unlocked...)]]
 int setvbuf([[nonnull]] FILE *__restrict stream,
-            char *__restrict buf, int modes,
+            char *__restrict buf, __STDC_INT_AS_UINT_T modes,
             size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.FILE.locked.read.getc")]
@@ -2400,12 +2400,13 @@ int putw_unlocked(int w, [[nonnull]] $FILE *__restrict stream) {
 }
 
 
-[[decl_include("<hybrid/typecore.h>"), no_crt_self_import, no_crt_self_export]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_setvbuf_unlocked...), alias(CNL_setvbuf...)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.utility")]]
 [[userimpl, requires_function(setvbuf)]]
 int setvbuf_unlocked([[nonnull]] $FILE *__restrict stream,
-                     char *__restrict buf, int modes,
+                     char *__restrict buf, __STDC_INT_AS_UINT_T modes,
                      $size_t bufsize) {
 	return setvbuf(stream, buf, modes, bufsize);
 }

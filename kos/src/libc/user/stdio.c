@@ -2682,13 +2682,13 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
 
-/*[[[head:libc_setvbuf,hash:CRC-32=0x154ea8ec]]]*/
+/*[[[head:libc_setvbuf,hash:CRC-32=0xbcb7d06e]]]*/
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
                                    char *__restrict buf,
-                                   int modes,
+                                   __STDC_INT_AS_UINT_T modes,
                                    size_t bufsize)
 /*[[[body:libc_setvbuf]]]*/
 {
@@ -2718,11 +2718,11 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
 }
 /*[[[end:libc_setvbuf]]]*/
 
-/*[[[head:libc_setvbuf_unlocked,hash:CRC-32=0x551d244e]]]*/
+/*[[[head:libc_setvbuf_unlocked,hash:CRC-32=0x524d657]]]*/
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.utility") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_setvbuf_unlocked)(FILE *__restrict stream,
                                             char *__restrict buf,
-                                            int modes,
+                                            __STDC_INT_AS_UINT_T modes,
                                             size_t bufsize)
 /*[[[body:libc_setvbuf_unlocked]]]*/
 {

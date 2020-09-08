@@ -19,5 +19,7 @@
  */
 #ifndef _USTAT_H
 #define _USTAT_H 1
+
 #include <sys/ustat.h>
+
 #endif /* !_USTAT_H */

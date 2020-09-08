@@ -122,41 +122,41 @@ int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ..
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_alias("_wspawnv")]]
-$pid_t wspawnv(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
+$pid_t wspawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), dos_export_alias("_wspawnve")]]
-$pid_t wspawnve(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
+$pid_t wspawnve(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, file, ___argv), dos_export_alias("_wspawnvp")]]
-$pid_t wspawnvp(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
+$pid_t wspawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
 
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_wspawnvpe")]]
-$pid_t wspawnvpe(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
+$pid_t wspawnvpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnv), ATTR_SENTINEL, dos_export_alias("_wspawnl")]]
-$pid_t wspawnl(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+$pid_t wspawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnv, mode, path, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnvp), ATTR_SENTINEL, dos_export_alias("_wspawnlp")]]
-$pid_t wspawnlp(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+$pid_t wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnvp, mode, file, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnve), ATTR_SENTINEL_O(1), dos_export_alias("_wspawnle")]]
-$pid_t wspawnle(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
+$pid_t wspawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnve, mode, path, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), dos_export_alias("_wspawnlpe")]]
-$pid_t wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
+$pid_t wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnvpe, mode, file, args)
 }
 

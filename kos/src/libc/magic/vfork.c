@@ -21,6 +21,7 @@
 %{
 #include <features.h>
 
+#include <asm/vfork.h> /* __ARCH_HAVE_VFORK_SHARED_VM */
 #include <bits/types.h>
 
 #ifdef __CC__

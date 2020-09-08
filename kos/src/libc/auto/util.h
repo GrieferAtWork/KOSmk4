@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x772dd91d */
+/* HASH CRC-32:0xd537b682 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *
  * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
  *                  line, that must be `free(3)'ed by the caller once they are done
  *                  using it.
- *                  The the result would be empty as the result of `feof(stream)' upon
+ *                  If the result would be empty as the result of `feof(stream)' upon
  *                  return of this function, `strdup("")' will be returned. (i.e. NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
@@ -63,7 +63,7 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stre
  * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
  *                  line, that must be `free(3)'ed by the caller once they are done
  *                  using it.
- *                  The the result would be empty as the result of `feof(stream)' upon
+ *                  If the result would be empty as the result of `feof(stream)' upon
  *                  return of this function, `strdup("")' will be returned. (i.e. NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */

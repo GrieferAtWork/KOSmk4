@@ -25,6 +25,9 @@
 
 #include <bits/types.h>
 
+/* TODO: Get rid of this header by inlining it in <time.h> */
+/* TODO: Figure out which parts of this file should actually go into <sys/select.h> */
+
 /* System-dependent timing definitions.  Linux version.
    Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -61,6 +64,7 @@
 
 #if (!defined(__STRICT_ANSI__) || defined(__USE_POSIX)) && \
      !defined(__USE_XOPEN2K) && defined(__CC__) && !defined(__USE_ISOC_PURE)
+/* TODO: Declare __libc_sysconf() in <libc/unistd.h> and use that one here! */
 __SYSDECL_BEGIN
 #ifdef __CRT_HAVE___sysconf
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),(__confno))

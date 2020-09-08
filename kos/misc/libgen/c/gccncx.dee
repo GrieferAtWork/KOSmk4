@@ -20,9 +20,8 @@
 
 import * from deemon;
 
-/* List of *known* functions that GCC considers noexcept, even if they aren't.
- * Declarations of these functions require special work-arounds in headers. */
-
+@@List of *known* functions that GCC considers noexcept, even if they may not be.
+@@Declarations of these functions may require special work-arounds in headers.
 global final GCC_NCX: {string...} = HashSet.Frozen({
 	"aligned_alloc",
 	"ceil",

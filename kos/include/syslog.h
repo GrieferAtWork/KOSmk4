@@ -19,5 +19,7 @@
  */
 #ifndef _SYSLOG_H
 #define _SYSLOG_H 1
+
 #include <sys/syslog.h>
+
 #endif /* !_SYSLOG_H */

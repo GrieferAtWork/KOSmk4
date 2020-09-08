@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b715ac0 */
+/* HASH CRC-32:0x7af54660 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@
 
 #include <asm/crt/confname.h>
 #include <asm/stdio.h>
+#include <asm/vfork.h> /* __ARCH_HAVE_VFORK_SHARED_VM */
 #include <bits/posix_opt.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
