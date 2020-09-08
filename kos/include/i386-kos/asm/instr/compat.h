@@ -142,11 +142,27 @@
 #define rclP         rclq
 #define rcrP         rcrq
 #define jPcxz        jrcxz
+#define rdfsbaseP    rdfsbaseq
+#define rdgsbaseP    rdgsbaseq
+#define wrfsbaseP    wrfsbaseq
+#define wrgsbaseP    wrgsbaseq
 
 #ifdef __KERNEL__
-#define segtls gs /* THIS_TASK */
+#define segtls       gs /* THIS_TASK */
+#define rdtlsbasel   rdgsbasel
+#define wrtlsbasel   wrgsbasel
+#define rdtlsbaseq   rdgsbaseq
+#define wrtlsbaseq   wrgsbaseq
+#define rdtlsbaseP   rdgsbaseq
+#define wrtlsbaseP   wrgsbaseq
 #else /* __KERNEL__ */
-#define segtls fs /* user-space TLS (as set-up by libdl.so) */
+#define segtls       fs /* user-space TLS (as set-up by libdl.so) */
+#define rdtlsbasel   rdfsbasel
+#define wrtlsbasel   wrfsbasel
+#define rdtlsbaseq   rdfsbaseq
+#define wrtlsbaseq   wrfsbaseq
+#define rdtlsbaseP   rdfsbaseq
+#define wrtlsbaseP   wrfsbaseq
 #endif /* !__KERNEL__ */
 
 
@@ -263,10 +279,23 @@
 #define rcrP         rcrl
 #define jPcxz        jecxz
 
+#define rdfsbaseP    rdfsbasel
+#define rdgsbaseP    rdgsbasel
+#define wrfsbaseP    wrfsbasel
+#define wrgsbaseP    wrgsbasel
+
 #ifdef __KERNEL__
-#define segtls fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */
+#define segtls       fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */
+#define rdtlsbasel   rdfsbasel
+#define wrtlsbasel   wrfsbasel
+#define rdtlsbaseP   rdfsbasel
+#define wrtlsbaseP   wrfsbasel
 #else /* __KERNEL__ */
-#define segtls gs /* user-space TLS (as set-up by libdl.so) (SEGMENT_USER_GSBASE_RPL) */
+#define segtls       gs /* user-space TLS (as set-up by libdl.so) (SEGMENT_USER_GSBASE_RPL) */
+#define rdtlsbasel   rdgsbasel
+#define wrtlsbasel   wrgsbasel
+#define rdtlsbaseP   rdgsbasel
+#define wrtlsbaseP   wrgsbasel
 #endif /* !__KERNEL__ */
 
 #endif /* !__x86_64__ */

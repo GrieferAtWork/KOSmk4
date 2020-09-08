@@ -79,6 +79,18 @@
 #endif /* !__x86_64__ */
 .endm /* pushP_cfi_r_cs */
 
+#ifdef __x86_64__
+#define x86_load_thread_Pax_cpu_Pbx x86_load_thread_rax_cpu_rbx
+#else /* __x86_64__ */
+#define x86_load_thread_Pax_cpu_Pbx x86_load_thread_eax_cpu_ebx
+#endif /* !__x86_64__ */
+
+#ifdef __x86_64__
+#define RETURN_FROM_INTERRUPT intr_exit
+#else /* __x86_64__ */
+#define RETURN_FROM_INTERRUPT iret
+#endif /* !__x86_64__ */
+
 
 
 .section .text
@@ -105,13 +117,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	intr_enter INTR
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 #else /* __x86_64__ */
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	pushal_cfi_r
+	ASM_PUSH_ICPUSTATE_AFTER_HM_IRET_CFI_R
 	/* Load kernel-space segments. */
 	movw   $(SEGMENT_USER_DATA_RPL), %ax
 	movw   %ax, %ds
@@ -181,19 +187,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 
 .Lipi_resume:
 	.cfi_remember_state
-#ifdef __x86_64__
-	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
-	intr_exit
-#else /* __x86_64__ */
-	popal_cfi_r
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-#endif /* !__x86_64__ */
+	ASM_POP_ICPUSTATE_BEFORE_HM_IRET_CFI_R
+	RETURN_FROM_INTERRUPT
 	.cfi_restore_state
 .Lipi_switch_tasks:
 	/* Complete the full scpustate structure. */
@@ -223,13 +218,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	/* Load the new CPU state */
 	EXTERN(thiscpu_current)
 	movP   thiscpu_current(%Pbx), %Pax
-#ifdef __x86_64__
-	EXTERN(x86_load_thread_rax_cpu_rbx)
-	jmp    x86_load_thread_rax_cpu_rbx
-#else /* __x86_64__ */
-	EXTERN(x86_load_thread_eax_cpu_ebx)
-	jmp    x86_load_thread_eax_cpu_ebx
-#endif /* !__x86_64__ */
+	EXTERN(x86_load_thread_Pax_cpu_Pbx)
+	jmp    x86_load_thread_Pax_cpu_Pbx
 	.cfi_endproc
 END(x86_idt_apic_ipi)
 END(cpu_ipi_service_nopr)
@@ -260,15 +250,9 @@ INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	pushP_cfi_r_cs    /* irregs::ir_cs */
 	pushP_cfi %Pax    /* irregs::ir_pip */
 	.cfi_rel_offset %Pip, 0
+
 	/* Construct a full `struct icpustate' */
-#ifdef __x86_64__
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-#else /* __x86_64__ */
-	pushl_cfi_r %ds
-	pushl_cfi_r %es
-	pushl_cfi_r %fs
-	pushal_cfi_r
-#endif /* !__x86_64__ */
 
 	/* Invoke the IPI function */
 	movP   %R_fcall0P, %Pax
@@ -304,15 +288,9 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	pushP_cfi_r_cs    /* irregs::ir_cs */
 	pushP_cfi %Pax    /* irregs::ir_pip */
 	.cfi_rel_offset %Pip, 0
+
 	/* Construct a full `struct icpustate' */
-#ifdef __x86_64__
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-#else /* __x86_64__ */
-	pushl_cfi_r %ds
-	pushl_cfi_r %es
-	pushl_cfi_r %fs
-	pushal_cfi_r
-#endif /* !__x86_64__ */
 
 	/* Reset the used action mode. */
 	xorP   %Pbp, %Pbp
@@ -990,8 +968,8 @@ INTERN_FUNCTION(x86_smp_entry64)
 	/* Reload debug registers */
 	reload_x86_debug_registers %Pcx, %Pax, %Pdx, 0
 
-	/* R_CPU:   THIS_CPU
-	 * R_TASK:  THIS_TASK */
+	/* R_CPU:   THIS_CPU   (%rbp)
+	 * R_TASK:  THIS_TASK  (%rbx) */
 
 	/* Check for, and load all threads that are pending execution by our CPU. */
 	movP   $(CPU_PENDING_ENDOFCHAIN), %Pdx
@@ -1074,7 +1052,6 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* (Partially) load the underlying CPU state */
 #ifdef __x86_64__
-	/* (Partially) load the underlying CPU state */
 	ASM_POP_SGREGS_CFI_R(%rax)
 	ASM_POP_SGBASE_CFI_R
 	wrgsbaseq R_TASK
@@ -1102,19 +1079,8 @@ INTERN_FUNCTION(x86_smp_entry64)
 	call   x86_serve_ipi
 	movP   %Pax, %Psp
 
-#ifdef __x86_64__
-	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
-	intr_exit
-#else /* __x86_64__ */
-	popal_cfi_r
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-#endif /* !__x86_64__ */
+	ASM_POP_ICPUSTATE_BEFORE_HM_IRET_CFI_R
+	RETURN_FROM_INTERRUPT
 	.cfi_endproc
 #ifdef __x86_64__
 END(x86_smp_entry64)
@@ -1145,21 +1111,12 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	.cfi_rel_offset %Pip, 0
 
 	/* Construct a `struct scpustate' on-stack */
-
 #ifdef __x86_64__
 	ASM_PUSH_GPREGSNSP_CFI_R /* gpregs */
 	ASM_PUSH_SGBASE_CFI_R
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 #else /* __x86_64__ */
-	pushl_cfi %ds   /* sgregs::sg_ds */
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es   /* sgregs::sg_es */
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs   /* sgregs::sg_fs */
-	.cfi_restore_iret_fs_or_offset -12
-	pushl_cfi %gs   /* sgregs::sg_gs */
-	.cfi_restore_iret_gs_or_offset -16
-	pushal_cfi_r             /* gpregs */
+	ASM_PUSH_SCPUSTATE_AFTER_HM_IRET_CFI_R
 #endif /* !__x86_64__ */
 
 #ifdef CONFIG_FPU
