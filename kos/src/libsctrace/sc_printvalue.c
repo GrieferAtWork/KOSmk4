@@ -380,6 +380,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_socket_proto
 #endif /* HAVE_SC_REPR_SOCKET_PROTOCOL */
 
+#ifdef HAVE_SC_REPR_ACCEPT4_FLAGS
+#define NEED_print_socket_type_flags
+#endif /* HAVE_SC_REPR_ACCEPT4_FLAGS */
+
 #ifdef HAVE_SC_REPR_SOCKET_TYPE
 #define NEED_print_socket_type
 #endif /* HAVE_SC_REPR_SOCKET_TYPE */
@@ -543,6 +547,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_sigset
 #define NEED_print_signo_t
 #endif /* NEED_print_sigset */
+
+#ifdef NEED_print_socket_type
+#define NEED_print_socket_type_flags
+#endif /* NEED_print_socket_type */
 
 
 
@@ -1991,6 +1999,44 @@ print_socket_proto(pformatprinter printer, void *arg,
 
 
 
+#ifdef NEED_print_socket_type_flags
+struct socket_type_flag {
+	uint32_t stf_flag;     /* Type flag */
+	char     stf_name[12]; /* Type name */
+};
+PRIVATE struct socket_type_flag const socket_type_flags[] = {
+	{ SOCK_NONBLOCK, "NONBLOCK" },
+	{ SOCK_CLOEXEC,  "CLOEXEC" },
+	{ SOCK_CLOFORK,  "CLOFORK" }
+};
+
+PRIVATE ssize_t CC
+print_socket_type_flags(pformatprinter printer, void *arg,
+                        syscall_ulong_t type_flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	/* Print type flags. */
+	for (i = 0; i < COMPILER_LENOF(socket_type_flags); ++i) {
+		if (!(type_flags & socket_type_flags[i].stf_flag))
+			continue;
+		PRINTF("%sSOCK_%s", is_first ? "" : PIPESTR,
+		       socket_type_flags[i].stf_name);
+		type_flags &= ~socket_type_flags[i].stf_flag;
+		is_first = false;
+	}
+	if (type_flags || is_first) {
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, type_flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_socket_type */
+
+
+
 #if defined(NEED_print_socket_type) || defined(__DEEMON__)
 /*[[[deemon
 import * from deemon;
@@ -2021,34 +2067,20 @@ done:
 PRIVATE ssize_t CC
 print_socket_type(pformatprinter printer, void *arg,
                   syscall_ulong_t type) {
-	syscall_ulong_t flags;
 	char const *type_name;
 	ssize_t temp, result;
-	flags = type & (SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK);
-	type &= ~(SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK);
 	type_name = get_socket_type_name(type & SOCK_TYPEMASK);
 	if (type_name) {
-		result = format_printf(printer, arg,
-		                       "SOCK_%s",
-		                       type_name);
+		result = format_printf(printer, arg, "SOCK_%s", type_name);
 	} else {
-		result = format_printf(printer, arg,
-		                       "%#x",
+		result = format_printf(printer, arg, "%#x",
 		                       (unsigned int)(type & SOCK_TYPEMASK));
 	}
 	type &= ~SOCK_TYPEMASK;
-	if (type != 0) {
-		DO(format_printf(printer, arg,
-		                 PIPESTR_S "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		                 type));
+	if (type) {
+		PRINT(PIPESTR);
+		DO(print_socket_type_flags(printer, arg, type));
 	}
-	/* Append flags */
-	if (flags & SOCK_CLOEXEC)
-		PRINT(PIPESTR_S "SOCK_CLOEXEC");
-	if (flags & SOCK_CLOFORK)
-		PRINT(PIPESTR_S "SOCK_CLOFORK");
-	if (flags & SOCK_NONBLOCK)
-		PRINT(PIPESTR_S "SOCK_NONBLOCK");
 	return result;
 err:
 	return temp;
@@ -3225,7 +3257,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	(void)link;
 	switch (argtype) {
 
-	// TODO: #define HAVE_SC_REPR_ACCEPT4_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_ACCESS_TYPE 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS 1
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_SETNS 1
@@ -3333,6 +3364,13 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#ifdef HAVE_SC_REPR_ACCEPT4_FLAGS
+	case SC_REPR_ACCEPT4_FLAGS:
+		result = print_socket_type_flags(printer, arg,
+		                                 (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_ACCEPT4_FLAGS */
 
 #ifdef HAVE_SC_REPR_MMAP_PROT
 	case SC_REPR_MMAP_PROT:
