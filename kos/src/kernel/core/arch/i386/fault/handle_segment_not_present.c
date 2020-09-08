@@ -27,6 +27,7 @@
 #include <kernel/except.h>
 #include <kernel/restart-interrupt.h>
 #include <kernel/syscall-properties.h>
+#include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/x86/fault.h>
@@ -74,6 +75,9 @@ PRIVATE struct icpustate *KERNEL_INTERRUPT_CALLBACK_CC
 lcall7_clone32(struct icpustate *__restrict state) {
 	pid_t cpid;
 	struct rpc_syscall_info sc_info;
+#ifndef CONFIG_NO_SYSCALL_TRACING
+	sc_info.rsi_sysno = __NR32_clone; /* Only needed for `syscall_trace()' */
+#endif /* !CONFIG_NO_SYSCALL_TRACING */
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
 	TRY {
 		u32 *argv;
@@ -85,6 +89,13 @@ lcall7_clone32(struct icpustate *__restrict state) {
 			sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
 			sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 		}
+
+#ifndef CONFIG_NO_SYSCALL_TRACING
+		/* Trace the system call invocation. */
+		if (arch_syscall_tracing_getenabled())
+			syscall_trace(&sc_info);
+#endif /* !CONFIG_NO_SYSCALL_TRACING */
+
 		/* Invoke the actual clone system call implementation. */
 		cpid = x86_clone_impl(state,
 		                      sc_info.rsi_regs[0],                         /* clone_flags */
