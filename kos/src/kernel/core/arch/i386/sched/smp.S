@@ -972,12 +972,12 @@ INTERN_FUNCTION(x86_smp_entry64)
 	 * R_TASK:  THIS_TASK  (%rbx) */
 
 	/* Check for, and load all threads that are pending execution by our CPU. */
-	movP   $(CPU_PENDING_ENDOFCHAIN), %Pdx
+	movP   $(CPU_PENDING_ENDOFCHAIN), %R_fcall1P
 	EXTERN(thiscpu_pending)
-	lock   xchgP %Pdx, thiscpu_pending(R_CPU)
-	cmpP   $(CPU_PENDING_ENDOFCHAIN), %Pdx
+	lock   xchgP %R_fcall1P, thiscpu_pending(R_CPU)
+	cmpP   $(CPU_PENDING_ENDOFCHAIN), %R_fcall1P
 	jz     1f
-	movP   R_CPU, %Pcx
+	movP   R_CPU, %R_fcall0P
 	EXTERN(cpu_loadpending_chain_nopr)
 	call   cpu_loadpending_chain_nopr
 1:
