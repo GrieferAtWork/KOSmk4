@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2cc8126 */
+/* HASH CRC-32:0xadd94673 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_execve_defined 1
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv
@@ -44,6 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv
@@ -60,6 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv

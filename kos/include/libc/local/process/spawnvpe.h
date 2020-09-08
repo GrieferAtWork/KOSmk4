@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf77c6508 */
+/* HASH CRC-32:0xb5c283bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,12 @@
 #include <__crt.h>
 #include <hybrid/__alloca.h>
 #include <libc/local/environ.h>
-#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)) && defined(__hybrid_alloca)
+#include <asm/fcntl.h>
+#include <asm/oflags.h>
+#include <asm/vfork.h>
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || (defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)))))))) && defined(__hybrid_alloca)
+#include <features.h>
+#include <bits/types.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv
@@ -48,6 +53,39 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
+/* Dependency: spawnve from process */
+#ifndef __local___localdep_spawnve_defined
+#define __local___localdep_spawnve_defined 1
+#ifdef __CRT_HAVE_spawnve
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP),spawnve,(__mode,__path,___argv,___envp))
+#elif defined(__CRT_HAVE__spawnve)
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP),_spawnve,(__mode,__path,___argv,___envp))
+#elif (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || (defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write))))))
+__NAMESPACE_LOCAL_END
+#include <libc/local/process/spawnve.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_spawnve __LIBC_LOCAL_NAME(spawnve)
+#else /* ... */
+#undef __local___localdep_spawnve_defined
+#endif /* !... */
+#endif /* !__local___localdep_spawnve_defined */
+/* Dependency: strchr from string */
+#ifndef __local___localdep_strchr_defined
+#define __local___localdep_strchr_defined 1
+#if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
+#elif defined(__CRT_HAVE_strchr)
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strchr.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
+#endif /* !... */
+#endif /* !__local___localdep_strchr_defined */
 /* Dependency: strchrnul from string */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
@@ -84,7 +122,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) __pid_t
-(__LIBCCALL __spawnvpe_impl)(int __mode,
+(__LIBCCALL __spawnvpe_impl)(__STDC_INT_AS_UINT_T __mode,
                              char const *__restrict __path, __SIZE_TYPE__ __path_len,
                              char const *__restrict __file, __SIZE_TYPE__ __file_len,
                              __TARGV, __TENVP) {
@@ -103,15 +141,29 @@ __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) __pid
 	*__dst++ = '/';
 	__dst = (char *)__mempcpyc(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
-	return __spawnve(__mode, __fullpath, ___argv, ___envp);
+	return (__NAMESPACE_LOCAL_SYM __localdep_spawnve)(__mode, __fullpath, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(spawnvpe) __ATTR_NONNULL((2, 3, 4)) __pid_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnvpe))(int __mode, char const *__restrict __file, __TARGV, __TENVP) {
-	__SIZE_TYPE__ __filelen = __localdep_strlen(__file);
-	char *__env_path = __localdep_getenv("PATH");
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnvpe))(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV, __TENVP) {
+	char *__env_path;
+	/* [...]
+	 * If the specified filename includes a slash character,
+	 * then $PATH is ignored, and the file at the specified
+	 * pathname is executed.
+	 * [...] */
+#ifdef _WIN32
+	if (__localdep_strchr(__file, '/') || __localdep_strchr(__file, '\\'))
+		return __localdep_spawnve(__mode, __file, ___argv, ___envp);
+#else /* _WIN32 */
+	if (__localdep_strchr(__file, '/'))
+		return __localdep_spawnve(__mode, __file, ___argv, ___envp);
+#endif /* !_WIN32 */
+	__env_path = __localdep_getenv("PATH");
 	if (__env_path && *__env_path) {
+		__SIZE_TYPE__ __filelen;
+		__filelen  = __localdep_strlen(__file);
 		for (;;) {
 			__pid_t __result;
 			char *__path_end;
@@ -140,7 +192,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_spawnvpe_defined 1
 #define __localdep_spawnvpe __LIBC_LOCAL_NAME(spawnvpe)
 #endif /* !__local___localdep_spawnvpe_defined */
-#else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve) && __hybrid_alloca */
+#else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || (__CRT_HAVE_fexecve && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write))))))) && __hybrid_alloca */
 #undef __local_spawnvpe_defined
-#endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve) || !__hybrid_alloca */
+#endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve && ((!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_fspawnve && (!__CRT_HAVE_fexecve || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write))))))) || !__hybrid_alloca */
 #endif /* !__local_spawnvpe_defined */

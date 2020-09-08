@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81a6ee08 */
+/* HASH CRC-32:0xe5203d0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #include <libc/local/environ.h>
 #include <hybrid/__alloca.h>
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv

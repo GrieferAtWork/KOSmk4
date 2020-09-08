@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb085bf3d */
+/* HASH CRC-32:0x6d49ed39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,14 @@
 #define __local_cwait_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)
+#include <features.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: waitpid from sys.wait */
 #ifndef __local___localdep_waitpid_defined
 #define __local___localdep_waitpid_defined 1
 #ifdef __CRT_HAVE_waitpid
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
-#include <features.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> waitpid(2)
@@ -42,8 +42,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options),waitpid,(__pid,__stat_loc,__options))
 #elif defined(__CRT_HAVE___waitpid)
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
-#include <features.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> waitpid(2)
@@ -59,7 +57,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 #endif /* !... */
 #endif /* !__local___localdep_waitpid_defined */
 __LOCAL_LIBC(cwait) __pid_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cwait))(int *__tstat, __pid_t __pid, int __action) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cwait))(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) {
 	/* This one's pretty simple, because it's literally just a waitpid() system call...
 	 * (It even returns the same thing, that being the PID of the joined process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x4416033b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
+#ifndef _ASM_CRT_PROCESS_H
+#define _ASM_CRT_PROCESS_H 1
 
-#include "../api.h"
-#include "../auto/process.h"
+#include <__crt.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <process.h>
+/* `MODE' argument values for spawn() functions. */
+#define __P_WAIT    0 /* Wait for the process to terminate, and return its exit status */
+#define __P_NOWAIT  1 /* Spawn the process asynchronously, and return its PID */
+#define __P_OVERLAY 2 /* Don't spawn, but rather try to exec() the new program */
+#define __P_NOWAITO 3 /* Same as `P_NOWAIT' */
+#define __P_DETACH  4 /* Create the new process as detached and return `0' */
 
-DECL_BEGIN
+/* `ACTION' argument values for cwait() functions. */
+#define __WAIT_CHILD      0 /* Ignored */
+#define __WAIT_GRANDCHILD 1 /* Ignored */
 
-#ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+#endif /* !_ASM_CRT_PROCESS_H */

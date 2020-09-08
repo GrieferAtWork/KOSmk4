@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccd1ad5a */
+/* HASH CRC-32:0x7645fbce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_c32execvp_defined 1
 #if defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv
@@ -41,6 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execvp,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE_KOS$wexecvp)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv
@@ -54,6 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execvp,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv
@@ -67,6 +70,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execvp,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV),_wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE_KOS$_wexecvp)
 __NAMESPACE_LOCAL_END
+#include <features.h>
 #ifndef __TARGV
 #ifdef __USE_DOS
 #define __TARGV char const *const *___argv

@@ -1778,6 +1778,7 @@
 #define __CRT_HAVE_fsetpos64_unlocked 1
 #define __CRT_HAVE_fsetpos_unlocked 1
 #define __CRT_HAVE_fsetxattr 1
+#define __CRT_HAVE_fspawnve 1
 #define __CRT_HAVE_fstat 1
 #define __CRT_HAVE_fstat64 1
 #define __CRT_HAVE_fstatat 1

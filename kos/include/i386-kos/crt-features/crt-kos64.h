@@ -1774,6 +1774,7 @@
 #define __CRT_HAVE_fsetpos64_unlocked 1
 #define __CRT_HAVE_fsetpos_unlocked 1
 #define __CRT_HAVE_fsetxattr 1
+#define __CRT_HAVE_fspawnve 1
 #define __CRT_HAVE_fstat 1
 #define __CRT_HAVE_fstat64 1
 #define __CRT_HAVE_fstatat 1
@@ -6021,6 +6022,7 @@
 #define __CRT_HAVE_KOS$fsetpos64_unlocked 1
 #define __CRT_HAVE_KOS$fsetpos_unlocked 1
 #define __CRT_HAVE_KOS$fsetxattr 1
+#define __CRT_HAVE_KOS$fspawnve 1
 #define __CRT_HAVE_KOS$fstat 1
 #define __CRT_HAVE_KOS$fstat64 1
 #define __CRT_HAVE_KOS$fstatat 1
@@ -9395,6 +9397,7 @@
 #define __CRT_HAVE_DOS$fsetpos64_unlocked 1
 #define __CRT_HAVE_DOS$fsetpos_unlocked 1
 #define __CRT_HAVE_DOS$fsetxattr 1
+#define __CRT_HAVE_DOS$fspawnve 1
 #define __CRT_HAVE_DOS$fstat 1
 #define __CRT_HAVE_DOS$fstat64 1
 #define __CRT_HAVE_DOS$fstatat 1

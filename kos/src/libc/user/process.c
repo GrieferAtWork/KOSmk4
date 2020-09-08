@@ -37,8 +37,6 @@
 
 DECL_BEGIN
 
-/*[[[start:implementation]]]*/
-
 
 #ifdef __NO_ATTR_STDCALL
 #define _BEGINTHREADEX_CC __LIBDCALL
@@ -163,70 +161,13 @@ INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 /*[[[end:libc__cexit]]]*/
 
 
-/*[[[head:libc__loaddll,hash:CRC-32=0x9112871e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") intptr_t
-(LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...)
-/*[[[body:libc__loaddll]]]*/
-{
-	return (intptr_t)(uintptr_t)dlopen(file, RTLD_LOCAL);
-}
-/*[[[end:libc__loaddll]]]*/
-
-/*[[[head:libc__unloaddll,hash:CRC-32=0xde2ec8d3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") int
-(LIBCCALL libc__unloaddll)(intptr_t hnd) THROWS(...)
-/*[[[body:libc__unloaddll]]]*/
-{
-	return dlclose((void *)(uintptr_t)hnd);
-}
-/*[[[end:libc__unloaddll]]]*/
-
-/*[[[head:libc__getdllprocaddr,hash:CRC-32=0xfcd6ecec]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") __procfun
-(LIBCCALL libc__getdllprocaddr)(intptr_t hnd,
-                                char __KOS_FIXED_CONST *symname,
-                                intptr_t ord) THROWS(...)
-/*[[[body:libc__getdllprocaddr]]]*/
-{
-	(void)ord;
-	return (__procfun)dlsym((void *)(uintptr_t)hnd, symname);
-}
-/*[[[end:libc__getdllprocaddr]]]*/
-
-/*[[[head:libc_spawnve,hash:CRC-32=0x341aa5f1]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
-NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
-                                   char const *__restrict path,
-                                   __TARGV,
-                                   __TENVP)
-/*[[[body:libc_spawnve]]]*/
-/*AUTO*/{
-	(void)mode;
-	(void)path;
-	(void)___argv;
-	(void)___envp;
-	CRT_UNIMPLEMENTEDF("spawnve(%x, %q, %p, %p)", mode, path, ___argv, ___envp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_spawnve]]]*/
 
 
-
-/*[[[end:implementation]]]*/
-
-
-
-/*[[[start:exports,hash:CRC-32=0x19691861]]]*/
+/*[[[start:exports,hash:CRC-32=0x13d1477b]]]*/
 DEFINE_PUBLIC_ALIAS(_beginthread, libc__beginthread);
 DEFINE_PUBLIC_ALIAS(_beginthreadex, libc__beginthreadex);
 DEFINE_PUBLIC_ALIAS(_endthreadex, libc__endthreadex);
 DEFINE_PUBLIC_ALIAS(_cexit, libc__cexit);
-DEFINE_PUBLIC_ALIAS(_loaddll, libc__loaddll);
-DEFINE_PUBLIC_ALIAS(_unloaddll, libc__unloaddll);
-DEFINE_PUBLIC_ALIAS(_getdllprocaddr, libc__getdllprocaddr);
-DEFINE_PUBLIC_ALIAS(_spawnve, libc_spawnve);
-DEFINE_PUBLIC_ALIAS(spawnve, libc_spawnve);
 /*[[[end:exports]]]*/
 
 DECL_END

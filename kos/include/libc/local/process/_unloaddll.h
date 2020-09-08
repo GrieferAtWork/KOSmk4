@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4416033b */
+/* HASH CRC-32:0xf77f4062 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
-
-#include "../api.h"
-#include "../auto/process.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <process.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+#ifndef __local__unloaddll_defined
+#define __local__unloaddll_defined 1
+#include <__crt.h>
+#include <kos/anno.h>
+#include <bits/types.h>
+#include <dlfcn.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_unloaddll) int
+(__LIBCCALL __LIBC_LOCAL_NAME(_unloaddll))(__INTPTR_TYPE__ __hnd) __THROWS(...) {
+#ifdef __CRT_HAVE_dlclose
+	return dlclose((void *)(__UINTPTR_TYPE__)__hnd);
+#else /* __CRT_HAVE_dlclose */
+	return 0;
+#endif /* !__CRT_HAVE_dlclose */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__unloaddll_defined
+#define __local___localdep__unloaddll_defined 1
+#define __localdep__unloaddll __LIBC_LOCAL_NAME(_unloaddll)
+#endif /* !__local___localdep__unloaddll_defined */
+#endif /* !__local__unloaddll_defined */

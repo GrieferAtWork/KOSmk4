@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4416033b */
+/* HASH CRC-32:0xc6ea31a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
-
-#include "../api.h"
-#include "../auto/process.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <process.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+#ifndef __local__loaddll_defined
+#define __local__loaddll_defined 1
+#include <__crt.h>
+#include <libdl/asm/dlfcn.h>
+#ifdef __CRT_HAVE_dlopen
+#include <kos/anno.h>
+#include <features.h>
+#include <bits/types.h>
+#include <dlfcn.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_loaddll) __INTPTR_TYPE__
+(__LIBCCALL __LIBC_LOCAL_NAME(_loaddll))(char __KOS_FIXED_CONST *__file) __THROWS(...) {
+#ifdef RTLD_LOCAL
+	return (__INTPTR_TYPE__)(__UINTPTR_TYPE__)dlopen(__file, RTLD_LOCAL);
+#elif defined(RTLD_GLOBAL)
+	return (__INTPTR_TYPE__)(__UINTPTR_TYPE__)dlopen(__file, RTLD_GLOBAL);
+#else /* ... */
+	return (__INTPTR_TYPE__)(__UINTPTR_TYPE__)dlopen(__file, 0);
+#endif /* !... */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__loaddll_defined
+#define __local___localdep__loaddll_defined 1
+#define __localdep__loaddll __LIBC_LOCAL_NAME(_loaddll)
+#endif /* !__local___localdep__loaddll_defined */
+#else /* __CRT_HAVE_dlopen */
+#undef __local__loaddll_defined
+#endif /* !__CRT_HAVE_dlopen */
+#endif /* !__local__loaddll_defined */

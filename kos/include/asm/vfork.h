@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x4416033b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +17,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_PROCESS_H
-#define GUARD_LIBC_USER_PROCESS_H 1
+#ifndef _ASM_VFORK_H
+#define _ASM_VFORK_H 1
 
-#include "../api.h"
-#include "../auto/process.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <process.h>
+/* 
+ * #define __ARCH_HAVE_VFORK_SHARED_VM
+ *
+ * >> Defined when the system implements the vfork(2) system call such
+ *    that it isn't a shallow alias for fork(2), but rather executes
+ *    the child process within the same VM as the parent process, only
+ *    that the parent will not resume execution before the child exits,
+ *    or invokes one the exec(2) system calls.
+ *
+ * >> Knowing this at compile-time allows for some trickery where the
+ *    child process will be able to write back extended exec status
+ *    information (such as the exec-errno upon failure) back to main
+ *    memory, such that once `vfork(2)' returns to the parent process,
+ *    that parent can assume that (among everything else that is memory),
+ *    its `errno' was shared with the child process, such that (assuming
+ *    that the error was caused by exec(2)->errno=ENOENT), the vfork(2)
+ *    system call will (seemingly) return with `errno=ENOENT'
+ *
+ * -> Knowing this, it becomes significantly easier to implement error
+ *    propagation as the result of a failed exec() in situations such as
+ *    system(3) or the spawn(3) family of functions (both POSIX and DOS)
+ *
+ */
 
-DECL_BEGIN
 
-#ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
-INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
-#endif /* !__KERNEL__ */
+#if defined(__linux__)
+#define __ARCH_HAVE_SHARED_VM_VFORK 1
+#elif defined(__KOS__)
+//#define __ARCH_HAVE_SHARED_VM_VFORK 1 /* XXX: Implement vfork() proper on KOS */
+#endif /* ... */
 
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_PROCESS_H */
+#endif /* !_ASM_VFORK_H */

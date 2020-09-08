@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50debd65 */
+/* HASH CRC-32:0x422d0d96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -897,6 +897,7 @@ DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnv, libc_spawnv, TIn(__SIZEOF_PID_T
 DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnvp, libc_spawnvp, TIn(__SIZEOF_PID_T__), 3, TD, TP, TP)
 DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnve, libc_spawnve, TIn(__SIZEOF_PID_T__), 4, TD, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnvpe, libc_spawnvpe, TIn(__SIZEOF_PID_T__), 4, TD, TP, TP, TP)
+DFUN(".text.crt.dos.fs.exec.spawn", libd_fspawnve, libc_fspawnve, TIn(__SIZEOF_PID_T__), 4, TD, TIn(__SIZEOF_FD_T__), TP, TP)
 
 /* pthread */
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_create, libc_pthread_create, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TP, TP)

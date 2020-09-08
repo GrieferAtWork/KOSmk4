@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x957e13c4 */
+/* HASH CRC-32:0xcdb3dfd2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1026,6 +1026,7 @@
 #define __CRT_HAVE_DOS$fsetpos64_unlocked 1
 #define __CRT_HAVE_DOS$fsetpos_unlocked 1
 #define __CRT_HAVE_DOS$fsetxattr 1
+#define __CRT_HAVE_DOS$fspawnve 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fstat 1
@@ -3974,6 +3975,7 @@
 #define __CRT_HAVE_fsetpos64_unlocked 1
 #define __CRT_HAVE_fsetpos_unlocked 1
 #define __CRT_HAVE_fsetxattr 1
+#define __CRT_HAVE_fspawnve 1
 #define __CRT_HAVE_fstat 1
 #define __CRT_HAVE_fstat64 1
 #define __CRT_HAVE_fstatat 1

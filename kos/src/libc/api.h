@@ -166,11 +166,8 @@
 #define ATTR_LIBC_WSCANF(a, b)    __ATTR_LIBC_WSCANF(a, b)
 
 #include <errno.h>
+#include <libc/errno.h>
 
-#define libc_seterrno_syserr(e) \
-	(likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)))
-#define libc_seterrno_syserr2(e, ERR) \
-	(likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
 #define ISSEP(x)           ((x) == '/') /* TODO: In DOS-mode, `\\' must also be accepted */
 #define GET_PATHLIST_SEP() ':'          /* TODO: In DOS-mode, `;' must be used */
 
@@ -187,18 +184,25 @@
 /* Re-bind errno memory locations. */
 #undef errno
 #undef __errno
+#undef __libc_errno
 #undef __libc_geterrno
 #undef __libc_geterrno_or
 #undef __libc_seterrno
+#undef ____errno_location_defined
+
+#ifndef __KERNEL__
 #define errno                   (*libc_errno_p())
 #define __errno                 (*libc_errno_p())
+#define __libc_errno            (*libc_errno_p())
 #define __libc_geterrno         libc_geterrno
 #define __libc_geterrno_or(alt) libc_geterrno()
 #define __libc_seterrno         libc_seterrno
-
-#undef ____errno_location_defined
 #define ____errno_location_defined 1
 #define __errno_location()         libc_errno_p()
+#define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)))
+#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
+#endif /* !__KERNEL__ */
+
 
 #ifdef __CC__
 DECL_BEGIN

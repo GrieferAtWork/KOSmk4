@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea3d0f52 */
+/* HASH CRC-32:0x91d0c786 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1184,6 +1184,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnve, libd_spawnve);
 DEFINE_PUBLIC_ALIAS(DOS$spawnve, libd_spawnve);
 DEFINE_PUBLIC_ALIAS(DOS$_spawnvpe, libd_spawnvpe);
 DEFINE_PUBLIC_ALIAS(DOS$spawnvpe, libd_spawnvpe);
+DEFINE_PUBLIC_ALIAS(DOS$_spawnve, libd_fspawnve);
+DEFINE_PUBLIC_ALIAS(DOS$fspawnve, libd_fspawnve);
 
 /* pthread */
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
