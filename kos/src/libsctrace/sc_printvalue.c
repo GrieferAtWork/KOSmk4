@@ -461,6 +461,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_mmap_flags
 #endif /* HAVE_SC_REPR_MMAP_FLAGS */
 
+#ifdef HAVE_SC_REPR_KREADDIR_MODE
+#define NEED_print_kreaddir_mode
+#endif /* HAVE_SC_REPR_KREADDIR_MODE */
+
 
 
 
@@ -3238,6 +3242,71 @@ err:
 
 
 
+#ifdef NEED_print_kreaddir_mode
+STATIC_ASSERT(READDIR_DEFAULT == 0);
+STATIC_ASSERT(READDIR_CONTINUE == 1);
+STATIC_ASSERT(READDIR_PEEK == 2);
+STATIC_ASSERT(READDIR_MULTIPLE == 3);
+STATIC_ASSERT(READDIR_MODEMAX == 3);
+PRIVATE char const repr_READDIR_0h[] =
+"DEFAULT\0CONTINUE\0PEEK\0MULTIPLE";
+
+PRIVATE ATTR_PURE WUNUSED char const *CC
+get_readdir_mode(unsigned int mode) {
+	char const *result;
+	if unlikely(mode > READDIR_MODEMAX)
+		return NULL;
+	result = repr_READDIR_0h;
+	while (mode) {
+		--mode;
+		result = strend(result) + 1;
+	}
+	return result;
+}
+
+struct readdir_flag {
+	uint16_t rf_flag;    /* Flag value */
+	char     rf_name[8]; /* Flag name */
+};
+
+PRIVATE struct readdir_flag const readdir_flags[] = {
+	{ READDIR_SKIPREL, "SKIPREL" },
+	{ READDIR_WANTEOF, "WANTEOF" }
+};
+
+PRIVATE ssize_t CC
+print_kreaddir_mode(pformatprinter printer, void *arg,
+                    unsigned int mode) {
+	ssize_t temp, result;
+	unsigned int mode_id, i;
+	char const *mode_name;
+	mode_id   = mode & READDIR_MODEMASK;
+	mode_name = get_readdir_mode(mode_id);
+	mode &= ~READDIR_MODEMASK;
+	result = mode_name ? format_printf(printer, arg, "READDIR_%s", mode_name)
+	                   : format_printf(printer, arg, "%#x", mode_id);
+	if unlikely(result < 0)
+		goto done;
+	for (i = 0; i < COMPILER_LENOF(readdir_flags); ++i) {
+		if (!(mode & readdir_flags[i].rf_flag))
+			continue;
+		PRINTF(PIPESTR_S "READDIR_%s",
+		       readdir_flags[i].rf_name);
+		mode &= ~readdir_flags[i].rf_flag;
+	}
+	if unlikely(mode)
+		PRINTF(PIPESTR_S "%#x", mode);
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_kreaddir_mode */
+
+
+
+
+
 
 
 
@@ -3281,7 +3350,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_IOPRIO_WHO 1
 	// TODO: #define HAVE_SC_REPR_ITIMER_WHICH 1
 	// TODO: #define HAVE_SC_REPR_KCMP_TYPE 1
-	// TODO: #define HAVE_SC_REPR_KREADDIR_MODE 1
 	// TODO: #define HAVE_SC_REPR_KSYSCTL_ARG 1
 	// TODO: #define HAVE_SC_REPR_KSYSCTL_COMMAND 1
 	// TODO: #define HAVE_SC_REPR_LFUTEX_OP 1
@@ -3364,6 +3432,13 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#ifdef HAVE_SC_REPR_KREADDIR_MODE
+	case SC_REPR_KREADDIR_MODE:
+		result = print_kreaddir_mode(printer, arg,
+		                             (unsigned int)(syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_KREADDIR_MODE */
 
 #ifdef HAVE_SC_REPR_ACCEPT4_FLAGS
 	case SC_REPR_ACCEPT4_FLAGS:
