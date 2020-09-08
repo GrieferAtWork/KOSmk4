@@ -414,8 +414,8 @@ typedef void *__locale_t;
 #define __CASMNAME_DOS(x)                                                                               /* nothing */
 #define __CASMNAME_KOS(x)                                                                               /* nothing */
 #define __CASMNAME_SAME(x)                                                                              /* nothing */
-#define __CASMNAME_SAME_DOS(x)                                                                          /* nothing */
-#define __CASMNAME_SAME_KOS(x)                                                                          /* nothing */
+#define __CASMNAME_DOS_SAME(x)                                                                          /* nothing */
+#define __CASMNAME_KOS_SAME(x)                                                                          /* nothing */
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                /* nothing */
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   /* nothing */
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       /* nothing */
@@ -453,8 +453,8 @@ typedef void *__locale_t;
 #define __CASMNAME_DOS(x)                                                                               __ASMNAME("libd_" x)
 #define __CASMNAME_KOS(x)                                                                               __ASMNAME("libc_" x)
 #define __CASMNAME_SAME(x)                                                                              __ASMNAME("libc_" x)
-#define __CASMNAME_SAME_DOS(x)                                                                          __ASMNAME("libd_" x)
-#define __CASMNAME_SAME_KOS(x)                                                                          __ASMNAME("libc_" x)
+#define __CASMNAME_DOS_SAME(x)                                                                          __ASMNAME("libd_" x)
+#define __CASMNAME_KOS_SAME(x)                                                                          __ASMNAME("libc_" x)
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
@@ -521,8 +521,8 @@ typedef void *__locale_t;
 #ifdef __PE__
 #define __CASMNAME_DOS                                                                                  __ASMNAME
 #define __CASMNAME_KOS(x)                                                                               __ASMNAME("KOS$" x)
-#define __CASMNAME_SAME_DOS(x)                                                                          /* nothing */
-#define __CASMNAME_SAME_KOS(x)                                                                          __ASMNAME("KOS$" x)
+#define __CASMNAME_DOS_SAME(x)                                                                          /* nothing */
+#define __CASMNAME_KOS_SAME(x)                                                                          __ASMNAME("KOS$" x)
 #define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __COMPILER_REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,asmname,args)
 #define __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __COMPILER_REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBKCALL,name,param,KOS$##asmname,args)
 #define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                      __COMPILER_REDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,asmname,args)
@@ -542,8 +542,8 @@ typedef void *__locale_t;
 #else /* __PE__ */
 #define __CASMNAME_DOS(x)                                                                               __ASMNAME("DOS$" x)
 #define __CASMNAME_KOS                                                                                  __ASMNAME
-#define __CASMNAME_SAME_DOS(x)                                                                          __ASMNAME("DOS$" x)
-#define __CASMNAME_SAME_KOS(x)                                                                          /* nothing */
+#define __CASMNAME_DOS_SAME(x)                                                                          __ASMNAME("DOS$" x)
+#define __CASMNAME_KOS_SAME(x)                                                                          /* nothing */
 #define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __COMPILER_REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBDCALL,name,param,DOS$##asmname,args)
 #define __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args)                                   __COMPILER_REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBKCALL,name,param,asmname,args)
 #define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                      __COMPILER_REDIRECT_VOID(__LIBC,attr,nothrow,__LIBDCALL,name,param,DOS$##asmname,args)
@@ -627,6 +627,94 @@ typedef void *__locale_t;
 #endif /* !__NO_EXTERN_INLINE */
 #endif /* !__BUILDING_LIBC... */
 
+
+/* Special c-declare functions that are needed to work around a GCC bug that
+ * causes certain functions to _always_ be considered as nothrow/noexcept,
+ * irregardless of compiler options passed, or how they are declared.
+ *
+ * The only thing that seems to work as far as workarounds go, is to declare
+ * the function with extern "C++" linkage, and use `__ASMNAME()' to re-assign
+ * the proper symbol name. */
+#ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
+#define __CASMNAME_GCCNCX          __CASMNAME
+#define __CASMNAME_DOS_GCCNCX      __CASMNAME_DOS
+#define __CASMNAME_KOS_GCCNCX      __CASMNAME_KOS
+#define __CASMNAME_SAME_GCCNCX     __CASMNAME
+#define __CASMNAME_DOS_SAME_GCCNCX __CASMNAME_DOS
+#define __CASMNAME_KOS_SAME_GCCNCX __CASMNAME_KOS
+#define __CDECLARE_GCCNCX(attr,Treturn,nothrow,name,param,args)                                                extern "C++" { __CREDIRECT(attr,Treturn,nothrow,name,param,name,args) }
+#define __CDECLARE_VOID_GCCNCX(attr,nothrow,name,param,args)                                                   extern "C++" { __CREDIRECT_VOID(attr,nothrow,name,param,name,args) }
+#define __CREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args)                                       extern "C++" { __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args) }
+#define __CREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args)                                   extern "C++" { __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args) }
+#define __CREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args)                                   extern "C++" { __CREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args) }
+#define __CREDIRECT_VOID_GCCNCX(attr,nothrow,name,param,asmname,args)                                          extern "C++" { __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args) }
+#define __CREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,param,asmname,args)                                      extern "C++" { __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args) }
+#define __CREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,param,asmname,args)                                      extern "C++" { __CREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args) }
+#define __CVREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    extern "C++" { __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) }
+#define __CVREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) extern "C++" { __CVREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) }
+#define __CVREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) extern "C++" { __CVREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) }
+#define __CVREDIRECT_VOID_GCCNCX(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       extern "C++" { __CVREDIRECT_VOID(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) }
+#define __CVREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   extern "C++" { __CVREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) }
+#define __CVREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)   extern "C++" { __CVREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes) }
+#define __CVFREDIRECT_GCCNCX(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) extern "C++" { __CVFREDIRECT(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) }
+#define __CVFREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) extern "C++" { __CVFREDIRECT_DOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) }
+#define __CVFREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) extern "C++" { __CVFREDIRECT_KOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) }
+#define __CVFREDIRECT_VOID_GCCNCX(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    extern "C++" { __CVFREDIRECT_VOID(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) }
+#define __CVFREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) extern "C++" { __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) }
+#define __CVFREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) extern "C++" { __CVFREDIRECT_VOID_KOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) }
+#define __CXREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,code)                                      extern "C++" { __CXREDIRECT(attr,Treturn,nothrow,name,param,asmname,code) }
+#define __CXREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,code)                                  extern "C++" { __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code) }
+#define __CXREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,code)                                  extern "C++" { __CXREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,code) }
+#define __CXREDIRECT_VOID_GCCNCX(attr,nothrow,name,param,asmname,code)                                         extern "C++" { __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code) }
+#define __CXREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,param,asmname,code)                                     extern "C++" { __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code) }
+#define __CXREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,param,asmname,code)                                     extern "C++" { __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code) }
+#define __CEIDECLARE_GCCNCX(attr,Treturn,nothrow,name,param,...)                                               extern "C++" { __CEIREDIRECT(attr,Treturn,nothrow,name,param,name,__VA_ARGS__) }
+#define __CEIDECLARE_DOS_GCCNCX(attr,Treturn,nothrow,name,param,...)                                           extern "C++" { __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,name,__VA_ARGS__) }
+#define __CEIDECLARE_KOS_GCCNCX(attr,Treturn,nothrow,name,param,...)                                           extern "C++" { __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,name,__VA_ARGS__) }
+#define __CEIREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      extern "C++" { __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,__VA_ARGS__) }
+#define __CEIREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                  extern "C++" { __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,__VA_ARGS__) }
+#define __CEIREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                  extern "C++" { __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,__VA_ARGS__) }
+#else /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
+#define __CASMNAME_GCCNCX             __CASMNAME
+#define __CASMNAME_DOS_GCCNCX         __CASMNAME_DOS
+#define __CASMNAME_KOS_GCCNCX         __CASMNAME_KOS
+#define __CASMNAME_SAME_GCCNCX        __CASMNAME_SAME
+#define __CASMNAME_DOS_SAME_GCCNCX    __CASMNAME_DOS_SAME
+#define __CASMNAME_KOS_SAME_GCCNCX    __CASMNAME_KOS_SAME
+#define __CDECLARE_GCCNCX             __CDECLARE
+#define __CDECLARE_VOID_GCCNCX        __CDECLARE_VOID
+#define __CREDIRECT_GCCNCX            __CREDIRECT
+#define __CREDIRECT_DOS_GCCNCX        __CREDIRECT_DOS
+#define __CREDIRECT_KOS_GCCNCX        __CREDIRECT_KOS
+#define __CREDIRECT_VOID_GCCNCX       __CREDIRECT_VOID
+#define __CREDIRECT_VOID_DOS_GCCNCX   __CREDIRECT_VOID_DOS
+#define __CREDIRECT_VOID_KOS_GCCNCX   __CREDIRECT_VOID_KOS
+#define __CVREDIRECT_GCCNCX           __CVREDIRECT
+#define __CVREDIRECT_DOS_GCCNCX       __CVREDIRECT_DOS
+#define __CVREDIRECT_KOS_GCCNCX       __CVREDIRECT_KOS
+#define __CVREDIRECT_VOID_GCCNCX      __CVREDIRECT_VOID
+#define __CVREDIRECT_VOID_DOS_GCCNCX  __CVREDIRECT_VOID_DOS
+#define __CVREDIRECT_VOID_KOS_GCCNCX  __CVREDIRECT_VOID_KOS
+#define __CVFREDIRECT_GCCNCX          __CVFREDIRECT
+#define __CVFREDIRECT_DOS_GCCNCX      __CVFREDIRECT_DOS
+#define __CVFREDIRECT_KOS_GCCNCX      __CVFREDIRECT_KOS
+#define __CVFREDIRECT_VOID_GCCNCX     __CVFREDIRECT_VOID
+#define __CVFREDIRECT_VOID_DOS_GCCNCX __CVFREDIRECT_VOID_DOS
+#define __CVFREDIRECT_VOID_KOS_GCCNCX __CVFREDIRECT_VOID_KOS
+#define __CXREDIRECT_GCCNCX           __CXREDIRECT
+#define __CXREDIRECT_DOS_GCCNCX       __CXREDIRECT_DOS
+#define __CXREDIRECT_KOS_GCCNCX       __CXREDIRECT_KOS
+#define __CXREDIRECT_VOID_GCCNCX      __CXREDIRECT_VOID
+#define __CXREDIRECT_VOID_DOS_GCCNCX  __CXREDIRECT_VOID_DOS
+#define __CXREDIRECT_VOID_KOS_GCCNCX  __CXREDIRECT_VOID_KOS
+#define __CEIDECLARE_GCCNCX           __CEIDECLARE
+#define __CEIDECLARE_DOS_GCCNCX       __CEIDECLARE_DOS
+#define __CEIDECLARE_KOS_GCCNCX       __CEIDECLARE_KOS
+#define __CEIREDIRECT_GCCNCX          __CEIREDIRECT
+#define __CEIREDIRECT_DOS_GCCNCX      __CEIREDIRECT_DOS
+#define __CEIREDIRECT_KOS_GCCNCX      __CEIREDIRECT_KOS
+#endif /* !__COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
+
 #define __PRIVATE_CDECLARE_OPT_ARG_PLACEHOLDER_ ,
 #define __PRIVATE_CDECLARE_OPT_ARG_PLACEHOLDER_1 ,
 #define __PRIVATE_CDECLARE_OPT_TAKE_SECOND_ARG_IMPL(x, val, ...) val
@@ -636,13 +724,22 @@ typedef void *__locale_t;
 #define __PRIVATE_CDECLARE_OPT_IS_DEFINED(x) __PRIVATE_CDECLARE_OPT_IS_DEFINED2(x)
 
 #define __PRIVATE_CDECLARE_OPT_0(attr,Treturn,nothrow,name,param,args)
-#define __PRIVATE_CDECLARE_VOID_OPT_0(attr,nothrow,name,param,args)
 #define __PRIVATE_CDECLARE_OPT_1         __CDECLARE
-#define __PRIVATE_CDECLARE_VOID_OPT_1    __CDECLARE_VOID
 #define __PRIVATE_CDECLARE_OPT2(is)      __PRIVATE_CDECLARE_OPT_##is
-#define __PRIVATE_CDECLARE_VOID_OPT2(is) __PRIVATE_CDECLARE_VOID_OPT_##is
 #define __PRIVATE_CDECLARE_OPT(is)       __PRIVATE_CDECLARE_OPT2(is)
+#define __PRIVATE_CDECLARE_VOID_OPT_0(attr,nothrow,name,param,args)
+#define __PRIVATE_CDECLARE_VOID_OPT_1    __CDECLARE_VOID
+#define __PRIVATE_CDECLARE_VOID_OPT2(is) __PRIVATE_CDECLARE_VOID_OPT_##is
 #define __PRIVATE_CDECLARE_VOID_OPT(is)  __PRIVATE_CDECLARE_VOID_OPT2(is)
+
+#define __PRIVATE_CDECLARE_GCCNCX_OPT_0(attr,Treturn,nothrow,name,param,args)
+#define __PRIVATE_CDECLARE_GCCNCX_OPT_1         __CDECLARE_GCCNCX
+#define __PRIVATE_CDECLARE_GCCNCX_OPT2(is)      __PRIVATE_CDECLARE_GCCNCX_OPT_##is
+#define __PRIVATE_CDECLARE_GCCNCX_OPT(is)       __PRIVATE_CDECLARE_GCCNCX_OPT2(is)
+#define __PRIVATE_CDECLARE_VOID_GCCNCX_OPT_0(attr,nothrow,name,param,args)
+#define __PRIVATE_CDECLARE_VOID_GCCNCX_OPT_1    __CDECLARE_VOID_GCCNCX
+#define __PRIVATE_CDECLARE_VOID_GCCNCX_OPT2(is) __PRIVATE_CDECLARE_VOID_GCCNCX_OPT_##is
+#define __PRIVATE_CDECLARE_VOID_GCCNCX_OPT(is)  __PRIVATE_CDECLARE_VOID_GCCNCX_OPT2(is)
 
 /* Same as the _OPT-less counterpart, only these macros
  * integrate the test for `defined(__CRT_HAVE_<name>)',
@@ -651,6 +748,10 @@ typedef void *__locale_t;
 	__PRIVATE_CDECLARE_OPT(__PRIVATE_CDECLARE_OPT_IS_DEFINED(__CRT_HAVE_##name))(attr,Treturn,nothrow,name,param,args)
 #define __CDECLARE_VOID_OPT(attr,nothrow,name,param,args) \
 	__PRIVATE_CDECLARE_VOID_OPT(__PRIVATE_CDECLARE_OPT_IS_DEFINED(__CRT_HAVE_##name))(attr,nothrow,name,param,args)
+#define __CDECLARE_GCCNCX_OPT(attr,Treturn,nothrow,name,param,args) \
+	__PRIVATE_CDECLARE_GCCNCX_OPT(__PRIVATE_CDECLARE_OPT_IS_DEFINED(__CRT_HAVE_##name))(attr,Treturn,nothrow,name,param,args)
+#define __CDECLARE_VOID_GCCNCX_OPT(attr,nothrow,name,param,args) \
+	__PRIVATE_CDECLARE_VOID_GCCNCX_OPT(__PRIVATE_CDECLARE_OPT_IS_DEFINED(__CRT_HAVE_##name))(attr,nothrow,name,param,args)
 
 
 #ifdef __CC__

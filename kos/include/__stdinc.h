@@ -144,12 +144,15 @@
 #else /* __NON_CALL_EXCEPTIONS */
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
+#undef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG /* No work-around needed w/o NCX */
 #define __NO_NON_CALL_EXCEPTIONS 1
 #define __NOTHROW_NCX __NOTHROW
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_NCX __CXX_NOEXCEPT
 #endif /* __cplusplus */
 #endif /* !__NON_CALL_EXCEPTIONS */
+
+
 
 /* RPC-nothrow exceptions definition (used for functions that may only throw
  * exceptions due to the use of RPC callbacks and pthread cancellation points

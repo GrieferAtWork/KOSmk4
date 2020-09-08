@@ -57,10 +57,12 @@ typedef __SIZE_TYPE__ size_t;
 
 }
 
-%[insert:extern(malloc)]
-%[insert:extern(calloc)]
-%[insert:extern(realloc)]
-%[insert:extern(free)]
+%[insert:std]
+
+%[insert:guarded_std_function(malloc)]
+%[insert:guarded_std_function(calloc)]
+%[insert:guarded_std_function(realloc)]
+%[insert:guarded_std_function(free)]
 
 
 

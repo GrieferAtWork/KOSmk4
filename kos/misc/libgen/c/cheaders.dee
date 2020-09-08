@@ -33,6 +33,7 @@ import * from .globals;
 import * from .namespace;
 import * from .namespace;
 import * from .typeclass;
+import GCC_NCX from .gccncx;
 import util;
 
 
@@ -526,6 +527,19 @@ class FunctionPrototype {
 	}
 	private member m_isNothrowThrowing: bool;
 
+	@@Returns @true if @nothrow describes @"NOTHROW_NCX" or something
+	@@else that needs the `__COMPILER_HAVE_GCCNCX_BUILTIN_BUG'-workaround
+	public property isNothrowGCCNCX: bool = {
+		get(): bool {
+			if (m_isNothrowGCCNCX !is bound) {
+				local nts = str nothrow;
+				m_isNothrowGCCNCX = nts !in ["NOTHROW", "__NOTHROW"];
+			}
+			return m_isNothrowGCCNCX;
+		}
+	}
+	private member m_isNothrowGCCNCX: bool;
+
 	@@Returns @"__THROWING" or @"THROWING" based on the escape-state of @nothrow
 	@@The caller must ensure that @isNothrowThrowing is @true
 	public property nothrowThrowingSpec: string = {
@@ -672,6 +686,13 @@ class FunctionPrototype {
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
 			isSameAsname: bool) {
+		local hasGccNCX = decl in LIBC_LINKAGE_DECLS && fp.externLinkage in ["", "C"] &&
+		                  exposedName in GCC_NCX && isNothrowGCCNCX;
+		if (hasGccNCX) {
+			fp << "#ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG\n";
+			fp << "extern \"C++\" {\n";
+			fp << "#endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */\n";
+		}
 		/* Same symbol name -> declare normally (or with `__ASMNAME()' suffix) */
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
 		if (decl in LIBC_LINKAGE_DECLS) {
@@ -689,11 +710,18 @@ class FunctionPrototype {
 			}
 			if (isSameAsname)
 				fp << "_SAME";
+			if (hasGccNCX)
+				fp << "_GCCNCX";
 			fp << suffix << "(" << repr(assemblyName) << ")";
 		} else if (!isSameAsname) {
 			fp << " __ASMNAME(" << repr(assemblyName) << ")";
 		}
 		fp << ";\n";
+		if (hasGccNCX) {
+			fp << "#ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG\n";
+			fp << "} /* extern \"C++\" */\n";
+			fp << "#endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */\n";
+		}
 	}
 
 	@@Print a declaration akin to:
@@ -707,6 +735,8 @@ class FunctionPrototype {
 		fp << "__CDECLARE";
 		if (isVoidReturn)
 			fp << "_VOID";
+		if (fp.externLinkage in ["", "C"] && exposedName in GCC_NCX && isNothrowGCCNCX)
+			fp << "_GCCNCX";
 		if (optSuffix)
 			fp << "_OPT";
 		fp << "(";
@@ -997,6 +1027,8 @@ class FunctionPrototype {
 				assemblyName = assemblyName[4:];
 			}
 		}
+		if (isLcl && fp.externLinkage in ["", "C"] && exposedName in GCC_NCX && isNothrowGCCNCX)
+			fp << "_GCCNCX";
 		fp << "(";
 		/* Linkage */
 		if (!isLcl)
@@ -1053,6 +1085,8 @@ class FunctionPrototype {
 				assemblyName = assemblyName[4:];
 			}
 		}
+		if (isLcl && fp.externLinkage in ["", "C"] && exposedName in GCC_NCX && isNothrowGCCNCX)
+			fp << "_GCCNCX";
 		fp << "(";
 		/* Linkage */
 		if (!isLcl)
@@ -1189,6 +1223,8 @@ class FunctionPrototype {
 				fp << "_KOS";
 				assemblyName = assemblyName[4:];
 			}
+			if (fp.externLinkage in ["", "C"] && exposedName in GCC_NCX && isNothrowGCCNCX)
+				fp << "_GCCNCX";
 		}
 		fp << "(";
 		if (!isLcl)

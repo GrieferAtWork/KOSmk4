@@ -2078,8 +2078,8 @@ again:
 		local insertedFunctionName = self.parseCStringOrKeyword();
 		if (guarded)
 			exposedFunction.guardName = true;
+		exposedFunction.exposedName = insertedFunctionName;
 		if (self.tok == "=") {
-			exposedFunction.exposedName = insertedFunctionName;
 			self.next();
 			insertedFunctionNameStart = self.tokStart;
 			insertedFunctionName = self.parseCStringOrKeyword();
@@ -2138,7 +2138,7 @@ again:
 					name:                     exposedName,
 					originalSystemHeaderName: headerName,
 					bindings: []{
-						local protos = exposedFunction.func()
+						local protos = exposedFunction.exposedFunc
 							.functionBindings.first.prototypes;
 						yield FunctionBinding(
 							ppCond:     importCondition,

@@ -825,6 +825,20 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #endif /* __GCC_VERSION_NUM < 40402 */
 
 #ifdef __cplusplus
+
+#if !defined(__INTELLISENSE__) || 1
+/* Compiler has the gcc-ncx-builtin bug:
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96985
+ *
+ * As work-around, libc functions that gcc/g++ considers to be nothrow/noexcept
+ * must be declared with extern "C++" linkage when compiling with non-call-exceptions
+ * enabled, else the compiler will believe them to be unable to throw exceptions,
+ * when in actuality they are _very_ _much_ able to do exactly that! */
+#define __COMPILER_HAVE_GCCNCX_BUILTIN_BUG 1
+#endif /* !__INTELLISENSE__ */
+
+
+
 /* `__builtin_choose_expr()' is only available in C, but not in C++ */
 #undef __builtin_choose_expr
 #define __NO_builtin_choose_expr 1

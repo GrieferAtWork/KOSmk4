@@ -150,7 +150,7 @@ using namespace std; /* Overlay */
 #define __NAMESPACE_STD_USING(x)            /* nothing (already done by the overlay) */
 #define __NAMESPACE_GLB_USING(x)            using ::x;
 #define __NAMESPACE_GLB_USING_TYPE(x)       __CXX_USING_TYPE(::, x)
-#define __NAMESPACE_GLB_USING_OR_IMPL(x, i) i
+#define __NAMESPACE_GLB_USING_OR_IMPL(x, i) extern "C" { i }
 #else /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __NAMESPACE_STD_USING(x)            using ::std::x;
 #define __NAMESPACE_GLB_USING(x)            using ::x;

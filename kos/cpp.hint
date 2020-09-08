@@ -457,8 +457,8 @@
 #define __CASMNAME_SAME(x)
 #define __CASMNAME_KOS(x)
 #define __CASMNAME_DOS(x)
-#define __CASMNAME_SAME_KOS(x)
-#define __CASMNAME_SAME_DOS(x)
+#define __CASMNAME_KOS_SAME(x)
+#define __CASMNAME_DOS_SAME(x)
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                    Treturn name param;
 #define __CDECLARE_OPT(attr,Treturn,nothrow,name,param,args)                                                Treturn name param;
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                       void name param;
@@ -494,6 +494,47 @@
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)                                               Treturn name param;
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
+
+#define __CASMNAME_GCCNCX(x)
+#define __CASMNAME_SAME_GCCNCX(x)
+#define __CASMNAME_KOS_GCCNCX(x)
+#define __CASMNAME_DOS_GCCNCX(x)
+#define __CASMNAME_KOS_SAME_GCCNCX(x)
+#define __CASMNAME_DOS_SAME_GCCNCX(x)
+#define __CDECLARE_GCCNCX(attr,Treturn,nothrow,name,param,args)                                                    Treturn name param;
+#define __CDECLARE_OPT_GCCNCX(attr,Treturn,nothrow,name,param,args)                                                Treturn name param;
+#define __CDECLARE_VOID_GCCNCX(attr,nothrow,name,param,args)                                                       void name param;
+#define __CDECLARE_VOID_OPT_GCCNCX(attr,nothrow,name,param,args)                                                   void name param;
+#define __CREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args)                                           Treturn name param;
+#define __CREDIRECT_VOID_GCCNCX(attr,nothrow,name,param,asmname,args)                                              void name param;
+#define __CVREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)        Treturn name param;
+#define __CVREDIRECT_VOID_GCCNCX(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)           void name param;
+#define __CVFREDIRECT_GCCNCX(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)     Treturn name paramf;
+#define __CVFREDIRECT_VOID_GCCNCX(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)        void name paramf;
+#define __CXREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,code)                                          Treturn name param;
+#define __CXREDIRECT_VOID_GCCNCX(attr,nothrow,name,param,asmname,code)                                             void name param;
+#define __CREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args)                                       Treturn name param;
+#define __CREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args)                                       Treturn name param;
+#define __CREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,param,asmname,args)                                          void name param;
+#define __CREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,param,asmname,args)                                          void name param;
+#define __CVREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
+#define __CVREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
+#define __CVREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       void name param;
+#define __CVREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       void name param;
+#define __CVFREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
+#define __CVFREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
+#define __CVFREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    void name paramf;
+#define __CVFREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    void name paramf;
+#define __CXREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,code)                                      Treturn name param;
+#define __CXREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,code)                                      Treturn name param;
+#define __CXREDIRECT_VOID_KOS_GCCNCX(attr,nothrow,name,param,asmname,code)                                         void name param;
+#define __CXREDIRECT_VOID_DOS_GCCNCX(attr,nothrow,name,param,asmname,code)                                         void name param;
+#define __CEIDECLARE_GCCNCX(attr,Treturn,nothrow,name,param,...)                                                   Treturn name param;
+#define __CEIREDIRECT_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                          Treturn name param;
+#define __CEIDECLARE_DOS_GCCNCX(attr,Treturn,nothrow,name,param,...)                                               Treturn name param;
+#define __CEIDECLARE_KOS_GCCNCX(attr,Treturn,nothrow,name,param,...)                                               Treturn name param;
+#define __CEIREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
+#define __CEIREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 
 #define DEFINE_PRIVATE_ALIAS(new,old) int new() {}
 #define DEFINE_PUBLIC_ALIAS(new,old) int new() {}
