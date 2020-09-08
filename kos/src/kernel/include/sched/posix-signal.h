@@ -100,7 +100,10 @@ struct kernel_sigmask {
 DEFINE_REFCOUNT_FUNCTIONS(struct kernel_sigmask, sm_refcnt, kfree)
 
 /* An empty signal mask used to initialize `this_sigmask' */
-DATDEF struct kernel_sigmask empty_kernel_sigmask;
+DATDEF struct kernel_sigmask kernel_sigmask_empty;
+
+/* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
+DATDEF struct kernel_sigmask kernel_sigmask_full;
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the current thread.

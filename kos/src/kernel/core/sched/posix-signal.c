@@ -46,6 +46,7 @@
 
 #include <compat/config.h>
 #include <kos/except/inval.h>
+#include <sys/param.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -68,15 +69,113 @@
 
 DECL_BEGIN
 
-PUBLIC struct kernel_sigmask empty_kernel_sigmask = {
+/* An empty signal mask used to initialize `this_sigmask' */
+PUBLIC struct kernel_sigmask kernel_sigmask_empty = {
 	/* .sm_refcnt = */ 2,
 	/* .sm_share  = */ 2,
 	/* .sm_mask   = */ { { 0 } }
 };
 
+
+#define SIGSET_WORD_C   __UINTPTR_C
+#define SIGSET_WORDBITS (__SIZEOF_POINTER__ * NBBY)
+#define SIGSET_NUMBITS  (__SIGSET_NWORDS * SIGSET_WORDBITS)
+
+
+/* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
+PUBLIC struct kernel_sigmask kernel_sigmask_full = {
+	/* .sm_refcnt = */ 2,
+	/* .sm_share  = */ 2,
+	/* .sm_mask   = */ {{
+/*[[[deemon
+
+// Supported values for various signal constants
+local supported_SIGKILL_values = [9];
+local supported_SIGSTOP_values = [19];
+local supported_sigset_bits    = [1024];
+local supported_pointer_bits   = [32, 64];
+
+function printMap(unmaskedSignals, bitsof_sigset, bits_per_word) {
+	local numWords = (bitsof_sigset + bits_per_word - 1) / bits_per_word;
+	local wordValues = [(1 << bits_per_word) - 1] * numWords;
+	function clearSig(signo) {
+		signo = signo - 1;
+		local word = signo / bits_per_word;
+		local mask = 1 << (signo % bits_per_word);
+		wordValues[word] = wordValues[word] & ~mask;
+	}
+	for (local x: unmaskedSignals)
+		clearSig(x);
+	local i, v;
+	import util;
+	for (i, v: util.enumerate(wordValues)) {
+		if ((i % 4) == 0)
+			print("\t\t"),;
+		else {
+			print(" "),;
+		}
+		print("SIGSET_WORD_C(", v.hex(), ")"),;
+		if (i != #wordValues - 1)
+			print(","),;
+		if ((i % 4) == 3)
+			print;
+	}
+	if ((i % 4) != 3)
+		print;
+}
+
+local combinations = [];
+for (local a: supported_SIGKILL_values) {
+	for (local b: supported_SIGSTOP_values) {
+		for (local c: supported_sigset_bits) {
+			for (local d: supported_pointer_bits) {
+				combinations.append((a, b, c, d));
+			}
+		}
+	}
+}
+
+local isFirst = true;
+for (local sigkill, sigstop, bitsof_sigset, bits_per_word: combinations) {
+	print("#", isFirst ? "" : "el",
+		"if SIGKILL == ", sigkill,
+		" && SIGSTOP == ", sigstop,
+		" && SIGSET_NUMBITS == ", bitsof_sigset,
+		" && SIGSET_WORDBITS == ", bits_per_word);
+	printMap((sigkill, sigstop), bitsof_sigset, bits_per_word);
+	isFirst = false;
+}
+print("#elif !defined(__DEEMON__)");
+print("#error \"Unsupported combination of signal constants\"");
+print("#endif /" "* ... *" "/");
+]]]*/
+#if SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 1024 && SIGSET_WORDBITS == 32
+		SIGSET_WORD_C(0xfffbfeff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 1024 && SIGSET_WORDBITS == 64
+		SIGSET_WORD_C(0xfffffffffffbfeff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
+		SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
+		SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
+		SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff)
+#elif !defined(__DEEMON__)
+#error "Unsupported combination of signal constants"
+#endif /* ... */
+/*[[[end]]]*/
+	}}
+};
+
+
+
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the current thread. */
-PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask = ATOMIC_REF_INIT(&empty_kernel_sigmask);
+PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask)
+this_sigmask = ATOMIC_REF_INIT(&kernel_sigmask_empty);
 
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
  * User-space signal handlers for the calling thread. */
@@ -87,12 +186,12 @@ DEFINE_PERTASK_CLONE(clone_posix_signals);
 PRIVATE ATTR_USED void KCALL
 clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
 	/* Clone the current signal mask. */
-	if (sigmask_getrd() == &empty_kernel_sigmask) {
+	if (sigmask_getrd() == &kernel_sigmask_empty) {
 		/* Nothing to do here! */
 	} else {
 		REF struct kernel_sigmask *mask;
 		mask = PERTASK(this_sigmask).get();
-		assert(mask != &empty_kernel_sigmask);
+		assert(mask != &kernel_sigmask_empty);
 		ATOMIC_FETCHINC(mask->sm_share);
 		COMPILER_WRITE_BARRIER();
 		FORTASK(new_thread, this_sigmask).m_pointer = mask; /* Inherit reference. */
@@ -165,7 +264,7 @@ PRIVATE NOBLOCK ATTR_USED void
 NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 	struct kernel_sigmask *mask;
 	mask = FORTASK(thread, this_sigmask).m_pointer;
-	if (mask != &empty_kernel_sigmask)
+	if (mask != &kernel_sigmask_empty)
 		decref(mask);
 	xdecref(FORTASK(thread, this_sighand_ptr));
 }
@@ -187,7 +286,7 @@ sigmask_getwr(void) THROWS(E_BADALLOC) {
 		copy->sm_refcnt = 1;
 		copy->sm_share  = 1;
 		result = PERTASK(this_sigmask).exchange_inherit_new(copy);
-		if (result != &empty_kernel_sigmask) {
+		if (result != &kernel_sigmask_empty) {
 			ATOMIC_FETCHDEC(result->sm_share);
 			decref_unlikely(result);
 		}

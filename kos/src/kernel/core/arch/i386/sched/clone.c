@@ -37,6 +37,7 @@
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
 #include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/x86/iopl.h>
@@ -55,9 +56,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <sched.h>
+#include <signal.h> /* SIGCHLD */
 #include <stdio.h>
 #include <string.h>
-#include <signal.h> /* SIGCHLD */
 
 #include <librpc/rpc.h>
 
@@ -148,7 +149,7 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		validate_writable(parent_tidptr, sizeof(*parent_tidptr));
 	if (clone_flags & (CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID))
 		validate_writable(child_tidptr, sizeof(*child_tidptr));
-	if (clone_flags & (CLONE_VM | CLONE_VFORK)) {
+	if (clone_flags & CLONE_VM) {
 		result_vm = incref(caller->t_vm);
 	} else {
 		result_vm = vm_clone(caller->t_vm, false);
@@ -334,24 +335,37 @@ again_lock_vm:
 
 		/* Deal with vfork() */
 		if (clone_flags & CLONE_VFORK) {
+			REF struct kernel_sigmask *old_sigmask;
+			ATOMIC_REF(struct kernel_sigmask) *mymask;
+
 			/* Set the VFORK flag to cause the thread to execute in VFORK-mode. */
 			ATOMIC_FETCHOR(result->t_flags, TASK_FVFORK);
 
 			/* Actually start execution of the newly created thread. */
 			task_start(result);
 
-			/* Wait for the thread to clear its VFORK flag. */
-			while ((ATOMIC_READ(result->t_flags) & TASK_FVFORK) != 0) {
-				struct taskpid *pid;
-				pid = FORTASK(result, this_taskpid);
-				assert(pid);
-				task_connect(&pid->tp_changed);
-				if unlikely((ATOMIC_READ(result->t_flags) & TASK_FVFORK) == 0) {
-					task_disconnectall();
-					break;
+			/* The specs say that we should ignore (mask) all POSIX
+			 * signals until the child indicate VFORK completion. */
+			mymask      = &PERTASK(this_sigmask);
+			old_sigmask = mymask->exchange(&kernel_sigmask_full);
+			TRY {
+				/* Wait for the thread to clear its VFORK flag. */
+				while ((ATOMIC_READ(result->t_flags) & TASK_FVFORK) != 0) {
+					struct taskpid *pid;
+					pid = FORTASK(result, this_taskpid);
+					assert(pid);
+					task_connect(&pid->tp_changed);
+					if unlikely((ATOMIC_READ(result->t_flags) & TASK_FVFORK) == 0) {
+						task_disconnectall();
+						break;
+					}
+					task_waitfor();
 				}
-				task_waitfor();
+			} EXCEPT {
+				mymask->set_inherit_new(old_sigmask);
+				RETHROW();
 			}
+			mymask->set_inherit_new(old_sigmask);
 		} else {
 			/* Actually start execution of the newly created thread. */
 			task_start(result);
@@ -524,7 +538,7 @@ INTERN struct icpustate *FCALL
 sys_vfork_impl(struct icpustate *__restrict state) {
 	pid_t child_tid;
 	child_tid = x86_clone_impl(state,
-	                           SIGCHLD | CLONE_VFORK,
+	                           CLONE_VM | CLONE_VFORK | SIGCHLD,
 	                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
 	                           NULL,
 	                           NULL,
