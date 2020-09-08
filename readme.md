@@ -394,14 +394,14 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- libvm86 (user/kernel)
 		- An entire software-based emulator of the 8086 and its instruction set
 		- Yes: I wrote yet another decoder and interpreter for the x86 instruction set (as if `vio.c` and `hw_illegal_instruction.c` weren't enough already)
-		- Allows BIOS functions to-be called from protected mode, or even from long-mode (still pending full support)
+		- Allows BIOS functions to-be called from protected mode, or even from long-mode
 	- libemu86 (user/kernel)
 		- The low-level driver for anything that requires the emulation/analysis of x86 instruction. Used by:
 			- libviocore
 			- libvm86
 			- Unsupported instruction emulation
 			- Generating detailed errors for hardware exceptions
-				- Most notably: I don't like how x86_64 triggers a #GP when accessing unaligned memory. So by inspecting the faulting instruction, I can determine the unaligned address, and throw an `E_SEGFAULT`, allowing the exception to be handled the same way that accessing to an unmapped address would be handled.
+				- Most notably: I don't like how x86_64 triggers a #GP when accessing unaligned memory. So by inspecting the faulting instruction, I can determine the unaligned address, and throw an `E_SEGFAULT`, allowing the exception to be handled the same way as an access of an unmapped address.
 	- ... More libraries may get added in the future without being documented here
 
 
@@ -419,7 +419,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	#endif /* LIBMYLIBRARY_WANT_PROTOTYPES */
 	```
 - As much as possible from `/kos/include/*` should be generated automatically using `/kos/misc/magicgenerator/generate_headers.dee`
-- `/kos/include/hybrid/*` must not have any cross-dependencies to files other `/kos/include/__std(cxx|inc).h` and `/kos/include/compiler/*`
+- `/kos/include/hybrid/*` must not have any cross-dependencies to files other than `/kos/include/__std(cxx|inc).h` and `/kos/include/compiler/*`
 	- The hybrid API should not be bound to only work under KOS and/or GCC
 - The provided `/kos/.clang-format` file is not perfect:
 	- See the comments on where it fails within the file itself
@@ -448,7 +448,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Always allow an assembler or linker script to include any arbirary header found in `/kos/include/`
 		- Related to the later, also consider if an assembly source file could reasonably need to make use of structures defined in your header, and if so: add `[__]OFFSET_MYSTRUCT_MYFIELD` and `[__]SIZEOF_MYSTRUCT` macros describing the absolute offsets of certain fields
 			- To assert that these offsets are valid, you may add the header to the list of checked headers in `$PROJPATH/kos/src/_verify/[arch/(i386|...)/]assert_types.c`
-	- This rule only exists to allow 3rd party programs to be built using a compiler other than the gcc from the KOS toolchain. Only example of where this makes a difference is using `tcc` from inside of KOS after also having installed KOS system headers.
+	- This rule only exists to allow 3rd party programs to be built using a compiler other than the gcc from the KOS toolchain. One example of where this makes a difference is using `tcc` from inside of KOS after also having installed KOS system headers.
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
 	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)
@@ -466,7 +466,7 @@ Requirements:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 		Don't worry: the install location will still be contained within the KOS source tree.
 		More specifically, the deemon executable will end up as `$PROJPATH/binutils/deemon/deemon[.exe]`
-- binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
+- binutils/gcc: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
 	- Can be easily downloaded + configured + build by:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 - qemu: qemu-system-i386[.exe] (preferrably in `$PATH`. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
@@ -511,7 +511,7 @@ deemon $PROJPATH/magic.dee --target=i386 --config=nOD --build-only
 bash $PROJPATH/kos/misc/make_utility.sh i386 busybox
 ```
 
-That's it. That last command will download, build & install busybox into every KOS disk image that it can find under `$PROJPATH/bin/...`, also meaning that if you choose to clear out `$PROJPATH/bin` (or have just build KOS for a specific configuration for the first time), you will have to ensure that `magic.dee` was run at least once for your intended configuration, followed by re-executing the `make_utility.sh` command
+That's it. That last command will download, build & install busybox into every i386 KOS disk image that it can find under `$PROJPATH/bin/...`, also meaning that if you choose to clear out `$PROJPATH/bin` (or have just build KOS for a specific configuration for the first time), you will have to ensure that `magic.dee` was run at least once for your intended configuration, followed by re-executing the `make_utility.sh` command
 
 The plan is to add more software to `make_utility.sh` in the future, so that you'll be able to install select third-party software with this easy-to-use method of building them.
 
@@ -555,7 +555,7 @@ To help you understand how this script works to do what it does, here is a docum
 - `--run-only`
 	- Skip the build step and only run KOS
 - `--build-only`
-	- Skip running KOS and only build its source
+	- Skip running KOS and only build the binaries
 	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
 - `-f`
 	- Force a full re-build of everything (except for re-formatting the KOS disk image)
