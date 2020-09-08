@@ -2999,6 +2999,77 @@ LOCAL void KCALL run_pervm_onexec(void) {
 
 
 
+PRIVATE struct icpustate *KCALL
+kernel_do_execveat_impl(struct icpustate *__restrict state,
+                        REF struct regular_node *__restrict exec_node,
+                        REF struct path *__restrict containing_path,
+                        REF struct directory_entry *__restrict containing_dentry,
+#ifdef __ARCH_HAVE_COMPAT
+                        USER CHECKED void const *argv,
+                        USER CHECKED void const *envp,
+                        bool argv_is_compat
+#else /* __ARCH_HAVE_COMPAT */
+                        USER UNCHECKED char const *USER CHECKED const *argv,
+                        USER UNCHECKED char const *USER CHECKED const *envp
+#endif /* !__ARCH_HAVE_COMPAT */
+                        ) {
+	/* Deal with the special VFORK mode. */
+	if (PERTASK_GET(this_task.t_flags) & TASK_FVFORK) {
+		REF struct vm *newvm;
+		/* Construct the new VM for the process after the exec. */
+		newvm = vm_alloc();
+		{
+			FINALLY_DECREF_UNLIKELY(newvm);
+			state = vm_exec(/* effective_vm:              */ newvm,
+			                /* user_state:                */ state,
+			                /* exec_path:                 */ containing_path,
+			                /* exec_dentry:               */ containing_dentry,
+			                /* exec_node:                 */ exec_node,
+			                /* change_vm_to_effective_vm: */ true,
+			                /* argc_inject:               */ 0,
+			                /* argv_inject:               */ NULL,
+			                /* argv:                      */ argv,
+			                /* envp:                      */ envp
+#ifdef __ARCH_HAVE_COMPAT
+			                ,
+			                /* argv_is_compat:            */ argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+			                );
+			/* Load the newly initialized VM as our current VM */
+			task_setvm(newvm);
+		}
+		/* ==== Point of no return: This is where we
+		 *      indicate success to our parent process. */
+		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FVFORK);
+		{
+			struct taskpid *mypid = THIS_TASKPID;
+			if likely(mypid)
+				sig_broadcast(&mypid->tp_changed);
+		}
+	} else {
+		state = vm_exec(/* effective_vm:              */ THIS_VM,
+		                /* user_state:                */ state,
+		                /* exec_path:                 */ containing_path,
+		                /* exec_dentry:               */ containing_dentry,
+		                /* exec_node:                 */ exec_node,
+		                /* change_vm_to_effective_vm: */ true, /* Doesn't matter! */
+		                /* argc_inject:               */ 0,
+		                /* argv_inject:               */ NULL,
+		                /* argv:                      */ argv,
+		                /* envp:                      */ envp
+#ifdef __ARCH_HAVE_COMPAT
+		                ,
+		                /* argv_is_compat:            */ argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+		                );
+	}
+	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
+	run_pervm_onexec();
+#ifndef CONFIG_EVERYONE_IS_ROOT
+	cred_onexec(exec_node);
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
+	return state;
+}
 
 PRIVATE struct icpustate *KCALL
 kernel_do_execveat(struct icpustate *__restrict state,
@@ -3044,26 +3115,18 @@ kernel_do_execveat(struct icpustate *__restrict state,
 			*dst = '\0';
 			assert(dst == buf + reglen);
 			*dst = 0;
-			/* Actually map the specified file into memory! */
-			state = vm_exec(THIS_VM,
-			                state,
-			                containing_path,
-			                containing_dentry,
-			                exec_node,
-			                0,
-			                NULL,
-			                argv,
-			                envp
+			/* Execute the specified program. */
+			state = kernel_do_execveat_impl(state,
+			                                exec_node,
+			                                containing_path,
+			                                containing_dentry,
+			                                argv,
+			                                envp
 #ifdef __ARCH_HAVE_COMPAT
-			                ,
-			                argv_is_compat
+			                                ,
+			                                argv_is_compat
 #endif /* __ARCH_HAVE_COMPAT */
-			                );
-			/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
-			run_pervm_onexec();
-#ifndef CONFIG_EVERYONE_IS_ROOT
-			cred_onexec(exec_node);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+			                                );
 			{
 				struct debugtrap_reason r;
 				r.dtr_signo  = SIGTRAP;
@@ -3077,26 +3140,18 @@ kernel_do_execveat(struct icpustate *__restrict state,
 		}
 		kfree(buf);
 	} else {
-		/* Actually map the specified file into memory! */
-		state = vm_exec(THIS_VM,
-		                state,
-		                containing_path,
-		                containing_dentry,
-		                exec_node,
-		                0,
-		                NULL,
-		                argv,
-		                envp
+		/* Execute the specified program. */
+		state = kernel_do_execveat_impl(state,
+		                                exec_node,
+		                                containing_path,
+		                                containing_dentry,
+		                                argv,
+		                                envp
 #ifdef __ARCH_HAVE_COMPAT
-		                ,
-		                argv_is_compat
+		                                ,
+		                                argv_is_compat
 #endif /* __ARCH_HAVE_COMPAT */
-		                );
-		/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
-		run_pervm_onexec();
-#ifndef CONFIG_EVERYONE_IS_ROOT
-		cred_onexec(exec_node);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+		                                );
 	}
 	return state;
 }

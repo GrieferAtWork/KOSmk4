@@ -708,6 +708,40 @@ int main_leak(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_vfork(int argc, char *argv[], char *envp[]) {
+	int status;
+	pid_t pid;
+	errno_t errno_after_vfork;
+	(void)argc, (void)argv, (void)envp;
+	errno = 0;
+	pid = vfork();
+	if (pid == 0) {
+		dprintf(STDOUT_FILENO, "Child process: %u\n", getpid());
+		errno = 1234;
+		execl("/bin/busybox", "sh", "-c", "echo Child says: hello!", (char *)0);
+		_exit(77);
+	}
+	errno_after_vfork = errno;
+	if (pid < 0)
+		err(1, "vfork() failed");
+	dprintf(STDOUT_FILENO, "Parent process:    %u\n", getpid());
+	dprintf(STDOUT_FILENO, "Child is:          %u\n", pid);
+	dprintf(STDOUT_FILENO, "errno_after_vfork: %d\n", errno_after_vfork); /* 1234 */
+
+	/* Wait for the child to exit */
+	while (waitpid(pid, &status, 0) < 0) {
+		if (errno == EINTR)
+			continue;
+		err(1, "waitpid() failed");
+	}
+	dprintf(STDOUT_FILENO, "Child exited with: %d\n", status);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -738,6 +772,7 @@ PRIVATE DEF defs[] = {
 	{ "rtm", &main_rtm },
 	{ "fault", &main_fault },
 	{ "leak", &main_leak },
+	{ "vfork", &main_vfork },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

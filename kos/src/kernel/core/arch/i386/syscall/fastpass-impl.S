@@ -586,6 +586,26 @@ SC_END(fork)
 
 
 
+/* >> pid_t vfork(void); */
+#if _SYSFAST_WANT(VFORK, vfork)
+SC_BEGIN(vfork)
+	SC_PUSH_ICPUSTATE
+	movP   %Psp, %R_fcall0P
+	EXTERN(sys_vfork_impl)
+	call   sys_vfork_impl
+	movP   %Pax, %Psp
+	SC_POP_ICPUSTATE
+	SC_IRET
+SC_END(vfork)
+#endif /* vfork... */
+
+
+
+
+
+
+
+
 /* >> rtm_status_t rtm_begin(void); */
 #if _SYSFAST_WANT(RTM_BEGIN, rtm_begin)
 SC_BEGIN(rtm_begin)

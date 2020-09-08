@@ -585,6 +585,9 @@ NOTHROW(FCALL task_exit)(int w_status) {
 				       0),
 				del = (/* We're no longer running */
 				       TASK_FRUNNING |
+				       /* If we were running in vfork()-mode, clear the
+				        * VFORK flag to wake up our waiting parent thread. */
+				       TASK_FVFORK |
 				       /* Any pending wakeup request will never come though, so if anyone is
 				        * listening for this flag, act as though their request was served. */
 				       TASK_FWAKING |

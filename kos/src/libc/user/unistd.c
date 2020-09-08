@@ -1263,45 +1263,6 @@ err:
 }
 /*[[[end:libc_ualarm]]]*/
 
-/*[[[head:libc_vfork,hash:CRC-32=0xfbb0ea69]]]*/
-/* >> vfork(2)
- * Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
- * child process invokes one of the following system calls:
- *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(2)', since the later would include
- *                 the invocation of `atexit(3)' handlers, which would then run in
- *                 the context of a VM that isn't actually about to be destroyed.
- *   - `execve(2)' Create a new VM that is populated with the specified process
- *                 image. The parent process will only be resumed in case the
- *                 new program image could be loaded successfully. Otherwise,
- *                 the call to `execve(2)' returns normally in the child.
- *                 Other functions from the exec()-family behave the same
- *
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
- * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
- * adds unnecessary bloat to code that doesn't rely on this)
- *
- * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
- * process performs any of the actions above. */
-INTERN ATTR_SECTION(".text.crt.sched.access") ATTR_RETURNS_TWICE WUNUSED pid_t
-NOTHROW_NCX(LIBCCALL libc_vfork)(void)
-/*[[[body:libc_vfork]]]*/
-{
-	/* The regular fork() can be used to substitue vfork()
-	 * However, implementing vfork() for real would be even
-	 * better (but would require quite significant additions
-	 * to kernel-space)... */
-	return fork();
-}
-/*[[[end:libc_vfork]]]*/
-
 /*[[[head:libc_fchown,hash:CRC-32=0x17d60241]]]*/
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
@@ -1856,6 +1817,9 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 	return 0;
 }
 /*[[[end:libc_revoke]]]*/
+
+/* `vfork' needs to be implemented in assembly! */
+/*[[[skip:libc_vfork]]]*/
 
 /* `syscall' needs to be implemented in assembly! */
 /*[[[skip:libc_syscall]]]*/
@@ -3656,7 +3620,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbc9e9a39]]]*/
+/*[[[start:exports,hash:CRC-32=0xbe46c884]]]*/
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(_getpid, libc_getpid);
@@ -3757,8 +3721,6 @@ DEFINE_PUBLIC_ALIAS(setresgid, libc_setresgid);
 DEFINE_PUBLIC_ALIAS(usleep, libc_usleep);
 DEFINE_PUBLIC_ALIAS(getwd, libc_getwd);
 DEFINE_PUBLIC_ALIAS(ualarm, libc_ualarm);
-DEFINE_PUBLIC_ALIAS(__vfork, libc_vfork);
-DEFINE_PUBLIC_ALIAS(vfork, libc_vfork);
 DEFINE_PUBLIC_ALIAS(fchown, libc_fchown);
 DEFINE_PUBLIC_ALIAS(fchdir, libc_fchdir);
 DEFINE_PUBLIC_ALIAS(__getpgid, libc_getpgid);

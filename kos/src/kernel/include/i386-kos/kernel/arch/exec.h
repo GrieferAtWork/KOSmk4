@@ -57,8 +57,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      Elf32_Ehdr const *__restrict ehdr,
                      USER void *peb_address, USER void *ustack_base,
-                     size_t ustack_size, USER void *entry_pc,
-                     bool has_rtld);
+                     size_t ustack_size, USER void *entry_pc);
 
 /* Initialize the RTLD user-space library for runtime linking. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
@@ -67,10 +66,10 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     struct directory_entry *__restrict exec_dentry,
                     struct regular_node *__restrict exec_node,
                     Elf32_Ehdr const *__restrict ehdr,
-                    Elf32_Phdr const *__restrict phdr_vec,
-                    Elf32_Half phdr_cnt,
-                    void *application_loadaddr,
-                    void *linker_loadaddr);
+                    Elf32_Phdr const *__restrict phdr_vec, Elf32_Half phdr_cnt,
+                    void *application_loadaddr, void *linker_loadaddr,
+                    USER void *peb_address, USER void *ustack_base,
+                    size_t ustack_size, USER void *entry_pc);
 
 /* Base address and size symbols for the system RTLD */
 DATDEF byte_t elfexec_system_rtld32[];

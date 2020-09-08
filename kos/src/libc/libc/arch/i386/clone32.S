@@ -23,8 +23,11 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
 #include <sys/syscall.h>
+
+#include <errno.h> /* ELIMIT */
 
 /* INTERN NONNULL((1))
  * ATTR_WEAK ATTR_SECTION(".text.crt.sched.access.clone") pid_t
@@ -49,6 +52,7 @@ INTERN_FUNCTION(libc_clone)
 	pushl_cfi  32(%esp) /* pid_t *ptid */
 	pushl_cfi  24(%esp) /* void *child_stack */
 	pushl_cfi  32(%esp) /* int flags */
+	clc
 	lcall  $(7), $SYS_clone
 
 	/* Check if we're inside of the child thread */
@@ -59,7 +63,7 @@ INTERN_FUNCTION(libc_clone)
 	.cfi_adjust_cfa_offset -20
 
 	/* Check for errors. */
-	cmpl   $(-4096), %eax
+	cmpl   $(-ELIMIT), %eax
 	ja     .Lthread_clone_error
 	
 	ret

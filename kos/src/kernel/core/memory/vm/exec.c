@@ -257,12 +257,13 @@ DECL_END
 
 DECL_BEGIN
 #else /* !__INTELLISENSE__ */
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
 vm_exec_impl(struct vm *__restrict effective_vm,
              struct icpustate *__restrict user_state,
              struct path *__restrict exec_path,
              struct directory_entry *__restrict exec_dentry,
              struct regular_node *__restrict exec_node,
+             bool change_vm_to_effective_vm,
              size_t argc_inject, KERNEL char const *const *argv_inject,
 #ifdef __ARCH_HAVE_COMPAT
              USER CHECKED void const *argv,
@@ -279,12 +280,13 @@ vm_exec_impl(struct vm *__restrict effective_vm,
              )
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 #ifdef __ARCH_HAVE_COMPAT
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
 compat_vm_exec_impl(struct vm *__restrict effective_vm,
                     struct icpustate *__restrict user_state,
                     struct path *__restrict exec_path,
                     struct directory_entry *__restrict exec_dentry,
                     struct regular_node *__restrict exec_node,
+                    bool change_vm_to_effective_vm,
                     size_t argc_inject, KERNEL char const *const *argv_inject,
                     USER CHECKED void const *argv,
                     USER CHECKED void const *envp,
@@ -308,6 +310,9 @@ compat_vm_exec_impl(struct vm *__restrict effective_vm,
  *       the caller themself if they are using the VM, too) will have been terminated.
  * @param: effective_vm: The VM into which to map the executable.
  *                       This must not be the kernel VM, which causes an assertion failure.
+ *                       NOTE: When `change_vm_to_effective_vm' is `true', prior to a successful
+ *                             return of this function, it will also do a `task_setvm(effective_vm)',
+ *                             meaning that the caller will become apart of the given VM.
  * @param: user_state:   The user-space CPU state to update upon success in a manner that
  *                       proper execution of the loaded binary is possible.
  *                       Note however that in the case of a dynamic binary, a dynamic linker
@@ -330,6 +335,7 @@ vm_exec(struct vm *__restrict effective_vm,
         struct path *__restrict exec_path,
         struct directory_entry *__restrict exec_dentry,
         struct regular_node *__restrict exec_node,
+        bool change_vm_to_effective_vm,
         size_t argc_inject, KERNEL char const *const *argv_inject,
 #ifdef __ARCH_HAVE_COMPAT
         USER CHECKED void const *argv,
@@ -367,6 +373,7 @@ vm_exec(struct vm *__restrict effective_vm,
 		                          exec_path,
 		                          exec_dentry,
 		                          exec_node,
+		                          change_vm_to_effective_vm,
 		                          argc_inject,
 		                          argv_inject,
 		                          argv,
@@ -387,6 +394,7 @@ vm_exec(struct vm *__restrict effective_vm,
 		                                         exec_path,
 		                                         exec_dentry,
 		                                         exec_node,
+		                                         change_vm_to_effective_vm,
 		                                         argc_inject, argv_inject,
 		                                         argv,
 		                                         envp,
@@ -455,6 +463,7 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	                init_path,
 	                init_dentry,
 	                (struct regular_node *)init_node,
+	                true, /* change_vm_to_effective_vm: Don't matter */
 	                COMPILER_LENOF(init_argv),
 	                init_argv,
 	                NULL,

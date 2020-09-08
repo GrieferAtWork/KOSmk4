@@ -42,14 +42,14 @@ struct directory_entry;
 struct regular_node;
 struct vm_ramfile;
 
+
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    KERNEL ElfW(Ehdr) const *__restrict ehdr,
                    USER void *peb_address, USER void *ustack_base,
-                   size_t ustack_size, USER void *entry_pc,
-                   bool has_rtld);
+                   size_t ustack_size, USER void *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY */
 
 /* Initialize the RTLD user-space library for runtime linking. */
@@ -62,8 +62,9 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
                   KERNEL ElfW(Ehdr) const *__restrict ehdr,
                   KERNEL ElfW(Phdr) const *__restrict phdr_vec,
                   ElfW(Half) phdr_cnt,
-                  void *application_loadaddr,
-                  void *linker_loadaddr);
+                  void *application_loadaddr, void *linker_loadaddr,
+                  USER void *peb_address, USER void *ustack_base,
+                  size_t ustack_size, USER void *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_RTLD */
 
 /* Base address and size symbols for the system RTLD */
@@ -98,8 +99,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 compat_elfexec_init_entry(struct icpustate *__restrict user_state,
                           KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                           USER void *peb_address, USER void *ustack_base,
-                          size_t ustack_size, USER void *entry_pc,
-                          bool has_rtld);
+                          size_t ustack_size, USER void *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY */
 
 /* Initialize the RTLD user-space library for runtime linking. */
@@ -112,8 +112,9 @@ compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                          KERNEL COMPAT_ElfW(Phdr) const *__restrict phdr_vec,
                          COMPAT_ElfW(Half) phdr_cnt,
-                         void *application_loadaddr,
-                         void *linker_loadaddr);
+                         void *application_loadaddr, void *linker_loadaddr,
+                         USER void *peb_address, USER void *ustack_base,
+                         size_t ustack_size, USER void *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD */
 
 /* Base address and size symbols for the system RTLD */

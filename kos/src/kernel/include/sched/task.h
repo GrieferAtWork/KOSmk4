@@ -50,6 +50,11 @@ DECL_BEGIN
 #define TASK_FNORMAL      0x0000 /* Normal task flags. */
 #define TASK_FKEEPCORE    0x0001 /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
 #define TASK_FKERNTHREAD  0x0002 /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
+#define TASK_FVFORK       0x0004 /* [lock(CLEAR_ONCE(THIS_TASK))] This is a child-after-vfork() thread.
+                                  * When set, this causes exec() to create a new VM, rather than clear
+                                  * an existing one, alongside both exec() and task_exit() causing the
+                                  * thread to broadcast `THIS_TASKPID->tp_changed' after clearing this
+                                  * flag following a successful exec(), or a call to task_exit() */
 #define TASK_FTERMINATING 0x0010 /* [lock(WRITE_ONCE)] The task has started the process of being terminated.
                                   *                  - No further synchronous RPCs may be scheduled for execution
                                   *                  - Implies `TASK_FKEEPCORE' (the task may no longer change its hosting CPU) */

@@ -2719,6 +2719,9 @@ struct regular_node;
  *       the caller themself if they are using the VM, too) will have been terminated.
  * @param: effective_vm: The VM into which to map the executable.
  *                       This must not be the kernel VM, which causes an assertion failure.
+ *                       NOTE: When `change_vm_to_effective_vm' is `true', prior to a successful
+ *                             return of this function, it will also do a `task_setvm(effective_vm)',
+ *                             meaning that the caller will become apart of the given VM.
  * @param: user_state:   The user-space CPU state to update upon success in a manner that
  *                       proper execution of the loaded binary is possible.
  *                       Note however that in the case of a dynamic binary, a dynamic linker
@@ -2741,6 +2744,7 @@ vm_exec(struct vm *__restrict effective_vm,
         struct path *__restrict exec_path,
         struct directory_entry *__restrict exec_dentry,
         struct regular_node *__restrict exec_node,
+        bool change_vm_to_effective_vm,
         size_t argc_inject, KERNEL char const *const *argv_inject,
 #ifdef __ARCH_HAVE_COMPAT
         USER CHECKED void const *argv,
@@ -2761,13 +2765,16 @@ vm_exec(struct vm *__restrict effective_vm,
         struct path *__restrict exec_path,
         struct directory_entry *__restrict exec_dentry,
         struct regular_node *__restrict exec_node,
+        bool change_vm_to_effective_vm,
         size_t argc_inject, KERNEL char const *const *argv_inject,
         USER UNCHECKED char const *USER CHECKED const *argv,
         USER UNCHECKED char const *USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
 	return vm_exec(effective_vm, user_state, exec_path,
-	               exec_dentry, exec_node, argc_inject,
-	               argv_inject, argv, envp, false);
+	               exec_dentry, exec_node,
+	               change_vm_to_effective_vm,
+	               argc_inject, argv_inject,
+	               argv, envp, false);
 }
 }
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
@@ -2777,13 +2784,16 @@ vm_exec32(struct vm *__restrict effective_vm,
           struct path *__restrict exec_path,
           struct directory_entry *__restrict exec_dentry,
           struct regular_node *__restrict exec_node,
+          bool change_vm_to_effective_vm,
           size_t argc_inject, KERNEL char const *const *argv_inject,
           USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
           USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
 	return vm_exec(effective_vm, user_state, exec_path,
-	               exec_dentry, exec_node, argc_inject,
-	               argv_inject, argv, envp, true);
+	               exec_dentry, exec_node,
+	               change_vm_to_effective_vm,
+	               argc_inject, argv_inject,
+	               argv, envp, true);
 }
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
 #define vm_exec32 vm_exec
@@ -2796,13 +2806,16 @@ vm_exec64(struct vm *__restrict effective_vm,
           struct path *__restrict exec_path,
           struct directory_entry *__restrict exec_dentry,
           struct regular_node *__restrict exec_node,
+          bool change_vm_to_effective_vm,
           size_t argc_inject, KERNEL char const *const *argv_inject,
           USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
           USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
 	return vm_exec(effective_vm, user_state, exec_path,
-	               exec_dentry, exec_node, argc_inject,
-	               argv_inject, argv, envp, true);
+	               exec_dentry, exec_node,
+	               change_vm_to_effective_vm,
+	               argc_inject, argv_inject,
+	               argv, envp, true);
 }
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == 8 */
 #define vm_exec64 vm_exec

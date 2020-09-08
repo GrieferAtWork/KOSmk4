@@ -666,7 +666,7 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 		}
 @@pp_endif@@
 		/* Join the child. */
-		while (waitpid(child, &status, WEXITED) < 0) {
+		while (waitpid(child, &status, 0) < 0) {
 @@pp_ifdef EINTR@@
 			if (__libc_geterrno() == EINTR)
 				continue;
@@ -721,7 +721,7 @@ err_join_zombie_child:
 		/* Unless the child was already spawned as detached,
 		 * we still have to re-join it, or else it will be
 		 * left dangling as a zombie process! */
-		if (waitpid(child, &status, WEXITED) < 0) {
+		if (waitpid(child, &status, 0) < 0) {
 @@pp_ifdef EINTR@@
 			if (__libc_geterrno() == EINTR)
 				goto err_join_zombie_child;

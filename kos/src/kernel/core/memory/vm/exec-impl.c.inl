@@ -37,12 +37,13 @@
 
 DECL_BEGIN
 
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
 MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
                       struct icpustate *__restrict user_state,
                       struct path *__restrict exec_path,
                       struct directory_entry *__restrict exec_dentry,
                       struct regular_node *__restrict exec_node,
+                      bool change_vm_to_effective_vm,
                       size_t argc_inject, KERNEL char const *const *argv_inject,
 #ifdef MY_EXEC_ARGV_SIZE
                       USER CHECKED void const *argv,
@@ -313,26 +314,62 @@ err_overlap:
 			RETHROW();
 		}
 
-		/* Set the entry point for the loaded binary. */
-		user_state = MY_FUNC(elfexec_init_entry)(user_state,
-		                                         ehdr,
-		                                         peb_base,
-		                                         stack_base,
-		                                         USER_STACK_NUM_PAGES * PAGESIZE,
-		                                         (USER void *)(uintptr_t)ehdr->e_entry,
-		                                         linker_base != (void *)-1);
-
-		/* Initialize the RTLD portion of the user-space bootstrap process. */
-		if (linker_base != (void *)-1) {
-			user_state = MY_FUNC(elfexec_init_rtld)(/* user_state:           */ user_state,
-			                                        /* exec_path:            */ exec_path,
-			                                        /* exec_dentry:          */ exec_dentry,
-			                                        /* exec_node:            */ exec_node,
-			                                        /* ehdr:                 */ ehdr,
-			                                        /* phdr_vec:             */ phdr_vector,
-			                                        /* phdr_cnt:             */ ehdr->e_phnum,
-			                                        /* application_loadaddr: */ (void *)0,
-			                                        /* linker_loadaddr:      */ linker_base);
+		{
+			REF struct vm *oldvm = THIS_VM;
+			/* Change the calling thread's vm to `effective_vm' */
+			if (oldvm != effective_vm) {
+				incref(oldvm);
+				TRY {
+					task_setvm(effective_vm);
+				} EXCEPT {
+					decref_nokill(oldvm);
+					RETHROW();
+				}
+			}
+			TRY {
+				size_t ustack_size;
+				USER void *entry_pc;
+				ustack_size = USER_STACK_NUM_PAGES * PAGESIZE;
+				entry_pc    = (USER void *)(uintptr_t)ehdr->e_entry;
+				if (linker_base != (void *)-1) {
+					/* Initialize such that we make use of the dynamic linker. */
+					user_state = MY_FUNC(elfexec_init_rtld)(/* user_state:           */ user_state,
+					                                        /* exec_path:            */ exec_path,
+					                                        /* exec_dentry:          */ exec_dentry,
+					                                        /* exec_node:            */ exec_node,
+					                                        /* ehdr:                 */ ehdr,
+					                                        /* phdr_vec:             */ phdr_vector,
+					                                        /* phdr_cnt:             */ ehdr->e_phnum,
+					                                        /* application_loadaddr: */ (void *)0,
+					                                        /* linker_loadaddr:      */ linker_base,
+					                                        /* peb_address:          */ peb_base,
+					                                        /* ustack_base:          */ stack_base,
+					                                        /* ustack_size:          */ ustack_size,
+					                                        /* entry_pc:             */ entry_pc);
+				} else {
+					/* Set the entry point for the loaded binary. */
+					user_state = MY_FUNC(elfexec_init_entry)(user_state,
+					                                         ehdr,
+					                                         peb_base,
+					                                         stack_base,
+					                                         ustack_size,
+					                                         entry_pc);
+				}
+			} EXCEPT {
+				if (oldvm != effective_vm) {
+					FINALLY_DECREF(oldvm);
+					task_setvm(oldvm);
+				}
+				RETHROW();
+			}
+			if (oldvm != effective_vm) {
+				if likely(change_vm_to_effective_vm) {
+					decref(oldvm);
+				} else {
+					FINALLY_DECREF(oldvm);
+					task_setvm(oldvm);
+				}
+			}
 		}
 	} EXCEPT {
 		freea(phdr_vector);

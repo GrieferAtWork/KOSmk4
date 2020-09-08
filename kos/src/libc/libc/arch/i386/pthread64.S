@@ -65,6 +65,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	       %rdi /* int flags */
 	/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
 	movq   $(SYS_clone), %rax
+	clc
 	syscall
 
 	/* Check if we're inside of the child thread
@@ -91,6 +92,7 @@ END(libc_pthread_clone)
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	movq   %rdx, %rbp          /* int exitcode */
 	movq   $(SYS_munmap), %rax
+	clc
 	syscall                    /* unmap our own stack. */
 	/* WARNING: No more accessing stack memory from here on! */
 

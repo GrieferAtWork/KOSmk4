@@ -17,40 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_VFORK_H
-#define _ASM_VFORK_H 1
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_VFORK32_S
+#define GUARD_LIBC_LIBC_ARCH_I386_VFORK32_S 1
 
-#include <__stdinc.h>
+#ifndef __INTELLISENSE__
+#include "vfork.S"
+#endif /* !__INTELLISENSE__ */
 
-/* 
- * #define __ARCH_HAVE_VFORK_SHARED_VM
- *
- * >> Defined when the system implements the vfork(2) system call such
- *    that it isn't a shallow alias for fork(2), but rather executes
- *    the child process within the same VM as the parent process, only
- *    that the parent will not resume execution before the child exits,
- *    or invokes one the exec(2) system calls.
- *
- * >> Knowing this at compile-time allows for some trickery where the
- *    child process will be able to write back extended exec status
- *    information (such as the exec-errno upon failure) back to main
- *    memory, such that once `vfork(2)' returns to the parent process,
- *    that parent can assume that (among everything else that is memory),
- *    its `errno' was shared with the child process, such that (assuming
- *    that the error was caused by exec(2)->errno=ENOENT), the vfork(2)
- *    system call will (seemingly) return with `errno=ENOENT'
- *
- * -> Knowing this, it becomes significantly easier to implement error
- *    propagation as the result of a failed exec() in situations such as
- *    system(3) or the spawn(3) family of functions (both POSIX and DOS)
- *
- */
-
-
-#if defined(__linux__)
-#define __ARCH_HAVE_SHARED_VM_VFORK 1
-#elif defined(__KOS__)
-#define __ARCH_HAVE_SHARED_VM_VFORK 1 /* Implemented as of 2020-09-08T14:05 */
-#endif /* ... */
-
-#endif /* !_ASM_VFORK_H */
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_VFORK32_S */

@@ -148,7 +148,7 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		validate_writable(parent_tidptr, sizeof(*parent_tidptr));
 	if (clone_flags & (CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID))
 		validate_writable(child_tidptr, sizeof(*child_tidptr));
-	if (clone_flags & CLONE_VM) {
+	if (clone_flags & (CLONE_VM | CLONE_VFORK)) {
 		result_vm = incref(caller->t_vm);
 	} else {
 		result_vm = vm_clone(caller->t_vm, false);
@@ -332,14 +332,35 @@ again_lock_vm:
 			result->t_cpu = cpu_vector[1];
 #endif
 
-		/* Actually start execution of the newly created thread. */
-		task_start(result);
+		/* Deal with vfork() */
+		if (clone_flags & CLONE_VFORK) {
+			/* Set the VFORK flag to cause the thread to execute in VFORK-mode. */
+			ATOMIC_FETCHOR(result->t_flags, TASK_FVFORK);
+
+			/* Actually start execution of the newly created thread. */
+			task_start(result);
+
+			/* Wait for the thread to clear its VFORK flag. */
+			while ((ATOMIC_READ(result->t_flags) & TASK_FVFORK) != 0) {
+				struct taskpid *pid;
+				pid = FORTASK(result, this_taskpid);
+				assert(pid);
+				task_connect(&pid->tp_changed);
+				if unlikely((ATOMIC_READ(result->t_flags) & TASK_FVFORK) == 0) {
+					task_disconnectall();
+					break;
+				}
+				task_waitfor();
+			}
+		} else {
+			/* Actually start execution of the newly created thread. */
+			task_start(result);
+		}
 	} EXCEPT {
 		decref_likely(result);
 		RETHROW();
 	}
 	decref_unlikely(result);
-
 	return result_pid;
 }
 
@@ -490,6 +511,52 @@ DEFINE_SYSCALL0(pid_t, fork) {
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_FORK */
+
+
+
+
+
+/************************************************************************/
+/* fork()                                                               */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_VFORK
+INTERN struct icpustate *FCALL
+sys_vfork_impl(struct icpustate *__restrict state) {
+	pid_t child_tid;
+	child_tid = x86_clone_impl(state,
+	                           SIGCHLD | CLONE_VFORK,
+	                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
+	                           NULL,
+	                           NULL,
+	                           get_user_gsbase(),
+	                           get_user_fsbase());
+	gpregs_setpax(&state->ics_gpregs, child_tid);
+	return state;
+}
+
+PRIVATE struct icpustate *FCALL
+task_vfork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
+               unsigned int reason, struct rpc_syscall_info const *UNUSED(sc_info)) {
+	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
+	       reason == TASK_RPC_REASON_SYSCALL ||
+	       reason == TASK_RPC_REASON_SHUTDOWN);
+	if (reason != TASK_RPC_REASON_SYSCALL)
+		return state;
+	return sys_vfork_impl(state);
+}
+
+DEFINE_SYSCALL0(pid_t, vfork) {
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_schedule_user_rpc(THIS_TASK,
+	                       &task_vfork_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       GFP_NORMAL);
+	/* Shouldn't get here... */
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_VFORK */
 
 
 

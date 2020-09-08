@@ -23,8 +23,11 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
 #include <sys/syscall.h>
+
+#include <errno.h> /* ELIMIT */
 
 /* INTERN NONNULL((1))
  * ATTR_WEAK ATTR_SECTION(".text.crt.sched.access.clone") pid_t
@@ -54,6 +57,7 @@ INTERN_FUNCTION(libc_clone)
 	movq   %r9,     %r8  /* newtls */
 
 	/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
+	clc
 	movq   $(SYS_clone), %rax
 	syscall
 
@@ -65,7 +69,7 @@ INTERN_FUNCTION(libc_clone)
 	popq_cfi_r %r14
 
 	/* Check for errors. */
-	cmpq   $-4096, %rax
+	cmpq   $(-ELIMIT), %rax
 	ja     .Lthread_clone_error
 	
 	ret

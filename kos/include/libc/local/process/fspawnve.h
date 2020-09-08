@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b7f75c9 */
+/* HASH CRC-32:0x5a3ffef4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -498,7 +498,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 		}
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 		/* Join the child. */
-		while (__localdep_waitpid(__child, &__status, __WEXITED) < 0) {
+		while (__localdep_waitpid(__child, &__status, 0) < 0) {
 #ifdef __EINTR
 			if (__libc_geterrno() == __EINTR)
 				continue;
@@ -553,7 +553,7 @@ __err_join_zombie_child:
 		/* Unless the child was already spawned as detached,
 		 * we still have to re-join it, or else it will be
 		 * left dangling as a zombie process! */
-		if (__localdep_waitpid(__child, &__status, __WEXITED) < 0) {
+		if (__localdep_waitpid(__child, &__status, 0) < 0) {
 #ifdef __EINTR
 			if (__libc_geterrno() == __EINTR)
 				goto __err_join_zombie_child;
