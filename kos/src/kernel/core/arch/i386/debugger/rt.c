@@ -757,8 +757,24 @@ fully_reset_task_connections:
 		                                                  CPU_IPI_FWAITFOR, mycpu);
 		if (count) {
 			/* Wait for other CPUs to ACK becoming suspended. */
-			while (x86_dbg_hostbackup_cpu_suspended_count() < count)
+			unsigned int volatile timeout = 100000000;
+
+			/* NOTE: We need a timeout here, since this can dead-lock if one of the other
+			 *       CPUs is itself in a dead-lock, which could easily happen when the
+			 *       debugger was entered while the caller was holding some kind of atomic
+			 *       lock, which another CPU is now trying to acquire. (all while having
+			 *       preemption, and thus all types of interrupts disabled)
+			 * When this happens, the other CPU will never respond to us until the user is
+			 * ready to return from debugger mode, but assuming that the above assumption
+			 * is correct, the secondary core that's not responding, while being unable to
+			 * halt in the mean time, still shouldn't be able to do any real harm until
+			 * that point, so this is actually (kind-of) ok. */
+			while (x86_dbg_hostbackup_cpu_suspended_count() < count) {
+				if (!timeout)
+					break;
+				--timeout;
 				__pause();
+			}
 		}
 	}
 #endif /* !CONFIG_NO_SMP */

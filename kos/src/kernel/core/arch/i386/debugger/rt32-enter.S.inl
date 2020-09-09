@@ -189,8 +189,23 @@ L(.Lacquire_lapicid_lock):
 	/* A secondary pause is used because `sti' only enables interrupts after the next instruction.
 	 * The intend here is that we execute `pause' at least once with interrupts enabled (if possible) */
 	pause
-1:	pause
+	pause
 	cli
+	jmp    L(.Lacquire_lapicid_lock)
+1:	/* We can't get into the debugger because some other thread is trying to get
+	 * in at this very moment. - However, in order to enter debugger mode, that
+	 * other CPU will have send out an IPI to get all other CPUs to suspend their
+	 * operations.
+	 *
+	 * The problem is that we can't enable preemption right now, and so we can't
+	 * respond to that interrupt request like we normally would.
+	 *
+	 * As such, the only way to work around this is by directly triggering the
+	 * interrupt used for IPI communications. (even though by doing so, we make
+	 * use of more stack space than our caller has given us permission to use...) */
+	pause
+	int    $(0xee) /* #define IDT_X86_ee apic_ipi */
+
 	jmp    L(.Lacquire_lapicid_lock)
 L(.Lsingle_lapicid_lock):
 	EXTERN(x86_dbg_owner_lapicid)
