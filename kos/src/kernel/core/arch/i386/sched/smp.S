@@ -549,10 +549,14 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	orP    $(CR0_TS | CR0_ET | CR0_MP), %Pax
 
 	/* Enable native FPU exceptions, if supported. */
+#ifndef __x86_64__
 	ttest  mask=CPU_FEATURE_FI486, loc=thiscpu_x86_cpufeatures(R_CPU)
 	jz     1f
+#endif /* !__x86_64__ */
 	orP    $(CR0_NE), %Pax /* Native exceptions enable */
+#ifndef __x86_64__
 1:
+#endif /* !__x86_64__ */
 	/* Enable SSE, if supported. */
 	ttest  mask=CPUID_1D_SSE, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
 	jz     1f

@@ -33,7 +33,8 @@ case EMU86_OPCODE_ENCODE(0xca):
 #endif /* EMU86_EMULATE_CONFIG_WANT_LRET */
 case EMU86_OPCODE_ENCODE(0xcb): {
 	/* CB     RET     Far return to calling procedure. */
-#if EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER
+#if (EMU86_EMULATE_CONFIG_WANT_LRET || EMU86_EMULATE_CONFIG_CHECKUSER || \
+     (EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_VALIDATE_IPCS)))
 	u16 cs;
 	byte_t *sp;
 	EMU86_UREG_TYPE ip;
@@ -81,6 +82,9 @@ case EMU86_OPCODE_ENCODE(0xcb): {
 	goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_LRET */
+#if EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_VALIDATE_IPCS)
+	EMU86_VALIDATE_IPCS(ip, cs);
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_VALIDATE_IPCS) */
 	goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction;
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LRET */

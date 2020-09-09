@@ -38,9 +38,9 @@ case EMU86_OPCODE_ENCODE(0xea): {
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#if EMU86_EMULATE_CONFIG_WANT_LJMP && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)
+#if ((EMU86_EMULATE_CONFIG_WANT_LJMP || (EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_VALIDATE_IPCS))) && \
+     (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT))
 	{
-#if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMP
 		u32 offset;
 		u16 cs;
 		if (!!EMU86_F_IS16(op_flags) ^ !!(op_flags & EMU86_F_AD16)) {
@@ -52,7 +52,6 @@ case EMU86_OPCODE_ENCODE(0xea): {
 		}
 		cs = UNALIGNED_GETLE16((u16 *)pc);
 		pc += 2;
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMP */
 		/* Verify the segment index. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (!SEGMENT_IS_VALID_USERCODE(cs) && EMU86_ISUSER_NOVM86()) {
@@ -72,6 +71,7 @@ case EMU86_OPCODE_ENCODE(0xea): {
 		goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
 #else /* EMU86_EMULATE_CONFIG_WANT_LJMP */
+		EMU86_VALIDATE_IPCS(offset, cs);
 #define NEED_return_unsupported_instruction
 		goto return_unsupported_instruction;
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LJMP */

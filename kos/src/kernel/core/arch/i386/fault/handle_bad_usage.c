@@ -1731,6 +1731,144 @@ throw_illegal_op:
 #define EMU86_EMULATE_XTEST_IS_ZERO 1
 
 
+/* Segment register verification */
+#define EMU86_VALIDATE_IPCS(new_ip, new_cs)                x86_validate_ipcs(_state, new_ip, new_cs)
+#define EMU86_VALIDATE_DATASEG(new_segment, segment_regno) x86_validate_datseg(_state, new_segment, segment_regno)
+
+PRIVATE NOPREEMPT WUNUSED ATTR_RETNONNULL NONNULL((1)) struct segment *KCALL
+x86_lookup_segment_nopr(struct icpustate *__restrict state,
+                        uint16_t segment_value, pflag_t was,
+                        uintptr_t segment_regno) {
+	uintptr_t segment_index;
+	struct segment *seg;
+	struct desctab dt;
+	__sgdt(&dt);
+	segment_index = segment_value;
+	if (segment_index & 4) {
+		/* LDT index. */
+		u16 ldt = __sldt() & ~7;
+		if unlikely(!ldt || ldt > dt.dt_limit) {
+			PREEMPTION_POP(was);
+			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
+			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+			      0,                                    /* opcode */
+			      0,                                    /* op_flags */
+			      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
+			      X86_REGISTER_MISC_LDT,                /* regno */
+			      0,                                    /* offset */
+			      ldt);                                 /* regval */
+		}
+		seg = (struct segment *)((byte_t *)dt.dt_base + ldt);
+		dt.dt_base  = segment_rdbaseX(seg);
+		dt.dt_limit = (uint16_t)segment_rdlimit(seg);
+	}
+	segment_index &= ~7;
+	if (!segment_index || segment_index > dt.dt_limit) {
+		PREEMPTION_POP(was);
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0,                                    /* opcode */
+		      0,                                    /* op_flags */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
+		      segment_regno,                        /* regno */
+		      0,                                    /* offset */
+		      segment_value);                       /* regval */
+	}
+	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
+	if (!((segment_value & 3) <= seg->s_descriptor.d_dpl)) {
+		/* Invariant violated: RPL <= DPL */
+		PREEMPTION_POP(was);
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0,                                    /* opcode */
+		      0,                                    /* op_flags */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV, /* what */
+		      segment_regno,                        /* regno */
+		      0,                                    /* offset */
+		      segment_value);                       /* regval */
+	}
+	if (!((icpustate_getcs(state) & 3) <= seg->s_descriptor.d_dpl)) {
+		/* Invariant violated: CPL <= DPL */
+		PREEMPTION_POP(was);
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0,                                    /* opcode */
+		      0,                                    /* op_flags */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV, /* what */
+		      segment_regno,                        /* regno */
+		      0,                                    /* offset */
+		      segment_value);                       /* regval */
+	}
+	return seg;
+}
+
+PRIVATE void KCALL
+x86_validate_ipcs(struct icpustate *__restrict state,
+                  uintptr_t ip, uint16_t cs) {
+	pflag_t was;
+	struct segment *seg;
+	was = PREEMPTION_PUSHOFF();
+	seg = x86_lookup_segment_nopr(state, cs, was, X86_REGISTER_SEGMENT_CS);
+	if (seg->s_descriptor.d_type != SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD) {
+		PREEMPTION_POP(was);
+		/* Not a code segment! */
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0,                                    /* opcode */
+		      0,                                    /* op_flags */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
+		      X86_REGISTER_SEGMENT_CS,              /* regno */
+		      0,                                    /* offset */
+		      cs);                                  /* regval */
+	}
+	/* Verify that `ip' belongs to `seg' */
+	if ((seg->s_descriptor.d_dpl == 0) != ADDR_ISKERN(ip)) {
+		PREEMPTION_POP(was);
+		if (ADDR_ISKERN(ip)) {
+			/* Tried to execute kernel with user CS */
+			THROW(E_SEGFAULT_NOTEXECUTABLE, ip,
+			      (icpustate_isuser(state) ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
+			      E_SEGFAULT_CONTEXT_EXEC);
+		}
+		/* Tried to execute user with kernel CS */
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0,                                    /* opcode */
+		      0,                                    /* op_flags */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV, /* what */
+		      X86_REGISTER_SEGMENT_CS,              /* regno */
+		      0,                                    /* offset */
+		      cs);                                  /* regval */
+	}
+	PREEMPTION_POP(was);
+}
+
+PRIVATE void KCALL
+x86_validate_datseg(struct icpustate *__restrict state,
+                    uint16_t segment_value, uintptr_t segment_regno) {
+	pflag_t was;
+	struct segment *seg;
+#ifdef __x86_64__
+	/* Special case: In 64-bit mode, one is allowed
+	 * to assign 0-values to segment registers. */
+	if (segment_value == 0 && icpustate_is64bit(state))
+		return;
+#endif /* __x86_64__ */
+	was = PREEMPTION_PUSHOFF();
+	seg = x86_lookup_segment_nopr(state, segment_value, was, segment_regno);
+	if (seg->s_descriptor.d_type != SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR) {
+		PREEMPTION_POP(was);
+		/* Not a data segment! */
+		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
+		      0,                                    /* opcode */
+		      0,                                    /* op_flags */
+		      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, /* what */
+		      segment_regno,                        /* regno */
+		      0,                                    /* offset */
+		      segment_value);                       /* regval */
+	}
+	PREEMPTION_POP(was);
+}
+
+
+
+
+
 
 
 DECL_END

@@ -103,6 +103,28 @@
 		setter(_value);                              \
 		EMU86_SETSTACKPTR(sp);                       \
 	} __WHILE0
+#define EMU86_POP1632_PEEK(T, setter)                \
+	do {                                             \
+		byte_t *sp;                                  \
+		T _value;                                    \
+		IF_64BIT({                                   \
+			if (EMU86_F_IS64(op_flags))              \
+				goto return_unsupported_instruction; \
+		});                                          \
+		sp = EMU86_GETSTACKPTR();                    \
+		if (IS_16BIT()) {                            \
+			EMU86_EMULATE_POP(sp, 2);                \
+			EMU86_READ_USER_MEMORY(sp, 2);           \
+			_value = (T)EMU86_MEMREADW(sp);          \
+			sp += 2;                                 \
+		} else {                                     \
+			EMU86_EMULATE_POP(sp, 4);                \
+			EMU86_READ_USER_MEMORY(sp, 4);           \
+			_value = (T)EMU86_MEMREADL(sp);          \
+			sp += 4;                                 \
+		}                                            \
+		setter(_value);                              \
+	} __WHILE0
 #define EMU86_POP1632_NOSUP()                                \
 	do {                                                     \
 		byte_t *sp;                                          \
@@ -122,8 +144,9 @@
 		goto return_unsupported_instruction;                 \
 	} __WHILE0
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
-#define EMU86_POP1632(T, setter) goto return_unsupported_instruction
-#define EMU86_POP1632_NOSUP()    goto return_unsupported_instruction
+#define EMU86_POP1632(T, setter)      goto return_unsupported_instruction
+#define EMU86_POP1632_PEEK(T, setter) goto return_unsupported_instruction
+#define EMU86_POP1632_NOSUP()         goto return_unsupported_instruction
 #endif
 
 
@@ -231,6 +254,12 @@
 		sp = EMU86_GETSTACKPTR();                          \
 		EMU86_POP163264_IMPL(setter16, setter32, setter64) \
 		EMU86_SETSTACKPTR(sp);                             \
+	} __WHILE0
+#define EMU86_POP163264_PEEK(setter16, setter32, setter64) \
+	do {                                                   \
+		byte_t *sp;                                        \
+		sp = EMU86_GETSTACKPTR();                          \
+		EMU86_POP163264_IMPL(setter16, setter32, setter64) \
 	} __WHILE0
 #define EMU86_POP163264_IMPL(setter16, setter32, setter64)             \
 		if (IS_16BIT()) {                                              \
