@@ -124,35 +124,10 @@ NOTHROW(KCALL are_preemptive_interrupts_enabled)(struct cpu *__restrict me) {
 
 
 #ifdef CONFIG_NO_SMP
-#define x86_dbg_get_hostcpu() &_bootcpu
+#define x86_failsafe_getcpu() &_bootcpu
 #else /* CONFIG_NO_SMP */
-PRIVATE ATTR_DBGTEXT struct cpu *
-NOTHROW(KCALL x86_dbg_get_hostcpu)(void) {
-	struct cpu *result;
-	/* Try to figure out which task we are (but
-	 * don't do anything that could break stuff...) */
-	if (cpu_count <= 1) {
-		/* Simple case: There's only 1 CPU, so that has to be us! */
-		result = &_bootcpu;
-	} else if (X86_HAVE_LAPIC) {
-		/* Use the LAPIC id to determine the current CPU. */
-		cpuid_t i;
-		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
-		result = &_bootcpu;
-		for (i = 0; i < cpu_count; ++i) {
-			if unlikely((uintptr_t)cpu_vector[i] < KERNELSPACE_BASE)
-				continue; /* At one point during booting, `cpu_vector' contains LAPIC IDs. */
-			if (FORCPU(cpu_vector[i], thiscpu_x86_lapicid) == id) {
-				result = cpu_vector[i];
-				break;
-			}
-		}
-	} else {
-		/* XXX: Use pointers from `x86_dbg_exitstate' to determine the calling CPU */
-		result = &_bootcpu;
-	}
-	return result;
-}
+INTDEF ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED struct cpu *
+NOTHROW(KCALL x86_failsafe_getcpu)(void);
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -184,7 +159,7 @@ ac_ints[CONFIG_DBG_ALTCORE_MAX_INTERRUPTS] = { };
  * is to filter out `vector == 0xf1' */
 INTERN ATTR_DBGTEXT NOBLOCK void
 NOTHROW(FCALL x86_dbg_altcore_interrupt)(u8 vector) {
-	struct cpu *mycpu = x86_dbg_get_hostcpu();
+	struct cpu *mycpu = x86_failsafe_getcpu();
 	union ac_int aint;
 	if ((uintptr_t)mycpu < KERNELSPACE_BASE)
 		return;
@@ -305,7 +280,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	PREEMPTION_DISABLE();
 	(void)args;
 	/* Figure out the calling CPU. */
-	ammend.dca_cpu = x86_dbg_get_hostcpu();
+	ammend.dca_cpu = x86_failsafe_getcpu();
 
 	/* Load the calling thread pointer. */
 	ammend.dca_thread = ammend.dca_cpu->c_current;
@@ -663,7 +638,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu    = x86_dbg_get_hostcpu();
+	mycpu    = x86_failsafe_getcpu();
 
 	mythread = mycpu->c_current;
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
@@ -898,7 +873,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu    = x86_dbg_get_hostcpu();
+	mycpu    = x86_failsafe_getcpu();
 	dbg_cpu_ = mycpu;
 
 	mythread = mycpu->c_current;
@@ -959,7 +934,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu    = x86_dbg_get_hostcpu();
+	mycpu    = x86_failsafe_getcpu();
 	dbg_cpu_ = mycpu;
 
 	mythread = mycpu->c_current;
@@ -1021,7 +996,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	struct cpu *mycpu;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu = x86_dbg_get_hostcpu();
+	mycpu = x86_failsafe_getcpu();
 
 	mythread = mycpu->c_current;
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */

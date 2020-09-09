@@ -31,8 +31,11 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/x86/apic.h>
 #include <kernel/x86/fault.h> /* x86_handle_double_fault() */
-#include <kernel/x86/idt.h>   /* IDT_CONFIG_ISTRAP() */
+#include <kernel/x86/gdt.h>
+#include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
+#include <sched/cpu.h>
 
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -43,6 +46,10 @@
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
+
+
+/* NOTE: This also prevents `x == NULL', since `ADDR_ISKERN(NULL) == false'! */
+#define VERIFY_ADDR(x) ADDR_ISKERN(x)
 
 DECL_BEGIN
 
@@ -59,10 +66,45 @@ struct df_cpustate {
 #ifdef __x86_64__
 	struct icpustate dcs_regs;
 #else /* __x86_64__ */
+	struct cpu      *dcs_cpu;  /* [1..1] The current CPU. */
 	PHYS pagedir_t  *dcs_cr3;
 	struct ucpustate dcs_regs;
 #endif /* !__x86_64__ */
 };
+
+
+#ifdef CONFIG_NO_SMP
+#define x86_failsafe_getcpu() &_bootcpu
+#else /* CONFIG_NO_SMP */
+INTERN ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED struct cpu *
+NOTHROW(KCALL x86_failsafe_getcpu)(void) {
+	struct cpu *result;
+	/* Try to figure out which task we are (but
+	 * don't do anything that could break stuff...) */
+	if (cpu_count <= 1) {
+		/* Simple case: There's only 1 CPU, so that has to be us! */
+		result = &_bootcpu;
+	} else if (X86_HAVE_LAPIC) {
+		/* Use the LAPIC id to determine the current CPU. */
+		cpuid_t i;
+		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
+		result = &_bootcpu;
+		for (i = 0; i < cpu_count; ++i) {
+			if unlikely(!ADDR_ISKERN(cpu_vector[i]))
+				continue; /* At one point during booting, `cpu_vector' contains LAPIC IDs. */
+			if (FORCPU(cpu_vector[i], thiscpu_x86_lapicid) == id) {
+				result = cpu_vector[i];
+				break;
+			}
+		}
+	} else {
+		/* XXX: Use pointers from `x86_dbg_exitstate' to determine the calling CPU */
+		result = &_bootcpu;
+	}
+	return result;
+}
+#endif /* !CONFIG_NO_SMP */
+
 
 
 INTDEF void FCALL
@@ -108,11 +150,40 @@ panic_df_dbg_main(void *cr3)
 INTERN struct df_cpustate *FCALL
 x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	void *pc;
+	struct cpu *mycpu;
+	struct task *mythread;
 #ifdef __x86_64__
 	pc = (void *)state->dcs_regs.ics_irregs.ir_rip;
 #else /* __x86_64__ */
 	pc = (void *)state->dcs_regs.ucs_eip;
 #endif /* !__x86_64__ */
+
+	/* In order to even be able to write to the system log, we must be able to
+	 * identify ourselves. As such, try to fix the `THIS_TASK' pointer by changing
+	 * it to become the c_current pointer of our current CPU, or, if that pointer
+	 * is broken, use the current CPU's IDLE thread instead. */
+#ifdef __x86_64__
+	mycpu = x86_failsafe_getcpu();
+#else /* __x86_64__ */
+	mycpu = state->dcs_cpu;
+	if unlikely(!VERIFY_ADDR(mycpu))
+		mycpu = x86_failsafe_getcpu();
+#endif /* !__x86_64__ */
+	mythread = mycpu->c_current;
+	if unlikely(!VERIFY_ADDR(mythread))
+		mythread = &FORCPU(mycpu, thiscpu_idle);
+#ifdef __x86_64__
+	__wrgsbase(mythread);
+#else /* __x86_64__ */
+	segment_wrbaseX(&FORCPU(mycpu, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
+	                (uintptr_t)mythread);
+	__lgdt(sizeof(thiscpu_x86_gdt) - 1, FORCPU(mycpu, thiscpu_x86_gdt));
+	__wrfs(SEGMENT_KERNEL_FSBASE);
+#endif /* !__x86_64__ */
+	COMPILER_BARRIER();
+	/* Ok. If we're still alive, then the above ~should~ have just
+	 * giving us ~some~ semblance of a consistent TLS state. */
+
 	printk(KERN_EMERG "Double fault at %p\n", pc);
 	{
 		struct ucpustate ustate;

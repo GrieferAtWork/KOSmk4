@@ -94,25 +94,29 @@ IDT_HANDLER_BEGIN
 	pushl  OFFSET_TSS_EBP(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_ebp */
 	pushl  OFFSET_TSS_ESI(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_esi */
 	pushl  OFFSET_TSS_EDI(%ebp)    /* state->dcs_regs.ucs_gpregs.gp_edi */
-	pushl  OFFSET_TSS_CR3(%ebp)    /* state->dcs_cr3 */
 
-	.cfi_def_cfa %esp, 4 + SIZEOF_UCPUSTATE
-	.cfi_rel_offset %eip, 4 + OFFSET_UCPUSTATE_EIP
-	.cfi_rel_offset %eflags, 4 + OFFSET_UCPUSTATE_EFLAGS
-	.cfi_rel_offset %ss, 4 + OFFSET_UCPUSTATE_SS
-	.cfi_rel_offset %cs, 4 + OFFSET_UCPUSTATE_CS
-	.cfi_rel_offset %ds, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS
-	.cfi_rel_offset %es, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES
-	.cfi_rel_offset %fs, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS
-	.cfi_rel_offset %gs, 4 + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS
-	.cfi_rel_offset %eax, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_rel_offset %ecx, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
-	.cfi_rel_offset %edx, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ebx, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
-	.cfi_rel_offset %esp, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	.cfi_rel_offset %ebp, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
-	.cfi_rel_offset %esi, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
-	.cfi_rel_offset %edi, 4 + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
+#define OFFSET_DFSTATE_UCPUSTATE 8 /* == Total addend from the following push instructions */
+	pushl  OFFSET_TSS_CR3(%ebp)    /* state->dcs_cr3 */
+	pushl  %ebx                    /* state->dcs_cpu */
+
+	.cfi_def_cfa %esp, OFFSET_DFSTATE_UCPUSTATE + SIZEOF_UCPUSTATE
+	.cfi_rel_offset %eip, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_EIP
+	.cfi_rel_offset %eflags, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_EFLAGS
+	.cfi_rel_offset %ss, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_SS
+	.cfi_rel_offset %cs, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_CS
+	.cfi_rel_offset %ds, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS
+	.cfi_rel_offset %es, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES
+	.cfi_rel_offset %fs, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS
+	.cfi_rel_offset %gs, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS
+	.cfi_rel_offset %eax, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
+	.cfi_rel_offset %ecx, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
+	.cfi_rel_offset %edx, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
+	.cfi_rel_offset %ebx, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
+	.cfi_rel_offset %esp, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
+	.cfi_rel_offset %ebp, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
+	.cfi_rel_offset %esi, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
+	.cfi_rel_offset %edi, OFFSET_DFSTATE_UCPUSTATE + OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
+#undef OFFSET_DFSTATE_UCPUSTATE
 
 	/* Invoke the C-level double-fault handler. */
 	movl   %esp, %ecx
