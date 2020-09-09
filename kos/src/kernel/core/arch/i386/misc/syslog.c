@@ -56,17 +56,17 @@ INTERN port_t x86_syslog_port = (port_t)0x80;
 #define log_write(ptr, num_bytes) \
 	outsb(x86_syslog_port, ptr, num_bytes)
 
-PRIVATE ATTR_ALIGNED(1) char const level_prefix[][9] = {
-	/* [SYSLOG_LEVEL_EMERG  ] = */ "emerg ][",
-	/* [SYSLOG_LEVEL_ALERT  ] = */ "alert ][",
-	/* [SYSLOG_LEVEL_CRIT   ] = */ "crit  ][",
-	/* [SYSLOG_LEVEL_ERR    ] = */ "error ][",
-	/* [SYSLOG_LEVEL_WARNING] = */ "warn  ][",
-	/* [SYSLOG_LEVEL_NOTICE ] = */ "notice][",
-	/* [SYSLOG_LEVEL_INFO   ] = */ "info  ][",
-	/* [SYSLOG_LEVEL_TRACE  ] = */ "trace ][",
-	/* [SYSLOG_LEVEL_DEBUG  ] = */ "debug ][",
-	/* [SYSLOG_LEVEL_DEFAULT] = */ "output]["
+PRIVATE ATTR_ALIGNED(1) char const level_prefix[][10] = {
+	/* [SYSLOG_LEVEL_EMERG  ] = */ ":emerg ][",
+	/* [SYSLOG_LEVEL_ALERT  ] = */ ":alert ][",
+	/* [SYSLOG_LEVEL_CRIT   ] = */ ":crit  ][",
+	/* [SYSLOG_LEVEL_ERR    ] = */ ":error ][",
+	/* [SYSLOG_LEVEL_WARNING] = */ ":warn  ][",
+	/* [SYSLOG_LEVEL_NOTICE ] = */ ":notice][",
+	/* [SYSLOG_LEVEL_INFO   ] = */ ":info  ][",
+	/* [SYSLOG_LEVEL_TRACE  ] = */ ":trace ][",
+	/* [SYSLOG_LEVEL_DEBUG  ] = */ ":debug ][",
+	/* [SYSLOG_LEVEL_DEFAULT] = */ ":output]["
 };
 
 
