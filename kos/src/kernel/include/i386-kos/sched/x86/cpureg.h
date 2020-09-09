@@ -52,6 +52,13 @@ DATDEF ATTR_PERCPU u16 thiscpu_x86_saved_ldtr;
 /* Saved Task register. (usually `SEGMENT_CPU_TSS') */
 DATDEF ATTR_PERCPU u16 thiscpu_x86_saved_tr;
 
+/* Saved %cr0 and %cr4 registers. Loaded during late CPU
+ * bootstrap, and saved when a CPU goes into deep sleep.
+ *
+ * First initialized alongside cpuid information. */
+DATDEF ATTR_PERCPU uintptr_t thiscpu_x86_saved_cr0;
+DATDEF ATTR_PERCPU uintptr_t thiscpu_x86_saved_cr4;
+
 
 /* Other (feature-dependent) registers exist that may be added here, such as:
  *   - %cr0 (certain bits only)

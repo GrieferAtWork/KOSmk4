@@ -51,13 +51,13 @@ struct fpustate;
  * NOTE: When accessing this field, preemption must be disabled, as
  *       this field affects the behavior of task state switches. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_THISCPU_FPUTHREAD
-DATDEF ATTR_PERCPU struct task *thiscpu_x86_fputhread; /* TODO: Rename to `thiscpu_fputhread' */
+DATDEF ATTR_PERCPU struct task *thiscpu_fputhread;
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_THISCPU_FPUTHREAD */
 
 /* [0..1][lock(WRITE_ONCE)][owned]
  * The per-task FPU state (lazily allocated) */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_THIS_FPUSTATE
-DATDEF ATTR_PERTASK struct fpustate *this_x86_fpustate; /* TODO: Rename to `this_fpustate' */
+DATDEF ATTR_PERTASK struct fpustate *this_fpustate;
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_THIS_FPUSTATE */
 
 
@@ -70,7 +70,7 @@ FUNDEF WUNUSED ATTR_MALLOC struct fpustate *NOTHROW(KCALL fpustate_alloc_nx)(voi
 FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE */
 
-/* Ensure that `this_x86_fpustate' has been allocated, allocating
+/* Ensure that `this_fpustate' has been allocated, allocating
  * and initializing it now if it hasn't already. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_INIT
 FUNDEF void KCALL fpustate_init(void) THROWS(E_BADALLOC);
@@ -92,7 +92,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_save)(void);
  * The main purpose of this function is to aid in implementing FPU support
  * in debuggers, where this function is called when suspending execution of
  * the associated CPU, after which the debugger can read/write FPU information
- * for any thread by simply looking at `PERTASK(thread, this_x86_fpustate)' */
+ * for any thread by simply looking at `PERTASK(thread, this_fpustate)' */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVECPU
 FUNDEF NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVECPU */

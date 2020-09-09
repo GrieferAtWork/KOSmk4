@@ -104,6 +104,13 @@ PUBLIC ATTR_PERCPU u16 thiscpu_x86_saved_ldtr = SEGMENT_CPU_LDT;
 /* Saved Task register. (usually `SEGMENT_CPU_TSS') */
 PUBLIC ATTR_PERCPU u16 thiscpu_x86_saved_tr = SEGMENT_CPU_TSS;
 
+/* Saved %cr0 and %cr4 registers. Loaded during late CPU
+ * bootstrap, and saved when a CPU goes into deep sleep.
+ *
+ * First initialized alongside cpuid information. */
+PUBLIC ATTR_PERCPU uintptr_t thiscpu_x86_saved_cr0 = 0;
+PUBLIC ATTR_PERCPU uintptr_t thiscpu_x86_saved_cr4 = 0;
+
 
 
 INTDEF NOBLOCK void NOTHROW(KCALL apic_send_init)(u8 procid);

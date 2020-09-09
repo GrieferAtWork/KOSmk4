@@ -36,7 +36,7 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 		struct fpustate64 *fpu;
 		if (thread == GDBServer_Host)
 			fpustate_save();
-		fpu = FORTASK(thread, this_x86_fpustate);
+		fpu = FORTASK(thread, this_fpustate);
 		if (!fpu) {
 #ifdef GET_REGISTER
 			size_t result;
@@ -56,7 +56,7 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 			fpu = fpustate_alloc_nx();
 			if unlikely(!fpu)
 				return 0;
-			FORTASK(thread, this_x86_fpustate) = fpu;
+			FORTASK(thread, this_fpustate) = fpu;
 #endif /* ... */
 		}
 		switch (regno) {

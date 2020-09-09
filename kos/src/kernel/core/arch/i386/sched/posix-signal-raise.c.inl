@@ -176,7 +176,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			user_ucontext->uc_mcontext.mc_cr2 = (ulongptr_t)siginfo->si_addr;
 			user_ucontext->uc_mcontext.mc_flags |= __MCONTEXT_FLAG_HAVECR2;
 		}
-		if (PERTASK_GET(this_x86_fpustate)) {
+		if (PERTASK_GET(this_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
 			(NAME2(fpustate, _saveinto)(user_fpustate));
 			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
@@ -197,7 +197,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		COMPILER_WRITE_BARRIER();
 		usp -= sizeof(struct NAME(ucpustate));
 		/* Only save the FPU state if it is in use. */
-		if (PERTASK_GET(this_x86_fpustate)) {
+		if (PERTASK_GET(this_fpustate)) {
 			/* Only allocate what we need for the used FPU state */
 			usp -= x86_fpustate_variant == FPU_STATE_SSTATE
 			       ? sizeof(struct sfpustate)

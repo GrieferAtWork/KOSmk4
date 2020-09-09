@@ -199,8 +199,8 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movl   %cr0, %ecx
 	andl   $(~CR0_TS), %ecx
-	EXTERN(thiscpu_x86_fputhread)
-	movl   thiscpu_x86_fputhread(%ebx), %edx
+	EXTERN(thiscpu_fputhread)
+	movl   thiscpu_fputhread(%ebx), %edx
 	cmpl   %edx, %eax
 	je     1f
 	/* Only disable if the target thread isn't holding the active FPU-context */

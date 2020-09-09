@@ -155,8 +155,8 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movq   %cr0, %rcx
 	andq   $~CR0_TS, %rcx
-	EXTERN(thiscpu_x86_fputhread)
-	movq   thiscpu_x86_fputhread(%rbx), %rdx
+	EXTERN(thiscpu_fputhread)
+	movq   thiscpu_fputhread(%rbx), %rdx
 	cmpq   %rdx, %rax
 	je     1f
 	/* Only disable if the target thread isn't holding the active FPU-context */

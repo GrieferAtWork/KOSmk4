@@ -62,23 +62,23 @@ PUBLIC unsigned int _x86_fpustate_variant ASMNAME("x86_fpustate_variant") = FPU_
 /* [0..1] The task associated with the current FPU register contents, or NULL if none.
  * NOTE: When accessing this field, preemption must be disabled, as
  *       this field affects the behavior of task state switches. */
-PUBLIC ATTR_PERCPU struct task *thiscpu_x86_fputhread = NULL;
+PUBLIC ATTR_PERCPU struct task *thiscpu_fputhread = NULL;
 
 /* [0..1][owned] The per-task FPU state (lazily allocated) */
-PUBLIC ATTR_PERTASK struct fpustate *this_x86_fpustate = NULL;
+PUBLIC ATTR_PERTASK struct fpustate *this_fpustate = NULL;
 
 DEFINE_PERTASK_ONEXIT(pertask_cleanup_fpustate);
 INTERN NOBLOCK void
 NOTHROW(KCALL pertask_cleanup_fpustate)(void) {
 	/* Unset the calling thread potentially holding the FPU state.
 	 * Since the task will go away, we don't actually have to save it. */
-	ATOMIC_CMPXCH(PERCPU(thiscpu_x86_fputhread), THIS_TASK, NULL);
+	ATOMIC_CMPXCH(PERCPU(thiscpu_fputhread), THIS_TASK, NULL);
 }
 
 DEFINE_PERTASK_FINI(pertask_finalize_fpustate);
 INTERN NOBLOCK void
 NOTHROW(KCALL pertask_finalize_fpustate)(struct task *__restrict self) {
-	fpustate_free(FORTASK(self, this_x86_fpustate));
+	fpustate_free(FORTASK(self, this_fpustate));
 }
 
 #if 0 /* No need... */
@@ -86,7 +86,7 @@ DEFINE_PERTASK_CLONE(clone_fpustate);
 PRIVATE ATTR_USED void KCALL
 clone_fpustate(struct task *__restrict new_thread, uintptr_t UNUSED(flags)) {
 	struct fpustate *fst;
-	fst = PERTASK_GET(this_x86_fpustate);
+	fst = PERTASK_GET(this_fpustate);
 	if (fst) {
 		struct fpustate *copy;
 		fpustate_save();
@@ -135,22 +135,22 @@ NOTHROW(KCALL fpustate_free)(struct fpustate *__restrict self) {
 
 
 
-/* Ensure that `this_x86_fpustate' has been allocated, allocating
+/* Ensure that `this_fpustate' has been allocated, allocating
  * and initializing it now if it hasn't already. */
 PUBLIC void KCALL fpustate_init(void) THROWS(E_BADALLOC) {
-	if (PERTASK_GET(this_x86_fpustate))
+	if (PERTASK_GET(this_fpustate))
 		return;
-	PERTASK_SET(this_x86_fpustate, fpustate_alloc());
+	PERTASK_SET(this_fpustate, fpustate_alloc());
 }
 
 PUBLIC WUNUSED bool NOTHROW(KCALL fpustate_init_nx)(void) {
 	struct fpustate *state;
-	if (PERTASK_GET(this_x86_fpustate))
+	if (PERTASK_GET(this_fpustate))
 		return true;
 	state = fpustate_alloc_nx();
 	if unlikely(!state)
 		return false;
-	PERTASK_SET(this_x86_fpustate, state);
+	PERTASK_SET(this_fpustate, state);
 	return true;
 }
 
@@ -159,17 +159,17 @@ PUBLIC WUNUSED bool NOTHROW(KCALL fpustate_init_nx)(void) {
  * last one to use the FPU, or has never used the FPU at all. */
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
 	pflag_t was;
-	if (PERCPU(thiscpu_x86_fputhread) != THIS_TASK)
+	if (PERCPU(thiscpu_fputhread) != THIS_TASK)
 		return;
 	was = PREEMPTION_PUSHOFF();
 	COMPILER_READ_BARRIER();
-	if (PERCPU(thiscpu_x86_fputhread) == THIS_TASK) {
+	if (PERCPU(thiscpu_fputhread) == THIS_TASK) {
 		__clts();
 		/* The FPU state was changed. */
-		assert(PERTASK_GET(this_x86_fpustate));
-		x86_fpustate_save(PERTASK_GET(this_x86_fpustate));
+		assert(PERTASK_GET(this_fpustate));
+		x86_fpustate_save(PERTASK_GET(this_fpustate));
 		__wrcr0(__rdcr0() | CR0_TS);
-		PERCPU(thiscpu_x86_fputhread) = NULL;
+		PERCPU(thiscpu_fputhread) = NULL;
 	}
 	PREEMPTION_POP(was);
 }
@@ -182,25 +182,25 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
  * The main purpose of this function is to aid in implementing FPU support
  * in debuggers, where this function is called when suspending execution of
  * the associated CPU, after which the debugger can read/write FPU information
- * for any thread by simply looking at `PERTASK(thread, this_x86_fpustate)' */
+ * for any thread by simply looking at `PERTASK(thread, this_fpustate)' */
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
 	pflag_t was;
 	struct task *holder;
 	was = PREEMPTION_PUSHOFF();
-	holder = PERCPU(thiscpu_x86_fputhread);
+	holder = PERCPU(thiscpu_fputhread);
 	if (holder) {
 		assert(!wasdestroyed(holder));
 		__clts();
 		/* The FPU state was changed. */
-		assertf(FORTASK(holder, this_x86_fpustate),
+		assertf(FORTASK(holder, this_fpustate),
 		        "This should have been allocated the first time thread %p used the FPU",
 		        holder);
 		/* Save the context */
-		x86_fpustate_save(FORTASK(holder, this_x86_fpustate));
+		x86_fpustate_save(FORTASK(holder, this_fpustate));
 		/* Disable FPU access (so-as to lazily re-load it
 		 * the next time an access is made by `holder') */
 		__wrcr0(__rdcr0() | CR0_TS);
-		PERCPU(thiscpu_x86_fputhread) = NULL;
+		PERCPU(thiscpu_fputhread) = NULL;
 	}
 	PREEMPTION_POP(was);
 }
@@ -215,13 +215,13 @@ PUBLIC NOBLOCK void KCALL
 fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	struct fpustate *mystate;
-	mystate = PERTASK_GET(this_x86_fpustate);
+	mystate = PERTASK_GET(this_fpustate);
 	if (mystate) {
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();
 		/* Make sure that the calling thread isn't the current FPU user. */
-		if (PERCPU(thiscpu_x86_fputhread) == THIS_TASK) {
-			PERCPU(thiscpu_x86_fputhread) = NULL;
+		if (PERCPU(thiscpu_fputhread) == THIS_TASK) {
+			PERCPU(thiscpu_fputhread) = NULL;
 			__wrcr0(__rdcr0() | CR0_TS);
 		}
 		PREEMPTION_POP(was);
@@ -236,21 +236,21 @@ fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 			RETHROW();
 		}
 		/* Save the newly allocated FPU state. */
-		PERTASK_SET(this_x86_fpustate, mystate);
+		PERTASK_SET(this_fpustate, mystate);
 	}
 }
 
 PUBLIC NOBLOCK void KCALL
 fpustate_saveinto(USER CHECKED struct fpustate *state)
 		THROWS(E_SEGFAULT) {
-	if (!PERTASK_GET(this_x86_fpustate)) {
+	if (!PERTASK_GET(this_fpustate)) {
 		memset(state, 0, SIZEOF_FPUSTATE);
 		x86_fpustate_init(state);
 		return;
 	}
 	/* Make sure that the calling thread's FPU state has been saved. */
 	fpustate_save();
-	memcpy(state, PERTASK_GET(this_x86_fpustate), SIZEOF_FPUSTATE);
+	memcpy(state, PERTASK_GET(this_fpustate), SIZEOF_FPUSTATE);
 }
 
 
@@ -258,7 +258,7 @@ fpustate_saveinto(USER CHECKED struct fpustate *state)
 INTERN struct icpustate *FCALL /* #NM */
 x86_handle_device_not_available(struct icpustate *__restrict state) {
 	struct task *old_task, *new_task;
-	old_task = PERCPU(thiscpu_x86_fputhread);
+	old_task = PERCPU(thiscpu_fputhread);
 	new_task = THIS_TASK;
 	COMPILER_BARRIER();
 	if (new_task == old_task) {
@@ -272,7 +272,7 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		       old_task, old_task ? task_getroottid_of_s(old_task) : 0,
 		       new_task, task_getroottid_of_s(new_task),
 		       state->ics_irregs.ir_pip);
-		mystate = PERTASK_GET(this_x86_fpustate);
+		mystate = PERTASK_GET(this_fpustate);
 		if (!mystate) {
 			/* Try to have interrupts enabled when allocating memory.
 			 * By doing this, we prevent the allocation failing with `E_WOULDBLOCK'
@@ -284,18 +284,18 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 			 *       will be propagated to user-space. */
 			mystate = fpustate_alloc();
 			__cli();
-			PERTASK_SET(this_x86_fpustate, mystate);
+			PERTASK_SET(this_fpustate, mystate);
 			/* Because we (may) had interrupts enabled again, we must re-read
 			 * the currently active FPU task again, as it may have changed in
 			 * the mean time. */
 			COMPILER_READ_BARRIER();
-			old_task = PERCPU(thiscpu_x86_fputhread);
+			old_task = PERCPU(thiscpu_fputhread);
 		}
 		__clts();
 		if (old_task) {
 			/* Save the current state within the old context holder. */
-			assert(FORTASK(old_task, this_x86_fpustate));
-			x86_fpustate_save(FORTASK(old_task, this_x86_fpustate));
+			assert(FORTASK(old_task, this_fpustate));
+			x86_fpustate_save(FORTASK(old_task, this_fpustate));
 		}
 		/* Load the new FPU state */
 		TRY {
@@ -305,10 +305,10 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 			 * new task's state will may have left the FPU in an undefined state.
 			 * -> Because of this, we must indicate that no one is holding the
 			 *    active FPU context at this point. */
-			PERCPU(thiscpu_x86_fputhread) = NULL;
+			PERCPU(thiscpu_fputhread) = NULL;
 			RETHROW();
 		}
-		PERCPU(thiscpu_x86_fputhread) = THIS_TASK;
+		PERCPU(thiscpu_fputhread) = THIS_TASK;
 	}
 	return state;
 }
@@ -435,13 +435,13 @@ setup_fpu_emulation:
 
 	/* Re-write `x86_fxsave()' and `x86_fxrstor()' based on processor capabilities. */
 	if (X86_HAVE_FXSR) {
-		u32 cr4;
-		cr4 = __rdcr4();
 		if (X86_HAVE_SSE) {
+			u32 cr4;
+			cr4 = __rdcr4();
 			printk(FREESTR(KERN_INFO "[fpu] Enable SSE & #XF exception support\n"));
-			cr4 |= (CR4_OSFXSR/* | CR4_OSXMMEXCPT*/);
+			cr4 |= (CR4_OSFXSR/* | CR4_OSXMMEXCPT*/); /* TODO: CR4_OSXMMEXCPT */
+			__wrcr4(cr4);
 		}
-		__wrcr4(cr4);
 		if (!X86_HAVE_SSE) {
 			/* No SSE support */
 			x86_fxsave_mxcsr_mask_ = 0;
@@ -518,7 +518,7 @@ setup_fpu_emulation:
 			x86_fpustate_init_mxcsr[0] = 0xc3; /* ret */
 		}
 	}
-	/* Set the TS bit because while the FPU is now initialized, `thiscpu_x86_fputhread'
+	/* Set the TS bit because while the FPU is now initialized, `thiscpu_fputhread'
 	 * isn't actually set to anything, much less the calling thread. */
 	__wrcr0(cr0 | CR0_TS);
 #ifndef NDEBUG

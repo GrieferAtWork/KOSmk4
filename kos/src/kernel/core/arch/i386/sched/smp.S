@@ -357,7 +357,7 @@ INTERN_CONST(x86_smp_entry_size, . - x86_smp_entry)
 END(x86_smp_entry)
 
 
-.section .pdata
+.section .text.free
 #ifdef __x86_64__
 .code64
 #else /* __x86_64__ */
@@ -417,7 +417,7 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	xorl   0(%esp), %eax
 	popfl
 	andl   $(EFLAGS_ID), %eax
-	jz     .Ldone_init_cpuid
+	jz     .Lsmp_init_crN
 
 	/* The `cpuid' instruction is available. */
 	EXTERN(thiscpu_x86_cpufeatures)
@@ -506,6 +506,66 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 3:  /* ci_80000000a < 0x80000004 */
 2:  /* ci_80000000a < 0x80000001 */
 	movP   %Pdi, %Pbx
+
+.Lsmp_init_crN:
+
+	movP   %cr0, %Pax
+	movP   %cr4, %Pcx
+
+#ifdef CONFIG_FPU
+	/* Check if KOS was booted with `nofpu' */
+	EXTERN(x86_config_nofpu)
+	cmpb   $(0), x86_config_nofpu
+	jnz    .Lsmp_ini_crN_nofpu
+	andP   $(~(CR0_EM | CR0_TS)), %Pax
+	/* Check if we're connected to a FPU */
+	ttest  mask=CPUID_1D_FPU, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
+	jnz    .Lsmp_ini_crN_havefpu
+	/* No? Ok then.
+	 * Check if that's actually true. */
+#ifdef __x86_64__
+	pushq  $(0x00000000000055aa)
+#else /* __x86_64__ */
+	pushl  $(0x000055aa)
+#endif /* !__x86_64__ */
+	movP   %Pax, %cr0
+	fninit
+	fnstsw 0(%Psp)
+	popP   %Pdx
+	cmpw   $(0), %dx
+	je     .Lsmp_ini_crN_havefpu_override /* We _do_ actually have an FPU */
+	/* Nope! Really no FPU here... */
+.Lsmp_ini_crN_nofpu:
+	/* Force FPU emulation */
+	andP   $(~CR0_MP),         %Pax /* Disable for emulated FPU */
+	orP    $(CR0_EM | CR0_TS), %Pax
+	jmp    .Lsmp_ini_crN_donefpu
+.Lsmp_ini_crN_havefpu_override:
+	/* Override saved cpuid feature flags, because we know better than they do! */
+	orl    $(CPUID_1D_FPU), (thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
+	orl    $(CPUID_80000001D_FPU), (thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
+.Lsmp_ini_crN_havefpu:
+	/* TODO: Only set `CR0_ET' if we're connected to a 387 (as opposed to a 287) */
+	orP    $(CR0_TS | CR0_ET | CR0_MP), %Pax
+
+	/* Enable native FPU exceptions, if supported. */
+	ttest  mask=CPU_FEATURE_FI486, loc=thiscpu_x86_cpufeatures(R_CPU)
+	jz     1f
+	orP    $(CR0_NE), %Pax /* Native exceptions enable */
+1:
+	/* Enable SSE, if supported. */
+	ttest  mask=CPUID_1D_SSE, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
+	jz     1f
+	orP    $(CR4_OSFXSR/* | CR4_OSXMMEXCPT*/), %Pcx /* TODO: CR4_OSXMMEXCPT */
+1:
+.Lsmp_ini_crN_donefpu:
+#endif /* CONFIG_FPU */
+
+	/* Store results */
+	EXTERN(thiscpu_x86_saved_cr0)
+	movP   %Pax, thiscpu_x86_saved_cr0(R_CPU)
+	EXTERN(thiscpu_x86_saved_cr4)
+	movP   %Pcx, thiscpu_x86_saved_cr4(R_CPU)
 	jmp    .Ldone_init_cpuid
 END(x86_smp_init_cpuid)
 
@@ -831,6 +891,14 @@ INTERN_FUNCTION(x86_smp_entry64)
 	jz     x86_smp_init_cpuid
 .Ldone_init_cpuid:
 
+	/* Load saved %cr0 and %cr4 registers. */
+	movP   thiscpu_x86_saved_cr0(R_CPU), %Pax
+#ifdef CONFIG_FPU
+	orP    $(CR0_TS), %Pax /* Force a lazy FPU context switch */
+#endif /* CONFIG_FPU */
+	movP   %Pax, %cr0
+	movP   thiscpu_x86_saved_cr4(R_CPU), %Pax
+	movP   %Pax, %cr4
 
 	/* If supported, initialize the `sysenter' instruction */
 	ttest  mask=CPUID_1D_SEP, loc=(thiscpu_x86_cpuid + OFFSET_CPUID_1D)(R_CPU)
@@ -1039,15 +1107,11 @@ INTERN_FUNCTION(x86_smp_entry64)
 #endif /* !__x86_64__ */
 
 #ifdef CONFIG_FPU
-	/* Disable the FPU, preparing it to be loaded lazily. */
-	movP   %cr0, %Pcx
-	orP    $(CR0_TS), %Pcx
-	movP   %Pcx, %cr0
-	/* Also: Indicate that no task is currently holding an FPU context.
+	/* Indicate that no task is currently holding an FPU context.
 	 * NOTE: Technically, we could also move this part into `cpu_enter_deepsleep()',
 	 *       however it's safer to unconditionally do this during initialization! */
-	EXTERN(thiscpu_x86_fputhread)
-	movP   $(0), thiscpu_x86_fputhread(R_CPU)
+	EXTERN(thiscpu_fputhread)
+	movP   $(0), thiscpu_fputhread(R_CPU)
 #endif /* CONFIG_FPU */
 
 	/* (Partially) load the underlying CPU state */
@@ -1123,15 +1187,15 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	/* With the CPU about to go OFFLINE, make sure to also save the current
 	 * FPU state (if the FPU was used), so-as to not lose that information
 	 * and have it still be available when we come back online. */
-	EXTERN(thiscpu_x86_fputhread)
-	movP   thiscpu_x86_fputhread(%R_fcall0P), %Pax
+	EXTERN(thiscpu_fputhread)
+	movP   thiscpu_fputhread(%R_fcall0P), %Pax
 	testP  %Pax, %Pax
 	jz     1f
 	clts   /* Make sure FPU access is allowed. */
-	/* Save the current FPU context into `this_x86_fpustate(%Pax)' */
+	/* Save the current FPU context into `this_fpustate(%Pax)' */
 	movP   %R_fcall0P, %Pbx /* Preserve THIS_CPU */
-	EXTERN(this_x86_fpustate)
-	movP   this_x86_fpustate(%Pax), %R_fcall0P
+	EXTERN(this_fpustate)
+	movP   this_fpustate(%Pax), %R_fcall0P
 	EXTERN(x86_fpustate_save)
 	call   x86_fpustate_save
 	movP   %Pbx, %R_fcall0P /* Restore THIS_CPU */
@@ -1154,6 +1218,13 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	sldtw  thiscpu_x86_saved_ldtr(%R_fcall0P)
 	EXTERN(thiscpu_x86_saved_tr)
 	strw   thiscpu_x86_saved_tr(%R_fcall0P)
+	movP   %cr0, %Pax
+	EXTERN(thiscpu_x86_saved_cr0)
+	movP   %Pax, thiscpu_x86_saved_cr0(%R_fcall0P)
+	movP   %cr4, %Pax
+	EXTERN(thiscpu_x86_saved_cr4)
+	movP   %Pax, thiscpu_x86_saved_cr4(%R_fcall0P)
+
 
 
 	/* Decrement the cpu-online counter. */
