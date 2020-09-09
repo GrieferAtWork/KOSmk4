@@ -382,31 +382,33 @@ IK(	movzlq %esi, %rsi)
 	cmpq   $(1), %rsi
 	jb     .Lclear_unused_exception_pointers /* 0 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX(%rsp), %rdx)
-	movq   %rdx, FIELD_ERROR_POINTERS(0)
+	movq   %rdx, FIELD_ERROR_POINTERS(0 * 8)
 	je     .Lclear_unused_exception_pointers /* 1 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX(%rsp), %rcx)
-	movq   %rcx, FIELD_ERROR_POINTERS(8)
+	movq   %rcx, FIELD_ERROR_POINTERS(1 * 8)
 	cmpq   $(3), %rsi
 	jb     .Lclear_unused_exception_pointers /* 2 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8(%rsp), %r8)
-	movq   %r8, FIELD_ERROR_POINTERS(16)
+	movq   %r8, FIELD_ERROR_POINTERS(2 * 8)
 	je     .Lclear_unused_exception_pointers /* 3 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%rsp), %r9)
-	movq   %r9, FIELD_ERROR_POINTERS(20)
+	movq   %r9, FIELD_ERROR_POINTERS(3 * 8)
 #if EXCEPTION_DATA_POINTERS >= 5
 	cmpq   $(4), %rsi
 	jbe    .Lclear_unused_exception_pointers /* 4 */
 	/* assume(%rsi >= 5); */
 	/* Copy any remaining arguments. */
+	movq   %rsi, %rdx
 	leaq   -4(%rsi), %rcx
 	leaq   SIZEOF_KCPUSTATE(%rsp), %rsi /* %rsi = &ptr4 */
-IK(	movq   $(this_exception_pointers), %rdi)
+IK(	movq   $(this_exception_pointers + (4 * 8)), %rdi)
 IK(	addq   %gs:0, %rdi  /* %rdi = &%gs:this_exception_pointers */)
-IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
-	rep;   movsq
+IU(	leaq   (OFFSET_EXCEPTION_INFO_POINTERS + (4 * 8))(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
+	rep    movsq
+	movq   %rdx, %rsi
 #endif /* EXCEPTION_DATA_POINTERS >= 5 */
 .Lclear_unused_exception_pointers:
-	/* Check if `%rsi < EXCEPTION_DATA_POINTERS', and fill
+	/* Check if `%rdx < EXCEPTION_DATA_POINTERS', and fill
 	 * any pointers that weren't given with all zeroes. */
 	cmpq   $(EXCEPTION_DATA_POINTERS), %rsi
 	jae    .Ldo_unwind_rsp_maybe_fill_trace
@@ -419,7 +421,7 @@ IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info
 	subq   %rsi, %rcx /* RCX = EXCEPTION_DATA_POINTERS - RSI */
 IU(	pushq_cfi %rax)
 	xorq   %rax, %rax
-	rep;   stosq
+	rep    stosq
 IU(	popq_cfi  %rax)
 	jmp    .Ldo_unwind_rsp_maybe_fill_trace
 	.cfi_endproc
