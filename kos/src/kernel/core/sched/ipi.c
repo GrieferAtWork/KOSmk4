@@ -327,10 +327,10 @@ NOTHROW(FCALL cpu_loadpending_chain_nopr)(struct cpu *__restrict me,
 		chain = next;
 		if (chain == CPU_PENDING_ENDOFCHAIN)
 			break;
-		next                                  = chain->t_sched.s_pending.ss_pennxt;
+		next = chain->t_sched.s_pending.ss_pennxt;
 		last_new->t_sched.s_running.sr_runnxt = chain;
 		chain->t_sched.s_running.sr_runprv    = last_new;
-		last_new                              = chain;
+		last_new = chain;
 	}
 	/* Insert all of the new tasks to-be executed after the current one:
 	 *      first_before | first_after
@@ -384,9 +384,14 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 		if (flags & TASK_FTERMINATED)
 			return state;
 		caller = THIS_TASK;
-		next   = caller->t_sched.s_running.sr_runnxt;
 		if (flags & TASK_FRUNNING) {
 			cpu_assert_running(thread);
+			if unlikely(caller == thread) {
+				/* Special case: We _are_ the thread that is being targeted! */
+				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+				cpu_assert_running(thread);
+				return state;
+			}
 			if ((unsigned int)(uintptr_t)args[1] & TASK_WAKE_FLOWPRIO)
 				goto unset_waking;
 			/* The thread is already running.
@@ -394,12 +399,14 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 			thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = thread->t_sched.s_running.sr_runnxt;
 			thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = thread->t_sched.s_running.sr_runprv;
 		} else {
+			assert(thread != caller);
 			cpu_assert_sleeping(thread);
 			ATOMIC_FETCHOR(thread->t_flags, TASK_FRUNNING);
 			/* The thread was sleeping. - Wake it up (before you go go...) */
 			if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
 				thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
 		}
+		next   = caller->t_sched.s_running.sr_runnxt;
 		thread->t_sched.s_running.sr_runprv = caller;
 		thread->t_sched.s_running.sr_runnxt = next;
 		caller->t_sched.s_running.sr_runnxt = thread;
@@ -507,7 +514,6 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 			return true;
 		}
 		caller = THIS_TASK;
-		next   = caller->t_sched.s_running.sr_runnxt;
 		if (thread_flags & TASK_FRUNNING) {
 			cpu_assert_running(thread);
 			if (flags & TASK_WAKE_FLOWPRIO)
@@ -531,9 +537,6 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 			 * In this case, re-schedule the thread to-be executed next. */
 			thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = thread->t_sched.s_running.sr_runnxt;
 			thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = thread->t_sched.s_running.sr_runprv;
-			/* Must re-load `next', as that field may have been modified by the unlink process above
-			 * (in case `thread' was already the successor of `caller') */
-			next = caller->t_sched.s_running.sr_runnxt;
 		} else {
 			assert(caller != thread);
 			cpu_assert_sleeping(thread);
@@ -542,6 +545,7 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 			if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
 				thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
 		}
+		next = caller->t_sched.s_running.sr_runnxt;
 		thread->t_sched.s_running.sr_runprv = caller;
 		thread->t_sched.s_running.sr_runnxt = next;
 		caller->t_sched.s_running.sr_runnxt = thread;
