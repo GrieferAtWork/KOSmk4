@@ -46,7 +46,7 @@
 DECL_BEGIN
 
 #if 0
-#define IPI_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
+#define IPI_DEBUG(...) (printk(KERN_DEBUG "[cpu:%u] ", THIS_CPU->c_id), printk(KERN_DEBUG __VA_ARGS__))
 #else
 #define IPI_DEBUG(...) (void)0
 #endif
@@ -262,14 +262,18 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 		if (!bits)
 			continue;
 		for (j = 0, mask = 1; bits; ++j, mask <<= 1) {
+			unsigned int slot;
 			struct pending_ipi ipi;
 			if (!(bits & mask))
 				continue;
+			/* Figure out the absolute allocation slot for the IPI */
+			slot = i * BITS_PER_POINTER + j;
 			/* Deallocate this IPI. */
-			memcpy(&ipi, &FORCPU(me, thiscpu_x86_ipi_pending[i]), sizeof(ipi));
+			memcpy(&ipi, &FORCPU(me, thiscpu_x86_ipi_pending[slot]), sizeof(ipi));
 			ATOMIC_FETCHAND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 			/* Execute the IPI callback. */
-			IPI_DEBUG("x86_serve_ipi:%p\n", ipi.pi_func);
+			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#Ix]\n",
+			          ipi.pi_func, slot, i, mask);
 			new_state = (*ipi.pi_func)(state, ipi.pi_args);
 			if (CPU_IPI_MODE_ISSPECIAL(new_state)) {
 				if ((uintptr_t)result < (uintptr_t)new_state)
@@ -355,6 +359,7 @@ again_i:
 		if (i == 0 && word == 0) {
 			if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING) {
 				/* Indicate that the IPI is now ready for handling by the core. */
+				IPI_DEBUG("cpu_sendipi:ipi_first [slot=%u,i=%u,mask=%#Ix]\n", slot, i, mask);
 				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
 				IPI_DEBUG("cpu_sendipi:do_send_ipi\n");
@@ -375,6 +380,7 @@ do_send_ipi:
 				}
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
+				IPI_DEBUG("cpu_sendipi:ipi_wakeup [slot=%u,i=%u,mask=%#Ix]\n", slot, i, mask);
 				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_wake_target:
 				IPI_DEBUG("cpu_sendipi:cpu_wake\n");
@@ -386,7 +392,7 @@ do_wake_target:
 			}
 		} else {
 			/* Indicate that the IPI is now ready for handling by the core. */
-			IPI_DEBUG("cpu_sendipi:secondary_ipi\n");
+			IPI_DEBUG("cpu_sendipi:ipi_secondary [slot=%u,i=%u,mask=%#Ix]\n", slot, i, mask);
 			ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 			if (flags & CPU_IPI_FWAITFOR) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */

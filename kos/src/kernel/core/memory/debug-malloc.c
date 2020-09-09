@@ -1494,7 +1494,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	uintptr_t old_flags;
 	struct task *me = THIS_TASK;
 	struct task *old_override;
-	struct task_connections old_cons;
+	struct task_connections new_cons;
 	assert(!PREEMPTION_ENABLED());
 	(void)args;
 
@@ -1515,7 +1515,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	ATOMIC_FETCHINC(mall_suspended_cpu_count);
 
 	/* Wait for the unlock to be signaled. */
-	task_pushconnections(&old_cons);
+	task_pushconnections(&new_cons);
 	PREEMPTION_ENABLE();
 	while (ATOMIC_READ(mall_suspended_locked) != NULL) {
 		/* Wait for `mall_suspended_unlock' */
@@ -1530,7 +1530,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 			task_disconnectall();
 	}
 	PREEMPTION_DISABLE();
-	task_popconnections(&old_cons);
+	task_popconnections(&new_cons);
 
 	/* Report that we've resumed execution. */
 	ATOMIC_FETCHDEC(mall_suspended_cpu_count);
