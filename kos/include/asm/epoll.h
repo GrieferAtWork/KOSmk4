@@ -22,7 +22,7 @@
 
 #include <__crt.h>
 
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#if defined(__KOS__) || defined(__linux__)
 
 /* EPOLL_EVENTS */
 #define __EPOLLIN       0x00000001 /* ... */
@@ -48,6 +48,6 @@
 /* Flags to be passed to `epoll_create1()'. */
 #define __EPOLL_CLOEXEC 0x80000 /* Set the IO_CLOEXEC flag */
 
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_EPOLL_H */

@@ -75,7 +75,7 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
 	int                    sa_flags; /* Special flags. */
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
-	__byte_t             __sa_bad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
+	__byte_t             __sa_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 	void      (__LIBKCALL *sa_restorer)(void); /* Restore handler. */
 };

@@ -22,143 +22,207 @@
 
 #include <__crt.h>
 
-#ifndef __O_ACCMODE
-#define __O_ACCMODE         0x003 /* Mask for access modes (O_RDONLY, O_WRONLY, O_RDWR) */
-#define __O_RDONLY          0x000 /* Read-only file access */
-#define __O_WRONLY          0x001 /* Write-only file access */
-#define __O_RDWR            0x002 /* Read/Write file access */
-#define __O_ACCMODE_INVALID 0x003 /* Invalid ACCMODE value. */
-/*      __O_RDWR            0x003 */
-#endif /* !__O_ACCMODE */
-
-#ifndef __O_TRUNC
-#define __O_TRUNC       0x200 /* Truncate (clear) the named file if it already exists,
-                               * and `O_WRONLY' or `O_RDWR' access is specified. */
-#endif /* !__O_TRUNC */
-
-
-/* DOS open flag values. */
-#define __DOS_O_APPEND       0x00008 /* Same as `O_APPEND' */
-#define __DOS_O_RANDOM       0x00010 /* Ignored */
-#define __DOS_O_SEQUENTIAL   0x00020 /* Ignored */
-#define __DOS_O_TEMPORARY    0x00040 /* Same as `O_TMPFILE' */
-#define __DOS_O_NOINHERIT    0x00080 /* Same as `O_CLOEXEC' */
-#define __DOS_O_CREAT        0x00100 /* Same as `O_CREAT' */
-#define __DOS_O_TRUNC        0x00200 /* Same as `O_TRUNC' */
-#define __DOS_O_EXCL         0x00400 /* Same as `O_EXCL' */
-#define __DOS_O_SHORT_LIVED  0x01000 /* Ignored */
-#define __DOS_O_OBTAIN_DIR   0x02000 /* Similar to `O_DIRECTORY' (while `O_DIRECTORY' requires that the
-                                      * named file be a directory, this flag will _allow_ it to be one)
-                                      * However, when it comes to the use-cases, this flag usually ends up
-                                      * being used in the same places. */
-#define __DOS_O_TEXT         0x04000 /* Ignored */
-#define __DOS_O_BINARY       0x08000 /* Ignored */
-#define __DOS_O_WTEXT        0x10000 /* Ignored */
-#define __DOS_O_U16TEXT      0x20000 /* Ignored */
-#define __DOS_O_U8TEXT       0x40000 /* Ignored */
-#define __DOS_O_RAW          __DOS_O_BINARY
-
-
 #if defined(__KOS__) || defined(__linux__)
-#define __O_CREAT      0x0000040 /* If missing, create a new file */
-#define __O_EXCL       0x0000080 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
-                                  * exception if the file already exists. */
-#define __O_NOCTTY     0x0000100 /* If the calling process does not have a controlling terminal assigned,
-                                  * do not attempt to assign the newly opened file as terminal, even when
-                                  * `isatty(open(...))' would be true. */
-#define __O_APPEND     0x0000400 /* Always append data to the end of the file */
-#define __O_NONBLOCK   0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
-#define __O_SYNC       0x0001000 /* ??? */
-#define __O_DSYNC      0x0001000 /* ??? */
-#define __O_ASYNC      0x0002000 /* ??? */
-#define __O_DIRECT     0x0004000 /* ??? */
-#define __O_LARGEFILE  0x0008000 /* Ignored... */
-#define __O_DIRECTORY  0x0010000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
-                                  * path component of an open() system call turns out to be something other than a directory. */
-#define __O_NOFOLLOW   0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
-                                  * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
-                                  * is given, in which case the link itself is opened. */
-#define __O_NOATIME    0x0040000 /* Don't update last-accessed time stamps. */
-#define __O_CLOEXEC    0x0080000 /* Close the file during exec() */
-#define __O_PATH       0x0200000 /* Open a path for *at system calls. */
-#define __O_TMPFILE   (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
-#endif /* __KOS__ || __linux__ */
+/************************************************************************/
+/* KOS/LINUX                                                            */
+/************************************************************************/
 
+#define __O_ACCMODE         0x0000003 /* Mask for access modes (O_RDONLY, O_WRONLY, O_RDWR) */
+#define __O_RDONLY          0x0000000 /* Read-only file access */
+#define __O_WRONLY          0x0000001 /* Write-only file access */
+#define __O_RDWR            0x0000002 /* Read/Write file access */
+#define __O_ACCMODE_INVALID 0x0000003 /* Invalid ACCMODE value. */
+#define __O_TRUNC           0x0000200 /* Truncate (clear) the named file if it already exists,
+                                       * and `O_WRONLY' or `O_RDWR' access is specified. */
+#define __O_CREAT           0x0000040 /* If missing, create a new file */
+#define __O_EXCL            0x0000080 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
+                                       * exception if the file already exists. */
+#define __O_NOCTTY          0x0000100 /* If the calling process does not have a controlling terminal assigned,
+                                       * do not attempt to assign the newly opened file as terminal, even when
+                                       * `isatty(open(...))' would be true. */
+#define __O_APPEND          0x0000400 /* Always append data to the end of the file */
+#define __O_NONBLOCK        0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
+#define __O_SYNC            0x0001000 /* ??? */
+#define __O_DSYNC           0x0001000 /* ??? */
+#define __O_ASYNC           0x0002000 /* ??? */
+#define __O_DIRECT          0x0004000 /* ??? */
+#define __O_LARGEFILE       0x0008000 /* Ignored... */
+#define __O_DIRECTORY       0x0010000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
+                                       * path component of an open() system call turns out to be something other than a directory. */
+#define __O_NOFOLLOW        0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
+                                       * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
+                                       * is given, in which case the link itself is opened. */
+#define __O_NOATIME         0x0040000 /* Don't update last-accessed time stamps. */
+#define __O_CLOEXEC         0x0080000 /* Close the file during exec() */
+#define __O_PATH            0x0200000 /* Open a path for *at system calls. */
+#define __O_TMPFILE        (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
 #ifdef __KOS__
-#define __O_CLOFORK    0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
-#define __O_SYMLINK    0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
-                                  * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
-                                  *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
-#define __O_DOSPATH    0x4000000 /* Interpret '\\' as '/', and ignore casing during path resolution.
-                                  * Additionally, recognize DOS mounting points, and interpret leading
-                                  * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
+#define __O_CLOFORK         0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#define __O_SYMLINK         0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
+                                       * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
+                                       *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
+#define __O_DOSPATH         0x4000000 /* Interpret '\\' as '/', and ignore casing during path resolution.
+                                       * Additionally, recognize DOS mounting points, and interpret leading
+                                       * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
+#define __O_ANYTHING __O_SYMLINK
 #endif /* __KOS__ */
 
+#elif defined(__CRT_DOS_PRIMARY)
+/************************************************************************/
+/* DOS/MSVCRT                                                           */
+/************************************************************************/
 
+#define __O_ACCMODE      0x00003 /* Mask for access modes (O_RDONLY, O_WRONLY, O_RDWR) */
+#define __O_RDONLY       0x00000 /* Read-only file access */
+#define __O_WRONLY       0x00001 /* Write-only file access */
+#define __O_RDWR         0x00002 /* Read/Write file access */
+#define __O_APPEND       0x00008 /* Always append data to the end of the file */
+#define __O_RANDOM       0x00010 /* Ignored */
+#define __O_SEQUENTIAL   0x00020 /* Ignored */
+#define __O_TMPFILE      0x00040 /* Open a temporary file */
+#define __O_CLOEXEC      0x00080 /* Close the file during exec() */
+#define __O_CREAT        0x00100 /* If missing, create a new file */
+#define __O_TRUNC        0x00200 /* Truncate (clear) the named file if it already exists,
+                                  * and `O_WRONLY' or `O_RDWR' access is specified. */
+#define __O_EXCL         0x00400 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
+                                  * exception if the file already exists. */
+#define __O_SHORT_LIVED  0x01000 /* Ignored */
+#define __O_OBTAIN_DIR   0x02000 /* Similar to `O_DIRECTORY' (while `O_DIRECTORY' requires that the
+                                  * named file be a directory, this flag will _allow_ it to be one)
+                                  * However, when it comes to the use-cases, this flag usually ends up
+                                  * being used in the same places. */
+#define __O_TEXT         0x04000 /* ??? */
+#define __O_BINARY       0x08000 /* ??? */
+#define __O_WTEXT        0x10000 /* ??? */
+#define __O_U16TEXT      0x20000 /* ??? */
+#define __O_U8TEXT       0x40000 /* ??? */
+#define __O_NOCTTY       0x00000 /* Concept doesn't exist under DOS */
+#define __O_ANYTHING     __O_OBTAIN_DIR
 
-#if !defined(__O_APPEND) && defined(__CRT_DOS)
-#define __O_APPEND __DOS_O_APPEND
-#endif /* !__O_APPEND && __CRT_DOS */
-#if !defined(__O_CREAT) && defined(__CRT_DOS)
-#define __O_CREAT __DOS_O_CREAT
-#endif /* !__O_CREAT && __CRT_DOS */
-#if !defined(__O_EXCL) && defined(__CRT_DOS)
-#define __O_EXCL __DOS_O_EXCL
-#endif /* !__O_EXCL && __CRT_DOS */
-#if !defined(__O_CLOEXEC) && defined(__CRT_DOS)
-#define __O_CLOEXEC __DOS_O_NOINHERIT
-#endif /* !__O_CLOEXEC && __CRT_DOS */
-#if !defined(__O_TMPFILE) && defined(__CRT_DOS)
-#define __O_TMPFILE __DOS_O_TEMPORARY
-#endif /* !__O_TMPFILE && __CRT_DOS */
-#if !defined(__O_NOFOLLOW) && defined(__CRT_DOS)
-#define __O_NOFOLLOW 0
-#endif /* !__O_NOFOLLOW && __CRT_DOS */
+#elif defined(__CRT_CYG_PRIMARY)
+/************************************************************************/
+/* CYGWIN                                                               */
+/************************************************************************/
 
+#define __O_ACCMODE    0x0000003 /* Mask for access modes (O_RDONLY, O_WRONLY, O_RDWR) */
+#define __O_RDONLY     0x0000000 /* Read-only file access */
+#define __O_WRONLY     0x0000001 /* Write-only file access */
+#define __O_RDWR       0x0000002 /* Read/Write file access */
+#define __O_FOPEN      (-1)      /* ??? */
+#define __O_FREAD      0x0000001 /* ??? */
+#define __O_FWRITE     0x0000002 /* ??? */
+#define __O_FAPPEND    0x0000008 /* ??? */
+#define __O_FMARK      0x0000010 /* ??? */
+#define __O_FDEFER     0x0000020 /* ??? */
+#define __O_ASYNC      0x0000040 /* ??? */
+#define __O_SHLOCK     0x0000080 /* ??? */
+#define __O_EXLOCK     0x0000100 /* ??? */
+#define __O_CREAT      0x0000200 /* If missing, create a new file */
+#define __O_TRUNC      0x0000400 /* Truncate (clear) the named file if it already exists,
+                                  * and `O_WRONLY' or `O_RDWR' access is specified. */
+#define __O_EXCL       0x0000800 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
+                                  * exception if the file already exists. */
+#define __O_NBIO       0x0001000 /* Do not block when trying to read data that hasn't been written, yet. */
+#define __O_SYNC       0x0002000 /* ??? */
+#define __O_NONBLOCK   0x0004000 /* Do not block when trying to read data that hasn't been written, yet. */
+#define __O_NOCTTY     0x0008000 /* If the calling process does not have a controlling terminal assigned,
+                                  * do not attempt to assign the newly opened file as terminal, even when
+                                  * `isatty(open(...))' would be true. */
+#define __O_BINARY     0x0010000 /* ??? */
+#define __O_TEXT       0x0020000 /* ??? */
+#define __O_CLOEXEC    0x0040000 /* Close the file during exec() */
+#define __O_DIRECT     0x0080000 /* ??? */
+#define __O_NOFOLLOW   0x0100000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
+                                  * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
+                                  * is given, in which case the link itself is opened. */
+#define __O_DIRECTORY  0x0200000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
+                                  * path component of an open() system call turns out to be something other than a directory. */
+#define __O_EXECSRCH   0x0400000 /* ??? */
+#define __O_TMPFILE    0x0800000 /* Open a temporary file */
+#define __O_NOATIME    0x1000000 /* Don't update last-accessed time stamps. */
 
+#elif defined(__NetBSD__)
+/************************************************************************/
+/* NetBSD                                                               */
+/************************************************************************/
 
+#define __O_RDONLY    0x00000000
+#define __O_WRONLY    0x00000001
+#define __O_RDWR      0x00000002
+#define __O_ACCMODE   0x00000003
+#define __O_FREAD     0x00000001
+#define __O_FWRITE    0x00000002
+#define __O_NONBLOCK  0x00000004
+#define __O_APPEND    0x00000008
+#define __O_SHLOCK    0x00000010
+#define __O_EXLOCK    0x00000020
+#define __O_ASYNC     0x00000040
+#define __O_SYNC      0x00000080
+#define __O_NOFOLLOW  0x00000100
+#define __O_CREAT     0x00000200
+#define __O_TRUNC     0x00000400
+#define __O_EXCL      0x00000800
+#define __O_NOCTTY    0x00008000
+#define __O_DSYNC     0x00010000
+#define __O_RSYNC     0x00020000
+#define __O_ALT_IO    0x00040000
+#define __O_DIRECT    0x00080000
+#define __O_DIRECTORY 0x00200000
+#define __O_CLOEXEC   0x00400000
+#define __O_SEARCH    0x00800000
+#define __O_NOSIGPIPE 0x01000000
+#define __O_REGULAR   0x02000000
+#define __O_EXEC      0x04000000
 
+#elif defined(__solaris__)
+/************************************************************************/
+/* SOLARIS                                                              */
+/************************************************************************/
 
-/* Substitute unimportant flags if they aren't supported. */
-#ifndef __O_NOCTTY
-#define __O_NOCTTY 0 /* If the calling process does not have a controlling terminal assigned,
-                      * do not attempt to assign the newly opened file as terminal, even when
-                      * `isatty(open(...))' would be true. */
-#endif /* !__O_NOCTTY */
-#ifndef __O_SYNC
-#define __O_SYNC   0 /* ??? */
-#endif /* !__O_SYNC */
-#ifndef __O_ASYNC
-#define __O_ASYNC  0 /* ??? */
-#endif /* !__O_ASYNC */
-#ifndef __O_PATH
-#define __O_PATH   0 /* Open a path for *at system calls. */
-#endif /* !__O_PATH */
-#ifndef __O_DSYNC
-#define __O_DSYNC  0 /* ??? */
-#endif /* !__O_DSYNC */
-#ifndef __O_DIRECT
-#define __O_DIRECT 0 /* ??? */
-#endif /* !__O_DIRECT */
-#ifndef __O_LARGEFILE
-#define __O_LARGEFILE 0 /* Enable 64-bit file support */
-#endif /* !__O_LARGEFILE */
-#ifndef __O_NOATIME
-#define __O_NOATIME 0 /* Don't update last-accessed time stamps. */
-#endif /* !__O_NOATIME */
+#define __O_RDONLY    0x00000
+#define __O_WRONLY    0x00001
+#define __O_RDWR      0x00002
+#define __O_ACCMODE   0x00003
+#define __O_NDELAY    0x00004
+#define __O_APPEND    0x00008
+#define __O_SYNC      0x00010
+#define __O_DSYNC     0x00040
+#define __O_NONBLOCK  0x00080
+#define __O_PRIV      0x01000
+#define __O_LARGEFILE 0x02000
+#define __O_RSYNC     0x08000
+#define __O_CREAT     0x00100
+#define __O_TRUNC     0x00200
+#define __O_EXCL      0x00400
+#define __O_NOCTTY    0x00800
+#define __O_XATTR     0x04000
+#define __O_NOFOLLOW  0x20000
+#define __O_NOLINKS   0x40000
+
+#else /* ... */
+/************************************************************************/
+/* GENERIC                                                              */
+/************************************************************************/
+
+#define __O_ACCMODE 0x003 /* Mask for access modes (O_RDONLY, O_WRONLY, O_RDWR) */
+#define __O_RDONLY  0x000 /* Read-only file access */
+#define __O_WRONLY  0x001 /* Write-only file access */
+#define __O_RDWR    0x002 /* Read/Write file access */
+
+#endif /* !... */
 
 
 /* Open anything directly (as best as possible). (file, directory or symlink)
  * KOS: Open a file, directory or symlink directly.
  * DOS: Open a file or directory directly.
  * GLC: Open a file or directory directly. */
-#ifdef __CRT_DOS_PRIMARY
-#define __O_ANYTHING   __DOS_O_OBTAIN_DIR
-#elif defined(__O_SYMLINK)
-#define __O_ANYTHING   __O_SYMLINK
-#else
-#define __O_ANYTHING   0
-#endif
+#ifndef __O_ANYTHING
+#define __O_ANYTHING 0
+#endif /* !__O_ANYTHING */
+
+#ifndef __O_LARGEFILE
+#define __O_LARGEFILE 0 /* Assume native supported (if necessary CRT functions are available) */
+#endif /* !__O_LARGEFILE */
 
 
 #endif /* !_ASM_OFLAGS_H */

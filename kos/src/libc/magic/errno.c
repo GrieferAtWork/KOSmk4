@@ -330,12 +330,25 @@ with (local fp = File.open("../../../include/asm/errno.h")) {
 		try {
 			name, none, comment = l.scanf(" # define __%[^ ] %[^/ ] /" "* %[^]")...;
 		} catch (...) {
-			continue;
+			try {
+				name = l.scanf(" # define __%[^ ] ")...;
+				if (!name.startswith("E"))
+					continue;
+				comment = "";
+			} catch (...) {
+				continue;
+			}
 		}
-		comment = comment.partition("*" "/")[0].strip();
-		while (comment.startswith("["))
-			comment = comment.partition("]")[2].lstrip();
-		errnoNames[name] = comment;
+		comment = comment.strip();
+		if (comment) {
+			comment = comment.partition("*" "/")[0].strip();
+			while (comment.startswith("["))
+				comment = comment.partition("]")[2].lstrip();
+		}
+		if (!comment)
+			comment = "??" "?";
+		if (name !in errnoNames || errnoNames[name] == "??" "?")
+			errnoNames[name] = comment;
 	}
 }
 
@@ -369,11 +382,13 @@ print("}");
 %[define_replacement(EAFNOSUPPORT    = __EAFNOSUPPORT)]   /* Address family not supported by protocol */
 %[define_replacement(EAGAIN          = __EAGAIN)]         /* Try again */
 %[define_replacement(EALREADY        = __EALREADY)]       /* Operation already in progress */
+%[define_replacement(EAUTH           = __EAUTH)]          /* ??? */
 %[define_replacement(EBADE           = __EBADE)]          /* Invalid exchange */
 %[define_replacement(EBADF           = __EBADF)]          /* Bad file number */
 %[define_replacement(EBADFD          = __EBADFD)]         /* File descriptor in bad state */
 %[define_replacement(EBADMSG         = __EBADMSG)]        /* Not a data message */
 %[define_replacement(EBADR           = __EBADR)]          /* Invalid request descriptor */
+%[define_replacement(EBADRPC         = __EBADRPC)]        /* ??? */
 %[define_replacement(EBADRQC         = __EBADRQC)]        /* Invalid request code */
 %[define_replacement(EBADSLT         = __EBADSLT)]        /* Invalid slot */
 %[define_replacement(EBFONT          = __EBFONT)]         /* Bad font file format */
@@ -425,6 +440,7 @@ print("}");
 %[define_replacement(ELIBSCN         = __ELIBSCN)]        /* .lib section in a.out corrupted */
 %[define_replacement(ELIMIT          = __ELIMIT)]         /* Max possible errno */
 %[define_replacement(ELNRNG          = __ELNRNG)]         /* Link number out of range */
+%[define_replacement(ELOCKUNMAPPED   = __ELOCKUNMAPPED)]  /* ??? */
 %[define_replacement(ELOOP           = __ELOOP)]          /* Too many symbolic links encountered */
 %[define_replacement(EMAX            = __EMAX)]           /* Max errno */
 %[define_replacement(EMEDIUMTYPE     = __EMEDIUMTYPE)]    /* Wrong medium type */
@@ -434,12 +450,14 @@ print("}");
 %[define_replacement(EMULTIHOP       = __EMULTIHOP)]      /* Multihop attempted */
 %[define_replacement(ENAMETOOLONG    = __ENAMETOOLONG)]   /* File name too long */
 %[define_replacement(ENAVAIL         = __ENAVAIL)]        /* No XENIX semaphores available */
+%[define_replacement(ENEEDAUTH       = __ENEEDAUTH)]      /* ??? */
 %[define_replacement(ENETDOWN        = __ENETDOWN)]       /* Network is down */
 %[define_replacement(ENETRESET       = __ENETRESET)]      /* Network dropped connection because of reset */
 %[define_replacement(ENETUNREACH     = __ENETUNREACH)]    /* Network is unreachable */
 %[define_replacement(ENFILE          = __ENFILE)]         /* File table overflow */
 %[define_replacement(ENMFILE         = __ENMFILE)]        /* No more files */
 %[define_replacement(ENOANO          = __ENOANO)]         /* No anode */
+%[define_replacement(ENOATTR         = __ENOATTR)]        /* ??? */
 %[define_replacement(ENOBUFS         = __ENOBUFS)]        /* No buffer space available */
 %[define_replacement(ENOCSI          = __ENOCSI)]         /* No CSI structure available */
 %[define_replacement(ENODATA         = __ENODATA)]        /* No data available */
@@ -460,6 +478,7 @@ print("}");
 %[define_replacement(ENOSR           = __ENOSR)]          /* Out of streams resources */
 %[define_replacement(ENOSTR          = __ENOSTR)]         /* Device not a stream */
 %[define_replacement(ENOSYS          = __ENOSYS)]         /* Function not implemented */
+%[define_replacement(ENOTACTIVE      = __ENOTACTIVE)]     /* ??? */
 %[define_replacement(ENOTBLK         = __ENOTBLK)]        /* Block device required */
 %[define_replacement(ENOTCONN        = __ENOTCONN)]       /* Transport endpoint is not connected */
 %[define_replacement(ENOTDIR         = __ENOTDIR)]        /* Not a directory */
@@ -480,6 +499,9 @@ print("}");
 %[define_replacement(EPFNOSUPPORT    = __EPFNOSUPPORT)]   /* Protocol family not supported */
 %[define_replacement(EPIPE           = __EPIPE)]          /* Broken pipe */
 %[define_replacement(EPROCLIM        = __EPROCLIM)]       /* Process limit reached */
+%[define_replacement(EPROCUNAVAIL    = __EPROCUNAVAIL)]   /* ??? */
+%[define_replacement(EPROGMISMATCH   = __EPROGMISMATCH)]  /* ??? */
+%[define_replacement(EPROGUNAVAIL    = __EPROGUNAVAIL)]   /* ??? */
 %[define_replacement(EPROTO          = __EPROTO)]         /* Protocol error */
 %[define_replacement(EPROTONOSUPPORT = __EPROTONOSUPPORT)]/* Protocol not supported */
 %[define_replacement(EPROTOTYPE      = __EPROTOTYPE)]     /* Protocol wrong type for socket */
@@ -490,6 +512,7 @@ print("}");
 %[define_replacement(ERESTART        = __ERESTART)]       /* Interrupted system call should be restarted */
 %[define_replacement(ERFKILL         = __ERFKILL)]        /* Operation not possible due to RF-kill */
 %[define_replacement(EROFS           = __EROFS)]          /* Read-only file system */
+%[define_replacement(ERPCMISMATCH    = __ERPCMISMATCH)]   /* ??? */
 %[define_replacement(ESHUTDOWN       = __ESHUTDOWN)]      /* Cannot send after transport endpoint shutdown */
 %[define_replacement(ESOCKTNOSUPPORT = __ESOCKTNOSUPPORT)]/* Socket type not supported */
 %[define_replacement(ESPIPE          = __ESPIPE)]         /* Illegal seek */
@@ -533,6 +556,9 @@ print("}");
 #ifdef __EALREADY
 #define EALREADY        __EALREADY        /* Operation already in progress */
 #endif /* __EALREADY */
+#ifdef __EAUTH
+#define EAUTH           __EAUTH           /* ??? */
+#endif /* __EAUTH */
 #ifdef __EBADE
 #define EBADE           __EBADE           /* Invalid exchange */
 #endif /* __EBADE */
@@ -548,6 +574,9 @@ print("}");
 #ifdef __EBADR
 #define EBADR           __EBADR           /* Invalid request descriptor */
 #endif /* __EBADR */
+#ifdef __EBADRPC
+#define EBADRPC         __EBADRPC         /* ??? */
+#endif /* __EBADRPC */
 #ifdef __EBADRQC
 #define EBADRQC         __EBADRQC         /* Invalid request code */
 #endif /* __EBADRQC */
@@ -692,6 +721,9 @@ print("}");
 #ifdef __ELNRNG
 #define ELNRNG          __ELNRNG          /* Link number out of range */
 #endif /* __ELNRNG */
+#ifdef __ELOCKUNMAPPED
+#define ELOCKUNMAPPED   __ELOCKUNMAPPED   /* ??? */
+#endif /* __ELOCKUNMAPPED */
 #ifdef __ELOOP
 #define ELOOP           __ELOOP           /* Too many symbolic links encountered */
 #endif /* __ELOOP */
@@ -716,6 +748,9 @@ print("}");
 #ifdef __ENAVAIL
 #define ENAVAIL         __ENAVAIL         /* No XENIX semaphores available */
 #endif /* __ENAVAIL */
+#ifdef __ENEEDAUTH
+#define ENEEDAUTH       __ENEEDAUTH       /* ??? */
+#endif /* __ENEEDAUTH */
 #ifdef __ENETDOWN
 #define ENETDOWN        __ENETDOWN        /* Network is down */
 #endif /* __ENETDOWN */
@@ -734,6 +769,9 @@ print("}");
 #ifdef __ENOANO
 #define ENOANO          __ENOANO          /* No anode */
 #endif /* __ENOANO */
+#ifdef __ENOATTR
+#define ENOATTR         __ENOATTR         /* ??? */
+#endif /* __ENOATTR */
 #ifdef __ENOBUFS
 #define ENOBUFS         __ENOBUFS         /* No buffer space available */
 #endif /* __ENOBUFS */
@@ -794,6 +832,9 @@ print("}");
 #ifdef __ENOSYS
 #define ENOSYS          __ENOSYS          /* Function not implemented */
 #endif /* __ENOSYS */
+#ifdef __ENOTACTIVE
+#define ENOTACTIVE      __ENOTACTIVE      /* ??? */
+#endif /* __ENOTACTIVE */
 #ifdef __ENOTBLK
 #define ENOTBLK         __ENOTBLK         /* Block device required */
 #endif /* __ENOTBLK */
@@ -851,6 +892,15 @@ print("}");
 #ifdef __EPROCLIM
 #define EPROCLIM        __EPROCLIM        /* Process limit reached */
 #endif /* __EPROCLIM */
+#ifdef __EPROCUNAVAIL
+#define EPROCUNAVAIL    __EPROCUNAVAIL    /* ??? */
+#endif /* __EPROCUNAVAIL */
+#ifdef __EPROGMISMATCH
+#define EPROGMISMATCH   __EPROGMISMATCH   /* ??? */
+#endif /* __EPROGMISMATCH */
+#ifdef __EPROGUNAVAIL
+#define EPROGUNAVAIL    __EPROGUNAVAIL    /* ??? */
+#endif /* __EPROGUNAVAIL */
 #ifdef __EPROTO
 #define EPROTO          __EPROTO          /* Protocol error */
 #endif /* __EPROTO */
@@ -881,6 +931,9 @@ print("}");
 #ifdef __EROFS
 #define EROFS           __EROFS           /* Read-only file system */
 #endif /* __EROFS */
+#ifdef __ERPCMISMATCH
+#define ERPCMISMATCH    __ERPCMISMATCH    /* ??? */
+#endif /* __ERPCMISMATCH */
 #ifdef __ESHUTDOWN
 #define ESHUTDOWN       __ESHUTDOWN       /* Cannot send after transport endpoint shutdown */
 #endif /* __ESHUTDOWN */
@@ -956,6 +1009,14 @@ print("}");
 #if !defined(ENOTSUP) && defined(EOPNOTSUPP)
 #define ENOTSUP EOPNOTSUPP /* Not supported */
 #endif /* !ENOTSUP && EOPNOTSUPP */
+
+
+/* Platform-specific extensions for errno limits. */
+#ifdef __USE_NETBSD
+#ifdef __ELIMIT
+#define ELAST __ELIMIT /* Max possible errno */
+#endif /* __ELIMIT */
+#endif /* __USE_NETBSD */
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 #ifdef __EOK

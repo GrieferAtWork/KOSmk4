@@ -22,6 +22,13 @@
 
 #include <__stdinc.h>
 
+#if defined(__KOS__) || defined(__linux__)
 #define __SIZEOF_SIGSET_T__ 128 /* 1024/8 */
+#endif /* __KOS__ || __linux__ */
+
+
+#ifndef __SIZEOF_SIGSET_T__
+#define __SIZEOF_SIGSET_T__ 128 /* 1024/8 */
+#endif /* !__SIZEOF_SIGSET_T__ */
 
 #endif /* !_ASM_SIGSET_H */

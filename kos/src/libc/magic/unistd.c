@@ -149,33 +149,37 @@ __SYSDECL_BEGIN
 #define F_OK __F_OK /* Test for existence. */
 #endif /* !F_OK && __F_OK */
 
-#ifndef SEEK_SET
-#ifdef __SEEK_SET
+#if !defined(SEEK_SET) && defined(__SEEK_SET)
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
-#endif /* __SEEK_SET */
-#ifdef __SEEK_CUR
+#endif /* !SEEK_SET && __SEEK_SET */
+#if !defined(SEEK_CUR) && defined(__SEEK_CUR)
 #define SEEK_CUR __SEEK_CUR /* Seek from current position. */
-#endif /* __SEEK_CUR */
-#ifdef __SEEK_END
+#endif /* !SEEK_CUR && __SEEK_CUR */
+#if !defined(SEEK_END) && defined(__SEEK_END)
 #define SEEK_END __SEEK_END /* Seek from end of file. */
-#endif /* __SEEK_END */
-#ifdef __USE_GNU
-#ifdef __SEEK_DATA
+#endif /* !SEEK_END && __SEEK_END */
+#if defined(__USE_GNU) || defined(__USE_SOLARIS)
+#if !defined(SEEK_DATA) && defined(__SEEK_DATA)
 #define SEEK_DATA __SEEK_DATA /* Seek to next data. */
-#endif /* __SEEK_DATA */
-#ifdef __SEEK_HOLE
+#endif /* !SEEK_DATA && __SEEK_DATA */
+#if !defined(SEEK_HOLE) && defined(__SEEK_HOLE)
 #define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
-#endif /* __SEEK_HOLE */
-#endif /* __USE_GNU */
-#endif /* !SEEK_SET */
+#endif /* !SEEK_HOLE && __SEEK_HOLE */
+#endif /* __USE_GNU || __USE_SOLARIS */
 
 #ifdef __USE_MISC
-#ifndef L_SET
-#define L_SET  SEEK_SET /* Seek from beginning of file. */
-#define L_CURR SEEK_CUR /* Seek from current position. */
-#define L_INCR SEEK_CUR /* Seek from current position. */
-#define L_XTND SEEK_END /* Seek from end of file. */
-#endif /* !L_SET */
+#if !defined(L_SET) && defined(__SEEK_SET)
+#define L_SET  __SEEK_SET /* Seek from beginning of file. */
+#endif /* !L_SET && __SEEK_SET */
+#if !defined(L_CURR) && defined(__SEEK_CUR)
+#define L_CURR __SEEK_CUR /* Seek from current position. */
+#endif /* !L_CURR && __SEEK_CUR */
+#if !defined(L_INCR) && defined(__SEEK_CUR)
+#define L_INCR __SEEK_CUR /* Seek from current position. */
+#endif /* !L_INCR && __SEEK_CUR */
+#if !defined(L_XTND) && defined(__SEEK_END)
+#define L_XTND __SEEK_END /* Seek from end of file. */
+#endif /* !L_XTND && __SEEK_END */
 #endif /* __USE_MISC */
 
 #ifdef __CC__

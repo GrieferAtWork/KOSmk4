@@ -27,9 +27,7 @@
 
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>
-#ifndef SEEK_SET
 #include <asm/stdio.h> /* __SEEK_SET, __SEEK_... */
-#endif /* !SEEK_SET */
 #endif /* __USE_OLD_DOS */
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -118,11 +116,16 @@ __LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(_
 #define FA_DIREC  _A_SUBDIR
 #define FA_ARCH   _A_ARCH
 #endif /* !FA_NORMAL */
-#ifndef SEEK_SET
+
+#if !defined(SEEK_SET) && defined(__SEEK_SET)
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#endif /* !SEEK_SET && __SEEK_SET */
+#if !defined(SEEK_CUR) && defined(__SEEK_CUR)
 #define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#endif /* !SEEK_CUR && __SEEK_CUR */
+#if !defined(SEEK_END) && defined(__SEEK_END)
 #define SEEK_END __SEEK_END /* Seek from end of file. */
-#endif /* !SEEK_SET */
+#endif /* !SEEK_END && __SEEK_END */
 #endif /* __USE_OLD_DOS */
 
 

@@ -20,6 +20,10 @@
 #ifndef _ASM_UNISTD_H
 #define _ASM_UNISTD_H 1
 
+#include <__stdinc.h>
+
+#if defined(__KOS__) || defined(__linux__)
 #include <asm/syscalls.h>
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_UNISTD_H */

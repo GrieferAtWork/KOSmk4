@@ -214,6 +214,7 @@ incdir("", "../../include");
 #include <asm/crt/math-exception.h>
 #include <asm/crt/math-libc_version.h>
 #include <asm/crt/posix_spawn.h>
+#include <asm/crt/process.h>
 #include <asm/crt/pthreadvalues.h>
 #include <asm/crt/stdio.h>
 #include <asm/crt/stdio_ext.h>
@@ -272,6 +273,7 @@ incdir("", "../../include");
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
 #include <asm/utsname.h>
+#include <asm/vfork.h>
 #include <asm/wait.h>
 #include <asm/xattr.h>
 #include <assert.h>
@@ -1530,6 +1532,7 @@ incdir("", "../../include");
 #include <strings.h>
 #include <stropts.h>
 #include <struct.h>
+#include <sys/_default_fcntl.h>
 #include <sys/_intsup.h>
 #include <sys/_pthreadtypes.h>
 #include <sys/_sigset.h>

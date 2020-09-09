@@ -412,45 +412,274 @@
 #define __ECOUNT          134 /* Max errno + 1 */
 #define __ELIMIT          4096 /* Max possible errno */
 
+#elif defined(__NetBSD__)
+
+#define __EPERM           1
+#define __ENOENT          2
+#define __ESRCH           3
+#define __EINTR           4
+#define __EIO             5
+#define __ENXIO           6
+#define __E2BIG           7
+#define __ENOEXEC         8
+#define __EBADF           9
+#define __ECHILD          10
+#define __EDEADLK         11
+#define __ENOMEM          12
+#define __EACCES          13
+#define __EFAULT          14
+#define __ENOTBLK         15
+#define __EBUSY           16
+#define __EEXIST          17
+#define __EXDEV           18
+#define __ENODEV          19
+#define __ENOTDIR         20
+#define __EISDIR          21
+#define __EINVAL          22
+#define __ENFILE          23
+#define __EMFILE          24
+#define __ENOTTY          25
+#define __ETXTBSY         26
+#define __EFBIG           27
+#define __ENOSPC          28
+#define __ESPIPE          29
+#define __EROFS           30
+#define __EMLINK          31
+#define __EPIPE           32
+#define __EDOM            33
+#define __ERANGE          34
+#define __EAGAIN          35
+#define __EINPROGRESS     36
+#define __EALREADY        37
+#define __ENOTSOCK        38
+#define __EDESTADDRREQ    39
+#define __EMSGSIZE        40
+#define __EPROTOTYPE      41
+#define __ENOPROTOOPT     42
+#define __EPROTONOSUPPORT 43
+#define __ESOCKTNOSUPPORT 44
+#define __EOPNOTSUPP      45
+#define __EPFNOSUPPORT    46
+#define __EAFNOSUPPORT    47
+#define __EADDRINUSE      48
+#define __EADDRNOTAVAIL   49
+#define __ENETDOWN        50
+#define __ENETUNREACH     51
+#define __ENETRESET       52
+#define __ECONNABORTED    53
+#define __ECONNRESET      54
+#define __ENOBUFS         55
+#define __EISCONN         56
+#define __ENOTCONN        57
+#define __ESHUTDOWN       58
+#define __ETOOMANYREFS    59
+#define __ETIMEDOUT       60
+#define __ECONNREFUSED    61
+#define __ELOOP           62
+#define __ENAMETOOLONG    63
+#define __EHOSTDOWN       64
+#define __EHOSTUNREACH    65
+#define __ENOTEMPTY       66
+#define __EPROCLIM        67
+#define __EUSERS          68
+#define __EDQUOT          69
+#define __ESTALE          70
+#define __EREMOTE         71
+#define __EBADRPC         72
+#define __ERPCMISMATCH    73
+#define __EPROGUNAVAIL    74
+#define __EPROGMISMATCH   75
+#define __EPROCUNAVAIL    76
+#define __ENOLCK          77
+#define __ENOSYS          78
+#define __EFTYPE          79
+#define __EAUTH           80
+#define __ENEEDAUTH       81
+#define __EIDRM           82
+#define __ENOMSG          83
+#define __EOVERFLOW       84
+#define __EILSEQ          85
+#define __ENOTSUP         86
+#define __ECANCELED       87
+#define __EBADMSG         88
+#define __ENODATA         89
+#define __ENOSR           90
+#define __ENOSTR          91
+#define __ETIME           92
+#define __ENOATTR         93
+#define __EMULTIHOP       94
+#define __ENOLINK         95
+#define __EPROTO          96
+
+#define __EMAX            96 /* Max errno */
+#define __ECOUNT          97 /* Max errno + 1 */
+
+#elif defined(__solaris__)
+
+#define __EPERM           1
+#define __ENOENT          2
+#define __ESRCH           3
+#define __EINTR           4
+#define __EIO             5
+#define __ENXIO           6
+#define __E2BIG           7
+#define __ENOEXEC         8
+#define __EBADF           9
+#define __ECHILD          10
+#define __EAGAIN          11
+#define __ENOMEM          12
+#define __EACCES          13
+#define __EFAULT          14
+#define __ENOTBLK         15
+#define __EBUSY           16
+#define __EEXIST          17
+#define __EXDEV           18
+#define __ENODEV          19
+#define __ENOTDIR         20
+#define __EISDIR          21
+#define __EINVAL          22
+#define __ENFILE          23
+#define __EMFILE          24
+#define __ENOTTY          25
+#define __ETXTBSY         26
+#define __EFBIG           27
+#define __ENOSPC          28
+#define __ESPIPE          29
+#define __EROFS           30
+#define __EMLINK          31
+#define __EPIPE           32
+#define __EDOM            33
+#define __ERANGE          34
+#define __ENOMSG          35
+#define __EIDRM           36
+#define __ECHRNG          37
+#define __EL2NSYNC        38
+#define __EL3HLT          39
+#define __EL3RST          40
+#define __ELNRNG          41
+#define __EUNATCH         42
+#define __ENOCSI          43
+#define __EL2HLT          44
+#define __EDEADLK         45
+#define __ENOLCK          46
+#define __ECANCELED       47
+#define __ENOTSUP         48
+#define __EDQUOT          49
+#define __EBADE           50
+#define __EBADR           51
+#define __EXFULL          52
+#define __ENOANO          53
+#define __EBADRQC         54
+#define __EBADSLT         55
+#define __EDEADLOCK       56
+#define __EBFONT          57
+#define __EOWNERDEAD      58
+#define __ENOTRECOVERABLE 59
+#define __ENOSTR          60
+#define __ENODATA         61
+#define __ETIME           62
+#define __ENOSR           63
+#define __ENONET          64
+#define __ENOPKG          65
+#define __EREMOTE         66
+#define __ENOLINK         67
+#define __EADV            68
+#define __ESRMNT          69
+#define __ECOMM           70
+#define __EPROTO          71
+#define __ELOCKUNMAPPED   72
+#define __ENOTACTIVE      73
+#define __EMULTIHOP       74
+#define __EBADMSG         77
+#define __ENAMETOOLONG    78
+#define __EOVERFLOW       79
+#define __ENOTUNIQ        80
+#define __EBADFD          81
+#define __EREMCHG         82
+#define __ELIBACC         83
+#define __ELIBBAD         84
+#define __ELIBSCN         85
+#define __ELIBMAX         86
+#define __ELIBEXEC        87
+#define __EILSEQ          88
+#define __ENOSYS          89
+#define __ELOOP           90
+#define __ERESTART        91
+#define __ESTRPIPE        92
+#define __ENOTEMPTY       93
+#define __EUSERS          94
+#define __ENOTSOCK        95
+#define __EDESTADDRREQ    96
+#define __EMSGSIZE        97
+#define __EPROTOTYPE      98
+#define __ENOPROTOOPT     99
+#define __EPROTONOSUPPORT 120
+#define __ESOCKTNOSUPPORT 121
+#define __EOPNOTSUPP      122
+#define __EPFNOSUPPORT    123
+#define __EAFNOSUPPORT    124
+#define __EADDRINUSE      125
+#define __EADDRNOTAVAIL   126
+#define __ENETDOWN        127
+#define __ENETUNREACH     128
+#define __ENETRESET       129
+#define __ECONNABORTED    130
+#define __ECONNRESET      131
+#define __ENOBUFS         132
+#define __EISCONN         133
+#define __ENOTCONN        134
+#define __ESHUTDOWN       143
+#define __ETOOMANYREFS    144
+#define __ETIMEDOUT       145
+#define __ECONNREFUSED    146
+#define __EHOSTDOWN       147
+#define __EHOSTUNREACH    148
+#define __EALREADY        149
+#define __EINPROGRESS     150
+#define __ESTALE          151
+
+#define __EMAX            151 /* Max errno */
+#define __ECOUNT          152 /* Max errno + 1 */
+
 #else /* ... */
 /* XXX: Other platforms... */
 
 /************************************************************************/
 /* GENERIC (guessed)                                                    */
 /************************************************************************/
-#define __EPERM           1   /* Operation not permitted */
-#define __ENOENT          2   /* No such file or directory */
-#define __ESRCH           3   /* No such process */
-#define __EINTR           4   /* Interrupted system call */
-#define __EIO             5   /* I/O error */
-#define __ENXIO           6   /* No such device or address */
-#define __E2BIG           7   /* Argument list too long */
-#define __ENOEXEC         8   /* Exec format error */
-#define __EBADF           9   /* Bad file number */
-#define __ECHILD          10  /* No child processes */
-#define __EAGAIN          11  /* Try again */
-#define __ENOMEM          12  /* Out of memory */
-#define __EACCES          13  /* Permission denied */
-#define __EFAULT          14  /* Bad address */
-#define __EBUSY           16  /* Device or resource busy */
-#define __EEXIST          17  /* File exists */
-#define __EXDEV           18  /* Cross-device link */
-#define __ENODEV          19  /* No such device */
-#define __ENOTDIR         20  /* Not a directory */
-#define __EISDIR          21  /* Is a directory */
-#define __EINVAL          22  /* Invalid argument */
-#define __ENFILE          23  /* File table overflow */
-#define __EMFILE          24  /* Too many open files */
-#define __ENOTTY          25  /* Not a typewriter */
-#define __ETXTBSY         26  /* Text file busy */
-#define __EFBIG           27  /* File too large */
-#define __ENOSPC          28  /* No space left on device */
-#define __ESPIPE          29  /* Illegal seek */
-#define __EROFS           30  /* Read-only file system */
-#define __EMLINK          31  /* Too many links */
-#define __EPIPE           32  /* Broken pipe */
-#define __EDOM            33  /* Math argument out of domain of func */
-#define __ERANGE          34  /* Math result not representable */
+#define __EPERM           1  /* Operation not permitted */
+#define __ENOENT          2  /* No such file or directory */
+#define __ESRCH           3  /* No such process */
+#define __EINTR           4  /* Interrupted system call */
+#define __EIO             5  /* I/O error */
+#define __ENXIO           6  /* No such device or address */
+#define __E2BIG           7  /* Argument list too long */
+#define __ENOEXEC         8  /* Exec format error */
+#define __EBADF           9  /* Bad file number */
+#define __ECHILD          10 /* No child processes */
+#define __EAGAIN          11 /* Try again */
+#define __ENOMEM          12 /* Out of memory */
+#define __EACCES          13 /* Permission denied */
+#define __EFAULT          14 /* Bad address */
+#define __EBUSY           16 /* Device or resource busy */
+#define __EEXIST          17 /* File exists */
+#define __EXDEV           18 /* Cross-device link */
+#define __ENODEV          19 /* No such device */
+#define __ENOTDIR         20 /* Not a directory */
+#define __EISDIR          21 /* Is a directory */
+#define __EINVAL          22 /* Invalid argument */
+#define __ENFILE          23 /* File table overflow */
+#define __EMFILE          24 /* Too many open files */
+#define __ENOTTY          25 /* Not a typewriter */
+#define __ETXTBSY         26 /* Text file busy */
+#define __EFBIG           27 /* File too large */
+#define __ENOSPC          28 /* No space left on device */
+#define __ESPIPE          29 /* Illegal seek */
+#define __EROFS           30 /* Read-only file system */
+#define __EMLINK          31 /* Too many links */
+#define __EPIPE           32 /* Broken pipe */
+#define __EDOM            33 /* Math argument out of domain of func */
+#define __ERANGE          34 /* Math result not representable */
 #define __EMAX            34 /* Max errno */
 #define __ECOUNT          35 /* Max errno + 1 */
 #endif /* !... */

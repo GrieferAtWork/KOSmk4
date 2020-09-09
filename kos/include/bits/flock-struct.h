@@ -21,12 +21,19 @@
 #define _BITS_FLOCK_STRUCT_H 1
 
 #include <__stdinc.h>
+#include <__crt.h>
 #include <features.h>
 
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
 
+
+#ifdef __solaris__
+/* ... */
+#elif defined(__CRT_CYG_PRIMARY)
+/* ... */
+#else /* ... */
 #define __OFFSET_FLOCK_TYPE   0
 #define __OFFSET_FLOCK_WHENCE 2
 #if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8
@@ -71,6 +78,8 @@
 #else /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8 */
 #define __SIZEOF_FLOCK64        (__OFFSET_FLOCK64_START + __SIZEOF_OFF64_T__ * 2 + __SIZEOF_PID_T__)
 #endif /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) < 8 || __SIZEOF_PID_T__ >= 8 */
+#endif /* !... */
+
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -78,6 +87,21 @@ __DECL_BEGIN
 #ifndef __flock_defined
 #define __flock_defined 1
 struct flock /*[PREFIX(l_)]*/ {
+#ifdef __solaris__
+	__INT16_TYPE__   l_type;
+	__INT16_TYPE__   l_whence;
+	__FS_TYPE(off)   l_start;
+	__FS_TYPE(off)   l_len;
+	int              l_sysid;
+	__pid_t          l_pid;
+	__LONGPTR_TYPE__ l_pad[4];
+#elif defined(__CRT_CYG_PRIMARY)
+	__INT16_TYPE__ l_type;
+	__INT16_TYPE__ l_whence;
+	__FS_TYPE(off) l_start;
+	__FS_TYPE(off) l_len;
+	__pid_t        l_pid;
+#else /* ... */
 	__INT16_TYPE__ l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__ l_whence; /* Where `l_start' is relative to (like `lseek'). */
 #if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8
@@ -94,6 +118,7 @@ struct flock /*[PREFIX(l_)]*/ {
 #if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 && __SIZEOF_PID_T__ < 8
 	__UINT32_TYPE__ __l_pad2; /* ... */
 #endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 && __SIZEOF_PID_T__ < 8 */
+#endif /* !... */
 };
 #endif /* !__flock_defined */
 
@@ -116,6 +141,21 @@ struct flock /*[PREFIX(l_)]*/ {
 #define __flock64 flock
 #else /* (__USE_FILE_OFFSET64 || _FLOCK_MATCHES_FLOCK64) && __USE_STRUCT64_MACRO */
 struct __flock64 /*[NAME(flock64)][PREFIX(l_)]*/ {
+#ifdef __solaris__
+	__INT16_TYPE__   l_type;
+	__INT16_TYPE__   l_whence;
+	__off64_t        l_start;
+	__off64_t        l_len;
+	int              l_sysid;
+	__pid_t          l_pid;
+	__LONGPTR_TYPE__ l_pad[4];
+#elif defined(__CRT_CYG_PRIMARY)
+	__INT16_TYPE__ l_type;
+	__INT16_TYPE__ l_whence;
+	__off64_t      l_start;
+	__off64_t      l_len;
+	__pid_t        l_pid;
+#else /* ... */
 	__INT16_TYPE__ l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__ l_whence; /* Where `l_start' is relative to (like `lseek'). */
 #if __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8
@@ -132,6 +172,7 @@ struct __flock64 /*[NAME(flock64)][PREFIX(l_)]*/ {
 #if __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8
 	__UINT32_TYPE__ __l_pad2; /* ... */
 #endif /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8 */
+#endif /* !... */
 };
 #endif /* (!__USE_FILE_OFFSET64 && !_FLOCK_MATCHES_FLOCK64) || !__USE_STRUCT64_MACRO */
 
@@ -150,6 +191,21 @@ struct __flock64 /*[NAME(flock64)][PREFIX(l_)]*/ {
 #define __flock32 flock
 #else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 struct __flock32 /*[NAME(flock32)][PREFIX(l_)]*/ {
+#ifdef __solaris__
+	__INT16_TYPE__   l_type;
+	__INT16_TYPE__   l_whence;
+	__off32_t        l_start;
+	__off32_t        l_len;
+	int              l_sysid;
+	__pid_t          l_pid;
+	__LONGPTR_TYPE__ l_pad[4];
+#elif defined(__CRT_CYG_PRIMARY)
+	__INT16_TYPE__ l_type;
+	__INT16_TYPE__ l_whence;
+	__off32_t      l_start;
+	__off32_t      l_len;
+	__pid_t        l_pid;
+#else /* ... */
 	__INT16_TYPE__ l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
 	__INT16_TYPE__ l_whence; /* Where `l_start' is relative to (like `lseek'). */
 #if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8
@@ -166,11 +222,14 @@ struct __flock32 /*[NAME(flock32)][PREFIX(l_)]*/ {
 #if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8 && __SIZEOF_PID_T__ < 8
 	__UINT32_TYPE__ __l_pad2; /* ... */
 #endif /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8 && __SIZEOF_PID_T__ < 8 */
+#endif /* ... */
 };
 #endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 
 __DECL_END
 #endif /* __CC__ */
+
+
 
 
 #endif /* !_BITS_FLOCK_STRUCT_H */

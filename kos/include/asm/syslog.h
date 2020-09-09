@@ -22,6 +22,7 @@
 
 #include <__stdinc.h>
 
+#if defined(__KOS__) || defined(__linux__)
 #define __LOG_EMERG   0    /* system is unusable */
 #define __LOG_ALERT   1    /* action must be taken immediately */
 #define __LOG_CRIT    2    /* critical conditions */
@@ -31,5 +32,6 @@
 #define __LOG_INFO    6    /* informational */
 #define __LOG_DEBUG   7    /* debug-level messages */
 #define __LOG_PRIMASK 0x07 /* mask to extract priority part (internal) */
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_SYSLOG_H */

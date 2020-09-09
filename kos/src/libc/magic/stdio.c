@@ -64,9 +64,9 @@
 %[define_replacement(stdout = __LOCAL_stdout)]
 %[define_replacement(stderr = __LOCAL_stderr)]
 
-%[define_replacement(SEEK_SET = __SEEK_SET)]
-%[define_replacement(SEEK_CUR = __SEEK_CUR)]
-%[define_replacement(SEEK_END = __SEEK_END)]
+%[define_replacement(SEEK_SET  = __SEEK_SET)]
+%[define_replacement(SEEK_CUR  = __SEEK_CUR)]
+%[define_replacement(SEEK_END  = __SEEK_END)]
 %[define_replacement(SEEK_DATA = __SEEK_DATA)]
 %[define_replacement(SEEK_HOLE = __SEEK_HOLE)]
 
@@ -138,19 +138,23 @@ __SYSDECL_BEGIN
 #define EOF __EOF
 #endif /* !EOF */
 
-#ifndef SEEK_SET
+#if !defined(SEEK_SET) && defined(__SEEK_SET)
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#endif /* !SEEK_SET && __SEEK_SET */
+#if !defined(SEEK_CUR) && defined(__SEEK_CUR)
 #define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#endif /* !SEEK_CUR && __SEEK_CUR */
+#if !defined(SEEK_END) && defined(__SEEK_END)
 #define SEEK_END __SEEK_END /* Seek from end of file. */
-#ifdef __USE_GNU
-#ifdef __SEEK_DATA
+#endif /* !SEEK_END && __SEEK_END */
+#if defined(__USE_GNU) || defined(__USE_SOLARIS)
+#if !defined(SEEK_DATA) && defined(__SEEK_DATA)
 #define SEEK_DATA __SEEK_DATA /* Seek to next data. */
-#endif /* __SEEK_DATA */
-#ifdef __SEEK_HOLE
+#endif /* !SEEK_DATA && __SEEK_DATA */
+#if !defined(SEEK_HOLE) && defined(__SEEK_HOLE)
 #define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
-#endif /* __SEEK_HOLE */
-#endif /* __USE_GNU */
-#endif /* !SEEK_SET */
+#endif /* !SEEK_HOLE && __SEEK_HOLE */
+#endif /* __USE_GNU || __USE_SOLARIS */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifdef __CRT_DOS_PRIMARY

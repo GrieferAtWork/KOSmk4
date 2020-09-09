@@ -30,28 +30,40 @@
 DECL_BEGIN
 
 
+#define DOS_O_APPEND     0x00008 /* Same as `O_APPEND' */
+#define DOS_O_TEMPORARY  0x00040 /* Same as `O_TMPFILE' */
+#define DOS_O_NOINHERIT  0x00080 /* Same as `O_CLOEXEC' */
+#define DOS_O_CREAT      0x00100 /* Same as `O_CREAT' */
+#define DOS_O_TRUNC      0x00200 /* Same as `O_TRUNC' */
+#define DOS_O_EXCL       0x00400 /* Same as `O_EXCL' */
+#define DOS_O_OBTAIN_DIR 0x02000 /* Similar to `O_DIRECTORY' (while `O_DIRECTORY' requires that the
+                                  * named file be a directory, this flag will _allow_ it to be one)
+                                  * However, when it comes to the use-cases, this flag usually ends up
+                                  * being used in the same places. */
+
+
 PRIVATE ATTR_SECTION(".text.crt.dos.io.access") oflag_t
 NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 	oflag_t result;
 	result = dos_oflags & (O_ACCMODE | O_TRUNC);
-	if (dos_oflags & __DOS_O_APPEND)
+	if (dos_oflags & DOS_O_APPEND)
 		result |= O_APPEND;
-	if (dos_oflags & __DOS_O_TEMPORARY)
+	if (dos_oflags & DOS_O_TEMPORARY)
 		result |= O_TMPFILE;
-	if (dos_oflags & __DOS_O_NOINHERIT)
+	if (dos_oflags & DOS_O_NOINHERIT)
 		result |= O_CLOEXEC;
-	if (dos_oflags & __DOS_O_CREAT)
+	if (dos_oflags & DOS_O_CREAT)
 		result |= O_CREAT;
-	if (dos_oflags & __DOS_O_TRUNC)
+	if (dos_oflags & DOS_O_TRUNC)
 		result |= O_TRUNC;
-	if (dos_oflags & __DOS_O_EXCL)
+	if (dos_oflags & DOS_O_EXCL)
 		result |= O_EXCL;
 #if 0 /* This flag ~allows~ the named file to be a directory.
        * With this in mind, it still isn't required to be one,
        * so for full compatibility, we'll have to ensure that
        * we _didn't_ open a directory when this flag _isn't_
        * given.  */
-	if (dos_oflags & __DOS_O_OBTAIN_DIR)
+	if (dos_oflags & DOS_O_OBTAIN_DIR)
 		result |= O_DIRECTORY;
 #endif
 	return result;
@@ -100,7 +112,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 		libc_seterrno(-result);
 		return -1;
 	}
-	if (!(oflags & __DOS_O_OBTAIN_DIR)) {
+	if (!(oflags & DOS_O_OBTAIN_DIR)) {
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;
 		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
@@ -158,7 +170,7 @@ NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
                                  mode_t mode)
 /*[[[body:libd_creat]]]*/
 {
-	return libd_open(filename, __DOS_O_CREAT | O_WRONLY | __DOS_O_TRUNC, mode);
+	return libd_open(filename, DOS_O_CREAT | O_WRONLY | DOS_O_TRUNC, mode);
 }
 /*[[[end:libd_creat]]]*/
 

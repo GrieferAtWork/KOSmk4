@@ -23,9 +23,9 @@
 #include <__stdinc.h>
 #include <__crt.h>
 
-#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#if defined(__KOS__) || defined(__linux__)
 #define __XATTR_CREATE  1 /* set value, fail if attr already exists. */
 #define __XATTR_REPLACE 2 /* set value, fail if attr does not exist. */
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_XATTR_H */

@@ -17,18 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_SWAP_H
-#define _ASM_SWAP_H 1
+#ifndef _SYS__DEFAULT_FCNTL_H
+#define _SYS__DEFAULT_FCNTL_H 1
 
-#include <__stdinc.h>
+#include <fcntl.h>
 
-#if defined(__KOS__) || defined(__linux__)
-/* The swap priority is encoded as:
- *  - (prio << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK */
-#define __SWAP_FLAG_PREFER     0x08000 /* Set if swap priority is specified. */
-#define __SWAP_FLAG_PRIO_MASK  0x07fff
-#define __SWAP_FLAG_PRIO_SHIFT 0
-#define __SWAP_FLAG_DISCARD    0x10000 /* Discard swap cluster after use. */
-#endif /* __KOS__ || __linux__ */
-
-#endif /* !_ASM_SWAP_H */
+#endif /* !_SYS__DEFAULT_FCNTL_H */

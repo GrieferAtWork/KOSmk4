@@ -21,8 +21,13 @@
 #define _ASM_FCNTL_H 1
 
 #include <__stdinc.h>
+#include <__crt.h>
 
 #if defined(__KOS__) || defined(__linux__)
+/************************************************************************/
+/* KOS/LINUX                                                            */
+/************************************************************************/
+
 #define __F_DUPFD         0    /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
 #define __F_GETFD         1    /* [void arg] Get file descriptor flags.
                                 * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
@@ -276,32 +281,264 @@
 #define __FALLOC_FL_COLLAPSE_RANGE    8 /* Remove a range of a file without leaving a hole. */
 #define __FALLOC_FL_ZERO_RANGE       16 /* Convert a range of a file to zeros. */
 
-
 #define __MAX_HANDLE_SZ 128
 
+#elif defined(__CRT_DOS_PRIMARY)
+/************************************************************************/
+/* DOS/MSVCRT                                                           */
+/************************************************************************/
 
-#else /* __KOS__ || __linux__ */
-#include <__crt.h>
+#elif defined(__CRT_CYG_PRIMARY)
+/************************************************************************/
+/* CYGWIN                                                               */
+/************************************************************************/
 
-#ifdef __CRT_CYG
-/* Special values that may be used for the `dfd' argument of `*at' functions. */
-#define __AT_FDCWD (-2) /* The current working directory. */
+#define __AT_FDCWD        (-2)
+#define __FD_CLOEXEC      1
+#define __F_DUPFD         0
+#define __F_GETFD         1
+#define __F_SETFD         2
+#define __F_GETFL         3
+#define __F_SETFL         4
+#define __F_GETOWN        5
+#define __F_SETOWN        6
+#define __F_GETLK         7
+#define __F_SETLK         8
+#define __F_SETLKW        9
+#define __F_RGETLK        10
+#define __F_RSETLK        11
+#define __F_CNVT          12
+#define __F_RSETLKW       13
+#define __F_DUPFD_CLOEXEC 14
 
-/* File descriptor flags (s.a. `F_GETFD' and `F_SETFL') */
-#define __FD_CLOEXEC 0x01 /* FLAG: Close the descriptor on `exec()'. */
-#endif /* __CRT_CYG */
+#define __F_RDLCK   1
+#define __F_WRLCK   2
+#define __F_UNLCK   3
+#define __F_UNLKSYS 4
 
-#endif /* !__KOS__ && !__linux__ */
+#define __AT_EACCESS          1
+#define __AT_SYMLINK_NOFOLLOW 2
+#define __AT_SYMLINK_FOLLOW   4
+#define __AT_REMOVEDIR        8
+#define __AT_EMPTY_PATH       16
 
+#define __LOCK_SH 0x01
+#define __LOCK_EX 0x02
+#define __LOCK_NB 0x04
+#define __LOCK_UN 0x08
+
+#ifdef __CC__
+#include <features.h>
+#if defined(__USE_NEWLIB) && defined(__USE_MISC)
+#include <hybrid/typecore.h>
+__DECL_BEGIN
+struct eflock {
+	__INT16_TYPE__   l_type;
+	__INT16_TYPE__   l_whence;
+	__LONGPTR_TYPE__ l_start;
+	__LONGPTR_TYPE__ l_len;
+	__INT16_TYPE__   l_pid;
+	__INT16_TYPE__   l_xxx;
+	__LONGPTR_TYPE__ l_rpid;
+	__LONGPTR_TYPE__ l_rsys;
+};
+__DECL_END
+#endif /* __USE_NEWLIB && __USE_MISC */
+#endif /* __CC__ */
+
+#elif defined(__NetBSD__)
+/************************************************************************/
+/* NetBSD                                                               */
+/************************************************************************/
+
+#define __F_DUPFD               0
+#define __F_GETFD               1
+#define __F_SETFD               2
+#define __F_GETFL               3
+#define __F_SETFL               4
+#define __F_GETOWN              5
+#define __F_SETOWN              6
+#define __F_GETLK               7
+#define __F_SETLK               8
+#define __F_SETLKW              9
+#define __F_CLOSEM              10
+#define __F_MAXFD               11
+#define __F_DUPFD_CLOEXEC       12
+#define __F_GETNOSIGPIPE        13
+#define __F_SETNOSIGPIPE        14
+#define __F_GETPATH             15
+#define __FD_CLOEXEC            1
+#define __F_RDLCK               1
+#define __F_UNLCK               2
+#define __F_WRLCK               3
+#define __LOCK_SH               0x01
+#define __LOCK_EX               0x02
+#define __LOCK_NB               0x04
+#define __LOCK_UN               0x08
+#define __POSIX_FADV_NORMAL     0
+#define __POSIX_FADV_RANDOM     1
+#define __POSIX_FADV_SEQUENTIAL 2
+#define __POSIX_FADV_WILLNEED   3
+#define __POSIX_FADV_DONTNEED   4
+#define __POSIX_FADV_NOREUSE    5
+#define __AT_FDCWD              (-100)
+#define __AT_EACCESS            0x100
+#define __AT_SYMLINK_NOFOLLOW   0x200
+#define __AT_SYMLINK_FOLLOW     0x400
+#define __AT_REMOVEDIR          0x800
+
+#elif defined(__solaris__)
+/************************************************************************/
+/* SOLARIS                                                              */
+/************************************************************************/
+#define __F_DUPFD               0
+#define __F_GETFD               1
+#define __F_SETFD               2
+#define __F_GETFL               3
+#define __F_SETFL               4
+#define __F_SETLK               6
+#define __F_SETLKW              7
+#define __F_CHKFL               8
+#define __F_DUP2FD              9
+#define __F_ALLOCSP             10
+#define __F_FREESP              11
+#define __F_ISSTREAM            13
+#define __F_GETLK               14
+#define __F_PRIV                15
+#define __F_NPRIV               16
+#define __F_QUOTACTL            17
+#define __F_BLOCKS              18
+#define __F_BLKSIZE             19
+#define __F_GETOWN              23
+#define __F_SETOWN              24
+#define __F_REVOKE              25
+#define __F_HASREMOTELOCKS      26
+#define __F_SHARE               40
+#define __F_UNSHARE             41
+#define __F_SETLK_NBMAND        42
+#define __F_SHARE_NBMAND        43
+#define __F_GETXFL              45
+#define __F_BADFD               46
+#define __F_RDLCK               1
+#define __F_WRLCK               2
+#define __F_UNLCK               3
+#define __F_UNLKSYS             4
+#define __O_ACCMODE             3
+#define __FD_CLOEXEC            1
+#define __DIRECTIO_OFF          (0)
+#define __DIRECTIO_ON           (1)
+#define __F_RDACC               0x1
+#define __F_WRACC               0x2
+#define __F_RWACC               0x3
+#define __F_RMACC               0x4
+#define __F_MDACC               0x20
+#define __F_NODNY               0x0
+#define __F_RDDNY               0x1
+#define __F_WRDNY               0x2
+#define __F_RWDNY               0x3
+#define __F_RMDNY               0x4
+#define __F_COMPAT              0x8
+#define __F_MANDDNY             0x10
+#define __AT_FDCWD              0xffd19553
+#define __AT_SYMLINK_NOFOLLOW   0x1000
+#define __AT_REMOVEDIR          0x1
+#define __AT_TRIGGER            0x2
+#define __POSIX_FADV_NORMAL     0
+#define __POSIX_FADV_RANDOM     1
+#define __POSIX_FADV_SEQUENTIAL 2
+#define __POSIX_FADV_WILLNEED   3
+#define __POSIX_FADV_DONTNEED   4
+#define __POSIX_FADV_NOREUSE    5
+#ifdef __CC__
+#include <features.h>
+
+#ifdef __USE_SOLARIS
+#include <hybrid/typecore.h>
+__DECL_BEGIN
+
+typedef struct fshare {
+	__INT16_TYPE__ f_access;
+	__INT16_TYPE__ f_deny;
+	__INT32_TYPE__ f_id;
+} fshare_t;
+
+__DECL_END
+#endif /* __USE_SOLARIS */
+#endif /* __CC__ */
+
+
+#else /* ... */
+/************************************************************************/
+/* GENERIC                                                              */
+/************************************************************************/
+
+#endif /* !... */
+
+
+#ifndef __R_OK
 #define __R_OK 4 /* Test for read permission. */
 #define __W_OK 2 /* Test for write permission. */
 #define __X_OK 1 /* Test for execute permission. */
 #define __F_OK 0 /* Test for existence. */
+#endif /* !__R_OK */
 
+#ifndef __F_ULOCK
 #define __F_ULOCK 0 /* Unlock a previously locked region. */
 #define __F_LOCK  1 /* Lock a region for exclusive use. */
 #define __F_TLOCK 2 /* Test and lock a region for exclusive use. */
 #define __F_TEST  3 /* Test a region for other processes locks. */
+#endif /* !__F_ULOCK */
+
+
+/* Deal with fcntl redirection on platforms with 64-bit-by-default filesystems. */
+#if (defined(__F_FREESP64) || defined(__F_ALLOCSP64) || \
+     defined(__F_GETLK64) || defined(__F_SETLK64) ||    \
+     defined(__F_SETLKW64) || defined(__F_SETLK64_NBMAND))
+#include <bits/typesizes.h>
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#ifdef __F_FREESP64
+#undef __F_FREESP64
+#ifdef __F_FREESP
+#define __F_FREESP64 __F_FREESP
+#endif /* __F_FREESP */
+#endif /* __F_FREESP64 */
+
+#ifdef __F_ALLOCSP64
+#undef __F_ALLOCSP64
+#ifdef __F_ALLOCSP
+#define __F_ALLOCSP64 __F_ALLOCSP
+#endif /* __F_ALLOCSP */
+#endif /* __F_ALLOCSP64 */
+
+#ifdef __F_GETLK64
+#undef __F_GETLK64
+#ifdef __F_GETLK
+#define __F_GETLK64 __F_GETLK
+#endif /* __F_GETLK */
+#endif /* __F_GETLK64 */
+
+#ifdef __F_SETLK64
+#undef __F_SETLK64
+#ifdef __F_SETLK
+#define __F_SETLK64 __F_SETLK
+#endif /* __F_SETLK */
+#endif /* __F_SETLK64 */
+
+#ifdef __F_SETLKW64
+#undef __F_SETLKW64
+#ifdef __F_SETLKW
+#define __F_SETLKW64 __F_SETLKW
+#endif /* __F_SETLKW */
+#endif /* __F_SETLKW64 */
+
+#ifdef __F_SETLK64_NBMAND
+#undef __F_SETLK64_NBMAND
+#ifdef __F_SETLK_NBMAND
+#define __F_SETLK64_NBMAND __F_SETLK_NBMAND
+#endif /* __F_SETLK_NBMAND */
+#endif /* __F_SETLK64_NBMAND */
+#endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+#endif /* ... */
 
 
 #endif /* !_ASM_FCNTL_H */

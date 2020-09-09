@@ -241,6 +241,8 @@
 #define _BSD_SOURCE 1
 #undef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
+#undef _ATFILE_SOURCE
+#define _ATFILE_SOURCE 1
 #endif /* _NETBSD_SOURCE */
 
 /* Make available some BSD-specific extensions such as `cfmakesane()' */
@@ -251,6 +253,16 @@
  * have understood the _BSD_SOURCE request) */
 #define __BSD_VISIBLE 1 /* API alias (don't use in headers!) */
 #endif /* _BSD_SOURCE */
+
+/* Make available some Cygwin-specific extensions */
+#ifdef _CYG_SOURCE
+#define __USE_CYGWIN 1
+#endif /* _CYG_SOURCE */
+
+/* Make available some newlib-specific extensions */
+#ifdef _NEWLIB_SOURCE
+#define __USE_NEWLIB 1
+#endif /* _NEWLIB_SOURCE */
 
 /* Enable additional extensions present on
  * Solaris (or more specifically: OpenSolaris) */
@@ -633,6 +645,7 @@
 #undef __USE_UTF
 #undef __USE_ISOC_PURE
 #undef __USE_BSD
+#undef __USE_CYGWIN
 #undef __USE_NETBSD
 #undef __USE_SOLARIS
 
@@ -670,6 +683,7 @@
 #define __USE_REENTRANT 1
 #define __USE_UTF 1
 #define __USE_BSD 1
+#define __USE_CYGWIN 1
 #define __USE_NETBSD 1
 #define __USE_SOLARIS 1
 #endif /* _EVERY_SOURCE */

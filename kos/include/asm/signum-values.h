@@ -22,6 +22,11 @@
 
 #include <__stdinc.h>
 
+/* TODO: Get rid of <i386-kos/asm/signum-values.h>, and its friends,
+ *       and merge that header together with this one, the same way
+ *       that <asm/errno.h> was merged! */
+
+
 /* Fake signal functions. */
 #define __SIG_ERR  (-1) /* Error return. */
 #define __SIG_DFL  0    /* Default action. */

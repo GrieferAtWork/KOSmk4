@@ -46,7 +46,6 @@
  *
  */
 
-
 #if defined(__linux__)
 #define __ARCH_HAVE_SHARED_VM_VFORK 1
 #elif defined(__KOS__)

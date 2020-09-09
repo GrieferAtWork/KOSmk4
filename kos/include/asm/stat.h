@@ -22,14 +22,17 @@
 
 #include <__stdinc.h>
 
-#define __S_IFMT   0170000 /* These bits determine file type. */
-#define __S_IFDIR  0040000 /* Directory. */
+#define __S_ISVTX    01000 /* Save swapped text after use (sticky). */
+#define __S_ISGID    02000 /* Set group ID on execution. */
+#define __S_ISUID    04000 /* Set user ID on execution. */
+#define __S_IFIFO  0010000 /* FIFO. */
 #define __S_IFCHR  0020000 /* Character device. */
+#define __S_IFDIR  0040000 /* Directory. */
 #define __S_IFBLK  0060000 /* Block device. */
 #define __S_IFREG  0100000 /* Regular file. */
-#define __S_IFIFO  0010000 /* FIFO. */
 #define __S_IFLNK  0120000 /* Symbolic link. */
 #define __S_IFSOCK 0140000 /* Socket. */
+#define __S_IFMT   0170000 /* These bits determine file type. */
 
 #define __S_ISDIR(x)  (((x) & __S_IFMT) == __S_IFDIR)  /* Directory. */
 #define __S_ISCHR(x)  (((x) & __S_IFMT) == __S_IFCHR)  /* Character device. */
@@ -40,11 +43,9 @@
 #define __S_ISLNK(x)  (((x) & __S_IFMT) == __S_IFLNK)  /* Symbolic link. */
 #define __S_ISSOCK(x) (((x) & __S_IFMT) == __S_IFSOCK) /* Socket. */
 
-#define __S_ISUID  04000 /* Set user ID on execution. */
-#define __S_ISGID  02000 /* Set group ID on execution. */
-#define __S_ISVTX  01000 /* Save swapped text after use (sticky). */
-
+#if defined(__KOS__) || defined(__linux__)
 #define __UTIME_NOW  ((1l << 30) - 1l)
 #define __UTIME_OMIT ((1l << 30) - 2l)
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_STAT_H */

@@ -21,8 +21,12 @@
 #define _ASM_SIGINFO_H 1
 
 #include <__crt.h>
+#include <__stdinc.h>
 
 #if defined(__KOS__) || defined(__linux__)
+/************************************************************************/
+/* KOS/LINUX                                                            */
+/************************************************************************/
 
 /* Values for `si_code'. Positive values are reserved for kernel-generated signals. */
 #define __SI_ASYNCNL (-60) /* Sent by asynch name lookup completion. */
@@ -86,10 +90,10 @@
 #define __POLL_PRI 5 /* High priority input available. */
 #define __POLL_HUP 6 /* Device disconnected. */
 
-#else /* __KOS__ || __linux__ */
-#include <__stdinc.h>
-
-#ifdef __CRT_CYG_PRIMARY
+#elif defined(__CRT_CYG_PRIMARY)
+/************************************************************************/
+/* CYGWIN                                                               */
+/************************************************************************/
 
 /* Values for `si_code'. */
 #define __SI_USER    0  /* Sent by kill, sigsend. */
@@ -136,8 +140,25 @@
 #define __CLD_STOPPED   32 /* Child has stopped. */
 #define __CLD_CONTINUED 33 /* Stopped child has continued. */
 
-#endif /* __CRT_CYG_PRIMARY */
+#elif defined(__NetBSD__)
+/************************************************************************/
+/* NetBSD                                                               */
+/************************************************************************/
 
-#endif /* !__KOS__ && !__linux__ */
+/* TODO */
+
+#elif defined(__solaris__)
+/************************************************************************/
+/* SOLARIS                                                              */
+/************************************************************************/
+
+/* TODO */
+
+#else /* ... */
+/************************************************************************/
+/* GENERIC                                                              */
+/************************************************************************/
+
+#endif /* !... */
 
 #endif /* !_ASM_SIGINFO_H */

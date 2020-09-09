@@ -21,6 +21,7 @@
 #define _ASM_UTSNAME_H 1
 
 #include <__stdinc.h>
+
 #include <asm/limits.h> /* __HOST_NAME_MAX */
 
 #ifndef _UTSNAME_LENGTH

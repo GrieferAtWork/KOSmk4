@@ -22,6 +22,7 @@
 
 #include <__stdinc.h>
 
+#if defined(__KOS__) || defined(__linux__)
 /* Bits in the third argument to `waitpid'. */
 #define __WNOHANG      0x00000001 /* Don't block waiting. */
 #define __WUNTRACED    0x00000002 /* Report status of stopped children. */
@@ -62,6 +63,7 @@
 #define __WIFSTOPPED(status)   (((status)&0xff) == 0x7f)                              /* Nonzero if STATUS indicates the child is stopped. */
 #define __WCOREDUMP(status)    ((status)&__WCOREFLAG)                                 /* Nonzero if STATUS indicates the child dumped core. */
 #define __WIFCONTINUED(status) ((status) == __W_CONTINUED)                            /* Nonzero if STATUS indicates the child continued after a stop. */
+#endif /* __KOS__ || __linux__ */
 
 
 #endif /* !_ASM_WAIT_H */

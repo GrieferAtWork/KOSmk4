@@ -19,5 +19,7 @@
  */
 #ifndef _SYS_FCNTL_H
 #define _SYS_FCNTL_H 1
+
 #include <fcntl.h>
+
 #endif /* !_SYS_FCNTL_H */

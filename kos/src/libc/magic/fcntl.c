@@ -87,6 +87,24 @@
 #include <bits/timespec.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
+#if defined(__USE_NETBSD) && defined(__USE_XOPEN)
+#include <sys/stat.h>
+#endif /* __USE_NETBSD && __USE_XOPEN */
+
+#ifdef __USE_NEWLIB
+#include <features.h>
+#include <sys/cdefs.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <_ansi.h>
+#ifdef __USE_GNU
+#include <sys/time.h> /* For `futimesat()' */
+#endif /* __USE_GNU */
+#ifdef __USE_BSD
+#include <sys/file.h> /* For `flock()' */
+#endif /* __USE_BSD */
+#endif /* __USE_NEWLIB */
+
 __SYSDECL_BEGIN
 
 /* Mask for `O_RDONLY | O_WRONLY | O_RDWR' */
@@ -207,11 +225,19 @@ __SYSDECL_BEGIN
 #endif /* !O_SYMLINK && __O_SYMLINK */
 #endif /* __USE_KOS */
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) || defined(__USE_BSD)
 #if !defined(O_DIRECT) && defined(__O_DIRECT)
 #define O_DIRECT __O_DIRECT /* ??? */
 #endif /* !O_DIRECT && __O_DIRECT */
+#endif /* __USE_GNU || __USE_BSD */
 
+#ifdef __USE_NETBSD
+#if !defined(O_ALT_IO) && defined(__O_ALT_IO)
+#define O_ALT_IO __O_ALT_IO
+#endif /* !O_ALT_IO && __O_ALT_IO */
+#endif /* __USE_NETBSD */
+
+#ifdef __USE_GNU
 /* Don't update last-accessed time stamps. */
 #if !defined(O_NOATIME) && defined(__O_NOATIME)
 #define O_NOATIME __O_NOATIME
@@ -227,42 +253,82 @@ __SYSDECL_BEGIN
 #endif /* !O_TMPFILE && __O_TMPFILE */
 #endif /* __USE_GNU */
 
-#if defined(__USE_POSIX199309) || defined(__USE_UNIX98)
+#if defined(__USE_POSIX199309) || defined(__USE_UNIX98) || defined(__USE_CYGWIN)
 #if !defined(O_DSYNC) && defined(__O_DSYNC)
 #define O_DSYNC __O_DSYNC /* ??? */
 #endif /* !O_DSYNC && __O_DSYNC */
 #if !defined(O_RSYNC) && defined(__O_SYNC)
 #define O_RSYNC __O_SYNC /* ??? */
 #endif /* !O_RSYNC && __O_SYNC */
-#endif /* __USE_POSIX199309 || __USE_UNIX98 */
+#endif /* __USE_POSIX199309 || __USE_UNIX98 || __USE_CYGWIN */
+
+#if defined(__USE_CYGWIN) || defined(__USE_DOS)
+#if !defined(O_BINARY) && defined(__O_BINARY)
+#define O_BINARY __O_BINARY /* ... */
+#endif /* !O_BINARY && __O_BINARY */
+#if !defined(O_TEXT) && defined(__O_TEXT)
+#define O_TEXT __O_TEXT /* ... */
+#endif /* !O_TEXT && __O_TEXT */
+#endif /* __USE_CYGWIN || __USE_DOS */
+
+#if defined(__USE_XOPEN2K8) || defined(__USE_NEWLIB) || defined(__USE_NETBSD)
+#if !defined(O_SEARCH) && defined(__O_SEARCH)
+#define O_SEARCH __O_SEARCH /* ... */
+#endif /* !O_SEARCH && __O_SEARCH */
+#if !defined(O_EXEC) && defined(__O_EXEC)
+#define O_EXEC __O_EXEC /* ... */
+#endif /* !O_EXEC && __O_EXEC */
+#endif /* __USE_XOPEN2K8 || __USE_NEWLIB || __USE_NETBSD */
+
+#ifdef __USE_NETBSD
+#if !defined(O_NOSIGPIPE) && defined(__O_NOSIGPIPE)
+#define O_NOSIGPIPE __O_NOSIGPIPE /* ... */
+#endif /* !O_NOSIGPIPE && __O_NOSIGPIPE */
+#if !defined(O_REGULAR) && defined(__O_REGULAR)
+#define O_REGULAR __O_REGULAR /* ... */
+#endif /* !O_REGULAR && __O_REGULAR */
+#if !defined(O_SHLOCK) && defined(__O_SHLOCK)
+#define O_SHLOCK __O_SHLOCK /* ... */
+#endif /* !O_SHLOCK && __O_SHLOCK */
+#if !defined(O_EXLOCK) && defined(__O_EXLOCK)
+#define O_EXLOCK __O_EXLOCK /* ... */
+#endif /* !O_EXLOCK && __O_EXLOCK */
+#endif /* __USE_NETBSD */
+
+
+
+
+
 
 /* Aliases */
 
 /* Do not block when trying to read data that hasn't been written, yet. */
-#ifdef __O_NONBLOCK
+#if !defined(O_NDELAY) && defined(__O_NONBLOCK)
 #define O_NDELAY __O_NONBLOCK
-#endif /* __O_NONBLOCK */
+#endif /* !O_NDELAY && __O_NONBLOCK */
 
-#ifdef __USE_MISC
-
+#if defined(__USE_MISC) || defined(__USE_NETBSD)
 /* Always append data to the end of the file */
-#ifdef __O_APPEND
+#if !defined(FAPPEND) && defined(__O_APPEND)
 #define FAPPEND __O_APPEND
-#endif /* __O_APPEND */
+#endif /* !FAPPEND && __O_APPEND */
 
-#ifdef __O_SYNC
+#if !defined(FFSYNC) && defined(__O_SYNC)
 #define FFSYNC __O_SYNC /* ??? */
-#endif /* __O_SYNC */
+#endif /* !FFSYNC && __O_SYNC */
 
-#ifdef __O_ASYNC
+#if !defined(FASYNC) && defined(__O_ASYNC)
 #define FASYNC __O_ASYNC /* ??? */
-#endif /* __O_ASYNC */
+#endif /* !FASYNC && __O_ASYNC */
 
-#ifdef __O_NONBLOCK
+#if !defined(FNONBLOCK) && defined(__O_NONBLOCK)
 #define FNONBLOCK __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
-#define FNDELAY   __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
-#endif /* __O_NONBLOCK */
-#endif /* __USE_MISC */
+#endif /* !FNONBLOCK && __O_NONBLOCK */
+
+#if !defined(FNDELAY) && defined(__O_NONBLOCK)
+#define FNDELAY __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !FNDELAY && __O_NONBLOCK */
+#endif /* __USE_MISC || __USE_NETBSD */
 
 
 
@@ -270,281 +336,316 @@ __SYSDECL_BEGIN
 
 #ifndef __USE_FILE_OFFSET64
 /* [struct flock *arg] Get record locking info. */
-#ifdef __F_GETLK
+#if !defined(F_GETLK) && defined(__F_GETLK)
 #define F_GETLK __F_GETLK
-#endif /* __F_GETLK */
+#endif /* !F_GETLK && __F_GETLK */
 
 /* [struct flock const *arg] Set record locking info (non-blocking). */
-#ifdef __F_SETLK
+#if !defined(F_SETLK) && defined(__F_SETLK)
 #define F_SETLK __F_SETLK
-#endif /* __F_SETLK */
+#endif /* !F_SETLK && __F_SETLK */
 
 /* [struct flock const *arg] Set record locking info (blocking). */
-#ifdef __F_SETLKW
+#if !defined(F_SETLKW) && defined(__F_SETLKW)
 #define F_SETLKW __F_SETLKW
-#endif /* __F_SETLKW */
+#endif /* !F_SETLKW && __F_SETLKW */
 #else /* __USE_FILE_OFFSET64 */
 /* [struct flock *arg] Get record locking info. */
-#ifdef __F_GETLK64
+#if !defined(F_GETLK) && defined(__F_GETLK64)
 #define F_GETLK __F_GETLK64
-#endif /* __F_GETLK64 */
+#endif /* !F_GETLK && __F_GETLK64 */
 
 /* [struct flock const *arg] Set record locking info (non-blocking). */
-#ifdef __F_SETLK64
+#if !defined(F_SETLK) && defined(__F_SETLK64)
 #define F_SETLK __F_SETLK64
-#endif /* __F_SETLK64 */
+#endif /* !F_SETLK && __F_SETLK64 */
 
 /* [struct flock const *arg] Set record locking info (blocking). */
-#ifdef __F_SETLKW64
+#if !defined(F_SETLKW) && defined(__F_SETLKW64)
 #define F_SETLKW __F_SETLKW64
-#endif /* __F_SETLKW64 */
+#endif /* !F_SETLKW && __F_SETLKW64 */
 #endif /* !__USE_FILE_OFFSET64 */
 
 
 #ifdef __USE_LARGEFILE64
 /* [struct flock64 *arg] Get record locking info. */
-#ifdef __F_GETLK64
+#if !defined(F_GETLK64) && defined(__F_GETLK64)
 #define F_GETLK64   __F_GETLK64
-#endif /* __F_GETLK64 */
+#endif /* !F_GETLK64 && __F_GETLK64 */
 
 /* [struct flock64 const *arg] Set record locking info (non-blocking). */
-#ifdef __F_SETLK64
+#if !defined(F_SETLK64) && defined(__F_SETLK64)
 #define F_SETLK64   __F_SETLK64
-#endif /* __F_SETLK64 */
+#endif /* !F_SETLK64 && __F_SETLK64 */
 
 /* [struct flock64 const *arg] Set record locking info (blocking). */
-#ifdef __F_SETLKW64
+#if !defined(F_SETLKW64) && defined(__F_SETLKW64)
 #define F_SETLKW64  __F_SETLKW64
-#endif /* __F_SETLKW64 */
+#endif /* !F_SETLKW64 && __F_SETLKW64 */
 #endif /* !__USE_LARGEFILE64 */
 
 #ifdef __USE_GNU
 /* [struct flock *arg] */
-#ifdef __F_OFD_GETLK
+#if !defined(F_OFD_GETLK) && defined(__F_OFD_GETLK)
 #define F_OFD_GETLK  __F_OFD_GETLK
-#endif /* __F_OFD_GETLK */
+#endif /* !F_OFD_GETLK && __F_OFD_GETLK */
 
 /* [struct flock const *arg] */
-#ifdef __F_OFD_SETLK
+#if !defined(F_OFD_SETLK) && defined(__F_OFD_SETLK)
 #define F_OFD_SETLK  __F_OFD_SETLK
-#endif /* __F_OFD_SETLK */
+#endif /* !F_OFD_SETLK && __F_OFD_SETLK */
 
 /* [struct flock const *arg] */
-#ifdef __F_OFD_SETLKW
+#if !defined(F_OFD_SETLKW) && defined(__F_OFD_SETLKW)
 #define F_OFD_SETLKW __F_OFD_SETLKW
-#endif /* __F_OFD_SETLKW */
+#endif /* !F_OFD_SETLKW && __F_OFD_SETLKW */
 #endif /* __USE_GNU */
 
 
 /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
-#ifdef __F_DUPFD
+#if !defined(F_DUPFD) && defined(__F_DUPFD)
 #define F_DUPFD __F_DUPFD
-#endif /* __F_DUPFD */
+#endif /* !F_DUPFD && __F_DUPFD */
 
 /* [void arg] Get file descriptor flags.
  * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
-#ifdef __F_GETFD
+#if !defined(F_GETFD) && defined(__F_GETFD)
 #define F_GETFD __F_GETFD
-#endif /* __F_GETFD */
+#endif /* !F_GETFD && __F_GETFD */
 
 /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
-#ifdef __F_SETFD
+#if !defined(F_SETFD) && defined(__F_SETFD)
 #define F_SETFD __F_SETFD
-#endif /* __F_SETFD */
+#endif /* !F_SETFD && __F_SETFD */
 
 /* [void arg] Get file status flags.
  * @return: * : Set of `O_*' */
-#ifdef __F_GETFL
+#if !defined(F_GETFL) && defined(__F_GETFL)
 #define F_GETFL __F_GETFL
-#endif /* __F_GETFL */
+#endif /* !F_GETFL && __F_GETFL */
 
 /* [oflag_t arg] Set file status flags. */
-#ifdef __F_SETFL
+#if !defined(F_SETFL) && defined(__F_SETFL)
 #define F_SETFL __F_SETFL
-#endif /* __F_SETFL */
+#endif /* !F_SETFL && __F_SETFL */
 
 
-#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-/* [pid_t arg] Set owner (process receiving SIGIO). */
-#ifdef __F_SETOWN
-#define F_SETOWN __F_SETOWN
-#endif /* __F_SETOWN */
-
+#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K) || defined(__USE_BSD)
 /* [void arg] Get owner (process receiving SIGIO).
  * @return: * : The PID of the process (warning: the PID may not
  *              fit into an int and -EOVERFLOW may be returned) */
-#ifdef __F_GETOWN
+#if !defined(F_GETOWN) && defined(__F_GETOWN)
 #define F_GETOWN __F_GETOWN
-#endif /* __F_GETOWN */
-#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
+#endif /* !F_GETOWN && __F_GETOWN */
+
+/* [pid_t arg] Set owner (process receiving SIGIO). */
+#if !defined(F_SETOWN) && defined(__F_SETOWN)
+#define F_SETOWN __F_SETOWN
+#endif /* !F_SETOWN && __F_SETOWN */
+#endif /* __USE_UNIX98 || __USE_XOPEN2K || __USE_BSD */
 
 
 #ifdef __USE_GNU
 /* [int signo] Set number of signal to be sent. */
-#ifdef __F_SETSIG
+#if !defined(F_SETSIG) && defined(__F_SETSIG)
 #define F_SETSIG __F_SETSIG
-#endif /* __F_SETSIG */
+#endif /* !F_SETSIG && __F_SETSIG */
 
 /* [void arg] Get number of signal to be sent.
  * @return: * : One of `SIG*' */
-#ifdef __F_GETSIG
+#if !defined(F_GETSIG) && defined(__F_GETSIG)
 #define F_GETSIG __F_GETSIG
-#endif /* __F_GETSIG */
+#endif /* !F_GETSIG && __F_GETSIG */
 
 /* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
-#ifdef __F_SETOWN_EX
+#if !defined(F_SETOWN_EX) && defined(__F_SETOWN_EX)
 #define F_SETOWN_EX __F_SETOWN_EX
-#endif /* __F_SETOWN_EX */
+#endif /* !F_SETOWN_EX && __F_SETOWN_EX */
 
 /* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
-#ifdef __F_GETOWN_EX
+#if !defined(F_GETOWN_EX) && defined(__F_GETOWN_EX)
 #define F_GETOWN_EX __F_GETOWN_EX
-#endif /* __F_GETOWN_EX */
+#endif /* !F_GETOWN_EX && __F_GETOWN_EX */
 #endif /* __USE_GNU */
 
 
 #ifdef __USE_GNU
 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
-#ifdef __F_SETLEASE
+#if !defined(F_SETLEASE) && defined(__F_SETLEASE)
 #define F_SETLEASE __F_SETLEASE
-#endif /* __F_SETLEASE */
+#endif /* !F_SETLEASE && __F_SETLEASE */
 
 /* [void arg] Enquire what lease is active.
  * @return: * : One of `F_RDLCK', `F_WRLCK', `F_UNLCK' */
-#ifdef __F_GETLEASE
+#if !defined(F_GETLEASE) && defined(__F_GETLEASE)
 #define F_GETLEASE __F_GETLEASE
-#endif /* __F_GETLEASE */
+#endif /* !F_GETLEASE && __F_GETLEASE */
 
 /* [int arg = <Set of `DN_*'>] Request notifications on a directory. */
-#ifdef __F_NOTIFY
+#if !defined(F_NOTIFY) && defined(__F_NOTIFY)
 #define F_NOTIFY __F_NOTIFY
-#endif /* __F_NOTIFY */
+#endif /* !F_NOTIFY && __F_NOTIFY */
 
 /* [unsigned int arg] Set pipe buffer size (in bytes). */
-#ifdef __F_SETPIPE_SZ
+#if !defined(F_SETPIPE_SZ) && defined(__F_SETPIPE_SZ)
 #define F_SETPIPE_SZ __F_SETPIPE_SZ
-#endif /* __F_SETPIPE_SZ */
+#endif /* !F_SETPIPE_SZ && __F_SETPIPE_SZ */
 
 /* [void arg] Get pipe buffer size (in bytes).
  * @return: * : The buffer size (in bytes) */
-#ifdef __F_GETPIPE_SZ
+#if !defined(F_GETPIPE_SZ) && defined(__F_GETPIPE_SZ)
 #define F_GETPIPE_SZ __F_GETPIPE_SZ
-#endif /* __F_GETPIPE_SZ */
+#endif /* !F_GETPIPE_SZ && __F_GETPIPE_SZ */
 #endif /* __USE_GNU */
 
-#ifdef __USE_XOPEN2K8
+#if defined(__USE_XOPEN2K8) || defined(__USE_NETBSD)
 /* [void arg] Duplicate file descriptor with close-on-exit set.
  * @[fd_t return]: * : A new FD for the same kernel object. */
-#ifdef __F_DUPFD_CLOEXEC
+#if !defined(F_DUPFD_CLOEXEC) && defined(__F_DUPFD_CLOEXEC)
 #define F_DUPFD_CLOEXEC __F_DUPFD_CLOEXEC
-#endif /* __F_DUPFD_CLOEXEC */
-#endif /* __USE_XOPEN2K8 */
+#endif /* !F_DUPFD_CLOEXEC && __F_DUPFD_CLOEXEC */
+#endif /* __USE_XOPEN2K8 || __USE_NETBSD */
 
 #ifdef __USE_KOS
 /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
-#ifdef __F_SETFD
+#if !defined(F_SETFD) && defined(__F_SETFD)
 #define F_SETFD __F_SETFD
-#endif /* __F_SETFD */
+#endif /* !F_SETFD && __F_SETFD */
 
 /* [int flags] Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
-#ifdef __F_SETFL_XCH
+#if !defined(F_SETFL_XCH) && defined(__F_SETFL_XCH)
 #define F_SETFL_XCH __F_SETFL_XCH
-#endif /* __F_SETFL_XCH */
+#endif /* !F_SETFL_XCH && __F_SETFL_XCH */
 
 /* [void arg] Return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
  * s.a. https://lkml.org/lkml/2012/4/1/71 */
-#ifdef __F_NEXT
+#if !defined(F_NEXT) && defined(__F_NEXT)
 #define F_NEXT __F_NEXT
-#endif /* __F_NEXT */
+#endif /* !F_NEXT && __F_NEXT */
 #endif /* __USE_KOS */
 
 #if defined(__USE_KOS) || defined(__USE_NETBSD)
 /* [void arg] close all handles >= to the one given
  * s.a. https://www.unix.com/man-page/FreeBSD/2/closefrom/ */
-#ifdef __F_CLOSEM
+#if !defined(F_CLOSEM) && defined(__F_CLOSEM)
 #define F_CLOSEM __F_CLOSEM
-#endif /* __F_CLOSEM */
+#endif /* !F_CLOSEM && __F_CLOSEM */
 
 /* [void arg] return the max open handle id (the given fd is ignored) */
-#ifdef __F_MAXFD
+#if !defined(F_MAXFD) && defined(__F_MAXFD)
 #define F_MAXFD __F_MAXFD
-#endif /* __F_MAXFD */
+#endif /* !F_MAXFD && __F_MAXFD */
+#endif /* __USE_KOS || __USE_NETBSD */
+
+#ifdef __USE_NETBSD
+#if !defined(F_GETNOSIGPIPE) && defined(__F_GETNOSIGPIPE)
+#define F_GETNOSIGPIPE __F_GETNOSIGPIPE /* ... */
+#endif /* !F_GETNOSIGPIPE && __F_GETNOSIGPIPE */
+#if !defined(F_SETNOSIGPIPE) && defined(__F_SETNOSIGPIPE)
+#define F_SETNOSIGPIPE __F_SETNOSIGPIPE /* ... */
+#endif /* !F_SETNOSIGPIPE && __F_SETNOSIGPIPE */
+#if !defined(F_GETPATH) && defined(__F_GETPATH)
+#define F_GETPATH      __F_GETPATH      /* ... */
+#endif /* !F_GETPATH && __F_GETPATH */
 #endif /* __USE_KOS || __USE_NETBSD */
 
 
 #if defined(__USE_KOS) || defined(__USE_BSD)
 /* [fd_t arg] Same as `dup2()' (the target FD is given as `(fd_t)arg') */
-#ifdef __F_DUP2FD
+#if !defined(F_DUP2FD) && defined(__F_DUP2FD)
 #define F_DUP2FD __F_DUP2FD
-#endif /* __F_DUP2FD */
+#endif /* !F_DUP2FD && __F_DUP2FD */
 
 /* [fd_t arg] Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
-#ifdef __F_DUP2FD_CLOEXEC
+#if !defined(F_DUP2FD_CLOEXEC) && defined(__F_DUP2FD_CLOEXEC)
 #define F_DUP2FD_CLOEXEC __F_DUP2FD_CLOEXEC
-#endif /* __F_DUP2FD_CLOEXEC */
+#endif /* !F_DUP2FD_CLOEXEC && __F_DUP2FD_CLOEXEC */
 #endif /* __USE_KOS || __USE_BSD */
+
+#if defined(__USE_NEWLIB) && defined(__USE_MISC)
+#if !defined(F_RGETLK) && defined(__F_RGETLK)
+#define F_RGETLK  __F_RGETLK
+#endif /* !F_RGETLK && __F_RGETLK */
+#if !defined(F_RSETLK) && defined(__F_RSETLK)
+#define F_RSETLK  __F_RSETLK
+#endif /* !F_RSETLK && __F_RSETLK */
+#if !defined(F_CNVT) && defined(__F_CNVT)
+#define F_CNVT    __F_CNVT
+#endif /* !F_CNVT && __F_CNVT */
+#if !defined(F_RSETLKW) && defined(__F_RSETLKW)
+#define F_RSETLKW __F_RSETLKW
+#endif /* !F_RSETLKW && __F_RSETLKW */
+#endif /* __USE_NEWLIB && __USE_MISC */
+
 
 
 /* FLAG: Close the descriptor on `exec()'. */
-#ifdef __FD_CLOEXEC
+#if !defined(FD_CLOEXEC) && defined(__FD_CLOEXEC)
 #define FD_CLOEXEC __FD_CLOEXEC
-#endif /* __FD_CLOEXEC */
+#endif /* !FD_CLOEXEC && __FD_CLOEXEC */
 
 #ifdef __USE_KOS
 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
-#ifdef __FD_CLOFORK
+#if !defined(FD_CLOFORK) && defined(__FD_CLOFORK)
 #define FD_CLOFORK __FD_CLOFORK
-#endif /* __FD_CLOFORK */
+#endif /* !FD_CLOFORK && __FD_CLOFORK */
 #endif /* __USE_KOS */
 
 /* Read lock. */
-#ifdef __F_RDLCK
+#if !defined(F_RDLCK) && defined(__F_RDLCK)
 #define F_RDLCK __F_RDLCK
-#endif /* __F_RDLCK */
+#endif /* !F_RDLCK && __F_RDLCK */
 
 /* Write lock. */
-#ifdef __F_WRLCK
+#if !defined(F_WRLCK) && defined(__F_WRLCK)
 #define F_WRLCK __F_WRLCK
-#endif /* __F_WRLCK */
+#endif /* !F_WRLCK && __F_WRLCK */
 
 /* Remove lock. */
-#ifdef __F_UNLCK
+#if !defined(F_UNLCK) && defined(__F_UNLCK)
 #define F_UNLCK __F_UNLCK
-#endif /* __F_UNLCK */
+#endif /* !F_UNLCK && __F_UNLCK */
 
 /* TODO: DOC */
-#ifdef __F_EXLCK
+#if !defined(F_EXLCK) && defined(__F_EXLCK)
 #define F_EXLCK __F_EXLCK
-#endif /* __F_EXLCK */
+#endif /* !F_EXLCK && __F_EXLCK */
 
 /* TODO: DOC */
-#ifdef __F_SHLCK
+#if !defined(F_SHLCK) && defined(__F_SHLCK)
 #define F_SHLCK __F_SHLCK
-#endif /* __F_SHLCK */
+#endif /* !F_SHLCK && __F_SHLCK */
+
+#if defined(__USE_NEWLIB) && defined(__USE_MISC)
+#if !defined(F_UNLKSYS) && defined(__F_UNLKSYS)
+#define F_UNLKSYS __F_UNLKSYS
+#endif /* !F_UNLKSYS && __F_UNLKSYS */
+#endif /* __USE_NEWLIB && __USE_MISC */
 
 
 
-#ifdef __USE_MISC
+
+#if defined(__USE_MISC) || defined(__USE_BSD)
 /* Shared lock. */
-#ifdef __LOCK_SH
+#if !defined(LOCK_SH) && defined(__LOCK_SH)
 #define LOCK_SH __LOCK_SH
-#endif /* __LOCK_SH */
+#endif /* !LOCK_SH && __LOCK_SH */
 
 /* Exclusive lock. */
-#ifdef __LOCK_EX
+#if !defined(LOCK_EX) && defined(__LOCK_EX)
 #define LOCK_EX __LOCK_EX
-#endif /* __LOCK_EX */
+#endif /* !LOCK_EX && __LOCK_EX */
 
 /* Or'd with one of the above to prevent blocking. */
-#ifdef __LOCK_NB
+#if !defined(LOCK_NB) && defined(__LOCK_NB)
 #define LOCK_NB __LOCK_NB
-#endif /* __LOCK_NB */
+#endif /* !LOCK_NB && __LOCK_NB */
 
 /* Remove lock. */
-#ifdef __LOCK_UN
+#if !defined(LOCK_UN) && defined(__LOCK_UN)
 #define LOCK_UN __LOCK_UN
-#endif /* __LOCK_UN */
-#endif /* __USE_MISC */
+#endif /* !LOCK_UN && __LOCK_UN */
+#endif /* __USE_MISC || __USE_BSD */
 
 
 
@@ -748,52 +849,52 @@ enum __pid_type {
 
 
 
-#ifdef __USE_ATFILE
+#if defined(__USE_ATFILE) || defined(__USE_BSD) || defined(__USE_XOPEN2K8)
 
 /* Special value used to indicate the *at functions
  * should use the current working directory. */
-#ifdef __AT_FDCWD
-#define AT_FDCWD  __AT_FDCWD
-#endif /* __AT_FDCWD */
+#if !defined(AT_FDCWD) && defined(__AT_FDCWD)
+#define AT_FDCWD __AT_FDCWD
+#endif /* !AT_FDCWD && __AT_FDCWD */
 
 /* If the last path component is a symlink, don't follow it. */
-#ifdef __AT_SYMLINK_NOFOLLOW
+#if !defined(AT_SYMLINK_NOFOLLOW) && defined(__AT_SYMLINK_NOFOLLOW)
 #define AT_SYMLINK_NOFOLLOW __AT_SYMLINK_NOFOLLOW
-#endif /* __AT_SYMLINK_NOFOLLOW */
+#endif /* !AT_SYMLINK_NOFOLLOW && __AT_SYMLINK_NOFOLLOW */
 
 /* Remove directory instead of unlinking file. */
-#ifdef __AT_REMOVEDIR
+#if !defined(AT_REMOVEDIR) && defined(__AT_REMOVEDIR)
 #define AT_REMOVEDIR __AT_REMOVEDIR
-#endif /* __AT_REMOVEDIR */
+#endif /* !AT_REMOVEDIR && __AT_REMOVEDIR */
 
 /* Test access permitted for effective IDs, not real IDs. */
-#ifdef __AT_EACCESS
+#if !defined(AT_EACCESS) && defined(__AT_EACCESS)
 #define AT_EACCESS __AT_EACCESS
-#endif /* __AT_EACCESS */
+#endif /* !AT_EACCESS && __AT_EACCESS */
 
 /* If the last path component is a symlink, follow it. (WARNING: Only used by `linkat(2)') */
-#ifdef __AT_SYMLINK_FOLLOW
+#if !defined(AT_SYMLINK_FOLLOW) && defined(__AT_SYMLINK_FOLLOW)
 #define AT_SYMLINK_FOLLOW __AT_SYMLINK_FOLLOW
-#endif /* __AT_SYMLINK_FOLLOW */
+#endif /* !AT_SYMLINK_FOLLOW && __AT_SYMLINK_FOLLOW */
 
 #if defined(__USE_GNU) || defined(__USE_KOS_KERNEL)
 /* Suppress terminal automount traversal. */
-#ifdef __AT_NO_AUTOMOUNT
+#if !defined(AT_NO_AUTOMOUNT) && defined(__AT_NO_AUTOMOUNT)
 #define AT_NO_AUTOMOUNT __AT_NO_AUTOMOUNT
-#endif /* __AT_NO_AUTOMOUNT */
+#endif /* !AT_NO_AUTOMOUNT && __AT_NO_AUTOMOUNT */
 
 /* Allow empty relative pathname. */
-#ifdef __AT_EMPTY_PATH
+#if !defined(AT_EMPTY_PATH) && defined(__AT_EMPTY_PATH)
 #define AT_EMPTY_PATH __AT_EMPTY_PATH
-#endif /* __AT_EMPTY_PATH */
+#endif /* !AT_EMPTY_PATH && __AT_EMPTY_PATH */
 #endif /* __USE_GNU || __USE_KOS_KERNEL */
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 /* Treat symbolic links similar to like regular files and throw
  * an `ERROR_FS_TOO_MANY_LINKS' error during the first encounter. */
-#ifdef __AT_SYMLINK_REGULAR
+#if !defined(AT_SYMLINK_REGULAR) && defined(__AT_SYMLINK_REGULAR)
 #define AT_SYMLINK_REGULAR __AT_SYMLINK_REGULAR
-#endif /* __AT_SYMLINK_REGULAR */
+#endif /* !AT_SYMLINK_REGULAR && __AT_SYMLINK_REGULAR */
 
 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
  * (when not equal to `UTIME_OMIT') is used to override the file creation timestamp.
@@ -805,9 +906,9 @@ enum __pid_type {
  *       the owner would allow you to copy the file (updating the timestamp), then
  *       replacing the original)
  * NOTE: This flag is used to implement full compatibility with NT's SetFileTime function. */
-#ifdef __AT_CHANGE_CTIME
+#if !defined(AT_CHANGE_CTIME) && defined(__AT_CHANGE_CTIME)
 #define AT_CHANGE_CTIME __AT_CHANGE_CTIME
-#endif /* __AT_CHANGE_CTIME */
+#endif /* !AT_CHANGE_CTIME && __AT_CHANGE_CTIME */
 
 /* For use with `freadlinkat' and friends.
  * Rather than following unix semantics and returning the amount of
@@ -819,18 +920,18 @@ enum __pid_type {
  * Additionally, as already mentioned, a trailing NUL-character is
  * appended to the link text, ensuring that a valid C-style string
  * can be read so long as the provided buffer was of sufficient size. */
-#ifdef __AT_READLINK_REQSIZE
+#if !defined(AT_READLINK_REQSIZE) && defined(__AT_READLINK_REQSIZE)
 #define AT_READLINK_REQSIZE __AT_READLINK_REQSIZE
-#endif /* __AT_READLINK_REQSIZE */
+#endif /* !AT_READLINK_REQSIZE && __AT_READLINK_REQSIZE */
 
 /* Explicitly allow removing anything that unlink() removes. (Default;
  * Set in addition to `AT_REMOVEDIR' to implement `remove()' semantics
  * as an atomic kernel operation, removing any race condition that the
  * alternative of `if (unlink(x) && errno == EISDIR) rmdir(x)' would
  * introduce). */
-#ifdef __AT_REMOVEREG
+#if !defined(AT_REMOVEREG) && defined(__AT_REMOVEREG)
 #define AT_REMOVEREG __AT_REMOVEREG
-#endif /* __AT_REMOVEREG */
+#endif /* !AT_REMOVEREG && __AT_REMOVEREG */
 
 /* For `frealpath4' / `frealpathat': the specified path should
  * be printed as the reverse of the `AT_DOSPATH' flag:
@@ -838,15 +939,15 @@ enum __pid_type {
  *  - AT_DOSPATH             : in:DOS   out:DOS
  *  - AT_ALTPATH             : in:UNIX  out:DOS
  *  - AT_ALTPATH | AT_DOSPATH: in:DOS   out:UNIX */
-#ifdef __AT_ALTPATH
+#if !defined(AT_ALTPATH) && defined(__AT_ALTPATH)
 #define AT_ALTPATH __AT_ALTPATH
-#endif /* __AT_ALTPATH */
+#endif /* !AT_ALTPATH && __AT_ALTPATH */
 
 #ifdef __USE_KOS_KERNEL
 /* Used internally by the kernel: Delete a mounting point. (Userspace must use `unmount()') */
-#ifdef __AT_REMOVEMNT
+#if !defined(AT_REMOVEMNT) && defined(__AT_REMOVEMNT)
 #define AT_REMOVEMNT __AT_REMOVEMNT
-#endif /* __AT_REMOVEMNT */
+#endif /* !AT_REMOVEMNT && __AT_REMOVEMNT */
 #endif /* __USE_KOS_KERNEL */
 
 /* Interpret '\\' as '/', and ignore casing during path resolution.
@@ -855,48 +956,48 @@ enum __pid_type {
  * path names that start with a leading slash.
  * Basically, when set: perform the system call in DOS-compatibility mode.
  * HINT: This flag can be specified with the `fsmode()' system call. */
-#ifdef __AT_DOSPATH
+#if !defined(AT_DOSPATH) && defined(__AT_DOSPATH)
 #define AT_DOSPATH __AT_DOSPATH
-#endif /* __AT_DOSPATH */
+#endif /* !AT_DOSPATH && __AT_DOSPATH */
 
 /* Same as `AT_FDCWD' but sets the filesystem root
  * (using this, you can `chroot()' with 'dup2()'!) */
-#ifdef __AT_FDROOT
+#if !defined(AT_FDROOT) && defined(__AT_FDROOT)
 #define AT_FDROOT __AT_FDROOT
-#endif /* __AT_FDROOT */
+#endif /* !AT_FDROOT && __AT_FDROOT */
 
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
  * and their meaning is context-sensible. */
-#ifdef __AT_THIS_TASK
+#if !defined(AT_THIS_TASK) && defined(__AT_THIS_TASK)
 #define AT_THIS_TASK __AT_THIS_TASK
-#endif /* __AT_THIS_TASK */
-#ifdef __AT_THIS_MMAN
+#endif /* !AT_THIS_TASK && __AT_THIS_TASK */
+#if !defined(AT_THIS_MMAN) && defined(__AT_THIS_MMAN)
 #define AT_THIS_MMAN __AT_THIS_MMAN   /* DEPRECATED */
-#endif /* __AT_THIS_MMAN */
-#ifdef __AT_THIS_STACK
+#endif /* !AT_THIS_MMAN && __AT_THIS_MMAN */
+#if !defined(AT_THIS_STACK) && defined(__AT_THIS_STACK)
 #define AT_THIS_STACK __AT_THIS_STACK /* DEPRECATED */
-#endif /* __AT_THIS_STACK */
+#endif /* !AT_THIS_STACK && __AT_THIS_STACK */
 
 /* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
-#ifdef __AT_THIS_PROCESS
+#if !defined(AT_THIS_PROCESS) && defined(__AT_THIS_PROCESS)
 #define AT_THIS_PROCESS __AT_THIS_PROCESS
-#endif /* __AT_THIS_PROCESS */
+#endif /* !AT_THIS_PROCESS && __AT_THIS_PROCESS */
 
 /* HANDLE_TYPE_TASK (writable, Equivalent of `getppid()') */
-#ifdef __AT_PARENT_PROCESS
+#if !defined(AT_PARENT_PROCESS) && defined(__AT_PARENT_PROCESS)
 #define AT_PARENT_PROCESS __AT_PARENT_PROCESS
-#endif /* __AT_PARENT_PROCESS */
+#endif /* !AT_PARENT_PROCESS && __AT_PARENT_PROCESS */
 
 /* HANDLE_TYPE_TASK (writable, Equivalent of `getpgid(0)') */
-#ifdef __AT_GROUP_LEADER
+#if !defined(AT_GROUP_LEADER) && defined(__AT_GROUP_LEADER)
 #define AT_GROUP_LEADER __AT_GROUP_LEADER
-#endif /* __AT_GROUP_LEADER */
+#endif /* !AT_GROUP_LEADER && __AT_GROUP_LEADER */
 
 /* HANDLE_TYPE_TASK (writable, Equivalent of `getsid(0)') */
-#ifdef __AT_SESSION_LEADER
+#if !defined(AT_SESSION_LEADER) && defined(__AT_SESSION_LEADER)
 #define AT_SESSION_LEADER __AT_SESSION_LEADER
-#endif /* __AT_SESSION_LEADER */
+#endif /* !AT_SESSION_LEADER && __AT_SESSION_LEADER */
 
 
 /* DOS Drive root / current-working paths.
@@ -961,97 +1062,99 @@ enum __pid_type {
  *     If a symbolic link starts with a '/' or '\\' character, the remainder
  *     of its text is relative to the first DOS drive mounting point
  *     encountered while walking up the chain of parent directories. */
-#ifdef __AT_FDDRIVE_CWD
+#if !defined(AT_FDDRIVE_CWD) && defined(__AT_FDDRIVE_CWD)
 #define AT_FDDRIVE_CWD(drivechar) __AT_FDDRIVE_CWD(drivechar)
-#endif /* __AT_FDDRIVE_CWD */
-#ifdef __AT_FDDRIVE_ROOT
+#endif /* !AT_FDDRIVE_CWD && __AT_FDDRIVE_CWD */
+#if !defined(AT_FDDRIVE_ROOT) && defined(__AT_FDDRIVE_ROOT)
 #define AT_FDDRIVE_ROOT(drivechar) __AT_FDDRIVE_ROOT(drivechar)
-#endif /* __AT_FDDRIVE_ROOT */
-#ifdef __AT_DOS_DRIVEMIN
+#endif /* !AT_FDDRIVE_ROOT && __AT_FDDRIVE_ROOT */
+#if !defined(AT_DOS_DRIVEMIN) && defined(__AT_DOS_DRIVEMIN)
 #define AT_DOS_DRIVEMIN __AT_DOS_DRIVEMIN
-#endif /* __AT_DOS_DRIVEMIN */
-#ifdef __AT_DOS_DRIVEMAX
+#endif /* !AT_DOS_DRIVEMIN && __AT_DOS_DRIVEMIN */
+#if !defined(AT_DOS_DRIVEMAX) && defined(__AT_DOS_DRIVEMAX)
 #define AT_DOS_DRIVEMAX __AT_DOS_DRIVEMAX
-#endif /* __AT_DOS_DRIVEMAX */
+#endif /* !AT_DOS_DRIVEMAX && __AT_DOS_DRIVEMAX */
 #endif /* __USE_KOS */
-#endif /* __USE_ATFILE */
+#endif /* __USE_ATFILE || __USE_BSD || __USE_XOPEN2K8 */
 
 
 
 #ifdef __USE_DOS
 /* DOS extension flags. */
-#ifdef __CRT_DOS_PRIMARY
-#define O_RAW           __DOS_O_RAW
-#define O_TEXT          __DOS_O_TEXT
-#define O_BINARY        __DOS_O_BINARY
-#define O_SEQUENTIAL    __DOS_O_SEQUENTIAL
-#define O_RANDOM        __DOS_O_RANDOM
-#define _O_SHORT_LIVED  __DOS_O_SHORT_LIVED
-#define _O_U16TEXT      __DOS_O_U16TEXT
-#define _O_U8TEXT       __DOS_O_U8TEXT
-#define _O_WTEXT        __DOS_O_WTEXT
-#define _O_OBTAIN_DIR   __DOS_O_OBTAIN_DIR
-#define O_TEMPORARY     __DOS_O_TEMPORARY
-#define _O_TEMPORARY    __DOS_O_TEMPORARY
-#else /* __CRT_DOS_PRIMARY */
-#define O_RAW           0
-#define O_TEXT          0
-#define O_BINARY        0
-#define O_SEQUENTIAL    0
-#define O_RANDOM        0
-#define _O_SHORT_LIVED  0
-#define _O_U16TEXT      0
-#define _O_U8TEXT       0
-#define _O_WTEXT        0
-#define _O_OBTAIN_DIR   0 /* Not the same as `O_DIRECTORY'! (quite the opposite actually) */
-#endif /* !__CRT_DOS_PRIMARY */
+#if !defined(O_RAW) && defined(__O_BINARY)
+#define O_RAW           __O_BINARY
+#endif /* !O_RAW && __O_BINARY */
+#if !defined(_O_RAW) && defined(__O_BINARY)
+#define _O_RAW          __O_BINARY
+#endif /* !_O_RAW && __O_BINARY */
+#if !defined(O_SEQUENTIAL) && defined(__O_SEQUENTIAL)
+#define O_SEQUENTIAL    __O_SEQUENTIAL
+#endif /* !O_SEQUENTIAL && __O_SEQUENTIAL */
+#if !defined(_O_SEQUENTIAL) && defined(__O_SEQUENTIAL)
+#define _O_SEQUENTIAL   __O_SEQUENTIAL
+#endif /* !_O_SEQUENTIAL && __O_SEQUENTIAL */
+#if !defined(O_RANDOM) && defined(__O_RANDOM)
+#define O_RANDOM        __O_RANDOM
+#endif /* !O_RANDOM && __O_RANDOM */
+#if !defined(_O_RANDOM) && defined(__O_RANDOM)
+#define _O_RANDOM       __O_RANDOM
+#endif /* !_O_RANDOM && __O_RANDOM */
+#if !defined(_O_SHORT_LIVED) && defined(__O_SHORT_LIVED)
+#define _O_SHORT_LIVED  __O_SHORT_LIVED
+#endif /* !_O_SHORT_LIVED && __O_SHORT_LIVED */
+#if !defined(_O_U16TEXT) && defined(__O_U16TEXT)
+#define _O_U16TEXT      __O_U16TEXT
+#endif /* !_O_U16TEXT && __O_U16TEXT */
+#if !defined(_O_U8TEXT) && defined(__O_U8TEXT)
+#define _O_U8TEXT       __O_U8TEXT
+#endif /* !_O_U8TEXT && __O_U8TEXT */
+#if !defined(_O_WTEXT) && defined(__O_WTEXT)
+#define _O_WTEXT        __O_WTEXT
+#endif /* !_O_WTEXT && __O_WTEXT */
+#if !defined(_O_OBTAIN_DIR) && defined(__O_OBTAIN_DIR)
+#define _O_OBTAIN_DIR   __O_OBTAIN_DIR
+#endif /* !_O_OBTAIN_DIR && __O_OBTAIN_DIR */
+#if !defined(O_TEMPORARY) && defined(__O_TMPFILE)
+#define O_TEMPORARY     __O_TMPFILE
+#endif /* !O_TEMPORARY && __O_TMPFILE */
+#if !defined(_O_TEMPORARY) && defined(__O_TMPFILE)
+#define _O_TEMPORARY    __O_TMPFILE
+#endif /* !_O_TEMPORARY && __O_TMPFILE */
+#if !defined(_O_BINARY) && defined(__O_BINARY)
+#define _O_BINARY       __O_BINARY
+#endif /* !_O_BINARY && __O_BINARY */
+#if !defined(_O_TEXT) && defined(__O_TEXT)
+#define _O_TEXT         __O_TEXT
+#endif /* !_O_TEXT && __O_TEXT */
 
 /* DOS name aliases */
-#ifdef __O_RDONLY
+#if !defined(_O_RDONLY) && defined(__O_RDONLY)
 #define _O_RDONLY __O_RDONLY
-#endif /* __O_RDONLY */
-
-#ifdef __O_WRONLY
+#endif /* !_O_RDONLY && __O_RDONLY */
+#if !defined(_O_WRONLY) && defined(__O_WRONLY)
 #define _O_WRONLY __O_WRONLY
-#endif /* __O_WRONLY */
-
-#ifdef __O_RDWR
+#endif /* !_O_WRONLY && __O_WRONLY */
+#if !defined(_O_RDWR) && defined(__O_RDWR)
 #define _O_RDWR __O_RDWR
-#endif /* __O_RDWR */
-
-#ifdef __O_APPEND
+#endif /* !_O_RDWR && __O_RDWR */
+#if !defined(_O_APPEND) && defined(__O_APPEND)
 #define _O_APPEND __O_APPEND
-#endif /* __O_APPEND */
-
-#ifdef __O_CREAT
+#endif /* !_O_APPEND && __O_APPEND */
+#if !defined(_O_CREAT) && defined(__O_CREAT)
 #define _O_CREAT __O_CREAT
-#endif /* __O_CREAT */
-
-#ifdef __O_EXCL
+#endif /* !_O_CREAT && __O_CREAT */
+#if !defined(_O_EXCL) && defined(__O_EXCL)
 #define _O_EXCL __O_EXCL
-#endif /* __O_EXCL */
-
-#ifdef __O_TRUNC
+#endif /* !_O_EXCL && __O_EXCL */
+#if !defined(_O_TRUNC) && defined(__O_TRUNC)
 #define _O_TRUNC __O_TRUNC
-#endif /* __O_TRUNC */
-
-#ifdef __O_CLOEXEC
+#endif /* !_O_TRUNC && __O_TRUNC */
+#if !defined(O_NOINHERIT) && defined(__O_CLOEXEC)
 #define O_NOINHERIT __O_CLOEXEC
+#endif /* !O_NOINHERIT && __O_CLOEXEC */
+#if !defined(_O_NOINHERIT) && defined(__O_CLOEXEC)
 #define _O_NOINHERIT __O_CLOEXEC
-#endif /* __O_CLOEXEC */
-
-#define _O_BINARY O_BINARY
-#define _O_RANDOM O_RANDOM
-#define _O_RAW O_RAW
-#define _O_SEQUENTIAL O_SEQUENTIAL
-#define _O_TEXT O_TEXT
-
-#ifndef _O_TEMPORARY
-/* XXX: Figure out exactly what `O_TEMPORARY' does,
- *      and check if it matches linux's `O_TMPFILE' */
-//#define _O_TEMPORARY    __O_TMPFILE
-//#define O_TEMPORARY     __O_TMPFILE
-#endif /* !_O_TEMPORARY */
+#endif /* !_O_NOINHERIT && __O_CLOEXEC */
 #endif /* __USE_DOS */
 
 
@@ -1135,23 +1238,189 @@ enum __pid_type {
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#ifndef SEEK_SET
+#if !defined(SEEK_SET) && defined(__SEEK_SET)
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#endif /* !SEEK_SET && __SEEK_SET */
+#if !defined(SEEK_CUR) && defined(__SEEK_CUR)
 #define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#endif /* !SEEK_CUR && __SEEK_CUR */
+#if !defined(SEEK_END) && defined(__SEEK_END)
 #define SEEK_END __SEEK_END /* Seek from end of file. */
-#ifdef __USE_GNU
-#ifdef __SEEK_DATA
+#endif /* !SEEK_END && __SEEK_END */
+#if defined(__USE_GNU) || defined(__USE_SOLARIS)
+#if !defined(SEEK_DATA) && defined(__SEEK_DATA)
 #define SEEK_DATA __SEEK_DATA /* Seek to next data. */
-#endif /* __SEEK_DATA */
-#ifdef __SEEK_HOLE
+#endif /* !SEEK_DATA && __SEEK_DATA */
+#if !defined(SEEK_HOLE) && defined(__SEEK_HOLE)
 #define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
-#endif /* __SEEK_HOLE */
-#endif /* __USE_GNU */
-#endif /* !SEEK_SET */
+#endif /* !SEEK_HOLE && __SEEK_HOLE */
+#endif /* __USE_GNU || __USE_SOLARIS */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 
+
+
+#if defined(__USE_NEWLIB) || defined(__USE_NETBSD)
+#if !defined(FREAD) && defined(__O_FREAD)
+#define FREAD   __O_FREAD
+#endif /* !FREAD && __O_FREAD */
+#if !defined(FWRITE) && defined(__O_FWRITE)
+#define FWRITE  __O_FWRITE
+#endif /* !FWRITE && __O_FWRITE */
+#endif /* __USE_NEWLIB || __USE_NETBSD */
+
+
+#ifdef __USE_NEWLIB
+/* API_LEVEL: newlib */
+#if !defined(_FOPEN) && defined(__O_FOPEN)
+#define _FOPEN __O_FOPEN
+#endif /* !_FOPEN && __O_FOPEN */
+
+#if !defined(_FREAD) && defined(__O_FREAD)
+#define _FREAD   __O_FREAD   /* ... */
+#endif /* !_FREAD && __O_FREAD */
+#if !defined(_FWRITE) && defined(__O_FWRITE)
+#define _FWRITE  __O_FWRITE  /* ... */
+#endif /* !_FWRITE && __O_FWRITE */
+#if !defined(_FMARK) && defined(__O_FMARK)
+#define _FMARK   __O_FMARK   /* ... */
+#endif /* !_FMARK && __O_FMARK */
+#if !defined(_FDEFER) && defined(__O_FDEFER)
+#define _FDEFER  __O_FDEFER  /* ... */
+#endif /* !_FDEFER && __O_FDEFER */
+#if !defined(_FSHLOCK) && defined(__O_SHLOCK)
+#define _FSHLOCK __O_SHLOCK /* ... */
+#endif /* !_FSHLOCK && __O_SHLOCK */
+#if !defined(_FEXLOCK) && defined(__O_EXLOCK)
+#define _FEXLOCK __O_EXLOCK /* ... */
+#endif /* !_FEXLOCK && __O_EXLOCK */
+
+#if !defined(_FAPPEND) && defined(__O_APPEND)
+#define _FAPPEND    __O_APPEND /* Always append data to the end of the file */
+#endif /* !_FAPPEND && __O_APPEND */
+#if !defined(_FASYNC) && defined(__O_ASYNC)
+#define _FASYNC     __O_ASYNC
+#endif /* !_FASYNC && __O_ASYNC */
+#if !defined(_FCREAT) && defined(__O_CREAT)
+#define _FCREAT     __O_CREAT
+#endif /* !_FCREAT && __O_CREAT */
+#if !defined(_FTRUNC) && defined(__O_TRUNC)
+#define _FTRUNC     __O_TRUNC
+#endif /* !_FTRUNC && __O_TRUNC */
+#if !defined(_FEXCL) && defined(__O_EXCL)
+#define _FEXCL      __O_EXCL
+#endif /* !_FEXCL && __O_EXCL */
+#if !defined(_FNBIO) && defined(__O_NBIO)
+#define _FNBIO      __O_NBIO     /* Do not block when trying to read data that hasn't been written, yet. */
+#elif !defined(_FNBIO) && defined(__O_NONBLOCK)
+#define _FNBIO      __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !_FNBIO && __O_NONBLOCK */
+#if !defined(_FSYNC) && defined(__O_SYNC)
+#define _FSYNC      __O_SYNC
+#endif /* !_FSYNC && __O_SYNC */
+#if !defined(_FNONBLOCK) && defined(__O_NONBLOCK)
+#define _FNONBLOCK  __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !_FNONBLOCK && __O_NONBLOCK */
+#if !defined(_FNDELAY) && defined(__O_NONBLOCK)
+#define _FNDELAY    __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !_FNDELAY && __O_NONBLOCK */
+#if !defined(_FNOCTTY) && defined(__O_NOCTTY)
+#define _FNOCTTY    __O_NOCTTY
+#endif /* !_FNOCTTY && __O_NOCTTY */
+#if !defined(_FBINARY) && defined(__O_BINARY)
+#define _FBINARY    __O_BINARY
+#endif /* !_FBINARY && __O_BINARY */
+#if !defined(_FTEXT) && defined(__O_TEXT)
+#define _FTEXT      __O_TEXT
+#endif /* !_FTEXT && __O_TEXT */
+#if !defined(_FNOINHERIT) && defined(__O_CLOEXEC)
+#define _FNOINHERIT __O_CLOEXEC
+#endif /* !_FNOINHERIT && __O_CLOEXEC */
+#if !defined(_FDIRECT) && defined(__O_DIRECT)
+#define _FDIRECT    __O_DIRECT
+#endif /* !_FDIRECT && __O_DIRECT */
+#if !defined(_FNOFOLLOW) && defined(__O_NOFOLLOW)
+#define _FNOFOLLOW  __O_NOFOLLOW
+#endif /* !_FNOFOLLOW && __O_NOFOLLOW */
+#if !defined(_FDIRECTORY) && defined(__O_DIRECTORY)
+#define _FDIRECTORY __O_DIRECTORY
+#endif /* !_FDIRECTORY && __O_DIRECTORY */
+#if !defined(_FEXECSRCH) && defined(__O_EXEC)
+#define _FEXECSRCH  __O_EXEC
+#endif /* !_FEXECSRCH && __O_EXEC */
+#if !defined(_FTMPFILE) && defined(__O_TMPFILE)
+#define _FTMPFILE   __O_TMPFILE
+#endif /* !_FTMPFILE && __O_TMPFILE */
+#if !defined(_FNOATIME) && defined(__O_NOATIME)
+#define _FNOATIME   __O_NOATIME
+#endif /* !_FNOATIME && __O_NOATIME */
+
+#ifdef __USE_MISC
+#if !defined(FSYNC) && defined(__O_SYNC)
+#define FSYNC __O_SYNC /* ??? */
+#endif /* !FSYNC && __O_SYNC */
+
+#if !defined(FNBIO) && defined(__O_NBIO)
+#define FNBIO __O_NBIO     /* Do not block when trying to read data that hasn't been written, yet. */
+#elif !defined(FNBIO) && defined(__O_NONBLOCK)
+#define FNBIO __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !FNBIO && __O_NONBLOCK */
+
+#if !defined(FNONBIO) && defined(__O_NONBLOCK)
+#define FNONBIO __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !FNONBIO && __O_NONBLOCK */
+
+#if !defined(FMARK) && defined(__O_FMARK)
+#define FMARK   __O_FMARK
+#endif /* !FMARK && __O_FMARK */
+#if !defined(FDEFER) && defined(__O_FDEFER)
+#define FDEFER  __O_FDEFER
+#endif /* !FDEFER && __O_FDEFER */
+#if !defined(FSHLOCK) && defined(__O_SHLOCK)
+#define FSHLOCK __O_SHLOCK
+#endif /* !FSHLOCK && __O_SHLOCK */
+#if !defined(FEXLOCK) && defined(__O_EXLOCK)
+#define FEXLOCK __O_EXLOCK
+#endif /* !FEXLOCK && __O_EXLOCK */
+
+#if !defined(FOPEN) && defined(__O_FOPEN)
+#define FOPEN   __O_FOPEN
+#endif /* !FOPEN && __O_FOPEN */
+#if !defined(FCREAT) && defined(__O_CREAT)
+#define FCREAT  __O_CREAT  /* If missing, create a new file */
+#endif /* !FCREAT && __O_CREAT */
+#if !defined(FTRUNC) && defined(__O_TRUNC)
+#define FTRUNC  __O_TRUNC  /* Truncate (clear) the named file if it already exists,
+                            * and `O_WRONLY' or `O_RDWR' access is specified. */
+#endif /* !FTRUNC && __O_TRUNC */
+#if !defined(FEXCL) && defined(__O_EXCL)
+#define FEXCL   __O_EXCL   /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
+                            * exception if the file already exists. */
+#endif /* !FEXCL && __O_EXCL */
+#if !defined(FNOCTTY) && defined(__O_NOCTTY)
+#define FNOCTTY __O_NOCTTY /* If the calling process does not have a controlling terminal assigned,
+                            * do not attempt to assign the newly opened file as terminal, even when
+                            * `isatty(open(...))' would be true. */
+#endif /* !FNOCTTY && __O_NOCTTY */
+#endif /* __USE_MISC */
+
+#ifdef __USE_BSD
+#if !defined(FNONBLOCK) && defined(__O_NONBLOCK)
+#define FNONBLOCK __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
+#endif /* !FNONBLOCK && __O_NONBLOCK */
+#endif /* __USE_BSD */
+
+#endif /* __USE_NEWLIB */
+
+
 #ifdef __CC__
+
+#ifdef __USE_SOLARIS
+typedef struct flock flock_t;
+#ifdef __USE_LARGEFILE64
+typedef struct flock64 flock64_t;
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_SOLARIS */
 
 }
 

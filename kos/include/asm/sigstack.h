@@ -22,11 +22,13 @@
 
 #include <__stdinc.h>
 
+#if defined(__KOS__) || defined(__linux__)
 /* Possible values for `ss_flags.'. */
 #define __SS_ONSTACK 1
 #define __SS_DISABLE 2
 
 #define __MINSIGSTKSZ 2048 /* Minimum stack size for a signal handler. */
 #define __SIGSTKSZ    8192 /* System default stack size. */
+#endif /* __KOS__ || __linux__ */
 
 #endif /* !_ASM_SIGSTACK_H */

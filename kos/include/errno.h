@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0ce3e7c */
+/* HASH CRC-32:0x697faf9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,9 @@
 #ifdef __EALREADY
 #define EALREADY        __EALREADY        /* Operation already in progress */
 #endif /* __EALREADY */
+#ifdef __EAUTH
+#define EAUTH           __EAUTH           /* ??? */
+#endif /* __EAUTH */
 #ifdef __EBADE
 #define EBADE           __EBADE           /* Invalid exchange */
 #endif /* __EBADE */
@@ -75,6 +78,9 @@
 #ifdef __EBADR
 #define EBADR           __EBADR           /* Invalid request descriptor */
 #endif /* __EBADR */
+#ifdef __EBADRPC
+#define EBADRPC         __EBADRPC         /* ??? */
+#endif /* __EBADRPC */
 #ifdef __EBADRQC
 #define EBADRQC         __EBADRQC         /* Invalid request code */
 #endif /* __EBADRQC */
@@ -219,6 +225,9 @@
 #ifdef __ELNRNG
 #define ELNRNG          __ELNRNG          /* Link number out of range */
 #endif /* __ELNRNG */
+#ifdef __ELOCKUNMAPPED
+#define ELOCKUNMAPPED   __ELOCKUNMAPPED   /* ??? */
+#endif /* __ELOCKUNMAPPED */
 #ifdef __ELOOP
 #define ELOOP           __ELOOP           /* Too many symbolic links encountered */
 #endif /* __ELOOP */
@@ -243,6 +252,9 @@
 #ifdef __ENAVAIL
 #define ENAVAIL         __ENAVAIL         /* No XENIX semaphores available */
 #endif /* __ENAVAIL */
+#ifdef __ENEEDAUTH
+#define ENEEDAUTH       __ENEEDAUTH       /* ??? */
+#endif /* __ENEEDAUTH */
 #ifdef __ENETDOWN
 #define ENETDOWN        __ENETDOWN        /* Network is down */
 #endif /* __ENETDOWN */
@@ -261,6 +273,9 @@
 #ifdef __ENOANO
 #define ENOANO          __ENOANO          /* No anode */
 #endif /* __ENOANO */
+#ifdef __ENOATTR
+#define ENOATTR         __ENOATTR         /* ??? */
+#endif /* __ENOATTR */
 #ifdef __ENOBUFS
 #define ENOBUFS         __ENOBUFS         /* No buffer space available */
 #endif /* __ENOBUFS */
@@ -321,6 +336,9 @@
 #ifdef __ENOSYS
 #define ENOSYS          __ENOSYS          /* Function not implemented */
 #endif /* __ENOSYS */
+#ifdef __ENOTACTIVE
+#define ENOTACTIVE      __ENOTACTIVE      /* ??? */
+#endif /* __ENOTACTIVE */
 #ifdef __ENOTBLK
 #define ENOTBLK         __ENOTBLK         /* Block device required */
 #endif /* __ENOTBLK */
@@ -378,6 +396,15 @@
 #ifdef __EPROCLIM
 #define EPROCLIM        __EPROCLIM        /* Process limit reached */
 #endif /* __EPROCLIM */
+#ifdef __EPROCUNAVAIL
+#define EPROCUNAVAIL    __EPROCUNAVAIL    /* ??? */
+#endif /* __EPROCUNAVAIL */
+#ifdef __EPROGMISMATCH
+#define EPROGMISMATCH   __EPROGMISMATCH   /* ??? */
+#endif /* __EPROGMISMATCH */
+#ifdef __EPROGUNAVAIL
+#define EPROGUNAVAIL    __EPROGUNAVAIL    /* ??? */
+#endif /* __EPROGUNAVAIL */
 #ifdef __EPROTO
 #define EPROTO          __EPROTO          /* Protocol error */
 #endif /* __EPROTO */
@@ -408,6 +435,9 @@
 #ifdef __EROFS
 #define EROFS           __EROFS           /* Read-only file system */
 #endif /* __EROFS */
+#ifdef __ERPCMISMATCH
+#define ERPCMISMATCH    __ERPCMISMATCH    /* ??? */
+#endif /* __ERPCMISMATCH */
 #ifdef __ESHUTDOWN
 #define ESHUTDOWN       __ESHUTDOWN       /* Cannot send after transport endpoint shutdown */
 #endif /* __ESHUTDOWN */
@@ -480,6 +510,14 @@
 #if !defined(ENOTSUP) && defined(EOPNOTSUPP)
 #define ENOTSUP EOPNOTSUPP /* Not supported */
 #endif /* !ENOTSUP && EOPNOTSUPP */
+
+
+/* Platform-specific extensions for errno limits. */
+#ifdef __USE_NETBSD
+#ifdef __ELIMIT
+#define ELAST __ELIMIT /* Max possible errno */
+#endif /* __ELIMIT */
+#endif /* __USE_NETBSD */
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 #ifdef __EOK
