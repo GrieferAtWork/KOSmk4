@@ -190,6 +190,19 @@ NOTHROW(FCALL ps2_keyboard_getbyte_nb)(void) {
 	return result;
 }
 
+PRIVATE NOBLOCK ATTR_DBGTEXT u8
+NOTHROW(FCALL ps2_keyboard_getbyte_timeout)(void) {
+	unsigned int volatile timeout = 1000000;
+	u8 result;
+	while ((result = ps2_keyboard_getbyte_nb()) == 0) {
+		if (!timeout)
+			break;
+		task_pause();
+		--timeout;
+	}
+	return result;
+}
+
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(FCALL ps2_keyboard_ungetbyte)(u8 byte) {
 	unsigned int index;
@@ -1337,23 +1350,27 @@ again:
 
 PRIVATE NOBLOCK ATTR_DBGTEXT bool
 NOTHROW(FCALL ps2_keyboard_assertbyte)(u8 expected) {
-	u8 got = ps2_keyboard_getbyte();
+	u8 got;
+	got = ps2_keyboard_getbyte_timeout();
 	if likely(got == expected)
 		return true;
-	do {
+	while (got) {
 		printk(KERN_ERR "[dbg] Unexpected init response byte (got: %#I8x, expected: %#I8x)\n",
 		       got, expected);
 		got = ps2_keyboard_getbyte_nb();
 		if likely(got == expected)
 			return true;
-	} while (got);
+	}
 	return false;
 }
 
 INTERN ATTR_DBGTEXT void
 NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) {
+	unsigned int attempt;
 	unsigned int position;
 	int data;
+	attempt = 0;
+again:
 
 	/* Acknowledge any pending interrupts so-as to
 	 * ensure that we'll be able to receive input. */
@@ -1448,7 +1465,11 @@ NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) {
 	position = __LINE__;
 	if (!ps2_keyboard_assertbyte(PS2_RSP_ACK))
 		goto err_no_ps2;
-	ps2_keyboard_scanset = ps2_keyboard_getbyte() & 3;
+	position = __LINE__;
+	ps2_keyboard_scanset = ps2_keyboard_getbyte_timeout();
+	if unlikely(!ps2_keyboard_scanset)
+		goto err_no_ps2;
+	ps2_keyboard_scanset = ps2_keyboard_scanset & 3;
 	if unlikely(!ps2_keyboard_scanset)
 		ps2_keyboard_scanset = 1;
 
@@ -1469,9 +1490,15 @@ NOTHROW(KCALL x86_debug_initialize_ps2_keyboard)(void) {
 	dbg_getc_pending_cnt   = 0;
 	return;
 err_no_ps2:
-	kernel_panic("Cannot enter debug mode: Failed to initialize "
-	             "PS/2 at %d (is a keyboard connected?)",
-	             position);
+	printk(KERN_ERR "[dbg] Keyboard init failed at %d (re-attempt #%u)\n",
+	       position, attempt);
+	if (attempt < 8) {
+		++attempt;
+		goto again;
+	}
+	printk(KERN_ERR "[dbg] Cannot enter debug mode: Failed to initialize "
+	                "PS/2 at %d (is a keyboard connected?)\n",
+	       position);
 }
 
 INTERN NOBLOCK ATTR_DBGTEXT void

@@ -760,7 +760,7 @@ fully_reset_task_connections:
 		                                                  CPU_IPI_FWAITFOR, mycpu);
 		if (count) {
 			/* Wait for other CPUs to ACK becoming suspended. */
-			unsigned int volatile timeout = 100000000;
+			unsigned int volatile timeout = 1000000;
 
 			/* NOTE: We need a timeout here, since this can dead-lock if one of the other
 			 *       CPUs is itself in a dead-lock, which could easily happen when the
