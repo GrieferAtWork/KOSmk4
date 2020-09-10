@@ -219,6 +219,8 @@ INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 	/* Update the used page directory pointer. */
 	EXTERN(this_vm)
 	movl   this_vm(%eax), %ecx
+	EXTERN(thiscpu_vm)
+	movl   %ecx, thiscpu_vm(%ebx) /* Update the per-cpu current-vm field. */
 	EXTERN(thisvm_pdir_phys_ptr)
 	movl   thisvm_pdir_phys_ptr(%ecx), %eax
 	movl   %cr3, %edx

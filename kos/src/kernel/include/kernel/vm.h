@@ -27,7 +27,6 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
-#include <sched/cpu.h> /* CONFIG_MAX_CPU_COUNT, cpuset_t */
 #include <sched/rwlock.h>
 #include <sched/shared_rwlock.h>
 
@@ -1654,9 +1653,6 @@ struct vm {
 	                                             * Chain of tasks that are pending deletion from `v_tasks',
 	                                             * as well as follow-up `heap_free()' of the task in question.
 	                                             * NOTE: All other components of the task will have already been destroyed. */
-#if CONFIG_MAX_CPU_COUNT > 1
-	WEAK cpuset_t              v_cpus;          /* Set of CPUs that are using this VM. */
-#endif /* CONFIG_MAX_CPU_COUNT > 1 */
 	struct vm_node             v_kernreserve;   /* A special RESERVED-like node that is used by user-space VMs
 	                                             * to cover the entire kernel-space, preventing user-space from
 	                                             * accidentally overwriting it, without the need of adding too
@@ -1797,9 +1793,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  *    going to enable preemption.
  * Note though that all other vm_*-level APIs already perform syncing
  * automatically, unless otherwise documented by individual functions. */
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncone)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncall)(struct vm *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_sync)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_syncone)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_syncall)(struct vm *__restrict self);
 
 /* Sync memory within `THIS_VM' */
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);

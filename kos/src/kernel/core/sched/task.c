@@ -227,8 +227,10 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
 	DEFINE_PUBLIC_SYMBOL(thiscpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
 #ifndef CONFIG_NO_SMP
+	DEFINE_PUBLIC_SYMBOL(thiscpu_vm, offsetof(struct cpu, c_vm), sizeof(struct vm *));
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
 #else /* !CONFIG_NO_SMP */
+	DEFINE_PUBLIC_SYMBOL(thiscpu_vm, 0, 0);
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, 0, 0);
 #endif /* CONFIG_NO_SMP */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));

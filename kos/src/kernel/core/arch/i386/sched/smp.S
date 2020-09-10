@@ -1000,6 +1000,8 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* Load the VM of the target task. */
 	movP   this_vm(R_TASK), %Pcx
+	EXTERN(thiscpu_vm)
+	movP   %Pcx, thiscpu_vm(R_CPU) /* Update the per-cpu current-vm field. */
 	EXTERN(vm_kernel)
 	cmpP   $(vm_kernel), %Pcx
 	je     1f

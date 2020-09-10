@@ -27,17 +27,56 @@
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 
+#include <hybrid/atomic.h>
+
 #include <assert.h>
 #include <string.h>
 
 DECL_BEGIN
 
-#if 1 /* TODO: The automatic updating of `v_cpus' has yet to be implemented. */
-#define vm_getcpus(self, result) CPUSET_SETFULL(result)
-#else
-#define vm_getcpus(self, result) CPUSET_ATOMIC_COPY(result, (self)->v_cpus)
-#endif
-
+#ifndef CONFIG_NO_SMP
+/* Return the set of CPUs that are currently mapped to make use of `self'
+ * Note that the returned set of CPUs is only a (possibly inconsistent)
+ * snapshot, with the only guaranties being that:
+ *   - If a CPU is apart of the returned cpuset, that CPU has at one point
+ *     made use of the given vm `self'.
+ *   - If a CPU is not apart of the returned cpuset, that CPU may have since
+ *     switched its VM to the given one. Note however that during this switch,
+ *     additional things may have also happened, such as the CPU invaliding
+ *     its TLB cache (where is function is meant to be used to calculate the
+ *     bounding set of CPUs that (may) need to have their page directories
+ *     invalidated)
+ * WARNING: This function does not include special handling for when `self'
+ *          is the kernel VM. In this case, the caller must implement a
+ *          dedicated code-path that behaves as though this function had
+ *          returned a completely filled cpuset. */
+#if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL vm_getcpus)(struct vm *__restrict self,
+                          cpuset_ptr_t result)
+#else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) cpuset_t
+NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
+	ASMNAME("vm_getcpus");
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) cpuset_t
+NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
+#endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
+{
+	cpuid_t i;
+#if CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER
+	cpuset_t result;
+#endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
+	/* Find all CPUs that make use of `self' */
+	CPUSET_CLEAR(result);
+	for (i = 0; i < cpu_count; ++i) {
+		if (ATOMIC_READ(cpu_vector[i]->c_vm) == self)
+			CPUSET_INSERT(result, i);
+	}
+#if CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER
+	return result;
+#endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
+}
+#endif /* !CONFIG_NO_SMP */
 
 
 #ifndef CONFIG_NO_SMP
@@ -96,7 +135,7 @@ NOTHROW(FCALL vm_sync)(struct vm *__restrict self,
 	{
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		vm_getcpus(self, targets);
+		vm_getcpus(self, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
 		if (self == &vm_kernel)
 			CPUSET_SETFULL(targets);
@@ -120,7 +159,7 @@ NOTHROW(FCALL vm_syncone)(struct vm *__restrict self,
 	{
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		vm_getcpus(self, targets);
+		vm_getcpus(self, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
 		if (self == &vm_kernel)
 			CPUSET_SETFULL(targets);
@@ -146,7 +185,7 @@ NOTHROW(FCALL vm_syncall)(struct vm *__restrict self) {
 	{
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		vm_getcpus(self, targets);
+		vm_getcpus(self, CPUSET_PTR(targets));
 		cpu_sendipi_cpuset(targets, &ipi_invtlb_user, args,
 		                   CPU_IPI_FWAITFOR |
 		                   CPU_IPI_FNOINTR);
@@ -167,9 +206,9 @@ NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 		cpuset_t targets;
 		struct vm *myvm   = THIS_VM;
 		struct cpu *mycpu = THIS_CPU;
-		vm_getcpus(self, targets);
+		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
-		if (myvm == &vm_kernel)
+		if unlikely(myvm == &vm_kernel)
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, mycpu->c_id);
@@ -192,9 +231,9 @@ NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 		cpuset_t targets;
 		struct vm *myvm   = THIS_VM;
 		struct cpu *mycpu = THIS_CPU;
-		vm_getcpus(self, targets);
+		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
-		if (myvm == &vm_kernel)
+		if unlikely(myvm == &vm_kernel)
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, mycpu->c_id);
@@ -215,9 +254,9 @@ NOTHROW(FCALL this_vm_syncall)(void) {
 		cpuset_t targets;
 		struct vm *myvm   = THIS_VM;
 		struct cpu *mycpu = THIS_CPU;
-		vm_getcpus(self, targets);
+		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
-		if (myvm == &vm_kernel)
+		if unlikely(myvm == &vm_kernel)
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, mycpu->c_id);

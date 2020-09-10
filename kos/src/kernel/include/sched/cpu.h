@@ -104,8 +104,18 @@ typedef uintptr_t cpuid_t;
 #endif /* !__cpuid_t_defined */
 
 struct task;
+struct vm;
+
 struct cpu {
 	cpuid_t          c_id;       /* The ID of this CPU. */
+#ifndef CONFIG_NO_SMP
+	WEAK struct vm  *c_vm;       /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
+	                              * The currently used VM. When `vm_sync()' is called, this field
+	                              * is checked for all configured CPUs, and if equal to the VM that
+	                              * is being synced, our CPU will receive an IPI, telling us that
+	                              * we need to (possibly partially) invalidate our VM caches.
+	                              * s.a. `vm_sync()', `pagedir_sync()' */
+#endif /* !CONFIG_NO_SMP */
 	REF struct task *c_current;  /* [1..1][lock(PRIVATE(THIS_CPU && PREEMPTION))]
 	                              * [CHAIN(->t_sched.s_running.sr_runnxt)]
 	                              * The task currently being executed, as well as a linked
@@ -320,8 +330,9 @@ DATDEF struct cpu *const cpu_vector[CONFIG_MAX_CPU_COUNT];
 DECL_END
 #include <libc/string.h>
 DECL_BEGIN
+typedef uintptr_t *cpuset_ptr_t;
+#define CPUSET_PTR(x) x
 typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER];
-#define CPUSET_INIT { }
 #if __SIZEOF_POINTER__ == 8
 #define CPUSET_COPY(dst, src) (void)__libc_memcpyq(dst, src, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
 #define CPUSET_CLEAR(x)       (void)__libc_memsetq(x, 0, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
@@ -358,6 +369,8 @@ LOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
 	return true;
 }
 #else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
+typedef uintptr_t *cpuset_ptr_t;
+#define CPUSET_PTR(x) (&(x))
 typedef uintptr_t cpuset_t;
 #define CPUSET_INIT 0
 #if CONFIG_MAX_CPU_COUNT <= 1
@@ -375,22 +388,14 @@ DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
 #else /* CONFIG_MAX_CPU_COUNT > ... */
 #define CPUSET_COUNT(x)       __hybrid_popcount8((u8)((x) & __cpuset_full_mask))
 #endif /* CONFIG_MAX_CPU_COUNT <= ... */
-#define CPUSET_COPY(dst, src)         (void)((dst) = (src))
-#define CPUSET_CLEAR(x)               (void)((x) = 0)
-#define CPUSET_ISEMPTY(x)             (((x) & __cpuset_full_mask) == 0)
-#define CPUSET_SETFULL(x)             (void)((x) = (uintptr_t)-1)
-#define CPUSET_SETONE(x, id)          (void)((x) = ((uintptr_t)1 << (id)))
-#define CPUSET_CONTAINS(x, id)        ((x) & ((uintptr_t)1 << (id)))
-#define CPUSET_INSERT(x, id)          (void)((x) |= ((uintptr_t)1 << (id)))
-#define CPUSET_REMOVE(x, id)          (void)((x) &= ~((uintptr_t)1 << (id)))
-#define CPUSET_ATOMIC_COPY(dst, src)  (void)((dst) = __hybrid_atomic_load(src, __ATOMIC_ACQUIRE))
-#define CPUSET_ATOMIC_CLEAR(x)        (void)__hybrid_atomic_store(x, 0, __ATOMIC_RELEASE)
-#define CPUSET_ATOMIC_ISEMPTY(x)      CPUSET_ISEMPTY(__hybrid_atomic_load(x, __ATOMIC_ACQUIRE))
-#define CPUSET_ATOMIC_SETFULL(x)      (void)__hybrid_atomic_store(x, (uintptr_t)-1, __ATOMIC_RELEASE)
-#define CPUSET_ATOMIC_SETONE(x, id)   (void)__hybrid_atomic_store(x, (uintptr_t)1 << (id), __ATOMIC_RELEASE)
-#define CPUSET_ATOMIC_CONTAINS(x, id) CPUSET_CONTAINS(__hybrid_atomic_load(x, __ATOMIC_ACQUIRE), id)
-#define CPUSET_ATOMIC_INSERT(x, id)   (void)__hybrid_atomic_fetchor(x, (uintptr_t)1 << (id), __ATOMIC_SEQ_CST)
-#define CPUSET_ATOMIC_REMOVE(x, id)   (void)__hybrid_atomic_fetchand(x, ~((uintptr_t)1 << (id)), __ATOMIC_SEQ_CST)
+#define CPUSET_COPY(dst, src)  (void)((dst) = (src))
+#define CPUSET_CLEAR(x)        (void)((x) = 0)
+#define CPUSET_ISEMPTY(x)      (((x)&__cpuset_full_mask) == 0)
+#define CPUSET_SETFULL(x)      (void)((x) = (uintptr_t)-1)
+#define CPUSET_SETONE(x, id)   (void)((x) = ((uintptr_t)1 << (id)))
+#define CPUSET_CONTAINS(x, id) ((x) & ((uintptr_t)1 << (id)))
+#define CPUSET_INSERT(x, id)   (void)((x) |= ((uintptr_t)1 << (id)))
+#define CPUSET_REMOVE(x, id)   (void)((x) &= ~((uintptr_t)1 << (id)))
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
 #ifndef CPUSET_SETONE
 #define CPUSET_SETONE(x, id) (CPUSET_CLEAR(x), CPUSET_INSERT(x, id))
@@ -426,6 +431,7 @@ DATDEF ATTR_PERCPU cpuid_t thiscpu_id;            /* ALIAS:THIS_CPU->c_id */
 DATDEF ATTR_PERCPU struct task *thiscpu_current;  /* ALIAS:THIS_CPU->c_current */
 DATDEF ATTR_PERCPU struct task *thiscpu_override; /* ALIAS:THIS_CPU->c_override */
 #ifndef CONFIG_NO_SMP
+DATDEF ATTR_PERCPU struct vm *thiscpu_vm;        /* ALIAS:THIS_CPU->c_vm */
 DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
 #endif /* !CONFIG_NO_SMP */
 
@@ -443,6 +449,56 @@ DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
 #define THIS_IDLE  (&PERCPU(thiscpu_idle))
 #endif /* !THIS_IDLE */
 #endif /* !CONFIG_NO_SMP */
+
+
+
+
+#ifndef CONFIG_NO_SMP
+/* Set the current VM, and update the VM pointer of `self' */
+#define cpu_setvm_ex(mycpu, current_vm)                                  \
+	(__hybrid_atomic_store((mycpu)->c_vm, current_vm, __ATOMIC_RELEASE), \
+	 pagedir_set((current_vm)->v_pdir_phys_ptr))
+#define cpu_setvm(current_vm) cpu_setvm_ex(THIS_CPU, current_vm)
+
+/* Return the set of CPUs that are currently mapped to make use of `self'
+ * Note that the returned set of CPUs is only a (possibly inconsistent)
+ * snapshot, with the only guaranties being that:
+ *   - If a CPU is apart of the returned cpuset, that CPU has at one point
+ *     made use of the given vm `self'.
+ *   - If a CPU is not apart of the returned cpuset, that CPU may have since
+ *     switched its VM to the given one. Note however that during this switch,
+ *     additional things may have also happened, such as the CPU invaliding
+ *     its TLB cache (where is function is meant to be used to calculate the
+ *     bounding set of CPUs that (may) need to have their page directories
+ *     invalidated)
+ * WARNING: This function does not include special handling for when `self'
+ *          is the kernel VM. In this case, the caller must implement a
+ *          dedicated code-path that behaves as though this function had
+ *          returned a completely filled cpuset. */
+#if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL vm_getcpus)(struct vm *__restrict self,
+                          cpuset_ptr_t result);
+#else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) cpuset_t
+NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
+	ASMNAME("vm_getcpus");
+FORCELOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL vm_getcpus)(struct vm *__restrict self,
+                          cpuset_ptr_t result) {
+	*result = __vm_getcpus(self);
+}
+#endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
+#else /* !CONFIG_NO_SMP */
+
+/* Set the current VM, and update the VM pointer of `self' */
+#define cpu_setvm_ex(mycpu, current_vm) pagedir_set((current_vm)->v_pdir_phys_ptr)
+#define cpu_setvm(current_vm)           pagedir_set((current_vm)->v_pdir_phys_ptr)
+
+#endif /* CONFIG_NO_SMP */
+
+
+
 
 
 /* Enter deep-sleep mode on the given CPU.

@@ -175,6 +175,8 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Update the used page directory pointer. */
 	EXTERN(this_vm)
 	movq   this_vm(%rax), %rcx
+	EXTERN(thiscpu_vm)
+	movq   %rcx, thiscpu_vm(%rbx) /* Update the per-cpu current-vm field. */
 	EXTERN(thisvm_pdir_phys_ptr)
 	movq   thisvm_pdir_phys_ptr(%rcx), %rdi
 	movq   %cr3, %rdx

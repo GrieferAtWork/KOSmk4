@@ -23,11 +23,13 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/paging.h>
-#include <kernel/driver.h>
 #include <kernel/vm.h>
+#include <sched/cpu.h>
+#include <sched/task.h>
 #include <sched/userkern.h>
 
 #include <hybrid/align.h>
@@ -259,7 +261,7 @@ again:
 		LLIST_INSERT(newvm->v_tasks, me, t_vm_tasks);
 		vm_tasklock_endwrite(newvm);
 		FORTASK(me, this_vm) = incref(newvm);
-		pagedir_set(newvm->v_pdir_phys_ptr);
+		cpu_setvm_ex(me->t_cpu, newvm);
 		sync_endwrite(&change_vm_lock);
 		PREEMPTION_POP(was);
 		decref(oldvm);

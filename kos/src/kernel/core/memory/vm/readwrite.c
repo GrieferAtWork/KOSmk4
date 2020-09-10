@@ -124,10 +124,10 @@ NOTHROW(KCALL memeq_ku_nopf)(KERNEL void const *kernel_buffer,
 
 
 
-#if defined(__INTELLISENSE__)
+#ifdef __INTELLISENSE__
 #define DEFINE_PAGEDIR_P_BEGIN(pagedir_phys) if (((pagedir_phys), 0)); else do
 #define DEFINE_PAGEDIR_P_END                 __WHILE0
-#else
+#else /* __INTELLISENSE__ */
 
 #ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
 typedef PHYS pagedir_t *pdir_set_type_t;
@@ -148,7 +148,7 @@ typedef PHYS vm_phys_t  pdir_set_type_t;
 		pagedir_set(_old_pdir);  \
 		PREEMPTION_POP(_p_was);  \
 	} __WHILE0
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 LOCAL NOBLOCK size_t

@@ -27,6 +27,7 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
@@ -443,6 +444,9 @@ PUBLIC struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector") = { &
 PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
 	/* .c_id       = */ 0,
+#ifndef CONFIG_NO_SMP
+	/* .c_vm       = */ &vm_kernel,
+#endif /* !CONFIG_NO_SMP */
 	/* .c_current  = */ NULL,
 	/* .c_sleeping = */ NULL,
 #ifndef CONFIG_NO_SMP
