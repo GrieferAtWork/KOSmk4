@@ -754,7 +754,8 @@ again_rw_region:
 		if likely(avail_bytes >= num_bytes) {
 			/* All data is already available */
 			if (write) {
-				buf = mempcpy(rdat, buf, num_bytes);
+				memcpy(rdat, buf, num_bytes);
+				buf = (byte_t *)buf + avail_bytes;
 				rtm_memory_mark_region_as_changed(self, i, region);
 			} else {
 				buf = mempcpy(buf, rdat, num_bytes);
@@ -762,7 +763,8 @@ again_rw_region:
 			return;
 		}
 		if (write) {
-			buf = mempcpy(rdat, buf, avail_bytes);
+			memcpy(rdat, buf, avail_bytes);
+			buf = (byte_t *)buf + avail_bytes;
 			rtm_memory_mark_region_as_changed(self, i, region);
 		} else {
 			buf = mempcpy(buf, rdat, avail_bytes);
