@@ -146,12 +146,36 @@ panic_df_dbg_main(void *cr3)
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
+PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+NOTHROW(KCALL x86_repair_broken_tls_state_impl)(struct cpu *__restrict mycpu) {
+	struct task *mythread;
+	mythread = mycpu->c_current;
+	if unlikely(!VERIFY_ADDR(mythread))
+		mythread = &FORCPU(mycpu, thiscpu_idle);
+#ifdef __x86_64__
+	__wrgsbase(mythread);
+#else /* __x86_64__ */
+	segment_wrbaseX(&FORCPU(mycpu, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
+	                (uintptr_t)mythread);
+	__lgdt(sizeof(thiscpu_x86_gdt) - 1, FORCPU(mycpu, thiscpu_x86_gdt));
+	__wrfs(SEGMENT_KERNEL_FSBASE);
+#endif /* !__x86_64__ */
+	return mythread;
+}
+
+INTERN NOBLOCK ATTR_RETNONNULL struct task *
+NOTHROW(KCALL x86_repair_broken_tls_state)(void) {
+	struct cpu *mycpu;
+	mycpu = x86_failsafe_getcpu();
+	return x86_repair_broken_tls_state_impl(mycpu);
+}
+
+
 /* Double fault handler. */
 INTERN struct df_cpustate *FCALL
 x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	void *pc;
 	struct cpu *mycpu;
-	struct task *mythread;
 #ifdef __x86_64__
 	pc = (void *)state->dcs_regs.ics_irregs.ir_rip;
 #else /* __x86_64__ */
@@ -169,17 +193,7 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	if unlikely(!VERIFY_ADDR(mycpu))
 		mycpu = x86_failsafe_getcpu();
 #endif /* !__x86_64__ */
-	mythread = mycpu->c_current;
-	if unlikely(!VERIFY_ADDR(mythread))
-		mythread = &FORCPU(mycpu, thiscpu_idle);
-#ifdef __x86_64__
-	__wrgsbase(mythread);
-#else /* __x86_64__ */
-	segment_wrbaseX(&FORCPU(mycpu, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
-	                (uintptr_t)mythread);
-	__lgdt(sizeof(thiscpu_x86_gdt) - 1, FORCPU(mycpu, thiscpu_x86_gdt));
-	__wrfs(SEGMENT_KERNEL_FSBASE);
-#endif /* !__x86_64__ */
+	x86_repair_broken_tls_state_impl(mycpu);
 	COMPILER_BARRIER();
 	/* Ok. If we're still alive, then the above ~should~ have just
 	 * giving us ~some~ semblance of a consistent TLS state. */

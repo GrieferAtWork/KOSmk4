@@ -94,6 +94,11 @@ NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 #endif /* !CONFIG_USE_NEW_SIGNAL_API */
 }
 
+#if defined(__x86_64__) || defined(__i386__)
+INTERN NOBLOCK ATTR_RETNONNULL struct task *
+NOTHROW(KCALL x86_repair_broken_tls_state)(void);
+#endif /* __x86_64__ || __i386__ */
+
 /* Poison the kernel.
  * This operation cannot be undone and may (under rare circumstances)
  * itself cause the kernel to crash (due to race conditions with other
@@ -111,15 +116,22 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	 * from within an assertion handler, which in turn is able
 	 * to cause other assertions) */
 	struct task *mythread;
-	pflag_t was;
+	pflag_t was = PREEMPTION_PUSHOFF();
+
+	/* Try to repair a broken TLS state, since we'll need
+	 * a (somewhat) working one in order to even do anything! */
+#if defined(__x86_64__) || defined(__i386__)
+	mythread = x86_repair_broken_tls_state();
+#else /* __x86_64__ || __i386__ */
 	mythread = THIS_TASK;
-	was      = PREEMPTION_PUSHOFF();
+#endif /* !__x86_64__ && !__i386__ */
+
 	fixup_uninitialized_thread(&_boottask);
 	fixup_uninitialized_thread(&_asyncwork);
 	fixup_uninitialized_thread(&_bootidle);
 	if (mythread != &_boottask &&
 	    mythread != &_asyncwork &&
-	    mythread != &_bootidle && mythread != NULL)
+	    mythread != &_bootidle)
 		fixup_uninitialized_thread(mythread);
 	/* Poison the kernel (indicating that the kernel has become
 	 * inconsistent, and can no longer be trusted to sporadically
