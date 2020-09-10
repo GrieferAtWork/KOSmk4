@@ -17,27 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_ASM_RTM_H
-#define _KOS_ASM_RTM_H 1
+#ifndef _ASM_OS_NETBSD_SIGNAL_H
+#define _ASM_OS_NETBSD_SIGNAL_H 1
 
-#if 0 /* Only if supported by the arch */
-/* RTM abort reasons. */
-#define __RTM_ABORT_FAILED   ? /* Transaction cannot be performed atomically. */
-#define __RTM_ABORT_EXPLICIT ? /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
-#define __RTM_ABORT_RETRY    ? /* The transaction may succeed if re-attempted. */
-#define __RTM_ABORT_CAPACITY ? /* The internal buffer to track transactions overflowed. */
-#define __RTM_ABORT_CODE_M   ? /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
-#define __RTM_ABORT_CODE_S   ? /* Shift for `RTM_ABORT_CODE_M' */
+#include <__stdinc.h>
 
-/* Returned by `sys_rtm_begin()' when RTM was entered successfully. */
-#define __RTM_STARTED        ? /* RTM was entered */
-#endif
+/************************************************************************/
+/* NetBSD                                                               */
+/************************************************************************/
 
-#include <asm/os/errno.h> /* __ENOSYS */
-#ifdef __ENOSYS
-#define __RTM_NOSYS (-__ENOSYS) /* RTM isn't supposed */
-#else /* __ENOSYS */
-#define __RTM_NOSYS (-1)        /* RTM isn't supposed */
-#endif /* !__ENOSYS */
+#define __SA_ONSTACK    0x0001
+#define __SA_RESTART    0x0002
+#define __SA_RESETHAND  0x0004
+#define __SA_NODEFER    0x0010
+#define __SA_NOCLDSTOP  0x0008
+#define __SA_NOCLDWAIT  0x0020
+#define __SA_SIGINFO    0x0040
+#define __SA_NOKERNINFO 0x0080
 
-#endif /* !_KOS_ASM_RTM_H */
+#define __SIG_BLOCK   1
+#define __SIG_UNBLOCK 2
+#define __SIG_SETMASK 3
+
+/* TODO: signum values */
+
+#endif /* !_ASM_OS_NETBSD_SIGNAL_H */

@@ -25,6 +25,7 @@
 
 #include <kos/exec/idata.h>
 
+#include "../libc/compat.h"
 #include "../libc/errno.h"
 #include "bits.crt.sys_errlist.h"
 #include "string.h"

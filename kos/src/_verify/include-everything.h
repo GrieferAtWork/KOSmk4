@@ -142,6 +142,8 @@ function incdir(prefix, path) {
 					"libdl", "X11", "xcb", "freetype", "GL",
 					"xorg", "python2.7"])
 				continue;
+			if (prefix.rstrip("\\/").endswith("/os"))
+				continue;
 			incdir(prefix + x + "/", total);
 			continue;
 		}
@@ -242,6 +244,8 @@ incdir("", "../../include");
 #include <asm/mman.h>
 #include <asm/mount.h>
 #include <asm/oflags.h>
+#include <asm/os/errno.h>
+#include <asm/os/signal.h>
 #include <asm/page.h>
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
@@ -254,9 +258,7 @@ incdir("", "../../include");
 #include <asm/select.h>
 #include <asm/sigevent.h>
 #include <asm/siginfo.h>
-#include <asm/signal.h>
 #include <asm/signalfd.h>
-#include <asm/signum-values.h>
 #include <asm/sigset.h>
 #include <asm/sigstack.h>
 #include <asm/socket.h>

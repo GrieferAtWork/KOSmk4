@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7aefbca9 */
+/* HASH CRC-32:0xb0251f98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <__crt.h>
 #include "core/errno.h"
 
-#include <asm/errno.h>
+#include <asm/os/errno.h>
 #include <bits/types.h>
 #ifndef __libc_errno
 #ifdef errno

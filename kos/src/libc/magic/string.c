@@ -4760,7 +4760,7 @@ char const *strerrorname_s($errno_t errnum) {
 
 [[decl_include("<bits/types.h>")]]
 [[wunused, nothrow, ATTR_CONST, section(".text.crt{|.dos}.errno")]]
-[[userimpl, crt_dos_variant, impl_include("<asm/signum-values.h>"), impl_prefix(
+[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
 #undef @sys_siglist@

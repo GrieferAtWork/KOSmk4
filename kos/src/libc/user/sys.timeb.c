@@ -23,7 +23,6 @@
 #include "../api.h"
 /**/
 
-#include "../libc/errno.h"
 #include "sys.timeb.h"
 #include <string.h>
 #include <sys/time.h>

@@ -41,7 +41,7 @@
 %{
 #include <features.h>
 
-#include <asm/signum-values.h> /* __SIG* */
+#include <asm/os/signal.h>
 #include <bits/sigset.h>
 #include <bits/types.h>
 
@@ -67,7 +67,6 @@
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
-#include <asm/signal.h>
 #include <bits/sigaction-struct.h>
 #endif /* __USE_POSIX */
 
@@ -1409,7 +1408,7 @@ $sighandler_t sigset($signo_t signo, $sighandler_t disp);
 
 
 [[ATTR_CONST, wunused]]
-[[requires_include("<asm/signum-values.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(__SIGRTMIN))]]
 [[decl_include("<bits/types.h>")]]
 $signo_t __libc_current_sigrtmin() {
@@ -1417,7 +1416,7 @@ $signo_t __libc_current_sigrtmin() {
 }
 
 [[ATTR_CONST, wunused]]
-[[requires_include("<asm/signum-values.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(__SIGRTMAX))]]
 [[decl_include("<bits/types.h>")]]
 $signo_t __libc_current_sigrtmax() {

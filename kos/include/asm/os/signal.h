@@ -17,27 +17,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_ASM_RTM_H
-#define _KOS_ASM_RTM_H 1
+#ifndef _ASM_OS_SIGNAL_H
+#define _ASM_OS_SIGNAL_H 1
 
-#if 0 /* Only if supported by the arch */
-/* RTM abort reasons. */
-#define __RTM_ABORT_FAILED   ? /* Transaction cannot be performed atomically. */
-#define __RTM_ABORT_EXPLICIT ? /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
-#define __RTM_ABORT_RETRY    ? /* The transaction may succeed if re-attempted. */
-#define __RTM_ABORT_CAPACITY ? /* The internal buffer to track transactions overflowed. */
-#define __RTM_ABORT_CODE_M   ? /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
-#define __RTM_ABORT_CODE_S   ? /* Shift for `RTM_ABORT_CODE_M' */
+#include <__stdinc.h>
 
-/* Returned by `sys_rtm_begin()' when RTM was entered successfully. */
-#define __RTM_STARTED        ? /* RTM was entered */
-#endif
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/signal.h>
+#elif defined(__NetBSD__)
+#include <asm/os/netbsd/signal.h>
+#elif defined(__solaris__)
+#include <asm/os/solaris/signal.h>
+#else /* ... */
+#include <__crt.h>
+#if defined(__CRT_CYG_PRIMARY)
+#include <asm/os/cygwin/signal.h>
+#elif defined(__CRT_DOS_PRIMARY)
+#include <asm/os/dos/signal.h>
+#endif /* ... */
+#endif /* !... */
 
-#include <asm/os/errno.h> /* __ENOSYS */
-#ifdef __ENOSYS
-#define __RTM_NOSYS (-__ENOSYS) /* RTM isn't supposed */
-#else /* __ENOSYS */
-#define __RTM_NOSYS (-1)        /* RTM isn't supposed */
-#endif /* !__ENOSYS */
-
-#endif /* !_KOS_ASM_RTM_H */
+#endif /* !_ASM_OS_SIGNAL_H */

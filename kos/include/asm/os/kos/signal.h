@@ -17,13 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_SIGNAL_H
-#define _ASM_SIGNAL_H 1
+#ifndef _ASM_OS_KOS_SIGNAL_H
+#define _ASM_OS_KOS_SIGNAL_H 1
 
 #include <__stdinc.h>
-#include <__crt.h>
 
-#if defined(__KOS__) || defined(__linux__)
 /************************************************************************/
 /* KOS/LINUX                                                            */
 /************************************************************************/
@@ -44,68 +42,68 @@
 #define __SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler. */
 #define __SA_INTERRUPT 0x20000000 /* Historical no-op. */
 
-/* Values for the HOW argument to `sigprocmask'. */
-#define __SIG_BLOCK   0 /* Block signals. */
-#define __SIG_UNBLOCK 1 /* Unblock signals. */
-#define __SIG_SETMASK 2 /* Set the set of blocked signals. */
-
-#elif defined(__CRT_CYG_PRIMARY)
-/************************************************************************/
-/* CYGWIN                                                               */
-/************************************************************************/
-
-/* Bits in `sa_flags'. */
-#define __SA_NOCLDSTOP 0x00000001 /* Don't send SIGCHLD when children stop. */
-#define __SA_NOCLDWAIT 0x00000002 /* Don't create zombie on child death. */
-#define __SA_SIGINFO   0x00000004 /* Invoke signal-catching function with three arguments instead of one. */
-#define __SA_RESTORER  0x04000000 /* A custom signal restore function (`sa_restorer') was given.
-                                   * This flag is set by libc, after having filled in the `sa_restorer' field.
-                                   * NOTE: On x86, the kernel assumes that this points to a function:
-                                   * >> sa_restorer:
-                                   * >>     movl   $SYS_sigreturn, %eax
-                                   * >>     int    $0x80 */
-#define __SA_ONSTACK   0x20000000 /* Execute the handler on sigaltstack. */
-#define __SA_RESTART   0x10000000 /* Restart restartable syscall on signal return. */
-#define __SA_NODEFER   0x40000000 /* Don't automatically block the signal when its handler is being executed. */
-#define __SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler. */
-#define __SA_INTERRUPT 0x20000000 /* Historical no-op. */
 
 /* Values for the HOW argument to `sigprocmask'. */
 #define __SIG_BLOCK   0 /* Block signals. */
 #define __SIG_UNBLOCK 1 /* Unblock signals. */
 #define __SIG_SETMASK 2 /* Set the set of blocked signals. */
 
-#elif defined(__NetBSD__)
-/************************************************************************/
-/* NetBSD                                                               */
-/************************************************************************/
 
-#define __SA_ONSTACK    0x0001
-#define __SA_RESTART    0x0002
-#define __SA_RESETHAND  0x0004
-#define __SA_NODEFER    0x0010
-#define __SA_NOCLDSTOP  0x0008
-#define __SA_NOCLDWAIT  0x0020
-#define __SA_SIGINFO    0x0040
-#define __SA_NOKERNINFO 0x0080
+/* Fake signal functions. */
+#define __SIG_ERR  (-1) /* Error return. */
+#define __SIG_DFL  0    /* Default action. */
+#define __SIG_IGN  1    /* Ignore signal. */
+#define __SIG_HOLD 2    /* Add signal to hold mask. */
+#ifdef __KOS__
+#define __SIG_TERM 3  /* Terminate the receiving process. */
+#define __SIG_EXIT 4  /* Terminate the receiving thread. */
+#define __SIG_CONT 8  /* Continue execution. */
+#define __SIG_STOP 9  /* Suspend execution. */
+#define __SIG_CORE 10 /* Create a coredump and terminate. */
+#define __SIG_GET  11 /* Only get the current handler (accepted by `signal(2)') */
+#endif /* __KOS__ */
 
-#define __SIG_BLOCK   1
-#define __SIG_UNBLOCK 2
-#define __SIG_SETMASK 3
+/* Signals. */
+#define __SIGHUP    1         /* Hangup (POSIX). */
+#define __SIGINT    2         /* Interrupt (ANSI). */
+#define __SIGQUIT   3         /* Quit (POSIX). */
+#define __SIGILL    4         /* Illegal instruction (ANSI). */
+#define __SIGTRAP   5         /* Trace trap (POSIX). */
+#define __SIGABRT   6         /* Abort (ANSI). */
+#define __SIGIOT    __SIGABRT /* IOT trap (4.2 BSD). */
+#define __SIGBUS    7         /* BUS error (4.2 BSD). */
+#define __SIGFPE    8         /* Floating-point exception (ANSI). */
+#define __SIGKILL   9         /* Kill, unblockable (POSIX). */
+#define __SIGUSR1   10        /* User-defined signal 1 (POSIX). */
+#define __SIGSEGV   11        /* Segmentation violation (ANSI). */
+#define __SIGUSR2   12        /* User-defined signal 2 (POSIX). */
+#define __SIGPIPE   13        /* Broken pipe (POSIX). */
+#define __SIGALRM   14        /* Alarm clock (POSIX). */
+#define __SIGTERM   15        /* Termination (ANSI). */
+#define __SIGSTKFLT 16        /* Stack fault. */
+#define __SIGCHLD   17        /* Child status has changed (POSIX). */
+#define __SIGCLD    __SIGCHLD /* Same as SIGCHLD (System V). */
+#define __SIGCONT   18        /* Continue (POSIX). */
+#define __SIGSTOP   19        /* Stop, unblockable (POSIX). */
+#define __SIGTSTP   20        /* Keyboard stop (POSIX). */
+#define __SIGTTIN   21        /* Background read from tty (POSIX). */
+#define __SIGTTOU   22        /* Background write to tty (POSIX). */
+#define __SIGURG    23        /* Urgent condition on socket (4.2 BSD). */
+#define __SIGXCPU   24        /* CPU limit exceeded (4.2 BSD). */
+#define __SIGXFSZ   25        /* File size limit exceeded (4.2 BSD). */
+#define __SIGVTALRM 26        /* Virtual alarm clock (4.2 BSD). */
+#define __SIGPROF   27        /* Profiling alarm clock (4.2 BSD). */
+#define __SIGWINCH  28        /* Window size change (4.3 BSD, Sun). */
+#define __SIGIO     29        /* I/O now possible (4.2 BSD). */
+#define __SIGPOLL   __SIGIO   /* Pollable event occurred (System V). */
+#define __SIGPWR    30        /* Power failure restart (System V). */
+#define __SIGSYS    31        /* Bad system call. */
+#define __NSIG      65        /* Biggest signal number + 1 (including real-time signals). */
 
-#elif defined(__solaris__)
-/************************************************************************/
-/* SOLARIS                                                              */
-/************************************************************************/
-
-/* TODO */
-
-#else /* ... */
-/************************************************************************/
-/* GENERIC                                                              */
-/************************************************************************/
+/* These are the hard limits of the kernel.
+ * These values should not be used directly at user level. */
+#define __SIGRTMIN 32
+#define __SIGRTMAX 64
 
 
-#endif /* !... */
-
-#endif /* !_ASM_SIGNAL_H */
+#endif /* !_ASM_OS_KOS_SIGNAL_H */

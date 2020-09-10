@@ -1845,30 +1845,15 @@ function getSigno(filename: string, prefix: string): {string...} {
 	return result;
 }
 
-print("#if defined(__x86_64__) || defined(__i386__)");
-printStrendNDatabase("SIGNO", getSigno("../../include/i386-kos/asm/signum-values-kos.h", "__KOS_SIG"));
-print("#else /" "* ... *" "/");
-printStrendNDatabase("SIGNO", getSigno("../../include/asm/signum-values.h", "__SIG"));
-print("#endif /" "* !... *" "/");
+printStrendNDatabase("SIGNO", getSigno("../../include/asm/os/kos/signal.h", "__SIG"));
 
 ]]]*/
-#if defined(__x86_64__) || defined(__i386__)
 #define GETBASE_SIGNO(result, index) \
 	(((index) <= 0x1f) ? ((result) = repr_SIGNO_0h, true) : false)
 PRIVATE char const repr_SIGNO_0h[] =
 "\0HUP\0INT\0QUIT\0ILL\0TRAP\0ABRT\0BUS\0FPE\0KILL\0USR1\0SEGV\0USR2\0PIPE\0ALR"
 "M\0TERM\0STKFLT\0CHLD\0CONT\0STOP\0TSTP\0TTIN\0TTOU\0URG\0XCPU\0XFSZ\0VTALRM"
 "\0PROF\0WINCH\0IO\0PWR\0SYS";
-
-#else /* ... */
-#define GETBASE_SIGNO(result, index) \
-	(((index) <= 0x1f) ? ((result) = repr_SIGNO_0h, true) : false)
-PRIVATE char const repr_SIGNO_0h[] =
-"\0HUP\0INT\0QUIT\0ILL\0TRAP\0ABRT\0BUS\0FPE\0KILL\0USR1\0SEGV\0USR2\0PIPE\0ALR"
-"M\0TERM\0STKFLT\0CHLD\0CONT\0STOP\0TSTP\0TTIN\0TTOU\0URG\0XCPU\0XFSZ\0VTALRM"
-"\0PROF\0WINCH\0IO\0PWR\0SYS";
-
-#endif /* !... */
 /*[[[end]]]*/
 
 PRIVATE ATTR_CONST WUNUSED char const *CC
@@ -2232,13 +2217,15 @@ local typ = getPrefixedMacrosFromFile("../../include/asm/fcntl.h", "__F_");
 printStrendNDatabase("FCNTL", typ);
 ]]]*/
 #define GETBASE_FCNTL(result, index) \
-	(((index) <= 0x26) ? ((result) = repr_FCNTL_0h, true) : \
+	(((index) <= 0x2e) ? ((result) = repr_FCNTL_0h, true) : \
 	 ((index) >= 0x400 && (index) <= 0x408) ? ((index) -= 0x400, (result) = repr_FCNTL_400h, true) : \
 	 ((index) >= 0x142b && (index) <= 0x1430) ? ((index) -= 0x142b, (result) = repr_FCNTL_142bh, true) : false)
 PRIVATE char const repr_FCNTL_0h[] =
 "DUPFD\0GETFD\0SETFD\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SETOWN\0GETOWN\0S"
-"ETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN_EX\0\0\0\0\0\0\0"
-"\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
+"ETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN_EX\0QUOTAC"
+"TL\0BLOCKS\0BLKSIZE\0\0\0\0GETOWN\0SETOWN\0REVOKE\0HASREMOTELOCKS\0\0\0\0\0\0MD"
+"ACC\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW\0\0SHARE\0UNSHARE\0SETLK_NBMAN"
+"D\0SHARE_NBMAND\0\0GETXFL\0BADFD";
 PRIVATE char const repr_FCNTL_400h[] =
 "SETLEASE\0GETLEASE\0NOTIFY\0\0\0\0DUPFD_CLOEXEC\0SETPIPE_SZ\0GETPIPE_SZ";
 PRIVATE char const repr_FCNTL_142bh[] =

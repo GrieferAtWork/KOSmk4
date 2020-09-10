@@ -38,6 +38,7 @@
 #include <unistd.h>
 
 #include "../libc/errno.h"
+#include "../libc/compat.h"
 #include "io.h"
 
 DECL_BEGIN

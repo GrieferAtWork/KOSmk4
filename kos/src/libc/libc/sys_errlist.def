@@ -18,6 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+#ifndef E
+#define E(id, message) /* nothing */
+#define __SYS_ERRLIST_DEFINES_E 1
+#endif /* !E */
+
 #ifndef ENDEF
 #define ENDEF(id) /* nothing */
 #define __SYS_ERRLIST_DEFINES_ENDEF 1
@@ -29,17 +34,15 @@ import * from deemon;
 @@Mapping for id -> (kosName, comment)
 local errnoMappings: {int: (string, string)} = Dict();
 
-local inKosContext = false;
-with (local fp = File.open("../../../include/asm/errno.h")) {
+local inside = false;
+with (local fp = File.open("../../../include/asm/os/kos/errno.h")) {
 	for (local l: fp) {
 		l = l.strip();
-		if (l == "/" "*[[[begin:kos]]]*" "/") {
-			inKosContext = true;
-			continue;
-		}
-		if (l == "/" "*[[[end:kos]]]*" "/")
-			inKosContext = false;
-		if (!inKosContext)
+		if (l == "/" "*[[[begin]]]*" "/")
+			inside = true;
+		if (l == "/" "*[[[end]]]*" "/")
+			inside = false;
+		if (!inside)
 			continue;
 		local name, value, comment;
 		try {
@@ -210,3 +213,8 @@ E(EHWPOISON,       "Memory page has hardware error")
 #undef __SYS_ERRLIST_DEFINES_ENDEF
 #undef ENDEF
 #endif /* __SYS_ERRLIST_DEFINES_ENDEF */
+
+#ifdef __SYS_ERRLIST_DEFINES_E
+#undef __SYS_ERRLIST_DEFINES_E
+#undef E
+#endif /* __SYS_ERRLIST_DEFINES_E */

@@ -17,34 +17,102 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-E(SIGHUP)    /* Hangup (POSIX). */
-E(SIGINT)    /* Interrupt (ANSI). */
-E(SIGQUIT)   /* Quit (POSIX). */
-E(SIGILL)    /* Illegal instruction (ANSI). */
-E(SIGTRAP)   /* Trace trap (POSIX). */
-E(SIGABRT)   /* Abort (ANSI). */
-E(SIGBUS)    /* BUS error (4.2 BSD). */
-E(SIGFPE)    /* Floating-point exception (ANSI). */
-E(SIGKILL)   /* Kill, unblockable (POSIX). */
-E(SIGUSR1)   /* User-defined signal 1 (POSIX). */
-E(SIGSEGV)   /* Segmentation violation (ANSI). */
-E(SIGUSR2)   /* User-defined signal 2 (POSIX). */
-E(SIGPIPE)   /* Broken pipe (POSIX). */
-E(SIGALRM)   /* Alarm clock (POSIX). */
-E(SIGTERM)   /* Termination (ANSI). */
-E(SIGSTKFLT) /* Stack fault. */
-E(SIGCHLD)   /* Child status has changed (POSIX). */
-E(SIGCONT)   /* Continue (POSIX). */
-E(SIGSTOP)   /* Stop, unblockable (POSIX). */
-E(SIGTSTP)   /* Keyboard stop (POSIX). */
-E(SIGTTIN)   /* Background read from tty (POSIX). */
-E(SIGTTOU)   /* Background write to tty (POSIX). */
-E(SIGURG)    /* Urgent condition on socket (4.2 BSD). */
-E(SIGXCPU)   /* CPU limit exceeded (4.2 BSD). */
-E(SIGXFSZ)   /* File size limit exceeded (4.2 BSD). */
-E(SIGVTALRM) /* Virtual alarm clock (4.2 BSD). */
-E(SIGPROF)   /* Profiling alarm clock (4.2 BSD). */
-E(SIGWINCH)  /* Window size change (4.3 BSD, Sun). */
-E(SIGIO)     /* I/O now possible (4.2 BSD). */
-E(SIGPWR)    /* Power failure restart (System V). */
-E(SIGSYS)    /* Bad system call. */
+
+#ifndef S
+#define S(id, message) /* nothing */
+#define __SYS_SIGLIST_DEFINES_S 1
+#endif /* !S */
+
+#ifndef S_UNDEF
+#define S_UNDEF(id) /* nothing */
+#define __SYS_SIGLIST_DEFINES_S_UNDEF 1
+#endif /* !S_UNDEF */
+
+
+/*[[[deemon
+import * from deemon;
+import * from util;
+local signum_values: {(string, string)...} = [];
+for (local l: File.open("../../../include/asm/os/kos/signal.h")) {
+	local name, value, comment;
+	try {
+		name, value, comment = l.scanf(" # define %[^ ] %[^/ ] /" "* %[^]")...;
+	} catch (...) {
+		continue;
+	}
+	comment = comment.strip().rsstrip("*" "/").rstrip();
+	name = name.strip();
+	try {
+		value = int(value.strip());
+	} catch (...) {
+		continue;
+	}
+	if (!name.startswith("__SIG"))
+		continue;
+	name = name[5:];
+	if (name.startswith("_"))
+		continue;
+	if (value >= #signum_values)
+		signum_values.resize(value + 1);
+	comment = comment.rpartition("(")[0].rstrip().rstrip(".").rstrip();
+	
+
+	signum_values[value] = (name, comment);
+}
+local longestNameLength = (
+	for (local name, none: signum_values)
+		if (name !is none)
+			#name
+	) > ...;
+for (local i, nameAndComment: enumerate(signum_values)) {
+	local name, comment = nameAndComment...;
+	if (name is none) {
+		print("S_UNDEF(", i, ")");
+		continue;
+	}
+	print("S(SIG", name, ", ", " " * (longestNameLength - #name), repr(comment), ")");
+}
+]]]*/
+S_UNDEF(0)
+S(SIGHUP,    "Hangup")
+S(SIGINT,    "Interrupt")
+S(SIGQUIT,   "Quit")
+S(SIGILL,    "Illegal instruction")
+S(SIGTRAP,   "Trace trap")
+S(SIGABRT,   "Abort")
+S(SIGBUS,    "BUS error")
+S(SIGFPE,    "Floating-point exception")
+S(SIGKILL,   "Kill, unblockable")
+S(SIGUSR1,   "User-defined signal 1")
+S(SIGSEGV,   "Segmentation violation")
+S(SIGUSR2,   "User-defined signal 2")
+S(SIGPIPE,   "Broken pipe")
+S(SIGALRM,   "Alarm clock")
+S(SIGTERM,   "Termination")
+S(SIGSTKFLT, "Stack fault")
+S(SIGCHLD,   "Child status has changed")
+S(SIGCONT,   "Continue")
+S(SIGSTOP,   "Stop, unblockable")
+S(SIGTSTP,   "Keyboard stop")
+S(SIGTTIN,   "Background read from tty")
+S(SIGTTOU,   "Background write to tty")
+S(SIGURG,    "Urgent condition on socket")
+S(SIGXCPU,   "CPU limit exceeded")
+S(SIGXFSZ,   "File size limit exceeded")
+S(SIGVTALRM, "Virtual alarm clock")
+S(SIGPROF,   "Profiling alarm clock")
+S(SIGWINCH,  "Window size change")
+S(SIGIO,     "I/O now possible")
+S(SIGPWR,    "Power failure restart")
+S(SIGSYS,    "Bad system call")
+/*[[[end]]]*/
+
+#ifdef __SYS_SIGLIST_DEFINES_S_UNDEF
+#undef __SYS_SIGLIST_DEFINES_S_UNDEF
+#undef S_UNDEF
+#endif /* __SYS_SIGLIST_DEFINES_S_UNDEF */
+
+#ifdef __SYS_SIGLIST_DEFINES_S
+#undef __SYS_SIGLIST_DEFINES_S
+#undef S
+#endif /* __SYS_SIGLIST_DEFINES_S */

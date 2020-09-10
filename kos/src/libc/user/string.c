@@ -23,9 +23,6 @@
 #include "../api.h"
 /**/
 
-#include <asm/signum-values-dos.h>
-#include <asm/signum-values-kos.h>
-
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -33,6 +30,7 @@
 #include <signal.h>
 #include <string.h>
 
+#include "../libc/compat.h"
 #include "../libc/errno.h"
 #include "malloc.h"
 #include "stdio.h"
@@ -231,22 +229,25 @@ NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum)
 
 PRIVATE ATTR_SECTION(".rodata.crt.errno")
 struct ATTR_PACKED strsignal_names_db_struct {
-#define E(id) char name_##id[sizeof(#id) / sizeof(char)];
+#define S(id, msg) char name_##id[sizeof(#id) / sizeof(char)];
 #include "../libc/sys_siglist.def"
-#undef E
+#undef S
 } const strsignal_names_db = {
-#define E(id) /* .name_##id = */ #id,
+#define S(id, msg) /* .name_##id = */ #id,
 #include "../libc/sys_siglist.def"
-#undef E
+#undef S
 };
 
 typedef u8 strsignal_offset_t;
 STATIC_ASSERT(sizeof(strsignal_names_db) <= 0x100);
 
-PRIVATE ATTR_SECTION(".rodata.crt.errno") strsignal_offset_t const strsignal_offsets_db[__ECOUNT] = {
-#define E(id) offsetof(struct strsignal_names_db_struct, name_##id),
+PRIVATE ATTR_SECTION(".rodata.crt.errno")
+strsignal_offset_t const strsignal_offsets_db[NSIG] = {
+#define S(id, msg)  offsetof(struct strsignal_names_db_struct, name_##id),
+#define S_UNDEF(id) (sizeof(strsignal_names_db) - 1),
 #include "../libc/sys_siglist.def"
-#undef E
+#undef S_UNDEF
+#undef S
 };
 
 
@@ -256,7 +257,6 @@ NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum)
 /*[[[body:libc_strsignal_s]]]*/
 {
 	char const *result;
-	--signum; /* Signal #0 isn't actually a valid signal. */
 	if ((unsigned int)signum >= COMPILER_LENOF(strsignal_offsets_db))
 		return NULL;
 	result = (char const *)((byte_t const *)&strsignal_names_db +
@@ -270,8 +270,8 @@ NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum)
 /* TODO: Unify this function with "user/signal.c" */
 LOCAL int LIBCCALL
 libc_signo_dos2kos(int dos_signo) {
-	if (dos_signo == __DOS_SIGABRT)
-		return __KOS_SIGABRT;
+	if (dos_signo == DOS_SIGABRT)
+		return SIGABRT;
 	return dos_signo;
 }
 

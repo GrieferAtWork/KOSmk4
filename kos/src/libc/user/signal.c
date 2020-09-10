@@ -25,16 +25,16 @@
 
 #include <hybrid/atomic.h>
 
-#include <asm/signum-values-dos.h>
-#include <asm/signum-values-kos.h>
 #include <kos/exec/idata.h>
 #include <kos/syscalls.h>
 
 #include <assert.h>
+#include <signal.h>
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "../libc/compat.h"
 #include "signal.h"
 #include "string.h"
 
@@ -42,16 +42,16 @@ DECL_BEGIN
 
 LOCAL signo_t LIBCCALL
 libc_signo_dos2kos(signo_t dos_signo) {
-	if (dos_signo == __DOS_SIGABRT)
-		return __KOS_SIGABRT;
+	if (dos_signo == DOS_SIGABRT)
+		return SIGABRT;
 	return dos_signo;
 }
 
 LOCAL int LIBCCALL
 libc_sigms_dos2kos(int dos_sigms) {
-	if ((unsigned int)dos_sigms & (1 << (__DOS_SIGABRT - 1))) {
-		dos_sigms &= ~(1 << (__DOS_SIGABRT - 1));
-		dos_sigms |= ~(1 << (__KOS_SIGABRT - 1));
+	if ((unsigned int)dos_sigms & (1 << (DOS_SIGABRT - 1))) {
+		dos_sigms &= ~(1 << (DOS_SIGABRT - 1));
+		dos_sigms |= ~(1 << (SIGABRT - 1));
 	}
 	return dos_sigms;
 }

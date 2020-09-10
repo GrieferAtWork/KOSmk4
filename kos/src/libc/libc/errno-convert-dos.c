@@ -24,6 +24,7 @@
 #include "../api.h"
 /**/
 
+#include "compat.h"
 #include "errno.h"
 
 DECL_BEGIN
@@ -56,23 +57,16 @@ local dosErrnoMappings: {int: (string, string, string)} = Dict();
 @@Mapping for id -> (kosName, dosName)
 local kosErrnoMappings: {int: (string, string, string)} = Dict();
 
-local context = "";
-with (local fp = File.open("../../../include/asm/errno.h")) {
+for (local context: ["kos", "dos"])
+with (local fp = File.open("../../../include/asm/os/" + context + "/errno.h")) {
+	local inside = false;
 	for (local l: fp) {
 		l = l.strip();
-		if (l == "/" "*[[[begin:dos]]]*" "/") {
-			context = "dos";
-			continue;
-		}
-		if (l == "/" "*[[[begin:kos]]]*" "/") {
-			context = "kos";
-			continue;
-		}
-		if (l == "/" "*[[[end:dos]]]*" "/")
-			context = "";
-		if (l == "/" "*[[[end:kos]]]*" "/")
-			context = "";
-		if (!context)
+		if (l == "/" "*[[[begin]]]*" "/")
+			inside = true;
+		if (l == "/" "*[[[end]]]*" "/")
+			inside = false;
+		if (!inside)
 			continue;
 		local name, value, comment;
 		try {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x697faf9 */
+/* HASH CRC-32:0x3b67ae24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 
-#include <asm/errno.h>
+#include <asm/os/errno.h>
 #include <bits/types.h>
 
 /************************************************************************/

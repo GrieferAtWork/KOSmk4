@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c41a774 */
+/* HASH CRC-32:0x61088ca1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_STD_USING(signal)
 
 #include <features.h>
 
-#include <asm/signum-values.h> /* __SIG* */
+#include <asm/os/signal.h>
 #include <bits/sigset.h>
 #include <bits/types.h>
 
@@ -80,7 +80,6 @@ __NAMESPACE_STD_USING(signal)
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
-#include <asm/signal.h>
 #include <bits/sigaction-struct.h>
 #endif /* __USE_POSIX */
 
@@ -1316,7 +1315,7 @@ __CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,sigset,(__signo_t __signo, __sighan
 #ifdef __CRT_HAVE___libc_current_sigrtmin
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
 #else /* __CRT_HAVE___libc_current_sigrtmin */
-#include <asm/signum-values.h>
+#include <asm/os/signal.h>
 #ifdef __SIGRTMIN
 #include <libc/local/signal/__libc_current_sigrtmin.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
@@ -1325,7 +1324,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ART
 #ifdef __CRT_HAVE___libc_current_sigrtmax
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
 #else /* __CRT_HAVE___libc_current_sigrtmax */
-#include <asm/signum-values.h>
+#include <asm/os/signal.h>
 #ifdef __SIGRTMAX
 #include <libc/local/signal/__libc_current_sigrtmax.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })

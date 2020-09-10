@@ -42,6 +42,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "../libc/compat.h"
 #include "../libc/dl.h"
 #include "../libc/errno.h"
 #include "../libc/globals.h"

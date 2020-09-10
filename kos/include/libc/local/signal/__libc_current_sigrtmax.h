@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63425693 */
+/* HASH CRC-32:0x5c6738f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local___libc_current_sigrtmax_defined
 #define __local___libc_current_sigrtmax_defined 1
 #include <__crt.h>
-#include <asm/signum-values.h>
+#include <asm/os/signal.h>
 #ifdef __SIGRTMAX
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

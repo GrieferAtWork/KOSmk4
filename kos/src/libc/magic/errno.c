@@ -28,7 +28,7 @@
 #include <features.h>
 
 }%(c,libc_fast){
-#include <asm/errno.h>
+#include <asm/os/errno.h>
 #include <bits/types.h>
 }
 
@@ -36,26 +36,26 @@
 /* Errno codes from emulated libcs */
 /*[[[deemon
 import * from deemon;
+import fs;
 local printed_contexts = { "dos", "cyg" };
 
 @@Mapping for context -> {id -> (dosName, comment)}
 local errnoMappings: {string: {int: (string, string)}} = Dict();
 
-local context = "";
-with (local fp = File.open("../../../include/asm/errno.h")) {
+for (local context: fs.dir("../../../include/asm/os"))
+with (local fp = try File.open("../../../include/asm/os/" + context + "/errno.h") catch (...) none) {
+	if (context !in ["dos", "cygwin"])
+		continue;
+	if (context == "cygwin")
+		context = "cyg";
+	local inside = false;
 	for (local l: fp) {
 		l = l.strip();
-		final local PREFIX = "/" "*[[[begin:";
-		final local SUFFIX = "]]]*" "/";
-		if (l.endswith(SUFFIX)) {
-			if (l.startswith(PREFIX)) {
-				context = l[#PREFIX:-#SUFFIX].strip();
-				continue;
-			}
-		}
-		if (l.startswith("/" "*[[[end"))
-			context = "";
-		if (!context)
+		if (l == "/" "*[[[begin]]]*" "/")
+			inside = true;
+		if (l == "/" "*[[[end]]]*" "/")
+			inside = false;
+		if (!inside)
 			continue;
 		local name, value, comment;
 		try {
@@ -322,8 +322,10 @@ for (local contextName: printed_contexts) {
 }
 /*[[[deemon
 import * from deemon;
+import fs;
 local errnoNames: {string: string} = Dict();
-with (local fp = File.open("../../../include/asm/errno.h")) {
+for (local context: fs.dir("../../../include/asm/os"))
+with (local fp = try File.open("../../../include/asm/os/" + context + "/errno.h") catch (...) none) {
 	for (local l: fp) {
 		l = l.strip();
 		local name, comment;
@@ -353,6 +355,7 @@ with (local fp = File.open("../../../include/asm/errno.h")) {
 }
 
 local longestNameLen = errnoNames.keys.each.length > ...;
+errnoNames.setdefault("EOK", "Success");
 
 for (local name: errnoNames.keys.sorted()) {
 	print("%[define_replacement(",

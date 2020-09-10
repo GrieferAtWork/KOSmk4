@@ -305,7 +305,7 @@ typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
 
 #ifndef __signo_t_defined
 #define __signo_t_defined 1
-typedef __signo_t signo_t; /* Signal number (one of `SIG*' from <asm/signum-values.h>) */
+typedef __signo_t signo_t; /* Signal number (one of `SIG*' from <signal.h>) */
 #endif /* !__signo_t_defined */
 
 #ifndef __atflag_t_defined

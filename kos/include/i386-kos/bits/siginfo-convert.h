@@ -39,7 +39,7 @@
 #include <hybrid/__minmax.h>
 #include <hybrid/host.h>
 
-#include <asm/signum-values.h>
+#include <asm/os/signal.h>
 
 #include <libc/string.h>
 

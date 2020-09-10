@@ -24,6 +24,7 @@
 #include "../api.h"
 /**/
 
+#include "compat.h"
 #include "errno.h"
 
 DECL_BEGIN
@@ -57,23 +58,16 @@ local cygErrnoMappings: {int: (string, string, string)} = Dict();
 @@Mapping for id -> (kosName, cygName)
 local kosErrnoMappings: {int: (string, string, string)} = Dict();
 
-local context = "";
-with (local fp = File.open("../../../include/asm/errno.h")) {
+for (local context: ["kos", "cyg"])
+with (local fp = File.open("../../../include/asm/os/" + (context == "cyg" ? "cygwin" : context) + "/errno.h")) {
+	local inside = false;
 	for (local l: fp) {
 		l = l.strip();
-		if (l == "/" "*[[[begin:cyg]]]*" "/") {
-			context = "cyg";
-			continue;
-		}
-		if (l == "/" "*[[[begin:kos]]]*" "/") {
-			context = "kos";
-			continue;
-		}
-		if (l == "/" "*[[[end:cyg]]]*" "/")
-			context = "";
-		if (l == "/" "*[[[end:kos]]]*" "/")
-			context = "";
-		if (!context)
+		if (l == "/" "*[[[begin]]]*" "/")
+			inside = true;
+		if (l == "/" "*[[[end]]]*" "/")
+			inside = false;
+		if (!inside)
 			continue;
 		local name, value, comment;
 		try {
