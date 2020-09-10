@@ -339,11 +339,11 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 						goto generic_print_symbol_addr;
 					}
 					TRY {
+						uintptr_t loadaddr;
 						uintptr_t symbol_offset;
+						loadaddr = module_getloadaddr(symbol_module, symbol_module_type);
 						if (debug_addr2line(&dbg_sect, &a2l_info,
-						                    (uintptr_t)symbol_addr -
-						                    (uintptr_t)module_getloadaddr(symbol_module,
-						                                                  symbol_module_type),
+						                    (uintptr_t)symbol_addr - loadaddr,
 						                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
 						                    DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS) {
 							module_decref(symbol_module, symbol_module_type);
@@ -352,6 +352,8 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 						}
 						if (!a2l_info.al_rawname)
 							a2l_info.al_rawname = a2l_info.al_name;
+						if (a2l_info.al_rawname && !*a2l_info.al_rawname)
+							a2l_info.al_rawname = NULL;
 						disasm_print(self, "<", 1);
 						if (a2l_info.al_rawname) {
 							disasm_printf(self, "%s", a2l_info.al_rawname);
@@ -359,10 +361,11 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 							/* If we can't determine the symbol's name, generate one using its address. */
 							disasm_printf(self, "sym_%.*p",
 							              address_width(self->d_target),
-							              a2l_info.al_symstart);
+							              a2l_info.al_symstart + loadaddr);
 						}
 						/* Include the symbol offset (if non-zero) */
-						symbol_offset = (uintptr_t)((byte_t *)symbol_addr - (byte_t *)a2l_info.al_symstart);
+						symbol_offset = (uintptr_t)((byte_t *)symbol_addr -
+						                            (byte_t *)(a2l_info.al_symstart + loadaddr));
 						if (symbol_offset != 0)
 							disasm_printf(self, "+%#Ix", symbol_offset);
 						disasm_print(self, ">", 1);
@@ -385,7 +388,8 @@ generic_print_symbol_addr:
 #ifdef CONFIG_LOOKUP_SYMBOL_NAME
 #ifndef __KERNEL__
 				Dl_info info;
-				if (dladdr(symbol_addr, &info) == 0 && info.dli_sname != NULL) {
+				if (dladdr(symbol_addr, &info) == 0 &&
+				    info.dli_sname != NULL && *info.dli_sname) {
 					/* Use DL symbol information as source for symbol names. */
 					disasm_printf(self, "<%s+%#Ix>", info.dli_sname,
 					              (uintptr_t)((byte_t *)symbol_addr - (byte_t *)info.dli_saddr));
