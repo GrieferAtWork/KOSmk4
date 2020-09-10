@@ -82,44 +82,44 @@ DECL_BEGIN
  * >> extern int bar, baz;
  * >> void foo() {
  * >>     for (;;) {
- * >>         uintptr_t tx_oldver_for_baz;
+ * >>         uintptr_t tx_oldver_for_bar;
  * >>         int baz_newval;
  * >>         bool baz_should_set = false;
- * >>         tx_oldver = tx_version_for_baz;
+ * >>
  * >>         COMPILER_BARRIER();
  * >>         // NOTE: Anything done in here that would be ~too~ complex, such as (trying
  * >>         //       to) do a system call would instead trigger `goto tx_failed'
+ * >>         //       If too much memory is accessed here, `RTM_ABORT_CAPACITY' would be returned.
+ * >>         if (IS_VIO(bar))
+ * >>             goto tx_failed; // VIO is _not_ allowed!
+ * >>         tx_oldver_for_bar = tx_version_for_bar;
  * >>         if (bar == 7) {
  * >>             baz_should_set = true;
  * >>             baz_newval = 3;
  * >>         }
  * >>         COMPILER_BARRIER();
- * >>         if (!baz_should_set) {
- * >>             // Nothing modified. -> No need to change the version of do any write-back
- * >>             // Must still verify version integrity, though!
- * >>             if (tx_version_for_baz != tx_oldver_for_baz)
- * >>                 continue;
- * >>             break;
+ * >>
+ * >>         ACQUIRE_LOCK_READ(tx_lock_for_bar);
+ * >>         if (tx_version_for_bar != tx_oldver_for_bar) {
+ * >>             RELEASE_LOCK_READ(tx_lock_for_bar);
+ * >>             continue; // Actually done by returning `RTM_ABORT_RETRY'
  * >>         }
- * >>         while (!sync_trywrite(&tx_lock_for_baz)) {
- * >>             if (tx_version_for_baz != tx_oldver_for_baz)
- * >>                 continue;
- * >>             task_yield();
- * >>         }
- * >>         COMPILER_BARRIER();
- * >>         FINALLY_ENDWRITE(&tx_lock_for_baz);
- * >>         if (tx_version_for_baz != tx_oldver_for_baz)
- * >>             continue;
+ * >>         RELEASE_LOCK_READ(tx_lock_for_bar);
  * >>         if (baz_should_set) {
- * >>             if (IS_VIO(baz))
- * >>                 goto tx_failed;
+ * >>             ACQUIRE_LOCK_WRITE(tx_lock_for_baz);
+ * >>             if (IS_VIO(baz)) {
+ * >>                 RELEASE_LOCK_WRITE(tx_lock_for_baz);
+ * >>                 goto tx_failed; // VIO is _not_ allowed!
+ * >>             }
  * >>             baz = baz_newval;
+ * >>             ++tx_version_for_baz;
+ * >>             RELEASE_LOCK_WRITE(tx_lock_for_baz);
  * >>         }
- * >>         ++tx_version_for_baz;
  * >>         break;
  * >>     }
  * >>     if (0) {
  * >> tx_failed:
+ * >>          // Actually done by returning `RTM_ABORT_FAILED'
  * >>         printf("Failed\n");
  * >>     }
  * >> }
@@ -135,8 +135,8 @@ DECL_BEGIN
  * >>
  * >> RETRY:
  * >>
- * >> // Accessed: did perform read or write
- * >> // Modified: did perform write
+ * >> // Accessed: did perform read or write (changed == true OR changed == false)
+ * >> // Modified: did perform write         (changed == true)
  * >>
  * >> ...
  * >>
@@ -155,23 +155,46 @@ DECL_BEGIN
  * >> for (local addr, data, changed, version, part: accessedParts) {
  * >>     if (VM_NODE_AT(min: addr, max: addr + #data - 1)->vn_part != part)
  * >>         goto RETRY;
- * >>     if (part->dp_futex->fc_rtm_vers != version)
- * >>         goto RETRY;
- * >>     if (changed)
+ * >>     if (changed) {
  * >>         sync_write(part);
+ * >>         if (part->dp_futex->fc_rtm_vers != version)
+ * >>             goto RETRY;
+ * >>     } else {
+ * >>         // Have to acquire a read-lock to ensure that parts
+ * >>         // that were only read aren't being modified right
+ * >>         // now by another RTM context.
+ * >>         sync_read(part);
+ * >>         if (part->dp_futex->fc_rtm_vers != version)
+ * >>             goto RETRY;
+ * >>         sync_endread(part);
+ * >>     }
+ * >> }
+ * >>
+ * >> // Verify that all modified memory is still writable.
+ * >> // We're currently holding write-locks to the backing vm_datapart-s
+ * >> // of all areas of interest, so we know that whatever their state is
+ * >> // right now, that state won't change until we release them. We also
+ * >> // know that (due to our `vm_forcefault()' above), all modified parts
+ * >> // had been made to be writable at one point in the past, so all we
+ * >> // have to do is assert that they still are writable, and start over
+ * >> // if we're too late, and they no longer are.
+ * >> for (local addr, data, changed, none, none: accessedParts) {
+ * >>     if (changed) {
+ * >>         if (!VERIFY_WRITABLE(addr, #data))
+ * >>             goto RETRY_FORCEFAULT;
+ * >>     }
  * >> }
  * >>
  * >> // Apply modifications
- * >> for (local addr, data, changed, none, none: modifiedMemory) {
+ * >> for (local addr, data, changed, none, none: accessedParts) {
  * >>     if (changed) {
- * >>         if (memcpy_nopf(addr, data.bytes(), #data) != 0)
- * >>             goto RETRY_FORCEFAULT;
+ * >>         size_t error;
+ * >>         error = memcpy_nopf(addr, data.bytes(), #data);
+ * >>         assert(error == 0); // We asserted this above!
  * >>         ++part->dp_futex->fc_rtm_vers;
  * >>         sync_endwrite(part);
  * >>     }
  * >> }
- * >>
- *
  */
 
 INTDEF struct vm_rtm_driver_hooks rtm_hooks;

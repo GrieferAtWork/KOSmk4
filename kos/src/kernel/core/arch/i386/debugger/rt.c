@@ -277,6 +277,9 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	struct x86_dbg_cpuammend ammend;
 	cpuid_t mycpuid;
+	/* Quick check: Are we even supposed to become suspended? */
+	if unlikely(ATOMIC_READ(dbg_cpu_) == NULL)
+		goto done;
 	PREEMPTION_DISABLE();
 	(void)args;
 	/* Figure out the calling CPU. */
@@ -410,7 +413,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 		cpu_enable_preemptive_interrupts_nopr();
 
 	/* TODO: Service interrupts for all 1-bits in `ammend.dca_intr' */
-
+done:
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */

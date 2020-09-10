@@ -204,6 +204,8 @@ L(.Lacquire_lapicid_lock):
 	 * interrupt used for IPI communications. (even though by doing so, we make
 	 * use of more stack space than our caller has given us permission to use...) */
 	pause
+	/* TODO: Don't trigger intee, but instead call `debugger_wait_for_done' directly.
+	 *       There's no reason to invoke arbitrary IPIs here! */
 	int    $(0xee) /* #define IDT_X86_ee apic_ipi */
 
 	jmp    L(.Lacquire_lapicid_lock)
