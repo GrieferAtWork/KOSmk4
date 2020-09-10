@@ -631,8 +631,13 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	 * has been set, the thread's pid's `tp_status' field contains its final exit status.
 	 * Thus, the terminate-flag acts as an interlocked check for the exit status and
 	 * waiting for the status to change during thread exit. */
-	if (pid)
-		sig_broadcast(&pid->tp_changed);
+	if (pid) {
+		/* Important! Must broadcast the change while impersonating `next'!
+		 *
+		 * Our current thread context is already too broken to allow us to
+		 * re-schedule others threads that may be waiting for us to exit. */
+		sig_broadcast_as(&pid->tp_changed, next);
+	}
 
 	/* Good bye... */
 	cpu_run_current_nopr();

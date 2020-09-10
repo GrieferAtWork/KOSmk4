@@ -782,6 +782,9 @@ DECL_END
 #define DEFINE_sig_altbroadcast 1
 #include "signal-newsend.c.inl"
 
+#define DEFINE_sig_broadcast_as 1
+#include "signal-newsend.c.inl"
+
 #define DEFINE_task_waitfor 1
 #include "signal-waitfor.c.inl"
 

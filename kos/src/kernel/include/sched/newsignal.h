@@ -146,6 +146,14 @@ NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
 
+/* Same as `sig_broadcast()', but impersonate `sender_thread', and
+ * wake up thread through use of `task_wake_as()'. The same rules
+ * apply, meaning that the (true) caller must ensure that their
+ * CPU won't change, and that `sender_thread' is also running as
+ * part of their CPU. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
+                                struct task *__restrict sender_thread);
 
 
 

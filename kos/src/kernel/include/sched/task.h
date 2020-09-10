@@ -348,6 +348,31 @@ FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_wake)(struct task *__restrict thread,
                          unsigned int flags DFL(TASK_WAKE_FNORMAL));
 
+/* Wake `thread' while impersonating `caller', where `caller' must some
+ * running thread from the calling CPU. - This function is used to wake
+ * up waiting threads during task exit, where at the point where the exit
+ * status is broadcast, the exiting thread (THIS_TASK) can no longer be
+ * used to send signals (since `task_wake()' has to look at things such
+ * as the prev/next thread within the scheduler ring, which would have
+ * already become invalid at that point, since the true calling thread
+ * could no longer be considered apart of the scheduler ring)
+ *
+ * When calling this function, the caller must ensure that their current
+ * CPU will no change, which can be done most easily by simply disabling
+ * preemption, or setting the `TASK_FKEEPCORE' flag.
+ *
+ * The given `caller' is used when `thread' is running on `THIS_CPU',
+ * in which case `thread' will be re-scheduled in relation to `caller',
+ * where-as the regular `task_wake()' does this re-scheduling in relation
+ * to `THIS_TASK'
+ *
+ * @param: flags:  Set of `TASK_WAKE_F*'
+ * @return: true:  The task was woken, or wasn't sleeping.
+ * @return: false: The given task has terminated. */
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
+                            unsigned int flags DFL(TASK_WAKE_FNORMAL));
+
 /* Pause execution for short moment, allowing other CPU cores to catch up.
  * This function is similar to `task_yield()', but intended to be used for
  * helping to synchronize between multiple cores. - If no such functionality

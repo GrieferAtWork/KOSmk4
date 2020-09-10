@@ -19,14 +19,16 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-#define DEFINE_sig_send 1
+//#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
+#define DEFINE_sig_broadcast_as 1
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) + \
-     defined(DEFINE_sig_broadcast) + defined(DEFINE_sig_altbroadcast)) != 1
+#if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) +      \
+     defined(DEFINE_sig_broadcast) + defined(DEFINE_sig_altbroadcast) + \
+     defined(DEFINE_sig_broadcast_as)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
@@ -59,6 +61,15 @@ NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                 struct sig *sender)
+#elif defined(DEFINE_sig_broadcast_as)
+#define HAVE_BROADCAST 1
+#define HAVE_SENDER_THREAD 1
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
+                                struct task *__restrict sender_thread)
 #endif /* ... */
 {
 #ifdef HAVE_BROADCAST
@@ -135,7 +146,11 @@ preemption_pop_and_lock:
 			ATOMIC_WRITE(self->s_con, next);
 			PREEMPTION_POP(was);
 			if (target_thread) {
+#ifdef HAVE_SENDER_THREAD
+				task_wake_as(target_thread, sender_thread);
+#else /* HAVE_SENDER_THREAD */
 				task_wake(target_thread);
+#endif /* !HAVE_SENDER_THREAD */
 				decref_unlikely(target_thread);
 			}
 			/* Only normal connections count towards the returned # of threads. */
@@ -197,7 +212,11 @@ again_find_receiver:
 			_sig_smp_lock_release(self);
 			PREEMPTION_POP(was);
 			if (target_thread) {
+#ifdef HAVE_SENDER_THREAD
+				task_wake_as(target_thread, sender_thread);
+#else /* HAVE_SENDER_THREAD */
 				task_wake(target_thread);
+#endif /* !HAVE_SENDER_THREAD */
 				decref_unlikely(target_thread);
 			}
 			return true;
@@ -240,7 +259,11 @@ again_find_receiver:
 				ATOMIC_WRITE(self->s_con, next);
 				PREEMPTION_POP(was);
 				if (target_thread) {
+#ifdef HAVE_SENDER_THREAD
+					task_wake_as(target_thread, sender_thread);
+#else /* HAVE_SENDER_THREAD */
 					task_wake(target_thread);
+#endif /* !HAVE_SENDER_THREAD */
 					decref_unlikely(target_thread);
 				}
 			}
@@ -270,12 +293,14 @@ done_nocon_nounlock:
 #undef SIG_SENDER
 }
 
+#undef HAVE_SENDER_THREAD
 #undef HAVE_BROADCAST
 #undef HAVE_SENDER
 
 
 DECL_END
 
+#undef DEFINE_sig_broadcast_as
 #undef DEFINE_sig_altbroadcast
 #undef DEFINE_sig_broadcast
 #undef DEFINE_sig_altsend

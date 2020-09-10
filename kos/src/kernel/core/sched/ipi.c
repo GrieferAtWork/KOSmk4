@@ -438,146 +438,6 @@ unset_waking:
 STATIC_ASSERT(CPU_IPI_FWAITFOR == TASK_WAKE_FWAITFOR);
 #endif /* !CONFIG_NO_SMP */
 
-
-/* Re-schedule the given `thread' if it was unscheduled (entered a sleeping state).
- * Using this function, a ~sporadic interrupt~ is implemented.
- * If the thread hasn't been unscheduled, this function is a no-op.
- * NOTE: This function is used in the implementation of `sig_send'
- * @return: true:  The task was woken, or wasn't sleeping.
- * @return: false: The given task has terminated. */
-PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL task_wake)(struct task *__restrict thread,
-                         unsigned int flags) {
-	uintptr_t old_flags;
-	pflag_t was;
-	struct cpu *mycpu;
-	assert(PERTASK_GET(this_task.t_sched.s_running.sr_runnxt)->t_sched.s_running.sr_runprv == THIS_TASK &&
-	       PERTASK_GET(this_task.t_sched.s_running.sr_runprv)->t_sched.s_running.sr_runnxt == THIS_TASK);
-	do {
-		old_flags = ATOMIC_READ(thread->t_flags);
-		if (old_flags & TASK_FTERMINATED) {
-			IPI_DEBUG("task_wake(%p):terminated\n", thread);
-			return false; /* The thread has already terminated. */
-		}
-		if (old_flags & TASK_FWAKING) {
-			IPI_DEBUG("task_wake(%p):already\n", thread);
-			return true; /* A wake-up is already pending. */
-		}
-	} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags, old_flags | TASK_FWAKING));
-	/* Now we're responsible to see to it that the thread either gets
-	 * woken, or that the `TASK_FTERMINATED' gets set before then.
-	 * NOTE: We can't actually track the later happening on other cores,
-	 *       but that's actually OK, since the wakeup simply got lost
-	 *       while the task was already dying, which can only happen
-	 *       when the thread was already in a state where it wasn't
-	 *       guarantied to be responsive to wakeup commands. */
-	was   = PREEMPTION_PUSHOFF();
-	mycpu = THIS_CPU;
-#ifndef CONFIG_NO_SMP
-	if (thread->t_cpu != mycpu) {
-		/* Use an IPI to wake up the thread! */
-		void *args[CPU_IPI_ARGCOUNT];
-		args[0] = thread;
-		args[1] = (void *)(uintptr_t)flags;
-		IPI_DEBUG("task_wake(%p):ipi\n", thread);
-		while (!cpu_sendipi(thread->t_cpu, &task_wake_ipi, args,
-		                    CPU_IPI_FWAKEUP | (flags & TASK_WAKE_FWAITFOR)))
-			task_pause();
-		PREEMPTION_POP(was);
-	} else
-#endif /* !CONFIG_NO_SMP */
-	{
-		/* Wake on the current thread. */
-		struct task *caller, *next;
-		uintptr_t thread_flags;
-		IPI_DEBUG("task_wake(%p):me\n", thread);
-		COMPILER_READ_BARRIER();
-		thread_flags = thread->t_flags;
-		COMPILER_READ_BARRIER();
-#ifndef CONFIG_NO_SMP
-		if (thread_flags & (TASK_FTERMINATED | TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-		if (thread_flags & (TASK_FTERMINATED))
-#endif /* CONFIG_NO_SMP */
-		{
-			/* The thread has already terminated, but the wake-up was requested at
-			 * a time when the thread wasn't. So between then and now, the thread
-			 * must have executed at least for a while, meaning it did get a wake-up
-			 * for one reason or another, which is good enough for us!
-			 *
-			 * On the other hand, a task that is intended to, or already was added
-			 * as a pending task within our CPU is guarantied to receive a wake-up
-			 * once that request goes through (which may actually happen as soon as
-			 * we re-enable preemption, which may be done by the next line) */
-			IPI_DEBUG("task_wake(%p):terminated\n", thread);
-			PREEMPTION_POP(was);
-			return true;
-		}
-		caller = THIS_TASK;
-		if (thread_flags & TASK_FRUNNING) {
-			cpu_assert_running(thread);
-			if (flags & TASK_WAKE_FLOWPRIO)
-				goto unset_waking; /* Don't re-prioritize the target thread. */
-			if unlikely(caller == thread) {
-				/* Special (and _very_ unlikely) case: The calling thread is trying to wake itself.
-				 * This could? happen under very rare circumstances, and is actually allowed behavior,
-				 * so handle it by operating as a no-op, other than unsetting our own `TASK_FWAKING'
-				 * flag. */
-#ifdef NDEBUG
-				PREEMPTION_POP(was);
-				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
-#else /* NDEBUG */
-				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
-				cpu_assert_running(thread);
-				PREEMPTION_POP(was);
-#endif /* !NDEBUG */
-				return true;
-			}
-			/* The thread is already running.
-			 * In this case, re-schedule the thread to-be executed next. */
-			thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = thread->t_sched.s_running.sr_runnxt;
-			thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = thread->t_sched.s_running.sr_runprv;
-		} else {
-			assert(caller != thread);
-			cpu_assert_sleeping(thread);
-			ATOMIC_FETCHOR(thread->t_flags, TASK_FRUNNING);
-			/* The thread was sleeping. - Wake it up */
-			if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
-				thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
-		}
-		next = caller->t_sched.s_running.sr_runnxt;
-		thread->t_sched.s_running.sr_runprv = caller;
-		thread->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = thread;
-		next->t_sched.s_running.sr_runprv   = thread;
-		assert(caller->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == caller &&
-		       caller->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == caller);
-		assert(thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == thread &&
-		       thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == thread);
-unset_waking:
-		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
-		cpu_assert_running(thread);
-		if (PREEMPTION_WASENABLED(was)) {
-			if ((flags & TASK_WAKE_FHIGHPRIO) &&
-			    mycpu->c_override != caller) {
-				/* End the current quantum prematurely. */
-				cpu_quantum_end_nopr(caller, thread);
-				/* Directly switch execution to the thread in question,
-				 * immediately allowing it to resume executing. */
-				mycpu->c_current = thread;
-				cpu_run_current_and_remember_nopr(caller);
-				/* At this point, `thread' got to execute for a while, and we're
-				 * back in business, with preemption enabled once again. */
-			}
-			PREEMPTION_ENABLE();
-		}
-		/*PREEMPTION_POP(was);*/
-	}
-	return true;
-}
-
-
-
 PUBLIC void NOTHROW(KCALL cpu_deepsleep)(void) {
 	struct cpu *me = THIS_CPU;
 	assertf(THIS_TASK == &FORCPU(me, thiscpu_idle),
@@ -981,8 +841,14 @@ done:
 	return thread;
 }
 
-
-
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define DEFINE_task_wake
+#include "ipi-task-wake.c.inl"
+#define DEFINE_task_wake_as
+#include "ipi-task-wake.c.inl"
+#endif /* !__INTELLISENSE__ */
+
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_IPI_C */
