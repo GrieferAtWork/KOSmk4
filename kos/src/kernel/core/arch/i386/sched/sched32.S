@@ -243,6 +243,7 @@ INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 	.cfi_restore_iret_ds
 
 	iret
+	nop /* This fixes tracebacks when the IRET breaks */
 	.cfi_restore_state
 
 	/* Disable the I/O permissions bitmap. */
@@ -347,7 +348,7 @@ PUBLIC_FUNCTION(task_yield)
 	movl   %esp, this_sched_state(%esi)
 
 	/* Prematurely end the current quantum */
-	movl   %esi, %ecx /* current */
+	movl   %esi, %ecx /* prev (current) */
 	movl   %edi, %edx /* next */
 	EXTERN(cpu_quantum_end_nopr)
 	call   cpu_quantum_end_nopr

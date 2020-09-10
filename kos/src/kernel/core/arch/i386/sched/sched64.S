@@ -202,6 +202,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 
 	/* Resume execution */
 	intr_exit intr_enabled=0
+	nop /* This fixes tracebacks when the IRET breaks */
 	.cfi_restore_state
 
 	/* Disable the I/O permissions bitmap. */

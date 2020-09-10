@@ -856,6 +856,9 @@ NOTHROW(FCALL trigger_clone_trap)(void *UNUSED(arg),
 /* Default task start flags. */
 PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
 
+/* Start executing the given task on the CPU it has been assigned.
+ * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU.
+ * @return: * : Always re-returns `thread' */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	pflag_t was;

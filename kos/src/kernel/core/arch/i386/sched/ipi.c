@@ -270,6 +270,9 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 			slot = i * BITS_PER_POINTER + j;
 			/* Deallocate this IPI. */
 			memcpy(&ipi, &FORCPU(me, thiscpu_x86_ipi_pending[slot]), sizeof(ipi));
+#ifndef NDEBUG
+			memset(&FORCPU(me, thiscpu_x86_ipi_pending[slot]), 0xcc, sizeof(ipi));
+#endif /* !NDEBUG */
 			ATOMIC_FETCHAND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 			/* Execute the IPI callback. */
 			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#Ix]\n",

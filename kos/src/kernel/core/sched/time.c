@@ -1141,7 +1141,7 @@ NOTHROW(FCALL cpu_check_quantum_rollover)(struct cpu *__restrict me,
 /* Prematurely end the current quantum, accounting its elapsed
  * time to `prev', and starting a new quantum such that the
  * next scheduler interrupt will happen after a full quantum. */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
                                     struct task *__restrict next) {
 	quantum_diff_t elapsed;

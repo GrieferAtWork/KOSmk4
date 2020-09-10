@@ -33,6 +33,15 @@
 #include <bits/wait.h> /* `union wait' */
 #endif /* __cplusplus */
 
+#ifdef CONFIG_NO_KERNEL_STACK_GUARD
+#undef CONFIG_HAVE_KERNEL_STACK_GUARD
+#elif !defined(CONFIG_HAVE_KERNEL_STACK_GUARD)
+#if !defined(NDEBUG) && 1
+#define CONFIG_HAVE_KERNEL_STACK_GUARD 1
+#endif /* !NDEBUG */
+#endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
+
+
 DECL_BEGIN
 
 /* Task flags <--> scheduler state mapping:
@@ -218,6 +227,10 @@ DATDEF struct task _bootidle; /* The idle thread for the boot CPU */
  */
 DATDEF ATTR_PERTASK struct vm_node const this_kernel_stacknode;
 DATDEF ATTR_PERTASK struct vm_datapart const this_kernel_stackpart;
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+DATDEF ATTR_PERTASK struct vm_node const this_kernel_stackguard;
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+
 #define THIS_KERNEL_STACK      (&PERTASK(this_kernel_stacknode))
 #define THIS_KERNEL_STACK_PART (&PERTASK(this_kernel_stackpart))
 

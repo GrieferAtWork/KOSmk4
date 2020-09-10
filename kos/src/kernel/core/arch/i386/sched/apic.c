@@ -261,6 +261,9 @@ INTDEF pertask_fini_t __kernel_pertask_fini_end[];
 DATDEF ATTR_PERCPU struct vm_node thiscpu_x86_dfstacknode_ ASMNAME("thiscpu_x86_dfstacknode");
 DATDEF ATTR_PERCPU struct vm_datapart thiscpu_x86_dfstackpart_ ASMNAME("thiscpu_x86_dfstackpart");
 DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+DATDEF ATTR_PERTASK struct vm_node this_kernel_stackguard_ ASMNAME("this_kernel_stackguard");
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 DATDEF ATTR_PERCPU u8 thiscpu_x86_iob_[] ASMNAME("thiscpu_x86_iob");
 
@@ -571,6 +574,9 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 		__pause();
 	vm_paged_node_remove(&vm_kernel, FORCPU(self, thiscpu_x86_dfstacknode_).vn_node.a_vmin);
 	vm_paged_node_remove(&vm_kernel, FORTASK(myidle, this_kernel_stacknode_).vn_node.a_vmin);
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+	vm_paged_node_remove(&vm_kernel, FORTASK(myidle, this_kernel_stackguard_).vn_node.a_vmin);
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 	vm_paged_node_remove(&vm_kernel, FORTASK(myidle, this_trampoline_node).vn_node.a_vmin);
 	sync_endwrite(&vm_kernel.v_treelock);
 	/* Finalize the associated data parts, freeing up backing physical memory. */
@@ -664,14 +670,34 @@ i386_allocate_secondary_cores(void) {
 		vm_datapart_do_allocram(&FORTASK(altidle, this_kernel_stackpart_));
 		{
 			void *addr;
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+			addr = vm_getfree(&vm_kernel,
+			                  HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
+			                  CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE) + PAGESIZE,
+			                  PAGESIZE, HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
+#else /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 			addr = vm_getfree(&vm_kernel,
 			                  HINT_GETADDR(KERNEL_VMHINT_IDLESTACK),
 			                  CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE), PAGESIZE,
 			                  HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
+#endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
 			if unlikely(addr == VM_GETFREE_ERROR)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE stack"), (unsigned int)i);
-			FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmin = PAGEID_ENCODE((byte_t *)addr);
-			FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmax = PAGEID_ENCODE((byte_t *)addr + CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
+			{
+				pageid_t stackpage;
+				stackpage = PAGEID_ENCODE((byte_t *)addr);
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+				FORTASK(altidle, this_kernel_stackguard_).vn_node.a_vmin = stackpage;
+				FORTASK(altidle, this_kernel_stackguard_).vn_node.a_vmax = stackpage;
+				FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmin  = stackpage + 1;
+				FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmax  = stackpage + 1 + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+				addr = (byte_t *)addr + PAGESIZE;
+#else  /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+				FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmin = stackpage;
+				FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmax = stackpage + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+#endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
+			}
+
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!pagedir_prepare_map(addr, CEIL_ALIGN(KERNEL_IDLE_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's IDLE stack"), (unsigned int)i);
@@ -680,6 +706,9 @@ i386_allocate_secondary_cores(void) {
 			                    addr,
 			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 			vm_node_insert(&FORTASK(altidle, this_kernel_stacknode_));
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+			vm_node_insert(&FORTASK(altidle, this_kernel_stackguard_));
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 		}
 
 		{

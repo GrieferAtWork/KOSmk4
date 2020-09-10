@@ -2523,11 +2523,13 @@ print_fcntl_arg(pformatprinter printer, void *arg,
 		result = format_printf(printer, arg, "(struct flock *)%#" PRIxPTR, fcntl_arg);
 		break;
 
+#if F_GETLK != F_GETLK64
 	case F_GETLK64:
 		result = format_printf(printer, arg,
 		                       "(struct flock64 *)%#" PRIxPTR,
 		                       fcntl_arg);
 		break;
+#endif /* F_GETLK != F_GETLK64 */
 
 	case F_SETLK:
 	case F_SETLKW:
@@ -2545,11 +2547,13 @@ print_fcntl_arg(pformatprinter printer, void *arg,
 		result = print_flock64(printer, arg, &lck64);
 	}	break;
 
+#if F_GETLK != F_GETLK64
 	case F_SETLK64:
 	case F_SETLKW64:
 		validate_readable(fcntl_arg, sizeof(struct flock64));
 		result = print_flock64(printer, arg, (USER CHECKED struct flock64 const *)fcntl_arg);
 		break;
+#endif /* F_GETLK != F_GETLK64 */
 
 	case F_SETOWN_EX:
 		validate_readable(fcntl_arg, sizeof(struct f_owner_ex));

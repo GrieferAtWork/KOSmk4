@@ -31,6 +31,7 @@
 #include <kernel/x86/multiboot.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/x86/tss.h>
+#include <sched/task.h> /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 #include <hybrid/align.h>
 
@@ -409,9 +410,12 @@ SECTIONS {
 
 
 		IP_ALIGN(PAGESIZE);
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 		PROVIDE_HIDDEN(__kernel_boottask_stack_guard = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_boottask_stack_guard_pageid = addr2pageid(ABSOLUTE(.)));
 		/* Insert a placeholder page to catch stack overflows */
 		. += PAGESIZE;
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 		PROVIDE_HIDDEN(__kernel_boottask_stack = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_boottask_stack_pageid = addr2pageid(ABSOLUTE(.)));
 		PROVIDE_HIDDEN(__kernel_boottask_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
@@ -419,9 +423,12 @@ SECTIONS {
 
 
 		IP_ALIGN(PAGESIZE);
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 		PROVIDE_HIDDEN(__kernel_asyncwork_stack_guard = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_asyncwork_stack_guard_pageid = addr2pageid(ABSOLUTE(.)));
 		/* Insert a placeholder page to catch stack overflows */
 		. += PAGESIZE;
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 		PROVIDE_HIDDEN(__kernel_asyncwork_stack = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_asyncwork_stack_pageid = addr2pageid(ABSOLUTE(.)));
 		PROVIDE_HIDDEN(__kernel_asyncwork_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
@@ -429,6 +436,12 @@ SECTIONS {
 
 
 		IP_ALIGN(PAGESIZE);
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+		PROVIDE_HIDDEN(__kernel_bootidle_stack_guard = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_bootidle_stack_guard_pageid = addr2pageid(ABSOLUTE(.)));
+		/* Insert a placeholder page to catch stack overflows */
+		. += PAGESIZE;
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 		PROVIDE_HIDDEN(__kernel_bootidle_stack = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_bootidle_stack_pageid = addr2pageid(ABSOLUTE(.)));
 		PROVIDE_HIDDEN(__kernel_bootidle_stack_pageptr = addr2pageptr(ABSOLUTE(.)));

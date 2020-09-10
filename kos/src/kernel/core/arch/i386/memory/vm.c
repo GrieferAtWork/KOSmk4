@@ -336,8 +336,11 @@ STATIC_ASSERT(VM_PROT_EXEC  == PAGEDIR_MAP_FEXEC);
 STATIC_ASSERT(VM_PROT_WRITE == PAGEDIR_MAP_FWRITE);
 STATIC_ASSERT(VM_PROT_READ  == PAGEDIR_MAP_FREAD);
 
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 INTDEF byte_t __kernel_boottask_stack_guard[];
 INTDEF byte_t __kernel_asyncwork_stack_guard[];
+INTDEF byte_t __kernel_bootidle_stack_guard[];
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
@@ -549,6 +552,7 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2].vn_node.a_vmin)));
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 
+#ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	/* Get rid of the page guarding the end of the boot-task stack. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_mapone(__kernel_boottask_stack_guard))
@@ -562,6 +566,13 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 	{
 		pagedir_unmapone(__kernel_asyncwork_stack_guard);
 	}
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if (pagedir_prepare_mapone(__kernel_bootidle_stack_guard))
+#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	{
+		pagedir_unmapone(__kernel_bootidle_stack_guard);
+	}
+#endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 }
 
 
