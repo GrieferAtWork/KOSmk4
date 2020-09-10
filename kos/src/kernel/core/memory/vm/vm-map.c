@@ -359,17 +359,11 @@ handle_remove_write_error:
 							if (!tryincref(blocking_vm))
 								blocking_vm = NULL;
 							partnode_pair_vector_endwrite_parts(info);
-							assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK ||
-							       error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS);
+							assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK);
 							if (blocking_vm) {
 								FINALLY_DECREF_UNLIKELY(blocking_vm);
-								if (error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS) {
-									vm_tasklock_read(blocking_vm);
-									vm_tasklock_endread(blocking_vm);
-								} else {
-									sync_write(blocking_vm);
-									sync_endwrite(blocking_vm);
-								}
+								sync_write(blocking_vm);
+								sync_endwrite(blocking_vm);
 							}
 							goto again_lock_all_parts;
 						}

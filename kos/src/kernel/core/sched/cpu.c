@@ -442,14 +442,14 @@ PUBLIC struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector") = { &
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
-	/*.c_id       = */ 0,
-	/*.c_current  = */ NULL,
-	/*.c_sleeping = */ NULL,
+	/* .c_id       = */ 0,
+	/* .c_current  = */ NULL,
+	/* .c_sleeping = */ NULL,
 #ifndef CONFIG_NO_SMP
-	/*.c_pending  = */ CPU_PENDING_ENDOFCHAIN,
+	/* .c_pending  = */ CPU_PENDING_ENDOFCHAIN,
 #endif /* !CONFIG_NO_SMP */
-	/*.c_override = */ NULL,
-	/*.c_state    = */ CPU_STATE_RUNNING
+	/* .c_override = */ NULL,
+	/* .c_state    = */ CPU_STATE_RUNNING
 };
 
 

@@ -3098,10 +3098,6 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		return VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS;
 	if (!sync_trywrite(self->vn_vm))
 		return VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK;
-	if (!vm_sync_trybegin(self->vn_vm)) {
-		sync_endwrite(self->vn_vm);
-		return VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS;
-	}
 	/* Just delete the mapping, so it has to be re-created, at which
 	 * point all of the intended copy-on-write mechanics will take
 	 * place. */
@@ -3111,7 +3107,6 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 	if (self->vn_vm == THIS_VM) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
 			if (!pagedir_prepare_map(addr, size)) {
-				vm_sync_abort(self->vn_vm);
 				sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
 			}
@@ -3129,7 +3124,6 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		PAGEDIR_P_SELFTYPE pdir = PAGEDIR_P_SELFOFVM(self->vn_vm);
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
 			if (!pagedir_prepare_map_p(pdir, addr, size)) {
-				vm_sync_abort(self->vn_vm);
 				sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
 			}
@@ -3144,7 +3138,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
 			pagedir_unprepare_map_p(pdir, addr, size);
 	}
-	vm_sync_end(self->vn_vm, addr, size);
+	vm_sync(self->vn_vm, addr, size);
 	sync_endwrite(self->vn_vm);
 	return VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS;
 }
@@ -3160,11 +3154,6 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		return VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS;
 	if (self->vn_vm != locked_vm && !sync_trywrite(self->vn_vm))
 		return VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK;
-	if (!vm_sync_trybegin(self->vn_vm)) {
-		if (self->vn_vm != locked_vm)
-			sync_endwrite(self->vn_vm);
-		return VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS;
-	}
 
 	/* Just delete the mapping, so it has to be re-created, at which
 	 * point all of the intended copy-on-write mechanics will take
@@ -3175,7 +3164,6 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 	if (self->vn_vm == THIS_VM) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
 			if (!pagedir_prepare_map(addr, size)) {
-				vm_sync_abort(self->vn_vm);
 				if (self->vn_vm != locked_vm)
 					sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
@@ -3194,7 +3182,6 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		PAGEDIR_P_SELFTYPE pdir = PAGEDIR_P_SELFOFVM(self->vn_vm);
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
 			if (!pagedir_prepare_map_p(pdir, addr, size)) {
-				vm_sync_abort(self->vn_vm);
 				if (self->vn_vm != locked_vm)
 					sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
@@ -3210,7 +3197,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
 			pagedir_unprepare_map_p(pdir, addr, size);
 	}
-	vm_sync_end(self->vn_vm, addr, size);
+	vm_sync(self->vn_vm, addr, size);
 	if (self->vn_vm != locked_vm)
 		sync_endwrite(self->vn_vm);
 	return VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS;
@@ -3569,293 +3556,6 @@ no_changes_in_node:
 	}
 	sync_endread(self);
 	return result;
-}
-
-
-
-
-
-
-#ifndef CONFIG_NO_SMP
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL ipi_invtlb_one)(struct icpustate *__restrict state,
-                              void *args[CPU_IPI_ARGCOUNT]) {
-	pagedir_syncone(args[0]);
-	return state;
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL ipi_invtlb)(struct icpustate *__restrict state,
-                          void *args[CPU_IPI_ARGCOUNT]) {
-	pagedir_sync(args[0], (size_t)args[1]);
-	return state;
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL ipi_invtlb_all)(struct icpustate *__restrict state,
-                              void *args[CPU_IPI_ARGCOUNT]) {
-	(void)args;
-	pagedir_syncall();
-	return state;
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL ipi_invtlb_one_for)(struct icpustate *__restrict state,
-                                  void *args[CPU_IPI_ARGCOUNT]) {
-	if (THIS_VM == (struct vm *)args[0])
-		pagedir_syncone(args[1]);
-	return state;
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL ipi_invtlb_for)(struct icpustate *__restrict state,
-                              void *args[CPU_IPI_ARGCOUNT]) {
-	if (THIS_VM == (struct vm *)args[0]) {
-		pagedir_sync(args[1], (size_t)args[2]);
-	}
-	return state;
-}
-
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL ipi_invtlb_all_for)(struct icpustate *__restrict state,
-                                  void *args[CPU_IPI_ARGCOUNT]) {
-	if (THIS_VM == (struct vm *)args[0])
-		pagedir_syncall();
-	return state;
-}
-#endif /* !CONFIG_NO_SMP */
-
-
-#ifndef CONFIG_NO_SMP
-/* Synchronize changes to `effective_vm' in the given address range.
- * In SMP, this function will automatically communicate changes to other
- * CPUs making use of the same VM, and doing this synchronously.
- * If the given address range is located within the kernel
- * share-segment, or if `vm_syncall()' was called, a
- * did-change RPC is broadcast to all other CPUs. */
-PUBLIC void FCALL
-vm_paged_sync(struct vm *__restrict effective_vm,
-              pageid_t page_index, size_t num_pages)
-		THROWS(E_WOULDBLOCK) {
-	if unlikely(effective_vm == &vm_kernel) {
-		vm_paged_kernel_sync(page_index, num_pages);
-		return;
-	}
-	vm_tasklock_read(effective_vm);
-	vm_paged_sync_end(effective_vm, page_index, num_pages);
-}
-
-PUBLIC void FCALL
-vm_paged_syncone(struct vm *__restrict effective_vm,
-           pageid_t page_index)
-		THROWS(E_WOULDBLOCK) {
-	if unlikely(effective_vm == &vm_kernel) {
-		vm_paged_kernel_syncone(page_index);
-		return;
-	}
-	vm_tasklock_read(effective_vm);
-	vm_paged_sync_endone(effective_vm, page_index);
-}
-
-PUBLIC void FCALL
-vm_syncall(struct vm *__restrict effective_vm)
-		THROWS(E_WOULDBLOCK) {
-	if unlikely(effective_vm == &vm_kernel) {
-		vm_kernel_syncall();
-		return;
-	}
-	vm_tasklock_read(effective_vm);
-	vm_sync_endall(effective_vm);
-}
-
-/* Sync functions for when the caller is already holding a lock to the VM's set of running tasks. */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_sync_locked)(struct vm *__restrict effective_vm,
-                                    pageid_t page_index, size_t num_pages) {
-	if unlikely(effective_vm == &vm_kernel) {
-		vm_paged_kernel_sync(page_index, num_pages);
-	} else {
-		cpuset_t targets;
-		struct task *thread;
-		void *args[CPU_IPI_ARGCOUNT];
-		CPUSET_CLEAR(targets);
-		LLIST_FOREACH(thread, effective_vm->v_tasks, t_vm_tasks) {
-			cpuid_t cid;
-			cid = ATOMIC_READ(thread->t_cpu)->c_id;
-			CPUSET_INSERT(targets, cid);
-		}
-		args[0] = (void *)effective_vm;
-		args[1] = PAGEID_DECODE(page_index);
-		args[2] = (void *)(num_pages * PAGESIZE);
-		cpu_sendipi_cpuset(targets,
-		                   &ipi_invtlb_for,
-		                   args,
-		                   CPU_IPI_FWAITFOR |
-		                   CPU_IPI_FNOINTR);
-	}
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_syncone_locked)(struct vm *__restrict effective_vm,
-                                 pageid_t page_index) {
-	if unlikely(effective_vm == &vm_kernel) {
-		vm_paged_kernel_syncone(page_index);
-	} else {
-		cpuset_t targets;
-		struct task *thread;
-		void *args[CPU_IPI_ARGCOUNT];
-		CPUSET_CLEAR(targets);
-		LLIST_FOREACH(thread, effective_vm->v_tasks, t_vm_tasks) {
-			cpuid_t cid;
-			cid = ATOMIC_READ(thread->t_cpu)->c_id;
-			CPUSET_INSERT(targets, cid);
-		}
-		args[0] = (void *)effective_vm;
-		args[1] = (void *)PAGEID_DECODE(page_index);
-		cpu_sendipi_cpuset(targets,
-		                   &ipi_invtlb_one_for,
-		                   args,
-		                   CPU_IPI_FWAITFOR |
-		                   CPU_IPI_FNOINTR);
-	}
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict effective_vm) {
-	if unlikely(effective_vm == &vm_kernel) {
-		vm_kernel_syncall();
-	} else {
-		cpuset_t targets;
-		struct task *thread;
-		void *args[CPU_IPI_ARGCOUNT];
-		CPUSET_CLEAR(targets);
-		LLIST_FOREACH(thread, effective_vm->v_tasks, t_vm_tasks) {
-			cpuid_t cid;
-			cid = ATOMIC_READ(thread->t_cpu)->c_id;
-			CPUSET_INSERT(targets, cid);
-		}
-		args[0] = (void *)effective_vm;
-		cpu_sendipi_cpuset(targets,
-		                   &ipi_invtlb_all_for,
-		                   args,
-		                   CPU_IPI_FWAITFOR |
-		                   CPU_IPI_FNOINTR);
-	}
-}
-
-
-
-/* Begin/end syncing page directory mappings:
- * >> pagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `pagedir_unmap_p()' will succeed)
- * >> vm_sync_begin(my_vm);                                             // Lock         (make sure we'll be able to sync)
- * >> pagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
- * >> vm_paged_sync_end(my_vm, start, count);                           // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
- * >> pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
- * This order to calls is required to prevent problems at a
- * point in time when those problems could no longer be handled,
- * since the regular vm_paged_sync() functions may throw an E_WOULDBLOCK
- * exception when failing to acquire a lock to `v_tasklock', which
- * is required in order to gather the set of CPUs containing tasks
- * which may need to be synced as well. */
-PUBLIC ATTR_FLATTEN NOBLOCK void
-NOTHROW(FCALL vm_paged_sync_end)(struct vm *__restrict effective_vm,
-                           pageid_t page_index, size_t num_pages) {
-	vm_paged_sync_locked(effective_vm, page_index, num_pages);
-	vm_tasklock_endread(effective_vm);
-}
-
-PUBLIC ATTR_FLATTEN NOBLOCK void
-NOTHROW(FCALL vm_paged_sync_endone)(struct vm *__restrict effective_vm,
-                              pageid_t page_index) {
-	vm_paged_syncone_locked(effective_vm, page_index);
-	vm_tasklock_endread(effective_vm);
-}
-
-PUBLIC ATTR_FLATTEN NOBLOCK void
-NOTHROW(FCALL vm_sync_endall)(struct vm *__restrict effective_vm) {
-	vm_syncall_locked(effective_vm);
-	vm_tasklock_endread(effective_vm);
-}
-
-#else /* !CONFIG_NO_SMP */
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_sync)(struct vm *__restrict effective_vm,
-                             pageid_t page_index, size_t num_pages) {
-	if (effective_vm == THIS_VM ||
-	    effective_vm == &vm_kernel)
-		pagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_syncone)(struct vm *__restrict effective_vm,
-                          pageid_t page_index) {
-	if (effective_vm == THIS_VM ||
-	    effective_vm == &vm_kernel)
-		pagedir_syncone(PAGEID_DECODE(page_index));
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_syncall)(struct vm *__restrict effective_vm) {
-	if (effective_vm == THIS_VM ||
-	    effective_vm == &vm_kernel)
-		pagedir_syncall();
-}
-
-DEFINE_PUBLIC_ALIAS(vm_paged_sync_end, vm_paged_sync);
-DEFINE_PUBLIC_ALIAS(vm_paged_sync_endone, vm_paged_syncone);
-DEFINE_PUBLIC_ALIAS(vm_sync_endall, vm_syncall);
-DEFINE_PUBLIC_ALIAS(vm_paged_sync_locked, vm_paged_sync);
-DEFINE_PUBLIC_ALIAS(vm_paged_syncone_locked, vm_paged_syncone);
-DEFINE_PUBLIC_ALIAS(vm_syncall_locked, vm_syncall);
-
-#endif /* CONFIG_NO_SMP */
-
-
-
-/* Similar to the user-variants above, however sync a kernel-VM range instead,
- * and causing the did-change RPC to be broadcast to _all_ CPUs, instead of
- * having to figure out the specific sub-set of CPUs that would be affected. */
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_kernel_sync)(pageid_t page_index, size_t num_pages) {
-#ifndef CONFIG_NO_SMP
-	{
-		void *args[CPU_IPI_ARGCOUNT];
-		args[0] = PAGEID_DECODE(page_index);
-		args[1] = (void *)(num_pages * PAGESIZE);
-		cpu_broadcastipi(&ipi_invtlb,
-		                 args,
-		                 CPU_IPI_FWAITFOR |
-		                 CPU_IPI_FNOINTR);
-	}
-#else /* !CONFIG_NO_SMP */
-	pagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
-#endif /* CONFIG_NO_SMP */
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_kernel_syncone)(pageid_t page_index) {
-#ifndef CONFIG_NO_SMP
-	{
-		void *args[CPU_IPI_ARGCOUNT];
-		args[0] = PAGEID_DECODE(page_index);
-		cpu_broadcastipi(&ipi_invtlb_one, args, CPU_IPI_FWAITFOR);
-	}
-#else /* !CONFIG_NO_SMP */
-	pagedir_syncone(PAGEID_DECODE(page_index));
-#endif /* CONFIG_NO_SMP */
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_kernel_syncall)(void) {
-#ifndef CONFIG_NO_SMP
-	{
-		void *args[CPU_IPI_ARGCOUNT];
-		cpu_broadcastipi(&ipi_invtlb_all, args, CPU_IPI_FWAITFOR);
-	}
-#else /* !CONFIG_NO_SMP */
-	pagedir_syncall();
-#endif /* CONFIG_NO_SMP */
 }
 
 

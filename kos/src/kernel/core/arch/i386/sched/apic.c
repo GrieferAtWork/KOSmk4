@@ -79,7 +79,7 @@ INTDEF byte_t x86_ack_apic_size[];
 DATDEF ATTR_PERCPU quantum_diff_t _thiscpu_quantum_length ASMNAME("thiscpu_quantum_length");
 DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicid ASMNAME("thiscpu_x86_lapicid");
 DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversion");
-DATDEF size_t _cpu_count ASMNAME("cpu_count");
+DATDEF cpuid_t _cpu_count ASMNAME("cpu_count");
 DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
 

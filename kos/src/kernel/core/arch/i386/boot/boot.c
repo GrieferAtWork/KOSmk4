@@ -470,6 +470,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       with system calls that were added to linux in the mean time.
 	 *       Specifically: 64-bit time system calls. */
 
+	/* TODO: Replace `NONNULL((1)) ATTR_RETNONNULL' -> `ATTR_RETNONNULL NONNULL((1))' */
+
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every

@@ -188,6 +188,9 @@ struct vm vm_kernel_head = {
 	/* .v_tasks      = */ NULL,
 	/* .v_tasklock   = */ ATOMIC_RWLOCK_INIT,
 	/* .v_deltasks   = */ NULL,
+#if CONFIG_MAX_CPU_COUNT > 1
+	/* .v_cpus       = */ CPUSET_INIT,
+#endif /* CONFIG_MAX_CPU_COUNT > 1 */
 	/* .v_kernreserve = */ {
 		/* .vn_node   = */ { NULL,
 		                     NULL,
@@ -2052,7 +2055,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
 			 * Otherwise, other CPUs may still be using the mappings after       \
 			 * they've already been re-designated as general-purpose RAM, at     \
 			 * which point they'd start reading garbage, or corrupt pointers. */ \
-			vm_syncall_locked(sync_vm);                                          \
+			vm_syncall(sync_vm);                                                 \
 			page_freeone(pageptr);                                               \
 			do {                                                                 \
 				--free_count;                                                    \
@@ -2092,7 +2095,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
 	}
 	/* Free any remaining pages. */
 	if (free_count) {
-		vm_syncall_locked(sync_vm);
+		vm_syncall(sync_vm);
 		do {
 			--free_count;
 			page_freeone((pageptr_t)free_pages[free_count]);

@@ -27,6 +27,7 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
+#include <sched/cpu.h> /* CONFIG_MAX_CPU_COUNT, cpuset_t */
 #include <sched/rwlock.h>
 #include <sched/shared_rwlock.h>
 
@@ -1558,10 +1559,9 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self);
  * @return: * : One of `VM_NODE_UPDATE_WRITE_ACCESS_*' */
 FUNDEF NOBLOCK unsigned int
 NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self);
-#define VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS          0 /* Success (or no-op when `self' isn't mapped with write-access) */
-#define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK       1 /* ERROR: The operation would have blocked (The caller must blocking-wait for `sync_write(self->vn_vm)') */
-#define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS 2 /* ERROR: The operation would have blocked (The caller must blocking-wait for `vm_tasklock_read(self)') */
-#define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC         3 /* ERROR: Failed to prepare the underlying page directory for making modifications to the associated mapping. */
+#define VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS    0 /* Success (or no-op when `self' isn't mapped with write-access) */
+#define VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK 1 /* ERROR: The operation would have blocked (The caller must blocking-wait for `sync_write(self->vn_vm)') */
+#define VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC   2 /* ERROR: Failed to prepare the underlying page directory for making modifications to the associated mapping. */
 
 /* Same as `vm_node_update_write_access()', but the caller
  * is already holding a write-lock to `locked_vm' */
@@ -1654,6 +1654,9 @@ struct vm {
 	                                             * Chain of tasks that are pending deletion from `v_tasks',
 	                                             * as well as follow-up `heap_free()' of the task in question.
 	                                             * NOTE: All other components of the task will have already been destroyed. */
+#if CONFIG_MAX_CPU_COUNT > 1
+	WEAK cpuset_t              v_cpus;          /* Set of CPUs that are using this VM. */
+#endif /* CONFIG_MAX_CPU_COUNT > 1 */
 	struct vm_node             v_kernreserve;   /* A special RESERVED-like node that is used by user-space VMs
 	                                             * to cover the entire kernel-space, preventing user-space from
 	                                             * accidentally overwriting it, without the need of adding too
@@ -1778,6 +1781,36 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_downgrade)(struct vm 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm *__restrict self);
 #define vm_tasklock_reading(self) atomic_rwlock_reading(&(self)->v_tasklock)
 #define vm_tasklock_writing(self) atomic_rwlock_writing(&(self)->v_tasklock)
+
+
+/************************************************************************/
+/* VM SYNCING FUNCTIONS                                                 */
+/************************************************************************/
+
+/* vm syncing functions. These functions must be called when a memory mapping
+ * becomes more restrictive, or has been deleted. These functions will
+ * automatically send IPIs to all CPUs that are using a given VM, such that
+ * the caller may assume that upon return of these functions:
+ *  - All CPUs that may have been using `self' will have either synced
+ *    their page directory cache to mirror the current mapping state,
+ *    or are about to do so no later than the next time such a CPU is
+ *    going to enable preemption.
+ * Note though that all other vm_*-level APIs already perform syncing
+ * automatically, unless otherwise documented by individual functions. */
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncone)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncall)(struct vm *__restrict self);
+
+/* Sync memory within `THIS_VM' */
+FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncall)(void);
+
+/* Same as above, but these functions are specifically designed to optimally
+ * sync changes made to the kernel VM. */
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
 
 
 
@@ -2355,122 +2388,6 @@ vm_syncmem(struct vm *__restrict self,
 	                        PAGEID_ENCODE((byte_t *)addr + num_bytes - 1));
 }
 
-
-/* Synchronize changes to `self' in the given address range.
- * In SMP, this function will automatically communicate changes to other
- * CPUs making use of the same VM, and doing this synchronously.
- * If the given address range is located within the kernel
- * share-segment, or if `vm_syncall()' was called, a
- * did-change RPC is broadcast to all other CPUs. */
-FUNDEF void FCALL vm_paged_sync(struct vm *__restrict self, pageid_t page_index, size_t num_pages) THROWS(E_WOULDBLOCK);
-FUNDEF void FCALL vm_paged_syncone(struct vm *__restrict self, pageid_t page_index) THROWS(E_WOULDBLOCK);
-FUNDEF void FCALL vm_syncall(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
-LOCAL void FCALL
-vm_sync(struct vm *__restrict self,
-        PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-        PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_WOULDBLOCK) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	vm_paged_sync(self,
-	              PAGEID_ENCODE((byte_t *)addr),
-	              num_bytes / PAGESIZE);
-}
-LOCAL void FCALL
-vm_syncone(struct vm *__restrict self, UNCHECKED void *addr) THROWS(E_WOULDBLOCK) {
-	vm_paged_syncone(self, PAGEID_ENCODE((byte_t *)addr));
-}
-
-/* Sync functions for when the caller is already holding a lock to the VM's set of running tasks. */
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_sync_locked)(struct vm *__restrict self, pageid_t page_index, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_syncone_locked)(struct vm *__restrict self, pageid_t page_index);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict self);
-LOCAL void FCALL
-vm_sync_locked(struct vm *__restrict self,
-               PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-               PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_WOULDBLOCK) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	vm_paged_sync_locked(self,
-	                     PAGEID_ENCODE((byte_t *)addr),
-	                     num_bytes / PAGESIZE);
-}
-LOCAL void FCALL
-vm_syncone_locked(struct vm *__restrict self, UNCHECKED void *addr) THROWS(E_WOULDBLOCK) {
-	vm_paged_syncone_locked(self, PAGEID_ENCODE((byte_t *)addr));
-}
-
-/* Begin/end syncing page directory mappings:
- * >> pagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `pagedir_unmap_p()' will succeed)
- * >> vm_sync_begin(my_vm);                                             // Lock         (make sure we'll be able to sync)
- * >> pagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
- * >> vm_paged_sync_end(my_vm, start, count);                           // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
- * >> pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
- * This order to calls is required to prevent problems at a
- * point in time when those problems could no longer be handled,
- * since the regular vm_paged_sync() functions may throw an E_WOULDBLOCK
- * exception when failing to acquire a lock to `v_tasklock', which
- * is required in order to gather the set of CPUs containing tasks
- * which may need to be synced as well. */
-/* TODO: The whole VM sync mechanims was made too complicated.
- *       Instead of forcing a lock to the VM's thread list, we could
- *       instead simply broadcast a TLB shootdown to all CPUs when we
- *       cannot acquire a lock to the task list. That way, the task
- *       list lock doesn't need to be held by the caller, and `vm_sync_begin()'
- *       can fall away entirely! */
-#ifdef __INTELLISENSE__
-FUNDEF void KCALL vm_sync_begin(struct vm *__restrict effective_vm) THROWS(E_WOULDBLOCK);
-FUNDEF bool NOTHROW(KCALL vm_sync_begin_nx)(struct vm *__restrict effective_vm);
-FUNDEF NOBLOCK bool NOTHROW(KCALL vm_sync_trybegin)(struct vm *__restrict effective_vm);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_sync_abort)(struct vm *__restrict effective_vm);
-#elif defined(CONFIG_NO_SMP)
-#define vm_sync_begin(effective_vm)    (void)0
-#define vm_sync_begin_nx(effective_vm)  true
-#define vm_sync_trybegin(effective_vm)  true
-#define vm_sync_abort(effective_vm)    (void)0
-#else
-#define vm_sync_begin(effective_vm)    vm_tasklock_read(effective_vm)
-#define vm_sync_begin_nx(effective_vm) vm_tasklock_read_nx(effective_vm)
-#define vm_sync_trybegin(effective_vm) vm_tasklock_tryread(effective_vm)
-#define vm_sync_abort(effective_vm)    vm_tasklock_endread(effective_vm)
-#endif
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_sync_end)(struct vm *__restrict effective_vm, pageid_t page_index, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_sync_endone)(struct vm *__restrict effective_vm, pageid_t page_index);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync_endall)(struct vm *__restrict effective_vm);
-LOCAL NOBLOCK void
-NOTHROW(FCALL vm_sync_end)(struct vm *__restrict self,
-                           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                           PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	vm_paged_sync_end(self,
-	                  PAGEID_ENCODE((byte_t *)addr),
-	                  num_bytes / PAGESIZE);
-}
-LOCAL NOBLOCK void
-NOTHROW(FCALL vm_sync_endone)(struct vm *__restrict self, UNCHECKED void *addr) {
-	vm_paged_sync_endone(self, PAGEID_ENCODE((byte_t *)addr));
-}
-
-
-/* Similar to the user-variants above, however sync a kernel-VM range instead,
- * and causing the did-change RPC to be broadcast to _all_ CPUs, instead of
- * having to figure out the specific sub-set of CPUs that would be affected. */
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_kernel_sync)(pageid_t page_index, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_kernel_syncone)(pageid_t page_index);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
-
-LOCAL NOBLOCK void
-NOTHROW(FCALL vm_kernel_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                              PAGEDIR_PAGEALIGNED size_t num_bytes) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	vm_paged_kernel_sync(PAGEID_ENCODE((byte_t *)addr),
-	                     num_bytes / PAGESIZE);
-}
-LOCAL NOBLOCK void
-NOTHROW(FCALL vm_kernel_syncone)(UNCHECKED void *addr) {
-	vm_paged_kernel_syncone(PAGEID_ENCODE((byte_t *)addr));
-}
 
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they

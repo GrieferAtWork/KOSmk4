@@ -438,13 +438,15 @@ again_scan_nodes:
 					perm |= PAGEDIR_MAP_FUSER;
 				if (node->vn_vm == v || node->vn_vm == &vm_kernel) {
 					vm_datapart_map_ram_autoprop(copy, vm_node_getstart(node), perm);
-					pagedir_sync(vm_node_getstart(node), vm_node_getsize(node));
 				} else {
 					vm_datapart_map_ram_autoprop_p(copy,
 					                               PAGEDIR_P_SELFOFVM(node->vn_vm),
 					                               vm_node_getstart(node),
 					                               perm);
 				}
+				vm_sync(node->vn_vm,
+				        vm_node_getstart(node),
+				        vm_node_getsize(node));
 			} while ((node = node->vn_link.ln_next) != NULL);
 
 			/* Unlock all of the VMs that were mapping the node as copy-on-write */

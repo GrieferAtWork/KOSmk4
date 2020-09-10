@@ -708,18 +708,12 @@ handle_remove_write_error:
 					if (!tryincref(blocking_vm))
 						blocking_vm = NULL;
 					pointer_set_unlock_vm_dataparts_and_clear(&locked_parts);
-					assert(update_write_error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK ||
-					       update_write_error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS);
+					assert(update_write_error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK);
 					if (blocking_vm) {
 						FINALLY_DECREF_UNLIKELY(blocking_vm);
 						TRY {
-							if (update_write_error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS) {
-								vm_tasklock_read(blocking_vm);
-								vm_tasklock_endread(blocking_vm);
-							} else {
-								sync_write(blocking_vm);
-								sync_endwrite(blocking_vm);
-							}
+							sync_write(blocking_vm);
+							sync_endwrite(blocking_vm);
 						} EXCEPT {
 							pointer_set_fini(&locked_parts);
 							rpc_free_chain(task_terminate_rpcs);
@@ -998,7 +992,7 @@ handle_remove_write_error:
 		/* Sync everything within the specified target VM */
 #ifndef CONFIG_NO_SMP
 		if (!(additional_actions & VMB_APPLY_AA_TERMTHREADS)) {
-			vm_syncall_locked(target);
+			vm_syncall(target);
 		} else
 #endif /* !CONFIG_NO_SMP */
 		{

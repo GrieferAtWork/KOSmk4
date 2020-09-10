@@ -429,17 +429,11 @@ do_throw_first_unmapped:
 												blocking_vm = NULL;
 											sync_endwrite(part);
 											sync_endwrite(self);
-											assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK ||
-											       error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS);
+											assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK);
 											if (blocking_vm) {
 												FINALLY_DECREF_UNLIKELY(blocking_vm);
-												if (error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS) {
-													vm_tasklock_read(blocking_vm);
-													vm_tasklock_endread(blocking_vm);
-												} else {
-													sync_write(blocking_vm);
-													sync_endwrite(blocking_vm);
-												}
+												sync_write(blocking_vm);
+												sync_endwrite(blocking_vm);
 											}
 											goto again_lock_vm;
 										}
@@ -505,8 +499,11 @@ did_update_node:
 		RETHROW();
 	}
 	/* Synchronize the affected address range. */
-	if (must_sync)
-		vm_paged_sync(self, minpageid, (size_t)(maxpageid - minpageid) + 1);
+	if (must_sync) {
+		vm_sync(self,
+		        PAGEID_DECODE(minpageid),
+		        ((size_t)(maxpageid - minpageid) + 1) * PAGESIZE);
+	}
 done:
 	sync_endwrite(self);
 	if unlikely(new_node)

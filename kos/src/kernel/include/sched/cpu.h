@@ -100,7 +100,7 @@ typedef __quantum_diff_t quantum_diff_t; /* Sub-quantum quantum_diff difference 
 
 #ifndef __cpuid_t_defined
 #define __cpuid_t_defined 1
-typedef __UINTPTR_TYPE__ cpuid_t;
+typedef uintptr_t cpuid_t;
 #endif /* !__cpuid_t_defined */
 
 struct task;
@@ -297,7 +297,7 @@ DATDEF cpuid_t const cpu_count;
  * Because the BOOT CPU can never dream, this value is always `>= 1'! */
 DATDEF cpuid_t cpu_online_count;
 #else /* !CONFIG_NO_SMP */
-#define cpu_online_count   1
+#define cpu_online_count 1
 #endif /* CONFIG_NO_SMP */
 
 
@@ -321,6 +321,7 @@ DECL_END
 #include <libc/string.h>
 DECL_BEGIN
 typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER];
+#define CPUSET_INIT { }
 #if __SIZEOF_POINTER__ == 8
 #define CPUSET_COPY(dst, src) (void)__libc_memcpyq(dst, src, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
 #define CPUSET_CLEAR(x)       (void)__libc_memsetq(x, 0, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
@@ -358,32 +359,41 @@ LOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
 }
 #else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
 typedef uintptr_t cpuset_t;
+#define CPUSET_INIT 0
 #if CONFIG_MAX_CPU_COUNT <= 1
 #define __cpuset_full_mask  1
-#else
+#else /* CONFIG_MAX_CPU_COUNT <= 1 */
 #define __HAVE_CPUSET_FULL_MASK 1
 DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
-#endif
-#define CPUSET_COPY(dst,src)  (void)((dst)=(src))
+#endif /* CONFIG_MAX_CPU_COUNT > 1 */
 #if CONFIG_MAX_CPU_COUNT > 32
 #define CPUSET_COUNT(x)       __hybrid_popcount64((u64)((x) & __cpuset_full_mask))
 #elif CONFIG_MAX_CPU_COUNT > 16
 #define CPUSET_COUNT(x)       __hybrid_popcount32((u32)((x) & __cpuset_full_mask))
 #elif CONFIG_MAX_CPU_COUNT > 8
 #define CPUSET_COUNT(x)       __hybrid_popcount16((u16)((x) & __cpuset_full_mask))
-#else
+#else /* CONFIG_MAX_CPU_COUNT > ... */
 #define CPUSET_COUNT(x)       __hybrid_popcount8((u8)((x) & __cpuset_full_mask))
-#endif
-#define CPUSET_CLEAR(x)        (void)((x) = 0)
-#define CPUSET_ISEMPTY(x)      (((x) & __cpuset_full_mask) == 0)
-#define CPUSET_SETFULL(x)      (void)((x) = (uintptr_t)-1)
-#define CPUSET_SETONE(x, id)   (void)((x) = ((uintptr_t)1 << (id)))
-#define CPUSET_CONTAINS(x, id) ((x) & ((uintptr_t)1 << (id)))
-#define CPUSET_INSERT(x, id)   (void)((x) |= ((uintptr_t)1 << (id)))
-#define CPUSET_REMOVE(x, id)   (void)((x) &= ~((uintptr_t)1 << (id)))
+#endif /* CONFIG_MAX_CPU_COUNT <= ... */
+#define CPUSET_COPY(dst, src)         (void)((dst) = (src))
+#define CPUSET_CLEAR(x)               (void)((x) = 0)
+#define CPUSET_ISEMPTY(x)             (((x) & __cpuset_full_mask) == 0)
+#define CPUSET_SETFULL(x)             (void)((x) = (uintptr_t)-1)
+#define CPUSET_SETONE(x, id)          (void)((x) = ((uintptr_t)1 << (id)))
+#define CPUSET_CONTAINS(x, id)        ((x) & ((uintptr_t)1 << (id)))
+#define CPUSET_INSERT(x, id)          (void)((x) |= ((uintptr_t)1 << (id)))
+#define CPUSET_REMOVE(x, id)          (void)((x) &= ~((uintptr_t)1 << (id)))
+#define CPUSET_ATOMIC_COPY(dst, src)  (void)((dst) = __hybrid_atomic_load(src, __ATOMIC_ACQUIRE))
+#define CPUSET_ATOMIC_CLEAR(x)        (void)__hybrid_atomic_store(x, 0, __ATOMIC_RELEASE)
+#define CPUSET_ATOMIC_ISEMPTY(x)      CPUSET_ISEMPTY(__hybrid_atomic_load(x, __ATOMIC_ACQUIRE))
+#define CPUSET_ATOMIC_SETFULL(x)      (void)__hybrid_atomic_store(x, (uintptr_t)-1, __ATOMIC_RELEASE)
+#define CPUSET_ATOMIC_SETONE(x, id)   (void)__hybrid_atomic_store(x, (uintptr_t)1 << (id), __ATOMIC_RELEASE)
+#define CPUSET_ATOMIC_CONTAINS(x, id) CPUSET_CONTAINS(__hybrid_atomic_load(x, __ATOMIC_ACQUIRE), id)
+#define CPUSET_ATOMIC_INSERT(x, id)   (void)__hybrid_atomic_fetchor(x, (uintptr_t)1 << (id), __ATOMIC_SEQ_CST)
+#define CPUSET_ATOMIC_REMOVE(x, id)   (void)__hybrid_atomic_fetchand(x, ~((uintptr_t)1 << (id)), __ATOMIC_SEQ_CST)
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
 #ifndef CPUSET_SETONE
-#define CPUSET_SETONE(x,id)  (CPUSET_CLEAR(x),CPUSET_INSERT(x,id))
+#define CPUSET_SETONE(x, id) (CPUSET_CLEAR(x), CPUSET_INSERT(x, id))
 #endif /* !CPUSET_SETONE */
 
 

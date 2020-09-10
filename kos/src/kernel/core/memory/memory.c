@@ -77,15 +77,15 @@ NOTHROW(KCALL do_trace_external)(char const *method,
 #endif /* NDEBUG */
 
 
-#define TRACE_ALLOC(zone, min, max)                                                                                \
-	(TRACE_EXTERNAL("alloc", min, max),                                                                            \
-	 PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu-%Iu=%Iu]\n", \
-	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(),       \
+#define TRACE_ALLOC(zone, min, max)                                                                        \
+	(TRACE_EXTERNAL("alloc", min, max),                                                                    \
+	 PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [%Iu-%Iu=%Iu]\n", \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1,                    \
 	                  (zone)->mz_cfree + (((max) - (min)) + 1), ((max) - (min)) + 1, (zone)->mz_cfree))
-#define TRACE_FREE(zone, min, max)                                                                             \
-	(TRACE_EXTERNAL("free", min, max),                                                                         \
-	 PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu+%Iu=%Iu]\n", \
-	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(),   \
+#define TRACE_FREE(zone, min, max)                                                                     \
+	(TRACE_EXTERNAL("free", min, max),                                                                 \
+	 PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [%Iu+%Iu=%Iu]\n", \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1,                \
 	                  (zone)->mz_cfree, ((max) - (min)) + 1, (zone)->mz_cfree + (((max) - (min)) + 1)))
 
 

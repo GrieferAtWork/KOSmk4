@@ -415,7 +415,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        node, &FORTASK(self, this_trampoline_node), self);
 	addr = vm_node_getstart(node);
 	pagedir_unmapone(addr);
-	pagedir_syncone(addr);
+	vm_kernel_syncone(addr);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_mapone(addr);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -438,7 +438,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	addr = vm_node_getstart(node);
 	size = vm_node_getsize(node);
 	pagedir_unmap(addr, size);
-	pagedir_sync(addr, size);
+	vm_kernel_sync(addr, size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_map(addr, size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */

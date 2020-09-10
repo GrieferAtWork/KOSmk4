@@ -236,17 +236,11 @@ handle_remove_write_error:
 							if (!tryincref(blocking_vm))
 								blocking_vm = NULL;
 							pointer_set_unlock_vm_dataparts_and_clear(&locked_parts);
-							assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK ||
-							       error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS);
+							assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK);
 							if (blocking_vm) {
 								FINALLY_DECREF_UNLIKELY(blocking_vm);
-								if (error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS) {
-									vm_tasklock_read(blocking_vm);
-									vm_tasklock_endread(blocking_vm);
-								} else {
-									sync_write(blocking_vm);
-									sync_endwrite(blocking_vm);
-								}
+								sync_write(blocking_vm);
+								sync_endwrite(blocking_vm);
 							}
 							pointer_set_assert_writing_vm_dataparts(&locked_parts);
 							goto again_lock_vm;

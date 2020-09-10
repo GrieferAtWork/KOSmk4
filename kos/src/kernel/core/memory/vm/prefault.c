@@ -359,22 +359,6 @@ upgrade_and_recheck_vm_for_node:
 			if (self != &vm_kernel)
 				pagedir_prot |= PAGEDIR_MAP_FUSER;
 
-			/* Since we're changing an existing mapping such that the
-			 * previous mapping may get deleted, we must sync this change.
-			 * Otherwise, some cached TLB entry may still reference the old
-			 * datapart once that part has been destroyed. */
-#ifndef CONFIG_NO_SMP
-			if unlikely(!vm_sync_begin_nx(self)) {
-				sync_endwrite(self);
-				sync_endwrite(part);
-				free_partilly_initialized_datapart(new_part);
-				/* Block until the task lock becomes available, then try again. */
-				vm_tasklock_read(self);
-				vm_tasklock_endread(self);
-				return 0;
-			}
-#endif /* !CONFIG_NO_SMP */
-
 			/* Actually map the accessed page(s)! */
 			if (self == THIS_VM || self == &vm_kernel) {
 				vm_datapart_map_ram(new_part, pageaddr, pagedir_prot);
@@ -383,7 +367,9 @@ upgrade_and_recheck_vm_for_node:
 				                      PAGEDIR_P_SELFOFVM(self),
 				                      pageaddr, pagedir_prot);
 			}
-			vm_paged_sync_end(self, addr_pageid, part_num_vpages);
+			vm_sync(self,
+			        PAGEID_DECODE(addr_pageid),
+			        part_num_vpages * PAGESIZE);
 
 			/* Unlink the given node from the old part's chain. */
 			LLIST_REMOVE(node, vn_link);

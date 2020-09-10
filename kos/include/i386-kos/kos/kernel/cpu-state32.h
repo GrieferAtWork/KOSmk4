@@ -212,7 +212,7 @@ struct sgregs32 {
 	union {
 		__u32 sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
-		__u32 sg_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+		__u16 sg_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
 	};
 };
 #endif /* __CC__ */

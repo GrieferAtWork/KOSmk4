@@ -1285,7 +1285,7 @@ again_read_word:
 				 * Otherwise, other CPUs may still be using the mappings after
 				 * they've already been re-designated as general-purpose RAM, at
 				 * which point they'd start reading garbage, or corrupt pointers. */
-				vm_syncall_locked(sync_vm);
+				vm_syncall(sync_vm);
 				page_freeone((pageptr_t)pageptr);
 				do {
 					--free_count;
@@ -1298,7 +1298,7 @@ again_read_word:
 	}
 	/* Free any remaining pages. */
 	if (free_count) {
-		vm_syncall_locked(sync_vm);
+		vm_syncall(sync_vm);
 		do {
 			--free_count;
 			page_freeone((pageptr_t)free_pages[free_count]);
