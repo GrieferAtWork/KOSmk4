@@ -34,6 +34,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
+#include <kernel/arch/syslog.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
@@ -848,12 +849,9 @@ NOTHROW(LIBANSITTY_CC vga_tty_putc)(struct ansitty *__restrict UNUSED(self),
 	u8 cp_ch;
 #if 1
 	{
-		INTDEF port_t x86_syslog_port;
-		if (x86_syslog_port) {
-			char buf[UNICODE_UTF8_CURLEN];
-			size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf);
-			outsb(x86_syslog_port, buf, buflen);
-		}
+		char buf[UNICODE_UTF8_CURLEN];
+		size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf);
+		x86_syslog_write(buf, buflen);
 	}
 #endif
 	/* Scroll to bottom before printing a character. */

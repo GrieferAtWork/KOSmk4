@@ -26,7 +26,9 @@
 #include <kernel/arch/syslog.h>
 #include <kernel/syslog.h>
 #include <kernel/types.h>
+#include <sched/task.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <sys/io.h>
@@ -53,8 +55,39 @@ DECL_BEGIN
 
 INTERN port_t x86_syslog_port = (port_t)0x80;
 
-#define log_write(ptr, num_bytes) \
-	outsb(x86_syslog_port, ptr, num_bytes)
+
+#ifndef CONFIG_NO_SMP
+PRIVATE unsigned int x86_syslog_smplock = 0;
+#define x86_syslog_smplock_acquire(was)                \
+	do {                                               \
+		(was) = PREEMPTION_PUSHOFF();                  \
+		while (ATOMIC_XCH(x86_syslog_smplock, 1) != 0) \
+			task_pause();                              \
+	}	__WHILE0
+#define x86_syslog_smplock_release(was)   \
+	(ATOMIC_STORE(x86_syslog_smplock, 0), \
+	 PREEMPTION_POP(was))
+#else /* !CONFIG_NO_SMP */
+#define x86_syslog_smplock_acquire(was) \
+	((was) = PREEMPTION_PUSHOFF())
+#define x86_syslog_smplock_release(was)   \
+	PREEMPTION_POP(was)
+#endif /* CONFIG_NO_SMP */
+
+
+/* Raw, low-level write the given data to the default x86 system log.
+ * The write is performed atomically in respect to other calls to
+ * this function. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL x86_syslog_write)(char const *__restrict data,
+                                size_t datalen) {
+	pflag_t was;
+	x86_syslog_smplock_acquire(was);
+	outsb(x86_syslog_port, data, datalen);
+	x86_syslog_smplock_release(was);
+}
+
+
 
 PRIVATE ATTR_ALIGNED(1) char const level_prefix[][10] = {
 	/* [SYSLOG_LEVEL_EMERG  ] = */ ":emerg ][",
@@ -79,6 +112,7 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
                                     struct syslog_packet const *__restrict packet,
                                     unsigned int level) {
+	pflag_t was;
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
 		char buf[64];
@@ -97,7 +131,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 			sync_endwrite(&monitor_memory_lock);
 			len = sprintf(buf, "[" PP_STR(DBG_MONITOR_TYPE) "@%Ix=%#I16x]",
 			              (uintptr_t)DBG_MONITOR_MEMORY, value);
-			log_write(buf, len);
+			x86_syslog_write(buf, len);
 		}
 #endif /* DBG_MONITOR_MEMORY */
 
@@ -109,9 +143,13 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 		              packet->sp_tid);
 		if (packet->sp_msg[0] == '[')
 			--len;
-		log_write(buf, len);
+		x86_syslog_smplock_acquire(was);
+		outsb(x86_syslog_port, buf, len);
+	} else {
+		x86_syslog_smplock_acquire(was);
 	}
-	log_write(packet->sp_msg, packet->sp_len);
+	outsb(x86_syslog_port, packet->sp_msg, packet->sp_len);
+	x86_syslog_smplock_release(was);
 }
 
 /* The x86 hook for the arch-specific, default system log sink */

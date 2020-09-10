@@ -310,7 +310,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_configure_syslog_levels,
 
 
 #ifdef CONFIG_HAVE_DEBUGGER
-PRIVATE ATTR_DBGTEXT unsigned int DBG_CALL
+PRIVATE ATTR_DBGTEXT ATTR_PURE unsigned int DBG_CALL
 dbg_loglevel_from_name(char const *__restrict name) {
 	unsigned int i;
 	for (i = 0; i < SYSLOG_LEVEL_COUNT; ++i) {

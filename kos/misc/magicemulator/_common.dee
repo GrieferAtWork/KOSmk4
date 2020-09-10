@@ -253,8 +253,11 @@ class TraceController {
 				maxaddr = minaddr;
 			}
 			if (method == "alloc") {
-				for (local x: [minaddr:maxaddr + 1])
+				for (local x: [minaddr:maxaddr + 1]) {
+					if (x in m_addresses)
+						err("Duplicate allocation for " + repr(x));
 					m_addresses.insert(x);
+				}
 			} else {
 				for (local x: [minaddr:maxaddr + 1])
 					m_addresses.remove(x);
@@ -288,7 +291,7 @@ class TraceController {
 		}	break;
 
 		default:
-			err("Unknown trace method " << repr(method));
+			err("Unknown trace method " + repr(method));
 			break;
 		}
 	}
@@ -423,6 +426,7 @@ function processKosDebugOutput(
 	local running_addr2line: {string: Addr2line} = Dict();
 	local stored_data = Cell();
 	function writeData(data: Bytes) {
+		data = data.replace("\030", "");
 		if (stored_data.value is bound) {
 			data = stored_data.value + data;
 			del stored_data.value;
@@ -504,6 +508,8 @@ do_format_line:
 				}
 again_find_match:
 				local end = text.findmatch("{", "}", i, i + MAX_COMMAND_LENGTH);
+				if (end < 0)
+					end = text.find("\030", i, i + MAX_COMMAND_LENGTH);
 				if (end < 0) {
 					if (len >= i + MAX_COMMAND_LENGTH) {
 						flushStart = i - 2;
@@ -529,19 +535,24 @@ again_find_match:
 					break;
 
 				case "trace": {
-					local method, name;
-					method, none, argument = argument.partition(":")...;
-					if (":" in argument) {
-						name, none, argument = argument.partition(":")...;
+					local method, name, extargs;
+					method, none, extargs = argument.partition(":")...;
+					if (":" in extargs) {
+						name, none, extargs = extargs.partition(":")...;
 					} else {
-						name = argument;
-						argument = "";
+						name = extargs;
+						extargs = "";
 					}
 					name = string(name);
 					local obj = tracedControllers.get(name);
 					if (obj is none)
 						tracedControllers[name] = obj = TraceController(name);
-					obj.doMethod(method, argument);
+					try {
+						obj.doMethod(method, extargs);
+					} catch (...) {
+						print("While executing: ", repr(method), " with ", repr(argument));
+						throw;
+					}
 				}	break;
 
 				case "artifact": {

@@ -43,6 +43,10 @@
 #include <stddef.h>
 #include <string.h>
 
+/* These are only here for do_trace_external() */
+#include <kernel/arch/syslog.h> /* x86_syslog_write() */
+#include <stdio.h>
+
 DECL_BEGIN
 
 
@@ -60,10 +64,11 @@ LOCAL NOBLOCK void
 NOTHROW(KCALL do_trace_external)(char const *method,
                                  pageptr_t min,
                                  pageptr_t max) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
-	printk(KERN_RAW "%%{trace:%s:pmem:%#p:%#p}", method, min, max);
-	PREEMPTION_POP(was);
+	size_t len;
+	char buf[128];
+	/* NOTE: 030 -> CAN -> CANCEL (abort any in-progress sequence) */
+	len = sprintf(buf, "\030%%{trace:%s:pmem:%#p:%#p}", method, min, max);
+	x86_syslog_write(buf, len);
 }
 #define TRACE_EXTERNAL(method, min, max) \
 	do_trace_external(method, min, max)
@@ -776,7 +781,11 @@ again:
 #ifndef NDEBUG
 			*res_pages = (pagecnt_t)-1;
 #endif /* !NDEBUG */
-			result = zone_malloc_part_before(zone, free_max, min_pages, max_pages, res_pages);
+			result = zone_malloc_part_before(zone,
+			                                 free_max,
+			                                 min_pages,
+			                                 max_pages,
+			                                 res_pages);
 			if likely(result != PAGEPTR_INVALID) {
 				assertf(*res_pages >= min_pages && *res_pages <= max_pages,
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
@@ -794,12 +803,22 @@ again:
 #ifndef NDEBUG
 			*res_pages = (pagecnt_t)-1;
 #endif /* !NDEBUG */
-			result = zone_malloc_part_between(zone, free_max, zone->mz_rmax, min_pages, max_pages, res_pages, true);
+			result = zone_malloc_part_between(zone,
+			                                  free_max,
+			                                  zone->mz_rmax,
+			                                  min_pages,
+			                                  max_pages,
+			                                  res_pages,
+			                                  true);
 		} else {
 #ifndef NDEBUG
 			*res_pages = (pagecnt_t)-1;
 #endif /* !NDEBUG */
-			result = zone_malloc_part_before(zone, zone->mz_rmax, min_pages, max_pages, res_pages);
+			result = zone_malloc_part_before(zone,
+			                                 zone->mz_rmax,
+			                                 min_pages,
+			                                 max_pages,
+			                                 res_pages);
 		}
 		if (result != PAGEPTR_INVALID) {
 			assertf(*res_pages >= min_pages && *res_pages <= max_pages,
